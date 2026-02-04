@@ -170,7 +170,7 @@ service UserService {
 
   // Create a new human user
   //
-  // Deprecated: Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) to create a new user of type human instead.
+  // Deprecated: Use [CreateUser](/docs/reference/api/user/zitadel.user.v2.UserService.CreateUser) to create a new user of type human instead.
   //
   // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
@@ -271,7 +271,7 @@ service UserService {
 
   // Change the user email
   //
-  // Deprecated: [Update the users email field](apis/resources/user_service_v2/user-service-update-user.api.mdx).
+  // Deprecated: [Update the users email field](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser).
   //
   // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email..
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
@@ -394,7 +394,7 @@ service UserService {
 
   // Set the user phone
   //
-  // Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx).
+  // Deprecated: [Update the users phone field](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser).
   //
   // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms..
   rpc SetPhone(SetPhoneRequest) returns (SetPhoneResponse) {
@@ -428,7 +428,7 @@ service UserService {
 
   // Delete the user phone
   //
-  // Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
+  // Deprecated: [Update the users phone field](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser) to remove the phone number.
   //
   // Delete the phone number of a user.
   rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
@@ -576,7 +576,7 @@ service UserService {
 
   // Update Human User
   //
-  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) to update a user of type human instead.
+  // Deprecated: Use [UpdateUser](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser) to update a user of type human instead.
   //
   // Update all information from a user.
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
@@ -1088,7 +1088,7 @@ service UserService {
 
   // Add OTP SMS for a user
   //
-  // Add a new One-Time Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor..
+  // Add a new OTP SMS factor to the authenticated user. OTP SMS will enable the user to verify an OTP with the latest verified phone number. The phone number has to be verified to add the second factor..
   rpc AddOTPSMS (AddOTPSMSRequest) returns (AddOTPSMSResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/otp_sms"
@@ -1116,9 +1116,9 @@ service UserService {
     };
   }
 
-  // Remove One-Time Password (OTP) SMS from a user
+  // Remove OTP SMS from a user
   //
-  // Remove the configured One-Time Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
+  // Remove the configured OTP SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
   rpc RemoveOTPSMS (RemoveOTPSMSRequest) returns (RemoveOTPSMSResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/otp_sms"
@@ -1194,7 +1194,7 @@ service UserService {
 
   // Add OTP Email for a user
   //
-  // Add a new One-Time Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor..
+  // Add a new OTP Email factor to the authenticated user. OTP Email will enable the user to verify an OTP with the latest verified email. The email has to be verified to add the second factor..
   rpc AddOTPEmail (AddOTPEmailRequest) returns (AddOTPEmailResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/otp_email"
@@ -1222,9 +1222,9 @@ service UserService {
     };
   }
 
-  // Remove One-Time Password (OTP) Email from a user
+  // Remove OTP Email from a user
   //
-  // Remove the configured One-Time Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
+  // Remove the configured OTP Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
   rpc RemoveOTPEmail (RemoveOTPEmailRequest) returns (RemoveOTPEmailResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/otp_email"
@@ -1427,7 +1427,7 @@ service UserService {
 
   // Change password
   //
-  // Deprecated: [Update the users password](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+  // Deprecated: [Update the users password](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser) instead.
   //
   // Change the password of a user with either a verification code or the current password..
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
@@ -1816,7 +1816,7 @@ service UserService {
 
   // Resend an invite code for a user
   //
-  // Deprecated: Use [CreateInviteCode](apis/resources/user_service_v2/user-service-create-invite-code.api.mdx) instead.
+  // Deprecated: Use [CreateInviteCode](/docs/reference/api/user/zitadel.user.v2.UserService.CreateInviteCode) instead.
   //
   // Resend an invite code for a user to initialize their first authentication method (password, passkeys, IdP) depending on the organization's available methods.
   // A resend is only possible if a code has been created previously and sent to the user. If there is no code or it was directly returned, an error will be returned.
@@ -1912,7 +1912,7 @@ service UserService {
   }
   // Set User Metadata
   //
-  // Sets a list of key value pairs. Existing metadata entries with matching keys are overwritten. Existing metadata entries without matching keys are untouched. To remove metadata entries, use [DeleteUserMetadata](apis/resources/user_service_v2/user-service-delete-user-metadata.api.mdx). For HTTP requests, make sure the bytes array value is base64 encoded.
+  // Sets a list of key value pairs. Existing metadata entries with matching keys are overwritten. Existing metadata entries without matching keys are untouched. To remove metadata entries, use [DeleteUserMetadata](/docs/reference/api/user/zitadel.user.v2.UserService.DeleteUserMetadata). For HTTP requests, make sure the bytes array value is base64 encoded.
   //
   // Required permission:
   //  - `user.write`
@@ -2072,8 +2072,8 @@ message CreateUserRequest{
     // For example, if a user already has an account in an external identity provider or another Zitadel instance, an IDP link allows the user to authenticate as usual.
     // Sessions, second factors, hardware keys registered externally are still available for authentication.
     // Use the following endpoints to manage identity provider links:
-    // - [AddIDPLink](apis/resources/user_service_v2/user-service-add-idp-link.api.mdx)
-    // - [RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx)
+    // - [AddIDPLink](/docs/reference/api/user/zitadel.user.v2.UserService.AddIDPLink)
+    // - [RemoveIDPLink](/docs/reference/api/user/zitadel.user.v2.UserService.RemoveIDPLink)
     repeated IDPLink idp_links = 7;
     // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
     // Currently no other options are supported, and if anything different is used the validation will fail.
@@ -2159,9 +2159,9 @@ message CreateUserRequest{
     // Read more about your options for controlling this behaviour in the email and phone field documentations.
     Human human = 4;
     // Users of type machine are users that are meant to be used by a machine.
-    // In order to authenticate, [add a secret](apis/resources/user_service_v2/user-service-add-secret.api.mdx), [a key](apis/resources/user_service_v2/user-service-add-key.api.mdx) or [a personal access token](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx) to the user.
+    // In order to authenticate, [add a secret](/docs/reference/api/user/zitadel.user.v2.UserService.AddSecret), [a key](/docs/reference/api/user/zitadel.user.v2.UserService.AddKey) or [a personal access token](/docs/reference/api/user/zitadel.user.v2.UserService.AddPersonalAccessToken) to the user.
     // Tokens generated for new users of type machine will be of an opaque Bearer type.
-    // You can change the users token type to JWT by using the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx).
+    // You can change the users token type to JWT by using the management v1 service method UpdateMachine.
     Machine machine = 5;
   }
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

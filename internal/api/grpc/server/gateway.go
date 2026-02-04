@@ -284,5 +284,4 @@ func setRequestURIPattern(ctx context.Context) {
 	}
 	span := trace.SpanFromContext(ctx)
 	span.SetName(pattern)
-	metrics.SetRequestURIPattern(ctx, pattern)
 }

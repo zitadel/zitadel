@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Aktív és Jövőbeli Webkulcsok",
           "DESCRIPTION": "Az aktív és közelgő webkulcsai. Egy új kulcs aktiválása deaktiválja az aktuálisat.",
-          "NOTE": "Megjegyzés: A JWKs OIDC végpont egy gyorsítótárazható választ ad vissza (alapértelmezett: 5 perc). Kerülje a kulcs túl korai aktiválását, mivel lehet, hogy még nem érhető el a gyorsítótárakban és a klienseknél.",
+          "NOTE": "Megjegyzés: A JWKs OIDC végpont egy gyorsítótárazható választ ad vissza (alapértelmezett: 5 perc). Kerülje a kulcs túl korai aktiválását, mivel lehet, hogy még nem érhető el a gyorsítótárakban és az alkalmazásoknál.",
           "ACTIVATE": "Következő Webkulcs aktiválása",
           "ACTIVE": "Jelenleg aktív",
           "NEXT": "Következő a sorban",
@@ -223,8 +223,8 @@
           "PR": "Amikor egy felhasználó visszaállítja a jelszavát, kap egy e-mailt egy linkkel az új jelszó beállításához.",
           "VE": "Amikor egy felhasználó megváltoztatja az e-mail címét, kap egy e-mailt egy linkkel az új cím megerősítéséhez.",
           "VP": "Amikor egy felhasználó megváltoztatja a telefonszámát, kap egy SMS-t egy kóddal az új szám megerősítéséhez.",
-          "VEO": "Amikor egy felhasználó egy egyszeri jelszót ad hozzá e-mail módszerrel, aktiválnia kell azt az e-mail címére küldött kód megadásával.",
-          "VSO": "Amikor egy felhasználó egy egyszeri jelszót ad hozzá SMS módszerrel, aktiválnia kell azt a telefonszámára küldött kód megadásával.",
+          "VEO": "Amikor egy felhasználó egy OTP-t ad hozzá e-mail módszerrel, aktiválnia kell azt az e-mail címére küldött kód megadásával.",
+          "VSO": "Amikor egy felhasználó egy OTP-t ad hozzá SMS módszerrel, aktiválnia kell azt a telefonszámára küldött kód megadásával.",
           "IU": "Amikor egy felhasználói meghívó kód létrejön, kap egy e-mailt egy linkkel az azonosítási módszer beállításához."
         }
       },
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Jogosultsága van felhasználók létrehozására és kezelésére",
     "IAM_ADMIN_IMPERSONATOR": "Jogosultsága van adminok és végfelhasználók megszemélyesítésére minden szervezetből",
     "IAM_END_USER_IMPERSONATOR": "Engedélye van az összes szervezet véghasználóinak megszemélyesítésére",
-    "IAM_LOGIN_CLIENT": "Jogosultsága van a bejelentkezési kliensek kezelésére",
+    "IAM_LOGIN_CLIENT": "Jogosultsága van a bejelentkezési alkalmazások kezelésére",
     "ORG_OWNER": "Engedélye van az egész szervezet fölött",
     "ORG_USER_MANAGER": "Engedélye van a szervezet felhasználóinak létrehozására és kezelésére",
     "ORG_OWNER_VIEWER": "Engedélye van az egész szervezet áttekintésére",
@@ -851,7 +851,7 @@
       "U2F_NAME": "Hitelesítő neve",
       "TYPE": {
         "0": "Nincs MFA meghatározva",
-        "1": "Egyszeri jelszó (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -884,7 +884,7 @@
       "DESCRIPTION": "Adj hozzá egy második tényezőt a fiókod optimális biztonsága érdekében.",
       "MANAGE_DESCRIPTION": "Kezeld a felhasználóid második tényező módszereit.",
       "ADD": "Tényező hozzáadása",
-      "OTP": "Hitelesítő alkalmazás TOTP-hez (ideiglenes egyedi jelszó időalapú)",
+      "OTP": "Hitelesítő alkalmazás TOTP-hez",
       "OTP_DIALOG_TITLE": "OTP hozzáadása",
       "OTP_DIALOG_DESCRIPTION": "Olvasd be a QR-kódot egy hitelesítő alkalmazással, majd írd be a kódot alul, hogy ellenőrizd és aktiváld az OTP módszert.",
       "U2F": "Passkey",
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "A faktor sikeresen hozzáadva!",
       "U2F_ERROR": "Hiba történt a beállítás során!",
       "U2F_NAME": "Hitelesítő neve",
-      "OTPSMS": "OTP (Egyszer használatos jelszó) SMS-el",
-      "OTPEMAIL": "OTP (Egyszer használatos jelszó) Email-el",
-      "SETUPOTPSMSDESCRIPTION": "Be akarod állítani ezt a telefonszámot mint OTP (Egyszer használatos jelszó) második faktort?",
+      "OTPSMS": "OTP SMS-el",
+      "OTPEMAIL": "OTP Email-el",
+      "SETUPOTPSMSDESCRIPTION": "Be akarod állítani ezt a telefonszámot mint OTP második faktort?",
       "OTPSMSSUCCESS": "Az OTP további biztonsági tényező sikeresen beállítva.",
       "OTPSMSPHONEMUSTBEVERIFIED": "A módszer használatához hitelesítened kell a telefonodat.",
       "OTPEMAILSUCCESS": "Az OTP további biztonsági tényező sikeresen beállítva.",
       "TYPE": {
         "0": "Nem definiáltak többtényezős hitelesítést",
-        "1": "Egyszeri Jelszó (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -1610,8 +1610,8 @@
         "4": "Jelszó visszaállítás",
         "5": "Passkey inicializálás",
         "6": "Alkalmazás titok",
-        "7": "Egyszer használatos jelszó (OTP) - SMS",
-        "8": "Egyszer használatos jelszó (OTP) - Email"
+        "7": "OTP - SMS",
+        "8": "OTP - Email"
       },
       "EXPIRY": "Lejárat (percben)",
       "INCLUDEDIGITS": "Számok bevonása",
@@ -1633,8 +1633,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Alapértelmezett Org bejelentkezés",
       "LOGINDEFAULTORG_DESCRIPTION": "A bejelentkezési felület az alapértelmezett org beállításait fogja használni (és nem az instance-tól), ha nincs megadva szervezeti kontextus",
-      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Engedélyezd a kísérleti urn:ietf:params:oauth:grant-type:token-exchange támogatását az OIDC token végpont számára. A token csere használható kisebb hatókörű tokenek kérésére vagy más felhasználók megszemélyesítésére. Tekintsd meg a biztonsági irányelvet az impersonáció engedélyezéséhez egy példányon.",
       "USERSCHEMA": "Felhasználói Séma",
       "USERSCHEMA_DESCRIPTION": "A Felhasználói Sémák lehetővé teszik a felhasználói adat sémák kezelését. Ha az opció engedélyezve van, használhatod az új API-t és annak funkcióit.",
       "ACTIONS": "Műveletek",
@@ -1644,7 +1642,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Ha a zászló engedélyezve van, az OIDC szülő hiba naplózva lesz a konzolban.",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout engedélyezése",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "A Back-Channel Logout megvalósítja az OpenID Connect Back-Channel Logout 1.0-t, és használható az ügyfelek értesítésére a munkamenet befejezéséről az OpenID szolgáltatónál.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "A Back-Channel Logout megvalósítja az OpenID Connect Back-Channel Logout 1.0-t, és használható az alkalmazások értesítésére a munkamenet befejezéséről az OpenID szolgáltatónál.",
       "PERMISSIONCHECKV2": "Engedély ellenőrzés V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Ha a zászló engedélyezve van, használhatja az új API-t és annak funkcióit.",
       "STATES": {
@@ -1851,8 +1849,8 @@
         "INIT": "Inicializálás",
         "VE": "Email ellenőrzése",
         "VP": "Telefon igazolása",
-        "VSO": "SMS OTP igazolása",
-        "VEO": "Email OTP igazolása",
+        "VSO": "OTP SMS igazolása",
+        "VEO": "OTP Email igazolása",
         "PR": "Jelszó visszaállítása",
         "DC": "Domain igénylés",
         "PL": "Passkey",
@@ -1875,8 +1873,8 @@
         "changedate": "Dátum megváltoztatása",
         "username": "Felhasználónév",
         "tempUsername": "Ideiglenes felhasználónév",
-        "otp": "Egyszeri jelszó",
-        "verifyUrl": "Egyszeri jelszó URL-jének ellenőrzése",
+        "otp": "OTP",
+        "verifyUrl": "OTP URL-jének ellenőrzése",
         "expiry": "Lejárat",
         "applicationName": "Alkalmazás neve"
       },
@@ -2430,10 +2428,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Ismeretlen",
-      "1": "Egyszeri Jelszó az Authenticator App-al (TOTP)",
+      "1": "OTP az Authenticator alkalmazással (TOTP)",
       "2": "Passkey",
-      "3": "Egyszeri Jelszó Emailben (Email OTP)",
-      "4": "Egyszeri jelszó SMS-ben (SMS OTP)",
+      "3": "OTP Email-el (OTP Email)",
+      "4": "OTP SMS-el (OTP SMS)",
       "5": "Helyreállítási kódok"
     }
   },
@@ -2658,8 +2656,8 @@
       "IDTOKENROLEASSERTION": "Felhasználói szerepkörök az ID Tokenben",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Ha kiválasztod, a hitelesített felhasználó kért szerepkörei hozzá lesznek adva az ID tokenhez.",
       "IDTOKENUSERINFOASSERTION": "Felhasználói információk az ID Tokenben",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Lehetővé teszi az ügyfelek számára, hogy lekérjék a profil-, e-mail-, telefon- és címadatokat az ID tokenből.",
-      "CLOCKSKEW": "Lehetővé teszi az ügyfelek számára az OP és az ügyfél óraeltolódásának kezelését. Az időtartam (0-5 másodperc) hozzá lesz adva az exp igényhez, és levonásra kerül az iats, auth_time és nbf értékeiből.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Lehetővé teszi az alkalmazások számára, hogy lekérjék a profil-, e-mail-, telefon- és címadatokat az ID tokenből.",
+      "CLOCKSKEW": "Lehetővé teszi az alkalmazások számára az OP és az alkalmazás óraeltolódásának kezelését. Az időtartam (0-5 másodperc) hozzá lesz adva az exp igényhez, és levonásra kerül az iats, auth_time és nbf értékeiből.",
       "RECOMMENDED": "ajánlott",
       "NOTRECOMMENDED": "nem ajánlott",
       "SELECTION": {

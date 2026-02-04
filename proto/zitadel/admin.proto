@@ -1087,7 +1087,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Add OIDC Settings";
-            description: "Create new OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and clients."
+            description: "Create new OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and applications."
         };
     }
 
@@ -1104,7 +1104,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Add OIDC Settings";
-            description: "Update existing OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and clients."
+            description: "Update existing OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and applications."
         };
     }
 
@@ -3583,8 +3583,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Default Verify SMS OTP Message Text";
-            description: "Get the default text of the verify SMS OTP message that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Default Verify OTP SMS Message Text";
+            description: "Get the default text of the verify OTP SMS message that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured."
         };
     }
 
@@ -3599,8 +3599,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Custom Verify SMS OTP Message Text";
-            description: "Get the custom text of the verify SMS OTP message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Custom Verify OTP SMS Message Text";
+            description: "Get the custom text of the verify OTP SMS message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured."
         };
     }
 
@@ -3616,8 +3616,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Set Default Verify SMS OTP Reset Message Text";
-            description: "Set the custom text of the verify SMS OTP user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            summary: "Set Default Verify OTP SMS Reset Message Text";
+            description: "Set the custom text of the verify OTP SMS user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
     }
 
@@ -3632,8 +3632,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Reset Custom Verify SMS OTP Message Text to Default";
-            description: "Removes the custom text of the verify SMS OTP message that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            summary: "Reset Custom Verify OTP SMS Message Text to Default";
+            description: "Removes the custom text of the verify OTP SMS message that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3649,8 +3649,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Default Verify SMS OTP Message Text";
-            description: "Get the default text of the verify Email OTP message that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Default Verify OTP SMS Message Text";
+            description: "Get the default text of the verify OTP Email message that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured."
         };
     }
 
@@ -3665,8 +3665,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Custom Verify SMS OTP Message Text";
-            description: "Get the custom text of the Email OTP message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Custom Verify OTP SMS Message Text";
+            description: "Get the custom text of the OTP Email message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured."
         };
     }
 
@@ -3682,8 +3682,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Set Default Verify SMS OTP Reset Message Text";
-            description: "Set the custom text of the Email OTP user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            summary: "Set Default Verify OTP SMS Reset Message Text";
+            description: "Set the custom text of the OTP Email user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
     }
 
@@ -3698,8 +3698,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Reset Custom Verify SMS OTP Message Text to Default";
-            description: "Removes the custom text of the Email OTP message that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            summary: "Reset Custom Verify OTP SMS Message Text to Default";
+            description: "Removes the custom text of the OTP Email message that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -4944,6 +4944,7 @@ message AddEmailProviderSMTPRequest {
             example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
         }
     ];
+    // Deprecated: use [Auth] oneof instead.
     string password = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"this-is-my-password\"";
@@ -4965,6 +4966,78 @@ message AddEmailProviderSMTPRequest {
             max_length: 200;
         }
     ];
+    oneof Auth {
+        SMTPNoAuth none = 9;
+        SMTPPlainAuth plain = 10;
+        SMTPXOAuth2Auth xoauth2 = 11;
+    }
+}
+
+// SMTPNoAuth can be used when no authentication is required for the SMTP connection.
+message SMTPNoAuth {}
+
+// SMTPPlainAuth adds plain authentication to the smtp connection. The username of the parent configuration is used in
+// combination with the password in this message.
+message SMTPPlainAuth {
+    string password = 1 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"this-is-my-client-secret\"";
+        }
+    ];
+}
+
+// SMTPXOAuth2Auth adds XOAut2 authentication to the smtp connection. The username of the parent configuration is used
+// in combination with the other parameters of this message.
+message SMTPXOAuth2Auth {
+    // token_endpoint is the endpoint from which a token will be requested according to the oauth2 specification.
+    string token_endpoint = 1 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"http://auth.example.com/token\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+    // scopes is a list of scopes which should be requested from the authorization service. To authorize a token to
+    // use the smtp functionality, the server requires a specific scope. These scopes can be found in the documentation
+    // of the provider.
+    repeated string scopes = 2 [
+        (google.api.field_behavior) = REQUIRED,
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://mail.example.com\"]";
+        }
+    ];
+    // OAuth2Type is a oneof used to switch between the different types of oauth2 authorization flows.
+    oneof OAuth2Type {
+        ClientCredentials client_credentials = 3;
+    }
+
+    // ClientCredentials authenticates the SMTP client using Oauth 2.0 Client Credentials grant.
+    // https://datatracker.ietf.org/doc/html/rfc6749#section-4.4
+    message ClientCredentials {
+        string client_id = 1 [
+            (validate.rules).string = {min_len: 0, max_len: 200},
+            (google.api.field_behavior) = REQUIRED,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+                min_length: 0;
+                max_length: 200;
+            }
+        ];
+        string client_secret = 2 [
+            (validate.rules).string = {min_len: 0, max_len: 200},
+            (google.api.field_behavior) = REQUIRED,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"this-is-my-client-secret\"";
+                min_length: 0;
+                max_length: 200;
+            }
+        ];
+    }
 }
 
 message AddEmailProviderSMTPResponse {
@@ -5029,6 +5102,11 @@ message UpdateEmailProviderSMTPRequest {
         }
     ];
     string id = 9 [(validate.rules).string = {min_len: 1, max_len: 100}];
+    oneof Auth {
+        SMTPNoAuth none = 10;
+        SMTPPlainAuth plain = 11;
+        SMTPXOAuth2Auth xoauth2 = 12;
+    }
 }
 
 message UpdateEmailProviderSMTPResponse {
@@ -5221,6 +5299,12 @@ message TestEmailProviderSMTPRequest {
             example: "\"267191369515139464\"";
         }
     ];
+    oneof Auth {
+        option (validate.required) = true;
+        SMTPNoAuth none = 9;
+        SMTPPlainAuth plain = 10;
+        SMTPXOAuth2Auth xoauth2 = 11;
+    }
 }
 
 // This is an empty response
@@ -8318,7 +8402,7 @@ message SetDefaultVerifySMSOTPMessageTextRequest {
     string text = 2 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please visit {{ .VerifyURL }} or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
+            example: "\"Please visit {{ .VerifyURL }} or copy the OTP {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
             max_length: 800;
         }
     ];
@@ -8363,21 +8447,21 @@ message SetDefaultVerifyEmailOTPMessageTextRequest {
     string title = 2 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ZITADEL - One-time Password\""
+            example: "\"ZITADEL - OTP\""
             max_length: 500;
         }
     ];
     string pre_header = 3 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify One-time Password \""
+            example: "\"Verify OTP\""
             max_length: 500;
         }
     ];
     string subject = 4 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify One-time Password\""
+            example: "\"Verify OTP\""
             max_length: 500;
         }
     ];
@@ -8391,7 +8475,7 @@ message SetDefaultVerifyEmailOTPMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please use the \\\"Authenticate\\\" button or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
+            example: "\"Please use the \\\"Authenticate\\\" button or copy the OTP {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
             max_length: 10000;
         }
     ];

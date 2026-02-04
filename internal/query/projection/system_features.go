@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	SystemFeatureTable = "projections.system_features2"
+	SystemFeatureTable = "projections.system_features3"
 
 	SystemFeatureKeyCol          = "key"
 	SystemFeatureCreationDateCol = "creation_date"
@@ -58,10 +58,6 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 			},
 			{
 				Event:  feature_v2.SystemUserSchemaEventType,
-				Reduce: reduceSystemSetFeature[bool],
-			},
-			{
-				Event:  feature_v2.SystemTokenExchangeEventType,
 				Reduce: reduceSystemSetFeature[bool],
 			},
 			{

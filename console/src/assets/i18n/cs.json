@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Aktivní a budoucí webové klíče",
           "DESCRIPTION": "Vaše aktivní a nadcházející webové klíče. Aktivací nového klíče dojde k deaktivaci aktuálního.",
-          "NOTE": "Poznámka: Koncový bod JWKs OIDC vrací odpověď uložitelnou do mezipaměti (výchozí 5 minut). Vyhněte se příliš brzké aktivaci klíče, protože nemusí být dostupný v mezipaměti a klientům.",
+          "NOTE": "Poznámka: Koncový bod JWKs OIDC vrací odpověď uložitelnou do mezipaměti (výchozí 5 minut). Vyhněte se příliš brzké aktivaci klíče, protože nemusí být dostupný v mezipaměti a aplikacím.",
           "ACTIVATE": "Aktivovat další webový klíč",
           "ACTIVE": "Aktuálně aktivní",
           "NEXT": "Další v řadě",
@@ -223,8 +223,8 @@
           "PR": "Když uživatel resetuje své heslo, obdrží e-mail s odkazem na nastavení nového hesla.",
           "VE": "Když uživatel změní svou e-mailovou adresu, obdrží e-mail s odkazem na ověření nové adresy.",
           "VP": "Když uživatel změní své telefonní číslo, obdrží SMS s kódem pro ověření nového čísla.",
-          "VEO": "Když uživatel přidá metodu jednorázového hesla přes e-mail, musí ji aktivovat zadáním kódu poslaného na jeho e-mailovou adresu.",
-          "VSO": "Když uživatel přidá metodu jednorázového hesla přes SMS, musí ji aktivovat zadáním kódu poslaného na jeho telefonní číslo.",
+          "VEO": "Když uživatel přidá metodu OTP přes e-mail, musí ji aktivovat zadáním kódu poslaného na jeho e-mailovou adresu.",
+          "VSO": "Když uživatel přidá metodu OTP přes SMS, musí ji aktivovat zadáním kódu poslaného na jeho telefonní číslo.",
           "IU": "Když se vytvoří pozvánka pro uživatele, obdrží e-mail s odkazem na nastavení své metody ověřování."
         }
       },
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele",
     "IAM_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele ze všech organizací",
     "IAM_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele ze všech organizací",
-    "IAM_LOGIN_CLIENT": "Má oprávnění spravovat přihlašovací klienty",
+    "IAM_LOGIN_CLIENT": "Má oprávnění spravovat přihlašovací aplikace",
     "ORG_OWNER": "Má oprávnění nad celou organizací",
     "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
     "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",
@@ -851,7 +851,7 @@
       "U2F_NAME": "Název autentizátoru",
       "TYPE": {
         "0": "Nejsou definovány žádné MFA",
-        "1": "Jednorázové heslo (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -884,7 +884,7 @@
       "DESCRIPTION": "Přidat druhý faktor pro zajištění optimální bezpečnosti vašeho účtu.",
       "MANAGE_DESCRIPTION": "Spravujte metody druhého faktoru vašich uživatelů.",
       "ADD": "Přidat faktor",
-      "OTP": "Autentizační aplikace pro TOTP (časově omezené jednorázové heslo)",
+      "OTP": "Autentizační aplikace pro TOTP (časově omezené OTP)",
       "OTP_DIALOG_TITLE": "Přidat OTP",
       "OTP_DIALOG_DESCRIPTION": "Naskenujte QR kód pomocí autentizační aplikace a zadejte kód níže pro ověření a aktivaci metody OTP.",
       "U2F": "Passkey",
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "Faktor úspěšně přidán!",
       "U2F_ERROR": "Během nastavení došlo k chybě!",
       "U2F_NAME": "Název autentizátoru",
-      "OTPSMS": "OTP (jednorázové heslo) s SMS",
-      "OTPEMAIL": "OTP (jednorázové heslo) s e-mailem",
-      "SETUPOTPSMSDESCRIPTION": "Chcete nastavit toto telefonní číslo jako druhý faktor OTP (jednorázové heslo)?",
+      "OTPSMS": "OTP s SMS",
+      "OTPEMAIL": "OTP s e-mailem",
+      "SETUPOTPSMSDESCRIPTION": "Chcete nastavit toto telefonní číslo jako druhý faktor OTP?",
       "OTPSMSSUCCESS": "Faktor OTP byl úspěšně nastaven.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Váš telefon musí být ověřen, aby bylo možné použít tuto metodu.",
       "OTPEMAILSUCCESS": "Faktor OTP byl úspěšně nastaven.",
       "TYPE": {
         "0": "Není definována žádná MFA",
-        "1": "Jednorázové heslo (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -1594,7 +1594,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Číslo odesílatele",
         "VERIFYSERVICESID": "ID služby ověření",
-        "VERIFYSERVICESID_DESCRIPTION": "Nastavení ID služby ověření umožňuje použití služby Twilio Verify místo služby Zprávy pro ověření telefonních čísel a SMS OTP.",
+        "VERIFYSERVICESID_DESCRIPTION": "Nastavení ID služby ověření umožňuje použití služby Twilio Verify místo služby Zprávy pro ověření telefonních čísel a OTP SMS.",
         "ADDED": "Twilio bylo úspěšně přidáno.",
         "UPDATED": "Twilio bylo úspěšně aktualizováno.",
         "REMOVED": "Twilio bylo odebráno",
@@ -1612,8 +1612,8 @@
         "4": "Resetování hesla",
         "5": "Inicializace Passkey",
         "6": "Tajemství pomocí aplikace",
-        "7": "Jednorázové heslo (OTP) - SMS",
-        "8": "Jednorázové heslo (OTP) - E-mail"
+        "7": "OTP - SMS",
+        "8": "OTP - E-mail"
       },
       "EXPIRY": "Expirace (v minutách)",
       "INCLUDEDIGITS": "Zahrnout čísla",
@@ -1635,8 +1635,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Výchozí organizace pro přihlášení",
       "LOGINDEFAULTORG_DESCRIPTION": "Přihlašovací rozhraní použije nastavení výchozí organizace (a ne z instance), pokud není nastaven žádný kontext organizace.",
-      "OIDCTOKENEXCHANGE": "Výměna tokenů OIDC",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Povolit experimentální typ udělení urn:ietf:params:oauth:grant-type:token-exchange pro bod tokenového bodu OIDC. Výměna tokenů lze použít k žádosti o tokeny s menším rozsahem nebo k impersonaci jiných uživatelů. Podívejte se na bezpečnostní politiku, abyste umožnili impersonaci na instanci.",
       "USERSCHEMA": "Schéma uživatele",
       "USERSCHEMA_DESCRIPTION": "Schémata uživatelů umožňují spravovat datová schémata uživatelů. Pokud je příznak povolen, budete moci používat nové API a jeho funkce.",
       "ACTIONS": "Akce",
@@ -1646,7 +1644,7 @@
       "DEBUGOIDCPARENTERROR": "Debugování chyby rodiče OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Pokud je příznak povolen, chyba rodiče OIDC bude zaznamenána v konzoli.",
       "ENABLEBACKCHANNELLOGOUT": "Povolit Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování klientů o ukončení relace u poskytovatele OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování aplikací o ukončení relace u poskytovatele OpenID.",
       "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
@@ -1853,7 +1851,7 @@
         "INIT": "Inicializace",
         "VE": "Ověření e-mailu",
         "VP": "Ověření telefonu",
-        "VSO": "Ověření SMS OTP",
+        "VSO": "Ověření OTP SMS",
         "VEO": "Ověření e-mailu OTP",
         "PR": "Reset hesla",
         "DC": "Nárok na doménu",
@@ -1877,8 +1875,8 @@
         "changedate": "Datum změny",
         "username": "Uživatelské jméno",
         "tempUsername": "Dočasné uživatelské jméno",
-        "otp": "Jednorázové heslo",
-        "verifyUrl": "Ověřovací URL jednorázového hesla",
+        "otp": "OTP",
+        "verifyUrl": "Ověřovací URL OTP",
         "expiry": "Expirace",
         "applicationName": "Název aplikace"
       },
@@ -2419,10 +2417,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Neznámý",
-      "1": "Jednorázové heslo pomocí autentizační aplikace (TOTP)",
+      "1": "OTP pomocí autentizační aplikace (TOTP)",
       "2": "Passkey",
-      "3": "Jednorázové heslo e-mailem (Email OTP)",
-      "4": "Jednorázové heslo SMS (SMS OTP)",
+      "3": "OTP e-mailem (OTP Email)",
+      "4": "OTP SMS (OTP SMS)",
       "5": "Obnovovací kódy"
     }
   },
@@ -2643,8 +2641,8 @@
       "IDTOKENROLEASSERTION": "Role uživatele uvnitř ID tokenu",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Pokud je vybráno, požadované role ověřeného uživatele jsou přidány do ID tokenu.",
       "IDTOKENUSERINFOASSERTION": "Informace o uživateli uvnitř ID tokenu",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Umožňuje klientům získávat nároky (claims) na profil, email, telefon a adresu z ID tokenu.",
-      "CLOCKSKEW": "Umožňuje klientům zvládnout rozdíl času mezi OP a klientem. Doba trvání (0-5s) bude přidána k nároku exp a odečtena od iats, auth_time a nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Umožňuje aplikacím získávat nároky (claims) na profil, email, telefon a adresu z ID tokenu.",
+      "CLOCKSKEW": "Umožňuje aplikacím zvládnout rozdíl času mezi OP a aplikací. Doba trvání (0-5s) bude přidána k nároku exp a odečtena od iats, auth_time a nbf.",
       "RECOMMENDED": "doporučeno",
       "NOTRECOMMENDED": "nedoporučeno",
       "SELECTION": {
