@@ -1,3 +1,7 @@
+// Force non-interactive mode for Nx
+process.env.NX_INTERACTIVE = 'false';
+process.env.CI = 'true';
+
 import { releaseVersion, releaseChangelog } from 'nx/release/index.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
@@ -65,6 +69,7 @@ async function cmdVersion(argv: any) {
             process.exit(1);
         }
     }
+    process.exit(0);
 }
 
 // Subcommand: RELEASE
@@ -125,17 +130,24 @@ async function cmdRelease(argv: any) {
             version: version,
             dryRun: true,
             verbose: argv.verbose,
+            interactive: false,
             gitCommit: false, // Don't commit in dry/preview usually
             gitTag: false,
         });
+
         // nx release changelog usually returns env.CHANGELOG or prints to stdout.
         // The programmatic API returns the changelog entry string if successful.
-        // NOTE: Types might vary, assuming string or object with contents.
-        if (typeof changelogResult === 'string') {
+        // We prioritize workspaceChangelog if configured.
+        if (changelogResult && (changelogResult as any).workspaceChangelog && (changelogResult as any).workspaceChangelog.contents) {
+            changelog = (changelogResult as any).workspaceChangelog.contents;
+        } else if (typeof changelogResult === 'string') {
             changelog = changelogResult;
         } else if (changelogResult && (changelogResult as any).projectChangelogs) {
-            // Aggregate changelogs?
-            changelog = Object.values((changelogResult as any).projectChangelogs).map((c: any) => c.contents).join('\n\n');
+            // Aggregate and deduplicate changelogs (projects in the same group might share the same notes)
+            const contents = Object.values((changelogResult as any).projectChangelogs)
+                .map((c: any) => c.contents)
+                .filter((c: any) => typeof c === 'string' && c.trim().length > 0);
+            changelog = Array.from(new Set(contents)).join('\n\n');
         }
     } catch (e) {
         console.warn('Could not generate changelog preview:', e);
@@ -147,6 +159,36 @@ async function cmdRelease(argv: any) {
     const octokit = token ? new Octokit({ auth: token }) : null;
     const owner = 'zitadel';
     const repo = 'zitadel';
+
+    // List Artifacts
+    const artifactsDir = path.join(process.cwd(), '.artifacts/pack');
+    let artifactList = '*(No artifacts found)*';
+    if (fs.existsSync(artifactsDir)) {
+        const files = fs.readdirSync(artifactsDir).filter(f => f.endsWith('.tar.gz') || f.endsWith('.zip') || f === 'checksums.txt');
+        if (files.length > 0) {
+            artifactList = files.map(f => `- 📦 ${f}`).join('\n');
+        }
+    }
+
+    let body = `### 🚀 Release Preview
+**Version**: \`${version}\`
+**Mode**: Plan (Dry-Run)
+
+#### 📦 Artifacts
+${artifactList}
+
+#### 📝 Changelog Preview
+${changelog}
+`;
+
+    // Prevent accidental tagging by injecting invisible comment after @
+    const sanitizedBody = body.replace(/@/g, '@<!-- -->');
+    if (dryRun) {
+        console.log('--------------------------------------------------------------------------------');
+        console.log('SANITIZED PREVIEW (This is what will be posted to GitHub):');
+        console.log(sanitizedBody);
+        console.log('--------------------------------------------------------------------------------');
+    }
 
     if (dryRun && octokit) {
         let prNumber = process.env.GITHUB_REF?.split('/')[2];
@@ -172,26 +214,6 @@ async function cmdRelease(argv: any) {
         }
 
         if (prNumber && !isNaN(parseInt(prNumber))) {
-            // List Artifacts
-            const artifactsDir = path.join(process.cwd(), '.artifacts/pack');
-            let artifactList = '*(No artifacts found)*';
-            if (fs.existsSync(artifactsDir)) {
-                const files = fs.readdirSync(artifactsDir).filter(f => f.endsWith('.tar.gz') || f.endsWith('.zip') || f === 'checksums.txt');
-                if (files.length > 0) {
-                    artifactList = files.map(f => `- 📦 ${f}`).join('\n');
-                }
-            }
-
-            const body = `### 🚀 Release Preview
-**Version**: \`${version}\`
-**Mode**: Plan (Dry-Run)
-
-#### 📦 Artifacts
-${artifactList}
-
-#### 📝 Changelog Preview
-${changelog}
-`;
             console.log(`[Plan] Would comment on PR #${prNumber}`);
 
             // Post or Update comment
@@ -206,12 +228,12 @@ ${changelog}
 
                 if (existingComment) {
                     await octokit.request('PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}', {
-                        owner, repo, comment_id: existingComment.id, body,
+                        owner, repo, comment_id: existingComment.id, body: sanitizedBody,
                     });
                     console.log(`✅ Updated existing comment on PR #${prNumber}`);
                 } else {
                     await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
-                        owner, repo, issue_number: parseInt(prNumber), body,
+                        owner, repo, issue_number: parseInt(prNumber), body: sanitizedBody,
                     });
                     console.log(`✅ Created new comment on PR #${prNumber}`);
                 }
@@ -292,6 +314,7 @@ ${changelog}
             console.log(`[Plan] Would run target: ${target}`);
         }
     }
+    process.exit(0);
 }
 
 // MAIN ENTRY POINT

@@ -667,8 +667,10 @@
                 "commands": [
                     "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/zitadel/zitadel:$VERSION -f apps/api/Dockerfile ."
                 ],
-                "parallel": false
-            }
+                "parallel": false,
+                "forwardAllArgs": false
+            },
+            "cache": false
         },
         "publish-container": {
             "description": "Builds and pushes the ZITADEL API Docker image",
@@ -680,8 +682,10 @@
                 "commands": [
                     "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/zitadel/zitadel:$VERSION -t ghcr.io/zitadel/zitadel:latest --push -f apps/api/Dockerfile ."
                 ],
-                "parallel": false
-            }
+                "parallel": false,
+                "forwardAllArgs": false
+            },
+            "cache": false
         },
         "pack": {
             "description": "Aggregates all packaging tasks (Archives + Docker build)",

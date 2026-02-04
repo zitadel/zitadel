@@ -22,7 +22,7 @@
         },
         "release": {
             "executor": "nx:run-commands",
-            "cache": true,
+            "cache": false,
             "inputs": [
                 "default",
                 "^production"

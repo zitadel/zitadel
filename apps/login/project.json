@@ -168,8 +168,10 @@
         "commands": [
           "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); docker build -t ghcr.io/zitadel/login:$VERSION -f apps/login/Dockerfile apps/login"
         ],
-        "parallel": false
-      }
+        "parallel": false,
+        "forwardAllArgs": false
+      },
+      "cache": true
     },
     "publish-container": {
       "description": "Pushes the ZITADEL Login Docker image",
@@ -181,8 +183,10 @@
         "commands": [
           "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); docker push ghcr.io/zitadel/login:$VERSION && docker tag ghcr.io/zitadel/login:$VERSION ghcr.io/zitadel/login:latest && docker push ghcr.io/zitadel/login:latest"
         ],
-        "parallel": false
-      }
+        "parallel": false,
+        "forwardAllArgs": false
+      },
+      "cache": true
     },
     "pack": {
       "description": "Aggregates all packaging tasks (Archive + Docker build)",

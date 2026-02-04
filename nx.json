@@ -5,7 +5,7 @@
     "libsDir": "packages"
   },
   "tui": {
-    "enabled": true,
+    "enabled": false,
     "autoExit": true
   },
   "namedInputs": {
@@ -85,15 +85,14 @@
     "changelog": {
       "workspaceChangelog": {
         "createRelease": "github",
-        "file": "CHANGELOG.md"
-      },
-      "projectChangelogs": {
+        "file": "CHANGELOG.md",
         "renderOptions": {
           "authors": true,
           "commitReferences": true,
           "versionTitleDate": true
         }
       },
+      "projectChangelogs": false,
       "git": {
         "commit": true,
         "tag": true
