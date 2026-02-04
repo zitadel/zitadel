@@ -225,7 +225,7 @@ This strategy aims to fulfill the following requirements:
 2. Applications have enough time to see the next activated web key on the [JWKS](#json-web-key-set) endpoint.
 3. Web keys are kept long enough to cover the access and ID token validity of 24 hours.
 4. Web keys are kept long enough to to allow usage of the `id_token_hint` for at least 3 months.
-  Users that haven't logged in / refreshed tokens with the client app for that period,
+  Users that haven't logged in / refreshed tokens with the client application for that period,
   will need to re-enter their username.
 
 When the instance was created, resp. the feature was rolled out, the instance got two keys with the first one activated. When this feature becomes generally available, instance creation will setup the first two keys in the same way. So the initial state always looks like this:

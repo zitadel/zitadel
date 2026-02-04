@@ -40,9 +40,9 @@ Install the package via nuget
 dotnet add package Zitadel.Api
 ```
 
-### Create example client
+### Create example application
 
-Change the program.cs file to the content below. This will create a client for the management api and call its `GetMyUsers` function.
+Change the program.cs file to the content below. This will create a application for the management api and call its `GetMyUsers` function.
 The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:zitadel:aud`).
 
 Make sure to fill the const `apiUrl`, and `personalAccessToken` with your own instance data. The used vars below are from a test instance, to show you how it should look.
@@ -86,7 +86,7 @@ result = await client.GetMyUserAsync(new());
 Console.WriteLine($"User: {result.User}");
 ```
 
-### Test client
+### Test application
 
 After you have configured everything correctly, you can simply start the example by:
 
