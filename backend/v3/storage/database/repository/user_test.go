@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -122,9 +123,16 @@ func Test_user_Update(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	t.Cleanup(rollback)
 
-	userRepo := repository.UserRepository()
-	// humanRepo := repository.HumanUserRepository()
-	// machineRepo := repository.MachineUserRepository()
+	userRepo := repository.UserRepository().
+		LoadMetadata().
+		// LoadIdentityProviderLinks().
+		LoadKeys().
+		// LoadPasskeys().
+		// LoadVerifications()
+		LoadPATs()
+
+	humanRepo := repository.HumanUserRepository()
+	machineRepo := repository.MachineUserRepository()
 
 	instanceID := createInstance(t, tx)
 
@@ -170,6 +178,8 @@ func Test_user_Update(t *testing.T) {
 	err = userRepo.Create(t.Context(), tx, machine)
 	require.NoError(t, err)
 
+	now := time.Now().Round(time.Millisecond)
+
 	type args struct {
 		condition database.Condition
 		changes   []database.Change
@@ -194,9 +204,10 @@ func Test_user_Update(t *testing.T) {
 			},
 			want: want{
 				user: func() *domain.User {
-					u := *human
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
 					u.Username = "new-human-username"
-					return &u
+					return u
 				}(),
 			},
 		},
@@ -210,18 +221,15 @@ func Test_user_Update(t *testing.T) {
 			},
 			want: want{
 				user: func() *domain.User {
-					u := *machine
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
+					require.NoError(t, err)
 					u.State = domain.UserStateInactive
-					return &u
+					return u
 				}(),
 			},
 		},
 		{
 			name: "add metadata",
-			setup: func(_ *testing.T, _ database.Transaction) error {
-				userRepo = userRepo.LoadMetadata()
-				return nil
-			},
 			args: args{
 				condition: machineCondition,
 				changes: []database.Change{
@@ -241,7 +249,8 @@ func Test_user_Update(t *testing.T) {
 			},
 			want: want{
 				user: func() *domain.User {
-					u := *machine
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
+					require.NoError(t, err)
 					u.Metadata = append(u.Metadata, &domain.Metadata{
 						InstanceID: instanceID,
 						Key:        "key1",
@@ -251,40 +260,171 @@ func Test_user_Update(t *testing.T) {
 						Key:        "key2",
 						Value:      []byte("42"),
 					})
-					return &u
+					return u
+				}(),
+			},
+		},
+		{
+			name: "remove metadata",
+			setup: func(t *testing.T, tx database.Transaction) error {
+				_, err := userRepo.Update(t.Context(), tx, machineCondition,
+					userRepo.AddMetadata(&domain.Metadata{
+						InstanceID: instanceID,
+						Key:        "key1",
+						Value:      []byte("value"),
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: machineCondition,
+				changes: []database.Change{
+					userRepo.RemoveMetadata(userRepo.MetadataConditions().MetadataKeyCondition(database.TextOperationEqual, "key1")),
+				},
+			},
+			want: want{
+				user: machine,
+			},
+		},
+		{
+			name: "set human first name",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetFirstName("Joanne"),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.FirstName = "Joanne"
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human last name",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetLastName("Known"),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.LastName = "Known"
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human nickname",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetNickname("Ghost"),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Nickname = "Ghost"
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human display name",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetDisplayName("Johnny the Ghost"),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.DisplayName = "Johnny the Ghost"
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human preferred language",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetPreferredLanguage(language.Afrikaans),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.PreferredLanguage = language.Afrikaans
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human gender",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetGender(domain.HumanGenderMale),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Gender = domain.HumanGenderMale
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human avatar key",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetAvatarKey(gu.Ptr("https://new.avatar/key")),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.AvatarKey = "https://new.avatar/key"
+					return u
 				}(),
 			},
 		},
 		// {
-		// 	name: "remove metadata",
-		// },
-		// {
-		// 	name: "set human first name",
-		// },
-		// {
-		// 	name: "set human last name",
-		// },
-		// {
-		// 	name: "set human nickname",
-		// },
-		// {
-		// 	name: "set human display name",
-		// },
-		// {
-		// 	name: "set human preferred language",
-		// },
-		// {
-		// 	name: "set human gender",
-		// },
-		// {
-		// 	name: "set human avatar key",
-		// },
-		// {
 		// 	name: "set human skip mfa initialization",
 		// },
-		// {
-		// 	name: "set human skip mfa initialization at",
-		// },
+		{
+			name: "set human skip mfa initialization at",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SkipMultifactorInitializationAt(now),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.MultifactorInitializationSkippedAt = now
+					return u
+				}(),
+			},
+		},
 		// {
 		// 	name: "set human verification init",
 		// },
@@ -309,23 +449,80 @@ func Test_user_Update(t *testing.T) {
 		// {
 		// 	name: "set human verification skipped",
 		// },
-		// {
-		// 	name: "set human password change required",
-		// },
+		{
+			name: "set human password change required",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetPasswordChangeRequired(true),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Password.IsChangeRequired = true
+					return u
+				}(),
+			},
+		},
 		// {
 		// 	name: "set human last successful password check",
 		// },
-		// {
-		// 	name: "set human increment password failed attempts",
-		// },
-		// {
-		// 	name: "set human reset password failed attempts",
-		// },
+		{
+			name: "set human increment password failed attempts",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.IncrementPasswordFailedAttempts(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Password.FailedAttempts++
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human reset password failed attempts",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.ResetPasswordFailedAttempts(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Password.FailedAttempts = 0
+					return u
+				}(),
+			},
+		},
 		// {
 		// 	name: "set human set email verification init",
 		// },
 		// {
 		// 	name: "set human set email verified",
+		// 	args: args{
+		// 		condition: humanCondition,
+		// 		changes: []database.Change{
+		// 			humanRepo.SetEmail()
+		// 			humanRepo.SetEmailVerifiedAt(time.Now()),
+		// 		},
+		// 	},
+		// 	want: want{
+		// 		user: func() *domain.User {
+		// 			u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+		// 			require.NoError(t, err)
+		// 			u.Human.Email.VerifiedAt = time.Now()
+		// 			return u
+		// 		}(),
+		// 	},
 		// },
 		// {
 		// 	name: "set human set email verification update",
@@ -336,12 +533,40 @@ func Test_user_Update(t *testing.T) {
 		// {
 		// 	name: "set human enable email otp",
 		// },
-		// {
-		// 	name: "set human enable email otp at",
-		// },
-		// {
-		// 	name: "set human disable email otp",
-		// },
+		{
+			name: "set human enable email otp at",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.EnableEmailOTPAt(now),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Email.OTP.EnabledAt = now
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human disable email otp",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.DisableEmailOTP(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Email.OTP.EnabledAt = time.Time{}
+					return u
+				}(),
+			},
+		},
 		// {
 		// 	name: "set human last successful email otp check",
 		// },
@@ -354,9 +579,36 @@ func Test_user_Update(t *testing.T) {
 		// {
 		// 	name: "set human set phone verification init",
 		// },
-		// {
-		// 	name: "set human set phone verified",
-		// },
+		{
+			name: "set human set phone verified",
+			setup: func(t *testing.T, tx database.Transaction) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetPhone(&domain.VerificationTypeInit{
+						Value: gu.Ptr("+1234567890"),
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetPhone(&domain.VerificationTypeVerified{
+						VerifiedAt: now,
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Phone = &domain.HumanPhone{
+						Number:     "+1234567890",
+						VerifiedAt: now,
+					}
+					return u
+				}(),
+			},
+		},
 		// {
 		// 	name: "set human set phone verification update",
 		// },
@@ -366,12 +618,67 @@ func Test_user_Update(t *testing.T) {
 		// {
 		// 	name: "set human enable sms otp",
 		// },
-		// {
-		// 	name: "set human enable sms otp at",
-		// },
-		// {
-		// 	name: "set human disable sms otp",
-		// },
+		{
+			name: "set human enable sms otp at",
+			setup: func(t *testing.T, tx database.Transaction) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
+						Value:     gu.Ptr("+1234567890"),
+						SkippedAt: now,
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.EnableSMSOTPAt(now),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Phone = &domain.HumanPhone{
+						Number:     "+1234567890",
+						VerifiedAt: now,
+						OTP: domain.OTP{
+							EnabledAt: now,
+						},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human disable sms otp",
+			setup: func(t *testing.T, tx database.Transaction) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
+						Value:     gu.Ptr("+1234567890"),
+						SkippedAt: now,
+					}),
+					humanRepo.EnableSMSOTPAt(now),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.DisableSMSOTP(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Phone = &domain.HumanPhone{
+						Number: "+1234567890",
+					}
+					return u
+				}(),
+			},
+		},
 		// {
 		// 	name: "set human last successful sms otp check",
 		// },
@@ -411,30 +718,177 @@ func Test_user_Update(t *testing.T) {
 		// {
 		// 	name: "set human remove passkey",
 		// },
-		// {
-		// 	name: "set machine name",
-		// },
-		// {
-		// 	name: "set machine description",
-		// },
-		// {
-		// 	name: "set machine set secret",
-		// },
-		// {
-		// 	name: "set machine access token type",
-		// },
-		// {
-		// 	name: "set machine add key",
-		// },
-		// {
-		// 	name: "set machine remove key",
-		// },
-		// {
-		// 	name: "set machine add personal access token",
-		// },
-		// {
-		// 	name: "set machine remove personal access token",
-		// },
+		{
+			name: "set machine name",
+			args: args{
+				condition: machineCondition,
+				changes: []database.Change{
+					machineRepo.SetName("Updated Machine"),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
+					require.NoError(t, err)
+					u.Machine.Name = "Updated Machine"
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set machine description",
+			args: args{
+				condition: machineCondition,
+				changes: []database.Change{
+					machineRepo.SetDescription("Updated description"),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
+					require.NoError(t, err)
+					u.Machine.Description = "Updated description"
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set machine set secret",
+			args: args{
+				condition: machineCondition,
+				changes: []database.Change{
+					machineRepo.SetSecret(gu.Ptr("new-secret")),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
+					require.NoError(t, err)
+					u.Machine.Secret = []byte("new-secret")
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set machine access token type",
+			args: args{
+				condition: machineCondition,
+				changes: []database.Change{
+					machineRepo.SetAccessTokenType(domain.AccessTokenTypeJWT),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
+					require.NoError(t, err)
+					u.Machine.AccessTokenType = domain.AccessTokenTypeJWT
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set machine add key",
+			args: args{
+				condition: machineCondition,
+				changes: []database.Change{
+					machineRepo.AddKey(&domain.MachineKey{
+						ID:        gofakeit.UUID(),
+						PublicKey: []byte("public-key"),
+						Type:      domain.MachineKeyTypeJSON,
+						ExpiresAt: time.Now().Add(24 * time.Hour),
+						CreatedAt: time.Now(),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
+					require.NoError(t, err)
+					u.Machine.Keys = append(u.Machine.Keys, &domain.MachineKey{
+						ID:        gofakeit.UUID(),
+						PublicKey: []byte("public-key"),
+						Type:      domain.MachineKeyTypeJSON,
+						ExpiresAt: time.Now().Add(24 * time.Hour),
+						CreatedAt: time.Now(),
+					})
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set machine remove key",
+			setup: func(t *testing.T, tx database.Transaction) error {
+				_, err := userRepo.Update(t.Context(), tx, machineCondition,
+					machineRepo.AddKey(&domain.MachineKey{
+						ID:        "key-to-remove",
+						PublicKey: []byte("public-key"),
+						Type:      domain.MachineKeyTypeJSON,
+						ExpiresAt: time.Now().Add(24 * time.Hour),
+						CreatedAt: time.Now(),
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: machineCondition,
+				changes: []database.Change{
+					machineRepo.RemoveKey("key-to-remove"),
+				},
+			},
+			want: want{
+				user: machine,
+			},
+		},
+		{
+			name: "set machine add personal access token",
+			args: args{
+				condition: machineCondition,
+				changes: []database.Change{
+					machineRepo.AddPersonalAccessToken(&domain.PersonalAccessToken{
+						ID:        gofakeit.UUID(),
+						Scopes:    []string{"openid", "profile"},
+						ExpiresAt: time.Now().Add(24 * time.Hour),
+						CreatedAt: time.Now(),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
+					require.NoError(t, err)
+					u.Machine.PATs = append(u.Machine.PATs, &domain.PersonalAccessToken{
+						ID:        gofakeit.UUID(),
+						Scopes:    []string{"openid", "profile"},
+						ExpiresAt: time.Now().Add(24 * time.Hour),
+						CreatedAt: time.Now(),
+					})
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set machine remove personal access token",
+			setup: func(t *testing.T, tx database.Transaction) error {
+				_, err := userRepo.Update(t.Context(), tx, machineCondition,
+					machineRepo.AddPersonalAccessToken(&domain.PersonalAccessToken{
+						ID:        "pat-to-remove",
+						Scopes:    []string{"openid", "profile"},
+						ExpiresAt: time.Now().Add(24 * time.Hour),
+						CreatedAt: time.Now(),
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: machineCondition,
+				changes: []database.Change{
+					machineRepo.RemovePersonalAccessToken("pat-to-remove"),
+				},
+			},
+			want: want{
+				user: machine,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
