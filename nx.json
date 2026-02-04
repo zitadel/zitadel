@@ -75,7 +75,6 @@
       "@zitadel/console"
     ],
     "version": {
-      "preVersionCommand": "pnpm install",
       "conventionalCommits": true,
       "git": {
         "commit": true,
