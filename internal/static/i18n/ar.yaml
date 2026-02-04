@@ -342,7 +342,7 @@ Errors:
         NotFound: مفتاح التطبيق غير موجود
     RequiredFieldsMissing: بعض الحقول المطلوبة مفقودة
     Grant:
-      AlreadyExists: منحة المشروع موجودة بالفع
+      AlreadyExists: منحة المشروع موجودة بالفعل
       NotFound: لم يتم العثور على منحة المشروع
       Invalid: منحة المشروع غير صالحة
       NotExisting: منحة المشروع غير موجودة
