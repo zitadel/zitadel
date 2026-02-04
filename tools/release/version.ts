@@ -88,36 +88,11 @@ import { DefaultArtifactClient } from '@actions/artifact';
             if (process.env.GITHUB_ENV) {
                 fs.appendFileSync(process.env.GITHUB_ENV, `ZITADEL_VERSION=${workspaceVersion}\n`);
             }
+
+            process.exit(0);
+
+        } catch (err) {
+            console.error(err);
+            process.exit(1);
         }
-
-        // Upload version as artifact if in CI
-        if (process.env.GITHUB_ACTIONS) {
-            const versionToUpload = path.join('.artifacts', 'version');
-            if (fs.existsSync(versionToUpload)) {
-                console.log('Uploading version artifact to GitHub Actions...');
-                try {
-                    const artifactClient = new DefaultArtifactClient();
-                    const artifactName = `release-version`;
-                    await artifactClient.uploadArtifact(
-                        artifactName,
-                        [versionToUpload],
-                        process.cwd()
-                    );
-                    console.log(`Uploaded version artifact.`);
-                } catch (err: any) {
-                    if (err.message?.includes('ACTIONS_RUNTIME_TOKEN')) {
-                        console.warn('Skipping version artifact upload: ACTIONS_RUNTIME_TOKEN not available.');
-                    } else {
-                        console.error('Failed to upload version artifact:', err);
-                    }
-                }
-            }
-        }
-
-        process.exit(0);
-
-    } catch (err) {
-        console.error(err);
-        process.exit(1);
-    }
-})();
+    }) ();
