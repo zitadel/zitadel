@@ -52,8 +52,8 @@ var (
 	SystemClient        system.SystemServiceClient
 	OrgClient           v2beta_org.OrganizationServiceClient
 	ProjectClient       v2beta_project.ProjectServiceClient
-	SessionClient session.SessionServiceClient
-	UserClient    user.UserServiceClient
+	SessionClient       session.SessionServiceClient
+	UserClient          user.UserServiceClient
 	AdminClient         admin.AdminServiceClient
 	MgmtClient          mgmt.ManagementServiceClient
 	AuthorizationClient authorization.AuthorizationServiceClient

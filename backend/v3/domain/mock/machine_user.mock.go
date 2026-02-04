@@ -237,6 +237,44 @@ func (c *MockMachineUserRepositoryExistsMetadataCall) DoAndReturn(f func(databas
 	return c
 }
 
+// IDColumn mocks base method.
+func (m *MockMachineUserRepository) IDColumn() database.Column {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IDColumn")
+	ret0, _ := ret[0].(database.Column)
+	return ret0
+}
+
+// IDColumn indicates an expected call of IDColumn.
+func (mr *MockMachineUserRepositoryMockRecorder) IDColumn() *MockMachineUserRepositoryIDColumnCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDColumn", reflect.TypeOf((*MockMachineUserRepository)(nil).IDColumn))
+	return &MockMachineUserRepositoryIDColumnCall{Call: call}
+}
+
+// MockMachineUserRepositoryIDColumnCall wrap *gomock.Call
+type MockMachineUserRepositoryIDColumnCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockMachineUserRepositoryIDColumnCall) Return(arg0 database.Column) *MockMachineUserRepositoryIDColumnCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockMachineUserRepositoryIDColumnCall) Do(f func() database.Column) *MockMachineUserRepositoryIDColumnCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockMachineUserRepositoryIDColumnCall) DoAndReturn(f func() database.Column) *MockMachineUserRepositoryIDColumnCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // IDCondition mocks base method.
 func (m *MockMachineUserRepository) IDCondition(userID string) database.Condition {
 	m.ctrl.T.Helper()
@@ -271,6 +309,44 @@ func (c *MockMachineUserRepositoryIDConditionCall) Do(f func(string) database.Co
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockMachineUserRepositoryIDConditionCall) DoAndReturn(f func(string) database.Condition) *MockMachineUserRepositoryIDConditionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// InstanceIDColumn mocks base method.
+func (m *MockMachineUserRepository) InstanceIDColumn() database.Column {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InstanceIDColumn")
+	ret0, _ := ret[0].(database.Column)
+	return ret0
+}
+
+// InstanceIDColumn indicates an expected call of InstanceIDColumn.
+func (mr *MockMachineUserRepositoryMockRecorder) InstanceIDColumn() *MockMachineUserRepositoryInstanceIDColumnCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceIDColumn", reflect.TypeOf((*MockMachineUserRepository)(nil).InstanceIDColumn))
+	return &MockMachineUserRepositoryInstanceIDColumnCall{Call: call}
+}
+
+// MockMachineUserRepositoryInstanceIDColumnCall wrap *gomock.Call
+type MockMachineUserRepositoryInstanceIDColumnCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockMachineUserRepositoryInstanceIDColumnCall) Return(arg0 database.Column) *MockMachineUserRepositoryInstanceIDColumnCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockMachineUserRepositoryInstanceIDColumnCall) Do(f func() database.Column) *MockMachineUserRepositoryInstanceIDColumnCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockMachineUserRepositoryInstanceIDColumnCall) DoAndReturn(f func() database.Column) *MockMachineUserRepositoryInstanceIDColumnCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -351,116 +427,78 @@ func (c *MockMachineUserRepositoryLoginNameConditionCall) DoAndReturn(f func(dat
 	return c
 }
 
-// MetadataKeyCondition mocks base method.
-func (m *MockMachineUserRepository) MetadataKeyCondition(key string) database.Condition {
+// MetadataConditions mocks base method.
+func (m *MockMachineUserRepository) MetadataConditions() domain.UserMetadataConditions {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MetadataKeyCondition", key)
-	ret0, _ := ret[0].(database.Condition)
+	ret := m.ctrl.Call(m, "MetadataConditions")
+	ret0, _ := ret[0].(domain.UserMetadataConditions)
 	return ret0
 }
 
-// MetadataKeyCondition indicates an expected call of MetadataKeyCondition.
-func (mr *MockMachineUserRepositoryMockRecorder) MetadataKeyCondition(key any) *MockMachineUserRepositoryMetadataKeyConditionCall {
+// MetadataConditions indicates an expected call of MetadataConditions.
+func (mr *MockMachineUserRepositoryMockRecorder) MetadataConditions() *MockMachineUserRepositoryMetadataConditionsCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MetadataKeyCondition", reflect.TypeOf((*MockMachineUserRepository)(nil).MetadataKeyCondition), key)
-	return &MockMachineUserRepositoryMetadataKeyConditionCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MetadataConditions", reflect.TypeOf((*MockMachineUserRepository)(nil).MetadataConditions))
+	return &MockMachineUserRepositoryMetadataConditionsCall{Call: call}
 }
 
-// MockMachineUserRepositoryMetadataKeyConditionCall wrap *gomock.Call
-type MockMachineUserRepositoryMetadataKeyConditionCall struct {
+// MockMachineUserRepositoryMetadataConditionsCall wrap *gomock.Call
+type MockMachineUserRepositoryMetadataConditionsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockMachineUserRepositoryMetadataKeyConditionCall) Return(arg0 database.Condition) *MockMachineUserRepositoryMetadataKeyConditionCall {
+func (c *MockMachineUserRepositoryMetadataConditionsCall) Return(arg0 domain.UserMetadataConditions) *MockMachineUserRepositoryMetadataConditionsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockMachineUserRepositoryMetadataKeyConditionCall) Do(f func(string) database.Condition) *MockMachineUserRepositoryMetadataKeyConditionCall {
+func (c *MockMachineUserRepositoryMetadataConditionsCall) Do(f func() domain.UserMetadataConditions) *MockMachineUserRepositoryMetadataConditionsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockMachineUserRepositoryMetadataKeyConditionCall) DoAndReturn(f func(string) database.Condition) *MockMachineUserRepositoryMetadataKeyConditionCall {
+func (c *MockMachineUserRepositoryMetadataConditionsCall) DoAndReturn(f func() domain.UserMetadataConditions) *MockMachineUserRepositoryMetadataConditionsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
-// MetadataValueCondition mocks base method.
-func (m *MockMachineUserRepository) MetadataValueCondition(op database.BytesOperation, value []byte) database.Condition {
+// OrganizationIDCondition mocks base method.
+func (m *MockMachineUserRepository) OrganizationIDCondition(orgID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MetadataValueCondition", op, value)
+	ret := m.ctrl.Call(m, "OrganizationIDCondition", orgID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
-// MetadataValueCondition indicates an expected call of MetadataValueCondition.
-func (mr *MockMachineUserRepositoryMockRecorder) MetadataValueCondition(op, value any) *MockMachineUserRepositoryMetadataValueConditionCall {
+// OrganizationIDCondition indicates an expected call of OrganizationIDCondition.
+func (mr *MockMachineUserRepositoryMockRecorder) OrganizationIDCondition(orgID any) *MockMachineUserRepositoryOrganizationIDConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MetadataValueCondition", reflect.TypeOf((*MockMachineUserRepository)(nil).MetadataValueCondition), op, value)
-	return &MockMachineUserRepositoryMetadataValueConditionCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OrganizationIDCondition", reflect.TypeOf((*MockMachineUserRepository)(nil).OrganizationIDCondition), orgID)
+	return &MockMachineUserRepositoryOrganizationIDConditionCall{Call: call}
 }
 
-// MockMachineUserRepositoryMetadataValueConditionCall wrap *gomock.Call
-type MockMachineUserRepositoryMetadataValueConditionCall struct {
+// MockMachineUserRepositoryOrganizationIDConditionCall wrap *gomock.Call
+type MockMachineUserRepositoryOrganizationIDConditionCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockMachineUserRepositoryMetadataValueConditionCall) Return(arg0 database.Condition) *MockMachineUserRepositoryMetadataValueConditionCall {
+func (c *MockMachineUserRepositoryOrganizationIDConditionCall) Return(arg0 database.Condition) *MockMachineUserRepositoryOrganizationIDConditionCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockMachineUserRepositoryMetadataValueConditionCall) Do(f func(database.BytesOperation, []byte) database.Condition) *MockMachineUserRepositoryMetadataValueConditionCall {
+func (c *MockMachineUserRepositoryOrganizationIDConditionCall) Do(f func(string) database.Condition) *MockMachineUserRepositoryOrganizationIDConditionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockMachineUserRepositoryMetadataValueConditionCall) DoAndReturn(f func(database.BytesOperation, []byte) database.Condition) *MockMachineUserRepositoryMetadataValueConditionCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// OrgIDCondition mocks base method.
-func (m *MockMachineUserRepository) OrgIDCondition(orgID string) database.Condition {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "OrgIDCondition", orgID)
-	ret0, _ := ret[0].(database.Condition)
-	return ret0
-}
-
-// OrgIDCondition indicates an expected call of OrgIDCondition.
-func (mr *MockMachineUserRepositoryMockRecorder) OrgIDCondition(orgID any) *MockMachineUserRepositoryOrgIDConditionCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OrgIDCondition", reflect.TypeOf((*MockMachineUserRepository)(nil).OrgIDCondition), orgID)
-	return &MockMachineUserRepositoryOrgIDConditionCall{Call: call}
-}
-
-// MockMachineUserRepositoryOrgIDConditionCall wrap *gomock.Call
-type MockMachineUserRepositoryOrgIDConditionCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockMachineUserRepositoryOrgIDConditionCall) Return(arg0 database.Condition) *MockMachineUserRepositoryOrgIDConditionCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockMachineUserRepositoryOrgIDConditionCall) Do(f func(string) database.Condition) *MockMachineUserRepositoryOrgIDConditionCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockMachineUserRepositoryOrgIDConditionCall) DoAndReturn(f func(string) database.Condition) *MockMachineUserRepositoryOrgIDConditionCall {
+func (c *MockMachineUserRepositoryOrganizationIDConditionCall) DoAndReturn(f func(string) database.Condition) *MockMachineUserRepositoryOrganizationIDConditionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -656,7 +694,7 @@ func (c *MockMachineUserRepositoryRemovePersonalAccessTokenCall) DoAndReturn(f f
 }
 
 // SetAccessTokenType mocks base method.
-func (m *MockMachineUserRepository) SetAccessTokenType(tokenType domain.PersonalAccessTokenType) database.Change {
+func (m *MockMachineUserRepository) SetAccessTokenType(tokenType domain.AccessTokenType) database.Change {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetAccessTokenType", tokenType)
 	ret0, _ := ret[0].(database.Change)
@@ -682,13 +720,13 @@ func (c *MockMachineUserRepositorySetAccessTokenTypeCall) Return(arg0 database.C
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockMachineUserRepositorySetAccessTokenTypeCall) Do(f func(domain.PersonalAccessTokenType) database.Change) *MockMachineUserRepositorySetAccessTokenTypeCall {
+func (c *MockMachineUserRepositorySetAccessTokenTypeCall) Do(f func(domain.AccessTokenType) database.Change) *MockMachineUserRepositorySetAccessTokenTypeCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockMachineUserRepositorySetAccessTokenTypeCall) DoAndReturn(f func(domain.PersonalAccessTokenType) database.Change) *MockMachineUserRepositorySetAccessTokenTypeCall {
+func (c *MockMachineUserRepositorySetAccessTokenTypeCall) DoAndReturn(f func(domain.AccessTokenType) database.Change) *MockMachineUserRepositorySetAccessTokenTypeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -993,6 +1031,44 @@ func (c *MockMachineUserRepositoryStateConditionCall) Do(f func(domain.UserState
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockMachineUserRepositoryStateConditionCall) DoAndReturn(f func(domain.UserState) database.Condition) *MockMachineUserRepositoryStateConditionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// TypeColumn mocks base method.
+func (m *MockMachineUserRepository) TypeColumn() database.Column {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TypeColumn")
+	ret0, _ := ret[0].(database.Column)
+	return ret0
+}
+
+// TypeColumn indicates an expected call of TypeColumn.
+func (mr *MockMachineUserRepositoryMockRecorder) TypeColumn() *MockMachineUserRepositoryTypeColumnCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TypeColumn", reflect.TypeOf((*MockMachineUserRepository)(nil).TypeColumn))
+	return &MockMachineUserRepositoryTypeColumnCall{Call: call}
+}
+
+// MockMachineUserRepositoryTypeColumnCall wrap *gomock.Call
+type MockMachineUserRepositoryTypeColumnCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockMachineUserRepositoryTypeColumnCall) Return(arg0 database.Column) *MockMachineUserRepositoryTypeColumnCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockMachineUserRepositoryTypeColumnCall) Do(f func() database.Column) *MockMachineUserRepositoryTypeColumnCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockMachineUserRepositoryTypeColumnCall) DoAndReturn(f func() database.Column) *MockMachineUserRepositoryTypeColumnCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
