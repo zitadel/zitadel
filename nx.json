@@ -76,7 +76,11 @@
     ],
     "version": {
       "preVersionCommand": "pnpm install",
-      "conventionalCommits": true
+      "conventionalCommits": true,
+      "git": {
+        "commit": true,
+        "tag": true
+      }
     },
     "changelog": {
       "workspaceChangelog": {
@@ -89,11 +93,11 @@
           "commitReferences": true,
           "versionTitleDate": true
         }
+      },
+      "git": {
+        "commit": true,
+        "tag": true
       }
-    },
-    "git": {
-      "commit": true,
-      "tag": true
     },
     "releaseTag": {
       "checkAllBranchesWhen": true

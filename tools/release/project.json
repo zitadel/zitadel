@@ -4,11 +4,20 @@
     "projectType": "library",
     "sourceRoot": "tools/release",
     "targets": {
-        "release-artifacts": {
+        "version": {
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
-                    "npx ts-node tools/release/release-artifacts.ts"
+                    "npx ts-node tools/release/version.ts"
+                ],
+                "passArgs": true
+            }
+        },
+        "publish": {
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "npx ts-node tools/release/publish.ts"
                 ],
                 "passArgs": true
             }

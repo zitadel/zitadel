@@ -63,15 +63,22 @@
             "description": "Compiles the Go-based API backend into an executable binary.",
             "dependsOn": [
                 "generate",
-                "build-console"
+                "build-console",
+                {
+                    "projects": "release-tools",
+                    "target": "version"
+                }
             ],
-            "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w\"'",
+            "command": "bash -c 'VERSION=${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}; CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.version=$VERSION -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\")\"'",
             "inputs": [
                 {
                     "runtime": "go env GOOS"
                 },
                 {
                     "runtime": "go env GOARCH"
+                },
+                {
+                    "env": "ZITADEL_VERSION"
                 },
                 "runtime",
                 {
