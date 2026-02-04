@@ -108,8 +108,8 @@ ZITADEL automatically configures the best security settings for your selected fr
     </Tab>
     <Tab value="Vue.js">
         <AppConfig
-            redirectUrl="http://localhost:5173/auth/signin/zitadel"
-            postLogoutRedirectUrl="http://localhost:5173/">
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/">
         </AppConfig>
     </Tab>
 </FrameworkSelector>
@@ -138,7 +138,7 @@ ZITADEL automatically configures the best security settings for your selected fr
         <AppValues valueCount="three" clientSecret={true} projectID={false}></AppValues>
     </Tab>
     <Tab value="Vue.js">
-        <AppValues valueCount="three" clientSecret={false} projectID={true}></AppValues>
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
     </Tab>
 </FrameworkSelector>
 
@@ -186,7 +186,6 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     <Tab value="Vue.js">
         - [Node.js](https://nodejs.org/)
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
-        - [Yarn](https://yarnpkg.com/)
     </Tab>
 </FrameworkSelector>
 
@@ -195,19 +194,19 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 <FrameworkSelector>
     <Tab value="Angular">
         ```bash
-        git clone [https://github.com/zitadel/example-auth-angular.git](https://github.com/zitadel/example-auth-angular.git)
+        git clone https://github.com/zitadel/example-auth-angular.git
         cd example-auth-angular
         ```
     </Tab>
     <Tab value="Flutter">
         ```bash
-        git clone [https://github.com/zitadel/zitadel_flutter.git](https://github.com/zitadel/zitadel_flutter.git)
+        git clone https://github.com/zitadel/zitadel_flutter.git
         cd zitadel_flutter
         ```
     </Tab>
     <Tab value="Go">
         ```bash
-        git clone [https://github.com/zitadel/zitadel-go.git](https://github.com/zitadel/zitadel-go.git)
+        git clone https://github.com/zitadel/zitadel-go.git
         cd zitadel_go
         ```
     </Tab>
@@ -219,20 +218,20 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     </Tab>
     <Tab value="React">
         ```bash
-        git clone [https://github.com/zitadel/zitadel-react.git](https://github.com/zitadel/zitadel-react.git)
+        git clone https://github.com/zitadel/zitadel-react.git
         cd zitadel-react
         ```
     </Tab>
     <Tab value="Symfony">
         ```bash
-        git clone [https://github.com/zitadel/example-auth-symfony.git](https://github.com/zitadel/example-auth-symfony.git)
+        git clone https://github.com/zitadel/example-auth-symfony.git
         cd example-auth-symfony
         ```
     </Tab>
     <Tab value="Vue.js">
         ```bash
-        git clone [https://github.com/zitadel/zitadel-vue.git](https://github.com/zitadel/zitadel-vue.git)
-        cd zitadel-vue
+        git clone git@github.com:zitadel/example-auth-vuejs.git
+        cd example-auth-vuejs
         ```
     </Tab>
 </FrameworkSelector>
@@ -298,7 +297,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     </Tab>
     <Tab value="Symfony">
 
-        1. Copy+past the .env.example to .env
+        1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
         ```bash
@@ -311,12 +310,17 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```
     </Tab>
     <Tab value="Vue.js">
-        Open .env and update the config object with the **Issuer**, **Client ID** and **PROJECT_ID** you collected in Step 5.
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
         ```bash
-        VITE_ZITADEL_PROJECT_RESOURCE_ID=
-        VITE_ZITADEL_CLIENT_ID=YOUR_CLIENT_ID
-        VITE_ZITADEL_ISSUER=[https://your-instance.zitadel.cloud/](https://your-instance.zitadel.cloud/)
+        NODE_ENV=development
+        PORT=3000
+        VITE_ZITADEL_DOMAIN="https://your-zitadel-domain"
+        VITE_ZITADEL_CLIENT_ID="your-client-id"
+        VITE_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        VITE_ZITADEL_POST_LOGIN_URL="/profile"
+        VITE_ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
         ```
     </Tab>
 </FrameworkSelector>
@@ -396,11 +400,11 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     </Tab>
     <Tab value="Vue.js">
         ```bash
-        yarn install
-        yarn dev
+        npm install
+        npm run dev
         ```
 
-        Your app will be live at `http://localhost:5173`.
+        Your app will be live at `http://localhost:3000`.
 
         ![Vue Example App](../../../public/img/guides/quickstart/vue_example_app.png)
     </Tab>
