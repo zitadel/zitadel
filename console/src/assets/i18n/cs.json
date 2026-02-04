@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Přihlašovací formulář",
           "DESCRIPTION": "Přizpůsob si přihlašovací formulář.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Povoleno přihlášení pomocí uživatelského jména a hesla",
-            "DESCRIPTION": "Umožni svým uživatelům přihlásit se pomocí uživatelského jména a hesla. Pokud je tato možnost deaktivována, tvoji uživatelé se mohou přihlásit pouze pomocí bezheslového přihlášení nebo pomocí externího poskytovatele identity."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Místní ověření povoleno",
+            "DESCRIPTION": "Umožněte uživatelům přihlásit se pomocí uživatelského jména a hesla nebo ověření pomocí přístupového klíče (passkey). Pokud je tato možnost deaktivována, uživatelé se mohou přihlásit pouze pomocí externího poskytovatele identity."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Povolena registrace uživatelů",

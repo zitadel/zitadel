@@ -47,7 +47,7 @@
       "userNotFound": "ユーザーがシステムに見つかりません",
       "couldNotCreateSession": "ユーザーのセッションを作成できませんでした",
       "initialUserNotSupported": "初期ユーザーはサポートされていません",
-      "usernamePasswordNotAllowed": "ユーザー名とパスワードは許可されていません！詳細については管理者にお問い合わせください。",
+      "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。",
       "passkeysNotAllowed": "パスキーは許可されていません！詳細については管理者にお問い合わせください。",
       "couldNotFindIdentityProvider": "IDプロバイダーが見つかりませんでした。",
       "userNotActive": "ユーザーはアクティブではありません。詳細については管理者にお問い合わせください。"

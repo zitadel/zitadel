@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Modulo di Login",
           "DESCRIPTION": "Personalizza il modulo di login.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Username e Password consentiti",
-            "DESCRIPTION": "Permetti ai tuoi utenti di accedere con il loro username e password. Se questa opzione è disattivata, i tuoi utenti possono accedere solo utilizzando l'autenticazione senza password o con un provider di identità esterno."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Autenticazione locale consentita",
+            "DESCRIPTION": "Consenti ai tuoi utenti di accedere con nome utente e password o autenticazione passkey. Se disattivato, i tuoi utenti potranno accedere solo utilizzando un provider di identità esterno."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Registrazione Utente consentita",

@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Login Form",
           "DESCRIPTION": "Customize the login form.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Username and Password allowed",
-            "DESCRIPTION": "Allow your users to log in with their username and password. If this is deactivated, your users can only log in using passwordless authentication or with an external identity provider."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Local authentication allowed",
+            "DESCRIPTION": "Allow your users to log in with their username and password or passkey authentication. If this is deactivated, your users can only log in using an external identity provider."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "User Registration allowed",

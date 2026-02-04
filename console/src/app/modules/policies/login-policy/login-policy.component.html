@@ -229,7 +229,7 @@
     <mat-checkbox
       class="login-policy-toggle"
       color="primary"
-      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USERNAME_PASSWORD_ALLOWED.DESCRIPTION' | translate }}"
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.LOCAL_AUTHENTICATION_ALLOWED.DESCRIPTION' | translate }}"
       ngDefaultControl
       [(ngModel)]="loginData.allowUsernamePassword"
       [disabled]="
@@ -244,7 +244,7 @@
           | async) === false
       "
     >
-      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USERNAME_PASSWORD_ALLOWED.TITLE' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.LOCAL_AUTHENTICATION_ALLOWED.TITLE' | translate }}
     </mat-checkbox>
 
     <!-- <cnsl-info-section class="info">
