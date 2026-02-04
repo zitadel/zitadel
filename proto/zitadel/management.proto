@@ -32,7 +32,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         title: "Management API";
         version: "1.0";
-        description: "The management API is as the name states the interface where systems can mutate IAM objects like organizations, projects, clients, users and so on if they have the necessary access rights.";
+        description: "The management API is as the name states the interface where systems can mutate IAM objects like organizations, projects, applications, users and so on if they have the necessary access rights.";
         contact:{
             name: "ZITADEL"
             url: "https://zitadel.com"
@@ -49,7 +49,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Applications",
-            description: "Applications are the entry point to your project. Users either login into one of your clients and interact with them directly or use one of your APIs. All applications share the roles and authorizations of their project."
+            description: "Applications are the entry point to your project. Users either login into one of your applications and interact with them directly or use one of your APIs. All applications share the roles and authorizations of their project."
         },
         {
             name: "Authentication Methods"
