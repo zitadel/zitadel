@@ -81,10 +81,11 @@ import { hideBin } from 'yargs/helpers';
     // Octokit setup
     const token = process.env.GITHUB_TOKEN;
     if (!token) {
-        console.warn('GITHUB_TOKEN not set.');
-        if (!dryRun && (isMain || isPR)) { // Critical for actual publish
-            console.error('GITHUB_TOKEN required for publishing.');
+        if (!dryRun && isMain) {
+            console.error('GITHUB_TOKEN required for publishing to Main.');
             process.exit(1);
+        } else {
+            console.warn('GITHUB_TOKEN not set. GitHub interactions will be skipped.');
         }
     }
     const octokit = token ? new Octokit({ auth: token }) : null;
