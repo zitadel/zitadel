@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Usuários",
-      "DESCRIPTION": "Um usuário é um humano ou uma máquina que pode acessar seus aplicativos.",
+      "DESCRIPTION": "Um usuário é um humano ou uma conta de serviço que pode acessar seus aplicativos.",
       "HUMANS": {
         "TITLE": "Usuários",
         "DESCRIPTION": "Os usuários são autenticados interativamente em uma sessão do navegador com um prompt de login.",

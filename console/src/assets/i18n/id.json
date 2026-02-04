@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Pengguna",
-      "DESCRIPTION": "Pengguna adalah manusia atau mesin yang dapat mengakses aplikasi Anda.",
+      "DESCRIPTION": "Pengguna adalah manusia atau akun layanan yang dapat mengakses aplikasi Anda.",
       "HUMANS": {
         "TITLE": "Pengguna",
         "DESCRIPTION": "Pengguna mengautentikasi secara interaktif dalam sesi browser dengan perintah login.",

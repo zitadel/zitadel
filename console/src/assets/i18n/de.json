@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Benutzer",
-      "DESCRIPTION": "Ein Benutzer ist ein Mensch oder ein Computer, der auf deine Anwendungen zugreifen kann.",
+      "DESCRIPTION": "Ein Benutzer ist ein Mensch oder ein Servicekonto, das auf deine Anwendungen zugreifen kann.",
       "HUMANS": {
         "TITLE": "Benutzer",
         "DESCRIPTION": "Benutzer authentifizieren sich interaktiv in einer Browsersitzung mit einem Login-Formular.",

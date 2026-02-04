@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Uživatelé",
-      "DESCRIPTION": "Uživatel je člověk nebo stroj, který může přistupovat k vašim aplikacím.",
+      "DESCRIPTION": "Uživatel je člověk nebo účet služby, který může přistupovat k vašim aplikacím.",
       "HUMANS": {
         "TITLE": "Uživatelé",
         "DESCRIPTION": "Uživatelé se autentizují interaktivně v prohlížečové relaci s výzvou k přihlášení.",
