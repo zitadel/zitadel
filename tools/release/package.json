@@ -1,5 +1,7 @@
 {
     "name": "@zitadel/release",
     "version": "1.0.0",
+    "description": "ZITADEL Release and Versioning Tools",
+    "type": "module",
     "private": true
 }
