@@ -6,17 +6,19 @@ import (
 	"net/http"
 	"slices"
 	"strings"
-	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
+	"github.com/zitadel/zitadel/internal/api/call"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
+// LogHandler is a gPRC interceptor that logs the request details
+// including protocol, domain, service, HTTP method, path, response code, and duration.
+// It depends on [CallDurationHandler] and [RequestIDHandler] to set the request start time and ID in the context.
 func LogHandler(ignoredMethodSuffixes ...string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, next grpc.UnaryHandler) (any, error) {
 		if slices.ContainsFunc(ignoredMethodSuffixes, func(s string) bool {
@@ -24,9 +26,7 @@ func LogHandler(ignoredMethodSuffixes ...string) grpc.UnaryServerInterceptor {
 		}) {
 			return next(ctx, req)
 		}
-		start := time.Now()
 		ctx = logging.NewCtx(ctx, logging.StreamRequest)
-		ctx = instrumentation.SetRequestID(ctx, start)
 
 		resp, err := next(ctx, req)
 		var code codes.Code
@@ -40,7 +40,7 @@ func LogHandler(ignoredMethodSuffixes ...string) grpc.UnaryServerInterceptor {
 			slog.String("http_method", http.MethodPost), // gRPC always uses POST
 			slog.String("path", info.FullMethod),
 			slog.Any("code", code),
-			slog.Duration("duration", time.Since(start)),
+			slog.Duration("duration", call.Took(ctx)),
 		)
 		return resp, err
 	}

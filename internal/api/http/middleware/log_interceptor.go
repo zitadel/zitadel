@@ -3,13 +3,16 @@ package middleware
 import (
 	"log/slog"
 	"net/http"
-	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
+	"github.com/zitadel/zitadel/internal/api/call"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
+// LogHandler is a gPRC interceptor that logs the request details
+// including protocol, domain, service, HTTP method, path, response code, and duration.
+// It depends on [CallDurationHandler] and [RequestIDHandler] to set the request start time and ID in the context.
 func LogHandler(service string, ignoredPrefix ...string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		filter := instrumentation.RequestFilter(ignoredPrefix...)
@@ -18,9 +21,7 @@ func LogHandler(service string, ignoredPrefix ...string) func(http.Handler) http
 				next.ServeHTTP(w, r)
 				return
 			}
-			start := time.Now()
 			ctx := logging.NewCtx(r.Context(), logging.StreamRequest)
-			ctx = instrumentation.SetRequestID(ctx, start)
 			sw := newStatusWriter(w)
 
 			next.ServeHTTP(sw, r.WithContext(ctx))
@@ -32,7 +33,7 @@ func LogHandler(service string, ignoredPrefix ...string) func(http.Handler) http
 				slog.String("http_method", r.Method), // gRPC always uses POST
 				slog.String("path", r.URL.Path),
 				slog.Int("status", sw.status),
-				slog.Duration("duration", time.Since(start)),
+				slog.Duration("duration", call.Took(ctx)),
 			)
 		})
 	}
