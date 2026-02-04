@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -44,7 +45,8 @@ func Test_statusWriter(t *testing.T) {
 			if tt.writeStatus != 0 {
 				sw.WriteHeader(tt.writeStatus)
 			}
-			sw.Write([]byte(body))
+			_, err := sw.Write([]byte(body))
+			require.NoError(t, err)
 			assert.Equal(t, tt.wantStatus, sw.Status())
 
 			resp := rec.Result()
