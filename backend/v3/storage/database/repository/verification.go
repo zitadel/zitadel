@@ -75,7 +75,7 @@ func (v verification) init(init *domain.VerificationTypeInit, existingTableName 
 		var (
 			createdAt any = database.NowInstruction
 			expiry    any = database.NullInstruction
-			id        any = database.DefaultInstruction
+			id        any = database.GenRandomUUIDInstruction
 		)
 		if !init.CreatedAt.IsZero() {
 			createdAt = init.CreatedAt

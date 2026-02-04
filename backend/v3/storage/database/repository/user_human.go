@@ -106,8 +106,6 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 		columnValues["email"] = user.Human.Email.Address
 		if !user.Human.Email.VerifiedAt.IsZero() {
 			columnValues["email_verified_at"] = user.Human.Email.VerifiedAt
-		} else {
-			columnValues["email_verified_at"] = database.NowInstruction
 		}
 	}
 	if user.Human.Phone != nil {
@@ -133,8 +131,6 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 			columnValues["phone"] = user.Human.Phone.Number
 			if !user.Human.Phone.VerifiedAt.IsZero() {
 				columnValues["phone_verified_at"] = user.Human.Phone.VerifiedAt
-			} else {
-				columnValues["phone_verified_at"] = database.NowInstruction
 			}
 		}
 	}
@@ -147,8 +143,6 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 		columnValues["totp_secret"] = user.Human.TOTP.Secret
 		if !user.Human.TOTP.VerifiedAt.IsZero() {
 			columnValues["totp_verified_at"] = user.Human.TOTP.VerifiedAt
-		} else {
-			columnValues["totp_verified_at"] = database.NowInstruction
 		}
 	}
 
