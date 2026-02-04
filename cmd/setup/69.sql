@@ -8,7 +8,7 @@ BEGIN
    END IF;
 
    -- Convert string_keys to logged (if unlogged)
-   -- Drop the FK constraint first to avoid conflict with parent table conversion
+   -- Drop the FK constraint first to allow converting cache.string_keys (and avoid loggedness-change restrictions involving the FK)
    IF EXISTS (SELECT 1 FROM pg_class WHERE oid = 'cache.string_keys'::REGCLASS AND relpersistence = 'u') THEN
         ALTER TABLE IF EXISTS cache.string_keys
             DROP CONSTRAINT IF EXISTS fk_object;
