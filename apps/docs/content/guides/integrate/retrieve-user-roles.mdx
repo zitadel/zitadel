@@ -40,7 +40,7 @@ In order to access role information via the token you must include the right aud
 
 An important concept in OpenID Connect (OIDC) is the 'audience' (`aud`) claim, which is part of the token payload. The `aud` claim identifies who or what this token is intended for. If the recipient (e.g., a resource server) does not identify itself with a value in the `aud` claim when this claim is present, then the token must be rejected.
 
-The audience is essential in multi-tier systems, where you may authenticate with one client (in one project) but access resources from another client (in a different project) or when you are accessing ZITADEL’s management APIs. Without the correct audience in your token, you will run into errors, such as the ‘Invalid audience’ error in ZITADEL.
+The audience is essential in multi-tier systems, where you may authenticate with one application (in one project) but access resources from another application (in a different project) or when you are accessing ZITADEL’s management APIs. Without the correct audience in your token, you will run into errors, such as the ‘Invalid audience’ error in ZITADEL.
 
 You can determine the audience in two ways:
 

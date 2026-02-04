@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Chaves Web Ativas e Futuras",
           "DESCRIPTION": "Suas chaves web ativas e futuras. Ativar uma nova chave desativará a atual.",
-          "NOTE": "Nota: O endpoint JWKs OIDC retorna uma resposta que pode ser armazenada em cache (padrão: 5 min). Evite ativar uma chave muito cedo, pois ela pode ainda não estar disponível no cache e para os clientes.",
+          "NOTE": "Nota: O endpoint JWKs OIDC retorna uma resposta que pode ser armazenada em cache (padrão: 5 min). Evite ativar uma chave muito cedo, pois ela pode ainda não estar disponível no cache e para os aplicativos.",
           "ACTIVATE": "Ativar próxima Chave Web",
           "ACTIVE": "Atualmente ativa",
           "NEXT": "Próxima na fila",
@@ -223,8 +223,8 @@
           "PR": "Quando um usuário reseta sua senha, ele receberá um e-mail com um link para definir uma nova senha.",
           "VE": "Quando um usuário muda seu endereço de e-mail, ele receberá um e-mail com um link para verificar o novo endereço.",
           "VP": "Quando um usuário muda seu número de telefone, ele receberá um SMS com um código para verificar o novo número.",
-          "VEO": "Quando um usuário adiciona um método de Senha Única via e-mail, ele precisa ativá-lo inserindo um código enviado para seu endereço de e-mail.",
-          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone.",
+          "VEO": "Quando um usuário adiciona um método OTP via e-mail, ele precisa ativá-lo inserindo um código enviado para seu endereço de e-mail.",
+          "VSO": "Quando um usuário adiciona um método OTP via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone.",
           "IU": "Quando um código de convite de usuário é criado, eles receberão um e-mail com um link para configurar seu método de autenticação."
         }
       },
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Tem permissão para criar e gerenciar usuários",
     "IAM_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais de todas as organizações",
     "IAM_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais de todas as organizações",
-    "IAM_LOGIN_CLIENT": "Tem permissão para gerenciar clientes de login",
+    "IAM_LOGIN_CLIENT": "Tem permissão para gerenciar aplicativos de login",
     "ORG_OWNER": "Tem permissão sobre toda a organização",
     "ORG_USER_MANAGER": "Tem permissão para criar e gerenciar usuários da organização",
     "ORG_OWNER_VIEWER": "Tem permissão para revisar toda a organização",
@@ -851,7 +851,7 @@
       "U2F_NAME": "Nome do Autenticador",
       "TYPE": {
         "0": "Nenhum MFA definido",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Impressão digital, Chaves de Segurança, Face ID e outros"
       },
       "STATE": {
@@ -884,7 +884,7 @@
       "DESCRIPTION": "Adicione um segundo fator para garantir a segurança ideal da sua conta.",
       "MANAGE_DESCRIPTION": "Gerencie os métodos de segundo fator dos seus usuários.",
       "ADD": "Adicionar Fator",
-      "OTP": "Aplicativo de Autenticação para TOTP (One-Time Password)",
+      "OTP": "Aplicativo de Autenticação para TOTP",
       "OTP_DIALOG_TITLE": "Adicionar OTP",
       "OTP_DIALOG_DESCRIPTION": "Digitalize o código QR com um aplicativo autenticador e insira o código abaixo para verificar e ativar o método OTP.",
       "U2F": "Impressão digital, Chaves de Segurança, Face ID e outros",
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "Fator adicionado com sucesso!",
       "U2F_ERROR": "Ocorreu um erro durante a configuração!",
       "U2F_NAME": "Nome do Autenticador",
-      "OTPSMS": "OTP (senha de uso único) com SMS",
-      "OTPEMAIL": "OTP (senha de uso único) com e-mail",
-      "SETUPOTPSMSDESCRIPTION": "Deseja configurar este número de telefone como segundo fator OTP (senha de uso único)?",
+      "OTPSMS": "OTP com SMS",
+      "OTPEMAIL": "OTP com e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Deseja configurar este número de telefone como segundo fator OTP?",
       "OTPSMSSUCCESS": "Fator OTP configurado com sucesso.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Seu telefone deve ser verificado para usar este método.",
       "OTPEMAILSUCCESS": "Fator OTP configurado com sucesso.",
       "TYPE": {
         "0": "Nenhum MFA definido",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Impressão digital, Chaves de Segurança, Face ID e outros"
       },
       "STATE": {
@@ -1595,7 +1595,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Número do remetente",
         "VERIFYSERVICESID": "SID do serviço de verificação",
-        "VERIFYSERVICESID_DESCRIPTION": "Configurar um SID do serviço de verificação permite usar o serviço Twilio Verify em vez do serviço de mensagens para a verificação de números de telefone e SMS OTP.",
+        "VERIFYSERVICESID_DESCRIPTION": "Configurar um SID do serviço de verificação permite usar o serviço Twilio Verify em vez do serviço de mensagens para a verificação de números de telefone e OTP SMS.",
         "ADDED": "Twilio adicionado com sucesso.",
         "UPDATED": "Twilio atualizado com sucesso.",
         "REMOVED": "Twilio removido",
@@ -1613,8 +1613,8 @@
         "4": "Redefinição de senha",
         "5": "Inicialização passkey",
         "6": "Segredo do aplicativo",
-        "7": "Senha única (OTP) - SMS",
-        "8": "Senha única (OTP) - e-mail"
+        "7": "OTP - SMS",
+        "8": "OTP - e-mail"
       },
       "EXPIRY": "Expiração (em minutos)",
       "INCLUDEDIGITS": "Incluir números",
@@ -1645,7 +1645,7 @@
       "DEBUGOIDCPARENTERROR": "Erro de Depuração do Pai OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se a bandeira estiver ativada, o erro do pai OIDC será registrado no console.",
       "ENABLEBACKCHANNELLOGOUT": "Ativar Logout de Backchannel",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Back-Channel implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os clientes sobre a terminação da sessão no Provedor de OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Back-Channel implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os aplicativos sobre a terminação da sessão no Provedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificação de Permissão V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Se a bandeira estiver ativada, você poderá usar a nova API e seus recursos.",
       "STATES": {
@@ -1876,8 +1876,8 @@
         "changedate": "Data de alteração",
         "username": "Nome de usuário",
         "tempUsername": "Nome de usuário temporário",
-        "otp": "Senha de uso único",
-        "verifyUrl": "URL para verificar a senha de uso único",
+        "otp": "OTP",
+        "verifyUrl": "URL para verificar o OTP",
         "expiry": "Data de expiração",
         "applicationName": "Nome do aplicativo"
       },
@@ -2404,10 +2404,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Desconhecido",
-      "1": "Senha de uso único para o aplicativo autenticador (TOTP)",
+      "1": "OTP para o aplicativo autenticador",
       "2": "Impressão digital, Chaves de Segurança, Face ID e outros",
-      "3": "Senha de uso único para e-mail (Email OTP)",
-      "4": "Senha de uso único para SMS (SMS OTP)",
+      "3": "OTP Email",
+      "4": "OTP SMS",
       "5": "Códigos de recuperação"
     }
   },
@@ -2628,8 +2628,8 @@
       "IDTOKENROLEASSERTION": "Funções do usuário no ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Se selecionado, as funções solicitadas do usuário autenticado serão adicionadas ao ID token.",
       "IDTOKENUSERINFOASSERTION": "Informações do usuário no ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite que os clientes obtenham claims de perfil, e-mail, telefone e endereço do ID token.",
-      "CLOCKSKEW": "Permite que os clientes lidem com a discrepância de tempo do OP e do cliente. A duração (0-5s) será adicionada ao claim exp e subtraída de iat, auth_time e nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite que os aplicativos obtenham claims de perfil, e-mail, telefone e endereço do ID token.",
+      "CLOCKSKEW": "Permite que os aplicativos lidem com a discrepância de tempo do OP e do aplicativo. A duração (0-5s) será adicionada ao claim exp e subtraída de iat, auth_time e nbf.",
       "RECOMMENDED": "recomendado",
       "NOTRECOMMENDED": "não recomendado",
       "SELECTION": {

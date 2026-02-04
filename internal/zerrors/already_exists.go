@@ -3,11 +3,11 @@ package zerrors
 import "fmt"
 
 func ThrowAlreadyExists(parent error, id, message string) error {
-	return newZitadelError(KindAlreadyExists, parent, id, message)
+	return CreateZitadelError(KindAlreadyExists, parent, id, message, 1)
 }
 
 func ThrowAlreadyExistsf(parent error, id, format string, a ...any) error {
-	return newZitadelError(KindAlreadyExists, parent, id, fmt.Sprintf(format, a...))
+	return CreateZitadelError(KindAlreadyExists, parent, id, fmt.Sprintf(format, a...), 1)
 }
 
 func IsErrorAlreadyExists(err error) bool {
