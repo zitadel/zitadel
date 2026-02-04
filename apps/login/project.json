@@ -149,7 +149,7 @@
           "tar -czf ${PACK_DIR}/zitadel-login.tar.gz -C ${STANDALONE_DIR} ."
         ]
       },
-      "cache": true,
+      "cache": false,
       "outputs": [
         "{workspaceRoot}/.artifacts/pack/zitadel-login.tar.gz"
       ]
@@ -171,7 +171,7 @@
         "parallel": false,
         "forwardAllArgs": false
       },
-      "cache": true
+      "cache": false
     },
     "publish-container": {
       "description": "Pushes the ZITADEL Login Docker image",
@@ -186,7 +186,7 @@
         "parallel": false,
         "forwardAllArgs": false
       },
-      "cache": true
+      "cache": false
     },
     "pack": {
       "description": "Aggregates all packaging tasks (Archive + Docker build)",
