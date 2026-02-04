@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Claves Web Activas y Futuras",
           "DESCRIPTION": "Tus claves web activas y próximas. Activar una nueva clave desactivará la actual.",
-          "NOTE": "Nota: El endpoint JWKs OIDC devuelve una respuesta almacenable en caché (por defecto 5 min). Evita activar una clave demasiado pronto, ya que puede que aún no esté disponible en cachés y clientes.",
+          "NOTE": "Nota: El endpoint JWKs OIDC devuelve una respuesta almacenable en caché (por defecto 5 min). Evita activar una clave demasiado pronto, ya que puede que aún no esté disponible en cachés y aplicaciones.",
           "ACTIVATE": "Activar la siguiente Clave Web",
           "ACTIVE": "Actualmente activa",
           "NEXT": "Siguiente en la cola",
@@ -388,7 +388,7 @@
       "APPLICATION_CREATED": {
         "title": "Registra tu aplicación",
         "description": "Registra tu aplicación web, nativa, api o saml y configura tu flujo de autenticación.",
-        "action": "Registrar app"
+        "action": "Registrar aplicación"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "Inicia sesión en tu aplicación",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios",
     "IAM_ADMIN_IMPERSONATOR": "Tiene permiso para hacerse pasar por administradores y usuarios finales de todas las organizaciones",
     "IAM_END_USER_IMPERSONATOR": "Tiene permiso para hacerse pasar por usuarios finales de todas las organizaciones",
-    "IAM_LOGIN_CLIENT": "Tiene permiso para gestionar los clientes de inicio de sesión",
+    "IAM_LOGIN_CLIENT": "Tiene permiso para gestionar las aplicaciones de inicio de sesión",
     "ORG_OWNER": "Tiene permisos sobre toda la organización",
     "ORG_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios de la organización",
     "ORG_OWNER_VIEWER": "TIene permiso para revisar toda la organización",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Añade un doble factor para configurar una seguridad óptima de tu cuenta.",
       "MANAGE_DESCRIPTION": "Gestiona el método de doble factor para tus usuarios.",
       "ADD": "Añadir factor",
-      "OTP": "App autenticadora para TOTP (Time-based One-Time Password)",
+      "OTP": "Aplicación autenticadora para TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Añadir TOTP",
-      "OTP_DIALOG_DESCRIPTION": "Escanea el código QR con una app autenticadora introduciendo el siguiente código para verificar y activar el método OTP.",
+      "OTP_DIALOG_DESCRIPTION": "Escanea el código QR con una aplicación autenticadora introduciendo el siguiente código para verificar y activar el método OTP.",
       "U2F": "Llave de acceso (Huella dactilar, claves de seguridad, Face ID y otros)",
       "U2F_DIALOG_TITLE": "Verificar factor",
       "U2F_DIALOG_DESCRIPTION": "Introduce un nombre para tu Multifactor universal.",
@@ -1612,7 +1612,7 @@
         "3": "Verificación de teléfono",
         "4": "Restablecimiento de contraseña",
         "5": "Inicialización de llave de acceso",
-        "6": "Secreto de App",
+        "6": "Secreto de aplicación",
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
@@ -1645,7 +1645,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si la bandera está habilitada, el error del padre OIDC se registrará en la consola.",
       "ENABLEBACKCHANNELLOGOUT": "Habilitar Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "El Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 y se puede usar para notificar a los clientes sobre la terminación de la sesión en el proveedor de OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "El Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 y se puede usar para notificar a las aplicaciones sobre la terminación de la sesión en el proveedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificación de permisos V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Si la bandera está habilitada, podrá usar la nueva API y sus funciones.",
       "STATES": {
@@ -2405,7 +2405,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Desconocido",
-      "1": "One Time Password por Authenticator App (TOTP)",
+      "1": "One Time Password por aplicación autenticadora (TOTP)",
       "2": "Llave de acceso",
       "3": "One Time Password por email (Email OTP)",
       "4": "One Time Password por SMS (SMS OTP)",
@@ -2629,8 +2629,8 @@
       "IDTOKENROLEASSERTION": "Roles de usuario dentro del Token de ID",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Si se selecciona, los roles solicitados para el usuario autenticado se añaden al token de ID.",
       "IDTOKENUSERINFOASSERTION": "Información del usuario dentro del Token de ID",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite a los clientes obtener los claims de perfil, email, teléfono y dirección del token de ID.",
-      "CLOCKSKEW": "Permite a los clientes manejar el sesgo de reloj de OP y el cliente. La duración (0-5 s) se agregará al claim exp y se restará de iats, auth_time y nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite a las aplicaciones obtener los claims de perfil, email, teléfono y dirección del token de ID.",
+      "CLOCKSKEW": "Permite a las aplicaciones manejar el sesgo de reloj de OP y la aplicación. La duración (0-5 s) se agregará al claim exp y se restará de iats, auth_time y nbf.",
       "RECOMMENDED": "recomendado",
       "NOTRECOMMENDED": "no recomendado",
       "SELECTION": {
