@@ -52,22 +52,30 @@ import { hideBin } from 'yargs/helpers';
     const filePaths = files.map(f => path.join(artifactsDir, f));
 
     // 1. Upload to GitHub Actions Artifacts (Available in CI)
-    if (process.env.GITHUB_ACTIONS) {
+    if (process.env.GITHUB_ACTIONS && !dryRun) {
         console.log('Uploading to GitHub Actions Artifacts...');
-        const artifactClient = new DefaultArtifactClient();
-        const artifactName = `release-artifacts-${version}`;
         try {
+            const artifactClient = new DefaultArtifactClient();
+            const artifactName = `release-artifacts-${version}`;
             const { id, size } = await artifactClient.uploadArtifact(
                 artifactName,
                 filePaths,
                 artifactsDir
             );
             console.log(`Uploaded artifact ${id} (${size} bytes)`);
-        } catch (err) {
-            console.error('Failed to upload artifact to GitHub Actions:', err);
+        } catch (err: any) {
+            if (err.message?.includes('ACTIONS_RUNTIME_TOKEN')) {
+                console.warn('Skipping artifact upload: ACTIONS_RUNTIME_TOKEN not available (expected in forks or some PRs).');
+            } else {
+                console.error('Failed to upload artifact to GitHub Actions:', err);
+            }
         }
     } else {
-        console.log('Skipping GitHub Actions Artifact upload (not in GH Actions env).');
+        if (dryRun) {
+            console.log('[Dry-Run] Skipping GitHub Actions Artifact upload.');
+        } else {
+            console.log('Skipping GitHub Actions Artifact upload (not in GH Actions env).');
+        }
     }
 
     // Octokit setup

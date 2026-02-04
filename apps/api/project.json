@@ -65,7 +65,7 @@
                 "generate",
                 "build-console",
                 {
-                    "projects": "release-tools",
+                    "projects": "@zitadel/release",
                     "target": "version"
                 }
             ],
