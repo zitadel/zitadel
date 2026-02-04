@@ -6,22 +6,30 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/embedded"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	// Trigger migration registration
 	_ "github.com/zitadel/zitadel/cmd/initialise"
 	_ "github.com/zitadel/zitadel/cmd/setup"
-	es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
+	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
 var (
-	pool   database.PoolTest
-	pusher *es.Eventstore
+	pool database.PoolTest
+	es   *eventstore.Eventstore
 )
 
 func TestMain(m *testing.M) {
@@ -40,15 +48,22 @@ func runTests(m *testing.M) int {
 	defer stop()
 
 	// q, err := queue.NewQueueWithDB(pool.RawDB())
-	pusher = eventstore.NewEventstore(&eventstore.Config{
+	pusher := es_v3.NewEventstoreFromPool(pool)
+	es = eventstore.NewEventstore(&eventstore.Config{
 		PushTimeout: 0,
 		MaxRetries:  0,
-		Pusher:      es.NewEventstoreFromPool(pool),
-		Querier:     nil,
-		Searcher:    nil,
+		Pusher:      pusher,
+		Querier:     old_es.NewPostgres(pool.InternalDB()),
+		Searcher:    pusher,
 		Queue:       nil,
 	})
 
+	projection.CreateRelational(ctx, pool.InternalDB(), es, projection.Config{})
+
+	if err := projection.Start(ctx); err != nil {
+		log.Printf("error starting projections: %v", err)
+		return 1
+	}
 
 	return m.Run()
 }
@@ -65,8 +80,7 @@ func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), er
 	}
 
 	pool = dummyPool.(database.PoolTest)
-
-	err = pool.MigrateTest(ctx, es.RegisterEventstoreTypes)
+	err = pool.MigrateTest(ctx, es_v3.RegisterEventstoreTypes)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to migrate database: %w", err)
 	}
@@ -75,10 +89,43 @@ func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), er
 }
 
 func TestMyTest(t *testing.T) {
-	require.Nil(t, pool.Ping(t.Context()))
-	tstCmd := instance.NewDomainAddedEvent(t.Context(), &instance.NewAggregate("123").Aggregate, "test-domain.com", false)
-	evt, err := pusher.Push(t.Context(), tstCmd)
+	ctx := t.Context()
+	instanceDomainRepo := repository.InstanceDomainRepository()
+	instanceRepo := repository.InstanceRepository()
 
+	err := instanceRepo.Create(ctx, pool, &domain.Instance{
+		ID:              "123",
+		Name:            "my instance",
+		DefaultOrgID:    gofakeit.UUID(),
+		IAMProjectID:    gofakeit.UUID(),
+		ConsoleClientID: gofakeit.UUID(),
+		ConsoleAppID:    gofakeit.UUID(),
+		DefaultLanguage: gofakeit.LanguageAbbreviation(),
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
+	})
 	require.NoError(t, err)
-	assert.NotEmpty(t, evt)
+
+	tstCmd := instance.NewDomainAddedEvent(ctx, &instance.NewAggregate("123").Aggregate, "test-domain.com", false)
+	_, err = es.Push(ctx, tstCmd)
+	require.NoError(t, err)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*30)
+	assert.EventuallyWithT(t, func(t *assert.CollectT) {
+		domain, err := instanceDomainRepo.Get(ctx, pool,
+			database.WithCondition(
+				database.And(
+					instanceDomainRepo.InstanceIDCondition("123"),
+					instanceDomainRepo.DomainCondition(database.TextOperationEqual, "test-domain.com"),
+				),
+			),
+		)
+		require.NoError(t, err)
+		// event instance.domain.added
+		assert.Equal(t, "test-domain.com", domain.Domain)
+		assert.Equal(t, "123", domain.InstanceID)
+		// assert.False(t, *domain.IsPrimary)
+		// assert.WithinRange(t, domain.CreatedAt, beforeAdd, afterAdd)
+		// assert.WithinRange(t, domain.UpdatedAt, beforeAdd, afterAdd)
+	}, retryDuration, tick)
 }
