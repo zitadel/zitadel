@@ -39,8 +39,7 @@
         "{projectRoot}/**/*",
         "!{projectRoot}/dist/**/*",
         "!{projectRoot}/.angular/**/*",
-        "{workspaceRoot}/pnpm-lock.yaml",
-        "{workspaceRoot}/apps/docs/frameworks.json"
+        "{workspaceRoot}/pnpm-lock.yaml"
       ],
       "outputs": [
         "{projectRoot}/dist"
