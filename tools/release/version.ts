@@ -95,4 +95,5 @@ import { DefaultArtifactClient } from '@actions/artifact';
             console.error(err);
             process.exit(1);
         }
-    }) ();
+    }
+})();

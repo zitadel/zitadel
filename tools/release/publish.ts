@@ -55,27 +55,9 @@ import { hideBin } from 'yargs/helpers';
     const files = fs.readdirSync(artifactsDir).filter(f => f.endsWith('.tar.gz') || f.endsWith('.zip') || f === 'checksums.txt');
     const filePaths = files.map(f => path.join(artifactsDir, f));
 
-    // 1. Upload to GitHub Actions Artifacts (Available in CI)
+    // 1. Upload to GitHub Actions Artifacts (Now handled by ci.yml)
     if (process.env.GITHUB_ACTIONS) {
-        console.log('Uploading to GitHub Actions Artifacts...');
-        try {
-            const artifactClient = new DefaultArtifactClient();
-            const artifactName = `release-artifacts-${version}`;
-            const { id, size } = await artifactClient.uploadArtifact(
-                artifactName,
-                filePaths,
-                artifactsDir
-            );
-            console.log(`Uploaded artifact ${id} (${size} bytes)`);
-        } catch (err: any) {
-            if (err.message?.includes('ACTIONS_RUNTIME_TOKEN')) {
-                console.warn('Skipping artifact upload: ACTIONS_RUNTIME_TOKEN not available (expected in forks or some PRs).');
-            } else {
-                console.error('Failed to upload artifact to GitHub Actions:', err);
-            }
-        }
-    } else {
-        console.log('Skipping GitHub Actions Artifact upload (not in GH Actions env).');
+        console.log('Artifacts generated in .artifacts/ directory. CI workflow will handle upload.');
     }
 
     // Octokit setup
