@@ -6,6 +6,13 @@
     "targets": {
         "version": {
             "executor": "nx:run-commands",
+            "cache": true,
+            "inputs": [
+                "default"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/version"
+            ],
             "options": {
                 "commands": [
                     "npx ts-node tools/release/version.ts"
@@ -15,6 +22,11 @@
         },
         "publish": {
             "executor": "nx:run-commands",
+            "cache": true,
+            "inputs": [
+                "default",
+                "^production"
+            ],
             "options": {
                 "commands": [
                     "npx ts-node tools/release/publish.ts"
