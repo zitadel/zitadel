@@ -154,7 +154,7 @@ The Login Policy defines how the login process should look like and which authen
 ### Default Redirect URI
 
 The Default Redirect URI will be used, if a user calls the login page directly.
-More specifically, typically a client will initiate login with an auth request.
+More specifically, typically an application will initiate login with an auth request.
 The auth request contains a client-id and a redirect uri, that must match the configuration in ZITADEL.
 If there is no [auth request](https://zitadel.com/playgrounds/oidc), users will be redirected to the Default Redirect URI, which is by default `https://${CUSTOM_DOMAIN}/ui/console/`
 

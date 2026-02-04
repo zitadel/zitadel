@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Chei Web Active și Viitoare",
           "DESCRIPTION": "Cheile tale web active și viitoare. Activarea unei noi chei va dezactiva cheia curentă.",
-          "NOTE": "Notă: Endpoint-ul JWKs OIDC returnează un răspuns care poate fi stocat în cache (implicit 5 min). Evită activarea unei chei prea devreme, deoarece este posibil să nu fie încă disponibilă în cache și pentru clienți.",
+          "NOTE": "Notă: Endpoint-ul JWKs OIDC returnează un răspuns care poate fi stocat în cache (implicit 5 min). Evită activarea unei chei prea devreme, deoarece este posibil să nu fie încă disponibilă în cache și pentru aplicații.",
           "ACTIVATE": "Activează următoarea Cheie Web",
           "ACTIVE": "În prezent activă",
           "NEXT": "Următoarea în coadă",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatori",
     "IAM_ADMIN_IMPERSONATOR": "Are permisiunea de a impersona administratorul și utilizatorii finali din toate organizațiile",
     "IAM_END_USER_IMPERSONATOR": "Are permisiunea de a impersona utilizatorii finali din toate organizațiile",
-    "IAM_LOGIN_CLIENT": "Are permisiunea de a gestiona clientii de login",
+    "IAM_LOGIN_CLIENT": "Are permisiunea de a gestiona aplicațiile de login",
     "ORG_OWNER": "Are permisiunea asupra întregii organizații",
     "ORG_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatorii organizației",
     "ORG_OWNER_VIEWER": "Are permisiunea de a revizui întreaga organizație",
@@ -1642,7 +1642,7 @@
       "DEBUGOIDCPARENTERROR": "Eroare de Depanare Părinte OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Dacă steagul este activat, eroarea părinte OIDC va fi înregistrată în consolă.",
       "ENABLEBACKCHANNELLOGOUT": "Activează Logout Backchannel",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Logout-ul Back-Channel implementează OpenID Connect Back-Channel Logout 1.0 și poate fi folosit pentru a notifica clienții despre terminarea sesiunii la Producătorul OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Logout-ul Back-Channel implementează OpenID Connect Back-Channel Logout 1.0 și poate fi folosit pentru a notifica aplicațiile despre terminarea sesiunii la Producătorul OpenID.",
       "PERMISSIONCHECKV2": "Verificare Permisiuni V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Dacă steagul este activat, veți putea folosi noua API și funcțiile sale.",
       "STATES": {
@@ -2654,8 +2654,8 @@
       "IDTOKENROLEASSERTION": "Roluri utilizator în interiorul token-ului ID",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Dacă este selectat, rolurile solicitate ale utilizatorului autentificat sunt adăugate la token-ul ID.",
       "IDTOKENUSERINFOASSERTION": "Informații utilizator în interiorul token-ului ID",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite clienților să preia revendicări de profil, e-mail, telefon și adresă din token-ul ID.",
-      "CLOCKSKEW": "Permite clienților să gestioneze decalajul de ceas al OP și al clientului. Durata (0-5s) va fi adăugată revendicării exp și scăzută din iats, auth_time și nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite aplicațiilor să preia revendicări de profil, e-mail, telefon și adresă din token-ul ID.",
+      "CLOCKSKEW": "Permite aplicațiilor să gestioneze decalajul de ceas al OP și al aplicației. Durata (0-5s) va fi adăugată revendicării exp și scăzută din iats, auth_time și nbf.",
       "RECOMMENDED": "recomandat",
       "NOTRECOMMENDED": "nerecomandat",
       "SELECTION": {

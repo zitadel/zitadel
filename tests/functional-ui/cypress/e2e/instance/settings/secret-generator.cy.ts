@@ -13,7 +13,7 @@ describe('instance secret generators', () => {
       cy.contains('Phone verification');
       cy.contains('Password Reset');
       cy.contains('Passkey Initialization');
-      cy.contains('App Secret');
+      cy.contains('Application Secret');
       cy.contains('OTP - SMS');
       cy.contains('OTP - Email');
     });

@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "活动和未来的 Web 密钥",
           "DESCRIPTION": "您的当前活动和即将启用的 Web 密钥。激活新密钥将会停用当前密钥。",
-          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认 5 分钟）。请避免过早激活密钥，否则它可能尚未在缓存或客户端中可用。",
+          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认 5 分钟）。请避免过早激活密钥，否则它可能尚未在缓存或应用中可用。",
           "ACTIVATE": "激活下一个 Web 密钥",
           "ACTIVE": "当前活动",
           "NEXT": "队列中的下一个",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "默认情况下启用开发模式。您可以稍后更新生产值。",
     "GUIDE": "指南",
     "BROWSEEXAMPLES": "浏览示例",
-    "DUPLICATEAPPRENAME": "具有相同 neme 的应用程序已经存在。请选择不同的名称。",
+    "DUPLICATEAPPRENAME": "具有相同名称的应用程序已经存在。请选择不同的名称。",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "变革框架",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "有权创建和管理用户",
     "IAM_ADMIN_IMPERSONATOR": "有权模拟所有组织的管理员和最终用户",
     "IAM_END_USER_IMPERSONATOR": "有权模拟所有组织的最终用户",
-    "IAM_LOGIN_CLIENT": "具有管理登录客户端的权限",
+    "IAM_LOGIN_CLIENT": "具有管理登录应用程序的权限",
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
@@ -1614,7 +1614,7 @@
         "3": "电话号码验证",
         "4": "重置密码",
         "5": "Passkey 初始化",
-        "6": "App 验证",
+        "6": "应用密钥",
         "7": "OTP - SMS",
         "8": "OTP - 电子邮件"
       },
@@ -1647,7 +1647,7 @@
       "DEBUGOIDCPARENTERROR": "调试 OIDC 父错误",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "如果启用该标志，OIDC 父错误将记录在控制台中。",
       "ENABLEBACKCHANNELLOGOUT": "启用 Backchannel 注销",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知客户端在 OpenID 提供商处终止会话。",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知应用程序在 OpenID 提供商处终止会话。",
       "PERMISSIONCHECKV2": "权限检查 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
       "STATES": {
@@ -2665,8 +2665,8 @@
       "IDTOKENROLEASSERTION": "在 ID Token 中包含用户角色",
       "IDTOKENROLEASSERTION_DESCRIPTION": "如果勾选，则已验证用户的请求角色将添加到 ID Token 中。",
       "IDTOKENUSERINFOASSERTION": "在 ID Token 中包含用户信息",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "使客户端能够从 ID Token 中读取个人资料、电子邮件、电话和地址声明。",
-      "CLOCKSKEW": "使客户端能够处理 OP 和客户端的时钟偏差。持续时间（0-5 秒）将添加到 exp 声明中，并从 iats、auth_time 和 nbf 中减去。",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "使应用程序能够从 ID Token 中读取个人资料、电子邮件、电话和地址声明。",
+      "CLOCKSKEW": "使应用程序能够处理 OP 和应用程序的时钟偏差。持续时间（0-5 秒）将添加到 exp 声明中，并从 iats、auth_time 和 nbf 中减去。",
       "RECOMMENDED": "推荐的",
       "NOTRECOMMENDED": "不推荐的",
       "SELECTION": {
