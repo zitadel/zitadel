@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Bejelentkező űrlap",
           "DESCRIPTION": "Szabd testre a bejelentkező űrlapot.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Felhasználónév és jelszó engedélyezve",
-            "DESCRIPTION": "Engedd meg a felhasználóidnak, hogy felhasználónévvel és jelszóval jelentkezzenek be. Ha ez nincs engedélyezve, a felhasználóid csak Passkey azonosítással vagy külső identitásszolgáltatóval tudnak bejelentkezni."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Helyi hitelesítés engedélyezve",
+            "DESCRIPTION": "Engedélyezze a felhasználók számára a bejelentkezést felhasználónévvel és jelszóval vagy jelkulcsos hitelesítéssel. Ha ez ki van kapcsolva, a felhasználók csak külső személyazonosság-szolgáltatón keresztül jelentkezhetnek be."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Felhasználói regisztráció engedélyezve",

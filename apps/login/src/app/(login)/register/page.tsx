@@ -13,7 +13,6 @@ import {
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -93,7 +92,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {legal &&
           passwordComplexitySettings &&
           organization &&
-          (loginSettings.allowUsernamePassword || loginSettings.passkeysType == PasskeysType.ALLOWED) && (
+          loginSettings.allowLocalAuthentication && (
             <RegisterForm
               idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
               legal={legal}
