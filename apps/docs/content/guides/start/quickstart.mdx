@@ -410,7 +410,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 You’ve successfully integrated ZITADEL into an application.
 
 <Callout type="warn" title="Prevent Misconfiguration Lockouts ">
-  Login policy misconfigurations during the testing phase and can easily lead to a [lockout](/legal/policies/account-lockout-policy). To ensure you don't lose access to your instance:
+  Login policy misconfigurations that occur during the testing phase can easily lead to a [lockout](/legal/policies/account-lockout-policy). To ensure you don't lose access to your instance:
 
   1.  **Generate a backup PAT:** Create a [Service User Personal Access Token](/guides/integrate/service-users/personal-access-token) with the [`IAM_OWNER`](/guides/manage/console/managers) role to revert any login UI misconfigurations using the API.
   2.  **Add a second Instance Manager:** Always designate at least one [**second instance manager**](/guides/manage/console/managers).
