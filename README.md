@@ -1,6 +1,6 @@
 <p align="center">
-    <img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
-    <img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
+    <img src="./apps/docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
+    <img src="./apps/docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 <p align="center">
     <a href="https://openid.net/certification/#OPs" alt="OpenID Connect Certified">
-        <img src="./docs/static/logos/oidc-cert.png" /></a>
+        <img src="./apps/docs/static/logos/oidc-cert.png" /></a>
 </p>
 
 Are you searching for a user management tool that is quickly set up like Auth0 and open source like Keycloak?
@@ -105,7 +105,7 @@ Yet it offers everything you need for a customer identity ([CIAM](https://zitade
 - [API-first approach](https://zitadel.com/docs/apis/introduction)
 - [Multi-tenancy](https://zitadel.com/docs/guides/solution-scenarios/b2b) authentication and access management
 - [Strong audit trail](https://zitadel.com/docs/concepts/features/audit-trail) thanks to [event sourcing](https://zitadel.com/docs/concepts/eventstore/overview) as storage pattern
-- [Actions](https://zitadel.com/docs/apis/actions/introduction) to react on events with custom code and extended ZITADEL for you needs
+- [Actions](https://zitadel.com/docs/guides/manage/console/actions-overview) to react on events with custom code and extended ZITADEL for you needs
 - [Branding](https://zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience across multiple organizations
 - [Self-service](https://zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
 - [Postgres](https://www.postgresql.org/) database as reliable and widespread storage option
@@ -132,13 +132,13 @@ Multi-Tenancy
 
 - [Identity Brokering](https://zitadel.com/docs/guides/integrate/identity-brokering) with templates for popular identity providers
 - [Customizable onboarding](https://zitadel.com/docs/guides/solution-scenarios/onboarding) for B2B and their users
-- [Delegate role management to third-parties](https://zitadel.com/docs/guides/manage/console/projects)
+- [Delegate role management to third-parties](https://zitadel.com/docs/guides/manage/console/projects-overview)
 - [Domain discovery](https://zitadel.com/docs/guides/solution-scenarios/domain-discovery)
 
 Integration
 
 - [GRPC and REST APIs](https://zitadel.com/docs/apis/introduction) for every functionality and resource
-- [Actions](https://zitadel.com/docs/apis/actions/introduction) to call any API, send webhooks, adjust workflows, or customize tokens
+- [Actions](https://zitadel.com/docs/guides/manage/console/actions-overview) to call any API, send webhooks, adjust workflows, or customize tokens
 - [Role Based Access Control (RBAC)](https://zitadel.com/docs/guides/integrate/retrieve-user-roles)
 - [SCIM 2.0 Server](https://zitadel.com/docs/apis/scim2)
 - [Examples and SDKs](https://zitadel.com/docs/sdk-examples/introduction)
@@ -149,7 +149,7 @@ Integration
 Self-Service
 - [Self-registration](https://zitadel.com/docs/concepts/features/selfservice#registration) including verification
 - [Self-service](https://zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
-- [Administration UI (Console)](https://zitadel.com/docs/guides/manage/console/overview)
+- [Administration UI (Console)](https://zitadel.com/docs/guides/manage/console/console-overview)
 
 Deployment
 - [Postgres](https://zitadel.com/docs/self-hosting/manage/database#postgres) (version >= 14)
@@ -185,9 +185,9 @@ Use our Login widget to allow easy and secure access to your applications and en
 
 [![Passkeys](https://user-images.githubusercontent.com/1366906/223664178-4132faef-4832-4014-b9ab-90c2a8d15436.gif)](https://www.youtube.com/watch?v=cZjHQYurSjw&list=PLTDa7jTlOyRLdABgD2zL0LGM7rx5GZ1IR&index=2 "Passkeys")
 
-### Admin Console
+### Management Console
 
-Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
+Use [Console](https://zitadel.com/docs/guides/manage/console/console-overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
 
 [![Console Showcase](https://user-images.githubusercontent.com/1366906/223663344-67038d5f-4415-4285-ab20-9a4d397e2138.gif)](http://www.youtube.com/watch?v=RPpHktAcCtk "Console Showcase")
 

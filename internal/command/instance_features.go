@@ -15,21 +15,19 @@ import (
 type InstanceFeatures struct {
 	LoginDefaultOrg                *bool
 	UserSchema                     *bool
-	TokenExchange                  *bool
 	ImprovedPerformance            []feature.ImprovedPerformanceType
 	DebugOIDCParentError           *bool
 	OIDCSingleV1SessionTermination *bool
 	EnableBackChannelLogout        *bool
 	LoginV2                        *feature.LoginV2
 	PermissionCheckV2              *bool
-	ConsoleUseV2UserApi            *bool
+	ManagementConsoleUseV2UserApi  *bool
 	EnableRelationalTables         *bool
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
 	return m == nil || (m.LoginDefaultOrg == nil &&
 		m.UserSchema == nil &&
-		m.TokenExchange == nil &&
 		// nil check to allow unset improvements
 		m.ImprovedPerformance == nil &&
 		m.DebugOIDCParentError == nil &&
@@ -37,7 +35,7 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.EnableBackChannelLogout == nil &&
 		m.LoginV2 == nil &&
 		m.PermissionCheckV2 == nil &&
-		m.ConsoleUseV2UserApi == nil &&
+		m.ManagementConsoleUseV2UserApi == nil &&
 		m.EnableRelationalTables == nil)
 }
 

@@ -24,7 +24,7 @@ type Props = {
 
 export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const t = useTranslations("ldap");

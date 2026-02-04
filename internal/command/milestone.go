@@ -123,7 +123,7 @@ func (s *OIDCSessionEvents) SetMilestones(ctx context.Context, clientID string, 
 		s.events = append(s.events, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance))
 		invalidate = true
 	}
-	if !milestones.AuthenticationSucceededOnApplication && isHuman && clientID != instance.ConsoleClientID() {
+	if !milestones.AuthenticationSucceededOnApplication && isHuman && clientID != instance.ManagementConsoleClientID() {
 		s.events = append(s.events, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication))
 		invalidate = true
 	}

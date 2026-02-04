@@ -26,18 +26,19 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const { serviceConfig } = getServiceConfig(_headers);
 
   const sessionFactors = sessionId
-    ? await loadSessionById(serviceConfig.baseUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceConfig.baseUrl, loginName, organization);
+    ? await loadSessionById(sessionId, organization)
+    : await loadSessionByLoginname(loginName, organization);
 
-  async function loadSessionByLoginname(serviceUrl: string, loginName?: string, organization?: string) {
-    return loadMostRecentSession({ serviceConfig, sessionParams: {
+  async function loadSessionByLoginname(loginName?: string, organization?: string) {
+    return loadMostRecentSession({
+      serviceConfig,
+      sessionParams: {
         loginName,
         organization,
       },
     }).then((session) => {
       if (session && session.factors?.user?.id) {
-        return listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id,
-        }).then((methods) => {
+        return listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id }).then((methods) => {
           return {
             factors: session?.factors,
             authMethods: methods.authMethodTypes ?? [],
@@ -47,14 +48,16 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     });
   }
 
-  async function loadSessionById(host: string, sessionId: string, organization?: string) {
+  async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({ serviceConfig, sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((response) => {
+
+    if (!recent) {
+      return undefined;
+    }
+
+    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
-        return listAuthenticationMethodTypes({ serviceConfig, userId: response.session.factors.user.id,
-        }).then((methods) => {
+        return listAuthenticationMethodTypes({ serviceConfig, userId: response.session.factors.user.id }).then((methods) => {
           return {
             factors: response.session?.factors,
             authMethods: methods.authMethodTypes ?? [],
@@ -64,8 +67,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     });
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
   return (
     <DynamicTheme branding={branding}>

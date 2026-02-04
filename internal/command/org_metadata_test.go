@@ -144,13 +144,14 @@ func TestCommandSide_SetOrgMetadata(t *testing.T) {
 
 func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
-			ctx          context.Context
-			orgID        string
-			metadataList []*domain.Metadata
+			ctx             context.Context
+			orgID           string
+			permissionCheck OrganizationPermissionCheck
+			metadataList    []*domain.Metadata
 		}
 	)
 	type res struct {
@@ -164,11 +165,9 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "empty meta data list, pre condition error",
+			name: "empty metadata list, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -181,8 +180,7 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 		{
 			name: "org not existing, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -201,8 +199,7 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 		{
 			name: "invalid metadata, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -228,8 +225,7 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 		{
 			name: "add metadata, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -266,13 +262,72 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "add metadata (with permission check), ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"ZITADEL",
+							),
+						),
+					),
+					expectPush(
+						org.NewMetadataSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+							[]byte("value"),
+						),
+						org.NewMetadataSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key1",
+							[]byte("value1"),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             context.Background(),
+				orgID:           "org1",
+				permissionCheck: newMockOrganizationPermissionCheckAllowed(),
+				metadataList: []*domain.Metadata{
+					{Key: "key", Value: []byte("value")},
+					{Key: "key1", Value: []byte("value1")},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "add metadata (no permission), error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:             context.Background(),
+				orgID:           "org1",
+				permissionCheck: newMockOrganizationPermissionCheckNotAllowed(),
+				metadataList: []*domain.Metadata{
+					{Key: "key", Value: []byte("value")},
+					{Key: "key1", Value: []byte("value1")},
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.BulkSetOrgMetadata(tt.args.ctx, tt.args.orgID, tt.args.metadataList...)
+			got, err := r.BulkSetOrgMetadata(tt.args.ctx, tt.args.orgID, tt.args.permissionCheck, tt.args.metadataList...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -341,7 +396,7 @@ func TestCommandSide_OrgRemoveMetadata(t *testing.T) {
 			},
 		},
 		{
-			name: "meta data not existing, not found error",
+			name: "metadata not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -428,13 +483,14 @@ func TestCommandSide_OrgRemoveMetadata(t *testing.T) {
 
 func TestCommandSide_BulkRemoveOrgMetadata(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
-			ctx          context.Context
-			orgID        string
-			metadataList []string
+			ctx             context.Context
+			orgID           string
+			permissionCheck OrganizationPermissionCheck
+			metadataList    []string
 		}
 	)
 	type res struct {
@@ -448,11 +504,9 @@ func TestCommandSide_BulkRemoveOrgMetadata(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "empty meta data list, pre condition error",
+			name: "empty metadata list, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -465,8 +519,7 @@ func TestCommandSide_BulkRemoveOrgMetadata(t *testing.T) {
 		{
 			name: "org not existing, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -482,8 +535,7 @@ func TestCommandSide_BulkRemoveOrgMetadata(t *testing.T) {
 		{
 			name: "remove metadata keys not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -515,8 +567,7 @@ func TestCommandSide_BulkRemoveOrgMetadata(t *testing.T) {
 		{
 			name: "invalid metadata, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -555,8 +606,7 @@ func TestCommandSide_BulkRemoveOrgMetadata(t *testing.T) {
 		{
 			name: "remove metadata, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -604,13 +654,80 @@ func TestCommandSide_BulkRemoveOrgMetadata(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "remove metadata (with permission check), ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"ZITADEL",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewMetadataSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"key",
+								[]byte("value"),
+							),
+						),
+						eventFromEventPusher(
+							org.NewMetadataSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"key1",
+								[]byte("value1"),
+							),
+						),
+					),
+					expectPush(
+						org.NewMetadataRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
+						org.NewMetadataRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key1",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             context.Background(),
+				orgID:           "org1",
+				permissionCheck: newMockOrganizationPermissionCheckAllowed(),
+				metadataList:    []string{"key", "key1"},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "remove metadata (no permission), ok",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:             context.Background(),
+				orgID:           "org1",
+				permissionCheck: newMockOrganizationPermissionCheckNotAllowed(),
+				metadataList:    []string{"key", "key1"},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.BulkRemoveOrgMetadata(tt.args.ctx, tt.args.orgID, tt.args.metadataList...)
+			got, err := r.BulkRemoveOrgMetadata(tt.args.ctx, tt.args.orgID, tt.args.permissionCheck, tt.args.metadataList...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -28,11 +28,14 @@ message SetInstanceFeaturesRequest{
     }
   ];
 
+  // Deprecated: the flag has been removed and `urn:ietf:params:oauth:grant-type:token-exchange`
+  // grant type for the OIDC token endpoint is enabled by default.
+  // Token exchange can be used to request tokens with a lesser scope or impersonate other users.
+  // See the security policy to allow impersonation on an instance.
+  // This field is only kept for backward compatibility and will be removed in the next major version of Zitadel.
+  // Setting the field will have no effect.
   optional bool oidc_token_exchange = 5 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
-    }
+    deprecated = true
   ];
 
   repeated ImprovedPerformance improved_performance = 7 [
@@ -81,7 +84,7 @@ message SetInstanceFeaturesRequest{
   optional bool console_use_v2_user_api = 15 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
-      description: "If this is enabled the console web client will use the new User v2 API for certain calls";
+      description: "If this is enabled the management console web client will use the new User v2 API for certain calls";
     }
   ];
 
@@ -131,11 +134,13 @@ message GetInstanceFeaturesResponse {
     }
   ];
 
+  // Deprecated: the flag has been removed and `urn:ietf:params:oauth:grant-type:token-exchange`
+  // grant type for the OIDC token endpoint is enabled by default.
+  // Token exchange can be used to request tokens with a lesser scope or impersonate other users.
+  // See the security policy to allow impersonation on an instance.
+  // This field is only kept for backward compatibility and will be removed in the next major version of Zitadel.
   FeatureFlag oidc_token_exchange = 6 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
-    }
+    deprecated = true
   ];
 
   ImprovedPerformanceFeatureFlag improved_performance = 8 [
@@ -182,7 +187,7 @@ message GetInstanceFeaturesResponse {
   FeatureFlag console_use_v2_user_api = 16 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
-      description: "If this is enabled the console web client will use the new User v2 API for certain calls";
+      description: "If this is enabled the management console web client will use the new User v2 API for certain calls";
     }
   ];
 

@@ -36,7 +36,7 @@ func TestSystemFeaturesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.system_features (key, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (key) DO UPDATE SET (creation_date, change_date, sequence, value) = (projections.system_features.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
+							expectedStmt: "INSERT INTO projections.system_features3 (key, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (key) DO UPDATE SET (creation_date, change_date, sequence, value) = (projections.system_features3.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
 							expectedArgs: []interface{}{
 								"user_schema",
 								anyArg{},
@@ -66,7 +66,7 @@ func TestSystemFeaturesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.system_features WHERE (key IS NOT NULL)",
+							expectedStmt: "DELETE FROM projections.system_features3 WHERE (key IS NOT NULL)",
 							expectedArgs: []interface{}{},
 						},
 					},

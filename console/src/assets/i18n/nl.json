@@ -1,9 +1,9 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Metadata",
     "HOME": {
-      "TITLE": "Begin met ZITADEL",
+      "TITLE": "Begin met Zitadel",
       "NEXT": {
         "TITLE": "Je volgende stappen",
         "DESCRIPTION": "Voltooi de volgende stappen om je applicatie te beveiligen.",
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "Documentatie",
-          "DESCRIPTION": "Verken de kennisbasis van ZITADEL om vertrouwd te raken met de kernconcepten en ideeën. Leer hoe ZITADEL werkt en hoe je het gebruikt."
+          "DESCRIPTION": "Verken de kennisbasis van Zitadel om vertrouwd te raken met de kernconcepten en ideeën. Leer hoe Zitadel werkt en hoe je het gebruikt."
         },
         "EXAMPLES": {
           "TITLE": "Voorbeelden en Software Development Kits",
-          "DESCRIPTION": "Bekijk onze voorbeelden en SDK's om ZITADEL te gebruiken met je favoriete programmeertalen en tools."
+          "DESCRIPTION": "Bekijk onze voorbeelden en SDK's om Zitadel te gebruiken met je favoriete programmeertalen en tools."
         }
       }
     },
@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projecten",
-      "DESCRIPTION": "Een project host een of meer applicaties, die je kunt gebruiken om je gebruikers te authenticeren. Bijvoorbeeld, je zou een enkel project kunnen hebben met 3 applicaties; een voor je web frontend, een voor je mobiele app, en een voor je backend. Ook kun je je gebruikers autoriseren met projecten. Om gebruikers van andere organisaties in staat te stellen in te loggen op je applicaties, geef ze toegang tot je project.<br/><br/>Als je een project niet kunt vinden, neem dan contact op met de eigenaar van het project of iemand met de bijbehorende rechten om toegang te krijgen.",
+      "DESCRIPTION": "Een project host een of meer applicaties, die je kunt gebruiken om je gebruikers te authenticeren. Bijvoorbeeld, je zou een enkel project kunnen hebben met 3 applicaties; een voor je web frontend, een voor je mobiele applicatie, en een voor je backend. Ook kun je je gebruikers autoriseren met projecten. Om gebruikers van andere organisaties in staat te stellen in te loggen op je applicaties, geef ze toegang tot je project.<br/><br/>Als je een project niet kunt vinden, neem dan contact op met de eigenaar van het project of iemand met de bijbehorende rechten om toegang te krijgen.",
       "OWNED": {
         "TITLE": "Eigen Projecten",
         "DESCRIPTION": "Dit zijn de projecten die je bezit. Je kunt de instellingen van deze projecten, autorisaties en applicaties beheren."
@@ -67,7 +67,7 @@
     },
     "ACTIONS": {
       "TITLE": "Acties",
-      "DESCRIPTION": "Voer aangepaste code uit bij gebeurtenissen die plaatsvinden terwijl je gebruikers zich authentiseren bij ZITADEL. Automatiseer je processen, verrijk de metadata en tokens van je gebruikers of meld externe systemen.",
+      "DESCRIPTION": "Voer aangepaste code uit bij gebeurtenissen die plaatsvinden terwijl je gebruikers zich authentiseren bij Zitadel. Automatiseer je processen, verrijk de metadata en tokens van je gebruikers of meld externe systemen.",
       "SCRIPTS": {
         "TITLE": "Scripts",
         "DESCRIPTION": "Schrijf je JavaScript-code eenmaal en activeer deze in meerdere stromen."
@@ -97,23 +97,23 @@
         "NEXT": "Wat nu?",
         "SAML": {
           "TITLE": "Configureer je SAML-identiteitsprovider",
-          "DESCRIPTION": "ZITADEL is geconfigureerd. Nu heeft je SAML-identiteitsprovider enige configuratie nodig. De meeste providers staan je toe om gewoon de volledige ZITADEL-metadata XML te uploaden. Andere providers vragen je om enkele specifieke URL's te verstrekken, zoals bijvoorbeeld de entiteits-ID (metadata-URL), de Assertion Consumer Service (ACS) URL of de Single Logout URL."
+          "DESCRIPTION": "Zitadel is geconfigureerd. Nu heeft je SAML-identiteitsprovider enige configuratie nodig. De meeste providers staan je toe om gewoon de volledige Zitadel-metadata XML te uploaden. Andere providers vragen je om enkele specifieke URL's te verstrekken, zoals bijvoorbeeld de entiteits-ID (metadata-URL), de Assertion Consumer Service (ACS) URL of de Single Logout URL."
         },
         "CALLBACK": {
           "TITLE": "Configureer je {{ provider }}-identiteitsprovider",
-          "DESCRIPTION": "Voordat je ZITADEL kunt configureren, geef deze URL door aan je identiteitsprovider om de browseromleiding terug naar ZITADEL na authenticatie mogelijk te maken."
+          "DESCRIPTION": "Voordat je Zitadel kunt configureren, geef deze URL door aan je identiteitsprovider om de browseromleiding terug naar Zitadel na authenticatie mogelijk te maken."
         },
         "JWT": {
           "TITLE": "Gebruik JWT's als gefedereerde identiteiten",
-          "DESCRIPTION": "De JWT-identiteitsprovider stelt je in staat om je bestaande JWT-tokens te gebruiken als gefedereerde identiteiten. Deze functie is handig als je al een uitgever voor JWT's hebt. Met een JWT IdP kun je deze JWT's gebruiken om gebruikers in ZITADEL on-the-fly te creëren en bij te werken."
+          "DESCRIPTION": "De JWT-identiteitsprovider stelt je in staat om je bestaande JWT-tokens te gebruiken als gefedereerde identiteiten. Deze functie is handig als je al een uitgever voor JWT's hebt. Met een JWT IdP kun je deze JWT's gebruiken om gebruikers in Zitadel on-the-fly te creëren en bij te werken."
         },
         "LDAP": {
-          "TITLE": "Configureer ZITADEL om te verbinden met je LDAP-identiteitsprovider",
-          "DESCRIPTION": "Geef de verbindingsdetails voor je LDAP-server op en configureer de toewijzing van je LDAP-attributen aan ZITADEL-attributen."
+          "TITLE": "Configureer Zitadel om te verbinden met je LDAP-identiteitsprovider",
+          "DESCRIPTION": "Geef de verbindingsdetails voor je LDAP-server op en configureer de toewijzing van je LDAP-attributen aan Zitadel-attributen."
         },
         "AUTOFILL": {
           "TITLE": "Gebruikersgegevens automatisch invullen",
-          "DESCRIPTION": "Gebruik een actie om de ervaring van je gebruikers te verbeteren. Je kunt het registratieformulier van ZITADEL vooraf invullen met waarden van de identiteitsprovider."
+          "DESCRIPTION": "Gebruik een actie om de ervaring van je gebruikers te verbeteren. Je kunt het registratieformulier van Zitadel vooraf invullen met waarden van de identiteitsprovider."
         },
         "ACTIVATE": {
           "TITLE": "Activeer de IdP",
@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externe links",
-        "DESCRIPTION": "Leid uw gebruikers naar aangepaste externe bronnen die op de inlogpagina worden weergegeven. Gebruikers moeten de Servicevoorwaarden en het Privacybeleid accepteren voordat ze zich kunnen aanmelden. Wijzig de link naar uw documentatie of stel een lege string in om de documentatieknop voor de console te verbergen. Voeg een aangepaste externe link en een aangepaste tekst voor die link toe in de console, of stel ze leeg om die knop te verbergen."
+        "DESCRIPTION": "Leid uw gebruikers naar aangepaste externe bronnen die op de inlogpagina worden weergegeven. Gebruikers moeten de Servicevoorwaarden en het Privacybeleid accepteren voordat ze zich kunnen aanmelden. Wijzig de link naar uw documentatie of stel een lege string in om de documentatieknop voor de beheerconsole te verbergen. Voeg een aangepaste externe link en een aangepaste tekst voor die link toe in de beheerconsole, of stel ze leeg om die knop te verbergen."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP-instellingen",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS-instellingen",
-        "DESCRIPTION": "Om alle ZITADEL-functies te ontgrendelen, configureer Twilio om SMS-berichten naar je gebruikers te sturen."
+        "DESCRIPTION": "Om alle Zitadel-functies te ontgrendelen, configureer Twilio om SMS-berichten naar je gebruikers te sturen."
       },
       "IAM_EVENTS": {
         "TITLE": "Evenementen",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "Mislukte Evenementen",
-        "DESCRIPTION": "Deze pagina toont alle mislukte evenementen in je instantie. Als ZITADEL zich niet gedraagt zoals je verwacht, controleer dan eerst deze lijst."
+        "DESCRIPTION": "Deze pagina toont alle mislukte evenementen in je instantie. Als Zitadel zich niet gedraagt zoals je verwacht, controleer dan eerst deze lijst."
       },
       "IAM_VIEWS": {
         "TITLE": "Weergaven",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "Beveiligingsinstellingen",
-        "DESCRIPTION": "Schakel ZITADEL-functies in die beveiligingsimpact kunnen hebben. Je moet echt weten wat je doet voordat je deze instellingen wijzigt."
+        "DESCRIPTION": "Schakel Zitadel-functies in die beveiligingsimpact kunnen hebben. Je moet echt weten wat je doet voordat je deze instellingen wijzigt."
       },
       "OIDC": {
         "TITLE": "OpenID Connect Instellingen",
@@ -187,11 +187,11 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "Beheer je OIDC Web Keys om tokens veilig te ondertekenen en te valideren voor je ZITADEL-instantie.",
+        "DESCRIPTION": "Beheer je OIDC Web Keys om tokens veilig te ondertekenen en te valideren voor je Zitadel-instantie.",
         "TABLE": {
           "TITLE": "Actieve en Toekomstige Websleutels",
           "DESCRIPTION": "Je actieve en aankomende websleutels. Het activeren van een nieuwe sleutel deactiveert de huidige.",
-          "NOTE": "Opmerking: Het JWKs OIDC-eindpunt geeft een cachebare respons terug (standaard 5 minuten). Vermijd het te vroeg activeren van een sleutel, omdat deze mogelijk nog niet beschikbaar is in caches en bij clients.",
+          "NOTE": "Opmerking: Het JWKs OIDC-eindpunt geeft een cachebare respons terug (standaard 5 minuten). Vermijd het te vroeg activeren van een sleutel, omdat deze mogelijk nog niet beschikbaar is in caches en bij applicaties.",
           "ACTIVATE": "Volgende Websleutel activeren",
           "ACTIVE": "Momenteel actief",
           "NEXT": "Volgende in de wachtrij",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "Nieuwe Websleutel aanmaken",
-          "DESCRIPTION": "Het aanmaken van een nieuwe websleutel voegt deze toe aan je lijst. ZITADEL gebruikt standaard RSA2048-sleutels met een SHA256-hasher.",
+          "DESCRIPTION": "Het aanmaken van een nieuwe websleutel voegt deze toe aan je lijst. Zitadel gebruikt standaard RSA2048-sleutels met een SHA256-hasher.",
           "KEY_TYPE": "Sleuteltype",
           "BITS": "Bits",
           "HASHER": "Hasher",
@@ -234,7 +234,7 @@
       },
       "DOMAINS": {
         "TITLE": "Domeininstellingen",
-        "DESCRIPTION": "Definieer beperkingen op je domeinen en configureer je inlognaampatronen. ZITADEL selecteert de organisatie van je gebruikers zodra ze hun inlognaam invoeren. Daarom moeten de inlognamen uniek zijn over alle organisaties. Als je gebruikers hebt die accounts hebben in meerdere domeinen, kun je uniciteit waarborgen door je inlognamen te suffixen met het domein van de organisatie.",
+        "DESCRIPTION": "Definieer beperkingen op je domeinen en configureer je inlognaampatronen. Zitadel selecteert de organisatie van je gebruikers zodra ze hun inlognaam invoeren. Daarom moeten de inlognamen uniek zijn over alle organisaties. Als je gebruikers hebt die accounts hebben in meerdere domeinen, kun je uniciteit waarborgen door je inlognamen te suffixen met het domein van de organisatie.",
         "REQUIRE_VERIFICATION": {
           "TITLE": "Verificatie van aangepaste domeinen vereisen",
           "DESCRIPTION": "Als dit is geactiveerd, moeten organisatiedomeinen worden geverifieerd voordat ze kunnen worden gebruikt voor domeinontdekking of gebruikersnaamtoevoeging."
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "Extern inloggen toegestaan",
-            "DESCRIPTION": "Sta je gebruikers toe om in te loggen met een externe identiteitsprovider in plaats van het gebruik van de ZITADEL gebruiker om in te loggen."
+            "DESCRIPTION": "Sta je gebruikers toe om in te loggen met een externe identiteitsprovider in plaats van het gebruik van de Zitadel gebruiker om in te loggen."
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "Wachtwoord reset verborgen",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "Begin met ZITADEL",
-    "DISCLAIMER": "ZITADEL behandelt uw gegevens vertrouwelijk en veilig.",
+    "WELCOME": "Begin met Zitadel",
+    "DISCLAIMER": "Zitadel behandelt uw gegevens vertrouwelijk en veilig.",
     "DISCLAIMERLINK": "Meer informatie",
     "DOCUMENTATION": {
-      "DESCRIPTION": "Begin snel met ZITADEL."
+      "DESCRIPTION": "Begin snel met Zitadel."
     },
     "GETSTARTED": {
-      "DESCRIPTION": "Begin snel met ZITADEL."
+      "DESCRIPTION": "Begin snel met Zitadel."
     },
     "QUICKSTARTS": {
       "LABEL": "Eerste stappen",
-      "DESCRIPTION": "Begin snel met ZITADEL."
+      "DESCRIPTION": "Begin snel met Zitadel."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Snelkoppelingen",
@@ -366,7 +366,7 @@
     "COMPLETED": "voltooid",
     "DISMISS": "Nee bedankt, ik ben een professional.",
     "CARD": {
-      "TITLE": "Zorg dat uw ZITADEL draait",
+      "TITLE": "Zorg dat uw Zitadel draait",
       "DESCRIPTION": "Deze checklist helpt om uw instantie in te stellen en begeleidt u door de meest essentiële stappen"
     },
     "MILESTONES": {
@@ -386,13 +386,13 @@
         "action": "Project aanmaken"
       },
       "APPLICATION_CREATED": {
-        "title": "Registreer uw app",
+        "title": "Registreer uw applicatie",
         "description": "Registreer uw web-, native-, api- of saml-applicatie en stel een authenticatiestroom in.",
-        "action": "App registreren"
+        "action": "Applicatie registreren"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Log in op uw app",
-        "description": "Integreer uw applicatie met ZITADEL voor authenticatie en test het door in te loggen met uw beheerdersgebruiker.",
+        "title": "Log in op uw applicatie",
+        "description": "Integreer uw applicatie met Zitadel voor authenticatie en test het door in te loggen met uw beheerdersgebruiker.",
         "action": "Log in"
       },
       "user.human.added": {
@@ -438,8 +438,8 @@
     "CUSTOMERPORTAL": "Klantenportaal"
   },
   "QUICKSTART": {
-    "TITLE": "Integreer ZITADEL in uw toepassing",
-    "DESCRIPTION": "Integreer ZITADEL in uw toepassing of gebruik een van onze voorbeelden om binnen enkele minuten aan de slag te gaan.",
+    "TITLE": "Integreer Zitadel in uw toepassing",
+    "DESCRIPTION": "Integreer Zitadel in uw toepassing of gebruik een van onze voorbeelden om binnen enkele minuten aan de slag te gaan.",
     "BTN_START": "Applicatie maken",
     "BTN_LEARNMORE": "Meer informatie",
     "CREATEPROJECTFORAPP": "Creëer Project {{value}}",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Dev-modus is standaard ingeschakeld. U kunt waarden voor productie later bijwerken.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Bekijk voorbeelden",
-    "DUPLICATEAPPRENAME": "Er bestaat al een app met dezelfde aartsvijand. Kies een andere naam.",
+    "DUPLICATEAPPRENAME": "Er bestaat al een applicatie met dezelfde aartsvijand. Kies een andere naam.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Verander Framework",
@@ -623,6 +623,14 @@
           "restAsync": "REST Asynchroon"
         },
         "TYPES_DESCRIPTION": "Webhook, de oproep verwerkt de statuscode maar de reactie is irrelevant\nCall, de oproep verwerkt de statuscode en de reactie\nAsync, de oproep verwerkt noch de statuscode noch de reactie, maar kan parallel aan andere doelen worden aangeroepen",
+        "PAYLOAD_TYPE": "Payload-type",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Niet opgegeven",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Versleuteld JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standaard JSON-payload met een handtekening-header voor verificatie.\nJWT: De payload wordt als een ondertekend JWT verzonden. Verificatie gebeurt via de JWT-handtekening.\nJWE: Het JWT wordt daarnaast versleuteld om ongeautoriseerde toegang tot payloadinformatie te voorkomen.",
         "ENDPOINT": "Eindpunt",
         "ENDPOINT_DESCRIPTION": "Voer het eindpunt in waar uw code wordt gehost. Zorg ervoor dat het voor ons toegankelijk is!",
         "TIMEOUT": "Time-out",
@@ -648,7 +656,7 @@
     "IAM_USER_MANAGER": "Heeft toestemming om gebruikers aan te maken en te beheren",
     "IAM_ADMIN_IMPERSONATOR": "Heeft toestemming om zich voor te doen als beheerder en eindgebruikers van alle organisaties",
     "IAM_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van alle organisaties na te bootsen",
-    "IAM_LOGIN_CLIENT": "Heeft toestemming om aanmeldklanten te beheren",
+    "IAM_LOGIN_CLIENT": "Heeft toestemming om aanmeldapplicaties te beheren",
     "ORG_OWNER": "Heeft toestemming over de hele organisatie",
     "ORG_USER_MANAGER": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
     "ORG_OWNER_VIEWER": "Heeft toestemming om de hele organisatie te bekijken",
@@ -668,7 +676,7 @@
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
-      "TEXT": "Alle organisatie-instellingen en tabellen in console zijn gebaseerd op een geselecteerde organisatie. Klik op deze knop om van organisatie te wisselen of een nieuwe aan te maken."
+      "TEXT": "Alle organisatie-instellingen en tabellen in de beheerconsole zijn gebaseerd op een geselecteerde organisatie. Klik op deze knop om van organisatie te wisselen of een nieuwe aan te maken."
     },
     "INSTANCE": {
       "TEXT": "Klik hier om naar de instantie-instellingen te gaan. Merk op dat u alleen toegang heeft tot deze knop als u uitgebreide machtigingen heeft."
@@ -736,7 +744,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "Uw instantie is geblokkeerd.",
-      "DESCRIPTION": "Vraag uw ZITADEL instantiebeheerder om het abonnement bij te werken."
+      "DESCRIPTION": "Vraag uw Zitadel instantiebeheerder om het abonnement bij te werken."
     },
     "INVALID_FORMAT": "De opmaak is ongeldig.",
     "NOTANEMAIL": "De opgegeven waarde is geen e-mailadres.",
@@ -832,12 +840,12 @@
       "TABLESTATE": "Status",
       "NAME": "Naam",
       "EMPTY": "Geen apparaat ingesteld",
-      "TITLE": "Wachtwoordloze authenticatie",
-      "DESCRIPTION": "Voeg op WebAuthn gebaseerde authenticatiemethoden toe om zonder wachtwoord in te loggen op ZITADEL.",
+      "TITLE": "Passkey authenticatie",
+      "DESCRIPTION": "Voeg op WebAuthn gebaseerde authenticatiemethoden toe met passkey in te loggen op Zitadel.",
       "MANAGE_DESCRIPTION": "Beheer de tweede factor-methoden van uw gebruikers.",
       "U2F": "Voeg methode toe",
       "U2F_DIALOG_TITLE": "Verifieer authenticator",
-      "U2F_DIALOG_DESCRIPTION": "Voer een naam in voor uw gebruikte wachtwoordloze login",
+      "U2F_DIALOG_DESCRIPTION": "Voer een naam in voor uw gebruikte passkey login",
       "U2F_SUCCESS": "Wachtwoordloze auth succesvol aangemaakt!",
       "U2F_ERROR": "Er is een fout opgetreden tijdens de installatie!",
       "U2F_NAME": "Authenticator Naam",
@@ -853,17 +861,17 @@
         "3": "Verwijderd"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Verwijder wachtwoordloze authenticatiemethode",
-        "DELETE_DESCRIPTION": "U staat op het punt om een wachtwoordloze authenticatiemethode te verwijderen. Weet u het zeker?",
-        "ADD_TITLE": "Wachtwoordloze Authenticatie",
-        "ADD_DESCRIPTION": "Selecteer een van de beschikbare opties voor het creëren van een wachtwoordloze authenticatiemethode.",
+        "DELETE_TITLE": "Verwijder passkey authenticatiemethode",
+        "DELETE_DESCRIPTION": "U staat op het punt om een passkey authenticatiemethode te verwijderen. Weet u het zeker?",
+        "ADD_TITLE": "Passkey Authenticatie",
+        "ADD_DESCRIPTION": "Selecteer een van de beschikbare opties voor het creëren van een passkey authenticatiemethode.",
         "SEND_DESCRIPTION": "Stuur uzelf een registratielink naar uw e-mailadres.",
         "SEND": "Stuur registratielink",
         "SENT": "De e-mail is succesvol verzonden. Controleer uw mailbox om verder te gaan met de installatie.",
         "QRCODE_DESCRIPTION": "Genereer QR-code voor het scannen met een ander apparaat.",
         "QRCODE": "Genereer QR-code",
         "QRCODE_SCAN": "Scan deze QR-code om verder te gaan met de installatie op uw apparaat.",
-        "NEW_DESCRIPTION": "Gebruik dit apparaat om Passwordless in te stellen.",
+        "NEW_DESCRIPTION": "Gebruik dit apparaat om passkey in te stellen.",
         "NEW": "Nieuw toevoegen"
       }
     },
@@ -876,9 +884,9 @@
       "DESCRIPTION": "Voeg een tweede factor toe om optimale beveiliging voor uw account te garanderen.",
       "MANAGE_DESCRIPTION": "Beheer de tweede factor-methoden van uw gebruikers.",
       "ADD": "Factor toevoegen",
-      "OTP": "Authenticator App voor TOTP (Time-based One-Time Password)",
+      "OTP": "Authenticator Applicatie voor TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Voeg OTP toe",
-      "OTP_DIALOG_DESCRIPTION": "Scan de QR-code met een authenticator-app en voer de code hieronder in om de OTP-methode te verifiëren en te activeren.",
+      "OTP_DIALOG_DESCRIPTION": "Scan de QR-code met een authenticator-applicatie en voer de code hieronder in om de OTP-methode te verifiëren en te activeren.",
       "U2F": "Vingerafdruk, beveiligingssleutels, gezichtsherkenning en andere",
       "U2F_DIALOG_TITLE": "Verifieer factor",
       "U2F_DIALOG_DESCRIPTION": "Voer een naam in voor uw gebruikte universele multifactor.",
@@ -1134,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "E-mail verificatiecode verzonden.",
       "OTPREMOVED": "OTP verwijderd.",
       "U2FREMOVED": "Factor verwijderd.",
-      "PASSWORDLESSREMOVED": "Wachtwoordloos verwijderd.",
+      "PASSWORDLESSREMOVED": "Passkey verwijderd.",
       "INITIALPASSWORDSET": "Initieel wachtwoord ingesteld.",
       "PASSWORDNOTIFICATIONSENT": "Wachtwoord wijzigingsnotificatie verzonden.",
       "PASSWORDCHANGED": "Wachtwoord succesvol gewijzigd.",
@@ -1152,7 +1160,7 @@
       "SECRETREMOVED": "Secret succesvol verwijderd!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL Beheerdersrollen",
+      "TITLE": "Zitadel Beheerdersrollen",
       "DESCRIPTION": "Dit zijn alle lidmaatschapstoewijzingen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of IAM.",
       "ORGCONTEXT": "U ziet alle organisaties en projecten die gerelateerd zijn aan de momenteel geselecteerde organisatie.",
       "USERCONTEXT": "U ziet alle organisaties en projecten waarvoor u gemachtigd bent. Inclusief andere organisaties.",
@@ -1218,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Mislukken toegestaan",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Waarschuwing",
-      "DESCRIPTION": "Als u deze instelling uitschakelt, kan dit ertoe leiden dat gebruikers in uw organisatie zich niet kunnen aanmelden. Bovendien kunt u de console niet meer bereiken om de actie uit te schakelen. Wij raden aan om eerst scripts te testen in een ontwikkelomgeving of een ontwikkelorganisatie."
+      "DESCRIPTION": "Als u deze instelling uitschakelt, kan dit ertoe leiden dat gebruikers in uw organisatie zich niet kunnen aanmelden. Bovendien kunt u de beheerconsole niet meer bereiken om de actie uit te schakelen. Wij raden aan om eerst scripts te testen in een ontwikkelomgeving of een ontwikkelorganisatie."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flowtype",
@@ -1260,7 +1268,7 @@
     },
     "EVENTSTORE": {
       "TITLE": "IAM Opslagbeheer",
-      "DESCRIPTION": "Beheer uw ZITADEL-weergaven en mislukte evenementen."
+      "DESCRIPTION": "Beheer uw Zitadel-weergaven en mislukte evenementen."
     },
     "MEMBER": {
       "TITLE": "Beheerders",
@@ -1404,7 +1412,7 @@
         "VERIFICATION_HTTP_URL_LABEL": "Verwachte URL:",
         "VERIFICATION_HTTP_FILE_LABEL": "Verificatiebestand:",
         "VERIFICATION_SKIP": "U kunt de verificatie voorlopig overslaan en doorgaan met het aanmaken van uw organisatie, maar om uw domein te gebruiken moet deze stap worden voltooid!",
-        "VERIFICATION_VALIDATION_DESC": "Verwijder de verificatiecode niet, aangezien ZITADEL van tijd tot tijd het eigendom van uw domein opnieuw zal controleren.",
+        "VERIFICATION_VALIDATION_DESC": "Verwijder de verificatiecode niet, aangezien Zitadel van tijd tot tijd het eigendom van uw domein opnieuw zal controleren.",
         "VERIFICATION_NEWTOKEN_TITLE": "Vraag een nieuw token aan",
         "VERIFICATION_VALIDATION_ONGOING": "De methode {{ value }} is geselecteerd om uw domein te verifiëren. Klik op de knop om een ​​verificatiecontrole te activeren of het verificatieproces opnieuw in te stellen.",
         "VERIFICATION_SUCCESSFUL": "Domein succesvol geverifieerd!",
@@ -1547,7 +1555,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1601,8 +1610,8 @@
         "2": "E-mail verificatie",
         "3": "Telefoon verificatie",
         "4": "Wachtwoord Reset",
-        "5": "Wachtwoordloos Initialisatie",
-        "6": "App Secret",
+        "5": "Passkey Initialisatie",
+        "6": "Applicatie Secret",
         "7": "Eenmalig Wachtwoord (OTP) - SMS",
         "8": "Eenmalig Wachtwoord (OTP) - Email"
       },
@@ -1626,8 +1635,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Standaard inlogorganisatie",
       "LOGINDEFAULTORG_DESCRIPTION": "Als er geen organisatiecontext is ingesteld, gebruikt de inlog-UI de instellingen van de standaardorganisatie (en niet van de instantie)",
-      "OIDCTOKENEXCHANGE": "OIDC-tokenuitwisseling",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Schakel het experimentele type verlening urn:ietf:params:oauth:grant-type:token-exchange in voor het OIDC-tokenendpoint. Tokenuitwisseling kan worden gebruikt om tokens met een kleinere scope op te vragen of om zich voor te doen als andere gebruikers. Raadpleeg het beveiligingsbeleid om impersonation op een instantie toe te staan.",
       "USERSCHEMA": "Gebruikerschema",
       "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "ACTIONS": "Acties",
@@ -1637,7 +1644,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Ouderfout",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Als de vlag is ingeschakeld, wordt de OIDC-ouderfout in de console geregistreerd.",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout inschakelen",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om clients te informeren over het beëindigen van de sessie bij de OpenID-provider.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om applicaties te informeren over het beëindigen van de sessie bij de OpenID-provider.",
       "PERMISSIONCHECKV2": "Permissiecontrole V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
       "STATES": {
@@ -1651,8 +1658,8 @@
         "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
       },
       "RESET": "Alles instellen op overgenomen",
-      "CONSOLEUSEV2USERAPI": "Gebruik de V2 API in de console voor het aanmaken van gebruikers",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de console de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status.",
+      "CONSOLEUSEV2USERAPI": "Gebruik de V2 API in de beheerconsole voor het aanmaken van gebruikers",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de beheerconsole de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status.",
       "LOGINV2": "Inloggen V2",
       "LOGINV2_DESCRIPTION": "Door dit in te schakelen wordt de nieuwe TypeScript-gebaseerde login-UI geactiveerd met verbeterde beveiliging, prestaties en aanpasbaarheid.",
       "LOGINV2_BASEURI": "Basis-URI",
@@ -1680,7 +1687,7 @@
     "NOTIFICATION": {
       "TITLE": "Notificatie",
       "DESCRIPTION": "Bepaalt bij welke wijzigingen notificaties worden verzonden.",
-      "PASSWORDCHANGE": "Wachtwoord wijziging"
+      "PASSWORDCHANGE": "Wachtwoord gewijzigd"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Geef de login uw gepersonaliseerde stijl en wijzig zijn gedrag.",
@@ -1699,7 +1706,7 @@
       "RELEASE": "Laat los",
       "DROPFONT": "Sleep lettertype bestand hier",
       "RELEASEFONT": "Laat los",
-      "USEOFLOGO": "Uw Logo zal worden gebruikt in de Login evenals e-mails, terwijl het pictogram wordt gebruikt voor kleinere UI-elementen zoals in de organisatieschakelaar in de console",
+      "USEOFLOGO": "Uw Logo zal worden gebruikt in de Login evenals e-mails, terwijl het pictogram wordt gebruikt voor kleinere UI-elementen zoals in de organisatieschakelaar in de beheerconsole",
       "MAXSIZE": "De maximale grootte is beperkt tot 524kB",
       "EMAILNOSVG": "Het SVG bestandsformaat wordt niet ondersteund in e-mails. Daarom moet u uw logo uploaden in PNG of een ander ondersteund formaat.",
       "MAXSIZEEXCEEDED": "Maximale grootte van 524kB overschreden.",
@@ -1715,7 +1722,7 @@
       },
       "PREVIEW": {
         "TITLE": "Login",
-        "SECOND": "login met uw ZITADEL-Account.",
+        "SECOND": "login met uw Zitadel-Account.",
         "ERROR": "Gebruiker kon niet worden gevonden!",
         "PRIMARYBUTTON": "volgende",
         "SECONDARYBUTTON": "registreer"
@@ -1755,9 +1762,9 @@
       "POLICYLINK": "Link naar Privacybeleid",
       "HELPLINK": "Link naar Help",
       "SUPPORTEMAIL": "Ondersteuning Email",
-      "DOCSLINK": "Documentenlink (Console)",
-      "CUSTOMLINK": "Aangepaste link (Console)",
-      "CUSTOMLINKTEXT": "Aangepaste linktekst (Console)",
+      "DOCSLINK": "Documentenlink (Beheerconsole)",
+      "CUSTOMLINK": "Aangepaste link (Beheerconsole)",
+      "CUSTOMLINKTEXT": "Aangepaste linktekst (Beheerconsole)",
       "SAVED": "Succesvol opgeslagen!",
       "RESET_TITLE": "Herstel Standaard Waarden",
       "RESET_DESCRIPTION": "U staat op het punt de standaard Links voor TOS en Privacybeleid te herstellen. Weet u zeker dat u wilt doorgaan?"
@@ -1798,7 +1805,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -1830,10 +1838,10 @@
         "usernameChangeText": "Gebruikersnaam wijziging",
         "verifyMfaOtpText": "Verifieer OTP",
         "verifyMfaU2fText": "Verifieer Universele Tweede Factor",
-        "passwordlessPromptText": "Wachtwoordloos Prompt",
-        "passwordlessRegistrationDoneText": "Wachtwoordloze Registratie Voltooid",
-        "passwordlessRegistrationText": "Wachtwoordloze Registratie",
-        "passwordlessText": "Wachtwoordloos",
+        "passwordlessPromptText": "Passkey Prompt",
+        "passwordlessRegistrationDoneText": "Passkey Registratie Voltooid",
+        "passwordlessRegistrationText": "Passkey Registratie",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Externe Registratie Gebruiker Overzicht"
       }
     },
@@ -1847,7 +1855,7 @@
         "VEO": "Verifieer Email OTP",
         "PR": "Wachtwoord Reset",
         "DC": "Domein Claim",
-        "PL": "Wachtwoordloos",
+        "PL": "Passkey",
         "PC": "Wachtwoord Verandering",
         "IU": "Gebruiker uitnodigen"
       },
@@ -1910,7 +1918,7 @@
       "DEFAULTREDIRECTURI_DESC": "Definieert waar de gebruiker naar wordt doorverwezen als de login is gestart zonder een app context (bijv. vanuit mail)",
       "ERRORMSGPOPUP": "Toon Fout in Dialoog",
       "DISABLEWATERMARK": "Verberg Watermerk",
-      "DISABLEWATERMARK_DESC": "Verberg Powered by ZITADEL watermerk in de login interface"
+      "DISABLEWATERMARK_DESC": "Verberg Powered by Zitadel watermerk in de login interface"
     },
     "RESET": "Reset naar Instantie standaard",
     "CREATECUSTOM": "Maak Aangepast Beleid",
@@ -1964,7 +1972,7 @@
       "CREATE_DESC": "Voer de naam van uw project in.",
       "ROLE": "Rol",
       "NOITEMS": "Geen projecten",
-      "ZITADELPROJECT": "Dit behoort tot het ZITADEL-project. Pas op: Als u wijzigingen aanbrengt, werkt ZITADEL mogelijk niet zoals bedoeld.",
+      "ZITADELPROJECT": "Dit behoort tot het Zitadel-project. Pas op: Als u wijzigingen aanbrengt, werkt Zitadel mogelijk niet zoals bedoeld.",
       "TYPE": {
         "OWNED": "Eigen Projecten",
         "OWNED_SINGULAR": "Eigen Project",
@@ -2347,7 +2355,7 @@
     "DELETE_SELECTION_TITLE": "Verwijder IDP",
     "DELETE_SELECTION_DESCRIPTION": "U staat op het punt om een identiteitsprovider te verwijderen. De resulterende wijzigingen zijn onomkeerbaar. Weet u zeker dat u dit wilt doen?",
     "FEDERATEDLOGOUTENABLED": "Federatieve afmelding ingeschakeld",
-    "FEDERATEDLOGOUTENABLED_DESC": "Indien ingeschakeld, wordt de gebruiker ook afgemeld bij de IdP als de gebruiker de sessie in ZITADEL beëindigt.",
+    "FEDERATEDLOGOUTENABLED_DESC": "Indien ingeschakeld, wordt de gebruiker ook afgemeld bij de IdP als de gebruiker de sessie in Zitadel beëindigt.",
     "EMPTY": "Geen IDP beschikbaar",
     "OIDC": {
       "GENERAL": "Algemene Informatie",
@@ -2394,8 +2402,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Wachtwoordloos",
-      "MULTIFACTORDESCRIPTION": "Definieer uw multifactor voor uw wachtwoordloze authenticatie hier.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Definieer uw multifactor voor uw passkey authenticatie hier.",
       "SECONDFACTORTITLE": "Multifactor Authenticatie",
       "SECONDFACTORDESCRIPTION": "Definieer verdere mogelijke factoren waarmee u uw wachtwoordauthenticatie kunt beveiligen."
     },
@@ -2419,7 +2427,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Onbekend",
-      "1": "Eenmalig wachtwoord door Authenticator App (TOTP)",
+      "1": "Eenmalig wachtwoord door Authenticator Applicatie (TOTP)",
       "2": "Vingerafdruk, Beveiligingssleutels, Face ID en andere",
       "3": "Eenmalig wachtwoord per e-mail (Email OTP)",
       "4": "Eenmalig wachtwoord per SMS (SMS OTP)",
@@ -2437,7 +2445,7 @@
       "DESCRIPTION": "U kunt vooraf gedefinieerde of zelfgemaakte providers selecteren voor authenticatie.",
       "SELECTIDPS": "Identiteitsproviders"
     },
-    "PASSWORDLESS": "Wachtwoordloze Login",
+    "PASSWORDLESS": "Passkey Login",
     "PASSWORDLESSTYPE": {
       "0": "Niet toegestaan",
       "1": "Toegestaan"
@@ -2446,7 +2454,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP-provider",
-      "DESCRIPTION": "Dit zijn de SMTP-providers voor uw ZITADEL-instantie. Activeer degene die u wilt gebruiken om meldingen naar uw gebruikers te sturen.",
+      "DESCRIPTION": "Dit zijn de SMTP-providers voor uw Zitadel-instantie. Activeer degene die u wilt gebruiken om meldingen naar uw gebruikers te sturen.",
       "EMPTY": "Geen SMTP-provider beschikbaar",
       "ACTIVATED": "Geactiveerd",
       "ACTIVATE": "Aanbieder activeren",
@@ -2478,11 +2486,11 @@
         "NEXT_STEPS": "Volgende stappen",
         "ACTIVATE": {
           "TITLE": "Activeer uw SMTP-provider",
-          "DESCRIPTION": "ZITADEL kan deze SMTP-provider niet gebruiken om meldingen te verzenden totdat u deze activeert. Als u deze provider activeert, worden alle andere actieve providers nu gedeactiveerd."
+          "DESCRIPTION": "Zitadel kan deze SMTP-provider niet gebruiken om meldingen te verzenden totdat u deze activeert. Als u deze provider activeert, worden alle andere actieve providers nu gedeactiveerd."
         },
         "DEACTIVATE": {
           "TITLE": "Deactiveer uw SMTP-provider",
-          "DESCRIPTION": "Als u deze SMTP-provider deactiveert, kan ZITADEL deze niet gebruiken om meldingen te verzenden totdat u deze opnieuw activeert."
+          "DESCRIPTION": "Als u deze SMTP-provider deactiveert, kan Zitadel deze niet gebruiken om meldingen te verzenden totdat u deze opnieuw activeert."
         },
         "SAVE_SETTINGS": "Sla uw instellingen op",
         "TEST": {
@@ -2643,8 +2651,8 @@
       "IDTOKENROLEASSERTION": "Gebruikersrollen in ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Indien geselecteerd, worden de aangevraagde rollen van de geauthenticeerde gebruiker toegevoegd aan het ID-token.",
       "IDTOKENUSERINFOASSERTION": "Gebruikersinformatie in ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Hiermee kunnen clients profiel-, e-mail-, telefoon- en adresclaims van ID-token ophalen.",
-      "CLOCKSKEW": "Hiermee kunnen clients de klok skew van OP en client verwerken. De duur (0-5s) wordt toegevoegd aan exp claim en afgetrokken van iats, auth_time en nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Hiermee kunnen applicaties profiel-, e-mail-, telefoon- en adresclaims van ID-token ophalen.",
+      "CLOCKSKEW": "Hiermee kunnen applicaties de klok skew van OP en applicatie verwerken. De duur (0-5s) wordt toegevoegd aan exp claim en afgetrokken van iats, auth_time en nbf.",
       "RECOMMENDED": "aanbevolen",
       "NOTRECOMMENDED": "niet aanbevolen",
       "SELECTION": {
@@ -2774,7 +2782,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",

@@ -1,0 +1,454 @@
+{
+  "common": {
+    "back": "رجوع",
+    "title": "تسجيل الدخول باستخدام Zitadel"
+  },
+  "accounts": {
+    "title": "الحسابات",
+    "description": "حدد الحساب الذي تريد استخدامه.",
+    "addAnother": "إضافة حساب آخر",
+    "noResults": "لم يتم العثور على حسابات",
+    "verified": "تم التحقق",
+    "expired": "منتهي الصلاحية"
+  },
+  "logout": {
+    "title": "تسجيل الخروج",
+    "description": "انقر فوق حساب لإنهاء الجلسة",
+    "noResults": "لم يتم العثور على حسابات",
+    "clear": "إنهاء الجلسة",
+    "verifiedAt": "آخر نشاط: {time}",
+    "success": {
+      "title": "تم تسجيل الخروج بنجاح",
+      "description": "لقد قمت بتسجيل الخروج بنجاح."
+    }
+  },
+  "loginname": {
+    "title": "مرحباً بعودتك!",
+    "description": "أدخل بيانات الدخول الخاصة بك.",
+    "register": "تسجيل مستخدم جديد",
+    "submit": "متابعة",
+    "labels": {
+      "loginname": "اسم الدخول",
+      "username": "اسم المستخدم",
+      "usernameOrPhoneNumber": "اسم المستخدم أو رقم الهاتف",
+      "usernameOrEmail": "اسم المستخدم أو البريد الإلكتروني"
+    },
+    "required": {
+      "loginName": "هذا الحقل مطلوب"
+    },
+    "errors": {
+      "internalError": "حدث خطأ داخلي",
+      "couldNotGetLoginSettings": "تعذر الحصول على إعدادات تسجيل الدخول",
+      "couldNotSearchUsers": "تعذر البحث عن المستخدمين",
+      "couldNotGetDomain": "تعذر الحصول على النطاق",
+      "couldNotGetHost": "تعذر الحصول على المضيف",
+      "couldNotStartIDPFlow": "تعذر بدء تدفق مزود الهوية (IDP)",
+      "moreThanOneUserFound": "تم العثور على أكثر من مستخدم. يرجى تقديم معرف فريد.",
+      "userNotFound": "المستخدم غير موجود في النظام",
+      "couldNotCreateSession": "تعذر إنشاء جلسة للمستخدم",
+      "initialUserNotSupported": "المستخدم الأولي غير مدعوم",
+      "usernamePasswordNotAllowed": "اسم المستخدم وكلمة المرور غير مسموح بهما! اتصل بالمسؤول لمزيد من المعلومات.",
+      "passkeysNotAllowed": "مفاتيح المرور غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
+      "couldNotFindIdentityProvider": "تعذر العثور على مزود الهوية.",
+      "userNotActive": "المستخدم غير نشط. اتصل بالمسؤول لمزيد من المعلومات."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "حدث خطأ",
+      "multipleUsersFound": "تم العثور على مستخدمين متعددين",
+      "userNotFound": "المستخدم غير موجود في النظام"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "كلمة المرور",
+      "description": "أدخل كلمة المرور الخاصة بك.",
+      "resetPassword": "إعادة تعيين كلمة المرور",
+      "submit": "متابعة",
+      "labels": {
+        "password": "كلمة المرور"
+      },
+      "required": {
+        "password": "هذا الحقل مطلوب"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور",
+        "couldNotResetPassword": "تعذر إعادة تعيين كلمة المرور"
+      },
+      "info": {
+        "passwordResetSent": "تمت إعادة تعيين كلمة المرور. يرجى التحقق من بريدك الإلكتروني"
+      }
+    },
+    "set": {
+      "title": "تعيين كلمة المرور",
+      "description": "تعيين كلمة المرور لحسابك",
+      "codeSent": "تم إرسال رمز إلى عنوان بريدك الإلكتروني.",
+      "noCodeReceived": "لم تستلم رمزاً؟",
+      "resend": "إعادة إرسال الرمز",
+      "submit": "متابعة",
+      "labels": {
+        "code": "الرمز",
+        "newPassword": "كلمة المرور الجديدة",
+        "confirmPassword": "تأكيد كلمة المرور"
+      },
+      "required": {
+        "code": "هذا الحقل مطلوب",
+        "newPassword": "عليك تقديم كلمة مرور!",
+        "confirmPassword": "هذا الحقل مطلوب"
+      },
+      "errors": {
+        "couldNotSetPassword": "تعذر تعيين كلمة المرور",
+        "couldNotResetPassword": "تعذر إعادة تعيين كلمة المرور",
+        "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور"
+      }
+    },
+    "change": {
+      "title": "تغيير كلمة المرور",
+      "description": "تعيين كلمة المرور لحسابك",
+      "submit": "متابعة",
+      "labels": {
+        "newPassword": "كلمة المرور الجديدة",
+        "confirmPassword": "تأكيد كلمة المرور"
+      },
+      "required": {
+        "newPassword": "عليك تقديم كلمة مرور جديدة!",
+        "confirmPassword": "هذا الحقل مطلوب"
+      },
+      "errors": {
+        "couldNotChangePassword": "تعذر تغيير كلمة المرور",
+        "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور",
+        "unknownError": "خطأ غير معروف"
+      }
+    },
+    "complexity": {
+      "length": "يجب أن تكون على الأقل {minLength} حرفاً.",
+      "hasSymbol": "يجب أن تتضمن رمزاً.",
+      "hasNumber": "يجب أن تتضمن رقماً.",
+      "hasUppercase": "يجب أن تتضمن حرفاً كبيراً.",
+      "hasLowercase": "يجب أن تتضمن حرفاً صغيراً.",
+      "equals": "تأكيد كلمة المرور متطابق.",
+      "matches": "مطابق",
+      "doesNotMatch": "غير مطابق"
+    },
+    "errors": {
+      "noHostFound": "لم يتم العثور على مضيف",
+      "couldNotSendResetLink": "تعذر إرسال رابط إعادة تعيين كلمة المرور",
+      "couldNotCreateSessionForUser": "تعذر إنشاء جلسة للمستخدم",
+      "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور",
+      "failedToAuthenticate": "فشلت المصادقة. لقد استهلكت {failedAttempts} من {maxPasswordAttempts} محاولة لكلمة المرور.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "فشلت المصادقة.",
+      "accountLockedContactAdmin": " اتصل بالمسؤول لفتح قفل حسابك",
+      "userNotFound": "المستخدم غير موجود في النظام",
+      "initialUserNotSupported": "المستخدم الأولي غير مدعوم",
+      "userInitialStateNotSupported": "حالة المستخدم الأولية غير مدعومة",
+      "codeOrVerificationRequired": "عليك تقديم رمز أو الحصول على فحص تحقق صالح للمستخدم",
+      "verificationRequired": "يجب إجراء فحص التحقق من المستخدم",
+      "couldNotLoadSession": "تعذر تحميل الجلسة",
+      "couldNotLoadAuthMethods": "تعذر تحميل طرق المصادقة",
+      "failedPrecondition": "فشل الشرط المسبق",
+      "sessionNotValid": "الجلسة غير صالحة"
+    }
+  },
+  "idp": {
+    "title": "تسجيل الدخول باستخدام SSO",
+    "description": "حدد أحد المزودين التاليين لتسجيل الدخول",
+    "orSignInWith": "أو تسجيل الدخول باستخدام",
+    "signInWithApple": "تسجيل الدخول باستخدام Apple",
+    "signInWithGoogle": "تسجيل الدخول باستخدام Google",
+    "signInWithAzureAD": "تسجيل الدخول باستخدام AzureAD",
+    "signInWithGithub": "تسجيل الدخول باستخدام GitHub",
+    "signInWithGitlab": "تسجيل الدخول باستخدام GitLab",
+    "loginError": {
+      "title": "فشل تسجيل الدخول",
+      "description": "حدث خطأ أثناء محاولة تسجيل الدخول."
+    },
+    "linkingError": {
+      "title": "فشل ربط الحساب",
+      "description": "حدث خطأ أثناء محاولة ربط حسابك."
+    },
+    "completeRegister": {
+      "title": "أكمل بياناتك",
+      "description": "تحتاج إلى إكمال تسجيلك من خلال توفير عنوان بريدك الإلكتروني واسمك."
+    },
+    "accountNotFound": {
+      "title": "الحساب غير موجود",
+      "description": "لم نتمكن من العثور على حساب مرتبط ببيانات اعتماد مزود الهوية الخاص بك.",
+      "info": "لم يتم العثور على حساب موجود. يرجى تسجيل الدخول بحساب موجود أو الاتصال بالمسؤول للحصول على المساعدة.",
+      "backToLogin": "العودة إلى تسجيل الدخول"
+    },
+    "registrationFailed": {
+      "title": "التسجيل غير متاح",
+      "description": "لم نتمكن من إكمال عملية التسجيل.",
+      "info": "تعذر تحديد المنظمة للتسجيل. يرجى الاتصال بالمسؤول للحصول على المساعدة.",
+      "backToLogin": "العودة إلى تسجيل الدخول"
+    },
+    "processing": {
+      "message": "جاري معالجة المصادقة...",
+      "noRedirect": "لم يتم إرجاع إعادة توجيه أو خطأ من الخادم",
+      "unexpectedError": "حدث خطأ غير متوقع"
+    },
+    "errors": {
+      "missingParameters": "معلمات مطلوبة مفقودة",
+      "missingIdpInfo": "معلومات IDP مفقودة",
+      "idpNotFound": "مزود الهوية غير موجود",
+      "linkingNotAllowed": "الربط غير مسموح به لمزود الهوية هذا",
+      "linkingFailed": "فشل ربط مزود الهوية بالحساب",
+      "autoLinkingFailed": "فشل ربط الحساب تلقائياً",
+      "userCreationFailed": "فشل إنشاء حساب المستخدم",
+      "orgResolutionFailed": "تعذر تحديد المنظمة للتسجيل",
+      "sessionCreationFailed": "تعذر إنشاء الجلسة أو تحديد إعادة التوجيه",
+      "unknownError": "حدث خطأ غير معروف"
+    }
+  },
+  "ldap": {
+    "title": "تسجيل الدخول LDAP",
+    "description": "أدخل بيانات اعتماد LDAP الخاصة بك.",
+    "submit": "متابعة",
+    "labels": {
+      "username": "اسم المستخدم",
+      "password": "كلمة المرور"
+    },
+    "required": {
+      "username": "هذا الحقل مطلوب",
+      "password": "هذا الحقل مطلوب"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "التحقق من هويتك",
+      "description": "اختر أحد العوامل التالية.",
+      "noResults": "لا توجد عوامل ثانية متاحة للإعداد."
+    },
+    "set": {
+      "title": "إعداد المصادقة الثنائية",
+      "description": "اختر أحد العوامل الثانية التالية.",
+      "skip": "تخطي"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "التحقق من المصادقة الثنائية",
+      "totpDescription": "أدخل الرمز من تطبيق المصادقة الخاص بك.",
+      "smsDescription": "أدخل الرمز الذي تلقيته عبر الرسائل القصيرة.",
+      "emailDescription": "أدخل الرمز الذي تلقيته عبر البريد الإلكتروني.",
+      "noCodeReceived": "لم تستلم رمزاً؟",
+      "resendCode": "إعادة إرسال الرمز",
+      "submit": "متابعة",
+      "labels": {
+        "code": "الرمز"
+      },
+      "required": {
+        "code": "هذا الحقل مطلوب"
+      }
+    },
+    "set": {
+      "title": "إعداد المصادقة الثنائية",
+      "totpDescription": "امسح رمز الاستجابة السريعة باستخدام تطبيق المصادقة الخاص بك.",
+      "smsDescription": "أدخل رقم هاتفك لتلقي رمز عبر الرسائل القصيرة.",
+      "emailDescription": "أدخل عنوان بريدك الإلكتروني لتلقي رمز عبر البريد الإلكتروني.",
+      "totpRegisterDescription": "امسح رمز الاستجابة السريعة أو انتقل إلى عنوان URL يدوياً.",
+      "submit": "متابعة",
+      "labels": {
+        "code": "الرمز"
+      },
+      "required": {
+        "code": "هذا الحقل مطلوب"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "المصادقة باستخدام مفتاح مرور",
+      "description": "سيطلب جهازك بصمة إصبعك، أو وجهك، أو قفل الشاشة",
+      "usePassword": "استخدم كلمة المرور",
+      "submit": "متابعة",
+      "errors": {
+        "couldNotRequestChallenge": "تعذر طلب تحدي مفتاح المرور",
+        "couldNotVerifyPasskey": "تعذر التحقق من مفتاح المرور",
+        "noResponseReceived": "فشل التحقق من مفتاح المرور - لم يتم استلام أي استجابة",
+        "noRedirectProvided": "اكتمل التحقق من مفتاح المرور ولكن لم يتم توفير إعادة توجيه",
+        "couldNotRetrievePasskey": "حدث خطأ أثناء استرداد مفتاح المرور",
+        "verificationCancelled": "تم إلغاء التحقق من مفتاح المرور",
+        "verificationFailed": "حدث خطأ أثناء التحقق من مفتاح المرور",
+        "couldNotFindSession": "تعذر العثور على الجلسة",
+        "couldNotUpdateSession": "تعذر تحديث الجلسة",
+        "userNotFound": "المستخدم غير موجود في النظام",
+        "couldNotDetermineRedirect": "تعذر تحديد عنوان URL لإعادة التوجيه بعد التحقق من مفتاح المرور"
+      }
+    },
+    "set": {
+      "title": "إعداد مفتاح مرور",
+      "description": "سيطلب جهازك بصمة إصبعك، أو وجهك، أو قفل الشاشة",
+      "info": {
+        "description": "مفتاح المرور هو طريقة مصادقة على جهاز مثل بصمة الإصبع، Apple FaceID أو ما شابه. ",
+        "link": "المصادقة بدون كلمة مرور"
+      },
+      "skip": "تخطي",
+      "submit": "متابعة"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "التحقق من المصادقة الثنائية",
+      "description": "تحقق من حسابك باستخدام جهازك."
+    },
+    "set": {
+      "title": "إعداد المصادقة الثنائية",
+      "description": "إعداد جهاز كعامل ثانٍ.",
+      "submit": "متابعة"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "مفتاح مرور",
+      "password": "كلمة المرور"
+    },
+    "disabled": {
+      "title": "التسجيل معطل",
+      "description": "التسجيل معطل. يرجى الاتصال بالمسؤول."
+    },
+    "missingdata": {
+      "title": "بيانات مفقودة",
+      "description": "قدم البريد الإلكتروني والاسم الأول والأخير للتسجيل."
+    },
+    "title": "تسجيل",
+    "description": "أنشئ حساب ZITADEL الخاص بك.",
+    "noMethodAvailableWarning": "لا توجد طريقة مصادقة متاحة. يرجى الاتصال بالمسؤول.",
+    "selectMethod": "حدد الطريقة التي ترغب في المصادقة بها",
+    "agreeTo": "للتسجيل يجب عليك الموافقة على الشروط والأحكام",
+    "termsOfService": "شروط الخدمة",
+    "privacyPolicy": "سياسة الخصوصية",
+    "submit": "متابعة",
+    "password": {
+      "title": "تعيين كلمة المرور",
+      "description": "تعيين كلمة المرور لحسابك",
+      "submit": "متابعة",
+      "labels": {
+        "password": "كلمة المرور",
+        "confirmPassword": "تأكيد كلمة المرور"
+      },
+      "required": {
+        "password": "عليك تقديم كلمة مرور!",
+        "confirmPassword": "هذا الحقل مطلوب"
+      }
+    },
+    "labels": {
+      "firstname": "الاسم الأول",
+      "lastname": "اسم العائلة",
+      "email": "البريد الإلكتروني"
+    },
+    "required": {
+      "firstname": "هذا الحقل مطلوب",
+      "lastname": "هذا الحقل مطلوب",
+      "email": "هذا الحقل مطلوب"
+    },
+    "errors": {
+      "couldNotCreateUser": "تعذر إنشاء المستخدم",
+      "couldNotCreateSession": "تعذر إنشاء الجلسة",
+      "userNotFound": "المستخدم غير موجود في النظام",
+      "couldNotLinkIDP": "تعذر ربط IDP بالمستخدم",
+      "couldNotRegisterUser": "تعذر تسجيل المستخدم"
+    }
+  },
+  "invite": {
+    "title": "دعوة مستخدم",
+    "description": "قدم عنوان البريد الإلكتروني واسم المستخدم الذي تريد دعوته.",
+    "info": "سيتلقى المستخدم بريداً إلكترونياً يحتوي على مزيد من التعليمات.",
+    "notAllowed": "إعداداتك لا تسمح لك بدعوة المستخدمين.",
+    "submit": "متابعة",
+    "success": {
+      "title": "تمت دعوة المستخدم",
+      "description": "تم إرسال البريد الإلكتروني بنجاح.",
+      "verified": "تمت دعوة المستخدم وقد تحقق بالفعل من بريده الإلكتروني.",
+      "notVerifiedYet": "تمت دعوة المستخدم. سيتلقى بريداً إلكترونياً يحتوي على مزيد من التعليمات.",
+      "submit": "دعوة مستخدم آخر"
+    }
+  },
+  "signedin": {
+    "title": "مرحباً {user}!",
+    "description": "أنت مسجل الدخول.",
+    "continue": "متابعة",
+    "error": {
+      "title": "خطأ",
+      "description": "حدث خطأ أثناء محاولة تسجيل الدخول."
+    }
+  },
+  "verify": {
+    "userIdMissing": "لم يتم تقديم userId!",
+    "successTitle": "تم التحقق من المستخدم",
+    "successDescription": "تم التحقق من المستخدم بنجاح.",
+    "setupAuthenticator": "إعداد المصادق",
+    "verify": {
+      "title": "التحقق من المستخدم",
+      "description": "أدخل الرمز المقدم في البريد الإلكتروني للتحقق.",
+      "noCodeReceived": "لم تستلم رمزاً؟",
+      "resendCode": "إعادة إرسال الرمز",
+      "codeSent": "تم إرسال رمز للتو إلى عنوان بريدك الإلكتروني.",
+      "submit": "متابعة",
+      "labels": {
+        "code": "الرمز"
+      },
+      "required": {
+        "code": "هذا الحقل مطلوب"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "تعذر إعادة إرسال البريد الإلكتروني",
+      "couldNotVerifyUser": "تعذر التحقق من المستخدم",
+      "couldNotVerifyInvite": "تعذر التحقق من الدعوة",
+      "couldNotVerifyEmail": "تعذر التحقق من البريد الإلكتروني",
+      "couldNotVerify": "تعذر التحقق",
+      "couldNotLoadUser": "تعذر تحميل المستخدم",
+      "couldNotLoadAuthenticators": "تعذر تحميل المصادقين المحتملين",
+      "couldNotCreateSession": "تعذر إنشاء الجلسة",
+      "noHostFound": "لم يتم العثور على مضيف",
+      "userAlreadyVerified": "تم التحقق من المستخدم بالفعل!",
+      "couldNotResendInvite": "تعذر إعادة إرسال الدعوة",
+      "inviteSendFailed": "فشل إرسال بريد الدعوة الإلكتروني",
+      "emailSendFailed": "فشل إرسال بريد التحقق الإلكتروني"
+    }
+  },
+  "authenticator": {
+    "title": "اختيار طريقة المصادقة",
+    "description": "حدد الطريقة التي ترغب في المصادقة بها",
+    "noMethodsAvailable": "لا توجد طرق مصادقة متاحة",
+    "allSetup": "لقد قمت بالفعل بإعداد مصادق!",
+    "linkWithIDP": "أو الربط مع مزود هوية"
+  },
+  "device": {
+    "usercode": {
+      "title": "رمز الجهاز",
+      "description": "أدخل الرمز المعروض على تطبيقك أو جهازك.",
+      "submit": "متابعة",
+      "labels": {
+        "code": "الرمز"
+      },
+      "required": {
+        "code": "هذا الحقل مطلوب"
+      }
+    },
+    "request": {
+      "title": "{appName} يود الاتصال",
+      "description": "{appName} سيكون لديه حق الوصول إلى:",
+      "disclaimer": "بالنقر فوق سماح، فإنك تسمح لـ {appName} و Zitadel استخدام معلوماتك وفقاً لشروط الخدمة وسياسات الخصوصية الخاصة بكل منهما. يمكنك إلغاء هذا الوصول في أي وقت.",
+      "submit": "سماح",
+      "deny": "رفض"
+    },
+    "scope": {
+      "openid": "التحقق من هويتك.",
+      "email": "عرض عنوان بريدك الإلكتروني.",
+      "profile": "عرض معلومات ملفك الشخصي الكاملة.",
+      "offline_access": "السماح بالوصول دون اتصال إلى حسابك."
+    }
+  },
+  "error": {
+    "noUserCode": "لم يتم تقديم رمز مستخدم!",
+    "noDeviceRequest": "لم يتم العثور على طلب جهاز.",
+    "unknownContext": "تعذر الحصول على سياق المستخدم. تأكد من إدخال اسم المستخدم أولاً أو تقديم loginName كمعلمة بحث.",
+    "sessionExpired": "انتهت صلاحية جلستك الحالية. يرجى تسجيل الدخول مرة أخرى.",
+    "failedLoading": "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.",
+    "tryagain": "حاول مرة أخرى",
+    "couldNotContinueSession": "تعذر المتابعة مع الجلسة - معلومات المستخدم مفقودة"
+  }
+}

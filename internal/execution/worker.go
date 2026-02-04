@@ -18,9 +18,10 @@ type Worker struct {
 	river.WorkerDefaults[*exec_repo.Request]
 
 	config WorkerConfig
-	now    nowFunc
+	now    NowFunc
 
-	targetEncAlg crypto.EncryptionAlgorithm
+	targetEncAlg     crypto.EncryptionAlgorithm
+	activeSigningKey GetActiveSigningWebKey
 }
 
 // Timeout implements the Timeout-function of [river.Worker].
@@ -45,7 +46,7 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) e
 		return river.JobCancel(fmt.Errorf("unable to unmarshal targets because %w", err))
 	}
 
-	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args), w.targetEncAlg)
+	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args), w.targetEncAlg, w.activeSigningKey)
 	if err != nil {
 		// If there is an error returned from the targets, it means that the execution was interrupted
 		return river.JobCancel(fmt.Errorf("interruption during call of targets because %w", err))
@@ -53,8 +54,8 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) e
 	return nil
 }
 
-// nowFunc makes [time.Now] mockable
-type nowFunc func() time.Time
+// NowFunc makes [time.Now] mockable
+type NowFunc func() time.Time
 
 type WorkerConfig struct {
 	Workers             uint8
@@ -65,11 +66,14 @@ type WorkerConfig struct {
 func NewWorker(
 	config WorkerConfig,
 	targetEncAlg crypto.EncryptionAlgorithm,
+	activeSigningKey GetActiveSigningWebKey,
+	now NowFunc,
 ) *Worker {
 	return &Worker{
-		config:       config,
-		now:          time.Now,
-		targetEncAlg: targetEncAlg,
+		config:           config,
+		now:              now,
+		targetEncAlg:     targetEncAlg,
+		activeSigningKey: activeSigningKey,
 	}
 }
 

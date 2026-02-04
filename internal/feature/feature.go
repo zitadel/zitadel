@@ -9,19 +9,18 @@ import (
 type Key int
 
 const (
-	// Reserved: 2, 3, 6, 8, 11
+	// Reserved: 2, 3, 5, 6, 8, 11
 
 	KeyUnspecified                    Key = 0
 	KeyLoginDefaultOrg                Key = 1
 	KeyUserSchema                     Key = 4
-	KeyTokenExchange                  Key = 5
 	KeyImprovedPerformance            Key = 7
 	KeyDebugOIDCParentError           Key = 9
 	KeyOIDCSingleV1SessionTermination Key = 10
 	KeyEnableBackChannelLogout        Key = 12
 	KeyLoginV2                        Key = 13
 	KeyPermissionCheckV2              Key = 14
-	KeyConsoleUseV2UserApi            Key = 15
+	KeyManagementConsoleUseV2UserApi  Key = 15
 	KeyEnableRelationalTables         Key = 16
 )
 
@@ -41,7 +40,6 @@ const (
 type Features struct {
 	LoginDefaultOrg                bool                      `json:"login_default_org,omitempty"`
 	UserSchema                     bool                      `json:"user_schema,omitempty"`
-	TokenExchange                  bool                      `json:"token_exchange,omitempty"`
 	ImprovedPerformance            []ImprovedPerformanceType `json:"improved_performance,omitempty"`
 	DebugOIDCParentError           bool                      `json:"debug_oidc_parent_error,omitempty"`
 	OIDCSingleV1SessionTermination bool                      `json:"oidc_single_v1_session_termination,omitempty"`

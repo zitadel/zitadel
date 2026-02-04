@@ -106,6 +106,10 @@ func NewMembershipIsIAMQuery() (SearchQuery, error) {
 	return NewNotNullQuery(InstanceMemberIAMID)
 }
 
+func NewMembershipRoleQuery(role string) (SearchQuery, error) {
+	return NewTextQuery(membershipRoles, role, TextListContains)
+}
+
 func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {

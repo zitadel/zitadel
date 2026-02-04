@@ -1,3 +1,91 @@
+Instrumentation:
+  ServiceName: "zitadel-mirror" # ZITADEL_INSTRUMENTATION_SERVICENAME
+  Trace:
+    Fraction: 1.0 # ZITADEL_INSTRUMENTATION_TRACE_FRACTION
+    # Trust incoming trace context from remote services for distributed tracing.
+    # Enable only in controlled environments; defaults to false for security.
+    TrustRemoteSpans: false # ZITADEL_INSTRUMENTATION_TRACE_TRUSTREMOTESPANS
+    Exporter:
+      # The following exporter types are supported:
+      # "none": Disables trace exporting
+      # "stdOut": Exports traces to standard output
+      # "stdErr": Exports traces to standard error
+      # "grpc": Exports traces using the OTEL gRPC exporter (recommended)
+      # "http": Exports traces using the OTEL HTTP exporter
+      # "google": Exports traces to Google Cloud. Need to configure GoogleProjectID below!
+      Type: "none" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE
+      # Endpoint of the OTEL collector for grpc and http exporters
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT
+      # Disable TLS for grpc and http exporters
+      Insecure: false # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_INSECURE
+      # Interval for batching traces before export
+      BatchDuration: 1s # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_BATCHDURATION
+      # Project ID for Google Cloud Trace exporter
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_GOOGLEPROJECTID
+  Metric:
+    Exporter:
+      # The following exporter types are supported:
+      # "none": Disables metric exporting
+      # "stdOut": Exports metrics to standard output
+      # "stdErr": Exports metrics to standard error
+      # "grpc": Exports metrics using the OTEL gRPC exporter (recommended)
+      # "http": Exports metrics using the OTEL HTTP exporter
+      # "google": Exports metrics to Google Cloud. Need to configure GoogleProjectID below!
+      # "prometheus": Exposes metrics via an HTTP endpoint for Prometheus to scrape
+      Type: "none" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE
+      # Endpoint of the OTEL collector for grpc and http exporters
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_ENDPOINT
+      # Disable TLS for grpc and http exporters
+      Insecure: false # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_INSECURE
+      # Interval at which metrics are exported
+      BatchDuration: 1m # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_BATCHDURATION
+      # Project ID for Google Cloud Trace exporter
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_GOOGLEPROJECTID
+  
+  # Structured logging can print logs on standard error and/or export them using OTEL.
+  Log:
+    # Log lines lower than this level are not emitted.
+    Level: "INFO" # ZITADEL_INSTRUMENTATION_LOG_LEVEL
+    # Enable printing structured logs to standard error in the specified format.
+    # The following formats are supported:
+    #   - "disabled": Disables logging
+    #   - "text": Logs are printed on StdErr as human-readable text
+    #   - "json": Logs are printed on StdErr as JSON objects
+    #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging. Need to configure GoogleProjectID below!
+    #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting. Need to configure GoogleProjectID below!
+    Format: "text" # ZITADEL_INSTRUMENTATION_LOG_STDERR
+    # Adds the source file and line number where the log line was emitted.
+    # Not to be confused with the source of an error.
+    AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE
+    # Configure how errors are logged.
+    Errors:
+      # Adds the source file, line number and function where the error was created.
+      ReportLocation: true # ZITADEL_INSTRUMENTATION_LOG_ERRORS_REPORTLOCATION
+      # Adds stack traces to logged errors.
+      StackTrace: false # ZITADEL_INSTRUMENTATION_LOG_ERRORS_STACKTRACE
+    Exporter:
+      # The following exporter types are supported:
+      #   - "none": Disables OTEL log exporter
+      #   - "stdOut": Exports OTEL logs to standard output
+      #   - "stdErr": Exports OTEL logs to standard error
+      #   - "grpc": Exports OTEL logs using the OTEL gRPC exporter (recommended)
+      #   - "http": Exports OTEL logs using the OTEL HTTP exporter
+      Type: "none" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_TYPE
+      # Endpoint of the OTEL collector for grpc and http exporters
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_ENDPOINT
+      # Disable TLS for grpc and http exporters
+      Insecure: false # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_INSECURE
+      # Interval at which metrics are exported
+      BatchDuration: 1s # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_BATCHDURATION
+  Profile:
+    Exporter:
+      # The following profiler types are supported:
+      # "none": Disables profiling
+      # "google": Exports profiling data to Google Cloud Profiler
+      Type: "none" # ZITADEL_INSTRUMENTATION_PROFILE_TYPE
+      # Project ID for Google Cloud Profiler
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_PROFILE_GOOGLEPROJECTID
+
 Source:
   cockroach:
     Host: localhost # ZITADEL_SOURCE_COCKROACH_HOST

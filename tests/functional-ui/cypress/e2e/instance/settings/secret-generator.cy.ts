@@ -12,8 +12,8 @@ describe('instance secret generators', () => {
       cy.contains('Email verification');
       cy.contains('Phone verification');
       cy.contains('Password Reset');
-      cy.contains('Passwordless Initialization');
-      cy.contains('App Secret');
+      cy.contains('Passkey Initialization');
+      cy.contains('Application Secret');
       cy.contains('One Time Password (OTP) - SMS');
       cy.contains('One Time Password (OTP) - Email');
     });
