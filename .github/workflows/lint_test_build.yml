@@ -68,6 +68,8 @@ jobs:
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
         run: pnpm nx affected --nxBail --targets test build --exclude @zitadel/docs
+      - name: Check for uncommitted changes (Codegen mismatch)
+        run: git diff --exit-code
       - name: Suggest Pipeline Fix By Nx Cloud AI
         if: failure() || cancelled()
         env:
