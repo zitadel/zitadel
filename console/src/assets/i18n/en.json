@@ -223,8 +223,8 @@
           "PR": "When a user resets their password, they will receive an email with a link to set a new password.",
           "VE": "When a user changes their email address, they will receive an email with a link to verify the new address.",
           "VP": "When a user changes their phone number, they will receive an SMS with a code to verify the new number.",
-          "VEO": "When a user adds a One-Time Password via email method, they need to activate it by entering a code sent to their email address.",
-          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number.",
+          "VEO": "When a user adds an OTP via email method, they need to activate it by entering a code sent to their email address.",
+          "VSO": "When a user adds an OTP via SMS method, they need to activate it by entering a code sent to their phone number.",
           "IU": "When a user invite code is created, they will receive an email with a link to set their authentication method."
         }
       },
@@ -852,7 +852,7 @@
       "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -885,24 +885,24 @@
       "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "ADD": "Add Factor",
-      "OTP": "Authenticator Application for TOTP (Time-based One-Time Password)",
+      "OTP": "Authenticator Application for TOTP",
       "OTP_DIALOG_TITLE": "Add OTP",
-      "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator application and enter the code below to verify and activate the OTP method.",
+      "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator application and enter the code below to verify and activate the TOTP method.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verify Factor",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
       "U2F_SUCCESS": "Factor added successfully!",
       "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
-      "OTPSMS": "OTP (One-Time Password) with SMS",
-      "OTPEMAIL": "OTP (One-Time Password) with Email",
-      "SETUPOTPSMSDESCRIPTION": "Do you want to setup this phonenumber as OTP (One-Time password) second factor?",
+      "OTPSMS": "OTP with SMS",
+      "OTPEMAIL": "OTP with Email",
+      "SETUPOTPSMSDESCRIPTION": "Do you want to setup this phonenumber as OTP second factor?",
       "OTPSMSSUCCESS": "OTP factor set up with success.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Your phone must be verified in order to use this method.",
       "OTPEMAILSUCCESS": "OTP factor set up with success.",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -1616,8 +1616,8 @@
         "4": "Password Reset",
         "5": "Passkey Initialization",
         "6": "Application Secret",
-        "7": "One Time Password (OTP) - SMS",
-        "8": "One Time Password (OTP) - Email"
+        "7": "OTP - SMS",
+        "8": "OTP - Email"
       },
       "EXPIRY": "Expiration (in minutes)",
       "INCLUDEDIGITS": "Include Numbers",
@@ -1855,8 +1855,8 @@
         "INIT": "Initialization",
         "VE": "Verify Email",
         "VP": "Verify Phone",
-        "VSO": "Verify SMS OTP",
-        "VEO": "Verify Email OTP",
+        "VSO": "Verify OTP SMS",
+        "VEO": "Verify OTP Email",
         "PR": "Password Reset",
         "DC": "Domain Claim",
         "PL": "Passkey",
@@ -1879,8 +1879,8 @@
         "changedate": "Change date",
         "username": "Username",
         "tempUsername": "Temp username",
-        "otp": "One-time password",
-        "verifyUrl": "Verify One-time password URL",
+        "otp": "OTP",
+        "verifyUrl": "Verify OTP URL",
         "expiry": "Expiry",
         "applicationName": "Application name"
       },
@@ -2434,10 +2434,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "One Time Password by Authenticator Application (TOTP)",
+      "1": "TOTP (Authenticator App)",
       "2": "Passkey",
-      "3": "One Time Password by Email (Email OTP)",
-      "4": "One Time Password by SMS (SMS OTP)",
+      "3": "OTP by Email (OTP Email)",
+      "4": "OTP by SMS (OTP SMS)",
       "5": "Recovery Codes"
     }
   },

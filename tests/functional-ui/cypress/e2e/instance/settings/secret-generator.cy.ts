@@ -14,8 +14,8 @@ describe('instance secret generators', () => {
       cy.contains('Password Reset');
       cy.contains('Passkey Initialization');
       cy.contains('Application Secret');
-      cy.contains('One Time Password (OTP) - SMS');
-      cy.contains('One Time Password (OTP) - Email');
+      cy.contains('OTP - SMS');
+      cy.contains('OTP - Email');
     });
 
     it(`Initialization Mail should contain default settings`, () => {
