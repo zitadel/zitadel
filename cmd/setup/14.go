@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -45,7 +45,7 @@ func (mig *NewEventsTable) Execute(ctx context.Context, _ eventstore.Event) erro
 	}
 	for _, stmt := range statements {
 		stmt.query = strings.ReplaceAll(stmt.query, "{{.username}}", mig.dbClient.Username())
-		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
+		logging.Info(ctx, "execute statement", "file", stmt.file, "migration", mig.String())
 		_, err = mig.dbClient.ExecContext(ctx, stmt.query)
 		if err != nil {
 			return err
