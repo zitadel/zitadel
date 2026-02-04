@@ -56,10 +56,12 @@ jobs:
           NX_DISABLE_DB: "true"
         run: pnpm nx run @zitadel/release:publish
       - run: ls -la .artifacts
+      - run: ls -R .artifacts
       - name: Upload Release Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: release-artifacts
           path: .artifacts/
+          include-hidden-files: true
           retention-days: 5
