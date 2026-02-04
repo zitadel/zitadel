@@ -1,1426 +1,1422 @@
 Errors:
-  Internal: 发生了内部错误
-  NoChangesFound: 没有变化
-  OriginNotAllowed: 这个"来源"是不被允许的
-  IDMissing: ID 丢失
-  ResourceOwnerMissing: 组织没有资源所有者
-  RemoveFailed: 无法移除
+  Internal: "发生了内部错误"
+  NoChangesFound: "没有变化"
+  OriginNotAllowed: "这个\"来源\"是不被允许的"
+  IDMissing: "ID 丢失"
+  ResourceOwnerMissing: "组织没有资源所有者"
+  RemoveFailed: "无法移除"
   ProjectionName:
-    Invalid: 错误的映射名称
+    Invalid: "错误的映射名称"
   Assets:
-    EmptyKey: 资产的 Key 为空
+    EmptyKey: "资产的 Key 为空"
     Store:
-      NotInitialized: 资产存储未初始化
-      NotConfigured: 未配置资产存储
+      NotInitialized: "资产存储未初始化"
+      NotConfigured: "未配置资产存储"
     Bucket:
-      Internal: 创建桶时出现内部错误
-      AlreadyExists: 存储桶已存在
-      CreateFailed: 未创建存储桶
-      ListFailed: 无法读取存储桶
-      RemoveFailed: 未删除存储桶
-      SetPublicFailed: 无法将存储桶设置为公开
+      Internal: "创建桶时出现内部错误"
+      AlreadyExists: "存储桶已存在"
+      CreateFailed: "未创建存储桶"
+      ListFailed: "无法读取存储桶"
+      RemoveFailed: "未删除存储桶"
+      SetPublicFailed: "无法将存储桶设置为公开"
     Object:
-      PutFailed: 未创建对象
-      GetFailed: 无法读取对象
-      NotFound: 找不到对象
-      PresignedTokenFailed: 无法创建签名令牌
-      ListFailed: 无法读取对象列表
-      RemoveFailed: 无法移除对象
+      PutFailed: "未创建对象"
+      GetFailed: "无法读取对象"
+      NotFound: "找不到对象"
+      PresignedTokenFailed: "无法创建签名令牌"
+      ListFailed: "无法读取对象列表"
+      RemoveFailed: "无法移除对象"
   Limit:
-    ExceedsDefault: 超出默认限制
+    ExceedsDefault: "超出默认限制"
   Limits:
-    NotFound: 未找到限制
-    NoneSpecified: 未指定限制
+    NotFound: "未找到限制"
+    NoneSpecified: "未指定限制"
     Instance:
-      Blocked: 实例被阻止
+      Blocked: "实例被阻止"
   Restrictions:
-    NoneSpecified: 未指定限制
-    DefaultLanguageMustBeAllowed: 默认语言必须被允许
+    NoneSpecified: "未指定限制"
+    DefaultLanguageMustBeAllowed: "默认语言必须被允许"
   Language:
-    NotParsed: 无法解析语言
-    NotSupported: 语言不支持
-    NotAllowed: 语言不被允许
-    Undefined: 语言未定义
-    Duplicate: 语言有重复
+    NotParsed: "无法解析语言"
+    NotSupported: "语言不支持"
+    NotAllowed: "语言不被允许"
+    Undefined: "语言未定义"
+    Duplicate: "语言有重复"
   OIDCSettings:
-    NotFound: OIDC 配置未找到
-    AlreadyExists: OIDC 配置已存在
+    NotFound: "OIDC 配置未找到"
+    AlreadyExists: "OIDC 配置已存在"
   SecretGenerator:
-    AlreadyExists: 秘密生成器已经存在
-    TypeMissing: 缺少秘钥生成器类型
-    NotFound: 未找到秘钥生成器
+    AlreadyExists: "秘密生成器已经存在"
+    TypeMissing: "缺少秘钥生成器类型"
+    NotFound: "未找到秘钥生成器"
   SMSConfig:
-    NotFound: 未找到 SMS 配置
-    AlreadyActive: SMS 配置已启用
-    AlreadyDeactivated: SMS 配置已停用
-    NotExternalVerification: SMS 配置不支持验证码
+    NotFound: "未找到 SMS 配置"
+    AlreadyActive: "SMS 配置已启用"
+    AlreadyDeactivated: "SMS 配置已停用"
+    NotExternalVerification: "SMS 配置不支持验证码"
   SMTP:
-    NotEmailMessage: 消息不是电子邮件消息
-    RequiredAttributes: 必须设置主题、收件人和内容，但部分或全部为空
-    CouldNotSplit: 无法拆分主机和端口以连接到 smtp
-    CouldNotDial: 无法与 SMTP 服务器联系，请检查端口、防火墙问题...
-    CouldNotDialTLS: 无法使用 TLS 与 SMTP 服务器联系，请检查端口、防火墙问题...
-    CouldNotCreateClient: 无法创建 smtp 客户端
-    CouldNotStartTLS: 无法启动 tls
-    CouldNotAuth: 无法添加 smtp 身份验证，请检查您的用户名和密码是否正确，如果正确，可能您的提供商需要 Zitadel 不支持的身份验证方法
-    CouldNotSetSender: 无法设置发件人
-    CouldNotSetRecipient: 无法设置收件人
+    NotEmailMessage: "消息不是电子邮件消息"
+    RequiredAttributes: "必须设置主题、收件人和内容，但部分或全部为空"
+    CouldNotSplit: "无法拆分主机和端口以连接到 smtp"
+    CouldNotDial: "无法与 SMTP 服务器联系，请检查端口、防火墙问题..."
+    CouldNotDialTLS: "无法使用 TLS 与 SMTP 服务器联系，请检查端口、防火墙问题..."
+    CouldNotCreateClient: "无法创建 smtp 客户端"
+    CouldNotStartTLS: "无法启动 tls"
+    CouldNotAuth: "无法添加 smtp 身份验证，请检查您的用户名和密码是否正确，如果正确，可能您的提供商需要 Zitadel 不支持的身份验证方法"
+    CouldNotSetSender: "无法设置发件人"
+    CouldNotSetRecipient: "无法设置收件人"
   SMTPConfig:
-    TestPassword: 未找到测试密码
-    NotFound: 未找到 SMTP 配置
-    AlreadyExists: SMTP 配置已存在
-    AlreadyDeactivated: SMTP 配置已停用
-    SenderAdressNotCustomDomain: 发件人地址必须在在实例的域名设置中验证。
-    TestEmailNotFound: 找不到用于测试的电子邮件地址
+    TestPassword: "未找到测试密码"
+    NotFound: "未找到 SMTP 配置"
+    AlreadyExists: "SMTP 配置已存在"
+    AlreadyDeactivated: "SMTP 配置已停用"
+    SenderAdressNotCustomDomain: "发件人地址必须在在实例的域名设置中验证。"
+    TestEmailNotFound: "找不到用于测试的电子邮件地址"
   Notification:
-    NoDomain: 未找到对应的域名
+    NoDomain: "未找到对应的域名"
   User:
-    NotFound: 找不到用户
-    AlreadyExists: 用户已存在
-    NotFoundOnOrg: 在所选组织中找不到用户
-    NotAllowedOrg: 用户不是所需组织的成员
-    UserIDMissing: 缺少用户 ID
+    NotFound: "找不到用户"
+    AlreadyExists: "用户已存在"
+    NotFoundOnOrg: "在所选组织中找不到用户"
+    NotAllowedOrg: "用户不是所需组织的成员"
+    UserIDMissing: "缺少用户 ID"
     UserIDWrong: "请求用户不等于经过身份验证的用户"
-    DomainPolicyNil: 组织策略为空
-    EmailAsUsernameNotAllowed: 电子邮件不允许作为用户名
-    Invalid: 用户数据无效
-    DomainNotAllowedAsUsername: 域已保存，但无法使用
-    AlreadyInactive: 用户已处于停用状态
-    NotInactive: 用户未处于停用状态
-    CantDeactivateInitial: 处于初始状态的用户只能删除不能停用
-    ShouldBeActiveOrInitial: 用户不是处于启用的的或初始化的
-    AlreadyInitialised: 用户已经初始化
-    NotInitialised: 用户尚未初始化
-    NotLocked: 用户未锁定
-    NoChanges: 未发现任何更改
-    InitCodeNotFound: 未找到初始化验证码
-    UsernameNotChanged: 用户名未更改
-    InvalidURLTemplate: URL模板无效
-    Locked: 用户已被锁定
+    DomainPolicyNil: "组织策略为空"
+    EmailAsUsernameNotAllowed: "电子邮件不允许作为用户名"
+    Invalid: "用户数据无效"
+    DomainNotAllowedAsUsername: "域已保存，但无法使用"
+    AlreadyInactive: "用户已处于停用状态"
+    NotInactive: "用户未处于停用状态"
+    CantDeactivateInitial: "处于初始状态的用户只能删除不能停用"
+    ShouldBeActiveOrInitial: "用户不是处于启用的的或初始化的"
+    AlreadyInitialised: "用户已经初始化"
+    NotInitialised: "用户尚未初始化"
+    NotLocked: "用户未锁定"
+    NoChanges: "未发现任何更改"
+    InitCodeNotFound: "未找到初始化验证码"
+    UsernameNotChanged: "用户名未更改"
+    InvalidURLTemplate: "URL模板无效"
+    Locked: "用户已被锁定"
     Profile:
-      NotFound: 未找到个人资料
-      NotChanged: 个人资料未更改
-      Empty: 简介是空的
-      FirstNameEmpty: 简介中的名字是空的
-      LastNameEmpty: 简介中的姓氏是空的
-      IDMissing: 简介ID丢失
+      NotFound: "未找到个人资料"
+      NotChanged: "个人资料未更改"
+      Empty: "简介是空的"
+      FirstNameEmpty: "简介中的名字是空的"
+      LastNameEmpty: "简介中的姓氏是空的"
+      IDMissing: "简介ID丢失"
     Email:
-      NotFound: 电子邮件没有找到
-      Invalid: 电子邮件无效
-      AlreadyVerified: 电子邮件已经过验证
-      NotChanged: 电子邮件未更改
-      Empty: 电子邮件是空的
-      IDMissing: 电子邮件ID丢失
+      NotFound: "电子邮件没有找到"
+      Invalid: "电子邮件无效"
+      AlreadyVerified: "电子邮件已经过验证"
+      NotChanged: "电子邮件未更改"
+      Empty: "电子邮件是空的"
+      IDMissing: "电子邮件ID丢失"
     Phone:
-      NotFound: 手机号码未找到
-      Invalid: 手机号码无效
-      AlreadyVerified: 手机号码已经验证
-      Empty: 电话号码是空的
-      NotChanged: 电话号码没有改变
-      VerifyingRemovalIsNotSupported: 验证手机号码删除不受支持
+      NotFound: "手机号码未找到"
+      Invalid: "手机号码无效"
+      AlreadyVerified: "手机号码已经验证"
+      Empty: "电话号码是空的"
+      NotChanged: "电话号码没有改变"
+      VerifyingRemovalIsNotSupported: "验证手机号码删除不受支持"
     Address:
-      NotFound: 找不到地址
-      NotChanged: 地址没有改变
+      NotFound: "找不到地址"
+      NotChanged: "地址没有改变"
     Machine:
       Key:
-        NotFound: 未找到机器密钥
-        AlreadyExisting: 已有的机器钥匙
-        Invalid: 公钥不是采用 PEM 编码的 PKIX 格式的有效 RSA 公钥
+        NotFound: "未找到机器密钥"
+        AlreadyExisting: "已有的机器钥匙"
+        Invalid: "公钥不是采用 PEM 编码的 PKIX 格式的有效 RSA 公钥"
       Secret:
-        NotExisting: 秘密并不存在
-        Invalid: 秘密是无效的
-        CouldNotGenerate: 无法生成秘密
+        NotExisting: "秘密并不存在"
+        Invalid: "秘密是无效的"
+        CouldNotGenerate: "无法生成秘密"
     PAT:
-      NotFound: 未找到个人访问令牌
-    NotHuman: 用户必须是个人
-    NotMachine: 用户必须是技术人员
-    WrongType: 此用户类型不允许
-    NotAllowedToLink: 不允许使用外部身份提供者登录并注册用户
+      NotFound: "未找到个人访问令牌"
+    NotHuman: "用户必须是个人"
+    NotMachine: "用户必须是技术人员"
+    WrongType: "此用户类型不允许"
+    NotAllowedToLink: "不允许使用外部身份提供者登录并注册用户"
     Username:
-      AlreadyExists: 用户名已被使用
-      Reserved: 用户名已被使用
-      Empty: 用户名是空的
+      AlreadyExists: "用户名已被使用"
+      Reserved: "用户名已被使用"
+      Empty: "用户名是空的"
     Code:
-      Empty: 验证码为空
-      NotFound: 验证码不存在
-      Expired: 验证码已过期
-      GeneratorAlgNotSupported: 不支持的生成器算法
-      Invalid: 代码无效
+      Empty: "验证码为空"
+      NotFound: "验证码不存在"
+      Expired: "验证码已过期"
+      GeneratorAlgNotSupported: "不支持的生成器算法"
+      Invalid: "代码无效"
     Password:
-      NotFound: 未找到密码
-      Empty: 密码为空
-      Invalid: 密码无效
-      NotSet: 用户未设置密码
-      NotChanged: 新密码不能与您当前的密码相同
-      NotSupported: 不支持密码哈希编码。查看 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NotFound: "未找到密码"
+      Empty: "密码为空"
+      Invalid: "密码无效"
+      NotSet: "用户未设置密码"
+      NotChanged: "新密码不能与您当前的密码相同"
+      NotSupported: "不支持密码哈希编码。查看 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
     PasswordComplexityPolicy:
-      NotFound: 未找到密码策略
-      MinLength: 密码太短
-      MinLengthNotAllowed: 给定的最小长度不被允许
-      HasLower: 密码必须包含小写
-      HasUpper: 密码必须包含大写
-      HasNumber: 密码必须包含数字
-      HasSymbol: 密码必须包含符号
+      NotFound: "未找到密码策略"
+      MinLength: "密码太短"
+      MinLengthNotAllowed: "给定的最小长度不被允许"
+      HasLower: "密码必须包含小写"
+      HasUpper: "密码必须包含大写"
+      HasNumber: "密码必须包含数字"
+      HasSymbol: "密码必须包含符号"
     ExternalIDP:
-      Invalid: 外部 IDP 无效
-      IDPConfigNotExisting: IDP 提供者对此组织无效
-      NotAllowed: 外部 IDP 不允许
-      MinimumExternalIDPNeeded: 必须添加至少一个 IDP
-      AlreadyExists: 外部 IDP 已存在
-      NotFound: 未找到外部 IDP
-      LoginFailed: 外部 IDP 登录失败
+      Invalid: "外部 IDP 无效"
+      IDPConfigNotExisting: "IDP 提供者对此组织无效"
+      NotAllowed: "外部 IDP 不允许"
+      MinimumExternalIDPNeeded: "必须添加至少一个 IDP"
+      AlreadyExists: "外部 IDP 已存在"
+      NotFound: "未找到外部 IDP"
+      LoginFailed: "外部 IDP 登录失败"
     MFA:
       OTP:
-        AlreadyReady: OTP (一次性密码) 已经设置好了
-        NotExisting: OTP (一次性密码) 不存在
-        NotReady: OTP (一次性密码) 还没准备好
-        InvalidCode: 无效的验证码
+        AlreadyReady: "OTP (一次性密码) 已经设置好了"
+        NotExisting: "OTP (一次性密码) 不存在"
+        NotReady: "OTP (一次性密码) 还没准备好"
+        InvalidCode: "无效的验证码"
       U2F:
-        NotExisting: U2F 不存在
+        NotExisting: "U2F 不存在"
       Passwordless:
-        NotExisting: 未设置无密码登录
+        NotExisting: "未设置无密码登录"
       RecoveryCodes:
-        InvalidCode: 提供的恢复代码无效
-        MaxCountExceeded: 恢复代码数量已超过最大限制
-        NotReady: 恢复代码尚未准备好使用
-        ConfigInvalid: 恢复代码配置无效
+        InvalidCode: "提供的恢复代码无效"
+        MaxCountExceeded: "恢复代码数量已超过最大限制"
+        NotReady: "恢复代码尚未准备好使用"
+        ConfigInvalid: "恢复代码配置无效"
     WebAuthN:
-      NotFound: 找不到 WebAuthN 令牌
-      BeginRegisterFailed: WebAuthN 注册失败
-      MarshalError: 编组数据错误
-      ErrorOnParseCredential: 解析凭证数据时出错
-      CreateCredentialFailed: 创建凭据时出错
-      BeginLoginFailed: WebAuthN 登录失败
-      ValidateLoginFailed: 验证登录凭据时出错
-      CloneWarning: 凭证可能被克隆
+      NotFound: "找不到 WebAuthN 令牌"
+      BeginRegisterFailed: "WebAuthN 注册失败"
+      MarshalError: "编组数据错误"
+      ErrorOnParseCredential: "解析凭证数据时出错"
+      CreateCredentialFailed: "创建凭据时出错"
+      BeginLoginFailed: "WebAuthN 登录失败"
+      ValidateLoginFailed: "验证登录凭据时出错"
+      CloneWarning: "凭证可能被克隆"
     RefreshToken:
-      Invalid: Refresh Token 无效
-      NotFound: 未找到 Refresh Token
+      Invalid: "Refresh Token 无效"
+      NotFound: "未找到 Refresh Token"
   Instance:
-    NotFound: 没有找到实例
-    AlreadyExists: 实例已经存在
-    NotChanged: 实例没有改变
+    NotFound: "没有找到实例"
+    AlreadyExists: "实例已经存在"
+    NotChanged: "实例没有改变"
   Org:
-    AlreadyExists: 该组织名称或 ID 已被占用
-    Invalid: 组织无效
-    AlreadyDeactivated: 组织已停用
-    AlreadyActive: 组织已处于启用状态
-    Empty: 组织为空
-    NotFound: 未找到组织
-    NotChanged: 组织信息未改变
-    DefaultOrgNotDeletable: 默认组织不应删除
-    ZitadelOrgNotDeletable: 不得删除与Zitadel项目有关的组织
-    InvalidDomain: 无效的域名
-    DomainMissing: 域名缺失
-    DomainNotOnOrg: 组织中不存在域
-    DomainNotVerified: 域名未验证
-    DomainAlreadyVerified: 域已经过验证
-    DomainVerificationTypeInvalid: 域名验证类型无效
-    DomainVerificationMissing: 域名验证尚未开始
-    DomainVerificationFailed: 域名验证失败
-    DomainVerificationTXTNotFound: 未找到您的域的 _zitadel-challenge TXT 记录。检查您是否已将其添加到 DNS 服务器或等待新记录传播
-    DomainVerificationTXTNoMatch: 已找到您的域的 _zitadel-challenge TXT 记录，但它不包含正确的令牌文本。检查您是否已将正确的令牌添加到 DNS 服务器或等待新记录传播
-    DomainVerificationHTTPNotFound: 在预期的 URL 中找不到包含质询的文件。检查您是否已将文件上传到正确的位置并具有读取权限
-    DomainVerificationHTTPNoMatch: 已在预期 URL 中找到包含质询的文件，但它不包含正确的标记文本。检查其内容
-    DomainVerificationTimeout: 查询 DNS 服务器超时
-    PrimaryDomainNotDeletable: 不得删除主域名
-    DomainNotFound: 未找到域名
-    MemberIDMissing: 成员 ID 丢失
-    MemberNotFound: 未找到组织成员
-    InvalidMember: 组织成员无效
-    UserIDMissing: 缺少用户 ID
-    PolicyAlreadyExists: 策略已存在
-    PolicyNotExisting: 策略不存在
-    IdpInvalid: IDP 配置无效
-    IdpNotExisting: IDP 配置不存在
-    OIDCConfigInvalid: OIDC IDP 配置无效
-    IdpIsNotOIDC: IDP 配置不是 OIDC 类型
+    AlreadyExists: "该组织名称或 ID 已被占用"
+    Invalid: "组织无效"
+    AlreadyDeactivated: "组织已停用"
+    AlreadyActive: "组织已处于启用状态"
+    Empty: "组织为空"
+    NotFound: "未找到组织"
+    NotChanged: "组织信息未改变"
+    DefaultOrgNotDeletable: "默认组织不应删除"
+    ZitadelOrgNotDeletable: "不得删除与Zitadel项目有关的组织"
+    InvalidDomain: "无效的域名"
+    DomainMissing: "域名缺失"
+    DomainNotOnOrg: "组织中不存在域"
+    DomainNotVerified: "域名未验证"
+    DomainAlreadyVerified: "域已经过验证"
+    DomainVerificationTypeInvalid: "域名验证类型无效"
+    DomainVerificationMissing: "域名验证尚未开始"
+    DomainVerificationFailed: "域名验证失败"
+    DomainVerificationTXTNotFound: "未找到您的域的 _zitadel-challenge TXT 记录。检查您是否已将其添加到 DNS 服务器或等待新记录传播"
+    DomainVerificationTXTNoMatch: "已找到您的域的 _zitadel-challenge TXT 记录，但它不包含正确的令牌文本。检查您是否已将正确的令牌添加到 DNS 服务器或等待新记录传播"
+    DomainVerificationHTTPNotFound: "在预期的 URL 中找不到包含质询的文件。检查您是否已将文件上传到正确的位置并具有读取权限"
+    DomainVerificationHTTPNoMatch: "已在预期 URL 中找到包含质询的文件，但它不包含正确的标记文本。检查其内容"
+    DomainVerificationTimeout: "查询 DNS 服务器超时"
+    PrimaryDomainNotDeletable: "不得删除主域名"
+    DomainNotFound: "未找到域名"
+    MemberIDMissing: "成员 ID 丢失"
+    MemberNotFound: "未找到组织成员"
+    InvalidMember: "组织成员无效"
+    UserIDMissing: "缺少用户 ID"
+    PolicyAlreadyExists: "策略已存在"
+    PolicyNotExisting: "策略不存在"
+    IdpInvalid: "IDP 配置无效"
+    IdpNotExisting: "IDP 配置不存在"
+    OIDCConfigInvalid: "OIDC IDP 配置无效"
+    IdpIsNotOIDC: "IDP 配置不是 OIDC 类型"
     Domain:
-      AlreadyExists: 域名已存在
-      InvalidCharacter: 只有字母数字字符，.和 - 允许用于域名中
-      EmptyString: 无效的非数字和字母字符被替换为空格，结果域是空字符串
+      AlreadyExists: "域名已存在"
+      InvalidCharacter: "只有字母数字字符，.和 - 允许用于域名中"
+      EmptyString: "无效的非数字和字母字符被替换为空格，结果域是空字符串"
     IDP:
-      InvalidSearchQuery: 无效的搜索查询
-      ClientIDMissing: 客户端 ID 丢失
-      TeamIDMissing: 团队 ID 丢失
-      KeyIDMissing: 密钥 ID 丢失
-      PrivateKeyMissing: 私钥丢失
+      InvalidSearchQuery: "无效的搜索查询"
+      ClientIDMissing: "客户端 ID 丢失"
+      TeamIDMissing: "团队 ID 丢失"
+      KeyIDMissing: "密钥 ID 丢失"
+      PrivateKeyMissing: "私钥丢失"
     LoginPolicy:
-      NotFound: 未找到登录策略
-      Invalid: 登录策略无效
-      RedirectURIInvalid: 默认重定向 URL 无效
-      NotExisting: 登录策略不存在
-      AlreadyExists: 登录策略已存在
-      IdpProviderAlreadyExisting: IDP 提供者已存在
-      IdpProviderNotExisting: IDP 提供者不存在
-      RegistrationNotAllowed: 不允许注册
-      UsernamePasswordNotAllowed: 不允许使用用户名/密码登录
+      NotFound: "未找到登录策略"
+      Invalid: "登录策略无效"
+      RedirectURIInvalid: "默认重定向 URL 无效"
+      NotExisting: "登录策略不存在"
+      AlreadyExists: "登录策略已存在"
+      IdpProviderAlreadyExisting: "IDP 提供者已存在"
+      IdpProviderNotExisting: "IDP 提供者不存在"
+      RegistrationNotAllowed: "不允许注册"
+      UsernamePasswordNotAllowed: "不允许使用用户名/密码登录"
       MFA:
-        AlreadyExists: 多因素身份认证已经存在
-        NotExisting: 多因素身份认证不存在
-        Unspecified: 多因素身份认证无效
+        AlreadyExists: "多因素身份认证已经存在"
+        NotExisting: "多因素身份认证不存在"
+        Unspecified: "多因素身份认证无效"
     MailTemplate:
-      NotFound: 未找到默认邮件模板
-      NotChanged: 默认邮件模板未更改
-      AlreadyExists: 默认邮件模板已存在
-      Invalid: 默认邮件模板无效
+      NotFound: "未找到默认邮件模板"
+      NotChanged: "默认邮件模板未更改"
+      AlreadyExists: "默认邮件模板已存在"
+      Invalid: "默认邮件模板无效"
     CustomMessageText:
-      NotFound: 未找到默认消息文本
-      NotChanged: 默认消息文本未更改
-      AlreadyExists: 默认消息文本已存在
-      Invalid: 默认消息文本无效
+      NotFound: "未找到默认消息文本"
+      NotChanged: "默认消息文本未更改"
+      AlreadyExists: "默认消息文本已存在"
+      Invalid: "默认消息文本无效"
     PasswordComplexityPolicy:
-      NotFound: 未找到密码复杂性策略
-      Empty: 密码复杂性策略为空
-      NotExisting: 密码复杂性策略不存在
-      AlreadyExists: 密码复杂性策略已存在
+      NotFound: "未找到密码复杂性策略"
+      Empty: "密码复杂性策略为空"
+      NotExisting: "密码复杂性策略不存在"
+      AlreadyExists: "密码复杂性策略已存在"
     PasswordLockoutPolicy:
-      NotFound: 密码锁定策略不存在
-      Empty: 密码锁定策略为空
-      NotExisting: 密码锁定策略不存在
-      AlreadyExists: 密码锁定策略已存在
+      NotFound: "密码锁定策略不存在"
+      Empty: "密码锁定策略为空"
+      NotExisting: "密码锁定策略不存在"
+      AlreadyExists: "密码锁定策略已存在"
     PasswordAgePolicy:
-      NotFound: 密码过期策略不存在
-      Empty: 密码过期策略为空
-      NotExisting: 密码过期策略不存在
-      AlreadyExists: 密码过期策略已存在
+      NotFound: "密码过期策略不存在"
+      Empty: "密码过期策略为空"
+      NotExisting: "密码过期策略不存在"
+      AlreadyExists: "密码过期策略已存在"
     OrgIAMPolicy:
-      Empty: 组织 IAM 策略为空
-      NotExisting: 组织 IAM 策略不存在
-      AlreadyExists: 组织 IAM 策略已存在
+      Empty: "组织 IAM 策略为空"
+      NotExisting: "组织 IAM 策略不存在"
+      AlreadyExists: "组织 IAM 策略已存在"
     NotificationPolicy:
-      NotFound: 未找到通知政策
-      NotChanged: 通知政策没有改变
-      AlreadyExists: 已经存在的通知政策
+      NotFound: "未找到通知政策"
+      NotChanged: "通知政策没有改变"
+      AlreadyExists: "已经存在的通知政策"
     LabelPolicy:
-      NotFound: 不存在私人政策
-      NotChanged: 私人政策不改变
+      NotFound: "不存在私人政策"
+      NotChanged: "私人政策不改变"
   Project:
-    ProjectIDMissing: P缺少项目 ID
-    AlreadyExists: 项目以存在于组织中
-    OrgNotExisting: 组织不存在
-    UserNotExisting: 用户不存在
-    CouldNotGenerateClientSecret: 无法生成客户端秘钥
-    Invalid: 项目无效
-    NotActive: 项目不是启用状态
-    NotInactive: 项目不是停用状态
-    NotFound: 项目不存在
-    UserIDMissing: 缺少用户 ID
+    ProjectIDMissing: "P缺少项目 ID"
+    AlreadyExists: "项目以存在于组织中"
+    OrgNotExisting: "组织不存在"
+    UserNotExisting: "用户不存在"
+    CouldNotGenerateClientSecret: "无法生成客户端秘钥"
+    Invalid: "项目无效"
+    NotActive: "项目不是启用状态"
+    NotInactive: "项目不是停用状态"
+    NotFound: "项目不存在"
+    UserIDMissing: "缺少用户 ID"
     Member:
-      NotFound: 项目成员不存在
-      Invalid: 项目成员无效
-      AlreadyExists: 项目成员已存在
-      NotExisting: 项目成员不存在
-    MinimumOneRoleNeeded: 必须添加至少一个角色
+      NotFound: "项目成员不存在"
+      Invalid: "项目成员无效"
+      AlreadyExists: "项目成员已存在"
+      NotExisting: "项目成员不存在"
+    MinimumOneRoleNeeded: "必须添加至少一个角色"
     Role:
-      AlreadyExists: 角色已存在
-      Invalid: 角色无效
-      NotExisting: 角色不存在
-    IDMissing: 丢失 ID
+      AlreadyExists: "角色已存在"
+      Invalid: "角色无效"
+      NotExisting: "角色不存在"
+    IDMissing: "丢失 ID"
     App:
-      AlreadyExists: 应用已存在
-      NotFound: 应用不存在
-      Invalid: 无效的应用
-      NotExisting: 应用不存在
-      NotActive: 应用不是启用状态
-      NotInactive: 应用不是停用状态
-      OIDCConfigInvalid: OIDC 配置无效
-      APIConfigInvalid: API 配置无效
-      SAMLConfigInvalid: SAML 配置无效
-      IsNotOIDC: 应用不是 OIDC 类型
-      IsNotAPI: 应用不是 API 类型
-      IsNotSAML: 应用不是 SAML 类型
-      SAMLMetadataMissing: SAML 元数据丢失
-      SAMLMetadataFormat: SAML 元数据格式化错误
-      SAMLEntityIDAlreadyExisting: SAML EntityID 已经存在
-      OIDCAuthMethodNoSecret: 选择的 OIDC 身份验证方法不需要秘钥
-      APIAuthMethodNoSecret: 选择的 API 身份验证方法不需要秘钥
-      AuthMethodNoPrivateKeyJWT: 选择的身份验证方法不需要 Key
-      ClientSecretInvalid: Client Secret 无效
+      AlreadyExists: "应用已存在"
+      NotFound: "应用不存在"
+      Invalid: "无效的应用"
+      NotExisting: "应用不存在"
+      NotActive: "应用不是启用状态"
+      NotInactive: "应用不是停用状态"
+      OIDCConfigInvalid: "OIDC 配置无效"
+      APIConfigInvalid: "API 配置无效"
+      SAMLConfigInvalid: "SAML 配置无效"
+      IsNotOIDC: "应用不是 OIDC 类型"
+      IsNotAPI: "应用不是 API 类型"
+      IsNotSAML: "应用不是 SAML 类型"
+      SAMLMetadataMissing: "SAML 元数据丢失"
+      SAMLMetadataFormat: "SAML 元数据格式化错误"
+      SAMLEntityIDAlreadyExisting: "SAML EntityID 已经存在"
+      OIDCAuthMethodNoSecret: "选择的 OIDC 身份验证方法不需要秘钥"
+      APIAuthMethodNoSecret: "选择的 API 身份验证方法不需要秘钥"
+      AuthMethodNoPrivateKeyJWT: "选择的身份验证方法不需要 Key"
+      ClientSecretInvalid: "Client Secret 无效"
       Key:
-        AlreadyExisting: 已经存在的应用钥匙
-        NotFound: 未找到应用钥匙
-    RequiredFieldsMissing: 缺少一些必填字段
+        AlreadyExisting: "已经存在的应用钥匙"
+        NotFound: "未找到应用钥匙"
+    RequiredFieldsMissing: "缺少一些必填字段"
     Grant:
-      AlreadyExists: 项目授权已存在
-      NotFound: 授权不存在
-      Invalid: 项目授权无效
-      NotExisting: 项目授权不存在
-      HasNotExistingRole: 角色不存在与项目中
-      NotActive: 项目授权不是启用状态
-      NotInactive: 项目授权不是停用状态
+      AlreadyExists: "项目授权已存在"
+      NotFound: "授权不存在"
+      Invalid: "项目授权无效"
+      NotExisting: "项目授权不存在"
+      HasNotExistingRole: "角色不存在与项目中"
+      NotActive: "项目授权不是启用状态"
+      NotInactive: "项目授权不是停用状态"
   IAM:
-    NotFound: IAM 未找到。确保您有正确的域。查看 https://zitadel.com/docs/apis/introduction#domains
+    NotFound: "IAM 未找到。确保您有正确的域。查看 https://zitadel.com/docs/apis/introduction#domains"
     Member:
-      RolesNotChanged: 角色没有改变
-    MemberInvalid: 成员无效
-    MemberAlreadyExisting: 成员已存在
-    MemberNotExisting: 成员不存在
-    IDMissing: ID 丢失
-    IAMProjectIDMissing: IAM 项目 ID 缺失
-    IamProjectAlreadySet: IAM 项目 ID 已设置
-    IdpInvalid: IDP 配置无效
-    IdpNotExisting: IDP 配置不存在
-    OIDCConfigInvalid: OIDC IDP 配置无效
-    IdpIsNotOIDC: IDP 配置不是 OIDC 类型
-    LoginPolicyInvalid: 登录策略无效
-    LoginPolicyNotExisting: 登录策略不存在
-    IdpProviderInvalid: IDP 提供者无效
+      RolesNotChanged: "角色没有改变"
+    MemberInvalid: "成员无效"
+    MemberAlreadyExisting: "成员已存在"
+    MemberNotExisting: "成员不存在"
+    IDMissing: "ID 丢失"
+    IAMProjectIDMissing: "IAM 项目 ID 缺失"
+    IamProjectAlreadySet: "IAM 项目 ID 已设置"
+    IdpInvalid: "IDP 配置无效"
+    IdpNotExisting: "IDP 配置不存在"
+    OIDCConfigInvalid: "OIDC IDP 配置无效"
+    IdpIsNotOIDC: "IDP 配置不是 OIDC 类型"
+    LoginPolicyInvalid: "登录策略无效"
+    LoginPolicyNotExisting: "登录策略不存在"
+    IdpProviderInvalid: "IDP 提供者无效"
     LoginPolicy:
-      NotFound: 默认登录策略不存在
-      NotChanged: 默认登录策略没有改变
-      NotExisting: 默认登录策略不存在
-      AlreadyExists: 默认登录策略已存在
-      RedirectURIInvalid: 默认重定向 URL 无效
+      NotFound: "默认登录策略不存在"
+      NotChanged: "默认登录策略没有改变"
+      NotExisting: "默认登录策略不存在"
+      AlreadyExists: "默认登录策略已存在"
+      RedirectURIInvalid: "默认重定向 URL 无效"
       MFA:
-        AlreadyExists: MFA 已存在
-        NotExisting: MFA 不存在
-        Unspecified: MFA 无效
+        AlreadyExists: "MFA 已存在"
+        NotExisting: "MFA 不存在"
+        Unspecified: "MFA 无效"
       IDP:
-        AlreadyExists: 身份提供者已存在
-        NotExisting: 身份提供者不存在
-        Invalid: 身份提供者无效
+        AlreadyExists: "身份提供者已存在"
+        NotExisting: "身份提供者不存在"
+        Invalid: "身份提供者无效"
       IDPConfig:
-        AlreadyExists: 身份提供者配置已存在
-        NotInactive: 身份提供者配置不是停用状态
-        NotActive: 身份提供者配置不是启动状态
+        AlreadyExists: "身份提供者配置已存在"
+        NotInactive: "身份提供者配置不是停用状态"
+        NotActive: "身份提供者配置不是启动状态"
     LabelPolicy:
-      NotFound: 默认私有策略不存在
-      NotChanged: 默认私有策略未更改
+      NotFound: "默认私有策略不存在"
+      NotChanged: "默认私有策略未更改"
     MailTemplate:
-      NotFound: 默认邮件模板不存在
-      NotChanged: 默认邮件模板未更改
-      AlreadyExists: 默认邮件模板已存在
-      Invalid: 默认邮件模板无效
+      NotFound: "默认邮件模板不存在"
+      NotChanged: "默认邮件模板未更改"
+      AlreadyExists: "默认邮件模板已存在"
+      Invalid: "默认邮件模板无效"
     CustomMessageText:
-      NotFound: 默认消息文本不存在
-      NotChanged: 默认消息文本未更改
-      AlreadyExists: 默认消息文本已存在
-      Invalid: 默认消息文本无效
+      NotFound: "默认消息文本不存在"
+      NotChanged: "默认消息文本未更改"
+      AlreadyExists: "默认消息文本已存在"
+      Invalid: "默认消息文本无效"
     PasswordComplexityPolicy:
-      NotFound: 默认密码复杂策略不存在
-      NotExisting: 默认密码复杂策略不存在
-      AlreadyExists: 默认密码复杂策略已存在
-      Empty: 默认密码复杂策略为空
-      NotChanged: 默认密码复杂策略未更改
+      NotFound: "默认密码复杂策略不存在"
+      NotExisting: "默认密码复杂策略不存在"
+      AlreadyExists: "默认密码复杂策略已存在"
+      Empty: "默认密码复杂策略为空"
+      NotChanged: "默认密码复杂策略未更改"
     PasswordAgePolicy:
-      NotFound: 默认密码有效期策略不存在
-      NotExisting: 默认密码有效期策略不存在
-      AlreadyExists: 默认密码有效期策略已存在
-      Empty: 默认密码有效期策略为空
-      NotChanged: 默认密码有效期策略未更改
+      NotFound: "默认密码有效期策略不存在"
+      NotExisting: "默认密码有效期策略不存在"
+      AlreadyExists: "默认密码有效期策略已存在"
+      Empty: "默认密码有效期策略为空"
+      NotChanged: "默认密码有效期策略未更改"
     PasswordLockoutPolicy:
-      NotFound: 默认密码锁策略不存在
-      NotExisting: 默认密码锁策略不存在
-      AlreadyExists: 默认密码锁策略已存在
-      Empty: 默认密码锁策略为空
-      NotChanged: 默认密码锁策略未更改
+      NotFound: "默认密码锁策略不存在"
+      NotExisting: "默认密码锁策略不存在"
+      AlreadyExists: "默认密码锁策略已存在"
+      Empty: "默认密码锁策略为空"
+      NotChanged: "默认密码锁策略未更改"
     DomainPolicy:
-      NotFound: 组织 IAM 策略不存在
-      Empty: 组织 IAM 策略为空
-      NotExisting: 组织 IAM 策略不存在
-      AlreadyExists: 组织 IAM 策略已存在
-      NotChanged: 组织 IAM 策略未更改
+      NotFound: "组织 IAM 策略不存在"
+      Empty: "组织 IAM 策略为空"
+      NotExisting: "组织 IAM 策略不存在"
+      AlreadyExists: "组织 IAM 策略已存在"
+      NotChanged: "组织 IAM 策略未更改"
     NotificationPolicy:
-      NotFound: 没有找到默认的通知政策
-      NotChanged: 默认的通知政策没有改变
-      AlreadyExists: 默认的通知政策已经存在
+      NotFound: "没有找到默认的通知政策"
+      NotChanged: "默认的通知政策没有改变"
+      AlreadyExists: "默认的通知政策已经存在"
   Policy:
-    AlreadyExists: 策略已存在
+    AlreadyExists: "策略已存在"
     Label:
       Invalid:
-        PrimaryColor: 主色调不是有效的十六进制颜色值
-        BackgroundColor: 背景颜色不是有效的十六进制颜色值
-        WarnColor: 警告颜色不是有效的十六进制颜色值
-        FontColor: 字体颜色不是有效的十六进制颜色值
-        PrimaryColorDark: 主色调 (深色模式) 不是有效的十六进制颜色值
-        BackgroundColorDark: 背景颜色 (深色模式) 不是有效的十六进制颜色值
-        WarnColorDark: 警告颜色 (深色模式) 不是有效的十六进制颜色值
-        FontColorDark: 字体颜色 (深色模式) 不是有效的十六进制颜色值
+        PrimaryColor: "主色调不是有效的十六进制颜色值"
+        BackgroundColor: "背景颜色不是有效的十六进制颜色值"
+        WarnColor: "警告颜色不是有效的十六进制颜色值"
+        FontColor: "字体颜色不是有效的十六进制颜色值"
+        PrimaryColorDark: "主色调 (深色模式) 不是有效的十六进制颜色值"
+        BackgroundColorDark: "背景颜色 (深色模式) 不是有效的十六进制颜色值"
+        WarnColorDark: "警告颜色 (深色模式) 不是有效的十六进制颜色值"
+        FontColorDark: "字体颜色 (深色模式) 不是有效的十六进制颜色值"
   UserGrant:
-    AlreadyExists: 用户授权已存在
-    NotFound: 用户授权不存在
-    Invalid: 用户授权无效
-    NotChanged: 用户授权未更改
-    IDMissing: 没有 ID
-    NoPermissionForProject: 用户对此项目没有权限
-    RoleKeyNotFound: 角色不存在
+    AlreadyExists: "用户授权已存在"
+    NotFound: "用户授权不存在"
+    Invalid: "用户授权无效"
+    NotChanged: "用户授权未更改"
+    IDMissing: "没有 ID"
+    NoPermissionForProject: "用户对此项目没有权限"
+    RoleKeyNotFound: "角色不存在"
   Member:
-    AlreadyExists: 成员已存在
+    AlreadyExists: "成员已存在"
   IDPConfig:
-    AlreadyExists: IDP 配置名称已存在
-    NotExisting: 身份提供者配置不存在
+    AlreadyExists: "IDP 配置名称已存在"
+    NotExisting: "身份提供者配置不存在"
   Changes:
-    NotFound: 未找到任何历史记录
-    AuditRetention: 历史记录在审核日志保留范围之外
+    NotFound: "未找到任何历史记录"
+    AuditRetention: "历史记录在审核日志保留范围之外"
   Token:
-    NotFound: 令牌不存在
-    Invalid: 令牌无效
+    NotFound: "令牌不存在"
+    Invalid: "令牌无效"
   UserSession:
-    NotFound: 用户会话不存在
+    NotFound: "用户会话不存在"
   Key:
-    NotFound: 找不到钥匙
-    ExpireBeforeNow: 过期日期是过去的无效日期
+    NotFound: "找不到钥匙"
+    ExpireBeforeNow: "过期日期是过去的无效日期"
   Login:
     LoginPolicy:
       MFA:
-        ForceAndNotConfigured: MFA 已根据需要进行配置，但未配置任何可能的提供程序。请联系您的系统管理员。
+        ForceAndNotConfigured: "MFA 已根据需要进行配置，但未配置任何可能的提供程序。请联系您的系统管理员。"
   Step:
     Started:
-      AlreadyExists: 设置已存在
+      AlreadyExists: "设置已存在"
     Done:
-      AlreadyExists: 设置完成已存在
+      AlreadyExists: "设置完成已存在"
   CustomText:
-    AlreadyExists: 自定义文本已存在
-    Invalid: 自定义文本无效
-    NotFound: 自定义文本不存在
+    AlreadyExists: "自定义文本已存在"
+    Invalid: "自定义文本无效"
+    NotFound: "自定义文本不存在"
   TranslationFile:
-    ReadError: 读取翻译文件时出错
-    MergeError: 翻译文件无法与自定义翻译合并
-    NotFound: 翻译文件不存在
+    ReadError: "读取翻译文件时出错"
+    MergeError: "翻译文件无法与自定义翻译合并"
+    NotFound: "翻译文件不存在"
   Metadata:
-    NotFound: 元数据不存在
-    NoData: 元数据列表为空
-    Invalid: 元数据无效
-    KeyNotExisting: 一个或多个键不存在
+    NotFound: "元数据不存在"
+    NoData: "元数据列表为空"
+    Invalid: "元数据无效"
+    KeyNotExisting: "一个或多个键不存在"
   Action:
-    Invalid: 动作无效
-    NotFound: 动作不存在
-    NotActive: 动作不是启用状态
-    NotInactive: 动作不是停用状态
-    MaxAllowed: 不允许额外的动作
-    NotEnabled: 未启用“操作”功能
+    Invalid: "动作无效"
+    NotFound: "动作不存在"
+    NotActive: "动作不是启用状态"
+    NotInactive: "动作不是停用状态"
+    MaxAllowed: "不允许额外的动作"
+    NotEnabled: "未启用“操作”功能"
   Flow:
-    FlowTypeMissing: 缺少身份认证流程类型
-    Empty: 身份认证流程为空
-    WrongTriggerType: 触发器类型无效
-    NoChanges: 未更改
-    ActionIDsNotExist: 动作 ID 不存在
+    FlowTypeMissing: "缺少身份认证流程类型"
+    Empty: "身份认证流程为空"
+    WrongTriggerType: "触发器类型无效"
+    NoChanges: "未更改"
+    ActionIDsNotExist: "动作 ID 不存在"
   Query:
-    CloseRows: SQL 语句无法完成
-    SQLStatement: 无法创建 SQL 语句
-    InvalidRequest: 请求无效
-    TooManyNestingLevels: 查询嵌套级别过多（最多 20 个）
-    LimitExceeded: 限制已超出
+    CloseRows: "SQL 语句无法完成"
+    SQLStatement: "无法创建 SQL 语句"
+    InvalidRequest: "请求无效"
+    TooManyNestingLevels: "查询嵌套级别过多（最多 20 个）"
+    LimitExceeded: "限制已超出"
   Quota:
-    AlreadyExists: 这个单位的配额已经存在
-    NotFound: 没有找到该单位的配额
+    AlreadyExists: "这个单位的配额已经存在"
+    NotFound: "没有找到该单位的配额"
     Invalid:
-      CallURL: 配额调用的URL是无效的
-      Percent: 配额百分比低于1
-      Unimplemented: 该单位没有实施配额
-      Amount: 配额数量低于1
-      ResetInterval: 配额重置时间间隔短于1分钟
-      Noop: 没有通知的无限配额没有效果
+      CallURL: "配额调用的URL是无效的"
+      Percent: "配额百分比低于1"
+      Unimplemented: "该单位没有实施配额"
+      Amount: "配额数量低于1"
+      ResetInterval: "配额重置时间间隔短于1分钟"
+      Noop: "没有通知的无限配额没有效果"
     Access:
-      Exhausted: 认证请求的配额已用完
+      Exhausted: "认证请求的配额已用完"
     Execution:
-      Exhausted: 行动秒数的配额已用完
+      Exhausted: "行动秒数的配额已用完"
   LogStore:
     Access:
-      StorageFailed: 存储访问日志到数据库失败
-      ScanFailed: 查询已认证请求的使用情况失败
+      StorageFailed: "存储访问日志到数据库失败"
+      ScanFailed: "查询已认证请求的使用情况失败"
     Execution:
-      StorageFailed: 将行动执行日志存储到数据库失败
-      ScanFailed: Q查询动作执行秒数的使用情况失败
+      StorageFailed: "将行动执行日志存储到数据库失败"
+      ScanFailed: "Q查询动作执行秒数的使用情况失败"
   Session:
-    NotExisting: 会话不存在
-    Terminated: 会话已经终止
-    Expired: 会话已过期
-    PositiveLifetime: 会话生存期不得小于 0
+    NotExisting: "会话不存在"
+    Terminated: "会话已经终止"
+    Expired: "会话已过期"
+    PositiveLifetime: "会话生存期不得小于 0"
     Token:
-      Invalid: 会话令牌是无效的
+      Invalid: "会话令牌是无效的"
     WebAuthN:
-      NoChallenge: 没有 WebAuthN 质询的会话
+      NoChallenge: "没有 WebAuthN 质询的会话"
   Intent:
-    IDPMissing: 请求中缺少IDP ID
-    IDPInvalid: 请求的 IDP 无效
-    ResponseInvalid: IDP 响应无效
-    MissingSingleMappingAttribute: 不包含映射属性或具有多个值
-    SuccessURLMissing: 请求中缺少成功URL
-    FailureURLMissing: 请求中缺少失败的URL
-    StateMissing: 请求中缺少状态参数
-    NotStarted: 意图没有开始或已经结束
-    NotSucceeded: 意图不成功
-    Expired: 意图已过期
-    TokenCreationFailed: 令牌创建失败
-    InvalidToken: 意图令牌是无效的
-    OtherUser: 意图是为另一个用户准备的
+    IDPMissing: "请求中缺少IDP ID"
+    IDPInvalid: "请求的 IDP 无效"
+    ResponseInvalid: "IDP 响应无效"
+    MissingSingleMappingAttribute: "不包含映射属性或具有多个值"
+    SuccessURLMissing: "请求中缺少成功URL"
+    FailureURLMissing: "请求中缺少失败的URL"
+    StateMissing: "请求中缺少状态参数"
+    NotStarted: "意图没有开始或已经结束"
+    NotSucceeded: "意图不成功"
+    Expired: "意图已过期"
+    TokenCreationFailed: "令牌创建失败"
+    InvalidToken: "意图令牌是无效的"
+    OtherUser: "意图是为另一个用户准备的"
   AuthRequest:
-    AlreadyExists: AuthRequest已经存在
-    NotExisting: AuthRequest不存在
-    WrongLoginClient: 其他登录客户端创建的AuthRequest
-    AlreadyHandled: 身份验证请求已被处理
+    AlreadyExists: "AuthRequest已经存在"
+    NotExisting: "AuthRequest不存在"
+    WrongLoginClient: "其他登录客户端创建的AuthRequest"
+    AlreadyHandled: "身份验证请求已被处理"
   OIDCSession:
-    RefreshTokenInvalid: Refresh Token 无效
+    RefreshTokenInvalid: "Refresh Token 无效"
     Token:
-      Invalid: 令牌无效
-      Expired: 令牌已过期
-    InvalidClient: 没有为该客户发放令牌
+      Invalid: "令牌无效"
+      Expired: "令牌已过期"
+    InvalidClient: "没有为该客户发放令牌"
   SAMLRequest:
-    AlreadyExists: SAMLRequest 已存在
-    NotExisting: SAMLRequest不存在
-    WrongLoginClient: 其他登录客户端创建的 SAMLRequest
-    AlreadyHandled: SAML请求已被处理
+    AlreadyExists: "SAMLRequest 已存在"
+    NotExisting: "SAMLRequest不存在"
+    WrongLoginClient: "其他登录客户端创建的 SAMLRequest"
+    AlreadyHandled: "SAML请求已被处理"
   SAMLSession:
-    InvalidClient: 未向该客户端发出 SAMLResponse
+    InvalidClient: "未向该客户端发出 SAMLResponse"
   DeviceAuth:
-    NotFound: 设备授权请求不存在
-    AlreadyHandled: 设备授权请求已被处理
+    NotFound: "设备授权请求不存在"
+    AlreadyHandled: "设备授权请求已被处理"
   Feature:
-    NotExisting: 功能不存在
-    TypeNotSupported: 不支持功能类型
-    InvalidValue: 此功能的值无效
+    NotExisting: "功能不存在"
+    TypeNotSupported: "不支持功能类型"
+    InvalidValue: "此功能的值无效"
   Target:
-    Invalid: 目标无效
-    NoTimeout: 目标没有超时
-    InvalidURL: 目标的 URL 无效
-    NotFound: 未找到目标
-    InvalidExpirationDate: 密钥的到期日期必须是将来的时间
-    PublicKeyExpired: 目标公钥已过期
-    PublicKeyActive: 无法删除处于活动状态的目标公钥
-    InvalidPublicKey: 公钥无效。必须是 PEM 编码的 RSA 或 ECDSA 公钥，格式为 PKCS#8
+    Invalid: "目标无效"
+    NoTimeout: "目标没有超时"
+    InvalidURL: "目标的 URL 无效"
+    NotFound: "未找到目标"
+    InvalidExpirationDate: "密钥的到期日期必须是将来的时间"
+    PublicKeyExpired: "目标公钥已过期"
+    PublicKeyActive: "无法删除处于活动状态的目标公钥"
+    InvalidPublicKey: "公钥无效。必须是 PEM 编码的 RSA 或 ECDSA 公钥，格式为 PKCS#8"
   Execution:
-    ConditionInvalid: 执行条件无效
-    Invalid: 执行无效
-    NotFound: 未找到执行
-    IncludeNotFound: 包括未找到的内容
-    NoTargets: 没有定义目标
-    Failed: 执行失败
-    ResponseIsNotValidJSON: 响应不是有效的 JSON
-    MissingEncryptionKey: 缺少加密密钥
+    ConditionInvalid: "执行条件无效"
+    Invalid: "执行无效"
+    NotFound: "未找到执行"
+    IncludeNotFound: "包括未找到的内容"
+    NoTargets: "没有定义目标"
+    Failed: "执行失败"
+    ResponseIsNotValidJSON: "响应不是有效的 JSON"
+    MissingEncryptionKey: "缺少加密密钥"
   UserSchema:
-    NotEnabled: 未启用“用户架构”功能
+    NotEnabled: "未启用“用户架构”功能"
     Type:
-      Missing: 缺少用户架构类型
-      AlreadyExists: 用户架构类型已存在
+      Missing: "缺少用户架构类型"
+      AlreadyExists: "用户架构类型已存在"
     Authenticator:
-      Invalid: 验证器类型无效
-    NotActive: 用户架构未激活
-    NotInactive: 用户架构未处于非活动状态
-    NotExists: 用户架构不存在
+      Invalid: "验证器类型无效"
+    NotActive: "用户架构未激活"
+    NotInactive: "用户架构未处于非活动状态"
+    NotExists: "用户架构不存在"
     ID:
-      Missing: 缺少用户架构 ID
-    Invalid: 用户架构无效
+      Missing: "缺少用户架构 ID"
+    Invalid: "用户架构无效"
     Data:
-      Invalid: 用户架构的数据无效
+      Invalid: "用户架构的数据无效"
   TokenExchange:
     Token:
-      Missing: 令牌丢失
-      Invalid: 令牌无效
-      TypeMissing: 缺少令牌类型
-      TypeNotAllowed: 不允许的令牌类型
-      TypeNotSupported: 不支持令牌类型
-      NotForAPI: API 不允许使用模拟令牌
+      Missing: "令牌丢失"
+      Invalid: "令牌无效"
+      TypeMissing: "缺少令牌类型"
+      TypeNotAllowed: "不允许的令牌类型"
+      TypeNotSupported: "不支持令牌类型"
+      NotForAPI: "API 不允许使用模拟令牌"
     Impersonation:
-      PolicyDisabled: 实例安全策略中禁用模拟
+      PolicyDisabled: "实例安全策略中禁用模拟"
   WebKey:
-    ActiveDelete: 无法删除活动 Web 密钥
-    Config: 无效的 Web 密钥配置
-    Duplicate: Web 密钥 ID 不唯一
-    NoActive: 未找到活动 Web 密钥
-    NotFound: 未找到 Web 密钥
+    ActiveDelete: "无法删除活动 Web 密钥"
+    Config: "无效的 Web 密钥配置"
+    Duplicate: "Web 密钥 ID 不唯一"
+    NoActive: "未找到活动 Web 密钥"
+    NotFound: "未找到 Web 密钥"
 
 AggregateTypes:
-  action: 动作
-  instance: 实例
-  key_pair: 密钥对
-  org: 组织
-  project: 项目
-  user: 用户
-  usergrant: 用户授权
-  quota: 配额
-  feature: 特征
-  target: 靶
-  execution: 执行
-  user_schema: 用户模式
-  auth_request: 认证请求
-  device_auth: 设备认证
-  idpintent: IDP 意图
-  limits: 限制
-  milestone: 里程碑
-  oidc_session: OIDC 会话
-  restrictions: 限制
-  system: 系统
-  session: 会话
-  web_key: Web 密钥
-  saml_request: SAML 请求
-  saml_session: SAML 会话
-
+  action: "动作"
+  instance: "实例"
+  key_pair: "密钥对"
+  org: "组织"
+  project: "项目"
+  user: "用户"
+  usergrant: "用户授权"
+  quota: "配额"
+  feature: "特征"
+  target: "靶"
+  execution: "执行"
+  user_schema: "用户模式"
+  auth_request: "认证请求"
+  device_auth: "设备认证"
+  idpintent: "IDP 意图"
+  limits: "限制"
+  milestone: "里程碑"
+  oidc_session: "OIDC 会话"
+  restrictions: "限制"
+  system: "系统"
+  session: "会话"
+  web_key: "Web 密钥"
+  saml_request: "SAML 请求"
+  saml_session: "SAML 会话"
 EventTypes:
   execution:
-    set: 执行集
-    removed: 执行已删除
+    set: "执行集"
+    removed: "执行已删除"
   target:
-    added: 目标已创建
-    changed: 目标改变
-    removed: 目标已删除
+    added: "目标已创建"
+    changed: "目标改变"
+    removed: "目标已删除"
   user:
-    added: 已添加用户
-    selfregistered: 自注册用户
+    added: "已添加用户"
+    selfregistered: "自注册用户"
     initialization:
       code:
-        added: 生成初始化代码
-        sent: 发送初始化代码
+        added: "生成初始化代码"
+        sent: "发送初始化代码"
       check:
-        succeeded: 初始化检查成功
-        failed: 初始化检查失败
+        succeeded: "初始化检查成功"
+        failed: "初始化检查失败"
     token:
-      added: 已创建访问令牌
-      v2.added: 已创建访问令牌
-      removed: 已删除访问令牌
-    impersonated: 用户冒充
+      added: "已创建访问令牌"
+      v2.added: "已创建访问令牌"
+      removed: "已删除访问令牌"
+    impersonated: "用户冒充"
     username:
-      reserved: 保留用户名
-      released: 用户名已发布
-      changed: 用户名已更改
+      reserved: "保留用户名"
+      released: "用户名已发布"
+      changed: "用户名已更改"
     email:
-      reserved: 电子邮件地址已保留
-      released: 电子邮件地址已发布
-      changed: 电子邮件地址已更改
-      verified: 电子邮件地址已验证
+      reserved: "电子邮件地址已保留"
+      released: "电子邮件地址已发布"
+      changed: "电子邮件地址已更改"
+      verified: "电子邮件地址已验证"
       verification:
-        failed: 电子邮件验证失败
+        failed: "电子邮件验证失败"
       code:
-        added: 生成电子邮件验证码
-        sent: 发送电子邮件验证码
+        added: "生成电子邮件验证码"
+        sent: "发送电子邮件验证码"
     machine:
-      added: 添加了服务用户
-      changed: 更改了服务用户
+      added: "添加了服务用户"
+      changed: "更改了服务用户"
       key:
-        added: 添加服务用户 Key
-        removed: 删除服务用户 Key
+        added: "添加服务用户 Key"
+        removed: "删除服务用户 Key"
       secret:
-        set: 秘密套装
-        updated: 秘密哈希已更新
-        removed: 秘密删除
+        set: "秘密套装"
+        updated: "秘密哈希已更新"
+        removed: "秘密删除"
         check:
-          succeeded: 成功的秘密控制
-          failed: 秘密控制失败
+          succeeded: "成功的秘密控制"
+          failed: "秘密控制失败"
     human:
-      added: 添加用户
-      selfregistered: 自注册用户
+      added: "添加用户"
+      selfregistered: "自注册用户"
       avatar:
-        added: 添加了头像
-        removed: 删除了头像
+        added: "添加了头像"
+        removed: "删除了头像"
       initialization:
         code:
-          added: 生成初始化验证码
-          sent: 发送初始化验证码
+          added: "生成初始化验证码"
+          sent: "发送初始化验证码"
         check:
-          succeeded: 初始化检查成功
-          failed: 初始化检查失败
+          succeeded: "初始化检查成功"
+          failed: "初始化检查失败"
       invite:
         code:
-          added: 生成了邀请码
-          sent: 发送了邀请码
+          added: "生成了邀请码"
+          sent: "发送了邀请码"
         check:
-          succeeded: 邀请检查成功
-          failed: 邀请检查失败
+          succeeded: "邀请检查成功"
+          failed: "邀请检查失败"
       username:
-        reserved: 保留用户名
-        released: 用户名已发布
+        reserved: "保留用户名"
+        released: "用户名已发布"
       email:
-        changed: 电子邮件地址已更改
-        verified: 电子邮件地址已验证
+        changed: "电子邮件地址已更改"
+        verified: "电子邮件地址已验证"
         verification:
-          failed: 电子邮件地址验证失败
+          failed: "电子邮件地址验证失败"
         code:
-          added: 生成电子邮件地址验证码
-          sent: 发送电子邮件地址验证码
+          added: "生成电子邮件地址验证码"
+          sent: "发送电子邮件地址验证码"
       password:
-        changed: 更改密码
+        changed: "更改密码"
         code:
-          added: 生成重置密码验证码
-          sent: 发送重置密码验证码
+          added: "生成重置密码验证码"
+          sent: "发送重置密码验证码"
         check:
-          succeeded: 密码检查成功
-          failed: 密码检查失败
+          succeeded: "密码检查成功"
+          failed: "密码检查失败"
         change:
-          sent: 密码更改已发送
+          sent: "密码更改已发送"
         hash:
-          updated: 密码哈希已更新
+          updated: "密码哈希已更新"
       externallogin:
         check:
-          succeeded: 外部登录成功
+          succeeded: "外部登录成功"
       externalidp:
-        added: 添加了外部 IDP
-        removed: 移除了外部 IDP
+        added: "添加了外部 IDP"
+        removed: "移除了外部 IDP"
         cascade:
-          removed: 移除了外部 IDP
+          removed: "移除了外部 IDP"
         id:
-          migrated: IDP 的外部用户 ID 已迁移
+          migrated: "IDP 的外部用户 ID 已迁移"
       phone:
-        changed: 修改手机号码
-        verified: 已验证手机号码
+        changed: "修改手机号码"
+        verified: "已验证手机号码"
         verification:
-          failed: 手机号码验证失败
+          failed: "手机号码验证失败"
         code:
-          added: 生成手机号码验证码
-          sent: 发送手机号码验证码
-        removed: 删除手机号码
+          added: "生成手机号码验证码"
+          sent: "发送手机号码验证码"
+        removed: "删除手机号码"
       profile:
-        changed: 更改个人资料
+        changed: "更改个人资料"
       address:
-        changed: 更改用户地址
+        changed: "更改用户地址"
       mfa:
         otp:
-          added: 添加 MFA OTP
-          verified: 验证 MFA OTP
-          removed: 删除 MFA OTP
+          added: "添加 MFA OTP"
+          verified: "验证 MFA OTP"
+          removed: "删除 MFA OTP"
           check:
-            succeeded: 验证 MFA OTP 成功
-            failed: 验证 MFA OTP 失败
+            succeeded: "验证 MFA OTP 成功"
+            failed: "验证 MFA OTP 失败"
           sms:
-            added: 添加了多因素 OTP 短信
-            removed: 删除了多因素 OTP 短信
+            added: "添加了多因素 OTP 短信"
+            removed: "删除了多因素 OTP 短信"
             code:
-              added: 添加了多因素 OTP 短信代码
-              sent: 已发送多因素 OTP 短信代码
+              added: "添加了多因素 OTP 短信代码"
+              sent: "已发送多因素 OTP 短信代码"
             check:
-              succeeded: 多因素 OTP 短信验证成功
-              failed: 多因素 OTP 短信验证失败
+              succeeded: "多因素 OTP 短信验证成功"
+              failed: "多因素 OTP 短信验证失败"
           email:
-            added: 添加了多因素 OTP 电子邮件
-            removed: 删除了多因素 OTP 电子邮件
+            added: "添加了多因素 OTP 电子邮件"
+            removed: "删除了多因素 OTP 电子邮件"
             code:
-              added: 添加了多因素 OTP 电子邮件代码
-              sent: 已发送多因素 OTP 电子邮件代码
+              added: "添加了多因素 OTP 电子邮件代码"
+              sent: "已发送多因素 OTP 电子邮件代码"
             check:
-              succeeded: 多因素 OTP 电子邮件验证成功
-              failed: 多因素 OTP 电子邮件验证失败
+              succeeded: "多因素 OTP 电子邮件验证成功"
+              failed: "多因素 OTP 电子邮件验证失败"
         u2f:
           token:
-            added: 添加 MFA U2F 令牌
-            verified: 验证 MFA U2F 令牌
-            removed: 删除 MFA U2F 令牌
+            added: "添加 MFA U2F 令牌"
+            verified: "验证 MFA U2F 令牌"
+            removed: "删除 MFA U2F 令牌"
             begin:
-              login: 开始验证 MFA U2F
+              login: "开始验证 MFA U2F"
             check:
-              succeeded: 验证 MFA U2F 成功
-              failed: 验证 MFA U2F 失败
+              succeeded: "验证 MFA U2F 成功"
+              failed: "验证 MFA U2F 失败"
             signcount:
-              changed: MFA U2F 令牌的校验和已更改
+              changed: "MFA U2F 令牌的校验和已更改"
         init:
-          skipped: 跳过 MFA 初始化
+          skipped: "跳过 MFA 初始化"
       passwordless:
         token:
-          added: 添加无密码登录令牌
-          verified: 验证无密码登录令牌
-          removed: 删除无密码登录令牌
+          added: "添加无密码登录令牌"
+          verified: "验证无密码登录令牌"
+          removed: "删除无密码登录令牌"
           begin:
-            login: 无密码登录检查开始
+            login: "无密码登录检查开始"
           check:
-            succeeded: 无密码登录检查成功
-            failed: 无密码登录检查失败
+            succeeded: "无密码登录检查成功"
+            failed: "无密码登录检查失败"
           signcount:
-            changed: 无密码登录令牌的校验和已更改
+            changed: "无密码登录令牌的校验和已更改"
         initialization:
           code:
-            added: 添加无密码初始化验证码
-            sent: 发送无密码初始化验证码
-            requested: 发起无密码初始化验证码请求
+            added: "添加无密码初始化验证码"
+            sent: "发送无密码初始化验证码"
+            requested: "发起无密码初始化验证码请求"
             check:
-              succeeded: 无密码初始化验证码验证成功
-              failed: 无密码初始化验证码验证失败
+              succeeded: "无密码初始化验证码验证成功"
+              failed: "无密码初始化验证码验证失败"
       signed:
-        out: 用户退出登录
+        out: "用户退出登录"
       refresh:
         token:
-          added: 创建 Refresh Token
-          renewed: 删除 Refresh Token
-          removed: 删除 Refresh Token
-    locked: 用户锁定
-    unlocked: 解锁用户
-    deactivated: 停用用户
-    reactivated: 启用用户
-    removed: 删除用户
+          added: "创建 Refresh Token"
+          renewed: "删除 Refresh Token"
+          removed: "删除 Refresh Token"
+    locked: "用户锁定"
+    unlocked: "解锁用户"
+    deactivated: "停用用户"
+    reactivated: "启用用户"
+    removed: "删除用户"
     password:
-      changed: 修改密码
+      changed: "修改密码"
       code:
-        added: 生成重置密码验证码
-        sent: 发送验证码
+        added: "生成重置密码验证码"
+        sent: "发送验证码"
       check:
-        succeeded: 密码检查成功
-        failed: 密码检查失败
+        succeeded: "密码检查成功"
+        failed: "密码检查失败"
     phone:
-      changed: 更改手机号码
-      verified: 验证手机号码
+      changed: "更改手机号码"
+      verified: "验证手机号码"
       verification:
-        failed: 手机号码验证失败
+        failed: "手机号码验证失败"
       code:
-        added: 生成的手机号码验证码
-        sent: 发送手机号码验证码
-        removed: 电话号码已删除
+        added: "生成的手机号码验证码"
+        sent: "发送手机号码验证码"
+        removed: "电话号码已删除"
     profile:
-      changed: 修改用户资料
+      changed: "修改用户资料"
     address:
-      changed: 修改用户地址
+      changed: "修改用户地址"
     mfa:
       otp:
-        added: 添加 MFA OTP
-        verified: 验证 MFA OTP
-        removed: 删除 MFA OTP
+        added: "添加 MFA OTP"
+        verified: "验证 MFA OTP"
+        removed: "删除 MFA OTP"
         check:
-          succeeded: MFA OTP 验证成功
-          failed: MFA OTP 验证失败
+          succeeded: "MFA OTP 验证成功"
+          failed: "MFA OTP 验证失败"
         init:
-          skipped: 跳过 MFA 初始化
+          skipped: "跳过 MFA 初始化"
       init:
-        skipped: 跳过多因素初始化
+        skipped: "跳过多因素初始化"
     signed:
-      out: 用户退出登录
+      out: "用户退出登录"
     grant:
-      added: 添加授权
-      changed: 更改授权
-      removed: 删除授权
-      deactivated: 停用授权
-      reactivated: 启用授权
-      reserved: 保留授权
-      released: 释放授权
+      added: "添加授权"
+      changed: "更改授权"
+      removed: "删除授权"
+      deactivated: "停用授权"
+      reactivated: "启用授权"
+      reserved: "保留授权"
+      released: "释放授权"
       cascade:
-        removed: 删除授权
-        changed: 更改授权
+        removed: "删除授权"
+        changed: "更改授权"
     metadata:
-      set: 用户元数据集
-      removed: 删除用户元数据
-      removed.all: 删除所有用户元数据
+      set: "用户元数据集"
+      removed: "删除用户元数据"
+      removed.all: "删除所有用户元数据"
     domain:
-      claimed: 已认领域名
-      claimed.sent: 已发送域声明通知
+      claimed: "已认领域名"
+      claimed.sent: "已发送域声明通知"
     pat:
-      added: 添加个人访问令牌
-      removed: 个人访问令牌已删除
+      added: "添加个人访问令牌"
+      removed: "个人访问令牌已删除"
   org:
-    added: 添加组织
-    changed: 更改组织
-    deactivated: 停用组织
-    reactivated: 启用组织
-    removed: 删除组织
+    added: "添加组织"
+    changed: "更改组织"
+    deactivated: "停用组织"
+    reactivated: "启用组织"
+    removed: "删除组织"
     domain:
-      added: 添加域名
+      added: "添加域名"
       verification:
-        added: 添加域名验证
-        failed: 域名验证失败
-      verified: 验证域名
-      removed: 删除域名
+        added: "添加域名验证"
+        failed: "域名验证失败"
+      verified: "验证域名"
+      removed: "删除域名"
       primary:
-        set: 设置主域名
-      reserved: 保留域名
-      released: 释放域名
+        set: "设置主域名"
+      reserved: "保留域名"
+      released: "释放域名"
     name:
-      reserved: 保留组织名
-      released: 释放组织名
+      reserved: "保留组织名"
+      released: "释放组织名"
     member:
-      added: 添加组织成员
-      changed: 更改组织成员
-      removed: 删除组织成员
+      added: "添加组织成员"
+      changed: "更改组织成员"
+      removed: "删除组织成员"
       cascade:
-        removed: 已删除组织级联成员
+        removed: "已删除组织级联成员"
     iam:
       policy:
-        added: 添加系统策略
-        changed: 更改系统策略
-        removed: 删除系统策略
+        added: "添加系统策略"
+        changed: "更改系统策略"
+        removed: "删除系统策略"
     idp:
       config:
-        added: 添加 IDP 配置
-        changed: 更改 IDP 配置
-        removed: 删除 IDP 配置
-        deactivated: 停用 IDP 配置
-        reactivated: 启用 IDP 配置
+        added: "添加 IDP 配置"
+        changed: "更改 IDP 配置"
+        removed: "删除 IDP 配置"
+        deactivated: "停用 IDP 配置"
+        reactivated: "启用 IDP 配置"
       oidc:
         config:
-          added: 添加 OIDC IDP 配置
-          changed: 更改 OIDC IDP 配置
+          added: "添加 OIDC IDP 配置"
+          changed: "更改 OIDC IDP 配置"
       saml:
         config:
-          added: 添加 SAML IDP 配置
-          changed: 更改 SAML IDP 配置
+          added: "添加 SAML IDP 配置"
+          changed: "更改 SAML IDP 配置"
       jwt:
         config:
-          added: 添加了 JWT IDP 配置
-          changed: JWT IDP 配置已更改
+          added: "添加了 JWT IDP 配置"
+          changed: "JWT IDP 配置已更改"
     customtext:
-      set: 设置自定义文本
-      removed: 删除自定义文本
+      set: "设置自定义文本"
+      removed: "删除自定义文本"
       template:
-        removed: 删除自定义文本模板
+        removed: "删除自定义文本模板"
     policy:
       login:
-        added: 添加登录策略
-        changed: 更改登录策略
-        removed: 删除登录策略
+        added: "添加登录策略"
+        changed: "更改登录策略"
+        removed: "删除登录策略"
         idpprovider:
-          added: 添加 IDP 到登录策略
-          removed: 从登录策略删除 IDP
+          added: "添加 IDP 到登录策略"
+          removed: "从登录策略删除 IDP"
           cascade:
-            removed: 从登录策略中删除了身份提供者级联
+            removed: "从登录策略中删除了身份提供者级联"
         secondfactor:
-          added: 添加两步认证到登录策略
-          removed: 删除两步认证到登录策略
+          added: "添加两步认证到登录策略"
+          removed: "删除两步认证到登录策略"
         multifactor:
-          added: 添加 MFA 到登录策略
-          removed: 从登录策略删除 MFA
+          added: "添加 MFA 到登录策略"
+          removed: "从登录策略删除 MFA"
       password:
         complexity:
-          added: 添加密码复杂性策略
-          changed: 更改密码复杂性策略
-          removed: 删除密码复杂性策略
+          added: "添加密码复杂性策略"
+          changed: "更改密码复杂性策略"
+          removed: "删除密码复杂性策略"
         age:
-          added: 添加密码有效期策略
-          changed: 更改密码有效期策略
-          removed: 删除密码有效期策略
+          added: "添加密码有效期策略"
+          changed: "更改密码有效期策略"
+          removed: "删除密码有效期策略"
         lockout:
-          added: 添加密码锁策略
-          changed: 更改密码锁策略
-          removed: 删除密码锁策略
+          added: "添加密码锁策略"
+          changed: "更改密码锁策略"
+          removed: "删除密码锁策略"
       label:
-        added: 添加标签策略
-        changed: 更改标签策略
-        activated: 启用标签策略
-        removed: 删除标签策略
+        added: "添加标签策略"
+        changed: "更改标签策略"
+        activated: "启用标签策略"
+        removed: "删除标签策略"
         logo:
-          added: 添加 Logo 标签策略
-          removed: 从标签策略删除 Logo
+          added: "添加 Logo 标签策略"
+          removed: "从标签策略删除 Logo"
           dark:
-            added: 添加 Logo (深色模式) Logo 标签策略
-            removed: 删除 Logo (深色模式) Logo 标签策略
+            added: "添加 Logo (深色模式) Logo 标签策略"
+            removed: "删除 Logo (深色模式) Logo 标签策略"
         icon:
-          added: 添加图标到标签策略
-          removed: 从标签策略中删除图标
+          added: "添加图标到标签策略"
+          removed: "从标签策略中删除图标"
           dark:
-            added: 添加图标(dark mode) 到标签策略
-            removed: 从标签策略中删除图标 (深色模式)
+            added: "添加图标(dark mode) 到标签策略"
+            removed: "从标签策略中删除图标 (深色模式)"
         font:
-          added: 字体添加到标签策略
-          removed: 从标签策略中删除字体
+          added: "字体添加到标签策略"
+          removed: "从标签策略中删除字体"
         assets:
-          removed: 从标签策略中删除的资产
+          removed: "从标签策略中删除的资产"
       privacy:
-        added: 添加隐私政策和服务条款
-        changed: 隐私政策和服务条款已更改
-        removed: 隐私政策和 TOS 已删除
+        added: "添加隐私政策和服务条款"
+        changed: "隐私政策和服务条款已更改"
+        removed: "隐私政策和 TOS 已删除"
       domain:
-        added: 添加了域策略
-        changed: 域策略已更改
-        removed: 域策略已删除
+        added: "添加了域策略"
+        changed: "域策略已更改"
+        removed: "域策略已删除"
       lockout:
-        added: 添加了锁定策略
-        changed: 更改隐私政策和服务条款
-        removed: 删除隐私政策和服务条款
+        added: "添加了锁定策略"
+        changed: "更改隐私政策和服务条款"
+        removed: "删除隐私政策和服务条款"
       notification:
-        added: 增加了通知政策
-        changed: 通知政策改变
-        removed: 删除了通知政策
+        added: "增加了通知政策"
+        changed: "通知政策改变"
+        removed: "删除了通知政策"
     flow:
       trigger_actions:
-        set: 设置动作
+        set: "设置动作"
         cascade:
-          removed: 删除动作级联
-        removed: 删除动作
-      cleared: 流量已清除
+          removed: "删除动作级联"
+        removed: "删除动作"
+      cleared: "流量已清除"
     mail:
       template:
-        added: 添加了电子邮件模板
-        changed: 电子邮件模板已更改
-        removed: 电子邮件模板已删除
+        added: "添加了电子邮件模板"
+        changed: "电子邮件模板已更改"
+        removed: "电子邮件模板已删除"
       text:
-        added: 添加了电子邮件文本
-        changed: 电子邮件文本已更改
-        removed: 电子邮件文本已删除
+        added: "添加了电子邮件文本"
+        changed: "电子邮件文本已更改"
+        removed: "电子邮件文本已删除"
     metadata:
-      removed: 电子邮件文本已删除
-      removed.all: 所有元数据已删除
-      set: 元数据集
+      removed: "电子邮件文本已删除"
+      removed.all: "所有元数据已删除"
+      set: "元数据集"
   project:
-    added: 添加项目
-    changed: 更改项目
-    deactivated: 停用项目
-    reactivated: 启用项目
-    removed: 删除项目
+    added: "添加项目"
+    changed: "更改项目"
+    deactivated: "停用项目"
+    reactivated: "启用项目"
+    removed: "删除项目"
     member:
-      added: 添加项目成员
-      changed: 更改项目成员
-      removed: 删除项目成员
+      added: "添加项目成员"
+      changed: "更改项目成员"
+      removed: "删除项目成员"
       cascade:
-        removed: 移除项目成员级联
+        removed: "移除项目成员级联"
     role:
-      added: 添加项目角色
-      changed: 更改项目角色
-      removed: 删除项目角色
+      added: "添加项目角色"
+      changed: "更改项目角色"
+      removed: "删除项目角色"
     grant:
-      added: 添加外部授权
-      changed: 更改外部授权
-      removed: 删除外部授权
-      deactivated: 停用外部授权
-      reactivated: 启用外部授权
+      added: "添加外部授权"
+      changed: "更改外部授权"
+      removed: "删除外部授权"
+      deactivated: "停用外部授权"
+      reactivated: "启用外部授权"
       cascade:
-        changed: 更改外部授权
+        changed: "更改外部授权"
       member:
-        added: 添加访问成员
-        changed: 更改访问成员
-        removed: 删除访问成员
+        added: "添加访问成员"
+        changed: "更改访问成员"
+        removed: "删除访问成员"
         cascade:
-          removed: 删除管理访问级联
+          removed: "删除管理访问级联"
     application:
-      added: 添加应用
-      changed: 更改应用
-      removed: 删除应用
-      deactivated: 停用应用
-      reactivated: 启用应用
+      added: "添加应用"
+      changed: "更改应用"
+      removed: "删除应用"
+      deactivated: "停用应用"
+      reactivated: "启用应用"
       oidc:
         secret:
           check:
-            succeeded: 检查 OIDC Client Secret 成功
-            failed: 检查 OIDC Client Secret 失败
+            succeeded: "检查 OIDC Client Secret 成功"
+            failed: "检查 OIDC Client Secret 失败"
         key:
-          added: 添加了 OIDC 应用密钥
-          removed: OIDC 应用密钥已删除
+          added: "添加了 OIDC 应用密钥"
+          removed: "OIDC 应用密钥已删除"
       api:
         secret:
           check:
-            succeeded: API密检成功
-            failed: API 秘密检查失败
+            succeeded: "API密检成功"
+            failed: "API 秘密检查失败"
         key:
-          added: 添加应用 Key
-          removed: 删除应用 Key
+          added: "添加应用 Key"
+          removed: "删除应用 Key"
       config:
         saml:
-          added: 添加 SAML 配置
-          changed: 更改 SAML 配置
+          added: "添加 SAML 配置"
+          changed: "更改 SAML 配置"
         oidc:
-          added: 添加 OIDC 配置
-          changed: 更改 OIDC 配置
+          added: "添加 OIDC 配置"
+          changed: "更改 OIDC 配置"
           secret:
-            changed: 更改 OIDC Secret
-            updated: OIDC 秘密哈希已更新
+            changed: "更改 OIDC Secret"
+            updated: "OIDC 秘密哈希已更新"
         api:
-          added: 添加 API 配置
-          changed: 更改 API 配置
+          added: "添加 API 配置"
+          changed: "更改 API 配置"
           secret:
-            changed: 更改 API Secret
-            updated: API 秘密哈希已更新
+            changed: "更改 API Secret"
+            updated: "API 秘密哈希已更新"
   policy:
     password:
       complexity:
-        added: 添加密码复杂性策略
-        changed: 更改密码复杂性策略
+        added: "添加密码复杂性策略"
+        changed: "更改密码复杂性策略"
       age:
-        added: 添加密码过期策略
-        changed: 更改密码过期策略
+        added: "添加密码过期策略"
+        changed: "更改密码过期策略"
       lockout:
-        added: 添加密码锁定策略
-        changed: 更改密码锁定策略
+        added: "添加密码锁定策略"
+        changed: "更改密码锁定策略"
   iam:
     setup:
-      started: 开始 Zitadel 配置
-      done: Zitadel 配置完成
+      started: "开始 Zitadel 配置"
+      done: "Zitadel 配置完成"
     global:
       org:
-        set: 设置全局组织
+        set: "设置全局组织"
     project:
       iam:
-        set: 设置 Zitadel 项目
+        set: "设置 Zitadel 项目"
     member:
-      added: 添加 Zitadel 成员
-      changed: 更改 Zitadel 成员
-      removed: 删除 Zitadel 成员
+      added: "添加 Zitadel 成员"
+      changed: "更改 Zitadel 成员"
+      removed: "删除 Zitadel 成员"
       cascade:
-        removed: 删除 Zitadel 成员级联
+        removed: "删除 Zitadel 成员级联"
     idp:
       config:
-        added: 添加 IDP 配置
-        changed: 更改 IDP 配置
-        removed: 删除 IDP 配置
-        deactivated: 停用 IDP 配置
-        reactivated: 启用 IDP 配置
+        added: "添加 IDP 配置"
+        changed: "更改 IDP 配置"
+        removed: "删除 IDP 配置"
+        deactivated: "停用 IDP 配置"
+        reactivated: "启用 IDP 配置"
       oidc:
         config:
-          added: 添加 OIDC IDP 配置
-          changed: 更改 OIDC IDP 配置
+          added: "添加 OIDC IDP 配置"
+          changed: "更改 OIDC IDP 配置"
       saml:
         config:
-          added: 添加 SAML IDP 配置
-          changed: 更改 SAML IDP 配置
+          added: "添加 SAML IDP 配置"
+          changed: "更改 SAML IDP 配置"
       jwt:
         config:
-          added: 添加了身份提供者的 JWT 配置
-          changed: 身份提供者的 JWT 配置已删除
+          added: "添加了身份提供者的 JWT 配置"
+          changed: "身份提供者的 JWT 配置已删除"
     customtext:
-      set: 设置文本
-      removed: 删除文本
+      set: "设置文本"
+      removed: "删除文本"
     policy:
       login:
-        added: 添加默认登录策略
-        changed: 更改默认登录策略
+        added: "添加默认登录策略"
+        changed: "更改默认登录策略"
         idpprovider:
-          added: IDP 添加到默认登录策略
-          removed: 从默认登录策略中删除 IDP
+          added: "IDP 添加到默认登录策略"
+          removed: "从默认登录策略中删除 IDP"
       label:
-        added: 添加标签策略
-        changed: 更改标签策略
-        activated: 启用标签策略
+        added: "添加标签策略"
+        changed: "更改标签策略"
+        activated: "启用标签策略"
         logo:
-          added: 添加 Logo 标签策略
-          removed: 从标签策略删除 Logo
+          added: "添加 Logo 标签策略"
+          removed: "从标签策略删除 Logo"
           dark:
-            added: 添加 Logo (深色模式) Logo 标签策略
-            removed: 删除Logo (深色模式) Logo 标签策略
+            added: "添加 Logo (深色模式) Logo 标签策略"
+            removed: "删除Logo (深色模式) Logo 标签策略"
         icon:
-          added: 添加图标到标签策略
-          removed: 从标签策略中删除图标
+          added: "添加图标到标签策略"
+          removed: "从标签策略中删除图标"
           dark:
-            added: 添加图标(dark mode) 到标签策略
-            removed: 从标签策略中删除图标 (深色模式)
+            added: "添加图标(dark mode) 到标签策略"
+            removed: "从标签策略中删除图标 (深色模式)"
         font:
-          added: 字体添加到标签策略
-          removed: 从标签策略中删除字体
+          added: "字体添加到标签策略"
+          removed: "从标签策略中删除字体"
         assets:
-          removed: 从标签策略中删除的资产
+          removed: "从标签策略中删除的资产"
     default:
       language:
-        set: 设置默认语言
+        set: "设置默认语言"
     oidc:
       settings:
-        added: 添加 OIDC 配置
-        changed: 更改 OIDC 配置
-        removed: 删除 OIDC 配置
+        added: "添加 OIDC 配置"
+        changed: "更改 OIDC 配置"
+        removed: "删除 OIDC 配置"
     secret:
       generator:
-        added: 添加秘钥生成器
-        changed: 更改秘钥生成器
-        removed: 删除秘钥生成器
+        added: "添加秘钥生成器"
+        changed: "更改秘钥生成器"
+        removed: "删除秘钥生成器"
     smtp:
       config:
-        added: 添加 SMTP 配置
-        changed: 更改 SMTP 配置
-        activated: SMTP 配置已激活
-        deactivated: SMTP 配置已停用
-        removed: SMTP 配置已删除
+        added: "添加 SMTP 配置"
+        changed: "更改 SMTP 配置"
+        activated: "SMTP 配置已激活"
+        deactivated: "SMTP 配置已停用"
+        removed: "SMTP 配置已删除"
         password:
-          changed: 更改 SMTP 安全设置
+          changed: "更改 SMTP 安全设置"
     sms:
       config:
         twilio:
-          added: 添加 Twilio SMS 提供者
-          changed: 更改 Twilio SMS 提供者
+          added: "添加 Twilio SMS 提供者"
+          changed: "更改 Twilio SMS 提供者"
           token:
-            changed: 更改 Twilio SMS 提供者令牌
-          removed: 删除 Twilio SMS 提供者
-          activated: 启用 Twilio SMS 提供者
-          deactivated: 停用 Twilio SMS 提供者
+            changed: "更改 Twilio SMS 提供者令牌"
+          removed: "删除 Twilio SMS 提供者"
+          activated: "启用 Twilio SMS 提供者"
+          deactivated: "停用 Twilio SMS 提供者"
   key_pair:
-    added: 添加密钥对
+    added: "添加密钥对"
     certificate:
-      added: 证书已添加
+      added: "证书已添加"
   action:
-    added: 添加动作
-    changed: 更改动作
-    deactivated: 停用动作
-    reactivated: 启用动作
-    removed: 删除动作
+    added: "添加动作"
+    changed: "更改动作"
+    deactivated: "停用动作"
+    reactivated: "启用动作"
+    removed: "删除动作"
   instance:
-    added: 实例已添加
-    changed: 实例已更改
+    added: "实例已添加"
+    changed: "实例已更改"
     customtext:
-      removed: 自定义文本已删除
-      set: 自定义文本集
+      removed: "自定义文本已删除"
+      set: "自定义文本集"
       template:
-        removed: 删除了自定义文本模板
+        removed: "删除了自定义文本模板"
     default:
       language:
-        set: 默认语言设置
+        set: "默认语言设置"
       org:
-        set: 默认组织集
+        set: "默认组织集"
     domain:
-      added: 已添加域名
+      added: "已添加域名"
       primary:
-        set: 主域集
-      removed: 域名已删除
+        set: "主域集"
+      removed: "域名已删除"
     iam:
       console:
-        set: Zitadel管理控制台应用程序已设置
+        set: "Zitadel管理控制台应用程序已设置"
       project:
-        set: Zitadel 项目集
+        set: "Zitadel 项目集"
     mail:
       template:
-        added: 添加了电子邮件模板
-        changed: 电子邮件模板已更改
+        added: "添加了电子邮件模板"
+        changed: "电子邮件模板已更改"
       text:
-        added: 添加了电子邮件文本
-        changed: 电子邮件文本已更改
+        added: "添加了电子邮件文本"
+        changed: "电子邮件文本已更改"
     member:
-      added: 已添加实例成员
-      changed: 实例成员发生变化
-      removed: 实例成员已删除
+      added: "已添加实例成员"
+      changed: "实例成员发生变化"
+      removed: "实例成员已删除"
       cascade:
-        removed: 实例成员级联已删除
+        removed: "实例成员级联已删除"
     notification:
       provider:
         debug:
-          fileadded: 添加了文件调试通知提供程序
-          filechanged: 文件调试通知提供程序已更改
-          fileremoved: 删除文件调试通知提供程序
-          logadded: 添加了日志调试通知提供程序
-          logchanged: 日志调试通知提供程序已更改
-          logremoved: 日志调试通知提供程序已删除
+          fileadded: "添加了文件调试通知提供程序"
+          filechanged: "文件调试通知提供程序已更改"
+          fileremoved: "删除文件调试通知提供程序"
+          logadded: "添加了日志调试通知提供程序"
+          logchanged: "日志调试通知提供程序已更改"
+          logremoved: "日志调试通知提供程序已删除"
     oidc:
       settings:
-        added: 添加了 OIDC 设置
-        changed: OIDC 设置已更改
+        added: "添加了 OIDC 设置"
+        changed: "OIDC 设置已更改"
     policy:
       domain:
-        added: 添加了域策略
-        changed: 域策略已更改
+        added: "添加了域策略"
+        changed: "域策略已更改"
       label:
-        activated: 标签政策已激活
-        added: 添加了标签策略
+        activated: "标签政策已激活"
+        added: "添加了标签策略"
         assets:
-          removed: 已删除标签政策中的资产
-        changed: 标签政策已更改
+          removed: "已删除标签政策中的资产"
+        changed: "标签政策已更改"
         font:
-          added: 添加到标签政策的字体
-          removed: 从标签政策中删除的字体
+          added: "添加到标签政策的字体"
+          removed: "从标签政策中删除的字体"
         icon:
-          added: 图标已添加到标签策略
-          removed: 图标已从标签政策中删除
+          added: "图标已添加到标签策略"
+          removed: "图标已从标签政策中删除"
           dark:
-            added: 图标已添加到暗标签政策
-            removed: 图标已从暗标签政策中删除
+            added: "图标已添加到暗标签政策"
+            removed: "图标已从暗标签政策中删除"
         logo:
-          added: 徽标已添加到标签政策中
-          removed: 徽标已从标签政策中删除
+          added: "徽标已添加到标签政策中"
+          removed: "徽标已从标签政策中删除"
           dark:
-            added: 徽标已添加到暗标签政策中
-            removed: 徽标从暗标签政策中删除
+            added: "徽标已添加到暗标签政策中"
+            removed: "徽标从暗标签政策中删除"
       lockout:
-        added: 添加了锁定策略
-        changed: 锁定政策已更改
+        added: "添加了锁定策略"
+        changed: "锁定政策已更改"
       login:
-        added: 添加了登录策略
-        changed: 登录政策已更改
+        added: "添加了登录策略"
+        changed: "登录政策已更改"
         idpprovider:
-          added: 身份提供者已添加到登录策略中
+          added: "身份提供者已添加到登录策略中"
           cascade:
-            removed: 身份提供者级联从登录策略中删除
-          removed: 身份提供者已从登录策略中删除
+            removed: "身份提供者级联从登录策略中删除"
+          removed: "身份提供者已从登录策略中删除"
         multifactor:
-          added: 登录策略中添加了多因素
-          removed: 从登录策略中删除了多因素
+          added: "登录策略中添加了多因素"
+          removed: "从登录策略中删除了多因素"
         secondfactor:
-          added: 添加到登录策略的第二个因素
-          removed: 从登录策略中删除了第二个因素
+          added: "添加到登录策略的第二个因素"
+          removed: "从登录策略中删除了第二个因素"
       password:
         age:
-          added: 添加了密码年龄策略
-          changed: 密码期限政策已更改
+          added: "添加了密码年龄策略"
+          changed: "密码期限政策已更改"
         complexity:
-          added: 添加了密码复杂性策略
-          changed: 删除了密码复杂性策略
+          added: "添加了密码复杂性策略"
+          changed: "删除了密码复杂性策略"
       privacy:
-        added: 添加了隐私政策
-        changed: 隐私政策已更改
+        added: "添加了隐私政策"
+        changed: "隐私政策已更改"
       security:
-        set: 安全策略集
-
-    removed: 实例已删除
+        set: "安全策略集"
+    removed: "实例已删除"
     secret:
       generator:
-        added: 添加了秘密生成器
-        changed: 秘密生成器已更改
-        removed: 秘密生成器已移除
+        added: "添加了秘密生成器"
+        changed: "秘密生成器已更改"
+        removed: "秘密生成器已移除"
     sms:
       configtwilio:
-        activated: Twilio SMS 配置已激活
-        added: 添加了 Twilio SMS 配置
-        changed: Twilio SMS 配置已更改
-        deactivated: Twilio SMS 配置已停用
-        removed: Twilio SMS 配置已删除
+        activated: "Twilio SMS 配置已激活"
+        added: "添加了 Twilio SMS 配置"
+        changed: "Twilio SMS 配置已更改"
+        deactivated: "Twilio SMS 配置已停用"
+        removed: "Twilio SMS 配置已删除"
         token:
-          changed: Twilio SMS 配置的令牌已更改
+          changed: "Twilio SMS 配置的令牌已更改"
     smtp:
       config:
-        added: 添加了 SMTP 配置
-        changed: SMTP 配置已更改
-        activated: SMTP 配置已激活
-        deactivated: SMTP 配置已停用
+        added: "添加了 SMTP 配置"
+        changed: "SMTP 配置已更改"
+        activated: "SMTP 配置已激活"
+        deactivated: "SMTP 配置已停用"
         password:
-          changed: SMTP 配置密码已更改
-        removed: SMTP 配置已删除
+          changed: "SMTP 配置密码已更改"
+        removed: "SMTP 配置已删除"
   user_schema:
-    created: 已创建用户架构
-    updated: 用户架构已更新
-    deactivated: 用户架构已停用
-    reactivated: 用户架构已重新激活
-    deleted: 用户架构已删除
+    created: "已创建用户架构"
+    updated: "用户架构已更新"
+    deactivated: "用户架构已停用"
+    reactivated: "用户架构已重新激活"
+    deleted: "用户架构已删除"
     user:
-      created: 用户已创建
-      updated: 用户已更新
-      deleted: 用户已删除
+      created: "用户已创建"
+      updated: "用户已更新"
+      deleted: "用户已删除"
       email:
-        updated: 电子邮件地址已更改
-        verified: 电子邮件地址已验证
+        updated: "电子邮件地址已更改"
+        verified: "电子邮件地址已验证"
         verification:
-          failed: 电子邮件地址验证失败
+          failed: "电子邮件地址验证失败"
         code:
-          added: 电子邮件地址验证码已生成
-          sent: 电子邮件地址验证码已发送
+          added: "电子邮件地址验证码已生成"
+          sent: "电子邮件地址验证码已发送"
       phone:
-        updated: 电话号码已更改
-        verified: 电话号码已验证
+        updated: "电话号码已更改"
+        verified: "电话号码已验证"
         verification:
-          failed: 电话号码验证失败
+          failed: "电话号码验证失败"
         code:
-          added: 电话号码验证码已生成
-          sent: 电话号码验证码已发送
+          added: "电话号码验证码已生成"
+          sent: "电话号码验证码已发送"
   web_key:
-    added: 已添加 Web Key
-    activated: 已激活 Web Key
-    deactivated: 已停用 Web Key
-    removed: 已删除 Web Key
-
+    added: "已添加 Web Key"
+    activated: "已激活 Web Key"
+    deactivated: "已停用 Web Key"
+    removed: "已删除 Web Key"
 Application:
   OIDC:
-    UnsupportedVersion: 不支持您的 OIDC 版本
+    UnsupportedVersion: "不支持您的 OIDC 版本"
     V1:
-      NotCompliant: 您的配置不符合要求，并且与 OIDC 1.0 标准不同。
-      NoRedirectUris: 必须至少注册一个重定向 URL。
-      NotAllCombinationsAreAllowed: 配置是合规的，但并非所有可能的组合都是允许的。
+      NotCompliant: "您的配置不符合要求，并且与 OIDC 1.0 标准不同。"
+      NoRedirectUris: "必须至少注册一个重定向 URL。"
+      NotAllCombinationsAreAllowed: "配置是合规的，但并非所有可能的组合都是允许的。"
       Code:
         RedirectUris:
-          HttpOnlyForWeb: 授权方式为 Code 模式时，仅允许 Web 和 Native 应用类型的应用使用 HTTP 重定向。
-          CustomOnlyForNative: 授权方式为 Code 时支持自定义原生 App Schema  (e.g appname:// )
+          HttpOnlyForWeb: "授权方式为 Code 模式时，仅允许 Web 和 Native 应用类型的应用使用 HTTP 重定向。"
+          CustomOnlyForNative: "授权方式为 Code 时支持自定义原生 App Schema  (e.g appname:// )"
       Implicit:
         RedirectUris:
-          CustomNotAllowed: 授权类型为隐式时不允许自定义重定向 URL。
-          HttpNotAllowed: 授权类型为隐式时不允许 HTTP 重定向 URL。
-          HttpLocalhostOnlyForNative: http://localhost 重定向 URL 仅允许用于本机应用程序。
+          CustomNotAllowed: "授权类型为隐式时不允许自定义重定向 URL。"
+          HttpNotAllowed: "授权类型为隐式时不允许 HTTP 重定向 URL。"
+          HttpLocalhostOnlyForNative: "http://localhost 重定向 URL 仅允许用于本机应用程序。"
       Native:
         AuthMethodType:
-          NotNone: 原生应用的身份验证方式应该为 None。
+          NotNone: "原生应用的身份验证方式应该为 None。"
         RedirectUris:
-          MustBeHttpLocalhost: 重定向 URL 必须以您自己的协议、http://127.0.0.1、http://[::1] 或 http://localhost 开头。
+          MustBeHttpLocalhost: "重定向 URL 必须以您自己的协议、http://127.0.0.1、http://[::1] 或 http://localhost 开头。"
       UserAgent:
         AuthMethodType:
-          NotNone: UserAgent 应用应使用 None 身份验证方式。
+          NotNone: "UserAgent 应用应使用 None 身份验证方式。"
       GrantType:
         Refresh:
-          NoAuthCode: Refresh Token 仅允许与授权码（Authorization Code）模式一起使用。
-
+          NoAuthCode: "Refresh Token 仅允许与授权码（Authorization Code）模式一起使用。"
 Action:
   Flow:
     Type:
-      Unspecified: 未指定的
-      ExternalAuthentication: 外部认证
-      CustomiseToken: 自定义令牌
-      InternalAuthentication: 内部认证
-      CustomizeSAMLResponse: 补充 SAMLResponse
+      Unspecified: "未指定的"
+      ExternalAuthentication: "外部认证"
+      CustomiseToken: "自定义令牌"
+      InternalAuthentication: "内部认证"
+      CustomizeSAMLResponse: "补充 SAMLResponse"
   TriggerType:
-    Unspecified: 未指定的
-    PostAuthentication: 后期认证
-    PreCreation: 创建前
-    PostCreation: 创建后
-    PreUserinfoCreation: 用户信息创建前
-    PreAccessTokenCreation: access 令牌创建前
-    PreSAMLResponseCreation: 创建 SAMLResponse 前
+    Unspecified: "未指定的"
+    PostAuthentication: "后期认证"
+    PreCreation: "创建前"
+    PostCreation: "创建后"
+    PreUserinfoCreation: "用户信息创建前"
+    PreAccessTokenCreation: "access 令牌创建前"
+    PreSAMLResponseCreation: "创建 SAMLResponse 前"

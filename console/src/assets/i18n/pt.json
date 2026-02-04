@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Chaves Web Ativas e Futuras",
           "DESCRIPTION": "Suas chaves web ativas e futuras. Ativar uma nova chave desativará a atual.",
-          "NOTE": "Nota: O endpoint JWKs OIDC retorna uma resposta que pode ser armazenada em cache (padrão: 5 min). Evite ativar uma chave muito cedo, pois ela pode ainda não estar disponível no cache e para os clientes.",
+          "NOTE": "Nota: O endpoint JWKs OIDC retorna uma resposta que pode ser armazenada em cache (padrão: 5 min). Evite ativar uma chave muito cedo, pois ela pode ainda não estar disponível no cache e para os aplicativos.",
           "ACTIVATE": "Ativar próxima Chave Web",
           "ACTIVE": "Atualmente ativa",
           "NEXT": "Próxima na fila",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Tem permissão para criar e gerenciar usuários",
     "IAM_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais de todas as organizações",
     "IAM_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais de todas as organizações",
-    "IAM_LOGIN_CLIENT": "Tem permissão para gerenciar clientes de login",
+    "IAM_LOGIN_CLIENT": "Tem permissão para gerenciar aplicativos de login",
     "ORG_OWNER": "Tem permissão sobre toda a organização",
     "ORG_USER_MANAGER": "Tem permissão para criar e gerenciar usuários da organização",
     "ORG_OWNER_VIEWER": "Tem permissão para revisar toda a organização",
@@ -1645,7 +1645,7 @@
       "DEBUGOIDCPARENTERROR": "Erro de Depuração do Pai OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se a bandeira estiver ativada, o erro do pai OIDC será registrado no console.",
       "ENABLEBACKCHANNELLOGOUT": "Ativar Logout de Backchannel",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Back-Channel implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os clientes sobre a terminação da sessão no Provedor de OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Back-Channel implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os aplicativos sobre a terminação da sessão no Provedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificação de Permissão V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Se a bandeira estiver ativada, você poderá usar a nova API e seus recursos.",
       "STATES": {
@@ -2628,8 +2628,8 @@
       "IDTOKENROLEASSERTION": "Funções do usuário no ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Se selecionado, as funções solicitadas do usuário autenticado serão adicionadas ao ID token.",
       "IDTOKENUSERINFOASSERTION": "Informações do usuário no ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite que os clientes obtenham claims de perfil, e-mail, telefone e endereço do ID token.",
-      "CLOCKSKEW": "Permite que os clientes lidem com a discrepância de tempo do OP e do cliente. A duração (0-5s) será adicionada ao claim exp e subtraída de iat, auth_time e nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite que os aplicativos obtenham claims de perfil, e-mail, telefone e endereço do ID token.",
+      "CLOCKSKEW": "Permite que os aplicativos lidem com a discrepância de tempo do OP e do aplicativo. A duração (0-5s) será adicionada ao claim exp e subtraída de iat, auth_time e nbf.",
       "RECOMMENDED": "recomendado",
       "NOTRECOMMENDED": "não recomendado",
       "SELECTION": {

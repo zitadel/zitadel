@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Kunci Web Aktif dan Mendatang",
           "DESCRIPTION": "Kunci web Anda yang aktif dan akan datang. Mengaktifkan kunci baru akan menonaktifkan kunci yang sedang digunakan.",
-          "NOTE": "Catatan: Endpoint JWKs OIDC mengembalikan respons yang dapat di-cache (default 5 menit). Hindari mengaktifkan kunci terlalu cepat, karena mungkin belum tersedia di cache dan klien.",
+          "NOTE": "Catatan: Endpoint JWKs OIDC mengembalikan respons yang dapat di-cache (default 5 menit). Hindari mengaktifkan kunci terlalu cepat, karena mungkin belum tersedia di cache dan aplikasi.",
           "ACTIVATE": "Aktifkan Kunci Web Berikutnya",
           "ACTIVE": "Saat ini aktif",
           "NEXT": "Berikutnya dalam antrean",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna",
     "IAM_ADMIN_IMPERSONATOR": "Memiliki izin untuk menyamar sebagai admin dan pengguna akhir dari semua organisasi",
     "IAM_END_USER_IMPERSONATOR": "Memiliki izin untuk meniru identitas pengguna akhir dari semua organisasi",
-    "IAM_LOGIN_CLIENT": "Memiliki izin untuk mengelola klien masuk",
+    "IAM_LOGIN_CLIENT": "Memiliki izin untuk mengelola aplikasi masuk",
     "ORG_OWNER": "Memiliki izin atas seluruh organisasi",
     "ORG_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna organisasi",
     "ORG_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh organisasi",
@@ -1641,7 +1641,7 @@
       "ACTIONS_DESCRIPTION": "Tindakan v2 memungkinkan untuk mengelola eksekusi dan target data. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
       "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify applications about session termination at the OpenID Provider.",
       "PERMISSIONCHECKV2": "Permission Check V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
       "STATES": {
@@ -2656,8 +2656,8 @@
       "IDTOKENROLEASSERTION": "Peran pengguna di dalam Token ID",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Jika dipilih, peran yang diminta dari pengguna yang diautentikasi akan ditambahkan ke token ID.",
       "IDTOKENUSERINFOASSERTION": "Info Pengguna di dalam Token ID",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Memungkinkan klien untuk mengambil klaim profil, email, telepon dan alamat dari token ID.",
-      "CLOCKSKEW": "Memungkinkan klien untuk menangani kemiringan jam OP dan klien. Durasi (0-5 detik) akan ditambahkan ke klaim exp dan dikurangi dari iats, auth_time, dan nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Memungkinkan aplikasi untuk mengambil klaim profil, email, telepon dan alamat dari token ID.",
+      "CLOCKSKEW": "Memungkinkan aplikasi untuk menangani kemiringan jam OP dan aplikasi. Durasi (0-5 detik) akan ditambahkan ke klaim exp dan dikurangi dari iats, auth_time, dan nbf.",
       "RECOMMENDED": "direkomendasikan",
       "NOTRECOMMENDED": "tidak disarankan",
       "SELECTION": {
