@@ -57,12 +57,45 @@ jobs:
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
         run: pnpm nx run @zitadel/release:release
-      - name: Upload Release Artifacts
+      - name: Upload Linux Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: release-artifacts
+          name: zitadel-linux
+          path: .artifacts/pack/zitadel-linux-*.tar.gz
+          if-no-files-found: ignore
+          retention-days: 5
+      - name: Upload Darwin Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zitadel-darwin
+          path: .artifacts/pack/zitadel-darwin-*.tar.gz
+          if-no-files-found: ignore
+          retention-days: 5
+      - name: Upload Windows Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zitadel-windows
+          path: .artifacts/pack/zitadel-windows-*.tar.gz
+          if-no-files-found: ignore
+          retention-days: 5
+      - name: Upload Login Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zitadel-login
+          path: .artifacts/pack/zitadel-login.tar.gz
+          if-no-files-found: ignore
+          retention-days: 5
+      - name: Upload Release Metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metadata
           path: |
-            .artifacts/pack/*
             .artifacts/version
+            .artifacts/pack/checksums.txt
+          if-no-files-found: ignore
           retention-days: 5
