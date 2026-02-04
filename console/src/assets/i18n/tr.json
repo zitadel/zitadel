@@ -223,8 +223,8 @@
           "PR": "Bir kullanıcı şifresini sıfırladığında, yeni bir şifre belirlemek için bir bağlantı içeren bir e-posta alacaktır.",
           "VE": "Bir kullanıcı e-posta adresini değiştirdiğinde, yeni adresi doğrulamak için bir bağlantı içeren bir e-posta alacaktır.",
           "VP": "Bir kullanıcı telefon numarasını değiştirdiğinde, yeni numarayı doğrulamak için bir kod içeren bir SMS alacaktır.",
-          "VEO": "Bir kullanıcı e-posta yoluyla Tek Seferlik Şifre yöntemi eklediğinde, e-posta adreslerine gönderilen bir kodu girerek etkinleştirmeleri gerekir.",
-          "VSO": "Bir kullanıcı SMS yoluyla Tek Seferlik Şifre yöntemi eklediğinde, telefon numaralarına gönderilen bir kodu girerek etkinleştirmeleri gerekir.",
+          "VEO": "Bir kullanıcı e-posta yoluyla OTP yöntemi eklediğinde, e-posta adreslerine gönderilen bir kodu girerek etkinleştirmeleri gerekir.",
+          "VSO": "Bir kullanıcı SMS yoluyla OTP yöntemi eklediğinde, telefon numaralarına gönderilen bir kodu girerek etkinleştirmeleri gerekir.",
           "IU": "Bir kullanıcı davet kodu oluşturulduğunda, kimlik doğrulama yöntemlerini belirlemek için bir bağlantı içeren bir e-posta alacaklardır."
         }
       },
@@ -851,7 +851,7 @@
       "U2F_NAME": "Kimlik Doğrulayıcı Adı",
       "TYPE": {
         "0": "MFA tanımlanmamış",
-        "1": "Tek Seferlik Şifre (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -884,7 +884,7 @@
       "DESCRIPTION": "Hesabınız için optimal güvenliği sağlamak için ikinci bir faktör ekleyin.",
       "MANAGE_DESCRIPTION": "Kullanıcılarınızın ikinci faktör yöntemlerini yönetin.",
       "ADD": "Faktör Ekle",
-      "OTP": "TOTP için Kimlik Doğrulayıcı Uygulaması (Zamana Dayalı Tek Seferlik Şifre)",
+      "OTP": "TOTP için Kimlik Doğrulayıcı Uygulaması",
       "OTP_DIALOG_TITLE": "OTP Ekle",
       "OTP_DIALOG_DESCRIPTION": "QR kodunu bir kimlik doğrulayıcı uygulamayla tarayın ve OTP yöntemini doğrulamak ve etkinleştirmek için aşağıya kodu girin.",
       "U2F": "Passkey",
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "Faktör başarıyla eklendi!",
       "U2F_ERROR": "Kurulum sırasında bir hata oluştu!",
       "U2F_NAME": "Kimlik Doğrulayıcı Adı",
-      "OTPSMS": "SMS ile OTP (Tek Seferlik Şifre)",
-      "OTPEMAIL": "E-posta ile OTP (Tek Seferlik Şifre)",
-      "SETUPOTPSMSDESCRIPTION": "Bu telefon numarasını OTP (Tek seferlik şifre) ikinci faktörü olarak kurmak istiyor musunuz?",
+      "OTPSMS": "SMS ile OTP",
+      "OTPEMAIL": "E-posta ile OTP",
+      "SETUPOTPSMSDESCRIPTION": "Bu telefon numarasını OTP ikinci faktörü olarak kurmak istiyor musunuz?",
       "OTPSMSSUCCESS": "OTP faktörü başarıyla kuruldu.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Bu yöntemi kullanabilmek için telefonunuzun doğrulanması gerekir.",
       "OTPEMAILSUCCESS": "OTP faktörü başarıyla kuruldu.",
       "TYPE": {
         "0": "MFA tanımlanmamış",
-        "1": "Tek Seferlik Şifre (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -1615,8 +1615,8 @@
         "4": "Şifre Sıfırlama",
         "5": "Passkey Başlatma",
         "6": "Uygulama Gizli Anahtarı",
-        "7": "Tek Kullanımlık Şifre (OTP) - SMS",
-        "8": "Tek Kullanımlık Şifre (OTP) - E-posta"
+        "7": "OTP - SMS",
+        "8": "OTP - E-posta"
       },
       "EXPIRY": "Son kullanma (dakika cinsinden)",
       "INCLUDEDIGITS": "Sayıları Dahil Et",
@@ -1854,7 +1854,7 @@
         "INIT": "Başlatma",
         "VE": "E-postayı Doğrula",
         "VP": "Telefonu Doğrula",
-        "VSO": "SMS OTP Doğrula",
+        "VSO": "OTP SMS Doğrula",
         "VEO": "E-posta OTP Doğrula",
         "PR": "Şifre Sıfırlama",
         "DC": "Domain Talebi",
@@ -1878,8 +1878,8 @@
         "changedate": "Değişiklik tarihi",
         "username": "Kullanıcı adı",
         "tempUsername": "Geçici kullanıcı adı",
-        "otp": "Tek kullanımlık şifre",
-        "verifyUrl": "Tek kullanımlık şifre URL'sini doğrula",
+        "otp": "OTP",
+        "verifyUrl": "OTP URL'sini doğrula",
         "expiry": "Son kullanma",
         "applicationName": "Uygulama adı"
       },
@@ -2433,10 +2433,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Bilinmeyen",
-      "1": "Kimlik Doğrulayıcı Uygulama ile Tek Kullanımlık Şifre (TOTP)",
+      "1": "Kimlik Doğrulayıcı Uygulama ile OTP (TOTP)",
       "2": "Passkey",
-      "3": "E-posta ile Tek Kullanımlık Şifre (Email OTP)",
-      "4": "SMS ile Tek Kullanımlık Şifre (SMS OTP)",
+      "3": "E-posta ile OTP (OTP Email)",
+      "4": "SMS ile OTP (OTP SMS)",
       "5": "Kurtarma Kodları"
     }
   },
