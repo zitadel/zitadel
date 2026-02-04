@@ -1,0 +1,33 @@
+{
+    "name": "@zitadel/release",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "sourceRoot": "tools/release",
+    "targets": {
+        "version": {
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "npx ts-node tools/release/version.ts"
+                ],
+                "passArgs": true
+            }
+        },
+        "publish": {
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "npx ts-node tools/release/publish.ts"
+                ],
+                "passArgs": true
+            },
+            "dependsOn": [
+                "version",
+                {
+                    "projects": "@zitadel/console",
+                    "target": "pack"
+                }
+            ]
+        }
+    }
+}

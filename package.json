@@ -13,10 +13,18 @@
     "clean:all": "pnpm run clean && rm -rf .nx node_modules"
   },
   "devDependencies": {
+    "@actions/artifact": "^6.1.0",
+    "@actions/core": "^3.0.0",
     "@changesets/cli": "^2.29.8",
-    "nx": "21.6.9",
+    "@nx/js": "^22.4.5",
+    "@types/node": "^25.2.0",
+    "@types/yargs": "^17.0.35",
+    "nx": "22.4.5",
+    "octokit": "^5.0.5",
     "sass": "^1.97.1",
     "shiki": "^3.21.0",
-    "wait-on": "^9.0.3"
+    "ts-node": "^10.9.2",
+    "wait-on": "^9.0.3",
+    "yargs": "^18.0.0"
   }
 }

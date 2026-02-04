@@ -22,7 +22,8 @@
         "@zitadel/api:pack-linux-*",
         "@zitadel/api:pack-darwin-*",
         "@zitadel/api:pack-windows-*",
-        "@zitadel/login:pack"
+        "@zitadel/login:pack",
+        "@zitadel/console:pack"
       ],
       "executor": "nx:run-commands",
       "options": {

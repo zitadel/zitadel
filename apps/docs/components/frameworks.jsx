@@ -1,6 +1,6 @@
 import React from "react";
 import { Tile } from "./tile";
-import frameworks from "../frameworks.json";
+import frameworks from "../../../packages/zitadel-common/src/frameworks.json";
 
 export function Frameworks({ filter }) {
 	const filteredFrameworks = frameworks.filter((framework) => {

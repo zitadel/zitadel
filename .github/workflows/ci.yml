@@ -1,72 +1,57 @@
-name: CI 
+name: NX Release
 
 on:
   push:
     tags-ignore:
       - "*"
     branches:
-      - "main"
+      - "nx-release-lean"
   pull_request:
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 permissions:
   contents: write
   packages: write
   issues: write
   pull-requests: write
+  actions: write
 
 jobs:
-  lint_test_build:
-    uses: ./.github/workflows/lint_test_build.yml
-    if: ${{ github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
-    permissions:
-      contents: read
-    with:
-      go_version: "1.25"
-      node_version: "22"
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      NX_CLOUD_ACCESS_TOKEN_READONLY: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-
-  pack:
-    uses: ./.github/workflows/pack.yml
-    permissions:
-      contents: write
-      packages: write
-    secrets:
-      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    with:
-      go_version: "1.25"
-      node_version: "22"
-      semantic_version: "23.0.7"
-      image_name_github_api: "ghcr.io/zitadel/zitadel"
-      image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
-      image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
-
-  release:
-    uses: ./.github/workflows/release.yml
-    permissions:
-      packages: write
-      contents: write
-      issues: write
-      pull-requests: write
-    needs:
-      - lint_test_build
-      - pack
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    secrets:
-      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-      APP_ID: ${{ secrets.APP_ID }}
-      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
-    with:
-      semantic_version: "23.0.7"
-      image_name_github_api: "ghcr.io/zitadel/zitadel"
-      image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
-      image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
+  ci:
+    name: ci
+    runs-on: depot-ubuntu-22.04-16
+    environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+      - name: Fetch main branch
+        if: ${{ github.ref != 'refs/heads/main' }}
+        run: git fetch origin main:main
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Set SHAs for nx affected commands
+        uses: nrwl/nx-set-shas@v4
+      - name: Build API
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+          NX_DAEMON: "false"
+          NX_DISABLE_DB: "true"
+        run: pnpm nx run @zitadel/release:publish

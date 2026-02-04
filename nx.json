@@ -5,7 +5,7 @@
     "libsDir": "packages"
   },
   "tui": {
-    "enabled": false
+    "enabled": true
   },
   "namedInputs": {
     "default": [
@@ -66,6 +66,41 @@
         "default"
       ],
       "cache": true
+    }
+  },
+  "release": {
+    "projects": [
+      "@zitadel/zitadel",
+      "@zitadel/login",
+      "@zitadel/console"
+    ],
+    "version": {
+      "preVersionCommand": "pnpm install",
+      "conventionalCommits": true,
+      "git": {
+        "commit": true,
+        "tag": true
+      }
+    },
+    "changelog": {
+      "workspaceChangelog": {
+        "createRelease": "github",
+        "file": "CHANGELOG.md"
+      },
+      "projectChangelogs": {
+        "renderOptions": {
+          "authors": true,
+          "commitReferences": true,
+          "versionTitleDate": true
+        }
+      },
+      "git": {
+        "commit": true,
+        "tag": true
+      }
+    },
+    "releaseTag": {
+      "checkAllBranchesWhen": true
     }
   }
 }
