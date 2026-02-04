@@ -272,7 +272,7 @@ This file is checked in to support building docs without a Go environment.
 
 {{$handler.Method}}: {{$service.Prefix}}{{$method.Path}}{{$handler.PathSuffix}}
 {{ if $method.HasDarkMode }}
-### {{$handler.Name}}{{$method.Name}}()
+### {{$handler.Name}}{{$method.Name}}Dark()
 
 > {{$handler.Name}}{{$method.Name}}Dark()
 
