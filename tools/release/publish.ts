@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import { execSync } from 'child_process';
 
 (async () => {
     const argv = await yargs(hideBin(process.argv))
@@ -154,6 +155,27 @@ import { hideBin } from 'yargs/helpers';
         }
     }
 
-    // 4. Docker (Excluded for now)
+    // 4. Docker Push Logic
+    console.log('Pushing Docker images...');
+    const dockerTargets = [
+        '@zitadel/devcontainer:publish',
+        '@zitadel/api:docker-push',
+        '@zitadel/login:docker-push'
+    ];
+
+    for (const target of dockerTargets) {
+        if (!dryRun) {
+            console.log(`Running target: ${target}`);
+            try {
+                // Pass PUSH_LATEST env var if needed, or rely on process.env
+                execSync(`npx nx run ${target}`, { stdio: 'inherit', env: process.env });
+            } catch (e) {
+                console.error(`Failed to run target ${target}:`, e);
+                process.exit(1);
+            }
+        } else {
+            console.log(`[Dry-Run] Would run target: ${target}`);
+        }
+    }
 
 })();

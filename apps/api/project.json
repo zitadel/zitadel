@@ -511,6 +511,47 @@
                 "{workspaceRoot}/.artifacts/pack/zitadel-windows-arm64.tar.gz",
                 "{workspaceRoot}/.artifacts/bin/windows/arm64/zitadel.exe"
             ]
+        },
+        "docker-repo": {
+            "description": "Ensures a Docker Buildx builder instance exists and is bootstrapped",
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "docker buildx inspect multiarch || docker buildx create --name multiarch --driver docker-container --bootstrap --use"
+                ]
+            }
+        },
+        "docker-build": {
+            "description": "Builds the ZITADEL API Docker image for multiple architectures (without pushing)",
+            "dependsOn": [
+                {
+                    "projects": "@zitadel/release",
+                    "target": "version"
+                },
+                "docker-repo",
+                "pack-linux-amd64",
+                "pack-linux-arm64"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/zitadel/zitadel:$VERSION -f apps/api/Dockerfile ."
+                ],
+                "parallel": false
+            }
+        },
+        "docker-push": {
+            "description": "Builds and pushes the ZITADEL API Docker image",
+            "dependsOn": [
+                "docker-build"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/zitadel/zitadel:$VERSION -t ghcr.io/zitadel/zitadel:latest --push -f apps/api/Dockerfile ."
+                ],
+                "parallel": false
+            }
         }
     }
 }

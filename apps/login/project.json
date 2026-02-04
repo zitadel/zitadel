@@ -123,12 +123,14 @@
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",
         "!{projectRoot}/acceptance/**/*",
-        { "env": "LOGIN_BASE_URL" }
+        {
+          "env": "LOGIN_BASE_URL"
+        }
       ]
     },
     "test-integration-stop": {
-        "description": "Stops the gRPC mock container used for integration tests.",
-        "command": "nx run @zitadel/login-api-mock:down"
+      "description": "Stops the gRPC mock container used for integration tests.",
+      "command": "nx run @zitadel/login-api-mock:down"
     },
     "pack": {
       "description": "Packages the standalone Login application build into an archive",
@@ -151,6 +153,36 @@
       "outputs": [
         "{workspaceRoot}/.artifacts/pack/zitadel-login.tar.gz"
       ]
+    },
+    "docker-build": {
+      "description": "Builds the ZITADEL Login Docker image",
+      "dependsOn": [
+        {
+          "projects": "@zitadel/release",
+          "target": "version"
+        },
+        "build"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); docker build -t ghcr.io/zitadel/login:$VERSION -f apps/login/Dockerfile apps/login"
+        ],
+        "parallel": false
+      }
+    },
+    "docker-push": {
+      "description": "Pushes the ZITADEL Login Docker image",
+      "dependsOn": [
+        "docker-build"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); docker push ghcr.io/zitadel/login:$VERSION && docker tag ghcr.io/zitadel/login:$VERSION ghcr.io/zitadel/login:latest && docker push ghcr.io/zitadel/login:latest"
+        ],
+        "parallel": false
+      }
     }
   }
 }

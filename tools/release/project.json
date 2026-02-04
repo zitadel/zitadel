@@ -39,7 +39,7 @@
             "dependsOn": [
                 "version",
                 {
-                    "projects": "@zitadel/console",
+                    "projects": "zitadel",
                     "target": "pack"
                 }
             ]

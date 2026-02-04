@@ -23,13 +23,16 @@
         "@zitadel/api:pack-darwin-*",
         "@zitadel/api:pack-windows-*",
         "@zitadel/login:pack",
-        "@zitadel/console:pack"
+        "@zitadel/console:pack",
+        "@zitadel/api:docker-build",
+        "@zitadel/login:docker-build"
       ],
       "executor": "nx:run-commands",
       "options": {
         "parallel": false,
+        "passArgs": false,
         "commands": [
-          "sha256sum .artifacts/pack/zitadel-*.tar.gz > .artifacts/pack/checksums.txt"
+          "bash -c 'sha256sum .artifacts/pack/zitadel-*.tar.gz > .artifacts/pack/checksums.txt' --"
         ]
       },
       "cache": true,
