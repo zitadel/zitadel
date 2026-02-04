@@ -36,8 +36,24 @@ import * as path from 'path';
                 firstRelease: true,
             });
 
-            const sha = execSync('git rev-parse --short HEAD').toString().trim();
-            const previewVersion = `${workspaceVersion}+${sha}`;
+
+
+            // Get branch name (try env first for CI, then git)
+            let branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME;
+            if (!branch) {
+                try {
+                    branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+                } catch (e) {
+                    branch = 'unknown';
+                }
+            }
+            // Sanitize branch name (replace non-alphanumeric-dash with dash)
+            const sanitizedBranch = branch.replace(/[^a-zA-Z0-9-]/g, '-');
+
+            // Use stable branch name as suffix (no SHA) to optimize caching
+            const previewSuffix = sanitizedBranch;
+
+            const previewVersion = `${workspaceVersion}+${previewSuffix}`;
             console.log(`Preview Version: ${previewVersion}`);
 
             // Output to env var for other steps

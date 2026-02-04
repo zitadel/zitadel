@@ -69,7 +69,7 @@
                     "target": "version"
                 }
             ],
-            "command": "bash -c 'VERSION=${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}; CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.version=$VERSION -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\")\"'",
+            "command": "bash -c 'VERSION=${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}; CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.version=$VERSION\"'",
             "inputs": [
                 {
                     "runtime": "go env GOOS"
@@ -79,6 +79,9 @@
                 },
                 {
                     "env": "ZITADEL_VERSION"
+                },
+                {
+                    "runtime": "cat .artifacts/version"
                 },
                 "runtime",
                 {
