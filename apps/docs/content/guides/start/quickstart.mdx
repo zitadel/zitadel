@@ -94,6 +94,12 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:8089">
         </AppConfig>
     </Tab>
+    <Tab value="Laravel">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback/zitadel">
+        </AppConfig>
+    </Tab>
     <Tab value="Next.js">
         <AppConfig
             redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
@@ -114,8 +120,8 @@ ZITADEL automatically configures the best security settings for your selected fr
     </Tab>
     <Tab value="Symfony">
         <AppConfig
-            redirectUrl="http://localhost:8000/login_check"
-            postLogoutRedirectUrl="http://localhost:8000/logout">
+            redirectUrl="http://localhost:3000/login_check"
+            postLogoutRedirectUrl="http://localhost:3000/logout">
         </AppConfig>
     </Tab>
     <Tab value="Vue.js">
@@ -142,6 +148,9 @@ ZITADEL automatically configures the best security settings for your selected fr
     </Tab>
     <Tab value="Go">
         <AppValues valueCount="two" clientSecret={false}></AppValues>
+    </Tab>
+    <Tab value="Laravel">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="Next.js">
         <AppValues valueCount="three" clientSecret={true}></AppValues>
@@ -189,6 +198,10 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     <Tab value="Go">
         - [Go](https://go.dev/)
     </Tab>
+    <Tab value="Laravel">
+        - [PHP](https://www.php.net/)
+        - [Composer](https://getcomposer.org/)
+    </Tab>
     <Tab value="Next.js">
         - [Node.js](https://nodejs.org/)
     </Tab>
@@ -235,6 +248,12 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```bash
         git clone https://github.com/zitadel/zitadel-go.git
         cd zitadel_go
+        ```
+    </Tab>
+    <Tab value="Laravel">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-laravel.git
+        cd example-auth-laravel
         ```
     </Tab>
     <Tab value="Next.js">
@@ -311,6 +330,28 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     <Tab value="Go">
         No action required for this step.
         The issuer and client Id will be passed directly when running the app (next step)
+    </Tab>
+    <Tab value="Symfony">
+
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+        3. Generate app key, this will update the APP_KEY variable in the .env file
+        ```bash
+        php artisan key:generate
+        ```
+
+        ```bash
+        APP_KEY=
+        APP_ENV=local
+        APP_DEBUG=true
+        SERVER_URL="http://localhost:3000"
+        SERVER_PORT=3000
+        DB_CONNECTION=sqlite
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        ```
     </Tab>
     <Tab value="Next.js">
         1. Copy+past the .env.example to .env.local
@@ -402,7 +443,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         npm run dev
         ```
 
-        Your app will be live at `http://localhost:4200`.
+        Your app will be live at `http://localhost:3000`.
 
         ![Angular Example App](../../../public/img/guides/quickstart/angular_example_app.png)
     </Tab>
@@ -414,7 +455,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
         Your app will be live at `http://localhost:3000`.
 
-        ![Angular Example App](../../../public/img/guides/quickstart/django_example_app.png)
+        ![Django Example App](../../../public/img/guides/quickstart/django_example_app.png)
     </Tab>
     <Tab value="Flutter">
         Make sure to replace the [zitadel_issuer] and [zitadel_client_id] with your own value before running the command
@@ -435,6 +476,16 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         Your app will be live at `http://localhost:8089`.
 
         ![Go Example App](../../../public/img/guides/quickstart/go_example_app.png)
+    </Tab>
+    <Tab value="Laravel">
+        ```bash
+        composer install
+        composer run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Laravel Example App](../../../public/img/guides/quickstart/laravel_example_app.png)
     </Tab>
     <Tab value="Next.js">
         ```bash
@@ -466,7 +517,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
         Your app will be live at `http://localhost:3000`.
 
-        ![Angular Example App](../../../public/img/guides/quickstart/symfony_example_app.png)
+        ![Spring Example App](../../../public/img/guides/quickstart/symfony_example_app.png)
     </Tab>
     <Tab value="Symfony">
         ```bash
@@ -476,7 +527,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
         Your app will be live at `http://localhost:3000`.
 
-        ![Angular Example App](../../../public/img/guides/quickstart/symfony_example_app.png)
+        ![Symfony Example App](../../../public/img/guides/quickstart/symfony_example_app.png)
     </Tab>
     <Tab value="Vue.js">
         ```bash
