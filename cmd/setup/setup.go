@@ -249,6 +249,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s66SessionRecoveryCodeCheckedAt = &SessionRecoveryCodeCheckedAt{dbClient: dbClient}
 	steps.s67SyncMemberRoleFields = &SyncMemberRoleFields{dbClient: dbClient}
 	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
+	steps.s69CacheTablesLogged = &CacheTablesLogged{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -303,6 +304,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s64ChangePushPosition,
 		steps.s65FixUserMetadata5Index,
 		steps.s67SyncMemberRoleFields,
+		steps.s69CacheTablesLogged,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -589,6 +591,7 @@ func startCommandsQueries(
 		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
 		config.Notifications,
+		config.OIDC.BackChannelLogoutConfig(),
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -601,8 +604,6 @@ func startCommandsQueries(
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
-		keys.OIDC,
-		config.OIDC.DefaultBackChannelLogoutLifetime,
 		q,
 	)
 

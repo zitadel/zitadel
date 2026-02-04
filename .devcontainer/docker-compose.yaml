@@ -24,7 +24,7 @@ services:
       - "4200:4200"
 
   db:
-    image: postgres:17
+    image: postgres:18
     restart: unless-stopped
     env_file:
       - ./.env.db
@@ -40,7 +40,7 @@ services:
       - 5432:5432
 
   db-api-integration:
-    image: 'postgres:17'
+    image: 'postgres:18'
     env_file:
       - ./.env.db
     environment:
@@ -61,7 +61,7 @@ services:
       - 6379:6379
 
   db-functional-ui:
-    image: 'postgres:17'
+    image: 'postgres:18'
     env_file:
       - ./.env.db
     environment:

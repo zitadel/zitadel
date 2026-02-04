@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Clés Web Actives et Futures",
           "DESCRIPTION": "Vos clés Web actives et à venir. L'activation d'une nouvelle clé désactivera l'actuelle.",
-          "NOTE": "Remarque : Le point de terminaison JWKs OIDC renvoie une réponse mise en cache (par défaut 5 min). Évitez d'activer une clé trop tôt, car elle pourrait ne pas encore être disponible pour les caches et les clients.",
+          "NOTE": "Remarque : Le point de terminaison JWKs OIDC renvoie une réponse mise en cache (par défaut 5 min). Évitez d'activer une clé trop tôt, car elle pourrait ne pas encore être disponible pour les caches et les applications.",
           "ACTIVATE": "Activer la prochaine Clé Web",
           "ACTIVE": "Actuellement active",
           "NEXT": "Prochaine dans la file d'attente",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs",
     "IAM_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de toutes les organisations",
     "IAM_END_USER_IMPERSONATOR": "Est autorisé à usurper l'identité des utilisateurs finaux de toutes les organisations",
-    "IAM_LOGIN_CLIENT": "A la permission de gérer les clients de connexion",
+    "IAM_LOGIN_CLIENT": "A la permission de gérer les applications de connexion",
     "ORG_OWNER": "A le droit de contrôler l'ensemble de l'organisation",
     "ORG_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs de l'organisation",
     "ORG_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'organisation",
@@ -1644,7 +1644,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si le drapeau est activé, l'erreur parent OIDC sera enregistrée dans la console.",
       "ENABLEBACKCHANNELLOGOUT": "Activer le Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Le Back-Channel Logout implémente OpenID Connect Back-Channel Logout 1.0 et peut être utilisé pour notifier les clients de la fin de session chez le fournisseur OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Le Back-Channel Logout implémente OpenID Connect Back-Channel Logout 1.0 et peut être utilisé pour notifier les applications de la fin de session chez le fournisseur OpenID.",
       "PERMISSIONCHECKV2": "Vérification des permissions V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "STATES": {
@@ -2633,8 +2633,8 @@
       "IDTOKENROLEASSERTION": "Rôles de l'utilisateur dans le jeton d'identification",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Si sélectionné, les rôles demandés à l'utilisateur authentifié sont ajoutés au jeton d'identification. Assurez-vous d'activer le paramètre de projet 'Attribuer des rôles d'utilisateur pendant l'authentification' ou de le demander via une portée personnalisée.",
       "IDTOKENUSERINFOASSERTION": "Informations sur l'utilisateur dans le jeton d'identification",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permet aux clients de récupérer le profil, l'e-mail, le téléphone et l'adresse à partir du jeton d'identification.",
-      "CLOCKSKEW": "Permet aux clients de gérer le décalage d'horloge de l'OP et du client. La durée (0-5s) sera ajoutée à la réclamation exp et soustraite de iats, auth_time et nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permet aux applications de récupérer le profil, l'e-mail, le téléphone et l'adresse à partir du jeton d'identification.",
+      "CLOCKSKEW": "Permet aux applications de gérer le décalage d'horloge de l'OP et de l'application. La durée (0-5s) sera ajoutée à la réclamation exp et soustraite de iats, auth_time et nbf.",
       "RECOMMENDED": "recommandé",
       "NOTRECOMMENDED": "non recommandé",
       "SELECTION": {
