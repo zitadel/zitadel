@@ -13,9 +13,21 @@ import {
   setLanguageCookie,
 } from "./cookies";
 
+// Mock logger - use vi.hoisted to ensure it's defined before vi.mock runs
+const mockLogger = vi.hoisted(() => ({
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+}));
+
 // Mock dependencies
 vi.mock("next/headers", () => ({
   cookies: vi.fn(),
+}));
+
+vi.mock("./logger", () => ({
+  createLogger: () => mockLogger,
 }));
 
 vi.mock("@zitadel/client", () => ({
@@ -148,11 +160,9 @@ describe("cookies", () => {
         value: JSON.stringify(manySessions),
       });
 
-      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-
       await addSessionToCookie({ session: mockSession });
 
-      expect(consoleSpy).toHaveBeenCalledWith("WARNING COOKIE OVERFLOW");
+      expect(mockLogger.warn).toHaveBeenCalledWith("WARNING COOKIE OVERFLOW");
 
       const setCall = mockCookies.set.mock.calls[0][0];
       const sessions = JSON.parse(setCall.value);
@@ -160,8 +170,6 @@ describe("cookies", () => {
       // Should have new session and all but the first old session
       expect(sessions[0]).toEqual(mockSession);
       expect(sessions).not.toContain(manySessions[0]);
-
-      consoleSpy.mockRestore();
     });
 
     it("should cleanup expired sessions when cleanup is true", async () => {
@@ -763,14 +771,11 @@ describe("cookies", () => {
 
     it("should return empty array when no sessions exist", async () => {
       mockCookies.get.mockReturnValue(undefined);
-      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
       const result = await getAllSessions();
 
       expect(result).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalledWith("getAllSessions: No session cookie found, returning empty array");
-
-      consoleSpy.mockRestore();
+      expect(mockLogger.info).toHaveBeenCalledWith("getAllSessions: No session cookie found, returning empty array");
     });
   });
 

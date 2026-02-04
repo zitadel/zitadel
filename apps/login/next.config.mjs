@@ -41,6 +41,23 @@ const nextConfig = {
     optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
     useCache: true,
   },
+  serverExternalPackages: [
+    'winston',
+    '@opentelemetry/api',
+    '@opentelemetry/api-logs',
+    '@opentelemetry/sdk-node',
+    '@opentelemetry/sdk-metrics',
+    '@opentelemetry/sdk-logs',
+    '@opentelemetry/exporter-metrics-otlp-http',
+    '@opentelemetry/exporter-logs-otlp-http',
+    '@opentelemetry/exporter-prometheus',
+    '@opentelemetry/resources',
+    '@opentelemetry/semantic-conventions',
+    '@opentelemetry/auto-instrumentations-node',
+    '@opentelemetry/winston-transport',
+    '@opentelemetry/resource-detector-container',
+    '@opentelemetry/resource-detector-gcp',
+  ],
   // Improve SSR stability - not actually needed for React 19 SSR issues
   // onDemandEntries: {
   //   maxInactiveAge: 25 * 1000,
