@@ -22,7 +22,6 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) (*command
 		UserSchema:                     req.UserSchema,
 		ImprovedPerformance:            improvedPerformanceListToDomain(req.ImprovedPerformance),
 		OIDCSingleV1SessionTermination: req.OidcSingleV1SessionTermination,
-		EnableBackChannelLogout:        req.EnableBackChannelLogout,
 		LoginV2:                        loginV2,
 		PermissionCheckV2:              req.PermissionCheckV2,
 	}, nil
@@ -39,7 +38,10 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		},
 		ImprovedPerformance:            featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		OidcSingleV1SessionTermination: featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
-		EnableBackChannelLogout:        featureSourceToFlagPb(&f.EnableBackChannelLogout),
+		EnableBackChannelLogout: &feature_pb.FeatureFlag{ // TODO: remove in next major version
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
 		LoginV2:                        loginV2ToLoginV2FlagPb(f.LoginV2),
 		PermissionCheckV2:              featureSourceToFlagPb(&f.PermissionCheckV2),
 	}
@@ -56,7 +58,6 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*com
 		ImprovedPerformance:            improvedPerformanceListToDomain(req.ImprovedPerformance),
 		DebugOIDCParentError:           req.DebugOidcParentError,
 		OIDCSingleV1SessionTermination: req.OidcSingleV1SessionTermination,
-		EnableBackChannelLogout:        req.EnableBackChannelLogout,
 		LoginV2:                        loginV2,
 		PermissionCheckV2:              req.PermissionCheckV2,
 		ConsoleUseV2UserApi:            req.ConsoleUseV2UserApi,
@@ -75,10 +76,13 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		ImprovedPerformance:            featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		DebugOidcParentError:           featureSourceToFlagPb(&f.DebugOIDCParentError),
 		OidcSingleV1SessionTermination: featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
-		EnableBackChannelLogout:        featureSourceToFlagPb(&f.EnableBackChannelLogout),
-		LoginV2:                        loginV2ToLoginV2FlagPb(f.LoginV2),
-		PermissionCheckV2:              featureSourceToFlagPb(&f.PermissionCheckV2),
-		ConsoleUseV2UserApi:            featureSourceToFlagPb(&f.ConsoleUseV2UserApi),
+		EnableBackChannelLogout: &feature_pb.FeatureFlag{ // TODO: remove in next major version
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		LoginV2:                loginV2ToLoginV2FlagPb(f.LoginV2),
+		PermissionCheckV2:      featureSourceToFlagPb(&f.PermissionCheckV2),
+		ConsoleUseV2UserApi:    featureSourceToFlagPb(&f.ConsoleUseV2UserApi),
 	}
 }
 

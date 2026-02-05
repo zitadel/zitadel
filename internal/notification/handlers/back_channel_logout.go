@@ -4,7 +4,6 @@ import (
 	"context"
 	"slices"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -75,17 +74,10 @@ func (u *backChannelLogoutNotifier) reduceUserSignedOut(event eventstore.Event) 
 	}
 
 	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		ctx, err := u.queries.HandlerContext(ctx, event.Aggregate())
-		if err != nil {
-			return err
-		}
-		if !authz.GetFeatures(ctx).EnableBackChannelLogout {
-			return nil
-		}
 		if e.SessionID == "" {
 			return nil
 		}
-		ctx, err = u.queries.Origin(ctx, e)
+		ctx, err := u.queries.Origin(ctx, e)
 		if err != nil {
 			return err
 		}
@@ -109,14 +101,7 @@ func (u *backChannelLogoutNotifier) reduceSessionTerminated(event eventstore.Eve
 	}
 
 	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		ctx, err := u.queries.HandlerContext(ctx, event.Aggregate())
-		if err != nil {
-			return err
-		}
-		if !authz.GetFeatures(ctx).EnableBackChannelLogout {
-			return nil
-		}
-		ctx, err = u.queries.Origin(ctx, e)
+		ctx, err := u.queries.Origin(ctx, e)
 		if err != nil {
 			return err
 		}

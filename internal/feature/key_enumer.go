@@ -16,8 +16,8 @@ const (
 	_KeyLowerName_2 = "improved_performance"
 	_KeyName_3      = "debug_oidc_parent_erroroidc_single_v1_session_termination"
 	_KeyLowerName_3 = "debug_oidc_parent_erroroidc_single_v1_session_termination"
-	_KeyName_4      = "enable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
-	_KeyLowerName_4 = "enable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
+	_KeyName_4      = "login_v2permission_check_v2console_use_v2_user_api"
+	_KeyLowerName_4 = "login_v2permission_check_v2console_use_v2_user_api"
 )
 
 var (
@@ -25,7 +25,7 @@ var (
 	_KeyIndex_1 = [...]uint8{0, 11}
 	_KeyIndex_2 = [...]uint8{0, 20}
 	_KeyIndex_3 = [...]uint8{0, 23, 57}
-	_KeyIndex_4 = [...]uint8{0, 26, 34, 53, 76}
+	_KeyIndex_4 = [...]uint8{0, 8, 27, 50}
 )
 
 func (i Key) String() string {
@@ -39,8 +39,8 @@ func (i Key) String() string {
 	case 9 <= i && i <= 10:
 		i -= 9
 		return _KeyName_3[_KeyIndex_3[i]:_KeyIndex_3[i+1]]
-	case 12 <= i && i <= 15:
-		i -= 12
+	case 13 <= i && i <= 15:
+		i -= 13
 		return _KeyName_4[_KeyIndex_4[i]:_KeyIndex_4[i+1]]
 	default:
 		return fmt.Sprintf("Key(%d)", i)
@@ -57,13 +57,12 @@ func _KeyNoOp() {
 	_ = x[KeyImprovedPerformance-(7)]
 	_ = x[KeyDebugOIDCParentError-(9)]
 	_ = x[KeyOIDCSingleV1SessionTermination-(10)]
-	_ = x[KeyEnableBackChannelLogout-(12)]
 	_ = x[KeyLoginV2-(13)]
 	_ = x[KeyPermissionCheckV2-(14)]
 	_ = x[KeyConsoleUseV2UserApi-(15)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyUserSchema, KeyImprovedPerformance, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyUserSchema, KeyImprovedPerformance, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi}
 
 var _KeyNameToValueMap = map[string]Key{
 	_KeyName_0[0:11]:       KeyUnspecified,
@@ -78,14 +77,12 @@ var _KeyNameToValueMap = map[string]Key{
 	_KeyLowerName_3[0:23]:  KeyDebugOIDCParentError,
 	_KeyName_3[23:57]:      KeyOIDCSingleV1SessionTermination,
 	_KeyLowerName_3[23:57]: KeyOIDCSingleV1SessionTermination,
-	_KeyName_4[0:26]:       KeyEnableBackChannelLogout,
-	_KeyLowerName_4[0:26]:  KeyEnableBackChannelLogout,
-	_KeyName_4[26:34]:      KeyLoginV2,
-	_KeyLowerName_4[26:34]: KeyLoginV2,
-	_KeyName_4[34:53]:      KeyPermissionCheckV2,
-	_KeyLowerName_4[34:53]: KeyPermissionCheckV2,
-	_KeyName_4[53:76]:      KeyConsoleUseV2UserApi,
-	_KeyLowerName_4[53:76]: KeyConsoleUseV2UserApi,
+	_KeyName_4[0:8]:        KeyLoginV2,
+	_KeyLowerName_4[0:8]:   KeyLoginV2,
+	_KeyName_4[8:27]:       KeyPermissionCheckV2,
+	_KeyLowerName_4[8:27]:  KeyPermissionCheckV2,
+	_KeyName_4[27:50]:      KeyConsoleUseV2UserApi,
+	_KeyLowerName_4[27:50]: KeyConsoleUseV2UserApi,
 }
 
 var _KeyNames = []string{
@@ -95,10 +92,9 @@ var _KeyNames = []string{
 	_KeyName_2[0:20],
 	_KeyName_3[0:23],
 	_KeyName_3[23:57],
-	_KeyName_4[0:26],
-	_KeyName_4[26:34],
-	_KeyName_4[34:53],
-	_KeyName_4[53:76],
+	_KeyName_4[0:8],
+	_KeyName_4[8:27],
+	_KeyName_4[27:50],
 }
 
 // KeyString retrieves an enum value from the enum constants string name.

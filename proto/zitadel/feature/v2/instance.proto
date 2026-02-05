@@ -61,11 +61,11 @@ message SetInstanceFeaturesRequest{
     }
   ];
 
+  // Deprecated: the flag has been removed and OIDC Back-Channel Logout is always enabled.
+  // This field is only kept for backward compatibility and will be removed in the next major version of Zitadel.
+  // Setting the field will have no effect.
   optional bool enable_back_channel_logout = 12 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "If the flag is enabled, you'll be able to use the OIDC Back-Channel Logout to be notified in your application about terminated user sessions.";
-    }
+    deprecated = true
   ];
 
   optional LoginV2 login_v2 = 13 [
@@ -157,11 +157,10 @@ message GetInstanceFeaturesResponse {
     }
   ];
 
+  // Deprecated: the flag has been removed and OIDC Back-Channel Logout is always enabled.
+  // This field is only kept for backward compatibility and will be removed in the next major version of Zitadel.
   FeatureFlag enable_back_channel_logout = 13 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "If the flag is enabled, you'll be able to use the OIDC Back-Channel Logout to be notified in your application about terminated user sessions.";
-    }
+    deprecated = true
   ];
 
   LoginV2FeatureFlag login_v2 = 14 [

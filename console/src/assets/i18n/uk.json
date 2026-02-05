@@ -1639,8 +1639,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Якщо прапорець увімкнено, ви зможете завершити одиночну сесію з інтерфейсу входу, надавши id_token з претензією `sid` як id_token_hint на кінцевій точці end_session. Зверніть увагу, що наразі всі сесії з того ж агента користувача (браузера) завершуються в інтерфейсі входу. Сесії, керовані через Session API, вже дозволяють завершення одиночних сесій.",
       "DEBUGOIDCPARENTERROR": "Налагодження батьківської помилки OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Якщо прапорець увімкнено, батьківська помилка OIDC буде записана в консоль.",
-      "ENABLEBACKCHANNELLOGOUT": "Увімкнути вихід через зворотний канал",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Вихід через зворотний канал реалізує OpenID Connect Back-Channel Logout 1.0 і може використовуватися для сповіщення клієнтів про завершення сесії у провайдера OpenID.",
       "PERMISSIONCHECKV2": "Перевірка дозволів V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Якщо прапорець увімкнено, ви зможете використовувати новий API та його можливості.",
       "STATES": {
