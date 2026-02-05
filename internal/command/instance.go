@@ -136,7 +136,6 @@ type InstanceSetupFeatures struct {
 	ImprovedPerformance            []feature.ImprovedPerformanceType
 	DebugOIDCParentError           *bool
 	OIDCSingleV1SessionTermination *bool
-	EnableBackChannelLogout        *bool
 	LoginV2                        *InstanceSetupFeatureLoginV2
 	PermissionCheckV2              *bool
 	ManagementConsoleUseV2UserApi  *bool
@@ -169,7 +168,6 @@ func (f *InstanceSetupFeatures) ToInstanceFeatures() (_ *InstanceFeatures, err e
 		ImprovedPerformance:            f.ImprovedPerformance,
 		DebugOIDCParentError:           f.DebugOIDCParentError,
 		OIDCSingleV1SessionTermination: f.OIDCSingleV1SessionTermination,
-		EnableBackChannelLogout:        f.EnableBackChannelLogout,
 		LoginV2:                        loginV2,
 		PermissionCheckV2:              f.PermissionCheckV2,
 		ManagementConsoleUseV2UserApi:  f.ManagementConsoleUseV2UserApi,

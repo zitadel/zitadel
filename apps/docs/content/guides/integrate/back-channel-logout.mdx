@@ -7,12 +7,6 @@ The Back-Channel Logout implements [OpenID Connect Back-Channel Logout 1.0](http
 and can be used to notify applications about session termination at the OpenID Provider. This guide will explain how
 back-channel logout is implemented inside ZITADEL and gives some usage examples.
 
-<Callout type="info">
-Back-Channel Logout is currently an experimental [beta](https://help.zitadel.com/zitadel-software-release-cycle#beta) feature.
-Be sure to enable it on the [feature API](#feature-api) before using it.
-We highly recommend also enabling the `webkey` feature on your instance. This will prevent issues with automatic key rotation.
-</Callout>
-
 In this guide we assume your already familiar with getting and validation token. You should already have a good
 understanding on the following topics before starting with this guide:
 
@@ -51,7 +45,7 @@ The application can then invalidate the user's session without the need for an a
 
 As required by the [specification](https://openid.net/specs/openid-connect-backchannel-1_0.html#BCSupport), ZITADEL
 will advertise the `backchannel_logout_supported` and `backchannel_logout_session_supported`
-on the discovery endpoint once the feature flag is enabled.
+on the discovery endpoint by default.
 The latter boolean indicates, that ZITADEL will provide a session ID (`sid`) claim as part of the logout token. This
 provides the possibility to match the exact SSO session, which was terminated.
 
@@ -85,7 +79,7 @@ The following Claims are used within the Logout Token:
 
 | Claim  | Example                                                        | Description                                                                                                                          |
 |--------|----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| iss    | `${CUSTOM_DOMAIN}`                                            | Issuer Identifier                                                                                                                    |
+| iss    | `${CUSTOM_DOMAIN}`                                             | Issuer Identifier                                                                                                                    |
 | sub    | `77776025198584418`                                            | Subject Identifier (the user who signed out)                                                                                         |
 | aud    | `69234237810729019`                                            | Audience(s), will always contain your client_id                                                                                      |
 | iat    | `1311280970`                                                   | Issued at time                                                                                                                       |
