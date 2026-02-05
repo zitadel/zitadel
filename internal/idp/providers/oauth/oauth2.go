@@ -91,14 +91,22 @@ func (p *Provider) Name() string {
 // It will create a [Session] with an OAuth2.0 authorization request as AuthURL.
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
 	opts := make([]rp.AuthURLOpt, 0)
+	
 	var loginHintSet bool
+	var hasPrompt bool
+
 	for _, param := range params {
 		if username, ok := param.(idp.LoginHintParam); ok {
 			loginHintSet = true
 			opts = append(opts, loginHint(string(username)))
 		}
+
+		if hasP, ok := param.(idp.HasPromptParam); ok && hasP {
+			hasPrompt = true
+		}
 	}
-	if !loginHintSet {
+	
+	if !loginHintSet && !hasPrompt {
 		opts = append(opts, rp.WithPrompt(oidc.PromptSelectAccount))
 	}
 

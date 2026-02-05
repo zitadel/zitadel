@@ -169,7 +169,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 	case domain.IDPTypeOAuth:
 		provider, err = l.oauthProvider(r.Context(), identityProvider)
 	case domain.IDPTypeOIDC:
-		provider, err = l.oidcProvider(r.Context(), identityProvider)
+		provider, err = l.oidcProvider(r.Context(), identityProvider, authReq)
 	case domain.IDPTypeJWT:
 		provider, err = l.jwtProvider(identityProvider)
 	case domain.IDPTypeAzureAD:
@@ -302,7 +302,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		}
 		session = oauth.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeOIDC:
-		provider, err := l.oidcProvider(r.Context(), identityProvider)
+		provider, err := l.oidcProvider(r.Context(), identityProvider, authReq)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
@@ -1056,13 +1056,23 @@ func (l *Login) googleProvider(ctx context.Context, identityProvider *query.IDPT
 	)
 }
 
-func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*openid.Provider, error) {
+func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTemplate, authReq *domain.AuthRequest) (*openid.Provider, error) {
 	secret, err := crypto.DecryptString(identityProvider.OIDCIDPTemplate.ClientSecret, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]openid.ProviderOpts, 1, 3)
-	opts[0] = openid.WithSelectAccount()
+
+	opts := make([]openid.ProviderOpts, 0, 3)
+
+	// Only add WithSelectAccount if the auth request doesn't already have a prompt parameter
+	if !domain.IsPrompt(authReq.Prompt, domain.PromptSelectAccount) && len(authReq.Prompt) == 0 {
+		opts = append(opts, openid.WithSelectAccount())
+	}
+
+	if !domain.IsPrompt(authReq.Prompt, domain.PromptSelectAccount) && len(authReq.Prompt) == 0 {
+	  opts = append(opts, openid.WithSelectAccount())
+	}
+	
 	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
 		opts = append(opts, openid.WithIDTokenMapping())
 	}
@@ -1421,8 +1431,13 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 }
 
 func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []idp.Parameter {
-	params := make([]idp.Parameter, 1, 2)
+	params := make([]idp.Parameter, 1, 3)
 	params[0] = idp.UserAgentID(authReq.AgentID)
+
+	// Indicate if the auth request already has a prompt parameter
+	if len(authReq.Prompt) > 0 {
+		params = append(params, idp.HasPromptParam(true))
+	}
 
 	if authReq.UserID != "" && identityProviderID != "" {
 		links, err := l.getUserLinks(ctx, authReq.UserID, identityProviderID)
