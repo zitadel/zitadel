@@ -59,7 +59,6 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemUserSchemaEventType,
 			feature_v2.SystemImprovedPerformanceEventType,
 			feature_v2.SystemOIDCSingleV1SessionTerminationEventType,
-			feature_v2.SystemEnableBackChannelLogout,
 			feature_v2.SystemLoginVersion,
 			feature_v2.SystemPermissionCheckV2,
 			feature_v2.SystemEnableRelationalTables,
@@ -88,8 +87,6 @@ func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.S
 		features.ImprovedPerformance.set(level, event.Value)
 	case feature.KeyOIDCSingleV1SessionTermination:
 		features.OIDCSingleV1SessionTermination.set(level, event.Value)
-	case feature.KeyEnableBackChannelLogout:
-		features.EnableBackChannelLogout.set(level, event.Value)
 	case feature.KeyLoginV2:
 		features.LoginV2.set(level, event.Value)
 	case feature.KeyPermissionCheckV2:
