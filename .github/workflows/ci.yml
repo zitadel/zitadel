@@ -56,17 +56,15 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Verify Packaging
-        run: pnpm nx run @zitadel/zitadel:pack
       - name: Release
-        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request' || github.ref == 'refs/heads/nx-release-lean'
         env:
           CI_RELEASE: ${{ github.ref == 'refs/heads/main' && 'true' || 'false' }} 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
-        run: pnpm release:release
+        run: pnpm release
       - name: Upload Linux AMD64 Artifact
         if: always()
         uses: actions/upload-artifact@v4
