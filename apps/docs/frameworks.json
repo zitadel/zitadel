@@ -71,6 +71,12 @@
 		"docsLink": "/docs/guides/start/quickstart?framework=react"
 	},
 	{
+		"id": "solidstart",
+		"title": "SolidStart",
+		"imgSrcDark": "/docs/img/tech/solidstart.svg",
+		"docsLink": "/docs/guides/start/quickstart?framework=solidstart"
+	},
+	{
 		"id": "spring",
 		"title": "Spring",
 		"imgSrcDark": "/docs/img/tech/spring.svg",
@@ -120,12 +126,6 @@
 		"title": "Qwik",
 		"imgSrcDark": "/docs/img/tech/qwik.svg",
 		"docsLink": "/docs/sdk-examples/qwik"
-	},
-	{
-		"id": "solidstart",
-		"title": "SolidStart",
-		"imgSrcDark": "/docs/img/tech/solidstart.svg",
-		"docsLink": "/docs/sdk-examples/solidstart"
 	},
 	{
 		"id": "sveltekit",

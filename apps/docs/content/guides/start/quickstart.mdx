@@ -136,6 +136,12 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:3000/">
         </AppConfig>
     </Tab>
+    <Tab value="SolidStart">
+        <AppConfig
+            redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000">
+        </AppConfig>
+    </Tab>
     <Tab value="Spring">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback"
@@ -193,6 +199,9 @@ ZITADEL automatically configures the best security settings for your selected fr
     </Tab>
     <Tab value="React">
         <AppValues valueCount="two" clientSecret={false}></AppValues>
+    </Tab>
+    <Tab value="SolidStart">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="Spring">
         <AppValues valueCount="three" clientSecret={true}></AppValues>
@@ -258,6 +267,10 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         - [Node.js](https://nodejs.org/)
     </Tab>
     <Tab value="React">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="SolidStart">
         - [Node.js](https://nodejs.org/)
         - [npm](https://www.npmjs.com/)
     </Tab>
@@ -342,6 +355,12 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```bash
         git clone https://github.com/zitadel/example-auth-react.git
         cd example-auth-react
+        ```
+    </Tab>
+    <Tab value="SolidStart">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-solidstart.git
+        cd example-auth-solidstart
         ```
     </Tab>
     <Tab value="Spring">
@@ -531,6 +550,24 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         VITE_ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
         ```
     </Tab>
+    <Tab value="SolidStart">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        NEXTAUTH_URL="http://localhost:3000"
+        ```
+    </Tab>
     <Tab value="Spring">
 
         1. Copy+paste the .env.example to .env
@@ -693,6 +730,15 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         Your app will be live at `http://localhost:3000`.
 
         ![React Example App](../../../public/img/guides/quickstart/react_example_app.png)
+    </Tab>
+    <Tab value="SolidStart">
+        npm install
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![SolidStart Example App](../../../public/img/guides/quickstart/solidstart_example_app.png)
     </Tab>
     <Tab value="Spring">
         ```bash
