@@ -58,16 +58,16 @@ export async function completeFlowOrGetUrl(
       sessionId: command.sessionId,
       requestId: command.requestId,
     });
-    console.log("completeFlowOrGetUrl: OIDC/SAML flow result:", result);
+    console.log("completeFlowOrGetUrl: got OIDC/SAML flow result");
     return result;
   }
 
   console.log("completeFlowOrGetUrl: Regular flow, getting next URL");
   // For all other cases, return URL for navigation
   const url = await getNextUrl(command, defaultRedirectUri);
-  console.log("completeFlowOrGetUrl: Next URL:", url);
+  console.log("completeFlowOrGetUrl: got Next URL:", url);
   const result = { redirect: url };
-  console.log("completeFlowOrGetUrl: Final result:", result);
+  console.log("completeFlowOrGetUrl: got final result");
   return result;
 }
 
@@ -93,7 +93,7 @@ export async function getNextUrl(
       ...command,
       organization: command.organization,
     });
-    console.log("getNextUrl: Device flow result:", result);
+    console.log("getNextUrl: Got Device flow result");
     return result;
   }
 
@@ -106,7 +106,7 @@ export async function getNextUrl(
   }
 
   const result = goToSignedInPage(command);
-  console.log("getNextUrl: Using goToSignedInPage result:", result);
+  console.log("getNextUrl: got goToSignedInPage result");
   return result;
 }
 
