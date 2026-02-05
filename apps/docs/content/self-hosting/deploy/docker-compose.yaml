@@ -25,7 +25,7 @@ services:
       ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
       ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
       
-      # By configuring a login client, the setup job creates a user of type machine with the role IAM_LOGIN_CLIENT.
+      # By configuring a login application, the setup job creates a user of type machine with the role IAM_LOGIN_CLIENT.
       # It writes a PAT to the path specified in ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH.
       # The PAT is passed to the login container via the environment variable ZITADEL_SERVICE_USER_TOKEN_FILE.
       ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client.pat

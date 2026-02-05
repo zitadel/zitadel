@@ -17,7 +17,7 @@
 		"id": "client-go",
 		"title": "Go",
 		"imgSrcDark": "/docs/img/tech/golang.svg",
-		"docsLink": "/docs/sdk-examples/go",
+		"docsLink": "/docs/guides/start/quickstart?framework=go",
 		"client": true,
 		"sdk": true
 	},
@@ -48,18 +48,18 @@
 		"description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
 		"imgSrcLight": "/docs/img/tech/angular.svg",
 		"imgSrcDark": "/docs/img/tech/angular.svg",
-		"docsLink": "/docs/sdk-examples/angular"
+		"docsLink": "/docs/guides/start/quickstart?framework=angular"
 	},
 	{
 		"id": "flutter",
 		"title": "Flutter",
 		"imgSrcDark": "/docs/img/tech/flutter.svg",
-		"docsLink": "/docs/sdk-examples/flutter"
+		"docsLink": "/docs/guides/start/quickstart?framework=flutter"
 	},
 	{
 		"title": "Go",
 		"imgSrcDark": "/docs/img/tech/golang.svg",
-		"docsLink": "/docs/sdk-examples/go"
+		"docsLink": "/docs/guides/start/quickstart?framework=go"
 	},
 	{
 		"id": "spring",
@@ -77,7 +77,7 @@
 		"title": "Next.js",
 		"imgSrcDark": "/docs/img/tech/nextjs.svg",
 		"imgSrcLight": "/docs/img/tech/nextjslight.svg",
-		"docsLink": "/docs/sdk-examples/nextjs"
+		"docsLink": "/docs/guides/start/quickstart?framework=nextjs"
 	},
 	{
 		"id": "django",
@@ -103,20 +103,20 @@
 		"title": "React",
 		"description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
 		"imgSrcDark": "/docs/img/tech/react.svg",
-		"docsLink": "/docs/sdk-examples/react"
+		"docsLink": "/docs/guides/start/quickstart?framework=react"
 	},
 	{
 		"id": "symfony",
 		"title": "Symfony",
 		"imgSrcDark": "/docs/img/tech/symfony.svg",
-		"docsLink": "/docs/sdk-examples/symfony"
+		"docsLink": "/docs/guides/start/quickstart?framework=symfony"
 	},
 	{
 		"id": "vue",
 		"title": "Vue.js",
 		"description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
 		"imgSrcDark": "/docs/img/tech/vue.svg",
-		"docsLink": "/docs/sdk-examples/vue"
+		"docsLink": "/docs/guides/start/quickstart?framework=vue"
 	},
 	{
 		"title": "Dart",

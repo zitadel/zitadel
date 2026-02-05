@@ -3,11 +3,11 @@ package zerrors
 import "fmt"
 
 func ThrowUnknown(parent error, id, message string) error {
-	return newZitadelError(KindUnknown, parent, id, message)
+	return CreateZitadelError(KindUnknown, parent, id, message, 1)
 }
 
 func ThrowUnknownf(parent error, id, format string, a ...any) error {
-	return newZitadelError(KindUnknown, parent, id, fmt.Sprintf(format, a...))
+	return CreateZitadelError(KindUnknown, parent, id, fmt.Sprintf(format, a...), 1)
 }
 
 func IsUnknown(err error) bool {
