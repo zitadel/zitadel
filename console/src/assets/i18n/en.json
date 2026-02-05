@@ -1162,7 +1162,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel Administrator Roles",
-      "DESCRIPTION": "These are all member grants of the user. You can modify them also on organization, project, or IAM detail pages.",
+      "DESCRIPTION": "These are all member grants of the user. You can modify them also on organization, project, or instance detail pages.",
       "ORGCONTEXT": "You see all organizations and projects that are related to the currently selected organization.",
       "USERCONTEXT": "You see all organizations and projects to which you are authorized. Including other organizations.",
       "CREATIONDATE": "Creation Date",
@@ -1268,7 +1268,7 @@
       "DESCRIPTION": "Manage your global Policies and Management Access Settings."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Storage Administration",
+      "TITLE": "Instance Storage Administration",
       "DESCRIPTION": "Manage your Zitadel views and failed events."
     },
     "MEMBER": {
