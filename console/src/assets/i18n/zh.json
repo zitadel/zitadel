@@ -2682,7 +2682,8 @@
             "DESCRIPTION": "单页应用程序 (SPA) 以及通常在浏览器中执行的所有 JS 框架"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "反向通道注销URI"
     },
     "API": {
       "INFO": {

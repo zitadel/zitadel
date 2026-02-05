@@ -2675,7 +2675,8 @@
             "DESCRIPTION": "シングルページアプリケーション（SPA）および一般に、ブラウザで実行されるすべてのJSフレームワーク"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "バックチャネルログアウトURI"
     },
     "API": {
       "INFO": {

@@ -2649,7 +2649,8 @@
             "DESCRIPTION": "Aplikacje jednoszczelinowe (SPA) i ogólnie wszystkie frameworki JS wykonywane w przeglądarkach"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
