@@ -10,7 +10,7 @@ import (
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
-func CreateOIDCAppRequestToDomain(name, appId, projectID string, req *app.CreateOIDCApplicationRequest) (*domain.OIDCApp, error) {
+func CreateOIDCAppRequestToDomain(name, appID, projectID string, req *app.CreateOIDCApplicationRequest) (*domain.OIDCApp, error) {
 	loginVersion, loginBaseURI, err := loginVersionToDomain(req.GetLoginVersion())
 	if err != nil {
 		return nil, err
@@ -19,7 +19,7 @@ func CreateOIDCAppRequestToDomain(name, appId, projectID string, req *app.Create
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectID,
 		},
-		AppID:                    appId,
+		AppID:                    appID,
 		AppName:                  name,
 		OIDCVersion:              gu.Ptr(domain.OIDCVersionV1),
 		RedirectUris:             req.GetRedirectUris(),
