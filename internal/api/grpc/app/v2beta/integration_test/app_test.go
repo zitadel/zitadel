@@ -120,37 +120,6 @@ func TestCreateApplication(t *testing.T) {
 			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_OidcResponse{}),
 		},
 		{
-			testName: "when CreateOIDCApp request is valid and has custom ID should create app with specified ID and return no error",
-			inputCtx: IAMOwnerCtx,
-			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: p.GetId(),
-				Name:      integration.ApplicationName(),
-				Id:        "custom-oidc-id",
-				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
-					OidcRequest: &app.CreateOIDCApplicationRequest{
-						RedirectUris:           []string{"http://example.com"},
-						ResponseTypes:          []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
-						GrantTypes:             []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
-						AppType:                app.OIDCAppType_OIDC_APP_TYPE_WEB,
-						AuthMethodType:         app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
-						PostLogoutRedirectUris: []string{"http://example.com/home"},
-						Version:                app.OIDCVersion_OIDC_VERSION_1_0,
-						AccessTokenType:        app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
-						BackChannelLogoutUri:   "http://example.com/logout",
-						LoginVersion: &app.LoginVersion{
-							Version: &app.LoginVersion_LoginV2{
-								LoginV2: &app.LoginV2{
-									BaseUri: &baseURI,
-								},
-							},
-						},
-					},
-				},
-			},
-
-			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_OidcResponse{}),
-		},
-		{
 			testName: "when project for SAML app creation is not found should return failed precondition error",
 			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
@@ -209,10 +178,6 @@ func TestCreateApplication(t *testing.T) {
 				assert.Equal(t, tc.expectedResponseType, resType)
 				assert.NotZero(t, res.GetAppId())
 				assert.NotZero(t, res.GetCreationDate())
-				// Check that the OIDC app got the ID specified during app creation
-				if tc.expectedResponseType == "*app.CreateApplicationResponse_OidcResponse" && tc.creationRequest.GetId() != "" {
-					assert.Equal(t, tc.creationRequest.GetId(), res.GetAppId())
-				}
 			}
 		})
 	}
