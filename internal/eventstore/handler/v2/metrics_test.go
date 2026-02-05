@@ -13,14 +13,14 @@ import (
 
 func TestNewProjectionMetrics(t *testing.T) {
 	mockMetrics := metrics.NewMockMetrics()
-	metrics := newProjectionMetrics(mockMetrics)
+	metrics := newProjectionMetrics(t.Context(), mockMetrics)
 	require.NotNil(t, metrics)
 	assert.NotNil(t, metrics.provider)
 }
 
 func TestProjectionMetrics_ProjectionUpdateTiming(t *testing.T) {
 	mockMetrics := metrics.NewMockMetrics()
-	projectionMetrics := newProjectionMetrics(mockMetrics)
+	projectionMetrics := newProjectionMetrics(t.Context(), mockMetrics)
 
 	ctx := context.Background()
 	projection := "test_projection"
@@ -39,7 +39,7 @@ func TestProjectionMetrics_ProjectionUpdateTiming(t *testing.T) {
 
 func TestProjectionMetrics_ProjectionEventsProcessed(t *testing.T) {
 	mockMetrics := metrics.NewMockMetrics()
-	projectionMetrics := newProjectionMetrics(mockMetrics)
+	projectionMetrics := newProjectionMetrics(t.Context(), mockMetrics)
 
 	ctx := context.Background()
 	projection := "test_projection"
@@ -59,7 +59,7 @@ func TestProjectionMetrics_ProjectionEventsProcessed(t *testing.T) {
 
 func TestProjectionMetrics_ProjectionStateLatency(t *testing.T) {
 	mockMetrics := metrics.NewMockMetrics()
-	projectionMetrics := newProjectionMetrics(mockMetrics)
+	projectionMetrics := newProjectionMetrics(t.Context(), mockMetrics)
 
 	ctx := context.Background()
 	projection := "test_projection"
@@ -78,7 +78,7 @@ func TestProjectionMetrics_ProjectionStateLatency(t *testing.T) {
 
 func TestProjectionMetrics_Integration(t *testing.T) {
 	mockMetrics := metrics.NewMockMetrics()
-	projectionMetrics := newProjectionMetrics(mockMetrics)
+	projectionMetrics := newProjectionMetrics(t.Context(), mockMetrics)
 
 	ctx := context.Background()
 	projection := "test_projection"

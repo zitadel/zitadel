@@ -17,6 +17,7 @@
     "incremental": true,
     "paths": {
       "@/*": ["./*"],
+      "@pub/*": ["./public/*"],
       "fumadocs-mdx:collections/*": [".source/*"]
     },
     "plugins": [

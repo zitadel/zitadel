@@ -4,7 +4,6 @@ package instrumentation
 
 import (
 	"context"
-	"log/slog"
 	"net/http"
 	"slices"
 	"strings"
@@ -67,11 +66,6 @@ func NewMeter(name string, options ...metric.MeterOption) *Meter {
 	return &Meter{
 		Meter: provider.Meter(name, options...),
 	}
-}
-
-// Logger returns the globally configured logger.
-func Logger() *slog.Logger {
-	return slog.Default()
 }
 
 func RequestFilter(ignoredPrefix ...string) otelhttp.Filter {
