@@ -2678,7 +2678,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) и като цяло всички JS рамки, изпълнявани в браузъри"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

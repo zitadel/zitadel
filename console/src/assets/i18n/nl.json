@@ -2670,7 +2670,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) en over het algemeen alle JS-frameworks die in browsers worden uitgevoerd"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

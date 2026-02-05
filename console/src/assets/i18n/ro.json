@@ -2673,7 +2673,8 @@
             "DESCRIPTION": "Aplicații cu o singură pagină (SPA) și în general toate cadrele JS executate în browsere"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
