@@ -69,7 +69,7 @@ func TestMain(m *testing.M) {
 		CTX = integration.WithSystemAuthorization(ctx)
 		Instance = integration.NewInstance(CTX)
 
-		IAMCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		IAMCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
 		SystemClient = integration.SystemClient()
 		OrgClient = Instance.Client.OrgV2beta
 		ProjectClient = Instance.Client.Projectv2Beta

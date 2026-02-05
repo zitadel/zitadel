@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formular de autentificare",
           "DESCRIPTION": "Personalizați formularul de autentificare.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Nume de utilizator și parolă permise",
-            "DESCRIPTION": "Permiteți utilizatorilor dvs. să se conecteze cu numele lor de utilizator și parola. Dacă acest lucru este dezactivat, utilizatorii dvs. se pot conecta numai utilizând autentificarea Passkey sau cu un furnizor de identitate extern."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Autentificare locală permisă",
+            "DESCRIPTION": "Permiteți utilizatorilor să se autentifice cu numele de utilizator și parola sau prin autentificare cu passkey. Dacă aceasta este dezactivată, utilizatorii se pot autentifica doar folosind un furnizor de identitate extern."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Înregistrarea utilizatorilor permisă",
@@ -2673,7 +2673,8 @@
             "DESCRIPTION": "Aplicații cu o singură pagină (SPA) și în general toate cadrele JS executate în browsere"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
