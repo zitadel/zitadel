@@ -47,7 +47,7 @@
       "userNotFound": "Użytkownik nie został znaleziony w systemie",
       "couldNotCreateSession": "Nie udało się utworzyć sesji dla użytkownika",
       "initialUserNotSupported": "Użytkownik inicjalny nie jest obsługiwany",
-      "usernamePasswordNotAllowed": "Logowanie przy użyciu nazwy użytkownika i hasła jest niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
       "passkeysNotAllowed": "Klucze dostępu są niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
       "couldNotFindIdentityProvider": "Nie udało się znaleźć dostawcy tożsamości.",
       "userNotActive": "Użytkownik jest nieaktywny. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Nie można załadować sesji",
       "couldNotLoadAuthMethods": "Nie można załadować metod uwierzytelniania",
       "failedPrecondition": "Nie spełniono warunków wstępnych",
-      "sessionNotValid": "Sesja jest nieważna"
+      "sessionNotValid": "Sesja jest nieważna",
+      "passwordVerificationMissing": "Brak weryfikacji hasła.",
+      "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie."
     }
   },
   "idp": {
@@ -274,10 +276,7 @@
         "couldNotFindSession": "Nie można znaleźć sesji",
         "couldNotUpdateSession": "Nie można zaktualizować sesji",
         "userNotFound": "Użytkownik nie znaleziony w systemie",
-        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu",
-        "couldNotSetSession": "Nie można ustawić sesji",
-        "couldNotGetUser": "Nie można pobrać danych użytkownika",
-        "couldNotRetrieveSessionCookie": "Nie można pobrać pliku cookie sesji"
+        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu"
       }
     },
     "set": {
@@ -316,7 +315,7 @@
       "description": "Podaj e-mail, imię i nazwisko, aby się zarejestrować."
     },
     "title": "Rejestracja",
-    "description": "Utwórz konto ZITADEL.",
+    "description": "Utwórz konto Zitadel.",
     "noMethodAvailableWarning": "Brak dostępnych metod uwierzytelniania. Skontaktuj się z administratorem.",
     "selectMethod": "Wybierz metodę uwierzytelniania, której chcesz użyć",
     "agreeTo": "Aby się zarejestrować, musisz zaakceptować warunki korzystania",
@@ -409,7 +408,8 @@
       "userAlreadyVerified": "Użytkownik jest już zweryfikowany!",
       "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia",
       "inviteSendFailed": "Nie udało się wysłać wiadomości e-mail z zaproszeniem",
-      "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej"
+      "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej",
+      "contextMissing": "Wystąpił błąd. Spróbuj ponownie."
     }
   },
   "authenticator": {
@@ -452,6 +452,6 @@
     "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
     "tryagain": "Spróbuj ponownie",
-    "couldNotContinueSession": "Nie można kontynuować sesji - brakujące informacje o użytkowniku"
+    "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku"
   }
 }

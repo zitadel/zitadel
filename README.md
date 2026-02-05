@@ -1,6 +1,6 @@
 <p align="center">
-    <img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
-    <img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
+    <img src="./apps/docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
+    <img src="./apps/docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 <p align="center">
     <a href="https://openid.net/certification/#OPs" alt="OpenID Connect Certified">
-        <img src="./docs/static/logos/oidc-cert.png" /></a>
+        <img src="./apps/docs/static/logos/oidc-cert.png" /></a>
 </p>
 
 Are you searching for a user management tool that is quickly set up like Auth0 and open source like Keycloak?
@@ -46,7 +46,7 @@ We provide you with a wide range of out-of-the-box features to accelerate your p
 :white_check_mark: SAML2  
 :white_check_mark: LDAP  
 :white_check_mark: Passkeys / FIDO2  
-:white_check_mark: OTP  
+:white_check_mark: OTP
 :white_check_mark: SCIM 2.0 Server
 and an unlimited audit trail is there for you, ready to use.
 
@@ -117,7 +117,7 @@ Authentication
 - Single Sign On (SSO)
 - [Passkeys support (FIDO2 / WebAuthN)](https://zitadel.com/docs/concepts/features/passkeys)
 - Username / Password
-- Multifactor authentication with OTP, U2F, Email OTP, SMS OTP
+- Multifactor authentication with OTP, U2F, OTP Email, OTP SMS
 - [LDAP](https://zitadel.com/docs/guides/integrate/identity-providers/ldap)
 - [External enterprise identity providers and social logins](https://zitadel.com/docs/guides/integrate/identity-providers/introduction)
 - [Device authorization](https://zitadel.com/docs/guides/solution-scenarios/device-authorization)
@@ -185,7 +185,7 @@ Use our Login widget to allow easy and secure access to your applications and en
 
 [![Passkeys](https://user-images.githubusercontent.com/1366906/223664178-4132faef-4832-4014-b9ab-90c2a8d15436.gif)](https://www.youtube.com/watch?v=cZjHQYurSjw&list=PLTDa7jTlOyRLdABgD2zL0LGM7rx5GZ1IR&index=2 "Passkeys")
 
-### Admin Console
+### Management Console
 
 Use [Console](https://zitadel.com/docs/guides/manage/console/console-overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
 

@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Faktorové ověření
   DescriptionPhone: Vytvořte svou 2-faktorovou autentizaci. Zadejte své telefonní číslo k jeho ověření.
   DescriptionCode: Vytvořte svou 2-faktorovou autentizaci. Zadejte obdržený kód k ověření vašeho telefonního čísla.
+  CountryCodeLabel: Země
   PhoneLabel: Telefon
   CodeLabel: Kód
   EditButtonText: Upravit
@@ -268,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Pohlaví
   Female: Žena
   Male: Muž
@@ -314,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Obchodní podmínky
   TosConfirm: Souhlasím s
   TosLinkText: obchodními podmínkami
@@ -394,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Autorizace zařízení
   UserCode:

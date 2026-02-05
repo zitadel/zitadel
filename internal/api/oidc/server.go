@@ -178,7 +178,6 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 
 func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
-	backChannelLogoutSupported := authz.GetInstance(ctx).Features().EnableBackChannelLogout
 
 	return &oidc.DiscoveryConfiguration{
 		Issuer:                      issuer,
@@ -211,8 +210,8 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		CodeChallengeMethodsSupported:                      op.CodeChallengeMethods(s.Provider()),
 		UILocalesSupported:                                 supportedUILocales,
 		RequestParameterSupported:                          s.Provider().RequestObjectSupported(),
-		BackChannelLogoutSupported:                         backChannelLogoutSupported,
-		BackChannelLogoutSessionSupported:                  backChannelLogoutSupported,
+		BackChannelLogoutSupported:                         true,
+		BackChannelLogoutSessionSupported:                  true,
 	}
 }
 

@@ -161,12 +161,12 @@ func (i instance) SetDefaultLanguage(lang language.Tag) database.Change {
 	return database.NewChange(i.DefaultLanguageColumn(), lang.String())
 }
 
-func (i instance) SetConsoleClientID(id string) database.Change {
-	return database.NewChange(i.ConsoleClientIDColumn(), id)
+func (i instance) SetManagementConsoleClientID(id string) database.Change {
+	return database.NewChange(i.ManagementConsoleClientIDColumn(), id)
 }
 
-func (i instance) SetConsoleAppID(id string) database.Change {
-	return database.NewChange(i.ConsoleAppIDColumn(), id)
+func (i instance) SetManagementConsoleAppID(id string) database.Change {
+	return database.NewChange(i.ManagementConsoleAppIDColumn(), id)
 }
 
 // -------------------------------------------------------------
@@ -244,13 +244,13 @@ func (i instance) IAMProjectIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "iam_project_id")
 }
 
-// ConsoleClientIDColumn implements [domain.instanceColumns].
-func (i instance) ConsoleClientIDColumn() database.Column {
+// ManagementConsoleClientIDColumn implements [domain.instanceColumns].
+func (i instance) ManagementConsoleClientIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "console_client_id")
 }
 
-// ConsoleAppIDColumn implements [domain.instanceColumns].
-func (i instance) ConsoleAppIDColumn() database.Column {
+// ManagementConsoleAppIDColumn implements [domain.instanceColumns].
+func (i instance) ManagementConsoleAppIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "console_app_id")
 }
 

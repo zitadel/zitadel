@@ -162,7 +162,7 @@ export class OrgTableComponent {
 
   public async setAndNavigateToOrg(org: Organization): Promise<void> {
     if (org.state !== OrganizationState.REMOVED) {
-      await this.newOrganizationService.setOrgId(org.id);
+      await this.authService.getActiveOrg(org.id);
       await this.router.navigate(['/org']);
     } else {
       this.translate.get('ORG.TOAST.ORG_WAS_DELETED').subscribe((data) => {

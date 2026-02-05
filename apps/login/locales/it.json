@@ -47,7 +47,7 @@
       "userNotFound": "Utente non trovato nel sistema",
       "couldNotCreateSession": "Impossibile creare la sessione per l'utente",
       "initialUserNotSupported": "Utente iniziale non supportato",
-      "usernamePasswordNotAllowed": "Nome utente e password non consentiti! Contatta l'amministratore per maggiori informazioni.",
+      "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni.",
       "passkeysNotAllowed": "Passkey non consentite! Contatta l'amministratore per maggiori informazioni.",
       "couldNotFindIdentityProvider": "Impossibile trovare il provider di identità.",
       "userNotActive": "L'utente non è attivo. Contatta l'amministratore per maggiori informazioni."
@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Impossibile caricare la sessione",
       "couldNotLoadAuthMethods": "Impossibile caricare i metodi di autenticazione",
       "failedPrecondition": "Precondizione non soddisfatta",
-      "sessionNotValid": "La sessione non è valida"
+      "sessionNotValid": "La sessione non è valida",
+      "passwordVerificationMissing": "Manca la verifica della password.",
+      "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password."
     }
   },
   "idp": {
@@ -274,10 +276,7 @@
         "couldNotFindSession": "Impossibile trovare la sessione",
         "couldNotUpdateSession": "Impossibile aggiornare la sessione",
         "userNotFound": "Utente non trovato nel sistema",
-        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey",
-        "couldNotSetSession": "Impossibile impostare la sessione",
-        "couldNotGetUser": "Impossibile recuperare i dati dell'utente",
-        "couldNotRetrieveSessionCookie": "Impossibile recuperare il cookie di sessione"
+        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey"
       }
     },
     "set": {
@@ -316,7 +315,7 @@
       "description": "Inserisci i tuoi dati per registrarti."
     },
     "title": "Registrati",
-    "description": "Crea il tuo account ZITADEL.",
+    "description": "Crea il tuo account Zitadel.",
     "noMethodAvailableWarning": "Nessun metodo di autenticazione disponibile. Contatta l'amministratore di sistema per assistenza.",
     "selectMethod": "Seleziona il metodo con cui desideri autenticarti",
     "agreeTo": "Per registrarti devi accettare i termini e le condizioni",
@@ -409,7 +408,8 @@
       "userAlreadyVerified": "L'utente è già verificato!",
       "couldNotResendInvite": "Impossibile reinviare l'invito",
       "inviteSendFailed": "Impossibile inviare l'email di invito",
-      "emailSendFailed": "Impossibile inviare l'email di verifica"
+      "emailSendFailed": "Impossibile inviare l'email di verifica",
+      "contextMissing": "Si è verificato un errore. Riprova."
     }
   },
   "authenticator": {
