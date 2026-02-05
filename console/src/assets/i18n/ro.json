@@ -2055,7 +2055,7 @@
       "DESCRIPTION": "Permiteți altei organizații să vă utilizeze proiectul.",
       "EDITTITLE": "Editați rolurile",
       "CREATE": {
-        "TITLE": "Creați un grant de organizație",
+        "TITLE": "Creează permisiune pentru proiect",
         "SEL_USERS": "Selectați utilizatorii cărora doriți să le acordați acces",
         "SEL_PROJECT": "Căutați un proiect",
         "SEL_ROLES": "Selectați rolurile pe care doriți să le adăugați la grant",
@@ -2065,7 +2065,7 @@
         "ORG_DESCRIPTION": "Sunteți pe cale să acordați un utilizator pentru organizația {{name}}.",
         "ORG_DESCRIPTION_DESC": "Schimbați contextul în antetul de mai sus pentru a acorda un utilizator pentru o altă organizație.",
         "SEL_ORG_FORMFIELD": "Organizație",
-        "FOR_ORG": "Grantul este creat pentru:"
+        "FOR_ORG": "Permisiunea proiectului va fi creată pentru:"
       },
       "DETAIL": {
         "TITLE": "Grant de proiect",

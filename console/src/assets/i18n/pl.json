@@ -2056,7 +2056,7 @@
       "DESCRIPTION": "Zezwól innej organizacji na korzystanie z Twojego projektu.",
       "EDITTITLE": "Edytuj role",
       "CREATE": {
-        "TITLE": "Udziel dostęp organizacji",
+        "TITLE": "Utwórz uprawnienie do projektu",
         "SEL_USERS": "Wybierz użytkowników, którym chcesz udzielić dostępu",
         "SEL_PROJECT": "Wyszukaj projekt",
         "SEL_ROLES": "Wybierz role, które mają zostać dodane do udzielenia ",
@@ -2066,7 +2066,7 @@
         "ORG_DESCRIPTION": "Masz zamiar udzielić użytkownikowi dostęp dla organizacji {{name}}.",
         "ORG_DESCRIPTION_DESC": "Przełącz kontekst w nagłówku powyżej, aby udzielić użytkownikowi dostępu dla innej organizacji.",
         "SEL_ORG_FORMFIELD": "Organizacja",
-        "FOR_ORG": "Dostęp udzielany:"
+        "FOR_ORG": "Uprawnienie do projektu zostanie utworzone dla:"
       },
       "DETAIL": {
         "TITLE": "Udzielone uprawnienia do projektu",

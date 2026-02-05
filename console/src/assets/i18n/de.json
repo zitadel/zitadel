@@ -2057,7 +2057,7 @@
       "DESCRIPTION": "Gewähre einer anderen Organisation Zugriff auf dieses Projekt.",
       "EDITTITLE": "Rollen editieren",
       "CREATE": {
-        "TITLE": "Organisation berechtigen",
+        "TITLE": "Projektberechtigung erstellen",
         "SEL_USERS": "Selektiere die gewünschten Benutzer für das Erstellen der Berechtigung.",
         "SEL_ROLES": "Selektiere die gewünschten Rollen für das Erstellen der Berechtigung.",
         "SEL_PROJECT": "Suchen nach Projekt",
@@ -2067,7 +2067,7 @@
         "ORG_DESCRIPTION": "Du bist im Begriff, einen Benutzer für die Organisation {{name}} zu berechtigen.",
         "ORG_DESCRIPTION_DESC": "Wechsle den Kontext, um die Organisation zu wechseln.",
         "SEL_ORG_FORMFIELD": "Organisation",
-        "FOR_ORG": "Die Berechtigung wird erstellt für:"
+        "FOR_ORG": "Die Projektberechtigung wird erstellt für:"
       },
       "DETAIL": {
         "TITLE": "Projektberechtigung",

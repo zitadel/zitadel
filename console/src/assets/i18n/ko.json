@@ -2057,7 +2057,7 @@
       "DESCRIPTION": "다른 조직이 프로젝트를 사용할 수 있도록 허용합니다.",
       "EDITTITLE": "역할 수정",
       "CREATE": {
-        "TITLE": "조직 권한 생성",
+        "TITLE": "프로젝트 권한 생성",
         "SEL_USERS": "액세스를 허가할 사용자를 선택하세요",
         "SEL_PROJECT": "프로젝트를 검색하세요",
         "SEL_ROLES": "권한에 추가할 역할을 선택하세요",
@@ -2067,7 +2067,7 @@
         "ORG_DESCRIPTION": "{{name}} 조직의 사용자에게 권한을 부여하려고 합니다.",
         "ORG_DESCRIPTION_DESC": "헤더의 컨텍스트를 전환하여 다른 조직에 대한 사용자 권한을 부여할 수 있습니다.",
         "SEL_ORG_FORMFIELD": "조직",
-        "FOR_ORG": "권한이 생성된 대상:"
+        "FOR_ORG": "프로젝트 권한이 다음을 위해 생성될 예정입니다:"
       },
       "DETAIL": {
         "TITLE": "프로젝트 권한",

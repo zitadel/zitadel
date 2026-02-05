@@ -2060,7 +2060,7 @@
       "DESCRIPTION": "Başka bir organizasyonun projenizi kullanmasına izin verin.",
       "EDITTITLE": "Rolleri düzenle",
       "CREATE": {
-        "TITLE": "Organizasyon Yetkisi Oluştur",
+        "TITLE": "Proje yetkisi oluştur",
         "SEL_USERS": "Erişim vermek istediğiniz kullanıcıları seçin",
         "SEL_PROJECT": "Bir proje arayın",
         "SEL_ROLES": "Yetkiye eklenmesini istediğiniz rolleri seçin",
@@ -2070,7 +2070,7 @@
         "ORG_DESCRIPTION": "{{name}} organizasyonu için bir kullanıcıyı yetkilendirmek üzeresiniz.",
         "ORG_DESCRIPTION_DESC": "Başka bir organizasyon için kullanıcı yetkilendirmek için yukarıdaki başlıktaki bağlamı değiştirin.",
         "SEL_ORG_FORMFIELD": "Organizasyon",
-        "FOR_ORG": "Yetki şunun için oluşturulur:"
+        "FOR_ORG": "Proje yetkisi şunun için oluşturulacak:"
       },
       "DETAIL": {
         "TITLE": "Proje Yetkisi",

@@ -2057,7 +2057,7 @@
       "DESCRIPTION": "Permite que outra organização use o seu projeto.",
       "EDITTITLE": "Editar funções",
       "CREATE": {
-        "TITLE": "Criar Concessão de Organização",
+        "TITLE": "Criar Concessão de projecto",
         "SEL_USERS": "Selecione os usuários aos quais deseja conceder acesso",
         "SEL_PROJECT": "Buscar um projeto",
         "SEL_ROLES": "Selecione as funções que deseja adicionar à concessão",
@@ -2069,7 +2069,7 @@
         "ORG_DESCRIPTION_DESC": "Altere o contexto no cabeçalho acima para conceder um usuário para outra organização.",
         "SEL_ORG_FORMFIELD": "Domínio Completo",
         "SEL_ORG_BUTTON": "Buscar Organização",
-        "FOR_ORG": "A concessão é criada para:"
+        "FOR_ORG": "A concessão do projeto será criada para:"
       },
       "DETAIL": {
         "TITLE": "Concessão de Projeto",
