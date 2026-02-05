@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Kezeld a globális szabályzatokat és a hozzáférési beállításokat."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM tárhely adminisztráció",
+      "TITLE": "Instance tárhely adminisztráció",
       "DESCRIPTION": "Kezeld a Zitadel nézeteidet és a sikertelen eseményeket."
     },
     "MEMBER": {

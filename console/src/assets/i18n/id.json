@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Kelola Kebijakan global dan Pengaturan Akses Manajemen Anda."
     },
     "EVENTSTORE": {
-      "TITLE": "Administrasi Penyimpanan IAM",
+      "TITLE": "Administrasi Penyimpanan Instance",
       "DESCRIPTION": "Kelola tampilan Zitadel Anda dan acara yang gagal."
     },
     "MEMBER": {

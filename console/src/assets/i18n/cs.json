@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Spravujte vaše globální politiky a nastavení přístupu k managementu."
     },
     "EVENTSTORE": {
-      "TITLE": "Administrace úložiště systému IAM",
+      "TITLE": "Administrace úložiště systému Instance",
       "DESCRIPTION": "Správa nastavení ukládání systému ZIDATEL."
     },
     "MEMBER": {

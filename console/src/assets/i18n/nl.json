@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Servicegebruikers",
     "LOGOUT": "Alle gebruikers uitloggen",
     "NEWORG": "Nieuwe organisatie",
-    "IAMADMIN": "U bent een IAM-beheerder. Let op: u heeft uitgebreide rechten.",
+    "IAMADMIN": "U bent een Instance-beheerder. Let op: u heeft uitgebreide rechten.",
     "SHOWORGS": "Toon alle organisaties",
     "GRANTS": "Machtigingen",
     "ACTIONS": "Acties",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Beheer uw wereldwijde beleid en beheer toegangsinstellingen."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Opslagbeheer",
+      "TITLE": "Instance Opslagbeheer",
       "DESCRIPTION": "Beheer uw Zitadel-weergaven en mislukte evenementen."
     },
     "MEMBER": {

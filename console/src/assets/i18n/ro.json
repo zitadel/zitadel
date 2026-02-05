@@ -1265,7 +1265,7 @@
       "DESCRIPTION": "Gestionați-vă politicile globale și setările de acces pentru gestionare."
     },
     "EVENTSTORE": {
-      "TITLE": "Administrarea stocării IAM",
+      "TITLE": "Administrarea stocării Instance",
       "DESCRIPTION": "Gestionați-vă vizualizările Zitadel și evenimentele eșuate."
     },
     "MEMBER": {

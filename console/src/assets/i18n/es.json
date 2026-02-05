@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Gestiona tus políticas globales y tus ajustes de gestión de accesos."
     },
     "EVENTSTORE": {
-      "TITLE": "Administración del almacenamiento IAM",
+      "TITLE": "Administración del almacenamiento Instance",
       "DESCRIPTION": "Gestionar tus vistas de Zitadel y tus eventos fallidos."
     },
     "MEMBER": {

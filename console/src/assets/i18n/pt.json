@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Gerencie as políticas globais e configurações de acesso à gerência."
     },
     "EVENTSTORE": {
-      "TITLE": "Administração de armazenamento IAM",
+      "TITLE": "Administração de armazenamento Instance",
       "DESCRIPTION": "Gerencie as visualizações do Zitadel e eventos falhados."
     },
     "MEMBER": {

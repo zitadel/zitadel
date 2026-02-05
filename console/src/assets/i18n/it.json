@@ -1266,7 +1266,7 @@
       "DESCRIPTION": "Gestisci le impostazioni del sistema e le impostazioni d'accesso."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Eventstore",
+      "TITLE": "Instance Eventstore",
       "DESCRIPTION": "Gestisci i view di Zitadel e gli eventi falliti."
     },
     "MEMBER": {

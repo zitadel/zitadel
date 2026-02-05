@@ -1266,7 +1266,7 @@
       "DESCRIPTION": "Zarządzaj swoimi globalnymi politykami i ustawieniami dostępu do zarządzania."
     },
     "EVENTSTORE": {
-      "TITLE": "Administracja magazynem IAM",
+      "TITLE": "Administracja magazynem Instance",
       "DESCRIPTION": "Zarządzaj swoimi widokami Zitadel i nieudanymi zdarzeniami."
     },
     "MEMBER": {

@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Servis Kullanıcıları",
     "LOGOUT": "Tüm Kullanıcıları Çıkış Yap",
     "NEWORG": "Yeni Organizasyon",
-    "IAMADMIN": "IAM Yöneticisisiniz. Genişletilmiş izinleriniz olduğunu unutmayın.",
+    "IAMADMIN": "Instance Yöneticisisiniz. Genişletilmiş izinleriniz olduğunu unutmayın.",
     "SHOWORGS": "Tüm Organizasyonları Göster",
     "GRANTS": "Yetkilendirmeler",
     "ACTIONS": "Eylemler",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Küresel Politikalarınızı ve Yönetim Erişim Ayarlarınızı yönetin."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Depolama Yönetimi",
+      "TITLE": "Instance Depolama Yönetimi",
       "DESCRIPTION": "Zitadel görünümlerinizi ve başarısız olaylarınızı yönetin."
     },
     "MEMBER": {

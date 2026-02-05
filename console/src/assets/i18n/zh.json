@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "管理您的全局策略和管理访问设置。"
     },
     "EVENTSTORE": {
-      "TITLE": "IAM 存储管理",
+      "TITLE": "Instance 存储管理",
       "DESCRIPTION": "管理您的 Zitadel 视图和失败的事件。"
     },
     "MEMBER": {

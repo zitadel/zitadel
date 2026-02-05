@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Verwalte die globalen Richtlinien und Zugangseinstellungen."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Speicher Administration",
+      "TITLE": "Instance Speicher Administration",
       "DESCRIPTION": "Verwalte Speicher-Einstellungen von Zitadel."
     },
     "MEMBER": {

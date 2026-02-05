@@ -1260,7 +1260,7 @@
       "DESCRIPTION": "إدارة السياسات العالمية وإعدادات الوصول الإداري."
     },
     "EVENTSTORE": {
-      "TITLE": "إدارة تخزين IAM",
+      "TITLE": "إدارة تخزين Instance",
       "DESCRIPTION": "إدارة مشاهدات ZITADEL والأحداث الفاشلة."
     },
     "MEMBER": {
