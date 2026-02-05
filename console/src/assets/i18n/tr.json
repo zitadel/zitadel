@@ -435,8 +435,7 @@
     "TOS": "Hizmet Şartları",
     "OPENSHORTCUTSTOOLTIP": "Klavye kısayollarını göstermek için ? yazın",
     "SETTINGS": "Ayarlar",
-    "CUSTOMERPORTAL": "Müşteri Portalı",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "Müşteri Portalı"
   },
   "QUICKSTART": {
     "TITLE": "Zitadel'i uygulamanıza entegre edin",
@@ -1162,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel Yönetici Rolleri",
-      "DESCRIPTION": "Bunlar kullanıcının tüm üyelik yetkileridir. Bunları organizasyon, proje veya IAM detay sayfalarında da değiştirebilirsiniz.",
+      "DESCRIPTION": "Bunlar kullanıcının tüm üyelik yetkileridir. Bunları organizasyon, proje veya Instance detay sayfalarında da değiştirebilirsiniz.",
       "ORGCONTEXT": "Şu anda seçili organizasyonla ilişkili tüm organizasyonları ve projeleri görüyorsunuz.",
       "USERCONTEXT": "Yetkiniz olan tüm organizasyonları ve projeleri görüyorsunuz. Diğer organizasyonlar dahil.",
       "CREATIONDATE": "Oluşturma Tarihi",

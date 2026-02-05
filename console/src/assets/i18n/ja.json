@@ -435,8 +435,7 @@
     "TOS": "利用規約",
     "OPENSHORTCUTSTOOLTIP": "「?」と入力し、キーボードショートカットを表示する",
     "SETTINGS": "設定",
-    "CUSTOMERPORTAL": "カスタマーポータル",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "カスタマーポータル"
   },
   "QUICKSTART": {
     "TITLE": "Zitadelをアプリケーションに統合する",
@@ -1511,9 +1510,7 @@
       "SECURITY": "セキュリティ設定",
       "EVENTS": "イベント",
       "FAILEDEVENTS": "失敗したイベント",
-      "VIEWS": "ビュー",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions",
-      "TARGETS": "[NEEDS TRANSLATION] Targets"
+      "VIEWS": "ビュー"
     },
     "GROUPS": {
       "GENERAL": "一般",
@@ -1523,8 +1520,7 @@
       "TEXTS": "テキストと言語",
       "APPEARANCE": "設定",
       "OTHER": "その他",
-      "STORAGE": "ストレージ",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions"
+      "STORAGE": "ストレージ"
     },
     "BETA": "ベータ"
   },

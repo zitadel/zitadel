@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Pengguna Layanan",
     "LOGOUT": "Logout Semua Pengguna",
     "NEWORG": "Organisasi Baru",
-    "IAMADMIN": "Anda adalah Administrator IAM. Perhatikan bahwa Anda memiliki izin yang diperluas.",
+    "IAMADMIN": "Anda adalah Administrator Instance. Perhatikan bahwa Anda memiliki izin yang diperluas.",
     "SHOWORGS": "Tampilkan Semua Organisasi",
     "GRANTS": "Otorisasi",
     "ACTIONS": "Tindakan",
@@ -435,8 +435,7 @@
     "TOS": "Ketentuan Layanan",
     "OPENSHORTCUTSTOOLTIP": "Jenis ? untuk menampilkan pintasan keyboard",
     "SETTINGS": "Pengaturan",
-    "CUSTOMERPORTAL": "Portal Pelanggan",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "Portal Pelanggan"
   },
   "QUICKSTART": {
     "TITLE": "Integrasikan Zitadel ke dalam aplikasi Anda",
@@ -1162,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Peran Administrator Zitadel",
-      "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau IAM.",
+      "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau Instance.",
       "ORGCONTEXT": "Anda melihat semua organisasi dan proyek yang terkait dengan organisasi yang dipilih saat ini.",
       "USERCONTEXT": "Anda melihat semua organisasi dan proyek yang Anda izinkan. Termasuk organisasi lain.",
       "CREATIONDATE": "Tanggal Pembuatan",
@@ -1511,9 +1510,7 @@
       "SECURITY": "Pengaturan keamanan",
       "EVENTS": "Acara",
       "FAILEDEVENTS": "Acara Gagal",
-      "VIEWS": "Tampilan",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions",
-      "TARGETS": "[NEEDS TRANSLATION] Targets"
+      "VIEWS": "Tampilan"
     },
     "GROUPS": {
       "GENERAL": "Informasi Umum",
@@ -1523,8 +1520,7 @@
       "TEXTS": "Teks dan Bahasa",
       "APPEARANCE": "Penampilan",
       "OTHER": "Lainnya",
-      "STORAGE": "Penyimpanan",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions"
+      "STORAGE": "Penyimpanan"
     },
     "BETA": "BETA"
   },
@@ -1663,10 +1659,7 @@
       "LOGINV2_DESCRIPTION": "Mengaktifkan ini akan mengaktifkan antarmuka login baru berbasis TypeScript dengan keamanan, performa, dan kustomisasi yang lebih baik.",
       "LOGINV2_BASEURI": "URI dasar",
       "ENABLERELATIONALTABLES": "Tabel Relasional",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktifkan ini untuk menggunakan tabel relasional alih-alih proyeksi untuk menyimpan data. Saat ini, toggle ini tidak berfungsi.",
-      "DEBUGOIDCPARENTERROR": "[NEEDS TRANSLATION] Debug OIDC Parent Error",
-      "OIDCSINGLEV1SESSIONTERMINATION": "[NEEDS TRANSLATION] OIDC Single V1 Session Termination",
-      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "[NEEDS TRANSLATION] If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktifkan ini untuk menggunakan tabel relasional alih-alih proyeksi untuk menyimpan data. Saat ini, toggle ini tidak berfungsi."
     },
     "DIALOG": {
       "RESET": {

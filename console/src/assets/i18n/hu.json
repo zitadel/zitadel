@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Szolgáltatási Felhasználók",
     "LOGOUT": "Minden Felhasználó Kijelentkezése",
     "NEWORG": "Új Szervezet",
-    "IAMADMIN": "Te egy IAM Adminisztrátor vagy. Ne felejtsd el, hogy kibővített jogosultságokkal rendelkezel.",
+    "IAMADMIN": "Te egy Instance Adminisztrátor vagy. Ne felejtsd el, hogy kibővített jogosultságokkal rendelkezel.",
     "SHOWORGS": "Show All Organizations",
     "GRANTS": "Engedélyek",
     "ACTIONS": "Műveletek",
@@ -435,8 +435,7 @@
     "TOS": "Szolgáltatási feltételek",
     "OPENSHORTCUTSTOOLTIP": "Írd be a ? jelet a billentyűparancsok megjelenítéséhez",
     "SETTINGS": "Beállítások",
-    "CUSTOMERPORTAL": "Ügyfélportál",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "Ügyfélportál"
   },
   "QUICKSTART": {
     "TITLE": "Integráld a Zitadel szolgáltatást az alkalmazásodba",
@@ -1162,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel rendszergazdai szerepkörök",
-      "DESCRIPTION": "Ezek a felhasználó összes tagsági jogosultságai. Ezeket módosíthatod szervezet, projekt vagy IAM részletező oldalakon is.",
+      "DESCRIPTION": "Ezek a felhasználó összes tagsági jogosultságai. Ezeket módosíthatod szervezet, projekt vagy Instance részletező oldalakon is.",
       "ORGCONTEXT": "Láthatod az összes szervezetet és projektet, amelyek a jelenleg kiválasztott szervezethez kapcsolódnak.",
       "USERCONTEXT": "Láthatod az összes szervezetet és projektet, amelyekhez jogosultságod van, beleértve más szervezeteket is.",
       "CREATIONDATE": "Létrehozás dátuma",
@@ -1511,9 +1510,7 @@
       "SECURITY": "Biztonsági beállítások",
       "EVENTS": "Események",
       "FAILEDEVENTS": "Sikertelen események",
-      "VIEWS": "Nézetek",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions",
-      "TARGETS": "[NEEDS TRANSLATION] Targets"
+      "VIEWS": "Nézetek"
     },
     "GROUPS": {
       "GENERAL": "Általános információ",
@@ -1523,8 +1520,7 @@
       "TEXTS": "Szövegek és nyelvek",
       "APPEARANCE": "Megjelenés",
       "OTHER": "Egyéb",
-      "STORAGE": "Tárolás",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions"
+      "STORAGE": "Tárolás"
     },
     "BETA": "BÉTA"
   },
@@ -1602,9 +1598,7 @@
         "REMOVED": "Twilio eltávolítva",
         "CHANGETOKEN": "Token módosítása",
         "SETTOKEN": "Token beállítása",
-        "TOKENSET": "A token sikeresen beállítva.",
-        "VERIFYSERVICESID": "[NEEDS TRANSLATION] Verification Service Sid",
-        "VERIFYSERVICESID_DESCRIPTION": "[NEEDS TRANSLATION] Setting a Verification Service Sid, allows using the Twilio Verify Service instead of the Messages Service for verification of phone numbers and OTP SMS"
+        "TOKENSET": "A token sikeresen beállítva."
       }
     },
     "SECRETS": {

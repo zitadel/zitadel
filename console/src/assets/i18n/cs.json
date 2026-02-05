@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Systémoví uživatelé",
     "LOGOUT": "Odhlásit všechny uživatele",
     "NEWORG": "Nová organizace",
-    "IAMADMIN": "Jste administrátor IAM. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
+    "IAMADMIN": "Jste administrátor Instance. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
     "SHOWORGS": "Zobrazit všechny organizace",
     "GRANTS": "Autorizace",
     "ACTIONS": "Akce",
@@ -435,8 +435,7 @@
     "TOS": "Podmínky služby",
     "OPENSHORTCUTSTOOLTIP": "Pro zobrazení klávesových zkratek stiskněte ?",
     "SETTINGS": "Nastavení",
-    "CUSTOMERPORTAL": "Zákaznický portál",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "Zákaznický portál"
   },
   "QUICKSTART": {
     "TITLE": "Integrovat Zitadel do vaší aplikace",
@@ -1162,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Role správce Zitadel",
-      "DESCRIPTION": "Zde jsou všechna členská oprávnění uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo IAM.",
+      "DESCRIPTION": "Zde jsou všechna členská oprávnění uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo Instance.",
       "ORGCONTEXT": "Vidíte všechny organizace a projekty, které souvisí s aktuálně vybranou organizací.",
       "USERCONTEXT": "Vidíte všechny organizace a projekty, na které máte oprávnění. Včetně jiných organizací.",
       "CREATIONDATE": "Datum vytvoření",
@@ -1511,9 +1510,7 @@
       "SECURITY": "Bezpečnostní nastavení",
       "EVENTS": "Události",
       "FAILEDEVENTS": "Selhané události",
-      "VIEWS": "Pohledy",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions",
-      "TARGETS": "[NEEDS TRANSLATION] Targets"
+      "VIEWS": "Pohledy"
     },
     "GROUPS": {
       "GENERAL": "Obecné informace",
@@ -1523,8 +1520,7 @@
       "TEXTS": "Texty a jazyky",
       "APPEARANCE": "Vzhled",
       "OTHER": "Ostatní",
-      "STORAGE": "Data",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions"
+      "STORAGE": "Data"
     },
     "BETA": "BETA"
   },
@@ -2247,10 +2243,6 @@
       "APPLE": {
         "TITLE": "Přihlásit se pomocí Apple",
         "DESCRIPTION": "Zadejte přihlašovací údaje pro vašeho poskytovatele identity Apple"
-      },
-      "SAML": {
-        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your SAML Provider",
-        "TITLE": "[NEEDS TRANSLATION] Sign in with SAML"
       }
     },
     "DETAIL": {
@@ -2394,17 +2386,7 @@
     "ISIDTOKENMAPPING": "Mapování z ID tokenu",
     "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo.",
     "USEPKCE": "Použijte PKCE",
-    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method",
-    "SAML": {
-      "BINDING": "[NEEDS TRANSLATION] Binding",
-      "METADATAURL": "[NEEDS TRANSLATION] Metadata URL",
-      "METADATAXML": "[NEEDS TRANSLATION] Metadata Xml",
-      "NAMEIDFORMAT": "[NEEDS TRANSLATION] NameID Format",
-      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm",
-      "SIGNEDREQUEST": "[NEEDS TRANSLATION] Signed Request",
-      "TRANSIENTMAPPINGATTRIBUTENAME": "[NEEDS TRANSLATION] Custom Mapping Attribute Name",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "[NEEDS TRANSLATION] Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
-    }
+    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method"
   },
   "MFA": {
     "LIST": {
@@ -2477,11 +2459,7 @@
         "DELETE_TITLE": "Smazat konfiguraci SMTP",
         "DELETE_DESCRIPTION": "Chystáte se smazat konfiguraci. Potvrďte tuto akci zadáním jména odesílatele",
         "DELETED": "Konfigurace SMTP byla smazána",
-        "SENDER": "Chcete-li smazat tuto konfiguraci SMTP, zadejte {{ value }}.",
-        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
-        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
-        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
-        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
+        "SENDER": "Chcete-li smazat tuto konfiguraci SMTP, zadejte {{ value }}."
       }
     },
     "CREATE": {

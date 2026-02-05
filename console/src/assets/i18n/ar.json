@@ -316,10 +316,6 @@
           "DISABLE_PHONE_LOGIN": {
             "TITLE": "تعطيل تسجيل الدخول بالهاتف",
             "DESCRIPTION": "إذا تم تفعيل هذا، لا يمكن للمستخدمين استخدام أرقام هواتفهم لتسجيل الدخول. احذر أنه إذا قمت بتعطيل هذا، يجب أن تكون أرقام هواتف المستخدمين فريدة عبر جميع المنظمات لتسجيل الدخول."
-          },
-          "LOCAL_AUTHENTICATION_ALLOWED": {
-            "DESCRIPTION": "[NEEDS TRANSLATION] Allow your users to log in with their username and password or passkey authentication. If this is deactivated, your users can only log in using an external identity provider.",
-            "TITLE": "[NEEDS TRANSLATION] Local authentication allowed"
           }
         }
       }
@@ -431,7 +427,7 @@
     "MACHINEUSERS": "مستخدمو الخدمة",
     "LOGOUT": "تسجيل خروج جميع المستخدمين",
     "NEWORG": "منظمة جديدة",
-    "IAMADMIN": "أنت مسؤول IAM. لاحظ أن لديك أذونات موسعة.",
+    "IAMADMIN": "أنت مسؤول Instance. لاحظ أن لديك أذونات موسعة.",
     "SHOWORGS": "إظهار جميع المنظمات",
     "GRANTS": "التفويضات",
     "ACTIONS": "الإجراءات",
@@ -636,15 +632,7 @@
         "INTERRUPT_ON_ERROR_DESCRIPTION": "إيقاف جميع التنفيذات عندما يعود الهدف بخطأ",
         "INTERRUPT_ON_ERROR_WARNING": "تنبيه: \"المقاطعة عند الخطأ\" توقف العمليات عند الفشل، مما يهدد بالقفل. اختبرها مع تعطيلها لمنع حظر تسجيل الدخول/الإنشاء.",
         "AWAIT_RESPONSE": "انتظار الاستجابة",
-        "AWAIT_RESPONSE_DESCRIPTION": "سننتظر الاستجابة قبل أن نفعل أي شيء آخر. مفيد إذا كنت تنوي استخدام أهداف متعددة لإجراء واحد",
-        "PAYLOAD_TYPE": "[NEEDS TRANSLATION] Payload Type",
-        "PAYLOAD_TYPES": {
-          "JSON": "[NEEDS TRANSLATION] JSON",
-          "JWE": "[NEEDS TRANSLATION] Encrypted JSON Web Token (JWE)",
-          "JWT": "[NEEDS TRANSLATION] JSON Web Token (JWT)",
-          "UNSPECIFIED": "[NEEDS TRANSLATION] Unspecified"
-        },
-        "PAYLOAD_TYPE_DESCRIPTION": "[NEEDS TRANSLATION] JSON: Standard JSON payload with an signature header for verification.\nJWT: Payload is sent as signed JWT. Verification is self-contained using the JWT signature.\nJWE: The JWT is additionally encrypted to prevent unauthorized access to payload information."
+        "AWAIT_RESPONSE_DESCRIPTION": "سننتظر الاستجابة قبل أن نفعل أي شيء آخر. مفيد إذا كنت تنوي استخدام أهداف متعددة لإجراء واحد"
       },
       "TABLE": {
         "NAME": "الاسم",
@@ -1166,7 +1154,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "أدوار مدير ZITADEL",
-      "DESCRIPTION": "هذه هي جميع منح الأعضاء للمستخدم. يمكنك تعديلها أيضاً في صفحات تفاصيل المنظمة أو المشروع أو IAM.",
+      "DESCRIPTION": "هذه هي جميع منح الأعضاء للمستخدم. يمكنك تعديلها أيضاً في صفحات تفاصيل المنظمة أو المشروع أو Instance.",
       "ORGCONTEXT": "أنت ترى جميع المنظمات والمشاريع المرتبطة بالمنظمة المحددة حالياً.",
       "USERCONTEXT": "أنت ترى جميع المنظمات والمشاريع التي لديك تفويض لها. بما في ذلك المنظمات الأخرى.",
       "CREATIONDATE": "تاريخ الإنشاء",
@@ -1563,8 +1551,7 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "ar": "العربية",
-        "uk": "[NEEDS TRANSLATION] Українська"
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1811,8 +1798,7 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "ar": "العربية",
-        "uk": "[NEEDS TRANSLATION] Українська"
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "تم التحقق من البريد الإلكتروني",
@@ -2796,8 +2782,7 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "ar": "العربية",
-    "uk": "[NEEDS TRANSLATION] Українська"
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "إضافة مدير",

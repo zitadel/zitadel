@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Service-Benutzer",
     "LOGOUT": "Alle Benutzer abmelden",
     "NEWORG": "Neue Organisation",
-    "IAMADMIN": "Du bist ein IAM-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
+    "IAMADMIN": "Du bist ein Instanz-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
     "SHOWORGS": "Alle Organisationen anzeigen",
     "GRANTS": "Berechtigungen",
     "ACTIONS": "Aktionen",
@@ -435,8 +435,7 @@
     "TOS": "AGB",
     "OPENSHORTCUTSTOOLTIP": "Tippe ? um die Tastaturkürzel anzuzeigen",
     "SETTINGS": "Einstellungen",
-    "CUSTOMERPORTAL": "Kundenportal",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "Kundenportal"
   },
   "QUICKSTART": {
     "TITEL": "Integriere Zitadel in deine Anwendung",
@@ -460,8 +459,7 @@
         "TITLE": "Framework ändern",
         "DESCRIPTION": "Wähle eines der verfügbaren Frameworks für die schnelle Einrichtung deiner Anwendung."
       }
-    },
-    "TITLE": "[NEEDS TRANSLATION] Integrate Zitadel into your application"
+    }
   },
   "ACTIONS": {
     "ACTIONS": "Aktionen",
@@ -1163,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel-Administratorrollen",
-      "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder IAM-Detailseite aufrufen und modifizieren.",
+      "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder Instanz-Detailseite aufrufen und modifizieren.",
       "ORGCONTEXT": "Sie sehen alle Organisationen und Projekte, die mit der aktuell gewählten Organisation in Verbindung stehen.",
       "USERCONTEXT": "Sie sehen alle Organisationen und Projekte auf denen Sie berechtigt sind inklusive aller zur Auswahl stehenden Organisationen.",
       "CREATIONDATE": "Erstellungsdatum",
@@ -1512,9 +1510,7 @@
       "SECURITY": "Sicherheitseinstellungen",
       "EVENTS": "Events",
       "FAILEDEVENTS": "Fehlerhafte Events",
-      "VIEWS": "Views",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions",
-      "TARGETS": "[NEEDS TRANSLATION] Targets"
+      "VIEWS": "Views"
     },
     "GROUPS": {
       "GENERAL": "Allgemein",
@@ -1524,8 +1520,7 @@
       "TEXTS": "Texte und Sprachen",
       "APPEARANCE": "Erscheinungsbild",
       "OTHER": "Anderes",
-      "STORAGE": "Speicher",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions"
+      "STORAGE": "Speicher"
     },
     "BETA": "BETA"
   },
@@ -2239,18 +2234,6 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren LDAP Provider ein."
-      },
-      "APPLE": {
-        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your Apple Provider",
-        "TITLE": "[NEEDS TRANSLATION] Sign in with Apple"
-      },
-      "OAUTH": {
-        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the required data for your OAuth provider.",
-        "TITLE": "[NEEDS TRANSLATION] OAuth Provider"
-      },
-      "SAML": {
-        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your SAML Provider",
-        "TITLE": "[NEEDS TRANSLATION] Sign in with SAML"
       }
     },
     "DETAIL": {
@@ -2367,8 +2350,7 @@
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
       "TITLE": "OIDC Konfiguration",
-      "DESCRIPTION": "Geben Sie die Daten OIDC Identitätsanbieter ein.",
-      "GENERAL": "[NEEDS TRANSLATION] General Information"
+      "DESCRIPTION": "Geben Sie die Daten OIDC Identitätsanbieter ein."
     },
     "OAUTH": {
       "TITLE": "OAuth Konfiguration",
@@ -2395,25 +2377,7 @@
     "ISIDTOKENMAPPING": "Zuordnung vom ID-Token",
     "ISIDTOKENMAPPING_DESC": "Legt fest, ob für das Mapping der Provider Informationen das ID-Token verwendet werden soll, anstatt des Userinfo-Endpoints.",
     "USEPKCE": "Verwenden Sie PKCE",
-    "USEPKCE_DESC": "Bestimmt, ob die Parameter code_challenge und code_challenge_method in der Authentifizierungsanforderung enthalten sind",
-    "APPLE": {
-      "KEYID": "[NEEDS TRANSLATION] Key ID",
-      "KEYMAXSIZEEXCEEDED": "[NEEDS TRANSLATION] Maximum size of 5kB exceeded.",
-      "PRIVATEKEY": "[NEEDS TRANSLATION] Private Key",
-      "TEAMID": "[NEEDS TRANSLATION] Team ID",
-      "UPDATEPRIVATEKEY": "[NEEDS TRANSLATION] Update Private Key",
-      "UPLOADPRIVATEKEY": "[NEEDS TRANSLATION] Upload Private Key"
-    },
-    "SAML": {
-      "BINDING": "[NEEDS TRANSLATION] Binding",
-      "METADATAURL": "[NEEDS TRANSLATION] Metadata URL",
-      "METADATAXML": "[NEEDS TRANSLATION] Metadata Xml",
-      "NAMEIDFORMAT": "[NEEDS TRANSLATION] NameID Format",
-      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm",
-      "SIGNEDREQUEST": "[NEEDS TRANSLATION] Signed Request",
-      "TRANSIENTMAPPINGATTRIBUTENAME": "[NEEDS TRANSLATION] Custom Mapping Attribute Name",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "[NEEDS TRANSLATION] Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
-    }
+    "USEPKCE_DESC": "Bestimmt, ob die Parameter code_challenge und code_challenge_method in der Authentifizierungsanforderung enthalten sind"
   },
   "MFA": {
     "LIST": {
@@ -2486,11 +2450,7 @@
         "DELETE_TITLE": "SMTP-Konfiguration löschen",
         "DELETE_DESCRIPTION": "Sie sind dabei, eine Konfiguration zu löschen. Bestätigen Sie diese Aktion, indem Sie den Absendernamen eingeben",
         "DELETED": "SMTP-Konfiguration wurde gelöscht",
-        "SENDER": "Geben Sie {{ value }} ein, um diese SMTP-Konfiguration zu löschen.",
-        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
-        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
-        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
-        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
+        "SENDER": "Geben Sie {{ value }} ein, um diese SMTP-Konfiguration zu löschen."
       }
     },
     "CREATE": {

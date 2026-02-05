@@ -435,8 +435,7 @@
     "TOS": "Användarvillkor",
     "OPENSHORTCUTSTOOLTIP": "Skriv ? för att visa tangentbordsgenvägar",
     "SETTINGS": "Inställningar",
-    "CUSTOMERPORTAL": "Kundportal",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "Kundportal"
   },
   "QUICKSTART": {
     "TITLE": "Integrera Zitadel i din applikation",
@@ -1515,9 +1514,7 @@
       "SECURITY": "Säkerhetsinställningar",
       "EVENTS": "Händelser",
       "FAILEDEVENTS": "Misslyckade händelser",
-      "VIEWS": "Vy",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions",
-      "TARGETS": "[NEEDS TRANSLATION] Targets"
+      "VIEWS": "Vy"
     },
     "GROUPS": {
       "GENERAL": "Allmän information",
@@ -1527,8 +1524,7 @@
       "TEXTS": "Texter och språk",
       "APPEARANCE": "Utseende",
       "OTHER": "Övrigt",
-      "STORAGE": "Lagring",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions"
+      "STORAGE": "Lagring"
     },
     "BETA": "BETA"
   },
@@ -2390,8 +2386,7 @@
       "SIGNEDREQUEST": "Signerad begäran",
       "NAMEIDFORMAT": "NameID-format",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Anpassat mappningsattributnamn",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternativt attributnamn för att mappa användaren om `nameid-format` som returneras är `transient`, t.ex. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
-      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternativt attributnamn för att mappa användaren om `nameid-format` som returneras är `transient`, t.ex. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
     },
     "TOAST": {
       "SAVED": "Sparat framgångsrikt.",

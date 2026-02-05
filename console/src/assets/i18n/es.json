@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Usuarios del servicio",
     "LOGOUT": "Cerrar sesión para todos los usuarios",
     "NEWORG": "Nueva organización",
-    "IAMADMIN": "Eres un administrador IAM. Ten en cuenta que tienes permisos ampliados.",
+    "IAMADMIN": "Eres un administrador Instance. Ten en cuenta que tienes permisos ampliados.",
     "SHOWORGS": "Mostrar todas las organizaciones",
     "GRANTS": "Autorizaciones",
     "ACTIONS": "Acciones",
@@ -435,8 +435,7 @@
     "TOS": "Términos de Servicio",
     "OPENSHORTCUTSTOOLTIP": "Pulsa ? para mostrar los atajos de teclado",
     "SETTINGS": "Ajustes",
-    "CUSTOMERPORTAL": "Portal del cliente",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "Portal del cliente"
   },
   "QUICKSTART": {
     "TITLE": "Integra Zitadel en tu aplicación",
@@ -459,10 +458,6 @@
       "CAMBIAR": {
         "TITLE": "Cambio framework",
         "DESCRIPTION": "Elige uno de los frameworks disponibles para configurar rápidamente tu aplicación."
-      },
-      "CHANGE": {
-        "DESCRIPTION": "[NEEDS TRANSLATION] Choose one of the available frameworks for quick setup of your application.",
-        "TITLE": "[NEEDS TRANSLATION] Change Framework"
       }
     }
   },
@@ -1166,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Roles del administrador de Zitadel",
-      "DESCRIPTION": "Estas son todas las concesiones de membresía del usuario. Puedes modificarlas también en las páginas de organización, proyecto o detalles IAM.",
+      "DESCRIPTION": "Estas son todas las concesiones de membresía del usuario. Puedes modificarlas también en las páginas de organización, proyecto o detalles Instance.",
       "ORGCONTEXT": "Puedes ver todas las organizaciones y proyectos que están relacionados con la organización seleccionada actualmente.",
       "USERCONTEXT": "Puedes ver todas las organizaciones y proyectos para los que estás autorizado. Incluyendo otras organizaciones.",
       "CREATIONDATE": "Fecha de creación",
@@ -1516,9 +1511,7 @@
       "SECURITY": "Ajustes de seguridad",
       "EVENTS": "Eventos",
       "FAILEDEVENTS": "Eventos fallidos",
-      "VIEWS": "Vistas",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions",
-      "TARGETS": "[NEEDS TRANSLATION] Targets"
+      "VIEWS": "Vistas"
     },
     "GROUPS": {
       "GENERAL": "General",
@@ -1528,8 +1521,7 @@
       "TEXTS": "Textos e idiomas",
       "APPEARANCE": "Apariencia",
       "OTHER": "Otros",
-      "STORAGE": "Datos",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions"
+      "STORAGE": "Datos"
     },
     "BETA": "BETA"
   },
@@ -2247,14 +2239,6 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Introduce las credenciales para tu proveedor LDAP"
-      },
-      "APPLE": {
-        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your Apple Provider",
-        "TITLE": "[NEEDS TRANSLATION] Sign in with Apple"
-      },
-      "SAML": {
-        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your SAML Provider",
-        "TITLE": "[NEEDS TRANSLATION] Sign in with SAML"
       }
     },
     "DETAIL": {
@@ -2390,25 +2374,7 @@
     "ISIDTOKENMAPPING": "Asignación del ID token",
     "ISIDTOKENMAPPING_DESC": "Si se selecciona, la información del proveedor se asigna desde el ID token, no desde el punto final de userinfo.",
     "USEPKCE": "Usa PKCE",
-    "USEPKCE_DESC": "Determina si los parámetros code_challenge y code_challenge_method son incluidos en la solicitud de autenticación.",
-    "APPLE": {
-      "KEYID": "[NEEDS TRANSLATION] Key ID",
-      "KEYMAXSIZEEXCEEDED": "[NEEDS TRANSLATION] Maximum size of 5kB exceeded.",
-      "PRIVATEKEY": "[NEEDS TRANSLATION] Private Key",
-      "TEAMID": "[NEEDS TRANSLATION] Team ID",
-      "UPDATEPRIVATEKEY": "[NEEDS TRANSLATION] Update Private Key",
-      "UPLOADPRIVATEKEY": "[NEEDS TRANSLATION] Upload Private Key"
-    },
-    "SAML": {
-      "BINDING": "[NEEDS TRANSLATION] Binding",
-      "METADATAURL": "[NEEDS TRANSLATION] Metadata URL",
-      "METADATAXML": "[NEEDS TRANSLATION] Metadata Xml",
-      "NAMEIDFORMAT": "[NEEDS TRANSLATION] NameID Format",
-      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm",
-      "SIGNEDREQUEST": "[NEEDS TRANSLATION] Signed Request",
-      "TRANSIENTMAPPINGATTRIBUTENAME": "[NEEDS TRANSLATION] Custom Mapping Attribute Name",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "[NEEDS TRANSLATION] Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
-    }
+    "USEPKCE_DESC": "Determina si los parámetros code_challenge y code_challenge_method son incluidos en la solicitud de autenticación."
   },
   "MFA": {
     "LIST": {
@@ -2481,11 +2447,7 @@
         "DELETE_TITLE": "Eliminar configuración SMTP",
         "DELETE_DESCRIPTION": "Estás a punto de eliminar una configuración. Confirma esta acción escribiendo el nombre del remitente",
         "DELETED": "La configuración SMTP ha sido eliminada",
-        "SENDER": "Escribe {{ value }} para eliminar esta configuración SMTP.",
-        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
-        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
-        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
-        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
+        "SENDER": "Escribe {{ value }} para eliminar esta configuración SMTP."
       }
     },
     "CREATE": {

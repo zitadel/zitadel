@@ -427,7 +427,7 @@
     "MACHINEUSERS": "服务用户",
     "LOGOUT": "退出所有账户",
     "NEWORG": "创建组织",
-    "IAMADMIN": "您是 IAM 管理员。请注意您具有扩展权限。",
+    "IAMADMIN": "您是 Instance 管理员。请注意您具有扩展权限。",
     "SHOWORGS": "查看所有组织",
     "GRANTS": "授权",
     "ACTIONS": "认证流程",
@@ -435,8 +435,7 @@
     "TOS": "服务条款",
     "OPENSHORTCUTSTOOLTIP": "按下 ？键查看快捷键",
     "SETTINGS": "设置",
-    "CUSTOMERPORTAL": "客户门户网站",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "客户门户网站"
   },
   "QUICKSTART": {
     "TITLE": "将 Zitadel 集成到您的应用程序中",
@@ -1162,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel 管理员角色",
-      "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或 IAM 详细信息页面上修改它们。",
+      "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或 Instance 详细信息页面上修改它们。",
       "ORGCONTEXT": "您会看到与当前所选组织相关的所有组织和项目。",
       "USERCONTEXT": "您会看到您被授权的所有组织和项目。包括其他组织。",
       "CREATIONDATE": "创建于",
@@ -2391,8 +2390,7 @@
       "SIGNEDREQUEST": "登录请求",
       "NAMEIDFORMAT": "名字 ID 格式",
       "TRANSIENTMAPPINGATTRIBUTENAME": "自定义映射属性名称",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "如果返回的 `nameid-format` 是 `transient` ，则映射用户的备用属性名称，参考 `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
-      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "如果返回的 `nameid-format` 是 `transient` ，则映射用户的备用属性名称，参考 `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
     },
     "TOAST": {
       "SAVED": "成功保存。",
@@ -2768,11 +2766,7 @@
     "LOGINV2": {
       "USEV2": "使用新的登录UI",
       "BASEURL": "新的登录UI的自定义基本URL"
-    },
-    "NAMEANDTYPESECTION": "[NEEDS TRANSLATION] Name and Type",
-    "PROSWITCH": "[NEEDS TRANSLATION] I'm a pro. Skip this wizard.",
-    "TITLEFIRST": "[NEEDS TRANSLATION] Name of the application",
-    "TYPETITLE": "[NEEDS TRANSLATION] Type of application"
+    }
   },
   "GENDERS": {
     "0": "未知",

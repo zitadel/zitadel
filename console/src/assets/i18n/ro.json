@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Utilizatori de servicii",
     "LOGOUT": "Deconectați toți utilizatorii",
     "NEWORG": "Organizație nouă",
-    "IAMADMIN": "Sunteți administrator IAM. Rețineți că aveți permisiuni extinse.",
+    "IAMADMIN": "Sunteți administrator Instance. Rețineți că aveți permisiuni extinse.",
     "SHOWORGS": "Afișați toate organizațiile",
     "GRANTS": "Autorizații",
     "ACTIONS": "Acțiuni",
@@ -435,8 +435,7 @@
     "TOS": "Termeni și condiții",
     "OPENSHORTCUTSTOOLTIP": "Tastați ? pentru a afișa comenzile rapide de la tastatură",
     "SETTINGS": "Setări",
-    "CUSTOMERPORTAL": "Portalul clienților",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "Portalul clienților"
   },
   "QUICKSTART": {
     "TITLE": "Integrați Zitadel în aplicația dvs.",
@@ -671,9 +670,7 @@
     "PROJECT_OWNER_GLOBAL": "Are permisiunea asupra întregului proiect",
     "PROJECT_OWNER_VIEWER_GLOBAL": "Are permisiunea de a revizui întregul proiect",
     "PROJECT_GRANT_OWNER": "Are permisiunea de a gestiona grantul proiectului",
-    "PROJECT_GRANT_OWNER_VIEWER": "Are permisiunea de a revizui grantul proiectului",
-    "ORG_SETTINGS_MANAGER": "[NEEDS TRANSLATION] Has permission to manage organization settings",
-    "ORG_USER_SELF_MANAGER": "[NEEDS TRANSLATION] Has permission to manage their own user"
+    "PROJECT_GRANT_OWNER_VIEWER": "Are permisiunea de a revizui grantul proiectului"
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
@@ -1162,7 +1159,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Rolurile administratorilor Zitadel",
-      "DESCRIPTION": "Acestea sunt toate granturile de membru ale utilizatorului. Puteți să le modificați și în paginile de detalii ale organizației, proiectului sau IAM.",
+      "DESCRIPTION": "Acestea sunt toate granturile de membru ale utilizatorului. Puteți să le modificați și în paginile de detalii ale organizației, proiectului sau Instance.",
       "ORGCONTEXT": "Vedeți toate organizațiile și proiectele care sunt legate de organizația selectată în prezent.",
       "USERCONTEXT": "Vedeți toate organizațiile și proiectele la care sunteți autorizat. Inclusiv alte organizații.",
       "CREATIONDATE": "Data creării",
@@ -1511,9 +1508,7 @@
       "SECURITY": "Setări de securitate",
       "EVENTS": "Evenimente",
       "FAILEDEVENTS": "Evenimente eșuate",
-      "VIEWS": "Vizualizări",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions",
-      "TARGETS": "[NEEDS TRANSLATION] Targets"
+      "VIEWS": "Vizualizări"
     },
     "GROUPS": {
       "GENERAL": "Informații generale",
@@ -1523,8 +1518,7 @@
       "TEXTS": "Texte și limbi",
       "APPEARANCE": "Aspect",
       "OTHER": "Altele",
-      "STORAGE": "Stocare",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions"
+      "STORAGE": "Stocare"
     },
     "BETA": "BETA"
   },
@@ -2401,9 +2395,7 @@
       "REMOVED": "Eliminat cu succes."
     },
     "ISIDTOKENMAPPING": "Mapați din tokenul ID",
-    "ISIDTOKENMAPPING_DESC": "Dacă este selectat, informațiile despre furnizor sunt mapate din tokenul ID, nu din endpoint-ul userinfo.",
-    "USEPKCE": "[NEEDS TRANSLATION] Use PKCE",
-    "USEPKCE_DESC": "[NEEDS TRANSLATION] Determines whether the code_challenge and code_challenge_method params are included in the auth request"
+    "ISIDTOKENMAPPING_DESC": "Dacă este selectat, informațiile despre furnizor sunt mapate din tokenul ID, nu din endpoint-ul userinfo."
   },
   "MFA": {
     "LIST": {

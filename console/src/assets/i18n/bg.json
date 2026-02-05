@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Потребители на услугата",
     "LOGOUT": "Излезте всички потребители",
     "NEWORG": "Нова организация",
-    "IAMADMIN": "Вие сте IAM администратор. ",
+    "IAMADMIN": "Вие сте Instance администратор. ",
     "SHOWORGS": "Показване на всички организации",
     "GRANTS": "Разрешения",
     "ACTIONS": "Действия",
@@ -435,8 +435,7 @@
     "TOS": "Условия за ползване",
     "OPENSHORTCUTSTOOLTIP": "Тип ? ",
     "SETTINGS": "Настройки",
-    "CUSTOMERPORTAL": "Портал за клиенти",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "Портал за клиенти"
   },
   "QUICKSTART": {
     "TITLE": "Интегрирайте Zitadel във вашето приложение",
@@ -527,8 +526,7 @@
       "SHOWUSER": "Покажи потребител {{value}}"
     },
     "DOWNLOAD": "Изтегляне",
-    "APPLY": "Прилагам",
-    "SETUP": "[NEEDS TRANSLATION] Setup"
+    "APPLY": "Прилагам"
   },
   "ACTIONSTWO": {
     "BETA_NOTE": "В момента използвате новата версия Actions V2, която е в бета фаза. Предишната версия 1 все още е достъпна, но ще бъде спряна в бъдеще. Моля, съобщавайте за всякакви проблеми или изпратете обратна връзка.",
@@ -1268,7 +1266,7 @@
       "DESCRIPTION": "Управлявайте своите глобални правила и настройки за достъп до управление."
     },
     "EVENTSTORE": {
-      "TITLE": "Администриране на IAM съхранение",
+      "TITLE": "Администриране на Instance съхранение",
       "DESCRIPTION": "Управлявайте вашите Zitadel изгледи и неуспешни събития."
     },
     "MEMBER": {
@@ -2479,11 +2477,7 @@
         "DELETE_TITLE": "Изтриване на SMTP конфигурация",
         "DELETE_DESCRIPTION": "На път сте да изтриете конфигурация. Потвърдете това действие, като въведете името на подателя",
         "DELETED": "SMTP конфигурацията е изтрита",
-        "SENDER": "Въведете {{ value }}, за да изтриете тази SMTP конфигурация.",
-        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
-        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
-        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
-        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
+        "SENDER": "Въведете {{ value }}, за да изтриете тази SMTP конфигурация."
       }
     },
     "CREATE": {

@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Usuários de Serviço",
     "LOGOUT": "Encerrar Sessão de Todos os Usuários",
     "NEWORG": "Nova Organização",
-    "IAMADMIN": "Você é um Administrador IAM. Observe que você possui permissões estendidas.",
+    "IAMADMIN": "Você é um Administrador Instance. Observe que você possui permissões estendidas.",
     "SHOWORGS": "Mostrar Todas as Organizações",
     "GRANTS": "Autorizações",
     "ACTIONS": "Ações",
@@ -435,8 +435,7 @@
     "TOS": "Termos de Serviço",
     "OPENSHORTCUTSTOOLTIP": "Digite ? para mostrar os atalhos do teclado",
     "SETTINGS": "Configurações",
-    "CUSTOMERPORTAL": "Portal do Cliente",
-    "TARGETS": "[NEEDS TRANSLATION] Targets"
+    "CUSTOMERPORTAL": "Portal do Cliente"
   },
   "QUICKSTART": {
     "TITLE": "Integrar a Zitadel na sua aplicação",
@@ -458,11 +457,9 @@
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Alterar Quadro",
-        "DESCRIÇÃO": "Escolha uma das estruturas disponíveis para uma configuração rápida da sua aplicação.",
-        "DESCRIPTION": "[NEEDS TRANSLATION] Choose one of the available frameworks for quick setup of your application."
+        "DESCRIÇÃO": "Escolha uma das estruturas disponíveis para uma configuração rápida da sua aplicação."
       }
-    },
-    "DESCRIPTION": "[NEEDS TRANSLATION] Integrate Zitadel into your application or use one of our samples to get started in minutes."
+    }
   },
   "ACTIONS": {
     "ACTIONS": "Ações",
@@ -990,8 +987,7 @@
         "DELETESUCCESS": "Excluído com sucesso!",
         "CROPPERERROR": "Ocorreu um erro ao carregar seu arquivo. Tente um formato e tamanho diferentes, se necessário."
       },
-      "COUNTRY": "País",
-      "PASSWORD": "[NEEDS TRANSLATION] Password"
+      "COUNTRY": "País"
     },
     "MACHINE": {
       "TITLE": "Detalhes do Usuário de Serviço",
@@ -1165,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Funções de administrador do Zitadel",
-      "DESCRIPTION": "Essas são todas as permissões de membros do usuário. Você também pode modificá-las nas páginas de detalhes da organização, projeto ou IAM.",
+      "DESCRIPTION": "Essas são todas as permissões de membros do usuário. Você também pode modificá-las nas páginas de detalhes da organização, projeto ou Instance.",
       "ORGCONTEXT": "Você vê todas as organizações e projetos relacionados à organização atualmente selecionada.",
       "USERCONTEXT": "Você vê todas as organizações e projetos para os quais está autorizado. Incluindo outras organizações.",
       "CREATIONDATE": "Data de Criação",
@@ -1515,9 +1511,7 @@
       "SECURITY": "Configurações de Segurança",
       "EVENTS": "Eventos",
       "FAILEDEVENTS": "Eventos com Falha",
-      "VIEWS": "Visualizações",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions",
-      "TARGETS": "[NEEDS TRANSLATION] Targets"
+      "VIEWS": "Visualizações"
     },
     "GROUPS": {
       "GENERAL": "Geral",
@@ -1527,8 +1521,7 @@
       "TEXTS": "Textos e Idiomas",
       "APPEARANCE": "Aparência",
       "OTHER": "Outro",
-      "STORAGE": "armazenar",
-      "ACTIONS": "[NEEDS TRANSLATION] Actions"
+      "STORAGE": "armazenar"
     },
     "BETA": "BETA"
   },
@@ -1670,8 +1663,7 @@
       "LOGINV2_DESCRIPTION": "Ativar esta opção ativa a nova interface de login baseada em TypeScript, com melhorias na segurança, desempenho e personalização.",
       "LOGINV2_BASEURI": "URI base",
       "ENABLERELATIONALTABLES": "Tabelas relacionais",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Ative isso para usar tabelas relacionais em vez de projeções para armazenar dados. Atualmente, este interruptor não faz nada.",
-      "USERSCHEMA_DESCRIPTION": "[NEEDS TRANSLATION] User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Ative isso para usar tabelas relacionais em vez de projeções para armazenar dados. Atualmente, este interruptor não faz nada."
     },
     "DIALOG": {
       "RESET": {
@@ -1924,8 +1916,7 @@
       "DEFAULTREDIRECTURI_DESC": "Define para onde o usuário será redirecionado se o login for iniciado sem um contexto de aplicativo (por exemplo, a partir do e-mail)",
       "ERRORMSGPOPUP": "Mostrar Erro em Diálogo",
       "DISABLEWATERMARK": "Ocultar Marca d'água",
-      "DISABLEWATERMARK_DESC": "Ocultar a marca d'água Powered by Zitadel na interface de login",
-      "FORCEMFALOCALONLY_DESC": "[NEEDS TRANSLATION] If the option is selected, local authenticated users have to configure a second factor for login."
+      "DISABLEWATERMARK_DESC": "Ocultar a marca d'água Powered by Zitadel na interface de login"
     },
     "RESET": "Redefinir para o padrão da instância",
     "CREATECUSTOM": "Criar Política Personalizada",
@@ -2249,14 +2240,6 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Insira as credenciais para o seu Provedor de Identidade LDAP"
-      },
-      "APPLE": {
-        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your Apple Provider",
-        "TITLE": "[NEEDS TRANSLATION] Sign in with Apple"
-      },
-      "SAML": {
-        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your SAML Provider",
-        "TITLE": "[NEEDS TRANSLATION] Sign in with SAML"
       }
     },
     "DETAIL": {
@@ -2390,27 +2373,7 @@
     "ISIDTOKENMAPPING": "Mapeamento do token ID",
     "ISIDTOKENMAPPING_DESC": "Se selecionado, as informações do provedor são mapeadas a partir do token ID, e não do ponto final userinfo.",
     "USEPKCE": "Usar PKCE",
-    "USEPKCE_DESC": "Determina se os parâmetros code_challenge e code_challenge_method estão incluídos na solicitação de autenticação",
-    "APPLE": {
-      "KEYID": "[NEEDS TRANSLATION] Key ID",
-      "KEYMAXSIZEEXCEEDED": "[NEEDS TRANSLATION] Maximum size of 5kB exceeded.",
-      "PRIVATEKEY": "[NEEDS TRANSLATION] Private Key",
-      "TEAMID": "[NEEDS TRANSLATION] Team ID",
-      "UPDATEPRIVATEKEY": "[NEEDS TRANSLATION] Update Private Key",
-      "UPLOADPRIVATEKEY": "[NEEDS TRANSLATION] Upload Private Key"
-    },
-    "REMOVE_WARN_DESCRIPTION": "[NEEDS TRANSLATION] You are about to remove an identity provider. This will remove the selection of the available IdP for your users and already registered users won't be able to login again. Are you sure to continue?",
-    "REMOVE_WARN_TITLE": "[NEEDS TRANSLATION] Remove IdP",
-    "SAML": {
-      "BINDING": "[NEEDS TRANSLATION] Binding",
-      "METADATAURL": "[NEEDS TRANSLATION] Metadata URL",
-      "METADATAXML": "[NEEDS TRANSLATION] Metadata Xml",
-      "NAMEIDFORMAT": "[NEEDS TRANSLATION] NameID Format",
-      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm",
-      "SIGNEDREQUEST": "[NEEDS TRANSLATION] Signed Request",
-      "TRANSIENTMAPPINGATTRIBUTENAME": "[NEEDS TRANSLATION] Custom Mapping Attribute Name",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "[NEEDS TRANSLATION] Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
-    }
+    "USEPKCE_DESC": "Determina se os parâmetros code_challenge e code_challenge_method estão incluídos na solicitação de autenticação"
   },
   "MFA": {
     "LIST": {
@@ -2483,11 +2446,7 @@
         "DELETE_TITLE": "Excluir configuração SMTP",
         "DELETE_DESCRIPTION": "Você está prestes a excluir uma configuração. Confirme esta ação digitando o nome do remetente",
         "DELETED": "A configuração SMTP foi excluída",
-        "SENDER": "Digite {{ value }} para excluir esta configuração SMTP.",
-        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
-        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
-        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
-        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
+        "SENDER": "Digite {{ value }} para excluir esta configuração SMTP."
       }
     },
     "CREATE": {
