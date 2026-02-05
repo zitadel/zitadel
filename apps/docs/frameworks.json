@@ -32,6 +32,12 @@
 		"docsLink": "/docs/guides/start/quickstart?framework=fastapi"
 	},
 	{
+		"id": "fastify",
+		"title": "Fastify",
+		"imgSrcDark": "/docs/img/tech/fastify.svg",
+		"docsLink": "/docs/guides/start/quickstart?framework=fastify"
+	},
+	{
 		"id": "flask",
 		"title": "Flask",
 		"imgSrcDark": "/docs/img/tech/flask.svg",
@@ -114,12 +120,6 @@
 		"title": "NestJS",
 		"imgSrcDark": "/docs/img/tech/nestjs.svg",
 		"docsLink": "/docs/sdk-examples/nestjs"
-	},
-	{
-		"id": "fastify",
-		"title": "Fastify",
-		"imgSrcDark": "/docs/img/tech/fastify.svg",
-		"docsLink": "/docs/sdk-examples/fastify"
 	},
 	{
 		"id": "nuxtjs",
