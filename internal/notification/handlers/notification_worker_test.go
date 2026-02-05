@@ -155,7 +155,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
 				expiry := 0 * time.Hour
 				testCode := ""
-				expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
+				expectContent := fmt.Sprintf(`%[1]s is your OTP for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, eventOriginDomain, expiry)
 				w.messageSMS = &messages.SMS{
 					SenderPhoneNumber:    "senderNumber",
