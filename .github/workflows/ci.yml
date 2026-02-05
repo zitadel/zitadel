@@ -66,7 +66,7 @@ jobs:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
-        run: pnpm nx run @zitadel/release:release
+        run: pnpm release:release
       - name: Upload Linux AMD64 Artifact
         if: always()
         uses: actions/upload-artifact@v4

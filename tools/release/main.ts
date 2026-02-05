@@ -78,6 +78,9 @@ async function cmdRelease(argv: any) {
     const isLive = process.env.CI_RELEASE === 'true';
     const dryRun = !isLive;
 
+    // Force non-interactive to prevent hangs
+    process.env.NX_INTERACTIVE = 'false';
+
     console.log(`Release Mode: ${isLive ? 'LIVE 🚀' : 'PLAN (Dry-Run) 🧪'}`);
 
     // 1. Calculate Version & Changelog
@@ -94,8 +97,9 @@ async function cmdRelease(argv: any) {
             specifier: version, // Reuse version if available
             dryRun: dryRun,
             verbose: argv.verbose,
-            gitCommit: true,
-            gitTag: true,
+            gitCommit: isLive,
+            gitTag: isLive,
+            stageChanges: isLive,
         });
         version = result.workspaceVersion;
 
@@ -317,8 +321,6 @@ ${changelog}
     process.env.TAG_LATEST = isLive ? 'true' : 'false';
     process.env.ZITADEL_VERSION = version;
 
-    console.log(`Processing Container Images... (Mode=${isLive ? 'Link' : 'Preview'}, Version=${version}, TagLatest=${process.env.TAG_LATEST})`);
-
     if (!process.env.GITHUB_TOKEN) {
         console.warn('⚠️  GITHUB_TOKEN is missing. Skipping Docker Push targets in Preview mode.');
         process.exit(0);
@@ -327,7 +329,11 @@ ${changelog}
     for (const target of dockerTargets) {
         console.log(`Running target: ${target}`);
         try {
-            execSync(`npx nx run ${target}`, { stdio: 'inherit', env: process.env });
+            // Disable Nx Daemon for nested calls to prevent deadlocks/hanging
+            execSync(`npx nx run ${target}`, {
+                stdio: 'inherit',
+                env: { ...process.env, NX_DAEMON: 'false' }
+            });
         } catch (e: any) {
             console.error(`\n❌ Failed to execute target: ${target}`);
             if (e.status) {
@@ -337,7 +343,6 @@ ${changelog}
             process.exit(1);
         }
     }
-    process.exit(0);
 }
 
 // MAIN ENTRY POINT
@@ -350,4 +355,6 @@ ${changelog}
         .demandCommand()
         .help()
         .parseAsync();
+
+    process.exit(0);
 })();

@@ -10,7 +10,8 @@
   },
   "scripts": {
     "changeset": "changeset",
-    "clean:all": "pnpm run clean && rm -rf .nx node_modules"
+    "clean:all": "pnpm run clean && rm -rf .nx node_modules",
+    "release": "NX_DAEMON=false nx run @zitadel/release:release"
   },
   "devDependencies": {
     "@actions/artifact": "^6.1.0",
