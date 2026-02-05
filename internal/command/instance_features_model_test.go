@@ -75,15 +75,6 @@ func Test_reduceInstanceFeature(t *testing.T) {
 			expected: &InstanceFeatures{OIDCSingleV1SessionTermination: gu.Ptr(true)},
 		},
 		{
-			name: "enable back channel logout",
-			args: args{
-				features: &InstanceFeatures{},
-				key:      feature.KeyEnableBackChannelLogout,
-				value:    true,
-			},
-			expected: &InstanceFeatures{EnableBackChannelLogout: gu.Ptr(true)},
-		},
-		{
 			name: "login v2",
 			args: args{
 				features: &InstanceFeatures{},
