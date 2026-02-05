@@ -394,8 +394,6 @@ export async function sendPassword(
     );
   }
 
-  console.log("Password auth: Result:", result);
-
   if (result && typeof result === "object") {
     return result;
   }
