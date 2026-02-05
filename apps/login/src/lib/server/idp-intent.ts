@@ -121,7 +121,7 @@ interface IDPHandlerContext {
   buildRedirectParams: (additionalParams?: Record<string, string>, includeToken?: boolean) => string;
 }
 
-type IDPHandlerResult = { redirect?: string; error?: string } | null;
+type IDPHandlerResult = { redirect?: string; error?: string; samlData?: { url: string; fields: Record<string, string> } } | null;
 
 /**
  * CASE 1: Explicit Linking (via sessionId)
@@ -259,6 +259,11 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
         return { redirect: sessionResult.redirect };
       }
 
+      if ("samlData" in sessionResult && sessionResult.samlData) {
+        console.log("[IDP Process] Session created, returning samlData");
+        return { samlData: sessionResult.samlData };
+      }
+
       return { error: t("errors.sessionCreationFailed") };
     } catch (error) {
       console.error("[IDP Process] Error linking IDP:", error);
@@ -322,6 +327,11 @@ async function handleUserExists(ctx: IDPHandlerContext): Promise<IDPHandlerResul
     if ("redirect" in sessionResult && sessionResult.redirect) {
       console.log("[IDP Process] Session created, redirecting to:", sessionResult.redirect);
       return { redirect: sessionResult.redirect };
+    }
+
+    if ("samlData" in sessionResult && sessionResult.samlData) {
+      console.log("[IDP Process] Session created, returning samlData");
+      return { samlData: sessionResult.samlData };
     }
 
     return { error: t("errors.sessionCreationFailed") };
@@ -418,6 +428,11 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
           return { redirect: sessionResult.redirect };
         }
 
+        if ("samlData" in sessionResult && sessionResult.samlData) {
+          console.log("[IDP Process] Session created, returning samlData");
+          return { samlData: sessionResult.samlData };
+        }
+
         return { error: t("errors.sessionCreationFailed") };
       } catch (error) {
         console.error("[IDP Process] Error auto-linking user:", error);
@@ -484,6 +499,11 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
       if ("redirect" in sessionResult && sessionResult.redirect) {
         console.log("[IDP Process] Session created, redirecting to:", sessionResult.redirect);
         return { redirect: sessionResult.redirect };
+      }
+
+      if ("samlData" in sessionResult && sessionResult.samlData) {
+        console.log("[IDP Process] Session created, returning samlData");
+        return { samlData: sessionResult.samlData };
       }
 
       return { error: t("errors.sessionCreationFailed") };
@@ -575,7 +595,7 @@ export async function processIDPCallback({
   postErrorRedirectUrl?: string;
   sessionId?: string;
   linkFingerprint?: string;
-}): Promise<{ redirect?: string; error?: string }> {
+}): Promise<{ redirect?: string; error?: string; samlData?: { url: string; fields: Record<string, string> } }> {
   // ... (headers and config retrieval) ...
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);

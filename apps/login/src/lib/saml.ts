@@ -60,7 +60,7 @@ export async function loginWithSAMLAndSession({
 
       // works not with _rsc request
       try {
-        const { url } = await createResponse({
+        const { url, binding } = await createResponse({
           serviceConfig,
           req: create(CreateResponseRequestSchema, {
             samlRequestId: samlRequest,
@@ -70,8 +70,18 @@ export async function loginWithSAMLAndSession({
             },
           }),
         });
-        if (url) {
+        if (url && binding.case === "redirect") {
           return { redirect: url };
+        } else if (url && binding.case === "post") {
+          return {
+            samlData: {
+              url,
+              fields: {
+                RelayState: binding.value.relayState,
+                SAMLResponse: binding.value.samlResponse,
+              },
+            },
+          };
         } else {
           return { error: "An error occurred!" };
         }
