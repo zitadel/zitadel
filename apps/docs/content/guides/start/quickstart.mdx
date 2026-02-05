@@ -148,6 +148,12 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
         </AppConfig>
     </Tab>
+    <Tab value="Nuxt">
+        <AppConfig
+            redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000">
+        </AppConfig>
+    </Tab>
     <Tab value="Qwik">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback/zitadel"
@@ -228,6 +234,9 @@ ZITADEL automatically configures the best security settings for your selected fr
         <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="Next.js">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="Nuxt">
         <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="Qwik">
@@ -313,6 +322,11 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     </Tab>
     <Tab value="Next.js">
         - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="Nuxt">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
     </Tab>
     <Tab value="Qwik">
         - [Node.js](https://nodejs.org/)
@@ -421,6 +435,12 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         cd example-auth-nextjs
         ```
     </Tab>
+    <Tab value="Nuxt">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-nuxtjs.git
+        cd example-auth-nuxtjs
+        ```
+    </Tab>
     <Tab value="Qwik">
         ```bash
         git clone https://github.com/zitadel/example-auth-qwik.git
@@ -453,7 +473,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     </Tab>
     <Tab value="Vue.js">
         ```bash
-        git clone git@github.com:zitadel/example-auth-vuejs.git
+        git clone https://github.com/zitadel/example-auth-vuejs.git
         cd example-auth-vuejs
         ```
     </Tab>
@@ -645,7 +665,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```
     </Tab>
     <Tab value="Next.js">
-        1. Copy+past the .env.example to .env.local
+        1. Copy+past the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
         ```bash
@@ -661,6 +681,24 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
         NEXTAUTH_URL="http://localhost:3000"
 
+        ```
+    </Tab>
+    <Tab value="Nuxt">
+        1. Copy+past the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        NEXTAUTH_URL="http://localhost:3000"
         ```
     </Tab>
     <Tab value="Qwik">
@@ -890,6 +928,16 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         Your app will be live at `http://localhost:3000`.
 
         ![Next.js Example App](../../../public/img/guides/quickstart/next_example_app.png)
+    </Tab>
+    <Tab value="Nuxt">
+        ```bash
+        npm install
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Nuxt Example App](../../../public/img/guides/quickstart/nuxt_example_app.png)
     </Tab>
     <Tab value="Qwik">
         ```bash

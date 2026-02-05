@@ -81,6 +81,12 @@
 		"docsLink": "/docs/guides/start/quickstart?framework=nextjs"
 	},
 	{
+		"id": "nuxt",
+		"title": "Nuxt.js",
+		"imgSrcDark": "/docs/img/tech/nuxtjs.svg",
+		"docsLink": "/docs/guides/start/quickstart?framework=nuxt"
+	},
+	{
 		"id": "react",
 		"title": "React",
 		"description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
@@ -121,12 +127,6 @@
 
 
 
-	{
-		"id": "nuxtjs",
-		"title": "Nuxt.js",
-		"imgSrcDark": "/docs/img/tech/nuxtjs.svg",
-		"docsLink": "/docs/sdk-examples/nuxtjs"
-	},
 	{
 		"id": "sveltekit",
 		"title": "SvelteKit",
