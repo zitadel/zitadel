@@ -319,12 +319,21 @@ ${changelog}
 
     console.log(`Processing Container Images... (Mode=${isLive ? 'Link' : 'Preview'}, Version=${version}, TagLatest=${process.env.TAG_LATEST})`);
 
+    if (!process.env.GITHUB_TOKEN) {
+        console.warn('⚠️  GITHUB_TOKEN is missing. Skipping Docker Push targets in Preview mode.');
+        process.exit(0);
+    }
+
     for (const target of dockerTargets) {
         console.log(`Running target: ${target}`);
         try {
             execSync(`npx nx run ${target}`, { stdio: 'inherit', env: process.env });
-        } catch (e) {
-            console.error(`Failed to run target ${target}:`, e);
+        } catch (e: any) {
+            console.error(`\n❌ Failed to execute target: ${target}`);
+            if (e.status) {
+                console.error(`   Exit Code: ${e.status}`);
+            }
+            console.error(`   See output above for failure details (e.g., registry permissions, build errors).`);
             process.exit(1);
         }
     }
