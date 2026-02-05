@@ -621,6 +621,10 @@ The new Login UI (Next.js) has its own translation files that are maintained sep
 
 - Please read [Security Policy](./SECURITY.md).
 
+## Releasing
+
+For details on the release process, including how to run previews and publish artifacts, please refer to the [Release Documentation](./tools/release/README.md).
+
 ## Product management
 
 The Zitadel Team works with an agile product management methodology.

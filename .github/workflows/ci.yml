@@ -64,6 +64,7 @@ jobs:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
+          NX_CLOUD_NO_TIMEOUTS: "true"
         run: pnpm release
       - name: Upload Linux AMD64 Artifact
         if: always()
