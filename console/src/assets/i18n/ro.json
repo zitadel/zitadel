@@ -435,7 +435,8 @@
     "TOS": "Termeni și condiții",
     "OPENSHORTCUTSTOOLTIP": "Tastați ? pentru a afișa comenzile rapide de la tastatură",
     "SETTINGS": "Setări",
-    "CUSTOMERPORTAL": "Portalul clienților"
+    "CUSTOMERPORTAL": "Portalul clienților",
+    "TARGETS": "[NEEDS TRANSLATION] Targets"
   },
   "QUICKSTART": {
     "TITLE": "Integrați Zitadel în aplicația dvs.",
@@ -670,7 +671,9 @@
     "PROJECT_OWNER_GLOBAL": "Are permisiunea asupra întregului proiect",
     "PROJECT_OWNER_VIEWER_GLOBAL": "Are permisiunea de a revizui întregul proiect",
     "PROJECT_GRANT_OWNER": "Are permisiunea de a gestiona grantul proiectului",
-    "PROJECT_GRANT_OWNER_VIEWER": "Are permisiunea de a revizui grantul proiectului"
+    "PROJECT_GRANT_OWNER_VIEWER": "Are permisiunea de a revizui grantul proiectului",
+    "ORG_SETTINGS_MANAGER": "[NEEDS TRANSLATION] Has permission to manage organization settings",
+    "ORG_USER_SELF_MANAGER": "[NEEDS TRANSLATION] Has permission to manage their own user"
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
@@ -1508,7 +1511,9 @@
       "SECURITY": "Setări de securitate",
       "EVENTS": "Evenimente",
       "FAILEDEVENTS": "Evenimente eșuate",
-      "VIEWS": "Vizualizări"
+      "VIEWS": "Vizualizări",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions",
+      "TARGETS": "[NEEDS TRANSLATION] Targets"
     },
     "GROUPS": {
       "GENERAL": "Informații generale",
@@ -1518,7 +1523,8 @@
       "TEXTS": "Texte și limbi",
       "APPEARANCE": "Aspect",
       "OTHER": "Altele",
-      "STORAGE": "Stocare"
+      "STORAGE": "Stocare",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions"
     },
     "BETA": "BETA"
   },
@@ -2395,7 +2401,9 @@
       "REMOVED": "Eliminat cu succes."
     },
     "ISIDTOKENMAPPING": "Mapați din tokenul ID",
-    "ISIDTOKENMAPPING_DESC": "Dacă este selectat, informațiile despre furnizor sunt mapate din tokenul ID, nu din endpoint-ul userinfo."
+    "ISIDTOKENMAPPING_DESC": "Dacă este selectat, informațiile despre furnizor sunt mapate din tokenul ID, nu din endpoint-ul userinfo.",
+    "USEPKCE": "[NEEDS TRANSLATION] Use PKCE",
+    "USEPKCE_DESC": "[NEEDS TRANSLATION] Determines whether the code_challenge and code_challenge_method params are included in the auth request"
   },
   "MFA": {
     "LIST": {

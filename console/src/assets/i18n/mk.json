@@ -435,7 +435,8 @@
     "TOS": "Услови на користење",
     "OPENSHORTCUTSTOOLTIP": "Внесете ? за прикажување на кратенки за тастатура",
     "SETTINGS": "Подесувања",
-    "CUSTOMERPORTAL": "Портал за клиенти"
+    "CUSTOMERPORTAL": "Портал за клиенти",
+    "TARGETS": "[NEEDS TRANSLATION] Targets"
   },
   "QUICKSTART": {
     "TITLE": "Интегрирајте го Zitadel во вашата апликација",
@@ -1511,7 +1512,9 @@
       "SECURITY": "Подесувања за безбедност",
       "EVENTS": "Настани",
       "FAILEDEVENTS": "Неуспешни настани",
-      "VIEWS": "Прегледи"
+      "VIEWS": "Прегледи",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions",
+      "TARGETS": "[NEEDS TRANSLATION] Targets"
     },
     "GROUPS": {
       "GENERAL": "Општи информации",
@@ -1521,7 +1524,8 @@
       "TEXTS": "Текстови и јазици",
       "APPEARANCE": "Изглед",
       "OTHER": "Друго",
-      "STORAGE": "складирање"
+      "STORAGE": "складирање",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions"
     },
     "BETA": "БЕТА"
   },
@@ -2241,6 +2245,14 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Внесете ги податоците за вашиот LDAP провајдер"
+      },
+      "APPLE": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your Apple Provider",
+        "TITLE": "[NEEDS TRANSLATION] Sign in with Apple"
+      },
+      "SAML": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your SAML Provider",
+        "TITLE": "[NEEDS TRANSLATION] Sign in with SAML"
       }
     },
     "DETAIL": {
@@ -2374,7 +2386,27 @@
     "ISIDTOKENMAPPING": "Совпаѓање од ID токен",
     "ISIDTOKENMAPPING_DESC": "Ако е избрано, информациите од провајдерот се мапираат од ID токенот, а не од userinfo крајната точка.",
     "USEPKCE": "Користете PKCE",
-    "USEPKCE_DESC": "Определува дали параметрите code_challenge и code_challenge_method се вклучени во барањето за авторизација"
+    "USEPKCE_DESC": "Определува дали параметрите code_challenge и code_challenge_method се вклучени во барањето за авторизација",
+    "APPLE": {
+      "KEYID": "[NEEDS TRANSLATION] Key ID",
+      "KEYMAXSIZEEXCEEDED": "[NEEDS TRANSLATION] Maximum size of 5kB exceeded.",
+      "PRIVATEKEY": "[NEEDS TRANSLATION] Private Key",
+      "TEAMID": "[NEEDS TRANSLATION] Team ID",
+      "UPDATEPRIVATEKEY": "[NEEDS TRANSLATION] Update Private Key",
+      "UPLOADPRIVATEKEY": "[NEEDS TRANSLATION] Upload Private Key"
+    },
+    "REMOVE_WARN_DESCRIPTION": "[NEEDS TRANSLATION] You are about to remove an identity provider. This will remove the selection of the available IdP for your users and already registered users won't be able to login again. Are you sure to continue?",
+    "REMOVE_WARN_TITLE": "[NEEDS TRANSLATION] Remove IdP",
+    "SAML": {
+      "BINDING": "[NEEDS TRANSLATION] Binding",
+      "METADATAURL": "[NEEDS TRANSLATION] Metadata URL",
+      "METADATAXML": "[NEEDS TRANSLATION] Metadata Xml",
+      "NAMEIDFORMAT": "[NEEDS TRANSLATION] NameID Format",
+      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm",
+      "SIGNEDREQUEST": "[NEEDS TRANSLATION] Signed Request",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "[NEEDS TRANSLATION] Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "[NEEDS TRANSLATION] Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2447,7 +2479,11 @@
         "DELETE_TITLE": "Избришете ја конфигурацијата SMTP",
         "DELETE_DESCRIPTION": "Ќе избришете конфигурација. Потврдете го ова дејство со внесување на името на испраќачот",
         "DELETED": "SMTP конфигурацијата е избришана",
-        "SENDER": "Внесете {{ value }}, за да ја избришете оваа SMTP конфигурација."
+        "SENDER": "Внесете {{ value }}, за да ја избришете оваа SMTP конфигурација.",
+        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
+        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
+        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
       }
     },
     "CREATE": {

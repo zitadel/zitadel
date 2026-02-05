@@ -435,7 +435,8 @@
     "TOS": "Szolgáltatási feltételek",
     "OPENSHORTCUTSTOOLTIP": "Írd be a ? jelet a billentyűparancsok megjelenítéséhez",
     "SETTINGS": "Beállítások",
-    "CUSTOMERPORTAL": "Ügyfélportál"
+    "CUSTOMERPORTAL": "Ügyfélportál",
+    "TARGETS": "[NEEDS TRANSLATION] Targets"
   },
   "QUICKSTART": {
     "TITLE": "Integráld a Zitadel szolgáltatást az alkalmazásodba",
@@ -1510,7 +1511,9 @@
       "SECURITY": "Biztonsági beállítások",
       "EVENTS": "Események",
       "FAILEDEVENTS": "Sikertelen események",
-      "VIEWS": "Nézetek"
+      "VIEWS": "Nézetek",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions",
+      "TARGETS": "[NEEDS TRANSLATION] Targets"
     },
     "GROUPS": {
       "GENERAL": "Általános információ",
@@ -1520,7 +1523,8 @@
       "TEXTS": "Szövegek és nyelvek",
       "APPEARANCE": "Megjelenés",
       "OTHER": "Egyéb",
-      "STORAGE": "Tárolás"
+      "STORAGE": "Tárolás",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions"
     },
     "BETA": "BÉTA"
   },
@@ -1598,7 +1602,9 @@
         "REMOVED": "Twilio eltávolítva",
         "CHANGETOKEN": "Token módosítása",
         "SETTOKEN": "Token beállítása",
-        "TOKENSET": "A token sikeresen beállítva."
+        "TOKENSET": "A token sikeresen beállítva.",
+        "VERIFYSERVICESID": "[NEEDS TRANSLATION] Verification Service Sid",
+        "VERIFYSERVICESID_DESCRIPTION": "[NEEDS TRANSLATION] Setting a Verification Service Sid, allows using the Twilio Verify Service instead of the Messages Service for verification of phone numbers and OTP SMS"
       }
     },
     "SECRETS": {

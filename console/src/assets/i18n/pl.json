@@ -435,7 +435,8 @@
     "TOS": "Warunki korzystania z usług",
     "OPENSHORTCUTSTOOLTIP": "Wpisz ? aby pokazać skróty klawiszowe",
     "SETTINGS": "Ustawienia",
-    "CUSTOMERPORTAL": "Portal klienta"
+    "CUSTOMERPORTAL": "Portal klienta",
+    "TARGETS": "[NEEDS TRANSLATION] Targets"
   },
   "QUICKSTART": {
     "TITLE": "Zintegruj Zitadel ze swoją aplikacją",
@@ -526,7 +527,8 @@
       "SHOWUSER": "Pokaż użytkownika {{value}}"
     },
     "DOWNLOAD": "Pobierz",
-    "APPLY": "Stosować"
+    "APPLY": "Stosować",
+    "SETUP": "[NEEDS TRANSLATION] Setup"
   },
   "ACTIONSTWO": {
     "BETA_NOTE": "Obecnie korzystasz z nowej wersji Actions V2, która jest w fazie beta. Poprzednia wersja 1 jest nadal dostępna, ale w przyszłości zostanie wycofana. Prosimy o zgłaszanie wszelkich problemów lub opinii.",
@@ -1509,7 +1511,9 @@
       "SECURITY": "Ustawienia bezpieczeństwa",
       "EVENTS": "Zdarzenia",
       "FAILEDEVENTS": "Nieudane Zdarzenia",
-      "VIEWS": "Widoki"
+      "VIEWS": "Widoki",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions",
+      "TARGETS": "[NEEDS TRANSLATION] Targets"
     },
     "GROUPS": {
       "GENERAL": "Informacje ogólne",
@@ -1519,7 +1523,8 @@
       "TEXTS": "Teksty i języki",
       "APPEARANCE": "Wygląd",
       "OTHER": "Inne",
-      "STORAGE": "składowanie"
+      "STORAGE": "składowanie",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions"
     },
     "BETA": "BETA"
   },
@@ -2237,6 +2242,14 @@
       "LDAP": {
         "TITLE": "LDAP Provider",
         "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości LDAP"
+      },
+      "APPLE": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your Apple Provider",
+        "TITLE": "[NEEDS TRANSLATION] Sign in with Apple"
+      },
+      "SAML": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your SAML Provider",
+        "TITLE": "[NEEDS TRANSLATION] Sign in with SAML"
       }
     },
     "DETAIL": {
@@ -2377,7 +2390,25 @@
     "ISIDTOKENMAPPING": "Mapowanie z tokena ID",
     "ISIDTOKENMAPPING_DESC": "Jeśli wybrane, informacje dostawcy są mapowane z tokena ID, a nie z punktu końcowego userinfo.",
     "USEPKCE": "Skorzystaj z PKCE",
-    "USEPKCE_DESC": "Określa, czy parametry code_challenge i code_challenge_method są uwzględnione w żądaniu uwierzytelnienia"
+    "USEPKCE_DESC": "Określa, czy parametry code_challenge i code_challenge_method są uwzględnione w żądaniu uwierzytelnienia",
+    "APPLE": {
+      "KEYID": "[NEEDS TRANSLATION] Key ID",
+      "KEYMAXSIZEEXCEEDED": "[NEEDS TRANSLATION] Maximum size of 5kB exceeded.",
+      "PRIVATEKEY": "[NEEDS TRANSLATION] Private Key",
+      "TEAMID": "[NEEDS TRANSLATION] Team ID",
+      "UPDATEPRIVATEKEY": "[NEEDS TRANSLATION] Update Private Key",
+      "UPLOADPRIVATEKEY": "[NEEDS TRANSLATION] Upload Private Key"
+    },
+    "SAML": {
+      "BINDING": "[NEEDS TRANSLATION] Binding",
+      "METADATAURL": "[NEEDS TRANSLATION] Metadata URL",
+      "METADATAXML": "[NEEDS TRANSLATION] Metadata Xml",
+      "NAMEIDFORMAT": "[NEEDS TRANSLATION] NameID Format",
+      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm",
+      "SIGNEDREQUEST": "[NEEDS TRANSLATION] Signed Request",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "[NEEDS TRANSLATION] Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "[NEEDS TRANSLATION] Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2450,7 +2481,11 @@
         "DELETE_TITLE": "Usuń konfigurację SMTP",
         "DELETE_DESCRIPTION": "Zamierzasz usunąć konfigurację. Potwierdź tę czynność, wpisując nazwę nadawcy",
         "DELETED": "Konfiguracja SMTP została usunięta",
-        "SENDER": "Wpisz {{ value }}, aby usunąć tę konfigurację SMTP."
+        "SENDER": "Wpisz {{ value }}, aby usunąć tę konfigurację SMTP.",
+        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
+        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
+        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
       }
     },
     "CREATE": {

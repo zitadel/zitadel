@@ -435,7 +435,8 @@
     "TOS": "Podmínky služby",
     "OPENSHORTCUTSTOOLTIP": "Pro zobrazení klávesových zkratek stiskněte ?",
     "SETTINGS": "Nastavení",
-    "CUSTOMERPORTAL": "Zákaznický portál"
+    "CUSTOMERPORTAL": "Zákaznický portál",
+    "TARGETS": "[NEEDS TRANSLATION] Targets"
   },
   "QUICKSTART": {
     "TITLE": "Integrovat Zitadel do vaší aplikace",
@@ -1510,7 +1511,9 @@
       "SECURITY": "Bezpečnostní nastavení",
       "EVENTS": "Události",
       "FAILEDEVENTS": "Selhané události",
-      "VIEWS": "Pohledy"
+      "VIEWS": "Pohledy",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions",
+      "TARGETS": "[NEEDS TRANSLATION] Targets"
     },
     "GROUPS": {
       "GENERAL": "Obecné informace",
@@ -1520,7 +1523,8 @@
       "TEXTS": "Texty a jazyky",
       "APPEARANCE": "Vzhled",
       "OTHER": "Ostatní",
-      "STORAGE": "Data"
+      "STORAGE": "Data",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions"
     },
     "BETA": "BETA"
   },
@@ -2243,6 +2247,10 @@
       "APPLE": {
         "TITLE": "Přihlásit se pomocí Apple",
         "DESCRIPTION": "Zadejte přihlašovací údaje pro vašeho poskytovatele identity Apple"
+      },
+      "SAML": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your SAML Provider",
+        "TITLE": "[NEEDS TRANSLATION] Sign in with SAML"
       }
     },
     "DETAIL": {
@@ -2386,7 +2394,17 @@
     "ISIDTOKENMAPPING": "Mapování z ID tokenu",
     "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo.",
     "USEPKCE": "Použijte PKCE",
-    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method"
+    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method",
+    "SAML": {
+      "BINDING": "[NEEDS TRANSLATION] Binding",
+      "METADATAURL": "[NEEDS TRANSLATION] Metadata URL",
+      "METADATAXML": "[NEEDS TRANSLATION] Metadata Xml",
+      "NAMEIDFORMAT": "[NEEDS TRANSLATION] NameID Format",
+      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm",
+      "SIGNEDREQUEST": "[NEEDS TRANSLATION] Signed Request",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "[NEEDS TRANSLATION] Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "[NEEDS TRANSLATION] Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2459,7 +2477,11 @@
         "DELETE_TITLE": "Smazat konfiguraci SMTP",
         "DELETE_DESCRIPTION": "Chystáte se smazat konfiguraci. Potvrďte tuto akci zadáním jména odesílatele",
         "DELETED": "Konfigurace SMTP byla smazána",
-        "SENDER": "Chcete-li smazat tuto konfiguraci SMTP, zadejte {{ value }}."
+        "SENDER": "Chcete-li smazat tuto konfiguraci SMTP, zadejte {{ value }}.",
+        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
+        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
+        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
       }
     },
     "CREATE": {

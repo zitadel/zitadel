@@ -435,7 +435,8 @@
     "TOS": "Termini di servizio",
     "OPENSHORTCUTSTOOLTIP": "Premi ? per mostrare le scorciatoie da tastiera",
     "SETTINGS": "Impostazioni",
-    "CUSTOMERPORTAL": "Customer Portal"
+    "CUSTOMERPORTAL": "Customer Portal",
+    "TARGETS": "[NEEDS TRANSLATION] Targets"
   },
   "QUICKSTART": {
     "TITLE": "Integra Zitadel nella tua applicazione",
@@ -526,7 +527,8 @@
       "SHOWUSER": "Mostra utente {{value}}"
     },
     "DOWNLOAD": "Scarica",
-    "APPLY": "Applicare"
+    "APPLY": "Applicare",
+    "UNSAVEDCHANGES": "[NEEDS TRANSLATION] Unsaved changes"
   },
   "ACTIONSTWO": {
     "BETA_NOTE": "Stai attualmente utilizzando la nuova versione Actions V2, che è in beta. La precedente Versione 1 è ancora disponibile, ma sarà dismessa in futuro. Ti preghiamo di segnalare eventuali problemi o feedback.",
@@ -1510,7 +1512,9 @@
       "SECURITY": "Impostazioni di sicurezza",
       "EVENTS": "Eventi",
       "FAILEDEVENTS": "Eventi falliti",
-      "VIEWS": "Views"
+      "VIEWS": "Views",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions",
+      "TARGETS": "[NEEDS TRANSLATION] Targets"
     },
     "GROUPS": {
       "GENERAL": "Generale",
@@ -1520,7 +1524,8 @@
       "TEXTS": "Testi e lingue",
       "APPEARANCE": "Aspetto",
       "OTHER": "Altro",
-      "STORAGE": "Dati"
+      "STORAGE": "Dati",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions"
     },
     "BETA": "BETA"
   },
@@ -2238,6 +2243,18 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Inserisci i dati necessari per il tuo provider LDAP."
+      },
+      "APPLE": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your Apple Provider",
+        "TITLE": "[NEEDS TRANSLATION] Sign in with Apple"
+      },
+      "OAUTH": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the required data for your OAuth provider.",
+        "TITLE": "[NEEDS TRANSLATION] OAuth Provider"
+      },
+      "SAML": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your SAML Provider",
+        "TITLE": "[NEEDS TRANSLATION] Sign in with SAML"
       }
     },
     "DETAIL": {
@@ -2378,7 +2395,25 @@
     "ISIDTOKENMAPPING": "Mappatura dal token ID",
     "ISIDTOKENMAPPING_DESC": "Se selezionato, le informazioni del provider vengono mappate dal token ID, non dal punto finale userinfo.",
     "USEPKCE": "Usa PKCE",
-    "USEPKCE_DESC": "Determina se i parametri code_challenge e code_challenge_method sono inclusi nella richiesta di autenticazione"
+    "USEPKCE_DESC": "Determina se i parametri code_challenge e code_challenge_method sono inclusi nella richiesta di autenticazione",
+    "APPLE": {
+      "KEYID": "[NEEDS TRANSLATION] Key ID",
+      "KEYMAXSIZEEXCEEDED": "[NEEDS TRANSLATION] Maximum size of 5kB exceeded.",
+      "PRIVATEKEY": "[NEEDS TRANSLATION] Private Key",
+      "TEAMID": "[NEEDS TRANSLATION] Team ID",
+      "UPDATEPRIVATEKEY": "[NEEDS TRANSLATION] Update Private Key",
+      "UPLOADPRIVATEKEY": "[NEEDS TRANSLATION] Upload Private Key"
+    },
+    "SAML": {
+      "BINDING": "[NEEDS TRANSLATION] Binding",
+      "METADATAURL": "[NEEDS TRANSLATION] Metadata URL",
+      "METADATAXML": "[NEEDS TRANSLATION] Metadata Xml",
+      "NAMEIDFORMAT": "[NEEDS TRANSLATION] NameID Format",
+      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm",
+      "SIGNEDREQUEST": "[NEEDS TRANSLATION] Signed Request",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "[NEEDS TRANSLATION] Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "[NEEDS TRANSLATION] Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2451,7 +2486,11 @@
         "DELETE_TITLE": "Elimina configurazione SMTP",
         "DELETE_DESCRIPTION": "Stai per eliminare una configurazione. Conferma questa azione digitando il nome del mittente",
         "DELETED": "La configurazione SMTP è stata eliminata",
-        "SENDER": "Digita {{ value }} per eliminare questa configurazione SMTP."
+        "SENDER": "Digita {{ value }} per eliminare questa configurazione SMTP.",
+        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
+        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
+        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
       }
     },
     "CREATE": {

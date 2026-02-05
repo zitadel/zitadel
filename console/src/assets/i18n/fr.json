@@ -435,7 +435,8 @@
     "TOS": "Conditions de service",
     "OPENSHORTCUTSTOOLTIP": "Tapez ? pour afficher les raccourcis clavier",
     "SETTINGS": "Paramètres",
-    "CUSTOMERPORTAL": "Portail Client"
+    "CUSTOMERPORTAL": "Portail Client",
+    "TARGETS": "[NEEDS TRANSLATION] Targets"
   },
   "QUICKSTART": {
     "TITLE": "Intégrer Zitadel dans votre application",
@@ -1510,7 +1511,9 @@
       "SECURITY": "Paramètres de sécurité",
       "EVENTS": "Événements",
       "FAILEDEVENTS": "Événements échoués",
-      "VIEWS": "Vues"
+      "VIEWS": "Vues",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions",
+      "TARGETS": "[NEEDS TRANSLATION] Targets"
     },
     "GROUPS": {
       "GENERAL": "Général",
@@ -1520,7 +1523,8 @@
       "TEXTS": "Textes et langues",
       "APPEARANCE": "Apparence",
       "OTHER": "Autres",
-      "STORAGE": "Stockage"
+      "STORAGE": "Stockage",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions"
     },
     "BETA": "BÊTA"
   },
@@ -2238,6 +2242,18 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité LDAP"
+      },
+      "APPLE": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your Apple Provider",
+        "TITLE": "[NEEDS TRANSLATION] Sign in with Apple"
+      },
+      "OAUTH": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the required data for your OAuth provider.",
+        "TITLE": "[NEEDS TRANSLATION] OAuth Provider"
+      },
+      "SAML": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your SAML Provider",
+        "TITLE": "[NEEDS TRANSLATION] Sign in with SAML"
       }
     },
     "DETAIL": {
@@ -2378,7 +2394,25 @@
     "ISIDTOKENMAPPING": "Mappage depuis le jeton ID",
     "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo.",
     "USEPKCE": "Utiliser PKCE",
-    "USEPKCE_DESC": "Détermine si les paramètres code_challenge et code_challenge_method sont inclus dans la demande d'authentification"
+    "USEPKCE_DESC": "Détermine si les paramètres code_challenge et code_challenge_method sont inclus dans la demande d'authentification",
+    "APPLE": {
+      "KEYID": "[NEEDS TRANSLATION] Key ID",
+      "KEYMAXSIZEEXCEEDED": "[NEEDS TRANSLATION] Maximum size of 5kB exceeded.",
+      "PRIVATEKEY": "[NEEDS TRANSLATION] Private Key",
+      "TEAMID": "[NEEDS TRANSLATION] Team ID",
+      "UPDATEPRIVATEKEY": "[NEEDS TRANSLATION] Update Private Key",
+      "UPLOADPRIVATEKEY": "[NEEDS TRANSLATION] Upload Private Key"
+    },
+    "SAML": {
+      "BINDING": "[NEEDS TRANSLATION] Binding",
+      "METADATAURL": "[NEEDS TRANSLATION] Metadata URL",
+      "METADATAXML": "[NEEDS TRANSLATION] Metadata Xml",
+      "NAMEIDFORMAT": "[NEEDS TRANSLATION] NameID Format",
+      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm",
+      "SIGNEDREQUEST": "[NEEDS TRANSLATION] Signed Request",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "[NEEDS TRANSLATION] Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "[NEEDS TRANSLATION] Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2451,7 +2485,11 @@
         "DELETE_TITLE": "Supprimer la configuration SMTP",
         "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer une configuration. Confirmez cette action en tapant le nom de l'expéditeur",
         "DELETED": "La configuration SMTP a été supprimée",
-        "SENDER": "Tapez {{ value }} pour supprimer cette configuration SMTP."
+        "SENDER": "Tapez {{ value }} pour supprimer cette configuration SMTP.",
+        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
+        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
+        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
       }
     },
     "CREATE": {
@@ -2734,7 +2772,11 @@
     "LOGINV2": {
       "USEV2": "Utiliser la nouvelle interface utilisateur de connexion",
       "BASEURL": "URL de base personnalisée pour la nouvelle interface utilisateur de connexion"
-    }
+    },
+    "NAMEANDTYPESECTION": "[NEEDS TRANSLATION] Name and Type",
+    "PROSWITCH": "[NEEDS TRANSLATION] I'm a pro. Skip this wizard.",
+    "TITLEFIRST": "[NEEDS TRANSLATION] Name of the application",
+    "TYPETITLE": "[NEEDS TRANSLATION] Type of application"
   },
   "GENDERS": {
     "0": "Inconnu",

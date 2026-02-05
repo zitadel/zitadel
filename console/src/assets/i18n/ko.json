@@ -435,7 +435,8 @@
     "TOS": "이용 약관",
     "OPENSHORTCUTSTOOLTIP": "키보드 단축키 표시하려면 ? 입력",
     "SETTINGS": "설정",
-    "CUSTOMERPORTAL": "고객 포털"
+    "CUSTOMERPORTAL": "고객 포털",
+    "TARGETS": "[NEEDS TRANSLATION] Targets"
   },
   "QUICKSTART": {
     "TITLE": "애플리케이션에 Zitadel 통합",
@@ -1510,7 +1511,9 @@
       "SECURITY": "보안 설정",
       "EVENTS": "이벤트",
       "FAILEDEVENTS": "실패한 이벤트",
-      "VIEWS": "뷰"
+      "VIEWS": "뷰",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions",
+      "TARGETS": "[NEEDS TRANSLATION] Targets"
     },
     "GROUPS": {
       "GENERAL": "일반 정보",
@@ -1520,7 +1523,8 @@
       "TEXTS": "텍스트 및 언어",
       "APPEARANCE": "외형",
       "OTHER": "기타",
-      "STORAGE": "저장소"
+      "STORAGE": "저장소",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions"
     },
     "BETA": "베타"
   },
@@ -2755,6 +2759,10 @@
       "CLIENTSECRETREGENERATED": "클라이언트 시크릿이 생성되었습니다.",
       "DELETED": "애플리케이션이 삭제되었습니다.",
       "CONFIGCHANGED": "변경 사항이 감지되었습니다!"
+    },
+    "LOGINV2": {
+      "BASEURL": "[NEEDS TRANSLATION] Custom base URL for the new Login UI",
+      "USEV2": "[NEEDS TRANSLATION] Use new Login UI"
     }
   },
   "GENDERS": {

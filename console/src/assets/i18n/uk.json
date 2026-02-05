@@ -2435,7 +2435,8 @@
       "1": "OTP через додаток автентифікатора (TOTP)",
       "2": "Ключ доступу",
       "3": "OTP через електронну пошту (OTP Email)",
-      "4": "OTP через SMS (OTP SMS)"
+      "4": "OTP через SMS (OTP SMS)",
+      "5": "[NEEDS TRANSLATION] Recovery Codes"
     }
   },
   "LOGINPOLICY": {

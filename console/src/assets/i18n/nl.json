@@ -435,7 +435,8 @@
     "TOS": "Algemene voorwaarden",
     "OPENSHORTCUTSTOOLTIP": "Typ ? om toetsenbordsnelkoppelingen te tonen",
     "SETTINGS": "Instellingen",
-    "CUSTOMERPORTAL": "Klantenportaal"
+    "CUSTOMERPORTAL": "Klantenportaal",
+    "TARGETS": "[NEEDS TRANSLATION] Targets"
   },
   "QUICKSTART": {
     "TITLE": "Integreer Zitadel in uw toepassing",
@@ -1510,7 +1511,9 @@
       "SECURITY": "Beveiligingsinstellingen",
       "EVENTS": "Evenementen",
       "FAILEDEVENTS": "Mislukte evenementen",
-      "VIEWS": "Weergaves"
+      "VIEWS": "Weergaves",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions",
+      "TARGETS": "[NEEDS TRANSLATION] Targets"
     },
     "GROUPS": {
       "GENERAL": "Algemeen",
@@ -1520,7 +1523,8 @@
       "TEXTS": "Teksten en Talen",
       "APPEARANCE": "Verschijning",
       "OTHER": "Andere",
-      "STORAGE": "opslag"
+      "STORAGE": "opslag",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions"
     },
     "BETA": "BÈTA"
   },
@@ -2380,7 +2384,10 @@
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
       "SIGNEDREQUEST": "Ondertekend Verzoek",
-      "SIGNATUREALGORITHM": "Handtekeningalgoritme"
+      "SIGNATUREALGORITHM": "Handtekeningalgoritme",
+      "NAMEIDFORMAT": "[NEEDS TRANSLATION] NameID Format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "[NEEDS TRANSLATION] Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "[NEEDS TRANSLATION] Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
     },
     "TOAST": {
       "SAVED": "Succesvol opgeslagen.",
@@ -2396,7 +2403,8 @@
     "ISIDTOKENMAPPING": "Kaart van de ID token",
     "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt.",
     "USEPKCE": "Gebruik PKCE",
-    "USEPKCE_DESC": "Bepaalt of de parameters code_challenge en code_challenge_method zijn opgenomen in het verificatieverzoek"
+    "USEPKCE_DESC": "Bepaalt of de parameters code_challenge en code_challenge_method zijn opgenomen in het verificatieverzoek",
+    "IDPDISPLAYNAMMAPPING": "[NEEDS TRANSLATION] IdP Display Name Mapping"
   },
   "MFA": {
     "LIST": {
@@ -2469,7 +2477,11 @@
         "DELETE_TITLE": "SMTP-configuratie verwijderen",
         "DELETE_DESCRIPTION": "U staat op het punt een configuratie te verwijderen. Bevestig deze actie door de naam van de afzender te typen",
         "DELETED": "SMTP-configuratie is verwijderd",
-        "SENDER": "Typ {{ value }} om deze SMTP-configuratie te verwijderen."
+        "SENDER": "Typ {{ value }} om deze SMTP-configuratie te verwijderen.",
+        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
+        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
+        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
       }
     },
     "CREATE": {

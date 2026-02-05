@@ -407,10 +407,38 @@
     "MILESTONES": {
       "APPLICATION_CREATED": {
         "title": "Зарегистрируйте свое приложение",
-        "action": "Зарегистрировать приложение"
+        "action": "Зарегистрировать приложение",
+        "description": "[NEEDS TRANSLATION] Register your web, native, api or saml application and setup an authentication flow."
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Войдите в свое приложение"
+        "title": "Войдите в свое приложение",
+        "action": "[NEEDS TRANSLATION] Log in",
+        "description": "[NEEDS TRANSLATION] Integrate your application with Zitadel for authentication and test it by logging in with your admin user."
+      },
+      "PROJECT_CREATED": {
+        "action": "[NEEDS TRANSLATION] Create project",
+        "description": "[NEEDS TRANSLATION] Add a project and define its roles and authorizations.",
+        "title": "[NEEDS TRANSLATION] Create a project"
+      },
+      "instance.policy.label.added": {
+        "title": "[NEEDS TRANSLATION] Setup your brand",
+        "description": "[NEEDS TRANSLATION] Define coloring and shape of your login and upload your logo and icons.",
+        "action": "[NEEDS TRANSLATION] Setup branding"
+      },
+      "instance.smtp.config.added": {
+        "title": "[NEEDS TRANSLATION] Setup your SMTP settings",
+        "description": "[NEEDS TRANSLATION] Set your own mail server settings.",
+        "action": "[NEEDS TRANSLATION] Setup SMTP"
+      },
+      "user.human.added": {
+        "title": "[NEEDS TRANSLATION] Add users",
+        "description": "[NEEDS TRANSLATION] Add your application users",
+        "action": "[NEEDS TRANSLATION] Add user"
+      },
+      "user.grant.added": {
+        "title": "[NEEDS TRANSLATION] Grant users",
+        "description": "[NEEDS TRANSLATION] Allow users to access your application and setup their role.",
+        "action": "[NEEDS TRANSLATION] Grant user"
       }
     }
   },
@@ -443,7 +471,8 @@
     "TOS": "Пользовательское соглашение",
     "OPENSHORTCUTSTOOLTIP": "Нажмите ? для просмотра сочетания клавиш",
     "SETTINGS": "Настройки",
-    "CUSTOMERPORTAL": "Клиентский портал"
+    "CUSTOMERPORTAL": "Клиентский портал",
+    "TARGETS": "[NEEDS TRANSLATION] Targets"
   },
   "QUICKSTART": {
     "TITLE": "Интегрируйте Zitadel в свое приложение",
@@ -465,9 +494,11 @@
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Рамки изменений",
-        "ОПИСАНИЕ": "Выберите один из доступных фреймворков для быстрой настройки вашего приложения"
+        "ОПИСАНИЕ": "Выберите один из доступных фреймворков для быстрой настройки вашего приложения",
+        "DESCRIPTION": "[NEEDS TRANSLATION] Choose one of the available frameworks for quick setup of your application."
       }
-    }
+    },
+    "DESCRIPTION": "[NEEDS TRANSLATION] Integrate Zitadel into your application or use one of our samples to get started in minutes."
   },
   "ACTIONS": {
     "ACTIONS": "Действия",
@@ -1002,7 +1033,8 @@
         "DELETESUCCESS": "Удалён успешно!",
         "CROPPERERROR": "Произошла ошибка при загрузке файла. При необходимости попробуйте другой формат и размер."
       },
-      "COUNTRY": "Страна"
+      "COUNTRY": "Страна",
+      "PREFERREDLOGINNAME": "[NEEDS TRANSLATION] Preferred login name"
     },
     "MACHINE": {
       "TITLE": "Сведения о служебном пользователе",
@@ -1398,7 +1430,10 @@
           "LABEL_UNTIL": "ДО"
         },
         "OTHER": "Другой",
-        "OTHERS": "Другие"
+        "OTHERS": "Другие",
+        "ASC": "[NEEDS TRANSLATION] Ascending",
+        "DESC": "[NEEDS TRANSLATION] Descending",
+        "SORT": "[NEEDS TRANSLATION] Sort"
       },
       "DIALOG": {
         "TITLE": "Детали события"
@@ -1563,7 +1598,12 @@
       "SECURITY": "Настройки безопасности",
       "EVENTS": "События",
       "FAILEDEVENTS": "Неудачные события",
-      "VIEWS": "Отображение"
+      "VIEWS": "Отображение",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions",
+      "SMS_PROVIDER": "[NEEDS TRANSLATION] SMS/Phone Provider",
+      "SMTP_PROVIDER": "[NEEDS TRANSLATION] SMTP Provider",
+      "TARGETS": "[NEEDS TRANSLATION] Targets",
+      "VERIFIED_DOMAINS": "[NEEDS TRANSLATION] Verified domains"
     },
     "GROUPS": {
       "GENERAL": "Общая информация",
@@ -1573,7 +1613,8 @@
       "TEXTS": "Тексты и языки",
       "APPEARANCE": "Вид",
       "OTHER": "Другое",
-      "STORAGE": "хранилище"
+      "STORAGE": "хранилище",
+      "ACTIONS": "[NEEDS TRANSLATION] Actions"
     },
     "BETA": "БЕТА"
   },
@@ -1625,7 +1666,8 @@
       "TLS": "Безопасность транспортного уровня (TLS)",
       "SAVED": "Успешно сохранено!",
       "NOCHANGES": "Без изменений!",
-      "REQUIREDWARN": "Для того, чтобы отправлять уведомления с вашего домена, вам необходимо ввести свои данные SMTP."
+      "REQUIREDWARN": "Для того, чтобы отправлять уведомления с вашего домена, вам необходимо ввести свои данные SMTP.",
+      "REPLYTOADDRESS": "[NEEDS TRANSLATION] Reply-to Address"
     },
     "SMS": {
       "TITLE": "Настройки СМС",
@@ -1652,7 +1694,8 @@
         "REMOVED": "Twilio удалён",
         "CHANGETOKEN": "Изменить токен",
         "SETTOKEN": "Установить токен",
-        "TOKENSET": "Токен успешно установлен."
+        "TOKENSET": "Токен успешно установлен.",
+        "UPDATED": "[NEEDS TRANSLATION] Twilio updated successfully."
       }
     },
     "OIDC": {
@@ -1691,7 +1734,9 @@
       "ALLOWEDORIGINS": "Разрешённые URL-адреса",
       "IMPERSONATIONTITLE": "Олицетворение",
       "IMPERSONATIONENABLED": "Разрешить олицетворение",
-      "IMPERSONATIONDESCRIPTION": "Этот параметр позволяет в принципе использовать олицетворение. Обратите внимание, что имитатору также необходимо назначить соответствующие роли `*_IMPERSONATOR`."
+      "IMPERSONATIONDESCRIPTION": "Этот параметр позволяет в принципе использовать олицетворение. Обратите внимание, что имитатору также необходимо назначить соответствующие роли `*_IMPERSONATOR`.",
+      "IFRAMEDESCRIPTION": "[NEEDS TRANSLATION] This setting sets the CSP to allow framing from a set of allowed domains. Note that by enabling the use of iFrames, you run the risk of allowing clickjacking.",
+      "IFRAMETITLE": "[NEEDS TRANSLATION] iFrame"
     },
     "FEATURES": {
       "LOGINDEFAULTORG": "Организация по умолчанию для входа",
@@ -1788,6 +1833,11 @@
         "ERROR": "Пользователь не найден!",
         "PRIMARYBUTTON": "далее",
         "SECONDARYBUTTON": "зарегистрироваться"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "[NEEDS TRANSLATION] Auto Mode",
+        "THEME_MODE_DARK": "[NEEDS TRANSLATION] Dark Mode only",
+        "THEME_MODE_LIGHT": "[NEEDS TRANSLATION] Light Mode only"
       }
     },
     "PWD_AGE": {
@@ -2004,7 +2054,8 @@
       "MFAINITSKIPLIFETIME": "Срок действия MFA",
       "SECONDFACTORCHECKLIFETIME": "Проверка срока действия двухфакторной аутентификации",
       "MULTIFACTORCHECKLIFETIME": "Проверка срока действия мультифактора",
-      "INHOURS": "Часы"
+      "INHOURS": "Часы",
+      "FORCEMFALOCALONLY_DESC": "[NEEDS TRANSLATION] If the option is selected, local authenticated users have to configure a second factor for login."
     },
     "RESET": "Сбросить значение по умолчанию для экземпляра",
     "CREATECUSTOM": "Создать пользовательскую политику",
@@ -2336,6 +2387,10 @@
       "APPLE": {
         "TITLE": "Войти через Apple",
         "DESCRIPTION": "Введите учетные данные вашего поставщика Apple."
+      },
+      "SAML": {
+        "DESCRIPTION": "[NEEDS TRANSLATION] Enter the credentials for your SAML Provider",
+        "TITLE": "[NEEDS TRANSLATION] Sign in with SAML"
       }
     },
     "DETAIL": {
@@ -2495,7 +2550,17 @@
     "ISIDTOKENMAPPING": "Карта из ID-токена",
     "ISIDTOKENMAPPING_DESC": "Если этот флажок установлен, информация о поставщике сопоставляется с маркером идентификатора, а не с конечной точкой информации о пользователе.",
     "USEPKCE": "Используйте ПКСЕ",
-    "USEPKCE_DESC": "Определяет, включены ли параметры code_challenge и code_challenge_method в запрос аутентификации"
+    "USEPKCE_DESC": "Определяет, включены ли параметры code_challenge и code_challenge_method в запрос аутентификации",
+    "SAML": {
+      "BINDING": "[NEEDS TRANSLATION] Binding",
+      "METADATAURL": "[NEEDS TRANSLATION] Metadata URL",
+      "METADATAXML": "[NEEDS TRANSLATION] Metadata Xml",
+      "NAMEIDFORMAT": "[NEEDS TRANSLATION] NameID Format",
+      "SIGNATUREALGORITHM": "[NEEDS TRANSLATION] Signature Algorithm",
+      "SIGNEDREQUEST": "[NEEDS TRANSLATION] Signed Request",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "[NEEDS TRANSLATION] Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "[NEEDS TRANSLATION] Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2568,7 +2633,11 @@
         "DELETE_TITLE": "Удалить конфигурацию SMTP",
         "DELETE_DESCRIPTION": "Вы собираетесь удалить конфигурацию. Подтвердите это действие, введя имя отправителя.",
         "DELETED": "Конфигурация SMTP удалена.",
-        "SENDER": "Введите {{ value }}, чтобы удалить эту конфигурацию SMTP."
+        "SENDER": "Введите {{ value }}, чтобы удалить эту конфигурацию SMTP.",
+        "TEST_DESCRIPTION": "[NEEDS TRANSLATION] Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "[NEEDS TRANSLATION] Email address",
+        "TEST_RESULT": "[NEEDS TRANSLATION] Test result",
+        "TEST_TITLE": "[NEEDS TRANSLATION] Test your SMTP config"
       }
     },
     "CREATE": {
@@ -2766,7 +2835,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "URI выхода из системы через резервный канал"
+      "BACKCHANNELLOOGOUTURI": "URI выхода из системы через резервный канал",
+      "DEVMODE_DISABLED": "[NEEDS TRANSLATION] Disabled",
+      "DEVMODE_ENABLED": "[NEEDS TRANSLATION] Enabled"
     },
     "API": {
       "INFO": {
@@ -2797,7 +2868,12 @@
       "DOWNLOADCERT": "Скачать сертификат SAML",
       "CREATEMETADATA": "Создать метаданные",
       "ENTITYID": "Идентификатор объекта",
-      "ACSURL": "URL-адрес конечной точки ACS"
+      "ACSURL": "URL-адрес конечной точки ACS",
+      "CHOOSEMETADATASOURCE": "[NEEDS TRANSLATION] Provide your SAML configuration using one of the following options:",
+      "METADATAOPT1": "[NEEDS TRANSLATION] Option 1. Specify the url where metadata file is located",
+      "METADATAOPT2": "[NEEDS TRANSLATION] Option 2. Upload a file containing your metadata XML",
+      "METADATAOPT3": "[NEEDS TRANSLATION] Option 3. Create a minimal metadata file on the fly providing ENTITYID and ACS URL",
+      "UPLOAD": "[NEEDS TRANSLATION] Upload XML file"
     },
     "AUTHMETHODS": {
       "CODE": {
