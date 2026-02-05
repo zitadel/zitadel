@@ -24,8 +24,8 @@ func (u userHuman) SetPhone(verification domain.VerificationType) database.Chang
 			existingHumanUser.InstanceIDColumn(), existingHumanUser.phoneVerificationIDColumn(),
 		)
 	case *domain.VerificationTypeVerified:
-		return u.verification.verified(typ, existingUser.unqualifiedTableName(), u.InstanceIDColumn(),
-			u.phoneVerificationIDColumn(), u.phoneVerifiedAtColumn(), u.phoneColumn())
+		return u.verification.verified(typ, existingUser.unqualifiedTableName(), existingUser.InstanceIDColumn(),
+			existingHumanUser.phoneVerificationIDColumn(), u.phoneVerifiedAtColumn(), u.phoneColumn())
 	case *domain.VerificationTypeFailed:
 		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.phoneVerificationIDColumn())
 	}
@@ -66,7 +66,7 @@ func (u userHuman) SetLastSuccessfulSMSOTPCheck(checkedAt time.Time) database.Ch
 }
 
 func (u userHuman) IncrementPhoneOTPFailedAttempts() database.Change {
-	return database.NewIncrementColumnChange(u.failedSMSOTPAttemptsColumn())
+	return database.NewIncrementColumnChange(u.failedSMSOTPAttemptsColumn(), database.Coalesce(u.failedSMSOTPAttemptsColumn(), 0))
 }
 
 func (u userHuman) ResetPhoneOTPFailedAttempts() database.Change {

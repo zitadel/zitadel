@@ -168,14 +168,14 @@ func (u user) Update(ctx context.Context, client database.QueryExecutor, conditi
 		changes = append(changes, u.clearUpdatedAt())
 	}
 
-	builder := database.NewStatementBuilder("WITH existing_user AS (SELECT id, instance_id FROM zitadel.users")
+	builder := database.NewStatementBuilder("WITH existing_user AS (SELECT * FROM zitadel.users")
 	writeCondition(builder, condition)
 	builder.WriteString(") ")
 	for i, change := range changes {
 		sessionCTE(change, i, 0, builder)
 	}
 
-	builder.WriteString(" UPDATE zitadel.users SET ")
+	builder.WriteString("UPDATE zitadel.users SET ")
 	if err := database.Changes(changes).Write(builder); err != nil {
 		return 0, err
 	}

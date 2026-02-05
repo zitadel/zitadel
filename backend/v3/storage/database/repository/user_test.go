@@ -188,12 +188,13 @@ func Test_user_Update(t *testing.T) {
 		err  error
 		user *domain.User
 	}
-	tests := []struct {
+	type test struct {
 		name  string
 		setup func(t *testing.T, tx database.Transaction) error
 		args  args
 		want  want
-	}{
+	}
+	tests := []test{
 		{
 			name: "set username",
 			args: args{
@@ -488,6 +489,12 @@ func Test_user_Update(t *testing.T) {
 		},
 		{
 			name: "set human reset password failed attempts",
+			setup: func(t *testing.T, tx database.Transaction) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.IncrementPasswordFailedAttempts(),
+				)
+				return err
+			},
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
@@ -673,7 +680,8 @@ func Test_user_Update(t *testing.T) {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
 					u.Human.Phone = &domain.HumanPhone{
-						Number: "+1234567890",
+						Number:     "+1234567890",
+						VerifiedAt: now,
 					}
 					return u
 				}(),
@@ -786,39 +794,36 @@ func Test_user_Update(t *testing.T) {
 				}(),
 			},
 		},
-		{
-			name: "set machine add key",
-			args: args{
-				condition: machineCondition,
-				changes: []database.Change{
-					machineRepo.AddKey(&domain.MachineKey{
-						ID:        gofakeit.UUID(),
-						PublicKey: []byte("public-key"),
-						Type:      domain.MachineKeyTypeJSON,
-						ExpiresAt: time.Now().Add(24 * time.Hour),
-						CreatedAt: time.Now(),
-					}),
+		func() test {
+			key := &domain.MachineKey{
+				ID:        gofakeit.UUID(),
+				PublicKey: []byte("public-key"),
+				Type:      domain.MachineKeyTypeJSON,
+				ExpiresAt: time.Now().Add(24 * time.Hour),
+				CreatedAt: time.Now(),
+			}
+			return test{
+				name: "set machine add key",
+				args: args{
+					condition: machineCondition,
+					changes: []database.Change{
+						machineRepo.AddKey(key),
+					},
 				},
-			},
-			want: want{
-				user: func() *domain.User {
-					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
-					require.NoError(t, err)
-					u.Machine.Keys = append(u.Machine.Keys, &domain.MachineKey{
-						ID:        gofakeit.UUID(),
-						PublicKey: []byte("public-key"),
-						Type:      domain.MachineKeyTypeJSON,
-						ExpiresAt: time.Now().Add(24 * time.Hour),
-						CreatedAt: time.Now(),
-					})
-					return u
-				}(),
-			},
-		},
+				want: want{
+					user: func() *domain.User {
+						u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
+						require.NoError(t, err)
+						u.Machine.Keys = append(u.Machine.Keys, key)
+						return u
+					}(),
+				},
+			}
+		}(),
 		{
 			name: "set machine remove key",
 			setup: func(t *testing.T, tx database.Transaction) error {
-				_, err := userRepo.Update(t.Context(), tx, machineCondition,
+				rowCount, err := userRepo.Update(t.Context(), tx, machineCondition,
 					machineRepo.AddKey(&domain.MachineKey{
 						ID:        "key-to-remove",
 						PublicKey: []byte("public-key"),
@@ -827,6 +832,7 @@ func Test_user_Update(t *testing.T) {
 						CreatedAt: time.Now(),
 					}),
 				)
+				assert.EqualValues(t, 1, rowCount)
 				return err
 			},
 			args: args{
@@ -839,37 +845,35 @@ func Test_user_Update(t *testing.T) {
 				user: machine,
 			},
 		},
-		{
-			name: "set machine add personal access token",
-			args: args{
-				condition: machineCondition,
-				changes: []database.Change{
-					machineRepo.AddPersonalAccessToken(&domain.PersonalAccessToken{
-						ID:        gofakeit.UUID(),
-						Scopes:    []string{"openid", "profile"},
-						ExpiresAt: time.Now().Add(24 * time.Hour),
-						CreatedAt: time.Now(),
-					}),
+		func() test {
+			pat := &domain.PersonalAccessToken{
+				ID:        gofakeit.UUID(),
+				Scopes:    []string{"openid", "profile"},
+				ExpiresAt: time.Now().Add(24 * time.Hour),
+				CreatedAt: time.Now(),
+			}
+			return test{
+				name: "set machine add personal access token",
+				args: args{
+					condition: machineCondition,
+					changes: []database.Change{
+						machineRepo.AddPersonalAccessToken(pat),
+					},
 				},
-			},
-			want: want{
-				user: func() *domain.User {
-					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
-					require.NoError(t, err)
-					u.Machine.PATs = append(u.Machine.PATs, &domain.PersonalAccessToken{
-						ID:        gofakeit.UUID(),
-						Scopes:    []string{"openid", "profile"},
-						ExpiresAt: time.Now().Add(24 * time.Hour),
-						CreatedAt: time.Now(),
-					})
-					return u
-				}(),
-			},
-		},
+				want: want{
+					user: func() *domain.User {
+						u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
+						require.NoError(t, err)
+						u.Machine.PATs = append(u.Machine.PATs, pat)
+						return u
+					}(),
+				},
+			}
+		}(),
 		{
 			name: "set machine remove personal access token",
 			setup: func(t *testing.T, tx database.Transaction) error {
-				_, err := userRepo.Update(t.Context(), tx, machineCondition,
+				rowCount, err := userRepo.Update(t.Context(), tx, machineCondition,
 					machineRepo.AddPersonalAccessToken(&domain.PersonalAccessToken{
 						ID:        "pat-to-remove",
 						Scopes:    []string{"openid", "profile"},
@@ -877,6 +881,7 @@ func Test_user_Update(t *testing.T) {
 						CreatedAt: time.Now(),
 					}),
 				)
+				assert.EqualValues(t, 1, rowCount)
 				return err
 			},
 			args: args{

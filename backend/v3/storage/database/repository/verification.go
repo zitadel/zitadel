@@ -30,17 +30,24 @@ func (v verification) verified(verified *domain.VerificationTypeVerified, existi
 	return database.NewChanges(
 		verifiedAtChange,
 		database.NewChangeToNull(pendingVerificationID),
-		database.NewCTEChange(func(builder *database.StatementBuilder) {
-			builder.WriteString("DELETE FROM ")
-			builder.WriteString(v.qualifiedTableName())
-			builder.WriteString(" USING ")
-			builder.WriteString(existingTableName)
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(v.instanceIDColumn(), instanceID),
-				database.NewColumnCondition(v.idColumn(), pendingVerificationID),
-			))
-			builder.WriteString(" RETURNING value")
-		}, nil),
+		database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("DELETE FROM ")
+				builder.WriteString(v.qualifiedTableName())
+				builder.WriteString(" USING ")
+				builder.WriteString(existingTableName)
+				writeCondition(builder, database.And(
+					database.NewColumnCondition(v.instanceIDColumn(), instanceID),
+					database.NewColumnCondition(v.idColumn(), pendingVerificationID),
+				))
+				builder.WriteString(" RETURNING value")
+			}, func(name string) database.Change {
+				return database.NewChangeToStatement(value, func(builder *database.StatementBuilder) {
+					builder.WriteString("SELECT value FROM ")
+					builder.WriteString(name)
+				})
+			},
+		),
 	)
 }
 
@@ -60,7 +67,7 @@ func (v verification) failed(existingTableName string, instanceID, verificationI
 		builder.WriteString("UPDATE ")
 		builder.WriteString(v.qualifiedTableName())
 		builder.WriteString(" SET ")
-		database.NewIncrementColumnChange(v.failedAttemptsColumn())
+		database.NewIncrementColumnChange(v.failedAttemptsColumn(), database.Coalesce(v.failedAttemptsColumn(), 0)).Write(builder)
 		builder.WriteString(" FROM ")
 		builder.WriteString(existingTableName)
 		writeCondition(builder, database.And(

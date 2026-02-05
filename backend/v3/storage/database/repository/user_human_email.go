@@ -44,7 +44,7 @@ func (u userHuman) EnableEmailOTP() database.Change {
 
 // DisableEmailOTP implements [domain.HumanUserRepository.DisableEmailOTP].
 func (u userHuman) DisableEmailOTP() database.Change {
-	return database.NewChange(u.emailOTPEnabledAtColumn(), false)
+	return database.NewChangeToNull(u.emailOTPEnabledAtColumn())
 }
 
 func (u userHuman) SetLastSuccessfulEmailOTPCheck(checkedAt time.Time) database.Change {
@@ -55,7 +55,7 @@ func (u userHuman) SetLastSuccessfulEmailOTPCheck(checkedAt time.Time) database.
 }
 
 func (u userHuman) IncrementEmailOTPFailedAttempts() database.Change {
-	return database.NewIncrementColumnChange(u.failedEmailOTPAttemptsColumn())
+	return database.NewIncrementColumnChange(u.failedEmailOTPAttemptsColumn(), database.Coalesce(u.failedEmailOTPAttemptsColumn(), 0))
 }
 
 func (u userHuman) ResetEmailOTPFailedAttempts() database.Change {

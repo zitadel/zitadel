@@ -280,7 +280,7 @@ func (u userHuman) SetLastSuccessfulPasswordCheck(checkedAt time.Time) database.
 }
 
 func (u userHuman) IncrementPasswordFailedAttempts() database.Change {
-	return database.NewIncrementColumnChange(u.failedPasswordAttemptsColumn())
+	return database.NewIncrementColumnChange(u.failedPasswordAttemptsColumn(), database.Coalesce(u.failedPasswordAttemptsColumn(), 0))
 }
 
 func (u userHuman) ResetPasswordFailedAttempts() database.Change {
