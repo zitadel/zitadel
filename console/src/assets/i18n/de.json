@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Login-Formular",
           "DESCRIPTION": "Passe das Login-Formular an.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Benutzername und Passwort erlaubt",
-            "DESCRIPTION": "Erlaube deinen Benutzern, sich mit ihrem Benutzernamen und Passwort einzuloggen. Ist dies deaktiviert, können sich deine Benutzer nur mit Passkey Authentifizierung oder einem externen Identitätsanbieter einloggen."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Lokale Authentifizierung erlaubt",
+            "DESCRIPTION": "Erlauben Sie Ihren Benutzern, sich mit ihrem Benutzernamen und Passwort oder per Passkey-Authentifizierung anzumelden. Wenn dies deaktiviert ist, können sich Ihre Benutzer nur über einen externen Identitätsanbieter anmelden."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Benutzerregistrierung erlaubt",
@@ -2651,7 +2651,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) und grundsätzlich alle im Browser aufgeführten JS-Frameworks"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

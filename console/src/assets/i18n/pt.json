@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formulário de Login",
           "DESCRIPTION": "Personalize o formulário de login.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Usuário e Senha permitidos",
-            "DESCRIPTION": "Permite que seus usuários façam login com seu nome de usuário e senha. Se isto for desativado, seus usuários só poderão fazer login usando autenticação sem senha ou com um provedor de identidade externo."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Autenticação local permitida",
+            "DESCRIPTION": "Permita que os seus utilizadores iniciem sessão com o seu nome de utilizador e palavra-passe ou autenticação por passkey. Se isto for desativado, os seus utilizadores apenas poderão iniciar sessão utilizando um fornecedor de identidade externo."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Registro de Usuário permitido",
@@ -2647,7 +2647,8 @@
             "DESCRIPTION": "Aplicativos de página única (SPA) e, em geral, todos os frameworks JS executados em navegadores"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
