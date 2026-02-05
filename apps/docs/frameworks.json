@@ -69,6 +69,11 @@
 		"docsLink": "/docs/sdk-examples/laravel"
 	},
 	{
+		"title": "NestJS",
+		"imgSrcDark": "/docs/img/tech/nestjs.svg",
+		"docsLink": "/docs/guides/start/quickstart?framework=nestjs"
+	},
+	{
 		"id": "next",
 		"title": "Next.js",
 		"imgSrcDark": "/docs/img/tech/nextjs.svg",
@@ -116,11 +121,6 @@
 
 
 
-	{
-		"title": "NestJS",
-		"imgSrcDark": "/docs/img/tech/nestjs.svg",
-		"docsLink": "/docs/sdk-examples/nestjs"
-	},
 	{
 		"id": "nuxtjs",
 		"title": "Nuxt.js",
