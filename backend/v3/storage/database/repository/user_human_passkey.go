@@ -91,7 +91,7 @@ func (u userPasskeyRepo) RemovePasskey(condition database.Condition) database.Ch
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
 			builder.WriteString("DELETE FROM ")
-			builder.WriteString(u.unqualifiedTableName())
+			builder.WriteString(u.qualifiedTableName())
 			builder.WriteString(" USING ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
@@ -103,6 +103,30 @@ func (u userPasskeyRepo) RemovePasskey(condition database.Condition) database.Ch
 		nil,
 	)
 }
+
+// UpdatePasskey implements [domain.HumanUserRepository.UpdatePasskey].
+func (u userPasskeyRepo) UpdatePasskey(condition database.Condition, changes ...database.Change) database.Change {
+	return database.NewCTEChange(
+		func(builder *database.StatementBuilder) {
+			builder.WriteString("UPDATE ")
+			builder.WriteString(u.qualifiedTableName())
+			builder.WriteString(" SET ")
+			database.Changes(changes).Write(builder)
+			builder.WriteString(" FROM ")
+			builder.WriteString(existingHumanUser.unqualifiedTableName())
+			writeCondition(builder, database.And(
+				database.NewColumnCondition(existingHumanUser.InstanceIDColumn(), u.instanceIDColumn()),
+				database.NewColumnCondition(existingHumanUser.IDColumn(), u.userIDColumn()),
+				condition,
+			))
+		},
+		nil,
+	)
+}
+
+// -------------------------------------------------------------
+// changes
+// -------------------------------------------------------------
 
 // SetPasskeyAttestationType implements [domain.HumanUserRepository.SetPasskeyAttestationType].
 func (u userPasskeyRepo) SetPasskeyAttestationType(attestationType string) database.Change {
@@ -146,26 +170,6 @@ func (u userPasskeyRepo) SetPasskeyVerifiedAt(verifiedAt time.Time) database.Cha
 		verifiedAtChange = database.NewChange(u.verifiedAtColumn(), verifiedAt)
 	}
 	return verifiedAtChange
-}
-
-// UpdatePasskey implements [domain.HumanUserRepository.UpdatePasskey].
-func (u userPasskeyRepo) UpdatePasskey(condition database.Condition, changes ...database.Change) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.unqualifiedTableName())
-			builder.WriteString(" SET ")
-			database.Changes(changes).Write(builder)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.InstanceIDColumn(), u.instanceIDColumn()),
-				database.NewColumnCondition(existingHumanUser.IDColumn(), u.userIDColumn()),
-				condition,
-			))
-		},
-		nil,
-	)
 }
 
 // -------------------------------------------------------------

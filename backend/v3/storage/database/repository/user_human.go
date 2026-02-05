@@ -251,16 +251,49 @@ func (u userHuman) SetNickname(nickname string) database.Change {
 func (u userHuman) SetPassword(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
 	case *domain.VerificationTypeInit:
+		if typ.Value != nil {
+			panic("value is not allowed for password verification use code instead")
+		}
 		return u.verification.init(typ, existingUser.unqualifiedTableName(), existingHumanUser.passwordVerificationIDColumn())
 	case *domain.VerificationTypeVerified:
-		return u.verification.verified(typ, existingUser.unqualifiedTableName(), u.InstanceIDColumn(),
-			u.passwordVerificationIDColumn(), u.passwordVerifiedAtColumn(), u.passwordColumn())
+		// return u.verification.verified(typ, existingUser.unqualifiedTableName(), existingUser.InstanceIDColumn(),
+		// 	existingHumanUser.passwordVerificationIDColumn(), u.passwordVerifiedAtColumn(), u.passwordColumn())
+		verifiedAtChange := database.NewChange(u.passwordVerifiedAtColumn(), database.NowInstruction)
+		if !typ.VerifiedAt.IsZero() {
+			verifiedAtChange = database.NewChange(u.passwordVerifiedAtColumn(), typ.VerifiedAt)
+		}
+
+		return database.NewChanges(
+			verifiedAtChange,
+			database.NewChangeToNull(u.passwordVerificationIDColumn()),
+			database.NewCTEChange(
+				func(builder *database.StatementBuilder) {
+					builder.WriteString("DELETE FROM ")
+					builder.WriteString(u.verification.qualifiedTableName())
+					builder.WriteString(" USING ")
+					builder.WriteString(existingHumanUser.unqualifiedTableName())
+					writeCondition(builder, database.And(
+						database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+						database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.passwordVerificationIDColumn()),
+					))
+					builder.WriteString(" RETURNING code")
+				}, func(name string) database.Change {
+					return database.NewChangeToStatement(u.passwordColumn(), func(builder *database.StatementBuilder) {
+						builder.WriteString("SELECT code FROM ")
+						builder.WriteString(name)
+					})
+				},
+			),
+		)
 	case *domain.VerificationTypeUpdate:
+		if typ.Value != nil {
+			panic("value is not allowed for password verification use code instead")
+		}
 		return u.verification.update(typ, existingHumanUser.unqualifiedTableName(),
 			existingHumanUser.InstanceIDColumn(), existingHumanUser.passwordVerificationIDColumn(),
 		)
 	case *domain.VerificationTypeSkipped:
-		return u.verification.skipped(typ, u.passwordVerifiedAtColumn(), u.passwordColumn())
+		panic("skip verification is not supported for password verification")
 	case *domain.VerificationTypeFailed:
 		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.passwordVerificationIDColumn())
 	}
@@ -323,16 +356,12 @@ func (u userHuman) SetVerification(verification domain.VerificationType) databas
 	case *domain.VerificationTypeVerified:
 		return database.NewCTEChange(func(builder *database.StatementBuilder) {
 			builder.WriteString("DELETE FROM zitadel.verifications USING existing_user")
-			conditions := make([]database.Condition, 0, 3)
-			conditions = append(conditions,
-				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewTextCondition(u.verification.idColumn(), database.TextOperationEqual, *typ.ID),
-			)
-			if typ.ID != nil {
-				conditions = append(conditions, database.NewTextCondition(u.verification.idColumn(), database.TextOperationEqual, *typ.ID))
-			}
 
-			writeCondition(builder, database.And(conditions...))
+			writeCondition(builder, database.And(
+				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+				database.NewColumnCondition(u.verification.userIDColumn(), existingHumanUser.IDColumn()),
+				database.NewTextCondition(u.verification.idColumn(), database.TextOperationEqual, *typ.ID),
+			))
 			builder.WriteString(" RETURNING value")
 		}, nil)
 
@@ -354,6 +383,7 @@ func (u userHuman) SetVerification(verification domain.VerificationType) databas
 				builder.WriteString(" FROM existing_user")
 				writeCondition(builder, database.And(
 					database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+					database.NewColumnCondition(u.verification.userIDColumn(), existingHumanUser.IDColumn()),
 					database.NewTextCondition(u.verification.idColumn(), database.TextOperationEqual, *typ.ID),
 				))
 			},
@@ -364,10 +394,14 @@ func (u userHuman) SetVerification(verification domain.VerificationType) databas
 	case *domain.VerificationTypeFailed:
 		return database.NewCTEChange(
 			func(builder *database.StatementBuilder) {
-				builder.WriteString("UPDATE zitadel.verifications SET verifications.failed_attempts = verifications.failed_attempts + 1")
-				builder.WriteString("FROM existing_user")
+				builder.WriteString("UPDATE ")
+				builder.WriteString(u.verification.qualifiedTableName())
+				builder.WriteString(" SET ")
+				database.NewIncrementColumnChange(u.verification.failedAttemptsColumn(), database.Coalesce(u.verification.failedAttemptsColumn(), 0)).Write(builder)
+				builder.WriteString(" FROM existing_user")
 				writeCondition(builder, database.And(
 					database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+					database.NewColumnCondition(u.verification.userIDColumn(), existingHumanUser.IDColumn()),
 					database.NewTextCondition(u.verification.idColumn(), database.TextOperationEqual, *typ.ID),
 				))
 			},

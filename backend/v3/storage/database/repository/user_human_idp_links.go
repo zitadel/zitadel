@@ -6,7 +6,7 @@ import (
 )
 
 func (u userHuman) unqualifiedIDPLinksTableName() string {
-	return "user_identity_provider_links"
+	return "identity_provider_links"
 }
 
 func (u userHuman) qualifiedIDPLinksTableName() string {
@@ -30,11 +30,12 @@ func (u userHuman) AddIdentityProviderLink(link *domain.IdentityProviderLink) da
 		func(builder *database.StatementBuilder) {
 			builder.WriteString("INSERT INTO ")
 			builder.WriteString(u.qualifiedIDPLinksTableName())
-			builder.WriteString("(instance_id, user_id, provided_user_id, provided_username, provider_id, created_at, updated_at) SELECT ")
+			builder.WriteString("(instance_id, user_id, provided_user_id, provided_username, identity_provider_id, created_at, updated_at) SELECT ")
 			database.Columns{
 				existingHumanUser.InstanceIDColumn(),
 				existingHumanUser.IDColumn(),
 			}.WriteQualified(builder)
+			builder.WriteString(", ")
 			builder.WriteArgs(
 				link.ProvidedUserID,
 				link.ProvidedUsername,
@@ -53,11 +54,13 @@ func (u userHuman) AddIdentityProviderLink(link *domain.IdentityProviderLink) da
 func (u userHuman) UpdateIdentityProviderLink(condition database.Condition, changes ...database.Change) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE zitadel.human_identity_provider_links SET ")
+			builder.WriteString("UPDATE zitadel.identity_provider_links SET ")
 			database.Changes(changes).Write(builder)
+			builder.WriteString(" FROM ")
+			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
 				database.NewColumnCondition(existingHumanUser.InstanceIDColumn(), u.linkedIdentityProviderInstanceIDColumn()),
-				database.NewColumnCondition(existingHumanUser.IDColumn(), u.linkedIdentityProviderInstanceIDColumn()),
+				database.NewColumnCondition(existingHumanUser.IDColumn(), u.linkedIdentityProviderUserIDColumn()),
 				condition,
 			))
 		}, nil,
@@ -79,7 +82,7 @@ func (u userHuman) RemoveIdentityProviderLink(providerID string, providedUserID 
 				),
 				database.NewColumnCondition(
 					existingHumanUser.IDColumn(),
-					u.linkedIdentityProviderInstanceIDColumn(),
+					u.linkedIdentityProviderUserIDColumn(),
 				),
 				database.NewTextCondition(
 					u.linkedIdentityProviderIDColumn(),
@@ -97,7 +100,7 @@ func (u userHuman) RemoveIdentityProviderLink(providerID string, providedUserID 
 }
 
 // SetIdentityProviderLinkUsername implements [domain.HumanUserRepository.SetIdentityProviderLinkUsername].
-func (u userHuman) SetIdentityProviderLinkUsername(providerID string, providedUserID string, username string) database.Change {
+func (u userHuman) SetIdentityProviderLinkUsername(username string) database.Change {
 	return database.NewChange(u.providedUsernameColumn(), username)
 }
 
@@ -131,6 +134,9 @@ func (u userHuman) ProvidedUsernameCondition(username string) database.Condition
 
 func (u userHuman) linkedIdentityProviderInstanceIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedIDPLinksTableName(), "instance_id")
+}
+func (u userHuman) linkedIdentityProviderUserIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedIDPLinksTableName(), "user_id")
 }
 
 func (u userHuman) linkedIdentityProviderIDColumn() database.Column {

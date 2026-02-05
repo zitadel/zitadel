@@ -93,6 +93,7 @@ var queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, 
 	`, 'totp', CASE WHEN users.totp_secret IS NOT NULL THEN jsonb_build_object('secret', encode(users.totp_secret, 'base64'), 'verifiedAt', users.totp_verified_at, 'lastSuccessfullyCheckedAt', users.totp_last_successful_check) ELSE NULL END` +
 	`, 'passkeys', jsonb_agg(DISTINCT jsonb_build_object('id', human_passkeys.token_id, 'keyId', encode(human_passkeys.key_id::BYTEA, 'base64'), 'type', human_passkeys.type, 'name', human_passkeys.name, 'signCount', human_passkeys.sign_count, 'challenge', encode(human_passkeys.challenge, 'base64'), 'publicKey', encode(human_passkeys.public_key, 'base64'), 'attestationType', human_passkeys.attestation_type, 'aaGuid', encode(human_passkeys.authenticator_attestation_guid, 'base64'), 'rpId', human_passkeys.relying_party_id, 'createdAt', human_passkeys.created_at, 'updatedAt', human_passkeys.updated_at, 'verifiedAt', human_passkeys.verified_at)) FILTER (WHERE human_passkeys.user_id IS NOT NULL)` +
 	`, 'verifications', (SELECT jsonb_agg(jsonb_build_object('id', verifications.id, 'value', verifications.value, 'code', encode(verifications.code, 'escape')::JSONB, 'createdAt', verifications.created_at, 'updatedAt', verifications.updated_at, 'expiresAt', verifications.created_at+verifications.expiry, 'failedAttempts', verifications.failed_attempts)) FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.user_id = users.id AND verifications.id NOT IN (COALESCE(users.password_verification_id, ''), COALESCE(users.email_verification_id, ''), COALESCE(users.phone_verification_id, '')))` +
+	`, 'identityProviderLinks', jsonb_agg(DISTINCT jsonb_build_object('providerId', identity_provider_links.identity_provider_id, 'providedUserId', identity_provider_links.provided_user_id, 'providedUsername', identity_provider_links.provided_username, 'createdAt', identity_provider_links.created_at, 'updatedAt', identity_provider_links.updated_at)) FILTER (WHERE identity_provider_links.user_id IS NOT NULL)` +
 	`) END AS human FROM zitadel.users`
 
 func verificationQuery(column database.Column) string {
@@ -113,6 +114,7 @@ func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...da
 		u.joinMetadata(),
 		u.joinVerifications(),
 		u.joinPasskeys(),
+		u.joinIdentityProviderLinks(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),
 	)
 	options := new(database.QueryOpts)
@@ -531,6 +533,18 @@ func (u user) joinVerifications() database.QueryOption {
 	)
 	return database.WithLeftJoin(
 		u.verification.qualifiedTableName(),
+		database.And(conditions...),
+	)
+}
+
+func (u user) joinIdentityProviderLinks() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), userHuman{}.linkedIdentityProviderInstanceIDColumn()),
+		database.NewColumnCondition(u.IDColumn(), userHuman{}.linkedIdentityProviderUserIDColumn()),
+	)
+	return database.WithLeftJoin(
+		userHuman{}.qualifiedIDPLinksTableName(),
 		database.And(conditions...),
 	)
 }

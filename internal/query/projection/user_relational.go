@@ -1918,8 +1918,11 @@ func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.UpdateIdentityProviderLink(
-				nil, // TODO(adlerhurst): set correct condition
-				repo.SetIdentityProviderLinkUsername(e.IDPConfigID, e.ExternalUserID, e.ExternalUsername),
+				database.And(
+					repo.LinkedIdentityProviderIDCondition(e.IDPConfigID),
+					nil, // TODO(adlerhurst): add e.ExternalUserID as condition
+				),
+				repo.SetIdentityProviderLinkUsername(e.ExternalUsername),
 			),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)

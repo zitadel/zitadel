@@ -195,7 +195,7 @@ CREATE TABLE zitadel.human_passkeys(
 -- identity provider links
 -- ----------------------------------------------------------------
 
-CREATE TABLE zitadel.human_identity_provider_links(
+CREATE TABLE zitadel.identity_provider_links(
     instance_id TEXT NOT NULL
     , identity_provider_id TEXT NOT NULL
     , user_id TEXT NOT NULL

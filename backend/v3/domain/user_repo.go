@@ -230,7 +230,7 @@ type identityProviderLinkChanges interface {
 	RemoveIdentityProviderLink(providerID, providedUserID string) database.Change
 
 	// SetIdentityProviderLinkUsername sets the username for an identity provider link
-	SetIdentityProviderLinkUsername(providerID, providedUserID, username string) database.Change
+	SetIdentityProviderLinkUsername(username string) database.Change
 	// SetIdentityProviderLinkProvidedID sets the provided user ID for an identity provider link
 	SetIdentityProviderLinkProvidedID(providerID, currentProvidedUserID, newProvidedUserID string) database.Change
 }

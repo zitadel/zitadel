@@ -152,15 +152,11 @@ func (v verification) codeColumn() database.Column {
 }
 
 func (v verification) expiryColumn() database.Column {
-	return database.NewColumn(v.unqualifiedTableName(), "expires_at")
+	return database.NewColumn(v.unqualifiedTableName(), "expiry")
 }
 
 func (v verification) failedAttemptsColumn() database.Column {
 	return database.NewColumn(v.unqualifiedTableName(), "failed_attempts")
-}
-
-func (v verification) creationDateColumn() database.Column {
-	return database.NewColumn(v.unqualifiedTableName(), "created_at")
 }
 
 func (v verification) userIDColumn() database.Column {

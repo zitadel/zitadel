@@ -206,7 +206,7 @@ const (
 
 type IdentityProviderLink struct {
 	// TODO(adlerhurst): double check with marcos pr
-	ProviderID       string `json:"providerId" db:"provider_id"`
+	ProviderID       string `json:"providerId" db:"identity_provider_id"`
 	ProvidedUserID   string `json:"providedUserId" db:"provided_user_id"`
 	ProvidedUsername string `json:"providedUsername" db:"provided_username"`
 

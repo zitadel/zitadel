@@ -37,6 +37,7 @@ func (u userHuman) RemovePhone() database.Change {
 	return database.NewChanges(
 		database.NewChangeToNull(u.phoneColumn()),
 		database.NewChangeToNull(u.phoneVerifiedAtColumn()),
+		database.NewChangeToNull(u.phoneVerificationIDColumn()),
 		database.NewChangeToNull(u.smsOTPEnabledAtColumn()),
 		database.NewChangeToNull(u.lastSuccessfulSMSOTPCheckColumn()),
 		database.NewChangeToNull(u.failedSMSOTPAttemptsColumn()),

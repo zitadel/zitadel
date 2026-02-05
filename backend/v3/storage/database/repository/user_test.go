@@ -2,6 +2,7 @@ package repository_test
 
 import (
 	"context"
+	"encoding/json"
 	"slices"
 	"testing"
 	"time"
@@ -122,6 +123,7 @@ func Test_user_Get(t *testing.T) {
 func Test_user_Update(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	t.Cleanup(rollback)
+	// tx := pool
 
 	userRepo := repository.UserRepository().
 		LoadMetadata().
@@ -190,7 +192,7 @@ func Test_user_Update(t *testing.T) {
 	}
 	type test struct {
 		name  string
-		setup func(t *testing.T, tx database.Transaction) error
+		setup func(t *testing.T, tx database.QueryExecutor) error
 		args  args
 		want  want
 	}
@@ -267,7 +269,7 @@ func Test_user_Update(t *testing.T) {
 		},
 		{
 			name: "remove metadata",
-			setup: func(t *testing.T, tx database.Transaction) error {
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, machineCondition,
 					userRepo.AddMetadata(&domain.Metadata{
 						InstanceID: instanceID,
@@ -406,9 +408,6 @@ func Test_user_Update(t *testing.T) {
 				}(),
 			},
 		},
-		// {
-		// 	name: "set human skip mfa initialization",
-		// },
 		{
 			name: "set human skip mfa initialization at",
 			args: args{
@@ -426,30 +425,335 @@ func Test_user_Update(t *testing.T) {
 				}(),
 			},
 		},
-		// {
-		// 	name: "set human verification init",
-		// },
-		// {
-		// 	name: "set human verification update",
-		// },
-		// {
-		// 	name: "set human verification verified",
-		// },
-		// {
-		// 	name: "set human verification failed",
-		// },
-		// {
-		// 	name: "set human password verification init",
-		// },
-		// {
-		// 	name: "set human password verification update",
-		// },
-		// {
-		// 	name: "set human password verified",
-		// },
-		// {
-		// 	name: "set human verification skipped",
-		// },
+		{
+			name: "set human verification init",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetVerification(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value: gu.Ptr("verificationValue"),
+						ID:    gu.Ptr("verification-id"),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Verifications = append(u.Human.Verifications, &domain.Verification{
+						ID:        "verification-id",
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value: gu.Ptr("verificationValue"),
+					})
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human verification update",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetVerification(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value: gu.Ptr("verificationValue"),
+						ID:    gu.Ptr("verification-id"),
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetVerification(&domain.VerificationTypeUpdate{
+						ID:     gu.Ptr("verification-id"),
+						Expiry: gu.Ptr(10 * time.Minute),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Verifications = append(u.Human.Verifications, &domain.Verification{
+						ID:        "verification-id",
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value:     gu.Ptr("verificationValue"),
+						ExpiresAt: gu.Ptr(now.Add(10 * time.Minute)),
+					})
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human verification verified",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetVerification(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value: gu.Ptr("verificationValue"),
+						ID:    gu.Ptr("verification-id"),
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetVerification(&domain.VerificationTypeVerified{
+						ID:         gu.Ptr("verification-id"),
+						VerifiedAt: now,
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Verifications = nil
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human verification failed",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetVerification(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value: gu.Ptr("verificationValue"),
+						ID:    gu.Ptr("verification-id"),
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetVerification(&domain.VerificationTypeFailed{
+						ID:       gu.Ptr("verification-id"),
+						FailedAt: now,
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Verifications = append(u.Human.Verifications, &domain.Verification{
+						ID:        "verification-id",
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value:          gu.Ptr("verificationValue"),
+						UpdatedAt:      now,
+						FailedAttempts: 1,
+					})
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human password verification init",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetPassword(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedPassword"),
+						},
+						Expiry: gu.Ptr(24 * time.Hour),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Password.Unverified = &domain.Verification{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedPassword"),
+						},
+						ExpiresAt: gu.Ptr(now.Add(24 * time.Hour)),
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human password verification update",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetPassword(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedPassword"),
+						},
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetPassword(&domain.VerificationTypeUpdate{
+						Expiry: gu.Ptr(48 * time.Hour),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Password.Unverified = &domain.Verification{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedPassword"),
+						},
+						ExpiresAt: gu.Ptr(now.Add(48 * time.Hour)),
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human password verified",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetPassword(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedPassword"),
+						},
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetPassword(&domain.VerificationTypeVerified{
+						VerifiedAt: now,
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Password = domain.HumanPassword{
+						Password: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedPassword"),
+						},
+						IsChangeRequired: false,
+						ChangedAt:        now,
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human password failed",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetPassword(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedPassword"),
+						},
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetPassword(&domain.VerificationTypeFailed{
+						FailedAt: now,
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Password.Unverified = &domain.Verification{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedPassword"),
+						},
+						FailedAttempts: 1,
+					}
+					return u
+				}(),
+			},
+		},
 		{
 			name: "set human password change required",
 			args: args{
@@ -467,9 +771,23 @@ func Test_user_Update(t *testing.T) {
 				}(),
 			},
 		},
-		// {
-		// 	name: "set human last successful password check",
-		// },
+		{
+			name: "set human last successful password check",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetLastSuccessfulPasswordCheck(now),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Password.LastSuccessfullyCheckedAt = &now
+					return u
+				}(),
+			},
+		},
 		{
 			name: "set human increment password failed attempts",
 			args: args{
@@ -489,7 +807,7 @@ func Test_user_Update(t *testing.T) {
 		},
 		{
 			name: "set human reset password failed attempts",
-			setup: func(t *testing.T, tx database.Transaction) error {
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
 					humanRepo.IncrementPasswordFailedAttempts(),
 				)
@@ -510,36 +828,187 @@ func Test_user_Update(t *testing.T) {
 				}(),
 			},
 		},
-		// {
-		// 	name: "set human set email verification init",
-		// },
-		// {
-		// 	name: "set human set email verified",
-		// 	args: args{
-		// 		condition: humanCondition,
-		// 		changes: []database.Change{
-		// 			humanRepo.SetEmail()
-		// 			humanRepo.SetEmailVerifiedAt(time.Now()),
-		// 		},
-		// 	},
-		// 	want: want{
-		// 		user: func() *domain.User {
-		// 			u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
-		// 			require.NoError(t, err)
-		// 			u.Human.Email.VerifiedAt = time.Now()
-		// 			return u
-		// 		}(),
-		// 	},
-		// },
-		// {
-		// 	name: "set human set email verification update",
-		// },
-		// {
-		// 	name: "set human set email verification skipped",
-		// },
-		// {
-		// 	name: "set human enable email otp",
-		// },
+		{
+			name: "set human set email verification init",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetEmail(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value: gu.Ptr("new@email.com"),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Email.Unverified = &domain.Verification{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value: gu.Ptr("new@email.com"),
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human set email verified",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition, humanRepo.SetEmail(&domain.VerificationTypeInit{
+					CreatedAt: now,
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeHash,
+						Algorithm:  "sha-1",
+						KeyID:      "keyID",
+						Crypted:    []byte("cryptedCode"),
+					},
+					Value: gu.Ptr("new@email.com"),
+				}),
+				)
+				assert.EqualValues(t, 1, rowCount)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetEmail(&domain.VerificationTypeVerified{
+						VerifiedAt: now,
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Email.Unverified = nil
+					u.Human.Email.Address = "new@email.com"
+					u.Human.Email.VerifiedAt = now
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human set email verification update",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition, humanRepo.SetEmail(&domain.VerificationTypeInit{
+					CreatedAt: now,
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeHash,
+						Algorithm:  "sha-1",
+						KeyID:      "keyID",
+						Crypted:    []byte("cryptedCode"),
+					},
+					Value: gu.Ptr("new@email.com"),
+				}),
+				)
+				assert.EqualValues(t, 1, rowCount)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetEmail(&domain.VerificationTypeUpdate{
+						Expiry: gu.Ptr(10 * time.Minute),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Email.Unverified = &domain.Verification{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value:     gu.Ptr("new@email.com"),
+						ExpiresAt: gu.Ptr(now.Add(10 * time.Minute)),
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human set email verification skipped",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetEmail(&domain.VerificationTypeSkipped{
+						SkippedAt: now,
+						Value:     gu.Ptr("new@email.com"),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Email.Unverified = nil
+					u.Human.Email.Address = "new@email.com"
+					u.Human.Email.VerifiedAt = now
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human set email verification failed",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition, humanRepo.SetEmail(&domain.VerificationTypeInit{
+					CreatedAt: now,
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeHash,
+						Algorithm:  "sha-1",
+						KeyID:      "keyID",
+						Crypted:    []byte("cryptedCode"),
+					},
+					Value: gu.Ptr("new@email.com"),
+				}),
+				)
+				assert.EqualValues(t, 1, rowCount)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetEmail(&domain.VerificationTypeFailed{
+						FailedAt: now,
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Email.Unverified = &domain.Verification{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value:          gu.Ptr("new@email.com"),
+						FailedAttempts: 1,
+					}
+					return u
+				}(),
+			},
+		},
 		{
 			name: "set human enable email otp at",
 			args: args{
@@ -552,6 +1021,7 @@ func Test_user_Update(t *testing.T) {
 				user: func() *domain.User {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
+					assert.False(t, u.Human.Email.OTP.EnabledAt.Equal(now))
 					u.Human.Email.OTP.EnabledAt = now
 					return u
 				}(),
@@ -574,21 +1044,105 @@ func Test_user_Update(t *testing.T) {
 				}(),
 			},
 		},
-		// {
-		// 	name: "set human last successful email otp check",
-		// },
-		// {
-		// 	name: "set human increment email otp failed attempts",
-		// },
-		// {
-		// 	name: "set human reset email otp failed attempts",
-		// },
-		// {
-		// 	name: "set human set phone verification init",
-		// },
+		{
+			name: "set human last successful email otp check",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetLastSuccessfulEmailOTPCheck(now),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					if u.Human.Email.OTP.LastSuccessfullyCheckedAt != nil {
+						assert.False(t, u.Human.Email.OTP.LastSuccessfullyCheckedAt.Equal(now))
+					}
+					u.Human.Email.OTP.LastSuccessfullyCheckedAt = &now
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human increment email otp failed attempts",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.IncrementEmailOTPFailedAttempts(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Email.OTP.FailedAttempts = 1
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human reset email otp failed attempts",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition, humanRepo.IncrementEmailOTPFailedAttempts())
+				assert.EqualValues(t, 1, rowCount)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.ResetEmailOTPFailedAttempts(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Email.OTP.FailedAttempts = 0
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human set phone verification init",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetPhone(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+						Value: gu.Ptr("+1234567890"),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Phone = &domain.HumanPhone{
+						Unverified: &domain.Verification{
+							CreatedAt: now,
+							Code: &crypto.CryptoValue{
+								CryptoType: crypto.TypeHash,
+								Algorithm:  "sha-1",
+								KeyID:      "keyID",
+								Crypted:    []byte("cryptedCode"),
+							},
+							Value: gu.Ptr("+1234567890"),
+						},
+					}
+					return u
+				}(),
+			},
+		},
 		{
 			name: "set human set phone verified",
-			setup: func(t *testing.T, tx database.Transaction) error {
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
 					humanRepo.SetPhone(&domain.VerificationTypeInit{
 						Value: gu.Ptr("+1234567890"),
@@ -616,18 +1170,78 @@ func Test_user_Update(t *testing.T) {
 				}(),
 			},
 		},
-		// {
-		// 	name: "set human set phone verification update",
-		// },
-		// {
-		// 	name: "set human set phone verification skipped",
-		// },
-		// {
-		// 	name: "set human enable sms otp",
-		// },
+		{
+			name: "set human set phone verification update",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition, humanRepo.SetPhone(&domain.VerificationTypeInit{
+					CreatedAt: now,
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeHash,
+						Algorithm:  "sha-1",
+						KeyID:      "keyID",
+						Crypted:    []byte("cryptedCode"),
+					},
+					Value: gu.Ptr("+1234567890"),
+				}),
+				)
+				assert.EqualValues(t, 1, rowCount)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetPhone(&domain.VerificationTypeUpdate{
+						Expiry: gu.Ptr(10 * time.Minute),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Phone = &domain.HumanPhone{
+						Unverified: &domain.Verification{
+							CreatedAt: now,
+							Code: &crypto.CryptoValue{
+								CryptoType: crypto.TypeHash,
+								Algorithm:  "sha-1",
+								KeyID:      "keyID",
+								Crypted:    []byte("cryptedCode"),
+							},
+							Value:     gu.Ptr("+1234567890"),
+							ExpiresAt: gu.Ptr(now.Add(10 * time.Minute)),
+						},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human set phone verification skipped",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
+						SkippedAt: now,
+						Value:     gu.Ptr("+1234567890"),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Phone = &domain.HumanPhone{
+						Number:     "+1234567890",
+						VerifiedAt: now,
+					}
+					return u
+				}(),
+			},
+		},
 		{
 			name: "set human enable sms otp at",
-			setup: func(t *testing.T, tx database.Transaction) error {
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
 					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
 						Value:     gu.Ptr("+1234567890"),
@@ -659,7 +1273,7 @@ func Test_user_Update(t *testing.T) {
 		},
 		{
 			name: "set human disable sms otp",
-			setup: func(t *testing.T, tx database.Transaction) error {
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
 					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
 						Value:     gu.Ptr("+1234567890"),
@@ -687,45 +1301,505 @@ func Test_user_Update(t *testing.T) {
 				}(),
 			},
 		},
-		// {
-		// 	name: "set human last successful sms otp check",
-		// },
-		// {
-		// 	name: "set human increment sms otp failed attempts",
-		// },
-		// {
-		// 	name: "set human reset sms otp failed attempts",
-		// },
-		// {
-		// 	name: "set human totp secret",
-		// },
-		// {
-		// 	name: "set human totp verified at",
-		// },
-		// {
-		// 	name: "set human remove totp",
-		// },
-		// {
-		// 	name: "set human last successful totp check",
-		// },
-		// {
-		// 	name: "set human add identity provider link",
-		// },
-		// {
-		// 	name: "set human update identity provider link",
-		// },
-		// {
-		// 	name: "set human remove identity provider link",
-		// },
-		// {
-		// 	name: "set human add passkey",
-		// },
-		// {
-		// 	name: "set human update passkey",
-		// },
-		// {
-		// 	name: "set human remove passkey",
-		// },
+		{
+			name: "set human last successful sms otp check",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
+						Value:     gu.Ptr("+1234567890"),
+						SkippedAt: now,
+					}),
+					humanRepo.EnableSMSOTPAt(now),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetLastSuccessfulSMSOTPCheck(now),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Phone = &domain.HumanPhone{
+						Number:     "+1234567890",
+						VerifiedAt: now,
+						OTP: domain.OTP{
+							EnabledAt:                 now,
+							LastSuccessfullyCheckedAt: &now,
+						},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human increment sms otp failed attempts",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
+						Value:     gu.Ptr("+1234567890"),
+						SkippedAt: now,
+					}),
+					humanRepo.EnableSMSOTPAt(now),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.IncrementPhoneOTPFailedAttempts(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Phone = &domain.HumanPhone{
+						Number:     "+1234567890",
+						VerifiedAt: now,
+						OTP: domain.OTP{
+							EnabledAt:      now,
+							FailedAttempts: 1,
+						},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human reset sms otp failed attempts",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
+						Value:     gu.Ptr("+1234567890"),
+						SkippedAt: now,
+					}),
+					humanRepo.EnableSMSOTPAt(now),
+				)
+				if err != nil {
+					return err
+				}
+				_, err = userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.IncrementPhoneOTPFailedAttempts(),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.ResetPhoneOTPFailedAttempts(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Phone = &domain.HumanPhone{
+						Number:     "+1234567890",
+						VerifiedAt: now,
+						OTP: domain.OTP{
+							EnabledAt:      now,
+							FailedAttempts: 0,
+						},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human remove phone",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetPhone(&domain.VerificationTypeInit{
+						Value: gu.Ptr("+1234567890"),
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.RemovePhone(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Phone = nil
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human totp secret",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetTOTPSecret([]byte("new-secret")),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.TOTP = &domain.HumanTOTP{
+						Secret: []byte("new-secret"),
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human totp verified at",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetTOTPSecret([]byte("secret")),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetTOTPVerifiedAt(now),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.TOTP = &domain.HumanTOTP{
+						Secret:     []byte("secret"),
+						VerifiedAt: now,
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human remove totp",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetTOTPSecret([]byte("secret")),
+					humanRepo.SetTOTPVerifiedAt(now),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.RemoveTOTP(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.TOTP = nil
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human last successful totp check",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetTOTPSecret([]byte("secret")),
+					humanRepo.SetTOTPVerifiedAt(now),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetLastSuccessfulTOTPCheck(now),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.TOTP = &domain.HumanTOTP{
+						Secret:                    []byte("secret"),
+						VerifiedAt:                now,
+						LastSuccessfullyCheckedAt: &now,
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human add identity provider link",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				return repository.IDProviderRepository().Create(t.Context(), tx, &domain.IdentityProvider{
+					InstanceID: instanceID,
+					OrgID:      &orgID1,
+					ID:         "provider-id",
+					Name:       "idp",
+					State:      domain.IDPStateActive,
+					Payload:    json.RawMessage("{}"),
+				})
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       "provider-id",
+						ProvidedUserID:   "provided-user-id",
+						ProvidedUsername: "provided-username",
+						CreatedAt:        now,
+						UpdatedAt:        now,
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.IdentityProviderLinks = []*domain.IdentityProviderLink{
+						{
+							ProviderID:       "provider-id",
+							ProvidedUserID:   "provided-user-id",
+							ProvidedUsername: "provided-username",
+							CreatedAt:        now,
+							UpdatedAt:        now,
+						},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human update identity provider link",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				err := repository.IDProviderRepository().Create(t.Context(), tx, &domain.IdentityProvider{
+					InstanceID: instanceID,
+					OrgID:      &orgID1,
+					ID:         "provider-id",
+					Name:       "idp",
+					State:      domain.IDPStateActive,
+					Payload:    json.RawMessage("{}"),
+				})
+				if err != nil {
+					return err
+				}
+				_, err = userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       "provider-id",
+						ProvidedUserID:   "provided-user-id",
+						ProvidedUsername: "provided-username",
+						CreatedAt:        now,
+						UpdatedAt:        now,
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.UpdateIdentityProviderLink(
+						database.And(
+							humanRepo.LinkedIdentityProviderIDCondition("provider-id"),
+						),
+						humanRepo.SetIdentityProviderLinkUsername("updated-username"),
+					),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.IdentityProviderLinks = []*domain.IdentityProviderLink{
+						{
+							ProviderID:       "provider-id",
+							ProvidedUserID:   "provided-user-id",
+							ProvidedUsername: "updated-username",
+							CreatedAt:        now,
+							UpdatedAt:        now,
+						},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human remove identity provider link",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				err := repository.IDProviderRepository().Create(t.Context(), tx, &domain.IdentityProvider{
+					InstanceID: instanceID,
+					OrgID:      &orgID1,
+					ID:         "provider-id",
+					Name:       "idp",
+					State:      domain.IDPStateActive,
+					Payload:    json.RawMessage("{}"),
+				})
+				if err != nil {
+					return err
+				}
+				_, err = userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       "provider-id",
+						ProvidedUserID:   "provided-user-id",
+						ProvidedUsername: "provided-username",
+						CreatedAt:        now,
+						UpdatedAt:        now,
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.RemoveIdentityProviderLink("provider-id", "provided-user-id"),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.IdentityProviderLinks = []*domain.IdentityProviderLink{}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human add passkey",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.AddPasskey(&domain.Passkey{
+						ID:                           "passkey-id",
+						PublicKey:                    []byte("public-key"),
+						Type:                         domain.PasskeyTypePasswordless,
+						CreatedAt:                    now,
+						UpdatedAt:                    now,
+						VerifiedAt:                   now,
+						KeyID:                        []byte("keyID"),
+						Name:                         "name",
+						AttestationType:              "attestation-type",
+						AuthenticatorAttestationGUID: []byte("aa guid"),
+						Challenge:                    []byte("challenge"),
+						RelyingPartyID:               "rp id",
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Passkeys = append(u.Human.Passkeys, &domain.Passkey{
+						ID:                           "passkey-id",
+						PublicKey:                    []byte("public-key"),
+						Type:                         domain.PasskeyTypePasswordless,
+						CreatedAt:                    now,
+						UpdatedAt:                    now,
+						VerifiedAt:                   now,
+						KeyID:                        []byte("keyID"),
+						Name:                         "name",
+						AttestationType:              "attestation-type",
+						AuthenticatorAttestationGUID: []byte("aa guid"),
+						Challenge:                    []byte("challenge"),
+						RelyingPartyID:               "rp id",
+					})
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human update passkey",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddPasskey(&domain.Passkey{
+						ID:                           "passkey-id",
+						PublicKey:                    []byte("public-key"),
+						Type:                         domain.PasskeyTypePasswordless,
+						CreatedAt:                    now,
+						UpdatedAt:                    now,
+						VerifiedAt:                   now,
+						KeyID:                        []byte("keyID"),
+						Name:                         "name",
+						AttestationType:              "attestation-type",
+						AuthenticatorAttestationGUID: []byte("aa guid"),
+						Challenge:                    []byte("challenge"),
+						RelyingPartyID:               "rp id",
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.UpdatePasskey(
+						database.And(
+							humanRepo.PasskeyIDCondition("passkey-id"),
+						),
+						humanRepo.SetPasskeyName("updated-name"),
+					),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Passkeys = []*domain.Passkey{
+						{
+							ID:                           "passkey-id",
+							PublicKey:                    []byte("public-key"),
+							Type:                         domain.PasskeyTypePasswordless,
+							CreatedAt:                    now,
+							UpdatedAt:                    now,
+							VerifiedAt:                   now,
+							KeyID:                        []byte("keyID"),
+							Name:                         "updated-name",
+							AttestationType:              "attestation-type",
+							AuthenticatorAttestationGUID: []byte("aa guid"),
+							Challenge:                    []byte("challenge"),
+							RelyingPartyID:               "rp id",
+						},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "set human remove passkey",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddPasskey(&domain.Passkey{
+						ID:                           "passkey-id",
+						PublicKey:                    []byte("public-key"),
+						Type:                         domain.PasskeyTypePasswordless,
+						CreatedAt:                    now,
+						UpdatedAt:                    now,
+						VerifiedAt:                   now,
+						KeyID:                        []byte("keyID"),
+						Name:                         "name",
+						AttestationType:              "attestation-type",
+						AuthenticatorAttestationGUID: []byte("aa guid"),
+						Challenge:                    []byte("challenge"),
+						RelyingPartyID:               "rp id",
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.RemovePasskey(humanRepo.PasskeyIDCondition("passkey-id")),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Passkeys = nil
+					return u
+				}(),
+			},
+		},
 		{
 			name: "set machine name",
 			args: args{
@@ -822,7 +1896,7 @@ func Test_user_Update(t *testing.T) {
 		}(),
 		{
 			name: "set machine remove key",
-			setup: func(t *testing.T, tx database.Transaction) error {
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				rowCount, err := userRepo.Update(t.Context(), tx, machineCondition,
 					machineRepo.AddKey(&domain.MachineKey{
 						ID:        "key-to-remove",
@@ -872,7 +1946,7 @@ func Test_user_Update(t *testing.T) {
 		}(),
 		{
 			name: "set machine remove personal access token",
-			setup: func(t *testing.T, tx database.Transaction) error {
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				rowCount, err := userRepo.Update(t.Context(), tx, machineCondition,
 					machineRepo.AddPersonalAccessToken(&domain.PersonalAccessToken{
 						ID:        "pat-to-remove",
@@ -905,6 +1979,7 @@ func Test_user_Update(t *testing.T) {
 					t.Log("rollback savepoint failed", err)
 				}
 			})
+
 			if tt.setup != nil {
 				err := tt.setup(t, savepoint)
 				require.NoError(t, err)
@@ -979,8 +2054,7 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 
 	if expected.Phone == nil {
 		assert.Nil(t, actual.Phone, "human phone nil")
-	}
-	if expected.Phone != nil {
+	} else {
 		require.NotNil(t, actual.Phone, "human phone not nil")
 		assert.Equal(t, expected.Phone.Number, actual.Phone.Number, "human phone number")
 		assert.True(t, expected.Phone.VerifiedAt.Equal(actual.Phone.VerifiedAt), "human phone verified at")
@@ -1033,19 +2107,19 @@ func assertHumanEmail(t *testing.T, expected, actual domain.HumanEmail) {
 	assertVerification(t, expected.Unverified, actual.Unverified, "human email unverified")
 }
 
-func assertCryptoValue(t *testing.T, expected, actual *crypto.CryptoValue) {
+func assertCryptoValue(t *testing.T, expected, actual *crypto.CryptoValue, field string) {
 	t.Helper()
 
 	if expected == nil {
-		assert.Nil(t, actual, "crypto value nil")
+		assert.Nil(t, actual, field+" nil")
 		return
 	}
 
-	require.NotNil(t, actual, "crypto value not nil")
-	assert.Equal(t, expected.Crypted, actual.Crypted, "crypto value crypted")
-	assert.Equal(t, expected.CryptoType, actual.CryptoType, "crypto value crypto type")
-	assert.Equal(t, expected.Algorithm, actual.Algorithm, "crypto value algorithm")
-	assert.Equal(t, expected.KeyID, actual.KeyID, "crypto value key id")
+	require.NotNil(t, actual, field+" not nil")
+	assert.Equal(t, expected.Crypted, actual.Crypted, field+" crypted")
+	assert.Equal(t, expected.CryptoType, actual.CryptoType, field+" crypto type")
+	assert.Equal(t, expected.Algorithm, actual.Algorithm, field+" algorithm")
+	assert.Equal(t, expected.KeyID, actual.KeyID, field+" key id")
 }
 
 func assertPersonalAccessTokens(t *testing.T, expected, actual []*domain.PersonalAccessToken) {
@@ -1163,6 +2237,7 @@ func assertVerification(t *testing.T, expected, actual *domain.Verification, fie
 
 	require.NotNil(t, actual, "%s not nil", field)
 	assert.Equal(t, expected.Value, actual.Value, "%s value", field)
+	assertCryptoValue(t, expected.Code, actual.Code, field+" code")
 	assert.Equal(t, expected.Code, actual.Code, "%s code", field)
 	if expected.ExpiresAt != nil {
 		require.NotNil(t, actual.ExpiresAt, "%s expires at not nil", field)
@@ -1184,5 +2259,4 @@ func assertIdentityProviderLinks(t *testing.T, expected, actual []*domain.Identi
 		assert.True(t, expectedLink.CreatedAt.Equal(actual[i].CreatedAt), "identity provider link[%d] created at", i)
 		assert.True(t, expectedLink.UpdatedAt.Equal(actual[i].UpdatedAt), "identity provider link[%d] updated at", i)
 	}
-	assert.Empty(t, actual, "unmatched identity provider links")
 }

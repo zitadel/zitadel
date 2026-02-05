@@ -21,11 +21,10 @@ func (u userHuman) SetEmail(verification domain.VerificationType) database.Chang
 		return u.verification.skipped(typ, u.emailVerifiedAtColumn(), u.EmailColumn())
 	case *domain.VerificationTypeUpdate:
 		return u.verification.update(typ, existingHumanUser.unqualifiedTableName(),
-			existingHumanUser.InstanceIDColumn(), existingHumanUser.emailVerificationIDColumn(),
-		)
+			existingHumanUser.InstanceIDColumn(), existingHumanUser.emailVerificationIDColumn())
 	case *domain.VerificationTypeVerified:
-		return u.verification.verified(typ, existingUser.unqualifiedTableName(), u.InstanceIDColumn(),
-			u.emailVerificationIDColumn(), u.emailVerifiedAtColumn(), u.EmailColumn())
+		return u.verification.verified(typ, existingUser.unqualifiedTableName(), existingUser.InstanceIDColumn(),
+			existingHumanUser.emailVerificationIDColumn(), u.emailVerifiedAtColumn(), u.EmailColumn())
 	case *domain.VerificationTypeFailed:
 		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.emailVerificationIDColumn())
 	}
