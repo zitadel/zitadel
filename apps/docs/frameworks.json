@@ -8,6 +8,12 @@
 		"docsLink": "/docs/guides/start/quickstart?framework=angular"
 	},
 	{
+		"id": "astro",
+		"title": "Astro",
+		"imgSrcDark": "/docs/img/tech/astro.svg",
+		"docsLink": "/docs/guides/start/quickstart?framework=astro"
+	},
+	{
 		"id": "django",
 		"title": "Django",
 		"imgSrcDark": "/docs/img/tech/django.svg",
@@ -80,109 +86,10 @@
 
 
 
-
-	{
-		"id": "client-php",
-		"title": "PHP",
-		"imgSrcDark": "/docs/img/tech/php.svg",
-		"docsLink": "/docs/sdk-examples/client-libraries/php",
-		"client": true
-	},
-	{
-		"id": "client-java",
-		"title": "Java",
-		"imgSrcDark": "/docs/img/tech/java.svg",
-		"docsLink": "/docs/sdk-examples/client-libraries/java",
-		"client": true
-	},
-	{
-		"id": "client-ruby",
-		"title": "Ruby",
-		"imgSrcDark": "/docs/img/tech/ruby.svg",
-		"docsLink": "/docs/sdk-examples/client-libraries/ruby",
-		"client": true
-	},
-	{
-		"id": "client-python",
-		"title": "Python",
-		"imgSrcDark": "/docs/img/tech/python.svg",
-		"docsLink": "/docs/sdk-examples/client-libraries/python",
-		"client": true
-	},
-	{
-		"id": "client-node",
-		"title": "Node.js",
-		"imgSrcDark": "/docs/img/tech/nodejs.svg",
-		"docsLink": "/docs/sdk-examples/client-libraries/node",
-		"client": true
-	},
 	{
 		"title": "NestJS",
 		"imgSrcDark": "/docs/img/tech/nestjs.svg",
 		"docsLink": "/docs/sdk-examples/nestjs"
-	},
-
-
-
-	{
-		"title": "Dart",
-		"imgSrcDark": "/docs/img/tech/dart.svg",
-		"docsLink": "https://github.com/smartive/zitadel-dart",
-		"external": true,
-		"client": true,
-		"sdk": true
-	},
-	{
-		"title": "Elixir",
-		"imgSrcDark": "/docs/img/tech/elixir.svg",
-		"docsLink": "https://github.com/maennchen/zitadel_api",
-		"external": true
-	},
-	{
-		"title": "NextAuth",
-		"imgSrcDark": "/docs/img/tech/nextjs.svg",
-		"imgSrcLight": "/docs/img/tech/nextjslight.svg",
-		"docsLink": "https://next-auth.js.org/providers/zitadel",
-		"external": true
-	},
-	{
-		"title": ".Net",
-		"imgSrcDark": "/docs/img/tech/dotnet.svg",
-		"docsLink": "https://github.com/smartive/zitadel-net",
-		"external": true,
-		"client": true
-	},
-	{
-		"title": "Passport.js",
-		"imgSrcDark": "/docs/img/tech/passportjs.svg",
-		"docsLink": "https://github.com/buehler/node-passport-zitadel",
-		"external": true
-	},
-	{
-		"title": "Rust",
-		"imgSrcLight": "/docs/img/tech/rust.svg",
-		"imgSrcDark": "/docs/img/tech/rustlight.svg",
-		"docsLink": "https://github.com/smartive/zitadel-rust",
-		"client": true,
-		"external": true
-	},
-	{
-		"title": "Pylon",
-		"imgSrcDark": "/docs/img/tech/pylon.svg",
-		"docsLink": "https://github.com/getcronit/pylon",
-		"external": true
-	},
-		{
-		"title": "Vanilla-JS",
-		"imgSrcDark": "/docs/img/tech/javascript.svg",
-		"docsLink": "https://github.com/zitadel/zitadel-vanilla-js",
-		"external": true
-	},
-	{
-		"id": "astro",
-		"title": "Astro",
-		"imgSrcDark": "/docs/img/tech/astro.svg",
-		"docsLink": "/docs/sdk-examples/astro"
 	},
 	{
 		"id": "expressjs",
