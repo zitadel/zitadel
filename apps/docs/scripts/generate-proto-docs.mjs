@@ -145,9 +145,19 @@ async function run() {
             console.log(`Excluding ${excludedPaths.length} paths matching v3alpha or v2beta`);
         }
 
+        // --- BUF_TOKEN Check ---
+        const bufToken = process.env.BUF_TOKEN;
+        if (!bufToken) {
+            console.warn('⚠️  BUF_TOKEN is not set. Remote plugins or private dependencies might fail if authentication is required.');
+        } else if (bufToken.length < 10) {
+            console.warn('⚠️  BUF_TOKEN appears to be too short or invalid.');
+        } else {
+            console.log('✅ BUF_TOKEN is present.');
+        }
+
         import('child_process').then(({ spawn }) => {
             const args = [
-              'buf', 'generate',
+              '@bufbuild/buf', 'generate',
               bufInput,
               '--template', templatePath,
               '--output', outputPath
