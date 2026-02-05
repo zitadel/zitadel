@@ -184,6 +184,12 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:3000/logout">
         </AppConfig>
     </Tab>
+    <Tab value="Svelte">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000">
+        </AppConfig>
+    </Tab>
     <Tab value="Vue.js">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback"
@@ -252,6 +258,9 @@ ZITADEL automatically configures the best security settings for your selected fr
         <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="Symfony">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="Svelte">
         <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="Vue.js">
@@ -347,6 +356,10 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     <Tab value="Symfony">
         - [PHP](https://www.php.net/)
         - [Composer](https://getcomposer.org/)
+    </Tab>
+    <Tab value="Svelte">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
     </Tab>
     <Tab value="Vue.js">
         - [Node.js](https://nodejs.org/)
@@ -469,6 +482,12 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```bash
         git clone https://github.com/zitadel/example-auth-symfony.git
         cd example-auth-symfony
+        ```
+    </Tab>
+    <Tab value="Svelte">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-sveltekit.git
+        cd example-auth-sveltekit
         ```
     </Tab>
     <Tab value="Vue.js">
@@ -778,6 +797,23 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         NG_APP_ZITADEL_POST_LOGIN_URL="/profile"
         ```
     </Tab>
+    <Tab value="Svelte">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        # Example: https://my-org-a1b2c3.zitadel.cloud
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        NEXTAUTH_URL="http://localhost:3000"
+        ```
+    </Tab>
     <Tab value="Vue.js">
         1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
@@ -987,6 +1023,15 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         Your app will be live at `http://localhost:3000`.
 
         ![Symfony Example App](../../../public/img/guides/quickstart/symfony_example_app.png)
+    </Tab>
+    <Tab value="Svelte">
+        npm install
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Svelte Example App](../../../public/img/guides/quickstart/sveltekit_example_app.png)
     </Tab>
     <Tab value="Vue.js">
         ```bash

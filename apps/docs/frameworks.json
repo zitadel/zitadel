@@ -118,19 +118,16 @@
 		"docsLink": "/docs/guides/start/quickstart?framework=symfony"
 	},
 	{
+		"id": "svelte",
+		"title": "Svelte",
+		"imgSrcDark": "/docs/img/tech/sveltekit.svg",
+		"docsLink": "/docs/guides/start/quickstart?framework=sveltekit"
+	},
+	{
 		"id": "vue",
 		"title": "Vue.js",
 		"description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
 		"imgSrcDark": "/docs/img/tech/vue.svg",
 		"docsLink": "/docs/guides/start/quickstart?framework=vue"
-	},
-
-
-
-	{
-		"id": "sveltekit",
-		"title": "SvelteKit",
-		"imgSrcDark": "/docs/img/tech/sveltekit.svg",
-		"docsLink": "/docs/sdk-examples/sveltekit"
 	}
 ]
