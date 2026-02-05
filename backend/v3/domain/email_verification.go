@@ -5,7 +5,7 @@ package domain
 // 	"time"
 // )
 
-// // EmailVerifiedCommand verifies an email address for a User (Human).
+// // EmailVerifiedCommand verifies an email address for a user.
 // type EmailVerifiedCommand struct {
 // 	UserID string `json:"userId"`
 // 	Email  *Email `json:"email"`

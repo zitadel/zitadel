@@ -113,7 +113,7 @@ service UserService {
 
   // Create a new User (Human)
   //
-  // Create/import a new User (Human). The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
+  // Create/import a new user. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA)
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
@@ -145,7 +145,7 @@ service UserService {
 
   // User by ID
   //
-  // Returns the full User (Human) or Service Account including the profile, email, etc.
+  // Returns the full user or Service Account including the profile, email, etc.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {

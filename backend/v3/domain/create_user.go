@@ -9,7 +9,7 @@ package domain
 // // CreateUserCommand adds a new user including the email verification for humans.
 // // In the future it might make sense to separate the command into two commands:
 // // - CreateHumanCommand: creates a new User (Human)
-// // - CreateMachineCommand: creates a new machine user
+// // - CreateMachineCommand: creates a new service account
 // type CreateUserCommand struct {
 // 	user  *User
 // 	email *SetEmailCommand

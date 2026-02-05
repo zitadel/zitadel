@@ -83,8 +83,8 @@ type userColumns interface {
 //go:generate mockgen -typed -package domainmock -destination ./mock/human_user.mock.go . HumanUserRepository
 
 type HumanUserRepository interface {
-	// Update updates the User (Human)
-	// It ensures that updates are only applied to User (Human)
+	// Update updates the user
+	// It ensures that updates are only applied to user
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	humanConditions
 	humanChanges
