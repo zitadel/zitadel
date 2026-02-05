@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Usuarios del servicio",
     "LOGOUT": "Cerrar sesión para todos los usuarios",
     "NEWORG": "Nueva organización",
-    "IAMADMIN": "Eres un administrador Instancia. Ten en cuenta que tienes permisos ampliados.",
+    "IAMADMIN": "Eres un administrador IAM. Ten en cuenta que tienes permisos ampliados.",
     "SHOWORGS": "Mostrar todas las organizaciones",
     "GRANTS": "Autorizaciones",
     "ACTIONS": "Acciones",
@@ -2766,7 +2766,7 @@
     "ADD": "Añadir un Mánager",
     "CREATIONTYPE": "Tipo de creación",
     "CREATIONTYPES": {
-      "3": "Instancia",
+      "3": "IAM",
       "2": "Organización",
       "0": "Proyecto propio",
       "1": "Proyecto con acceso concedido",

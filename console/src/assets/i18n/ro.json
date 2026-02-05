@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Utilizatori de servicii",
     "LOGOUT": "Deconectați toți utilizatorii",
     "NEWORG": "Organizație nouă",
-    "IAMADMIN": "Sunteți administrator Instanță. Rețineți că aveți permisiuni extinse.",
+    "IAMADMIN": "Sunteți administrator IAM. Rețineți că aveți permisiuni extinse.",
     "SHOWORGS": "Afișați toate organizațiile",
     "GRANTS": "Autorizații",
     "ACTIONS": "Acțiuni",
@@ -2791,7 +2791,7 @@
     "ADD": "Adăugați un manager",
     "CREATIONTYPE": "Tip creare",
     "CREATIONTYPES": {
-      "3": "Instanță",
+      "3": "IAM",
       "2": "Organizație",
       "0": "Proiect deținut",
       "1": "Proiect acordat",

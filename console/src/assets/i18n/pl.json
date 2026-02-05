@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Użytkownicy usług",
     "LOGOUT": "Wyloguj Wszystkich Użytkowników",
     "NEWORG": "Nowa Organizacja",
-    "IAMADMIN": "Jesteś administratorem Instancja. Zauważ, że masz rozszerzone uprawnienia.",
+    "IAMADMIN": "Jesteś administratorem IAM. Zauważ, że masz rozszerzone uprawnienia.",
     "SHOWORGS": "Pokaż wszystkie organizacje",
     "GRANTS": "Autoryzacje",
     "ACTIONS": "Akcje",
@@ -2769,7 +2769,7 @@
     "ADD": "Dodaj managera",
     "CREATIONTYPE": "Typ utworzenia",
     "CREATIONTYPES": {
-      "3": "Instancja",
+      "3": "IAM",
       "2": "Organizacja",
       "0": "Własny projekt",
       "1": "Nadany projekt",

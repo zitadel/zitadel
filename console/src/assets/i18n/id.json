@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Pengguna Layanan",
     "LOGOUT": "Logout Semua Pengguna",
     "NEWORG": "Organisasi Baru",
-    "IAMADMIN": "Anda adalah Administrator Contoh. Perhatikan bahwa Anda memiliki izin yang diperluas.",
+    "IAMADMIN": "Anda adalah Administrator IAM. Perhatikan bahwa Anda memiliki izin yang diperluas.",
     "SHOWORGS": "Tampilkan Semua Organisasi",
     "GRANTS": "Otorisasi",
     "ACTIONS": "Tindakan",

@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Service-Benutzer",
     "LOGOUT": "Alle Benutzer abmelden",
     "NEWORG": "Neue Organisation",
-    "IAMADMIN": "Du bist ein Instanz-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
+    "IAMADMIN": "Du bist ein IAM-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
     "SHOWORGS": "Alle Organisationen anzeigen",
     "GRANTS": "Berechtigungen",
     "ACTIONS": "Aktionen",
@@ -2769,7 +2769,7 @@
     "ADD": "Manager hinzufügen",
     "CREATIONTYPE": "Erstelltyp",
     "CREATIONTYPES": {
-      "3": "Instanz",
+      "3": "IAM",
       "2": "Organisation",
       "0": "Eigenes Projekt",
       "1": "Berechtigtes Projekt",

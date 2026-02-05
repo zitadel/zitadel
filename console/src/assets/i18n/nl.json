@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Servicegebruikers",
     "LOGOUT": "Alle gebruikers uitloggen",
     "NEWORG": "Nieuwe organisatie",
-    "IAMADMIN": "U bent een Instantie-beheerder. Let op: u heeft uitgebreide rechten.",
+    "IAMADMIN": "U bent een IAM-beheerder. Let op: u heeft uitgebreide rechten.",
     "SHOWORGS": "Toon alle organisaties",
     "GRANTS": "Machtigingen",
     "ACTIONS": "Acties",
@@ -2788,7 +2788,7 @@
     "ADD": "Voeg een Manager toe",
     "CREATIONTYPE": "Creatietype",
     "CREATIONTYPES": {
-      "3": "Instantie",
+      "3": "IAM",
       "2": "Organisatie",
       "0": "Eigendom Project",
       "1": "Verleend Project",

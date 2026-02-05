@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Usuários de Serviço",
     "LOGOUT": "Encerrar Sessão de Todos os Usuários",
     "NEWORG": "Nova Organização",
-    "IAMADMIN": "Você é um Administrador Instância. Observe que você possui permissões estendidas.",
+    "IAMADMIN": "Você é um Administrador IAM. Observe que você possui permissões estendidas.",
     "SHOWORGS": "Mostrar Todas as Organizações",
     "GRANTS": "Autorizações",
     "ACTIONS": "Ações",
@@ -2765,7 +2765,7 @@
     "ADD": "Adicionar um Gerente",
     "CREATIONTYPE": "Tipo de Criação",
     "CREATIONTYPES": {
-      "3": "Instância",
+      "3": "IAM",
       "2": "Organização",
       "0": "Projeto Próprio",
       "1": "Projeto Concedido",

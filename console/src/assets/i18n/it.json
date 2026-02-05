@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Utenti di servizio",
     "LOGOUT": "Esci con tutti gli utenti",
     "NEWORG": "Nuova organizzazione",
-    "IAMADMIN": "Sei un amministratore Istanza. Nota che hai autorizzazioni estese.",
+    "IAMADMIN": "Sei un amministratore IAM. Nota che hai autorizzazioni estese.",
     "SHOWORGS": "Mostra tutte le organizzazioni",
     "GRANTS": "Autorizzazioni",
     "ACTIONS": "Azioni",
@@ -2770,7 +2770,7 @@
     "ADD": "Aggiungi un manager",
     "CREATIONTYPE": "Tipo di creazione",
     "CREATIONTYPES": {
-      "3": "Istanza",
+      "3": "IAM",
       "2": "Organizzazione",
       "0": "Progetto proprio",
       "1": "Progetto delegato",

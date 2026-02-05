@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Szolgáltatási Felhasználók",
     "LOGOUT": "Minden Felhasználó Kijelentkezése",
     "NEWORG": "Új Szervezet",
-    "IAMADMIN": "Te egy Példány Adminisztrátor vagy. Ne felejtsd el, hogy kibővített jogosultságokkal rendelkezel.",
+    "IAMADMIN": "Te egy IAM Adminisztrátor vagy. Ne felejtsd el, hogy kibővített jogosultságokkal rendelkezel.",
     "SHOWORGS": "Show All Organizations",
     "GRANTS": "Engedélyek",
     "ACTIONS": "Műveletek",
@@ -2793,7 +2793,7 @@
     "ADD": "Hozzáadás egy menedzsert",
     "CREATIONTYPE": "Létrehozás típusa",
     "CREATIONTYPES": {
-      "3": "Példány",
+      "3": "IAM",
       "2": "Szervezet",
       "0": "Saját projekt",
       "1": "Engedélyezett Projekt",

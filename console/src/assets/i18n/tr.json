@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Servis Kullanıcıları",
     "LOGOUT": "Tüm Kullanıcıları Çıkış Yap",
     "NEWORG": "Yeni Organizasyon",
-    "IAMADMIN": "Örnek Yöneticisisiniz. Genişletilmiş izinleriniz olduğunu unutmayın.",
+    "IAMADMIN": "IAM Yöneticisisiniz. Genişletilmiş izinleriniz olduğunu unutmayın.",
     "SHOWORGS": "Tüm Organizasyonları Göster",
     "GRANTS": "Yetkilendirmeler",
     "ACTIONS": "Eylemler",
@@ -2798,7 +2798,7 @@
     "ADD": "Yönetici Ekle",
     "CREATIONTYPE": "Oluşturma Türü",
     "CREATIONTYPES": {
-      "3": "Örnek",
+      "3": "IAM",
       "2": "Organizasyon",
       "0": "Sahip Olunan Proje",
       "1": "Verilen Proje",
