@@ -2679,7 +2679,8 @@
             "DESCRIPTION": "Tek Sayfa Uygulamaları (SPA) ve genel olarak tarayıcılarda çalıştırılan tüm JS framework'leri"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

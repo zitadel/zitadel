@@ -207,6 +207,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       authMethodType: [{ value: '', disabled: true }],
       loginV2: [{ value: false, disabled: true }],
       loginV2BaseURL: [{ value: '', disabled: true }],
+      backChannelLogoutURI: [{ value: '', disabled: true }],
     });
 
     this.oidcTokenForm = this.fb.group({
@@ -443,6 +444,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 const inSecs = this.app.oidcConfig?.clockSkew.seconds + this.app.oidcConfig?.clockSkew.nanos / 100000;
                 this.oidcTokenForm.controls['clockSkewSeconds'].setValue(inSecs);
               }
+              if (this.app.oidcConfig?.backChannelLogoutUri) {
+                this.oidcForm.controls['backChannelLogoutURI'].setValue(this.app.oidcConfig.backChannelLogoutUri);
+              }
               if (this.app.oidcConfig?.loginVersion?.loginV1) {
                 this.oidcForm.controls['loginV2'].setValue(false);
               } else if (this.app.oidcConfig?.loginVersion?.loginV2) {
@@ -651,6 +655,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
         this.app.oidcConfig.appType = this.appType?.value;
         this.app.oidcConfig.authMethodType = this.authMethodType?.value;
+        this.app.oidcConfig.backChannelLogoutUri = this.backChannelLogoutURI?.value;
 
         // token
         this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
@@ -674,6 +679,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         req.setAuthMethodType(this.app.oidcConfig.authMethodType);
         req.setGrantTypesList(this.app.oidcConfig.grantTypesList);
         req.setAppType(this.app.oidcConfig.appType);
+        req.setBackChannelLogoutUri(this.app.oidcConfig.backChannelLogoutUri);
         const login = new LoginVersion();
         if (this.oidcLoginV2?.value) {
           const loginV2 = new LoginV2();
@@ -875,6 +881,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public get authMethodType(): AbstractControl | null {
     return this.oidcForm.get('authMethodType');
+  }
+
+  public get backChannelLogoutURI(): AbstractControl | null {
+    return this.oidcForm.get('backChannelLogoutURI');
   }
 
   public get oidcLoginV2(): FormControl<boolean> | null {

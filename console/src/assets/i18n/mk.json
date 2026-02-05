@@ -2647,7 +2647,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) и воопшто сите JS frameworks кои се извршуваат во прелистувачите"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

@@ -2674,7 +2674,8 @@
             "DESCRIPTION": "Egylapos alkalmazások (SPA) és általában minden böngészőben futó JS keretrendszer"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
