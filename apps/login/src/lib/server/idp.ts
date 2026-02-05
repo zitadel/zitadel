@@ -79,6 +79,10 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
     return { error: "Could not start IDP flow" };
   }
 
+  if (response && "error" in response && response?.error) {
+    return { error: response.error };
+  }
+
   if (response && "redirect" in response && response?.redirect) {
     redirect(response.redirect);
   }
