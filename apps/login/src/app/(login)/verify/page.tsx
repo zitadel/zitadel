@@ -41,6 +41,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const doSend = send === "true";
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  const disableAutoVerify = process.env.NEXT_PUBLIC_DISABLE_AUTO_VERIFY_EMAIL === "true";
 
   async function sendEmail(userId: string) {
     const hostWithProtocol = await getPublicHostWithProtocol(_headers);
@@ -220,6 +221,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
             code={code}
             isInvite={invite === "true"}
             requestId={requestId}
+            submit={!disableAutoVerify}
           />
         )}
       </div>

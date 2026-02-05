@@ -144,4 +144,8 @@ Also ensure your login domain is registered on your instance by adding it as a [
 
 If you want to enforce users to have their email verified, you can set the optional `EMAIL_VERIFICATION` variable to `true` in your environment and your users will be enforced to verify their email address before they can log in.
 
+If your organization uses enterprise email link scanners that pre-fetch URLs in emails, these scanners can inadvertently consume one-time verification codes before users click them.
+To prevent this, set `NEXT_PUBLIC_DISABLE_AUTO_VERIFY_EMAIL` to `true`.
+This disables automatic code redemption on page load and instead displays the verification code in a form with a Submit button, requiring explicit user action.
+
 ![](../../../../public/img/deploy-to-vercel.png)
