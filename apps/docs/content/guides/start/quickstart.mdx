@@ -88,6 +88,12 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
+    <Tab value="Express.js">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000">
+        </AppConfig>
+    </Tab>
     <Tab value="FastAPI">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback"
@@ -182,6 +188,9 @@ ZITADEL automatically configures the best security settings for your selected fr
     <Tab value="Django">
         <AppValues valueCount="two" clientSecret={false}></AppValues>
     </Tab>
+    <Tab value="Express.js">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
     <Tab value="Flask">
         <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
@@ -249,6 +258,10 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     <Tab value="Django">
         - [Python](https://www.python.org/)
         - [Poetry](https://python-poetry.org/)
+    </Tab>
+    <Tab value="Express.js">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
     </Tab>
     <Tab value="FastAPI">
         - [Python](https://www.python.org/)
@@ -320,6 +333,12 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```bash
         git clone https://github.com/zitadel/example-auth-django.git
         cd example-auth-django
+        ```
+    </Tab>
+    <Tab value="Express.js">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-expressjs.git
+        cd example-auth-expressjs
         ```
     </Tab>
     <Tab value="FastAPI">
@@ -420,7 +439,6 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```
     </Tab>
     <Tab value="Astro">
-
         1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
@@ -454,6 +472,23 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ZITADEL_POST_LOGIN_URL="/profile"
         ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
 
+        ```
+    </Tab>
+    <Tab value="Express.js">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
         ```
     </Tab>
     <Tab value="FastAPI">
@@ -604,7 +639,6 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```
     </Tab>
     <Tab value="Spring">
-
         1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
@@ -621,7 +655,6 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```
     </Tab>
     <Tab value="Symfony">
-
         1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
@@ -683,6 +716,16 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         Your app will be live at `http://localhost:3000`.
 
         ![Django Example App](../../../public/img/guides/quickstart/django_example_app.png)
+    </Tab>
+    <Tab value="Express.js">
+        ```bash
+        npm install
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Express.js Example App](../../../public/img/guides/quickstart/expressjs_example_app.png)
     </Tab>
     <Tab value="FastAPI">
         ```bash

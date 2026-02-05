@@ -106,6 +106,13 @@ export const OIDC_CONFIGURATIONS: OidcAppConfigurations = {
     .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
     .setRedirectUrisList(['http://localhost:3000/api/auth/callback/zitadel'])
     .setPostLogoutRedirectUrisList(['http://localhost:3000']),
+  ['expressjs']: new AddOIDCAppRequest()
+    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
+    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
+    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
+    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
+    .setRedirectUrisList(['http://localhost:3000/auth/callback/zitadel'])
+    .setPostLogoutRedirectUrisList(['http://localhost:3000']),
   // native
   ['flutter']: new AddOIDCAppRequest()
     .setAppType(OIDCAppType.OIDC_APP_TYPE_NATIVE)

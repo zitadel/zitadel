@@ -20,6 +20,12 @@
 		"docsLink": "/docs/guides/start/quickstart?framework=django"
 	},
 	{
+		"id": "expressjs",
+		"title": "Express.js",
+		"imgSrcDark": "/docs/img/tech/expressjs.svg",
+		"docsLink": "/docs/guides/start/quickstart?framework=expressjs"
+	},
+	{
 		"id": "fastapi",
 		"title": "FastAPI",
 		"imgSrcDark": "/docs/img/tech/fastapi.svg",
@@ -108,12 +114,6 @@
 		"title": "NestJS",
 		"imgSrcDark": "/docs/img/tech/nestjs.svg",
 		"docsLink": "/docs/sdk-examples/nestjs"
-	},
-	{
-		"id": "expressjs",
-		"title": "Express.js",
-		"imgSrcDark": "/docs/img/tech/expressjs.svg",
-		"docsLink": "/docs/sdk-examples/expressjs"
 	},
 	{
 		"id": "fastify",
