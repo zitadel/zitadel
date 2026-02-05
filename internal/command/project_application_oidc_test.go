@@ -501,6 +501,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 						),
 					),
 					expectFilter(),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -608,6 +609,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
@@ -717,6 +719,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
