@@ -31,7 +31,6 @@
           "bash -c 'sha256sum .artifacts/pack/zitadel-*.tar.gz > .artifacts/pack/checksums.txt' --"
         ]
       },
-      "cache": false,
       "inputs": [
         "{workspaceRoot}/.artifacts/pack/zitadel-*.tar.gz"
       ],

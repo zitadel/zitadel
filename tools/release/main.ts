@@ -300,25 +300,32 @@ ${changelog}
         console.log('[Plan] Would create GitHub Release and upload assets.');
     }
 
-    // 4. Docker Push (Live Mode Only)
-    // Targets renamed to publish-container
+    // Safety check for Live Mode
+    if (isLive && !octokit) {
+        console.error('❌ Error: GITHUB_TOKEN is missing. Cannot perform Release or Docker Push in Live mode.');
+        process.exit(1);
+    }
+
+    // 4. Docker Push (Live & Preview)
+    // We publish images on PRs (Preview) and Main (Live).
+    // The project.json targets handle the "latest" tag based on TAG_LATEST.
     const dockerTargets = [
-        '@zitadel/api:publish-container',
-        '@zitadel/login:publish-container'
+        '@zitadel/api:publish',
+        '@zitadel/login:publish'
     ];
 
-    console.log('Processing Container Images...');
+    process.env.TAG_LATEST = isLive ? 'true' : 'false';
+    process.env.ZITADEL_VERSION = version;
+
+    console.log(`Processing Container Images... (Mode=${isLive ? 'Link' : 'Preview'}, Version=${version}, TagLatest=${process.env.TAG_LATEST})`);
+
     for (const target of dockerTargets) {
-        if (isLive) {
-            console.log(`Running target: ${target}`);
-            try {
-                execSync(`npx nx run ${target}`, { stdio: 'inherit', env: process.env });
-            } catch (e) {
-                console.error(`Failed to run target ${target}:`, e);
-                process.exit(1);
-            }
-        } else {
-            console.log(`[Plan] Would run target: ${target}`);
+        console.log(`Running target: ${target}`);
+        try {
+            execSync(`npx nx run ${target}`, { stdio: 'inherit', env: process.env });
+        } catch (e) {
+            console.error(`Failed to run target ${target}:`, e);
+            process.exit(1);
         }
     }
     process.exit(0);

@@ -1,0 +1,9 @@
+.git
+.nx
+node_modules
+dist
+tmp
+.vscode
+.idea
+coverage
+.DS_Store

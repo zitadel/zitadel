@@ -133,8 +133,20 @@
       "description": "Stops the gRPC mock container used for integration tests.",
       "command": "nx run @zitadel/login-api-mock:down"
     },
-    "archive": {
-      "description": "Packages the standalone Login application build into an archive",
+    "pack": {
+      "description": "Aggregates all packaging tasks",
+      "dependsOn": [
+        "pack-archive",
+        "pack-container"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": []
+      },
+      "cache": false
+    },
+    "pack-archive": {
+      "description": "Creates platform-specific archive tarballs",
       "dependsOn": [
         "build"
       ],
@@ -150,51 +162,46 @@
           "tar -czf ${PACK_DIR}/zitadel-login.tar.gz -C ${STANDALONE_DIR} ."
         ]
       },
-      "cache": false,
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/Dockerfile",
+        "{projectRoot}/.next/standalone/**/*",
+        "{workspaceRoot}/.dockerignore"
+      ],
       "outputs": [
         "{workspaceRoot}/.artifacts/pack/zitadel-login.tar.gz"
       ]
     },
     "pack-container": {
-      "description": "Builds the ZITADEL Login Docker image",
+      "description": "Builds the ZITADEL Login Docker image (Local Verification)",
       "dependsOn": [
-        {
-          "projects": "@zitadel/release",
-          "target": "version"
-        },
         "build"
       ],
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); docker build -t ghcr.io/zitadel/login:$VERSION -f apps/login/Dockerfile apps/login"
-        ],
         "parallel": false,
-        "forwardAllArgs": false
+        "commands": [
+          "docker buildx inspect multiarch >/dev/null 2>&1 || docker buildx create --name multiarch --driver docker-container --bootstrap --use",
+          "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/zitadel/test-login:$VERSION -f apps/login/Dockerfile apps/login"
+        ]
       },
       "cache": false
     },
-    "publish-container": {
+    "publish": {
       "description": "Pushes the ZITADEL Login Docker image",
       "dependsOn": [
-        "pack-container"
+        "pack-archive"
       ],
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); docker push ghcr.io/zitadel/login:$VERSION && docker tag ghcr.io/zitadel/login:$VERSION ghcr.io/zitadel/login:latest && docker push ghcr.io/zitadel/login:latest"
+          "docker buildx inspect multiarch >/dev/null 2>&1 || docker buildx create --name multiarch --driver docker-container --bootstrap --use",
+          "VERSION=$(echo \"${ZITADEL_VERSION:-$(cat .artifacts/version 2>/dev/null || echo dev)}\" | tr '+' '-'); LATEST_ARG=\"\"; if [ \"$TAG_LATEST\" = \"true\" ]; then LATEST_ARG=\"-t ghcr.io/zitadel/test-login:latest\"; fi; docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/zitadel/test-login:$VERSION $LATEST_ARG --push -f apps/login/Dockerfile apps/login"
         ],
         "parallel": false,
         "forwardAllArgs": false
       },
       "cache": false
-    },
-    "pack": {
-      "description": "Aggregates all packaging tasks (Archive + Docker build)",
-      "dependsOn": [
-        "archive",
-        "pack-container"
-      ]
     }
   }
 }

@@ -5,8 +5,7 @@
     "libsDir": "packages"
   },
   "tui": {
-    "enabled": true,
-    "autoExit": true
+    "enabled": true
   },
   "namedInputs": {
     "default": [

@@ -50,35 +50,69 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
-      - name: Build API
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify Packaging
+        run: pnpm nx run @zitadel/zitadel:pack
+      - name: Release
+        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
         env:
+          CI_RELEASE: ${{ github.ref == 'refs/heads/main' && 'true' || 'false' }} 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
         run: pnpm nx run @zitadel/release:release
-      - name: Upload Linux Artifacts
+      - name: Upload Linux AMD64 Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: zitadel-linux
-          path: .artifacts/pack/zitadel-linux-*.tar.gz
+          name: zitadel-linux-amd64
+          path: .artifacts/pack/zitadel-linux-amd64.tar.gz
           if-no-files-found: ignore
           retention-days: 5
-      - name: Upload Darwin Artifacts
+      - name: Upload Linux ARM64 Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: zitadel-darwin
-          path: .artifacts/pack/zitadel-darwin-*.tar.gz
+          name: zitadel-linux-arm64
+          path: .artifacts/pack/zitadel-linux-arm64.tar.gz
           if-no-files-found: ignore
           retention-days: 5
-      - name: Upload Windows Artifacts
+      - name: Upload Darwin AMD64 Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: zitadel-windows
-          path: .artifacts/pack/zitadel-windows-*.tar.gz
+          name: zitadel-darwin-amd64
+          path: .artifacts/pack/zitadel-darwin-amd64.tar.gz
+          if-no-files-found: ignore
+          retention-days: 5
+      - name: Upload Darwin ARM64 Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zitadel-darwin-arm64
+          path: .artifacts/pack/zitadel-darwin-arm64.tar.gz
+          if-no-files-found: ignore
+          retention-days: 5
+      - name: Upload Windows AMD64 Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zitadel-windows-amd64
+          path: .artifacts/pack/zitadel-windows-amd64.tar.gz
+          if-no-files-found: ignore
+          retention-days: 5
+      - name: Upload Windows ARM64 Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zitadel-windows-arm64
+          path: .artifacts/pack/zitadel-windows-arm64.tar.gz
           if-no-files-found: ignore
           retention-days: 5
       - name: Upload Login Artifact
