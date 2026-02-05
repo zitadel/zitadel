@@ -370,7 +370,8 @@ export async function sendPassword(
     return mfaFactorCheck;
   }
 
-  let result;
+  let result: Awaited<ReturnType<typeof completeFlowOrGetUrl>>;
+  
   if (command.requestId && session.id) {
     // OIDC/SAML flow
     console.log("Password auth: OIDC/SAML flow with requestId:", command.requestId, "sessionId:", session.id);
