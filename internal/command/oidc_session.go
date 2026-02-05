@@ -452,9 +452,6 @@ func (c *OIDCSessionEvents) RegisterLogout(ctx context.Context, sessionID, userI
 	if sessionID == "" || backChannelLogoutURI == "" {
 		return
 	}
-	if !authz.GetFeatures(ctx).EnableBackChannelLogout {
-		return
-	}
 
 	c.events = append(c.events, sessionlogout.NewBackChannelLogoutRegisteredEvent(
 		ctx,
