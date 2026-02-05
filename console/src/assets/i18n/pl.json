@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formularz Logowania",
           "DESCRIPTION": "Dostosuj formularz logowania.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Dozwolone użytkownik i hasło",
-            "DESCRIPTION": "Pozwól swoim użytkownikom logować się za pomocą nazwy użytkownika i hasła. Jeśli to zostanie dezaktywowane, użytkownicy mogą logować się tylko za pomocą uwierzytelniania bez hasła lub z zewnętrznym dostawcą tożsamości."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Lokalne uwierzytelnianie dozwolone",
+            "DESCRIPTION": "Zezwól użytkownikom na logowanie za pomocą nazwy użytkownika i hasła lub uwierzytelniania passkey. Jeśli ta opcja jest wyłączona, użytkownicy mogą logować się tylko za pomocą zewnętrznego dostawcy tożsamości."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Dozwolona rejestracja użytkownika",
@@ -2651,7 +2651,8 @@
             "DESCRIPTION": "Aplikacje jednoszczelinowe (SPA) i ogólnie wszystkie frameworki JS wykonywane w przeglądarkach"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

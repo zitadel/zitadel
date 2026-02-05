@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formulario de Inicio de Sesión",
           "DESCRIPTION": "Personaliza el formulario de inicio de sesión.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Permitido Nombre de Usuario y Contraseña",
-            "DESCRIPTION": "Permite a tus usuarios iniciar sesión con su nombre de usuario y contraseña. Si esto está desactivado, tus usuarios solo pueden iniciar sesión utilizando llaves de acceso o con un proveedor de identidad externo."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Autenticación local permitida",
+            "DESCRIPTION": "Permita que sus usuarios inicien sesión con su nombre de usuario y contraseña o autenticación con passkey. Si esto se desactiva, sus usuarios solo podrán iniciar sesión utilizando un proveedor de identidad externo."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Permitida la Registración de Usuarios",
@@ -2648,7 +2648,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) y en general todos los frameworks de JS ejecutados en navegadores"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

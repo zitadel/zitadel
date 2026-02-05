@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Modulo di Login",
           "DESCRIPTION": "Personalizza il modulo di login.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Username e Password consentiti",
-            "DESCRIPTION": "Permetti ai tuoi utenti di accedere con il loro username e password. Se questa opzione è disattivata, i tuoi utenti possono accedere solo utilizzando l'autenticazione con passkey o con un provider di identità esterno."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Autenticazione locale consentita",
+            "DESCRIPTION": "Consenti ai tuoi utenti di accedere con nome utente e password o autenticazione passkey. Se disattivato, i tuoi utenti potranno accedere solo utilizzando un provider di identità esterno."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Registrazione Utente consentita",
@@ -2652,7 +2652,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) e in generale tutti i framework JS eseguiti nei browser"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
