@@ -130,6 +130,12 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
         </AppConfig>
     </Tab>
+    <Tab value="Qwik">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
+        </AppConfig>
+    </Tab>
     <Tab value="React">
         <AppConfig
             redirectUrl="http://localhost:3000/callback"
@@ -195,6 +201,9 @@ ZITADEL automatically configures the best security settings for your selected fr
         <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="Next.js">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="Qwik">
         <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="React">
@@ -265,6 +274,10 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     </Tab>
     <Tab value="Next.js">
         - [Node.js](https://nodejs.org/)
+    </Tab>
+    <Tab value="Qwik">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
     </Tab>
     <Tab value="React">
         - [Node.js](https://nodejs.org/)
@@ -349,6 +362,12 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```bash
         git clone git@github.com:zitadel/example-auth-nextjs.git
         cd example-auth-nextjs
+        ```
+    </Tab>
+    <Tab value="Qwik">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-qwik.git
+        cd example-auth-qwik
         ```
     </Tab>
     <Tab value="React">
@@ -536,6 +555,22 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
         ```
     </Tab>
+    <Tab value="Qwik">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        VITE_PORT=3000
+        VITE_SESSION_SECRET="your-very-secret-and-strong-session-key"
+        VITE_SESSION_DURATION=3600
+        VITE_ZITADEL_DOMAIN="https://your-zitadel-domain"
+        VITE_ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        VITE_ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        VITE_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
+        VITE_ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
+        ```
+    </Tab>
     <Tab value="React">
         1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
@@ -720,6 +755,16 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
         ![Next.js Example App](../../../public/img/guides/quickstart/next_example_app.png)
 
+    </Tab>
+    <Tab value="Qwik">
+        ```bash
+        npm install
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Qwik Example App](../../../public/img/guides/quickstart/qwik_example_app.png)
     </Tab>
     <Tab value="React">
         ```bash

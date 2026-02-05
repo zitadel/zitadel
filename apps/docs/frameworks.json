@@ -71,6 +71,12 @@
 		"docsLink": "/docs/guides/start/quickstart?framework=react"
 	},
 	{
+		"id": "qwik",
+		"title": "Qwik",
+		"imgSrcDark": "/docs/img/tech/qwik.svg",
+		"docsLink": "/docs/guides/start/quickstart?framework=qwik"
+	},
+	{
 		"id": "solidstart",
 		"title": "SolidStart",
 		"imgSrcDark": "/docs/img/tech/solidstart.svg",
@@ -120,12 +126,6 @@
 		"title": "Nuxt.js",
 		"imgSrcDark": "/docs/img/tech/nuxtjs.svg",
 		"docsLink": "/docs/sdk-examples/nuxtjs"
-	},
-	{
-		"id": "qwik",
-		"title": "Qwik",
-		"imgSrcDark": "/docs/img/tech/qwik.svg",
-		"docsLink": "/docs/sdk-examples/qwik"
 	},
 	{
 		"id": "sveltekit",
