@@ -29,7 +29,7 @@ services:
     env_file:
       - ./.env.db
     volumes:
-      - db-data-dev:/var/lib/postgresql/data
+      - db-data-dev:/var/lib/postgresql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-U", "postgres" ]
       interval: "10s"

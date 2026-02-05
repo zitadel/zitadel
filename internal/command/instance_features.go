@@ -18,7 +18,6 @@ type InstanceFeatures struct {
 	ImprovedPerformance            []feature.ImprovedPerformanceType
 	DebugOIDCParentError           *bool
 	OIDCSingleV1SessionTermination *bool
-	EnableBackChannelLogout        *bool
 	LoginV2                        *feature.LoginV2
 	PermissionCheckV2              *bool
 	ManagementConsoleUseV2UserApi  *bool
@@ -32,7 +31,6 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.ImprovedPerformance == nil &&
 		m.DebugOIDCParentError == nil &&
 		m.OIDCSingleV1SessionTermination == nil &&
-		m.EnableBackChannelLogout == nil &&
 		m.LoginV2 == nil &&
 		m.PermissionCheckV2 == nil &&
 		m.ManagementConsoleUseV2UserApi == nil &&
