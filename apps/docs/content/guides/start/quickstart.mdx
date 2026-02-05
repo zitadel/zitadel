@@ -112,6 +112,12 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:8089">
         </AppConfig>
     </Tab>
+    <Tab value="Hono">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000">
+        </AppConfig>
+    </Tab>
     <Tab value="Laravel">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback/zitadel"
@@ -176,6 +182,9 @@ ZITADEL automatically configures the best security settings for your selected fr
     <Tab value="Go">
         <AppValues valueCount="two" clientSecret={false}></AppValues>
     </Tab>
+    <Tab value="Go">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
     <Tab value="Laravel">
         <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
@@ -236,6 +245,10 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     </Tab>
     <Tab value="Go">
         - [Go](https://go.dev/)
+    </Tab>
+    <Tab value="Hono">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
     </Tab>
     <Tab value="Laravel">
         - [PHP](https://www.php.net/)
@@ -304,7 +317,13 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     <Tab value="Go">
         ```bash
         git clone https://github.com/zitadel/zitadel-go.git
-        cd zitadel_go
+        cd zitadel-go
+        ```
+    </Tab>
+    <Tab value="Hono">
+        ```bash
+        git clone https://github.com/zitadel/zitadel-auth-hono.git
+        cd zitadel-auth-hono
         ```
     </Tab>
     <Tab value="Laravel">
@@ -441,8 +460,24 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         No action required for this step.
         The issuer and client Id will be passed directly when running the app (next step)
     </Tab>
-    <Tab value="Symfony">
+    <Tab value="Hono">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        ```
+    </Tab>
+    <Tab value="Symfony">
         1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
         3. Generate app key, this will update the APP_KEY variable in the .env file
@@ -616,6 +651,16 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         Your app will be live at `http://localhost:8089`.
 
         ![Go Example App](../../../public/img/guides/quickstart/go_example_app.png)
+    </Tab>
+    <Tab value="Hono">
+        ```bash
+        npm install
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Hono Example App](../../../public/img/guides/quickstart/hono_example_app.png)
     </Tab>
     <Tab value="Laravel">
         ```bash

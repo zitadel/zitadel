@@ -45,6 +45,12 @@
 		"sdk": true
 	},
 	{
+		"id": "hono",
+		"title": "Hono",
+		"imgSrcDark": "/docs/img/tech/hono.svg",
+		"docsLink": "/docs/guides/start/quickstart?framework=hono"
+	},
+	{
 		"id": "laravel",
 		"title": "Laravel",
 		"imgSrcDark": "/docs/img/tech/laravel.svg",
@@ -102,12 +108,6 @@
 		"title": "Fastify",
 		"imgSrcDark": "/docs/img/tech/fastify.svg",
 		"docsLink": "/docs/sdk-examples/fastify"
-	},
-	{
-		"id": "hono",
-		"title": "Hono",
-		"imgSrcDark": "/docs/img/tech/hono.svg",
-		"docsLink": "/docs/sdk-examples/hono"
 	},
 	{
 		"id": "nuxtjs",
