@@ -460,10 +460,10 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 	alg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
-		newCode                      encrypedCodeFunc
-		eventstore                   func(t *testing.T) *eventstore.Eventstore
-		idGenerator                  id.Generator
-		defaultPasskeySetURLTemplate func(_ context.Context) string
+		newCode     encrypedCodeFunc
+		eventstore  func(t *testing.T) *eventstore.Eventstore
+		idGenerator id.Generator
+		loginPaths  func(*testing.T) LoginPaths
 	}
 	type args struct {
 		userID        string
@@ -482,6 +482,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 				newCode:     mockEncryptedCode("passkey1", time.Hour),
 				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:        "user1",
@@ -520,8 +521,8 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 						),
 					),
 				),
-				defaultPasskeySetURLTemplate: func(_ context.Context) string { return "" },
-				idGenerator:                  id_mock.NewIDGeneratorExpectIDs(t, "123"),
+				loginPaths:  expectLoginPathsDefaultPasskeySetURLTemplate(""),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			},
 			args: args{
 				userID:        "user1",
@@ -562,8 +563,8 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 						),
 					),
 				),
-				defaultPasskeySetURLTemplate: func(_ context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
-				idGenerator:                  id_mock.NewIDGeneratorExpectIDs(t, "123"),
+				loginPaths:  expectLoginPathsDefaultPasskeySetURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			},
 			args: args{
 				userID:        "user1",
@@ -577,10 +578,10 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				newEncryptedCode:             tt.fields.newCode,
-				eventstore:                   tt.fields.eventstore(t),
-				idGenerator:                  tt.fields.idGenerator,
-				defaultPasskeySetURLTemplate: tt.fields.defaultPasskeySetURLTemplate,
+				newEncryptedCode: tt.fields.newCode,
+				eventstore:       tt.fields.eventstore(t),
+				idGenerator:      tt.fields.idGenerator,
+				loginPaths:       tt.fields.loginPaths(t),
 			}
 			got, err := c.AddUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -701,10 +702,10 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 	alg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
-		newCode                      encrypedCodeFunc
-		eventstore                   func(t *testing.T) *eventstore.Eventstore
-		idGenerator                  id.Generator
-		defaultPasskeySetURLTemplate func(_ context.Context) string
+		newCode     encrypedCodeFunc
+		eventstore  func(t *testing.T) *eventstore.Eventstore
+		idGenerator id.Generator
+		loginPaths  func(*testing.T) LoginPaths
 	}
 	type args struct {
 		userID        string
@@ -723,6 +724,7 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 				newCode:     newEncryptedCode,
 				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:        "user1",
@@ -761,8 +763,8 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:                  id_mock.NewIDGeneratorExpectIDs(t, "123"),
-				defaultPasskeySetURLTemplate: func(_ context.Context) string { return "" },
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
+				loginPaths:  expectLoginPathsDefaultPasskeySetURLTemplate(""),
 			},
 			args: args{
 				userID:        "user1",
@@ -807,8 +809,8 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:                  id_mock.NewIDGeneratorExpectIDs(t, "123"),
-				defaultPasskeySetURLTemplate: func(_ context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
+				loginPaths:  expectLoginPathsDefaultPasskeySetURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				userID:        "user1",
@@ -826,10 +828,10 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				newEncryptedCode:             tt.fields.newCode,
-				eventstore:                   tt.fields.eventstore(t),
-				idGenerator:                  tt.fields.idGenerator,
-				defaultPasskeySetURLTemplate: tt.fields.defaultPasskeySetURLTemplate,
+				newEncryptedCode: tt.fields.newCode,
+				eventstore:       tt.fields.eventstore(t),
+				idGenerator:      tt.fields.idGenerator,
+				loginPaths:       tt.fields.loginPaths(t),
 			}
 			got, err := c.AddUserPasskeyCodeReturn(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
 			if tt.wantErr != nil {
@@ -847,10 +849,10 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 	alg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
-		newCode                      encrypedCodeFunc
-		eventstore                   func(t *testing.T) *eventstore.Eventstore
-		idGenerator                  id.Generator
-		defaultPasskeySetURLTemplate func(context.Context) string
+		newCode     encrypedCodeFunc
+		eventstore  func(t *testing.T) *eventstore.Eventstore
+		idGenerator id.Generator
+		loginPaths  func(*testing.T) LoginPaths
 	}
 	type args struct {
 		userID        string
@@ -869,6 +871,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 				newCode:     newEncryptedCode,
 				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:        "user1",
@@ -882,6 +885,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 				newCode:     newEncryptedCode,
 				eventstore:  expectEventstore(expectFilterError(io.ErrClosedPipe)),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:        "user1",
@@ -898,6 +902,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 					expectFilterError(io.ErrClosedPipe),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:        "user1",
@@ -936,8 +941,8 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:                  id_mock.NewIDGeneratorExpectIDs(t, "123"),
-				defaultPasskeySetURLTemplate: func(_ context.Context) string { return "" },
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
+				loginPaths:  expectLoginPathsDefaultPasskeySetURLTemplate(""),
 			},
 			args: args{
 				userID:        "user1",
@@ -976,8 +981,8 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:                  id_mock.NewIDGeneratorExpectIDs(t, "123"),
-				defaultPasskeySetURLTemplate: func(_ context.Context) string { return "" },
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
+				loginPaths:  expectLoginPathsDefaultPasskeySetURLTemplate(""),
 			},
 			args: args{
 				userID:        "user1",
@@ -1021,8 +1026,8 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:                  id_mock.NewIDGeneratorExpectIDs(t, "123"),
-				defaultPasskeySetURLTemplate: func(_ context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
+				loginPaths:  expectLoginPathsDefaultPasskeySetURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				userID:        "user1",
@@ -1040,10 +1045,10 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				newEncryptedCode:             tt.fields.newCode,
-				eventstore:                   tt.fields.eventstore(t),
-				idGenerator:                  tt.fields.idGenerator,
-				defaultPasskeySetURLTemplate: tt.fields.defaultPasskeySetURLTemplate,
+				newEncryptedCode: tt.fields.newCode,
+				eventstore:       tt.fields.eventstore(t),
+				idGenerator:      tt.fields.idGenerator,
+				loginPaths:       tt.fields.loginPaths(t),
 			}
 			got, err := c.addUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg, "", false)
 			if tt.wantErr != nil {

@@ -19,8 +19,8 @@ import (
 
 func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 	type fields struct {
-		eventstore                  func(*testing.T) *eventstore.Eventstore
-		defaultEmailCodeURLTemplate func(_ context.Context) string
+		eventstore func(*testing.T) *eventstore.Eventstore
+		loginPaths func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx             context.Context
@@ -42,6 +42,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 			name: "invalid email, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -62,6 +63,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -105,6 +107,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -141,6 +144,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -186,6 +190,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -235,6 +240,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -284,6 +290,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -347,7 +354,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "" },
+				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate(""),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -410,7 +417,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -437,8 +444,8 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:                  tt.fields.eventstore(t),
-				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
+				eventstore: tt.fields.eventstore(t),
+				loginPaths: tt.fields.loginPaths(t),
 			}
 			got, err := r.ChangeHumanEmail(tt.args.ctx, tt.args.email, tt.args.secretGenerator)
 			if tt.res.err == nil {
@@ -456,9 +463,9 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 
 func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 	type fields struct {
-		eventstore                  func(*testing.T) *eventstore.Eventstore
-		defaultEmailCodeURLTemplate func(_ context.Context) string
-		userPasswordHasher          *crypto.Hasher
+		eventstore         func(*testing.T) *eventstore.Eventstore
+		loginPaths         func(*testing.T) LoginPaths
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx                 context.Context
@@ -483,6 +490,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 			name: "userid missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -497,6 +505,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 			name: "code missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -513,6 +522,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -545,6 +555,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -597,7 +608,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 						),
 					),
 				),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "" },
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:             context.Background(),
@@ -651,7 +662,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 						),
 					),
 				),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "" },
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:             context.Background(),
@@ -725,8 +736,8 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 						),
 					),
 				),
-				userPasswordHasher:          mockPasswordHasher("x"),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "" },
+				userPasswordHasher: mockPasswordHasher("x"),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:                 context.Background(),
@@ -744,7 +755,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 			},
 		},
 		{
-			name: "valid code (with password and user agent), ulr template, ok",
+			name: "valid code (with password and user agent), url template, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -802,8 +813,8 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 						),
 					),
 				),
-				userPasswordHasher:          mockPasswordHasher("x"),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				userPasswordHasher: mockPasswordHasher("x"),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:                 context.Background(),
@@ -824,9 +835,9 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:                  tt.fields.eventstore(t),
-				userPasswordHasher:          tt.fields.userPasswordHasher,
-				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
+				eventstore:         tt.fields.eventstore(t),
+				userPasswordHasher: tt.fields.userPasswordHasher,
+				loginPaths:         tt.fields.loginPaths(t),
 			}
 			got, err := r.VerifyHumanEmail(
 				tt.args.ctx,
@@ -852,8 +863,8 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 
 func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 	type fields struct {
-		eventstore                  func(*testing.T) *eventstore.Eventstore
-		defaultEmailCodeURLTemplate func(_ context.Context) string
+		eventstore func(*testing.T) *eventstore.Eventstore
+		loginPaths func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx             context.Context
@@ -876,6 +887,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 			name: "userid missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -891,6 +903,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -929,6 +942,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -965,6 +979,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1022,7 +1037,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 						),
 					),
 				),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "" },
+				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate(""),
 			},
 			args: args{
 				ctx:             context.Background(),
@@ -1083,7 +1098,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 						),
 					),
 				),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "" },
+				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate(""),
 			},
 			args: args{
 				ctx:             context.Background(),
@@ -1145,7 +1160,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 						),
 					),
 				),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx:             context.Background(),
@@ -1164,8 +1179,8 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:                  tt.fields.eventstore(t),
-				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
+				eventstore: tt.fields.eventstore(t),
+				loginPaths: tt.fields.loginPaths(t),
 			}
 			got, err := r.CreateHumanEmailVerificationCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.secretGenerator, tt.args.authRequestID)
 			if tt.res.err == nil {
