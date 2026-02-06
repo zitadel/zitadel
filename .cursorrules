@@ -1,0 +1,12 @@
+# Cursor Rules for ZITADEL
+
+You are working in the ZITADEL monorepo. 
+
+**ALWAYS** start your session by reading the relevant `agents.md` file for your current context to understand the architecture and conventions.
+
+- **Root Context**: [agents.md](agents.md) (Architecture, Repo Map, Global Commands)
+- **Login App**: [apps/login/agents.md](apps/login/agents.md) (Next.js/React Authentication UI)
+- **Docs Site**: [apps/docs/agents.md](apps/docs/agents.md) (Fumadocs/MDX)
+- **Management Console**: [console/agents.md](console/agents.md) (Angular/RxJS)
+
+Use `pnpm nx run [PROJECT]:[TARGET]` for all build, test, and lint tasks.
