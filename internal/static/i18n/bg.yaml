@@ -283,10 +283,6 @@ Errors:
       Empty: "Правилата за възрастта на паролата са празни"
       NotExisting: "Правилата за възрастта на паролата не съществуват"
       AlreadyExists: "Вече съществува политика за възрастта на паролата"
-    OrgIAMPolicy:
-      Empty: "Правилата за IAM на организацията са празни"
-      NotExisting: "IAM политиката на организацията не съществува"
-      AlreadyExists: "Политиката за IAM на организацията вече съществува"
     NotificationPolicy:
       NotFound: "Правилата за уведомяване не са намерени"
       NotChanged: "Правилата за уведомяване не са променени"
@@ -348,7 +344,7 @@ Errors:
       HasNotExistingRole: "Една роля не съществува в проекта"
       NotActive: "Грантът по проекта не е активен"
       NotInactive: "Грантът по проекта не е неактивен"
-  IAM:
+  Instance:
     NotFound: "IAM не е намерен. Уверете се, че сте получили правилния домейн. Вижте https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Ролите не са сменени"
@@ -356,8 +352,6 @@ Errors:
     MemberAlreadyExisting: "Член вече съществува"
     MemberNotExisting: "Членът не съществува"
     IDMissing: "ID липсва"
-    IAMProjectIDMissing: "Липсва идентификатор на IAM проект"
-    IamProjectAlreadySet: "Идентификаторът на IAM проект вече е зададен"
     IdpInvalid: "IDP конфигурацията е невалидна"
     IdpNotExisting: "IDP конфигурация не съществува"
     OIDCConfigInvalid: "OIDC IDP конфигурацията е невалидна"

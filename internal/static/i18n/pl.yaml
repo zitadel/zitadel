@@ -283,10 +283,6 @@ Errors:
       Empty: "Polityka wieku hasła jest pusta"
       NotExisting: "Polityka wieku hasła nie istnieje"
       AlreadyExists: "Polityka wieku hasła już istnieje"
-    OrgIAMPolicy:
-      Empty: "Polityka IAM organizacji jest pusta"
-      NotExisting: "Polityka IAM organizacji nie istnieje"
-      AlreadyExists: "Polityka IAM organizacji już istnieje"
     NotificationPolicy:
       NotFound: "Polityka powiadomień nie znaleziona"
       NotChanged: "Polityka powiadomień nie zmieniona"
@@ -348,7 +344,7 @@ Errors:
       HasNotExistingRole: "Jedna rola nie istnieje w projekcie"
       NotActive: "Grant projektu jest nieaktywny"
       NotInactive: "Grant projektu nie jest nieaktywny"
-  IAM:
+  Instance:
     NotFound: "IAM nie znaleziony. Upewnij się, że masz poprawną domenę. Sprawdź https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Role nie zmienione"
@@ -356,8 +352,6 @@ Errors:
     MemberAlreadyExisting: "Członek już istnieje"
     MemberNotExisting: "Członek nie istnieje"
     IDMissing: "Id brakuje"
-    IAMProjectIDMissing: "Brak identyfikatora projektu IAM"
-    IamProjectAlreadySet: "Identyfikator projektu IAM został już ustawiony"
     IdpInvalid: "Konfiguracja IDP jest nieprawidłowa"
     IdpNotExisting: "Konfiguracja IDP nie istnieje"
     OIDCConfigInvalid: "Konfiguracja OIDC IDP jest nieprawidłowa"

@@ -283,10 +283,6 @@ Errors:
       Empty: "Kebijakan Usia Kata Sandi kosong"
       NotExisting: "Kebijakan Usia Kata Sandi tidak ada"
       AlreadyExists: "Kebijakan Usia Kata Sandi sudah ada"
-    OrgIAMPolicy:
-      Empty: "Kebijakan IAM Organisasi kosong"
-      NotExisting: "Kebijakan IAM Organisasi tidak ada"
-      AlreadyExists: "Kebijakan IAM Organisasi sudah ada"
     NotificationPolicy:
       NotFound: "Kebijakan Pemberitahuan tidak ditemukan"
       NotChanged: "Kebijakan Pemberitahuan tidak diubah"
@@ -348,7 +344,7 @@ Errors:
       HasNotExistingRole: "Satu peran tidak ada di proyek"
       NotActive: "Hibah proyek tidak aktif"
       NotInactive: "Hibah proyek bukannya tidak aktif"
-  IAM:
+  Instance:
     NotFound: "Contoh tidak ditemukan. "
     Member:
       RolesNotChanged: "Peran belum diubah"
@@ -356,8 +352,6 @@ Errors:
     MemberAlreadyExisting: "Anggota sudah ada"
     MemberNotExisting: "Anggota tidak ada"
     IDMissing: "Aku hilang"
-    IAMProjectIDMissing: "ID proyek IAM tidak ada"
-    IamProjectAlreadySet: "Id proyek IAM telah ditetapkan"
     IdpInvalid: "Konfigurasi IDP tidak valid"
     IdpNotExisting: "Konfigurasi IDP tidak ada"
     OIDCConfigInvalid: "Konfigurasi IDP OIDC tidak valid"

@@ -282,10 +282,6 @@ Errors:
       Empty: "Политиката за важност на лозинката е празна"
       NotExisting: "Политиката за важност на лозинката не постои"
       AlreadyExists: "Политиката за важност на лозинката веќе постои"
-    OrgIAMPolicy:
-      Empty: "Политиката за IAM на организацијата е празна"
-      NotExisting: "Политиката за IAM на организацијата не постои"
-      AlreadyExists: "Политиката за IAM на организацијата веќе постои"
     NotificationPolicy:
       NotFound: "Политиката за известување не е пронајдена"
       NotChanged: "Политиката за известување не е променета"
@@ -347,7 +343,7 @@ Errors:
       HasNotExistingRole: "Една улога не постои на проектот"
       NotActive: "Овластувањето за проектот не е активно"
       NotInactive: "Овластувањето за проектот не е неактивно"
-  IAM:
+  Instance:
     NotFound: "IAM не е пронајден. Проверете дали имате точен домен. Погледнете на https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Улогите не се променети"
@@ -355,8 +351,6 @@ Errors:
     MemberAlreadyExisting: "Членот веќе постои"
     MemberNotExisting: "Членот не постои"
     IDMissing: "ID недостасува"
-    IAMProjectIDMissing: "ID на IAM проектот недостасува"
-    IamProjectAlreadySet: "ID на IAM проектот веќе е поставена"
     IdpInvalid: "IDP конфигурацијата е невалидна"
     IdpNotExisting: "IDP конфигурацијата не постои"
     OIDCConfigInvalid: "OIDC конфигурацијата е невалидна"

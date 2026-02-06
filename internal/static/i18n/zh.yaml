@@ -284,10 +284,6 @@ Errors:
       Empty: "密码过期策略为空"
       NotExisting: "密码过期策略不存在"
       AlreadyExists: "密码过期策略已存在"
-    OrgIAMPolicy:
-      Empty: "组织 IAM 策略为空"
-      NotExisting: "组织 IAM 策略不存在"
-      AlreadyExists: "组织 IAM 策略已存在"
     NotificationPolicy:
       NotFound: "未找到通知政策"
       NotChanged: "通知政策没有改变"
@@ -349,7 +345,7 @@ Errors:
       HasNotExistingRole: "角色不存在与项目中"
       NotActive: "项目授权不是启用状态"
       NotInactive: "项目授权不是停用状态"
-  IAM:
+  Instance:
     NotFound: "IAM 未找到。确保您有正确的域。查看 https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "角色没有改变"
@@ -357,8 +353,6 @@ Errors:
     MemberAlreadyExisting: "成员已存在"
     MemberNotExisting: "成员不存在"
     IDMissing: "ID 丢失"
-    IAMProjectIDMissing: "IAM 项目 ID 缺失"
-    IamProjectAlreadySet: "IAM 项目 ID 已设置"
     IdpInvalid: "IDP 配置无效"
     IdpNotExisting: "IDP 配置不存在"
     OIDCConfigInvalid: "OIDC IDP 配置无效"

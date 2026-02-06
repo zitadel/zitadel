@@ -277,10 +277,6 @@ Errors:
       Empty: "Политика срока действия пароля не заполнена"
       NotExisting: "Политика срока действия пароля не существует"
       AlreadyExists: "Политика срока действия пароля уже существует"
-    OrgIAMPolicy:
-      Empty: "IAM-политика организации не заполнена"
-      NotExisting: "IAM-политика организации не существует"
-      AlreadyExists: "IAM-политика организации уже существует"
     NotificationPolicy:
       NotFound: "Политика уведомлений не найдена"
       NotChanged: "Политика уведомлений не изменилась"
@@ -342,7 +338,7 @@ Errors:
       HasNotExistingRole: "В проекте не существует ни одной роли"
       NotActive: "Допуск проекта неактивен"
       NotInactive: "Допуск проекта не является неактивным"
-  IAM:
+  Instance:
     NotFound: "Экземпляр не найден"
     Member:
       RolesNotChanged: "Роли не изменены"
@@ -350,8 +346,6 @@ Errors:
     MemberAlreadyExisting: "Участник уже существует"
     MemberNotExisting: "Участник не существует"
     IDMissing: "ID отсутствует"
-    IAMProjectIDMissing: "ID проекта IAM отсутствует"
-    IamProjectAlreadySet: "ID проекта IAM уже установлен"
     IdpInvalid: "Конфигурация поставщика идентификационных данных недействительна"
     IdpNotExisting: "Конфигурация поставщика идентификационных данных не существует"
     OIDCConfigInvalid: "Недопустимая конфигурация OIDC поставщика идентификационных данных"

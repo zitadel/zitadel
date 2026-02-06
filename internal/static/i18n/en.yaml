@@ -284,10 +284,6 @@ Errors:
       Empty: "Password Age Policy is empty"
       NotExisting: "Password Age Policy doesn't exist"
       AlreadyExists: "Password Age Policy already exists"
-    OrgIAMPolicy:
-      Empty: "Org IAM Policy is empty"
-      NotExisting: "Org IAM Policy doesn't exist"
-      AlreadyExists: "Org IAM Policy already exists"
     NotificationPolicy:
       NotFound: "Notification Policy not found"
       NotChanged: "Notification Policy not changed"
@@ -349,7 +345,7 @@ Errors:
       HasNotExistingRole: "One role doesn't exist on project"
       NotActive: "Project grant is not active"
       NotInactive: "Project grant is not inactive"
-  IAM:
+  Instance:
     NotFound: "Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roles have not been changed"
@@ -357,8 +353,6 @@ Errors:
     MemberAlreadyExisting: "Member already exists"
     MemberNotExisting: "Member does not exist"
     IDMissing: "Id missing"
-    IAMProjectIDMissing: "IAM project id missing"
-    IamProjectAlreadySet: "IAM project id has already been set"
     IdpInvalid: "IDP configuration is invalid"
     IdpNotExisting: "IDP configuration does not exist"
     OIDCConfigInvalid: "OIDC IDP configuration is invalid"

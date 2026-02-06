@@ -283,10 +283,6 @@ Errors:
       Empty: "Impostazioni di validità della password mancanti"
       NotExisting: "Impostazioni di validità della password non esistenti"
       AlreadyExists: "Impostazioni di validità della password sono già esistenti"
-    OrgIAMPolicy:
-      Empty: "Mancano le impostazioni Org IAM"
-      NotExisting: "Impostazioni Org IAM non esistenti"
-      AlreadyExists: "Impostazioni Org IAM già esistenti"
     NotificationPolicy:
       NotFound: "Impostazioni di notifica non trovate"
       NotChanged: "Impostazioni di notifica non è stato cambiato"
@@ -348,7 +344,7 @@ Errors:
       HasNotExistingRole: "Uno dei ruoli assegnati non è esistente nel progetto"
       NotActive: "Grant del progetto non è attivo"
       NotInactive: "Grant del progetto non è inattivo"
-  IAM:
+  Instance:
     NotFound: "IAM non trovato. Assicurati di avere il dominio corretto. Guarda su https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "I ruoli non sono stati cambiati"
@@ -356,8 +352,6 @@ Errors:
     MemberAlreadyExisting: "Il membro già esistente"
     MemberNotExisting: "Il membro non esistente"
     IDMissing: "ID mancante"
-    IAMProjectIDMissing: "Manca l'ID del progetto IAM"
-    IamProjectAlreadySet: "L'ID del progetto IAM è già stato impostato"
     IdpInvalid: "La configurazione dell'IDP non è valida"
     IdpNotExisting: "La configurazione IDP non esiste"
     OIDCConfigInvalid: "La configurazione OIDC IDP non è valida"
