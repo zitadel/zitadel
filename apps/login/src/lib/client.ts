@@ -120,17 +120,17 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
   // 1. Environment variable override
   const envOverride = process.env.DEFAULT_REDIRECT_URI;
   if (envOverride) {
-    if (envOverride === "/") {
-      // Special state: trigger absolute host-based redirect
+    if (envOverride.startsWith("/")) {
+      // Special state: trigger absolute host-based redirect with provided path
       try {
         const _headers = await headers();
         const host = getPublicHostWithProtocol(_headers);
         const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
-        const result = `${host}${basePath}`;
-        console.log("resolveRedirectUri: Using host-only redirect from '/' override:", result);
+        const result = `${host}${basePath}${envOverride}`;
+        console.log("resolveRedirectUri: Using host-based redirect from override:", result);
         return result;
       } catch (error) {
-        console.warn("resolveRedirectUri: Could not determine host for '/' override, falling back", error);
+        console.warn("resolveRedirectUri: Could not determine host for override, falling back", error);
       }
     } else {
       console.log("resolveRedirectUri: Using DEFAULT_REDIRECT_URI override:", envOverride);

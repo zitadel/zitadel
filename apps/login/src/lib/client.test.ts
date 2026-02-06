@@ -26,17 +26,17 @@ describe("getNextUrl", () => {
     expect(result).toBe("https://env-override.com");
   });
 
-  test("should use host-based redirect if DEFAULT_REDIRECT_URI is set to '/'", async () => {
+  test("should use host-based redirect if DEFAULT_REDIRECT_URI is set to a path (starting with '/')", async () => {
     const { headers } = await import("next/headers");
     const { getPublicHostWithProtocol } = await import("./server/host");
 
-    process.env.DEFAULT_REDIRECT_URI = "/";
+    process.env.DEFAULT_REDIRECT_URI = "/dashboard";
     vi.mocked(headers).mockResolvedValue({} as any);
     vi.mocked(getPublicHostWithProtocol).mockReturnValue("https://my-host.com");
     process.env.NEXT_PUBLIC_BASE_PATH = "/ui/v2/login";
 
     const result = await getNextUrl(command);
-    expect(result).toBe("https://my-host.com/ui/v2/login");
+    expect(result).toBe("https://my-host.com/ui/v2/login/dashboard");
   });
 
   test("should use defaultRedirectUri if env is NOT set", async () => {
