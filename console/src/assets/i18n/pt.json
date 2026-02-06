@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formulário de Login",
           "DESCRIPTION": "Personalize o formulário de login.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Usuário e Senha permitidos",
-            "DESCRIPTION": "Permite que seus usuários façam login com seu nome de usuário e senha. Se isto for desativado, seus usuários só poderão fazer login usando autenticação sem senha ou com um provedor de identidade externo."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Autenticação local permitida",
+            "DESCRIPTION": "Permita que os seus utilizadores iniciem sessão com o seu nome de utilizador e palavra-passe ou autenticação por passkey. Se isto for desativado, os seus utilizadores apenas poderão iniciar sessão utilizando um fornecedor de identidade externo."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Registro de Usuário permitido",
@@ -1644,8 +1644,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se a bandeira estiver habilitada, você poderá encerrar uma sessão única da interface do usuário de login fornecendo um id_token com uma reivindicação `sid como id_token_hint no ponto final de end_session. Observe que atualmente todas as sessões do mesmo agente de usuário (navegador) são encerradas na interface do usuário de login. As sessões gerenciadas por meio da API de sessão já permitem o encerramento de sessões individuais.",
       "DEBUGOIDCPARENTERROR": "Erro de Depuração do Pai OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se a bandeira estiver ativada, o erro do pai OIDC será registrado no console.",
-      "ENABLEBACKCHANNELLOGOUT": "Ativar Logout de Backchannel",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Back-Channel implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os aplicativos sobre a terminação da sessão no Provedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificação de Permissão V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Se a bandeira estiver ativada, você poderá usar a nova API e seus recursos.",
       "STATES": {
@@ -2647,7 +2645,8 @@
             "DESCRIPTION": "Aplicativos de página única (SPA) e, em geral, todos os frameworks JS executados em navegadores"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

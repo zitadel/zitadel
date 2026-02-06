@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Inloggningsformulär",
           "DESCRIPTION": "Anpassa inloggningsformuläret.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Användarnamn och lösenord tillåtet",
-            "DESCRIPTION": "Tillåt dina användare att logga in med sitt användarnamn och lösenord. Om detta är inaktiverat, kan dina användare endast logga in med Passkey autentisering eller med en extern identitetsleverantör."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Lokal autentisering tillåten",
+            "DESCRIPTION": "Tillåt dina användare att logga in med sitt användarnamn och lösenord eller nyckelautentisering (passkey). Om detta är inaktiverat kan dina användare endast logga in med en extern identitetsleverantör."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Användarregistrering tillåten",
@@ -1647,8 +1647,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
       "DEBUGOIDCPARENTERROR": "Debugga OIDC Föräldrafel",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Om flaggan är aktiverad kommer OIDC-föräldrafel att loggas i konsolen.",
-      "ENABLEBACKCHANNELLOGOUT": "Aktivera Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementerar OpenID Connect Back-Channel Logout 1.0 och kan användas för att meddela applikationer om sessionens avslutning hos OpenID-leverantören.",
       "PERMISSIONCHECKV2": "Behörighetskontroll V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Om flaggan är aktiverad kan du använda den nya API:n och dess funktioner.",
       "STATES": {
@@ -2680,7 +2678,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) och i allmänhet alla JS-ramverk som körs i webbläsare"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

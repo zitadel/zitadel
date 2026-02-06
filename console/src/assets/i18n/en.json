@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Login Form",
           "DESCRIPTION": "Customize the login form.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Username and Password allowed",
-            "DESCRIPTION": "Allow your users to log in with their username and password. If this is deactivated, your users can only log in using passkey authentication or with an external identity provider."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Local authentication allowed",
+            "DESCRIPTION": "Allow your users to log in with their username and password or passkey authentication. If this is deactivated, your users can only log in using an external identity provider."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "User Registration allowed",
@@ -1647,8 +1647,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
-      "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify applications about session termination at the OpenID Provider.",
       "PERMISSIONCHECKV2": "Permission Check V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
       "STATES": {
@@ -2681,7 +2679,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) and in general all JS frameworks executed in browsers"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

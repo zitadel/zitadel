@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Login-Formular",
           "DESCRIPTION": "Passe das Login-Formular an.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Benutzername und Passwort erlaubt",
-            "DESCRIPTION": "Erlaube deinen Benutzern, sich mit ihrem Benutzernamen und Passwort einzuloggen. Ist dies deaktiviert, können sich deine Benutzer nur mit Passkey Authentifizierung oder einem externen Identitätsanbieter einloggen."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Lokale Authentifizierung erlaubt",
+            "DESCRIPTION": "Erlauben Sie Ihren Benutzern, sich mit ihrem Benutzernamen und Passwort oder per Passkey-Authentifizierung anzumelden. Wenn dies deaktiviert ist, können sich Ihre Benutzer nur über einen externen Identitätsanbieter anmelden."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Benutzerregistrierung erlaubt",
@@ -1643,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Wenn das Flag aktiviert ist, können Sie eine einzelne Sitzung über die Login-Benutzeroberfläche beenden, indem Sie einen id_token mit einem `sid` Claim als id_token_hint am Endpunkt end_session übergeben. Beachten Sie, dass derzeit alle Sitzungen desselben Benutzeragenten (Browser) in der Login-Benutzeroberfläche beendet werden. Sitzungen, die über die Session API verwaltet werden, ermöglichen bereits die Beendigung einzelner Sitzungen.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Wenn die Flagge aktiviert ist, wird der OIDC-Elternfehler in der Konsole protokolliert.",
-      "ENABLEBACKCHANNELLOGOUT": "Backchannel-Logout aktivieren",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Der Back-Channel-Logout implementiert OpenID Connect Back-Channel Logout 1.0 und kann verwendet werden, um Anwendungen über die Beendigung der Sitzung beim OpenID-Provider zu benachrichtigen.",
       "PERMISSIONCHECKV2": "Berechtigungsprüfung V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "STATES": {
@@ -2651,7 +2649,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) und grundsätzlich alle im Browser aufgeführten JS-Frameworks"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

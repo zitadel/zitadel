@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formulario de Inicio de Sesión",
           "DESCRIPTION": "Personaliza el formulario de inicio de sesión.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Permitido Nombre de Usuario y Contraseña",
-            "DESCRIPTION": "Permite a tus usuarios iniciar sesión con su nombre de usuario y contraseña. Si esto está desactivado, tus usuarios solo pueden iniciar sesión utilizando llaves de acceso o con un proveedor de identidad externo."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Autenticación local permitida",
+            "DESCRIPTION": "Permita que sus usuarios inicien sesión con su nombre de usuario y contraseña o autenticación con passkey. Si esto se desactiva, sus usuarios solo podrán iniciar sesión utilizando un proveedor de identidad externo."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Permitida la Registración de Usuarios",
@@ -1644,8 +1644,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si la bandera está habilitada, podrá terminar una sesión única desde la interfaz de usuario de inicio de sesión proporcionando un id_token con una reclamación `sid` como id_token_hint en el punto final de end_session. Tenga en cuenta que actualmente se terminan todas las sesiones del mismo agente de usuario (navegador) en la interfaz de usuario de inicio de sesión. Las sesiones administradas a través de la API de sesión ya permiten la terminación de sesiones individuales.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si la bandera está habilitada, el error del padre OIDC se registrará en la consola.",
-      "ENABLEBACKCHANNELLOGOUT": "Habilitar Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "El Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 y se puede usar para notificar a las aplicaciones sobre la terminación de la sesión en el proveedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificación de permisos V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Si la bandera está habilitada, podrá usar la nueva API y sus funciones.",
       "STATES": {
@@ -2648,7 +2646,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) y en general todos los frameworks de JS ejecutados en navegadores"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

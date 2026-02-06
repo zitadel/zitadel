@@ -29,9 +29,8 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseUri:  gu.Ptr("https://login.com"),
 		},
-		EnableRelationalTables:  gu.Ptr(true),
-		EnableBackChannelLogout: gu.Ptr(true),
-		PermissionCheckV2:       gu.Ptr(true),
+		EnableRelationalTables: gu.Ptr(true),
+		PermissionCheckV2:      gu.Ptr(true),
 	}
 	want := &command.SystemFeatures{
 		LoginDefaultOrg:                gu.Ptr(true),
@@ -42,9 +41,8 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 		},
-		EnableRelationalTables:  gu.Ptr(true),
-		EnableBackChannelLogout: gu.Ptr(true),
-		PermissionCheckV2:       gu.Ptr(true),
+		EnableRelationalTables: gu.Ptr(true),
+		PermissionCheckV2:      gu.Ptr(true),
 	}
 
 	// Test
@@ -78,10 +76,6 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
 		},
 		OIDCSingleV1SessionTermination: query.FeatureSource[bool]{
-			Level: feature.LevelSystem,
-			Value: true,
-		},
-		EnableBackChannelLogout: query.FeatureSource[bool]{
 			Level: feature.LevelSystem,
 			Value: true,
 		},
@@ -162,7 +156,6 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		ImprovedPerformance:            nil,
 		DebugOidcParentError:           gu.Ptr(true),
 		OidcSingleV1SessionTermination: gu.Ptr(true),
-		EnableBackChannelLogout:        gu.Ptr(true),
 		LoginV2: &feature_pb.LoginV2{
 			Required: true,
 			BaseUri:  gu.Ptr("https://login.com"),
@@ -177,7 +170,6 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		ImprovedPerformance:            nil,
 		DebugOIDCParentError:           gu.Ptr(true),
 		OIDCSingleV1SessionTermination: gu.Ptr(true),
-		EnableBackChannelLogout:        gu.Ptr(true),
 		LoginV2: &feature.LoginV2{
 			Required: true,
 			BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
@@ -217,10 +209,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
 		},
 		OIDCSingleV1SessionTermination: query.FeatureSource[bool]{
-			Level: feature.LevelInstance,
-			Value: true,
-		},
-		EnableBackChannelLogout: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
 			Value: true,
 		},
@@ -276,7 +264,7 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		},
 		EnableBackChannelLogout: &feature_pb.FeatureFlag{
 			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_INSTANCE,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 		LoginV2: &feature_pb.LoginV2FeatureFlag{
 			Required: true,

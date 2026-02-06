@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formulaire de connexion",
           "DESCRIPTION": "Personnalisez le formulaire de connexion",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Nom d'utilisateur et mot de passe autorisés",
-            "DESCRIPTION": "Autorisez vos utilisateurs à se connecter avec leur nom d'utilisateur et mot de passe. Si désactivé, vos utilisateurs pourront uniquement se connecter avec une clé d'accès ou avec un fournisseur d'identité externe"
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Authentification locale autorisée",
+            "DESCRIPTION": "Autorisez vos utilisateurs à se connecter avec leur nom d'utilisateur et leur mot de passe ou via l'authentification par passkey. Si cette option est désactivée, vos utilisateurs ne pourront se connecter qu'en utilisant un fournisseur d'identité externe."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Enregistrement de nouveaux utilisateurs autorisé",
@@ -1643,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si l'indicateur est activé, vous pourrez terminer une seule session à partir de l'interface utilisateur de connexion en fournissant un id_token avec une revendication `sid` en tant que id_token_hint sur le point de terminaison end_session. Notez que toutes les sessions du même agent utilisateur (navigateur) sont actuellement terminées dans l'interface utilisateur de connexion. Les sessions gérées via l'API de session permettent déjà la terminaison de sessions individuelles.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si le drapeau est activé, l'erreur parent OIDC sera enregistrée dans la console.",
-      "ENABLEBACKCHANNELLOGOUT": "Activer le Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Le Back-Channel Logout implémente OpenID Connect Back-Channel Logout 1.0 et peut être utilisé pour notifier les applications de la fin de session chez le fournisseur OpenID.",
       "PERMISSIONCHECKV2": "Vérification des permissions V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "STATES": {
@@ -2652,7 +2650,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) et en général tous les frameworks JS exécutés dans les navigateurs"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Přihlašovací formulář",
           "DESCRIPTION": "Přizpůsob si přihlašovací formulář.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Povoleno přihlášení pomocí uživatelského jména a hesla",
-            "DESCRIPTION": "Umožni svým uživatelům přihlásit se pomocí uživatelského jména a hesla. Pokud je tato možnost deaktivována, tvoji uživatelé se mohou přihlásit pouze pomocí autentizace pomocí passkey nebo pomocí externího poskytovatele identity."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Místní ověření povoleno",
+            "DESCRIPTION": "Umožněte uživatelům přihlásit se pomocí uživatelského jména a hesla nebo ověření pomocí přístupového klíče (passkey). Pokud je tato možnost deaktivována, uživatelé se mohou přihlásit pouze pomocí externího poskytovatele identity."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Povolena registrace uživatelů",
@@ -1643,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Pokud je příznak aktivován, budete moci ukončit jedinou relaci z rozhraní pro přihlášení zadáním id_token s nárokem `sid` jako id_token_hint na koncovém bodu end_session. Poznamenejte si, že v současné době jsou v rozhraní pro přihlášení ukončeny všechny relace ze stejného uživatelského agenta (prohlížeče). Relace spravované prostřednictvím rozhraní API relace již umožňují ukončení jednotlivých relací.",
       "DEBUGOIDCPARENTERROR": "Debugování chyby rodiče OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Pokud je příznak povolen, chyba rodiče OIDC bude zaznamenána v konzoli.",
-      "ENABLEBACKCHANNELLOGOUT": "Povolit Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování aplikací o ukončení relace u poskytovatele OpenID.",
       "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
@@ -2660,7 +2658,8 @@
             "DESCRIPTION": "Single Page Aplikace (SPA) a obecně všechny JS frameworky spouštěné v prohlížečích"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
