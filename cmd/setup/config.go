@@ -3,7 +3,6 @@ package setup
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -12,7 +11,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	//nolint:staticcheck
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/encryption"
@@ -98,13 +96,6 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
 	}
 	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamReady))
-
-	err = config.Log.SetLogger()
-	if err != nil {
-		err = errors.Join(err, shutdown(cmd.Context()))
-		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
-	}
-
 	id.Configure(config.Machine)
 
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.

@@ -2,16 +2,19 @@ package instrumentation
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 	"slices"
 	"sync/atomic"
 	"time"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/rs/xid"
 	slogmulti "github.com/samber/slog-multi"
 	slogctx "github.com/veqryn/slog-context"
-	slogotel "github.com/veqryn/slog-context/otel" //nolint:staticcheck
+	slogotel "github.com/veqryn/slog-context/otel"
+	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 	"github.com/zitadel/sloggcp"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/sdk/log"
@@ -140,13 +143,62 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	logger := slog.New(slogmulti.Fanout(stdErrHandler, otelHandler))
 	logger.Info("structured logger configured", "config_level", cfg.Level, "format", cfg.Format)
 	slog.SetDefault(logger)
+	err := setLegacyLogger(cfg)
+	if err != nil {
+		slog.Error("failed to set legacy logger", "err", err)
+	}
 }
 
-const (
-	ProtocolHttp    = "http"
-	ProtocolConnect = "connect"
-	ProtocolGrpc    = "grpc"
-)
+// legacyGcpMap is used to set the "severity" field for GCP logging,
+// which is required for proper log parsing in GCP.
+// We previously had this configured in our infra repo.
+var legacyGcpMap = map[string]any{
+	"FieldMap": map[string]any{
+		"level": "severity",
+	},
+}
+
+// setLegacyLogger configures the old logrus logger for backward compatibility with existing logging infrastructure.
+// It is recommended to migrate to the new slog logger and remove this function in the future.
+// TODO: https://github.com/zitadel/zitadel/issues/11330
+func setLegacyLogger(cfg LogConfig) error {
+	var (
+		format string
+		data   map[string]any
+	)
+	level := cfg.Level.String()
+
+	switch cfg.Format {
+	case LogFormatUnspecified, LogFormatDisabled:
+		level = "panic" // no other way to disable logrus logger, but panic level is effectively disabled for us
+		format = "text"
+	case LogFormatText:
+		format = "text"
+	case LogFormatJSON:
+		format = "json"
+	case LogFormatGCP, LogFormatGCPErrorReporting:
+		format = "json"
+		data = legacyGcpMap
+	default:
+		format = "text"
+	}
+	oc := old_logging.Config{
+		Level:     level,
+		AddSource: cfg.AddSource,
+	}
+
+	// Hack: [old_logging.formatter] is a private type,
+	// using mapstructure to decode the public config into the private struct.
+	formatter := map[string]any{
+		"Format": format,
+		"Data":   data,
+	}
+	err := mapstructure.Decode(formatter, &oc.Formatter)
+	if err != nil {
+		return fmt.Errorf("decode formatter: %w", err)
+	}
+	return oc.SetLogger()
+}
 
 // Instance is a minimal interface for logging the instance ID.
 type Instance interface {
