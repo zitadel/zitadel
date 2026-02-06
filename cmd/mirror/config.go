@@ -8,7 +8,6 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
@@ -29,10 +28,8 @@ type Migration struct {
 	EventBulkSize     uint32
 	MaxAuthRequestAge time.Duration
 
-	Log             *old_logging.Config
 	Machine         *id.Config
 	Instrumentation instrumentation.Config
-	Metrics         instrumentation.LegacyMetricConfig
 }
 
 var (
@@ -46,7 +43,7 @@ func newMigrationConfig(cmd *cobra.Command, v *viper.Viper) (*Migration, instrum
 	if err != nil {
 		return nil, nil, err
 	}
-	shutdown, err := startInstrumentation(cmd, config.Instrumentation, config.Log)
+	shutdown, err := startInstrumentation(cmd, config.Instrumentation)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -60,7 +57,7 @@ func newProjectionsConfig(cmd *cobra.Command, v *viper.Viper) (*ProjectionsConfi
 	if err != nil {
 		return nil, nil, err
 	}
-	shutdown, err := startInstrumentation(cmd, config.Instrumentation, config.Log)
+	shutdown, err := startInstrumentation(cmd, config.Instrumentation)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -68,16 +65,10 @@ func newProjectionsConfig(cmd *cobra.Command, v *viper.Viper) (*ProjectionsConfi
 	return config, shutdown, nil
 }
 
-func startInstrumentation(cmd *cobra.Command, cfg instrumentation.Config, logConfig *old_logging.Config) (instrumentation.ShutdownFunc, error) {
-	cfg.Log.SetLegacyConfig(logConfig)
+func startInstrumentation(cmd *cobra.Command, cfg instrumentation.Config) (instrumentation.ShutdownFunc, error) {
 	shutdown, err := instrumentation.Start(cmd.Context(), cfg)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start instrumentation: %w", err)
-	}
-	// Legacy logger
-	err = logConfig.SetLogger()
-	if err != nil {
-		return nil, fmt.Errorf("unable to set logger: %w", err)
 	}
 	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 	return shutdown, nil

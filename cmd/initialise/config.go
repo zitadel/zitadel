@@ -35,7 +35,6 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 		return nil, nil, fmt.Errorf("unable to read config: %w", err)
 	}
 
-	config.Instrumentation.Log.SetLegacyConfig(config.Log)
 	shutdown, err := instrumentation.Start(cmd.Context(), config.Instrumentation)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)

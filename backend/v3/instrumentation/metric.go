@@ -35,21 +35,6 @@ type Meter struct {
 	Histograms        sync.Map
 }
 
-// TODO: remove for v5 release
-type LegacyMetricConfig struct {
-	Type string
-}
-
-func (c *MetricConfig) SetLegacyConfig(lc *LegacyMetricConfig) {
-	typ := c.Exporter.Type
-	if lc == nil || !typ.isNone() {
-		return
-	}
-	if lc.Type == "otel" {
-		c.Exporter.Type = ExporterTypePrometheus
-	}
-}
-
 var hasPrometheusExporter bool
 
 func (m *Meter) GetExporter() http.Handler {

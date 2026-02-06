@@ -658,7 +658,7 @@ func startAPIs(
 		userAgentInterceptor,
 		instanceInterceptor.Handler,
 		limitingAccessInterceptor,
-		config.Log.Slog(),
+		logging.New(logging.StreamRequest, "service", "oidc"),
 		config.SystemDefaults.SecretHasher,
 		federatedLogoutsCache,
 	)
