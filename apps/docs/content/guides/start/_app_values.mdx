@@ -3,7 +3,7 @@ import ProjectClientIdSecretImg from '@pub/img/guides/quickstart/project_client_
 import ProjectUrlsImg from '@pub/img/guides/quickstart/project_urls.png'
 import ProjectProjectIdImg from '@pub/img/guides/quickstart/project_project_id.png'
 
-export default function AppValue({ valueCount, clientSecret, projectID }) {
+export default function AppValue({ valueCount, clientSecret }) {
     return (
         <div>
             <p>
@@ -29,11 +29,6 @@ export default function AppValue({ valueCount, clientSecret, projectID }) {
 
                     <img src={ProjectUrlsImg.src} alt="Get URLs"/>
                 </li>
-                {!!projectID && (<li >
-                    <b>Project ID</b> Your currently in the application configuration which is a sub resource of the Project. Navigate to the Project with the back arrow and copy the Project ID.
-
-                    <img src={ProjectProjectIdImg.src} alt="Get Project ID"/>
-                </li>)}
             </ol>
         </div>
 
