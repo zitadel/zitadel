@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organisasi",
     "PROJECT": "Proyek",
     "PROJECTOVERVIEW": "Ringkasan",
-    "PROJECTGRANTS": "Hibah",
+    "PROJECTGRANTS": "Izin proyek",
     "ROLES": "Peran",
     "GRANTEDPROJECT": "Proyek yang Diberikan",
     "HUMANUSERS": "Pengguna",
@@ -2053,7 +2053,7 @@
       "DESCRIPTION": "Izinkan organisasi lain untuk menggunakan proyek Anda.",
       "EDITTITLE": "Edit peran",
       "CREATE": {
-        "TITLE": "Buat Hibah Organisasi",
+        "TITLE": "Buat hak akses proyek",
         "SEL_USERS": "Pilih pengguna yang ingin Anda berikan akses",
         "SEL_PROJECT": "Cari proyek",
         "SEL_ROLES": "Pilih peran yang ingin Anda tambahkan ke hibah",
@@ -2063,7 +2063,7 @@
         "ORG_DESCRIPTION": "Anda akan memberikan pengguna untuk organisasi {{name}}.",
         "ORG_DESCRIPTION_DESC": "Ganti konteks pada header di atas untuk memberikan pengguna untuk organisasi lain.",
         "SEL_ORG_FORMFIELD": "Organisasi",
-        "FOR_ORG": "Hibah ini dibuat untuk:"
+        "FOR_ORG": "Hak akses proyek akan dibuat untuk:"
       },
       "DETAIL": {
         "TITLE": "Hibah Proyek",
@@ -2176,7 +2176,7 @@
       "DEACTIVATED": "Dinonaktifkan.",
       "CREATED": "Proyek dibuat.",
       "UPDATED": "Proyek berubah.",
-      "GRANTUPDATED": "Hibah berubah.",
+      "GRANTUPDATED": "Izin proyek telah diubah.",
       "DELETED": "Proyek dihapus."
     }
   },
