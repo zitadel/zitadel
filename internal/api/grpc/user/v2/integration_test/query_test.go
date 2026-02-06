@@ -446,7 +446,7 @@ func TestServer_ListUsers(t *testing.T) {
 					},
 				}
 			}(),
-			want: &user.ListUsersResponse{ // human user should return itself when calling ListUsers() even if it has no permissions
+			want: &user.ListUsersResponse{ // User (Human) should return itself when calling ListUsers() even if it has no permissions
 				Details: &object.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),

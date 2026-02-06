@@ -17,7 +17,7 @@ var _ eventstore.Event = (*Event)(nil)
 
 // Event represents all information about a manipulation of an aggregate
 type Event struct {
-	//ID is a generated uuid for this event
+	// ID is a generated uuid for this event
 	ID string
 
 	// Seq is the sequence of the event
@@ -25,7 +25,7 @@ type Event struct {
 	// Pos is the global sequence of the event multiple events can have the same sequence
 	Pos decimal.Decimal
 
-	//CreationDate is the time the event is created
+	// CreationDate is the time the event is created
 	// it's used for human readability.
 	// Don't use it for event ordering,
 	// time drifts in different services could cause integrity problems
@@ -35,29 +35,29 @@ type Event struct {
 	// it should always be in past-form
 	Typ eventstore.EventType
 
-	//Data describe the changed fields (e.g. userName = "hodor")
+	// Data describe the changed fields (e.g. userName = "hodor")
 	// data must always a pointer to a struct, a struct or a byte array containing json bytes
 	Data []byte
 
-	//EditorUser should be a unique identifier for the user which created the event
+	// EditorUser should be a unique identifier for the user which created the event
 	// it's meant for maintainability.
 	// It's recommend to use the aggregate id of the user
 	EditorUser string
 
-	//Version describes the definition of the aggregate at a certain point in time
+	// Version describes the definition of the aggregate at a certain point in time
 	// it's used in read models to reduce the events in the correct definition
 	Version eventstore.Version
-	//AggregateID id is the unique identifier of the aggregate
+	// AggregateID id is the unique identifier of the aggregate
 	// the client must generate it by it's own
 	AggregateID string
-	//AggregateType describes the meaning of the aggregate for this event
+	// AggregateType describes the meaning of the aggregate for this event
 	// it could an object like user
 	AggregateType eventstore.AggregateType
-	//ResourceOwner is the organisation which owns this aggregate
+	// ResourceOwner is the organisation which owns this aggregate
 	// an aggregate can only be managed by one organisation
 	// use the ID of the org
 	ResourceOwner sql.NullString
-	//InstanceID is the instance where this event belongs to
+	// InstanceID is the instance where this event belongs to
 	// use the ID of the instance
 	InstanceID string
 

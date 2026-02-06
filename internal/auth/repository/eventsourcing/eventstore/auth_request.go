@@ -362,7 +362,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, authReqID, userID, 
 }
 
 func (repo *AuthRequestRepo) selectUser(ctx context.Context, request *domain.AuthRequest, userID string) error {
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID, false)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, userID, false)
 	if err != nil {
 		return err
 	}
@@ -669,7 +669,7 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 	if request.UserID != userID {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
 	}
-	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, false)
+	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, request.UserID, false)
 	if err != nil {
 		return request, err
 	}
@@ -820,7 +820,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
-	// if there's an active (human) user, let's use it
+	// if there's an active User (Human), let's use it
 	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).IsEnabled() {
 		request.SetUserInfo(user.ID, loginNameInput, preferredLoginName, "", "", user.ResourceOwner)
 		return nil
@@ -1054,7 +1054,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 	if len(links.Links) != 1 {
 		return zerrors.ThrowNotFound(nil, "AUTH-Sf8sd", "Errors.ExternalIDP.NotFound")
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, links.Links[0].UserID, false)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, links.Links[0].UserID, false)
 	if err != nil {
 		return err
 	}
@@ -1084,7 +1084,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 			return steps, err
 		}
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
 	if err != nil {
 		return nil, err
 	}
@@ -1166,7 +1166,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return steps, nil
 	}
 
-	if request.LinkingUsers != nil && len(request.LinkingUsers) != 0 {
+	if len(request.LinkingUsers) != 0 {
 		return append(steps, &domain.LinkUsersStep{}), nil
 	}
 	//PLANNED: consent step
@@ -1223,7 +1223,7 @@ func (repo *AuthRequestRepo) nextStepsUser(ctx context.Context, request *domain.
 	defer func() { span.EndWithError(err) }()
 
 	steps := make([]domain.NextStep, 0)
-	if request.LinkingUsers != nil && len(request.LinkingUsers) > 0 {
+	if len(request.LinkingUsers) > 0 {
 		steps = append(steps, new(domain.ExternalNotFoundOptionStep))
 		return steps, nil
 	}
@@ -1739,8 +1739,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	return user_view_model.UserSessionToModel(&sessionCopy), nil
 }
 
-func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string, ignoreUnknownUsernames bool) (user *user_model.UserView, err error) {
-	// PLANNED: Check LockoutPolicy
+func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries orgViewProvider, userID string, ignoreUnknownUsernames bool) (user *user_model.UserView, err error) {
 	user, err = userByID(ctx, userViewProvider, userEventProvider, userID)
 	if err != nil {
 		if ignoreUnknownUsernames && zerrors.IsNotFound(err) {
