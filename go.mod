@@ -65,7 +65,6 @@ require (
 	github.com/muesli/gamut v0.3.1
 	github.com/muhlemmer/gu v0.3.1
 	github.com/muhlemmer/httpforwarded v0.1.0
-	github.com/muhlemmer/sloggcp v0.1.0
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/pashagolub/pgxmock/v4 v4.9.0
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
