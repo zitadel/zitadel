@@ -410,11 +410,11 @@ Errors:
       Empty: "Default Password Lockout Policy empty"
       NotChanged: "Default Password Lockout Policy has not been changed"
     DomainPolicy:
-      NotFound: "Org IAM Policy not found"
-      Empty: "Org IAM Policy is empty"
-      NotExisting: "Org IAM Policy not existing"
-      AlreadyExists: "Org IAM Policy already exists"
-      NotChanged: "Org IAM Policy has not been changed"
+      NotFound: "Organization Domain Policy not found"
+      Empty: "Organization Domain Policy is empty"
+      NotExisting: "Organization Domain Policy not existing"
+      AlreadyExists: "Organization Domain Policy already exists"
+      NotChanged: "Organization Domain Policy has not been changed"
     NotificationPolicy:
       NotFound: "Default Notification Policy not found"
       NotChanged: "Default Notification Policy not changed"
