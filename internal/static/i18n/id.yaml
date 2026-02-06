@@ -345,7 +345,7 @@ Errors:
       NotActive: "Hibah proyek tidak aktif"
       NotInactive: "Hibah proyek bukannya tidak aktif"
   Instance:
-    NotFound: "Contoh tidak ditemukan. "
+    NotFound: "Instans tidak ditemukan. Pastikan Anda memiliki domain yang benar. Lihat https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Peran belum diubah"
     MemberInvalid: "Anggota tidak valid"
@@ -409,11 +409,11 @@ Errors:
       Empty: "Kebijakan Penguncian Kata Sandi Default kosong"
       NotChanged: "Kebijakan Penguncian Kata Sandi Default belum diubah"
     DomainPolicy:
-      NotFound: "Kebijakan IAM Organisasi tidak ditemukan"
-      Empty: "Kebijakan IAM Organisasi kosong"
-      NotExisting: "Kebijakan IAM Organisasi tidak ada"
-      AlreadyExists: "Kebijakan IAM Organisasi sudah ada"
-      NotChanged: "Kebijakan IAM Organisasi belum diubah"
+      NotFound: "Kebijakan Domain Organisasi tidak ditemukan"
+      Empty: "Kebijakan Domain Organisasi kosong"
+      NotExisting: "Kebijakan Domain Organisasi tidak ada"
+      AlreadyExists: "Kebijakan Domain Organisasi sudah ada"
+      NotChanged: "Kebijakan Domain Organisasi belum diubah"
     NotificationPolicy:
       NotFound: "Kebijakan Pemberitahuan Default tidak ditemukan"
       NotChanged: "Kebijakan Pemberitahuan Default tidak diubah"

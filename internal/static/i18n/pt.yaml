@@ -344,7 +344,7 @@ Errors:
       NotActive: "A concessão do projeto não está ativa"
       NotInactive: "A concessão do projeto não está inativa"
   Instance:
-    NotFound: "IAM não encontrado. Verifique se você tem o domínio correto. Consulte https://zitadel.com/docs/apis/introduction#domains"
+    NotFound: "Instância não encontrada. Verifique se você tem o domínio correto. Consulte https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "As funções não foram alteradas"
     MemberInvalid: "O membro é inválido"
@@ -408,11 +408,11 @@ Errors:
       Empty: "Política de Bloqueio de Senha Padrão vazia"
       NotChanged: "Política de Bloqueio de Senha Padrão não foi alterada"
     DomainPolicy:
-      NotFound: "Política IAM da Organização não encontrada"
-      Empty: "Política IAM da Organização está vazia"
-      NotExisting: "Política IAM da Organização não existente"
-      AlreadyExists: "Política IAM da Organização já existe"
-      NotChanged: "Política IAM da Organização não foi alterada"
+      NotFound: "Política de Domínio da Organização não encontrada"
+      Empty: "Política de Domínio da Organização está vazia"
+      NotExisting: "Política de Domínio da Organização não existente"
+      AlreadyExists: "Política de Domínio da Organização já existe"
+      NotChanged: "Política de Domínio da Organização não foi alterada"
     NotificationPolicy:
       NotFound: "Política de Notificação Padrão não encontrada"
       NotChanged: "Política de Notificação Padrão não foi alterada"
