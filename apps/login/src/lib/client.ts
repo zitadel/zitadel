@@ -125,8 +125,7 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
       try {
         const _headers = await headers();
         const host = getPublicHostWithProtocol(_headers);
-        const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
-        const result = `${host}${basePath}${envOverride}`;
+        const result = `${host}${envOverride}`;
         console.log("resolveRedirectUri: Using host-based redirect from override:", result);
         return result;
       } catch (error) {

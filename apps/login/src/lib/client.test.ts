@@ -36,7 +36,7 @@ describe("getNextUrl", () => {
     process.env.NEXT_PUBLIC_BASE_PATH = "/ui/v2/login";
 
     const result = await getNextUrl(command);
-    expect(result).toBe("https://my-host.com/ui/v2/login/dashboard");
+    expect(result).toBe("https://my-host.com/dashboard");
   });
 
   test("should use defaultRedirectUri if env is NOT set", async () => {
