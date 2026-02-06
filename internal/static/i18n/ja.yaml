@@ -346,7 +346,7 @@ Errors:
       NotActive: "プロジェクトグラントはアクティブではありません"
       NotInactive: "プロジェクトグラントは非アクティブではありません"
   Instance:
-    NotFound: "IAMが見つかりません。正しいドメインを持っていることを確認してください。 https://zitadel.com/docs/apis/introduction#domains を参照してください"
+    NotFound: "インスタンスが見つかりません。正しいドメインを持っていることを確認してください。 https://zitadel.com/docs/apis/introduction#domains を参照してください"
     Member:
       RolesNotChanged: "ロールは変更されていません"
     MemberInvalid: "無効なメンバーです"
@@ -410,11 +410,11 @@ Errors:
       Empty: "デフォルトのパスワードロックアウトポリシーが空です"
       NotChanged: "デフォルトのパスワードロックアウトポリシーは変更されていません"
     DomainPolicy:
-      NotFound: "組織IAMポリシーは見つかりません"
-      Empty: "組織IAMポリシーは空です"
-      NotExisting: "組織IAMポリシーは存在しません"
-      AlreadyExists: "組織IAMポリシーはすでに存在しています"
-      NotChanged: "組織IAMポリシーは変更されていません"
+      NotFound: "組織ドメインポリシーは見つかりません"
+      Empty: "組織ドメインポリシーは空です"
+      NotExisting: "組織ドメインポリシーは存在しません"
+      AlreadyExists: "組織ドメインポリシーはすでに存在しています"
+      NotChanged: "組織ドメインポリシーは変更されていません"
     NotificationPolicy:
       NotFound: "デフォルトの通知ポリシーが見つかりません"
       NotChanged: "デフォルトの通知ポリシーは変更されていません"

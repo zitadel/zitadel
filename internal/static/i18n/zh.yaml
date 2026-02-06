@@ -346,7 +346,7 @@ Errors:
       NotActive: "项目授权不是启用状态"
       NotInactive: "项目授权不是停用状态"
   Instance:
-    NotFound: "IAM 未找到。确保您有正确的域。查看 https://zitadel.com/docs/apis/introduction#domains"
+    NotFound: "实例未找到。确保您有正确的域。查看 https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "角色没有改变"
     MemberInvalid: "成员无效"
@@ -410,11 +410,11 @@ Errors:
       Empty: "默认密码锁策略为空"
       NotChanged: "默认密码锁策略未更改"
     DomainPolicy:
-      NotFound: "组织 IAM 策略不存在"
-      Empty: "组织 IAM 策略为空"
-      NotExisting: "组织 IAM 策略不存在"
-      AlreadyExists: "组织 IAM 策略已存在"
-      NotChanged: "组织 IAM 策略未更改"
+      NotFound: "组织域策略不存在"
+      Empty: "组织域策略为空"
+      NotExisting: "组织域策略不存在"
+      AlreadyExists: "组织域策略已存在"
+      NotChanged: "组织域策略未更改"
     NotificationPolicy:
       NotFound: "没有找到默认的通知政策"
       NotChanged: "默认的通知政策没有改变"

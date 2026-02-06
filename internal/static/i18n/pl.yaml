@@ -345,7 +345,7 @@ Errors:
       NotActive: "Grant projektu jest nieaktywny"
       NotInactive: "Grant projektu nie jest nieaktywny"
   Instance:
-    NotFound: "IAM nie znaleziony. Upewnij się, że masz poprawną domenę. Sprawdź https://zitadel.com/docs/apis/introduction#domains"
+    NotFound: "Instancja nie znaleziona. Upewnij się, że masz poprawną domenę. Sprawdź https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Role nie zmienione"
     MemberInvalid: "Członek jest nieprawidłowy"
@@ -409,11 +409,11 @@ Errors:
       Empty: "Domyślna polityka blokowania hasła jest pusta"
       NotChanged: "Domyślna polityka blokowania hasła nie została zmieniona"
     DomainPolicy:
-      NotFound: "Polityka IAM organizacji nie znaleziona"
-      Empty: "Polityka IAM organizacji jest pusta"
-      NotExisting: "Polityka IAM organizacji nie istnieje"
-      AlreadyExists: "Polityka IAM organizacji już istnieje"
-      NotChanged: "Polityka IAM organizacji nie została zmieniona"
+      NotFound: "Polityka domen organizacji nie znaleziona"
+      Empty: "Polityka domen organizacji jest pusta"
+      NotExisting: "Polityka domen organizacji nie istnieje"
+      AlreadyExists: "Polityka domen organizacji już istnieje"
+      NotChanged: "Polityka domen organizacji nie została zmieniona"
     NotificationPolicy:
       NotFound: "Domyślna polityka powiadomień nie znaleziona"
       NotChanged: "Domyślna polityka powiadomień nie zmieniona"

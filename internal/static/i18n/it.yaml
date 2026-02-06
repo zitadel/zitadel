@@ -345,7 +345,7 @@ Errors:
       NotActive: "Grant del progetto non è attivo"
       NotInactive: "Grant del progetto non è inattivo"
   Instance:
-    NotFound: "IAM non trovato. Assicurati di avere il dominio corretto. Guarda su https://zitadel.com/docs/apis/introduction#domains"
+    NotFound: "Istanza non trovata. Assicurati di avere il dominio corretto. Guarda su https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "I ruoli non sono stati cambiati"
     MemberInvalid: "Il membro non è valido"
@@ -409,11 +409,11 @@ Errors:
       Empty: "Impostazioni di blocco della password predefinite sono vuote"
       NotChanged: "Le impostazioni di blocco della password predefinite non sono state cambiate"
     DomainPolicy:
-      NotFound: "Impostazioni Org IAM non trovate"
-      Empty: "Impostazioni Org IAM mancanti"
-      NotExisting: "Impostazioni Org IAM non esistenti"
-      AlreadyExists: "Impostazioni Org IAM già esistenti"
-      NotChanged: "Impostazioni Org IAM non sono state cambiate"
+      NotFound: "Impostazioni di dominio dell'organizzazione non trovate"
+      Empty: "Impostazioni di dominio dell'organizzazione mancanti"
+      NotExisting: "Impostazioni di dominio dell'organizzazione non esistenti"
+      AlreadyExists: "Impostazioni di dominio dell'organizzazione già esistenti"
+      NotChanged: "Impostazioni di dominio dell'organizzazione non sono state cambiate"
     NotificationPolicy:
       NotFound: "Impostazioni di notifica predefinite non trovate"
       NotChanged: "Impostazioni di notifica predefinite non è stato cambiato"
