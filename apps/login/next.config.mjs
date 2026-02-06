@@ -41,6 +41,11 @@ const nextConfig = {
     optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
     useCache: true,
   },
+  serverActions: {
+    allowedOrigins: process.env.SERVER_ACTION_ALLOWED_ORIGINS
+      ? process.env.SERVER_ACTION_ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+      : [],
+  },
   // Improve SSR stability - not actually needed for React 19 SSR issues
   // onDemandEntries: {
   //   maxInactiveAge: 25 * 1000,

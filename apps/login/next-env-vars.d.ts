@@ -44,5 +44,19 @@ declare namespace NodeJS {
      * Optional: The application name shown in the login and invite emails
      */
     NEXT_PUBLIC_APPLICATION_NAME?: string;
+
+    /**
+     * Optional: override the redirect URI after successful login
+     * If set to "/", it will redirect back to the host of the request (useful for rewrites)
+     * Otherwise, it will use the value as an absolute redirect URI.
+     * Takes precedence over organization settings.
+     */
+    ZITADEL_DEFAULT_REDIRECT_URI?: string;
+
+    /**
+     * Optional: Comma-separated list of allowed origins for Server Actions (e.g., 'localhost:3000,zitadel.com')
+     * If not set, it defaults to an empty list.
+     */
+    SERVER_ACTION_ALLOWED_ORIGINS?: string;
   }
 }

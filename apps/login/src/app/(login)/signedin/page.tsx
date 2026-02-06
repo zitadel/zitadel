@@ -3,6 +3,7 @@ import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
+import { resolveRedirectUri } from "@/lib/client";
 import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/cookies";
 import { completeDeviceAuthorization } from "@/lib/server/device";
 import { getServiceConfig } from "@/lib/service-url";
@@ -108,17 +109,28 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </Alert>
         )}
 
-        {loginSettings?.defaultRedirectUri && (
-          <div className="mt-8 flex w-full flex-row items-center">
-            <span className="flex-grow"></span>
+        {(async () => {
+          const redirectUri = await resolveRedirectUri(
+            requestId && sessionId
+              ? { sessionId, requestId }
+              : { loginName: loginName ?? sessionFactors?.factors?.user?.loginName },
+            loginSettings?.defaultRedirectUri,
+          );
 
-            <Link href={loginSettings?.defaultRedirectUri}>
-              <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
-                <Translated i18nKey="continue" namespace="signedin" />
-              </Button>
-            </Link>
-          </div>
-        )}
+          if (redirectUri) {
+            return (
+              <div className="mt-8 flex w-full flex-row items-center">
+                <span className="flex-grow"></span>
+
+                <Link href={redirectUri}>
+                  <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
+                    <Translated i18nKey="continue" namespace="signedin" />
+                  </Button>
+                </Link>
+              </div>
+            );
+          }
+        })()}
       </div>
     </DynamicTheme>
   );
