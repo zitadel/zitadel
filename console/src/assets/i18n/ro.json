@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Utilizatori de servicii",
     "LOGOUT": "Deconectați toți utilizatorii",
     "NEWORG": "Organizație nouă",
-    "IAMADMIN": "Sunteți administrator IAM. Rețineți că aveți permisiuni extinse.",
+    "IAMADMIN": "Sunteți administrator instanță. Rețineți că aveți permisiuni extinse.",
     "SHOWORGS": "Afișați toate organizațiile",
     "GRANTS": "Autorizații",
     "ACTIONS": "Acțiuni",
@@ -1159,7 +1159,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Rolurile administratorilor Zitadel",
-      "DESCRIPTION": "Acestea sunt toate granturile de membru ale utilizatorului. Puteți să le modificați și în paginile de detalii ale organizației, proiectului sau IAM.",
+      "DESCRIPTION": "Acestea sunt toate granturile de membru ale utilizatorului. Puteți să le modificați și în paginile de detalii ale organizației, proiectului sau instanță.",
       "ORGCONTEXT": "Vedeți toate organizațiile și proiectele care sunt legate de organizația selectată în prezent.",
       "USERCONTEXT": "Vedeți toate organizațiile și proiectele la care sunteți autorizat. Inclusiv alte organizații.",
       "CREATIONDATE": "Data creării",
@@ -1265,7 +1265,7 @@
       "DESCRIPTION": "Gestionați-vă politicile globale și setările de acces pentru gestionare."
     },
     "EVENTSTORE": {
-      "TITLE": "Administrarea stocării IAM",
+      "TITLE": "Administrarea stocării Instanță",
       "DESCRIPTION": "Gestionați-vă vizualizările Zitadel și evenimentele eșuate."
     },
     "MEMBER": {
@@ -2791,7 +2791,7 @@
     "ADD": "Adăugați un manager",
     "CREATIONTYPE": "Tip creare",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instanță",
       "2": "Organizație",
       "0": "Proiect deținut",
       "1": "Proiect acordat",

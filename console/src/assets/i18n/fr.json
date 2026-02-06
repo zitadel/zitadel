@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Utilisateurs de services",
     "LOGOUT": "Déconnexion de tous les utilisateurs",
     "NEWORG": "Nouvelle organisation",
-    "IAMADMIN": "Vous êtes un administrateur IAM. Notez que vous disposez de permissions étendues.",
+    "IAMADMIN": "Vous êtes un administrateur d'instance. Notez que vous disposez de permissions étendues.",
     "SHOWORGS": "Afficher toutes les organisations",
     "GRANTS": "Autorisations",
     "ACTIONS": "Actions",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Rôles d'administrateur Zitadel",
-      "DESCRIPTION": "Il s'agit de toutes les attributions des membres de l'utilisateur. Vous pouvez également les modifier sur les pages de détails de l'organisation, du projet ou de l'IAM.",
+      "DESCRIPTION": "Il s'agit de toutes les attributions des membres de l'utilisateur. Vous pouvez également les modifier sur les pages de détails de l'organisation, du projet ou de l'instance.",
       "ORGCONTEXT": "Vous voyez toutes les organisations et tous les projets qui sont liés à l'organisation actuellement sélectionnée.",
       "USERCONTEXT": "Vous voyez toutes les organisations et tous les projets auxquels vous êtes autorisé. Y compris les autres organisations.",
       "CREATIONDATE": "Date de création",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Gérer vos politiques globales et vos paramètres d'accès à la gestion."
     },
     "EVENTSTORE": {
-      "TITLE": "Administration du stockage IAM",
+      "TITLE": "Administration du stockage Instance",
       "DESCRIPTION": "Gérez vos vues Zitadel et les événements échoués."
     },
     "MEMBER": {
@@ -2770,7 +2770,7 @@
     "ADD": "Ajouter un responsable",
     "CREATIONTYPE": "Type de création",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instance",
       "2": "Organisation",
       "0": "Projet Détenu",
       "1": "Projet Octroyé",
