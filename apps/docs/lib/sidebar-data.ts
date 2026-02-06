@@ -752,6 +752,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               "self-hosting/deploy/kubernetes/configuration",
               "self-hosting/deploy/kubernetes/ingress",
               "self-hosting/deploy/kubernetes/database",
+              "self-hosting/deploy/kubernetes/caching",
               "self-hosting/deploy/kubernetes/observability",
               "self-hosting/deploy/kubernetes/operations",
               "self-hosting/deploy/kubernetes/uninstalling",
