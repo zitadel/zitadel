@@ -2308,7 +2308,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance instance remove reduces", func(t *testing.T) {
+	t.Run("test instance idp remove reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
