@@ -341,13 +341,13 @@ Errors:
         NotFound: "Chiave di applicazione non trovata"
     RequiredFieldsMissing: "Mancano alcuni campi obbligatori"
     Grant:
-      AlreadyExists: "Il permesso di progetto già esistente"
-      NotFound: "Il permesso di progetto non trovato"
+      AlreadyExists: "Il permesso di progetto esiste già"
+      NotFound: "Permesso di progetto non trovato"
       Invalid: "Il permesso di progetto non è valido"
-      NotExisting: "Il permesso di progetto non esistente"
-      HasNotExistingRole: "Uno dei ruoli assegnati non esiste nel progetto"
+      NotExisting: "Il permesso di progetto non esiste"
+      HasNotExistingRole: "Uno dei ruoli assegnati nel progetto non esiste"
       NotActive: "Il permesso di progetto non è attivo"
-      NotInactive: "Il permesso di progetto non è inattivo"
+      NotInactive: "Il permesso di progetto non è disattivato"
   IAM:
     NotFound: "IAM non trovato. Assicurati di avere il dominio corretto. Guarda su https://zitadel.com/docs/apis/introduction#domains"
     Member:
