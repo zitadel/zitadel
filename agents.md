@@ -40,6 +40,6 @@ ZITADEL follows a strict hierarchical containment model. When generating code, l
 If a translation is requested for a language not listed above, follow these priority rules for the word 'Instance':
 
 1. **Priority 1 (Transliteration):** Use the phonetic transliteration into the local script (common in Japanese/Korean/Russian).
-3. **Priority 2 (System Entity):** Use a term that implies a "running process" or "logical environment."
-2. **Priority 3 (Tenant):** If 'Instance' is ambiguous, use the local word for 'Tenant' (e.g., 租户 in Chinese).
+2. **Priority 2 (System Entity):** Use a term that implies a "running process" or "logical environment."
+3. **Priority 3 (Tenant):** If 'Instance' is ambiguous, use the local word for 'Tenant' (e.g., 租户 in Chinese).
 4. **Strict Ban:** NEVER use words that mean "an illustration", "a case", "a sample", or "an example."
