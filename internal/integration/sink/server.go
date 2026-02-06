@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -108,7 +109,12 @@ func SuccessfulOIDCIntent(instanceID, idpID, idpUserID, userID string, expiry ti
 	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
 }
 
-func SuccessfulSAMLIntent(instanceID, idpID, idpUserID, userID string, expiry time.Time) (string, string, time.Time, uint64, error) {
+// SuccessfulSAMLIntent creates a SAMLIntent and then executes the flow to put it in
+// successful state.
+//
+// If intentID is not empty, the intent creation is skipped and only the flow part to switch
+// the intent to a successful state is executed.
+func SuccessfulSAMLIntent(instanceID, idpID, idpUserID, userID, intentID string, expiry time.Time) (string, string, time.Time, uint64, error) {
 	u := url.URL{
 		Scheme: "http",
 		Host:   host,
@@ -120,6 +126,7 @@ func SuccessfulSAMLIntent(instanceID, idpID, idpUserID, userID string, expiry ti
 		IDPUserID:  idpUserID,
 		UserID:     userID,
 		Expiry:     expiry,
+		IntentID:   intentID,
 	})
 	if err != nil {
 		return "", "", time.Time{}, uint64(0), err
@@ -341,6 +348,7 @@ type SuccessfulIntentRequest struct {
 	IDPUserID  string    `json:"idp_user_id"`
 	UserID     string    `json:"user_id"`
 	Expiry     time.Time `json:"expiry"`
+	IntentID   string    `json:"intent_id"`
 }
 type SuccessfulIntentResponse struct {
 	IntentID   string    `json:"intent_id"`
@@ -519,7 +527,10 @@ func createSuccessfulOIDCIntent(ctx context.Context, cmd *command.Commands, req 
 }
 
 func createSuccessfulSAMLIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
-	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
+	intentID := strings.TrimSpace(req.IntentID)
+	if intentID == "" {
+		intentID, _ = createIntent(ctx, cmd, req.InstanceID, req.IDPID)
+	}
 	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
 
 	idpUser := &saml.UserMapper{

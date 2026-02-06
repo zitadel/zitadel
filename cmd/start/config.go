@@ -1,16 +1,17 @@
 package start
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	//nolint:staticcheck
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
@@ -42,7 +43,6 @@ import (
 
 type Config struct {
 	Instrumentation     instrumentation.Config
-	Log                 *logging.Config
 	Port                uint16
 	ExternalPort        uint16
 	ExternalDomain      string
@@ -92,21 +92,22 @@ type QuotasConfig struct {
 	Execution *logstore.EmitterConfig
 }
 
-func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
+func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
 	config, err := readConfig(v)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to read config: %w", err)
 	}
 
-	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
+	shutdown, err := instrumentation.Start(cmd.Context(), config.Instrumentation)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
 	}
+	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 
 	// Legacy logger
 	err = config.Log.SetLogger()
 	if err != nil {
-		err = errors.Join(err, shutdown(ctx))
+		err = errors.Join(err, shutdown(cmd.Context()))
 		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
 	}
 
@@ -117,7 +118,7 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 
 	err = config.SystemDefaults.Validate()
 	if err != nil {
-		err = errors.Join(err, shutdown(ctx))
+		err = errors.Join(err, shutdown(cmd.Context()))
 		return nil, nil, fmt.Errorf("system defaults config invalid: %w", err)
 	}
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.

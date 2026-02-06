@@ -19,7 +19,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
@@ -1088,7 +1087,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			},
 		},
 		{
-			name: "approved with backChannelLogout (feature enabled), success",
+			name: "approved with backChannelLogout, success",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1167,9 +1166,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				authz.WithFeatures(ctx, feature.Features{
-					EnableBackChannelLogout: true,
-				}),
+				ctx,
 				"123",
 				"backChannelLogoutURI",
 			},

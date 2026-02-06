@@ -6,14 +6,14 @@ with domain as (
 ), instance_features as (
 	select i.*
 	from domain d
-	join projections.instance_features2 i on d.instance_id = i.instance_id
+	join projections.instance_features5 i on d.instance_id = i.instance_id
 ), features as (
 	select instance_id, json_object_agg(
 		coalesce(i.key, s.key),
 		coalesce(i.value, s.value)
 	) features
 	from domain d
-	cross join projections.system_features s
+	cross join projections.system_features4 s
 	full outer join instance_features i using (instance_id, key)
 	group by instance_id
 ), external_domains as (
@@ -35,7 +35,10 @@ with domain as (
 			'endpoint', t.endpoint,
 			'timeout', t.timeout,
 			'interrupt_on_error', t.interrupt_on_error,
-			'signing_key', t.signing_key
+			'signing_key', t.signing_key,
+			'payload_type', t.payload_type,
+            'encryption_key', encode(k.public_key, 'base64'),
+            'encryption_key_id', k.id
 		) as execution_targets
 		from domain d
 		join projections.executions1 e
@@ -46,6 +49,11 @@ with domain as (
 		join projections.targets2 t
 			on et.instance_id = t.instance_id
 			and et.target_id = t.id
+        left join projections.authn_keys2 k
+            on k.instance_id = et.instance_id
+            and k.object_id = t.id
+            and k.enabled = true
+            and (k.expiration IS NULL or k.expiration > now())
 		order by et.position asc
 	) as x
 	group by instance_id

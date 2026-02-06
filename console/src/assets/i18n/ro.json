@@ -1,9 +1,9 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Metadata",
     "HOME": {
-      "TITLE": "Începeți cu ZITADEL",
+      "TITLE": "Începeți cu Zitadel",
       "NEXT": {
         "TITLE": "Pașii următori",
         "DESCRIPTION": "Finalizați următorii pași pentru a vă securiza aplicația.",
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "Documentație",
-          "DESCRIPTION": "Explorați baza de cunoștințe ZITADEL pentru a vă familiariza cu conceptele și ideile de bază. Aflați cum funcționează ZITADEL și cum să îl utilizați."
+          "DESCRIPTION": "Explorați baza de cunoștințe Zitadel pentru a vă familiariza cu conceptele și ideile de bază. Aflați cum funcționează Zitadel și cum să îl utilizați."
         },
         "EXAMPLES": {
           "TITLE": "Exemple și Kituri de Dezvoltare Software",
-          "DESCRIPTION": "Navigați prin exemplele și SDK-urile noastre pentru a utiliza ZITADEL împreună cu limbajele și instrumentele de programare preferate."
+          "DESCRIPTION": "Navigați prin exemplele și SDK-urile noastre pentru a utiliza Zitadel împreună cu limbajele și instrumentele de programare preferate."
         }
       }
     },
@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Utilizatori",
-      "DESCRIPTION": "Un utilizator este o persoană sau o mașină care vă poate accesa aplicațiile.",
+      "DESCRIPTION": "Un utilizator este o persoană sau un cont de serviciu care vă poate accesa aplicațiile.",
       "HUMANS": {
         "TITLE": "Utilizatori",
         "DESCRIPTION": "Utilizatorii se autentifică interactiv într-o sesiune de browser cu o solicitare de autentificare.",
@@ -67,7 +67,7 @@
     },
     "ACTIONS": {
       "TITLE": "Acțiuni",
-      "DESCRIPTION": "Executați cod personalizat pe evenimente care se întâmplă pe măsură ce utilizatorii dvs. se autentifică la ZITADEL. Automatizați-vă procesele, îmbogățiți metadatele utilizatorilor și tokenurile lor sau notificați sistemele externe.",
+      "DESCRIPTION": "Executați cod personalizat pe evenimente care se întâmplă pe măsură ce utilizatorii dvs. se autentifică la Zitadel. Automatizați-vă procesele, îmbogățiți metadatele utilizatorilor și tokenurile lor sau notificați sistemele externe.",
       "SCRIPTS": {
         "TITLE": "Scripturi",
         "DESCRIPTION": "Scrieți codul JavaScript o singură dată și declanșați-l în mai multe fluxuri."
@@ -97,23 +97,23 @@
         "NEXT": "Ce urmează?",
         "SAML": {
           "TITLE": "Configurați-vă furnizorul de identitate SAML",
-          "DESCRIPTION": "ZITADEL este configurat. Acum, furnizorul dvs. de identitate SAML are nevoie de o anumită configurație. Majoritatea furnizorilor vă permit să încărcați pur și simplu întregul XML de metadate ZITADEL. Alți furnizori vă cer să furnizați doar câteva URL-uri distincte, cum ar fi, de exemplu, ID-ul entității (URL-ul metadatelor), URL-ul Assertion Consumer Service (ACS) sau URL-ul Single Logout."
+          "DESCRIPTION": "Zitadel este configurat. Acum, furnizorul dvs. de identitate SAML are nevoie de o anumită configurație. Majoritatea furnizorilor vă permit să încărcați pur și simplu întregul XML de metadate Zitadel. Alți furnizori vă cer să furnizați doar câteva URL-uri distincte, cum ar fi, de exemplu, ID-ul entității (URL-ul metadatelor), URL-ul Assertion Consumer Service (ACS) sau URL-ul Single Logout."
         },
         "CALLBACK": {
           "TITLE": "Configurați-vă furnizorul de identitate {{ provider }}",
-          "DESCRIPTION": "Înainte de a putea configura ZITADEL, transmiteți acest URL furnizorului dvs. de identitate pentru a activa redirecționarea browserului înapoi la ZITADEL după autentificare."
+          "DESCRIPTION": "Înainte de a putea configura Zitadel, transmiteți acest URL furnizorului dvs. de identitate pentru a activa redirecționarea browserului înapoi la Zitadel după autentificare."
         },
         "JWT": {
           "TITLE": "Utilizați JWT-urile ca identități federate",
-          "DESCRIPTION": "Furnizorul de identitate JWT vă permite să utilizați tokenurile JWT existente ca identități federate. Această caracteristică este utilă dacă aveți deja un emitent pentru JWT-uri. Cu un IdP JWT, puteți utiliza aceste JWT-uri pentru a crea și actualiza utilizatori în ZITADEL din mers."
+          "DESCRIPTION": "Furnizorul de identitate JWT vă permite să utilizați tokenurile JWT existente ca identități federate. Această caracteristică este utilă dacă aveți deja un emitent pentru JWT-uri. Cu un IdP JWT, puteți utiliza aceste JWT-uri pentru a crea și actualiza utilizatori în Zitadel din mers."
         },
         "LDAP": {
-          "TITLE": "Configurați ZITADEL pentru a vă conecta la furnizorul dvs. de identitate LDAP",
-          "DESCRIPTION": "Furnizați detaliile de conectare la serverul dvs. LDAP și configurați maparea atributelor LDAP la atributele ZITADEL."
+          "TITLE": "Configurați Zitadel pentru a vă conecta la furnizorul dvs. de identitate LDAP",
+          "DESCRIPTION": "Furnizați detaliile de conectare la serverul dvs. LDAP și configurați maparea atributelor LDAP la atributele Zitadel."
         },
         "AUTOFILL": {
           "TITLE": "Completare automată a datelor utilizatorului",
-          "DESCRIPTION": "Utilizați o acțiune pentru a îmbunătăți experiența utilizatorilor dvs. Puteți pre-completa formularul de înregistrare ZITADEL cu valori de la furnizorul de identitate."
+          "DESCRIPTION": "Utilizați o acțiune pentru a îmbunătăți experiența utilizatorilor dvs. Puteți pre-completa formularul de înregistrare Zitadel cu valori de la furnizorul de identitate."
         },
         "ACTIVATE": {
           "TITLE": "Activați IdP-ul",
@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Linkuri externe",
-        "DESCRIPTION": "Ghidați utilizatorii către resurse externe personalizate afișate pe pagina de autentificare. Utilizatorii trebuie să accepte Termenii și condițiile și Politica de confidențialitate înainte de a se putea înregistra. Modificați linkul către documentația dvs. sau setați un șir gol pentru a ascunde butonul de documentație din consolă. Adăugați un link extern personalizat și un text personalizat pentru acel link în consolă sau setați-le goale pentru a ascunde acel buton."
+        "DESCRIPTION": "Ghidați utilizatorii către resurse externe personalizate afișate pe pagina de autentificare. Utilizatorii trebuie să accepte Termenii și condițiile și Politica de confidențialitate înainte de a se putea înregistra. Modificați linkul către documentația dvs. sau setați un șir gol pentru a ascunde butonul de documentație din consola de administrare. Adăugați un link extern personalizat și un text personalizat pentru acel link în consola de administrare sau setați-le goale pentru a ascunde acel buton."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Setări SMTP",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "Setări SMS",
-        "DESCRIPTION": "Pentru a debloca toate caracteristicile ZITADEL, configurați Twilio pentru a trimite mesaje SMS utilizatorilor dvs."
+        "DESCRIPTION": "Pentru a debloca toate caracteristicile Zitadel, configurați Twilio pentru a trimite mesaje SMS utilizatorilor dvs."
       },
       "IAM_EVENTS": {
         "TITLE": "Evenimente",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "Evenimente eșuate",
-        "DESCRIPTION": "Această pagină afișează toate evenimentele eșuate din instanța dvs. Dacă ZITADEL nu se comportă așa cum vă așteptați, verificați întotdeauna mai întâi această listă."
+        "DESCRIPTION": "Această pagină afișează toate evenimentele eșuate din instanța dvs. Dacă Zitadel nu se comportă așa cum vă așteptați, verificați întotdeauna mai întâi această listă."
       },
       "IAM_VIEWS": {
         "TITLE": "Vizualizări",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "Setări de securitate",
-        "DESCRIPTION": "Activați caracteristicile ZITADEL care pot avea impact asupra securității. Ar trebui să știți cu adevărat ce faceți înainte de a modifica aceste setări."
+        "DESCRIPTION": "Activați caracteristicile Zitadel care pot avea impact asupra securității. Ar trebui să știți cu adevărat ce faceți înainte de a modifica aceste setări."
       },
       "OIDC": {
         "TITLE": "Setări OpenID Connect",
@@ -187,11 +187,11 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "Gestionează-ți cheile web OIDC pentru a semna și valida în siguranță tokenurile pentru instanța ta ZITADEL.",
+        "DESCRIPTION": "Gestionează-ți cheile web OIDC pentru a semna și valida în siguranță tokenurile pentru instanța ta Zitadel.",
         "TABLE": {
           "TITLE": "Chei Web Active și Viitoare",
           "DESCRIPTION": "Cheile tale web active și viitoare. Activarea unei noi chei va dezactiva cheia curentă.",
-          "NOTE": "Notă: Endpoint-ul JWKs OIDC returnează un răspuns care poate fi stocat în cache (implicit 5 min). Evită activarea unei chei prea devreme, deoarece este posibil să nu fie încă disponibilă în cache și pentru clienți.",
+          "NOTE": "Notă: Endpoint-ul JWKs OIDC returnează un răspuns care poate fi stocat în cache (implicit 5 min). Evită activarea unei chei prea devreme, deoarece este posibil să nu fie încă disponibilă în cache și pentru aplicații.",
           "ACTIVATE": "Activează următoarea Cheie Web",
           "ACTIVE": "În prezent activă",
           "NEXT": "Următoarea în coadă",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "Creează o nouă Cheie Web",
-          "DESCRIPTION": "Crearea unei noi chei web o va adăuga pe lista ta. ZITADEL folosește implicit chei RSA2048 cu un algoritm de hash SHA256.",
+          "DESCRIPTION": "Crearea unei noi chei web o va adăuga pe lista ta. Zitadel folosește implicit chei RSA2048 cu un algoritm de hash SHA256.",
           "KEY_TYPE": "Tip de Cheie",
           "BITS": "Biti",
           "HASHER": "Algoritm de Hash",
@@ -219,12 +219,12 @@
           "DC": "Când revendicați un domeniu pentru organizația dvs., utilizatorii care nu utilizează acest domeniu în numele lor de conectare vor fi solicitați să își schimbe numele de conectare pentru a se potrivi cu domeniul revendicat.",
           "INIT": "Când un utilizator este creat, acesta va primi un e-mail cu un link pentru a-și seta parola.",
           "PC": "Când un utilizator își schimbă parola, acesta va primi o notificare despre modificare dacă ați activat acest lucru în setările de notificare.",
-          "PL": "Când un utilizator adaugă o metodă de autentificare fără parolă, acesta trebuie să o activeze făcând clic pe un link dintr-un e-mail.",
+          "PL": "Când un utilizator adaugă o metodă de autentificare Passkey, acesta trebuie să o activeze făcând clic pe un link dintr-un e-mail.",
           "PR": "Când un utilizator își resetează parola, acesta va primi un e-mail cu un link pentru a seta o parolă nouă.",
           "VE": "Când un utilizator își schimbă adresa de e-mail, acesta va primi un e-mail cu un link pentru a verifica noua adresă.",
           "VP": "Când un utilizator își schimbă numărul de telefon, acesta va primi un SMS cu un cod pentru a verifica noul număr.",
-          "VEO": "Când un utilizator adaugă o parolă unică prin metoda e-mail, acesta trebuie să o activeze introducând un cod trimis la adresa sa de e-mail.",
-          "VSO": "Când un utilizator adaugă o parolă unică prin metoda SMS, acesta trebuie să o activeze introducând un cod trimis la numărul său de telefon.",
+          "VEO": "Când un utilizator adaugă o metodă OTP prin e-mail, acesta trebuie să o activeze introducând un cod trimis la adresa sa de e-mail.",
+          "VSO": "Când un utilizator adaugă o metodă OTP prin SMS, acesta trebuie să o activeze introducând un cod trimis la numărul său de telefon.",
           "IU": "Când este creat un cod de invitație pentru utilizator, acesta va primi un e-mail cu un link pentru a-și seta metoda de autentificare."
         }
       },
@@ -241,7 +241,7 @@
         },
         "LOGIN_NAME_PATTERN": {
           "TITLE": "Model de nume de conectare",
-          "DESCRIPTION": "Controlați modelul numelor de conectare ale utilizatorilor dvs. ZITADEL selectează organizația utilizatorilor dvs. imediat ce aceștia își introduc numele de conectare. Prin urmare, numele de conectare trebuie să fie unice în toate organizațiile. Dacă aveți utilizatori care au un cont în mai multe domenii, puteți asigura unicitatea prin sufixarea numelor de conectare cu domeniul organizației."
+          "DESCRIPTION": "Controlați modelul numelor de conectare ale utilizatorilor dvs. Zitadel selectează organizația utilizatorilor dvs. imediat ce aceștia își introduc numele de conectare. Prin urmare, numele de conectare trebuie să fie unice în toate organizațiile. Dacă aveți utilizatori care au un cont în mai multe domenii, puteți asigura unicitatea prin sufixarea numelor de conectare cu domeniul organizației."
         },
         "DOMAIN_VERIFICATION": {
           "TITLE": "Verificarea domeniului",
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formular de autentificare",
           "DESCRIPTION": "Personalizați formularul de autentificare.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Nume de utilizator și parolă permise",
-            "DESCRIPTION": "Permiteți utilizatorilor dvs. să se conecteze cu numele lor de utilizator și parola. Dacă acest lucru este dezactivat, utilizatorii dvs. se pot conecta numai utilizând autentificarea fără parolă sau cu un furnizor de identitate extern."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Autentificare locală permisă",
+            "DESCRIPTION": "Permiteți utilizatorilor să se autentifice cu numele de utilizator și parola sau prin autentificare cu passkey. Dacă aceasta este dezactivată, utilizatorii se pot autentifica doar folosind un furnizor de identitate extern."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Înregistrarea utilizatorilor permisă",
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "Autentificare externă permisă",
-            "DESCRIPTION": "Permiteți utilizatorilor dvs. să se conecteze cu un furnizor de identitate extern în loc să utilizeze utilizatorul ZITADEL pentru a se conecta."
+            "DESCRIPTION": "Permiteți utilizatorilor dvs. să se conecteze cu un furnizor de identitate extern în loc să utilizeze utilizatorul Zitadel pentru a se conecta."
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "Resetarea parolei ascunsă",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "Începeți cu ZITADEL",
-    "DISCLAIMER": "ZITADEL vă tratează datele în mod confidențial și sigur.",
+    "WELCOME": "Începeți cu Zitadel",
+    "DISCLAIMER": "Zitadel vă tratează datele în mod confidențial și sigur.",
     "DISCLAIMERLINK": "Informații suplimentare",
     "DOCUMENTATION": {
-      "DESCRIPTION": "Începeți rapid cu ZITADEL."
+      "DESCRIPTION": "Începeți rapid cu Zitadel."
     },
     "GETSTARTED": {
-      "DESCRIPTION": "Începeți rapid cu ZITADEL."
+      "DESCRIPTION": "Începeți rapid cu Zitadel."
     },
     "QUICKSTARTS": {
       "LABEL": "Primii pași",
-      "DESCRIPTION": "Începeți rapid cu ZITADEL."
+      "DESCRIPTION": "Începeți rapid cu Zitadel."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Comenzi rapide",
@@ -366,7 +366,7 @@
     "COMPLETED": "finalizat",
     "DISMISS": "Nu, mulțumesc, sunt profesionist.",
     "CARD": {
-      "TITLE": "Puneți ZITADEL să funcționeze",
+      "TITLE": "Puneți Zitadel să funcționeze",
       "DESCRIPTION": "Această listă de verificare ajută la configurarea instanței și vă ghidează prin cei mai esențiali pași"
     },
     "MILESTONES": {
@@ -392,7 +392,7 @@
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "Conectați-vă la aplicația dvs.",
-        "description": "Integrați aplicația dvs. cu ZITADEL pentru autentificare și testați-o conectându-vă cu utilizatorul dvs. administrator.",
+        "description": "Integrați aplicația dvs. cu Zitadel pentru autentificare și testați-o conectându-vă cu utilizatorul dvs. administrator.",
         "action": "Conectați-vă"
       },
       "user.human.added": {
@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organizație",
     "PROJECT": "Proiecte",
     "PROJECTOVERVIEW": "Prezentare generală",
-    "PROJECTGRANTS": "Granturi",
+    "PROJECTGRANTS": "Granturi de proiect",
     "ROLES": "Roluri",
     "GRANTEDPROJECT": "Proiecte acordate",
     "HUMANUSERS": "Utilizatori",
@@ -438,8 +438,8 @@
     "CUSTOMERPORTAL": "Portalul clienților"
   },
   "QUICKSTART": {
-    "TITLE": "Integrați ZITADEL în aplicația dvs.",
-    "DESCRIPTION": "Integrați ZITADEL în aplicația dvs. sau utilizați unul dintre exemplele noastre pentru a începe în câteva minute.",
+    "TITLE": "Integrați Zitadel în aplicația dvs.",
+    "DESCRIPTION": "Integrați Zitadel în aplicația dvs. sau utilizați unul dintre exemplele noastre pentru a începe în câteva minute.",
     "BTN_START": "Creați aplicație",
     "BTN_LEARNMORE": "Aflați mai multe",
     "CREATEPROJECTFORAPP": "Creați proiectul {{value}}",
@@ -623,6 +623,14 @@
           "restAsync": "REST Asincron"
         },
         "TYPES_DESCRIPTION": "Webhook, apelul gestionează codul de stare, dar răspunsul este irelevant\nCall, apelul gestionează codul de stare și răspunsul\nAsync, apelul nu gestionează nici codul de stare, nici răspunsul, dar poate fi apelat în paralel cu alte Ținte",
+        "PAYLOAD_TYPE": "Tipul payload-ului",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Nespecificat",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "JSON Web Token criptat (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Payload JSON standard cu un antet de semnătură pentru verificare.\nJWT: Payload-ul este trimis ca un JWT semnat. Verificarea se realizează prin semnătura JWT.\nJWE: JWT-ul este în plus criptat pentru a preveni accesul neautorizat la informațiile din payload.",
         "ENDPOINT": "Punct Final",
         "ENDPOINT_DESCRIPTION": "Introduceți punctul final unde este găzduit codul dvs. Asigurați-vă că este accesibil pentru noi!",
         "TIMEOUT": "Timeout",
@@ -648,7 +656,7 @@
     "IAM_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatori",
     "IAM_ADMIN_IMPERSONATOR": "Are permisiunea de a impersona administratorul și utilizatorii finali din toate organizațiile",
     "IAM_END_USER_IMPERSONATOR": "Are permisiunea de a impersona utilizatorii finali din toate organizațiile",
-    "IAM_LOGIN_CLIENT": "Are permisiunea de a gestiona clientii de login",
+    "IAM_LOGIN_CLIENT": "Are permisiunea de a gestiona aplicațiile de login",
     "ORG_OWNER": "Are permisiunea asupra întregii organizații",
     "ORG_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatorii organizației",
     "ORG_OWNER_VIEWER": "Are permisiunea de a revizui întreaga organizație",
@@ -734,7 +742,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "Instanța dvs. este blocată.",
-      "DESCRIPTION": "Solicitați administratorului instanței ZITADEL să actualizeze abonamentul."
+      "DESCRIPTION": "Solicitați administratorului instanței Zitadel să actualizeze abonamentul."
     },
     "INVALID_FORMAT": "Formatarea este nevalidă.",
     "NOTANEMAIL": "Valoarea furnizată nu este o adresă de e-mail.",
@@ -830,18 +838,18 @@
       "TABLESTATE": "Stare",
       "NAME": "Nume",
       "EMPTY": "Niciun dispozitiv setat",
-      "TITLE": "Autentificare fără parolă",
-      "DESCRIPTION": "Adăugați metode de autentificare bazate pe WebAuthn pentru a vă conecta la ZITADEL fără parolă.",
+      "TITLE": "Autentificare cu Passkey",
+      "DESCRIPTION": "Adăugați metode de autentificare bazate pe WebAuthn pentru a vă conecta la Zitadel cu Passkey.",
       "MANAGE_DESCRIPTION": "Gestionați metodele de al doilea factor ale utilizatorilor dvs.",
       "U2F": "Adăugați metodă",
       "U2F_DIALOG_TITLE": "Verificați autentificatorul",
-      "U2F_DIALOG_DESCRIPTION": "Introduceți un nume pentru conectarea fără parolă utilizată",
-      "U2F_SUCCESS": "Autentificare fără parolă creată cu succes!",
+      "U2F_DIALOG_DESCRIPTION": "Introduceți un nume pentru conectarea cu Passkey utilizată",
+      "U2F_SUCCESS": "Passkey creată cu succes!",
       "U2F_ERROR": "A apărut o eroare în timpul configurării!",
       "U2F_NAME": "Numele autentificatorului",
       "TYPE": {
         "0": "Niciun MFA definit",
-        "1": "Parolă unică (OTP)",
+        "1": "OTP",
         "2": "Amprentă, chei de securitate, Face ID și altele"
       },
       "STATE": {
@@ -851,17 +859,17 @@
         "3": "Șters"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Eliminați metoda de autentificare fără parolă",
-        "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți o metodă de autentificare fără parolă. Sigur doriți să continuați?",
-        "ADD_TITLE": "Autentificare fără parolă",
-        "ADD_DESCRIPTION": "Selectați una dintre opțiunile disponibile pentru a crea o metodă de autentificare fără parolă.",
+        "DELETE_TITLE": "Eliminați metoda de autentificare cu passkey",
+        "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți o metodă de autentificare cu passkey. Sigur doriți să continuați?",
+        "ADD_TITLE": "Autentificare cu passkey",
+        "ADD_DESCRIPTION": "Selectați una dintre opțiunile disponibile pentru a crea o metodă de autentificare cu passkey.",
         "SEND_DESCRIPTION": "Trimiteți-vă un link de înregistrare la adresa dvs. de e-mail.",
         "SEND": "Trimiteți linkul de înregistrare",
         "SENT": "E-mailul a fost livrat cu succes. Verificați-vă căsuța poștală pentru a continua cu configurarea.",
         "QRCODE_DESCRIPTION": "Generați codul QR pentru scanare cu un alt dispozitiv.",
         "QRCODE": "Generați codul QR",
-        "QRCODE_SCAN": "Scanați acest cod QR pentru a continua cu configurarea pe dispozitivul dvs.",
-        "NEW_DESCRIPTION": "Utilizați acest dispozitiv pentru a configura Autentificarea fără parolă.",
+        "QRCODE_SCAN": "Scanați acest cod QR pentru a continua cu configurarea passkey pe dispozitivul dvs.",
+        "NEW_DESCRIPTION": "Utilizați acest dispozitiv pentru a configura Autentificarea cu passkey.",
         "NEW": "Adăugați nou"
       }
     },
@@ -874,7 +882,7 @@
       "DESCRIPTION": "Adăugați un al doilea factor pentru a asigura o securitate optimă pentru contul dvs.",
       "MANAGE_DESCRIPTION": "Gestionați metodele de al doilea factor ale utilizatorilor dvs.",
       "ADD": "Adăugați factor",
-      "OTP": "Aplicație de autentificare pentru TOTP (Parolă unică bazată pe timp)",
+      "OTP": "Aplicație de autentificare pentru TOTP",
       "OTP_DIALOG_TITLE": "Adăugați OTP",
       "OTP_DIALOG_DESCRIPTION": "Scanați codul QR cu o aplicație de autentificare și introduceți codul de mai jos pentru a verifica și a activa metoda OTP.",
       "U2F": "Amprentă, chei de securitate, Face ID și altele",
@@ -883,15 +891,15 @@
       "U2F_SUCCESS": "Factor adăugat cu succes!",
       "U2F_ERROR": "A apărut o eroare în timpul configurării!",
       "U2F_NAME": "Numele autentificatorului",
-      "OTPSMS": "OTP (Parolă unică) cu SMS",
-      "OTPEMAIL": "OTP (Parolă unică) cu e-mail",
-      "SETUPOTPSMSDESCRIPTION": "Doriți să configurați acest număr de telefon ca al doilea factor OTP (parolă unică)?",
+      "OTPSMS": "OTP cu SMS",
+      "OTPEMAIL": "OTP cu e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Doriți să configurați acest număr de telefon ca al doilea factor OTP?",
       "OTPSMSSUCCESS": "Factorul OTP configurat cu succes.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Telefonul dvs. trebuie să fie verificat pentru a utiliza această metodă.",
       "OTPEMAILSUCCESS": "Factorul OTP configurat cu succes.",
       "TYPE": {
         "0": "Niciun MFA definit",
-        "1": "Parolă unică (OTP)",
+        "1": "OTP",
         "2": "Amprentă, chei de securitate, Face ID și altele"
       },
       "STATE": {
@@ -1132,7 +1140,7 @@
       "EMAILVERIFICATIONSENT": "Codul de verificare a e-mailului trimis.",
       "OTPREMOVED": "OTP eliminat.",
       "U2FREMOVED": "Factor eliminat.",
-      "PASSWORDLESSREMOVED": "Fără parolă eliminat.",
+      "PASSWORDLESSREMOVED": "Autentificare cu passkey eliminată.",
       "INITIALPASSWORDSET": "Parola inițială setată.",
       "PASSWORDNOTIFICATIONSENT": "Notificarea de modificare a parolei trimisă.",
       "PASSWORDCHANGED": "Parola modificată cu succes.",
@@ -1150,7 +1158,7 @@
       "SECRETREMOVED": "Secret eliminat cu succes!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Roluri de manager ZITADEL",
+      "TITLE": "Rolurile administratorilor Zitadel",
       "DESCRIPTION": "Acestea sunt toate granturile de membru ale utilizatorului. Puteți să le modificați și în paginile de detalii ale organizației, proiectului sau IAM.",
       "ORGCONTEXT": "Vedeți toate organizațiile și proiectele care sunt legate de organizația selectată în prezent.",
       "USERCONTEXT": "Vedeți toate organizațiile și proiectele la care sunteți autorizat. Inclusiv alte organizații.",
@@ -1216,7 +1224,7 @@
     "ALLOWEDTOFAIL": "Permis să eșueze",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Avertisment",
-      "DESCRIPTION": "Dacă dezactivați această setare, este posibil ca utilizatorii din organizația dvs. să nu se poată conecta. În plus, nu veți mai putea accesa consola pentru a dezactiva acțiunea. Vă recomandăm să creați un utilizator administrator într-o organizație separată sau să testați mai întâi scripturile într-un mediu de dezvoltare sau într-o organizație de dezvoltare."
+      "DESCRIPTION": "Dacă dezactivați această setare, este posibil ca utilizatorii din organizația dvs. să nu se poată conecta. În plus, nu veți mai putea accesa consola de administrare pentru a dezactiva acțiunea. Vă recomandăm să creați un utilizator administrator într-o organizație separată sau să testați mai întâi scripturile într-un mediu de dezvoltare sau într-o organizație de dezvoltare."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tip flux",
@@ -1258,7 +1266,7 @@
     },
     "EVENTSTORE": {
       "TITLE": "Administrarea stocării IAM",
-      "DESCRIPTION": "Gestionați-vă vizualizările ZITADEL și evenimentele eșuate."
+      "DESCRIPTION": "Gestionați-vă vizualizările Zitadel și evenimentele eșuate."
     },
     "MEMBER": {
       "TITLE": "Manageri",
@@ -1402,7 +1410,7 @@
         "VERIFICATION_HTTP_URL_LABEL": "Adresă URL așteptată:",
         "VERIFICATION_HTTP_FILE_LABEL": "Fișier de verificare:",
         "VERIFICATION_SKIP": "Puteți sări peste verificarea deocamdată și să continuați să vă creați organizația, dar pentru a utiliza domeniul, acest pas trebuie finalizat!",
-        "VERIFICATION_VALIDATION_DESC": "Nu ștergeți codul de verificare, deoarece ZITADEL va verifica din când în când proprietatea domeniului dvs.",
+        "VERIFICATION_VALIDATION_DESC": "Nu ștergeți codul de verificare, deoarece Zitadel va verifica din când în când proprietatea domeniului dvs.",
         "VERIFICATION_NEWTOKEN_TITLE": "Solicitați un token nou",
         "VERIFICATION_VALIDATION_ONGOING": "Metoda {{ value }} a fost selectată pentru a vă verifica domeniul. Faceți clic pe buton pentru a declanșa o verificare de verificare sau pentru a reseta procesul de verificare.",
         "VERIFICATION_SUCCESSFUL": "Domeniu verificat cu succes!",
@@ -1545,7 +1553,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1599,10 +1608,10 @@
         "2": "Verificarea e-mailului",
         "3": "Verificarea telefonului",
         "4": "Resetarea parolei",
-        "5": "Inițializarea fără parolă",
+        "5": "Inițializarea Passkey",
         "6": "Secretul aplicației",
-        "7": "Parolă unică (OTP) - SMS",
-        "8": "Parolă unică (OTP) - E-mail"
+        "7": "OTP - SMS",
+        "8": "OTP - E-mail"
       },
       "EXPIRY": "Expirare (în minute)",
       "INCLUDEDIGITS": "Includeți numere",
@@ -1624,8 +1633,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Organizație implicită de conectare",
       "LOGINDEFAULTORG_DESCRIPTION": "UI-ul de conectare va utiliza setările organizației implicite (și nu din instanță) dacă nu este setat niciun context de organizație",
-      "OIDCTOKENEXCHANGE": "Schimb de token OIDC",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Activați tipul de grant experimental urn:ietf:params:oauth:grant-type:token-exchange pentru endpointul token OIDC. Schimbul de tokenuri poate fi utilizat pentru a solicita tokenuri cu o rază de acțiune mai mică sau pentru a impersona alți utilizatori. Consultați politica de securitate pentru a permite impersonarea pe o instanță.",
       "USERSCHEMA": "Schema de utilizator",
       "USERSCHEMA_DESCRIPTION": "Schemele de utilizator permit gestionarea schemelor de date ale utilizatorului. Dacă indicatorul este activat, veți putea utiliza noul API și caracteristicile sale.",
       "ACTIONS": "Acțiuni",
@@ -1634,8 +1641,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Dacă indicatorul este activat, veți putea termina o singură sesiune din UI-ul de conectare furnizând un id_token cu o revendicare sid ca id_token_hint pe endpointul end_session. Rețineți că în prezent toate sesiunile de la același agent utilizator (browser) sunt terminate în UI-ul de conectare. Sesiunile gestionate prin API-ul Session permit deja terminarea sesiunilor individuale.",
       "DEBUGOIDCPARENTERROR": "Eroare de Depanare Părinte OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Dacă steagul este activat, eroarea părinte OIDC va fi înregistrată în consolă.",
-      "ENABLEBACKCHANNELLOGOUT": "Activează Logout Backchannel",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Logout-ul Back-Channel implementează OpenID Connect Back-Channel Logout 1.0 și poate fi folosit pentru a notifica clienții despre terminarea sesiunii la Producătorul OpenID.",
       "PERMISSIONCHECKV2": "Verificare Permisiuni V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Dacă steagul este activat, veți putea folosi noua API și funcțiile sale.",
       "STATES": {
@@ -1649,8 +1654,8 @@
         "DISABLED": "\"Dezactivat\" este moștenit"
       },
       "RESET": "Setați totul pentru a moșteni",
-      "CONSOLEUSEV2USERAPI": "Utilizați API-ul V2 în Consola pentru crearea utilizatorului",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Când acest indicator este activat, consola utilizează API-ul de utilizator V2 pentru a crea utilizatori noi. Cu API-ul V2, utilizatorii nou creați încep fără o stare inițială.",
+      "CONSOLEUSEV2USERAPI": "Utilizați API-ul V2 în consola de administrare pentru crearea utilizatorului",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Când acest indicator este activat, consola de administrare utilizează API-ul de utilizator V2 pentru a crea utilizatori noi. Cu API-ul V2, utilizatorii nou creați încep fără o stare inițială.",
       "LOGINV2": "Autentificare V2",
       "LOGINV2_DESCRIPTION": "Activarea acestei opțiuni pornește noua interfață de autentificare bazată pe TypeScript, cu securitate, performanță și personalizare îmbunătățite.",
       "LOGINV2_BASEURI": "URI de bază",
@@ -1678,7 +1683,7 @@
     "NOTIFICATION": {
       "TITLE": "Notificare",
       "DESCRIPTION": "Determină la ce modificări vor fi trimise notificări.",
-      "PASSWORDCHANGE": "Modificarea parolei"
+      "PASSWORDCHANGE": "Parolă modificată"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Oferiți conectării stilul dvs. personalizat și modificați-i comportamentul.",
@@ -1697,7 +1702,7 @@
       "RELEASE": "Eliberați",
       "DROPFONT": "Trageți fișierul fontului aici",
       "RELEASEFONT": "Eliberați",
-      "USEOFLOGO": "Logo-ul dvs. va fi utilizat în conectare, precum și în e-mailuri, în timp ce pictograma este utilizată pentru elemente UI mai mici, cum ar fi în comutatorul organizației în consolă",
+      "USEOFLOGO": "Logo-ul dvs. va fi utilizat în conectare, precum și în e-mailuri, în timp ce pictograma este utilizată pentru elemente UI mai mici, cum ar fi în comutatorul organizației în consola de administrare",
       "MAXSIZE": "Dimensiunea maximă este limitată la 524 kB",
       "EMAILNOSVG": "Formatul de fișier SVG nu este acceptat în e-mailuri. Prin urmare, încărcați-vă logo-ul în PNG sau în alt format acceptat.",
       "MAXSIZEEXCEEDED": "Dimensiune maximă de 524 kB depășită.",
@@ -1713,7 +1718,7 @@
       },
       "PREVIEW": {
         "TITLE": "Conectare",
-        "SECOND": "conectați-vă cu contul dvs. ZITADEL.",
+        "SECOND": "conectați-vă cu contul dvs. Zitadel.",
         "ERROR": "Utilizatorul nu a putut fi găsit!",
         "PRIMARYBUTTON": "următorul",
         "SECONDARYBUTTON": "înregistrați-vă"
@@ -1753,9 +1758,9 @@
       "POLICYLINK": "Link către Politica de confidențialitate",
       "HELPLINK": "Link către Ajutor",
       "SUPPORTEMAIL": "E-mail de asistență",
-      "DOCSLINK": "Link către Documente (Consolă)",
-      "CUSTOMLINK": "Link personalizat (Consolă)",
-      "CUSTOMLINKTEXT": "Text link personalizat (Consolă)",
+      "DOCSLINK": "Link către Documente (Consolă de Administrare)",
+      "CUSTOMLINK": "Link personalizat (Consolă de Administrare)",
+      "CUSTOMLINKTEXT": "Text link personalizat (Consolă de Administrare)",
       "SAVED": "Salvat cu succes!",
       "RESET_TITLE": "Restabiliți valorile implicite",
       "RESET_DESCRIPTION": "Sunteți pe cale să restabiliți linkurile implicite pentru TOS și Politica de confidențialitate. Doriți cu adevărat să continuați?"
@@ -1796,7 +1801,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificarea e-mailului efectuată",
@@ -1828,10 +1834,10 @@
         "usernameChangeText": "Modificarea numelui de utilizator",
         "verifyMfaOtpText": "Verificați OTP",
         "verifyMfaU2fText": "Verificați al doilea factor universal",
-        "passwordlessPromptText": "Solicitare fără parolă",
-        "passwordlessRegistrationDoneText": "Înregistrarea fără parolă efectuată",
-        "passwordlessRegistrationText": "Înregistrarea fără parolă",
-        "passwordlessText": "Fără parolă",
+        "passwordlessPromptText": "Solicitare Passkey",
+        "passwordlessRegistrationDoneText": "Înregistrarea cu Passkey efectuată",
+        "passwordlessRegistrationText": "Înregistrarea cu Passkey",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Prezentare generală utilizator înregistrare externă"
       }
     },
@@ -1845,7 +1851,7 @@
         "VEO": "Verificați OTP e-mail",
         "PR": "Resetare parolă",
         "DC": "Revendicare domeniu",
-        "PL": "Fără parolă",
+        "PL": "Passkey",
         "PC": "Modificare parolă",
         "IU": "Invitați utilizatorul"
       },
@@ -1865,8 +1871,8 @@
         "changedate": "Data modificării",
         "username": "Nume de utilizator",
         "tempUsername": "Nume de utilizator temporar",
-        "otp": "Parolă unică",
-        "verifyUrl": "Verificați adresa URL a parolei unice",
+        "otp": "OTP",
+        "verifyUrl": "Verificați adresa URL a OTP",
         "expiry": "Expirare",
         "applicationName": "Numele aplicației"
       },
@@ -1908,7 +1914,7 @@
       "DEFAULTREDIRECTURI_DESC": "Definește unde va fi redirecționat utilizatorul dacă conectarea a început fără un context de aplicație (de exemplu, din e-mail)",
       "ERRORMSGPOPUP": "Afișați mesajul de eroare într-o casetă de dialog",
       "DISABLEWATERMARK": "Ascundeți filigranul",
-      "DISABLEWATERMARK_DESC": "Ascundeți filigranul Alimentat de ZITADEL în interfața de conectare"
+      "DISABLEWATERMARK_DESC": "Ascundeți filigranul Alimentat de Zitadel în interfața de conectare"
     },
     "RESET": "Resetați la valoarea implicită a instanței",
     "CREATECUSTOM": "Creați o politică personalizată",
@@ -1962,7 +1968,7 @@
       "CREATE_DESC": "Introduceți numele proiectului dvs.",
       "ROLE": "Rol",
       "NOITEMS": "Niciun proiect",
-      "ZITADELPROJECT": "Acesta aparține proiectului ZITADEL. Atenție: Dacă faceți modificări, ZITADEL ar putea să nu se comporte conform intențiilor.",
+      "ZITADELPROJECT": "Acesta aparține proiectului Zitadel. Atenție: Dacă faceți modificări, Zitadel ar putea să nu se comporte conform intențiilor.",
       "TYPE": {
         "OWNED": "Proiecte deținute",
         "OWNED_SINGULAR": "Proiect deținut",
@@ -2047,7 +2053,7 @@
       "DESCRIPTION": "Permiteți altei organizații să vă utilizeze proiectul.",
       "EDITTITLE": "Editați rolurile",
       "CREATE": {
-        "TITLE": "Creați un grant de organizație",
+        "TITLE": "Creează permisiune pentru proiect",
         "SEL_USERS": "Selectați utilizatorii cărora doriți să le acordați acces",
         "SEL_PROJECT": "Căutați un proiect",
         "SEL_ROLES": "Selectați rolurile pe care doriți să le adăugați la grant",
@@ -2057,7 +2063,7 @@
         "ORG_DESCRIPTION": "Sunteți pe cale să acordați un utilizator pentru organizația {{name}}.",
         "ORG_DESCRIPTION_DESC": "Schimbați contextul în antetul de mai sus pentru a acorda un utilizator pentru o altă organizație.",
         "SEL_ORG_FORMFIELD": "Organizație",
-        "FOR_ORG": "Grantul este creat pentru:"
+        "FOR_ORG": "Permisiunea proiectului va fi creată pentru:"
       },
       "DETAIL": {
         "TITLE": "Grant de proiect",
@@ -2170,7 +2176,7 @@
       "DEACTIVATED": "Dezactivat.",
       "CREATED": "Proiect creat.",
       "UPDATED": "Proiect modificat.",
-      "GRANTUPDATED": "Grant modificat.",
+      "GRANTUPDATED": "Grantul proiectului a fost modificat.",
       "DELETED": "Proiect șters."
     }
   },
@@ -2345,7 +2351,7 @@
     "DELETE_SELECTION_TITLE": "Ștergeți IdP",
     "DELETE_SELECTION_DESCRIPTION": "Sunteți pe cale să ștergeți un furnizor de identitate. Modificările rezultate sunt irevocabile. Doriți cu adevărat să faceți acest lucru?",
     "FEDERATEDLOGOUTENABLED": "Deconectare federată activată",
-    "FEDERATEDLOGOUTENABLED_DESC": "Dacă este activat, utilizatorul va fi deconectat și de la IdP dacă încheie sesiunea în ZITADEL.",
+    "FEDERATEDLOGOUTENABLED_DESC": "Dacă este activat, utilizatorul va fi deconectat și de la IdP dacă încheie sesiunea în Zitadel.",
     "EMPTY": "Niciun IdP disponibil",
     "OIDC": {
       "GENERAL": "Informații generale",
@@ -2393,8 +2399,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Fără parolă",
-      "MULTIFACTORDESCRIPTION": "Definiți-vă multifactorii pentru autentificarea fără parolă aici.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Definiți-vă multifactorii pentru autentificarea cu passkey aici.",
       "SECONDFACTORTITLE": "Autentificare multifactor",
       "SECONDFACTORDESCRIPTION": "Definiți alți factori posibili cu care vă puteți securiza autentificarea cu parolă."
     },
@@ -2418,10 +2424,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Necunoscut",
-      "1": "Parolă unică după aplicația de autentificare (TOTP)",
+      "1": "OTP după aplicația de autentificare (TOTP)",
       "2": "Amprentă, chei de securitate, Face ID și altele",
-      "3": "Parolă unică prin e-mail (OTP e-mail)",
-      "4": "Parolă unică prin SMS (OTP SMS)",
+      "3": "OTP e-mail",
+      "4": "OTP SMS",
       "5": "Coduri de recuperare"
     }
   },
@@ -2436,7 +2442,7 @@
       "DESCRIPTION": "Puteți selecta furnizori predefiniți sau autocreați pentru autentificare.",
       "SELECTIDPS": "Furnizori de identitate"
     },
-    "PASSWORDLESS": "Conectare fără parolă",
+    "PASSWORDLESS": "Autentificare cu Passkey",
     "PASSWORDLESSTYPE": {
       "0": "Nepermis",
       "1": "Permis"
@@ -2445,7 +2451,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Furnizor SMTP",
-      "DESCRIPTION": "Aceștia sunt furnizorii SMTP pentru instanța dvs. ZITADEL. Activați-l pe cel pe care doriți să-l utilizați pentru a trimite notificări utilizatorilor dvs.",
+      "DESCRIPTION": "Aceștia sunt furnizorii SMTP pentru instanța dvs. Zitadel. Activați-l pe cel pe care doriți să-l utilizați pentru a trimite notificări utilizatorilor dvs.",
       "EMPTY": "Niciun furnizor SMTP disponibil",
       "ACTIVATED": "Activat",
       "ACTIVATE": "Activați furnizorul",
@@ -2481,11 +2487,11 @@
         "NEXT_STEPS": "Pași următori",
         "ACTIVATE": {
           "TITLE": "Activați-vă furnizorul SMTP",
-          "DESCRIPTION": "ZITADEL nu poate utiliza acest furnizor SMTP pentru a trimite notificări până când nu îl activați. Dacă activați acest furnizor, orice alt furnizor care era activ va fi acum dezactivat."
+          "DESCRIPTION": "Zitadel nu poate utiliza acest furnizor SMTP pentru a trimite notificări până când nu îl activați. Dacă activați acest furnizor, orice alt furnizor care era activ va fi acum dezactivat."
         },
         "DEACTIVATE": {
           "TITLE": "Dezactivați-vă furnizorul SMTP",
-          "DESCRIPTION": "Dacă dezactivați acest furnizor SMTP, ZITADEL nu îl poate utiliza pentru a trimite notificări până când nu îl activați din nou."
+          "DESCRIPTION": "Dacă dezactivați acest furnizor SMTP, Zitadel nu îl poate utiliza pentru a trimite notificări până când nu îl activați din nou."
         },
         "SAVE_SETTINGS": "Salvați-vă setările",
         "TEST": {
@@ -2646,8 +2652,8 @@
       "IDTOKENROLEASSERTION": "Roluri utilizator în interiorul token-ului ID",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Dacă este selectat, rolurile solicitate ale utilizatorului autentificat sunt adăugate la token-ul ID.",
       "IDTOKENUSERINFOASSERTION": "Informații utilizator în interiorul token-ului ID",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite clienților să preia revendicări de profil, e-mail, telefon și adresă din token-ul ID.",
-      "CLOCKSKEW": "Permite clienților să gestioneze decalajul de ceas al OP și al clientului. Durata (0-5s) va fi adăugată revendicării exp și scăzută din iats, auth_time și nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite aplicațiilor să preia revendicări de profil, e-mail, telefon și adresă din token-ul ID.",
+      "CLOCKSKEW": "Permite aplicațiilor să gestioneze decalajul de ceas al OP și al aplicației. Durata (0-5s) va fi adăugată revendicării exp și scăzută din iats, auth_time și nbf.",
       "RECOMMENDED": "recomandat",
       "NOTRECOMMENDED": "nerecomandat",
       "SELECTION": {
@@ -2665,7 +2671,8 @@
             "DESCRIPTION": "Aplicații cu o singură pagină (SPA) și în general toate cadrele JS executate în browsere"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2777,7 +2784,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Adăugați un manager",

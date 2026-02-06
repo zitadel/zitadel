@@ -110,6 +110,7 @@ func New(
 	accessInterceptor *http_mw.AccessInterceptor,
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
+	trustRemoteSpans bool,
 ) (_ *API, err error) {
 	api := &API{
 		port:                      port,
@@ -132,12 +133,16 @@ func New(
 	if err != nil {
 		return nil, err
 	}
-	api.connectOTELInterceptor, err = otelconnect.NewInterceptor(
+	otelOpts := []otelconnect.Option{
 		otelconnect.WithTracerProvider(otel.GetTracerProvider()),
 		otelconnect.WithMeterProvider(otel.GetMeterProvider()),
 		otelconnect.WithPropagator(otel.GetTextMapPropagator()),
 		otelconnect.WithoutServerPeerAttributes(),
-	)
+	}
+	if trustRemoteSpans {
+		otelOpts = append(otelOpts, otelconnect.WithTrustRemote())
+	}
+	api.connectOTELInterceptor, err = otelconnect.NewInterceptor(otelOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +219,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.AuthorizationInterceptor(a.verifier, a.systemAuthZ, a.authConfig),
 		connect_middleware.TranslationHandler(),
 		connect_middleware.QuotaExhaustedInterceptor(a.accessInterceptor.AccessService(), system_pb.SystemService_ServiceDesc.ServiceName),
-		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm),
+		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm, a.queries.GetActiveSigningWebKey),
 		connect_middleware.ValidationHandler(),
 		connect_middleware.ServiceHandler(),
 		connect_middleware.ActivityInterceptor(),

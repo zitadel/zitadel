@@ -46,7 +46,7 @@ export function RegisterForm({
   idpCount = 0,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       email: email ?? "",
       firstName: firstname ?? "",
@@ -159,7 +159,7 @@ export function RegisterForm({
         <PrivacyPolicyCheckboxes legal={legal} onChange={setTosAndPolicyAccepted} />
       )}
       {/* show chooser if both methods are allowed */}
-      {loginSettings && loginSettings.allowUsernamePassword && loginSettings.passkeysType == PasskeysType.ALLOWED && (
+      {loginSettings && loginSettings.allowLocalAuthentication && loginSettings.passkeysType == PasskeysType.ALLOWED && (
         <>
           <p className="ztdl-p mb-6 mt-4 block text-left">
             <Translated i18nKey="selectMethod" namespace="register" />
@@ -170,7 +170,7 @@ export function RegisterForm({
           </div>
         </>
       )}
-      {!loginSettings?.allowUsernamePassword &&
+      {!loginSettings?.allowLocalAuthentication &&
         loginSettings?.passkeysType !== PasskeysType.ALLOWED &&
         (!loginSettings?.allowExternalIdp || !idpCount) && (
           <div className="py-4">
@@ -194,9 +194,9 @@ export function RegisterForm({
           disabled={loading || !canSubmit}
           onClick={handleSubmit((values) => {
             const usePasswordToContinue: boolean =
-              loginSettings?.allowUsernamePassword && loginSettings?.passkeysType == PasskeysType.ALLOWED
+              loginSettings?.allowLocalAuthentication && loginSettings?.passkeysType == PasskeysType.ALLOWED
                 ? !(selected === methods[0]) // choose selection if both available
-                : !!loginSettings?.allowUsernamePassword; // if password is chosen
+                : !!loginSettings?.allowLocalAuthentication; // if password is chosen
             // set password as default if only password is allowed
             return submitAndContinue(values, usePasswordToContinue);
           })}

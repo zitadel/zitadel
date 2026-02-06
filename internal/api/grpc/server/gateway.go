@@ -218,7 +218,6 @@ func addInterceptors(
 		metrics.MetricTypeTotalCount,
 		metrics.MetricTypeStatusCode,
 	}, http_utils.Probes...)(handler)
-	handler = http_mw.TraceHandler(http_utils.Probes...)(handler)
 	handler = http_mw.LogHandler("grpc_gateway", http_utils.Probes...)(handler)
 	return handler
 }
@@ -285,5 +284,4 @@ func setRequestURIPattern(ctx context.Context) {
 	}
 	span := trace.SpanFromContext(ctx)
 	span.SetName(pattern)
-	metrics.SetRequestURIPattern(ctx, pattern)
 }

@@ -1,9 +1,8 @@
 package build
 
 import (
+	"log/slog"
 	"time"
-
-	"github.com/zitadel/logging"
 )
 
 // These variables are set via ldflags in the Makefile
@@ -21,11 +20,12 @@ func init() {
 	var err error
 	dateTime, err = time.Parse(time.RFC3339, date)
 	if err != nil {
-		logging.WithError(err).Warn("could not parse build date, using current time instead")
+		slog.Warn("could not parse build date, using current time instead", "err", err)
 		dateTime = time.Now()
+		date = dateTime.Format(time.RFC3339)
 	}
 	if version == "" {
-		logging.Warn("no build version set, using timestamp as version")
+		slog.Warn("no build version set, using timestamp as version")
 		version = date
 	}
 }

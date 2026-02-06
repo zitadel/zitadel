@@ -216,7 +216,7 @@
         "description": "Einige Daten fehlen. Bitte überprüfen Sie Ihre Eingaben."
       },
       "title": "Registrieren",
-      "description": "Erstellen Sie Ihr ZITADEL-Konto.",
+      "description": "Erstellen Sie Ihr Zitadel-Konto.",
       "noMethodAvailableWarning": "Keine Authentifizierungsmethode verfügbar. Bitte wenden Sie sich an den Administrator.",
       "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
       "agreeTo": "Um sich zu registrieren, müssen Sie den Nutzungsbedingungen zustimmen",
@@ -518,7 +518,7 @@
         "description": "Your device will ask for your fingerprint, face, or screen lock",
         "info": {
           "description": "A passkey is an authentication method on a device like your fingerprint, Apple FaceID or similar. ",
-          "link": "Passwordless Authentication"
+          "link": "passkey Authentication"
         },
         "skip": "Skip",
         "submit": "Continue"
@@ -549,7 +549,7 @@
         "description": "Provide email, first and last name to register."
       },
       "title": "Register",
-      "description": "Create your ZITADEL account.",
+      "description": "Create your Zitadel account.",
       "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
       "selectMethod": "Select the method you would like to authenticate",
       "agreeTo": "To register you must agree to the terms and conditions",
@@ -882,7 +882,7 @@
         "description": "No se proporcionaron datos suficientes para el registro."
       },
       "title": "Registrarse",
-      "description": "Crea tu cuenta ZITADEL.",
+      "description": "Crea tu cuenta Zitadel.",
       "noMethodAvailableWarning": "No hay métodos de autenticación disponibles. Por favor, contacta a tu administrador.",
       "selectMethod": "Selecciona el método con el que deseas autenticarte",
       "agreeTo": "Para registrarte debes aceptar los términos y condiciones",
@@ -1215,7 +1215,7 @@
         "description": "Inserisci i tuoi dati per registrarti."
       },
       "title": "Registrati",
-      "description": "Crea il tuo account ZITADEL.",
+      "description": "Crea il tuo account Zitadel.",
       "noMethodAvailableWarning": "Nessun metodo di autenticazione disponibile. Contatta l'amministratore di sistema per assistenza.",
       "selectMethod": "Seleziona il metodo con cui desideri autenticarti",
       "agreeTo": "Per registrarti devi accettare i termini e le condizioni",
@@ -1329,6 +1329,460 @@
       "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
       "failedLoading": "Impossibile caricare i dati. Riprova.",
       "tryagain": "Riprova"
+    }
+  },
+  "nl": {
+    "common": {
+      "back": "Terug",
+      "title": "Inloggen met Zitadel"
+    },
+    "accounts": {
+      "title": "Accounts",
+      "description": "Selecteer het account dat je wilt gebruiken.",
+      "addAnother": "Nog een account toevoegen",
+      "noResults": "Geen accounts gevonden",
+      "verified": "geverifieerd",
+      "expired": "verlopen"
+    },
+    "logout": {
+      "title": "Uitloggen",
+      "description": "Klik op een account om de sessie te beëindigen",
+      "noResults": "Geen accounts gevonden",
+      "clear": "Sessie beëindigen",
+      "verifiedAt": "Laatst actief: {time}",
+      "success": {
+        "title": "Succesvol uitgelogd",
+        "description": "U bent succesvol uitgelogd."
+      }
+    },
+    "loginname": {
+      "title": "Welkom terug!",
+      "description": "Voer jouw inloggegevens in.",
+      "register": "Nieuwe gebruiker registreren",
+      "submit": "Verder",
+      "labels": {
+        "loginname": "Loginnaam",
+        "username": "Gebruikersnaam",
+        "usernameOrPhoneNumber": "Telefoonnummer of gebruikersnaam",
+        "usernameOrEmail": "E-mail of gebruikersnaam"
+      },
+      "required": {
+        "loginName": "Dit veld is verplicht"
+      },
+      "errors": {
+        "internalError": "Er is een interne fout opgetreden",
+        "couldNotGetLoginSettings": "Kon aanmeldinstellingen niet ophalen",
+        "couldNotSearchUsers": "Kon gebruikers niet zoeken",
+        "couldNotGetDomain": "Kon domein niet ophalen",
+        "couldNotGetHost": "Kon host niet ophalen",
+        "couldNotStartIDPFlow": "Kon IDP-stroom niet starten",
+        "moreThanOneUserFound": "Meer dan één gebruiker gevonden. Geef een unieke identificatie op.",
+        "userNotFound": "Gebruiker niet in het systeem gevonden",
+        "couldNotCreateSession": "Kon sessie voor gebruiker niet aanmaken",
+        "initialUserNotSupported": "Initiële gebruiker wordt niet ondersteund",
+        "usernamePasswordNotAllowed": "Gebruikersnaam en wachtwoord niet toegestaan! Neem contact op met jouw beheerder voor meer informatie.",
+        "passkeysNotAllowed": "Passkeys niet toegestaan! Neem contact op met jouw beheerder voor meer informatie.",
+        "couldNotFindIdentityProvider": "Kon identiteitsprovider niet vinden.",
+        "userNotActive": "Gebruiker is niet actief. Neem contact op met jouw beheerder voor meer informatie."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Er is een fout opgetreden",
+        "multipleUsersFound": "Meerdere gebruikers gevonden",
+        "userNotFound": "Gebruiker niet in het systeem gevonden"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "Wachtwoord",
+        "description": "Voer jouw wachtwoord in.",
+        "resetPassword": "Wachtwoord resetten",
+        "submit": "Verder",
+        "labels": {
+          "password": "Wachtwoord"
+        },
+        "required": {
+          "password": "Dit veld is verplicht"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
+          "couldNotResetPassword": "Kon wachtwoord niet resetten"
+        },
+        "info": {
+          "passwordResetSent": "Het wachtwoord is opnieuw ingesteld. Controleer jouw e-mail"
+        }
+      },
+      "set": {
+        "title": "Stel Wachtwoord in",
+        "description": "Stel het wachtwoord voor jouw account in",
+        "codeSent": "Er is een code naar jouw e-mailadres verzonden.",
+        "noCodeReceived": "Geen code ontvangen?",
+        "resend": "Code opnieuw versturen",
+        "submit": "Verder",
+        "labels": {
+          "code": "Code",
+          "newPassword": "Nieuw Wachtwoord",
+          "confirmPassword": "Bevestig Wachtwoord"
+        },
+        "required": {
+          "code": "Dit veld is verplicht",
+          "newPassword": "U moet een wachtwoord opgeven!",
+          "confirmPassword": "Dit veld is verplicht"
+        },
+        "errors": {
+          "couldNotSetPassword": "Kon wachtwoord niet instellen",
+          "couldNotResetPassword": "Kon wachtwoord niet resetten",
+          "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren"
+        }
+      },
+      "change": {
+        "title": "Verander Wachtwoord",
+        "description": "Stel het wachtwoord voor jouw account in",
+        "submit": "Verder",
+        "labels": {
+          "newPassword": "Nieuw wachtwoord",
+          "confirmPassword": "Bevestig wachtwoord"
+        },
+        "required": {
+          "newPassword": "Je moet een nieuw wachtwoord opgeven!",
+          "confirmPassword": "Dit veld is verplicht"
+        },
+        "errors": {
+          "couldNotChangePassword": "Kon wachtwoord niet wijzigen",
+          "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
+          "unknownError": "Onbekende fout"
+        }
+      },
+      "complexity": {
+        "length": "Moet minstens {minLength} tekens lang zijn.",
+        "hasSymbol": "Moet een symbool bevatten.",
+        "hasNumber": "Moet een nummer bevatten.",
+        "hasUppercase": "Moet een hoofdletter bevatten.",
+        "hasLowercase": "Moet een kleine letter bevatten.",
+        "equals": "Wachtwoordbevestiging komt overeen.",
+        "matches": "Komt overeen",
+        "doesNotMatch": "Komt niet overeen"
+      },
+      "errors": {
+        "noHostFound": "Geen host gevonden",
+        "couldNotSendResetLink": "Kon link voor wachtwoordherstel niet verzenden",
+        "couldNotCreateSessionForUser": "Kon sessie voor gebruiker niet aanmaken",
+        "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
+        "failedToAuthenticate": "Authenticatie mislukt. U had {failedAttempts} van {maxPasswordAttempts} wachtwoordpogingen.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Authenticatie mislukt.",
+        "accountLockedContactAdmin": " Neem contact op met jouw beheerder om jouw account te ontgrendelen",
+        "userNotFound": "Gebruiker niet in het systeem gevonden",
+        "initialUserNotSupported": "Initiële gebruiker wordt niet ondersteund",
+        "userInitialStateNotSupported": "Initiële gebruikersstatus wordt niet ondersteund",
+        "codeOrVerificationRequired": "U moet een code opgeven of een geldige gebruikersverificatie hebben",
+        "verificationRequired": "Gebruikersverificatie moet worden uitgevoerd",
+        "couldNotLoadSession": "Kon sessie niet laden",
+        "couldNotLoadAuthMethods": "Kon verificatiemethoden niet laden",
+        "failedPrecondition": "Voorwaarde mislukt",
+        "sessionNotValid": "Sessie is niet geldig"
+      }
+    },
+    "idp": {
+      "title": "Aanmelden met SSO",
+      "description": "Selecteer een van de volgende providers om u aan te melden",
+      "orSignInWith": "of meld u aan met",
+      "signInWithApple": "Aanmelden met Apple",
+      "signInWithGoogle": "Aanmelden met Google",
+      "signInWithAzureAD": "Aanmelden met AzureAD",
+      "signInWithGithub": "Aanmelden met GitHub",
+      "signInWithGitlab": "Aanmelden met GitLab",
+      "loginError": {
+        "title": "Inloggen mislukt",
+        "description": "Er is een fout opgetreden tijdens het inloggen."
+      },
+      "linkingError": {
+        "title": "Koppelen van account mislukt",
+        "description": "Er is een fout opgetreden tijdens het koppelen van jouw account."
+      },
+      "completeRegister": {
+        "title": "Vul jouw gegevens aan",
+        "description": "U moet jouw registratie voltooien door jouw e-mailadres en naam op te geven."
+      },
+      "accountNotFound": {
+        "title": "Account niet gevonden",
+        "description": "We hebben geen account gevonden dat aan jouw identiteitsprovidergegevens is gekoppeld.",
+        "info": "Er is geen bestaand account gevonden. Meld u aan met een bestaand account of neem contact op met jouw beheerder voor hulp.",
+        "backToLogin": "Terug naar inloggen"
+      },
+      "registrationFailed": {
+        "title": "Registratie niet beschikbaar",
+        "description": "We konden het registratieproces niet voltooien.",
+        "info": "Kan de organisatie voor registratie niet bepalen. Neem contact op met jouw beheerder voor hulp.",
+        "backToLogin": "Terug naar inloggen"
+      },
+      "processing": {
+        "message": "Authenticatie wordt verwerkt...",
+        "noRedirect": "Geen omleiding of fout van server ontvangen",
+        "unexpectedError": "Er is een onverwachte fout opgetreden"
+      },
+      "errors": {
+        "missingParameters": "Vereiste parameters ontbreken",
+        "missingIdpInfo": "IDP-informatie ontbreekt",
+        "idpNotFound": "Identiteitsprovider niet gevonden",
+        "linkingNotAllowed": "Koppelen is niet toegestaan voor deze identiteitsprovider",
+        "linkingFailed": "Koppelen van identiteitsprovider aan account mislukt",
+        "autoLinkingFailed": "Automatisch koppelen van account mislukt",
+        "userCreationFailed": "Aanmaken van gebruikersaccount mislukt",
+        "orgResolutionFailed": "Kon organisatie voor registratie niet bepalen",
+        "sessionCreationFailed": "Kon sessie niet aanmaken of omleiding bepalen",
+        "unknownError": "Er is een onbekende fout opgetreden"
+      }
+    },
+    "ldap": {
+      "title": "LDAP-inlog",
+      "description": "Voer jouw LDAP-inloggegevens in.",
+      "submit": "Verder",
+      "labels": {
+        "username": "Gebruikersnaam",
+        "password": "Wachtwoord"
+      },
+      "required": {
+        "username": "Dit veld is verplicht",
+        "password": "Dit veld is verplicht"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "Verifieer jouw identiteit",
+        "description": "Kies een van de volgende factoren.",
+        "noResults": "Er zijn geen tweede factoren beschikbaar om in te stellen."
+      },
+      "set": {
+        "title": "Stel 2-factor in",
+        "description": "Kies een van de volgende tweede factoren.",
+        "skip": "Overslaan"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "Verifieer 2-Factor",
+        "totpDescription": "Voer de code uit jouw authenticator-app in.",
+        "smsDescription": "Voer de code in die u via sms heeft ontvangen.",
+        "emailDescription": "Voer de code in die u via e-mail heeft ontvangen.",
+        "noCodeReceived": "Geen code ontvangen?",
+        "resendCode": "Code opnieuw versturen",
+        "submit": "Verder",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Dit veld is verplicht"
+        }
+      },
+      "set": {
+        "title": "Stel 2-factor in",
+        "totpDescription": "Scan de QR-code met jouw authenticator-app.",
+        "smsDescription": "Voer jouw telefoonnummer in om een code via sms te ontvangen.",
+        "emailDescription": "Voer jouw e-mailadres in om een code via e-mail te ontvangen.",
+        "totpRegisterDescription": "Scan de QR-code of navigeer handmatig naar de URL.",
+        "submit": "Verder",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Dit veld is verplicht"
+        }
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "Authenticeer met een passkey",
+        "description": "Uw apparaat vraagt om jouw vingerafdruk, gezicht of schermvergrendeling",
+        "usePassword": "Gebruik wachtwoord",
+        "submit": "Doorgaan",
+        "errors": {
+          "couldNotRequestChallenge": "Kon passkey-uitdaging niet aanvragen",
+          "couldNotVerifyPasskey": "Kon passkey niet verifiëren",
+          "noResponseReceived": "Passkey-verificatie mislukt - geen reactie ontvangen",
+          "noRedirectProvided": "Passkey-verificatie voltooid maar er werd geen omleiding geleverd",
+          "couldNotRetrievePasskey": "Er trad een fout op bij het ophalen van de passkey",
+          "verificationCancelled": "Passkey-verificatie is geannuleerd",
+          "verificationFailed": "Er trad een fout op tijdens de passkey-verificatie",
+          "couldNotFindSession": "Kon sessie niet vinden",
+          "couldNotUpdateSession": "Kon sessie niet bijwerken",
+          "userNotFound": "Gebruiker niet in het systeem gevonden",
+          "couldNotDetermineRedirect": "Kon omleidings-URL na passkey-verificatie niet bepalen"
+        }
+      },
+      "set": {
+        "title": "Stel een passkey in",
+        "description": "Uw apparaat vraagt om jouw vingerafdruk, gezicht of schermvergrendeling",
+        "info": {
+          "description": "Een passkey is een authenticatiemethode op een apparaat zoals jouw vingerafdruk, Apple FaceID of iets dergelijks. ",
+          "link": "Wachtwoordloze authenticatie"
+        },
+        "skip": "Overslaan",
+        "submit": "Doorgaan"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "Verifieer 2-Factor",
+        "description": "Verifieer jouw account met jouw apparaat."
+      },
+      "set": {
+        "title": "Stel 2-factor in",
+        "description": "Stel een apparaat in als tweede factor.",
+        "submit": "Doorgaan"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "Passkey",
+        "password": "Wachtwoord"
+      },
+      "disabled": {
+        "title": "Registratie uitgeschakeld",
+        "description": "Registratie is uitgeschakeld. Neem contact op met jouw beheerder."
+      },
+      "missingdata": {
+        "title": "Ontbrekende gegevens",
+        "description": "Geef e-mail, voornaam en achternaam op om te registreren."
+      },
+      "title": "Registreren",
+      "description": "Maak jouw Zitadel-account aan.",
+      "noMethodAvailableWarning": "Geen authenticatiemethode beschikbaar. Neem contact op met jouw beheerder.",
+      "selectMethod": "Selecteer de methode waarmee u wilt verifiëren",
+      "agreeTo": "Om te registreren moet u akkoord gaan met de voorwaarden",
+      "termsOfService": "Servicevoorwaarden",
+      "privacyPolicy": "Privacybeleid",
+      "submit": "Doorgaan",
+      "password": {
+        "title": "Stel Wachtwoord in",
+        "description": "Stel het wachtwoord voor jouw account in",
+        "submit": "Doorgaan",
+        "labels": {
+          "password": "Wachtwoord",
+          "confirmPassword": "Bevestig Wachtwoord"
+        },
+        "required": {
+          "password": "U moet een wachtwoord opgeven!",
+          "confirmPassword": "Dit veld is verplicht"
+        }
+      },
+      "labels": {
+        "firstname": "Voornaam",
+        "lastname": "Achternaam",
+        "email": "E-Mail"
+      },
+      "required": {
+        "firstname": "Dit veld is verplicht",
+        "lastname": "Dit veld is verplicht",
+        "email": "Dit veld is verplicht"
+      },
+      "errors": {
+        "couldNotCreateUser": "Kon gebruiker niet aanmaken",
+        "couldNotCreateSession": "Kon sessie niet aanmaken",
+        "userNotFound": "Gebruiker niet in het systeem gevonden",
+        "couldNotLinkIDP": "Kon IDP niet aan gebruiker koppelen",
+        "couldNotRegisterUser": "Kon gebruiker niet registreren"
+      }
+    },
+    "invite": {
+      "title": "Gebruiker uitnodigen",
+      "description": "Geef het e-mailadres en de naam op van de gebruiker die u wilt uitnodigen.",
+      "info": "De gebruiker ontvangt een e-mail met verdere instructies.",
+      "notAllowed": "Uw instellingen staan het uitnodigen van gebruikers niet toe.",
+      "submit": "Doorgaan",
+      "success": {
+        "title": "Gebruiker uitgenodigd",
+        "description": "De e-mail is succesvol verzonden.",
+        "verified": "De gebruiker is uitgenodigd en heeft zijn e-mail al geverifieerd.",
+        "notVerifiedYet": "De gebruiker is uitgenodigd. Zij ontvangen een e-mail met verdere instructies.",
+        "submit": "Nog een gebruiker uitnodigen"
+      }
+    },
+    "signedin": {
+      "title": "Welkom {user}!",
+      "description": "U bent aangemeld.",
+      "continue": "Verder",
+      "error": {
+        "title": "Fout",
+        "description": "Er is een fout opgetreden tijdens het aanmelden."
+      }
+    },
+    "verify": {
+      "userIdMissing": "Geen gebruikers-ID opgegeven!",
+      "successTitle": "Gebruiker geverifieerd",
+      "successDescription": "De gebruiker is succesvol geverifieerd.",
+      "setupAuthenticator": "Authenticator instellen",
+      "verify": {
+        "title": "Gebruiker verifiëren",
+        "description": "Voer de code in uit de verificatie-e-mail.",
+        "noCodeReceived": "Geen code ontvangen?",
+        "resendCode": "Code opnieuw versturen",
+        "codeSent": "Er is zojuist een code naar jouw e-mailadres gestuurd.",
+        "submit": "Doorgaan",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Dit veld is verplicht"
+        }
+      },
+      "errors": {
+        "couldNotResendEmail": "Kon e-mail niet opnieuw versturen",
+        "couldNotVerifyUser": "Kon gebruiker niet verifiëren",
+        "couldNotVerifyInvite": "Kon uitnodiging niet verifiëren",
+        "couldNotVerifyEmail": "Kon e-mail niet verifiëren",
+        "couldNotVerify": "Kon niet verifiëren",
+        "couldNotLoadUser": "Kon gebruiker niet laden",
+        "couldNotLoadAuthenticators": "Kon mogelijke authenticators niet laden",
+        "couldNotCreateSession": "Kon sessie niet aanmaken",
+        "noHostFound": "Geen host gevonden",
+        "userAlreadyVerified": "Gebruiker is al geverifieerd!",
+        "couldNotResendInvite": "Kon uitnodiging niet opnieuw versturen",
+        "inviteSendFailed": "Versturen van uitnodigingsmail mislukt",
+        "emailSendFailed": "Versturen van verificatie-e-mail mislukt"
+      }
+    },
+    "authenticator": {
+      "title": "Kies authenticatiemethode",
+      "description": "Selecteer de methode waarmee u wilt verifiëren",
+      "noMethodsAvailable": "Geen authenticatiemethoden beschikbaar",
+      "allSetup": "U heeft al een authenticator ingesteld!",
+      "linkWithIDP": "of link met een identiteitsprovider"
+    },
+    "device": {
+      "usercode": {
+        "title": "Apparaatcode",
+        "description": "Voer de code in die op jouw app of apparaat wordt weergegeven.",
+        "submit": "Doorgaan",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Dit veld is verplicht"
+        }
+      },
+      "request": {
+        "title": "{appName} wil verbinding maken",
+        "description": "{appName} krijgt toegang tot:",
+        "disclaimer": "Door op Toestaan te klikken geeft u {appName} en Zitadel toestemming om jouw informatie te gebruiken overeenkomstig hun respectieve servicevoorwaarden en privacybeleid. U kunt deze toegang op elk moment intrekken.",
+        "submit": "Toestaan",
+        "deny": "Weigeren"
+      },
+      "scope": {
+        "openid": "Verifieer jouw identiteit.",
+        "email": "Bekijk jouw e-mailadres.",
+        "profile": "Bekijk jouw volledige profielinformatie.",
+        "offline_access": "Sta offline toegang tot jouw account toe."
+      }
+    },
+    "error": {
+      "noUserCode": "Geen gebruikerscode opgegeven!",
+      "noDeviceRequest": "Geen apparaatverzoek gevonden.",
+      "unknownContext": "Kon de context van de gebruiker niet ophalen. Zorg ervoor dat u eerst de gebruikersnaam invoert of een loginName als zoekparameter opgeeft.",
+      "sessionExpired": "Uw huidige sessie is verlopen. Log opnieuw in.",
+      "failedLoading": "Gegevens laden mislukt. Probeer het opnieuw.",
+      "tryagain": "Opnieuw proberen",
+      "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie"
     }
   },
   "pl": {
@@ -1548,7 +2002,7 @@
         "description": "Podaj e-mail, imię i nazwisko, aby się zarejestrować."
       },
       "title": "Rejestracja",
-      "description": "Utwórz konto ZITADEL.",
+      "description": "Utwórz konto Zitadel.",
       "noMethodAvailableWarning": "Brak dostępnych metod uwierzytelniania. Skontaktuj się z administratorem.",
       "selectMethod": "Wybierz metodę uwierzytelniania, której chcesz użyć",
       "agreeTo": "Aby się zarejestrować, musisz zaakceptować warunki korzystania",
@@ -1881,7 +2335,7 @@
         "description": "Укажите email, имя и фамилию для регистрации."
       },
       "title": "Регистрация",
-      "description": "Создайте свой аккаунт ZITADEL.",
+      "description": "Создайте свой аккаунт Zitadel.",
       "noMethodAvailableWarning": "Нет доступных методов аутентификации. Обратитесь к администратору.",
       "selectMethod": "Выберите метод аутентификации",
       "agreeTo": "Для регистрации необходимо принять условия:",
@@ -2214,7 +2668,7 @@
         "description": "请提供所有必需的数据。"
       },
       "title": "注册",
-      "description": "创建您的 ZITADEL 账户。",
+      "description": "创建您的 Zitadel 账户。",
       "noMethodAvailableWarning": "没有可用的认证方法。请联系您的系统管理员。",
       "selectMethod": "选择您想使用的认证方法",
       "agreeTo": "注册即表示您同意条款和条件",
@@ -2469,7 +2923,7 @@
         "description": "Kayıt olmak için e-posta, ad ve soyadı sağlayın."
       },
       "title": "Kayıt Ol",
-      "description": "ZITADEL hesabınızı oluşturun.",
+      "description": "Zitadel hesabınızı oluşturun.",
       "selectMethod": "Kimlik doğrulamak istediğiniz yöntemi seçin",
       "agreeTo": "Kayıt olmak için şartları ve koşulları kabul etmelisiniz",
       "termsOfService": "Hizmet Şartları",
@@ -2769,7 +3223,7 @@
         "description": "Вкажіть електронну пошту, ім'я та прізвище для реєстрації."
       },
       "title": "Реєстрація",
-      "description": "Створіть свій обліковий запис ZITADEL.",
+      "description": "Створіть свій обліковий запис Zitadel.",
       "noMethodAvailableWarning": "Немає доступного методу автентифікації. Будь ласка, зверніться до адміністратора.",
       "selectMethod": "Виберіть метод автентифікації",
       "agreeTo": "Для реєстрації ви повинні погодитися з умовами та положеннями",
@@ -2883,6 +3337,339 @@
       "sessionExpired": "Ваш поточний сеанс закінчився. Будь ласка, увійдіть знову.",
       "failedLoading": "Не вдалося завантажити дані. Будь ласка, спробуйте ще раз.",
       "tryagain": "Спробувати ще раз"
+    }
+  },
+  "ar": {
+    "common": {
+      "back": "رجوع",
+      "title": "تسجيل الدخول باستخدام Zitadel"
+    },
+    "accounts": {
+      "title": "الحسابات",
+      "description": "حدد الحساب الذي تريد استخدامه.",
+      "addAnother": "إضافة حساب آخر",
+      "noResults": "لم يتم العثور على حسابات",
+      "verified": "تم التحقق",
+      "expired": "منتهي الصلاحية"
+    },
+    "logout": {
+      "title": "تسجيل الخروج",
+      "description": "انقر فوق حساب لإنهاء الجلسة",
+      "noResults": "لم يتم العثور على حسابات",
+      "clear": "إنهاء الجلسة",
+      "verifiedAt": "آخر نشاط: {time}",
+      "success": {
+        "title": "تم تسجيل الخروج بنجاح",
+        "description": "لقد قمت بتسجيل الخروج بنجاح."
+      }
+    },
+    "loginname": {
+      "title": "مرحباً بعودتك!",
+      "description": "أدخل بيانات الدخول الخاصة بك.",
+      "register": "تسجيل مستخدم جديد",
+      "submit": "متابعة",
+      "labels": {
+        "loginname": "اسم الدخول",
+        "username": "اسم المستخدم",
+        "usernameOrPhoneNumber": "اسم المستخدم أو رقم الهاتف",
+        "usernameOrEmail": "اسم المستخدم أو البريد الإلكتروني"
+      },
+      "required": {
+        "loginName": "هذا الحقل مطلوب"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "كلمة المرور",
+        "description": "أدخل كلمة المرور الخاصة بك.",
+        "resetPassword": "إعادة تعيين كلمة المرور",
+        "submit": "متابعة",
+        "labels": {
+          "password": "كلمة المرور"
+        },
+        "required": {
+          "password": "هذا الحقل مطلوب"
+        }
+      },
+      "set": {
+        "title": "تعيين كلمة المرور",
+        "description": "تعيين كلمة المرور لحسابك",
+        "codeSent": "تم إرسال رمز إلى عنوان بريدك الإلكتروني.",
+        "noCodeReceived": "لم تستلم رمزاً؟",
+        "resend": "إعادة إرسال الرمز",
+        "submit": "متابعة",
+        "labels": {
+          "code": "الرمز",
+          "newPassword": "كلمة المرور الجديدة",
+          "confirmPassword": "تأكيد كلمة المرور"
+        },
+        "required": {
+          "code": "هذا الحقل مطلوب",
+          "newPassword": "عليك تقديم كلمة مرور!",
+          "confirmPassword": "هذا الحقل مطلوب"
+        }
+      },
+      "change": {
+        "title": "تغيير كلمة المرور",
+        "description": "تعيين كلمة المرور لحسابك",
+        "submit": "متابعة",
+        "labels": {
+          "newPassword": "كلمة المرور الجديدة",
+          "confirmPassword": "تأكيد كلمة المرور"
+        },
+        "required": {
+          "newPassword": "عليك تقديم كلمة مرور جديدة!",
+          "confirmPassword": "هذا الحقل مطلوب"
+        }
+      }
+    },
+    "idp": {
+      "title": "تسجيل الدخول باستخدام SSO",
+      "description": "حدد أحد المزودين التاليين لتسجيل الدخول",
+      "orSignInWith": "أو تسجيل الدخول باستخدام",
+      "signInWithApple": "تسجيل الدخول باستخدام Apple",
+      "signInWithGoogle": "تسجيل الدخول باستخدام Google",
+      "signInWithAzureAD": "تسجيل الدخول باستخدام AzureAD",
+      "signInWithGithub": "تسجيل الدخول باستخدام GitHub",
+      "signInWithGitlab": "تسجيل الدخول باستخدام GitLab",
+      "loginSuccess": {
+        "title": "تم تسجيل الدخول بنجاح",
+        "description": "لقد تم تسجيل دخولك بنجاح!"
+      },
+      "linkingSuccess": {
+        "title": "الحساب مرتبط",
+        "description": "لقد ربطت حسابك بنجاح!"
+      },
+      "registerSuccess": {
+        "title": "تم التسجيل بنجاح",
+        "description": "لقد تم تسجيلك بنجاح!"
+      },
+      "loginError": {
+        "title": "فشل تسجيل الدخول",
+        "description": "حدث خطأ أثناء محاولة تسجيل الدخول."
+      },
+      "linkingError": {
+        "title": "فشل ربط الحساب",
+        "description": "حدث خطأ أثناء محاولة ربط حسابك."
+      },
+      "completeRegister": {
+        "title": "أكمل بياناتك",
+        "description": "تحتاج إلى إكمال تسجيلك من خلال توفير عنوان بريدك الإلكتروني واسمك."
+      }
+    },
+    "ldap": {
+      "title": "تسجيل الدخول LDAP",
+      "description": "أدخل بيانات اعتماد LDAP الخاصة بك.",
+      "submit": "متابعة",
+      "labels": {
+        "username": "اسم المستخدم",
+        "password": "كلمة المرور"
+      },
+      "required": {
+        "username": "هذا الحقل مطلوب",
+        "password": "هذا الحقل مطلوب"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "التحقق من هويتك",
+        "description": "اختر أحد العوامل التالية.",
+        "noResults": "لا توجد عوامل ثانية متاحة للإعداد."
+      },
+      "set": {
+        "title": "إعداد المصادقة الثنائية",
+        "description": "اختر أحد العوامل الثانية التالية.",
+        "skip": "تخطي"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "التحقق من المصادقة الثنائية",
+        "totpDescription": "أدخل الرمز من تطبيق المصادقة الخاص بك.",
+        "smsDescription": "أدخل الرمز الذي تلقيته عبر الرسائل القصيرة.",
+        "emailDescription": "أدخل الرمز الذي تلقيته عبر البريد الإلكتروني.",
+        "noCodeReceived": "لم تستلم رمزاً؟",
+        "resendCode": "إعادة إرسال الرمز",
+        "submit": "متابعة",
+        "labels": {
+          "code": "الرمز"
+        },
+        "required": {
+          "code": "هذا الحقل مطلوب"
+        }
+      },
+      "set": {
+        "title": "إعداد المصادقة الثنائية",
+        "totpDescription": "امسح رمز الاستجابة السريعة باستخدام تطبيق المصادقة الخاص بك.",
+        "smsDescription": "أدخل رقم هاتفك لتلقي رمز عبر الرسائل القصيرة.",
+        "emailDescription": "أدخل عنوان بريدك الإلكتروني لتلقي رمز عبر البريد الإلكتروني.",
+        "totpRegisterDescription": "امسح رمز الاستجابة السريعة أو انتقل إلى عنوان URL يدوياً.",
+        "submit": "متابعة",
+        "labels": {
+          "code": "الرمز"
+        },
+        "required": {
+          "code": "هذا الحقل مطلوب"
+        }
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "المصادقة باستخدام مفتاح مرور",
+        "description": "سيطلب جهازك بصمة إصبعك، أو وجهك، أو قفل الشاشة",
+        "usePassword": "استخدم كلمة المرور",
+        "submit": "متابعة"
+      },
+      "set": {
+        "title": "إعداد مفتاح مرور",
+        "description": "سيطلب جهازك بصمة إصبعك، أو وجهك، أو قفل الشاشة",
+        "info": {
+          "description": "مفتاح المرور هو طريقة مصادقة على جهاز مثل بصمة الإصبع، Apple FaceID أو ما شابه. ",
+          "link": "المصادقة بدون كلمة مرور"
+        },
+        "skip": "تخطي",
+        "submit": "متابعة"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "التحقق من المصادقة الثنائية",
+        "description": "تحقق من حسابك باستخدام جهازك."
+      },
+      "set": {
+        "title": "إعداد المصادقة الثنائية",
+        "description": "إعداد جهاز كعامل ثانٍ.",
+        "submit": "متابعة"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "مفتاح مرور",
+        "password": "كلمة المرور"
+      },
+      "disabled": {
+        "title": "التسجيل معطل",
+        "description": "التسجيل معطل. يرجى الاتصال بالمسؤول."
+      },
+      "missingdata": {
+        "title": "بيانات مفقودة",
+        "description": "قدم البريد الإلكتروني والاسم الأول والأخير للتسجيل."
+      },
+      "title": "تسجيل",
+      "description": "أنشئ حساب ZITADEL الخاص بك.",
+      "noMethodAvailableWarning": "لا توجد طريقة مصادقة متاحة. يرجى الاتصال بالمسؤول.",
+      "selectMethod": "حدد الطريقة التي ترغب في المصادقة بها",
+      "agreeTo": "للتسجيل يجب عليك الموافقة على الشروط والأحكام",
+      "termsOfService": "شروط الخدمة",
+      "privacyPolicy": "سياسة الخصوصية",
+      "submit": "متابعة",
+      "password": {
+        "title": "تعيين كلمة المرور",
+        "description": "تعيين كلمة المرور لحسابك",
+        "submit": "متابعة",
+        "labels": {
+          "password": "كلمة المرور",
+          "confirmPassword": "تأكيد كلمة المرور"
+        },
+        "required": {
+          "password": "عليك تقديم كلمة مرور!",
+          "confirmPassword": "هذا الحقل مطلوب"
+        }
+      },
+      "labels": {
+        "firstname": "الاسم الأول",
+        "lastname": "اسم العائلة",
+        "email": "البريد الإلكتروني"
+      },
+      "required": {
+        "firstname": "هذا الحقل مطلوب",
+        "lastname": "هذا الحقل مطلوب",
+        "email": "هذا الحقل مطلوب"
+      }
+    },
+    "invite": {
+      "title": "دعوة مستخدم",
+      "description": "قدم عنوان البريد الإلكتروني واسم المستخدم الذي تريد دعوته.",
+      "info": "سيتلقى المستخدم بريداً إلكترونياً يحتوي على مزيد من التعليمات.",
+      "notAllowed": "إعداداتك لا تسمح لك بدعوة المستخدمين.",
+      "submit": "متابعة",
+      "success": {
+        "title": "تمت دعوة المستخدم",
+        "description": "تم إرسال البريد الإلكتروني بنجاح.",
+        "verified": "تمت دعوة المستخدم وقد تحقق بالفعل من بريده الإلكتروني.",
+        "notVerifiedYet": "تمت دعوة المستخدم. سيتلقى بريداً إلكترونياً يحتوي على مزيد من التعليمات.",
+        "submit": "دعوة مستخدم آخر"
+      }
+    },
+    "signedin": {
+      "title": "مرحباً {user}!",
+      "description": "أنت مسجل الدخول.",
+      "continue": "متابعة",
+      "error": {
+        "title": "خطأ",
+        "description": "حدث خطأ أثناء محاولة تسجيل الدخول."
+      }
+    },
+    "verify": {
+      "userIdMissing": "لم يتم تقديم userId!",
+      "successTitle": "تم التحقق من المستخدم",
+      "successDescription": "تم التحقق من المستخدم بنجاح.",
+      "setupAuthenticator": "إعداد المصادق",
+      "verify": {
+        "title": "التحقق من المستخدم",
+        "description": "أدخل الرمز المقدم في البريد الإلكتروني للتحقق.",
+        "noCodeReceived": "لم تستلم رمزاً؟",
+        "resendCode": "إعادة إرسال الرمز",
+        "codeSent": "تم إرسال رمز للتو إلى عنوان بريدك الإلكتروني.",
+        "submit": "متابعة",
+        "labels": {
+          "code": "الرمز"
+        },
+        "required": {
+          "code": "هذا الحقل مطلوب"
+        }
+      }
+    },
+    "authenticator": {
+      "title": "اختيار طريقة المصادقة",
+      "description": "حدد الطريقة التي ترغب في المصادقة بها",
+      "noMethodsAvailable": "لا توجد طرق مصادقة متاحة",
+      "allSetup": "لقد قمت بالفعل بإعداد مصادق!",
+      "linkWithIDP": "أو الربط مع مزود هوية"
+    },
+    "device": {
+      "usercode": {
+        "title": "رمز الجهاز",
+        "description": "أدخل الرمز المعروض على تطبيقك أو جهازك.",
+        "submit": "متابعة",
+        "labels": {
+          "code": "الرمز"
+        },
+        "required": {
+          "code": "هذا الحقل مطلوب"
+        }
+      },
+      "request": {
+        "title": "{appName} يود الاتصال",
+        "description": "{appName} سيكون لديه حق الوصول إلى:",
+        "disclaimer": "بالنقر فوق سماح، فإنك تسمح لـ {appName} و Zitadel استخدام معلوماتك وفقاً لشروط الخدمة وسياسات الخصوصية الخاصة بكل منهما. يمكنك إلغاء هذا الوصول في أي وقت.",
+        "submit": "سماح",
+        "deny": "رفض"
+      },
+      "scope": {
+        "openid": "التحقق من هويتك.",
+        "email": "عرض عنوان بريدك الإلكتروني.",
+        "profile": "عرض معلومات ملفك الشخصي الكاملة.",
+        "offline_access": "السماح بالوصول دون اتصال إلى حسابك."
+      }
+    },
+    "error": {
+      "noUserCode": "لم يتم تقديم رمز مستخدم!",
+      "noDeviceRequest": "لم يتم العثور على طلب جهاز.",
+      "unknownContext": "تعذر الحصول على سياق المستخدم. تأكد من إدخال اسم المستخدم أولاً أو تقديم loginName كمعلمة بحث.",
+      "sessionExpired": "انتهت صلاحية جلستك الحالية. يرجى تسجيل الدخول مرة أخرى.",
+      "failedLoading": "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.",
+      "tryagain": "حاول مرة أخرى"
     }
   }
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
+//go:generate mockgen -typed -package mock -destination ./mock/queries.mock.go . Queries
 type Queries interface {
 	ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.LabelPolicy, error)
 	MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.MailTemplate, error)

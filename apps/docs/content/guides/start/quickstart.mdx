@@ -1,0 +1,421 @@
+---
+title: The ZITADEL Quick Start Guide
+description: Learn how to integrate OIDC PKCE authentication in your application using ZITADEL in under 5 minutes.
+sidebar_label: Quick Start Guide
+keywords: [ZITADEL, OIDC, PKCE, Authentication, Identity Management]
+---
+
+import { Tab } from 'fumadocs-ui/components/tabs';
+import { FrameworkSelector } from '@/components/framework_selector';
+import AppConfig from './_app_config.mdx';
+import AppValues from './_app_values.mdx';
+
+In this guide, you’ll set up a Zitadel account and authenticate your first example application.
+
+## Get Started with ZITADEL Cloud
+
+Set up your ZITADEL account and organization to begin managing identities for your applications.
+
+### 1. Create your Account and Organization
+
+You first need access to the ZITADEL Cloud Customer Portal.
+This is the administrative hub for managing your billing, teams, and instances.
+1. **Sign Up**: Go to [zitadel.com](http://zitadel.com) and select Sign Up.
+2. **Onboarding**: Follow the prompts to verify your email and set up your Portal Team.
+  - Tip: We recommend using Passkeys for a secure, passwordless login experience.
+3. **Access**: Once authenticated, you will be redirected to the Customer Portal dashboard.
+
+![Home Page](../../../public/img/guides/quickstart/cloud_sign_up.png)
+![Registration Page](../../../public/img/guides/quickstart/cloud_register.png)
+
+### 2. Quick Onboarding
+
+Complete the brief onboarding questions.
+This data helps us prioritize the development of new features, SDKs, and integrations that matter most to our community.
+![Onboarding Questions](../../../public/img/guides/quickstart/onboarding_questions.png)
+
+### 3. Create your ZITADEL instance
+
+An [Instance](/concepts/structure/instance) is a fully isolated identity environment with its own users, policies, and data.
+Most developers use separate instances to isolate Development, Test, and Production workflows.
+
+Follow these steps to deploy your first instance:
+1. **Start**: Click Create Instance on your dashboard.
+2. **Identity**: Provide an Instance Name (e.g., dev-environment). This will be used to generate your default domain (e.g., dev-environment-xxxx.zitadel.cloud).
+3. **Locality**: Select your Region.
+  - Note: Choosing a region close to your users minimizes latency and helps with data residency compliance.
+4. **Admin Setup**: Create your Instance Administrator. This user has "root" permissions to manage all organizations, policies, and settings within this specific instance.
+5. **Deploy**: Review your configuration and click Create Instance.
+
+![Create Instance](../../../public/img/guides/quickstart/cloud_create_instance.png)
+
+### 4. Create your Project and Application
+
+In ZITADEL, [**Applications**](/guides/manage/console/applications-overview) are grouped into [**Projects**](/guides/manage/console/projects-overview).
+This allows multiple applications (like a React frontend and a Go backend) to share the same roles and authorizations.
+
+#### Launch the Management Console
+
+Click **Create your app**. This opens the Management Console for your instance in a new tab.
+Log in using the Admin credentials you just created.
+![Create App](../../../public/img/guides/quickstart/cloud_create_app.png)
+
+#### Step 1: Define your Project
+- **Name**: Enter a name (e.g., Project1).
+- **Framework**: Select your preferred framework
+- **Continue**: Click the Continue button.
+![Project Name and Framework/Language](../../../public/img/guides/quickstart/create_project_react.png)
+
+#### Step 2: Review Default Configuration
+ZITADEL automatically configures the best security settings for your selected framework.
+
+<FrameworkSelector>
+    <Tab value="Angular">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/signedout">
+        </AppConfig>
+    </Tab>
+    <Tab value="Flutter">
+        <AppConfig
+            redirectUrl="http://localhost:4444/auth.html, com.example.zitadelflutter"
+            postLogoutRedirectUrl="http://localhost:4444, com.example.zitadelflutter">
+        </AppConfig>
+    </Tab>
+    <Tab value="Go">
+        <AppConfig
+            redirectUrl="http://localhost:8089/auth/callback"
+            postLogoutRedirectUrl="http://localhost:8089">
+        </AppConfig>
+    </Tab>
+    <Tab value="Next.js">
+        <AppConfig
+            redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="React">
+        <AppConfig
+            redirectUrl="http://localhost:3000/callback"
+            postLogoutRedirectUrl="http://localhost:3000/">
+        </AppConfig>
+    </Tab>
+    <Tab value="Symfony">
+        <AppConfig
+            redirectUrl="http://localhost:8000/login_check"
+            postLogoutRedirectUrl="http://localhost:8000/logout">
+        </AppConfig>
+    </Tab>
+    <Tab value="Vue.js">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/">
+        </AppConfig>
+    </Tab>
+</FrameworkSelector>
+
+![Project Configuration Overview](../../../public/img/guides/quickstart/project_config_overview_react.png)
+
+### 5. Collect your Integration Keys
+
+<FrameworkSelector>
+    <Tab value="Angular">
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Flutter">
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Go">
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Next.js">
+        <AppValues valueCount="three" clientSecret={true} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="React">
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Symfony">
+        <AppValues valueCount="three" clientSecret={true} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Vue.js">
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+    </Tab>
+</FrameworkSelector>
+
+
+## Integrate ZITADEL into your App
+
+### How the Authentication Flow Works
+
+ZITADEL handles the complexity of the OIDC handshake so your app stays secure without manual token management.
+1. **Login**: App redirects the user to ZITADEL with a PKCE challenge.
+2. **Auth**: User authenticates on the ZITADEL hosted login page.
+3. **Exchange**: ZITADEL returns an Auth Code, which the app exchanges for an Access Token.
+4. **Tokens**: The app shows the Access and ID Token
+5. **Logout**: The app clears local tokens and terminates the ZITADEL session.
+
+### 1. Prerequisites
+
+<FrameworkSelector>
+    <Tab value="Angular">
+        - [Node.js](https://nodejs.org/)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="Flutter">
+        - [Flutter](https://docs.flutter.dev/install)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="Go">
+        - [Go](https://go.dev/)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="Next.js">
+        - [Node.js](https://nodejs.org/)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="React">
+        - [Node.js](https://nodejs.org/)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="Symfony">
+        - [PHP](https://www.php.net/)
+        - [Composer](https://getcomposer.org/)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="Vue.js">
+        - [Node.js](https://nodejs.org/)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+</FrameworkSelector>
+
+### 2. Get the Example Project
+
+<FrameworkSelector>
+    <Tab value="Angular">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-angular.git
+        cd example-auth-angular
+        ```
+    </Tab>
+    <Tab value="Flutter">
+        ```bash
+        git clone https://github.com/zitadel/zitadel_flutter.git
+        cd zitadel_flutter
+        ```
+    </Tab>
+    <Tab value="Go">
+        ```bash
+        git clone https://github.com/zitadel/zitadel-go.git
+        cd zitadel_go
+        ```
+    </Tab>
+    <Tab value="Next.js">
+        ```bash
+        git clone git@github.com:zitadel/example-auth-nextjs.git
+        cd example-auth-nextjs
+        ```
+    </Tab>
+    <Tab value="React">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-react.git
+        cd example-auth-react
+        ```
+    </Tab>
+    <Tab value="Symfony">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-symfony.git
+        cd example-auth-symfony
+        ```
+    </Tab>
+    <Tab value="Vue.js">
+        ```bash
+        git clone git@github.com:zitadel/example-auth-vuejs.git
+        cd example-auth-vuejs
+        ```
+    </Tab>
+</FrameworkSelector>
+
+### 3. Configure your Credentials
+
+<FrameworkSelector>
+    <Tab value="Angular">
+
+        1. Copy+paste the .env.example to .env.local
+        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        PORT=3000
+        NG_APP_ZITADEL_DOMAIN="https://your-zitadel-domain"
+        NG_APP_ZITADEL_CLIENT_ID="your-client-id"
+        NG_APP_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        NG_APP_ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        NG_APP_ZITADEL_POST_LOGIN_URL="/profile"
+        ```
+    </Tab>
+    <Tab value="Flutter">
+        No action required for this step.
+        The issuer and client Id will be passed directly when running the app (next step)
+    </Tab>
+    <Tab value="Go">
+        No action required for this step.
+        The issuer and client Id will be passed directly when running the app (next step)
+    </Tab>
+    <Tab value="Next.js">
+        1. Copy+past the .env.example to .env.local
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="[https://your-instance.zitadel.cloud/](https://your-instance.zitadel.cloud/)"
+        ZITADEL_CLIENT_ID="zitadel-client-id"
+        ZITADEL_CLIENT_SECRET="zitadel-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
+        NEXTAUTH_URL="http://localhost:3000"
+
+        ```
+    </Tab>
+    <Tab value="React">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        VITE_ZITADEL_DOMAIN="https://your-zitadel-domain"
+        VITE_ZITADEL_CLIENT_ID="your-client-id"
+        VITE_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        VITE_ZITADEL_POST_LOGIN_URL="/profile"
+        VITE_ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        ```
+    </Tab>
+    <Tab value="Symfony">
+
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        PORT=3000
+        NG_APP_ZITADEL_DOMAIN="https://your-zitadel-domain"
+        NG_APP_ZITADEL_CLIENT_ID="your-client-id"
+        NG_APP_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        NG_APP_ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        NG_APP_ZITADEL_POST_LOGIN_URL="/profile"
+        ```
+    </Tab>
+    <Tab value="Vue.js">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        VITE_ZITADEL_DOMAIN="https://your-zitadel-domain"
+        VITE_ZITADEL_CLIENT_ID="your-client-id"
+        VITE_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        VITE_ZITADEL_POST_LOGIN_URL="/profile"
+        VITE_ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        ```
+    </Tab>
+</FrameworkSelector>
+
+
+### 4. Build and Run
+
+<FrameworkSelector>
+    <Tab value="Angular">
+        ```bash
+        npm install
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:4200`.
+
+        ![Angular Example App](../../../public/img/guides/quickstart/angular_example_app.png)
+    </Tab>
+    <Tab value="Flutter">
+        Make sure to replace the [zitadel_issuer] and [zitadel_client_id] with your own value before running the command
+        ```bash
+        flutter run -d chrome --web-port=4444 --dart-define zitadel_url=[zitadel_issuer] --dart-define zitadel_client_id=[zitadel_client_id]
+        ```
+
+        Your app will be live at `http://localhost:4444`.
+
+        ![Flutter Example App](../../../public/img/guides/quickstart/flutter_example_app.png)
+    </Tab>
+    <Tab value="Go">
+        Make sure to replace the [zitadel_domain] (use the domain from the issuer without the https://) and [zitadel_client_id] with your own value before running the command
+        ```bash
+        go run example/app/app.go --domain [zitadel_domain] --key XKv2Lqd7YAq13NUZVUWZEWZeruqyzViM --clientID [zitadel_client_id] --redirectURI http://localhost:8089/auth/callback
+        ```
+
+        Your app will be live at `http://localhost:8089`.
+
+        ![Go Example App](../../../public/img/guides/quickstart/go_example_app.png)
+    </Tab>
+    <Tab value="Next.js">
+        ```bash
+        npm install
+
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Next.js Example App](../../../public/img/guides/quickstart/next_example_app.png)
+
+    </Tab>
+    <Tab value="React">
+        ```bash
+        npm install
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![React Example App](../../../public/img/guides/quickstart/react_example_app.png)
+    </Tab>
+    <Tab value="Symfony">
+        ```bash
+        composer install
+        composer run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Angular Example App](../../../public/img/guides/quickstart/symfony_example_app.png)
+    </Tab>
+    <Tab value="Vue.js">
+        ```bash
+        npm install
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Vue Example App](../../../public/img/guides/quickstart/vue_example_app.png)
+    </Tab>
+</FrameworkSelector>
+
+## Success! 🚀
+You’ve successfully integrated ZITADEL into an application.
+
+<Callout type="warn" title="Prevent Misconfiguration Lockouts">
+  Login policy misconfigurations that occur during the testing phase can easily lead to a [lockout](/legal/policies/account-lockout-policy). To ensure you don't lose access to your instance:
+
+  1.  **Generate a backup PAT:** Create a [Service User Personal Access Token](/guides/integrate/service-accounts/personal-access-token) with the [`IAM_OWNER`](/guides/manage/console/managers) role to revert any login UI misconfigurations using the API.
+  2.  **Add a second Instance Manager:** Always designate at least one [**second instance manager**](/guides/manage/console/managers).
+  
+</Callout>
+
+### What’s next?
+- [**Example Applications**](/examples/introduction): Find more comprehensive guides and examples for the different frameworks
+- [**SSO**](/guides/integrate/services): Learn how to add SSO to your services
+- [**Customize the UI**](/guides/manage/customize/branding): Make the login page your own with Branding.
+- [**Explore the API**](/apis/introduction): Check out the ZITADEL API Reference for advanced integrations.
+
+Need help? Join our [Discord community](https://zitadel.com/chat) or explore the full Documentation. Happy coding!

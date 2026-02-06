@@ -34,17 +34,17 @@ import (
 
 func instanceSetupZitadelIDs() ZitadelConfig {
 	return ZitadelConfig{
-		instanceID:   "INSTANCE",
-		orgID:        "ORG",
-		projectID:    "PROJECT",
-		consoleAppID: "console-id",
-		authAppID:    "auth-id",
-		mgmtAppID:    "mgmt-id",
-		adminAppID:   "admin-id",
+		instanceID:             "INSTANCE",
+		orgID:                  "ORG",
+		projectID:              "PROJECT",
+		managementConsoleAppID: "console-id",
+		authAppID:              "auth-id",
+		mgmtAppID:              "mgmt-id",
+		adminAppID:             "admin-id",
 	}
 }
 
-func projectAddedEvents(ctx context.Context, instanceID, orgID, id, owner string, externalSecure bool) []eventstore.Command {
+func projectAddedEvents(ctx context.Context, instanceID, orgID, id string, externalSecure bool) []eventstore.Command {
 	events := []eventstore.Command{
 		project.NewProjectAddedEvent(ctx,
 			&project.NewAggregate(id, orgID).Aggregate,
@@ -63,14 +63,14 @@ func projectAddedEvents(ctx context.Context, instanceID, orgID, id, owner string
 	events = append(events, apiAppEvents(ctx, orgID, id, "admin-id", "Admin-API")...)
 	events = append(events, apiAppEvents(ctx, orgID, id, "auth-id", "Auth-API")...)
 
-	consoleAppID := "console-id"
-	consoleClientID := "clientID"
-	events = append(events, oidcAppEvents(ctx, orgID, id, consoleAppID, "Console", consoleClientID, externalSecure)...)
+	managementConsoleAppID := "console-id"
+	managementConsoleClientID := "clientID"
+	events = append(events, oidcAppEvents(ctx, orgID, id, managementConsoleAppID, "Management Console", managementConsoleClientID, externalSecure)...)
 	events = append(events,
-		instance.NewIAMConsoleSetEvent(ctx,
+		instance.NewIAMManagementConsoleSetEvent(ctx,
 			&instance.NewAggregate(instanceID).Aggregate,
-			&consoleClientID,
-			&consoleAppID,
+			&managementConsoleClientID,
+			&managementConsoleAppID,
 		),
 	)
 	return events
@@ -170,23 +170,20 @@ func orgEvents(ctx context.Context, instanceID, orgID, name, projectID, defaultD
 		instance.NewDefaultOrgSetEventEvent(ctx, &instanceAgg.Aggregate, orgID),
 	}
 
-	owner := ""
 	if machine {
 		machineID := "USER-MACHINE"
 		events = append(events, machineEvents(ctx, instanceID, orgID, machineID, "PAT")...)
-		owner = machineID
 	}
 	if human {
 		userID := "USER"
 		events = append(events, humanEvents(ctx, instanceID, orgID, userID)...)
-		owner = userID
 	}
 	if loginClient {
 		userID := "USER-LOGIN-CLIENT"
 		events = append(events, loginClientEvents(ctx, instanceID, orgID, userID, "LOGIN-CLIENT-PAT")...)
 	}
 
-	events = append(events, projectAddedEvents(ctx, instanceID, orgID, projectID, owner, externalSecure)...)
+	events = append(events, projectAddedEvents(ctx, instanceID, orgID, projectID, externalSecure)...)
 	return events
 }
 
@@ -194,7 +191,7 @@ func orgIDs() []string {
 	return slices.Concat([]string{"USER-MACHINE", "PAT", "USER", "USER-LOGIN-CLIENT", "LOGIN-CLIENT-PAT"}, projectClientIDs())
 }
 
-func instancePoliciesFilters(instanceID string) []expect {
+func instancePoliciesFilters(_ string) []expect {
 	return []expect{
 		expectFilter(),
 		expectFilter(),
@@ -253,7 +250,7 @@ func instanceSetupPoliciesConfig() *InstanceSetup {
 			ForceMFA                   bool
 			ForceMFALocalOnly          bool
 			HidePasswordReset          bool
-			IgnoreUnknownUsername      bool
+			IgnoreUnknownUsernames     bool
 			AllowDomainDiscovery       bool
 			DisableLoginWithEmail      bool
 			DisableLoginWithPhone      bool
@@ -774,7 +771,6 @@ func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 									"INSTANCE",
 									"ORG",
 									"PROJECT",
-									"owner",
 									false,
 								)...,
 							),
@@ -1180,13 +1176,13 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 					},
 				},
 				ids: ZitadelConfig{
-					instanceID:   "INSTANCE",
-					orgID:        "ORG",
-					projectID:    "PROJECT",
-					consoleAppID: "console-id",
-					authAppID:    "auth-id",
-					mgmtAppID:    "mgmt-id",
-					adminAppID:   "admin-id",
+					instanceID:             "INSTANCE",
+					orgID:                  "ORG",
+					projectID:              "PROJECT",
+					managementConsoleAppID: "console-id",
+					authAppID:              "auth-id",
+					mgmtAppID:              "mgmt-id",
+					adminAppID:             "admin-id",
 				},
 			},
 			res: res{
@@ -1566,8 +1562,9 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
+		ctx             context.Context
+		instanceID      string
+		errorIfNotFound bool
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1613,12 +1610,27 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
-				instanceID: "INSTANCE",
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: true,
 			},
 			res: res{
 				err: zerrors.IsNotFound,
 			},
+		},
+		{
+			name: "instance not existing, no error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: false,
+			},
+			res: res{},
 		},
 		{
 			name: "instance removed, not found error",
@@ -1643,12 +1655,42 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
-				instanceID: "INSTANCE",
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: true,
 			},
 			res: res{
 				err: zerrors.IsNotFound,
 			},
+		},
+		{
+			name: "instance removed, no error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewInstanceAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"INSTANCE",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewInstanceRemovedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"INSTANCE",
+								nil,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: false,
+			},
+			res: res{},
 		},
 		{
 			name: "instance remove, ok",
@@ -1714,7 +1756,7 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
 				},
 			}
-			got, err := r.RemoveInstance(tt.args.ctx, tt.args.instanceID)
+			got, err := r.RemoveInstance(tt.args.ctx, tt.args.instanceID, tt.args.errorIfNotFound)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1734,14 +1776,12 @@ func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
 	type fields struct {
 		LoginDefaultOrg                *bool
 		UserSchema                     *bool
-		TokenExchange                  *bool
 		ImprovedPerformance            []feature.ImprovedPerformanceType
 		DebugOIDCParentError           *bool
 		OIDCSingleV1SessionTermination *bool
-		EnableBackChannelLogout        *bool
 		LoginV2                        *InstanceSetupFeatureLoginV2
 		PermissionCheckV2              *bool
-		ConsoleUseV2UserApi            *bool
+		ManagementConsoleUseV2UserApi  *bool
 		EnableRelationalTables         *bool
 	}
 
@@ -1764,26 +1804,22 @@ func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
 			fields: fields{
 				LoginDefaultOrg:                gu.Ptr(true),
 				UserSchema:                     gu.Ptr(false),
-				TokenExchange:                  gu.Ptr(true),
 				ImprovedPerformance:            []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
 				DebugOIDCParentError:           gu.Ptr(true),
 				OIDCSingleV1SessionTermination: gu.Ptr(false),
-				EnableBackChannelLogout:        gu.Ptr(true),
 				PermissionCheckV2:              gu.Ptr(true),
-				ConsoleUseV2UserApi:            gu.Ptr(false),
+				ManagementConsoleUseV2UserApi:  gu.Ptr(false),
 				EnableRelationalTables:         gu.Ptr(true),
 			},
 			want: &InstanceFeatures{
 				LoginDefaultOrg:                gu.Ptr(true),
 				UserSchema:                     gu.Ptr(false),
-				TokenExchange:                  gu.Ptr(true),
 				ImprovedPerformance:            []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
 				DebugOIDCParentError:           gu.Ptr(true),
 				OIDCSingleV1SessionTermination: gu.Ptr(false),
-				EnableBackChannelLogout:        gu.Ptr(true),
 				LoginV2:                        nil,
 				PermissionCheckV2:              gu.Ptr(true),
-				ConsoleUseV2UserApi:            gu.Ptr(false),
+				ManagementConsoleUseV2UserApi:  gu.Ptr(false),
 				EnableRelationalTables:         gu.Ptr(true),
 			},
 		},
@@ -1833,14 +1869,12 @@ func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
 			f := &InstanceSetupFeatures{
 				LoginDefaultOrg:                tc.fields.LoginDefaultOrg,
 				UserSchema:                     tc.fields.UserSchema,
-				TokenExchange:                  tc.fields.TokenExchange,
 				ImprovedPerformance:            tc.fields.ImprovedPerformance,
 				DebugOIDCParentError:           tc.fields.DebugOIDCParentError,
 				OIDCSingleV1SessionTermination: tc.fields.OIDCSingleV1SessionTermination,
-				EnableBackChannelLogout:        tc.fields.EnableBackChannelLogout,
 				LoginV2:                        tc.fields.LoginV2,
 				PermissionCheckV2:              tc.fields.PermissionCheckV2,
-				ConsoleUseV2UserApi:            tc.fields.ConsoleUseV2UserApi,
+				ManagementConsoleUseV2UserApi:  tc.fields.ManagementConsoleUseV2UserApi,
 				EnableRelationalTables:         tc.fields.EnableRelationalTables,
 			}
 			got, err := f.ToInstanceFeatures()

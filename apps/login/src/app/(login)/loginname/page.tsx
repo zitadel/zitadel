@@ -28,25 +28,22 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: organization ?? defaultOrganization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
-  const contextLoginSettings = await getLoginSettings({ serviceConfig, organization,
-  });
-
-  const identityProviders = await getActiveIdentityProviders({ serviceConfig, orgId: organization ?? defaultOrganization,
+  const identityProviders = await getActiveIdentityProviders({
+    serviceConfig,
+    orgId: organization ?? defaultOrganization,
   }).then((resp) => {
     return resp.identityProviders;
   });
 
-  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
   return (
     <DynamicTheme branding={branding}>
@@ -60,15 +57,16 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       </div>
 
       <div className="w-full">
-        <UsernameForm
+        {loginSettings?.allowLocalAuthentication && <UsernameForm
           loginName={loginName}
           requestId={requestId}
           organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
-          loginSettings={contextLoginSettings}
+          defaultOrganization={defaultOrganization}
+          loginSettings={loginSettings}
           suffix={suffix}
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
-        ></UsernameForm>
+        ></UsernameForm>}
 
         {loginSettings?.allowExternalIdp && !!identityProviders?.length && (
           <div className="w-full pb-4 pt-6">
@@ -77,6 +75,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               requestId={requestId}
               organization={organization}
               postErrorRedirectUrl="/loginname"
+              showLabel={loginSettings?.allowLocalAuthentication}
             ></SignInWithIdp>
           </div>
         )}

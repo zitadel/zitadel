@@ -33,7 +33,7 @@ func (s *Server) listAdministratorsRequestToModel(req *internal_permission.ListA
 	if err != nil {
 		return nil, err
 	}
-	queries, err := administratorSearchFiltersToQuery(req.Filters)
+	queries, err := administratorSearchFiltersToQuery(req.Filters, 0) // start at level 0
 	if err != nil {
 		return nil, err
 	}
@@ -63,10 +63,10 @@ func administratorFieldNameToSortingColumn(field internal_permission.Administrat
 	}
 }
 
-func administratorSearchFiltersToQuery(queries []*internal_permission.AdministratorSearchFilter) (_ []query.SearchQuery, err error) {
+func administratorSearchFiltersToQuery(queries []*internal_permission.AdministratorSearchFilter, level uint8) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, qry := range queries {
-		q[i], err = administratorFilterToModel(qry)
+		q[i], err = administratorFilterToQuery(qry, level)
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +74,11 @@ func administratorSearchFiltersToQuery(queries []*internal_permission.Administra
 	return q, nil
 }
 
-func administratorFilterToModel(filter *internal_permission.AdministratorSearchFilter) (query.SearchQuery, error) {
+func administratorFilterToQuery(filter *internal_permission.AdministratorSearchFilter, level uint8) (query.SearchQuery, error) {
+	if level > 20 {
+		// can't go deeper than 20 levels of nesting.
+		return nil, zerrors.ThrowInvalidArgument(nil, "PERM-zsQ97", "Errors.Query.TooManyNestingLevels")
+	}
 	switch q := filter.Filter.(type) {
 	case *internal_permission.AdministratorSearchFilter_InUserIdsFilter:
 		return inUserIDsFilterToQuery(q.InUserIdsFilter)
@@ -90,8 +94,16 @@ func administratorFilterToModel(filter *internal_permission.AdministratorSearchF
 		return userDisplayNameFilterToQuery(q.UserDisplayName)
 	case *internal_permission.AdministratorSearchFilter_Resource:
 		return resourceFilterToQuery(q.Resource)
+	case *internal_permission.AdministratorSearchFilter_Role:
+		return roleFilterToQuery(q.Role)
+	case *internal_permission.AdministratorSearchFilter_And:
+		return andQueryToQuery(q.And, level)
+	case *internal_permission.AdministratorSearchFilter_Or:
+		return orQueryToQuery(q.Or, level)
+	case *internal_permission.AdministratorSearchFilter_Not:
+		return notQueryToQuery(q.Not, level)
 	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "PERM-vR9nC", "List.Query.Invalid")
 	}
 }
 
@@ -149,6 +161,32 @@ func resourceFilterToQuery(q *internal_permission.ResourceFilter) (query.SearchQ
 		return query.NewAndQuery(projectIDQuery, grantedOrganizationID)
 	}
 	return nil, nil
+}
+
+func roleFilterToQuery(q *internal_permission.RoleFilter) (query.SearchQuery, error) {
+	return query.NewMembershipRoleQuery(q.GetRoleKey())
+}
+
+func orQueryToQuery(q *internal_permission.OrFilter, level uint8) (query.SearchQuery, error) {
+	mappedQueries, err := administratorSearchFiltersToQuery(q.Queries, level+1)
+	if err != nil {
+		return nil, err
+	}
+	return query.NewOrQuery(mappedQueries...)
+}
+func andQueryToQuery(q *internal_permission.AndFilter, level uint8) (query.SearchQuery, error) {
+	mappedQueries, err := administratorSearchFiltersToQuery(q.Queries, level+1)
+	if err != nil {
+		return nil, err
+	}
+	return query.NewAndQuery(mappedQueries...)
+}
+func notQueryToQuery(q *internal_permission.NotFilter, level uint8) (query.SearchQuery, error) {
+	mappedQuery, err := administratorFilterToQuery(q.Query, level+1)
+	if err != nil {
+		return nil, err
+	}
+	return query.NewNotQuery(mappedQuery)
 }
 
 func administratorsToPb(administrators []*query.Administrator) []*internal_permission.Administrator {

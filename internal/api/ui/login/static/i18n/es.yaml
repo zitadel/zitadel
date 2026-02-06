@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: siguiente
   CancelButtonText: cancelar
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Verificación de doble factor
   DescriptionPhone: Crea tu doble factor de autenticación. Introduce tu número de teléfono para verificarlo.
   DescriptionCode: Crea tu doble factor de autenticación. Ingrese el código recibido para verificar su número de teléfono.
+  CountryCodeLabel: País
   PhoneLabel: Número de teléfono
   CodeLabel: Código
   EditButtonText: editar
@@ -268,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Género
   Female: Mujer
   Male: Hombre
@@ -314,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Términos y condiciones
   TosConfirm: Acepto los
   TosLinkText: TDS
@@ -394,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 
 Footer:
   PoweredBy: Powered By
@@ -428,8 +432,8 @@ Errors:
       NotFound: Perfil no encontrado
       NotChanged: El perfil no ha cambiado
       Empty: El perfil está vacío
-      FirstNameEmpty: El nombre del perfil está vacío
-      LastNameEmpty: Los apellidos del perfil están vacíos
+      FirstNameEmpty: El nombre en el perfil está vacío
+      LastNameEmpty: El apellido en el perfil está vacío
       IDMissing: Falta el ID del perfil
     Email:
       NotFound: Email no encontrado

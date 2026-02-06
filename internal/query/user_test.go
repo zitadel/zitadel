@@ -225,7 +225,7 @@ var (
 		"username",
 		"login_names",
 		"preferred_login_name",
-		// human
+		// User (human)
 		"user_id",
 		"first_name",
 		"last_name",
@@ -234,7 +234,7 @@ var (
 		"preferred_language",
 		"gender",
 		"avatar_key",
-		// machine
+		// service account
 		"user_id",
 		"last_email",
 		"verified_email",
@@ -293,7 +293,7 @@ var (
 		"username",
 		"login_names",
 		"preferred_login_name",
-		// human
+		// User (human)
 		"user_id",
 		"first_name",
 		"last_name",
@@ -309,7 +309,7 @@ var (
 		"password_change_required",
 		"password_changed",
 		"mfa_init_skipped",
-		// machine
+		// service account
 		"user_id",
 		"name",
 		"description",
@@ -717,7 +717,7 @@ func Test_UserPrepares(t *testing.T) {
 						"username",
 						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
-						// human
+						// User (human)
 						"id",
 						"first_name",
 						"last_name",
@@ -780,7 +780,7 @@ func Test_UserPrepares(t *testing.T) {
 						"username",
 						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
-						// human
+						// User (human)
 						"id",
 						"first_name",
 						"last_name",
@@ -867,7 +867,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (human)
 							"id",
 							"first_name",
 							"last_name",
@@ -883,7 +883,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							testNow,
 							testNow,
-							// machine
+							// service account
 							nil,
 							nil,
 							nil,
@@ -952,7 +952,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (human)
 							"id",
 							"first_name",
 							"last_name",
@@ -968,7 +968,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							testNow,
 							testNow,
-							// machine
+							// service account
 							nil,
 							nil,
 							nil,
@@ -1042,7 +1042,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (human)
 							"id",
 							"first_name",
 							"last_name",
@@ -1058,7 +1058,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							testNow,
 							testNow,
-							// machine
+							// service account
 							nil,
 							nil,
 							nil,
@@ -1077,7 +1077,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (human)
 							nil,
 							nil,
 							nil,
@@ -1093,7 +1093,7 @@ func Test_UserPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							// machine
+							// service account
 							"id",
 							"name",
 							"description",

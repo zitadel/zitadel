@@ -197,19 +197,21 @@ export async function getPasswordComplexitySettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function createSessionFromChecks({
+export async function createSessionFromChecksAndChallenges({
   serviceConfig,
   checks,
+  challenges,
   lifetime,
 }: WithServiceConfig<{
   checks: Checks;
+  challenges?: RequestChallenges;
   lifetime: Duration;
 }>) {
   const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceConfig);
 
   const userAgent = await getUserAgent();
 
-  return sessionService.createSession({ checks, lifetime, userAgent }, {});
+  return sessionService.createSession({ ...{ checks, lifetime, userAgent }, ...(challenges ? { challenges } : {}) }, {});
 }
 
 export async function createSessionForUserIdAndIdpIntent({
@@ -225,7 +227,6 @@ export async function createSessionForUserIdAndIdpIntent({
   };
   lifetime: Duration;
 }>) {
-  console.log("Creating session for userId and IDP intent", { userId, idpIntent, lifetime });
   const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceConfig);
 
   const userAgent = await getUserAgent();
@@ -774,8 +775,11 @@ export async function startIdentityProviderFlow({
   idpId: string;
   urls: RedirectURLsJson;
 }>): Promise<string | null> {
-    // Use empty publicHost to avoid issues with redirect URIs pointing to the login UI instead of the zitadel API
-    const userService: Client<typeof UserService> = await createServiceForHost(UserService, {...serviceConfig, publicHost: ''});
+  // Use empty publicHost to avoid issues with redirect URIs pointing to the login UI instead of the zitadel API
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, {
+    ...serviceConfig,
+    publicHost: "",
+  });
 
   return userService
     .startIdentityProviderIntent({
@@ -793,16 +797,7 @@ export async function startIdentityProviderFlow({
         const redirectUrl = "/saml-post";
 
         try {
-          // Log the attempt with structure inspection
-          console.log("Attempting to stringify formData.fields:", {
-            fields: formData.fields,
-            fieldsType: typeof formData.fields,
-            fieldsKeys: Object.keys(formData.fields || {}),
-            fieldsEntries: Object.entries(formData.fields || {}),
-          });
-
           const stringifiedFields = JSON.stringify(formData.fields);
-          console.log("Successfully stringified formData.fields, length:", stringifiedFields.length);
 
           // Check cookie size limits (typical limit is 4KB)
           if (stringifiedFields.length > 4000) {
@@ -816,7 +811,6 @@ export async function startIdentityProviderFlow({
 
           return `${redirectUrl}?${params.toString()}`;
         } catch (stringifyError) {
-          console.error("JSON serialization failed:", stringifyError);
           throw new Error(
             `Failed to serialize SAML form data: ${stringifyError instanceof Error ? stringifyError.message : String(stringifyError)}`,
           );
@@ -1279,7 +1273,13 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
                   process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
                     const kv = header.indexOf(":");
                     if (kv > 0) {
-                      req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
+                      const key = header.slice(0, kv).trim();
+                      const value = header.slice(kv + 1).trim();
+                      if (value) {
+                        req.header.set(key, value);
+                      } else {
+                        req.header.delete(key);
+                      }
                     } else {
                       console.warn(`Skipping malformed header: ${header}`);
                     }

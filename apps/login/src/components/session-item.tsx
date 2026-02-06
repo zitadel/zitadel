@@ -9,7 +9,7 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Avatar } from "./avatar";
 import { Translated } from "./translated";
 
@@ -141,12 +141,11 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
 
             <XCircleIcon
               className="h-5 w-5 opacity-50 transition-all hover:opacity-100 group-hover:block sm:hidden"
-              onClick={(event) => {
+              onClick={async (event: React.MouseEvent) => {
                 event.preventDefault();
                 event.stopPropagation();
-                clearSessionId(session.id).then(() => {
-                  reload();
-                });
+                await clearSessionId(session.id);
+                reload();
               }}
             />
           </div>

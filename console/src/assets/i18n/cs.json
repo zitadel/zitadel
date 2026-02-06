@@ -1,9 +1,9 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Metadata",
     "HOME": {
-      "TITLE": "Začněte s ZITADEL",
+      "TITLE": "Začněte s Zitadel",
       "NEXT": {
         "TITLE": "Vaše další kroky",
         "DESCRIPTION": "Dokončete následující kroky pro zabezpečení vaší aplikace.",
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "Dokumentace",
-          "DESCRIPTION": "Prozkoumejte znalostní bázi ZITADEL a seznámte se s klíčovými koncepty a nápady. Naučte se, jak ZITADEL funguje a jak jej používat."
+          "DESCRIPTION": "Prozkoumejte znalostní bázi Zitadel a seznámte se s klíčovými koncepty a nápady. Naučte se, jak Zitadel funguje a jak jej používat."
         },
         "EXAMPLES": {
           "TITLE": "Příklady a Software Development Kits",
-          "DESCRIPTION": "Procházejte naše příklady a SDK, abyste mohli používat ZITADEL společně s vašimi oblíbenými programovacími jazyky a nástroji."
+          "DESCRIPTION": "Procházejte naše příklady a SDK, abyste mohli používat Zitadel společně s vašimi oblíbenými programovacími jazyky a nástroji."
         }
       }
     },
@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Uživatelé",
-      "DESCRIPTION": "Uživatel je člověk nebo stroj, který může přistupovat k vašim aplikacím.",
+      "DESCRIPTION": "Uživatel je člověk nebo účet služby, který může přistupovat k vašim aplikacím.",
       "HUMANS": {
         "TITLE": "Uživatelé",
         "DESCRIPTION": "Uživatelé se autentizují interaktivně v prohlížečové relaci s výzvou k přihlášení.",
@@ -67,7 +67,7 @@
     },
     "ACTIONS": {
       "TITLE": "Akce",
-      "DESCRIPTION": "Spusťte vlastní kód na událostech, které se stane, když se vaši uživatelé autentizují v ZITADEL. Automatizujte vaše procesy, obohaťte metadata vašich uživatelů a jejich tokeny nebo informujte externí systémy.",
+      "DESCRIPTION": "Spusťte vlastní kód na událostech, které se stane, když se vaši uživatelé autentizují v Zitadel. Automatizujte vaše procesy, obohaťte metadata vašich uživatelů a jejich tokeny nebo informujte externí systémy.",
       "SCRIPTS": {
         "TITLE": "Skripty",
         "DESCRIPTION": "Napište svůj JavaScriptový kód jednou a spusťte jej v několika procesech."
@@ -97,23 +97,23 @@
         "NEXT": "Co teď?",
         "SAML": {
           "TITLE": "Nakonfiguruj svého SAML Identity Provider",
-          "DESCRIPTION": "ZITADEL je nakonfigurován. Nyní je třeba nakonfigurovat tvého SAML Identity Provider. Většina poskytovatelů ti umožní nahrát celý ZITADEL metadata XML. Jiní poskytovatelé požadují, abys poskytl jen některé specifické URL, jako je například entity ID (metadata URL), URL Assertion Consumer Service (ACS) nebo Single Logout URL."
+          "DESCRIPTION": "Zitadel je nakonfigurován. Nyní je třeba nakonfigurovat tvého SAML Identity Provider. Většina poskytovatelů ti umožní nahrát celý Zitadel metadata XML. Jiní poskytovatelé požadují, abys poskytl jen některé specifické URL, jako je například entity ID (metadata URL), URL Assertion Consumer Service (ACS) nebo Single Logout URL."
         },
         "CALLBACK": {
           "TITLE": "Nakonfiguruj svého {{ provider }} Identity Provider",
-          "DESCRIPTION": "Před konfigurací ZITADEL, předej tuto URL svému Identity Provider, aby bylo možné povolit přesměrování prohlížeče zpět na ZITADEL po autentizaci."
+          "DESCRIPTION": "Před konfigurací Zitadel, předej tuto URL svému Identity Provider, aby bylo možné povolit přesměrování prohlížeče zpět na Zitadel po autentizaci."
         },
         "JWT": {
           "TITLE": "Použij JWT jako federované identity",
-          "DESCRIPTION": "Identity Provider JWT ti umožňuje používat existující JWT tokeny jako federované identity. Tato funkce je praktická, pokud již máš vystavitele JWT. S JWT IdP můžeš tyto JWT použít k vytváření a aktualizaci uživatelů v ZITADEL na počkání."
+          "DESCRIPTION": "Identity Provider JWT ti umožňuje používat existující JWT tokeny jako federované identity. Tato funkce je praktická, pokud již máš vystavitele JWT. S JWT IdP můžeš tyto JWT použít k vytváření a aktualizaci uživatelů v Zitadel na počkání."
         },
         "LDAP": {
-          "TITLE": "Nakonfiguruj ZITADEL pro připojení k tvému LDAP Identity Provider",
-          "DESCRIPTION": "Poskytni údaje pro připojení k tvému LDAP serveru a nakonfiguruj mapování tvých LDAP atributů na atributy ZITADEL."
+          "TITLE": "Nakonfiguruj Zitadel pro připojení k tvému LDAP Identity Provider",
+          "DESCRIPTION": "Poskytni údaje pro připojení k tvému LDAP serveru a nakonfiguruj mapování tvých LDAP atributů na atributy Zitadel."
         },
         "AUTOFILL": {
           "TITLE": "Automatické vyplnění údajů uživatele",
-          "DESCRIPTION": "Vylepši zážitek svých uživatelů pomocí akce. Můžeš automaticky vyplnit registrační formulář ZITADEL hodnotami z identity provider."
+          "DESCRIPTION": "Vylepši zážitek svých uživatelů pomocí akce. Můžeš automaticky vyplnit registrační formulář Zitadel hodnotami z identity provider."
         },
         "ACTIVATE": {
           "TITLE": "Aktivuj IdP",
@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externí odkazy",
-        "DESCRIPTION": "Naveďte své uživatele k vlastním externím zdrojům zobrazeným na přihlašovací stránce. Než se uživatelé mohou zaregistrovat, musí přijmout podmínky služby a zásady ochrany osobních údajů. Změňte odkaz na dokumentaci nebo nastavte prázdný řetězec, abyste skryli tlačítko dokumentace z konzoly. Přidejte vlastní externí odkaz a vlastní text pro tento odkaz v konzole nebo je nastavte na prázdné, abyste toto tlačítko skryli."
+        "DESCRIPTION": "Naveďte své uživatele k vlastním externím zdrojům zobrazeným na přihlašovací stránce. Než se uživatelé mohou zaregistrovat, musí přijmout podmínky služby a zásady ochrany osobních údajů. Změňte odkaz na dokumentaci nebo nastavte prázdný řetězec, abyste skryli tlačítko dokumentace z konzoly pro správu. Přidejte vlastní externí odkaz a vlastní text pro tento odkaz v konzole pro správu nebo je nastavte na prázdné, abyste toto tlačítko skryli."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Nastavení SMTP",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "Nastavení SMS",
-        "DESCRIPTION": "Pro odemčení všech funkcí ZITADEL nakonfigurujte Twilio pro odesílání SMS zpráv vašim uživatelům."
+        "DESCRIPTION": "Pro odemčení všech funkcí Zitadel nakonfigurujte Twilio pro odesílání SMS zpráv vašim uživatelům."
       },
       "IAM_EVENTS": {
         "TITLE": "Události",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "Selhané události",
-        "DESCRIPTION": "Tato stránka zobrazuje všechny selhané události ve vaší instanci. Pokud se ZITADEL nechová tak, jak očekáváte, vždy nejdříve zkontrolujte tento seznam."
+        "DESCRIPTION": "Tato stránka zobrazuje všechny selhané události ve vaší instanci. Pokud se Zitadel nechová tak, jak očekáváte, vždy nejdříve zkontrolujte tento seznam."
       },
       "IAM_VIEWS": {
         "TITLE": "Pohledy",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "Nastavení bezpečnosti",
-        "DESCRIPTION": "Povol funkce ZITADEL, které mohou mít dopad na bezpečnost. Skutečně bys měl vědět, co děláš, než tyto nastavení změníš."
+        "DESCRIPTION": "Povol funkce Zitadel, které mohou mít dopad na bezpečnost. Skutečně bys měl vědět, co děláš, než tyto nastavení změníš."
       },
       "OIDC": {
         "TITLE": "Nastavení OpenID Connect",
@@ -187,11 +187,11 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "Spravujte své OIDC webové klíče pro bezpečné podepisování a ověřování tokenů ve vaší instanci ZITADEL.",
+        "DESCRIPTION": "Spravujte své OIDC webové klíče pro bezpečné podepisování a ověřování tokenů ve vaší instanci Zitadel.",
         "TABLE": {
           "TITLE": "Aktivní a budoucí webové klíče",
           "DESCRIPTION": "Vaše aktivní a nadcházející webové klíče. Aktivací nového klíče dojde k deaktivaci aktuálního.",
-          "NOTE": "Poznámka: Koncový bod JWKs OIDC vrací odpověď uložitelnou do mezipaměti (výchozí 5 minut). Vyhněte se příliš brzké aktivaci klíče, protože nemusí být dostupný v mezipaměti a klientům.",
+          "NOTE": "Poznámka: Koncový bod JWKs OIDC vrací odpověď uložitelnou do mezipaměti (výchozí 5 minut). Vyhněte se příliš brzké aktivaci klíče, protože nemusí být dostupný v mezipaměti a aplikacím.",
           "ACTIVATE": "Aktivovat další webový klíč",
           "ACTIVE": "Aktuálně aktivní",
           "NEXT": "Další v řadě",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "Vytvořit nový webový klíč",
-          "DESCRIPTION": "Vytvořením nového webového klíče jej přidáte do svého seznamu. ZITADEL používá klíče RSA2048 s hashováním SHA256 jako výchozí.",
+          "DESCRIPTION": "Vytvořením nového webového klíče jej přidáte do svého seznamu. Zitadel používá klíče RSA2048 s hashováním SHA256 jako výchozí.",
           "KEY_TYPE": "Typ klíče",
           "BITS": "Bity",
           "HASHER": "Hasher",
@@ -219,12 +219,12 @@
           "DC": "Když si pro svou organizaci nárokuješ doménu, uživatelé, kteří v názvu přihlášení nepoužívají tuto doménu, budou vyzváni ke změně svého přihlašovacího jména tak, aby odpovídalo nárokované doméně.",
           "INIT": "Když je uživatel vytvořen, obdrží e-mail s odkazem na nastavení svého hesla.",
           "PC": "Když uživatel změní své heslo, obdrží o tomto změně notifikaci, pokud máš tuto možnost povolenou v nastavení notifikací.",
-          "PL": "Když uživatel přidá metodu bezheslového přihlášení, musí ji aktivovat kliknutím na odkaz v e-mailu.",
+          "PL": "Když uživatel přidá metodu autentizace pomocí passkey, musí ji aktivovat kliknutím na odkaz v e-mailu.",
           "PR": "Když uživatel resetuje své heslo, obdrží e-mail s odkazem na nastavení nového hesla.",
           "VE": "Když uživatel změní svou e-mailovou adresu, obdrží e-mail s odkazem na ověření nové adresy.",
           "VP": "Když uživatel změní své telefonní číslo, obdrží SMS s kódem pro ověření nového čísla.",
-          "VEO": "Když uživatel přidá metodu jednorázového hesla přes e-mail, musí ji aktivovat zadáním kódu poslaného na jeho e-mailovou adresu.",
-          "VSO": "Když uživatel přidá metodu jednorázového hesla přes SMS, musí ji aktivovat zadáním kódu poslaného na jeho telefonní číslo.",
+          "VEO": "Když uživatel přidá metodu OTP přes e-mail, musí ji aktivovat zadáním kódu poslaného na jeho e-mailovou adresu.",
+          "VSO": "Když uživatel přidá metodu OTP přes SMS, musí ji aktivovat zadáním kódu poslaného na jeho telefonní číslo.",
           "IU": "Když se vytvoří pozvánka pro uživatele, obdrží e-mail s odkazem na nastavení své metody ověřování."
         }
       },
@@ -241,7 +241,7 @@
         },
         "LOGIN_NAME_PATTERN": {
           "TITLE": "Vzor přihlašovacího jména",
-          "DESCRIPTION": "Ovládej vzor přihlašovacích jmen svých uživatelů. ZITADEL vybere organizaci uživatele hned, jakmile zadá své přihlašovací jméno. Proto musí být přihlašovací jména jedinečná napříč všemi organizacemi. Pokud máš uživatele, kteří mají účet ve více doménách, můžeš zajistit jedinečnost přidáním přípony domény organizace k jejich přihlašovacím jménům."
+          "DESCRIPTION": "Ovládej vzor přihlašovacích jmen svých uživatelů. Zitadel vybere organizaci uživatele hned, jakmile zadá své přihlašovací jméno. Proto musí být přihlašovací jména jedinečná napříč všemi organizacemi. Pokud máš uživatele, kteří mají účet ve více doménách, můžeš zajistit jedinečnost přidáním přípony domény organizace k jejich přihlašovacím jménům."
         },
         "DOMAIN_VERIFICATION": {
           "TITLE": "Ověření domény",
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Přihlašovací formulář",
           "DESCRIPTION": "Přizpůsob si přihlašovací formulář.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Povoleno přihlášení pomocí uživatelského jména a hesla",
-            "DESCRIPTION": "Umožni svým uživatelům přihlásit se pomocí uživatelského jména a hesla. Pokud je tato možnost deaktivována, tvoji uživatelé se mohou přihlásit pouze pomocí bezheslového přihlášení nebo pomocí externího poskytovatele identity."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Místní ověření povoleno",
+            "DESCRIPTION": "Umožněte uživatelům přihlásit se pomocí uživatelského jména a hesla nebo ověření pomocí přístupového klíče (passkey). Pokud je tato možnost deaktivována, uživatelé se mohou přihlásit pouze pomocí externího poskytovatele identity."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Povolena registrace uživatelů",
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "Povoleno externí přihlášení",
-            "DESCRIPTION": "Umožni svým uživatelům přihlásit se pomocí externího poskytovatele identity namísto použití ZITADEL uživatele pro přihlášení."
+            "DESCRIPTION": "Umožni svým uživatelům přihlásit se pomocí externího poskytovatele identity namísto použití Zitadel uživatele pro přihlášení."
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "Obnovení hesla skryté",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "Začněte s ZITADEL",
-    "DISCLAIMER": "ZITADEL zachází s vašimi daty důvěrně a bezpečně.",
+    "WELCOME": "Začněte s Zitadel",
+    "DISCLAIMER": "Zitadel zachází s vašimi daty důvěrně a bezpečně.",
     "DISCLAIMERLINK": "Další informace",
     "DOCUMENTATION": {
-      "DESCRIPTION": "Rychlý start se ZITADEL."
+      "DESCRIPTION": "Rychlý start se Zitadel."
     },
     "GETSTARTED": {
-      "DESCRIPTION": "Rychlý start se ZITADEL."
+      "DESCRIPTION": "Rychlý start se Zitadel."
     },
     "QUICKSTARTS": {
       "LABEL": "První kroky",
-      "DESCRIPTION": "Rychlý start se ZITADEL."
+      "DESCRIPTION": "Rychlý start se Zitadel."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Zkratky",
@@ -366,7 +366,7 @@
     "COMPLETED": "dokončeno",
     "DISMISS": "Ne, děkuji, jsem profesionál.",
     "CARD": {
-      "TITLE": "Nastavte Váš ZITADEL",
+      "TITLE": "Nastavte Váš Zitadel",
       "DESCRIPTION": "Tento seznam pomáhá nastavit vaši instanci a provede vás nejdůležitějšími kroky"
     },
     "MILESTONES": {
@@ -392,7 +392,7 @@
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "Přihlašte se do své aplikace",
-        "description": "Integrujte vaši aplikaci se ZITADEL pro autentizaci a otestujte ji přihlášením se vaším administrátorským uživatelem.",
+        "description": "Integrujte vaši aplikaci se Zitadel pro autentizaci a otestujte ji přihlášením se vaším administrátorským uživatelem.",
         "action": "Přihlásit se"
       },
       "user.human.added": {
@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organizace",
     "PROJECT": "Projekty",
     "PROJECTOVERVIEW": "Přehled",
-    "PROJECTGRANTS": "Pověření",
+    "PROJECTGRANTS": "Grantové projekty",
     "ROLES": "Role",
     "GRANTEDPROJECT": "Pověřené projekty",
     "HUMANUSERS": "Uživatelé",
@@ -438,8 +438,8 @@
     "CUSTOMERPORTAL": "Zákaznický portál"
   },
   "QUICKSTART": {
-    "TITLE": "Integrovat ZITADEL do vaší aplikace",
-    "DESCRIPTION": "Integrujte ZITADEL do své aplikace nebo použijte některou z našich ukázek a začněte během několika minut.",
+    "TITLE": "Integrovat Zitadel do vaší aplikace",
+    "DESCRIPTION": "Integrujte Zitadel do své aplikace nebo použijte některou z našich ukázek a začněte během několika minut.",
     "BTN_START": "Vytvořit aplikaci",
     "BTN_LEARNMORE": "Zjistěte více",
     "CREATEPROJECTFORAPP": "Vytvořit projekt {{value}}",
@@ -623,6 +623,14 @@
           "restAsync": "REST Asynchronní"
         },
         "TYPES_DESCRIPTION": "Webhook, volání zpracovává stavový kód, ale odpověď je irelevantní\nCall, volání zpracovává stavový kód a odpověď\nAsync, volání nezpracovává ani stavový kód, ani odpověď, ale může být spuštěno paralelně s jinými cíli",
+        "PAYLOAD_TYPE": "Typ obsahu",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Neurčeno",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Šifrovaný JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standardní JSON payload s hlavičkou pro podpis a ověření.\nJWT: Payload je odeslán jako podepsané JWT. Ověření probíhá pomocí podpisu JWT.\nJWE: JWT je navíc zašifrován, aby se předešlo neoprávněnému přístupu k informacím v payloadu.",
         "ENDPOINT": "Koncový bod",
         "ENDPOINT_DESCRIPTION": "Zadejte koncový bod, kde je hostován váš kód. Ujistěte se, že je pro nás přístupný!",
         "TIMEOUT": "Časový limit",
@@ -648,7 +656,7 @@
     "IAM_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele",
     "IAM_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele ze všech organizací",
     "IAM_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele ze všech organizací",
-    "IAM_LOGIN_CLIENT": "Má oprávnění spravovat přihlašovací klienty",
+    "IAM_LOGIN_CLIENT": "Má oprávnění spravovat přihlašovací aplikace",
     "ORG_OWNER": "Má oprávnění nad celou organizací",
     "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
     "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",
@@ -736,7 +744,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "Vaše instance je blokována.",
-      "DESCRIPTION": "Požádejte svého správce instance ZITADEL, aby aktualizoval předplatné."
+      "DESCRIPTION": "Požádejte svého správce instance Zitadel, aby aktualizoval předplatné."
     },
     "INVALID_FORMAT": "Formát je neplatný.",
     "NOTANEMAIL": "Zadaná hodnota není e-mailová adresa.",
@@ -832,19 +840,19 @@
       "TABLESTATE": "Stav",
       "NAME": "Jméno",
       "EMPTY": "Není nastaveno žádné zařízení",
-      "TITLE": "Bezheslová autentizace",
-      "DESCRIPTION": "Přidat metody autentizace založené na WebAuthn pro přihlášení do ZITADEL bez hesla.",
+      "TITLE": "Autentizace pomocí Passkey",
+      "DESCRIPTION": "Přidat metody autentizace založené na WebAuthn pro přihlášení do Zitadel pomocí Passkey.",
       "MANAGE_DESCRIPTION": "Spravujte metody druhého faktoru vašich uživatelů.",
       "U2F": "Přidat metodu",
       "U2F_DIALOG_TITLE": "Ověřit autentizátor",
-      "U2F_DIALOG_DESCRIPTION": "Zadejte název pro vaše zařízení používané pro bezheslové přihlášení",
-      "U2F_SUCCESS": "Bezheslová autentizace úspěšně vytvořena!",
+      "U2F_DIALOG_DESCRIPTION": "Zadejte název pro váš Passkey Login",
+      "U2F_SUCCESS": "Autentizace pomocí Passkey úspěšně vytvořena!",
       "U2F_ERROR": "Během nastavení došlo k chybě!",
       "U2F_NAME": "Název autentizátoru",
       "TYPE": {
         "0": "Nejsou definovány žádné MFA",
-        "1": "Jednorázové heslo (OTP)",
-        "2": "Otisk prstu, bezpečnostní klíče, Face ID a další"
+        "1": "OTP",
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Žádný stav",
@@ -853,17 +861,17 @@
         "3": "Smazáno"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Odstranit metodu bezheslové autentizace",
-        "DELETE_DESCRIPTION": "Chystáte se odstranit metodu bezheslové autentizace. Jste si jisti?",
-        "ADD_TITLE": "Bezheslová autentizace",
-        "ADD_DESCRIPTION": "Vyberte jednu z dostupných možností pro vytvoření metody bezheslové autentizace.",
+        "DELETE_TITLE": "Odstranit Passkey",
+        "DELETE_DESCRIPTION": "Chystáte se odstranit Passkey. Jste si jisti?",
+        "ADD_TITLE": "Autentizace pomocí Passkey",
+        "ADD_DESCRIPTION": "Vyberte jednu z dostupných možností pro vytvoření Passkey.",
         "SEND_DESCRIPTION": "Pošlete si registrační odkaz na vaši e-mailovou adresu.",
         "SEND": "Odeslat registrační odkaz",
         "SENT": "E-mail byl úspěšně odeslán. Zkontrolujte vaši poštovní schránku pro pokračování v nastavení.",
         "QRCODE_DESCRIPTION": "Generovat QR kód pro skenování s jiným zařízením.",
         "QRCODE": "Generovat QR kód",
         "QRCODE_SCAN": "Skenovat tento QR kód pro pokračování v nastavení na vašem zařízení.",
-        "NEW_DESCRIPTION": "Použijte toto zařízení pro nastavení bezheslového přihlášení.",
+        "NEW_DESCRIPTION": "Použijte toto zařízení pro nastavení Passkey.",
         "NEW": "Přidat nové"
       }
     },
@@ -876,25 +884,25 @@
       "DESCRIPTION": "Přidat druhý faktor pro zajištění optimální bezpečnosti vašeho účtu.",
       "MANAGE_DESCRIPTION": "Spravujte metody druhého faktoru vašich uživatelů.",
       "ADD": "Přidat faktor",
-      "OTP": "Autentizační aplikace pro TOTP (časově omezené jednorázové heslo)",
+      "OTP": "Autentizační aplikace pro TOTP (časově omezené OTP)",
       "OTP_DIALOG_TITLE": "Přidat OTP",
       "OTP_DIALOG_DESCRIPTION": "Naskenujte QR kód pomocí autentizační aplikace a zadejte kód níže pro ověření a aktivaci metody OTP.",
-      "U2F": "Otisk prstu, bezpečnostní klíče, Face ID a další",
+      "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Ověřit faktor",
       "U2F_DIALOG_DESCRIPTION": "Zadejte název pro vaše univerzální vícefaktorové zařízení.",
       "U2F_SUCCESS": "Faktor úspěšně přidán!",
       "U2F_ERROR": "Během nastavení došlo k chybě!",
       "U2F_NAME": "Název autentizátoru",
-      "OTPSMS": "OTP (jednorázové heslo) s SMS",
-      "OTPEMAIL": "OTP (jednorázové heslo) s e-mailem",
-      "SETUPOTPSMSDESCRIPTION": "Chcete nastavit toto telefonní číslo jako druhý faktor OTP (jednorázové heslo)?",
+      "OTPSMS": "OTP s SMS",
+      "OTPEMAIL": "OTP s e-mailem",
+      "SETUPOTPSMSDESCRIPTION": "Chcete nastavit toto telefonní číslo jako druhý faktor OTP?",
       "OTPSMSSUCCESS": "Faktor OTP byl úspěšně nastaven.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Váš telefon musí být ověřen, aby bylo možné použít tuto metodu.",
       "OTPEMAILSUCCESS": "Faktor OTP byl úspěšně nastaven.",
       "TYPE": {
         "0": "Není definována žádná MFA",
-        "1": "Jednorázové heslo (OTP)",
-        "2": "Otisk prstu, bezpečnostní klíče, Face ID a další"
+        "1": "OTP",
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Žádný stav",
@@ -1134,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "Kód pro ověření e-mailu odeslán.",
       "OTPREMOVED": "OTP odstraněn.",
       "U2FREMOVED": "Faktor odstraněn.",
-      "PASSWORDLESSREMOVED": "Bezheslové přihlášení odstraněno.",
+      "PASSWORDLESSREMOVED": "Passkey odstraněn.",
       "INITIALPASSWORDSET": "Počáteční heslo nastaveno.",
       "PASSWORDNOTIFICATIONSENT": "Oznámení o změně hesla odesláno.",
       "PASSWORDCHANGED": "Heslo úspěšně změněno.",
@@ -1147,12 +1155,12 @@
       "MACHINEADDED": "Systémový uživatel vytvořen!",
       "DELETED": "Uživatel úspěšně smazán!",
       "UNLOCKED": "Uživatel úspěšně odemčen!",
-      "PASSWORDLESSREGISTRATIONSENT": "Odkaz pro registraci odeslán úspěšně.",
+      "PASSWORDLESSREGISTRATIONSENT": "Odkaz pro registraci Passkey odeslán úspěšně.",
       "SECRETGENERATED": "Tajemství úspěšně vygenerováno!",
       "SECRETREMOVED": "Tajemství úspěšně odstraněno!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Manažerské role v ZITADEL",
+      "TITLE": "Role správce Zitadel",
       "DESCRIPTION": "Zde jsou všechna členská oprávnění uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo IAM.",
       "ORGCONTEXT": "Vidíte všechny organizace a projekty, které souvisí s aktuálně vybranou organizací.",
       "USERCONTEXT": "Vidíte všechny organizace a projekty, na které máte oprávnění. Včetně jiných organizací.",
@@ -1218,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Povoleno selhat",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Varování",
-      "DESCRIPTION": "Pokud tuto nastavení zrušíte, může to způsobit, že uživatelé vaší organizace nebudou moci přihlašovat. Dále nebudete moci přístupovat do konzoly pro zrušení akce. Doporučujeme vytvořit administrátorského uživatele v samostatné organizaci nebo nejprve testovat skripty v prostředí pro vývoj nebo vývojové organizaci."
+      "DESCRIPTION": "Pokud tuto nastavení zrušíte, může to způsobit, že uživatelé vaší organizace nebudou moci přihlašovat. Dále nebudete moci přístupovat do konzoly pro správu pro zrušení akce. Doporučujeme vytvořit administrátorského uživatele v samostatné organizaci nebo nejprve testovat skripty v prostředí pro vývoj nebo vývojové organizaci."
     },
     "SCRIPT": "Skript",
     "FLOWTYPE": "Typ toku",
@@ -1404,7 +1412,7 @@
         "VERIFICATION_HTTP_URL_LABEL": "Očekávaná adresa URL:",
         "VERIFICATION_HTTP_FILE_LABEL": "Ověřovací soubor:",
         "VERIFICATION_SKIP": "Ověření můžete zatím přeskočit a pokračovat ve vytváření organizace, ale abyste mohli používat svou doménu, musíte tento krok dokončit!",
-        "VERIFICATION_VALIDATION_DESC": "Nemažte ověřovací kód, protože ZITADEL čas od času znovu zkontroluje vlastnictví vaší domény.",
+        "VERIFICATION_VALIDATION_DESC": "Nemažte ověřovací kód, protože Zitadel čas od času znovu zkontroluje vlastnictví vaší domény.",
         "VERIFICATION_NEWTOKEN_TITLE": "Vyžádejte si nový token",
         "VERIFICATION_VALIDATION_ONGOING": "Pro ověření vaší domény byla vybrána metoda {{ value }}. Kliknutím na tlačítko spustíte kontrolu ověření nebo resetujete proces ověření.",
         "VERIFICATION_SUCCESSFUL": "Doména byla úspěšně ověřena!",
@@ -1547,7 +1555,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1585,7 +1594,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Číslo odesílatele",
         "VERIFYSERVICESID": "ID služby ověření",
-        "VERIFYSERVICESID_DESCRIPTION": "Nastavení ID služby ověření umožňuje použití služby Twilio Verify místo služby Zprávy pro ověření telefonních čísel a SMS OTP.",
+        "VERIFYSERVICESID_DESCRIPTION": "Nastavení ID služby ověření umožňuje použití služby Twilio Verify místo služby Zprávy pro ověření telefonních čísel a OTP SMS.",
         "ADDED": "Twilio bylo úspěšně přidáno.",
         "UPDATED": "Twilio bylo úspěšně aktualizováno.",
         "REMOVED": "Twilio bylo odebráno",
@@ -1601,10 +1610,10 @@
         "2": "Ověření e-mailem",
         "3": "Ověření telefonem",
         "4": "Resetování hesla",
-        "5": "Inicializace bez hesla",
+        "5": "Inicializace Passkey",
         "6": "Tajemství pomocí aplikace",
-        "7": "Jednorázové heslo (OTP) - SMS",
-        "8": "Jednorázové heslo (OTP) - E-mail"
+        "7": "OTP - SMS",
+        "8": "OTP - E-mail"
       },
       "EXPIRY": "Expirace (v minutách)",
       "INCLUDEDIGITS": "Zahrnout čísla",
@@ -1626,8 +1635,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Výchozí organizace pro přihlášení",
       "LOGINDEFAULTORG_DESCRIPTION": "Přihlašovací rozhraní použije nastavení výchozí organizace (a ne z instance), pokud není nastaven žádný kontext organizace.",
-      "OIDCTOKENEXCHANGE": "Výměna tokenů OIDC",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Povolit experimentální typ udělení urn:ietf:params:oauth:grant-type:token-exchange pro bod tokenového bodu OIDC. Výměna tokenů lze použít k žádosti o tokeny s menším rozsahem nebo k impersonaci jiných uživatelů. Podívejte se na bezpečnostní politiku, abyste umožnili impersonaci na instanci.",
       "USERSCHEMA": "Schéma uživatele",
       "USERSCHEMA_DESCRIPTION": "Schémata uživatelů umožňují spravovat datová schémata uživatelů. Pokud je příznak povolen, budete moci používat nové API a jeho funkce.",
       "ACTIONS": "Akce",
@@ -1636,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Pokud je příznak aktivován, budete moci ukončit jedinou relaci z rozhraní pro přihlášení zadáním id_token s nárokem `sid` jako id_token_hint na koncovém bodu end_session. Poznamenejte si, že v současné době jsou v rozhraní pro přihlášení ukončeny všechny relace ze stejného uživatelského agenta (prohlížeče). Relace spravované prostřednictvím rozhraní API relace již umožňují ukončení jednotlivých relací.",
       "DEBUGOIDCPARENTERROR": "Debugování chyby rodiče OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Pokud je příznak povolen, chyba rodiče OIDC bude zaznamenána v konzoli.",
-      "ENABLEBACKCHANNELLOGOUT": "Povolit Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování klientů o ukončení relace u poskytovatele OpenID.",
       "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
@@ -1651,8 +1656,8 @@
         "DISABLED": "„Zakázáno“ je zděděno"
       },
       "RESET": "Nastavit vše na děděné",
-      "CONSOLEUSEV2USERAPI": "Použijte V2 API v konzoli pro vytvoření uživatele",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Když je tato příznak povolen, konzole používá V2 User API k vytvoření nových uživatelů. S V2 API nově vytvoření uživatelé začínají bez počátečního stavu.",
+      "CONSOLEUSEV2USERAPI": "Použijte V2 API v konzoli pro správu pro vytvoření uživatele",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Když je tato příznak povolen, konzole pro správu používá V2 User API k vytvoření nových uživatelů. S V2 API nově vytvoření uživatelé začínají bez počátečního stavu.",
       "LOGINV2": "Přihlášení V2",
       "LOGINV2_DESCRIPTION": "Povolením této možnosti se aktivuje nové přihlašovací rozhraní založené na TypeScriptu s vylepšeným zabezpečením, výkonem a přizpůsobitelností.",
       "LOGINV2_BASEURI": "Základní URI",
@@ -1680,7 +1685,7 @@
     "NOTIFICATION": {
       "TITLE": "Oznámení",
       "DESCRIPTION": "Určuje, při jakých změnách budou odesílána oznámení.",
-      "PASSWORDCHANGE": "Změna hesla"
+      "PASSWORDCHANGE": "Heslo změněno"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Upravte si přihlašovací stránku podle svého stylu a změňte její chování.",
@@ -1699,7 +1704,7 @@
       "RELEASE": "Uvolněte",
       "DROPFONT": "Přetáhněte soubor s fontem sem",
       "RELEASEFONT": "Uvolněte",
-      "USEOFLOGO": "Vaše logo bude použito jak na přihlašovací stránce, tak v e-mailech, zatímco ikona je používána pro menší prvky uživatelského rozhraní, jako je přepínač organizací v konzole",
+      "USEOFLOGO": "Vaše logo bude použito jak na přihlašovací stránce, tak v e-mailech, zatímco ikona je používána pro menší prvky uživatelského rozhraní, jako je přepínač organizací v konzole pro správu",
       "MAXSIZE": "Maximální velikost je omezena na 524 kB",
       "EMAILNOSVG": "Formát souboru SVG není podporován v e-mailech. Proto nahrajte své logo ve formátu PNG nebo jiném podporovaném formátu.",
       "MAXSIZEEXCEEDED": "Překročena maximální velikost 524 kB.",
@@ -1715,7 +1720,7 @@
       },
       "PREVIEW": {
         "TITLE": "Přihlášení",
-        "SECOND": "přihlaste se pomocí vašeho ZITADEL účtu.",
+        "SECOND": "přihlaste se pomocí vašeho Zitadel účtu.",
         "ERROR": "Uživatel nebyl nalezen!",
         "PRIMARYBUTTON": "další",
         "SECONDARYBUTTON": "registrovat"
@@ -1755,9 +1760,9 @@
       "POLICYLINK": "Odkaz na Zásady ochrany osobních údajů",
       "HELPLINK": "Odkaz na pomoc",
       "SUPPORTEMAIL": "E-mailová podpora",
-      "DOCSLINK": "Odkaz na Dokumenty (Console)",
-      "CUSTOMLINK": "Vlastní odkaz (Console)",
-      "CUSTOMLINKTEXT": "Text vlastního odkazu (Console)",
+      "DOCSLINK": "Odkaz na Dokumenty (Konzole pro správu)",
+      "CUSTOMLINK": "Vlastní odkaz (Konzole pro správu)",
+      "CUSTOMLINKTEXT": "Text vlastního odkazu (Konzole pro správu)",
       "SAVED": "Úspěšně uloženo!",
       "RESET_TITLE": "Obnovit výchozí hodnoty",
       "RESET_DESCRIPTION": "Chystáte se obnovit výchozí odkazy pro Podmínky služby a Zásady ochrany osobních údajů. Opravdu chcete pokračovat?"
@@ -1798,7 +1803,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -1830,10 +1836,10 @@
         "usernameChangeText": "Změna uživatelského jména",
         "verifyMfaOtpText": "Ověřit OTP",
         "verifyMfaU2fText": "Ověřit Univerzální druhý faktor",
-        "passwordlessPromptText": "Výzva k bezheslovému přístupu",
-        "passwordlessRegistrationDoneText": "Bezheslová registrace dokončena",
-        "passwordlessRegistrationText": "Bezheslová registrace",
-        "passwordlessText": "Bezheslový",
+        "passwordlessPromptText": "Výzva k Passkey",
+        "passwordlessRegistrationDoneText": "Registrace Passkey dokončena",
+        "passwordlessRegistrationText": "Registrace Passkey",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Přehled o externí registraci uživatelů"
       }
     },
@@ -1843,11 +1849,11 @@
         "INIT": "Inicializace",
         "VE": "Ověření e-mailu",
         "VP": "Ověření telefonu",
-        "VSO": "Ověření SMS OTP",
+        "VSO": "Ověření OTP SMS",
         "VEO": "Ověření e-mailu OTP",
         "PR": "Reset hesla",
         "DC": "Nárok na doménu",
-        "PL": "Bezheslový",
+        "PL": "Passkey",
         "PC": "Změna hesla",
         "IU": "Pozvat uživatele"
       },
@@ -1867,8 +1873,8 @@
         "changedate": "Datum změny",
         "username": "Uživatelské jméno",
         "tempUsername": "Dočasné uživatelské jméno",
-        "otp": "Jednorázové heslo",
-        "verifyUrl": "Ověřovací URL jednorázového hesla",
+        "otp": "OTP",
+        "verifyUrl": "Ověřovací URL OTP",
         "expiry": "Expirace",
         "applicationName": "Název aplikace"
       },
@@ -1911,7 +1917,7 @@
       "DEFAULTREDIRECTURI_DESC": "Definuje, kam bude uživatel přesměrován, pokud bylo přihlášení zahájeno bez kontextu aplikace (např. z e-mailu)",
       "ERRORMSGPOPUP": "Zobrazit chybu v dialogovém okně",
       "DISABLEWATERMARK": "Skrýt vodoznak",
-      "DISABLEWATERMARK_DESC": "Skrýt vodoznak Powered by ZITADEL v přihlašovacím rozhraní"
+      "DISABLEWATERMARK_DESC": "Skrýt vodoznak Powered by Zitadel v přihlašovacím rozhraní"
     },
     "RESET": "Resetovat na výchozí hodnoty instance",
     "CREATECUSTOM": "Vytvořit vlastní pravidlo",
@@ -1965,7 +1971,7 @@
       "CREATE_DESC": "Vložte název vašeho projektu.",
       "ROLE": "Role",
       "NOITEMS": "Žádné projekty",
-      "ZITADELPROJECT": "Tato nastavení jsou základní nastavení instance projektu ZITADEL. Pozor: Pokud provedete změny, ZITADEL se nemusí chovat podle očekávání.",
+      "ZITADELPROJECT": "Tato nastavení jsou základní nastavení instance projektu Zitadel. Pozor: Pokud provedete změny, Zitadel se nemusí chovat podle očekávání.",
       "TYPE": {
         "OWNED": "Vlastní projekty",
         "OWNED_SINGULAR": "Vlastní projekt",
@@ -2050,7 +2056,7 @@
       "DESCRIPTION": "Umožněte jiné organizaci využívat váš projekt.",
       "EDITTITLE": "Upravit oprávnění",
       "CREATE": {
-        "TITLE": "Vytvořit povolení pro organizaci",
+        "TITLE": "Vytvořit projektové oprávnění",
         "SEL_USERS": "Vyberte uživatele, kterým chcete povolit přístup",
         "SEL_PROJECT": "Vyhledejte projekt",
         "SEL_ROLES": "Vyberte role, které chcete do povolení přidat",
@@ -2060,7 +2066,7 @@
         "ORG_DESCRIPTION": "Chystáte se povolit uživateli organizace {{name}} přístup.",
         "ORG_DESCRIPTION_DESC": "Změňte kontext v hlavičce výše pro povolení přístupu uživateli jiné organizace.",
         "SEL_ORG_FORMFIELD": "Organizace",
-        "FOR_ORG": "Povolení je vytvořeno pro:"
+        "FOR_ORG": "Projektové oprávnění bude vytvořeno pro:"
       },
       "DETAIL": {
         "TITLE": "Povolení k projektu",
@@ -2173,7 +2179,7 @@
       "DEACTIVATED": "Deaktivováno.",
       "CREATED": "Projekt vytvořen.",
       "UPDATED": "Projekt změněn.",
-      "GRANTUPDATED": "Povolení změněno.",
+      "GRANTUPDATED": "Grant projektu změněno.",
       "DELETED": "Projekt smazán."
     }
   },
@@ -2344,7 +2350,7 @@
     "DELETE_SELECTION_TITLE": "Odstranit IDP",
     "DELETE_SELECTION_DESCRIPTION": "Chystáte se odstranit poskytovatele identity. Výsledné změny jsou nevratné. Opravdu to chcete udělat?",
     "FEDERATEDLOGOUTENABLED": "Federované odhlášení povoleno",
-    "FEDERATEDLOGOUTENABLED_DESC": "Je-li povoleno, uživatel bude odhlášen i z IdP, pokud ukončí relaci v ZITADEL.",
+    "FEDERATEDLOGOUTENABLED_DESC": "Je-li povoleno, uživatel bude odhlášen i z IdP, pokud ukončí relaci v Zitadel.",
     "EMPTY": "Žádný IDP není dostupný",
     "OIDC": {
       "GENERAL": "Obecné informace",
@@ -2384,8 +2390,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Bezheslové přihlášení",
-      "MULTIFACTORDESCRIPTION": "Definujte zde vaše vícefaktorové možnosti pro bezheslové ověřování.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Definujte zde vaše vícefaktorové možnosti pro autentizaci pomocí Passkey.",
       "SECONDFACTORTITLE": "Vícefaktorové ověřování",
       "SECONDFACTORDESCRIPTION": "Definujte další možné faktory, kterými lze zabezpečit ověřování heslem."
     },
@@ -2405,14 +2411,14 @@
     "TYPE": "Typ",
     "MULTIFACTORTYPES": {
       "0": "Neznámý",
-      "1": "Otisk prstu, bezpečnostní klíče, Face ID a další"
+      "1": "Passkey"
     },
     "SECONDFACTORTYPES": {
       "0": "Neznámý",
-      "1": "Jednorázové heslo pomocí autentizační aplikace (TOTP)",
-      "2": "Otisk prstu, bezpečnostní klíče, Face ID a další",
-      "3": "Jednorázové heslo e-mailem (Email OTP)",
-      "4": "Jednorázové heslo SMS (SMS OTP)",
+      "1": "OTP pomocí autentizační aplikace (TOTP)",
+      "2": "Passkey",
+      "3": "OTP e-mailem (OTP Email)",
+      "4": "OTP SMS (OTP SMS)",
       "5": "Obnovovací kódy"
     }
   },
@@ -2427,7 +2433,7 @@
       "DESCRIPTION": "Pro ověření můžete vybrat předdefinované nebo vlastní vytvořené poskytovatele.",
       "SELECTIDPS": "Poskytovatelé identity"
     },
-    "PASSWORDLESS": "Přihlášení bez hesla",
+    "PASSWORDLESS": "Přihlášení pomocí Passkey",
     "PASSWORDLESSTYPE": {
       "0": "Nepovoleno",
       "1": "Povoleno"
@@ -2436,7 +2442,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Poskytovatel SMTP",
-      "DESCRIPTION": "Toto jsou poskytovatelé SMTP pro vaši instanci ZITADEL. Aktivujte ten, který chcete používat k odesílání upozornění svým uživatelům.",
+      "DESCRIPTION": "Toto jsou poskytovatelé SMTP pro vaši instanci Zitadel. Aktivujte ten, který chcete používat k odesílání upozornění svým uživatelům.",
       "EMPTY": "Není k dispozici žádný poskytovatel SMTP",
       "ACTIVATED": "Aktivováno",
       "ACTIVATE": "Aktivujte poskytovatele",
@@ -2468,11 +2474,11 @@
         "NEXT_STEPS": "Další kroky",
         "ACTIVATE": {
           "TITLE": "Aktivujte svého poskytovatele SMTP",
-          "DESCRIPTION": "ZITADEL nemůže používat tohoto poskytovatele SMTP k odesílání upozornění, dokud jej neaktivujete. Pokud aktivujete tohoto poskytovatele, jakýkoli jiný aktivní poskytovatel bude nyní deaktivován."
+          "DESCRIPTION": "Zitadel nemůže používat tohoto poskytovatele SMTP k odesílání upozornění, dokud jej neaktivujete. Pokud aktivujete tohoto poskytovatele, jakýkoli jiný aktivní poskytovatel bude nyní deaktivován."
         },
         "DEACTIVATE": {
           "TITLE": "Deaktivujte svého poskytovatele SMTP",
-          "DESCRIPTION": "Pokud deaktivujete tohoto poskytovatele SMTP, ZITADEL jej nebude moci používat k odesílání upozornění, dokud jej znovu neaktivujete."
+          "DESCRIPTION": "Pokud deaktivujete tohoto poskytovatele SMTP, Zitadel jej nebude moci používat k odesílání upozornění, dokud jej znovu neaktivujete."
         },
         "SAVE_SETTINGS": "Uložte nastavení",
         "TEST": {
@@ -2633,8 +2639,8 @@
       "IDTOKENROLEASSERTION": "Role uživatele uvnitř ID tokenu",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Pokud je vybráno, požadované role ověřeného uživatele jsou přidány do ID tokenu.",
       "IDTOKENUSERINFOASSERTION": "Informace o uživateli uvnitř ID tokenu",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Umožňuje klientům získávat nároky (claims) na profil, email, telefon a adresu z ID tokenu.",
-      "CLOCKSKEW": "Umožňuje klientům zvládnout rozdíl času mezi OP a klientem. Doba trvání (0-5s) bude přidána k nároku exp a odečtena od iats, auth_time a nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Umožňuje aplikacím získávat nároky (claims) na profil, email, telefon a adresu z ID tokenu.",
+      "CLOCKSKEW": "Umožňuje aplikacím zvládnout rozdíl času mezi OP a aplikací. Doba trvání (0-5s) bude přidána k nároku exp a odečtena od iats, auth_time a nbf.",
       "RECOMMENDED": "doporučeno",
       "NOTRECOMMENDED": "nedoporučeno",
       "SELECTION": {
@@ -2652,7 +2658,8 @@
             "DESCRIPTION": "Single Page Aplikace (SPA) a obecně všechny JS frameworky spouštěné v prohlížečích"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2764,7 +2771,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",

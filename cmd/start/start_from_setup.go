@@ -1,12 +1,12 @@
 package start
 
 import (
-	"context"
 	"errors"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/setup"
 	"github.com/zitadel/zitadel/cmd/tls"
@@ -25,6 +25,10 @@ Requirements:
 - database is initialized
 `,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).Error("zitadel start-from-setup command failed")
+			}()
+
 			err = tls.ModeFromFlag(cmd)
 			if err != nil {
 				return err
@@ -40,7 +44,7 @@ Requirements:
 				return err
 			}
 
-			setupConfig, shutdown, err := setup.NewConfig(cmd.Context(), viper.GetViper())
+			setupConfig, shutdown, err := setup.NewConfig(cmd, viper.GetViper())
 			if err != nil {
 				return err
 			}
@@ -48,13 +52,17 @@ Requirements:
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()
 
-			setupSteps := setup.MustNewSteps(viper.New())
+			setupSteps, err := setup.NewSteps(cmd.Context(), viper.New())
+			if err != nil {
+				return err
+			}
 
-			setupCtx, cancel := context.WithCancel(cmd.Context())
-			setup.Setup(setupCtx, setupConfig, setupSteps, masterKey)
-			cancel()
+			err = setup.Setup(cmd.Context(), setupConfig, setupSteps, masterKey)
+			if err != nil {
+				return err
+			}
 
-			startConfig, _, err := NewConfig(cmd.Context(), viper.GetViper())
+			startConfig, _, err := NewConfig(cmd, viper.GetViper())
 			if err != nil {
 				return err
 			}

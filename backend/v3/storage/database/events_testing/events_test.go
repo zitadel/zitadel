@@ -17,11 +17,14 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
 	v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func getEnv(key, fallback string) string {
@@ -42,15 +45,18 @@ var ConnString = fmt.Sprintf(
 )
 
 var (
-	dbPool        *pgxpool.Pool
-	CTX           context.Context
-	IAMCTX        context.Context
-	Instance      *integration.Instance
-	SystemClient  system.SystemServiceClient
-	OrgClient     v2beta_org.OrganizationServiceClient
-	ProjectClient v2beta_project.ProjectServiceClient
-	AdminClient   admin.AdminServiceClient
-	MgmtClient    mgmt.ManagementServiceClient
+	dbPool              *pgxpool.Pool
+	CTX                 context.Context
+	IAMCTX              context.Context
+	Instance            *integration.Instance
+	SystemClient        system.SystemServiceClient
+	OrgClient           v2beta_org.OrganizationServiceClient
+	ProjectClient       v2beta_project.ProjectServiceClient
+	SessionClient       session.SessionServiceClient
+	UserClient          user.UserServiceClient
+	AdminClient         admin.AdminServiceClient
+	MgmtClient          mgmt.ManagementServiceClient
+	AuthorizationClient authorization.AuthorizationServiceClient
 )
 
 var pool database.Pool
@@ -63,12 +69,15 @@ func TestMain(m *testing.M) {
 		CTX = integration.WithSystemAuthorization(ctx)
 		Instance = integration.NewInstance(CTX)
 
-		IAMCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		IAMCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
 		SystemClient = integration.SystemClient()
 		OrgClient = Instance.Client.OrgV2beta
 		ProjectClient = Instance.Client.Projectv2Beta
+		SessionClient = Instance.Client.SessionV2
+		UserClient = Instance.Client.UserV2
 		AdminClient = Instance.Client.Admin
 		MgmtClient = Instance.Client.Mgmt
+		AuthorizationClient = Instance.Client.AuthorizationV2
 
 		defer func() {
 			_, err := Instance.Client.InstanceV2Beta.DeleteInstance(CTX, &v2beta.DeleteInstanceRequest{
