@@ -3,6 +3,8 @@ package domain
 import (
 	"context"
 	"time"
+
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 )
 
 // loggingInvoker decorates each command with logging.
@@ -19,6 +21,7 @@ func NewLoggingInvoker(next Invoker) *loggingInvoker {
 
 func (i *loggingInvoker) Invoke(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
 	start := time.Now()
+	logger := logging.FromCtx(ctx)
 	logger.InfoContext(ctx, "invoking", "name", executor.String())
 
 	err = i.execute(ctx, executor, opts)

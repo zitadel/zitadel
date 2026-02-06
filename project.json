@@ -8,35 +8,36 @@
       "command": "nx run @zitadel/devcontainer:compose up db"
     },
     "clean": {
-      "description": "Cleans all local-only files relating to the Zitadel platform (API, Login and Console)",
+      "description": "Cleans all local-only files relating to the Zitadel platform (API, Login and Management Console)",
       "dependsOn": [
         "@zitadel/api:clean",
         "@zitadel/login:clean",
-        "@zitadel/console:clean"
+        "@zitadel/console:clean",
+        "@zitadel/docs:clean"
       ]
     },
     "pack": {
-        "description": "Creates package archives for the API across all platforms and for the Login component, then generates a checksums.txt file containing the SHA256 checksums for all created archives.",
-        "dependsOn": [
-            "@zitadel/api:pack-linux-*",
-            "@zitadel/api:pack-darwin-*",
-            "@zitadel/api:pack-windows-*",
-            "@zitadel/login:pack"
-        ],
-        "executor": "nx:run-commands",
-        "options": {
-            "parallel": false,
-            "commands": [
-                "sha256sum .artifacts/pack/zitadel-*.tar.gz > .artifacts/pack/checksums.txt"
-            ]
-        },
-        "cache": true,
-        "inputs": [
-            "{workspaceRoot}/.artifacts/pack/zitadel-*.tar.gz"
-        ],
-        "outputs": [
-            "{workspaceRoot}/.artifacts/pack/checksums.txt"
+      "description": "Creates package archives for the API across all platforms and for the Login component, then generates a checksums.txt file containing the SHA256 checksums for all created archives.",
+      "dependsOn": [
+        "@zitadel/api:pack-linux-*",
+        "@zitadel/api:pack-darwin-*",
+        "@zitadel/api:pack-windows-*",
+        "@zitadel/login:pack"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "commands": [
+          "sha256sum .artifacts/pack/zitadel-*.tar.gz > .artifacts/pack/checksums.txt"
         ]
-    }    
+      },
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/.artifacts/pack/zitadel-*.tar.gz"
+      ],
+      "outputs": [
+        "{workspaceRoot}/.artifacts/pack/checksums.txt"
+      ]
+    }
   }
 }

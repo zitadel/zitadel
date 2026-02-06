@@ -1,9 +1,9 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Metadaten",
     "HOME": {
-      "TITLE": "Mit ZITADEL loslegen",
+      "TITLE": "Mit Zitadel loslegen",
       "NEXT": {
         "TITLE": "Die nächsten Schritte",
         "DESCRIPTION": "Führe die folgenden Schritte aus, um deine Anwendung zu sichern.",
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "Dokumentation",
-          "DESCRIPTION": "Erkunde die Wissensbasis von ZITADEL, um dich mit den Kernkonzepten und Ideen vertraut zu machen. Lerne, wie ZITADEL funktioniert und wie du es nutzen kannst."
+          "DESCRIPTION": "Erkunde die Wissensbasis von Zitadel, um dich mit den Kernkonzepten und Ideen vertraut zu machen. Lerne, wie Zitadel funktioniert und wie du es nutzen kannst."
         },
         "EXAMPLES": {
           "TITLE": "Beispiele und Software Development Kits",
-          "DESCRIPTION": "Durchstöbere unsere Beispiele und SDKs, um ZITADEL zusammen mit deinen bevorzugten Programmiersprachen und Werkzeugen zu nutzen."
+          "DESCRIPTION": "Durchstöbere unsere Beispiele und SDKs, um Zitadel zusammen mit deinen bevorzugten Programmiersprachen und Werkzeugen zu nutzen."
         }
       }
     },
@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekte",
-      "DESCRIPTION": "Ein Projekt enthält eine oder mehrere Anwendungen, die du nutzen kannst, um deine Benutzer zu authentifizieren. Zum Beispiel könntest du ein einziges Projekt mit 3 Anwendungen haben; eine für dein Web-Frontend, eine für deine mobile App und eine für dein Backend. Außerdem kannst du deine Benutzer mit Projekten autorisieren. Um Benutzern aus anderen Organisationen das Einloggen in deine Anwendungen zu erlauben, gewähre ihnen Zugriff auf dein Projekt.<br/><br/>Wenn du ein Projekt nicht finden kannst, kontaktiere den Projekteigentümer oder jemanden mit den entsprechenden Rechten, um Zugang zu erhalten.",
+      "DESCRIPTION": "Ein Projekt enthält eine oder mehrere Anwendungen, die du nutzen kannst, um deine Benutzer zu authentifizieren. Zum Beispiel könntest du ein einziges Projekt mit 3 Anwendungen haben; eine für dein Web-Frontend, eine für deine mobile Anwendung, und eine für dein Backend. Außerdem kannst du deine Benutzer mit Projekten autorisieren. Um Benutzern aus anderen Organisationen das Einloggen in deine Anwendungen zu erlauben, gewähre ihnen Zugriff auf dein Projekt.<br/><br/>Wenn du ein Projekt nicht finden kannst, kontaktiere den Projekteigentümer oder jemanden mit den entsprechenden Rechten, um Zugang zu erhalten.",
       "OWNED": {
         "TITLE": "Eigene Projekte",
         "DESCRIPTION": "Dies sind die Projekte, die du besitzt. Du kannst die Einstellungen, Berechtigungen und Anwendungen dieser Projekte verwalten."
@@ -67,7 +67,7 @@
     },
     "ACTIONS": {
       "TITLE": "Aktionen",
-      "DESCRIPTION": "Führe eigenen Code bei Ereignissen aus, die auftreten, während sich deine Benutzer bei ZITADEL authentifizieren. Automatisiere deine Prozesse, erweitere die Metadaten deiner Benutzer und deren Token oder benachrichtige externe Systeme.",
+      "DESCRIPTION": "Führe eigenen Code bei Ereignissen aus, die auftreten, während sich deine Benutzer bei Zitadel authentifizieren. Automatisiere deine Prozesse, erweitere die Metadaten deiner Benutzer und deren Token oder benachrichtige externe Systeme.",
       "SCRIPTS": {
         "TITLE": "Skripte",
         "DESCRIPTION": "Schreibe einmalig deinen JavaScript-Code und löse ihn in mehreren Flows aus."
@@ -97,23 +97,23 @@
         "NEXT": "Was nun?",
         "SAML": {
           "TITLE": "Konfiguriere deinen SAML-Identitätsanbieter",
-          "DESCRIPTION": "ZITADEL ist konfiguriert. Jetzt benötigt dein SAML-Identitätsanbieter eine Konfiguration. Die meisten Anbieter erlauben es dir, einfach die gesamte ZITADEL-Metadaten-XML hochzuladen. Andere Anbieter bitten dich, nur einige bestimmte URLs anzugeben, wie zum Beispiel die Entity-ID (Metadaten-URL), die Assertion Consumer Service (ACS)-URL oder die Single Logout-URL."
+          "DESCRIPTION": "Zitadel ist konfiguriert. Jetzt benötigt dein SAML-Identitätsanbieter eine Konfiguration. Die meisten Anbieter erlauben es dir, einfach die gesamte Zitadel-Metadaten-XML hochzuladen. Andere Anbieter bitten dich, nur einige bestimmte URLs anzugeben, wie zum Beispiel die Entity-ID (Metadaten-URL), die Assertion Consumer Service (ACS)-URL oder die Single Logout-URL."
         },
         "CALLBACK": {
           "TITLE": "Konfiguriere deinen {{ provider }}-Identitätsanbieter",
-          "DESCRIPTION": "Bevor du ZITADEL konfigurieren kannst, gib diese URL an deinen Identitätsanbieter weiter, um die Weiterleitung zurück zu ZITADEL nach der Authentifizierung zu ermöglichen."
+          "DESCRIPTION": "Bevor du Zitadel konfigurieren kannst, gib diese URL an deinen Identitätsanbieter weiter, um die Weiterleitung zurück zu Zitadel nach der Authentifizierung zu ermöglichen."
         },
         "JWT": {
           "TITLE": "Verwende JWTs als föderierte Identitäten",
-          "DESCRIPTION": "Der JWT-Identitätsanbieter ermöglicht es dir, deine vorhandenen JWT-Tokens als föderierte Identitäten zu nutzen. Diese Funktion ist praktisch, wenn du bereits einen Aussteller für JWTs hast. Mit einem JWT-IdP kannst du diese JWTs nutzen, um Benutzer in ZITADEL on-the-fly zu erstellen und zu aktualisieren."
+          "DESCRIPTION": "Der JWT-Identitätsanbieter ermöglicht es dir, deine vorhandenen JWT-Tokens als föderierte Identitäten zu nutzen. Diese Funktion ist praktisch, wenn du bereits einen Aussteller für JWTs hast. Mit einem JWT-IdP kannst du diese JWTs nutzen, um Benutzer in Zitadel on-the-fly zu erstellen und zu aktualisieren."
         },
         "LDAP": {
-          "TITLE": "Konfiguriere ZITADEL, um eine Verbindung zu deinem LDAP-Identitätsanbieter herzustellen",
-          "DESCRIPTION": "Gib die Verbindungsdetails zu deinem LDAP-Server an und konfiguriere die Zuordnung deiner LDAP-Attribute zu ZITADEL-Attributen."
+          "TITLE": "Konfiguriere Zitadel, um eine Verbindung zu deinem LDAP-Identitätsanbieter herzustellen",
+          "DESCRIPTION": "Gib die Verbindungsdetails zu deinem LDAP-Server an und konfiguriere die Zuordnung deiner LDAP-Attribute zu Zitadel-Attributen."
         },
         "AUTOFILL": {
           "TITLE": "Benutzerdaten automatisch ausfüllen",
-          "DESCRIPTION": "Verwende eine Aktion, um das Benutzererlebnis zu verbessern. Du kannst das Registrierungsformular von ZITADEL mit Daten des Identitätsanbieter vorab ausfüllen."
+          "DESCRIPTION": "Verwende eine Aktion, um das Benutzererlebnis zu verbessern. Du kannst das Registrierungsformular von Zitadel mit Daten des Identitätsanbieter vorab ausfüllen."
         },
         "ACTIVATE": {
           "TITLE": "Aktiviere den IdP",
@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externe Links",
-        "DESCRIPTION": "Leite die Benutzer zu benutzerdefinierten externen Ressourcen, die auf der Anmeldeseite angezeigt werden. Benutzer müssen die Nutzungsbedingungen und Datenschutzrichtlinien akzeptieren, bevor sie sich anmelden können. Ändere den Link zur Dokumentation oder lege eine leere Zeichenfolge fest, um den Dokumentations-Button in der Konsole auszublenden. Füge in der Konsole einen benutzerdefinierten externen Link und einen benutzerdefinierten Text für diesen Link hinzu oder lasse ihn leer, um diesen Button auszublenden."
+        "DESCRIPTION": "Leite die Benutzer zu benutzerdefinierten externen Ressourcen, die auf der Anmeldeseite angezeigt werden. Benutzer müssen die Nutzungsbedingungen und Datenschutzrichtlinien akzeptieren, bevor sie sich anmelden können. Ändere den Link zur Dokumentation oder lege eine leere Zeichenfolge fest, um den Dokumentations-Button in der Verwaltungskonsole auszublenden. Füge in der Verwaltungskonsole einen benutzerdefinierten externen Link und einen benutzerdefinierten Text für diesen Link hinzu oder lasse ihn leer, um diesen Button auszublenden."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP-Einstellungen",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS-Einstellungen",
-        "DESCRIPTION": "Um alle ZITADEL-Funktionen zu nutzen, konfiguriere Twilio, um SMS-Nachrichten an deine Benutzer zu senden."
+        "DESCRIPTION": "Um alle Zitadel-Funktionen zu nutzen, konfiguriere Twilio, um SMS-Nachrichten an deine Benutzer zu senden."
       },
       "IAM_EVENTS": {
         "TITLE": "Ereignisse",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "Fehlgeschlagene Ereignisse",
-        "DESCRIPTION": "Diese Seite zeigt alle fehlerhaften Ereignisse deiner Instanz. Wenn ZITADEL sich nicht wie erwartet verhält, überprüfe immer zuerst diese Liste."
+        "DESCRIPTION": "Diese Seite zeigt alle fehlerhaften Ereignisse deiner Instanz. Wenn Zitadel sich nicht wie erwartet verhält, überprüfe immer zuerst diese Liste."
       },
       "IAM_VIEWS": {
         "TITLE": "Datenbankansichten",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "Sicherheitseinstellungen",
-        "DESCRIPTION": "Aktiviere ZITADEL-Funktionen, die Auswirkungen auf die Sicherheit haben können. Du solltest wirklich wissen, was du tust, bevor du diese Einstellungen änderst."
+        "DESCRIPTION": "Aktiviere Zitadel-Funktionen, die Auswirkungen auf die Sicherheit haben können. Du solltest wirklich wissen, was du tust, bevor du diese Einstellungen änderst."
       },
       "OIDC": {
         "TITLE": "OpenID Connect Einstellungen",
@@ -187,11 +187,11 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "Verwalte deine OIDC Web Keys, um Tokens für deine ZITADEL-Instanz sicher zu signieren und zu validieren.",
+        "DESCRIPTION": "Verwalte deine OIDC Web Keys, um Tokens für deine Zitadel-Instanz sicher zu signieren und zu validieren.",
         "TABLE": {
           "TITLE": "Aktive und zukünftige Web Keys",
           "DESCRIPTION": "Deine aktiven und kommenden Web Keys. Das Aktivieren eines neuen Schlüssels deaktiviert den aktuellen.",
-          "NOTE": "Hinweis: Der JWKs OIDC-Endpunkt gibt eine zwischenspeicherbare Antwort zurück (Standard: 5 Min.). Vermeide es, einen Schlüssel zu früh zu aktivieren, da er möglicherweise noch nicht in Caches und Clients verfügbar ist.",
+          "NOTE": "Hinweis: Der JWKs OIDC-Endpunkt gibt eine zwischenspeicherbare Antwort zurück (Standard: 5 Min.). Vermeide es, einen Schlüssel zu früh zu aktivieren, da er möglicherweise noch nicht in Caches und Anwendungen verfügbar ist.",
           "ACTIVATE": "Nächsten Web Key aktivieren",
           "ACTIVE": "Derzeit aktiv",
           "NEXT": "Als Nächstes in der Warteschlange",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "Neuen Web Key erstellen",
-          "DESCRIPTION": "Das Erstellen eines neuen Web Keys fügt ihn zu deiner Liste hinzu. ZITADEL verwendet standardmäßig RSA2048-Schlüssel mit einem SHA256-Hasher.",
+          "DESCRIPTION": "Das Erstellen eines neuen Web Keys fügt ihn zu deiner Liste hinzu. Zitadel verwendet standardmäßig RSA2048-Schlüssel mit einem SHA256-Hasher.",
           "KEY_TYPE": "Schlüsseltyp",
           "BITS": "Bits",
           "HASHER": "Hasher",
@@ -219,12 +219,12 @@
           "DC": "Wenn du eine Domain für deine Organisation beanspruchst, werden Benutzer, die diese Domain nicht in ihrem Anmeldenamen verwenden, aufgefordert, ihren Anmeldenamen zu ändern, um ihn an die beanspruchte Domain anzupassen.",
           "INIT": "Wenn ein Benutzer erstellt wird, erhält er eine E-Mail mit einem Link, um sein Passwort festzulegen.",
           "PC": "Wenn ein Benutzer sein Passwort ändert, erhält er eine Benachrichtigung über die Änderung, wenn du dies in den Benachrichtigungseinstellungen aktiviert hast.",
-          "PL": "Wenn ein Benutzer eine passwortlose Authentifizierungsmethode hinzufügt, muss er sie aktivieren, indem er auf einen Link in einer E-Mail klickt.",
+          "PL": "Wenn ein Benutzer eine Passkey Authentifizierungsmethode hinzufügt, muss er sie aktivieren, indem er auf einen Link in einer E-Mail klickt.",
           "PR": "Wenn ein Benutzer sein Passwort zurücksetzt, erhält er eine E-Mail mit einem Link, um ein neues Passwort festzulegen.",
           "VE": "Wenn ein Benutzer seine E-Mail-Adresse ändert, erhält er eine E-Mail mit einem Link zur Verifizierung der neuen Adresse.",
           "VP": "Wenn ein Benutzer seine Telefonnummer ändert, erhält er eine SMS mit einem Code zur Verifizierung der neuen Nummer.",
-          "VEO": "Wenn ein Benutzer eine Einmalpasswort-Methode per E-Mail hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine E-Mail-Adresse gesendet wurde.",
-          "VSO": "Wenn ein Benutzer eine Einmalpasswort-Methode per SMS hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine Telefonnummer gesendet wurde.",
+          "VEO": "Wenn ein Benutzer eine OTP-Methode per E-Mail hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine E-Mail-Adresse gesendet wurde.",
+          "VSO": "Wenn ein Benutzer eine OTP-Methode per SMS hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine Telefonnummer gesendet wurde.",
           "IU": "Wenn ein Benutzer-Einladungscode erstellt wird, erhält er eine E-Mail mit einem Link zur Einstellung seiner Authentifizierungsmethode."
         }
       },
@@ -241,7 +241,7 @@
         },
         "LOGIN_NAME_PATTERN": {
           "TITLE": "Muster für Anmeldenamen",
-          "DESCRIPTION": "Erstelle ein Muster für die Anmeldenamen deiner Benutzer. ZITADEL wählt die Organisation deiner Benutzer aus, sobald sie ihren Anmeldenamen eingeben. Daher müssen die Anmeldenamen über alle Organisationen hinweg einzigartig sein. Wenn du Benutzer hast, die Konten in mehreren Domains haben, kannst du die Einzigartigkeit sicherstellen, indem du deine Anmeldenamen mit der Organisationsdomain ergänzt."
+          "DESCRIPTION": "Erstelle ein Muster für die Anmeldenamen deiner Benutzer. Zitadel wählt die Organisation deiner Benutzer aus, sobald sie ihren Anmeldenamen eingeben. Daher müssen die Anmeldenamen über alle Organisationen hinweg einzigartig sein. Wenn du Benutzer hast, die Konten in mehreren Domains haben, kannst du die Einzigartigkeit sicherstellen, indem du deine Anmeldenamen mit der Organisationsdomain ergänzt."
         },
         "DOMAIN_VERIFICATION": {
           "TITLE": "Domain-Verifizierung",
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Login-Formular",
           "DESCRIPTION": "Passe das Login-Formular an.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Benutzername und Passwort erlaubt",
-            "DESCRIPTION": "Erlaube deinen Benutzern, sich mit ihrem Benutzernamen und Passwort einzuloggen. Ist dies deaktiviert, können sich deine Benutzer nur mit passwortloser Authentifizierung oder einem externen Identitätsanbieter einloggen."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Lokale Authentifizierung erlaubt",
+            "DESCRIPTION": "Erlauben Sie Ihren Benutzern, sich mit ihrem Benutzernamen und Passwort oder per Passkey-Authentifizierung anzumelden. Wenn dies deaktiviert ist, können sich Ihre Benutzer nur über einen externen Identitätsanbieter anmelden."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Benutzerregistrierung erlaubt",
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "Externer Login erlaubt",
-            "DESCRIPTION": "Erlaube deinen Benutzern, sich mit einem externen Identitätsanbieter einzuloggen, anstatt den ZITADEL-Benutzer zum Anmelden zu verwenden."
+            "DESCRIPTION": "Erlaube deinen Benutzern, sich mit einem externen Identitätsanbieter einzuloggen, anstatt den Zitadel-Benutzer zum Anmelden zu verwenden."
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "Passwort-Reset ausgeblendet",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "Mit ZITADEL loslegen",
-    "DISCLAIMER": "ZITADEL behandelt Deine Daten vertraulich und sicher.",
+    "WELCOME": "Mit Zitadel loslegen",
+    "DISCLAIMER": "Zitadel behandelt Deine Daten vertraulich und sicher.",
     "DISCLAIMERLINK": "Mehr Informationen zur Sicherheit",
     "DOCUMENTATION": {
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Mit Zitadel schnell durchstarten."
     },
     "GETSTARTED": {
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Mit Zitadel schnell durchstarten."
     },
     "QUICKSTARTS": {
       "LABEL": "Erste Schritte",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Mit Zitadel schnell durchstarten."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Shortcuts",
@@ -386,13 +386,13 @@
         "action": "Projekt erstellen"
       },
       "APPLICATION_CREATED": {
-        "title": "Registriere deine App",
+        "title": "Registriere deine Anwendung",
         "description": "Registriere deine erste Web-, Nativ-, API- oder SAML-Applikation und konfiguriere den Authentification-Flow.",
-        "action": "App registrieren"
+        "action": "Anwendung registrieren"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Logge dich in deine App ein",
-        "description": "Integriere deine Applikation mit ZITADEL für die Authentifizierung und teste es, indem du dich mit deinem Admin-Benutzer einloggst.",
+        "title": "Logge dich in deine Anwendung ein",
+        "description": "Integriere deine Applikation mit Zitadel für die Authentifizierung und teste es, indem du dich mit deinem Admin-Benutzer einloggst.",
         "action": "Einloggen"
       },
       "user.human.added": {
@@ -438,8 +438,8 @@
     "CUSTOMERPORTAL": "Kundenportal"
   },
   "QUICKSTART": {
-    "TITEL": "Integriere ZITADEL in deine Anwendung",
-    "DESCRIPTION": "Integriere ZITADEL in deine Anwendung oder verwende eines unserer Beispiele, um in wenigen Minuten loszulegen.",
+    "TITEL": "Integriere Zitadel in deine Anwendung",
+    "DESCRIPTION": "Integriere Zitadel in deine Anwendung oder verwende eines unserer Beispiele, um in wenigen Minuten loszulegen.",
     "BTN_START": "Anwendung erstellen",
     "BTN_LEARNMORE": "Mehr erfahren",
     "CREATEPROJECTFORAPP": "Projekt erstellen {{value}}",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Der Dev-Modus ist standardmäßig aktiviert. Sie können Werte für die Produktion später aktualisieren.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Beispiele durchsuchen",
-    "DUPLICATEAPPRENAME": "Es gibt bereits eine App mit gleichem Namen. Bitte wähle einen anderen Namen.",
+    "DUPLICATEAPPRENAME": "Es gibt bereits eine Anwendung mit gleichem Namen. Bitte wähle einen anderen Namen.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Framework ändern",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Hat die Berechtigung zum Erstellen und Verwalten von Benutzern",
     "IAM_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer aller Organisationen auszugeben",
     "IAM_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer aller Organisationen auszugeben",
-    "IAM_LOGIN_CLIENT": "Hat die Berechtigung, Anmeldeclients zu verwalten",
+    "IAM_LOGIN_CLIENT": "Hat die Berechtigung, Anmeldeanwendungen zu verwalten",
     "ORG_OWNER": "Hat die Berechtigung für die gesamte Organisation",
     "ORG_USER_MANAGER": "Hat die Berechtigung, Benutzer der Organisation zu erstellen und zu verwalten",
     "ORG_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Organisation zu überprüfen",
@@ -744,7 +744,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "Deine Instanz ist blockiert.",
-      "DESCRIPTION": "Bitte kontaktiere den Administrator deiner ZITADEL Instanz."
+      "DESCRIPTION": "Bitte kontaktiere den Administrator deiner Zitadel Instanz."
     },
     "INVALID_FORMAT": "Das Format ist ungültig.",
     "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
@@ -840,19 +840,19 @@
       "TABLESTATE": "Status",
       "NAME": "Name",
       "EMPTY": "Kein Gerät definiert",
-      "TITLE": "Passwortlose Authentifizierungsmethoden",
-      "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich passwortlos anzumelden.",
+      "TITLE": "Passkey Authentifizierungsmethoden",
+      "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich mit einem Passkey anzumelden.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
       "U2F": "Methode hinzufügen",
       "U2F_DIALOG_TITLE": "Authentifikator hinzufügen",
-      "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Login an.",
-      "U2F_SUCCESS": "Passwortlos erfolgreich erstellt!",
+      "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Passkey Login an.",
+      "U2F_SUCCESS": "Passkey Authentifizierung erfolgreich erstellt!",
       "U2F_ERROR": "Ein Fehler ist aufgetreten!",
       "U2F_NAME": "Authentifikator Name",
       "TYPE": {
         "0": "Keine MFA definiert",
-        "1": "One Time Password (OTP)",
-        "2": "Fingerabdruck, Security Keys, Face ID und andere"
+        "1": "OTP",
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Kein Status",
@@ -861,17 +861,17 @@
         "3": "Gelöscht"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Passwortlose Authentifizierung entfernen",
-        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?",
-        "ADD_TITLE": "Passwortlose Authentifizierung",
-        "ADD_DESCRIPTION": "Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwortlosen Authentifizierungsmethode.",
+        "DELETE_TITLE": "Passkey Authentifizierung entfernen",
+        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passkey Authentifizierungsmethode zu entfernen. Sind sie sicher?",
+        "ADD_TITLE": "Passkey Authentifizierung",
+        "ADD_DESCRIPTION": "Wählen Sie eine der verfügbaren Optionen für das Erstellen einer Passkey Authentifizierungsmethode.",
         "SEND_DESCRIPTION": "Senden Sie sich einen Registrierungslink an Ihre E-Mail Adresse.",
         "SEND": "Registrierungslink senden",
         "SENT": "Die E-Mail wurde erfolgreich zugestellt. Kontrollieren Sie Ihr Postfach, um mit dem Setup fortzufahren.",
         "QRCODE_DESCRIPTION": "QR-Code zum Scannen mit einem anderen Gerät generieren.",
         "QRCODE": "QR-Code generieren",
         "QRCODE_SCAN": "Scannen Sie diesen QR-Code, um mit dem Setup auf Ihrem Gerät fortzufahren.",
-        "NEW_DESCRIPTION": "Verwenden Sie dieses Gerät um Passwortlos aufzusetzen.",
+        "NEW_DESCRIPTION": "Verwenden Sie dieses Gerät um einen Passkey aufzusetzen.",
         "NEW": "Hinzufügen"
       }
     },
@@ -884,25 +884,25 @@
       "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
       "ADD": "Faktor hinzufügen",
-      "OTP": "Authentikator App für TOTP (Time-based One-Time Password)",
+      "OTP": "Authentikator Anwendung für TOTP",
       "OTP_DIALOG_TITLE": "OTP hinzufügen",
-      "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
-      "U2F": "Fingerabdruck, Security Key, Face ID oder andere",
+      "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer TOTP Anwendung und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
+      "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Faktor hinzufügen",
       "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Authentikator an.",
       "U2F_SUCCESS": "Faktor erfolgreich hinzugefügt!",
       "U2F_ERROR": "Ein Fehler ist aufgetreten!",
       "U2F_NAME": "Authenticator Name",
-      "OTPSMS": "OTP (One-Time Password) mit SMS",
-      "OTPEMAIL": "OTP (One-Time Password) mit E-Mail",
-      "SETUPOTPSMSDESCRIPTION": "Möchten Sie diese Telefonnummer als zweiten OTP-Faktor (Einmalpasswort) einrichten?",
+      "OTPSMS": "OTP mit SMS",
+      "OTPEMAIL": "OTP mit E-Mail",
+      "SETUPOTPSMSDESCRIPTION": "Möchten Sie diese Telefonnummer als zweiten OTP-Faktor einrichten?",
       "OTPSMSSUCCESS": "OTP-Faktor erfolgrech hinzugefügt.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Um diese Methode nutzen zu können, muss Ihr Telefon verifiziert werden.",
       "OTPEMAILSUCCESS": "OTP-Faktor erfolgrech hinzugefügt.",
       "TYPE": {
         "0": "Keine MFA definiert",
         "1": "OTP",
-        "2": "Fingerabdruck, Security Key, Face ID oder andere"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Kein Status",
@@ -1142,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "Bestätigungscode per E-Mail gesendet.",
       "OTPREMOVED": "OTP entfernt.",
       "U2FREMOVED": "Faktor entfernt.",
-      "PASSWORDLESSREMOVED": "Passwortlos entfernt.",
+      "PASSWORDLESSREMOVED": "Passkey entfernt.",
       "INITIALPASSWORDSET": "Initiales Passwort gesetzt.",
       "PASSWORDNOTIFICATIONSENT": "Passwortänderung mitgeteilt.",
       "PASSWORDCHANGED": "Passwort geändert.",
@@ -1155,12 +1155,12 @@
       "MACHINEADDED": "Service-Benutzer erstellt!",
       "DELETED": "Benutzer erfolgreich gelöscht!",
       "UNLOCKED": "Benutzer erfolgreich freigeschaltet!",
-      "PASSWORDLESSREGISTRATIONSENT": "Link via E-Mail versendet.",
+      "PASSWORDLESSREGISTRATIONSENT": "Passkey Registrierungslink via E-Mail versendet.",
       "SECRETGENERATED": "Secret erfolgreich generiert!",
       "SECRETREMOVED": "Secret erfolgreich gelöscht!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL Manager-Rollen",
+      "TITLE": "Zitadel-Administratorrollen",
       "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder IAM-Detailseite aufrufen und modifizieren.",
       "ORGCONTEXT": "Sie sehen alle Organisationen und Projekte, die mit der aktuell gewählten Organisation in Verbindung stehen.",
       "USERCONTEXT": "Sie sehen alle Organisationen und Projekte auf denen Sie berechtigt sind inklusive aller zur Auswahl stehenden Organisationen.",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Scheitern erlaubt",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Warnung",
-      "DESCRIPTION": "Wenn du diese Einstellung deaktivierst, kann dies dazu führen, dass sich Benutzer deiner Organisation nicht mehr anmelden können. Außerdem kannst du dann nicht mehr auf die Konsole zugreifen, um die Aktion zu deaktivieren. Wir empfehlen, einen Administratorbenutzer in einer separaten Organisation zu erstellen oder Skripte zuerst in einer Entwicklungsumgebung oder einer Entwicklungsorganisation zu testen."
+      "DESCRIPTION": "Wenn du diese Einstellung deaktivierst, kann dies dazu führen, dass sich Benutzer deiner Organisation nicht mehr anmelden können. Außerdem kannst du dann nicht mehr auf die Verwaltungskonsole zugreifen, um die Aktion zu deaktivieren. Wir empfehlen, einen Administratorbenutzer in einer separaten Organisation zu erstellen oder Skripte zuerst in einer Entwicklungsumgebung oder einer Entwicklungsorganisation zu testen."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Typ",
@@ -1268,7 +1268,7 @@
     },
     "EVENTSTORE": {
       "TITLE": "IAM Speicher Administration",
-      "DESCRIPTION": "Verwalte Speicher-Einstellungen von ZITADEL."
+      "DESCRIPTION": "Verwalte Speicher-Einstellungen von Zitadel."
     },
     "MEMBER": {
       "TITLE": "Manager",
@@ -1412,7 +1412,7 @@
         "VERIFICATION_HTTP_URL_LABEL": "Erwartete URL:",
         "VERIFICATION_HTTP_FILE_LABEL": "Verifizierungsdatei:",
         "VERIFICATION_SKIP": "Sie können die Verifizierung vorerst überspringen und mit der Erstellung Ihrer Organisation fortfahren, aber um Ihre Domain nutzen zu können, muss dieser Schritt abgeschlossen sein!",
-        "VERIFICATION_VALIDATION_DESC": "Löschen Sie den Bestätigungscode nicht, da ZITADEL die Inhaberschaft Ihrer Domain von Zeit zu Zeit erneut überprüft.",
+        "VERIFICATION_VALIDATION_DESC": "Löschen Sie den Bestätigungscode nicht, da Zitadel die Inhaberschaft Ihrer Domain von Zeit zu Zeit erneut überprüft.",
         "VERIFICATION_NEWTOKEN_TITLE": "Fordern Sie ein neues Token an",
         "VERIFICATION_VALIDATION_ONGOING": "Zur Verifizierung Ihrer Domain wurde die Methode {{ value }} ausgewählt. Klicken Sie auf die Schaltfläche, um eine Verifizierungsprüfung auszulösen oder den Verifizierungsprozess zurückzusetzen.",
         "VERIFICATION_SUCCESSFUL": "Domain erfolgreich verifiziert!",
@@ -1555,7 +1555,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1609,10 +1610,10 @@
         "2": "Email Verifikationscode",
         "3": "Telefonnummer Verifikationscode",
         "4": "Passwort Zurücksetzen Code",
-        "5": "Passwordless Initialisierungscode",
-        "6": "Applicationssecret",
-        "7": "One Time Password (OTP) - SMS",
-        "8": "One Time Password (OTP) - Email"
+        "5": "Passkey Initialisierungscode",
+        "6": "Anwendungsgeheimnis",
+        "7": "OTP - SMS",
+        "8": "OTP - Email"
       },
       "EXPIRY": "Ablauf (in Minuten)",
       "INCLUDEDIGITS": "Enthält Zahlen",
@@ -1634,8 +1635,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Standardorganisation für die Anmeldung",
       "LOGINDEFAULTORG_DESCRIPTION": "Die Anmelde-Benutzeroberfläche verwendet die Einstellungen der Standardorganisation (und nicht von der Instanz), wenn kein Organisationskontext festgelegt ist.",
-      "OIDCTOKENEXCHANGE": "OIDC Token-Austausch",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktivieren Sie den experimentellen urn:ietf:params:oauth:grant-type:token-exchange-Grant-Typ für den OIDC-Token-Endpunkt. Der Token-Austausch kann verwendet werden, um Token mit einem geringeren Umfang anzufordern oder andere Benutzer zu impersonieren. Siehe die Sicherheitsrichtlinie, um die Impersonation auf einer Instanz zu erlauben.",
       "USERSCHEMA": "Benutzerschema",
       "USERSCHEMA_DESCRIPTION": "Benutzerschemata ermöglichen das Verwalten von Datenschemata von Benutzern. Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "ACTIONS": "Aktionen",
@@ -1644,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Wenn das Flag aktiviert ist, können Sie eine einzelne Sitzung über die Login-Benutzeroberfläche beenden, indem Sie einen id_token mit einem `sid` Claim als id_token_hint am Endpunkt end_session übergeben. Beachten Sie, dass derzeit alle Sitzungen desselben Benutzeragenten (Browser) in der Login-Benutzeroberfläche beendet werden. Sitzungen, die über die Session API verwaltet werden, ermöglichen bereits die Beendigung einzelner Sitzungen.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Wenn die Flagge aktiviert ist, wird der OIDC-Elternfehler in der Konsole protokolliert.",
-      "ENABLEBACKCHANNELLOGOUT": "Backchannel-Logout aktivieren",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Der Back-Channel-Logout implementiert OpenID Connect Back-Channel Logout 1.0 und kann verwendet werden, um Clients über die Beendigung der Sitzung beim OpenID-Provider zu benachrichtigen.",
       "PERMISSIONCHECKV2": "Berechtigungsprüfung V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "STATES": {
@@ -1659,8 +1656,8 @@
         "DISABLED": "„Deaktiviert“ wird vererbt"
       },
       "RESET": "Alle auf Erben setzen",
-      "CONSOLEUSEV2USERAPI": "Verwende die V2-API in der Konsole zur Erstellung von Benutzern",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wenn diese Option aktiviert ist, verwendet die Konsole die V2 User API, um neue Benutzer zu erstellen. Mit der V2 API starten neu erstellte Benutzer nicht im Initial Zustand.",
+      "CONSOLEUSEV2USERAPI": "Verwende die V2-API in der Verwaltungskonsole zur Erstellung von Benutzern",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wenn diese Option aktiviert ist, verwendet die Verwaltungskonsole die V2 User API, um neue Benutzer zu erstellen. Mit der V2 API starten neu erstellte Benutzer nicht im Initial Zustand.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Durch das Aktivieren wird das neue TypeScript-basierte Login-UI mit verbesserter Sicherheit, Leistung und Anpassbarkeit aktiviert.",
       "LOGINV2_BASEURI": "Basis-URI",
@@ -1688,7 +1685,7 @@
     "NOTIFICATION": {
       "TITLE": "Benachrichtigung",
       "DESCRIPTION": "Legt fest, bei welchen Änderungen Benachrichtigungen gesendet werden",
-      "PASSWORDCHANGE": "Passwortänderung"
+      "PASSWORDCHANGE": "Passwort geändert"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Verleihen Sie dem Login Ihren benutzerdefinierten Style und passen Sie das Verhalten an.",
@@ -1707,7 +1704,7 @@
       "RELEASE": "Jetzt loslassen",
       "DROPFONT": "Fontdatei hier ablegen",
       "RELEASEFONT": "Jetzt loslassen",
-      "USEOFLOGO": "Ihr Logo wird im Login sowie emails verwendet, während das Icon für kleinere UI-Elemente wie den Organisationswechsel in der Konsole verwendet wird",
+      "USEOFLOGO": "Ihr Logo wird im Login sowie emails verwendet, während das Icon für kleinere UI-Elemente wie den Organisationswechsel in der Verwaltungskonsole verwendet wird",
       "MAXSIZE": "Die maximale Grösse von Uploads ist mit 524kB begrenzt",
       "EMAILNOSVG": "Das SVG Dateiformat wird nicht in E-Mails unterstützt. Laden Sie deshalb ihr Logo im PNG oder einem anderen unterstützten Format hoch.",
       "MAXSIZEEXCEEDED": "Maximale Grösse von 524kB überschritten",
@@ -1723,7 +1720,7 @@
       },
       "PREVIEW": {
         "TITLE": "Anmeldung",
-        "SECOND": "mit ZITADEL-Konto anmelden.",
+        "SECOND": "mit Zitadel-Konto anmelden.",
         "ERROR": "Benutzer konnte nicht gefunden werden!",
         "PRIMARYBUTTON": "Weiter",
         "SECONDARYBUTTON": "Registrieren"
@@ -1763,9 +1760,9 @@
       "POLICYLINK": "Link zur den Datenschutzrichtlinien",
       "HELPLINK": "Link zur Hilfestellung",
       "SUPPORTEMAIL": "Support E-Mail",
-      "DOCSLINK": "Link zu Dokumenten (Console)",
-      "CUSTOMLINK": "Benutzerdefinierter Link (Console)",
-      "CUSTOMLINKTEXT": "Benutzerdefinierter Linktext (Console)",
+      "DOCSLINK": "Link zu Dokumenten (Verwaltungskonsole)",
+      "CUSTOMLINK": "Benutzerdefinierter Link (Verwaltungskonsole)",
+      "CUSTOMLINKTEXT": "Benutzerdefinierter Linktext (Verwaltungskonsole)",
       "SAVED": "Gespeichert!",
       "RESET_TITLE": "Standardwerte wiederherstellen",
       "RESET_DESCRIPTION": "Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"
@@ -1806,7 +1803,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1838,10 +1836,10 @@
         "usernameChangeText": "Benutzernamenwechsel",
         "verifyMfaOtpText": "OTP Verifikation",
         "verifyMfaU2fText": "Universeller Zweitfaktor Verifikation",
-        "passwordlessPromptText": "Passwortlos Aufforderung",
-        "passwordlessRegistrationDoneText": "Passwortlos setzen erfolgreich",
-        "passwordlessRegistrationText": "Passwortlos Registrierung",
-        "passwordlessText": "Passwortlos",
+        "passwordlessPromptText": "Passkey Aufforderung",
+        "passwordlessRegistrationDoneText": "Passkey setzen erfolgreich",
+        "passwordlessRegistrationText": "Passkey Registrierung",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Externe Registrierung Benutzer Übersicht"
       }
     },
@@ -1855,7 +1853,7 @@
         "VEO": "E-Mail-OTP überprüfen",
         "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
-        "PL": "Passwortlos",
+        "PL": "Passkey",
         "PC": "Passwordwechsel",
         "IU": "Benutzer einladen"
       },
@@ -1875,8 +1873,8 @@
         "changedate": "Änderungsdatum",
         "username": "Username",
         "tempUsername": "Temp. Username",
-        "otp": "Einmalpasswort",
-        "verifyUrl": "URL zur Überprüfung des Einmalpassworts",
+        "otp": "OTP",
+        "verifyUrl": "URL zur Überprüfung des OTPs",
         "expiry": "Ablauf",
         "applicationName": "Anwendungsname"
       },
@@ -1918,7 +1916,7 @@
       "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne App-Kontext gestartet wurde (z. B. von Mail)",
       "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
       "DISABLEWATERMARK": "Wasserzeichen ausblenden",
-      "DISABLEWATERMARK_DESC": "Powered by ZITADEL Wasserzeichen in der Login-Oberfläche ausblenden"
+      "DISABLEWATERMARK_DESC": "Powered by Zitadel Wasserzeichen in der Login-Oberfläche ausblenden"
     },
     "RESET": "Auf Instanzeinstellung zurücksetzen",
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",
@@ -1972,7 +1970,7 @@
       "CREATE_DESC": "Gebe den Namen ein.",
       "ROLE": "Rolle",
       "NOITEMS": "Keine Projekte",
-      "ZITADELPROJECT": "Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn Du diese änderst, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt.",
+      "ZITADELPROJECT": "Diese Einstellungen gehören zum Zitadel-Projekt. Wenn Du diese änderst, verhält sich Zitadel möglicherweise nicht wie beabsichtigt.",
       "TYPE": {
         "OWNED": "Eigene Projekte",
         "OWNED_SINGULAR": "Eigenes Projekt",
@@ -2325,8 +2323,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "Vorname-Attribut",
+    "LASTNAMEATTRIBUTE": "Nachname-Attribut",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2348,7 +2346,7 @@
     "DELETE_SELECTION_TITLE": "Identitätsanbieter löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "FEDERATEDLOGOUTENABLED": "Federated Logout aktiviert",
-    "FEDERATEDLOGOUTENABLED_DESC": "Wenn aktiviert, wird der Benutzer auch vom IdP abgemeldet, wenn der Benutzer die Sitzung in ZITADEL beendet.",
+    "FEDERATEDLOGOUTENABLED_DESC": "Wenn aktiviert, wird der Benutzer auch vom IdP abgemeldet, wenn der Benutzer die Sitzung in Zitadel beendet.",
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
       "TITLE": "OIDC Konfiguration",
@@ -2383,8 +2381,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Passwordless",
-      "MULTIFACTORDESCRIPTION": "Definieren Sie hier Ihre Multifaktoren, die sie für die Passwortlose Authentifizierung verwenden können.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Definieren Sie hier Ihre Multifaktoren, die sie für die Passkey Authentifizierung verwenden können.",
       "SECONDFACTORTITLE": "Multifaktor Authentifizierung",
       "SECONDFACTORDESCRIPTION": "Definieren Sie hier weitere mögliche Faktoren, mit dem die sie Ihre Passwordauthentifizierung absichern können."
     },
@@ -2404,14 +2402,14 @@
     "TYPE": "Typ",
     "MULTIFACTORTYPES": {
       "0": "Unknown",
-      "1": "Fingerabdruck, Security Keys, Face ID und andere"
+      "1": "Passkey"
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "One Time Password per Authenticator App (TOTP)",
-      "2": "Fingerabdruck, Security Keys, Face ID und andere",
-      "3": "One Time Password per Email (Email OTP)",
-      "4": "One Time Password per SMS (SMS OTP)",
+      "1": "OTP per Authenticator Anwendung (TOTP)",
+      "2": "Passkey",
+      "3": "OTP per Email (OTP Email)",
+      "4": "OTP per SMS (OTP SMS)",
       "5": "Wiederherstellungscodes"
     }
   },
@@ -2426,7 +2424,7 @@
       "DESCRIPTION": "Sie können vordefinierte oder selbsterstellten Provider auswählen",
       "SELECTIDPS": "Identitätsanbieter"
     },
-    "PASSWORDLESS": "Passwortloser Login",
+    "PASSWORDLESS": "Passkey Login",
     "PASSWORDLESSTYPE": {
       "0": "Nicht erlaubt",
       "1": "Erlaubt"
@@ -2435,7 +2433,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP-Anbieter",
-      "DESCRIPTION": "Dies sind die SMTP-Anbieter für diese ZITADEL-Instanz. Aktiviere diejenige, die du zum Senden von Benachrichtigungen an deine Benutzer verwenden möchtest.",
+      "DESCRIPTION": "Dies sind die SMTP-Anbieter für diese Zitadel-Instanz. Aktiviere diejenige, die du zum Senden von Benachrichtigungen an deine Benutzer verwenden möchtest.",
       "EMPTY": "Kein SMTP-Anbieter verfügbar",
       "ACTIVATED": "Aktiviert",
       "ACTIVATE": "Anbieter aktivieren",
@@ -2467,11 +2465,11 @@
         "NEXT_STEPS": "Nächste Schritte",
         "ACTIVATE": {
           "TITLE": "Aktivieren Sie Ihren SMTP-Anbieter",
-          "DESCRIPTION": "ZITADEL kann diesen SMTP-Anbieter nicht zum Senden von Benachrichtigungen verwenden, bis Sie ihn aktivieren. Wenn Sie diesen Anbieter aktivieren, werden alle anderen aktiven Anbieter nun deaktiviert."
+          "DESCRIPTION": "Zitadel kann diesen SMTP-Anbieter nicht zum Senden von Benachrichtigungen verwenden, bis Sie ihn aktivieren. Wenn Sie diesen Anbieter aktivieren, werden alle anderen aktiven Anbieter nun deaktiviert."
         },
         "DEACTIVATE": {
           "TITLE": "Deaktivieren Sie Ihren SMTP-Anbieter",
-          "DESCRIPTION": "Wenn Sie diesen SMTP-Anbieter deaktivieren, kann ZITADEL ihn nicht zum Versenden von Benachrichtigungen verwenden, bis Sie ihn erneut aktivieren."
+          "DESCRIPTION": "Wenn Sie diesen SMTP-Anbieter deaktivieren, kann Zitadel ihn nicht zum Versenden von Benachrichtigungen verwenden, bis Sie ihn erneut aktivieren."
         },
         "SAVE_SETTINGS": "Speichern Sie Ihre Einstellungen",
         "TEST": {
@@ -2632,8 +2630,8 @@
       "IDTOKENROLEASSERTION": "Benutzerrollen im ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Bei Auswahl werden dem ID Token die angeforderten Rollen des authentifizierten Benutzers hinzugefügt.",
       "IDTOKENUSERINFOASSERTION": "User Info im ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Ermöglich OIDC clients claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
-      "CLOCKSKEW": "ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Ermöglich OIDC Anwendungen claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
+      "CLOCKSKEW": "ermöglicht Anwendungen, den Taktversatz von OP und Anwendung zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen.",
       "RECOMMENDED": "Empfohlen",
       "NOTRECOMMENDED": "nicht empfohlen",
       "SELECTION": {
@@ -2651,7 +2649,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) und grundsätzlich alle im Browser aufgeführten JS-Frameworks"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2763,7 +2762,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

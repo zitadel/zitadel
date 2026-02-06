@@ -15,11 +15,6 @@
     "lint-staged": "lint-staged",
     "clean": "rm -rf node_modules .next cypress"
   },
-  "pnpm": {
-    "overrides": {
-      "form-data@>=4.0.0 <4.0.4": ">=4.0.4"
-    }
-  },
   "git": {
     "pre-commit": "lint-staged"
   },
@@ -60,6 +55,7 @@
     "@types/node": "^22.19.3",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
+    "@types/uuid": "^10.0.0",
     "@types/tinycolor2": "^1.4.6",
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",

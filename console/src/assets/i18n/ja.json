@@ -1,9 +1,9 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "メタデータ",
     "HOME": {
-      "TITLE": "ZITADELを始めよう",
+      "TITLE": "Zitadelを始めよう",
       "NEXT": {
         "TITLE": "次のステップ",
         "DESCRIPTION": "アプリケーションを保護するために、以下のステップを完了してください。",
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "ドキュメント",
-          "DESCRIPTION": "ZITADELの知識ベースを探索して、コアコンセプトやアイデアに慣れ親しんでください。ZITADELの機能と使い方を学びましょう。"
+          "DESCRIPTION": "Zitadelの知識ベースを探索して、コアコンセプトやアイデアに慣れ親しんでください。Zitadelの機能と使い方を学びましょう。"
         },
         "EXAMPLES": {
           "TITLE": "例とソフトウェア開発キット",
-          "DESCRIPTION": "例やSDKを参照して、お気に入りのプログラミング言語やツールと一緒にZITADELを使用してください。"
+          "DESCRIPTION": "例やSDKを参照して、お気に入りのプログラミング言語やツールと一緒にZitadelを使用してください。"
         }
       }
     },
@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "プロジェクト",
-      "DESCRIPTION": "プロジェクトは、ユーザーを認証するために使用できる1つ以上のアプリケーションをホストします。例えば、Webフロントエンド、モバイルアプリ、バックエンド用にそれぞれ1つずつ、合計3つのアプリケーションを持つ単一のプロジェクトを持つことができます。また、プロジェクトでユーザーに権限を与えることもできます。他の組織のユーザーがあなたのアプリケーションにログインできるようにするには、プロジェクトへのアクセスを許可してください。<br/><br/>プロジェクトが見つからない場合は、プロジェクトの所有者または対応する権利を持つ人に連絡してアクセスを取得してください。",
+      "DESCRIPTION": "プロジェクトは、ユーザーを認証するために使用できる1つ以上のアプリケーションをホストします。例えば、Webフロントエンド、モバイルアプリケーション、バックエンド用にそれぞれ1つずつ、合計3つのアプリケーションを持つ単一のプロジェクトを持つことができます。また、プロジェクトでユーザーに権限を与えることもできます。他の組織のユーザーがあなたのアプリケーションにログインできるようにするには、プロジェクトへのアクセスを許可してください。<br/><br/>プロジェクトが見つからない場合は、プロジェクトの所有者または対応する権利を持つ人に連絡してアクセスを取得してください。",
       "OWNED": {
         "TITLE": "所有しているプロジェクト",
         "DESCRIPTION": "これらはあなたが所有しているプロジェクトです。これらのプロジェクトの設定、権限、アプリケーションを管理できます。"
@@ -67,7 +67,7 @@
     },
     "ACTIONS": {
       "TITLE": "アクション",
-      "DESCRIPTION": "ユーザーがZITADELで認証される際のイベントにカスタムコードを実行します。プロセスを自動化し、ユーザーのメタデータとトークンを豊かにしたり、外部システムに通知したりします。",
+      "DESCRIPTION": "ユーザーがZitadelで認証される際のイベントにカスタムコードを実行します。プロセスを自動化し、ユーザーのメタデータとトークンを豊かにしたり、外部システムに通知したりします。",
       "SCRIPTS": {
         "TITLE": "スクリプト",
         "DESCRIPTION": "JavaScriptコードを一度書いて、複数のフローでトリガーします。"
@@ -97,23 +97,23 @@
         "NEXT": "次は？",
         "SAML": {
           "TITLE": "SAML IDプロバイダーを設定する",
-          "DESCRIPTION": "ZITADELは設定されました。次に、SAML IDプロバイダーの設定が必要です。ほとんどのプロバイダーでは、ZITADELのメタデータXML全体をアップロードするだけで済みます。他のプロバイダーでは、エンティティID（メタデータURL）、Assertion Consumer Service (ACS) URL、またはシングルログアウトURLなど、特定のURLのみを提供するよう求められる場合があります。"
+          "DESCRIPTION": "Zitadelは設定されました。次に、SAML IDプロバイダーの設定が必要です。ほとんどのプロバイダーでは、ZitadelのメタデータXML全体をアップロードするだけで済みます。他のプロバイダーでは、エンティティID（メタデータURL）、Assertion Consumer Service (ACS) URL、またはシングルログアウトURLなど、特定のURLのみを提供するよう求められる場合があります。"
         },
         "CALLBACK": {
           "TITLE": "{{ provider }} IDプロバイダーを設定する",
-          "DESCRIPTION": "ZITADELを設定する前に、このURLをIDプロバイダーに渡して、認証後にブラウザがZITADELにリダイレクトするようにしてください。"
+          "DESCRIPTION": "Zitadelを設定する前に、このURLをIDプロバイダーに渡して、認証後にブラウザがZitadelにリダイレクトするようにしてください。"
         },
         "JWT": {
           "TITLE": "JWTをフェデレーテッドアイデンティティとして使用する",
-          "DESCRIPTION": "JWT IDプロバイダーを使用すると、既存のJWTトークンをフェデレーテッドアイデンティティとして使用できます。JWTの発行者がすでにある場合に便利な機能です。JWT IdPを使用すると、これらのJWTを使用してZITADELでユーザーを即座に作成および更新できます。"
+          "DESCRIPTION": "JWT IDプロバイダーを使用すると、既存のJWTトークンをフェデレーテッドアイデンティティとして使用できます。JWTの発行者がすでにある場合に便利な機能です。JWT IdPを使用すると、これらのJWTを使用してZitadelでユーザーを即座に作成および更新できます。"
         },
         "LDAP": {
-          "TITLE": "LDAP IDプロバイダーに接続するためにZITADELを設定する",
-          "DESCRIPTION": "LDAPサーバーへの接続詳細を提供し、LDAP属性をZITADEL属性にマッピングする設定を行ってください。"
+          "TITLE": "LDAP IDプロバイダーに接続するためにZitadelを設定する",
+          "DESCRIPTION": "LDAPサーバーへの接続詳細を提供し、LDAP属性をZitadel属性にマッピングする設定を行ってください。"
         },
         "AUTOFILL": {
           "TITLE": "ユーザーデータの自動入力",
-          "DESCRIPTION": "アクションを使用してユーザーの体験を向上させます。IDプロバイダーからの値でZITADELの登録フォームを事前に入力することができます。"
+          "DESCRIPTION": "アクションを使用してユーザーの体験を向上させます。IDプロバイダーからの値でZitadelの登録フォームを事前に入力することができます。"
         },
         "ACTIVATE": {
           "TITLE": "IdPを有効にする",
@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "外部リンク",
-        "DESCRIPTION": "ログイン ページに表示されるカスタム外部リソースにユーザーを誘導します。ユーザーはサインアップする前に、サービス利用規約とプライバシー ポリシーに同意する必要があります。ドキュメントへのリンクを変更するか、空の文字列を設定してコンソールからドキュメント ボタンを非表示にします。カスタム外部リンクとそのリンクのカスタム テキストをコンソールに追加するか、それらを空に設定してそのボタンを非表示にします。"
+        "DESCRIPTION": "ログイン ページに表示されるカスタム外部リソースにユーザーを誘導します。ユーザーはサインアップする前に、サービス利用規約とプライバシー ポリシーに同意する必要があります。ドキュメントへのリンクを変更するか、空の文字列を設定して管理コンソールからドキュメント ボタンを非表示にします。カスタム外部リンクとそのリンクのカスタム テキストを管理コンソールに追加するか、それらを空に設定してそのボタンを非表示にします。"
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP設定",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS設定",
-        "DESCRIPTION": "ZITADELのすべての機能を解放するために、ユーザーにSMSメッセージを送信するためにTwilioを設定します。"
+        "DESCRIPTION": "Zitadelのすべての機能を解放するために、ユーザーにSMSメッセージを送信するためにTwilioを設定します。"
       },
       "IAM_EVENTS": {
         "TITLE": "イベント",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "失敗したイベント",
-        "DESCRIPTION": "このページには、インスタンスの失敗したイベントがすべて表示されます。ZITADELが期待通りに動作しない場合は、まずこのリストを確認してください。"
+        "DESCRIPTION": "このページには、インスタンスの失敗したイベントがすべて表示されます。Zitadelが期待通りに動作しない場合は、まずこのリストを確認してください。"
       },
       "IAM_VIEWS": {
         "TITLE": "ビュー",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "セキュリティ設定",
-        "DESCRIPTION": "セキュリティに影響を与えるZITADELの機能を有効にします。これらの設定を変更する前に、何をしているかを正確に理解することが重要です。"
+        "DESCRIPTION": "セキュリティに影響を与えるZitadelの機能を有効にします。これらの設定を変更する前に、何をしているかを正確に理解することが重要です。"
       },
       "OIDC": {
         "TITLE": "OpenID Connect設定",
@@ -187,11 +187,11 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "ZITADELインスタンスのトークンを安全に署名および検証するために、OIDC Webキーを管理します。",
+        "DESCRIPTION": "Zitadelインスタンスのトークンを安全に署名および検証するために、OIDC Webキーを管理します。",
         "TABLE": {
           "TITLE": "アクティブおよび今後のWebキー",
           "DESCRIPTION": "現在アクティブなWebキーと、今後使用予定のWebキーです。新しいキーをアクティブ化すると、現在のキーは無効になります。",
-          "NOTE": "注意: JWKs OIDCエンドポイントはキャッシュ可能なレスポンスを返します（デフォルト5分）。キーを早くアクティブ化しすぎると、キャッシュやクライアントでまだ利用できない可能性があります。",
+          "NOTE": "注意: JWKs OIDCエンドポイントはキャッシュ可能なレスポンスを返します（デフォルト5分）。キーを早くアクティブ化しすぎると、キャッシュやアプリケーションでまだ利用できない可能性があります。",
           "ACTIVATE": "次のWebキーをアクティブ化",
           "ACTIVE": "現在アクティブ",
           "NEXT": "次のキュー",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "新しいWebキーを作成",
-          "DESCRIPTION": "新しいWebキーを作成すると、リストに追加されます。ZITADELはデフォルトでRSA2048キーとSHA256ハッシュを使用します。",
+          "DESCRIPTION": "新しいWebキーを作成すると、リストに追加されます。ZitadelはデフォルトでRSA2048キーとSHA256ハッシュを使用します。",
           "KEY_TYPE": "キーの種類",
           "BITS": "ビット",
           "HASHER": "ハッシュ方式",
@@ -219,12 +219,12 @@
           "DC": "組織のドメインを主張すると、そのドメインをログイン名に使用していないユーザーは、主張されたドメインに合わせてログイン名を変更するよう促されます。",
           "INIT": "ユーザーが作成されると、パスワードを設定するリンクが記載されたメールを受け取ります。",
           "PC": "ユーザーがパスワードを変更すると、通知設定でこれを有効にした場合、変更に関する通知を受け取ります。",
-          "PL": "ユーザーがパスワードレス認証方法を追加すると、メールのリンクをクリックしてそれをアクティブにする必要があります。",
+          "PL": "ユーザーがパスキー認証方法を追加すると、メールのリンクをクリックしてそれをアクティブにする必要があります。",
           "PR": "ユーザーがパスワードをリセットすると、新しいパスワードを設定するリンクが記載されたメールを受け取ります。",
           "VE": "ユーザーがメールアドレスを変更すると、新しいアドレスを検証するリンクが記載されたメールを受け取ります。",
           "VP": "ユーザーが電話番号を変更すると、新しい番号を検証するコードが記載されたSMSを受け取ります。",
-          "VEO": "ユーザーがメール経由でワンタイムパスワードの方法を追加すると、それをアクティブにするためにメールに送信されたコードを入力する必要があります。",
-          "VSO": "ユーザーがSMS経由でワンタイムパスワードの方法を追加すると、それをアクティブにするために電話番号に送信されたコードを入力する必要があります。",
+          "VEO": "ユーザーがメール経由でOTPの方法を追加すると、それをアクティブにするためにメールに送信されたコードを入力する必要があります。",
+          "VSO": "ユーザーがSMS経由でOTPの方法を追加すると、それをアクティブにするために電話番号に送信されたコードを入力する必要があります。",
           "IU": "ユーザー招待コードが作成されると、認証方法を設定するためのリンクを含むメールが送信されます。"
         }
       },
@@ -234,7 +234,7 @@
       },
       "DOMAINS": {
         "TITLE": "ドメイン設定",
-        "DESCRIPTION": "ドメインに対する制限を定義し、ログイン名のパターンを設定します。ZITADELは、ログイン名を入力した瞬間にユーザーの組織を選択します。したがって、ログイン名はすべての組織で一意である必要があります。複数のドメインにアカウントを持つユーザーがいる場合は、ログイン名に組織のドメインを追加することで一意性を保証できます。",
+        "DESCRIPTION": "ドメインに対する制限を定義し、ログイン名のパターンを設定します。Zitadelは、ログイン名を入力した瞬間にユーザーの組織を選択します。したがって、ログイン名はすべての組織で一意である必要があります。複数のドメインにアカウントを持つユーザーがいる場合は、ログイン名に組織のドメインを追加することで一意性を保証できます。",
         "REQUIRE_VERIFICATION": {
           "TITLE": "カスタムドメインの検証が必要",
           "DESCRIPTION": "これが有効になっている場合、組織のドメインはドメインディスカバリーまたはユーザーネームサフィックスに使用できる前に検証する必要があります。"
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "ログインフォーム",
           "DESCRIPTION": "ログインフォームをカスタマイズします。",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "ユーザー名とパスワードが許可",
-            "DESCRIPTION": "ユーザーがユーザー名とパスワードでログインできるようにします。これが無効になっている場合、ユーザーはパスワードレス認証または外部IDプロバイダーを使用してのみログインできます。"
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "ローカル認証を許可",
+            "DESCRIPTION": "ユーザーがユーザー名とパスワード、またはパスキー認証でログインできるようにします。これが無効になっている場合、ユーザーは外部IDプロバイダーを使用してのみログインできます。"
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "ユーザー登録が許可",
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "外部ログインが許可",
-            "DESCRIPTION": "ユーザーがZITADELユーザーを使用する代わりに外部IDプロバイダーでログインできるようにします。"
+            "DESCRIPTION": "ユーザーがZitadelユーザーを使用する代わりに外部IDプロバイダーでログインできるようにします。"
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "パスワードリセットは非表示です",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "ZITADELをはじめる",
-    "DISCLAIMER": "ZITADELはあなたのデータを機密かつ安全に扱います。",
+    "WELCOME": "Zitadelをはじめる",
+    "DISCLAIMER": "Zitadelはあなたのデータを機密かつ安全に扱います。",
     "DISCLAIMERLINK": "さらに詳しく",
     "DOCUMENTATION": {
-      "DESCRIPTION": "ZITADELをすぐにはじめる。"
+      "DESCRIPTION": "Zitadelをすぐにはじめる。"
     },
     "GETSTARTED": {
-      "DESCRIPTION": "ZITADELをすぐにはじめる。"
+      "DESCRIPTION": "Zitadelをすぐにはじめる。"
     },
     "QUICKSTARTS": {
       "LABEL": "最初のステップ",
-      "DESCRIPTION": "ZITADELをすぐにはじめる。"
+      "DESCRIPTION": "Zitadelをすぐにはじめる。"
     },
     "SHORTCUTS": {
       "SHORTCUTS": "ショートカット",
@@ -366,7 +366,7 @@
     "COMPLETED": "完了",
     "DISMISS": "熟知しているので必要ありません。",
     "CARD": {
-      "TITLE": "ZITADELの起動",
+      "TITLE": "Zitadelの起動",
       "DESCRIPTION": "このチェックリストを使用して、重要な手順を確認しながらインスタンスをセットアップします。"
     },
     "MILESTONES": {
@@ -386,13 +386,13 @@
         "action": "プロジェクトを作成"
       },
       "APPLICATION_CREATED": {
-        "title": "アプリを登録する",
+        "title": "アプリケーションを登録する",
         "description": "Web、ネイティブ、API、またはSAMLアプリケーションを登録し、認証フローをセットアップします。",
-        "action": "アプリを登録する"
+        "action": "アプリケーションを登録する"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "アプリにログインする",
-        "description": "アプリケーションをZITADELと統合して認証し、管理者ユーザーでログインしてテストします。",
+        "title": "アプリケーションにログインする",
+        "description": "アプリケーションをZitadelと統合して認証し、管理者ユーザーでログインしてテストします。",
         "action": "ログイン"
       },
       "user.human.added": {
@@ -438,8 +438,8 @@
     "CUSTOMERPORTAL": "カスタマーポータル"
   },
   "QUICKSTART": {
-    "TITLE": "ZITADELをアプリケーションに統合する",
-    "DESCRIPTION": "あなたのアプリケーションにZITADELを組み込むか、当社のサンプルを使って数分で始められます。",
+    "TITLE": "Zitadelをアプリケーションに統合する",
+    "DESCRIPTION": "あなたのアプリケーションにZitadelを組み込むか、当社のサンプルを使って数分で始められます。",
     "BTN_START": "アプリケーションの作成",
     "BTN_LEARNMORE": "さらに詳しく",
     "CREATEPROJECTFORAPP": "プロジェクトの作成 {{value}}",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "開発モードはデフォルトで有効になっています。実稼働用の値は後で更新できます。",
     "GUIDE": "ガイド",
     "BROWSEEXAMPLES": "サンプルを見る",
-    "DUPLICATEAPPRENAME": "同じ名前のアプリがすでに存在します。別の名前を選択してください。",
+    "DUPLICATEAPPRENAME": "同じ名前のアプリケーションがすでに存在します。別の名前を選択してください。",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "変更の枠組み",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "ユーザーの作成および管理する権限を持ちます",
     "IAM_ADMIN_IMPERSONATOR": "すべての組織の管理者およびエンドユーザーになりすます権限を持っています",
     "IAM_END_USER_IMPERSONATOR": "すべての組織のエンドユーザーになりすます権限を持っています",
-    "IAM_LOGIN_CLIENT": "ログインクライアントを管理する権限を持っています",
+    "IAM_LOGIN_CLIENT": "ログインアプリケーションを管理する権限を持っています",
     "ORG_OWNER": "組織全体に対する権限を持ちます",
     "ORG_USER_MANAGER": "組織のユーザーを作成および管理する権限を持ちます",
     "ORG_OWNER_VIEWER": "組織全体を閲覧する権限を持ちます",
@@ -744,7 +744,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "あなたのインスタンスはブロックされています。",
-      "DESCRIPTION": "ZITADELインスタンス管理者にサブスクリプションの更新を依頼してください。"
+      "DESCRIPTION": "Zitadelインスタンス管理者にサブスクリプションの更新を依頼してください。"
     },
     "INVALID_FORMAT": "不正なフォーマットです",
     "NOTANEMAIL": "入力された値がメールアドレスではありません。",
@@ -840,19 +840,19 @@
       "TABLESTATE": "ステータス",
       "NAME": "名前",
       "EMPTY": "デバイスセットはありません",
-      "TITLE": "パスワードレス認証",
-      "DESCRIPTION": "WebAuthnベースの認証方法を追加して、ZITADELにパスワードレスでログオンします。",
+      "TITLE": "パスキー認証",
+      "DESCRIPTION": "WebAuthnベースの認証方法を追加して、Zitadelにパスキーでログオンします。",
       "MANAGE_DESCRIPTION": "二段階認証を管理する。",
       "U2F": "認証方法を追加する",
       "U2F_DIALOG_TITLE": "Authenticatorの認証",
-      "U2F_DIALOG_DESCRIPTION": "使用済みのパスワードレスログインの名前を入力する",
-      "U2F_SUCCESS": "パスワードレス認証が正常に作成されました！",
+      "U2F_DIALOG_DESCRIPTION": "使用済みのパスキーログインの名前を入力する",
+      "U2F_SUCCESS": "パスキー認証が正常に作成されました！",
       "U2F_ERROR": "セットアップ中のエラーが発生しました！",
       "U2F_NAME": "認証者名",
       "TYPE": {
         "0": "MFAは定義されていません",
-        "1": "ワンタイムパスワード（OTP）",
-        "2": "指紋、セキュリティキー、フェイスIDなど"
+        "1": "OTP",
+        "2": "パスキー"
       },
       "STATE": {
         "0": "状態なし",
@@ -861,17 +861,17 @@
         "3": "削除"
       },
       "DIALOG": {
-        "DELETE_TITLE": "パスワードレス認証の削除",
-        "DELETE_DESCRIPTION": "パスワードレス認証を削除しようとしています。本当によろしいですか？",
-        "ADD_TITLE": "パスワードレス認証",
-        "ADD_DESCRIPTION": "パスワードレス認証方法を作成するための、利用可能なオプションのいずれかを選択する。",
+        "DELETE_TITLE": "パスキー認証の削除",
+        "DELETE_DESCRIPTION": "パスキー認証を削除しようとしています。本当によろしいですか？",
+        "ADD_TITLE": "パスキー認証",
+        "ADD_DESCRIPTION": "パスキー認証方法を作成するための、利用可能なオプションのいずれかを選択する。",
         "SEND_DESCRIPTION": "メールアドレスに登録リンクを送信する。",
         "SEND": "登録リンクを送信する",
         "SENT": "メールは正常に配信されました。セットアップを続行するには、メールボックスを確認してください。",
         "QRCODE_DESCRIPTION": "別のデバイスでスキャンするためのQRコードを生成する。",
         "QRCODE": "QRコードを生成する",
         "QRCODE_SCAN": "このQRコードをスキャンして、デバイスのセットアップを続行する。",
-        "NEW_DESCRIPTION": "このデバイスを使用して、パスワードレス認証をセットアップする。",
+        "NEW_DESCRIPTION": "このデバイスを使用して、パスキー認証をセットアップする。",
         "NEW": "新規追加"
       }
     },
@@ -884,25 +884,25 @@
       "DESCRIPTION": "二要素認証を追加して、アカウントに最適なセキュリティを確保します。",
       "MANAGE_DESCRIPTION": "ユーザーの二要素認証を管理する。",
       "ADD": "二要素認証を追加する",
-      "OTP": "TOTP用認証アプリ（ワンタイム・パスワード）",
+      "OTP": "TOTP認証アプリケーション",
       "OTP_DIALOG_TITLE": "OTPの追加",
-      "OTP_DIALOG_DESCRIPTION": "認証アプリでQRコードを読み取り、下記のコードを入力することで、OTP方式の確認と有効化ができます。",
-      "U2F": "指紋、セキュリティキー、フェイスIDなど",
+      "OTP_DIALOG_DESCRIPTION": "認証アプリケーションでQRコードを読み取り、下記のコードを入力することで、OTP方式の確認と有効化ができます。",
+      "U2F": "パスキー",
       "U2F_DIALOG_TITLE": "二要素認証の検証",
       "U2F_DIALOG_DESCRIPTION": "使用済みの二要素認証の名前を入力する。",
       "U2F_SUCCESS": "二要素認証が正常に追加されました！",
       "U2F_ERROR": "セットアップ中にエラーが発生しました！",
       "U2F_NAME": "認証者名",
       "OTPSMS": "OTP（ワンタイムパスワード）とSMS",
-      "OTPEMAIL": "電子メールによる OTP (ワンタイム パスワード)",
+      "OTPEMAIL": "電子メールによる OTP",
       "SETUPOTPSMSDESCRIPTION": "この電話番号を OTP (ワンタイム パスワード) の第 2 要素として設定しますか?",
       "OTPSMSSUCCESS": "OTP 係数の設定が成功しました。",
       "OTPSMSPHONEMUSTBEVERIFIED": "この方法を使用するには、電話を認証する必要があります。",
       "OTPEMAILSUCCESS": "OTP 係数の設定が成功しました。",
       "TYPE": {
         "0": "MFAは定義されていません",
-        "1": "ワンタイムパスワード（OTP）",
-        "2": "指紋、セキュリティキー、フェイスIDなど"
+        "1": "OTP",
+        "2": "パスキー"
       },
       "STATE": {
         "0": "状態なし",
@@ -1142,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "メールアドレス認証コードが送信されました。",
       "OTPREMOVED": "OTPが削除されました",
       "U2FREMOVED": "要素認証が削除されました。",
-      "PASSWORDLESSREMOVED": "パスワードレス認証が削除削除。",
+      "PASSWORDLESSREMOVED": "パスキー認証が削除削除。",
       "INITIALPASSWORDSET": "初期パスワードがセットされました。",
       "PASSWORDNOTIFICATIONSENT": "パスワード変更通知が送信されました。",
       "PASSWORDCHANGED": "パスワードは正常に変更されました。",
@@ -1160,7 +1160,7 @@
       "SECRETREMOVED": "シークレットは正常に削除されました！"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL管理者ロール",
+      "TITLE": "Zitadel管理者ロール",
       "DESCRIPTION": "ユーザーのメンバーグラント一覧です。組織、プロジェクト、IAMの詳細ページでも変更することができます。",
       "ORGCONTEXT": "現在選択されている組織に関連するすべての組織とプロジェクトが表示されます。",
       "USERCONTEXT": "自分が権限を持つすべての組織やプロジェクトが表示されます。他の組織も含みます。",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "失敗を許可",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "警告",
-      "DESCRIPTION": "この設定を無効にすると、組織のユーザーがログインできなくなる可能性があります。さらに、アクションを無効にするためにコンソールにアクセスできなくなります。開発環境または開発組織でスクリプトを最初にテストするか、別の組織で管理者ユーザーを作成することをお勧めします。"
+      "DESCRIPTION": "この設定を無効にすると、組織のユーザーがログインできなくなる可能性があります。さらに、アクションを無効にするために管理コンソールにアクセスできなくなります。開発環境または開発組織でスクリプトを最初にテストするか、別の組織で管理者ユーザーを作成することをお勧めします。"
     },
     "SCRIPT": "スクリプトp",
     "FLOWTYPE": "フロータイプ",
@@ -1268,7 +1268,7 @@
     },
     "EVENTSTORE": {
       "TITLE": "IAMストレージ管理",
-      "DESCRIPTION": "ZITADELのビューと失敗したイベントを管理します。"
+      "DESCRIPTION": "Zitadelのビューと失敗したイベントを管理します。"
     },
     "MEMBER": {
       "TITLE": "マネージャー",
@@ -1412,7 +1412,7 @@
         "VERIFICATION_HTTP_URL_LABEL": "予想される URL:",
         "VERIFICATION_HTTP_FILE_LABEL": "検証ファイル:",
         "VERIFICATION_SKIP": "現時点では検証をスキップして組織の作成を続行できますが、ドメインを使用するにはこの手順を完了する必要があります。",
-        "VERIFICATION_VALIDATION_DESC": "ZITADEL はドメインの所有権を随時再確認するため、確認コードは削除しないでください。",
+        "VERIFICATION_VALIDATION_DESC": "Zitadel はドメインの所有権を随時再確認するため、確認コードは削除しないでください。",
         "VERIFICATION_NEWTOKEN_TITLE": "新しいトークンをリクエストする",
         "VERIFICATION_VALIDATION_ONGOING": "ドメインを確認するために {{ value }} 方法が選択されました。ボタンをクリックして検証チェックをトリガーするか、検証プロセスをリセットします。",
         "VERIFICATION_SUCCESSFUL": "ドメインが正常に認証されました。",
@@ -1555,7 +1555,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1609,10 +1610,10 @@
         "2": "メール認証",
         "3": "電話番号認証",
         "4": "パスワードのリセット",
-        "5": "パスワードレスの初期設定",
-        "6": "アプリのシークレット",
-        "7": "ワンタイムパスワード (OTP) - SMS",
-        "8": "ワンタイムパスワード (OTP) - 電子メール"
+        "5": "パスキーの初期設定",
+        "6": "アプリケーションのシークレット",
+        "7": "OTP - SMS",
+        "8": "OTP - 電子メール"
       },
       "EXPIRY": "有効期限 (分単位)",
       "INCLUDEDIGITS": "数字を含める",
@@ -1634,8 +1635,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "ログイン時の既定組織",
       "LOGINDEFAULTORG_DESCRIPTION": "組織コンテキストが設定されていない場合、ログイン UI は既定の組織の設定を使用します (インスタンスの設定ではなく)",
-      "OIDCTOKENEXCHANGE": "OIDC トークン交換",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "OIDC トークン エンドポイント用に実験的な urn:ietf:params:oauth:grant-type:token-exchange 付与タイプを有効にします。トークン交換は、より少ないスコープを持つトークンを要求するか、他のユーザーになりすますために使用できます。インスタンスでのなりすましを許可するには、セキュリティポリシーを参照してください。",
       "USERSCHEMA": "ユーザー スキーマ",
       "USERSCHEMA_DESCRIPTION": "ユーザー スキーマを使用すると、ユーザーのデータスキーマを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
       "ACTIONS": "アクション",
@@ -1644,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "フラグが有効になっている場合、id_token を `sid` クレームと共に id_token_hint として end_session エンドポイントに提供することで、ログイン UI から単一のセッションを終了できるようになります。 現在、同じユーザー エージェント (ブラウザ) からのすべてのセッションがログイン UI で終了することに注意してください。 セッション API を通じて管理されるセッションは、すでに単一のセッションの終了を許可しています。",
       "DEBUGOIDCPARENTERROR": "デバッグ OIDC 親エラー",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "フラグが有効になっている場合、OIDC 親エラーはコンソールに記録されます。",
-      "ENABLEBACKCHANNELLOGOUT": "バックチャネルログアウトを有効にする",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "バックチャネルログアウトは OpenID Connect バックチャネルログアウト 1.0 を実装し、OpenID プロバイダーでのセッション終了についてクライアントに通知するために使用できます。",
       "PERMISSIONCHECKV2": "権限チェック V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "フラグが有効になっている場合、新しい API とその機能を使用できます。",
       "STATES": {
@@ -1659,8 +1656,8 @@
         "DISABLED": "無効は継承されます"
       },
       "RESET": "すべて継承に設定",
-      "CONSOLEUSEV2USERAPI": "コンソールでユーザー作成のためにV2 APIを使用してください。",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "このフラグが有効化されると、コンソールはV2ユーザーAPIを使用して新しいユーザーを作成します。V2 APIでは、新しく作成されたユーザーは初期状態なしで開始します。",
+      "CONSOLEUSEV2USERAPI": "管理コンソールでユーザー作成のためにV2 APIを使用してください。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "このフラグが有効化されると、管理コンソールはV2ユーザーAPIを使用して新しいユーザーを作成します。V2 APIでは、新しく作成されたユーザーは初期状態なしで開始します。",
       "LOGINV2": "ログイン V2",
       "LOGINV2_DESCRIPTION": "これを有効にすると、セキュリティ、パフォーマンス、およびカスタマイズ性が向上した、TypeScript ベースの新しいログイン UI が有効になります。",
       "LOGINV2_BASEURI": "ベースURI",
@@ -1688,7 +1685,7 @@
     "NOTIFICATION": {
       "TITLE": "通知",
       "DESCRIPTION": "どのような変更に対して、どのような通知を行うかを決定します。",
-      "PASSWORDCHANGE": "パスワードの変更"
+      "PASSWORDCHANGE": "パスワードが変更されました"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "ログインをパーソナライズされた動作に変更します。",
@@ -1707,7 +1704,7 @@
       "RELEASE": "リリース",
       "DROPFONT": "ここにフォントファイルをドロップする",
       "RELEASEFONT": "リリース",
-      "USEOFLOGO": "ロゴはログインと電子メールで使用されますが、アイコンはコンソールの組織スイッチャーのような小さなUI要素に使用されます",
+      "USEOFLOGO": "ロゴはログインと電子メールで使用されますが、アイコンは管理コンソールの組織スイッチャーのような小さなUI要素に使用されます",
       "MAXSIZE": "最大サイズは524KBに制限されています",
       "EMAILNOSVG": "SVGファイル形式はメールではサポートされていません。ロゴをPNGまたはその他のサポート形式でアップロードしてください。",
       "MAXSIZEEXCEEDED": "最大サイズの524KBを超えました。",
@@ -1723,7 +1720,7 @@
       },
       "PREVIEW": {
         "TITLE": "ログイン",
-        "SECOND": "ZITADEL-Accountでログインする。",
+        "SECOND": "Zitadel-Accountでログインする。",
         "ERROR": "ユーザーは見つかりません！",
         "PRIMARYBUTTON": "次へ",
         "SECONDARYBUTTON": "登録"
@@ -1763,9 +1760,9 @@
       "POLICYLINK": "プライバシーポリシーへのリンク",
       "HELPLINK": "ヘルプへのリンク",
       "SUPPORTEMAIL": "サポートメール",
-      "DOCSLINK": "ドキュメントリンク (Console)",
-      "CUSTOMLINK": "カスタムリンク(Console)",
-      "CUSTOMLINKTEXT": "カスタム リンク テキスト (Console)",
+      "DOCSLINK": "ドキュメントリンク (管理コンソール)",
+      "CUSTOMLINK": "カスタムリンク (管理コンソール)",
+      "CUSTOMLINKTEXT": "カスタム リンク テキスト (管理コンソール)",
       "SAVED": "正常に保存されました！",
       "RESET_TITLE": "デフォルト値を復元する",
       "RESET_DESCRIPTION": "TOSおよびプライバシーポリシーのデフォルトリンクを復元しようとしています。本当によろしいですか？"
@@ -1806,7 +1803,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1838,10 +1836,10 @@
         "usernameChangeText": "ユーザー名の変更",
         "verifyMfaOtpText": "OTPを認証する",
         "verifyMfaU2fText": "ユニバーサルの二要素認証を承認する",
-        "passwordlessPromptText": "パスワードレスプロンプト",
-        "passwordlessRegistrationDoneText": "パスワードレス登録が完了しました",
-        "passwordlessRegistrationText": "パスワードレス登録",
-        "passwordlessText": "パスワードレス",
+        "passwordlessPromptText": "パスキープロンプト",
+        "passwordlessRegistrationDoneText": "パスキー登録が完了しました",
+        "passwordlessRegistrationText": "パスキー登録",
+        "passwordlessText": "パスキー",
         "externalRegistrationUserOverviewText": "外部登録ユーザーの概要"
       }
     },
@@ -1851,11 +1849,11 @@
         "INIT": "初期セットアップ",
         "VE": "メールの認証",
         "VP": "電話番号の認証",
-        "VSO": "SMS OTPを確認する",
+        "VSO": "OTP SMSを確認する",
         "VEO": "メールOTPを確認する",
         "PR": "パスワードのリセット",
         "DC": "ドメインクレーム",
-        "PL": "パスワードレス",
+        "PL": "パスキー",
         "PC": "パスワードの変更",
         "IU": "ユーザーの招待"
       },
@@ -1875,8 +1873,8 @@
         "changedate": "変更日",
         "username": "ユーザー名",
         "tempUsername": "一時ユーザー名",
-        "otp": "ワンタイムパスワード",
-        "verifyUrl": "ワンタイムパスワードを確認するURL",
+        "otp": "OTP",
+        "verifyUrl": "OTPを確認するURL",
         "expiry": "有効期限",
         "applicationName": "アプリケーション名"
       },
@@ -1918,7 +1916,7 @@
       "DEFAULTREDIRECTURI_DESC": "アプリのコンテキストなしでログインが開始された場合（例：メール）、ユーザーがどこにリダイレクトされるかを定義します。",
       "ERRORMSGPOPUP": "ダイアログにエラーを表示する",
       "DISABLEWATERMARK": "ウォーターマークを非表示にする",
-      "DISABLEWATERMARK_DESC": "ログイン画面上のZITADELのウォーターマークを非表示にします。"
+      "DISABLEWATERMARK_DESC": "ログイン画面上のZitadelのウォーターマークを非表示にします。"
     },
     "RESET": "インスタンスデフォルトにリセットする",
     "CREATECUSTOM": "カスタムポリシーを作成する",
@@ -1972,7 +1970,7 @@
       "CREATE_DESC": "プロジェクトの名前を入力します。",
       "ROLE": "ロール",
       "NOITEMS": "プロジェクトはありません",
-      "ZITADELPROJECT": "これはZITADELプロジェクトに属します。注意：変更した場合、ZITADELは意図したとおりに動作しないことがあります。",
+      "ZITADELPROJECT": "これはZitadelプロジェクトに属します。注意：変更した場合、Zitadelは意図したとおりに動作しないことがあります。",
       "TYPE": {
         "OWNED": "所有プロジェクト",
         "OWNED_SINGULAR": "所有プロジェクト",
@@ -2332,8 +2330,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "名の属性",
+    "LASTNAMEATTRIBUTE": "姓の属性",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2355,7 +2353,7 @@
     "DELETE_SELECTION_TITLE": "IDPの削除",
     "DELETE_SELECTION_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
     "FEDERATEDLOGOUTENABLED": "フェデレーションログアウト有効",
-    "FEDERATEDLOGOUTENABLED_DESC": "有効にすると、ユーザーがZITADELでセッションを終了した場合、IdPからもログアウトされます。",
+    "FEDERATEDLOGOUTENABLED_DESC": "有効にすると、ユーザーがZitadelでセッションを終了した場合、IdPからもログアウトされます。",
     "EMPTY": "IDPは利用できません",
     "OIDC": {
       "GENERAL": "一般",
@@ -2405,8 +2403,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "パスワードレス",
-      "MULTIFACTORDESCRIPTION": "ここでパスワードレス認証のための多要素認証を定義します。",
+      "MULTIFACTORTITLE": "パスキー",
+      "MULTIFACTORDESCRIPTION": "ここでパスキー認証のための多要素認証を定義します。",
       "SECONDFACTORTITLE": "多要素認証",
       "SECONDFACTORDESCRIPTION": "パスワード認証を保護できるさらに多要素認証を定義します。"
     },
@@ -2426,14 +2424,14 @@
     "TYPE": "タイプ",
     "MULTIFACTORTYPES": {
       "0": "不明",
-      "1": "指紋、セキュリティキー、フェイスIDなど"
+      "1": "パスキー"
     },
     "SECONDFACTORTYPES": {
       "0": "不明",
-      "1": "認証アプリ用ワンタイムパスワード(TOTP)",
-      "2": "指紋、セキュリティキー、フェイスIDなど",
-      "3": "Eメール用ワンタイムパスワード（email OTP）",
-      "4": "SMS用ワンタイムパスワード（SMS OTP）",
+      "1": "認証アプリケーション用のOTP",
+      "2": "パスキー",
+      "3": "Eメール用OTP (OTP Email)",
+      "4": "SMS用OTP (OTP SMS)",
       "5": "リカバリーコード"
     }
   },
@@ -2448,7 +2446,7 @@
       "DESCRIPTION": "認証に使用するプロバイダーは、あらかじめ定義されたものと自分で作成したものを選択できます。",
       "SELECTIDPS": "IDプロバイダー"
     },
-    "PASSWORDLESS": "パスワードレスログイン",
+    "PASSWORDLESS": "パスキーログイン",
     "PASSWORDLESSTYPE": {
       "0": "無効",
       "1": "有効"
@@ -2457,7 +2455,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTPプロバイダー",
-      "DESCRIPTION": "これらは、ZITADEL インスタンスの SMTP プロバイダーです。ユーザーに通知を送信するために使用するものをアクティブにします。",
+      "DESCRIPTION": "これらは、Zitadel インスタンスの SMTP プロバイダーです。ユーザーに通知を送信するために使用するものをアクティブにします。",
       "EMPTY": "使用可能な SMTP プロバイダーがありません",
       "ACTIVATED": "アクティブ化された",
       "ACTIVATE": "プロバイダーをアクティブ化する",
@@ -2493,7 +2491,7 @@
         "NEXT_STEPS": "次のステップ",
         "ACTIVATE": {
           "TITLE": "SMTP プロバイダーをアクティブ化する",
-          "DESCRIPTION": "ZITADEL は、アクティブ化するまで、この SMTP プロバイダーを使用して通知を送信できません。このプロバイダーをアクティブ化すると、アクティブだった他のプロバイダーは非アクティブ化されます。"
+          "DESCRIPTION": "Zitadel は、アクティブ化するまで、この SMTP プロバイダーを使用して通知を送信できません。このプロバイダーをアクティブ化すると、アクティブだった他のプロバイダーは非アクティブ化されます。"
         },
         "DEACTIVATE": {
           "TITLE": "SMTPプロバイダーを非アクティブ化します",
@@ -2607,7 +2605,7 @@
       "CLIENTID": "クライアントID",
       "CLIENTSECRET": "クライアントシークレット",
       "CLIENTSECRET_NOSECRET": "選択した認証フローでは、シークレットは必要ないため、利用できません。",
-      "CLIENTSECRET_DESCRIPTION": "クライアントシークレットは、ダイアログを閉じると消えてしまうので、安全な場所に保管してください。",
+      "CLIENTSECRET_DESCRIPTION": "クライアントシークレットは、ダイアログを閉じた後は表示されません。安全な場所に保管してください。",
       "REGENERATESECRET": "クライアントシークレットを再生成する",
       "DEVMODE": "開発モード",
       "DEVMODE_ENABLED": "アクティブ化された",
@@ -2658,8 +2656,8 @@
       "IDTOKENROLEASSERTION": "IDトークン内のユーザーロール",
       "IDTOKENROLEASSERTION_DESCRIPTION": "選択した場合、認証されたユーザーの要求されたロールがIDトークンに追加されます。",
       "IDTOKENUSERINFOASSERTION": "IDトークン内のユーザー情報",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "クライアントは、IDトークンからプロフィール、メール、電話、住所のクレームを取得できます。",
-      "CLOCKSKEW": "OPとクライアントのクロックスキューをクライアントが処理できるようにします。持続時間（0～5s）は、exp claimに加算され、iats、auth_timeおよびnbfから減算されます。",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "アプリケーションは、IDトークンからプロフィール、メール、電話、住所のクレームを取得できます。",
+      "CLOCKSKEW": "OPとアプリケーションのクロックスキューをアプリケーションが処理できるようにします。持続時間（0～5s）は、exp claimに加算され、iats、auth_timeおよびnbfから減算されます。",
       "RECOMMENDED": "推奨",
       "NOTRECOMMENDED": "非推奨",
       "SELECTION": {
@@ -2677,7 +2675,8 @@
             "DESCRIPTION": "シングルページアプリケーション（SPA）および一般に、ブラウザで実行されるすべてのJSフレームワーク"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "バックチャネルログアウトURI"
     },
     "API": {
       "INFO": {
@@ -2789,7 +2788,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

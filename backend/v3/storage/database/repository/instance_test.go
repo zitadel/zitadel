@@ -44,8 +44,8 @@ func TestCreateInstance(t *testing.T) {
 					Name:            instanceName,
 					DefaultOrgID:    "defaultOrgId",
 					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
+					ConsoleClientID: "managementConsoleCLient",
+					ConsoleAppID:    "managementConsoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
 				return instance
@@ -61,8 +61,8 @@ func TestCreateInstance(t *testing.T) {
 					Name:            "",
 					DefaultOrgID:    "defaultOrgId",
 					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
+					ConsoleClientID: "managementConsoleCLient",
+					ConsoleAppID:    "managementConsoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
 				return instance
@@ -77,8 +77,8 @@ func TestCreateInstance(t *testing.T) {
 					Name:            gofakeit.Name(),
 					DefaultOrgID:    "defaultOrgId",
 					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
+					ConsoleClientID: "managementConsoleCLient",
+					ConsoleAppID:    "managementConsoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
 
@@ -113,8 +113,8 @@ func TestCreateInstance(t *testing.T) {
 						Name:            instanceName,
 						DefaultOrgID:    "defaultOrgId",
 						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
+						ConsoleClientID: "managementConsoleCLient",
+						ConsoleAppID:    "managementConsoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
 
@@ -132,8 +132,8 @@ func TestCreateInstance(t *testing.T) {
 					Name:            instanceName,
 					DefaultOrgID:    "defaultOrgId",
 					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
+					ConsoleClientID: "managementConsoleCLient",
+					ConsoleAppID:    "managementConsoleApp",
 					DefaultLanguage: "defaultLanguage",
 				},
 				// two instances can have the sane name
@@ -147,8 +147,8 @@ func TestCreateInstance(t *testing.T) {
 					Name:            gofakeit.Name(),
 					DefaultOrgID:    "defaultOrgId",
 					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
+					ConsoleClientID: "managementConsoleCLient",
+					ConsoleAppID:    "managementConsoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
 				return instance
@@ -231,8 +231,8 @@ func TestUpdateInstance(t *testing.T) {
 					Name:            gofakeit.Name(),
 					DefaultOrgID:    "defaultOrgId",
 					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
+					ConsoleClientID: "managementConsoleCLient",
+					ConsoleAppID:    "managementConsoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
 
@@ -251,8 +251,8 @@ func TestUpdateInstance(t *testing.T) {
 					Name:            gofakeit.Name(),
 					DefaultOrgID:    "defaultOrgId",
 					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
+					ConsoleClientID: "managementConsoleCLient",
+					ConsoleAppID:    "managementConsoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
 
@@ -344,8 +344,8 @@ func TestGetInstance(t *testing.T) {
 						Name:            gofakeit.BeerName(),
 						DefaultOrgID:    "defaultOrgId",
 						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
+						ConsoleClientID: "managementConsoleCLient",
+						ConsoleAppID:    "managementConsoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
 
@@ -364,8 +364,8 @@ func TestGetInstance(t *testing.T) {
 					Name:            gofakeit.BeerName(),
 					DefaultOrgID:    "defaultOrgId",
 					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
+					ConsoleClientID: "managementConsoleCLient",
+					ConsoleAppID:    "managementConsoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
 
@@ -472,8 +472,8 @@ func TestListInstance(t *testing.T) {
 						Name:            gofakeit.Name(),
 						DefaultOrgID:    "defaultOrgId",
 						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
+						ConsoleClientID: "managementConsoleCLient",
+						ConsoleAppID:    "managementConsoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
 
@@ -499,8 +499,8 @@ func TestListInstance(t *testing.T) {
 						Name:            gofakeit.Name(),
 						DefaultOrgID:    "defaultOrgId",
 						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
+						ConsoleClientID: "managementConsoleCLient",
+						ConsoleAppID:    "managementConsoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
 
@@ -528,8 +528,8 @@ func TestListInstance(t *testing.T) {
 							Name:            gofakeit.Name(),
 							DefaultOrgID:    "defaultOrgId",
 							IAMProjectID:    "iamProject",
-							ConsoleClientID: "consoleCLient",
-							ConsoleAppID:    "consoleApp",
+							ConsoleClientID: "managementConsoleCLient",
+							ConsoleAppID:    "managementConsoleApp",
 							DefaultLanguage: "defaultLanguage",
 						}
 
@@ -559,8 +559,8 @@ func TestListInstance(t *testing.T) {
 							Name:            instanceName,
 							DefaultOrgID:    "defaultOrgId",
 							IAMProjectID:    "iamProject",
-							ConsoleClientID: "consoleCLient",
-							ConsoleAppID:    "consoleApp",
+							ConsoleClientID: "managementConsoleCLient",
+							ConsoleAppID:    "managementConsoleApp",
 							DefaultLanguage: "defaultLanguage",
 						}
 
@@ -648,8 +648,8 @@ func TestDeleteInstance(t *testing.T) {
 						Name:            gofakeit.Name(),
 						DefaultOrgID:    "defaultOrgId",
 						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
+						ConsoleClientID: "managementConsoleCLient",
+						ConsoleAppID:    "managementConsoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
 
@@ -679,8 +679,8 @@ func TestDeleteInstance(t *testing.T) {
 						Name:            gofakeit.BeerName(),
 						DefaultOrgID:    "defaultOrgId",
 						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
+						ConsoleClientID: "managementConsoleCLient",
+						ConsoleAppID:    "managementConsoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
 

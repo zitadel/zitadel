@@ -134,7 +134,7 @@ describe("sendLoginname", () => {
     });
 
     test("should return error when user search fails", async () => {
-      mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
+      mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: true });
       mockSearchUsers.mockResolvedValue({ error: "Search failed" });
 
       const result = await sendLoginname({
@@ -145,7 +145,7 @@ describe("sendLoginname", () => {
     });
 
     test("should return error when search result has no result field", async () => {
-      mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
+      mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: true });
       mockSearchUsers.mockResolvedValue({});
 
       const result = await sendLoginname({
@@ -156,7 +156,7 @@ describe("sendLoginname", () => {
     });
 
     test("should return error when more than one user found", async () => {
-      mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
+      mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: true });
       mockSearchUsers.mockResolvedValue({
         result: [
           { userId: "user1", preferredLoginName: "user1@example.com" },
@@ -192,10 +192,10 @@ describe("sendLoginname", () => {
     };
 
     beforeEach(() => {
-      mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
+      mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue(mockSession);
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
     });
 
     test("should redirect to verify when user has no authentication methods", async () => {
@@ -232,7 +232,7 @@ describe("sendLoginname", () => {
       });
 
       test("should attempt IDP redirect when password is not allowed but user has IDP links", async () => {
-        mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: false });
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSWORD],
         });
@@ -253,7 +253,7 @@ describe("sendLoginname", () => {
       });
 
       test("should return error when password not allowed and no IDP links available", async () => {
-        mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: false });
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSWORD],
         });
@@ -265,12 +265,12 @@ describe("sendLoginname", () => {
         });
 
         expect(result).toEqual({
-          error: "errors.usernamePasswordNotAllowed",
+          error: "errors.localAuthenticationNotAllowed",
         });
       });
 
       test("should redirect to organization IDP when password not allowed, no user IDP links, but organization has active IDP", async () => {
-        mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: false });
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSWORD],
         });
@@ -293,7 +293,7 @@ describe("sendLoginname", () => {
       });
 
       test("should redirect to passkey when user has only passkey method and it's allowed", async () => {
-        mockGetLoginSettings.mockResolvedValue({ passkeysType: PasskeysType.ALLOWED });
+        mockGetLoginSettings.mockResolvedValue({ passkeysType: PasskeysType.ALLOWED, allowLocalAuthentication: true });
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSKEY],
         });
@@ -310,7 +310,25 @@ describe("sendLoginname", () => {
       });
 
       test("should return error when passkeys are not allowed", async () => {
-        mockGetLoginSettings.mockResolvedValue({ passkeysType: PasskeysType.NOT_ALLOWED });
+        mockGetLoginSettings.mockResolvedValue({ passkeysType: PasskeysType.NOT_ALLOWED, allowLocalAuthentication: true });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSKEY],
+        });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(result).toEqual({
+          error: "errors.passkeysNotAllowed",
+        });
+      });
+
+      test("should return error when passkeys are allowed but allowLocalAuthentication is false", async () => {
+        mockGetLoginSettings.mockResolvedValue({
+          passkeysType: PasskeysType.ALLOWED,
+          allowLocalAuthentication: false,
+        });
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSKEY],
         });
@@ -339,6 +357,27 @@ describe("sendLoginname", () => {
 
         expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
       });
+
+      test("should NOT create session when ignoreUnknownUsernames is true", async () => {
+        mockGetLoginSettings.mockResolvedValue({
+          allowLocalAuthentication: true,
+          ignoreUnknownUsernames: true,
+        });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+          requestId: "req123",
+        });
+
+        expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+
+        expect(result).toHaveProperty("redirect");
+        expect((result as any).redirect).toMatch(/^\/password\?/);
+        expect((result as any).redirect).toContain("loginName=user%40example.com");
+      });
     });
 
     describe("Multiple authentication methods", () => {
@@ -356,8 +395,8 @@ describe("sendLoginname", () => {
         expect((result as any).redirect).toContain("altPassword=true"); // password is allowed
       });
 
-      test("should not show password alternative when password is not allowed", async () => {
-        mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: false });
+      test("should return error when allowLocalAuthentication is false (disabling both password and passkey)", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.PASSKEY],
         });
@@ -366,9 +405,9 @@ describe("sendLoginname", () => {
           loginName: "user@example.com",
         });
 
-        expect(result).toBeDefined();
-        expect(result?.redirect).toMatch(/^\/passkey\?/);
-        expect(result?.redirect).toContain("altPassword=false"); // password is not allowed
+        expect(result).toEqual({
+          error: "errors.localAuthenticationNotAllowed",
+        });
       });
 
       test("should redirect to IDP when no passkey but IDP available", async () => {
@@ -401,7 +440,7 @@ describe("sendLoginname", () => {
       });
 
       test("should return error when password is only method in multi-method scenario but not allowed", async () => {
-        mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: false });
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSWORD],
         });
@@ -413,7 +452,7 @@ describe("sendLoginname", () => {
         });
 
         expect(result).toEqual({
-          error: "errors.usernamePasswordNotAllowed",
+          error: "errors.localAuthenticationNotAllowed",
         });
       });
     });
@@ -427,7 +466,7 @@ describe("sendLoginname", () => {
     test("should redirect to single IDP when register allowed but password not allowed", async () => {
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: true,
-        allowUsernamePassword: false,
+        allowLocalAuthentication: false,
       });
       mockGetActiveIdentityProviders.mockResolvedValue({
         identityProviders: [{ id: "idp123", type: "OIDC" }],
@@ -444,7 +483,7 @@ describe("sendLoginname", () => {
     test("should redirect to register when both register and password allowed", async () => {
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: true,
-        allowUsernamePassword: true,
+        allowLocalAuthentication: true,
         ignoreUnknownUsernames: false,
       });
 
@@ -470,6 +509,7 @@ describe("sendLoginname", () => {
         loginName: "user@example.com",
         requestId: "req123",
         organization: "org123",
+        ignoreUnknownUsernames: true,
       });
 
       expect(result).toBeDefined();
@@ -482,7 +522,7 @@ describe("sendLoginname", () => {
     test("should return error when user not found and no registration allowed", async () => {
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: false,
-        allowUsernamePassword: true,
+        allowLocalAuthentication: true,
       });
 
       const result = await sendLoginname({
@@ -497,14 +537,14 @@ describe("sendLoginname", () => {
       mockGetLoginSettings
         .mockResolvedValueOnce({
           allowRegister: true,
-          allowUsernamePassword: true,
+          allowLocalAuthentication: true,
           ignoreUnknownUsernames: false,
         })
         // Mock login settings for discovered org - must include all necessary flags
         .mockResolvedValueOnce({
           allowDomainDiscovery: true,
           allowRegister: true,
-          allowUsernamePassword: true,
+          allowLocalAuthentication: true,
           ignoreUnknownUsernames: false,
         });
 
@@ -537,13 +577,13 @@ describe("sendLoginname", () => {
       mockGetLoginSettings
         .mockResolvedValueOnce({
           allowRegister: true,
-          allowUsernamePassword: false,
+          allowLocalAuthentication: false,
         })
         // Mock login settings for discovered org - must include all necessary flags
         .mockResolvedValueOnce({
           allowDomainDiscovery: true,
           allowRegister: true,
-          allowUsernamePassword: false,
+          allowLocalAuthentication: false,
         });
 
       // Mock org discovery to return one org with matching domain
@@ -581,7 +621,7 @@ describe("sendLoginname", () => {
       mockGetLoginSettings
         .mockResolvedValueOnce({
           allowRegister: true,
-          allowUsernamePassword: true,
+          allowLocalAuthentication: true,
           ignoreUnknownUsernames: false,
         })
         // Mock login settings for org with domain discovery disabled
@@ -605,7 +645,7 @@ describe("sendLoginname", () => {
     test("should not discover org if multiple orgs match the domain", async () => {
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: true,
-        allowUsernamePassword: true,
+        allowLocalAuthentication: true,
         ignoreUnknownUsernames: false,
       });
 
@@ -629,7 +669,7 @@ describe("sendLoginname", () => {
     test("should use provided organization instead of discovering when org context exists", async () => {
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: true,
-        allowUsernamePassword: true,
+        allowLocalAuthentication: true,
         ignoreUnknownUsernames: false,
       });
 
@@ -646,10 +686,128 @@ describe("sendLoginname", () => {
       // Verify org discovery was NOT called since org was provided
       expect(mockGetOrgsByDomain).not.toHaveBeenCalled();
     });
-  });
 
-  describe("Edge cases", () => {
-    test("should handle session creation failure", async () => {
+    test("should redirect to password when ignoreUnknownUsernames is true, allowRegister is true, but allowLocalAuthentication is false (User not found)", async () => {
+      mockSearchUsers.mockResolvedValue({ result: [] });
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: true,
+        allowLocalAuthentication: false,
+        ignoreUnknownUsernames: true,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        ignoreUnknownUsernames: true,
+      });
+
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
+
+    test("should redirect to password when ignoreUnknownUsernames is true, user found but rejected due to disableLoginWithEmail", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "user@example.com" }, phone: { phone: "123456" } } },
+        state: UserState.ACTIVE,
+      };
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockGetLoginSettings.mockResolvedValue({
+        disableLoginWithEmail: true,
+        ignoreUnknownUsernames: true,
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        ignoreUnknownUsernames: true,
+      });
+
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
+
+    test("should redirect to password when ignoreUnknownUsernames is true and more than one user found", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        ignoreUnknownUsernames: true,
+      });
+      mockSearchUsers.mockResolvedValue({
+        result: [
+          { userId: "user1", preferredLoginName: "user1@example.com" },
+          { userId: "user2", preferredLoginName: "user2@example.com" },
+        ],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        ignoreUnknownUsernames: true,
+      });
+
+      expect(result).not.toEqual({ error: "errors.moreThanOneUserFound" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
+
+    test("should return generic error when user not active and ignoreUnknownUsernames is true", async () => {
+      mockSearchUsers.mockResolvedValue({
+        result: [
+          {
+            userId: "user1",
+            state: UserState.ACTIVE,
+            preferredLoginName: "user1",
+            type: { case: "human", value: { email: { isVerified: true } } },
+          },
+        ],
+      });
+      mockGetLoginSettings.mockResolvedValue({
+        ignoreUnknownUsernames: true,
+        allowLocalAuthentication: true,
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+      // Mock createSessionAndUpdateCookie to fail with user not active error
+      mockCreateSessionAndUpdateCookie.mockRejectedValue({
+        rawMessage: "Errors.User.NotActive (SESSION-Gj4ko)",
+      });
+
+      const result = await sendLoginname({ loginName: "user1", ignoreUnknownUsernames: true });
+
+      expect(result).toEqual({ redirect: "/password?loginName=user1" });
+      // With ignoreUnknownUsernames: true, we skip session creation, so this mock is NOT called
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("should NOT create session and return redirect when ignoreUnknownUsernames is true and user is valid", async () => {
+      mockSearchUsers.mockResolvedValue({
+        result: [
+          {
+            userId: "user1",
+            state: UserState.ACTIVE,
+            preferredLoginName: "user1",
+            type: { case: "human", value: { email: { isVerified: true } } },
+          },
+        ],
+      });
+      mockGetLoginSettings.mockResolvedValue({
+        ignoreUnknownUsernames: true,
+        allowLocalAuthentication: true,
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      const result = await sendLoginname({ loginName: "user1", ignoreUnknownUsernames: true });
+
+      expect(result).toEqual({ redirect: "/password?loginName=user1" });
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("should redirect to password when ignoreUnknownUsernames is true and password not allowed", async () => {
       const mockUser = {
         userId: "user123",
         preferredLoginName: "user@example.com",
@@ -658,18 +816,81 @@ describe("sendLoginname", () => {
         state: UserState.ACTIVE,
       };
 
-      mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
+      const mockSession = {
+        factors: {
+          user: {
+            id: "user123",
+            loginName: "user@example.com",
+            organizationId: "org123",
+          },
+        },
+      };
+
+      mockGetLoginSettings.mockResolvedValue({
+        allowLocalAuthentication: false,
+        ignoreUnknownUsernames: true,
+      });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue({ factors: {} }); // No user in session
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+      mockListIDPLinks.mockResolvedValue({ result: [] });
+      mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
 
       const result = await sendLoginname({
         loginName: "user@example.com",
+        ignoreUnknownUsernames: true,
       });
 
-      expect(result).toEqual({ error: "errors.couldNotCreateSession" });
+      expect(result).not.toEqual({ error: "errors.localAuthenticationNotAllowed" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
     });
 
+    test("should redirect to password when ignoreUnknownUsernames is true and passkeys not allowed", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@example.com",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "user@example.com" } } },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: {
+          user: {
+            id: "user123",
+            loginName: "user@example.com",
+            organizationId: "org123",
+          },
+        },
+      };
+
+      mockGetLoginSettings.mockResolvedValue({
+        passkeysType: PasskeysType.NOT_ALLOWED,
+        ignoreUnknownUsernames: true,
+      });
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockCreate.mockReturnValue({});
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSKEY],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        ignoreUnknownUsernames: true,
+      });
+
+      expect(result).not.toEqual({ error: "errors.passkeysNotAllowed" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
+  });
+
+  describe("Edge cases", () => {
     test("should handle initial user state", async () => {
       const mockUser = {
         userId: "user123",
@@ -689,10 +910,10 @@ describe("sendLoginname", () => {
         },
       };
 
-      mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
+      mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue(mockSession);
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
 
       const result = await sendLoginname({
         loginName: "user@example.com",
@@ -720,10 +941,10 @@ describe("sendLoginname", () => {
         },
       };
 
-      mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
+      mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue(mockSession);
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
       mockListAuthenticationMethodTypes.mockResolvedValue({
         authMethodTypes: [AuthenticationMethodType.PASSWORD],
       });
@@ -737,6 +958,228 @@ describe("sendLoginname", () => {
       expect(result).toBeDefined();
       expect(result?.redirect).toContain("organization=custom-org");
       expect(result?.redirect).toContain("requestId=req123");
+    });
+
+    test("should redirect to password with INPUT loginName when ignoreUnknownUsernames is true, even if user preferredLoginName is different", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@example.com",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "user@example.com" } } },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: {
+          user: {
+            id: "user123",
+            loginName: "user@example.com",
+            organizationId: "org123",
+          },
+        },
+      };
+
+      mockGetLoginSettings.mockResolvedValue({
+        allowLocalAuthentication: true,
+        ignoreUnknownUsernames: true,
+      });
+      // Mock search result returns a user with resolved/different loginName
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockCreate.mockReturnValue({});
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      // INPUT login name is just "user"
+      const result = await sendLoginname({
+        loginName: "user",
+        ignoreUnknownUsernames: true,
+      });
+
+      expect(result).toHaveProperty("redirect");
+      // Expect redirect to contain input "user" not resolved "user@example.com"
+      expect((result as any).redirect).toContain("loginName=user");
+      expect((result as any).redirect).not.toContain("loginName=user%40example.com");
+    });
+
+    test("should redirect to passkey with INPUT loginName when ignoreUnknownUsernames is true", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@example.com",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "user@example.com" } } },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: {
+          user: {
+            id: "user123",
+            loginName: "user@example.com",
+            organizationId: "org123",
+          },
+        },
+      };
+
+      mockGetLoginSettings.mockResolvedValue({
+        passkeysType: PasskeysType.ALLOWED,
+        allowLocalAuthentication: true,
+        ignoreUnknownUsernames: true,
+      });
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockCreate.mockReturnValue({});
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSKEY],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user",
+        ignoreUnknownUsernames: true,
+      });
+
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/passkey\?/);
+      expect((result as any).redirect).toContain("loginName=user");
+      expect((result as any).redirect).not.toContain("loginName=user%40example.com");
+    });
+
+    test("should redirect to passkey with INPUT loginName when ignoreUnknownUsernames is true (multi-method)", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@example.com",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "user@example.com" } } },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: {
+          user: {
+            id: "user123",
+            loginName: "user@example.com",
+            organizationId: "org123",
+          },
+        },
+      };
+
+      mockGetLoginSettings.mockResolvedValue({
+        passkeysType: PasskeysType.ALLOWED,
+        allowLocalAuthentication: true,
+        ignoreUnknownUsernames: true,
+      });
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockCreate.mockReturnValue({});
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSKEY, AuthenticationMethodType.PASSWORD],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user",
+        ignoreUnknownUsernames: true,
+      });
+
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/passkey\?/);
+      expect((result as any).redirect).toContain("loginName=user");
+      expect((result as any).redirect).not.toContain("loginName=user%40example.com");
+    });
+    test("should use CONTEXT settings to HIDE username even if USER settings would show it", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@example.com",
+        details: { resourceOwner: "user-org" },
+        type: { case: "human", value: { email: { email: "user@example.com" } } },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: {
+          user: {
+            id: "user123",
+            loginName: "user@example.com",
+            organizationId: "user-org",
+          },
+        },
+      };
+
+      // Mock implementation to return different settings based on organization
+      mockGetLoginSettings.mockImplementation(async (args: any) => {
+        if (args.organization === "context-org") {
+          return { allowLocalAuthentication: true, ignoreUnknownUsernames: true };
+        }
+        if (args.organization === "user-org") {
+          return { allowLocalAuthentication: true, ignoreUnknownUsernames: false };
+        }
+        return {};
+      });
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockCreate.mockReturnValue({});
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      const result = await sendLoginname({
+        loginName: "input-name",
+        organization: "context-org", // Context has ignore=true
+        ignoreUnknownUsernames: true,
+      });
+
+      expect(result).toHaveProperty("redirect");
+      // Should result in input-name because context says HIDE
+      expect((result as any).redirect).toContain("loginName=input-name");
+      expect((result as any).redirect).not.toContain("loginName=user%40example.com");
+    });
+
+    test("should use CONTEXT settings to SHOW username even if USER settings would hide it", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@example.com",
+        details: { resourceOwner: "user-org" },
+        type: { case: "human", value: { email: { email: "user@example.com" } } },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: {
+          user: {
+            id: "user123",
+            loginName: "user@example.com",
+            organizationId: "user-org",
+          },
+        },
+      };
+
+      mockGetLoginSettings.mockImplementation(async (args: any) => {
+        if (args.organization === "context-org") {
+          return { allowLocalAuthentication: true, ignoreUnknownUsernames: false };
+        }
+        if (args.organization === "user-org") {
+          return { allowLocalAuthentication: true, ignoreUnknownUsernames: true };
+        }
+        return {};
+      });
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockCreate.mockReturnValue({});
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      const result = await sendLoginname({
+        loginName: "input-name",
+        organization: "context-org", // Context has ignore=false
+        ignoreUnknownUsernames: false,
+      });
+
+      expect(result).toHaveProperty("redirect");
+      // Should result in resolved name because context says SHOW
+      expect((result as any).redirect).toContain("loginName=user%40example.com");
     });
   });
 });

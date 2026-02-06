@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	_ "embed"
+	"errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -19,7 +20,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
@@ -27,6 +27,7 @@ import (
 	"golang.org/x/text/language"
 
 	new_domain "github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	v3_postgres "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/encryption"
@@ -127,12 +128,23 @@ func New(server chan<- *Server) *cobra.Command {
 		Long: `starts ZITADEL.
 Requirements:
 - postgreSQL`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			err := cmd_tls.ModeFromFlag(cmd)
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).Error("zitadel start command failed")
+			}()
+
+			err = cmd_tls.ModeFromFlag(cmd)
 			if err != nil {
 				return err
 			}
-			config := MustNewConfig(viper.GetViper())
+			config, shutdown, err := NewConfig(cmd, viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+
 			masterKey, err := key.MasterKey(cmd)
 			if err != nil {
 				return err
@@ -309,6 +321,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
 		config.Notifications,
+		config.OIDC.BackChannelLogoutConfig(),
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -321,13 +334,12 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
-		keys.OIDC,
-		config.OIDC.DefaultBackChannelLogoutLifetime,
 		q,
 	)
 	notification.Start(ctx)
 
 	execution.Register(
+		ctx,
 		config.Executions,
 		q,
 		keys.Target,
@@ -345,7 +357,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}
 
 	// the scheduler / periodic jobs need to be started after the queue already runs
-	if err = serviceping.Start(config.ServicePing, q); err != nil {
+	if err = serviceping.Start(ctx, config.ServicePing, q); err != nil {
 		return err
 	}
 
@@ -466,6 +478,7 @@ func startAPIs(
 		limitingAccessInterceptor,
 		keys.Target,
 		translator,
+		config.Instrumentation.Trace.TrustRemoteSpans,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
@@ -674,17 +687,17 @@ func startAPIs(
 
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcServer.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal)
 	if err != nil {
-		return nil, fmt.Errorf("unable to start console: %w", err)
+		return nil, fmt.Errorf("unable to start management console: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(path.HandlerPrefix, c)
-	consolePath := path.HandlerPrefix + "/"
+	managementConsolePath := path.HandlerPrefix + "/"
 	l, err := login.CreateLogin(
 		config.Login,
 		commands,
 		queries,
 		authRepo,
 		store,
-		consolePath,
+		managementConsolePath,
 		oidcServer.AuthCallbackURL(),
 		samlProvider.AuthCallbackURL(),
 		config.ExternalSecure,
@@ -693,7 +706,7 @@ func startAPIs(
 		provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler,
 		instanceInterceptor.Handler,
 		assetsCache.Handler,
-		limitingAccessInterceptor.WithRedirect(consolePath).Handle,
+		limitingAccessInterceptor.WithRedirect(managementConsolePath).Handle,
 		keys.User,
 		keys.IDPConfig,
 		keys.CSRFCookieKey,
@@ -735,7 +748,7 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 	errCh := make(chan error)
 
 	go func() {
-		logging.Infof("server is listening on %s", lis.Addr().String())
+		logging.Info(ctx, "server is listening", "address", lis.Addr().String())
 		if tlsConfig != nil {
 			// we don't need to pass the files here, because we already initialized the TLS config on the server
 			errCh <- http1Server.ServeTLS(lis, "", "")
@@ -761,7 +774,7 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 	if err != nil {
 		return fmt.Errorf("could not shutdown gracefully: %w", err)
 	}
-	logging.New().Info("server shutdown gracefully")
+	logging.Info(ctx, "server shutdown gracefully")
 	return nil
 }
 
@@ -772,19 +785,19 @@ func showBasicInformation(startConfig *Config) {
 		http = "https"
 	}
 
-	consoleURL := fmt.Sprintf("%s://%s:%v/ui/console\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
+	managementConsoleURL := fmt.Sprintf("%s://%s:%v/ui/console\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
 	healthCheckURL := fmt.Sprintf("%s://%s:%v/debug/healthz\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
 	machineIdMethod := id.MachineIdentificationMethod()
 
 	insecure := !startConfig.TLS.Enabled && !startConfig.ExternalSecure
 
 	fmt.Printf(" ===============================================================\n\n")
-	fmt.Printf(" Version          	: %s\n", build.Version())
-	fmt.Printf(" TLS enabled      	: %v\n", startConfig.TLS.Enabled)
-	fmt.Printf(" External Secure 	: %v\n", startConfig.ExternalSecure)
-	fmt.Printf(" Machine Id Method	: %v\n", machineIdMethod)
-	fmt.Printf(" Console URL      	: %s", color.BlueString(consoleURL))
-	fmt.Printf(" Health Check URL 	: %s", color.BlueString(healthCheckURL))
+	fmt.Printf(" Version          		: %s\n", build.Version())
+	fmt.Printf(" TLS enabled      		: %v\n", startConfig.TLS.Enabled)
+	fmt.Printf(" External Secure 		: %v\n", startConfig.ExternalSecure)
+	fmt.Printf(" Machine Id Method		: %v\n", machineIdMethod)
+	fmt.Printf(" Management Console URL	: %s", color.BlueString(managementConsoleURL))
+	fmt.Printf(" Health Check URL 		: %s", color.BlueString(healthCheckURL))
 	if insecure {
 		fmt.Printf("\n %s: you're using plain http without TLS. Be aware this is \n", color.RedString("Warning"))
 		fmt.Printf(" not a secure setup and should only be used for test systems.         \n")

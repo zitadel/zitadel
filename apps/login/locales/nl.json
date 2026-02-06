@@ -47,7 +47,7 @@
       "userNotFound": "Gebruiker niet in het systeem gevonden",
       "couldNotCreateSession": "Kon sessie voor gebruiker niet aanmaken",
       "initialUserNotSupported": "Initiële gebruiker wordt niet ondersteund",
-      "usernamePasswordNotAllowed": "Gebruikersnaam en wachtwoord niet toegestaan! Neem contact op met jouw beheerder voor meer informatie.",
+      "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
       "passkeysNotAllowed": "Passkeys niet toegestaan! Neem contact op met jouw beheerder voor meer informatie.",
       "couldNotFindIdentityProvider": "Kon identiteitsprovider niet vinden.",
       "userNotActive": "Gebruiker is niet actief. Neem contact op met jouw beheerder voor meer informatie."
@@ -282,7 +282,7 @@
       "description": "Uw apparaat vraagt om jouw vingerafdruk, gezicht of schermvergrendeling",
       "info": {
         "description": "Een passkey is een authenticatiemethode op een apparaat zoals jouw vingerafdruk, Apple FaceID of iets dergelijks. ",
-        "link": "Wachtwoordloze authenticatie"
+        "link": "Passkey authenticatie"
       },
       "skip": "Overslaan",
       "submit": "Doorgaan"
@@ -313,7 +313,7 @@
       "description": "Geef e-mail, voornaam en achternaam op om te registreren."
     },
     "title": "Registreren",
-    "description": "Maak jouw ZITADEL-account aan.",
+    "description": "Maak jouw Zitadel-account aan.",
     "noMethodAvailableWarning": "Geen authenticatiemethode beschikbaar. Neem contact op met jouw beheerder.",
     "selectMethod": "Selecteer de methode waarmee u wilt verifiëren",
     "agreeTo": "Om te registreren moet u akkoord gaan met de voorwaarden",
