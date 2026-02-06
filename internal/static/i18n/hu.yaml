@@ -342,7 +342,7 @@ Errors:
     RequiredFieldsMissing: "Néhány kötelező mező hiányzik"
     Grant:
       AlreadyExists: "A projekt támogatás már létezik"
-      NotFound: "Engedély nem található"
+      NotFound: "A projekt engedély nem található"
       Invalid: "A projekt engedélye érvénytelen"
       NotExisting: "A projekt engedélye nem létezik"
       HasNotExistingRole: "Egy szerepkör nem létezik a projektben"

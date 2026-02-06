@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organizace",
     "PROJECT": "Projekty",
     "PROJECTOVERVIEW": "Přehled",
-    "PROJECTGRANTS": "Pověření",
+    "PROJECTGRANTS": "Grantové projekty",
     "ROLES": "Role",
     "GRANTEDPROJECT": "Pověřené projekty",
     "HUMANUSERS": "Uživatelé",
@@ -2056,7 +2056,7 @@
       "DESCRIPTION": "Umožněte jiné organizaci využívat váš projekt.",
       "EDITTITLE": "Upravit oprávnění",
       "CREATE": {
-        "TITLE": "Vytvořit povolení pro organizaci",
+        "TITLE": "Vytvořit projektové oprávnění",
         "SEL_USERS": "Vyberte uživatele, kterým chcete povolit přístup",
         "SEL_PROJECT": "Vyhledejte projekt",
         "SEL_ROLES": "Vyberte role, které chcete do povolení přidat",
@@ -2066,7 +2066,7 @@
         "ORG_DESCRIPTION": "Chystáte se povolit uživateli organizace {{name}} přístup.",
         "ORG_DESCRIPTION_DESC": "Změňte kontext v hlavičce výše pro povolení přístupu uživateli jiné organizace.",
         "SEL_ORG_FORMFIELD": "Organizace",
-        "FOR_ORG": "Povolení je vytvořeno pro:"
+        "FOR_ORG": "Projektové oprávnění bude vytvořeno pro:"
       },
       "DETAIL": {
         "TITLE": "Povolení k projektu",
@@ -2179,7 +2179,7 @@
       "DEACTIVATED": "Deaktivováno.",
       "CREATED": "Projekt vytvořen.",
       "UPDATED": "Projekt změněn.",
-      "GRANTUPDATED": "Povolení změněno.",
+      "GRANTUPDATED": "Grant projektu změněno.",
       "DELETED": "Projekt smazán."
     }
   },

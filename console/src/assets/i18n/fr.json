@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organisation",
     "PROJECT": "Projets",
     "PROJECTOVERVIEW": "Vue d'ensemble",
-    "PROJECTGRANTS": "Droits",
+    "PROJECTGRANTS": "Concessions de projet",
     "ROLES": "Rôles",
     "GRANTEDPROJECT": "Projets octroyés",
     "HUMANUSERS": "Utilisateurs",
@@ -2055,7 +2055,7 @@
       "DESCRIPTION": "Autoriser une autre organisation à utiliser votre projet.",
       "EDITTITLE": "Rôles d'édition",
       "CREATE": {
-        "TITLE": "Octroyer une organisation",
+        "TITLE": "Créer une concession de projet",
         "SEL_USERS": "Sélectionnez les utilisateurs auxquels vous souhaitez accorder l'accès",
         "SEL_PROJECT": "Rechercher un projet",
         "SEL_ROLES": "Sélectionnez les rôles que vous souhaitez ajouter à l'autorisation.",
@@ -2065,7 +2065,7 @@
         "ORG_DESCRIPTION": "Vous êtes sur le point d'octroyer un utilisateur pour l'organisation {{name}}.",
         "ORG_DESCRIPTION_DESC": "Changez le contexte dans l'en-tête ci-dessus pour accorder un utilisateur pour une autre organisation.",
         "SEL_ORG_FORMFIELD": "Organisation",
-        "FOR_ORG": "L'autorisation est créée pour"
+        "FOR_ORG": "La concession de projet est créée pour:"
       },
       "DETAIL": {
         "TITLE": "Octroyer un projet",
@@ -2178,7 +2178,7 @@
       "DEACTIVATED": "Désactivé.",
       "CREATED": "Projet créé.",
       "UPDATED": "Projet modifié.",
-      "GRANTUPDATED": "Octroi modifié.",
+      "GRANTUPDATED": "Attribution de projet modifiée.",
       "DELETED": "Projet supprimé."
     }
   },
