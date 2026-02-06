@@ -338,7 +338,7 @@ Errors:
     RequiredFieldsMissing: "Beberapa bidang wajib diisi tidak ada"
     Grant:
       AlreadyExists: "Hibah proyek sudah ada"
-      NotFound: "Hibah tidak ditemukan"
+      NotFound: "Hibah proyek tidak ditemukan"
       Invalid: "Hibah proyek tidak valid"
       NotExisting: "Hibah proyek tidak ada"
       HasNotExistingRole: "Satu peran tidak ada di proyek"

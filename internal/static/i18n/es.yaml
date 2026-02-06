@@ -338,7 +338,7 @@ Errors:
     RequiredFieldsMissing: "Faltan algunos campos requeridos"
     Grant:
       AlreadyExists: "La concesión del proyecto ya existe"
-      NotFound: "Concesión no encontrada"
+      NotFound: "Concesión del proyecto no encontrada"
       Invalid: "La concesión del proyecto no es válida"
       NotExisting: "La concesión del proyecto no existe"
       HasNotExistingRole: "Un rol no existe en el proyecto"

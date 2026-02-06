@@ -333,7 +333,7 @@ Errors:
     RequiredFieldsMissing: "Деякі обов'язкові поля відсутні"
     Grant:
       AlreadyExists: "Грант проекту вже існує"
-      NotFound: "Грант не знайдено"
+      NotFound: "Грант проекту не знайдено"
       Invalid: "Грант проекту недійсний"
       NotExisting: "Грант проекту не існує"
       HasNotExistingRole: "Одна роль не існує в проекті"

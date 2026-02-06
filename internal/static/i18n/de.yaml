@@ -339,7 +339,7 @@ Errors:
     Grant:
       AlreadyExists: "Projekt Grant existiert bereits"
       Invalid: "Projekt Grant ist ungültig"
-      NotFound: "Grant konnte nicht gefunden werden"
+      NotFound: "Project Grant konnte nicht gefunden werden"
       NotExisting: "Projekt Grant existiert nicht"
       HasNotExistingRole: "Eine der Rollen existiert nicht auf dem Projekt"
       NotActive: "Projekt Grant ist nicht aktiv"

@@ -332,7 +332,7 @@ Errors:
     RequiredFieldsMissing: "Отсутствуют некоторые обязательные поля"
     Grant:
       AlreadyExists: "Допуск проекта уже существует"
-      NotFound: "Допуск не найден"
+      NotFound: "Допуск проекта не найден"
       Invalid: "Допуск проекта недействителен"
       NotExisting: "Допуск проекта не существует"
       HasNotExistingRole: "В проекте не существует ни одной роли"

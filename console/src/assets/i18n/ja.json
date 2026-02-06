@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "ユーザー",
-      "DESCRIPTION": "ユーザーは、あなたのアプリケーションにアクセスできる人間または機械です。",
+      "DESCRIPTION": "ユーザーは、あなたのアプリケーションにアクセスできる人間またはサービスアカウントです。",
       "HUMANS": {
         "TITLE": "ユーザー",
         "DESCRIPTION": "ユーザーは、ログイン プロンプトを使用してブラウザ セッションで対話的に認証を行います。",
@@ -420,7 +420,7 @@
     "ORGANIZATION": "組織",
     "PROJECT": "プロジェクト",
     "PROJECTOVERVIEW": "概要",
-    "PROJECTGRANTS": "グラント",
+    "PROJECTGRANTS": "プロジェクト権限",
     "ROLES": "ロール",
     "GRANTEDPROJECT": "グラントされたプロジェクト",
     "HUMANUSERS": "ユーザー",
@@ -2055,7 +2055,7 @@
       "DESCRIPTION": "他の組織にプロジェクトを使用できるようにします。",
       "EDITTITLE": "ロールの編集",
       "CREATE": {
-        "TITLE": "組織グラントの作成",
+        "TITLE": "プロジェクト権限を作成",
         "SEL_USERS": "アクセスを許可するユーザーを選択する",
         "SEL_PROJECT": "プロジェクトを検索する",
         "SEL_ROLES": "許可するロールを選択する",
@@ -2065,7 +2065,7 @@
         "ORG_DESCRIPTION": "組織 {{name}} にユーザーをグラントします。",
         "ORG_DESCRIPTION_DESC": "上記のヘッダーのコンテキストを切り替えることで、別組織のユーザーにグラントできます。",
         "SEL_ORG_FORMFIELD": "組織",
-        "FOR_ORG": "グラントが以下に対して作成されます："
+        "FOR_ORG": "プロジェクト付与は次のために作成されます："
       },
       "DETAIL": {
         "TITLE": "プロジェクトグラント",
@@ -2178,7 +2178,7 @@
       "DEACTIVATED": "非アクティブになりました。",
       "CREATED": "プロジェクトが作成されました。",
       "UPDATED": "プロジェクトが変更されました。",
-      "GRANTUPDATED": "グラントが変更されました。",
+      "GRANTUPDATED": "プロジェクト権限が変更されました。",
       "DELETED": "プロジェクトが削除されました。"
     }
   },

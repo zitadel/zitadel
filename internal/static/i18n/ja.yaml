@@ -339,7 +339,7 @@ Errors:
     RequiredFieldsMissing: "一部の必須項目が不足しています"
     Grant:
       AlreadyExists: "プロジェクトグラントはすでに存在しています"
-      NotFound: "グラントが見つかりません"
+      NotFound: "プロジェクトグラントが見つかりません"
       Invalid: "無効なプロジェクトグラントです"
       NotExisting: "プロジェクトグラントは存在しません"
       HasNotExistingRole: "プロジェクトに1つのロールが存在しません"

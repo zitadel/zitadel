@@ -339,7 +339,7 @@ Errors:
     RequiredFieldsMissing: "필요한 필드가 일부 누락되었습니다"
     Grant:
       AlreadyExists: "프로젝트 권한이 이미 존재합니다"
-      NotFound: "권한을 찾을 수 없습니다"
+      NotFound: "프로젝트 권한을 찾을 수 없습니다"
       Invalid: "프로젝트 권한이 유효하지 않습니다"
       NotExisting: "프로젝트 권한이 존재하지 않습니다"
       HasNotExistingRole: "프로젝트에 존재하지 않는 역할이 있습니다"

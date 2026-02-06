@@ -338,13 +338,13 @@ Errors:
         NotFound: "مفتاح التطبيق غير موجود"
     RequiredFieldsMissing: "بعض الحقول المطلوبة مفقودة"
     Grant:
-      AlreadyExists: "منح المشروع موجود بالفعل"
-      NotFound: "المنح غير موجود"
-      Invalid: "منح المشروع غير صالح"
-      NotExisting: "منح المشروع غير موجود"
-      HasNotExistingRole: "دور واحد غير موجود في المشروع"
-      NotActive: "منح المشروع ليس نشطاً"
-      NotInactive: "منح المشروع ليس معطلاً"
+      AlreadyExists: "منحة المشروع موجودة بالفعل"
+      NotFound: "لم يتم العثور على منحة المشروع"
+      Invalid: "منحة المشروع غير صالحة"
+      NotExisting: "منحة المشروع غير موجودة"
+      HasNotExistingRole: "يوجد دور غير موجود في المشروع"
+      NotActive: "منحة المشروع غير نشطة"
+      NotInactive: "منحة المشروع غير معطلة"
   Instance:
     NotFound: "المثيل غير موجود. تأكد من أن النطاق صحيح. تحقق من https://zitadel.com/docs/apis/introduction#domains"
     Member:

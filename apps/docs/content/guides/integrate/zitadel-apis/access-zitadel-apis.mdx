@@ -27,9 +27,9 @@ For further details and in-depth exploration, you can refer to the [ZITADEL API 
 
 Accessing ZITADEL APIs, except for the Auth API and the System API, requires these basic steps:
 
-1. **Create a service user**: A service user is a special type of account used to grant programmatic access to ZITADEL's functionalities. Unlike regular users who log in with a username and password, [service users rely on a more secure mechanism involving digital keys and tokens](../service-users/authenticate-service-users).
+1. **Create a service user**: A service user is a special type of account used to grant programmatic access to ZITADEL's functionalities. Unlike regular users who log in with a username and password, [service users rely on a more secure mechanism involving digital keys and tokens](../service-accounts/authenticate-service-accounts).
 2. **Give permission to access ZITADEL APIs**: Assign a Administrator role to the service user, giving it permission to make changes to certain resources in ZITADEL.
-3. **Authenticate the service user**: Like human users, service users must authenticate and request an OAuth token with the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to access ZITADEL APIs. [Service users can be authenticated](../service-users/authenticate-service-users) using private key JWT, client credentials, or personal access tokens.
+3. **Authenticate the service account**: Like users, service accounts must authenticate and request an OAuth token with the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to access ZITADEL APIs. [Service accounts can be authenticated](../service-accounts/authenticate-service-accounts) using private key JWT, client credentials, or personal access tokens.
 4. **Access ZITADEL APIs with the token**: The OAuth token must be included in the Authorization Header of calls to ZITADEL APIs.
 
 ### Accessing Auth API
@@ -84,7 +84,7 @@ To be able to access the ZITADEL APIs your service user needs permissions to ZIT
 ## 3. Authenticate service user and request token
 
 Service users can be authenticated using private key JWT, client credentials, or personal access tokens.
-The [service user authentication](../service-users/authenticate-service-users) can be used to make machine-to-machine requests to any Resource Server (eg, a backend service / API) by requesting a token from the Authorization Server (ZITADEL) and sending the short-lived token (access token) in the Header of requests.
+The [service user authentication](../service-accounts/authenticate-service-accounts) can be used to make machine-to-machine requests to any Resource Server (eg, a backend service / API) by requesting a token from the Authorization Server (ZITADEL) and sending the short-lived token (access token) in the Header of requests.
 
 This guide covers a specific case of service user authentication when requesting access to the [ZITADEL APIs](/apis/introduction).
 While PAT can be used directly to access the ZITADEL APIS, the more secure authentication methods private key JWT and client credentials must include the [reserved scope](/apis/openidoauth/scopes) `urn:zitadel:iam:org:project:id:zitadel:aud` when requesting an access from the token endpoint.
@@ -95,7 +95,7 @@ The following sections will explain the more specific authentication to access t
 
 ### Authenticate with private key JWT
 
-Follow the steps in this guide to [generate an key file](../service-users/private-key-jwt#2-register-a-private-key-for-your-service-user) and [create a JWT and sign with private key](../service-users/private-key-jwt#3-create-a-jwt-and-sign-it-with-your-private-key).
+Follow the steps in this guide to [generate an key file](../service-accounts/private-key-jwt#2-register-a-private-key-for-your-service-user) and [create a JWT and sign with private key](../service-accounts/private-key-jwt#3-create-a-jwt-and-sign-it-with-your-private-key).
 
 With the encoded JWT (assertion) from the prior step, you will need to craft a POST request to ZITADEL's token endpoint.
 
@@ -232,4 +232,4 @@ curl --request GET \
 - [Example application in Go](./example-zitadel-api-with-go) to access ZITADEL APIs
 - [Example application in .NET](./example-zitadel-api-with-dot-net) to access ZITADEL APIs
 - Learn how to use the [Event API](./event-api) to retrieve your audit trail
-- Read about the [different methods to authenticate service users](../service-users/authenticate-service-users)
+- Read about the [different methods to authenticate service users](../service-accounts/authenticate-service-accounts)

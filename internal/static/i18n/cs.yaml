@@ -338,7 +338,7 @@ Errors:
     RequiredFieldsMissing: "Některá povinná pole chybí"
     Grant:
       AlreadyExists: "Grant projektu již existuje"
-      NotFound: "Grant nebyl nalezen"
+      NotFound: "Grant projektu nebyl nalezen"
       Invalid: "Grant projektu je neplatný"
       NotExisting: "Grant projektu neexistuje"
       HasNotExistingRole: "Jedna z rolí v projektu neexistuje"

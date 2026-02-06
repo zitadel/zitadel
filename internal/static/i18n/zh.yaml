@@ -339,7 +339,7 @@ Errors:
     RequiredFieldsMissing: "缺少一些必填字段"
     Grant:
       AlreadyExists: "项目授权已存在"
-      NotFound: "授权不存在"
+      NotFound: "未找到项目授权"
       Invalid: "项目授权无效"
       NotExisting: "项目授权不存在"
       HasNotExistingRole: "角色不存在与项目中"

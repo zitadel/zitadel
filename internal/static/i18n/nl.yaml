@@ -338,7 +338,7 @@ Errors:
     RequiredFieldsMissing: "Enkele vereiste velden ontbreken"
     Grant:
       AlreadyExists: "Projecttoekenning bestaat al"
-      NotFound: "Toekenning niet gevonden"
+      NotFound: "Projecttoekenning niet gevonden"
       Invalid: "Projecttoekenning is ongeldig"
       NotExisting: "Projecttoekenning bestaat niet"
       HasNotExistingRole: "Een rol bestaat niet op project"
