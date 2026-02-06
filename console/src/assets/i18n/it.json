@@ -1160,7 +1160,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Ruoli dell'amministratore Zitadel",
-      "DESCRIPTION": "Questi sono tutti i member grant dell'utente. Puoi modificarli anche nelle pagine di dettaglio dell'organizzazione, del progetto o di sistema.",
+      "DESCRIPTION": "Questi sono tutti i member grant dell'utente. Puoi modificarli anche nelle pagine di dettaglio dell'organizzazione, del progetto o dell'istanza.",
       "ORGCONTEXT": "Vedi tutti i progetti che sono collegati all'organizzazione attualmente selezionata.",
       "USERCONTEXT": "Vedi tutte le organizzazioni e i progetti a cui sei autorizzato. Comprese le altre organizzazioni.",
       "CREATIONDATE": "Data di creazione",
