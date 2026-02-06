@@ -208,6 +208,7 @@ func (a *API) RegisterService(ctx context.Context, srv server.Server) error {
 func (a *API) registerConnectServer(service server.ConnectServer) {
 	prefix, handler := service.RegisterConnectServer(
 		connect_middleware.CallDurationHandler(),
+		connect_middleware.RequestIDHandler(),
 		a.connectOTELInterceptor,
 		connect_middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 		connect_middleware.LogHandler(grpc_api.Probes...),

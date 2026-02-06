@@ -50,6 +50,7 @@ const (
 	ReferrerPolicy          = "referrer-policy"
 	FeaturePolicy           = "feature-policy"
 	PermissionsPolicy       = "permissions-policy"
+	XRequestID              = "x-request-id"
 
 	ZitadelOrgID = "x-zitadel-orgid"
 

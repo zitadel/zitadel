@@ -207,6 +207,7 @@ func addInterceptors(
 	accessInterceptor *http_mw.AccessInterceptor,
 ) http.Handler {
 	handler = http_mw.CallDurationHandler(handler)
+	handler = http_mw.RequestIDHandler()(handler)
 	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.RobotsTagHandler(handler)
 	handler = http_mw.DefaultTraceHandler(handler)
