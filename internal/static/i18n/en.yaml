@@ -196,6 +196,10 @@ Errors:
     RefreshToken:
       Invalid: "Refresh Token is invalid"
       NotFound: "Refresh Token not found"
+  Instance:
+    NotFound: "Instance not found"
+    AlreadyExists: "Instance already exists"
+    NotChanged: "Instance not changed"
   Org:
     AlreadyExists: "Organisation's name or id already taken"
     Invalid: "Organisation is invalid"
@@ -280,6 +284,10 @@ Errors:
       Empty: "Password Age Policy is empty"
       NotExisting: "Password Age Policy doesn't exist"
       AlreadyExists: "Password Age Policy already exists"
+    OrgIAMPolicy:
+      Empty: "Org IAM Policy is empty"
+      NotExisting: "Org IAM Policy doesn't exist"
+      AlreadyExists: "Org IAM Policy already exists"
     NotificationPolicy:
       NotFound: "Notification Policy not found"
       NotChanged: "Notification Policy not changed"
@@ -341,16 +349,16 @@ Errors:
       HasNotExistingRole: "One role doesn't exist on project"
       NotActive: "Project grant is not active"
       NotInactive: "Project grant is not inactive"
-  Instance:
+  IAM:
     NotFound: "Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains"
-    AlreadyExists: "Instance already exists"
-    NotChanged: "Instance not changed"
     Member:
       RolesNotChanged: "Roles have not been changed"
     MemberInvalid: "Member is invalid"
     MemberAlreadyExisting: "Member already exists"
     MemberNotExisting: "Member does not exist"
     IDMissing: "Id missing"
+    IAMProjectIDMissing: "IAM project id missing"
+    IamProjectAlreadySet: "IAM project id has already been set"
     IdpInvalid: "IDP configuration is invalid"
     IdpNotExisting: "IDP configuration does not exist"
     OIDCConfigInvalid: "OIDC IDP configuration is invalid"
@@ -408,11 +416,11 @@ Errors:
       Empty: "Default Password Lockout Policy empty"
       NotChanged: "Default Password Lockout Policy has not been changed"
     DomainPolicy:
-      NotFound: "Organization domain Policy not found"
-      Empty: "Organization domain Policy is empty"
-      NotExisting: "Organization domain Policy not existing"
-      AlreadyExists: "Organization domain Policy already exists"
-      NotChanged: "Organization domain Policy has not been changed"
+      NotFound: "Org IAM Policy not found"
+      Empty: "Org IAM Policy is empty"
+      NotExisting: "Org IAM Policy not existing"
+      AlreadyExists: "Org IAM Policy already exists"
+      NotChanged: "Org IAM Policy has not been changed"
     NotificationPolicy:
       NotFound: "Default Notification Policy not found"
       NotChanged: "Default Notification Policy not changed"
