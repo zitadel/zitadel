@@ -53,23 +53,24 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
         password: { password: values.password },
       }),
       requestId,
-    })
-      .catch(() => {
-        setError(t("verify.errors.couldNotVerifyPassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("verify.errors.couldNotVerifyPassword"));
+      setLoading(false);
+      return;
+    });
 
     if (response && "error" in response && response.error) {
       setError(response.error);
+      setLoading(false);
       return;
     }
 
     if (response && "redirect" in response && response.redirect) {
+      // Keep loading state true during redirect
       return router.push(response.redirect);
     }
+
+    setLoading(false);
   }
 
   async function resetPasswordAndContinue() {
@@ -93,10 +94,12 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
 
     if (response && "error" in response) {
       setError(response.error as string);
+      setLoading(false);
       return;
     }
 
     setInfo(t("verify.info.passwordResetSent"));
+    setLoading(false);
 
     const params = new URLSearchParams({
       loginName: loginName,

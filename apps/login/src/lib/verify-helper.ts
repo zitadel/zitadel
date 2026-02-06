@@ -77,7 +77,27 @@ export function checkEmailVerification(session: Session, humanUser?: HumanUser, 
       params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
-    return { redirect: `/verify?` + params };
+    return { redirect: `/verify/email?` + params };
+  }
+}
+
+export function checkPhoneVerification(session: Session, humanUser?: HumanUser, organization?: string, requestId?: string) {
+  if (!humanUser?.phone?.isVerified && humanUser?.phone?.phone) {
+    const params = new URLSearchParams({
+      loginName: session.factors?.user?.loginName as string,
+      userId: session.factors?.user?.id as string,
+      send: "true", // we request a new phone code once the page is loaded
+    });
+
+    if (organization || session.factors?.user?.organizationId) {
+      params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
+    }
+
+    if (requestId) {
+      params.append("requestId", requestId);
+    }
+
+    return { redirect: `/verify/phone?` + params };
   }
 }
 
