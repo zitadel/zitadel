@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Gebruikers",
-      "DESCRIPTION": "Een gebruiker is een mens of een machine die toegang kan krijgen tot je applicaties.",
+      "DESCRIPTION": "Een gebruiker is een mens of een serviceaccount die toegang kan krijgen tot je applicaties.",
       "HUMANS": {
         "TITLE": "Gebruikers",
         "DESCRIPTION": "Gebruikers authenticeren interactief in een browsersessie met een loginprompt.",

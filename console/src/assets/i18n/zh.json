@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "用户",
-      "DESCRIPTION": "用户是可以访问你的应用的人或机器。",
+      "DESCRIPTION": "用户是可以访问你的应用的人或服务账户。",
       "HUMANS": {
         "TITLE": "用户",
         "DESCRIPTION": "用户在浏览器会话中通过登录提示进行交互身份验证。",

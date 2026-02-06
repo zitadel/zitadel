@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Utilizatori",
-      "DESCRIPTION": "Un utilizator este o persoană sau o mașină care vă poate accesa aplicațiile.",
+      "DESCRIPTION": "Un utilizator este o persoană sau un cont de serviciu care vă poate accesa aplicațiile.",
       "HUMANS": {
         "TITLE": "Utilizatori",
         "DESCRIPTION": "Utilizatorii se autentifică interactiv într-o sesiune de browser cu o solicitare de autentificare.",

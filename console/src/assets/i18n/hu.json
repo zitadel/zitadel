@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Felhasználók",
-      "DESCRIPTION": "A felhasználó lehet ember vagy gép, amely hozzáfér az alkalmazásaidhoz.",
+      "DESCRIPTION": "A felhasználó lehet ember vagy szolgáltatásfiók, amely hozzáfér az alkalmazásaidhoz.",
       "HUMANS": {
         "TITLE": "Felhasználók",
         "DESCRIPTION": "A felhasználók interaktívan hitelesítik magukat egy böngésző munkamenetben egy bejelentkezési felhívással.",

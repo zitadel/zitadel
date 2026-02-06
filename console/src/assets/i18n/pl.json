@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Użytkownicy",
-      "DESCRIPTION": "Użytkownik to człowiek lub maszyna, która może uzyskać dostęp do twoich aplikacji.",
+      "DESCRIPTION": "Użytkownik to człowiek lub konto usługi, które może uzyskać dostęp do twoich aplikacji.",
       "HUMANS": {
         "TITLE": "Użytkownicy",
         "DESCRIPTION": "Użytkownicy uwierzytelniają się interaktywnie w sesji przeglądarki z monitem logowania.",

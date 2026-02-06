@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Användare",
-      "DESCRIPTION": "En användare är en människa eller en maskin som kan få åtkomst till dina applikationer.",
+      "DESCRIPTION": "En användare är en människa eller ett tjänstkonto som kan få åtkomst till dina applikationer.",
       "HUMANS": {
         "TITLE": "Användare",
         "DESCRIPTION": "Användare autentiserar interaktivt i en webbläsarsession med en inloggningsprompt.",

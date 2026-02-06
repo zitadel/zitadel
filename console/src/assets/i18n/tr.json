@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Kullanıcılar",
-      "DESCRIPTION": "Kullanıcı, uygulamalarınıza erişebilen bir insan veya makinedir.",
+      "DESCRIPTION": "Kullanıcı, uygulamalarınıza erişebilen bir insan veya hizmet hesabıdır.",
       "HUMANS": {
         "TITLE": "Kullanıcılar",
         "DESCRIPTION": "Kullanıcılar, giriş istemiyle bir tarayıcı oturumunda etkileşimli olarak kimlik doğrulaması yapar.",
