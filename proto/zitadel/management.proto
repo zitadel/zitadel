@@ -32,7 +32,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         title: "Management API";
         version: "1.0";
-        description: "The management API is as the name states the interface where systems can mutate IAM objects like organizations, projects, applications, users and so on if they have the necessary access rights.";
+        description: "The management API is as the name states the interface where systems can mutate instance objects like organizations, projects, applications, users and so on if they have the necessary access rights.";
         contact:{
             name: "ZITADEL"
             url: "https://zitadel.com"
@@ -4778,7 +4778,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Domain Settings";
             summary: "Get Domain Policy";
-            description: "Returns the domain policy (this policy is managed by the IAM administrator)";
+            description: "Returns the domain policy (this policy is managed by the instance administrator)";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";

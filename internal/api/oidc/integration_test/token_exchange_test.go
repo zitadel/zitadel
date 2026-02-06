@@ -399,7 +399,7 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "IAM IMPERSONATION: subject: userID, actor: access token, success",
+			name: "Instance IMPERSONATION: subject: userID, actor: access token, success",
 			args: args{
 				SubjectToken:       userResp.GetUserId(),
 				SubjectTokenType:   oidc_api.UserIDTokenType,
@@ -564,7 +564,7 @@ func TestImpersonation_API_Call(t *testing.T) {
 	iamUserID, iamImpersonatorPAT := createMachineUserPATWithMembership(ctx, t, instance, "IAM_ADMIN_IMPERSONATOR")
 	iamOwner := instance.Users.Get(integration.UserTypeIAMOwner)
 
-	// impersonating the IAM owner!
+	// impersonating the instance owner!
 	resp, err := tokenexchange.ExchangeToken(ctx, exchanger, iamOwner.Token, oidc.AccessTokenType, iamImpersonatorPAT, oidc.AccessTokenType, nil, nil, nil, oidc.AccessTokenType)
 	require.NoError(t, err)
 	accessTokenVerifier(ctx, resourceServer, iamOwner.ID, iamUserID)

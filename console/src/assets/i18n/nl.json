@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Servicegebruikers",
     "LOGOUT": "Alle gebruikers uitloggen",
     "NEWORG": "Nieuwe organisatie",
-    "IAMADMIN": "U bent een IAM-beheerder. Let op: u heeft uitgebreide rechten.",
+    "IAMADMIN": "U bent een instantie-beheerder. Let op: u heeft uitgebreide rechten.",
     "SHOWORGS": "Toon alle organisaties",
     "GRANTS": "Machtigingen",
     "ACTIONS": "Acties",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel Beheerdersrollen",
-      "DESCRIPTION": "Dit zijn alle lidmaatschapstoewijzingen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of IAM.",
+      "DESCRIPTION": "Dit zijn alle lidmaatschapstoewijzingen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of instantie.",
       "ORGCONTEXT": "U ziet alle organisaties en projecten die gerelateerd zijn aan de momenteel geselecteerde organisatie.",
       "USERCONTEXT": "U ziet alle organisaties en projecten waarvoor u gemachtigd bent. Inclusief andere organisaties.",
       "CREATIONDATE": "Aanmaakdatum",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Beheer uw wereldwijde beleid en beheer toegangsinstellingen."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Opslagbeheer",
+      "TITLE": "Instantie Opslagbeheer",
       "DESCRIPTION": "Beheer uw Zitadel-weergaven en mislukte evenementen."
     },
     "MEMBER": {
@@ -2788,7 +2788,7 @@
     "ADD": "Voeg een Manager toe",
     "CREATIONTYPE": "Creatietype",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instantie",
       "2": "Organisatie",
       "0": "Eigendom Project",
       "1": "Verleend Project",

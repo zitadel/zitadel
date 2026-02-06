@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Tjänsteanvändare",
     "LOGOUT": "Logga ut alla användare",
     "NEWORG": "Ny Organisation",
-    "IAMADMIN": "Du är en IAM-administratör. Observera att du har utökade behörigheter.",
+    "IAMADMIN": "Du är en instans-administratör. Observera att du har utökade behörigheter.",
     "SHOWORGS": "Visa Alla Organisationer",
     "GRANTS": "Behörigheter",
     "ACTIONS": "Åtgärder",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel-administratörsroller",
-      "DESCRIPTION": "Detta är alla medlemsbeviljanden för användaren. Du kan också ändra dem på organisations-, projekt- eller IAM-detaljsidor.",
+      "DESCRIPTION": "Detta är alla medlemsbeviljanden för användaren. Du kan också ändra dem på organisations-, projekt- eller instans-detaljsidor.",
       "ORGCONTEXT": "Du ser alla organisationer och projekt som är relaterade till den för närvarande valda organisationen.",
       "USERCONTEXT": "Du ser alla organisationer och projekt som du är auktoriserad till. Inklusive andra organisationer.",
       "CREATIONDATE": "Skapelsedatum",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Hantera dina globala policyer och åtkomstinställningar."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Lagringsadministration",
+      "TITLE": "Instans Lagringsadministration",
       "DESCRIPTION": "Hantera dina Zitadel-vyer och misslyckade händelser."
     },
     "MEMBER": {
@@ -2798,7 +2798,7 @@
     "ADD": "Lägg till en administratör",
     "CREATIONTYPE": "Skapandetyp",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instans",
       "2": "Organisation",
       "0": "Eget Projekt",
       "1": "Beviljat Projekt",

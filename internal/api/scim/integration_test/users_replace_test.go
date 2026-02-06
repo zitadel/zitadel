@@ -229,7 +229,7 @@ func TestReplaceUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// use iam owner => we don't want to test permissions of the create endpoint.
+			// use instance owner => we don't want to test permissions of the create endpoint.
 			createdUser, err := Instance.Client.SCIM.Users.Create(Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner), Instance.DefaultOrg.Id, withUsername(fullUserJson, integration.Username()))
 			require.NoError(t, err)
 
