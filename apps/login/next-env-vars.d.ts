@@ -51,11 +51,11 @@ declare namespace NodeJS {
      * Otherwise, it will use the value as an absolute redirect URI.
      * Takes precedence over organization settings.
      */
-    ZITADEL_DEFAULT_REDIRECT_URI?: string;
+    DEFAULT_REDIRECT_URI?: string;
 
     /**
-     * Optional: Comma-separated list of allowed origins for Server Actions (e.g., 'localhost:3000,zitadel.com')
-     * If not set, it defaults to an empty list.
+     * Optional: Comma-separated list of additional allowed origins for Server Actions (e.g., 'localhost:3000,zitadel.com').
+     * If not set, it defaults to an empty list, allowing only same-origin requests.
      */
     SERVER_ACTION_ALLOWED_ORIGINS?: string;
   }

@@ -16,21 +16,21 @@ describe("getNextUrl", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    delete (process.env as any).ZITADEL_DEFAULT_REDIRECT_URI;
+    delete (process.env as any).DEFAULT_REDIRECT_URI;
     delete (process.env as any).NEXT_PUBLIC_BASE_PATH;
   });
 
-  test("should use ZITADEL_DEFAULT_REDIRECT_URI if set", async () => {
-    process.env.ZITADEL_DEFAULT_REDIRECT_URI = "https://env-override.com";
+  test("should use DEFAULT_REDIRECT_URI if set", async () => {
+    process.env.DEFAULT_REDIRECT_URI = "https://env-override.com";
     const result = await getNextUrl(command);
     expect(result).toBe("https://env-override.com");
   });
 
-  test("should use host-based redirect if ZITADEL_DEFAULT_REDIRECT_URI is set to '/'", async () => {
+  test("should use host-based redirect if DEFAULT_REDIRECT_URI is set to '/'", async () => {
     const { headers } = await import("next/headers");
     const { getPublicHostWithProtocol } = await import("./server/host");
 
-    process.env.ZITADEL_DEFAULT_REDIRECT_URI = "/";
+    process.env.DEFAULT_REDIRECT_URI = "/";
     vi.mocked(headers).mockResolvedValue({} as any);
     vi.mocked(getPublicHostWithProtocol).mockReturnValue("https://my-host.com");
     process.env.NEXT_PUBLIC_BASE_PATH = "/ui/v2/login";

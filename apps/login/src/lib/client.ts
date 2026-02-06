@@ -111,14 +111,14 @@ export async function getNextUrl(
 
 /**
  * Resolves the redirect URI based on the following priority:
- * 1. ZITADEL_DEFAULT_REDIRECT_URI environment variable
+ * 1. DEFAULT_REDIRECT_URI environment variable
  * 2. defaultRedirectUri from organization settings
  * 3. Request host (absolute URL)
  * 4. Relative signed-in page fallback
  */
 export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedirectUri?: string): Promise<string> {
   // 1. Environment variable override
-  const envOverride = process.env.ZITADEL_DEFAULT_REDIRECT_URI;
+  const envOverride = process.env.DEFAULT_REDIRECT_URI;
   if (envOverride) {
     if (envOverride === "/") {
       // Special state: trigger absolute host-based redirect
@@ -133,7 +133,7 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
         console.warn("resolveRedirectUri: Could not determine host for '/' override, falling back", error);
       }
     } else {
-      console.log("resolveRedirectUri: Using ZITADEL_DEFAULT_REDIRECT_URI override:", envOverride);
+      console.log("resolveRedirectUri: Using DEFAULT_REDIRECT_URI override:", envOverride);
       return envOverride;
     }
   }
