@@ -341,13 +341,13 @@ Errors:
         NotFound: "Clé d'application non trouvée"
     RequiredFieldsMissing: "Certains champs obligatoires sont manquants"
     Grant:
-      AlreadyExists: "La subvention du projet existe déjà"
-      NotFound: "Subvention non trouvée"
-      Invalid: "La subvention du projet n'est pas valide"
-      NotExisting: "La subvention de projet n'existe pas"
+      AlreadyExists: "La concession du projet existe déjà"
+      NotFound: "Subvention du projet non trouvée"
+      Invalid: "La concession du projet n'est pas valide"
+      NotExisting: "La concession du projet n'existe pas"
       HasNotExistingRole: "Un rôle n'existe pas sur le projet"
-      NotActive: "La subvention de projet n'est pas active"
-      NotInactive: "La subvention du projet n'est pas inactive"
+      NotActive: "La concession du projet n'est pas active"
+      NotInactive: "La concession du projet n'est pas inactive"
   IAM:
     NotFound: "IAM non trouvé. Assurez-vous que vous avez la bonne organisation. Vérifiez https://zitadel.com/docs/apis/introduction#organizations"
     Member:
