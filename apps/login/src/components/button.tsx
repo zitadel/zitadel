@@ -36,7 +36,7 @@ export const getButtonClasses = (
   clsx(
     {
       "box-border leading-36px text-14px inline-flex items-center focus:outline-none transition-colors transition-shadow duration-300": true,
-      "disabled:border-none disabled:bg-gray-300 disabled:text-gray-600 disabled:shadow-none disabled:cursor-not-allowed disabled:dark:bg-gray-800 disabled:dark:text-gray-900":
+      "disabled:border-none disabled:bg-gray-300 disabled:text-gray-600 disabled:shadow-none disabled:cursor-not-allowed disabled:dark:bg-gray-700 disabled:dark:text-gray-900":
         variant === ButtonVariants.Primary,
       "bg-primary-light-500 dark:bg-primary-dark-500 hover:bg-primary-light-400 hover:dark:bg-primary-dark-400 text-primary-light-contrast-500 dark:text-primary-dark-contrast-500":
         variant === ButtonVariants.Primary && color !== ButtonColors.Warn,
