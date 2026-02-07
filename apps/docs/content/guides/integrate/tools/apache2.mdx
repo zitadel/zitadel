@@ -2,9 +2,9 @@
 title: Apache 2.0
 ---
 
-This integration guide shows you the basic OpenID Connect integration with ZITADEL and an Apache 2.0 server.
+This integration guide shows you the basic OpenID Connect integration with Zitadel and an Apache 2.0 server.
 
-## Setup PKCE client in ZITADEL
+## Setup PKCE client in Zitadel
 
 - Go to your organization and setup a new application with the type PKCE
 - When created go to the "Redirect Settings" and *enable Development Mode*
@@ -23,7 +23,7 @@ You can find the url to your discovery endpoint under "URLs":
 We use the module `mod_auth_openidc` in this guide.
 You can find a minimal configuration in the [official documentation](https://github.com/OpenIDC/mod_auth_openidc/wiki#16-what-does-a-minimal-apache-configuration-file-look-like).
 
-The following parameters must be set with the values from ZITADEL.
+The following parameters must be set with the values from Zitadel.
 
 ```yaml
 OIDCProviderMetadataURL https://${CUSTOM_DOMAIN}/.well-known/openid-configuration
@@ -42,7 +42,7 @@ With the following parameters
 |---|---|---|
 | OIDCProviderMetadataURL | Is the url to the discovery endpoint | `https://${CUSTOM_DOMAIN}/.well-known/openid-configuration` |
 | OIDCClientID | Is the ID of the zitadel application. You can find it on the settings page of the application.  | 123456789123@apache_test |
-| OIDCRedirectURI | Users will be redirected to this page after successful login. If you are using localhost or any other non-https endpoint, make sure to enable development mode in ZITADEL. | https://mysecureapp.io/secure/callback |
+| OIDCRedirectURI | Users will be redirected to this page after successful login. If you are using localhost or any other non-https endpoint, make sure to enable development mode in Zitadel. | https://mysecureapp.io/secure/callback |
 | OIDCCryptoPassphrase | Create a secure passphrase. Consult the module's documentation for more details. | ... |
 | OIDCScope | OpenID Connect scopes that should be included. You can find a list of [all scopes](/apis/openidoauth/scopes) in our documentation. | "openid profile" |
 | OIDCPKCEMethod | The method should be set to `S256` | S256 |
@@ -68,5 +68,5 @@ Or check out the [example code](#example-code) for a minimal  version.
 
 ## Example code
 
-We provide a [minimum boilerplate example](https://github.com/zitadel/example-apache2) to test the integration of ZITADEL with an Apache server.
+We provide a [minimum boilerplate example](https://github.com/zitadel/example-apache2) to test the integration of Zitadel with an Apache server.
 Follow the instructions in the readme.

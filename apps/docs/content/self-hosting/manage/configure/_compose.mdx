@@ -9,7 +9,7 @@ import ExampleZITADELConfigSource from "./example-zitadel-config.yaml"
 import ExampleZITADELSecretsSource from "./example-zitadel-secrets.yaml"
 import ExampleZITADELInitStepsSource from "./example-zitadel-init-steps.yaml"
 
-The docker compose example mounts the example zitadel configuration files to the ZITADEL container.
+The docker compose example mounts the example zitadel configuration files to the Zitadel container.
 
 By executing the commands below, you will download the following files:
 
@@ -46,7 +46,7 @@ wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/ma
 # Download and adjust the example configuration file containing database initialization configuration.
 wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/manage/configure/example-zitadel-init-steps.yaml
 
-# A single ZITADEL instance always needs the same 32 bytes long masterkey
+# A single Zitadel instance always needs the same 32 bytes long masterkey
 # Generate one to a file if you haven't done so already and pass it as environment variable
 LC_ALL=C tr -dc '[:graph:]' </dev/urandom | head -c 32 > ./zitadel-masterkey
 export ZITADEL_MASTERKEY="$(cat ./zitadel-masterkey)"

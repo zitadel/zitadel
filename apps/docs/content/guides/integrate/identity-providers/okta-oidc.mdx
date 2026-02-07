@@ -1,5 +1,5 @@
 ---
-title: Configure OKTA as an OIDC Identity Provider in ZITADEL
+title: Configure OKTA as an OIDC Identity Provider in Zitadel
 sidebar_label: OKTA generic OIDC
 id: okta-oidc
 ---
@@ -18,7 +18,7 @@ import TestSetup from './_test_setup.mdx';
 
 <IDPsOverview components={props.components}  templates="Generic OIDC"/>
 
-Click on the ZITADEL Callback URL to copy it to your clipboard.
+Click on the Zitadel Callback URL to copy it to your clipboard.
 You will have to paste it in the OKTA application later.
 
 ![](../../../../public/img/guides/zitadel_generic_oidc_create_provider.png)
@@ -30,14 +30,14 @@ You will have to paste it in the OKTA application later.
 1. Login to your OKTA Account and go to the applications list: `OKTA-DOMAIN/admin/apps/active^
 2. Click on "Create App Integration" and choose "OIDC - OpenID Connect"
 3. Choose Web application as Application type and give a name
-4. [Paste the ZITADEL Callback URL you copied before](#open-the-generic-oidc-provider-template) to the Sign-in redirect URIs
+4. [Paste the Zitadel Callback URL you copied before](#open-the-generic-oidc-provider-template) to the Sign-in redirect URIs
 5. Save the clientid and client secret
 
 ![](../../../../public/img/guides/okta_add_app.png)
 
-## ZITADEL Configuration
+## Zitadel Configuration
 
-1. Go back [to the Generic OIDC Provider template you opened before in ZITADEL](#open-the-generic-oidc-provider-template).
+1. Go back [to the Generic OIDC Provider template you opened before in Zitadel](#open-the-generic-oidc-provider-template).
 2. Add the [client ID and secret created before on your Web application](#register-a-new-client).
 3. Give the provider a name, e.g. OKTA. This name will be displayed on the login screen button.
 4. Add the issuer URL of your OKTA account, e.g. `https://trial-1925566.okta.com`
@@ -46,8 +46,8 @@ You can optionally configure the following settings.
 A useful default will be filled if you don't change anything.
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
-This information will be taken to create/update the user within ZITADEL.
-ZITADEL ensures that at least the `openid`-scope is always sent.
+This information will be taken to create/update the user within Zitadel.
+Zitadel ensures that at least the `openid`-scope is always sent.
 
 **Use PKCE**: If enabled, the provider will use Proof Key for Code Exchange (PKCE) to secure the authorization code flow
 in addition to the client secret.
@@ -72,7 +72,7 @@ in addition to the client secret.
 
 ![](../../../../public/img/guides/okta_login.png)
 
-## Optional: Add ZITADEL action to autofill userdata
+## Optional: Add Zitadel action to autofill userdata
 
 <PrefillAction components={props.components}  fields="firstname, lastname and email verified" provider="Okta"/>
 

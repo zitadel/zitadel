@@ -138,27 +138,6 @@ const nextConfig = {
   },
 };
 
-const withMDX = createMDX({
-  mdxOptions: {
-    rehypePlugins: [
-      [
-        rehypeCode,
-        {
-          langs: [
-            'bash',
-            'yaml',
-            'json',
-            'go',
-            'typescript',
-            'javascript',
-            'sql',
-            'prometheus',
-            'promql',
-          ],
-        },
-      ],
-    ],
-  },
-});
+const withMDX = createMDX();
 
 export default withMDX(nextConfig);

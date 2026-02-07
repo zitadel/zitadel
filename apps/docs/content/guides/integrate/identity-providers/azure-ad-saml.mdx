@@ -1,5 +1,5 @@
 ---
-title: Configure Entra ID as a SAML Service Provider in ZITADEL
+title: Configure Entra ID as a SAML Service Provider in Zitadel
 sidebar_label: Entra ID SAML
 ---
 
@@ -28,7 +28,7 @@ We start setting up the enterprise application.
 
 ### Disable required assignment
 
-To allow all users to sign in using ZITADEL we need to manually disable required assignment:
+To allow all users to sign in using Zitadel we need to manually disable required assignment:
 
 1. Go to Manage > Properties
 2. Set "Assignment required?" to No
@@ -47,7 +47,7 @@ Configure the sign-on method of the app.
 
 ![](../../../../public/img/guides/azure_saml_overview.png)
 
-## ZITADEL Configuration
+## Zitadel Configuration
 
 ### Go to the IdP Providers Overview
 
@@ -55,7 +55,7 @@ Configure the sign-on method of the app.
 
 ### Create a new SAML Service Provider (SP)
 
-Now we configure the identity provider on ZITADEL.
+Now we configure the identity provider on Zitadel.
 
 1. Set a name like "Microsoft Entra"
 2. Paste the previously copied URL into the "Metadata URL"-field. The metadata will automatically be fetched from the provided URL after creation.
@@ -70,29 +70,29 @@ Now we configure the identity provider on ZITADEL.
 
 ## Configure Basic SAML Configuration
 
-After you created the SAML provider in ZITADEL, you can copy the URLs you need to configure in your Entra ID application.
+After you created the SAML provider in Zitadel, you can copy the URLs you need to configure in your Entra ID application.
 
 ![](../../../../public/img/guides/zitadel_azure_saml_provider_urls.png)
 
 1. Go to Microsoft Entra > Manage > Single sign-on
 2. Edit the "Basic SAML Configuration"
-3. **Identifier (Entity ID)**: Paste the *ZITADEL Metadata URL*.
-4. **Reply URL (Assertion Consumer Service URL)**: Paste the *ZITADEL ACS Login Form URL*
-5. **Sign on URL**: Paste the *ZITADEL ACS Login Form URL*
-6. **Logout URL**: Paste the *ZITADEL Single Logout URL*
-7. Optionally, you can enable the "Federated Logout", which will log out the user from Entra ID once they terminate their session in ZITADEL using the OIDC End Session Endpoint.
+3. **Identifier (Entity ID)**: Paste the *Zitadel Metadata URL*.
+4. **Reply URL (Assertion Consumer Service URL)**: Paste the *Zitadel ACS Login Form URL*
+5. **Sign on URL**: Paste the *Zitadel ACS Login Form URL*
+6. **Logout URL**: Paste the *Zitadel Single Logout URL*
+7. Optionally, you can enable the "Federated Logout", which will log out the user from Entra ID once they terminate their session in Zitadel using the OIDC End Session Endpoint.
 8. Click Save
 
 <Callout>
-You can ignore the ZITADEL ACS Intent API URL for now.
-This is relevant if you want to [programmatically sign users in at ZITADEL via a SAML Service Provider](/guides/integrate/login-ui/external-login).
+You can ignore the Zitadel ACS Intent API URL for now.
+This is relevant if you want to [programmatically sign users in at Zitadel via a SAML Service Provider](/guides/integrate/login-ui/external-login).
 </Callout>
 
 ![](../../../../public/img/guides/azure_saml_overview2.png)
 
-## Enable the Microsoft Entra Button in ZITADELs Login Page
+## Enable the Microsoft Entra Button in Zitadels Login Page
 
-Go back to ZITADEL and activate the IdP.
+Go back to Zitadel and activate the IdP.
 
 ### Activate IdP
 
@@ -111,7 +111,7 @@ To test the setup, use incognito mode and browse to your login page.
 You see a new button which redirects you to Microsoft Entra screen.
 </p>
 
-By default, ZITADEL shows what you define in the default settings.
+By default, Zitadel shows what you define in the default settings.
 If you overwrite the default settings for an organization, you need to send the organization scope in your auth request.
 
 ![](../../../../public/img/guides/zitadel_login_azure_saml.png)

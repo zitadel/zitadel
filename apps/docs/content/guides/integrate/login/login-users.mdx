@@ -3,11 +3,11 @@ title: Log users into your application with different authentication options
 sidebar_label: Authentication Options
 ---
 
-ZITADEL is a comprehensive identity and access management platform designed to streamline user authentication, authorization, and management processes for your application. It offers a range of features, including single sign-on (SSO), multi-factor authentication (MFA), and centralized user management.
+Zitadel is a comprehensive identity and access management platform designed to streamline user authentication, authorization, and management processes for your application. It offers a range of features, including single sign-on (SSO), multi-factor authentication (MFA), and centralized user management.
 
-With ZITADEL, you can securely authenticate users using industry-standard protocols such as OpenID Connect and SAML. This enables seamless integration with various applications and services, providing a unified authentication experience for your users.
+With Zitadel, you can securely authenticate users using industry-standard protocols such as OpenID Connect and SAML. This enables seamless integration with various applications and services, providing a unified authentication experience for your users.
 
-Besides federated authentication with OpenID Connect and SAML, ZITADEL offers an API to authenticate users allowing you to create your own login process and user interface.
+Besides federated authentication with OpenID Connect and SAML, Zitadel offers an API to authenticate users allowing you to create your own login process and user interface.
 
 In this guide, we will walk through the different protocols, features and concepts that can be used to login users securely into your applications.
 
@@ -18,10 +18,10 @@ In this guide, we will walk through the different protocols, features and concep
 ### Authenticate users with OpenID Connect 1.0
 
 OpenID Connect (OIDC) offers a modern and lightweight authentication protocol built on top of OAuth 2.0, providing flexible authentication flows and easy integration with web and mobile applications.
-ZITADEL offers a certified compliant implementation of the OpenID Connect Standard, ensuring compliance with proven security best practices.
+Zitadel offers a certified compliant implementation of the OpenID Connect Standard, ensuring compliance with proven security best practices.
 
 Authenticating users through the OpenID Connect protocol typically requires an application to redirect the user with an [Auth Request](https://zitadel.com/playgrounds/oidc) to the identity provider that contains information such as the requesting application, [scopes](/apis/openidoauth/scopes), and redirect url.
-The identity provider is not part of the original application, but a standalone service like ZITADEL that may run under the [same domain](/concepts/features/custom-domain)
+The identity provider is not part of the original application, but a standalone service like Zitadel that may run under the [same domain](/concepts/features/custom-domain)
 The user will authenticate using their credentials.
 After successful authentication, the user will be redirected back to the original application.
 
@@ -56,9 +56,9 @@ In case you want to integrate a mobile application, use OpenID Connect or our Se
 There are more [differences between SAML and OIDC](https://zitadel.com/blog/saml-vs-oidc) that you might want to consider.
 If you want to read more about authenticating with SAML, head over to our comprehensive [SAML Guide](/guides/integrate/login/saml).
 
-## ZITADEL's Session API
+## Zitadel's Session API
 
-ZITADEL's [Session API](/reference/api/session) provides developers with a straightforward method to manage user sessions within their applications.
+Zitadel's [Session API](/reference/api/session) provides developers with a straightforward method to manage user sessions within their applications.
 The Session API is not an industry-standard and can be used instead of OpenID Connect or SAML to authenticate users by [building your own custom login user interface](/guides/integrate/login-ui).
 
 ### Tokens in the Session API
@@ -76,7 +76,7 @@ These are some key features of the API:
 
 1. **Session Management**: The Session API allows you to create, retrieve, update, and delete sessions for users within your application. Sessions represent a user's active login session, providing temporary access to your application's resources.
 
-2. **Creating Sessions**: With the Session API, you can initiate a new session for a user after they successfully authenticate through ZITADEL. This typically involves generating a session token or ID, which is then associated with the user's identity and used to track their session activity.
+2. **Creating Sessions**: With the Session API, you can initiate a new session for a user after they successfully authenticate through Zitadel. This typically involves generating a session token or ID, which is then associated with the user's identity and used to track their session activity.
 
 3. **Retrieving Sessions**: You can retrieve information about existing sessions using the Session API, such as session ID, user ID, creation time, and expiration time. This allows you to monitor active user sessions and retrieve session details as needed for auditing or troubleshooting purposes.
 
@@ -84,11 +84,11 @@ These are some key features of the API:
 
 5. **Deleting Sessions**: When a user logs out or their session expires, you can use the Session API to delete the corresponding session from your application's records. This helps maintain data integrity and security by ensuring that inactive sessions are properly removed from the system.
 
-Overall, ZITADEL's Session API simplifies session management within your application, providing a convenient and secure way to track user sessions, enforce session policies, and maintain a seamless user experience. By integrating the Session API into your application, you can effectively manage user authentication and access control while ensuring data privacy and security.
+Overall, Zitadel's Session API simplifies session management within your application, providing a convenient and secure way to track user sessions, enforce session policies, and maintain a seamless user experience. By integrating the Session API into your application, you can effectively manage user authentication and access control while ensuring data privacy and security.
 
 ## Use the Hosted Login to sign-in users
 
-ZITADEL provides a hosted single-sign-on page for secure user authentication within your applications.
+Zitadel provides a hosted single-sign-on page for secure user authentication within your applications.
 This centralized authentication interface simplifies application integration by offering a ready-to-use login experience.
 For a comprehensive understanding of the hosted login page and its capabilities, please refer to our [dedicated guide](/guides/integrate/login/hosted-login)
 
@@ -103,12 +103,12 @@ The hosted login is particularly well-suited for scenarios where:
 ## Build a custom Login UI to authenticate users
 
 In certain cases, you want to build your own login UI to optimize your user experience.
-We have dedicated guides on [how to build your custom login UI](/guides/integrate/login-ui) with ZITADEL.
+We have dedicated guides on [how to build your custom login UI](/guides/integrate/login-ui) with Zitadel.
 
-When building your own login UI, you will leverage the [Session API](#zitadel-session-api) to authenticate users and manage user sessions.
+When building your own login UI, you will leverage the [Session API](#zitadels-session-api) to authenticate users and manage user sessions.
 
 <Callout title="Session API support for OIDC and SAML">
-At the moment developers can only integrate with ZITADEL's Session API and not with standard compliant OpenID Connect or SAML flows.
+At the moment developers can only integrate with Zitadel's Session API and not with standard compliant OpenID Connect or SAML flows.
 </Callout>
 
 ### When to build your custom Login UI
@@ -123,5 +123,5 @@ Main reasons why developers might want to build their own login UI include:
 ## Further reference
 
 - Learn how to [register and onboard users](/guides/integrate/onboarding)
-- Learn how to [build your own login UI](/guides/integrate/login-ui) based on ZITADEL
-- Learn how to [configure ZITADEL](/guides/manage/console/console-overview) through the Management Console
+- Learn how to [build your own login UI](/guides/integrate/login-ui) based on Zitadel
+- Learn how to [configure Zitadel](/guides/manage/console/console-overview) through the Management Console

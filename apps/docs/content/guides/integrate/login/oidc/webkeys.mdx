@@ -3,27 +3,27 @@ title: OpenID Connect and OAuth2 web keys
 sidebar_label: Web Keys
 ---
 
-Web Keys in ZITADEL are used to sign and verify JSON Web Tokens (JWT).
-ID tokens are created, signed and returned by ZITADEL when a OpenID connect (OIDC) or OAuth2
+Web Keys in Zitadel are used to sign and verify JSON Web Tokens (JWT).
+ID tokens are created, signed and returned by Zitadel when a OpenID connect (OIDC) or OAuth2
 authorization flow completes and a user is authenticated.
-Optionally, ZITADEL can return JWTs for access tokens if the OIDC Application is configured for it.
+Optionally, Zitadel can return JWTs for access tokens if the OIDC Application is configured for it.
 
 ## Introduction
 
-ZITADEL uses asymmetric cryptography to sign and validate JWTs.
+Zitadel uses asymmetric cryptography to sign and validate JWTs.
 Keys are generated in pairs resulting in a private and public key.
 Private keys are used to sign tokens.
 Public keys are used to verify tokens.
 OIDC clients need the public key to verify ID tokens.
 OAuth2 API apps might need the public key if they want to client-side verification of a
 JWT access tokens, instead of [introspection](/apis/openidoauth/endpoints#introspection-endpoint).
-ZITADEL uses public key verification when API calls are made or when the userInfo or introspection
+Zitadel uses public key verification when API calls are made or when the userInfo or introspection
 endpoints are called with a JWT access token.
 
 ### JSON Web Key
 
-ZITADEL implements the [RFC7517 - JSON Web Key (JWK)](https://www.rfc-editor.org/rfc/rfc7517) format for storage and distribution of public keys.
-Web keys in ZITADEL support a number of [JSON Web Algorithms (JWA)](https://www.rfc-editor.org/rfc/rfc7518) for digital signatures:
+Zitadel implements the [RFC7517 - JSON Web Key (JWK)](https://www.rfc-editor.org/rfc/rfc7517) format for storage and distribution of public keys.
+Web keys in Zitadel support a number of [JSON Web Algorithms (JWA)](https://www.rfc-editor.org/rfc/rfc7518) for digital signatures:
 
 | Identifier | Description                     |
 | ---------- | ------------------------------- |
@@ -35,7 +35,7 @@ Web keys in ZITADEL support a number of [JSON Web Algorithms (JWA)](https://www.
 | ES512      | ECDSA using P-512 and SHA-512   |
 | EdDSA      | EdDSA signature algorithms[^1]  |
 
-[^1]: EdDSA refers to both Ed25519 and Ed448 curves. ZITADEL only supports Ed25519 with a SHA-512 hashing algorithm. EdDSA is for JSON Object Signing is defined in [RFC8037](https://www.rfc-editor.org/rfc/rfc8037).
+[^1]: EdDSA refers to both Ed25519 and Ed448 curves. Zitadel only supports Ed25519 with a SHA-512 hashing algorithm. EdDSA is for JSON Object Signing is defined in [RFC8037](https://www.rfc-editor.org/rfc/rfc8037).
 
 ### Client Algorithm Support
 
@@ -47,7 +47,7 @@ introspection for token validation, only the OIDC applications will need to supp
 If JWT access tokens are used and APIs do public key verification, those APIs need to support the chosen algorithm as well.
 
 RS256 is widely considered the default algorithm and must be supported by all OIDC/Oauth2 providers, relying parties and resource servers.
-This is also the default ZITADEL uses when [creating web keys](#creation).
+This is also the default Zitadel uses when [creating web keys](#creation).
 It might be reasonable to assume RS384 and RS512 are just as supported, because those are just variations on RSA based keys.
 The ES256, ES384 and ES512 might have reasonable support as well,
 ECDSA is part of the same [JSON Web Algorithms (JWA)](https://www.rfc-editor.org/rfc/rfc7518) as RSA.
@@ -72,13 +72,13 @@ This means both signers and verifiers can't know the hasher by the `alg` value a
 Since the decision in the proposal isn't published yet,
 there is a big change some OIDC client libraries don't have proper support for EdDSA / ed25519.
 
-The ZITADEL back-end is written in Go. The Go developers have denied ed448 curve implementations to be included.
-Therefore ZITADEL only uses ed25519 with a SHA512.
+The Zitadel back-end is written in Go. The Go developers have denied ed448 curve implementations to be included.
+Therefore Zitadel only uses ed25519 with a SHA512.
 The same counts for [zitadel/oidc](https://github.com/zitadel/oidc) Go library.
 
 ## Web Key management
 
-ZITADEL provides a resource based [web keys API](/reference/api/webkey).
+Zitadel provides a resource based [web keys API](/reference/api/webkey).
 The API allows the creation, activation, deletion and listing of web keys.
 All public keys that are stored for an instance are served on the [JWKS endpoint](#json-web-key-set).
 Applications need public keys for token verification and not all applications are capable of on-demand
@@ -167,7 +167,7 @@ curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
 
 #### ED25519
 
-ED25519 is an EdDSA curve and currently the only EdDSA curve supported by ZITADEL.[^2]
+ED25519 is an EdDSA curve and currently the only EdDSA curve supported by Zitadel.[^2]
 No config is needed for ed25519 as its specification already includes the curve parameters.
 ed25519 always uses the SHA512 hasher.
 
@@ -187,8 +187,8 @@ curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
 }'
 ```
 
-[^2]: The ZITADEL back-end is written in Go. The Go developers have denied ed448 curve implementations to be included.
-  Therefore ZITADEL won't support this either.
+[^2]: The Zitadel back-end is written in Go. The Go developers have denied ed448 curve implementations to be included.
+  Therefore Zitadel won't support this either.
 
 ### Activation
 
@@ -338,9 +338,9 @@ The legacy keys will disappear once they expire.
 ### Caching
 
 As web keys can be created and distributed ahead of time, it is safe for JWKS responses to be cached at intermediate proxies.
-Once the `web_key` feature is enabled, ZITADEL will send a `Cache-Control` header which allows caching.
+Once the `web_key` feature is enabled, Zitadel will send a `Cache-Control` header which allows caching.
 
-By default and in ZITADEL Cloud we allow 5 minutes of caching:
+By default and in Zitadel Cloud we allow 5 minutes of caching:
 
 ```
 Cache-Control: max-age=300, must-revalidate

@@ -1,5 +1,5 @@
 ---
-title: ZITADEL with Django Python
+title: Zitadel with Django Python
 sidebar_label: Django
 ---
 
@@ -8,7 +8,7 @@ import ServiceuserJWT from '../imports/_serviceuser_jwt.mdx';
 import ServiceuserRole from '../imports/_serviceuser_role.mdx';
 import SetupPython from '../imports/_setup_python.mdx';
 
-This integration guide demonstrates the recommended way to incorporate ZITADEL into your Django Python application.
+This integration guide demonstrates the recommended way to incorporate Zitadel into your Django Python application.
 It explains how to check the token validity in the API and how to check for permissions.
 
 By the end of this guide, your application will have three different endpoint which are public, private(valid token) and private-scoped(valid token with specific role).
@@ -17,9 +17,9 @@ By the end of this guide, your application will have three different endpoint wh
 This documentation references our [example](https://github.com/zitadel/example-django-python-oauth) on GitHub.
 </Callout>
 
-## ZITADEL setup
+## Zitadel setup
 
-Before we can start building our application, we have to do a few configuration steps in ZITADEL Management Console.
+Before we can start building our application, we have to do a few configuration steps in Zitadel Management Console.
 
 ### Create application
 
@@ -77,7 +77,7 @@ django-admin startproject myapi .
 
 ## Define the Django API
 
-### Add to the settings.py to include ZITADEL info
+### Add to the settings.py to include Zitadel info
 
 There is info needed for the introspection calls, which we put into the settings.py:
 
@@ -89,7 +89,7 @@ and create a ".env"-file in the root folder with the configuration as an example
 ```bash
 ZITADEL_INTROSPECTION_URL = 'URL to the introspection endpoint to verify the provided token'
 ZITADEL_DOMAIN = 'Domain used as audience in the token verification'
-API_PRIVATE_KEY_FILE_PATH = 'Path to the key.json created in ZITADEL'
+API_PRIVATE_KEY_FILE_PATH = 'Path to the key.json created in Zitadel'
 ```
 
 I should look something like this:
@@ -143,7 +143,7 @@ python manage.py runserver
 
 ### Call the API
 
-To call the API you need an access token, which is then verified by ZITADEL.
+To call the API you need an access token, which is then verified by Zitadel.
 Please follow [this guide here](/guides/integrate/token-introspection/private-key-jwt), ignoring the first step as we already have the `.json`-key-file from the serviceaccount.
 
 Optionally set the token as an environment variable:
@@ -160,6 +160,6 @@ curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:8000/api/private-
 
 ## Completion
 
-Congratulations! You have successfully integrated your Django API with ZITADEL!
+Congratulations! You have successfully integrated your Django API with Zitadel!
 
 If you get stuck, consider checking out our [example](https://github.com/zitadel/example-python-django-oauth) application. This application includes all the functionalities mentioned in this quick-start. You can start by cloning the repository and defining the settings in the settings.py. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/example-python-django-oauth/issues).

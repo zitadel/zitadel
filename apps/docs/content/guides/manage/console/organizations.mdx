@@ -1,5 +1,5 @@
 ---
-title: ZITADEL Organizations
+title: Zitadel Organizations
 sidebar_label: Organizations
 ---
 
@@ -32,21 +32,21 @@ The customer needs to fill in the form with the organization name and the contac
   alt="Register new organization"
 />
 
-## How ZITADEL handles usernames
+## How Zitadel handles usernames
 
 If your domain setting "user loginname must contain orgdomain" is disabled, your username will be unique within the whole instance.
 At the moment the username only allows e-mail formatted input. (This will be changed soon)
 
 ### User Loginname must contain orgdomain
 
-If this behavior is not suitable for you, ZITADEL has the option to suffix the usernames with the organization domain.
+If this behavior is not suitable for you, Zitadel has the option to suffix the usernames with the organization domain.
 This setting is called **User Loginname must contain orgdomain** and is part of your [Domain settings](./default-settings#domain-settings).
 
 Those loginnames consist of the format `{username}@{domainname}.${CUSTOM_DOMAIN}`.
 If your user had the username `john.doe`, the generated loginname would be `john.doe@acme.zitadel.cloud`.
 This also means that only one user with the username `john.doe` can exist in your organization called `ACME`.
 
-If you verify your domain name or add additional domains, ZITADEL will generate those additional login names for you.
+If you verify your domain name or add additional domains, Zitadel will generate those additional login names for you.
 If the organization would own the domain `acme.ch` and verify it, then the resulting loginname would be `john.doe@acme.ch` in addition to the already generated `john.doe@acme.zitadel.cloud`.
 The user can now use either login name to authenticate with your application.
 
@@ -54,7 +54,7 @@ The user can now use either login name to authenticate with your application.
 
 ## Domain verification and primary domain
 
-Once you have successfully registered your organization, ZITADEL will automatically generate a domain name for your organization (eg, acme.zitadel.cloud).
+Once you have successfully registered your organization, Zitadel will automatically generate a domain name for your organization (eg, acme.zitadel.cloud).
 Users that you create within your organization will be suffixed with this domain name.
 
 You can improve the user experience, by suffixing users with a domain name that is in your control.
@@ -62,11 +62,11 @@ If the "validate org domains" settings in the [Domain Settings](./default-settin
 If the setting is set to false, the created domain will automatically be set to verified.
 
 An organization can have multiple domain names, but only one domain can be primary.
-The primary domain defines which login name ZITADEL displays to the user, and what information gets asserted in access_tokens (`preferred_username`).
+The primary domain defines which login name Zitadel displays to the user, and what information gets asserted in access_tokens (`preferred_username`).
 
 Please note that domain verification also removes the login name from all users, who might have used this combination in the global organization (ie. users not belonging to a specific organization).
 Relating to our example with acme.ch: If a user ‘coyote’ exists in the global organization with the login name coyote@acme.ch, then after verification of acme.ch, this login name will be replaced with `coyote@{randomvalue.tld}`.
-ZITADEL will notify users affected by this change.
+Zitadel will notify users affected by this change.
 
 ## Verify your domain name
 
@@ -84,7 +84,7 @@ You can also disable domain verification with DNS challenge in the [default sett
   alt="Select Organization"
 />
 
-4. For example, create a TXT record with your DNS provider for the used domain and click verify. ZITADEL will then proceed and check your DNS. Here are some useful links explaining how you can add TXT records for popular domain providers:
+4. For example, create a TXT record with your DNS provider for the used domain and click verify. Zitadel will then proceed and check your DNS. Here are some useful links explaining how you can add TXT records for popular domain providers:
 
 - [Cloudflare](https://www.zoho.com/mail/help/adminconsole/cloudflare.html#alink1)
 - [Squarespace](https://support.squarespace.com/hc/en-us/articles/205812388-Domain-verification-with-a-TXT-Record-alternative-method-)
@@ -95,7 +95,7 @@ You can also disable domain verification with DNS challenge in the [default sett
 5. When the verification is successful you have the option to activate the domain by clicking **Set as primary**
 
 <Callout type="warn">
-Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time
+Do not delete the verification code, as Zitadel will re-check the ownership of your domain from time to time
 </Callout>
 
 ## Organization Settings
@@ -123,9 +123,9 @@ The behavior of the login page, applying custom design, is then defined on your 
 
 ## Show Organization Login
 
-As you should know by now ZITADEL knows the concept of Organizations.
-You can define [default settings](/guides/manage/console/default-settings) for your ZITADEL, or you can overwrite them for an [Organization](#organization-settings).
-Per default the ZITADEL Login will always show what is defined per default. As soon as the Organization context is given, the settings defined on the specific organization can be triggered.
+As you should know by now Zitadel knows the concept of Organizations.
+You can define [default settings](/guides/manage/console/default-settings) for your Zitadel, or you can overwrite them for an [Organization](#organization-settings).
+Per default the Zitadel Login will always show what is defined per default. As soon as the Organization context is given, the settings defined on the specific organization can be triggered.
 This means when you want to trigger the settings of an organization directly, make sure to send the organization scope in the authentication request.
 
 ```bash

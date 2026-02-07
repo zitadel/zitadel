@@ -3,7 +3,7 @@ title: Usage Control
 sidebar_label: Usage Control
 ---
 
-If you have a self-hosted ZITADEL environment, you can limit the usage of your [instances](/concepts/structure/instance).
+If you have a self-hosted Zitadel environment, you can limit the usage of your [instances](/concepts/structure/instance).
 For example, if you provide your customers [their own virtual instances](/concepts/structure/instance#multiple-virtual-instances) with access on their own domains, you can design a pricing model based on the usage of their instances.
 The usage control features are currently limited to the instance level only.
 
@@ -14,7 +14,7 @@ You can block an instance using the [system API](/reference/api/system).
 Most requests to a blocked instance are rejected with the HTTP status *429 Too Many Requests* or the gRPC status *8 Resource Exhausted*.
 However, requests to the [system API](/apis/introduction#system) are still allowed.
 Requests to paths with the prefix */ui/login* return a redirect with HTTP status *302 Found* to */ui/console*, where the user is guided to *InstanceManagementURL*.
-Blocked HTTP requests additionally set a cookie to make it easy to block traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
+Blocked HTTP requests additionally set a cookie to make it easy to block traffic before it reaches your Zitadel runtime, for example with a WAF rule.
 
 You can block new instances by default using the *DefaultInstance.Limits.Block* runtime configuration.
 The following snippets shows the default YAML:
@@ -39,7 +39,7 @@ You can restrict the maximum age of events returned by the following APIs:
 - [A Projects History](/reference/api/management/zitadel.management.v1.ManagementService.ListProjectChanges)
 - [A Project Grants History](/reference/api/management/zitadel.management.v1.ManagementService.ListProjectGrantChanges)
 
-You can set a global default limit as well as a default limit [for new virtual instances](/concepts/structure/instance#multiple-virtual-instances) in the ZITADEL configuration.
+You can set a global default limit as well as a default limit [for new virtual instances](/concepts/structure/instance#multiple-virtual-instances) in the Zitadel configuration.
 The following snippets shows the defaults:
 
 ```yaml
@@ -62,9 +62,9 @@ You can also set a limit for [a specific virtual instance](/concepts/structure/i
 Quotas enables you to limit usage and/or register webhooks that trigger on configurable usage levels for certain units.
 For example, you might want to report usage to an external billing tool and notify users when 80 percent of a quota is exhausted.
 
-ZITADEL supports limiting authenticated requests and action run seconds with quotas.
+Zitadel supports limiting authenticated requests and action run seconds with quotas.
 
-For using the quotas feature you have to activate it in your ZITADEL configurations *Quotas* section.
+For using the quotas feature you have to activate it in your Zitadel configurations *Quotas* section.
 The following snippets shows the defaults:
 
 ```yaml
@@ -95,7 +95,7 @@ DefaultInstance:
     # The following unit types are supported
 
     # "requests.all.authenticated"
-    # The sum of all requests to the ZITADEL API with an authorization header,
+    # The sum of all requests to the Zitadel API with an authorization header,
     # excluding the following exceptions
     # - Calls to the System API
     # - Calls that cause internal server errors
@@ -113,9 +113,9 @@ DefaultInstance:
 #        ResetInterval: 720h # 30 days
 #        # Amount defines the number of units for this quota
 #        Amount: 25000
-#        # Limit defines whether ZITADEL should block further usage when the configured amount is used
+#        # Limit defines whether Zitadel should block further usage when the configured amount is used
 #        Limit: false
-#        # Notifications are emitted by ZITADEL when certain quota percentages are reached
+#        # Notifications are emitted by Zitadel when certain quota percentages are reached
 #        Notifications:
 #            # Percent defines the relative amount of used units, after which a notification should be emitted.
 #          - Percent: 100
@@ -128,7 +128,7 @@ DefaultInstance:
 ### Exhausted Authenticated Requests
 
 If a quota is configured to limit requests and the quotas amount is exhausted, all further authenticated requests are blocked except requests to the [system API](/apis/introduction#system).
-Also, a cookie is set, to make it easier to block further traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
+Also, a cookie is set, to make it easier to block further traffic before it reaches your Zitadel runtime, for example with a WAF rule.
 The management console is still served, but it only shows a dialog that says that the instance is blocked with a link to *InstanceManagementURL*.
 
 ### Exhausted Action Run Seconds

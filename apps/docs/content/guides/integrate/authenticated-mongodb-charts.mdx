@@ -1,13 +1,13 @@
 ---
-title: Embed Authenticated MongoDB Charts Using ZITADEL
+title: Embed Authenticated MongoDB Charts Using Zitadel
 sidebar_label: Authenticated MongoDB Charts
 ---
 
-This integration guide shows how you can embed authenticated MongoDB Charts in your web application using ZITADEL as authentication provider.
+This integration guide shows how you can embed authenticated MongoDB Charts in your web application using Zitadel as authentication provider.
 
-## Setup ZITADEL Application
+## Setup Zitadel Application
 
-Before you can embed an authenticated chart in your application, you have to do a few configuration steps in ZITADEL Console.
+Before you can embed an authenticated chart in your application, you have to do a few configuration steps in Zitadel Console.
 You will need to provide some information about your app. We recommend creating a new app to start from scratch.
 
 1. Navigate to your Project
@@ -24,13 +24,13 @@ Your application configuration should now look similar to this:
 
 ## Setup Custom JWT Provider for MongoDB Charts
 
-Configure ZITADEL as your _Custom JWT Provider_ following the [MongoDB docs](https://docs.mongodb.com/charts/configure-auth-providers/) .
+Configure Zitadel as your _Custom JWT Provider_ following the [MongoDB docs](https://docs.mongodb.com/charts/configure-auth-providers/) .
 
 Configure the following values:
 - Signing Algorithm: RS256
 - Signing Key: JWK or JWKS URL
 - JWKS: https://$CUSTOM_DOMAIN/oauth/v2/keys
-- Audience: Your app's client ID which you copied when you created the ZITADEL app
+- Audience: Your app's client ID which you copied when you created the Zitadel app
 
 Your configuration should look similar to this:
 

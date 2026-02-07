@@ -2,7 +2,7 @@
 title: Using Actions
 ---
 
-The Action API provides a flexible mechanism for customizing and extending the functionality of ZITADEL. By allowing you to define targets and executions, you can implement custom workflows triggered on an API requests and responses, events or specific functions.
+The Action API provides a flexible mechanism for customizing and extending the functionality of Zitadel. By allowing you to define targets and executions, you can implement custom workflows triggered on an API requests and responses, events or specific functions.
 
 **How it works:**
 - Create Target
@@ -12,12 +12,12 @@ The Action API provides a flexible mechanism for customizing and extending the f
 **Use Cases:**
 - User Management: Automate provisioning user data to external systems when users are created, updated or deleted.
 - Security: Implement IP blocking or rate limiting based on API usage patterns.
-- Extend Workflows: Automatically setup resources in your application, when a new organization in ZITADEL is created.
+- Extend Workflows: Automatically setup resources in your application, when a new organization in Zitadel is created.
 - Token extension: Add custom claims to the tokens.
 
 ## Endpoints
 
-ZITADEL sends an HTTP Post request to the endpoint set as Target, the received request than can be edited and send back or custom processes can be handled.
+Zitadel sends an HTTP Post request to the endpoint set as Target, the received request than can be edited and send back or custom processes can be handled.
 
 ### Sent information Request
 
@@ -354,7 +354,7 @@ The information sent to the Endpoint is structured as JSON:
 
 ## Target
 
-The Target describes how ZITADEL interacts with the Endpoint.
+The Target describes how Zitadel interacts with the Endpoint.
 
 There are different types of Targets:
 
@@ -368,7 +368,7 @@ The API documentation to create a target can be found [here](/reference/api/acti
 
 ### Content Signing
 
-To ensure the integrity of request content, each call includes a 'ZITADEL-Signature' in the headers. This header contains an HMAC value computed from the request content and a timestamp, which can be used to time out requests. The logic for this process is provided in 'pkg/actions/signing.go'. The goal is to verify that the HMAC value in the header matches the HMAC value computed by the Target, ensuring that the sent and received requests are identical.
+To ensure the integrity of request content, each call includes a 'Zitadel-Signature' in the headers. This header contains an HMAC value computed from the request content and a timestamp, which can be used to time out requests. The logic for this process is provided in 'pkg/actions/signing.go'. The goal is to verify that the HMAC value in the header matches the HMAC value computed by the Target, ensuring that the sent and received requests are identical.
 
 Each Target resource now contains also a Signing Key, which gets generated and returned when a Target is [created](/reference/api/action/zitadel.action.v2.ActionService.CreateTarget),
 and can also be newly generated when a Target is [patched](/reference/api/action/zitadel.action.v2.ActionService.UpdateTarget).
@@ -377,23 +377,23 @@ For an example on how to check the signature, [refer to the example](/guides/int
 
 ## Execution
 
-ZITADEL decides on specific conditions if one or more Targets have to be called.
+Zitadel decides on specific conditions if one or more Targets have to be called.
 The Execution resource contains 2 parts, the condition and the called targets.
 
 The condition can be defined for 4 types of processes:
 
-- `Requests`, before a request is processed by ZITADEL
+- `Requests`, before a request is processed by Zitadel
 - `Responses`, before a response is sent back to the application
-- `Functions`, handling specific functionality in the logic of ZITADEL
-- `Events`, after a specific event happened and was stored in ZITADEL
+- `Functions`, handling specific functionality in the logic of Zitadel
+- `Events`, after a specific event happened and was stored in Zitadel
 
 The API documentation to set an Execution can be found [here](/reference/api/action/zitadel.action.v2.ActionService.SetExecution)
 
 ### Condition Best Match
 
-As the conditions can be defined on different levels, ZITADEL tries to find out which Execution is the best match.
+As the conditions can be defined on different levels, Zitadel tries to find out which Execution is the best match.
 This means that for example if you have an Execution defined on `all requests`, on the service `zitadel.user.v2.UserService` and on `/zitadel.user.v2.UserService/AddHumanUser`,
-ZITADEL would with a call on the `/zitadel.user.v2.UserService/AddHumanUser` use the Executions with the following priority:
+Zitadel would with a call on the `/zitadel.user.v2.UserService/AddHumanUser` use the Executions with the following priority:
 
 1. `/zitadel.user.v2.UserService/AddHumanUser`
 2. `zitadel.user.v2.UserService`
@@ -449,9 +449,9 @@ The called Targets on `/zitadel.user.v2.UserService/AddHumanUser` would be, in o
 
 For Request and Response there are 3 levels the condition can be defined:
 
-- `Method`, handling a request or response of a specific GRPC full method, which includes the service name and method of the ZITADEL API
-- `Service`, handling any request or response under a service of the ZITADEL API
-- `All`, handling any request or response under the ZITADEL API
+- `Method`, handling a request or response of a specific GRPC full method, which includes the service name and method of the Zitadel API
+- `Service`, handling any request or response under a service of the Zitadel API
+- `All`, handling any request or response under the Zitadel API
 
 The available conditions can be found under:
 - [All available Methods](/reference/api/action/zitadel.action.v2.ActionService.ListExecutionMethods), for example `/zitadel.user.v2.UserService/AddHumanUser`
@@ -467,13 +467,13 @@ For event there are 3 levels the condition can be defined:
 
 - Event, handling a specific event
 - Group, handling a specific group of events
-- All, handling any event in ZITADEL
+- All, handling any event in Zitadel
 
 The concept of events can be found under [Events](/concepts/architecture/software#events)
 
 ### Error forwarding
 
-If you want to forward a specific error from the Target through ZITADEL, you can provide a response from the Target with status code 200 and a JSON in the following format:
+If you want to forward a specific error from the Target through Zitadel, you can provide a response from the Target with status code 200 and a JSON in the following format:
 
 ```json
 {
@@ -482,7 +482,7 @@ If you want to forward a specific error from the Target through ZITADEL, you can
 }
 ```
 
-Only values from 400 to 499 will be forwarded through ZITADEL, other StatusCodes will end in a PreconditionFailed error.
+Only values from 400 to 499 will be forwarded through Zitadel, other StatusCodes will end in a PreconditionFailed error.
 
 If the Target returns any other status code than >= 200 and < 299, the execution is looked at as failed, and a PreconditionFailed error is logged.
 

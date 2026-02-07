@@ -37,7 +37,7 @@ wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/ma
 # Download and adjust the example configuration file containing database initialization configuration
 wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/manage/configure/example-zitadel-init-steps.yaml
 
-# A single ZITADEL instance always needs the same 32 characters long masterkey
+# A single Zitadel instance always needs the same 32 characters long masterkey
 # If you haven't done so already, you can generate a new one
 # The key must be passed as argument
 ZITADEL_MASTERKEY="$(LC_ALL=C tr -dc '[:graph:]' </dev/urandom | head -c 32)"
@@ -65,7 +65,7 @@ export ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME="root"
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
 
-# A single ZITADEL instance always needs the same 32 bytes long masterkey
+# A single Zitadel instance always needs the same 32 bytes long masterkey
 # Generate one to a file if you haven't done so already and pass it as environment variable
 LC_ALL=C tr -dc '[:graph:]' </dev/urandom | head -c 32 > ./zitadel-masterkey
 

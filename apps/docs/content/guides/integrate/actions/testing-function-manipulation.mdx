@@ -2,7 +2,7 @@
 title: Test Actions Function Manipulation
 ---
 
-This guide shows you how to leverage the ZITADEL actions feature to enhance different functions in your ZITADEL instance.
+This guide shows you how to leverage the Zitadel actions feature to enhance different functions in your Zitadel instance.
 You can use the actions feature to create a target that will be called when a specific functionality is used.
 This is useful for integrating with other systems which need specific claims in tokens or for executing external code during OIDC or SAML flows.
 
@@ -10,12 +10,12 @@ This is useful for integrating with other systems which need specific claims in 
 
 Before you start, make sure you have everything set up correctly.
 
-- You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
-- Your ZITADEL instance needs to have the actions feature enabled.
+- You need to be at least a Zitadel [_IAM_OWNER_](/guides/manage/console/managers)
+- Your Zitadel instance needs to have the actions feature enabled.
 
 <Callout>
-Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
-In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
+Note that this guide assumes that Zitadel is running on the same machine as the target and can be reached via `localhost`.
+In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from Zitadel.
 </Callout>
 
 ## Available functions
@@ -118,7 +118,7 @@ Save the returned ID to set in the execution.
 
 ## Set execution
 
-To configure ZITADEL to call the target when a function is executed, you need to set an execution and define the function
+To configure Zitadel to call the target when a function is executed, you need to set an execution and define the function
 condition.
 
 See [Set an execution](/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
@@ -154,6 +154,6 @@ For any further information related to [the OIDC Flow, refer to our documentatio
 
 ## Conclusion
 
-You have successfully set up a target and execution to react to functions in your ZITADEL instance.
-This feature can now be used to integrate with your existing systems to create custom workflows or automate tasks based on functionality in ZITADEL.
+You have successfully set up a target and execution to react to functions in your Zitadel instance.
+This feature can now be used to integrate with your existing systems to create custom workflows or automate tasks based on functionality in Zitadel.
 Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

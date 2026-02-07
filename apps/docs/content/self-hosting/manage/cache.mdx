@@ -3,7 +3,7 @@ title: Caches
 sidebar_label: Caches [Beta]
 ---
 
-ZITADEL supports the use of a caches to speed up the lookup of frequently needed objects. As opposed to HTTP caches which might reside between ZITADEL and end-user applications, the cache build into ZITADEL uses active invalidation when an object gets updated. Another difference is that HTTP caches only cache the result of a complete request and the built-in cache stores objects needed for the internal business logic. For example, each request made to ZITADEL needs to retrieve and set [instance](/concepts/structure/instance) information in middleware.
+Zitadel supports the use of a caches to speed up the lookup of frequently needed objects. As opposed to HTTP caches which might reside between Zitadel and end-user applications, the cache build into Zitadel uses active invalidation when an object gets updated. Another difference is that HTTP caches only cache the result of a complete request and the built-in cache stores objects needed for the internal business logic. For example, each request made to Zitadel needs to retrieve and set [instance](/concepts/structure/instance) information in middleware.
 
 <Callout type="info">
 Caches is currently an [experimental beta](https://help.zitadel.com/zitadel-software-release-cycle#beta) feature.
@@ -36,12 +36,12 @@ For a full configuration reference, please see the [runtime configuration file](
 
 ## Connectors
 
-ZITADEL supports a number of *connectors*. Connectors integrate a cache with a storage backend. Users can combine connectors with the type of object cache depending on their operational and performance requirements.
+Zitadel supports a number of *connectors*. Connectors integrate a cache with a storage backend. Users can combine connectors with the type of object cache depending on their operational and performance requirements.
 When no connector is specified for an object cache, then no caching is performed. This is the current default.
 
 ### Auto prune
 
-Some connectors take an `AutoPrune` option. This is provided for caches which don't have built-in expiry and cleanup routines. The auto pruner is a routine launched by ZITADEL and scans and removes outdated objects in the cache. Pruning can take a cost as they typically involve some kind of scan. However, using a long interval can cause higher storage utilization.
+Some connectors take an `AutoPrune` option. This is provided for caches which don't have built-in expiry and cleanup routines. The auto pruner is a routine launched by Zitadel and scans and removes outdated objects in the cache. Pruning can take a cost as they typically involve some kind of scan. However, using a long interval can cause higher storage utilization.
 
 ```yaml
 Caches:
@@ -68,11 +68,11 @@ Benefits:
 Drawbacks:
 
 - Increased operational overhead: need to run a Redis instance as part of your infrastructure.
-- When running multiple servers of ZITADEL in different regions, network roundtrip time might impact performance, neutralizing the benefit of a cache.
+- When running multiple servers of Zitadel in different regions, network roundtrip time might impact performance, neutralizing the benefit of a cache.
 
 #### Circuit breaker
 
-A [circuit breaker](https://learn.microsoft.com/en-us/previous-versions/msp-n-p/dn589784(v=pandp.10)?redirectedfrom=MSDN) is provided for the Redis connector, to prevent a single point of failure in the case persistent errors. When the circuit breaker opens, the cache is temporary disabled and ignored. ZITADEL will continue to operate using queries to the database.
+A [circuit breaker](https://learn.microsoft.com/en-us/previous-versions/msp-n-p/dn589784(v=pandp.10)?redirectedfrom=MSDN) is provided for the Redis connector, to prevent a single point of failure in the case persistent errors. When the circuit breaker opens, the cache is temporary disabled and ignored. Zitadel will continue to operate using queries to the database.
 
 ```yaml
 Caches:
@@ -97,7 +97,7 @@ Caches:
 
 ### PostgreSQL cache
 
-PostgreSQL can be used to store objects in unlogged tables. [Unlogged tables](https://www.postgresql.org/docs/current/sql-createtable.html#SQL-CREATETABLE-UNLOGGED) do not write to the WAL log and are therefore faster than regular tables. If the PostgreSQL server crashes, the data from those tables are lost. ZITADEL always creates the cache schema in the `zitadel` database during [setup](./updating_scaling#the-setup-phase). This connector requires a [pruner](#auto-prune) routine.
+PostgreSQL can be used to store objects in unlogged tables. [Unlogged tables](https://www.postgresql.org/docs/current/sql-createtable.html#SQL-CREATETABLE-UNLOGGED) do not write to the WAL log and are therefore faster than regular tables. If the PostgreSQL server crashes, the data from those tables are lost. Zitadel always creates the cache schema in the `zitadel` database during [setup](./updating_scaling#the-setup-phase). This connector requires a [pruner](#auto-prune) routine.
 
 Benefits:
 
@@ -113,7 +113,7 @@ Drawbacks:
 
 ### Local memory cache
 
-ZITADEL is capable of caching object in local application memory, using hash-maps. Each ZITADEL server manages its own copy of the cache. This connector requires a [pruner](#auto-prune) routine.
+Zitadel is capable of caching object in local application memory, using hash-maps. Each Zitadel server manages its own copy of the cache. This connector requires a [pruner](#auto-prune) routine.
 
 Benefits:
 
@@ -122,18 +122,18 @@ Benefits:
 
 Drawbacks:
 
-- Inconsistent invalidation. An object validated in one ZITADEL server will not get invalidated in other servers.
+- Inconsistent invalidation. An object validated in one Zitadel server will not get invalidated in other servers.
 - There's no single source of truth. Different servers may operate on a different version of an object
 - Data is duplicated in each server, consuming more total memory inside a deployment.
 
 The drawbacks restricts its usefulness in distributed deployments. However simple installations running a single server can benefit greatly from this type of cache. For example test, development or home deployments.
 If inconsistency is acceptable for short periods of time, one can choose to use this type of cache in distributed deployments with short max age configuration.
 
-**For example**: A ZITADEL deployment with 2 servers is serving 1000 req/sec total. The installation only has one instance[^1]. There is only a small amount of data cached (a few kB) so duplication is not a problem in this case. It is acceptable for [instance level setting](/guides/manage/console/default-settings) to be out-dated for a short amount of time. When the memory cache is enabled for the instance objects, with a max age of 1 second, the instance only needs to be obtained from the database 2 times per second (once for each server). Saving 998 of redundant queries. Once an instance level setting is changed, it takes up to 1 second for all the servers to get the new state.
+**For example**: A Zitadel deployment with 2 servers is serving 1000 req/sec total. The installation only has one instance[^1]. There is only a small amount of data cached (a few kB) so duplication is not a problem in this case. It is acceptable for [instance level setting](/guides/manage/console/default-settings) to be out-dated for a short amount of time. When the memory cache is enabled for the instance objects, with a max age of 1 second, the instance only needs to be obtained from the database 2 times per second (once for each server). Saving 998 of redundant queries. Once an instance level setting is changed, it takes up to 1 second for all the servers to get the new state.
 
 ## Objects
 
-The following section describes the type of objects ZITADEL can currently cache. Objects are actively invalidated at the cache backend when one of their properties is changed. Each object cache defines:
+The following section describes the type of objects Zitadel can currently cache. Objects are actively invalidated at the cache backend when one of their properties is changed. Each object cache defines:
 
 - `Connector`: Selects the used [connector](#connectors) back-end. Must be activated first.
 - `MaxAge`: the amount of time that an object is considered valid. When this age is passed the object is ignored (cache miss) and possibly cleaned up by the [pruner](#auto-prune) or other built-in garbage collection.
@@ -158,7 +158,7 @@ Caches:
 
 ### Instance
 
-All HTTP and gRPC requests sent to ZITADEL receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/reference/api/system), the instance can be resolved by its ID. An instance object contains many of the [default settings](/reference/api/system), the instance can be resolved by its ID. An instance object contains many of the [default settings](/guides/manage/console/default-settings):
+All HTTP and gRPC requests sent to Zitadel receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/reference/api/system), the instance can be resolved by its ID. An instance object contains many of the [default settings](/reference/api/system), the instance can be resolved by its ID. An instance object contains many of the [default settings](/guides/manage/console/default-settings):
 
 - Instance [features](/guides/manage/console/default-settings#features)
 - Custom Domains: generated and [custom](/guides/manage/cloud/instances#add-custom-domain)
@@ -167,19 +167,19 @@ All HTTP and gRPC requests sent to ZITADEL receive an instance context. The inst
 - Limits[^2]
 - [Allowed languages](/guides/manage/console/default-settings#languages)
 
-These settings typically change infrequently in production. ***Every*** request made to ZITADEL needs to query for the instance. This is a typical case of set once, get many times where a cache can provide a significant optimization.
+These settings typically change infrequently in production. ***Every*** request made to Zitadel needs to query for the instance. This is a typical case of set once, get many times where a cache can provide a significant optimization.
 
 ### Milestones
 
 Milestones are used to track the administrator's progress in setting up their instance. Milestones are used to render *your next steps* in the [console](/guides/manage/console/console-overview) landing page.
-Milestones are reached upon the first time a certain action is performed. For example the first application created or the first human login. In order to push a "reached" event only once, ZITADEL must keep track of the current state of milestones by an eventstore query every time an eligible action is performed. This can cause an unwanted overhead on production servers, therefore they are cached.
+Milestones are reached upon the first time a certain action is performed. For example the first application created or the first human login. In order to push a "reached" event only once, Zitadel must keep track of the current state of milestones by an eventstore query every time an eligible action is performed. This can cause an unwanted overhead on production servers, therefore they are cached.
 
 As an extra optimization, once all milestones are reached by the instance, an in-memory flag is set and the milestone state is never queried again from the database nor cache.
-For single instance setups which fulfilled all milestone (*your next steps* in the management console) it is not needed to enable this cache. We mainly use it for ZITADEL cloud where there are many instances with *incomplete* milestones.
+For single instance setups which fulfilled all milestone (*your next steps* in the management console) it is not needed to enable this cache. We mainly use it for Zitadel cloud where there are many instances with *incomplete* milestones.
 
 ### Organization
 
-Most resources like users, project and applications are part of an [organization](/guides/manage/console/organizations-overview). Therefore many parts of the ZITADEL logic search for an organization by ID or by their primary domain.
+Most resources like users, project and applications are part of an [organization](/guides/manage/console/organizations-overview). Therefore many parts of the Zitadel logic search for an organization by ID or by their primary domain.
 Organization objects are quite small and receive infrequent updates after they are created:
 
 - Change of organization name
@@ -191,7 +191,7 @@ Organization objects are quite small and receive infrequent updates after they a
 
 Currently caches are in beta and disabled by default. However, if you want to give caching a try, the following sections contains some suggested configurations for different setups.
 
-The following configuration is recommended for single instance setups with a single ZITADEL server:
+The following configuration is recommended for single instance setups with a single Zitadel server:
 
 ```yaml
 Caches:
@@ -249,6 +249,6 @@ Caches:
 ```
 ----
 
-[^1]: Many deployments of ZITADEL have only one or few [instances](/concepts/structure/instance). Multiple instances are mostly used for ZITADEL cloud, where each customer gets at least one instance.
+[^1]: Many deployments of Zitadel have only one or few [instances](/concepts/structure/instance). Multiple instances are mostly used for Zitadel cloud, where each customer gets at least one instance.
 
-[^2]: Limits are imposed by the system API, usually when customers exceed their subscription in ZITADEL cloud.
+[^2]: Limits are imposed by the system API, usually when customers exceed their subscription in Zitadel cloud.

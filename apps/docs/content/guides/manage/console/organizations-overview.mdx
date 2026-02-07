@@ -5,9 +5,9 @@ sidebar_label: Organizations
 
 ## Overview
 
-ZITADEL is organized around the idea of multi-tenancy. An **Organization** is the vessel where your projects and users live. It is comparable to a tenant in a SaaS system or an organizational unit (OU) in a directory-based system.
+Zitadel is organized around the idea of multi-tenancy. An **Organization** is the vessel where your projects and users live. It is comparable to a tenant in a SaaS system or an organizational unit (OU) in a directory-based system.
 
-Key characteristics of Organizations in ZITADEL include:
+Key characteristics of Organizations in Zitadel include:
 
 * **Multi-tenancy:** Multiple organizations can be managed within one [instance](/concepts/structure/instance).
 * **Isolation:** Users and data from one organization are separated from others.
@@ -15,7 +15,7 @@ Key characteristics of Organizations in ZITADEL include:
 
 In a B2B use case, an organization typically represents a business partner who requires their own branding, specific access settings, or distinct federated login providers.
 
-![Overview ZITADEL Organizations](../../../../public/img/concepts/objects/organization.png)
+![Overview Zitadel Organizations](../../../../public/img/concepts/objects/organization.png)
 
 ## Structure and Delegation
 
@@ -23,7 +23,7 @@ In a B2B use case, an organization typically represents a business partner who r
 You can use **Projects** within your organization to manage the security context of closely related components, such as roles, grants, and authorizations for multiple applications. You can set up multiple projects within a single organization.
 
 ### Project Grants
-ZITADEL allows you to give *other* organizations permission to manage certain aspects of a project within *your* organization.
+Zitadel allows you to give *other* organizations permission to manage certain aspects of a project within *your* organization.
 
 For example, you could set up a project with roles that define access to your software, but allow a partner organization to allocate those roles to their own users independently. As a service provider, this allows you to establish a self-service culture for your business customers.
 
@@ -46,7 +46,7 @@ You have two options regarding the initial administrator:
 />
 
 ### Self-Service Registration
-If you want to enable your customers to create organizations themselves, ZITADEL provides a built-in registration form at:
+If you want to enable your customers to create organizations themselves, Zitadel provides a built-in registration form at:
 `https://$CUSTOM-DOMAIN/ui/login/register/org`
 
 The customer simply fills in the organization name and contact details to get started.
@@ -81,7 +81,7 @@ If a user has the username `john.doe` in an organization with the domain `acme`,
 
 ### Custom Domain Names
 You can verify your own domain names (e.g., `acme.ch`) to simplify the user experience. Once verified:
-1.  ZITADEL generates additional login names for users.
+1.  Zitadel generates additional login names for users.
 2.  The user `john.doe` can log in via `john.doe@acme.ch` OR `john.doe@acme.zitadel.cloud`.
 
 <Callout type="info">
@@ -95,7 +95,7 @@ An organization can have multiple domain names, but only one is **Primary**. The
 
 <Callout type="caution">
 Setting a Primary Domain affects users.
-If a user `coyote` exists in the global organization with the login name `coyote@acme.ch`, and you subsequently verify `acme.ch` for a specific organization, the global user's login name will be replaced with `coyote@{randomvalue.tld}`. ZITADEL will notify users affected by this change.
+If a user `coyote` exists in the global organization with the login name `coyote@acme.ch`, and you subsequently verify `acme.ch` for a specific organization, the global user's login name will be replaced with `coyote@{randomvalue.tld}`. Zitadel will notify users affected by this change.
 </Callout>
 
 ## Domain Verification Guide
@@ -116,7 +116,7 @@ You can disable domain verification requirements in the [default settings](/guid
   alt="Verify Domain Dialog"
 />
 
-4.  **DNS Challenge Example:** Create a TXT record with your DNS provider using the value provided by ZITADEL.
+4.  **DNS Challenge Example:** Create a TXT record with your DNS provider using the value provided by Zitadel.
     * [Cloudflare Guide](https://www.zoho.com/mail/help/adminconsole/cloudflare.html#alink1)
     * [Squarespace Guide](https://support.squarespace.com/hc/en-us/articles/205812388-Domain-verification-with-a-TXT-Record-alternative-method-)
     * [Name.com Guide](https://www.name.com/support/articles/115004972547-adding-a-txt-record)
@@ -126,7 +126,7 @@ You can disable domain verification requirements in the [default settings](/guid
 6.  (Optional) Click **Set as primary** to make this the default domain for user login names.
 
 <Callout type="caution">
-Do not delete the DNS verification record after success. ZITADEL re-checks domain ownership periodically.
+Do not delete the DNS verification record after success. Zitadel re-checks domain ownership periodically.
 </Callout>
 
 ## Organization Settings
@@ -149,12 +149,12 @@ To apply a custom design (e.g., for a specific B2B customer):
 3.  Ensure the **Login Behavior** on your **Project** is configured to allow organization-specific branding. Read more about project branding [here](./projects-overview#branding).
 
 ### Triggering Organization Context
-When a user begins the login process, ZITADEL automatically determines the user's organization based on their entered login name and redirects them to the appropriate organization context. Users cannot select their organization manually.
+When a user begins the login process, Zitadel automatically determines the user's organization based on their entered login name and redirects them to the appropriate organization context. Users cannot select their organization manually.
 
-By default, the ZITADEL Login uses the instance default settings. To trigger the specific settings (and branding) of an organization, you must provide the organization scope in your authentication request:
+By default, the Zitadel Login uses the instance default settings. To trigger the specific settings (and branding) of an organization, you must provide the organization scope in your authentication request:
 
 ```bash
 urn:zitadel:iam:org:id:{id}
 ```
 
-This value is a [reserved scope](/apis/openidoauth/scopes#reserved-scopes) within ZITADEL.
+This value is a [reserved scope](/apis/openidoauth/scopes#reserved-scopes) within Zitadel.

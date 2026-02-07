@@ -3,7 +3,7 @@ import { BookOpen, Code2, Server } from 'lucide-react';
 
 export const baseOptions: BaseLayoutProps = {
   nav: {
-    title: 'ZITADEL Docs',
+    title: 'Zitadel Docs',
   },
   links: [
     {

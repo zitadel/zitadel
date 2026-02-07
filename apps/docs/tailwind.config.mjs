@@ -1,8 +1,13 @@
 import typography from '@tailwindcss/typography';
 import animate from 'tailwindcss-animate';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const sharedConfig = require('@zitadel/theme/tailwind');
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  presets: [sharedConfig],
   darkMode: ["class", '[data-theme="dark"]'],
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",

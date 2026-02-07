@@ -2,20 +2,20 @@
 title: Test Actions Request
 ---
 
-This guide shows you how to leverage the ZITADEL actions feature to react to API requests in your ZITADEL instance.
+This guide shows you how to leverage the Zitadel actions feature to react to API requests in your Zitadel instance.
 You can use the actions feature to create a target that will be called when a specific API request occurs.
-This is useful for information provisioning in between systems or for triggering workflows based on API requests in ZITADEL.
+This is useful for information provisioning in between systems or for triggering workflows based on API requests in Zitadel.
 
 ## Prerequisites
 
 Before you start, make sure you have everything set up correctly.
 
-- You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
-- Your ZITADEL instance needs to have the actions feature enabled.
+- You need to be at least a Zitadel [_IAM_OWNER_](/guides/manage/console/managers)
+- Your Zitadel instance needs to have the actions feature enabled.
 
 <Callout>
-Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
-In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
+Note that this guide assumes that Zitadel is running on the same machine as the target and can be reached via `localhost`.
+In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from Zitadel.
 </Callout>
 
 <Callout>
@@ -96,7 +96,7 @@ Save the returned ID to set in the execution.
 
 ## Set execution
 
-To configure ZITADEL to call the target when an API endpoint is called, you need to set an execution and define the request
+To configure Zitadel to call the target when an API endpoint is called, you need to set an execution and define the request
 condition.
 
 See [Set an execution](/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
@@ -121,7 +121,7 @@ curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/executions' \
 ## Example call
 
 Now that you have set up the target and execution, you can test it by creating a user through the Management Console UI or
-by calling the ZITADEL API to create a user.
+by calling the Zitadel API to create a user.
 
 ```shell
 curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/users/new' \
@@ -204,6 +204,6 @@ The incoming request headers to the Execution are propagated via the request pay
 
 ## Conclusion
 
-You have successfully set up a target and execution to react to API requests in your ZITADEL instance.
-This feature can now be used to provision information in between systems or for triggering workflows based on API requests in ZITADEL.
+You have successfully set up a target and execution to react to API requests in your Zitadel instance.
+This feature can now be used to provision information in between systems or for triggering workflows based on API requests in Zitadel.
 Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

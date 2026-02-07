@@ -1,0 +1,62 @@
+{
+    "name": "zitadel-dark",
+    "type": "dark",
+    "colors": {
+        "editor.background": "#0f0f11",
+        "editor.foreground": "#f4f4f6"
+    },
+    "tokenColors": [
+        {
+            "name": "Brand Orange - Logic and Commands",
+            "scope": [
+                "keyword",
+                "storage",
+                "support",
+                "entity",
+                "variable",
+                "parameter",
+                "constant.other",
+                "string.unquoted",
+                "meta.function-call",
+                "punctuation.definition.variable",
+                "source.shell"
+            ],
+            "settings": {
+                "foreground": "#f25543"
+            }
+        },
+        {
+            "name": "Brand Lilac - Strings and Keys",
+            "scope": [
+                "string.quoted",
+                "constant.other.symbol",
+                "constant.other.key",
+                "punctuation.definition.string"
+            ],
+            "settings": {
+                "foreground": "#bba5e4"
+            }
+        },
+        {
+            "name": "Brand Pink - Data and Constants",
+            "scope": [
+                "constant.numeric",
+                "constant.language",
+                "constant.character"
+            ],
+            "settings": {
+                "foreground": "#ea8aa0"
+            }
+        },
+        {
+            "name": "Comments",
+            "scope": [
+                "comment"
+            ],
+            "settings": {
+                "foreground": "#686883",
+                "fontStyle": "italic"
+            }
+        }
+    ]
+}

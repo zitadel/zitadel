@@ -10,14 +10,14 @@ The following flow shows you the different components you need to enable SAML fo
 ![](../../../../public/img/guides/login-ui/saml-flow.png)
 
 1. Your application makes an SAML request to your login UI
-2. The login UI proxies the request to the ZITADEL API.
-3. The ZITADEL API parses the request and does what it needs to interpret certain parameters (e.g., binding, nameID policy, etc.)
+2. The login UI proxies the request to the Zitadel API.
+3. The Zitadel API parses the request and does what it needs to interpret certain parameters (e.g., binding, nameID policy, etc.)
 4. Redirect to a predefined, relative URL of the login UI that includes the samlrequest ID ("/login?authRequest="), configurable per application.
-5. Request to ZITADEL API to get all the information from the SAML request. This is optional and only needed if you like to get all the parsed information from the samlrequest-
+5. Request to Zitadel API to get all the information from the SAML request. This is optional and only needed if you like to get all the parsed information from the samlrequest-
 6. Authenticate the user in your login UI by creating and updating a session with all the checks you need.
 7. Finalize the SAML request by sending the session to the request, you will get the URL to redirect to or the body in the response
 8. Redirect to your application with the URL or call the application with HTTP Post with the content you got in the previous request
-9. All SAML-specific endpoints have to be accepted in the Login UI and should be proxied and sent to the ZITADEL API
+9. All SAML-specific endpoints have to be accepted in the Login UI and should be proxied and sent to the Zitadel API
 
 ## Example
 
@@ -35,7 +35,7 @@ https://login.example.com/saml/v2/SSO?SAMLRequest=nJLRa9swEMb%2FFXHvjmVTY0fUhqxh
 
 The SAML request includes all the relevant information for the SAML standard, which includes the RelayState, the used binding and other information.
 
-You now have to proxy the SAML request from your own UI to the SSO Endpoint of ZITADEL.
+You now have to proxy the SAML request from your own UI to the SSO Endpoint of Zitadel.
 For more information, see [OIDC Proxy](./login-app#oidc-proxy) for the necessary headers.
 
 <Callout>
@@ -158,7 +158,7 @@ Which expects your application to redirect to the url 'https://myapp.example.com
 
 ### SAML Endpoints
 
-All SAML relevant endpoints are provided by ZITADEL. In your login UI you just have to proxy them through and send them directly to the backend.
+All SAML relevant endpoints are provided by Zitadel. In your login UI you just have to proxy them through and send them directly to the backend.
 
 These are endpoints like:
 - Metadata

@@ -1,23 +1,23 @@
 ---
 title: Prometheus
-description: Configure Prometheus to scrape ZITADEL metrics from /debug/metrics on Kubernetes and Docker.
+description: Configure Prometheus to scrape Zitadel metrics from /debug/metrics on Kubernetes and Docker.
 ---
 
 # Prometheus
 
-This page shows platform-agnostic ways to scrape ZITADEL metrics using:
+This page shows platform-agnostic ways to scrape Zitadel metrics using:
 
 - Kubernetes **annotation-based autodiscovery** (no Operator required)
 - Kubernetes with **Prometheus Operator** using **ServiceMonitor**
 - Standalone Prometheus on a VM or using **Docker**
 - How to verify scraping, plus a minimal alert example
 
-> ZITADEL’s endpoint path is `/debug/metrics`. If you changed ports or paths via your deployment tooling, adjust the examples accordingly.
+> Zitadel’s endpoint path is `/debug/metrics`. If you changed ports or paths via your deployment tooling, adjust the examples accordingly.
 
 ## Before you begin
 
-- You have a running ZITADEL instance reachable from your monitoring stack.
-- You know the base URL and port to reach ZITADEL (e.g., `http://zitadel.zitadel.svc:8080` in Kubernetes or `http://localhost:8080` locally).
+- You have a running Zitadel instance reachable from your monitoring stack.
+- You know the base URL and port to reach Zitadel (e.g., `http://zitadel.zitadel.svc:8080` in Kubernetes or `http://localhost:8080` locally).
 - Metrics are enabled in your runtime [configuration](https://zitadel.com/docs/self-hosting/manage/configure) (they are enabled by default in standard setups). If you explicitly disabled metrics in your configuration, re-enable them before proceeding. The (default) configuration is located in the [defaults.yaml](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
 
 ## Option A — Kubernetes (annotation-based autodiscovery)
@@ -32,7 +32,7 @@ metadata:
     prometheus.io/port: "8080"
 ```
 
-When your Prometheus server is configured with **Kubernetes service discovery** and **relabeling rules** that honor these annotations, it will automatically discover and scrape ZITADEL without any per-target `scrape_configs`.
+When your Prometheus server is configured with **Kubernetes service discovery** and **relabeling rules** that honor these annotations, it will automatically discover and scrape Zitadel without any per-target `scrape_configs`.
 
 ### 1) Ensure Prometheus has Kubernetes discovery and relabeling
 
@@ -63,9 +63,9 @@ scrape_configs:
 
 > Most Prometheus Helm charts already ship with similar discovery jobs and relabeling rules. If you installed Prometheus via Helm, you likely already have these in place.
 
-### 2) Annotate ZITADEL Pods (or the Service)
+### 2) Annotate Zitadel Pods (or the Service)
 
-If you deploy ZITADEL via Helm and the chart emits scrape annotations on the Deployment/Pods, no extra work is needed. Otherwise, add the annotations yourself (via values override or a strategic patch):
+If you deploy Zitadel via Helm and the chart emits scrape annotations on the Deployment/Pods, no extra work is needed. Otherwise, add the annotations yourself (via values override or a strategic patch):
 
 ```yaml
 spec:
@@ -85,7 +85,7 @@ Prometheus must have permission to **list/watch** Pods/Endpoints in the target n
 
 ## Option B — Kubernetes with Prometheus Operator (ServiceMonitor)
 
-If you run **kube-prometheus-stack** or the **Prometheus Operator**, use a **ServiceMonitor** (or **PodMonitor**). ZITADEL’s Helm chart provides **out-of-the-box** [ServiceMonitor](https://github.com/zitadel/zitadel-charts/blob/main/charts/zitadel/templates/servicemonitor.yaml) support that you can enable via values—no manual YAML is required.
+If you run **kube-prometheus-stack** or the **Prometheus Operator**, use a **ServiceMonitor** (or **PodMonitor**). Zitadel’s Helm chart provides **out-of-the-box** [ServiceMonitor](https://github.com/zitadel/zitadel-charts/blob/main/charts/zitadel/templates/servicemonitor.yaml) support that you can enable via values—no manual YAML is required.
 
 ### Enable the built-in ServiceMonitor (recommended)
 
@@ -104,7 +104,7 @@ helm upgrade --install zitadel zitadel/zitadel \
   ```bash
   --set metrics.serviceMonitor.additionalLabels.release=kube-prometheus-stack
   ```
-* Place the ServiceMonitor in a central monitoring namespace (default is the ZITADEL release namespace):
+* Place the ServiceMonitor in a central monitoring namespace (default is the Zitadel release namespace):
 
   ```bash
   --set metrics.serviceMonitor.namespace=monitoring
@@ -149,7 +149,7 @@ spec:
       - "<release-namespace>"                         # defaults to the Helm release namespace
   selector:
     matchLabels:
-      # Matches the ZITADEL Service created by the chart
+      # Matches the Zitadel Service created by the chart
       # {{- include "zitadel.service.selectorLabels" . | nindent 6 }}
   endpoints:
     - port: "<protocol>-server"                       # e.g., "http-server" or "https-server"
@@ -173,9 +173,9 @@ spec:
 
 * **Port name**: The chart uses
   `port: {{ regexReplaceAll "\\W+" .Values.service.protocol "-" }}-server`
-  which resolves to **`http-server`** when `service.protocol=http` (default) or **`https-server`** when `service.protocol=https`. You do **not** need to edit this—just make sure you didn’t rename the ZITADEL Service port.
+  which resolves to **`http-server`** when `service.protocol=http` (default) or **`https-server`** when `service.protocol=https`. You do **not** need to edit this—just make sure you didn’t rename the Zitadel Service port.
 
-* **Namespace selection**: By default, the ServiceMonitor targets the **ZITADEL release namespace** via:
+* **Namespace selection**: By default, the ServiceMonitor targets the **Zitadel release namespace** via:
 
   ```yaml
   namespaceSelector:
@@ -183,7 +183,7 @@ spec:
       - "<release-namespace>"
   ```
 
-  Set `metrics.serviceMonitor.namespace` if you want the ServiceMonitor object itself to live elsewhere (e.g., `monitoring`). The `selector.matchLabels` still points to the ZITADEL **Service** labels.
+  Set `metrics.serviceMonitor.namespace` if you want the ServiceMonitor object itself to live elsewhere (e.g., `monitoring`). The `selector.matchLabels` still points to the Zitadel **Service** labels.
 
 * **Labels for discovery**: If your Prometheus (Operator) instance selects ServiceMonitors by label (common in kube-prometheus-stack), add those under `metrics.serviceMonitor.additionalLabels`—for example:
 
@@ -194,13 +194,13 @@ spec:
         release: kube-prometheus-stack
   ```
 
-* **Path**: The chart fixes the metrics path to **`/debug/metrics`** (matches ZITADEL’s endpoint).
+* **Path**: The chart fixes the metrics path to **`/debug/metrics`** (matches Zitadel’s endpoint).
 
 ### Manual ServiceMonitor (only if you don’t want Helm to render it)
 
 If you prefer to manage the `ServiceMonitor` yourself, keep it aligned with the chart’s conventions:
 
-* Target the ZITADEL **Service** (not pods) using the same selector labels the chart adds.
+* Target the Zitadel **Service** (not pods) using the same selector labels the chart adds.
 * Use the correct **port name** (`http-server` or `https-server`) and **path** (`/debug/metrics`).
 * Ensure your Prometheus (Operator) selects this ServiceMonitor by label/namespace.
 
@@ -209,7 +209,7 @@ If you prefer to manage the `ServiceMonitor` yourself, keep it aligned with the 
 
 ## Option C — Standalone Prometheus (VM / Docker)
 
-If you run Prometheus outside of Kubernetes, add a static job pointing at ZITADEL’s metrics endpoint:
+If you run Prometheus outside of Kubernetes, add a static job pointing at Zitadel’s metrics endpoint:
 
 ```yaml
 global:
@@ -223,12 +223,12 @@ scrape_configs:
       - targets: ["<ZITADEL_HOST>:8080"]  # e.g., "localhost:8080",  "zitadel.internal:8080" or "host.docker.internal:8080"
 ```
 
-In this snippet, replace `<ZITADEL_HOST>:8080` with the appropriate address. This could be localhost:8080 for local deployments, or a DNS name / IP of the server or Kubernetes service where ZITADEL is running. If ZITADEL is behind a reverse proxy or ingress, ensure that `/debug/metrics` is reachable (you might expose it internally only). The metrics_path is set to /debug/metrics to match ZITADEL’s endpoint. We use http scheme assuming an internal/non-TLS endpoint; if you have enabled TLS on ZITADEL, use https and the appropriate port (e.g., `443`) and adjust any hostname (like zitadel.yourdomain.com).
+In this snippet, replace `<ZITADEL_HOST>:8080` with the appropriate address. This could be localhost:8080 for local deployments, or a DNS name / IP of the server or Kubernetes service where Zitadel is running. If Zitadel is behind a reverse proxy or ingress, ensure that `/debug/metrics` is reachable (you might expose it internally only). The metrics_path is set to /debug/metrics to match Zitadel’s endpoint. We use http scheme assuming an internal/non-TLS endpoint; if you have enabled TLS on Zitadel, use https and the appropriate port (e.g., `443`) and adjust any hostname (like zitadel.yourdomain.com).
 
 > When running **Prometheus in Docker** on your workstation:
 >
-> - **macOS/Windows**: if ZITADEL runs on your host, use `host.docker.internal:8080`.
-> - **Linux**: either add `--add-host=host.docker.internal:host-gateway` to `docker run`, attach Prometheus to the same Docker network as ZITADEL and use the service name (e.g., `zitadel:8080`), or run Prometheus with `--network host` (Linux only).
+> - **macOS/Windows**: if Zitadel runs on your host, use `host.docker.internal:8080`.
+> - **Linux**: either add `--add-host=host.docker.internal:host-gateway` to `docker run`, attach Prometheus to the same Docker network as Zitadel and use the service name (e.g., `zitadel:8080`), or run Prometheus with `--network host` (Linux only).
 
 ## Verify scraping
 
@@ -242,17 +242,17 @@ Use Prometheus’s built-in UI to confirm your target is up:
    ```
    Value **1** indicates successful scrapes.
 
-To explore ZITADEL metrics, type `zitadel` in the expression box and pick from auto-complete. Common families include:
+To explore Zitadel metrics, type `zitadel` in the expression box and pick from auto-complete. Common families include:
 
 - **Go runtime / process** (e.g., `go_goroutines`, `process_resident_memory_bytes`)
 - **HTTP / gRPC** request counters/latencies (names vary by build and exporters)
-- **ZITADEL server / DB** metrics (e.g., connection pool counts or other instrumentation available in your version)
+- **Zitadel server / DB** metrics (e.g., connection pool counts or other instrumentation available in your version)
 
 > Metric names and labels can change between releases. Use the **Graph → Insert metric at cursor** dropdown to discover what your instance exposes.
 
 ## Minimal alerting example
 
-Create a basic rule to alert when ZITADEL stops scraping:
+Create a basic rule to alert when Zitadel stops scraping:
 
 ```yaml
 # /etc/prometheus/alerts/zitadel.yml
@@ -265,8 +265,8 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "ZITADEL metrics target is down"
-          description: "Prometheus has not scraped ZITADEL successfully for 5 minutes."
+          summary: "Zitadel metrics target is down"
+          description: "Prometheus has not scraped Zitadel successfully for 5 minutes."
 ```
 
 Reference the rule file in your Prometheus config:
@@ -281,18 +281,18 @@ rule_files:
 ## Troubleshooting
 
 **Target is DOWN / connection refused**
-- In Docker: remember **`localhost` inside the Prometheus container is the container itself**, not your host. Use `host.docker.internal:8080` (plus `--add-host=host.docker.internal:host-gateway` on Linux), or join Prometheus to the **same Docker network** as ZITADEL and use the **service name** (e.g., `zitadel:8080`), or run with `--network host` on Linux.
+- In Docker: remember **`localhost` inside the Prometheus container is the container itself**, not your host. Use `host.docker.internal:8080` (plus `--add-host=host.docker.internal:host-gateway` on Linux), or join Prometheus to the **same Docker network** as Zitadel and use the **service name** (e.g., `zitadel:8080`), or run with `--network host` on Linux.
 - In Kubernetes: verify the Service port name (for example, `http-server` or `https-server`) and path (`/debug/metrics`) match your ServiceMonitor (or annotations). Check that Prometheus has RBAC to list Pods/Endpoints.
 
 **Metrics path mismatch**
-- ZITADEL uses **`/debug/metrics`**. If you see 404s, confirm your Prometheus job or annotations aren’t still using `/metrics`.
+- Zitadel uses **`/debug/metrics`**. If you see 404s, confirm your Prometheus job or annotations aren’t still using `/metrics`.
 
 **No targets discovered (Kubernetes)**
 - If using annotations, make sure your Prometheus config has **Kubernetes discovery & relabeling** rules that honor `prometheus.io/*` annotations and that the Pods/Service are annotated.
 - If using ServiceMonitor, ensure your Prometheus Operator instance **selects** the ServiceMonitor by label/namespace.
 
 **Nothing shows up in the Graph dropdown**
-- First confirm `up{job="zitadel"}` returns **1**. If yes, metrics are being scraped—start typing generic prefixes like `go_` or `process_` to explore. ZITADEL’s exported metric set can evolve; check the raw output at `/debug/metrics` to see exactly what is exposed by your version.
+- First confirm `up{job="zitadel"}` returns **1**. If yes, metrics are being scraped—start typing generic prefixes like `go_` or `process_` to explore. Zitadel’s exported metric set can evolve; check the raw output at `/debug/metrics` to see exactly what is exposed by your version.
 
 ## Alternatives that understand OTEL/Prometheus
 

@@ -1,0 +1,74 @@
+@import 'tailwindcss';
+@import './variables.css';
+
+@theme {
+    /* Color Tokens */
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-primary: var(--color-primary);
+    --color-primary-light: var(--color-primary-light);
+    --color-surface-black-primary: var(--color-surface-black-primary);
+    --color-surface-black-secondary: var(--color-surface-black-secondary);
+    --color-text-primary: var(--color-text-primary);
+    --color-text-secondary: var(--color-text-secondary);
+    --color-text-tertiary: var(--color-text-tertiary);
+    --color-text-disabled: var(--color-text-disabled);
+    --color-text-light: var(--color-text-light);
+    --color-border-primary: var(--color-border-primary);
+    --color-border-secondary: var(--color-border-secondary);
+    --color-border-soft-primary: var(--color-border-soft-primary);
+    --color-border-default: var(--color-border-default);
+    --color-text-muted: var(--color-text-muted);
+    --color-text-accent: var(--color-text-accent);
+    --color-text-reserved: var(--color-text-reserved);
+    --color-text-critical: var(--color-text-critical);
+    --color-comparison-positive: var(--color-comparison-positive);
+    --color-accent-strong: var(--color-accent-strong);
+    --color-pagination-bullet-inactive: var(--color-pagination-bullet-inactive);
+    --color-pricing-tier-free: var(--color-pricing-tier-free);
+    --color-pricing-tier-pro: var(--color-pricing-tier-pro);
+    --color-pricing-tier-enterprise: var(--color-pricing-tier-enterprise);
+
+    /* Font Family Configuration */
+    --font-family-sans: var(--font-sans), Arial, Helvetica, sans-serif;
+    --font-family-heading: var(--font-heading), Arial, Helvetica, sans-serif;
+
+    /* Custom Breakpoints */
+    --breakpoint-3xl: 120rem;
+    --breakpoint-4xl: 160rem;
+
+    /* Spacing Scale */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 2.5rem;
+    --spacing-3xl: 3rem;
+    --spacing-4xl: 4rem;
+    --spacing-5xl: 5.6rem;
+
+    /* Border Radius */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.9375rem;
+}
+
+/* Utilities */
+@utility text-muted {
+    color: var(--color-text-muted);
+}
+
+@utility border-card {
+    border-color: var(--color-border-primary);
+}
+
+@utility section-title {
+    font-family: var(--font-heading), Arial, Helvetica, sans-serif;
+    letter-spacing: -0.02em;
+    @apply font-normal text-[2rem] leading-[2.5rem] md:text-[2.5rem] md:leading-[3rem] tracking-[-0.02em] text-text-primary;
+}
+
+@utility section-description {
+    @apply font-sans font-normal text-base leading-6 tracking-normal text-text-secondary;
+}

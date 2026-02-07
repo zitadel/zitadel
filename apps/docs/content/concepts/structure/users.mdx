@@ -1,11 +1,11 @@
 ---
-title: ZITADEL Users
+title: Zitadel Users
 sidebar_label: Users
 ---
 
 ## Types of users
 
-ZITADEL supports authentication and authorization for different user types.
+Zitadel supports authentication and authorization for different user types.
 We can mainly differentiate between Users and Service Accounts.
 We typically call human users simply "Users" and machine users "Service Users".
 
@@ -13,22 +13,22 @@ We typically call human users simply "Users" and machine users "Service Users".
 
 Users typically logon with an interactive login.
 This means that an application redirects a user to a website ("login page") where the user can provide the credentials.
-ZITADEL handles the authentication and provides the application with a token that verifies the authentication process.
+Zitadel handles the authentication and provides the application with a token that verifies the authentication process.
 
-Read more on how to [login users with ZITADEL](/guides/integrate/login/login-users).
+Read more on how to [login users with Zitadel](/guides/integrate/login/login-users).
 
 ### Service users
 
 Service users are for machine-to-machine communication and you would use those typically to access secure backend services.
-For example in ZITADEL you would require an authenticated Service User to access the Management API.
+For example in Zitadel you would require an authenticated Service User to access the Management API.
 The main difference between users and service accounts is the type of credentials that can be used for authentication: users typically logon via an login prompt, but service accounts require a non-interactive logon process.
 
-Learn how to [use service accounts](/guides/integrate/service-accounts/authenticate-service-accounts) with ZITADEL.
+Learn how to [use service accounts](/guides/integrate/service-accounts/authenticate-service-accounts) with Zitadel.
 
 ### Managers
 
 Any user or service account can be given a [Manager](/concepts/structure/managers) role.
-A user with an administrator role is not only an end-user of ZITADEL but can also manage certain aspects of ZITADEL itself.
+A user with an administrator role is not only an end-user of Zitadel but can also manage certain aspects of Zitadel itself.
 
 ### Federated users
 
@@ -77,5 +77,5 @@ You can use organization metadata or your own business logic to describe a hiera
 ## References
 
 - [Manage users in the Management Console](../../guides/manage/console/users-overview)
-- [ZITADEL APIs: Users](/reference/api/user)
+- [Zitadel APIs: Users](/reference/api/user)
 - [User onboarding and registration](/guides/integrate/onboarding)

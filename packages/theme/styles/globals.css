@@ -1,0 +1,112 @@
+@import './variables.css';
+@import './v4-theme.css';
+
+/* Swiper Styles */
+.swiper {
+  --swiper-pagination-bullet-inactive-color: var(--carousel-bullet-color,
+      var(--color-pagination-bullet-inactive, #9e9eb2));
+  --swiper-pagination-bullet-inactive-opacity: 1;
+  --swiper-pagination-bullet-horizontal-gap: 0.375rem;
+}
+
+.swiper .swiper-pagination-bullet {
+  background-color: var(--swiper-pagination-bullet-inactive-color);
+  opacity: var(--swiper-pagination-bullet-inactive-opacity);
+  width: 0.5rem;
+  height: 0.3125rem;
+  border-radius: 9999px;
+  transition: width var(--transition-base, 200ms ease-in-out);
+}
+
+.swiper .swiper-pagination-bullet-active {
+  width: 2rem;
+}
+
+/* Custom Checkbox Styles */
+input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-border-secondary);
+}
+
+input[type='checkbox']:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-foreground);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23f4f4f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M2 6l2 2 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 12px 12px;
+}
+
+/* Link Styles */
+a {
+  text-decoration: none;
+  transition: color var(--transition-base);
+}
+
+a:hover {
+  color: var(--color-text-secondary);
+}
+
+/* Markdown Content Links */
+.markdown-content a.markdown-link {
+  text-decoration: none;
+  color: var(--color-text-accent);
+}
+
+.markdown-content a.markdown-link:hover {
+  text-decoration: underline;
+  color: var(--color-text-accent);
+}
+
+/* Focus Visible Styles */
+*:focus-visible {
+  outline: var(--focus-outline-width) solid var(--color-text-primary);
+  outline-offset: var(--focus-outline-offset);
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-border-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-secondary);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-disabled);
+}
+
+/* Selection Styles */
+::selection {
+  background-color: var(--color-text-primary);
+  color: var(--color-primary);
+}
+
+/* Login Registration Assets */
+.login-registration-asset {
+  width: 100%;
+  max-width: 43rem;
+  height: auto;
+}
+
+@media (min-width: 768px) {
+  .login-registration-asset {
+    height: 350px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .login-registration-asset {
+    max-width: var(--max-width-270);
+  }
+}

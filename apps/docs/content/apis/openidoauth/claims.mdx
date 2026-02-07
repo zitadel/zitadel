@@ -1,9 +1,9 @@
 ---
-title: Claims in ZITADEL
+title: Claims in Zitadel
 sidebar_label: Claims
 ---
 
-ZITADEL asserts claims on different places according to the corresponding specifications or project and applications settings.
+Zitadel asserts claims on different places according to the corresponding specifications or project and applications settings.
 Please check below the matrix for an overview where which scope is asserted.
 
 | Claims                                            | Userinfo       | Introspection                           | ID Token                                        | Access Token                                         |
@@ -54,7 +54,7 @@ Please check below the matrix for an overview where which scope is asserted.
 | auth_time          | `1311280969`                                                   | Unix time of the authentication                                                                                                                                            |
 | azp                | `69234237810729234`                                            | Client id of the client who requested the token                                                                                                                            |
 | email              | `road.runner@acme.ch`                                          | Email Address of the subject                                                                                                                                               |
-| email_verified     | `true`                                                         | Boolean if the email was verified by ZITADEL                                                                                                                               |
+| email_verified     | `true`                                                         | Boolean if the email was verified by Zitadel                                                                                                                               |
 | events             | `{ "http://schemas.openid.net/event/backchannel-logout": {} }` | Security Events such as Back-Channel Logout                                                                                                                                |
 | exp                | `1311281970`                                                   | Time the token expires (as unix time)                                                                                                                                      |
 | family_name        | `Runner`                                                       | Last name of the subject                                                                                                                                                   |
@@ -70,8 +70,8 @@ Please check below the matrix for an overview where which scope is asserted.
 | nbf                | `1311280970`                                                   | Time the token must not be used before (as unix time)                                                                                                                      |
 | nonce              | `blQtVEJHNTF0WHhFQmhqZ0RqeHJsdzdkd2d...`                       | The nonce provided by the client                                                                                                                                           |
 | phone              | `+41 79 XXX XX XX`                                             | Phone number provided by the user                                                                                                                                          |
-| phone_verified     | `true`                                                         | Boolean if the phone was verified by ZITADEL                                                                                                                               |
-| preferred_username | `road.runner@acme.caos.ch`                                     | ZITADEL's login name of the user. Consist of `username@primarydomain`                                                                                                      |
+| phone_verified     | `true`                                                         | Boolean if the phone was verified by Zitadel                                                                                                                               |
+| preferred_username | `road.runner@acme.caos.ch`                                     | Zitadel's login name of the user. Consist of `username@primarydomain`                                                                                                      |
 | sid                | `291693710356251044`                                           | String identifier for a session. This represents a session of a user agent for a logged-in end-User. Different sid values are used to identify distinct sessions at an OP. |
 | sub                | `77776025198584418`                                            | Subject ID of the user                                                                                                                                                     |
 
@@ -82,7 +82,7 @@ Your app can use custom claims to handle more complex scenarios, such as restric
 
 You can add custom claims using the [complement token flow](/apis/actions/complement-token) of the [actions feature](/guides/manage/console/actions-overview).
 
-Multiple examples of Actions that result in custom claims can be found in our [Marketplace for ZITADEL Actions](https://github.com/zitadel/actions).
+Multiple examples of Actions that result in custom claims can be found in our [Marketplace for Zitadel Actions](https://github.com/zitadel/actions).
 
 ### Static values as custom claim
 
@@ -104,14 +104,14 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js#L20-L33
 
 ## Reserved Claims
 
-ZITADEL reserves some claims to assert certain data. Please check out the [reserved scopes](./scopes#reserved-scopes).
+Zitadel reserves some claims to assert certain data. Please check out the [reserved scopes](./scopes#reserved-scopes).
 
 | Claims                                            | Example                                                                                                  | Description                                                                                                                                                                                                                              |
 |:--------------------------------------------------|:---------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | urn:zitadel:iam:action:\{actionname}:log          | `{"urn:zitadel:iam:action:appendCustomClaims:log": ["test log", "another test log"]}`                    | This claim is set during Actions as a log, e.g. if two custom claims with the same keys are set.                                                                                                                                         |
 | urn:zitadel:iam:org:domain:primary:\{domainname}  | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                                                      | This claim represents the primary domain of the organization the user belongs to.                                                                                                                                                        |
-| urn:zitadel:iam:org:project:roles                 | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }`     | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role on the current project (where your application belongs to). |
-| urn:zitadel:iam:org:project:\{projectid}:roles    | `{"urn:zitadel:iam:org:project:id3:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role on a specific project.                                 |
+| urn:zitadel:iam:org:project:roles                 | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }`     | When roles are asserted, Zitadel does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role on the current project (where your application belongs to). |
+| urn:zitadel:iam:org:project:\{projectid}:roles    | `{"urn:zitadel:iam:org:project:id3:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` | When roles are asserted, Zitadel does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role on a specific project.                                 |
 | urn:zitadel:iam:user:metadata                     | `{"urn:zitadel:iam:user:metadata": [ {"key": "VmFsdWU=" } ] }`                                           | The metadata claim will include all metadata of a user. The values are base64 encoded.                                                                                                                                                   |
 | urn:zitadel:iam:user:resourceowner:id             | `{"urn:zitadel:iam:user:resourceowner:id": "orgid"}`                                                     | This claim represents the user's organization ID.                                                                                                                                                                                        |
 | urn:zitadel:iam:user:resourceowner:name           | `{"urn:zitadel:iam:user:resourceowner:name": "ACME"}`                                                    | This claim represents the user's organization's name.                                                                                                                                                                                    |

@@ -1,15 +1,15 @@
 ---
-title: Configure ZITADEL for your Scenario
+title: Configure Zitadel for your Scenario
 sidebar_label: Common Configurations
 ---
 
-Each customer does have different needs and use-cases. In ZITADEL you are able to configure your settings depending on your needs.
+Each customer does have different needs and use-cases. In Zitadel you are able to configure your settings depending on your needs.
 In this section we show you the different use-cases we have already experienced, that could interest you.
 
 ## Automatically redirect users if the organization has only one identity provider
 
-You have different customers (organizations) in your ZITADEL instance and they have different needs on how to authenticate their users. One of your customers does only allow login with an external identity provider like Google, Entra ID, and so on.
-If a user of this organization wants to login, you don't want them to enter their username in the ZITADEL Login UI, they should be redirected directly to the identity provider without their interaction.
+You have different customers (organizations) in your Zitadel instance and they have different needs on how to authenticate their users. One of your customers does only allow login with an external identity provider like Google, Entra ID, and so on.
+If a user of this organization wants to login, you don't want them to enter their username in the Zitadel Login UI, they should be redirected directly to the identity provider without their interaction.
 
 ### Settings
 
@@ -24,20 +24,20 @@ More about the [scopes](/apis/openidoauth/scopes#reserved-scopes)
 
 ## Custom Application Domain per Organization
 
-If you have an application that runs a dedicated domain for each customer you need to instruct ZITADEL to allow redirection for each domain specifically to safeguard against phishing attacks.
+If you have an application that runs a dedicated domain for each customer you need to instruct Zitadel to allow redirection for each domain specifically to safeguard against phishing attacks.
 
 Example:
 MyApplication: `customer-a.app.com`
-ZITADEL Login: `login.app.com`
+Zitadel Login: `login.app.com`
 
 In the OIDC Authorization request you always have to send the redirect URI to where you like to be redirected after login.
-To handle this scenario it is possible to register multiple URIs on each application in ZITADEL, the only criteria is that the requested URI has to match one of the registered URIs.
+To handle this scenario it is possible to register multiple URIs on each application in Zitadel, the only criteria is that the requested URI has to match one of the registered URIs.
 
 Read more about [applications](../manage/console/applications) and the [redirect urls](../manage/console/applications#redirect-ur-is)
 
-### Trigger organization in ZITADEL login
+### Trigger organization in Zitadel login
 
-It is possible to trigger the organization directly with the authorization request to ZITADEL.
+It is possible to trigger the organization directly with the authorization request to Zitadel.
 
 This will have the following impacts:
 - Trigger organization login behavior settings
@@ -62,7 +62,7 @@ To be able to use the email as username you have to disable the attribute "User 
 This means that all your users will not be suffixed with the domain of your organization and you can enter the email as username.
 All usernames will then be globally unique within your instance.
 
-You can either set this attribute on your whole ZITADEL instance or just on some specific organizations.
+You can either set this attribute on your whole Zitadel instance or just on some specific organizations.
 
 ### Use the email field of the user as additional login to the username
 
@@ -89,7 +89,7 @@ To be able to use the phone number as username you have to disable the attribute
 This means that your users will not be suffixed with the domain of an organization and you can enter the phone number as username.
 All usernames will then be globally unique within your instance.
 
-You can either set this attribute on your whole ZITADEL instance or just on some specific organizations.
+You can either set this attribute on your whole Zitadel instance or just on some specific organizations.
 
 ### Use the phone number field of the user as additional login to the username
 
@@ -101,9 +101,9 @@ Go to the "Advanced" section, per default login with phone number should be allo
 
 ![](../../../public/img/guides/scenarios/login_policy_advanced_phone.png)
 
-## Embedding ZITADEL in an iFrame
+## Embedding Zitadel in an iFrame
 
-To maximize the security during login and in the Management Console UI, ZITADEL follows security best practices by setting a
+To maximize the security during login and in the Management Console UI, Zitadel follows security best practices by setting a
 Content-Security-Policy (CSP), X-Frame-Options and cookies with SameSite Lax:
 
 ```
@@ -119,7 +119,7 @@ These settings block the use of serving it in an iframe to prevents clickjacking
 This change can make you vulnerable to clickjacking attacks.
 </Callout>
 
-If your applications need to load ZITADEL inside an iframe, e.g. for a silent login or silent refresh, you can enable the use on an instance level.
+If your applications need to load Zitadel inside an iframe, e.g. for a silent login or silent refresh, you can enable the use on an instance level.
 
 1. Navigate to the Default Settings.
 2. Click on the Security Policy tab.

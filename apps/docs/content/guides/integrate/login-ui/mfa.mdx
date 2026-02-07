@@ -11,7 +11,7 @@ import UpdateSessionWebAuthN from './_update_session_webauthn.mdx';
 Multi-factor authentication (MFA) is a multi-step account authentication which requires to user to enter more than only the password.
 It is highly recommended to use MFA or [Passkeys](./passkey) to make your user accounts more secure.
 
-ZITADEL supports different Methods:
+Zitadel supports different Methods:
 - Time-based one time password (TOTP), which are Authenticator apps like Google/Microsoft Authenticator, Authy, etc
 - OTP sent as SMS
 - OTP sent as Email
@@ -30,7 +30,7 @@ ZITADEL supports different Methods:
 ### Start TOTP Registration
 
 The user has selected to setup TOTP.
-To show the user the QR to register TOTP with his Authenticator App like Google/Microsoft Authenticator or Authy you have to start the registration on the ZITADEL API.
+To show the user the QR to register TOTP with his Authenticator App like Google/Microsoft Authenticator or Authy you have to start the registration on the Zitadel API.
 Generate the QR Code with the URI from the response.
 For users that do not have a QR Code reader make sure to also show the secret, to enable manual configuration.
 
@@ -56,7 +56,7 @@ Response Example:
     "changeDate": "2023-06-28",
     "resourceOwner": "69629023906488334"
   },
-  "uri": "otpauth://totp/ZITADEL:minni-mouse@mouse.com?algorithm=SHA1&digits=6&issuer=ZITADEL&period=30&secret=TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK",
+  "uri": "otpauth://totp/Zitadel:minni-mouse@mouse.com?algorithm=SHA1&digits=6&issuer=Zitadel&period=30&secret=TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK",
   "secret": "TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK"
 }
 ```
@@ -64,7 +64,7 @@ Response Example:
 ### Verify TOTP Registration
 
 When the user has added the account to the authenticator app, the code from the App has to be entered to finish the registration.
-This code has to be sent to the verify endpoint in ZITADEL.
+This code has to be sent to the verify endpoint in Zitadel.
 
 More detailed information about the API: [Verify TOTP Documentation](/reference/api/user/zitadel.user.v2.UserService.VerifyTOTPRegistration)
 
@@ -162,9 +162,9 @@ curl --request PATCH \
 When the user has decided to register the phone number to get a code as a second factor, the first step is to add a verified phone number to the user.
 If the user already has a verified phone number you can skip this step.
 
-When adding a new phone number, you can choose if you want ZITADEL to send the verification code to the number, or if you want to send it by yourself.
-If ZITADEL should do it, make sure that you have registered an [SMS Provider](/guides/manage/console/default-settings#sms) and send an empty sendCode object in the request.
-With an empty returnCode object in the request, ZITADEL will not send the code, but return it in the response.
+When adding a new phone number, you can choose if you want Zitadel to send the verification code to the number, or if you want to send it by yourself.
+If Zitadel should do it, make sure that you have registered an [SMS Provider](/guides/manage/console/default-settings#sms) and send an empty sendCode object in the request.
+With an empty returnCode object in the request, Zitadel will not send the code, but return it in the response.
 
 If you don't want the user to verify the phone number, you can also create it directly as verified, by sending the isVerified attribute.
 
@@ -228,7 +228,7 @@ curl --request POST \
 
 To be able to check the SMS Code you need a session with a checked user.
 When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
-You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
+You can tell the challenge, if the code should be returned (returnCode: true) or if Zitadel should send it (returnCode: false).
 
 More detailed information about the API: [Create new session Documentation](/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
 
@@ -288,7 +288,7 @@ curl --request PATCH \
 
 ### Verified Email
 
-As ZITADEL required all users to have a verified email address, you do not need to add a new email and verify it for setting up the second factor.
+As Zitadel required all users to have a verified email address, you do not need to add a new email and verify it for setting up the second factor.
 For the Email second factor the already verified email address will be taken.
 
 ### Add OTP Email to the user
@@ -316,7 +316,7 @@ curl --request POST \
 
 To be able to check the Email Code you need a session with a checked user.
 When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
-You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
+You can tell the challenge, if the code should be returned (returnCode: true) or if Zitadel should send it (returnCode: false).
 
 More detailed information about the API: [Create new session Documentation](/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
 
@@ -377,7 +377,7 @@ curl --request PATCH \
 ### Start U2F Registration
 
 The user has selected to setup Universal Second Factor (U2F).
-To be able to authenticate in the browser you have to start the u2f registration within ZITADEL.
+To be able to authenticate in the browser you have to start the u2f registration within Zitadel.
 
 More detailed information about the API: [Start U2F Registration Documentation](/reference/api/user/zitadel.user.v2.UserService.RegisterU2F)
 
@@ -425,7 +425,7 @@ Response Example:
       ],
       "rp": {
         "id": "localhost",
-        "name": "ZITADEL"
+        "name": "Zitadel"
       },
       "timeout": 300000,
       "user": {
@@ -444,7 +444,7 @@ Response Example:
 
 ### Verify U2F Registration
 
-In the next request you have to verify the U2F within ZITADEL.
+In the next request you have to verify the U2F within Zitadel.
 Include the public key credential you got from the browser in your request.
 You can give the U2F a name, which makes it easier for the user to identify the registered authentication methods.
 Example: Google Pixel, iCloud Keychain, Yubikey, etc

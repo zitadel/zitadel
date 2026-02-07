@@ -1,5 +1,5 @@
 ---
-title: Configure LDAP as an Identity Provider in ZITADEL
+title: Configure LDAP as an Identity Provider in Zitadel
 sidebar_label: LDAP
 ---
 
@@ -18,7 +18,7 @@ import HowLDAPIDPWorks from './_how_ldap_idp_works.mdx'
 
 <HowLDAPIDPWorks components={props.components} />
 
-## ZITADEL Configuration
+## Zitadel Configuration
 
 ### Go to the IdP Providers Overview
 
@@ -47,9 +47,9 @@ Otherwise, your users passwords are sent in clear text through the wire.
 
 **User Object Classes**: ObjectClasses which are "and"-joined in the SearchQuery and the user has to have in the LDAP.
 
-**LDAP Attributes**: Mapping of LDAP attributes to ZITADEL attributes, the ID attributes is required, the rest depends on usage of the identity provider
+**LDAP Attributes**: Mapping of LDAP attributes to Zitadel attributes, the ID attributes is required, the rest depends on usage of the identity provider
 
-**StartTLS**: If this setting is enabled after the initial connection ZITADEL tries to build a TLS connection. If your LDAP server doesn't support LDAPS, at least it should support StartTLS.
+**StartTLS**: If this setting is enabled after the initial connection Zitadel tries to build a TLS connection. If your LDAP server doesn't support LDAPS, at least it should support StartTLS.
 
 **Timeout**: If this setting is set all connection run with a set timeout, if it is 0s the default timeout of 60s is used.
 
@@ -69,7 +69,7 @@ Otherwise, your users passwords are sent in clear text through the wire.
 
 ## Test the setup
 
-<TestSetup components={props.components}  loginscreen="ZITADELs LDAP login"/>
+<TestSetup components={props.components}  loginscreen="Zitadels LDAP login"/>
 
 ![](../../../../public/img/guides/zitadel_login_ldap.png)
 

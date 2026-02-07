@@ -1,20 +1,20 @@
 ---
-title: External ZITADEL Access
+title: External Zitadel Access
 sidebar_label: Instance Not Found
 ---
 
 ## Why do I get an "Instance not found" error?
 
-Also, ZITADEL has the [concept of virtual instances](/concepts/structure/instance#multiple-virtual-instances).
+Also, Zitadel has the [concept of virtual instances](/concepts/structure/instance#multiple-virtual-instances).
 It uses a requests Host header to determine which virtual instance to use.
 This is useful for multi-tenancy and resource sharing, for example in SaaS scenarios.
-For most cases however, ZITADEL should run on exactly one domain.
+For most cases however, Zitadel should run on exactly one domain.
 
-This guide assumes you are already familiar with [configuring ZITADEL](./configure).
+This guide assumes you are already familiar with [configuring Zitadel](./configure).
 
 ## Standard Config
 
-ZITADEL only serves requests sent to the expected protocol, host and port.
+Zitadel only serves requests sent to the expected protocol, host and port.
 For local testing purposes, you can use following configuration:
 
 ```yaml
@@ -34,11 +34,11 @@ ExternalSecure: true
 ## Changing ExternalDomain, ExternalPort or ExternalSecure
 
 You can change the ExternalDomain, ExternalPort and ExternalSecure configuration options at any time.
-However, for ZITADEL to be able to pick up the changes, [you need to rerun ZITADELs setup phase](/self-hosting/manage/updating_scaling#the-setup-phase).
+However, for Zitadel to be able to pick up the changes, [you need to rerun Zitadels setup phase](/self-hosting/manage/updating_scaling#the-setup-phase).
 
-## Running ZITADEL behind a Reverse Proxy
+## Running Zitadel behind a Reverse Proxy
 
-If you run ZITADEL behind a reverse proxy, you need to ensure that it sends the correct request headers to ZITADEL.
+If you run Zitadel behind a reverse proxy, you need to ensure that it sends the correct request headers to Zitadel.
 The proxy must either ensure that
 - the original *Host* header value is assigned to the *Forwarded* headers host directive.
 - the original requests *Host* header value is unchanged by the proxy.
@@ -47,18 +47,18 @@ Check out the [reverse proxy configuration examples](/self-hosting/manage/revers
 
 ## Organization Domains
 
-Note that by default, you cannot access ZITADEL at an organizations domain.
+Note that by default, you cannot access Zitadel at an organizations domain.
 Organization level domains [are intended for routing users by their login methods to their correct organization](/guides/solution-scenarios/domain-discovery).
 
-However, if you want to access ZITADEL at an organization domain, [you can add additional domains using the System API](/reference/api/system/zitadel.system.v1.SystemService.AddDomain).
-Be aware that you won't automatically have the organizations context when you access ZITADEL like this.
+However, if you want to access Zitadel at an organization domain, [you can add additional domains using the System API](/reference/api/system/zitadel.system.v1.SystemService.AddDomain).
+Be aware that you won't automatically have the organizations context when you access Zitadel like this.
 
 ## Generated Subdomains
 
-ZITADEL creates random subdomains for [each new virtual instance](/concepts/structure/instance#multiple-virtual-instances).
-You can immediately access the ZITADEL Management Console and APIs using these subdomains without further actions.
+Zitadel creates random subdomains for [each new virtual instance](/concepts/structure/instance#multiple-virtual-instances).
+You can immediately access the Zitadel Management Console and APIs using these subdomains without further actions.
 
 ## More Information
 
 - [Check out the production-near loadbalancing example with Traefik](/self-hosting/manage/reverseproxy/traefik)
-- [Explore some concrete proxy configuration examples for ZITADEL using the domain 127.0.0.1.sslip.io](/self-hosting/manage/reverseproxy/reverse_proxy)
+- [Explore some concrete proxy configuration examples for Zitadel using the domain 127.0.0.1.sslip.io](/self-hosting/manage/reverseproxy/reverse_proxy)

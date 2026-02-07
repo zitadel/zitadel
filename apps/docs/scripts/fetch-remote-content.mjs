@@ -459,7 +459,7 @@ function getLocalVersion() {
         return { label: branch, isUnreleased: true };
     }
     if (branch === 'main' || branch === 'master') {
-        return { label: 'ZITADEL Docs', isUnreleased: false };
+        return { label: 'Zitadel Docs', isUnreleased: false };
     }
 
     try {

@@ -1,0 +1,25 @@
+{
+    "name": "@zitadel/theme",
+    "version": "0.0.1",
+    "description": "Shared theme assets, styles, and configurations for ZITADEL apps",
+    "private": true,
+    "files": [
+        "assets",
+        "styles",
+        "fonts",
+        "tailwind.config.js"
+    ],
+    "exports": {
+        "./styles/*": "./styles/*",
+        "./assets/*": "./assets/*",
+        "./fonts/*": "./fonts/*",
+        "./tailwind": "./tailwind.config.js"
+    },
+    "devDependencies": {
+        "tailwindcss": "4.0.0",
+        "@fortawesome/fontawesome-free": "^6.6.0"
+    },
+    "peerDependencies": {
+        "tailwindcss": ">=4.0.0"
+    }
+}

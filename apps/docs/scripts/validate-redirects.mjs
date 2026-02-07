@@ -1,7 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 
-const REDIRECTS_PATH = '/home/ffo/git/zitadel/zitadel/apps/docs/redirects.json';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const REDIRECTS_PATH = path.resolve(__dirname, '../redirects.json');
 
 function validateRedirects() {
     const content = fs.readFileSync(REDIRECTS_PATH, 'utf8');

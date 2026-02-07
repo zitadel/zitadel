@@ -1,22 +1,22 @@
 ---
-title: ZITADEL API Reference Overview
+title: Zitadel API Reference Overview
 sidebar_label: Overview
 ---
 
 import { ApiCard } from "@/components/apicard";
 import Column from "@/components/column";
 
-ZITADEL exposes all features via different gRPC and REST APIs and provides SDKs for popular languages and frameworks.
+Zitadel exposes all features via different gRPC and REST APIs and provides SDKs for popular languages and frameworks.
 
-The [OpenID Connect & OAuth endpoints](/apis/openidoauth/endpoints) and [SAML 2.0 endpoints](/apis/saml/endpoints) are implemented and exposed according to the specific standards. Managing resources such as users, organizations, instances, or settings must be done with the different [ZITADEL APIs](#zitadel-apis-resource-based).
+The [OpenID Connect & OAuth endpoints](/apis/openidoauth/endpoints) and [SAML 2.0 endpoints](/apis/saml/endpoints) are implemented and exposed according to the specific standards. Managing resources such as users, organizations, instances, or settings must be done with the different [Zitadel APIs](#zitadel-apis-resource-based).
 
-[Actions](/guides/manage/console/actions-overview) allow to extend ZITADEL with custom code to change default behaviors or calling external systems.
+[Actions](/guides/manage/console/actions-overview) allow to extend Zitadel with custom code to change default behaviors or calling external systems.
 
 ## Authentication & authorization
 
 ### Authentication for users (interactive)
 
-ZITADEL implements industry standards such as OpenID Connect, OAuth 2.0, or SAML for authentication.
+Zitadel implements industry standards such as OpenID Connect, OAuth 2.0, or SAML for authentication.
 Please refer to our guides how to [authenticate users](/guides/integrate/login/login-users) through an interactive authentication process.
 
 For user authentication on devices with limited accessibility (eg, SmartTV, Smart Watch etc.) use the [device authorization grant](/guides/integrate/login/oidc/device-authorization).
@@ -28,7 +28,7 @@ Additionally, you can use the [session API](/reference/api/session) to authentic
 Service users allow for machine-to-machine (M2M) communication.
 Follow the guides to learn how to [authenticate service accounts](/guides/integrate/service-accounts/authenticate-service-accounts).
 
-Accessing the ZITADEL APIs through a service user might require additional steps, please follow the guide on how to [access ZITADEL APIs](../guides/integrate/zitadel-apis/access-zitadel-apis) to include the correct audience scope in your requests.
+Accessing the Zitadel APIs through a service user might require additional steps, please follow the guide on how to [access Zitadel APIs](../guides/integrate/zitadel-apis/access-zitadel-apis) to include the correct audience scope in your requests.
 
 ### OpenID Connect & OAuth
 
@@ -45,14 +45,14 @@ The [OIDC Playground](https://zitadel.com/playgrounds/oidc) is for testing OpenI
 
 ### Custom
 
-ZITADEL allows to authenticate users by creating a session with the [Session API](/reference/api/session), get OIDC authentication request details with the [OIDC service API](/reference/api/oidc) or get SAML request details with the [SAML service API](/reference/api/saml).
+Zitadel allows to authenticate users by creating a session with the [Session API](/reference/api/session), get OIDC authentication request details with the [OIDC service API](/reference/api/oidc) or get SAML request details with the [SAML service API](/reference/api/saml).
 User authorizations can be [retrieved as roles from our APIs](/guides/integrate/retrieve-user-roles).
 
 Refer to our guide to learn how to [build your own login UI](/guides/integrate/login-ui)
 
-## ZITADEL APIs (resource-based)
+## Zitadel APIs (resource-based)
 
-ZITADEL provides APIs for each [core resource](/apis/v2):
+Zitadel provides APIs for each [core resource](/apis/v2):
 
 - [User](/reference/api/user)
 - [Session](/reference/api/session)
@@ -63,14 +63,14 @@ We are migrating to a resource-based API approach.
 You might need to use the existing [service-based](#zitadel-apis-service-based) APIs for now to manage Organizations, Instances, Assets etc.
 </Callout>
 
-## ZITADEL APIs (service-based)
+## Zitadel APIs (service-based)
 
 <Callout title="Prefer resource-based API">
-ZITADEL APIs were organized by UseCase/Context, such as Auth API for authenticated users and Management API for organization managers.
+Zitadel APIs were organized by UseCase/Context, such as Auth API for authenticated users and Management API for organization managers.
 This led to confusion about which API to use, particularly for requests that could be useful across multiple APIs but with different filters.
 For instance, SearchUsers on an Instance Level or on an Organization Level.
 
-To address this issue, ZITADEL is migrating to a [resource-based API](#zitadel-apis-resource-based).
+To address this issue, Zitadel is migrating to a [resource-based API](#zitadel-apis-resource-based).
 </Callout>
 
 <ApiCard title="Authentication" type="AUTH">
@@ -143,7 +143,7 @@ API Reference:
 
 ### Administration
 
-This API is intended to configure and manage one ZITADEL instance itself.
+This API is intended to configure and manage one Zitadel instance itself.
 
 </div>
 <div className="apicard-right">
@@ -174,9 +174,9 @@ API Reference:
 
 ### System
 
-This API is intended to manage the different ZITADEL instances within the system.
+This API is intended to manage the different Zitadel instances within the system.
 
-Checkout the guide how to [access the ZITADEL System API](/guides/integrate/zitadel-apis/access-zitadel-system-api).
+Checkout the guide how to [access the Zitadel System API](/guides/integrate/zitadel-apis/access-zitadel-system-api).
 
 </div>
 <div className="apicard-right">
@@ -229,11 +229,11 @@ Definition:
 Each service's proto definition is located in the source control on GitHub.
 As we generate the REST services and Swagger file out of the proto definition we recommend that you rely on the proto file.
 We annotate the corresponding REST methods on each possible call as well as the AuthN and AuthZ requirements.
-The last API (assets) is only a REST API because ZITADEL uses multipart form data for certain elements.
+The last API (assets) is only a REST API because Zitadel uses multipart form data for certain elements.
 
 ### SDKs
 
-ZITADEL provides some [official and community supported SDKs](/sdk-examples/introduction) for multiple languages and frameworks.
+Zitadel provides some [official and community supported SDKs](/sdk-examples/introduction) for multiple languages and frameworks.
 Most languages allow you to build a client from proto definitions, which allows you to build your own client in case an SDK is missing.
 
 ### Proto
@@ -270,7 +270,7 @@ In the table below you can see the URI of those calls.
 
 ## Domains
 
-ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or your Custom Domain `${CUSTOM_DOMAIN}`
+Zitadel hosts everything under a single domain: `{instance}.zitadel.cloud` or your Custom Domain `${CUSTOM_DOMAIN}`
 
 The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Management Console UI, which you'll find under `${CUSTOM_DOMAIN}/ui/console/`.
 
@@ -278,8 +278,8 @@ Are you self-hosting and having troubles with _Instance not found_ errors? [Chec
 
 ## API path prefixes
 
-If you run ZITADEL on a Custom Domain, you may want to reuse that domain for other applications.
-For easy copying to your reverse proxy configuration, here is the list of URL path prefixes, ZITADEL uses.
+If you run Zitadel on a Custom Domain, you may want to reuse that domain for other applications.
+For easy copying to your reverse proxy configuration, here is the list of URL path prefixes, Zitadel uses.
 
 ```yaml
 /zitadel.admin.v1.AdminService/
@@ -314,7 +314,7 @@ For easy copying to your reverse proxy configuration, here is the list of URL pa
 ```
 ## Postman Collection (Beta)
 
-We published an official Postman collection to help you explore and test the ZITADEL APIs.
+We published an official Postman collection to help you explore and test the Zitadel APIs.
 
 The collection is organized by services, and includes a script to automatically authenticate requests. Before using it, make sure to configure the required environment variables in Postman:
 

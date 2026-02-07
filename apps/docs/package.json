@@ -45,7 +45,8 @@
     "shiki": "^3.21.0",
     "tailwind-merge": "^2.6.0",
     "vanilla-cookieconsent": "3.0.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "@zitadel/theme": "workspace:*"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.61.0",

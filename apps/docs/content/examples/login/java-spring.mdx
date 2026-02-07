@@ -1,9 +1,9 @@
 ---
-title: ZITADEL with Java Spring Boot
+title: Zitadel with Java Spring Boot
 sidebar_label: Java Spring Boot
 ---
 
-This integration guide demonstrates the recommended way to incorporate ZITADEL into your Spring Boot web application.
+This integration guide demonstrates the recommended way to incorporate Zitadel into your Spring Boot web application.
 It explains how to enable user login in your application and how to fetch data from the user info endpoint.
 
 By the end of this guide, your application will have login functionality and will be able to access the current user's profile.
@@ -15,7 +15,7 @@ You can either create your own application or directly run the example by provid
 
 ## Set up application
 
-Before we begin developing our application, we need to perform a few configuration steps in the ZITADEL Console.
+Before we begin developing our application, we need to perform a few configuration steps in the Zitadel Console.
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select the **Web** application type and continue.
 
@@ -27,7 +27,7 @@ We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth
 
 ### Redirect URIs
 
-The Redirect URIs field tells ZITADEL where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
+The Redirect URIs field tells Zitadel where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 The Post-logout redirect send the users back to a route on your application after they have logged out.
 
 <Callout>
@@ -46,13 +46,13 @@ After successful creation of the app, a pop-up will appear displaying the app's 
 
 ## Spring setup
 
-Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Spring application.
+Now that you have configured your web application on the Zitadel side, you can proceed with the integration of your Spring application.
 This guide will reference the [example repository](https://github.com/zitadel/zitadel-java) and explain the necessary steps taken in there.
 If your starting from scratch, you can use the Spring Initializer with the [following setup](https://start.spring.io/#!type=maven-project&language=java&platformVersion=3.2.1&packaging=jar&jvmVersion=17&dependencies=web,thymeleaf,security,oauth2-client,lombok) as a base.
 
 ### Support classes
 
-To be able to take the most out of ZITADELs RBAC, we first need to create a GrantedAuthoritiesMapper, that will map the role claims (`urn:zitadel:iam:org:project:roles`)
+To be able to take the most out of Zitadels RBAC, we first need to create a GrantedAuthoritiesMapper, that will map the role claims (`urn:zitadel:iam:org:project:roles`)
 into Spring Security `authiorities`, which can be used later on to determine the granted permissions.
 
 So in your application, create a 'support/zitadel' package and in there the `ZitadelGrantedAuthoritiesMapper.java`:
@@ -96,7 +96,7 @@ For the authentication (and the server in general) to work, the application need
 https://github.com/zitadel/zitadel-java/blob/main/web/src/main/resources/application.yml
 ```
 
-Note that both the `issuer-uri` as well as the `client-id` are only placeholders. You can either change them in here using the values provided by ZITADEL
+Note that both the `issuer-uri` as well as the `client-id` are only placeholders. You can either change them in here using the values provided by Zitadel
 or pass them later on as arguments when starting the application.
 
 ### Add pages to your application
@@ -162,14 +162,14 @@ java \
   -jar web/target/web-0.0.2-SNAPSHOT.jar
 ```
 
-If you then visit on [http://localhost:18080/webapp](http://localhost:18080/webapp) you should directly be redirected to your ZITADEL instance.
+If you then visit on [http://localhost:18080/webapp](http://localhost:18080/webapp) you should directly be redirected to your Zitadel instance.
 After login with your existing user you will be presented the profile page:
 
 ![](../../../public/img/java-spring/app-profile.png)
 
 ## Completion
 
-Congratulations! You have successfully integrated your Spring Boot web application with ZITADEL!
+Congratulations! You have successfully integrated your Spring Boot web application with Zitadel!
 
 If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-java) application.
 This application includes all the functionalities mentioned in this quickstart.

@@ -1,9 +1,9 @@
 ---
-title: Domain Discovery in ZITADEL
+title: Domain Discovery in Zitadel
 sidebar_label: Domain Discovery
 ---
 
-This guide should explain how domain discovery works and how to configure it in ZITADEL.
+This guide should explain how domain discovery works and how to configure it in Zitadel.
 
 ## Overview
 
@@ -11,7 +11,7 @@ Domain discovery is typically used in [B2B](./b2b) or [SaaS](./saas) scenarios w
 
 ![](../../../public/img/guides/solution-scenarios/domain-discovery.png)
 
-In the example there is a service provider with a ZITADEL instance running on a [Custom Domain](/guides/manage/cloud/instances#add-custom-domain) on `login.mycompany.com`.
+In the example there is a service provider with a Zitadel instance running on a [Custom Domain](/guides/manage/cloud/instances#add-custom-domain) on `login.mycompany.com`.
 By default all users login on the organization **CIAM** with their preferred social login provider.
 
 Users of the two business customers **Alpha** and **Beta** should login according to their organization login and access policy settings.
@@ -20,7 +20,7 @@ Beta users must only login with username/password and MFA instead.
 
 For this scenario you need to route the user `alice@alpha.com` to the **Alpha Organization** and `bob@beta.com` to the **Beta Organization** respectively.
 
-Follow this guide to configure your ZITADEL instance for this scenario.
+Follow this guide to configure your Zitadel instance for this scenario.
 
 ## Instance
 
@@ -104,7 +104,7 @@ You should be all setup to try out domain discovery.
 The user journeys for the different users would look as follows:
 
 - User (Alice, Bob, Chuck) clicks a login button in your application
-- Redirected to `login.mycompany.com` (ZITADEL running under a Custom Domain)
+- Redirected to `login.mycompany.com` (Zitadel running under a Custom Domain)
 
 Chuck
 

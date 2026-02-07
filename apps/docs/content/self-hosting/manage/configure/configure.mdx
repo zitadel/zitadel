@@ -1,5 +1,5 @@
 ---
-title: Configuration Options in ZITADEL
+title: Configuration Options in Zitadel
 sidebar_label: Configuration
 ---
 
@@ -12,7 +12,7 @@ import DefaultsYamlSource from "../../../../../../cmd/defaults.yaml";
 import StepsYamlSource from "../../../../../../cmd/setup/steps.yaml";
 import SkipSuperUserDatabaseQueries from "./example-skip-superuser-queries.yaml";
 
-This guide assumes you are familiar with [running ZITADEL using the least amount of configuration possible](/self-hosting/deploy/overview).
+This guide assumes you are familiar with [running Zitadel using the least amount of configuration possible](/self-hosting/deploy/overview).
 
 ## Configuration files
 
@@ -32,7 +32,7 @@ For overwriting the default configuration for the first instance created by zita
 
 ### Database initialization file
 
-ZITADEL uses a [different configuration file](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml) for _database initialization steps_.
+Zitadel uses a [different configuration file](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml) for _database initialization steps_.
 Use the `--steps` flag of the `zitadel` binary to provide this configuration file.
 Also, you can use the environment variables listed in the steps.yaml.
 
@@ -47,10 +47,10 @@ By using the FirstInstance section, you can overwrite the [DefaultInstance confi
 
 ### Pre-existing Database and User
 
-By default, when you run `zitadel init` or `zitadel start-from-init`, ZITADEL checks if the specified database and user exist. If they don't, ZITADEL creates them and grants the necessary permissions.
+By default, when you run `zitadel init` or `zitadel start-from-init`, Zitadel checks if the specified database and user exist. If they don't, Zitadel creates them and grants the necessary permissions.
 
-If you manage the database and user manually, you can instruct ZITADEL to skip these checks. This is useful if the ZITADEL user has limited database permissions, for example, if it is not a `SUPERUSER`. This scenario is most common on cloud providers.
-To skip the checks, you must ensure the database objects (database, user, grant) exist before running the commands and then set the `Database.postgres.Admin.ExistingDatabase` field in your configuration as shown below. This tells ZITADEL to connect to the existing database as an admin user, bypassing the creation and permission steps.
+If you manage the database and user manually, you can instruct Zitadel to skip these checks. This is useful if the Zitadel user has limited database permissions, for example, if it is not a `SUPERUSER`. This scenario is most common on cloud providers.
+To skip the checks, you must ensure the database objects (database, user, grant) exist before running the commands and then set the `Database.postgres.Admin.ExistingDatabase` field in your configuration as shown below. This tells Zitadel to connect to the existing database as an admin user, bypassing the creation and permission steps.
 
 <details>
   <summary>skip-superuser-queries-config.yaml</summary>
@@ -59,7 +59,7 @@ To skip the checks, you must ensure the database objects (database, user, grant)
 
 ### Multiple configuration files
 
-ZITADEL merges configuration files when multiple `--config` and `--steps` flags are provided.
+Zitadel merges configuration files when multiple `--config` and `--steps` flags are provided.
 You can use these flags to handle standard configuration files differently from secret configuration files.
 For example, standard configuration files stored in git may contain public information such as a database hostname.
 To use private information — such as a database admin credential — without storing it in git, use an extra `--config` or `--steps` flag that requests the private information from a secret manager.
@@ -67,8 +67,8 @@ To use private information — such as a database admin credential — without s
 ## Environment variables
 
 All configuration properties are configurable using environment variables.
-ZITADEL environment variable keys are prefixed with `ZITADEL_`.
-For example, to configure the default ZITADEL IAM admin username and password set the `zitadel` binary runtime environment variables `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME` and `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD`.
+Zitadel environment variable keys are prefixed with `ZITADEL_`.
+For example, to configure the default Zitadel IAM admin username and password set the `zitadel` binary runtime environment variables `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME` and `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD`.
 All supported environment variables are listed in the [runtime configuration file](#runtime-configuration-file) and the [database initialization file](#database-initialization-file).
 
 ### Proxy configuration
@@ -115,11 +115,11 @@ There are three ways to pass the masterkey to the `zitadel` binary:
 ## What's next
 
 - Read more about [the login process](/guides/integrate/login/login-users).
-- If you are running ZITADEL in production, you need to [customize your own domain](../custom-domain).
+- If you are running Zitadel in production, you need to [customize your own domain](../custom-domain).
 - Check out all possible [runtime configuration properties and their defaults in the source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml)
 - Check out all possible [setup step configuration properties and their defaults in the source code](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml)
 
 <Callout type="warn">
 
-The ZITADEL management console [requires end-to-end HTTP/2 support](/self-hosting/manage/http2)
+The Zitadel management console [requires end-to-end HTTP/2 support](/self-hosting/manage/http2)
 </Callout>

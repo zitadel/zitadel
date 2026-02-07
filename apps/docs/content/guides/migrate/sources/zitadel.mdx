@@ -1,13 +1,13 @@
 ---
-title: Migrate from ZITADEL
-sidebar_label: From ZITADEL
+title: Migrate from Zitadel
+sidebar_label: From Zitadel
 ---
 
-This guide explains how to migrate from ZITADEL, this includes
+This guide explains how to migrate from Zitadel, this includes
 
-- ZITADEL Cloud to self-hosted
-- ZITADEL self-hosted to ZITADEL Cloud
-- ZITADEL v1 (deprecated) to ZITADEL v2.x
+- Zitadel Cloud to self-hosted
+- Zitadel self-hosted to Zitadel Cloud
+- Zitadel v1 (deprecated) to Zitadel v2.x
 
 ## Considerations
 
@@ -90,7 +90,7 @@ curl  --request POST \
 ### Import from file
 
 <Callout>
-To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL, with all desired configuration and global resources.
+To import the exported data into you new instance, you have to have an already existing instance on a Zitadel, with all desired configuration and global resources.
 </Callout>
 
 Then as an example you can use one request for the import:
@@ -109,7 +109,7 @@ curl --request POST \
 | Field       | Type            | Description                             |
 | ----------- | --------------- | --------------------------------------- |
 | timeout     | duration string | timeout of the call to import the data  |
-| data_orgsv1 | string          | data which was exported from ZITADEL V1 |
+| data_orgsv1 | string          | data which was exported from Zitadel V1 |
 
 ## Use Google Cloud Storage
 
@@ -161,7 +161,7 @@ data_orgsv1_gcs object:
 ### Import to GCS
 
 <Callout>
-To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL, with all desired configuration and global resources.
+To import the exported data into you new instance, you have to have an already existing instance on a Zitadel, with all desired configuration and global resources.
 The used serviceaccount has to have at least the role "Storage Object Viewer" to read objects from GCS
 </Callout>
 

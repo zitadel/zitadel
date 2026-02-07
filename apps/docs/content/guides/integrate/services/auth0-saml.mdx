@@ -1,9 +1,9 @@
 ---
-title: Log in with ZITADEL on Auth0 through SAML 2.0
+title: Log in with Zitadel on Auth0 through SAML 2.0
 sidebar_label: Auth0 (SAML)
 ---
 
-This guide shows how to enable login with ZITADEL on Auth0.
+This guide shows how to enable login with Zitadel on Auth0.
 
 It covers how to:
 
@@ -12,12 +12,12 @@ It covers how to:
 
 Prerequisites:
 
-- existing ZITADEL Instance, if not present follow [this guide](/guides/start/quickstart)
-- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
-- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
+- existing Zitadel Instance, if not present follow [this guide](/guides/start/quickstart)
+- existing Zitadel Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
+- existing Zitadel project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
 - existing Auth0 tenant as described [here](https://auth0.com/docs/get-started/auth0-overview/create-tenants)
 
-> We have to switch between ZITADEL and a Auth0. If the headings begin with "ZITADEL" switch to the ZITADEL Management Console and
+> We have to switch between Zitadel and a Auth0. If the headings begin with "Zitadel" switch to the Zitadel Management Console and
 > if the headings start with "Auth0" please switch to the Auth0 GUI.
 
 ## **Auth0**: Create a new connection
@@ -37,7 +37,7 @@ This includes:
 - the "Sign Out URL"
 - used "User ID Attribute"
 - the definition how the request should be signed
-- which binding should be used to call ZITADEL
+- which binding should be used to call Zitadel
 
 All the information is filled out as an example, and to connect with any other environment you only have to change the
 used domain, for example "example.com" with "zitadel.cloud".
@@ -46,13 +46,13 @@ URL \{your_instance_domain}/saml/v2/certificate.
 
 Then just press the button "Create" and the connection on Auth0 is configured.
 
-## **ZITADEL**: Create the application
+## **Zitadel**: Create the application
 
-You need to upload the SAML metadata to ZITADEL for it to recognize this newly created connection.
+You need to upload the SAML metadata to Zitadel for it to recognize this newly created connection.
 [Under this link](https://auth0.com/docs/authenticate/protocols/saml/saml-identity-provider-configuration-settings) are
 all necessary information to correctly fill out the metadata or download the metadata-file directly under the
 URL https://YOUR_AUTH0_DOMAIN/samlp/metadata?connection=YOUR_CONNECTION_NAME, which in this example would
-be https://example.auth0.com/samlp/metadata?connection=SAML-ZITADEL.
+be https://example.auth0.com/samlp/metadata?connection=SAML-Zitadel.
 
 In your existing project:
 
@@ -60,13 +60,13 @@ In your existing project:
    ![](../../../../public/img/saml/zitadel/project.png)
 2. Fill in a name for the application and chose the SAML type, then click "Continue".
    ![](../../../../public/img/saml/zitadel/application_saml.png)
-3. Either fill in the URL where ZITADEL can read the metadata from, or upload the metadata XML directly, then click "
+3. Either fill in the URL where Zitadel can read the metadata from, or upload the metadata XML directly, then click "
    Continue".
    ![](../../../../public/img/saml/zitadel/application_saml_metadata.png)
 4. Check your application, if everything is correct, press "Create".
    ![](../../../../public/img/saml/zitadel/application_saml_create.png)
 
-Everything on the side of ZITADEL is done if the application is correctly created.
+Everything on the side of Zitadel is done if the application is correctly created.
 
 ## **Auth0**: Try the connection
 

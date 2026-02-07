@@ -2,10 +2,10 @@
 title: TLS Modes
 ---
 
-To run ZITADEL on any kind of infrastructure, you can configure on how to handle TLS connections.
+To run Zitadel on any kind of infrastructure, you can configure on how to handle TLS connections.
 There are three modes of operation: `disabled`, `external`, `enabled`.
 
-Generally this command is set as argument while starting ZITADEL. For example like this:
+Generally this command is set as argument while starting Zitadel. For example like this:
 
 ```bash
 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
@@ -13,7 +13,7 @@ zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode
 
 ## Disabled
 
-With the mode `disabled`, you instruct ZITADEL to await all connections with plain http without TLS.
+With the mode `disabled`, you instruct Zitadel to await all connections with plain http without TLS.
 
 <Callout type="warn">
 
@@ -23,20 +23,20 @@ Be aware this is not a secure setup and should only be used for test systems!
 
 ## External
 
-The mode `external` allows you to configure ZITADEL in such a way that it will instruct its clients to use https.
-However ZITADEL delegates the management of TLS connections to a reverseproxy, web application firewall or a service mesh.
+The mode `external` allows you to configure Zitadel in such a way that it will instruct its clients to use https.
+However Zitadel delegates the management of TLS connections to a reverseproxy, web application firewall or a service mesh.
 
 ## Enabled
 
-When using the mode `enabled` ZITADEL is setup to await incoming connections in an encrypted fashion.
+When using the mode `enabled` Zitadel is setup to await incoming connections in an encrypted fashion.
 Whether it is from a client directly, a reverse proxy or web application firewall.
 This allows HTTP connections to be secured at the transport level the whole way.
 
-If you use the mode `enabled` you need to configure ZITADEL with the necessary TLS settings.
+If you use the mode `enabled` you need to configure Zitadel with the necessary TLS settings.
 
 ```yaml
 TLS:
-  # if enabled, ZITADEL will serve all traffic over TLS (HTTPS and gRPC)
+  # if enabled, Zitadel will serve all traffic over TLS (HTTPS and gRPC)
   # you must then also provide a private key and certificate to be used for the connection
   # either directly or by a path to the corresponding file
   Enabled: true
@@ -54,8 +54,8 @@ TLS:
 
 ## More Information
 
-Beware that ZITADEL uses HTTP/2 for all its connections.
+Beware that Zitadel uses HTTP/2 for all its connections.
 If you are using the mode `external` or `disabled` make sure to verify h2c compatibility.
 
-- [Read more about how ZITADEL utilizes HTTP/2](/self-hosting/manage/http2).
-- [Explore some concrete proxy configuration examples for ZITADEL](/self-hosting/manage/reverseproxy/reverse_proxy).
+- [Read more about how Zitadel utilizes HTTP/2](/self-hosting/manage/http2).
+- [Explore some concrete proxy configuration examples for Zitadel](/self-hosting/manage/reverseproxy/reverse_proxy).

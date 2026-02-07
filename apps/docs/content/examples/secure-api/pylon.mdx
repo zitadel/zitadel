@@ -1,5 +1,5 @@
 ---
-title: ZITADEL with Pylon
+title: Zitadel with Pylon
 sidebar_label: Pylon
 ---
 
@@ -7,14 +7,14 @@ import AppJWT from "../imports/_app_jwt.mdx";
 import ServiceuserJWT from "../imports/_serviceuser_jwt.mdx";
 import ServiceuserRole from "../imports/_serviceuser_role.mdx";
 
-This integration guide demonstrates the recommended way to incorporate ZITADEL into your [Pylon](https://pylon.cronit.io) service.
+This integration guide demonstrates the recommended way to incorporate Zitadel into your [Pylon](https://pylon.cronit.io) service.
 It explains how to check the token validity in the API and how to check for permissions.
 
 By the end of this guide, your application will have three different endpoint which are public, private(valid token) and private-scoped(valid token with specific role).
 
-## ZITADEL setup
+## Zitadel setup
 
-Before we can start building our application, we have to do a few configuration steps in ZITADEL Management Console.
+Before we can start building our application, we have to do a few configuration steps in Zitadel Management Console.
 
 ### Create application
 
@@ -96,7 +96,7 @@ export default app;
 
 ## Secure the API
 
-### Add ZITADEL info to the service
+### Add Zitadel info to the service
 
 1. Create a `.env` file in the root folder of your project and add the following configuration:
 
@@ -112,7 +112,7 @@ AUTH_ISSUER='https://example.zitadel.cloud'
 AUTH_PROJECT_ID='250719519163548112'
 ```
 
-2. Copy the `.json`-key-file that you downloaded from the ZITADEL Management Console into the root folder of your project and rename it to `key.json`.
+2. Copy the `.json`-key-file that you downloaded from the Zitadel Management Console into the root folder of your project and rename it to `key.json`.
 
 3. (Optional) For added convenience in production environments, you can include the content of the .json key file as `AUTH_KEY` in the .env file or as an environment variable.
 
@@ -201,7 +201,7 @@ class User {
     }
 
     const user = new User(auth.sub, auth.username || "unknown", [
-      "Welcome to Pylon with ZITADEL!",
+      "Welcome to Pylon with Zitadel!",
     ]);
 
     User.users.push(user);
@@ -259,7 +259,7 @@ export default app;
 
 ### Call the API
 
-To call the API you need an access token, which is then verified by ZITADEL.
+To call the API you need an access token, which is then verified by Zitadel.
 Please follow [this guide here](/guides/integrate/token-introspection/private-key-jwt), ignoring the first step as we already have the `.json`-key-file from the serviceaccount.
 
 <Callout>
@@ -301,6 +301,6 @@ curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:3000/api/me/messa
 
 ## Completion
 
-Congratulations! You have successfully integrated your Pylon with ZITADEL!
+Congratulations! You have successfully integrated your Pylon with Zitadel!
 
 If you get stuck, consider checking out their [documentation](https://pylon.cronit.io). If you face issues, contact Pylon or raise an issue on [GitHub](https://github.com/getcronit/pylon/issues).

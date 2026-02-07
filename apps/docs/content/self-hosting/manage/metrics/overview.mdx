@@ -1,17 +1,17 @@
 ---
 title: Metrics
-description: Overview of ZITADEL metrics, exposure endpoint, and compatibility with monitoring systems.
+description: Overview of Zitadel metrics, exposure endpoint, and compatibility with monitoring systems.
 ---
 
 # Metrics
 
-ZITADEL exposes operational and performance metrics to support monitoring, alerting, and capacity planning.
+Zitadel exposes operational and performance metrics to support monitoring, alerting, and capacity planning.
 
 Metrics are **enabled by default** in standard deployments and are exposed via an HTTP endpoint that can be consumed by Prometheus and other monitoring systems that understand the Prometheus exposition format or use an OpenTelemetry pipeline.
 
 ## Metrics endpoint
 
-ZITADEL exposes metrics at the following endpoint:
+Zitadel exposes metrics at the following endpoint:
 `/debug/metrics`
 
 This endpoint returns a snapshot of the current metrics in **Prometheus-compatible exposition format**.
@@ -20,7 +20,7 @@ If you changed ports, paths, or network exposure as part of your deployment (for
 
 ## Instrumentation model
 
-Internally, ZITADEL instruments metrics using **OpenTelemetry (OTel)**.
+Internally, Zitadel instruments metrics using **OpenTelemetry (OTel)**.
 
 The exposed metrics include:
 
@@ -30,10 +30,10 @@ The exposed metrics include:
 - **HTTP and gRPC server metrics**
   (request counts, latencies, error rates)
 
-- **ZITADEL-specific metrics**
+- **Zitadel-specific metrics**
   (server behavior and internal components available in your version)
 
-The exact set of metrics and labels may evolve between ZITADEL releases.
+The exact set of metrics and labels may evolve between Zitadel releases.
 
 ## Collection and compatibility
 
@@ -43,11 +43,11 @@ The `/debug/metrics` endpoint can be consumed in multiple ways:
 - **OpenTelemetry Collector** can scrape the endpoint using a Prometheus receiver and forward metrics to other backends.
 - **Managed monitoring platforms** (for example Grafana Cloud, Amazon Managed Service for Prometheus, Datadog, New Relic) can ingest the same endpoint via Prometheus-compatible agents or collectors.
 
-ZITADEL does **not** require a specific metrics backend. Any system capable of scraping or ingesting Prometheus-format metrics can be used.
+Zitadel does **not** require a specific metrics backend. Any system capable of scraping or ingesting Prometheus-format metrics can be used.
 
 ## Configuration
 
-Metrics are enabled by default in standard ZITADEL deployments.
+Metrics are enabled by default in standard Zitadel deployments.
 
 If metrics were explicitly disabled in your configuration, re-enable them before proceeding. The default configuration is defined in the project's `defaults.yaml` file:
 
@@ -59,7 +59,7 @@ Refer to the configuration documentation for details on enabling or adjusting me
 
 Choose how you want to collect and store metrics:
 
-- **Prometheus** — scrape metrics directly from ZITADEL
+- **Prometheus** — scrape metrics directly from Zitadel
 - **OpenTelemetry Collector** — aggregate and forward metrics to another backend
 - **Managed observability platforms** — use their Prometheus-compatible agents
 

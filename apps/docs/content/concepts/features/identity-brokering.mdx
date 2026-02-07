@@ -25,8 +25,8 @@ Compatibility across various IdPs is ensured by using industry standard protocol
 A service provider that specializes in brokering access control between multiple service providers (also referred to as relying parties) is called an identity broker.
 Federated identity management is an arrangement that is made between two or more such identity brokers across organizations.
 
-For example, if Google is configured as an identity provider in your organization, the user will get the option to use his Google Account on the Login Screen of ZITADEL.
-Because Google is registered as a trusted identity provider, the user will be able to login in with the Google account after the user is linked with an existing ZITADEL account (if the user is already registered) or a new one with the claims provided by Google.
+For example, if Google is configured as an identity provider in your organization, the user will get the option to use his Google Account on the Login Screen of Zitadel.
+Because Google is registered as a trusted identity provider, the user will be able to login in with the Google account after the user is linked with an existing Zitadel account (if the user is already registered) or a new one with the claims provided by Google.
 
 ![](../../../public/img/concepts/features/identity-brokering.png)
 
@@ -54,25 +54,25 @@ This allows users to log in once and gain access to multiple systems that the br
 In a multi-tenancy application, you want to be able to configure an external identity provider per tenant.
 For example some organizations might use their EntraID, some other want to login with their OKTA, or Google Workspace.
 
-Using an identity provider with strong multitenancy capabilities such as ZITADEL, you can configure a different set of external identity providers per organization.
+Using an identity provider with strong multitenancy capabilities such as Zitadel, you can configure a different set of external identity providers per organization.
 
 [Domain discovery](/guides/solution-scenarios/domain-discovery) ensures that users are redirected to their external identity provider based on their email-address or username.
 [Managers](../structure/managers) can configure organization domains that are used for domain-based redirection to an external IdP.
 
 ![](../../../public/img/concepts/features/domain-discovery.png)
 
-## Simplify identity brokering with ZITADEL templates
+## Simplify identity brokering with Zitadel templates
 
-ZITADEL works with SAML, OpenID Connect, and LDAP external identity providers.
+Zitadel works with SAML, OpenID Connect, and LDAP external identity providers.
 
-For popular IdPs such as EntraID, Okta, Google, Facebook, and GitHub, ZITADEL [offers pre-configured templates](/guides/integrate/identity-providers/introduction).
+For popular IdPs such as EntraID, Okta, Google, Facebook, and GitHub, Zitadel [offers pre-configured templates](/guides/integrate/identity-providers/introduction).
 These templates expedite the configuration process, allowing organizations to quickly integrate these providers with minimal effort.
 
-ZITADEL recognizes that specific needs may extend beyond pre-built templates.
-To address this, ZITADEL provides generic templates that enable connection to virtually any IdP.  This ensures maximum flexibility and future-proofs login infrastructure, accommodating future integrations with ease.
+Zitadel recognizes that specific needs may extend beyond pre-built templates.
+To address this, Zitadel provides generic templates that enable connection to virtually any IdP.  This ensures maximum flexibility and future-proofs login infrastructure, accommodating future integrations with ease.
 
 ### References
 
 * [Detailed integration guide for many identity providers](/guides/integrate/identity-providers/introduction)
 * [Setup identity providers with Management Console](/guides/manage/console/default-settings#identity-providers)
-* [Configure identity providers with the ZITADEL API](/reference/api/management)
+* [Configure identity providers with the Zitadel API](/reference/api/management)

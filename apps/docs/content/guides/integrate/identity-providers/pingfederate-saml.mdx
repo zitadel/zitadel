@@ -1,5 +1,5 @@
 ---
-title: Configure PingFederate as a SAML Identity Provider in ZITADEL
+title: Configure PingFederate as a SAML Identity Provider in Zitadel
 sidebar_label: PingFederate SAML
 id: pingfederate-saml
 ---
@@ -17,10 +17,10 @@ import TestSetup from './_test_setup.mdx';
 
 You need access to a PingFederate administrative console with permission to create **SP Connections**.
 
-We’ll first configure PingFederate sufficiently to **export IdP metadata**, which we then import into ZITADEL.
-After the ZITADEL SAML provider exists, we’ll return to PingFederate and finish the SP configuration using the ZITADEL URLs.
+We’ll first configure PingFederate sufficiently to **export IdP metadata**, which we then import into Zitadel.
+After the Zitadel SAML provider exists, we’ll return to PingFederate and finish the SP configuration using the Zitadel URLs.
 
-### Create a new SP Connection for ZITADEL
+### Create a new SP Connection for Zitadel
 
 1. Sign in to the **PingFederate admin console**.
 2. Go to **Applications > SP Connections**.
@@ -30,7 +30,7 @@ After the ZITADEL SAML provider exists, we’ll return to PingFederate and finis
    - **Browser SSO** as the connection type.
    - **SAML 2.0** as the protocol.
 6. On **General Settings**:
-   - Set a **Connection Name**, for example: `ZITADEL SAML`.
+   - Set a **Connection Name**, for example: `Zitadel SAML`.
    - Optionally set an ID or description to identify the connection.
 
 ### Configure Browser SSO
@@ -39,17 +39,17 @@ After the ZITADEL SAML provider exists, we’ll return to PingFederate and finis
 2. Make sure **SAML 2.0** Browser SSO is enabled for this connection.
 3. Proceed to **Assertion Creation**:
    - Keep the default **NameID** attribute.
-   - Add additional attributes you want to send to ZITADEL (you need at least `email`, `given_name` (first name of the user), `family_name` (last name of the user), and you can send optional attributes like `display_name`).
+   - Add additional attributes you want to send to Zitadel (you need at least `email`, `given_name` (first name of the user), `family_name` (last name of the user), and you can send optional attributes like `display_name`).
 4. In **Attribute Mapping**, map the contract attributes to your directory/user store fields.
 
 ### Export PingFederate IdP metadata
 
-Now export IdP metadata for this connection so ZITADEL can trust PingFederate.
+Now export IdP metadata for this connection so Zitadel can trust PingFederate.
 
 1. In PingFederate, go to **System > Protocol Metadata > Metadata Export**.
 2. Select **SAML 2.0**.
 3. Set the **Role** to **IdP** (Identity Provider).
-4. Choose to generate **connection-specific metadata** and select the SP Connection you created for ZITADEL.
+4. Choose to generate **connection-specific metadata** and select the SP Connection you created for Zitadel.
 5. Choose a transfer method:
    - **Metadata URL** – PingFederate publishes metadata at a URL you can copy; or
    - **File download** – export the metadata as an XML file.
@@ -59,9 +59,9 @@ Keep either:
 - the **Metadata URL**, or
 - the **XML file** contents,
 
-ready for the ZITADEL configuration steps.
+ready for the Zitadel configuration steps.
 
-## ZITADEL configuration
+## Zitadel configuration
 
 ### Go to the IdP providers overview
 
@@ -70,39 +70,39 @@ ready for the ZITADEL configuration steps.
 ### Create a new SAML Service Provider
 
 The SAML provider template has everything you need preconfigured.
-Add the metadata.xml or the URL to the metadata which are accessible by your ZITADEL instance.
+Add the metadata.xml or the URL to the metadata which are accessible by your Zitadel instance.
 All the necessary configuration is contained in the metadata which has to be exchanged by the ServiceProvider and the IdentityProvider.
 
 <GeneralConfigDescription components={props.components} provider_account="PingFederate" />
 
 ![SAML Provider](../../../../public/img/guides/zitadel_saml_create_provider.png)
 
-After saving, open the newly created PingFederate SAML provider in ZITADEL.
-In the details view you will find the **ZITADEL Service Provider** URLs, such as:
+After saving, open the newly created PingFederate SAML provider in Zitadel.
+In the details view you will find the **Zitadel Service Provider** URLs, such as:
 
-- **ZITADEL Metadata URL**
-- **ZITADEL ACS Login Form URL** (for Login V1)
-- **ZITADEL Single Logout URL**
-- **ZITADEL ACS Intent API URL** (for Login V2 and programmatic SAML flows)
+- **Zitadel Metadata URL**
+- **Zitadel ACS Login Form URL** (for Login V1)
+- **Zitadel Single Logout URL**
+- **Zitadel ACS Intent API URL** (for Login V2 and programmatic SAML flows)
 
 You’ll need these in the next step.
 
-### Import ZITADEL metadata into PingFederate (recommended)
+### Import Zitadel metadata into PingFederate (recommended)
 
-Now that ZITADEL is configured, you can let PingFederate **consume ZITADEL’s SP metadata URL**.
+Now that Zitadel is configured, you can let PingFederate **consume Zitadel’s SP metadata URL**.
 This allows PingFederate to:
 
-- Auto-fill the ZITADEL **ACS URL**, **entity ID**, and **SLO URLs**.
+- Auto-fill the Zitadel **ACS URL**, **entity ID**, and **SLO URLs**.
 - Import and keep up-to-date the **verification/encryption certificates** from the metadata.
 
-#### Create a Partner Metadata URL for ZITADEL
+#### Create a Partner Metadata URL for Zitadel
 
 1. In the PingFederate admin console, go to:
    **System > Protocol Metadata > Partner Metadata URLs**.
 2. Click **Add New URL**.
 3. On the **URL** tab:
-   - **Name** – `ZITADEL SP Metadata` (or similar).
-   - **URL** – paste the **ZITADEL Metadata URL** you copied from ZITADEL.
+   - **Name** – `Zitadel SP Metadata` (or similar).
+   - **URL** – paste the **Zitadel Metadata URL** you copied from Zitadel.
    - Keep **Validate Metadata Signature** enabled (recommended) unless you have a reason to disable it.
 4. Click **Load Metadata**.
 5. On the **Certificate Summary** tab, review the certificate information associated with the metadata.
@@ -110,22 +110,22 @@ This allows PingFederate to:
 
 PingFederate can now use this metadata URL to configure and automatically update the SP connection.
 
-### Import SP metadata into the ZITADEL SP Connection
+### Import SP metadata into the Zitadel SP Connection
 
-With the partner metadata URL defined, apply it to your existing SP Connection for ZITADEL.
+With the partner metadata URL defined, apply it to your existing SP Connection for Zitadel.
 
 1. Go to **Applications > SP Connections**.
-2. Edit the SP Connection you created for ZITADEL.
+2. Edit the SP Connection you created for Zitadel.
 3. Go to the **Import Metadata** tab.
 4. Select **URL**.
-5. From the **Metadata URL** drop-down, select the **ZITADEL SP Metadata** entry you created.
+5. From the **Metadata URL** drop-down, select the **Zitadel SP Metadata** entry you created.
    - If you don’t see it, click **Manage Partner Metadata URLs** and verify it exists and loads correctly.
 6. Ensure **Enable Automatic Reloading** is checked if you want PingFederate to periodically refresh metadata (recommended).
 7. Click **Load Metadata**.
 
 PingFederate will:
 
-- Read the SP metadata from ZITADEL,
+- Read the SP metadata from Zitadel,
 - Populate the **ACS URL**, SLO URLs, and other protocol settings for the connection, and
 - Import the SP’s **signing/encryption certificates** for signature verification and encryption.
 
@@ -136,20 +136,20 @@ You can review the updated values on:
 
 If needed, you can still override specific settings manually, but using the metadata URL is the preferred way to keep endpoints and certificates in sync.
 
-#### If you need to update the SP Connection with ZITADEL URLs
+#### If you need to update the SP Connection with Zitadel URLs
 
-1. In PingFederate, open the **SP Connection** you created for ZITADEL.
+1. In PingFederate, open the **SP Connection** you created for Zitadel.
 2. Go to the **Browser SSO / Protocol Settings** (exact naming may vary by version).
 3. Update the SP settings:
 
    - **Assertion Consumer Service (ACS) URL**
-     Set this to the **ZITADEL ACS Intent API URL** from the SAML provider details.
+     Set this to the **Zitadel ACS Intent API URL** from the SAML provider details.
 
    - **SP Entity ID / Audience / Partner Entity ID**
-     Set this to the **ZITADEL Metadata URL**.
+     Set this to the **Zitadel Metadata URL**.
 
    - **Single Logout (optional)**
-     If you want SAML Single Logout, configure PingFederate’s logout behavior to call the **ZITADEL Single Logout URL** using the appropriate binding (typically HTTP-Redirect).
+     If you want SAML Single Logout, configure PingFederate’s logout behavior to call the **Zitadel Single Logout URL** using the appropriate binding (typically HTTP-Redirect).
 
 4. Save and **activate** the connection changes in PingFederate.
 
@@ -157,7 +157,7 @@ If needed, you can still override specific settings manually, but using the meta
 
 <Activate components={props.components} />
 
-![Activate PingFederate SAML provider in ZITADEL](../../../../public/img/guides/zitadel-activate-pingfederate-saml.png)
+![Activate PingFederate SAML provider in Zitadel](../../../../public/img/guides/zitadel-activate-pingfederate-saml.png)
 
 ### Ensure your Login Policy allows External IdPs
 
@@ -166,9 +166,9 @@ If needed, you can still override specific settings manually, but using the meta
 ## Configure an action to autofill user data
 
 ### Required for Login V2
-The creation of users in ZITADEL will fail if the required fields to create a user are not set.
+The creation of users in Zitadel will fail if the required fields to create a user are not set.
 
-**Actions V2** can be used to map the SAML attributes returned by the IdP to the required fields in ZITADEL.
+**Actions V2** can be used to map the SAML attributes returned by the IdP to the required fields in Zitadel.
 See the [Actions V2 Response Manipulation](/guides/integrate/actions/testing-response-manipulation)
 guide for more information on setting up a Target and an Execution. In short,
 * Create an Actions V2 Target of type `REST Call`
@@ -342,4 +342,4 @@ func main() {
 
 <TestSetup components={props.components} loginscreen="your PingFederate login"/>
 
-![Image: PingFederate button on ZITADEL login](../../../../public/img/guides/zitadel-login-pingfederate-button.png)
+![Image: PingFederate button on Zitadel login](../../../../public/img/guides/zitadel-login-pingfederate-button.png)

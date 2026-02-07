@@ -1,11 +1,11 @@
 ---
-title: ZITADEL Users
+title: Zitadel Users
 sidebar_label: Users
 ---
 
 import CreateUser from './_create-user.mdx';
 
-ZITADEL differs two different types of users:
+Zitadel differs two different types of users:
 
 - Users (Humans)
 - Service Users (Machine Accounts)
@@ -18,7 +18,7 @@ A service account only has a name and a description aside his username.
 A service account can be authenticated with JWT profile or Personal Access Tokens. Both methods can specify an expiry.
 A user can authenticate itself with his password, add multiple factors for additional security, and enable passkey authentication.
 
-Service users are primarily used to gain access for a backend service or iot device. The fact that service accounts can also be ZITADEL managers is used to restrict access to specific projects or organizations.
+Service users are primarily used to gain access for a backend service or iot device. The fact that service accounts can also be Zitadel managers is used to restrict access to specific projects or organizations.
 To get an understanding on how service accounts are used, take a look at our NextJS B2B Demo application.
 
 ## Create User
@@ -28,7 +28,7 @@ To get an understanding on how service accounts are used, take a look at our Nex
 ## Metadata
 
 When building complex applications, having the possibility to add metadata is essential.
-ZITADEL provides a key value storage for users on the user pages.
+Zitadel provides a key value storage for users on the user pages.
 Just navigate to the section **Metadata** and click on **edit**.
 
 > In our [Point of Sales example](./projects#example) from the projects guide, you could add a `stripeCustomerId` as a metadata key. In your client application you could then easily fetch the customer from Stripe APIs for your payments.

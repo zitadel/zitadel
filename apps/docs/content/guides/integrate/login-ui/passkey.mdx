@@ -23,9 +23,9 @@ There are two options to onboard users with passkeys:
 
 ### Send Registration Link
 
-When you want to send a link to your user, that enables them to register a new passkey device, you can choose if ZITADEL sends the code or ZITADEL can return the code in the API response. This way you can send a link through any channel of your choice (email, sms, phone, in-person, postal, ...).
+When you want to send a link to your user, that enables them to register a new passkey device, you can choose if Zitadel sends the code or Zitadel can return the code in the API response. This way you can send a link through any channel of your choice (email, sms, phone, in-person, postal, ...).
 
-If you asked ZITADEL to send the link to the user please make sure to populate the link with the needed values that point towards your registration UI.
+If you asked Zitadel to send the link to the user please make sure to populate the link with the needed values that point towards your registration UI.
 
 More detailed information about the API: [Send Registration Link Documentation](/reference/api/user/zitadel.user.v2.UserService.CreatePasskeyRegistrationLink)
 
@@ -65,7 +65,7 @@ The code is only filled if returnCode has been requested in the Request.Passkey
 
 ### Start Passkey Registration
 
-When starting the passkey registration you can optionally send the registration code from the step above to ZITADEL to pair it with a specific user.
+When starting the passkey registration you can optionally send the registration code from the step above to Zitadel to pair it with a specific user.
 
 By specifying the authenticator type you can choose if the passkey should be cross platform or not. Per default all types are allowed:
 - PASSKEY_AUTHENTICATOR_UNSPECIFIED
@@ -155,7 +155,7 @@ Response Example:
 			],
 			"rp": {
 				"id": "example.domain.com",
-				"name": "ZITADEL"
+				"name": "Zitadel"
 			},
 			"timeout": 300000,
 			"user": {
@@ -172,9 +172,9 @@ Response Example:
 
 <BrowserRegisterWebAuthN components={props.components} />
 
-### Verify Passkey in ZITADEL
+### Verify Passkey in Zitadel
 
-In the next request you have to verify the Passkey within ZITADEL.
+In the next request you have to verify the Passkey within Zitadel.
 Include the public key credential you got from the browser in your request.
 You can give the Passkey a name, which makes it easier for the user to identify the registered authentication methods.
 Example: Google Pixel, iCloud Keychain, Yubikey, etc
@@ -214,7 +214,7 @@ Next step is to authenticate the user with the new registered passkey.
 
 ### Create Session
 
-First step is to ask the user for his username and create a new session with the ZITADEL API.
+First step is to ask the user for his username and create a new session with the Zitadel API.
 When creating the new session make sure to include the challenge for passkey, resp. webAuthN with a required user verification and the domain of your login UI.
 The response will include the public key credential request options for the passkey in the challenges.
 

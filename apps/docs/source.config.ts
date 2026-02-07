@@ -49,13 +49,34 @@ export const versions = defineDocs({
   },
 });
 
+import { readFileSync, existsSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const findThemePath = () => {
+  const possiblePaths = [
+    path.resolve(__dirname, '../../packages/theme/shiki-theme.json'),
+    path.resolve(__dirname, '../../../packages/theme/shiki-theme.json'),
+    path.resolve(process.cwd(), '../../packages/theme/shiki-theme.json'),
+  ];
+  for (const p of possiblePaths) {
+    if (existsSync(p)) return p;
+  }
+  return possiblePaths[0];
+};
+
+const shikiTheme = JSON.parse(readFileSync(findThemePath(), 'utf-8'));
+
 export default defineConfig({
   mdxOptions: {
     remarkPlugins: [[remarkHeadingId, { defaults: true }]],
     rehypeCodeOptions: {
       themes: {
-        light: 'github-light',
-        dark: 'github-dark',
+        light: shikiTheme,
+        dark: shikiTheme,
       },
       langs: ['json', 'yaml', 'bash', 'sh', 'shell', 'http', 'nginx', 'dockerfile', 'go', 'python', 'javascript', 'typescript', 'tsx', 'jsx', 'css', 'html', 'csharp', 'java', 'xml', 'sql', 'properties', 'ini', 'diff', 'markdown', 'mdx'],
       // Map unknown languages to text or similar

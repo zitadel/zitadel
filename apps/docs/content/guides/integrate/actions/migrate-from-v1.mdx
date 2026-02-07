@@ -7,32 +7,32 @@ This guide helps existing users understand the shift from Actions V1 (Embedded) 
 
 <Callout type="caution">
 Deprecation Notice
-Actions V1 APIs are planned to be sunsetted in ZITADEL V5. While a definitive V5 release date is not yet available, this is the final timeline for V1 API removal. Actions V1 will receive no new features, and all new implementations must use V2.
+Actions V1 APIs are planned to be sunsetted in Zitadel V5. While a definitive V5 release date is not yet available, this is the final timeline for V1 API removal. Actions V1 will receive no new features, and all new implementations must use V2.
 </Callout>
 
 ## Why Actions Changed from V1 to V2
 
-ZITADEL Actions evolved from V1 to V2 to address fundamental architectural limitations. While Actions V1 executed JavaScript code directly within ZITADEL's runtime, Actions V2 uses external HTTP endpoints.
+Zitadel Actions evolved from V1 to V2 to address fundamental architectural limitations. While Actions V1 executed JavaScript code directly within Zitadel's runtime, Actions V2 uses external HTTP endpoints.
 
 This shift enables:
 
 - **Better Scalability:** Distributed, serverless execution
 - **Greater Flexibility:** Support for any technology stack (not just JavaScript)
-- **Improved Resilience:** Isolating custom logic from core ZITADEL services
+- **Improved Resilience:** Isolating custom logic from core Zitadel services
 - **Cost Optimization:** Pay-per-execution models with serverless providers
 - **Enhanced Monitoring:** Better debugging and observability of custom extensions
 
-The transition represents a move from "embedded extensions" to "true webhooks," aligning ZITADEL with industry patterns (GitHub Actions, Zapier, etc.).
+The transition represents a move from "embedded extensions" to "true webhooks," aligning Zitadel with industry patterns (GitHub Actions, Zapier, etc.).
 
 ## Architecture Deep Dive: V1 vs V2
 
 ### Actions V1: The Embedded Model
 
-Custom JavaScript code executed directly inside ZITADEL's process. For a complete list of V1 flow types, see [Actions V1 Flow Types](/guides/manage/console/actions-overview#available-flow-types).
+Custom JavaScript code executed directly inside Zitadel's process. For a complete list of V1 flow types, see [Actions V1 Flow Types](/guides/manage/console/actions-overview#available-flow-types).
 
 - **Context:** Embedded goja JavaScript engine
 - **Risks:** Shared memory space; errors could affect core functionality
-- **Constraints:** Bound to ZITADEL process resources; limited timeout configuration
+- **Constraints:** Bound to Zitadel process resources; limited timeout configuration
 - **V1 Triggers:** Pre-event hooks (fire before operation) and Post-event hooks (fire after success)
 
 ### Actions V2: The Webhook Model
@@ -40,8 +40,8 @@ Custom JavaScript code executed directly inside ZITADEL's process. For a complet
 Custom logic lives in external HTTP endpoints called via webhooks.
 
 - **Context:** Runs on your infrastructure (Cloudflare Workers, AWS Lambda, etc.)
-- **Isolation:** Completely isolated memory; failures do not crash ZITADEL
-- **Scaling:** Endpoints scale independently of ZITADEL
+- **Isolation:** Completely isolated memory; failures do not crash Zitadel
+- **Scaling:** Endpoints scale independently of Zitadel
 
 **V2 Execution Types:**
 
@@ -50,20 +50,20 @@ Custom logic lives in external HTTP endpoints called via webhooks.
 | **Request** | Triggers when a specific API request occurs |
 | **Response** | Triggers when a specific API response occurs |
 | **Function** | Triggers when specific functionality is used (useful for adding custom claims to tokens or executing external code during OIDC/SAML flows) |
-| **Event** | Triggers reactively when ZITADEL events occur |
+| **Event** | Triggers reactively when Zitadel events occur |
 
 ### Key Architectural Differences
 
 | Aspect | Actions V1 | Actions V2 |
 |--------|-----------|-----------|
-| Execution Environment | Embedded in ZITADEL (sandboxed JavaScript) | External webhooks (Cloudflare Workers, AWS Lambda, etc.) |
-| Code Location | Inline in ZITADEL Console | Hosted on your infrastructure |
+| Execution Environment | Embedded in Zitadel (sandboxed JavaScript) | External webhooks (Cloudflare Workers, AWS Lambda, etc.) |
+| Code Location | Inline in Zitadel Console | Hosted on your infrastructure |
 | Language | JavaScript (limited runtime) | Any language |
-| API Access | `ctx` and `api` objects provided by ZITADEL | ZITADEL REST/gRPC APIs via HTTP calls |
+| API Access | `ctx` and `api` objects provided by Zitadel | Zitadel REST/gRPC APIs via HTTP calls |
 | Triggers | Flow + Trigger (e.g., "Pre Access Token Creation") | Specific API methods or webhook events |
 | Dependencies | Limited (`zitadel/http`, `zitadel/log`) | Any framework |
-| Security | Managed by ZITADEL | HMAC signature verification required (to validate incoming webhook requests from ZITADEL) |
-| Scalability | Limited by ZITADEL instance | Independent scaling |
+| Security | Managed by Zitadel | HMAC signature verification required (to validate incoming webhook requests from Zitadel) |
+| Scalability | Limited by Zitadel instance | Independent scaling |
 
 ### Business Benefits
 
@@ -74,7 +74,7 @@ Custom logic lives in external HTTP endpoints called via webhooks.
 
 ## When to Use Each V2 Execution Type
 
-We provide a collection of [ready-to-deploy Cloudflare Worker examples](https://github.com/zitadel/actions/tree/main/actions-v2-cloudflare-workers) that integrate with ZITADEL Actions V2. Each script demonstrates how to handle ZITADEL events, signatures, and responses directly from a serverless Cloudflare Worker environment. While the examples are designed for Cloudflare Workers, the code can be adapted to deploy on the platform of your choice (AWS Lambda, Azure Functions, etc.).
+We provide a collection of [ready-to-deploy Cloudflare Worker examples](https://github.com/zitadel/actions/tree/main/actions-v2-cloudflare-workers) that integrate with Zitadel Actions V2. Each script demonstrates how to handle Zitadel events, signatures, and responses directly from a serverless Cloudflare Worker environment. While the examples are designed for Cloudflare Workers, the code can be adapted to deploy on the platform of your choice (AWS Lambda, Azure Functions, etc.).
 
 | If You Need To... | Use This V2 Type | When It Fires | Example |
 |-------------------|------------------|---------------|---------|
@@ -128,6 +128,6 @@ Moves to the Function (`presamlresponse`).
 
 ## Additional Resources
 
-- [ZITADEL Actions V2 Documentation](/concepts/features/actions_v2)
+- [Zitadel Actions V2 Documentation](/concepts/features/actions_v2)
 - [Using Actions Guide](./usage)
 - [Actions V2 Examples Repository](https://github.com/zitadel/actions/tree/main/actions-v2-cloudflare-workers)

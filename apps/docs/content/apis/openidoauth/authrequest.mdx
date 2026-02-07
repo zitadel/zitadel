@@ -1,13 +1,13 @@
 ---
-title: ZITADEL OIDC Authentication Request Playground
+title: Zitadel OIDC Authentication Request Playground
 sidebar_label: OIDC Playground
 ---
 
 import { ExternalLink } from "lucide-react";
 
-The OIDC Playground is for testing OpenID Authentication Requests, giving you more insight how OpenID Connect works and how you can customize ZITADEL behavior with different parameters.
+The OIDC Playground is for testing OpenID Authentication Requests, giving you more insight how OpenID Connect works and how you can customize Zitadel behavior with different parameters.
 
-An OpenID Connect (OIDC) [authentication request](https://openid.net/specs/openid-connect-core-1_0.html) is an OAuth 2.0 Authorization Request using additional parameters and scopes to request that the end-user be authenticated by ZITADEL.
+An OpenID Connect (OIDC) [authentication request](https://openid.net/specs/openid-connect-core-1_0.html) is an OAuth 2.0 Authorization Request using additional parameters and scopes to request that the end-user be authenticated by Zitadel.
 
 <a href="https://zitadel.com/playgrounds/oidc" target="_blank" className="flex items-center gap-2 text-primary hover:underline">
   Go to the OIDC Playground <ExternalLink className="h-4 w-4" />
@@ -15,10 +15,10 @@ An OpenID Connect (OIDC) [authentication request](https://openid.net/specs/openi
 
 ## Why this OIDC playground?
 
-Currently ZITADEL requires human users to authenticate trough the hosted login page.
-Your application should initiate a login by issuing an authentication request and redirecting the user to the login page. You can customize the behavior of ZITADEL by providing additional parameters and scopes in the request.
+Currently Zitadel requires human users to authenticate trough the hosted login page.
+Your application should initiate a login by issuing an authentication request and redirecting the user to the login page. You can customize the behavior of Zitadel by providing additional parameters and scopes in the request.
 
-This playground should help you to initially craft an authentication request and to explore the behavior of ZITADEL in more depth.
+This playground should help you to initially craft an authentication request and to explore the behavior of Zitadel in more depth.
 
 ## Request parameters explained
 
@@ -26,7 +26,7 @@ Not all request parameters are available in the playground. Please refer to the 
 
 ### Your Domain
 
-The <span className="text-yellow-500">Custom Domain</span> to your ZITADEL instance. Use the base-path, the playground will add the required path to the request.
+The <span className="text-yellow-500">Custom Domain</span> to your Zitadel instance. Use the base-path, the playground will add the required path to the request.
 
 ### Required Parameters
 
@@ -95,7 +95,7 @@ There are many more additional parameters. Please refer to the [documentation](/
 
 ## Standard Scopes
 
-Used to request additional information from ZITADEL.
+Used to request additional information from Zitadel.
 These scopes are defined in the OpenID Connect specification.
 The `openid` scope is mandatory.
 
@@ -103,7 +103,7 @@ Not all scopes are available in the playground. Please refer to the full [docume
 
 ## Reserved Scopes
 
-You can request additional information that is specific to ZITADEL or customize the behavior of ZITADEL by including reserved scopes.
+You can request additional information that is specific to Zitadel or customize the behavior of Zitadel by including reserved scopes.
 Please refer to the [documentation](/apis/openidoauth/scopes#reserved-scopes) for a full list of available reserved scopes.
 
 ### Organization policies and branding
@@ -119,11 +119,11 @@ Please refer to the full [guide on user-metadata](/guides/manage/customize/user-
 
 ### Access core apis
 
-Calling the [core API](/apis/introduction) with the authenticated user, requires that the projectID of ZITADEL is included in the audience claim.
+Calling the [core API](/apis/introduction) with the authenticated user, requires that the projectID of Zitadel is included in the audience claim.
 
 This can be achieved by adding the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your applications authorization request.
 
-## How to use ZITADEL in your project
+## How to use Zitadel in your project
 
 Please refer to our [guide](/guides/integrate/login/oidc/login-users) on how to login users.
 

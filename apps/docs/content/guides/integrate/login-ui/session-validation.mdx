@@ -3,12 +3,12 @@ title: How to Handle Session Validation
 sidebar_label: Session Validation
 ---
 
-Sessions represent the state of a user session in ZITADEL. They can be aggregated and updated over time to reflect
+Sessions represent the state of a user session in Zitadel. They can be aggregated and updated over time to reflect
 the changes.
 
-For example, a session could be started by checking a username and ZITADEL will return a new session
+For example, a session could be started by checking a username and Zitadel will return a new session
 with some information about the user like their id and loginName as well as details about the session itself.
-Later on, if the user's password was checked successfully, ZITADEL will update the session and provide the date and time
+Later on, if the user's password was checked successfully, Zitadel will update the session and provide the date and time
 when the password was verified.
 
 ## Verification
@@ -82,7 +82,7 @@ where you might use some information of an expired session like the user's `logi
 session in your Login UI and let the user only provide their password.
 
 <Callout>
-Note that ZITADEL will reject any expired sessions automatically and that they cannot be updated anymore.
+Note that Zitadel will reject any expired sessions automatically and that they cannot be updated anymore.
 </Callout>
 
 ### Set a lifetime

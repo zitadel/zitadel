@@ -1,9 +1,9 @@
 ---
-title: ZITADEL Technical Advisories
+title: Zitadel Technical Advisories
 sidebar_label: Technical Advisories
 ---
 
-Technical advisories are notices that report major issues with ZITADEL Self-Hosted or the ZITADEL Cloud platform that could potentially impact security or stability in production environments.
+Technical advisories are notices that report major issues with Zitadel Self-Hosted or the Zitadel Cloud platform that could potentially impact security or stability in production environments.
 These advisories may include details about the nature of the issue, its potential impact, and recommended mitigation actions.
 
 Users are strongly encouraged to evaluate these advisories and consider the recommended mitigation actions independently from their version upgrade schedule.
@@ -64,8 +64,8 @@ We understand that these advisories may include breaking changes, and we aim to 
       keep the library up-to-date, the management console UI will loose its dynamic theming
       capability. If you need users to have your branding settings (background-,
       button-, link and text coloring) you should implement your own user
-      facing UI yourself and not use ZITADELs management console UI.
-      ZITADEL hosted Login-UI is not affected by this change.
+      facing UI yourself and not use Zitadels management console UI.
+      Zitadel hosted Login-UI is not affected by this change.
     </td>
     <td>2.40.0</td>
     <td>Calendar week 44</td>
@@ -77,7 +77,7 @@ We understand that these advisories may include breaking changes, and we aim to 
     <td>Login-UI - Default Context</td>
     <td>Breaking Behavior Change</td>
     <td>
-        When users are redirected to the ZITADEL Login-UI without any organizational context,
+        When users are redirected to the Zitadel Login-UI without any organizational context,
         they're currently presented a login screen, based on the default settings,
         e.g. available IDPs and possible login mechanisms. If the user will then register themselves,
         by the registration form or through an IDP, the user will always be created on the default organization.
@@ -93,8 +93,8 @@ We understand that these advisories may include breaking changes, and we aim to 
     <td>Sequence uniqueness</td>
     <td>Breaking Behavior Change</td>
     <td>
-      Due to storage optimizations ZITADEL changes the behavior of sequences.
-      This change improves command (create, update, delete) performance of ZITADEL.
+      Due to storage optimizations Zitadel changes the behavior of sequences.
+      This change improves command (create, update, delete) performance of Zitadel.
       Sequences are no longer unique inside an instance.
       From now on sequences are upcounting per aggregate id.
       For example sequences of newly created users begin at 1.
@@ -113,7 +113,7 @@ We understand that these advisories may include breaking changes, and we aim to 
       Migrating to versions &gt;= 2.39 from &lt; 2.39 will cause down time during setup starts and the new version is started.
       This is caused by storage optimizations which replace the `eventstore.events` database table with the new `eventstore.events2` table.
       All existing events are migrated during the execution of the `zitadel setup` command.
-      New events will be inserted into the new `eventstore.events2` table. The old table `evetstore.events` is renamed to `eventstore.events_old` and will be dropped in a future release of ZITADEL.
+      New events will be inserted into the new `eventstore.events2` table. The old table `evetstore.events` is renamed to `eventstore.events_old` and will be dropped in a future release of Zitadel.
     </td>
     <td>2.39.0</td>
     <td>Calendar week 41/42 2023</td>
@@ -125,7 +125,7 @@ We understand that these advisories may include breaking changes, and we aim to 
     <td>Additional grant to cockroach database user</td>
     <td>Breaking Behavior Change</td>
     <td>
-      Versions &gt;= 2.39.0 require the cockroach database user of ZITADEL to be granted to the `VIEWACTIVITY` grant. This can either be reached by grant the role manually or execute the `zitadel init` command.
+      Versions &gt;= 2.39.0 require the cockroach database user of Zitadel to be granted to the `VIEWACTIVITY` grant. This can either be reached by grant the role manually or execute the `zitadel init` command.
     </td>
     <td>2.39.0</td>
     <td>Calendar week 41/42 2023</td>
@@ -137,7 +137,7 @@ We understand that these advisories may include breaking changes, and we aim to 
     <td>Additional grant to cockroach database user</td>
     <td>Breaking Behavior Change</td>
     <td>
-      Upcoming Versions require the SYSTEM_OWNER role to be available in the permission role mappings. Self-hosting ZITADEL users who define custom permission role mappings need to make sure their system users don't lose access to the system API.
+      Upcoming Versions require the SYSTEM_OWNER role to be available in the permission role mappings. Self-hosting Zitadel users who define custom permission role mappings need to make sure their system users don't lose access to the system API.
     </td>
     <td>Upcoming</td>
     <td>Upcoming</td>
@@ -256,20 +256,20 @@ We understand that these advisories may include breaking changes, and we aim to 
 
 If you want to stay up to date on our technical advisories, we recommend subscribing to our [Technical Advisory mailing list](https://share-eu1.hsforms.com/1NAOUyAMmRzSnB7uP665xHA2dljbt) or visiting our [website](https://zitadel.com/technical-advisory).
 
-As ZITADEL Cloud customer, you can also login to the <a href="https://zitadel.com/admin">ZITADEL Customer Portal</a> and enable the Technical Advisory <a href="https://zitadel.com/admin/settings">Notifications</a> in your settings.
+As Zitadel Cloud customer, you can also login to the <a href="https://zitadel.com/admin">Zitadel Customer Portal</a> and enable the Technical Advisory <a href="https://zitadel.com/admin/settings">Notifications</a> in your settings.
 
 ## Categories
 
 ### Breaking Behavior Change
 
-A breaking behavior change refers to a modification or update that changes the behavior of ZITADEL.
+A breaking behavior change refers to a modification or update that changes the behavior of Zitadel.
 This change does not necessarily affect the APIs or any functions you are calling, so it may not require an update to your code.
 However, if you rely on specific results or behaviors, they may no longer be guaranteed after the change is implemented.
-Therefore, it is important to be aware of breaking behavior changes and their potential impact on your use of ZITADEL, and to take appropriate action if needed to ensure continued functionality.
+Therefore, it is important to be aware of breaking behavior changes and their potential impact on your use of Zitadel, and to take appropriate action if needed to ensure continued functionality.
 
 ### Expected downtime during upgrade
 
-Expected downtime during upgrade means that ZITADEL might become unavailable during an upgrade.
-ZITADEL is built for [zero downtime upgrades](/concepts/architecture/solution#zero-downtime-updates) at upgrades can be executed without downtime by just updating to a more recent version.
+Expected downtime during upgrade means that Zitadel might become unavailable during an upgrade.
+Zitadel is built for [zero downtime upgrades](/concepts/architecture/solution#zero-downtime-updates) at upgrades can be executed without downtime by just updating to a more recent version.
 When deploying certain changes a zero downtime upgrade might not be possible, for example to guarantee data integrity.
 In such cases we will issue a technical advisory to make you aware of this unexpected behavior.

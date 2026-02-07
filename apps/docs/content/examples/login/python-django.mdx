@@ -1,5 +1,5 @@
 ---
-title: ZITADEL with Django Python
+title: Zitadel with Django Python
 sidebar_label: Django
 ---
 
@@ -7,8 +7,8 @@ import SetupPython from '../imports/_setup_python.mdx';
 import SetupDjango from '../imports/_setup_django.mdx';
 import SetupDotenv from '../imports/_setup_dotenv.mdx';
 
-This integration guide demonstrates the recommended way to incorporate ZITADEL into your Django Python application.
-It explains how to enable user login in your application and how to incorporate the ZITADEL users into the existing AuthenticationBackend.
+This integration guide demonstrates the recommended way to incorporate Zitadel into your Django Python application.
+It explains how to enable user login in your application and how to incorporate the Zitadel users into the existing AuthenticationBackend.
 
 By the end of this guide, your application will have login functionality with basic role mapping, admin console and polls as described in the Django guide.
 
@@ -16,9 +16,9 @@ By the end of this guide, your application will have login functionality with ba
 This documentation references our [example](https://github.com/zitadel/example-django-python-oidc) on GitHub.
 </Callout>
 
-## ZITADEL setup
+## Zitadel setup
 
-Before we can start building our application, we have to do a few configuration steps in ZITADEL Management Console.
+Before we can start building our application, we have to do a few configuration steps in Zitadel Management Console.
 
 ### Project roles
 
@@ -60,7 +60,7 @@ Select `CODE` in the next step. This makes sure you still get a secret. Note tha
 
 ![Configure app authentication method in management console](../../../public/img/django/app-auth-method.png)
 
-With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
+With the Redirect URIs field, you tell Zitadel where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
 For the example application we are writing use:
 
@@ -98,10 +98,10 @@ python -m pip install -U requirements.txt
 ```
 
 The used base is the "Writing your first Django app" from the Django documentation under [https://docs.djangoproject.com/en/5.0/intro/](https://docs.djangoproject.com/en/5.0/intro/),
-which has documented additional parts in to use [mozilla-django-oidc](https://github.com/mozilla/mozilla-django-oidc) to integrate ZITADEL as AuthenticationBackend.
+which has documented additional parts in to use [mozilla-django-oidc](https://github.com/mozilla/mozilla-django-oidc) to integrate Zitadel as AuthenticationBackend.
 
 <Callout>
-Skip this step if you are connecting ZITADEL to an existing application.
+Skip this step if you are connecting Zitadel to an existing application.
 </Callout>
 
 ## Define the Django app
@@ -146,10 +146,10 @@ https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/settings.
 and create a ".env"-file in the root folder with the configuration:
 
 ```bash
-ZITADEL_PROJECT = "ID of the project you created the application in ZITADEL"
-OIDC_RP_CLIENT_ID = "ClientID provided by the created application in ZITADEL"
-OIDC_RP_CLIENT_SECRET = "ClientSecret provided by the created application in ZITADEL"
-OIDC_OP_BASE_URL = "Base URL to the ZITADEL instance"
+ZITADEL_PROJECT = "ID of the project you created the application in Zitadel"
+OIDC_RP_CLIENT_ID = "ClientID provided by the created application in Zitadel"
+OIDC_RP_CLIENT_SECRET = "ClientSecret provided by the created application in Zitadel"
+OIDC_OP_BASE_URL = "Base URL to the Zitadel instance"
 ```
 
 which should then look something like this:
@@ -163,7 +163,7 @@ OIDC_OP_BASE_URL = "https://example.zitadel.cloud"
 
 ### AuthenticationBackend definition
 
-To create and update the users regarding the roles given in the authentications in ZITADEL a Subclass of OIDCAuthenticationBackend has to be created:
+To create and update the users regarding the roles given in the authentications in Zitadel a Subclass of OIDCAuthenticationBackend has to be created:
 
 ```python reference
 https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/backend.py
@@ -232,10 +232,10 @@ Visit http://localhost:8000/polls or http://localhost:8000/admin and click aroun
 
 ## Completion
 
-Congratulations! You have successfully integrated your Python Django application with ZITADEL!
+Congratulations! You have successfully integrated your Python Django application with Zitadel!
 
 If you get stuck, consider checking out our [example](https://github.com/zitadel/example-python-django-oidc) application. This application includes all the functionalities mentioned in this quick-start. You can start by cloning the repository and defining the settings in the settings.py. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/example-python-django-oidc/issues).
 
 ### What's next?
 
-Now that you have enabled authentication, it's time for you to add more authorizations to your application using ZITADEL APIs. To do this, you can refer to the [docs](/apis/introduction) or check out the ZITADEL Management Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC and OpenAPI to access data.
+Now that you have enabled authentication, it's time for you to add more authorizations to your application using Zitadel APIs. To do this, you can refer to the [docs](/apis/introduction) or check out the Zitadel Management Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC and OpenAPI to access data.

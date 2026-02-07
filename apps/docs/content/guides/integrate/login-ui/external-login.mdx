@@ -5,14 +5,14 @@ sidebar_label: External Identity Provider
 
 ## Flow
 
-The prerequisite for adding an external login (social and enterprise) to your user account is a registered identity provider on your ZITADEL instance or the organization of the user.
+The prerequisite for adding an external login (social and enterprise) to your user account is a registered identity provider on your Zitadel instance or the organization of the user.
 If you haven’t added a provider yet, have a look at the following guide first: [Identity Providers](/guides/integrate/identity-providers/introduction)
 
 ![](../../../../public/img/guides/login-ui/external-login-flow.png)
 
 ## Start the Provider Flow
 
-ZITADEL will handle as much as possible from the authentication flow with the external provider.
+Zitadel will handle as much as possible from the authentication flow with the external provider.
 This requires you to initiate the flow with your desired provider.
 
 Send the following two URLs in the request body:
@@ -62,7 +62,7 @@ This will open up the login page of the given provider. In this guide, it is Goo
 https://accounts.google.com/o/oauth2/v2/auth?client_id=Test&prompt=select_account&redirect_uri=https%3A%2F%2F${CUSTOM_DOMAIN}%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=218525066445455617
 ```
 
-After the user has successfully authenticated, a redirect to the ZITADEL backend /idps/callback will automatically be performed.
+After the user has successfully authenticated, a redirect to the Zitadel backend /idps/callback will automatically be performed.
 
 <Callout type="warn">
 Note that the redirect URL is `https://${CUSTOM_DOMAIN}/idps/callback` when using the new V2 hosted login compared to the V1 hosted login, which was `https://${CUSTOM_DOMAIN}/ui/login/login/externalidp/callback`.
@@ -70,9 +70,9 @@ Note that the redirect URL is `https://${CUSTOM_DOMAIN}/idps/callback` when usin
 
 ## Get Provider Information
 
-ZITADEL will take the information of the provider. After this, a redirect will be made to either the success page in case of a successful login or to the error page in case of a failure will be performed. In the parameters, you will provide the IDP intentID, a token, and optionally, if a user could be found, a user ID.
+Zitadel will take the information of the provider. After this, a redirect will be made to either the success page in case of a successful login or to the error page in case of a failure will be performed. In the parameters, you will provide the IDP intentID, a token, and optionally, if a user could be found, a user ID.
 
-To get the information of the provider, make a request to ZITADEL.
+To get the information of the provider, make a request to Zitadel.
 [Retrieve Identity Provider Intent Documentation](/reference/api/user/zitadel.user.v2.UserService.RetrieveIdentityProviderIntent)
 
 ### Request
@@ -158,10 +158,10 @@ curl --request POST \
 
 ### Register
 
-If you didn't get a user ID in the parameters of your success page, you know that there is no existing user in ZITADEL with that provider, and you can register a new user or link it to an existing account (read the next section).
+If you didn't get a user ID in the parameters of your success page, you know that there is no existing user in Zitadel with that provider, and you can register a new user or link it to an existing account (read the next section).
 
 Fill the IdP links in the create user request to add a user with an external login provider.
-The idpId is the ID of the provider in ZITADEL, the userId is the ID of the user in the external identity provider; usually, this is sent in the “sub”.
+The idpId is the ID of the provider in Zitadel, the userId is the ID of the user in the external identity provider; usually, this is sent in the “sub”.
 The display name is used to list the linkings on the users.
 
 [Create User API Documentation](/reference/api/user/zitadel.user.v2.UserService.AddHumanUser)
@@ -200,7 +200,7 @@ curl --request POST \
 
 ### Add External Login to Existing User
 
-If you didn't get a user ID in the parameters to your success page, you know that there is no existing user in ZITADEL with that provider and you can register a new user (read previous section), or link it to an existing account.
+If you didn't get a user ID in the parameters to your success page, you know that there is no existing user in Zitadel with that provider and you can register a new user (read previous section), or link it to an existing account.
 
 If you want to link/connect to an existing account you can perform the add identity provider link request.
 [Add IDP Link to existing user documentation](/reference/api/user/zitadel.user.v2.UserService.AddIDPLink)

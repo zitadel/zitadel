@@ -1,5 +1,5 @@
 ---
-title: Configure Entra ID as an Identity Provider in ZITADEL
+title: Configure Entra ID as an Identity Provider in Zitadel
 sidebar_label: Entra ID
 ---
 
@@ -16,7 +16,7 @@ import Activate from './_activate.mdx';
 
 <IDPsOverview components={props.components}  templates="Microsoft"/>
 
-Click on the ZITADEL Callback URL to copy it to your clipboard.
+Click on the Zitadel Callback URL to copy it to your clipboard.
 You will have to paste it in the Entra ID Client later.
 
 ![](../../../../public/img/guides/zitadel_azure_provider2.png)
@@ -28,8 +28,8 @@ You need to have access to an Entra ID Tenant. If you do not yet have one follow
 ### Register a new application
 
 1. Browse to the [App registration menus create dialog](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade/quickStartType~/null/isMSAApp~/false) to create a new app.
-2. Give the application a name and choose who should be able to login (Single-Tenant, Multi-Tenant, Personal Accounts, etc.) This setting will also have an impact on how to configure the provider later on in ZITADEL.
-3. Choose "Web" in the redirect uri field and [paste the ZITADEL Callback URL you copied before](#open-the-microsoft-identity-provider-template).
+2. Give the application a name and choose who should be able to login (Single-Tenant, Multi-Tenant, Personal Accounts, etc.) This setting will also have an impact on how to configure the provider later on in Zitadel.
+3. Choose "Web" in the redirect uri field and [paste the Zitadel Callback URL you copied before](#open-the-microsoft-identity-provider-template).
 4. Save the Application (client) ID and the Directory (tenant) ID from the detail page
 5. Register the application
 
@@ -49,7 +49,7 @@ Generate a new client secret to authenticate your user.
 
 ### Token configuration
 
-To allow ZITADEL to get the information from the authenticating user you have to configure what kind of optional claims should be returned in the token.
+To allow Zitadel to get the information from the authenticating user you have to configure what kind of optional claims should be returned in the token.
 
 1. Click on Token configuration in the side menu
 2. Click on "+ Add optional claim"
@@ -59,7 +59,7 @@ To allow ZITADEL to get the information from the authenticating user you have to
 
 ### API permissions
 
-To be able to get all the information that ZITADEL needs, you have to configure the correct permissions.
+To be able to get all the information that Zitadel needs, you have to configure the correct permissions.
 
 1. Go to "API permissions" in the side menu
 2. Make sure the permissions include "Microsoft Graph": email, profile and User.Read
@@ -67,16 +67,16 @@ To be able to get all the information that ZITADEL needs, you have to configure 
 
 ![](../../../../public/img/guides/azure_api_permissions.png)
 
-## ZITADEL Configuration
+## Zitadel Configuration
 
-Go back [to the Microsoft provider template you opened before in ZITADEL](#open-the-microsoft-identity-provider-template).
+Go back [to the Microsoft provider template you opened before in Zitadel](#open-the-microsoft-identity-provider-template).
 Add the [client ID and secret created before on your Entra ID application](#add-client-secret).
 
 You can optionally configure the following settings.
 A useful default will be filled if you don't change anything.
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
-This information will be taken to create/update the user within ZITADEL. Make sure to also add `User.Read`. ZITADEL ensures that at least `openid` and `User.Read` scopes are always sent.
+This information will be taken to create/update the user within Zitadel. Make sure to also add `User.Read`. Zitadel ensures that at least `openid` and `User.Read` scopes are always sent.
 
 **Email Verified**: Entra ID doesn't send the email verified claim in the users token, if you don't enable this setting.
 The user is then created with an unverified email, which results in an email verification message.

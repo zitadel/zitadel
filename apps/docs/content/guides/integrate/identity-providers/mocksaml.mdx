@@ -1,5 +1,5 @@
 ---
-title: Configure MockSAML as an Identity Provider in ZITADEL
+title: Configure MockSAML as an Identity Provider in Zitadel
 sidebar_label: MockSAML
 id: mocksaml
 ---
@@ -23,9 +23,9 @@ MockSAML is not intended for any production environment, only for test purposes
 ### Download metadata
 
 You can either download the metadata under [https://mocksaml.com/api/saml/metadata?download=true](https://mocksaml.com/api/saml/metadata?download=true) or skip this step and
-fill in the URL when creating the SAML Provider in ZITADEL.
+fill in the URL when creating the SAML Provider in Zitadel.
 
-## ZITADEL configuration
+## Zitadel configuration
 
 ### Go to the IdP providers overview
 
@@ -34,7 +34,7 @@ fill in the URL when creating the SAML Provider in ZITADEL.
 ### Create a new SAML ServiceProvider
 
 The SAML provider template has everything you need preconfigured.
-Add the metadata.xml or the URL to the metadata which are accessible by you ZITADEL instance.
+Add the metadata.xml or the URL to the metadata which are accessible by you Zitadel instance.
 All the necessary configuration is contained in the metadata which has to be exchanged by the ServiceProvider and the IdentityProvider.
 
 <GeneralConfigDescription components={props.components}  provider_account="SAML account" />
@@ -43,8 +43,8 @@ All the necessary configuration is contained in the metadata which has to be exc
 
 ### Download metadata
 
-Normally, you would need to download the ServiceProvider metadata from ZITADEL to upload to the IdentityProvider.
-They are available under `https://${CUSTOMDOMAIN}/idps/\{ID of the provider in ZITADEL}/saml/metadata`, but this step can be skipped due to the fact that MockSAML is only for testing purposes.
+Normally, you would need to download the ServiceProvider metadata from Zitadel to upload to the IdentityProvider.
+They are available under `https://${CUSTOMDOMAIN}/idps/\{ID of the provider in Zitadel}/saml/metadata`, but this step can be skipped due to the fact that MockSAML is only for testing purposes.
 
 ### Activate IdP
 
@@ -59,9 +59,9 @@ They are available under `https://${CUSTOMDOMAIN}/idps/\{ID of the provider in Z
 ## Configure an action to autofill user data
 
 ### Required for Login V2
-The creation of users in ZITADEL will fail if the required fields to create a user are not set.
+The creation of users in Zitadel will fail if the required fields to create a user are not set.
 
-**Actions V2** can be used to map the SAML attributes returned by the IDP to the required fields in ZITADEL.
+**Actions V2** can be used to map the SAML attributes returned by the IDP to the required fields in Zitadel.
 See the [Actions V2 Response Manipulation](/guides/integrate/actions/testing-response-manipulation)
 guide for more information on setting up a Target and an Execution. In short,
 * Create an Actions V2 Target of type `REST Call`

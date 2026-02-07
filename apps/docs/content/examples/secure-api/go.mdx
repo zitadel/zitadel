@@ -1,9 +1,9 @@
 ---
-title: ZITADEL with Go
+title: Zitadel with Go
 sidebar_label: Go
 ---
 
-This integration guide shows you how to integrate **ZITADEL** into your Go API. It demonstrates how to secure your API using
+This integration guide shows you how to integrate **Zitadel** into your Go API. It demonstrates how to secure your API using
 OAuth 2 Token Introspection.
 
 > ℹ️ These examples and guides are based on our official [Go SDK](https://github.com/zitadel/zitadel-go).
@@ -21,7 +21,7 @@ All that is required, is to create your API, create a private key and a personal
 
 ### Set up application and obtain keys
 
-Before we begin developing our API, we need to perform a few configuration steps in the ZITADEL Console.
+Before we begin developing our API, we need to perform a few configuration steps in the Zitadel Console.
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch.
 
 Starting from the homepage of your management console, click on Create Application
@@ -98,7 +98,7 @@ https://github.com/zitadel/zitadel-go/blob/next/example/api/http/main.go
 ```
 
 You will need to provide some values for the program to run:
-- `domain`: Your ZITADEL Custom Domain, e.g. https://my-domain.zitadel.cloud
+- `domain`: Your Zitadel Custom Domain, e.g. https://my-domain.zitadel.cloud
 - `key`: The path to the downloaded key.json
 - `port`: The port on which the API will be accessible, default it 8089
 
@@ -199,7 +199,7 @@ permission denied: missing required role: `admin`
 
 ### Add administrator role
 
-So let's create the role and grant it to the user. To do so, go to your project in ZITADEL Management Console
+So let's create the role and grant it to the user. To do so, go to your project in Zitadel Management Console
 and create the role by selecting `Roles` in the navigation and then clicking on the `New Role` button.
 Finally, create the role as shown below:
 

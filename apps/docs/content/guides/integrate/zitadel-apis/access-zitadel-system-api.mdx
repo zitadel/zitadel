@@ -1,11 +1,11 @@
 ---
-title: Access ZITADEL System API
+title: Access Zitadel System API
 sidebar_label: System API
 ---
 
 <Callout>
-This guide focuses on the ZITADEL System API. To access the other APIs (Admin, Auth, Management), please checkout [this guide](./access-zitadel-apis).
-The ZITADEL System API is currently only available for ZITADEL Self-Hosted deployments.
+This guide focuses on the Zitadel System API. To access the other APIs (Admin, Auth, Management), please checkout [this guide](./access-zitadel-apis).
+The Zitadel System API is currently only available for Zitadel Self-Hosted deployments.
 </Callout>
 
 ## System API User
@@ -35,7 +35,7 @@ openssl rsa -in system-user-1.pem -outform PEM -pubout -out system-user-1.pub
 
 ## Runtime Configuration
 
-Provide the **public** key to the ZITADEL runtime configuration.
+Provide the **public** key to the Zitadel runtime configuration.
 
 Either with the path to the key:
 
@@ -78,11 +78,11 @@ SystemAPIUsers:
      KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
 ```
 
-If you don't specify any memberships, you are allowed to access the whole [ZITADEL System API](/reference/api/system).
+If you don't specify any memberships, you are allowed to access the whole [Zitadel System API](/reference/api/system).
 
 ## Generate JWT
 
-Similar to the OAuth 2.0 JWT Profile, we will create and sign a JWT. For this API, the JWT will not be used to authenticate against ZITADEL Authorization Server, but rather directly to the API itself.
+Similar to the OAuth 2.0 JWT Profile, we will create and sign a JWT. For this API, the JWT will not be used to authenticate against Zitadel Authorization Server, but rather directly to the API itself.
 
 The JWT payload will need to contain the following claims:
 
@@ -112,9 +112,9 @@ So for your instance running on `custom-domain.com` the claims could look like t
 If your system is exposed without TLS or on a dedicated port, be sure to provide this in your audience, e.g. http://localhost:8080
 </Callout>
 
-### ZITADEL Tools
+### Zitadel Tools
 
-If you want to manually create a JWT for a test, you can also use our [ZITADEL Tools](https://github.com/zitadel/zitadel-tools). Download the latest release and run:
+If you want to manually create a JWT for a test, you can also use our [Zitadel Tools](https://github.com/zitadel/zitadel-tools). Download the latest release and run:
 
 ```bash
 zitadel-tools key2jwt --audience=https://custom-domain.com --key=system-user-1.pem --issuer=system-user-1
@@ -122,7 +122,7 @@ zitadel-tools key2jwt --audience=https://custom-domain.com --key=system-user-1.p
 
 ## Call the System API
 
-Now that you configured ZITADEL and created a JWT, you can call the System API and authenticate using the token:
+Now that you configured Zitadel and created a JWT, you can call the System API and authenticate using the token:
 
 ```bash
 curl --request POST \
@@ -148,7 +148,7 @@ You should get a successful response with a `totalResult` number of 1 and the de
 				"resourceOwner": "172698969497928101"
 			},
 			"state": "STATE_RUNNING",
-			"name": "ZITADEL",
+			"name": "Zitadel",
 			"domains": [
 				{
 					"details": {
@@ -179,9 +179,9 @@ You should get a successful response with a `totalResult` number of 1 and the de
 ## Summary
 
 * Create an RSA keypair
-* Provide the public key with a userID to ZITADEL using the runtime configuration
+* Provide the public key with a userID to Zitadel using the runtime configuration
 * Authorize the request with a JWT signed with your private key
 
 Where to go from here:
 
-* [ZITADEL API Documentation](/apis/introduction)
+* [Zitadel API Documentation](/apis/introduction)

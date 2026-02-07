@@ -1,18 +1,18 @@
 ---
-title: ZITADEL with Flutter
+title: Zitadel with Flutter
 sidebar_label: Flutter
 
 ---
 
-This guide demonstrates how you integrate **ZITADEL** into a Flutter app. It refers to our example on [GitHub](https://github.com/zitadel/zitadel_flutter)
+This guide demonstrates how you integrate **Zitadel** into a Flutter app. It refers to our example on [GitHub](https://github.com/zitadel/zitadel_flutter)
 
-At the end of the guide you have a mobile application for **Android**, **iOS** and **Web** with the ability to authenticate users via ZITADEL.
+At the end of the guide you have a mobile application for **Android**, **iOS** and **Web** with the ability to authenticate users via Zitadel.
 
 If you need any other information about Flutter, head over to the [documentation](https://flutter.dev/).
 
 ## Setup Application
 
-Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
+Before we can start building our application, we have to do a few configuration steps in Zitadel Console.
 You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select **Native** application type and continue.
 
@@ -20,7 +20,7 @@ Select **Native** application type and continue.
 
 ### Redirect URIs
 
-With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication.
+With the Redirect URIs field, you tell Zitadel where it is allowed to redirect users to after authentication.
 As our application will also support web, we have to make sure to set redirects for http and https, as well as a **custom-scheme** for our native Android and IOS Setup.
 
 For our local web development, add a redirectURI for `http://localhost:4444/auth.html` with your custom port. For Android and IOS, add your **custom scheme**. In our case it is `com.example.zitadelflutter`.
@@ -53,13 +53,13 @@ To move further in this quickstart, you'll need the following things prepared:
 - Have Flutter (and Dart) installed ([how-to](https://flutter.dev/docs/get-started/install))
 - Have an IDE set up for developing Flutter ([how-to](https://flutter.dev/docs/get-started/editor))
 - Create a basic Flutter app ([how-to](https://flutter.dev/docs/get-started/codelab))
-- Create a "Native" application in ZITADEL
+- Create a "Native" application in Zitadel
 
 After you created the starter Flutter app, the app will show a simple, templated Flutter app.
 
 ### Install Dependencies
 
-To authenticate users with ZITADEL in a mobile application, some specific packages are needed.
+To authenticate users with Zitadel in a mobile application, some specific packages are needed.
 The [RFC 8252 specification](https://tools.ietf.org/html/rfc8252) defines how
 [OAUTH2.0 for mobile and native apps](https://oauth.net/2/native-apps/) works.
 Basically, there are two major points in this specification:
@@ -108,7 +108,7 @@ https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L30-L37
 ```
 
 What we'll change now, is the `_MyHomePageState` class to enable
-authentication via ZITADEL and remove the counter button of the starter application. We'll show the username of the authenticated user.
+authentication via Zitadel and remove the counter button of the starter application. We'll show the username of the authenticated user.
 
 We define the needed elements for our state:
 
@@ -156,13 +156,13 @@ or by directly selecting your device
 flutter run -d iphone
 ```
 
-For Web make sure you run the application on your fixed port such that it matches your redirect URI in your ZITADEL application. We used 4444 as port before so the command would look like this:
+For Web make sure you run the application on your fixed port such that it matches your redirect URI in your Zitadel application. We used 4444 as port before so the command would look like this:
 
 ```bash
 flutter run -d chrome --web-port=4444
 ```
 
-Our Android and iOS Application opens ZITADEL's login within a custom tab, on Web a new tab is opened.
+Our Android and iOS Application opens Zitadel's login within a custom tab, on Web a new tab is opened.
 
 ### Result
 

@@ -70,7 +70,7 @@ services:
       # In case something doesn't work as expected,
       # it can be handy to be able to read the access logs.
       ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED: true
-      # For convenience, ZITADEL should not ask to change the initial admin users password.
+      # For convenience, Zitadel should not ask to change the initial admin users password.
       ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
       # database configuration
       ZITADEL_DATABASE_POSTGRES_HOST: db

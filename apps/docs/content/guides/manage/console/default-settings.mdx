@@ -1,5 +1,5 @@
 ---
-title: ZITADEL Default Settings
+title: Zitadel Default Settings
 sidebar_label: Default Settings
 ---
 
@@ -64,7 +64,7 @@ In the Branding settings, you can upload you Logo for the login interface, set y
 | Icon              | Upload your icon for the light and the dark design. Icons are used for smaller components. For example in management console on the top left as the home button.                                                                      |
 | Colors            | You can set four different colors to design your login page and email. (Background-, Primary-, Warn- and Font Color)                                                                                                       |
 | Font              | Upload your custom font                                                                                                                                                                                                    |
-| Advanced Behavior | **Hide Loginname suffix**: If enabled, your loginname suffix (Domain) will not be shown in the login page. **Disable Watermark**: If you disable the watermark you will not see the "Powered by ZITADEL" in the login page |
+| Advanced Behavior | **Hide Loginname suffix**: If enabled, your loginname suffix (Domain) will not be shown in the login page. **Disable Watermark**: If you disable the watermark you will not see the "Powered by Zitadel" in the login page |
 
 Make sure you click the "Apply configuration" button after you finish your configuration. This will ensure your design is visible for your customers.
 
@@ -102,7 +102,7 @@ Email delivery through this service may be **delayed or temporarily unstable**.
 For any **production setup**, you must configure your own SMTP provider to ensure reliable and consistent email delivery.
 </Callout>
 
-Go to the ZITADEL [customer portal](https://zitadel.cloud) to configure a Custom Domain.
+Go to the Zitadel [customer portal](https://zitadel.cloud) to configure a Custom Domain.
 
 To configure your custom SMTP please fill the following fields:
 
@@ -140,7 +140,7 @@ The Login Policy defines how the login process should look like and which authen
 | Register allowed                 | Enable self register possibility in the login ui, this enables username password registration as well as registration with configured external identity providers                                                                                                                                                                                                                                                                                             |
 | External IDP allowed             | Possibility to login with an external identity (e.g Google, Microsoft, Apple, etc), If you like to allow external Identity providers add them to the providers list                                                                                                                                                                                                                                                                                           |
 | Hide password reset              | Disable the self-service option for users to reset their password.                                                                                                                                                                                                                                                                                                                                                                                            |
-| Domain discovery allowed         | If this setting is enabled, the user doesn't have to exist when entering the username. It is required to have verified domains on the organization. Example: ZITADEL is registered as organization with the domain zitadel.com and Entra ID as identity provider. A user enters john@zitadel.com in the login but the user doesn't exist. The domain can be mapped to the organization and therefore the user can be redirected to the Entra ID. |
+| Domain discovery allowed         | If this setting is enabled, the user doesn't have to exist when entering the username. It is required to have verified domains on the organization. Example: Zitadel is registered as organization with the domain zitadel.com and Entra ID as identity provider. A user enters john@zitadel.com in the login but the user doesn't exist. The domain can be mapped to the organization and therefore the user can be redirected to the Entra ID. |
 | Ignore unknown usernames         | This setting can be enabled, if no error message should be shown if the user doesn't exist. Example: A user enters the login name john@zitadel.com, the user doesn't exist, but will be redirected to the password screen. After entering a password, the user will get an error that either username or password are wrong.                                                                                                                                  |
 | Disable login with email address | By default users can additionally [login with the email attribute](/guides/solution-scenarios/configurations#use-an-email-address-as-username) of their user. Check this option to disable.                                                                                                                                                                                                                                                              |
 | Disable login with phone number  | By default users can additionally [login with the phonenumber attribute](/guides/solution-scenarios/configurations#use-a-phone-number-as-username) of their user. Check this option to disable.                                                                                                                                                                                                                                                          |
@@ -155,15 +155,15 @@ The Login Policy defines how the login process should look like and which authen
 
 The Default Redirect URI will be used, if a user calls the login page directly.
 More specifically, typically an application will initiate login with an auth request.
-The auth request contains a client-id and a redirect uri, that must match the configuration in ZITADEL.
+The auth request contains a client-id and a redirect uri, that must match the configuration in Zitadel.
 If there is no [auth request](https://zitadel.com/playgrounds/oidc), users will be redirected to the Default Redirect URI, which is by default `https://${CUSTOM_DOMAIN}/ui/console/`
 
-Reasons why ZITADEL doesn't have a redirect URI:
+Reasons why Zitadel doesn't have a redirect URI:
 
 - The login has not been called with an OIDC authorize request
 - The user landed on the login through an email link, e.g. Password Reset, Initialize User
 
-We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL Management Console.
+We recommend setting your own default redirect URI, if you do not want end users to access Zitadel Management Console.
 
 Change default redirect url of instance: `https://${CUSTOM_DOMAIN}/ui/console/instance?id=login`
 
@@ -236,7 +236,7 @@ The following properties can be set:
 With the password expiry policy you can set an expiration for user password.
 After the expiration, a user will be prompted to change their password during the next authentication.
 
-Note, that ZITADEL will not warn or notify the user about the expiry, yet. If you want your users to be notified, you can read this setting and send the notification yourself.
+Note, that Zitadel will not warn or notify the user about the expiry, yet. If you want your users to be notified, you can read this setting and send the notification yourself.
 
 The following properties can be set:
 
@@ -258,7 +258,7 @@ The following settings are available:
 - Maximum Password Attempts: When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger.
 - Maximum OTP Attempts: When the user has reached the maximum (T)OTP attempts the account will be locked, If this is set to 0 the lockout will not trigger.
 
-If an account is locked, the administrator has to unlock it in the ZITADEL Management Console
+If an account is locked, the administrator has to unlock it in the Zitadel Management Console
 
 <img src="/docs/img/guides/console/lockout.png" alt="Lockout" width="600px" />
 
@@ -286,7 +286,7 @@ To be able to use the email as username you have to disable the attribute "User 
 This means that all your users will not be suffixed with the domain of your organization and you can enter the email as username.
 All usernames will then be globally unique within your instance.
 
-You can either set this attribute on your whole ZITADEL instance or just on some specific organizations.
+You can either set this attribute on your whole Zitadel instance or just on some specific organizations.
 
 Please refer to the [configuration guide](/guides/solution-scenarios/configurations#use-email-to-login) for more information.
 
@@ -374,7 +374,7 @@ You can set the following times:
 
 ## Secret generator
 
-ZITADEL has some different codes and secrets, that can be specified.
+Zitadel has some different codes and secrets, that can be specified.
 You can configure what kind of characters should be included, how long the secret should be and the expiration.
 The following secrets can be configured:
 
