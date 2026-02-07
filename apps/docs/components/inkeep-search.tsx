@@ -18,7 +18,7 @@ export default function CustomDialog(props: SharedProps) {
   const config: InkeepModalSearchAndChatProps = {
     baseSettings: {
       apiKey: process.env.NEXT_PUBLIC_INKEEP_API_KEY,
-      primaryBrandColor: '#425b76',
+      primaryBrandColor: '#f25543',
       organizationDisplayName: "Zitadel",
       colorMode: {
         sync: {

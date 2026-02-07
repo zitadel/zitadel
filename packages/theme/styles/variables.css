@@ -1,0 +1,95 @@
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+:root {
+    /* Base Colors */
+    --background: #0f0f11;
+    --foreground: #f4f4f6;
+
+    /* Gray Scale */
+    --color-gray-50: #0f0f11;
+    --color-gray-75: #252528;
+    --color-gray-100: #37373a;
+    --color-gray-200: #484a57;
+    --color-gray-300: #686883;
+    --color-gray-400: #82829c;
+    --color-gray-500: #9e9eb2;
+    --color-gray-600: #b5b9b9;
+    --color-gray-700: #bfbfcf;
+    --color-gray-800: #e1e1e7;
+    --color-gray-900: #f4f4f6;
+
+    /* Primary Colors */
+    --color-primary: #0f0f11;
+    --color-primary-light: #252528;
+
+    /* Surface Colors */
+    --color-surface-black-primary: #0f0f11;
+    --color-surface-black-secondary: #252528;
+
+    /* Text Colors */
+    --color-text-primary: #f4f4f6;
+    --color-text-secondary: #bfbfcf;
+    --color-text-tertiary: #b5b9b9;
+    --color-text-disabled: #686883;
+    --color-text-light: #e1e1e7;
+    --color-text-muted: #82829c;
+    --color-text-accent: #bba5e4;
+    --color-text-reserved: #c52247;
+    --color-text-critical: #f25543;
+    --color-comparison-positive: #bba5e4;
+    --color-accent-strong: #bd2514;
+    --color-pagination-bullet-inactive: #9e9eb2;
+
+    /* Pricing Tier Colors */
+    --color-pricing-tier-free: #ea8aa0;
+    --color-pricing-tier-pro: var(--color-text-critical);
+    --color-pricing-tier-enterprise: var(--color-text-accent);
+
+    --login-registration-accent-orange: var(--color-text-critical);
+    --login-registration-accent-pink: var(--color-pricing-tier-free);
+    --login-registration-accent-purple: var(--color-text-accent);
+    --login-registration-accent: var(--login-registration-accent-orange);
+    --login-registration-selector-bg: linear-gradient(237.7deg,
+            rgba(72, 74, 87, 0.5) 25.66%,
+            rgba(15, 15, 17, 0.5) 86.15%);
+    --login-registration-form-bg-dark: var(--gradient-pricing-card-default);
+    --login-registration-form-bg-light: var(--color-text-primary);
+    --login-registration-profile-bg: var(--color-text-accent);
+
+    /* Border Colors */
+    --color-border-primary: #252528;
+    --color-border-secondary: #484a57;
+    --color-border-soft-primary: #f1f1f30d;
+    --color-border-default: #686883;
+    --color-border-tertiary: #9e9eb2;
+
+    /* Transitions */
+    --transition-fast: 150ms ease-in-out;
+    --transition-base: 200ms ease-in-out;
+    --transition-slow: 300ms ease-in-out;
+
+    /* Focus States */
+    --focus-outline-width: 2px;
+    --focus-outline-offset: 2px;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+p,
+a,
+button,
+input,
+textarea,
+label {
+    font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}

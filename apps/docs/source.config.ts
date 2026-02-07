@@ -49,13 +49,24 @@ export const versions = defineDocs({
   },
 });
 
+import { readFileSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const shikiTheme = JSON.parse(
+  readFileSync('/home/ffo/git/zitadel/zitadel/packages/theme/shiki-theme.json', 'utf-8')
+);
+
 export default defineConfig({
   mdxOptions: {
     remarkPlugins: [[remarkHeadingId, { defaults: true }]],
     rehypeCodeOptions: {
       themes: {
-        light: 'github-light',
-        dark: 'github-dark',
+        light: shikiTheme,
+        dark: shikiTheme,
       },
       langs: ['json', 'yaml', 'bash', 'sh', 'shell', 'http', 'nginx', 'dockerfile', 'go', 'python', 'javascript', 'typescript', 'tsx', 'jsx', 'css', 'html', 'csharp', 'java', 'xml', 'sql', 'properties', 'ini', 'diff', 'markdown', 'mdx'],
       // Map unknown languages to text or similar
