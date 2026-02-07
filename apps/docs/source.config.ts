@@ -57,7 +57,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const shikiTheme = JSON.parse(
-  readFileSync('/home/ffo/git/zitadel/zitadel/packages/theme/shiki-theme.json', 'utf-8')
+  readFileSync(path.resolve(__dirname, '../../packages/theme/shiki-theme.json'), 'utf-8')
 );
 
 export default defineConfig({
