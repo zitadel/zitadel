@@ -49,16 +49,26 @@ export const versions = defineDocs({
   },
 });
 
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const shikiTheme = JSON.parse(
-  readFileSync(path.resolve(__dirname, '../../packages/theme/shiki-theme.json'), 'utf-8')
-);
+const findThemePath = () => {
+  const possiblePaths = [
+    path.resolve(__dirname, '../../packages/theme/shiki-theme.json'),
+    path.resolve(__dirname, '../../../packages/theme/shiki-theme.json'),
+    path.resolve(process.cwd(), '../../packages/theme/shiki-theme.json'),
+  ];
+  for (const p of possiblePaths) {
+    if (existsSync(p)) return p;
+  }
+  return possiblePaths[0];
+};
+
+const shikiTheme = JSON.parse(readFileSync(findThemePath(), 'utf-8'));
 
 export default defineConfig({
   mdxOptions: {
