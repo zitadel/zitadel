@@ -10,8 +10,8 @@ Date: 2023-10-14
 
 ## Description
 
-Due to storage optimizations ZITADEL changes the behavior of sequences.
-This change improves command (create, update, delete) performance of ZITADEL.
+Due to storage optimizations Zitadel changes the behavior of sequences.
+This change improves command (create, update, delete) performance of Zitadel.
 
 Sequences are no longer unique inside an instance.
 From now on sequences are upcounting per aggregate id.
@@ -32,6 +32,6 @@ Therefore it's recommended to use the change data of the objects instead.
 ## Impact
 
 Once this update has been released and deployed, sequences are no longer unique inside an instance.
-ZITADEL will increase parallel write capabilities, because there is no global sequence to track anymore.
-Editor service does not respond the different services of ZITADEL anymore, it returns zitadel.
+Zitadel will increase parallel write capabilities, because there is no global sequence to track anymore.
+Editor service does not respond the different services of Zitadel anymore, it returns zitadel.
 As we are switching to resource based API's there is no need for this field anymore.

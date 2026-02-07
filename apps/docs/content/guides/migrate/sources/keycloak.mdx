@@ -6,13 +6,13 @@ sidebar_label: From Keycloak
 
 ## 1. Introduction
 
-This guide will walk you through the steps to migrate users from **Keycloak** to **ZITADEL**, including password hashes, using the `zitadel-tools` CLI and the user import APIs.
+This guide will walk you through the steps to migrate users from **Keycloak** to **Zitadel**, including password hashes, using the `zitadel-tools` CLI and the user import APIs.
 
 **What you'll learn with this guide**
 
 * How to export users from Keycloak
-* Use of the ZITADEL migration tooling
-* Performing the user import via ZITADEL's API
+* Use of the Zitadel migration tooling
+* Performing the user import via Zitadel's API
 * Troubleshooting and validating the migration
 
 ---
@@ -23,12 +23,12 @@ This guide will walk you through the steps to migrate users from **Keycloak** to
 
 The migration tool is written in Go. Download and install the latest version of Go from the [official Go website](https://go.dev/doc/install).
 
-### 2.2. Create a ZITADEL Instance and Organization
+### 2.2. Create a Zitadel Instance and Organization
 
-You'll need a target organization in ZITADEL to import your users. You can create a new organization or use an existing one.
+You'll need a target organization in Zitadel to import your users. You can create a new organization or use an existing one.
 
-If you don't have a ZITADEL instance, you can [sign up for free here](https://zitadel.com) to create a new one for you.
-See: [Managing Organizations in ZITADEL](https://zitadel.com/docs/guides/manage/console/organizations-overview).
+If you don't have a Zitadel instance, you can [sign up for free here](https://zitadel.com) to create a new one for you.
+See: [Managing Organizations in Zitadel](https://zitadel.com/docs/guides/manage/console/organizations-overview).
 
 > **Note:** Copy your Organization ID (Resource ID) since you will use the id in the later steps.
 
@@ -73,15 +73,15 @@ This creates a file such as:
 
 ---
 
-## 4. Running the ZITADEL Migration Tool
+## 4. Running the Zitadel Migration Tool
 
 ### 4.1. Install the Migration Tool
 
-Follow the installation instructions to set up the ZITADEL migration tool from [ZITADEL Tools](https://github.com/zitadel/zitadel-tools?tab=readme-ov-file#installation).
+Follow the installation instructions to set up the Zitadel migration tool from [Zitadel Tools](https://github.com/zitadel/zitadel-tools?tab=readme-ov-file#installation).
 
 ### 4.2. Generate Import JSON
 
-Use the migration tool to convert the Keycloak realm export into a ZITADEL-compatible JSON file:
+Use the migration tool to convert the Keycloak realm export into a Zitadel-compatible JSON file:
 
 ```bash
 zitadel-tools migrate keycloak \
@@ -92,15 +92,15 @@ zitadel-tools migrate keycloak \
   --multiline
 ```
 
-The tool will generate `importBody.json`, which is ready for importing into ZITADEL.
+The tool will generate `importBody.json`, which is ready for importing into Zitadel.
 
 ---
 
-## 5. Importing Users into ZITADEL
+## 5. Importing Users into Zitadel
 
 ### 5.1. Obtain Access Token (or PAT) for API Access
 
-To call the ZITADEL Management API, you need to authenticate using a **Service User** with the `IAM_OWNER` Manager permissions.
+To call the Zitadel Management API, you need to authenticate using a **Service User** with the `IAM_OWNER` Manager permissions.
 
 There are two recommended authentication methods:
 
@@ -114,7 +114,7 @@ There are two recommended authentication methods:
 
 ---
 
-### 5.2. Import Data with the ZITADEL API
+### 5.2. Import Data with the Zitadel API
 
 Use your **access token** or **PAT** to authenticate, then call the [Management API – User Import](/reference/api/management/zitadel.management.v1.ManagementService.ImportHumanUser) endpoint.
 
@@ -173,7 +173,7 @@ Successful Response:
 
 ### 6.1. Test User Login
 
-Use the **ZITADEL login page** or your integrated app to test logging in with one of the imported users.
+Use the **Zitadel login page** or your integrated app to test logging in with one of the imported users.
 
 Confirm that the migrated password works as expected.
 
@@ -248,6 +248,6 @@ Successful Response
 
 **Q:** What is the maximum number of users that can be imported in a single batch?
 **A:** There is no hard limit on the number of users. However, there is a **timeout**.
-For **ZITADEL Cloud deployments**, the timeout is **5 minutes**, which typically allows for importing around **5,000 users per batch**.
+For **Zitadel Cloud deployments**, the timeout is **5 minutes**, which typically allows for importing around **5,000 users per batch**.
 
 ---

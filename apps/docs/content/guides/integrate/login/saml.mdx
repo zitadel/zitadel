@@ -60,7 +60,7 @@ Commonly, with workforce identity providers, there is a centralized user portal 
 The other method is SP-initiated (Service Provider-initiated) authentication. Here, the user starts at the service provider, which then sends a SAML request to the identity provider. The identity provider processes this request and sends back a SAML response.
 In IdP-initiated flows, there is no SAML request, while in SP-initiated flows, the SAML request and response are both involved. The identity provider must understand how to receive a SAML request and create a SAML response. The service provider, particularly its Assertion Consumer Service (ACS), needs to validate the SAML response and potentially generate a SAML request if SP-initiated flow is supported.
 
-It's important to note that not all service providers support both methods. Some only support IdP-initiated, while others only support SP-initiated. The choice between supporting IdP-initiated or SP-initiated authentication depends on the specific requirements of the product and the preferences of the developer implementing SAML. ZITADEL, for instance, supports only the SP-initiated flow.
+It's important to note that not all service providers support both methods. Some only support IdP-initiated, while others only support SP-initiated. The choice between supporting IdP-initiated or SP-initiated authentication depends on the specific requirements of the product and the preferences of the developer implementing SAML. Zitadel, for instance, supports only the SP-initiated flow.
 
 ## SAML requests and responses
 
@@ -219,8 +219,8 @@ In this SAML response:
 - **Initial Authentication Request**: A user attempts to access a service (SP1) that is protected by an IdP (IdP1).
 - **Redirection to IdP1**: The user is redirected to IdP1 for authentication. If IdP1 trusts another IdP (IdP2) for authentication, it will redirect the user to IdP2.
 - **Authentication at IdP2**: The user authenticates with IdP2, which generates a SAML assertion containing the user's identity and attributes.
-- **Assertion Processing**: ZITADEL (IdP1) processes the SAML assertion from IdP2. ZITADEL then creates an independent SAML assertion based on the information received and its own policies.
-- **Response to SP1**: ZITADEL (IdP1) sends this newly created SAML assertion to SP1, completing the authentication process.
+- **Assertion Processing**: Zitadel (IdP1) processes the SAML assertion from IdP2. Zitadel then creates an independent SAML assertion based on the information received and its own policies.
+- **Response to SP1**: Zitadel (IdP1) sends this newly created SAML assertion to SP1, completing the authentication process.
 - **Access Granted to SP1**:IdP1 then sends a final SAML assertion to SP1, which grants the user access to the requested service.
 
 See [Let Users Login with Preferred Identity Provider](https://zitadel.com/docs/guides/integrate/identity-providers/introduction) for more information.
@@ -247,17 +247,17 @@ For example, SAML is not well-suited for desktop and mobile applications due to 
 
 If a project requires SAML due to specific requirements or existing infrastructure, it should be used. However, for new projects, it is advisable to consider OpenID Connect because it is a more modern standard and is the more popular choice in the industry.
 
-## Testing SAML scenarios using ZITADEL
+## Testing SAML scenarios using Zitadel
 
-To test SAML scenarios with ZITADEL, follow these steps:
+To test SAML scenarios with Zitadel, follow these steps:
 
-1. Integrate a SAML SP with ZITADEL as the IdP:
-    - Sign up for a ZITADEL account if you don't already have one. If you are self-hosting ZITADEL, you can skip this step.
-    -  Create an Organization and a Project in ZITADEL.
+1. Integrate a SAML SP with Zitadel as the IdP:
+    - Sign up for a Zitadel account if you don't already have one. If you are self-hosting Zitadel, you can skip this step.
+    -  Create an Organization and a Project in Zitadel.
     - Within your project, create a SAML application.
-    - Follow this example on how to create a SAML SP and integrate ZITADEL as the SAML IdP: [ZITADEL Python SAML SP Integration](https://github.com/zitadel/python-saml-sp).
+    - Follow this example on how to create a SAML SP and integrate Zitadel as the SAML IdP: [Zitadel Python SAML SP Integration](https://github.com/zitadel/python-saml-sp).
 
-2. Integrate ZITADEL with another SAML IdP for identity brokering:
+2. Integrate Zitadel with another SAML IdP for identity brokering:
 
     - Configure an identity provider that supports SAML.
     - Set up the necessary metadata and endpoints. Here are some guides to help with this setup:
@@ -266,7 +266,7 @@ To test SAML scenarios with ZITADEL, follow these steps:
         - [Configure MockSAML as a SAML IdP](https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml)
 
 3. Create test users and simulate authentication requests:
-    - Create test users in ZITADEL.
+    - Create test users in Zitadel.
     - Simulate authentication requests to verify that the SAML assertions are correctly generated and transmitted.
     - Ensure that the SAML assertions contain the expected attributes and that these attributes are correctly processed by the service provider.
 
@@ -276,4 +276,4 @@ To test SAML scenarios with ZITADEL, follow these steps:
     - Attribute Mapping: Check that user attributes (e.g., roles, permissions) are correctly mapped and utilized by the service provider.
     - Logout Requests: Test single logout (SLO) to ensure that logging out from one service logs the user out of all connected services.
 
-For more information, refer to [SAML Endpoints in ZITADEL](https://zitadel.com/docs/apis/saml/endpoints).
+For more information, refer to [SAML Endpoints in Zitadel](https://zitadel.com/docs/apis/saml/endpoints).

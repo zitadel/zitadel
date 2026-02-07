@@ -1,9 +1,9 @@
 ---
-title: ZITADEL with Python
+title: Zitadel with Python
 sidebar_label: Python
 ---
 
-This example shows you how to secure a Python3 Flask API with both authentication and authorization using ZITADEL.
+This example shows you how to secure a Python3 Flask API with both authentication and authorization using Zitadel.
 
 ## Overview
 
@@ -11,9 +11,9 @@ This example shows you how to secure a Python3 Flask API with both authenticatio
 
 The Python API will have public, private, and private-scoped routes and check if a user is authenticated and authorized to access the routes.
 The private routes expect an authorization header with a valid access token in the request. The access token is used as a bearer token to authenticate the user when calling the API.
-The API will validate the access token on the [introspect endpoint](/apis/openidoauth/endpoints#introspection-endpoint) and will receive the user's roles from ZITADEL.
+The API will validate the access token on the [introspect endpoint](/apis/openidoauth/endpoints#introspection-endpoint) and will receive the user's roles from Zitadel.
 
-The API application uses [Client Secret Basic](/apis/openidoauth/authn-methods#client-secret-basic) to authenticate against ZITADEL and access the introspection endpoint.
+The API application uses [Client Secret Basic](/apis/openidoauth/authn-methods#client-secret-basic) to authenticate against Zitadel and access the introspection endpoint.
 You can use any valid access_token from a user or service account to send requests to the example API.
 In this example we will use a service account with a [personal access token](/guides/integrate/service-accounts/personal-access-token) which can be used directly to access the example API.
 
@@ -23,11 +23,11 @@ In this example we will use a service account with a [personal access token](/gu
 
 In order to run the example you need to have `python3` and `pip3` installed.
 
-### ZITADEL configuration for the API
+### Zitadel configuration for the API
 
 ![](../../../public/img/python-flask/2.png)
 
-You need to setup a couple of things in ZITADEL.
+You need to setup a couple of things in Zitadel.
 
 1. If you don't have an instance yet, please go ahead and create an instance as explained [here](/guides/start/quickstart#3-create-your-zitadel-instance). Also, create a new project by following the steps [here](/guides/start/quickstart#4-create-your-project-and-application).
 
@@ -99,7 +99,7 @@ The API has three routes:
 <li>"/img/api/private-scoped" - A valid access token and a "read:messages" scope are required.</li>
 </ul>
 
-The [validator.py](https://github.com/zitadel/example-api-python3-flask/blob/main/validator.py) file implements the ZitadelIntrospectTokenValidator class, which is a custom class that inherits from the IntrospectTokenValidator class provided by the authlib library. The introspection process retrieves the token details from ZITADEL using ZITADEL's introspection endpoint.
+The [validator.py](https://github.com/zitadel/example-api-python3-flask/blob/main/validator.py) file implements the ZitadelIntrospectTokenValidator class, which is a custom class that inherits from the IntrospectTokenValidator class provided by the authlib library. The introspection process retrieves the token details from Zitadel using Zitadel's introspection endpoint.
 
 ```python
 from os import environ as env
@@ -182,7 +182,7 @@ CLIENT_ID = "197....@projectname"
 CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 ```
 
-### ZITADEL configuration to create a service user
+### Zitadel configuration to create a service user
 
 ![](../../../public/img/python-flask/3.png)
 
@@ -252,4 +252,4 @@ You should get a response with Status Code 200 and the following message.
 
 `{"message":"Private, scoped route - You need to be authenticated and have the role read:messages to see this."}`
 
-You can remove the role from the service user in ZITADEL and try again. You should then get a Status Code 403, Forbidden error.
+You can remove the role from the service user in Zitadel and try again. You should then get a Status Code 403, Forbidden error.

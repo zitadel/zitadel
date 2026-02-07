@@ -1,5 +1,5 @@
 ---
-title: ZITADEL Production Checklist
+title: Zitadel Production Checklist
 sidebar_label: Production Checklist
 ---
 
@@ -13,10 +13,10 @@ To apply best practices to your production setup we created a step by step check
 
 #### HA Setup
 
-- [ ] High Availability for ZITADEL containers
+- [ ] High Availability for Zitadel containers
   - [ ] Use a container orchestrator such as Kubernetes
   - [ ] Use serverless platform such as Knative or a hyperscaler equivalent (e.g. CloudRun from Google)
-  - [ ] Split `zitadel init` and `zitadel setup` for fast start-up times when [scaling](/self-hosting/manage/updating_scaling) ZITADEL
+  - [ ] Split `zitadel init` and `zitadel setup` for fast start-up times when [scaling](/self-hosting/manage/updating_scaling) Zitadel
 - [ ] High Availability for database
   - [ ] Follow [this guide](https://www.postgresql.org/docs/current/high-availability.html) to set up the database.
   - [ ] Configure logging
@@ -31,12 +31,12 @@ To apply best practices to your production setup we created a step by step check
 
 #### Networking
 
-- [ ] Use a Layer 7 Web Application Firewall to secure ZITADEL that supports **[HTTP/2](/self-hosting/manage/http2)**
+- [ ] Use a Layer 7 Web Application Firewall to secure Zitadel that supports **[HTTP/2](/self-hosting/manage/http2)**
   - [ ] Limit the access by IP addresses if needed
-  - [ ] Secure the access by rate limits for specific endpoints (e.g. API vs frontend) to secure availability on high load. See the [ZITADEL Cloud rate limits](/legal/policies/rate-limit-policy) for reference.
+  - [ ] Secure the access by rate limits for specific endpoints (e.g. API vs frontend) to secure availability on high load. See the [Zitadel Cloud rate limits](/legal/policies/rate-limit-policy) for reference.
   - [ ] Check that your firewall also filters IPv6 traffic
 
-### ZITADEL configuration
+### Zitadel configuration
 
 - [ ] Configure a valid [SMTP Server](/guides/manage/console/default-settings#smtp) and test the email delivery
 - [ ] Add [Custom Branding](/guides/manage/customize/branding) if required
@@ -47,22 +47,22 @@ To apply best practices to your production setup we created a step by step check
 
 ### Security
 
-- [ ] Ensure that your ZITADEL does not use [the default, example or _easy-to-guess_ credentials](/self-hosting/manage/database#zitadel-credentials)
+- [ ] Ensure that your Zitadel does not use [the default, example or _easy-to-guess_ credentials](/self-hosting/manage/database#zitadel-credentials)
 - [ ] Use a FQDN and a trusted valid certificate for external [TLS](/self-hosting/manage/tls_modes) connections
-- [ ] Create service accounts for applications that interact with ZITADEL's APIs
-- [ ] Make use of a CDN service to decrease the load for static assets served by ZITADEL
+- [ ] Create service accounts for applications that interact with Zitadel's APIs
+- [ ] Make use of a CDN service to decrease the load for static assets served by Zitadel
 - [ ] Make use of a [security scanner](https://owasp.org/www-community/Vulnerability_Scanning_Tools) to test your application and deployment environment
 
 ### Monitoring
 
-Use an appropriate monitoring solution to have an overview about your ZITADEL instance. In particular you may want to watch out for things like:
+Use an appropriate monitoring solution to have an overview about your Zitadel instance. In particular you may want to watch out for things like:
 
-- [ ] CPU and memory of ZITADEL and the database
+- [ ] CPU and memory of Zitadel and the database
 - [ ] Open database connections
-- [ ] Running instances of ZITADEL and the database
+- [ ] Running instances of Zitadel and the database
 - [ ] Latency of requests
 - [ ] Requests per second
 - [ ] Requests by URL/endpoint
 - [ ] Lifetime of TLS certificates
-- [ ] ZITADEL and database logs
-- [ ] ZITADEL [metrics](/apis/observability/metrics)
+- [ ] Zitadel and database logs
+- [ ] Zitadel [metrics](/apis/observability/metrics)

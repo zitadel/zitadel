@@ -6,13 +6,13 @@ sidebar_label: Onboard Users
 import CreateUser from "../../../guides/manage/console/_create-user.mdx";
 import OrgLoginDescription from "./_org_login_description.mdx";
 
-End Users have three different possibilities on how to login with ZITADEL.
+End Users have three different possibilities on how to login with Zitadel.
 
 1. Local Account with Username, Password, MFA, Passkey, etc
 2. Social Login like Google, Apple, Github, etc
 3. External Identity Provider hosted/managed by Organization like Entra ID, LDAP, Okta etc
 
-You can either use the hosted login of ZITADEL to let users register themselves, or you can build your own UI and use the existing APIs.
+You can either use the hosted login of Zitadel to let users register themselves, or you can build your own UI and use the existing APIs.
 
 ## Manually add/invite users
 
@@ -103,7 +103,7 @@ If you only need the social logins for your end users and you want to have them 
 In that case you can configure the identity providers on the default organization.
 If you want to have the social logins on different organizations you can configure the default on the instance, and enable it on the needed organizations.
 
-Please follow the configuration guides for the needed providers: [Let Users Login with Preferred Identity Provider in ZITADEL](/guides/integrate/identity-providers/introduction)
+Please follow the configuration guides for the needed providers: [Let Users Login with Preferred Identity Provider in Zitadel](/guides/integrate/identity-providers/introduction)
 
 The configured providers will be shown on the first login screen or when the users click on the registration button, they will be able to choose between local account or the social login.
 
@@ -117,13 +117,13 @@ The configured providers will be shown on the first login screen or when the use
 If your business customer already have an identity provider, and you want to allow SSO for them, you can configure their providers directly for their organization.
 Configure the needed provider such as Entra ID or OKTA.
 
-Please follow the configuration guides for the needed providers: [Let Users Login with Preferred Identity Provider in ZITADEL](/guides/integrate/identity-providers/introduction)
+Please follow the configuration guides for the needed providers: [Let Users Login with Preferred Identity Provider in Zitadel](/guides/integrate/identity-providers/introduction)
 
 <OrgLoginDescription components={props.components}  name="OrgLoginDescription" />
 
 ### Build your own registration form
 
-ZITADEL allows you to build your own registration form and login UI.
+Zitadel allows you to build your own registration form and login UI.
 The registration process highly depends on your needs.
 
 We do have a guide series on how to build your own login ui, which also includes the registration of different authentication methods, such as:
@@ -138,11 +138,11 @@ You can find all the guides here: [Build your own login UI](/guides/integrate/lo
 #### Custom fields
 
 The [create user request](/reference/api/user/zitadel.user.v2.UserService.AddHumanUser) also allows you to add [metadata](/guides/manage/customize/user-metadata) (key, value) to the user.
-This gives you the possibility to collect additional data from your users during the registration process and store it directly to the user in ZITADEL.
+This gives you the possibility to collect additional data from your users during the registration process and store it directly to the user in Zitadel.
 Those metadata can also directly be included in the [token](/guides/manage/customize/user-metadata#use-tokens-to-get-user-metadata) of the user.
-We recommend storing business relevant data in the database of your application, and only authentication and authorization relevant data in ZITADEL to follow the separation of concern pattern.
+We recommend storing business relevant data in the database of your application, and only authentication and authorization relevant data in Zitadel to follow the separation of concern pattern.
 
 #### Registration with Organization External Identity Provider
 
-If you want to know more about the multi-tenancy possibilities of ZITADEL, read the following blog post:
+If you want to know more about the multi-tenancy possibilities of Zitadel, read the following blog post:
 [Multi-Tenancy and Delegated Access Management with Organizations](https://zitadel.com/blog/multi-tenancy-with-organizations)

@@ -10,14 +10,14 @@ The following flow shows you the different components you need to enable OIDC fo
 ![](../../../../public/img/guides/login-ui/oidc-flow.png)
 
 1. Your application makes an authorization request to your login UI
-2. The login UI proxies the request to the ZITADEL API.
-3. The ZITADEL API parses the request and does what it needs to interpret certain parameters (e.g., organization scope, etc.)
+2. The login UI proxies the request to the Zitadel API.
+3. The Zitadel API parses the request and does what it needs to interpret certain parameters (e.g., organization scope, etc.)
 4. Redirect to a predefined, relative URL of the login UI that includes the authrequest ID ("/login?authRequest="), configurable per application.
-5. Request to ZITADEL API to get all the information from the auth request. This is optional and only needed if you like to get all the parsed information from the authrequest-
+5. Request to Zitadel API to get all the information from the auth request. This is optional and only needed if you like to get all the parsed information from the authrequest-
 6. Authenticate the user in your login UI by creating and updating a session with all the checks you need.
 7. Finalize the auth request by sending the session to the request, you will get the callback URL in the response
 8. Redirect to your application with the callback URL you got in the previous request
-9. All OIDC-specific endpoints have to be accepted in the Login UI and should be proxied and sent to the ZITADEL API
+9. All OIDC-specific endpoints have to be accepted in the Login UI and should be proxied and sent to the Zitadel API
 
 ## Example
 
@@ -35,7 +35,7 @@ https://login.example.com/oauth/v2/authorize?client_id=170086824411201793%40your
 
 The auth request includes all the relevant information for the OIDC standard and in this example we also have a login hint for the login name "minnie-mouse".
 
-You now have to proxy the auth request from your own UI to the authorize Endpoint of ZITADEL.
+You now have to proxy the auth request from your own UI to the authorize Endpoint of Zitadel.
 For more information, see [OIDC Proxy](./login-app#oidc-proxy) for the necessary headers.
 
 <Callout>
@@ -127,7 +127,7 @@ Example Response:
 
 ### OIDC Endpoints
 
-All OIDC relevant endpoints are provided by ZITADEL. In your login UI you just have to proxy them through and send them directly to the backend.
+All OIDC relevant endpoints are provided by Zitadel. In your login UI you just have to proxy them through and send them directly to the backend.
 
 These are endpoints like:
 - Userinfo
@@ -138,8 +138,8 @@ These are endpoints like:
 
 ### End Session / Logout
 
-The end session endpoint has to be implemented as all the other OIDC endpoints. This means you have to proxy the request from you UI to the ZITADEL.
-In case the ZITADEL backend is not able to determine which session to terminate directly or requires additional approval from the user, it will redirect the browser to the following endpoint:
+The end session endpoint has to be implemented as all the other OIDC endpoints. This means you have to proxy the request from you UI to the Zitadel.
+In case the Zitadel backend is not able to determine which session to terminate directly or requires additional approval from the user, it will redirect the browser to the following endpoint:
 
 ```/logout?post_logout_redirect=```
 

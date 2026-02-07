@@ -1,9 +1,9 @@
 ---
-title: ZITADEL with Vue
+title: Zitadel with Vue
 sidebar_label: Vue
 ---
 
-This integration guide demonstrates the recommended way to incorporate ZITADEL into your Vue application.
+This integration guide demonstrates the recommended way to incorporate Zitadel into your Vue application.
 It explains how to enable user login in your application and how to fetch data from the user info endpoint.
 
 By the end of this guide, your application will have login functionality and will be able to access the current user's profile.
@@ -15,7 +15,7 @@ It also uses the @zitadel/vue package with its default configuration.
 
 ## Set up application and obtain keys
 
-Before we begin developing our application, we need to perform a few configuration steps in the ZITADEL Management Console.
+Before we begin developing our application, we need to perform a few configuration steps in the Zitadel Management Console.
 You'll need to provide some information about your app.
 We recommend creating a new app to start from scratch.
 Navigate to your project, then add a new application at the top of the page.
@@ -26,7 +26,7 @@ We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth
 
 ### Redirect URIs
 
-The redirect URIs field tells ZITADEL where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
+The redirect URIs field tells Zitadel where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 The post logout redirect sends your users back to a public route on your application after they have logged out.
 
 <Callout>
@@ -53,11 +53,11 @@ Also note the projects resource ID, as you will need it to configure your Vue ap
 
 ## Vue setup
 
-Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Vue application.
+Now that you have configured your web application on the Zitadel side, you can proceed with the integration of your Vue application.
 
 ### Install Vue dependencies
 
-To conveniently connect with ZITADEL, you can install the [@zitadel/vue NPM package](https://www.npmjs.com/package/@zitadel/vue). Run the following command:
+To conveniently connect with Zitadel, you can install the [@zitadel/vue NPM package](https://www.npmjs.com/package/@zitadel/vue). Run the following command:
 
 ```bash
 npm install --save @zitadel/vue
@@ -82,7 +82,7 @@ https://github.com/zitadel/zitadel-vue/blob/main/src/main.ts
 
 ### Add three new views to your application
 
-The restricted admin view will only be shown if the user is authenticated and has the role "admin" in the apps project in ZITADEL.
+The restricted admin view will only be shown if the user is authenticated and has the role "admin" in the apps project in Zitadel.
 
 ```ts reference
 https://github.com/zitadel/zitadel-vue/blob/main/src/views/AdminView.vue
@@ -111,9 +111,9 @@ https://github.com/zitadel/zitadel-vue/blob/main/src/router/index.ts
 
 ## Completion
 
-Congratulations! You have successfully integrated your Vue application with ZITADEL!
+Congratulations! You have successfully integrated your Vue application with Zitadel!
 
-If you get stuck, consider checking out the [ZITADEL Vue example application](https://github.com/zitadel/zitadel-vue).
+If you get stuck, consider checking out the [Zitadel Vue example application](https://github.com/zitadel/zitadel-vue).
 This application includes all the functionalities mentioned in this quickstart.
 You can start by cloning the repository and change the arguments to createZITADELAuth so they fit your requirements.
 If you face issues, contact us or [raise an issue on GitHub](https://github.com/zitadel/zitadel-vue/issues).
@@ -122,8 +122,8 @@ If you face issues, contact us or [raise an issue on GitHub](https://github.com/
 
 ### What's next?
 
-Now that you have enabled authentication, you are ready to call add authorization to your application using ZITADEL APIs.
-To do this, [refer to the API docs](/apis/introduction) or check out [the ZITADEL Management Console code on GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
+Now that you have enabled authentication, you are ready to call add authorization to your application using Zitadel APIs.
+To do this, [refer to the API docs](/apis/introduction) or check out [the Zitadel Management Console code on GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
 
 For more information on how to create an Vue application, you can refer to [Vue](https://vuejs.org/guide/quick-start.html).
 If you want to learn more about the libraries wrapped by [@zitadel/vue](https://www.npmjs.com/package/@zitadel/vue), [read the docs for vue-oidc-client](https://github.com/soukoku/vue-oidc-client/wiki/V1-Docs).

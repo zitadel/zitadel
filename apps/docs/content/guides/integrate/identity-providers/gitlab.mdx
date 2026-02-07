@@ -1,5 +1,5 @@
 ---
-title: Configure GitLab as an Identity Provider in ZITADEL
+title: Configure GitLab as an Identity Provider in Zitadel
 sidebar_label: GitLab
 ---
 
@@ -18,7 +18,7 @@ import PrefillAction from './_prefill_action.mdx';
 
 <IDPsOverview components={props.components}  templates="GitLab or GitLab Self Hosted"/>
 
-Click on the ZITADEL Callback URL to copy it to your clipboard.
+Click on the Zitadel Callback URL to copy it to your clipboard.
 You will have to paste it to the GitLab Application later.
 
 ![](../../../../public/img/guides/zitadel_gitlab_create_provider.png)
@@ -31,29 +31,29 @@ You will have to paste it to the GitLab Application later.
 2. Select [Edit Profile](https://gitlab.com/-/profile)
 3. Click on [Applications](https://gitlab.com/-/profile/applications) in the side navigation
 4. Fill in the application name
-5. [Paste the ZITADEL Callback URL you copied before](#open-the-gitlab-identity-provider-template) to the Redirect URI field.
+5. [Paste the Zitadel Callback URL you copied before](#open-the-gitlab-identity-provider-template) to the Redirect URI field.
 
 ![](../../../../public/img/guides/gitlab_app_registration.png)
 
 ### Client ID and secret
 
 After clicking "Save application", you will see the detail page of the application you have just created.
-To be able to connect GitLab to ZITADEL you will need a client ID and a client secret.
+To be able to connect GitLab to Zitadel you will need a client ID and a client secret.
 Save the ID and the Secret, you will not be able to copy the secret again, if you lose it you have to generate a new one.
 
 ![](../../../../public/img/guides/gitlab_app_id_secret.png)
 
-## ZITADEL Configuration
+## Zitadel Configuration
 
-Go back [to the GitLab provider template you opened before in ZITADEL](#open-the-gitlab-identity-provider-template).
+Go back [to the GitLab provider template you opened before in Zitadel](#open-the-gitlab-identity-provider-template).
 Add the [client ID and secret you created before when you registered your GitLab application](#client-id-and-secret).
 
 You can optionally configure the following settings.
 A useful default will be filled if you don't change anything.
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
-This information will be taken to create/update the user within ZITADEL.
-ZITADEL ensures that at least the `openid`-scope is always sent.
+This information will be taken to create/update the user within Zitadel.
+Zitadel ensures that at least the `openid`-scope is always sent.
 
 <GeneralConfigDescription components={props.components}  provider_account="GitLab account" />
 
@@ -79,7 +79,7 @@ ZITADEL ensures that at least the `openid`-scope is always sent.
 
 ![](../../../../public/img/guides/zitadel_login_external_not_found_registration.png)
 
-## Optional: Add ZITADEL action to autofill userdata
+## Optional: Add Zitadel action to autofill userdata
 
 <PrefillAction components={props.components}  fields="firstname and lastname" provider="GitLab"/>
 

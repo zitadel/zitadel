@@ -74,7 +74,7 @@ async function cleanOpenApi() {
       doc.servers = [
         {
           url: V1_BASE_PATHS[filename],
-          description: "ZITADEL " + filename.split('.')[0] + " API v1"
+          description: "Zitadel " + filename.split('.')[0] + " API v1"
         }
       ];
     }

@@ -1,5 +1,5 @@
 ---
-title: Configure a Generic OIDC Identity Provider in ZITADEL
+title: Configure a Generic OIDC Identity Provider in Zitadel
 sidebar_label: Generic OIDC
 id: generic-oidc
 ---
@@ -18,7 +18,7 @@ import TestSetup from './_test_setup.mdx';
 
 <IDPsOverview components={props.components} templates="Generic OIDC"/>
 
-Click on the ZITADEL Callback URL to copy it to your clipboard.
+Click on the Zitadel Callback URL to copy it to your clipboard.
 You will have to paste this URL in your external OIDC provider's application configuration later.
 
 ![Generic OIDC Provider](../../../../public/img/guides/zitadel_generic_oidc_create_provider.png)
@@ -31,23 +31,23 @@ You will have to paste this URL in your external OIDC provider's application con
 2. Navigate to the applications, clients, or integrations section (name may vary depending on your provider).
 3. Create a new application and select "OIDC" or "OpenID Connect" as the type.
 4. Set a name for the application.
-5. [Paste the ZITADEL Callback URL you copied before](#open-the-generic-oidc-provider-template) into the "redirect URIs" or "sign-in redirect URIs" field.
+5. [Paste the Zitadel Callback URL you copied before](#open-the-generic-oidc-provider-template) into the "redirect URIs" or "sign-in redirect URIs" field.
 6. Save or copy the generated **Client ID** and **Client Secret**.
 
 > The exact steps and terminology may vary for each provider. Refer to your provider's documentation if you don't see these options.
 
-## ZITADEL Configuration
+## Zitadel Configuration
 
-1. Return to [the Generic OIDC Provider template in ZITADEL](#open-the-generic-oidc-provider-template).
+1. Return to [the Generic OIDC Provider template in Zitadel](#open-the-generic-oidc-provider-template).
 2. Enter the **Client ID** and **Client Secret** from your OIDC provider's application.
-3. Give the provider a name (e.g., "My OIDC Provider"). This name will appear as a button on the ZITADEL login screen.
+3. Give the provider a name (e.g., "My OIDC Provider"). This name will appear as a button on the Zitadel login screen.
 4. Enter the **Issuer URL** of your OIDC provider (e.g., `https://your-provider.example.com`).
 
-You can optionally configure the following settings. ZITADEL provides sensible defaults if you leave these unchanged.
+You can optionally configure the following settings. Zitadel provides sensible defaults if you leave these unchanged.
 
-**Scopes**: The scopes define which information ZITADEL will request from the provider. `openid`, `profile`, and `email` are pre-filled.
-This information is used to create or update the user within ZITADEL.
-ZITADEL ensures that at least the `openid` scope is always sent.
+**Scopes**: The scopes define which information Zitadel will request from the provider. `openid`, `profile`, and `email` are pre-filled.
+This information is used to create or update the user within Zitadel.
+Zitadel ensures that at least the `openid` scope is always sent.
 
 **Use PKCE**: If enabled, Proof Key for Code Exchange (PKCE) will be used to secure the authorization code flow in addition to the client secret.
 

@@ -1,5 +1,5 @@
 ---
-title: ZITADEL with Next.js
+title: Zitadel with Next.js
 sidebar_label: Next.js
 ---
 
@@ -27,7 +27,7 @@ then open [http://localhost:3000](http://localhost:3000) with your browser to se
 
 ## Setup Application and Get Keys
 
-Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
+Before we can start building our application, we have to do a few configuration steps in Zitadel Console.
 You will need to provide some information about your app.
 
 Navigate to your Project, then add a new application at the top of the page.
@@ -38,7 +38,7 @@ Select `CODE` in the next step. This makes sure you still get a secret. Note tha
 ![Create app in management console](../../../public/img/nextjs/app-create.png)
 ### Redirect URIs
 
-With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
+With the Redirect URIs field, you tell Zitadel where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
 > If you are following along with the [example](https://github.com/zitadel/zitadel-nextjs), set dev mode to `true` and the Redirect URIs to `http://localhost:3000/api/auth/callback/zitadel`.
 
@@ -52,19 +52,19 @@ After successful app creation, a pop-up will appear, showing the app's client ID
 
 ## NextJS Setup
 
-Now that you have your web application configured on the ZITADEL side, you can go ahead and integrate your NextJS app.
+Now that you have your web application configured on the Zitadel side, you can go ahead and integrate your NextJS app.
 
 ### Configuration
 
 NextAuth.js exposes a REST API which is used by your application.
 To setup your configuration, create a file called `src/lib/auth.ts`.
-You can directly import the ZITADEL provider from [next-auth](https://next-auth.js.org/providers/zitadel).
+You can directly import the Zitadel provider from [next-auth](https://next-auth.js.org/providers/zitadel).
 
 ```ts reference
 https://github.com/zitadel/example-auth-nextjs/blob/main/src/lib/auth.ts
 ```
 
-You can overwrite the profile callback, just append it to the ZITADEL provider.
+You can overwrite the profile callback, just append it to the Zitadel provider.
 
 ```ts
 // ...
@@ -137,7 +137,7 @@ ZitadelProvider({
 // ...
 ```
 
-To be able to connect to ZITADEL, make sure to add `http://localhost:3000/api/auth/callback/zitadel` as redirect url to your app.
+To be able to connect to Zitadel, make sure to add `http://localhost:3000/api/auth/callback/zitadel` as redirect url to your app.
 For simplicity reasons we set the default to the one that next-auth provides us. You'll be able to change the redirect later if you want to.
 
 Hit Create, then in the detail view of your application make sure to enable dev mode. Dev mode ensures that you can start an auth flow from a non https endpoint for testing.

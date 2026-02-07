@@ -39,7 +39,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Key Concepts",
           slug: "concepts",
           description:
-            "This part of our documentation contains ZITADEL specific or general concepts required to understand the system or our guides.",
+            "This part of our documentation contains Zitadel specific or general concepts required to understand the system or our guides.",
         },
         items: [
           "concepts/structure/instance",
@@ -55,10 +55,10 @@ export const guidesSidebar: readonly SidebarItem[] = [
         label: "Authenticate Users",
         link: {
           type: "generated-index",
-          title: "Login users with ZITADEL",
+          title: "Login users with Zitadel",
           slug: "guides/integrate/login",
           description:
-            "Sign-in users and application with ZITADEL. In this section you will find resources on how to authenticate your users by using the hosted login via OpenID Connect and SAML. Follow our dedicated guides to build your custom login user interface, if you want to customize the login behavior further.",
+            "Sign-in users and application with Zitadel. In this section you will find resources on how to authenticate your users by using the hosted login via OpenID Connect and SAML. Follow our dedicated guides to build your custom login user interface, if you want to customize the login behavior further.",
         },
         items: [
           "guides/integrate/login/login-users",
@@ -74,7 +74,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Example Applications",
           slug: "/examples/introduction",
           description:
-            "Practical examples showing how to integrate ZITADEL authentication and secure APIs across different application types and frameworks.",
+            "Practical examples showing how to integrate Zitadel authentication and secure APIs across different application types and frameworks.",
         },
         items: [
           {
@@ -85,7 +85,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Frontend (SPA) Quickstart Guides",
               slug: "/examples/introduction/frontend",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into frontend single-page applications.",
+                "Quickstart guides for integrating Zitadel authentication into frontend single-page applications.",
             },
             items: [
               {
@@ -106,7 +106,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Mobile & Native Quickstart Guides",
               slug: "/examples/introduction/mobile",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into Mobile & Native applications.",
+                "Quickstart guides for integrating Zitadel authentication into Mobile & Native applications.",
             },
             items: [
               "examples/login/flutter",
@@ -120,7 +120,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Full-Stack / SSR Quickstart Guides",
               slug: "/examples/introduction/fullstack",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into Full-Stack / SSR applications.",
+                "Quickstart guides for integrating Zitadel authentication into Full-Stack / SSR applications.",
             },
             items: [
               "examples/login/nextjs",
@@ -135,7 +135,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Web App (Server-Side) Quickstart Guides",
               slug: "/examples/introduction/webapp",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into Web App (Server-Side) applications.",
+                "Quickstart guides for integrating Zitadel authentication into Web App (Server-Side) applications.",
             },
             items: [
               "examples/login/symfony",
@@ -152,7 +152,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "APIs / Backend Quickstart Guides",
               slug: "/examples/introduction/backend",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into APIs / Backend Services.",
+                "Quickstart guides for integrating Zitadel authentication into APIs / Backend Services.",
             },
             items: [
               "examples/secure-api/go",
@@ -173,7 +173,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Use Cases",
           slug: "guides/solution-scenarios/introduction",
           description:
-            "Customers of an SaaS Identity and access management system usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into solution scenarios which aim to help you getting started with ZITADEL.",
+            "Customers of an SaaS Identity and access management system usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into solution scenarios which aim to help you getting started with Zitadel.",
         },
         items: [
           "guides/solution-scenarios/b2b",
@@ -232,7 +232,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
       title: "Integrate",
       slug: "guides/integrate",
       description:
-        "Integrate your users and application with ZITADEL. In this section you will find resource on how to authenticate your users, configure external identity providers, access the ZITADEL APIs to manage resources, and integrate with third party services and tools.",
+        "Integrate your users and application with Zitadel. In this section you will find resource on how to authenticate your users, configure external identity providers, access the Zitadel APIs to manage resources, and integrate with third party services and tools.",
     },
     collapsed: true,
     items: [
@@ -244,7 +244,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Authenticate users with OpenID Connect (OIDC)",
           slug: "guides/integrate/login/oidc",
           description:
-            "This guide explains how to utilize ZITADEL for user authentication within your applications using OpenID Connect (OIDC). Here, we offer comprehensive guidance on seamlessly integrating ZITADEL's authentication features, ensuring both security and user experience excellence. Throughout this documentation, we'll cover the setup process for ZITADEL authentication, including the recommended OIDC flows tailored to different application types. Additionally, we'll provide clear instructions on securely signing out or logging out users from your application, ensuring data security and user privacy. With our guidance, you'll be equipped to leverage ZITADEL's authentication capabilities effectively, enhancing your application's security posture while delivering a seamless login experience for your users.",
+            "This guide explains how to utilize Zitadel for user authentication within your applications using OpenID Connect (OIDC). Here, we offer comprehensive guidance on seamlessly integrating Zitadel's authentication features, ensuring both security and user experience excellence. Throughout this documentation, we'll cover the setup process for Zitadel authentication, including the recommended OIDC flows tailored to different application types. Additionally, we'll provide clear instructions on securely signing out or logging out users from your application, ensuring data security and user privacy. With our guidance, you'll be equipped to leverage Zitadel's authentication capabilities effectively, enhancing your application's security posture while delivering a seamless login experience for your users.",
         },
         items: [
           "guides/integrate/login/oidc/oauth-recommended-flows",
@@ -441,10 +441,10 @@ export const guidesSidebar: readonly SidebarItem[] = [
             label: "Services",
             link: {
               type: "generated-index",
-              title: "Integrate ZITADEL with your Favorite Services",
+              title: "Integrate Zitadel with your Favorite Services",
               slug: "/guides/integrate/services",
               description:
-                "With the guides in this section you will learn how to integrate ZITADEL with your services.",
+                "With the guides in this section you will learn how to integrate Zitadel with your services.",
             },
             items: [
               "guides/integrate/services/google-workspace",
@@ -720,7 +720,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Overview",
           slug: "guides/manage/cloud/overview",
           description:
-            "Our customer portal is used to manage all your ZITADEL instances. You can also manage your subscriptions, billing, newsletters and support requests.",
+            "Our customer portal is used to manage all your Zitadel instances. You can also manage your subscriptions, billing, newsletters and support requests.",
         },
         items: [
           "guides/manage/cloud/start",
@@ -1091,7 +1091,7 @@ export const legalSidebar: readonly SidebarItem[] = [
           title: "Service description",
           slug: "/legal/service-description",
           description:
-            "Description of services and service levels for ZITADEL Cloud and Enterprise subscriptions.",
+            "Description of services and service levels for Zitadel Cloud and Enterprise subscriptions.",
         },
         items: [
           {

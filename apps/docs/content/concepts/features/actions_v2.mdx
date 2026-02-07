@@ -1,9 +1,9 @@
 ---
-title: ZITADEL Actions v2
+title: Zitadel Actions v2
 sidebar_label: Actions v2
 ---
 
-By using ZITADEL Actions v2, you can modify ZITADEL's behavior on specific API calls, events, or functions. This is useful when you have special business requirements that ZITADEL does not support out-of-the-box.
+By using Zitadel Actions v2, you can modify Zitadel's behavior on specific API calls, events, or functions. This is useful when you have special business requirements that Zitadel does not support out-of-the-box.
 
 <Callout>
 We're working on Actions continuously. In the [roadmap](https://zitadel.com/roadmap), you can see how we plan to expand and improve this feature. Please tell us about your needs to help us prioritize further improvements and features.
@@ -16,27 +16,27 @@ Actions v2 will always be executed if available, even if the feature flag is swi
 </Callout>
 
 ## Why Actions?
-ZITADEL can't anticipate or solve every possible business rule and integration requirement for all users. Here are some examples:
+Zitadel can't anticipate or solve every possible business rule and integration requirement for all users. Here are some examples:
 - A business requires domain-specific data validation before a user can be created or authenticated.
 - A business needs to automate tasks, such as assigning roles to users based on their ADFS 2016+ groups.
 - A business needs to store metadata on a user, which is used for integrating applications.
 - A business needs to restrict which users are allowed to register to a certain organization by their email domains.
 
-With Actions, ZITADEL provides a way to address such scenarios.
+With Actions, Zitadel provides a way to address such scenarios.
 
 ## How it works
 There are three necessary components:
 - **Endpoint:** An external endpoint with the desired logic. It can be anything, as long as it can receive an HTTP POST request.
-- **Target:** A resource in ZITADEL containing all the necessary information about how to trigger an endpoint.
-- **Execution:** A resource in ZITADEL specifying when to trigger which targets.
+- **Target:** A resource in Zitadel containing all the necessary information about how to trigger an endpoint.
+- **Execution:** A resource in Zitadel specifying when to trigger which targets.
 
-The process is that, at certain points, ZITADEL executes a defined Execution, which then calls the defined Target(s). This allows everyone to implement custom behavior for as many processes as needed.
+The process is that, at certain points, Zitadel executes a defined Execution, which then calls the defined Target(s). This allows everyone to implement custom behavior for as many processes as needed.
 
 Possible conditions for the Execution:
-- **Request:** Reacts to or manipulates requests to ZITADEL, for example, by adding information to newly created users.
-- **Response:** Reacts to or manipulates responses from ZITADEL, for example, provisioning newly created users to other systems.
-- **Function:** Reacts to various functions in ZITADEL, replacing [Actions](/concepts/features/actions).
-- **Event:** Reacts to different events created in ZITADEL, for example, to inform someone if a user gets locked.
+- **Request:** Reacts to or manipulates requests to Zitadel, for example, by adding information to newly created users.
+- **Response:** Reacts to or manipulates responses from Zitadel, for example, provisioning newly created users to other systems.
+- **Function:** Reacts to various functions in Zitadel, replacing [Actions](/concepts/features/actions).
+- **Event:** Reacts to different events created in Zitadel, for example, to inform someone if a user gets locked.
 
 <Callout>
 Currently, defined Actions v2 will be executed in addition to [Actions](/concepts/features/actions).

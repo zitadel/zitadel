@@ -7,7 +7,7 @@ export default function AppValue({ valueCount, clientSecret, projectID }) {
     return (
         <div>
             <p>
-                To connect your application to ZITADEL, you need {valueCount} primary configuration values.
+                To connect your application to Zitadel, you need {valueCount} primary configuration values.
                 These are typically stored as environment variables in your project.
             </p>
             <ol>
@@ -25,7 +25,7 @@ export default function AppValue({ valueCount, clientSecret, projectID }) {
                 <li>
                     <b>Issuer URL</b> Click on URLs in the left sidebar to find your <b>Discovery Endpoint</b>.
                     - The Value: Copy the issuer URL (e.g., https://your-instance.zitadel.cloud).
-                    - Why it matters: ZITADEL supports OIDC Discovery. By providing just the Issuer URL to your SDK, the library automatically finds the login, logout, and token endpoints for you.
+                    - Why it matters: Zitadel supports OIDC Discovery. By providing just the Issuer URL to your SDK, the library automatically finds the login, logout, and token endpoints for you.
 
                     <img src={ProjectUrlsImg.src} alt="Get URLs"/>
                 </li>

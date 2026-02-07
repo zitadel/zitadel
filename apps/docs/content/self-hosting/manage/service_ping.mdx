@@ -3,8 +3,8 @@ title: Service Ping
 sidebar_label: Service Ping
 ---
 
-Service Ping is a feature that periodically sends anonymized analytics and usage data from your ZITADEL system to a central endpoint.
-This data helps improve ZITADEL by providing insights into its usage patterns.
+Service Ping is a feature that periodically sends anonymized analytics and usage data from your Zitadel system to a central endpoint.
+This data helps improve Zitadel by providing insights into its usage patterns.
 
 The feature is enabled by default, but can be disabled either completely or for specific reports.
 Checkout the configuration options below.
@@ -22,7 +22,7 @@ ServicePing:
 
 The base information sent back includes the following:
 - your systemID
-- the currently run version of ZITADEL
+- the currently run version of Zitadel
 - information on all instances
   - id
   - creation date
@@ -30,7 +30,7 @@ The base information sent back includes the following:
 
 ### Resource Counts
 
-Resource counts is a report that provides us with information about the number of resources in your ZITADEL instances.
+Resource counts is a report that provides us with information about the number of resources in your Zitadel instances.
 
 The following resources are counted:
 - Instances
@@ -74,7 +74,7 @@ and by default is set to `@daily`, which means it will send data every day. The 
 all systems from sending data at the same time.
 
 You can adjust it to your needs to make sure there is no performance impact on your system.
-For example, if you already have some scheduled job syncing data in and out of ZITADEL around a specific time or have regularly a
+For example, if you already have some scheduled job syncing data in and out of Zitadel around a specific time or have regularly a
 lot of traffic during the day, you might want to change it to a different time, e.g. `15 4 * * *` to send it every day at 4:15 AM.
 
 The interval must be at least 30 minutes to prevent too frequent requests to the central endpoint.

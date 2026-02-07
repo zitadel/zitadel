@@ -1,5 +1,5 @@
 ---
-title: ZITADEL for B2C Scenarios
+title: Zitadel for B2C Scenarios
 sidebar_label: B2C
 ---
 
@@ -11,23 +11,23 @@ Users in general come with different needs. You may have end users, employees, o
 This groups of users usually don't share the same intentions and use applications differently.
 When planning your applications, investing time in researching your apps architecture is vital for later feature upgrades and enhancements as those changes come in with heftier price points if you have to make bigger changes.
 
-This guide introduces you to the grouping and structuring of ZITADEL projects which forms the base for all projects. This can be used as a quick start to the [B2B scenario](./b2b), which is merely focused on planning considerations if you are having projects with multiple organizations.
+This guide introduces you to the grouping and structuring of Zitadel projects which forms the base for all projects. This can be used as a quick start to the [B2B scenario](./b2b), which is merely focused on planning considerations if you are having projects with multiple organizations.
 
-The journey of this guide starts with creating an Organization, the outermost layer of ZITADEL within your instance, as it is the vessel for projects, roles, applications and users.
-Creation can be done from [ZITADEL Management Console](https://${CUSTOM_DOMAIN}.zitadel.cloud/ui/console/orgs/create). You can choose your current account for the organization owner or create a new one.
+The journey of this guide starts with creating an Organization, the outermost layer of Zitadel within your instance, as it is the vessel for projects, roles, applications and users.
+Creation can be done from [Zitadel Management Console](https://${CUSTOM_DOMAIN}.zitadel.cloud/ui/console/orgs/create). You can choose your current account for the organization owner or create a new one.
 
 Depending on your Software Development Life Cycle (SDLC) you can create multiple organizations or projects to keep your applications environments separated.
 
 ### Organization Domain
 
 Right after org creation you'll be greeted with the domain section of your organization.
-ZITADEL automatically creates an organization domain of the form `[orgname].zitadel.cloud`, but you can create your own. Depending on the settings on the [Domain Policy](../../concepts/structure/policies) it has to be verified by saving a verification file on the specified location.
+Zitadel automatically creates an organization domain of the form `[orgname].zitadel.cloud`, but you can create your own. Depending on the settings on the [Domain Policy](../../concepts/structure/policies) it has to be verified by saving a verification file on the specified location.
 We recommend that you create your domains early as they create a sense of confidence and trust for your application and changes later on might create additional migration effort.
-You can read more about how ZITADEL handles usernames [here](../manage/console/organizations#how-zitadel-handles-usernames).
+You can read more about how Zitadel handles usernames [here](../manage/console/organizations#how-zitadel-handles-usernames).
 
 ### Data Provisioning
 
-ZITADEL gives you a basic storage for users and manages phone and email addresses. It also allows you to store your own application data such as preferences or external identifiers to the metadata of a user.
+Zitadel gives you a basic storage for users and manages phone and email addresses. It also allows you to store your own application data such as preferences or external identifiers to the metadata of a user.
 
 If you are migrating an existing project and you already have an external identity store you can consider bulk importing your user datasets.
 Read our [Management API definitions](/reference/api/management) for more info. If the users email is not verified or no password is set, a initialization mail will be send.
@@ -38,8 +38,8 @@ Requests to the management API are rate limited. Read our [Rate limit Policy](/l
 
 ### User Authentication
 
-User Authentication can be performed in multiple ways. Default method in ZITADEL is username and password with MFA enabled.
-ZITADEL allows you to configure Multifactor- and Passkey Authentication in order to enhance security for your users. All authentication methods are available from the FREE Tier.
+User Authentication can be performed in multiple ways. Default method in Zitadel is username and password with MFA enabled.
+Zitadel allows you to configure Multifactor- and Passkey Authentication in order to enhance security for your users. All authentication methods are available from the FREE Tier.
 To setup your organizations login policy, go to your organizations detail in [Console](https://${CUSTOM_DOMAIN}.zitadel.cloud/ui/console/org).
 
 When planning your application consider the following questions about User Authentication:
@@ -57,14 +57,14 @@ Particularly because you should focus building your applications.
 
 ### Federation
 
-ZITADEL supports signup with OIDC Identity providers as well as JWT Identity Providers. On signup, ZITADEL imports user information to the own profile.
+Zitadel supports signup with OIDC Identity providers as well as JWT Identity Providers. On signup, Zitadel imports user information to the own profile.
 
 ### Hosted Login
 
-ZITADEL offers a "secure by default approach" and comes with a Hosted Login which is a fixed endpoint for your users to authenticate.
+Zitadel offers a "secure by default approach" and comes with a Hosted Login which is a fixed endpoint for your users to authenticate.
 It's safe and secure and comes with Multifactor, Federated Login and Passkey capabilities.
 OIDC (OpenID Connect) opens the doors to Single Sign On (SSO). Especially if you have more than one application, you may want a central and familiar authentication experience.
-With SSO, ZITADEL provides a seamless experience across all your apps.
+With SSO, Zitadel provides a seamless experience across all your apps.
 
 ### Branding
 
@@ -72,9 +72,9 @@ With SSO, ZITADEL provides a seamless experience across all your apps.
 <div>
 
 Branding and customization is a very important part of your application.
-With ZITADEL you can modify colors, logos, icons as well as configure your typography styles, such that you can provide a consistent design throughout your applications.
+With Zitadel you can modify colors, logos, icons as well as configure your typography styles, such that you can provide a consistent design throughout your applications.
 In addition to visual modifications, you can edit notification texts for your users.
-ZITADEL gives you handlebar similar templating for variables. Of course you can define texts for any language.
+Zitadel gives you handlebar similar templating for variables. Of course you can define texts for any language.
 We'd appreciate if you could contribute to our repo with translations of your language. Read on how to contribute [here](../manage/customize/texts).
 
 > Note that your management console design changes to your design too
@@ -86,7 +86,7 @@ We'd appreciate if you could contribute to our repo with translations of your la
 ### Projects and applications
 
 As our Hosted Login is a separate authentication screen, you have to determine how you are directing your users from your applications.
-ZITADEL's Applications live under ZITADEL's Projects. You may add multiple applications for your different application-types (Native, Web, User Agent, or API). When setting up your applications consider reading our guide about [Authentication Flows](../integrate/login/oidc/login-users).
+Zitadel's Applications live under Zitadel's Projects. You may add multiple applications for your different application-types (Native, Web, User Agent, or API). When setting up your applications consider reading our guide about [Authentication Flows](../integrate/login/oidc/login-users).
 
 ### Access Control
 

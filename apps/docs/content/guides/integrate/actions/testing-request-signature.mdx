@@ -15,25 +15,25 @@ The examples are based on the request action, but the same principles apply to o
 
 Before you start, make sure you have everything set up correctly.
 
-- You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
+- You need to be at least a Zitadel [_IAM_OWNER_](/guides/manage/console/managers)
 
 <Callout type="info">
-Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
-In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
+Note that this guide assumes that Zitadel is running on the same machine as the target and can be reached via `localhost`.
+In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from Zitadel.
 </Callout>
 
 ## Payload and Validation Types
 
-ZITADEL supports the following three types of payload in actions:
+Zitadel supports the following three types of payload in actions:
 - **JSON**: The payload is sent as JSON in the request body. Additionally, a signature header is sent to validate the payload.
 This is the simplest form of payload and validation and doesn't require any additional calls to validate the payload. It's also the default type,
 which will be used if no type is specified.
 - **JWT**: The payload is sent as a JSON Web Token (JWT) in the request body. The JWT is signed with the signing key of the instance.
-This allows you to validate the payload by verifying the signature of the JWT using the signing key managed though the webkeys endpoint of the ZITADEL instance,
+This allows you to validate the payload by verifying the signature of the JWT using the signing key managed though the webkeys endpoint of the Zitadel instance,
 which allows for easier key rotation and management. Additionally, it's the base for the JWE type, in case you need to encrypt the payload for certain use cases.
 - **JWE**: The payload is sent as encrypted JSON Web Token (JWE) in the request body. The JWT is additionally encrypted with the public key provided by you.
-This allows you to validate and decrypt the payload by verifying the signature of the JWT using the signing key managed though the webkeys endpoint of the ZITADEL instance,
-and decrypting the payload using your private key. This is the most secure form of payload and validation, but requires additional setup to provide the public key to ZITADEL.
+This allows you to validate and decrypt the payload by verifying the signature of the JWT using the signing key managed though the webkeys endpoint of the Zitadel instance,
+and decrypting the payload using your private key. This is the most secure form of payload and validation, but requires additional setup to provide the public key to Zitadel.
 This type is recommended if the payload contains sensitive information that should not be exposed to any intermediaries.
 
 ## Create target
@@ -72,7 +72,7 @@ Save the returned ID to set in the execution. If you're intending to use the `PA
 
 ### JWE Specific Setup
 
-If you are using the `PAYLOAD_TYPE_JWE`, you need to provide a public key to ZITADEL so that it can encrypt the payload.
+If you are using the `PAYLOAD_TYPE_JWE`, you need to provide a public key to Zitadel so that it can encrypt the payload.
 
 Create a public/private key pair. You can use the following command to generate an RSA key pair:
 ```shell
@@ -80,7 +80,7 @@ openssl genpkey -algorithm RSA -outform PEM -out private_key.pem -pkeyopt rsa_ke
 openssl rsa -pubout -in private_key.pem -out public_key.pem
 ```
 
-Then upload the public key to ZITADEL using the following command. Replace `<TargetID>` with the ID of the target you created earlier.
+Then upload the public key to Zitadel using the following command. Replace `<TargetID>` with the ID of the target you created earlier.
 Use the base64 encoded content of the `public_key.pem` file as the value for `publicKey`.
 ```shell
 curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/actions/targets/<TargetID>/publickeys' \
@@ -102,7 +102,7 @@ curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/targets/<TargetID>/publickey
 
 ## Set execution
 
-To configure ZITADEL to call the target when an API endpoint is called, you need to set an execution and define the request
+To configure Zitadel to call the target when an API endpoint is called, you need to set an execution and define the request
 condition.
 
 See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
@@ -152,7 +152,7 @@ You can do this by using **Webhook.site** (see [Creating a Listener with Webhook
 ## Example call
 
 Now that you have set up the target and execution, you can test it by creating a user through the Management Console UI or
-by calling the ZITADEL API to create a user.
+by calling the Zitadel API to create a user.
 
 ```shell
 curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/users/new' \

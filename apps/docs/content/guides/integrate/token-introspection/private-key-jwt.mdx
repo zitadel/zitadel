@@ -5,15 +5,15 @@ sidebar_label: Private Key JWT
 
 import IntrospectionResponse from './_introspection-response.mdx';
 
-This guide explains how to use ZITADEL's [Private Key JWT authentication method](/apis/openidoauth/authn-methods#jwt-with-private-key) to authenticate your application and call the token introspection endpoint. This is not about securing an API, but about allowing your backend to introspect access tokens in a secure way.
+This guide explains how to use Zitadel's [Private Key JWT authentication method](/apis/openidoauth/authn-methods#jwt-with-private-key) to authenticate your application and call the token introspection endpoint. This is not about securing an API, but about allowing your backend to introspect access tokens in a secure way.
 
 If you're looking to set up Private Key JWT authentication specifically for Service Users, see our dedicated guide [here](/guides/integrate/service-accounts/private-key-jwt).
 
 ## Register an Application & Generate a Key Pair
 
-To use Private Key JWT for introspection, you must register your client application in ZITADEL and create a key pair. This process enables your application to obtain credentials needed to generate JWT assertions for authentication.
+To use Private Key JWT for introspection, you must register your client application in Zitadel and create a key pair. This process enables your application to obtain credentials needed to generate JWT assertions for authentication.
 
-1. In your ZITADEL project, click **New** to add an application.
+1. In your Zitadel project, click **New** to add an application.
 
 <img
     src="/docs/img/guides/integrate/token-introspection-jwt-profile-1.png"
@@ -107,7 +107,7 @@ To use Private Key JWT for introspection, you must register your client applicat
 
 ## Calling the Introspection Endpoint
 
-To introspect an access token in ZITADEL, your backend must authenticate by providing a JWT (`client_assertion`) signed with your application's private key. ZITADEL verifies this JWT to ensure the request is from a trusted application.
+To introspect an access token in Zitadel, your backend must authenticate by providing a JWT (`client_assertion`) signed with your application's private key. Zitadel verifies this JWT to ensure the request is from a trusted application.
 
 **Required request parameters:**
 
@@ -134,14 +134,14 @@ The `client_assertion` parameter is a signed JWT with the following structure:
 {
   "iss": "<YOUR_CLIENT_ID>",
   "sub": "<YOUR_CLIENT_ID>",
-  "aud": "https://${YOUR_DOMAIN}",        // Your ZITADEL issuer URL
+  "aud": "https://${YOUR_DOMAIN}",        // Your Zitadel issuer URL
   "exp": 1605183582,                     // Expiry (Unix timestamp)
   "iat": 1605179982                      // Issued at (Unix timestamp, not older than 1 hour)
 }
 ```
 
 - `iss` and `sub`: Your application’s Client ID.
-- `aud`: The issuer URL for your ZITADEL instance (e.g. `https://my-tenant.zitadel.cloud`).
+- `aud`: The issuer URL for your Zitadel instance (e.g. `https://my-tenant.zitadel.cloud`).
 - `exp`: JWT expiration time (seconds since epoch).
 - `iat`: JWT issued at time (seconds since epoch), must not be older than 1 hour.
 
@@ -197,4 +197,4 @@ def introspect_token(token_string):
 
 <IntrospectionResponse components={props.components} />
 
-For more details and a complete working example, see this [tutorial](https://github.com/zitadel/examples-api-access-and-token-introspection/tree/main/api-jwt) on registering an application in ZITADEL and calling the introspection endpoint with a JWT assertion.
+For more details and a complete working example, see this [tutorial](https://github.com/zitadel/examples-api-access-and-token-introspection/tree/main/api-jwt) on registering an application in Zitadel and calling the introspection endpoint with a JWT assertion.

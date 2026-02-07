@@ -129,7 +129,7 @@ The snippets in the sections below are parts from the bulk import endpoint, to c
 
 ### Passwords
 
-ZITADEL stores passwords only as irreversible hashes, never in clear text.
+Zitadel stores passwords only as irreversible hashes, never in clear text.
 Existing password hashes can be imported if they use a supported [hash algorithm](/concepts/architecture/secrets#hashed-secrets).
 
 Import password hashes using the import API (snippet from [bulk-import](#bulk-import)):
@@ -146,13 +146,13 @@ Import password hashes using the import API (snippet from [bulk-import](#bulk-im
 }
 ```
 
-Upon initial login, ZITADEL validates the imported password using the appropriate verifier.
+Upon initial login, Zitadel validates the imported password using the appropriate verifier.
 
 <Callout title="Verifiers">
-In ZITADEL, a password verifier checks the validity of a password hash created with an algorithm different from the currently configured one.
-It acts as a translator, allowing ZITADEL to understand and validate hashes made with older algorithms like MD5 even when the system has transitioned to newer ones like Argon2.
+In Zitadel, a password verifier checks the validity of a password hash created with an algorithm different from the currently configured one.
+It acts as a translator, allowing Zitadel to understand and validate hashes made with older algorithms like MD5 even when the system has transitioned to newer ones like Argon2.
 This is crucial during migrations or when importing user data.
-Essentially, a verifier ensures ZITADEL can work with passwords hashed using various algorithms, maintaining security while transitioning to stronger hashing methods.
+Essentially, a verifier ensures Zitadel can work with passwords hashed using various algorithms, maintaining security while transitioning to stronger hashing methods.
 </Callout>
 
 Regardless of the `passwordChangeRequired` setting, the password is rehashed using the configured hasher algorithm and stored.
@@ -167,9 +167,9 @@ ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM='pbkdf2'
 
 Hasher configuration updates will automatically rehash existing passwords when they are validated or changed.
 
-In case the hashes can't be transferred directly, you always have the option to create a user in ZITADEL without password and prompt users to create a new password.
+In case the hashes can't be transferred directly, you always have the option to create a user in Zitadel without password and prompt users to create a new password.
 
-If your legacy system receives the passwords in clear text (eg, login form) you could also directly create users via ZITADEL API.
+If your legacy system receives the passwords in clear text (eg, login form) you could also directly create users via Zitadel API.
 We will explain this pattern in more detail in this guide.
 
 ### One-time passwords (OTP)
@@ -209,7 +209,7 @@ Currently it is not possible to migrate passkeys directly from another system.
 ## Users linked to an external IDP
 
 A users `sub` is bound to the external [IDP's Client ID](/guides/manage/console/default-settings#identity-providers).
-This means that the IDP Client ID configured in ZITADEL must be the same ID as in the legacy system.
+This means that the IDP Client ID configured in Zitadel must be the same ID as in the legacy system.
 
 Users should be imported with their `externalUserId`.
 
@@ -228,11 +228,11 @@ _snippet from [bulk-import](#bulk-import) example:_
 }
 ```
 
-You can use an Action with [post-creation flow](/apis/actions/external-authentication#post-creation) to pull information such as roles from the old system and apply them to the user in ZITADEL.
+You can use an Action with [post-creation flow](/apis/actions/external-authentication#post-creation) to pull information such as roles from the old system and apply them to the user in Zitadel.
 
 ## Metadata
 
-You can store arbitrary key-value information on a user (or Organization) in ZITADEL.
+You can store arbitrary key-value information on a user (or Organization) in Zitadel.
 Use metadata to store additional attributes of the users, such as organizational unit, backend-id, etc.
 
 <Callout>

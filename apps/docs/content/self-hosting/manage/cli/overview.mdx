@@ -1,5 +1,5 @@
 ---
-title: ZITADEL Command Line Interface
+title: Zitadel Command Line Interface
 sidebar_label: Overview
 ---
 
@@ -15,20 +15,20 @@ Download the CLI for [Linux](/self-hosting/deploy/linux#install-zitadel) or [Mac
 
 ## Quick start
 
-The easiest way to start ZITADEL is by following the [docker compose example](/self-hosting/deploy/compose) which executes the commands for you.
+The easiest way to start Zitadel is by following the [docker compose example](/self-hosting/deploy/compose) which executes the commands for you.
 
 ## Initialize the database
 
 The `zitadel init`-command sets up the zitadel database. The statements executed need a user with `ADMIN`-privilege. See [init phase](/self-hosting/manage/updating_scaling#the-init-phase) for more information.
 
-## Setup ZITADEL
+## Setup Zitadel
 
 The `zitadel setup`-command further sets up the database created using `zitadel init`. This command only requires the user created in the previous step.  See [setup phase](/self-hosting/manage/updating_scaling#the-setup-phase) for more information.
 
-## Start ZITADEL
+## Start Zitadel
 
-The `zitadel start`-command runs the ZITADEL server.  See [runtime phase](/self-hosting/manage/updating_scaling#the-runtime-phase) for more information.
+The `zitadel start`-command runs the Zitadel server.  See [runtime phase](/self-hosting/manage/updating_scaling#the-runtime-phase) for more information.
 
-The `zitadel start-from-setup`-command first executes [the setup phase](#setup-zitadel) and afterwards runs the ZITADEL server.
+The `zitadel start-from-setup`-command first executes [the setup phase](#setup-zitadel) and afterwards runs the Zitadel server.
 
-The `zitadel start-from-init`-command first executes [the init phase](#Initialize-the-database), afterwards [the setup phase](#setup-zitadel) and lastly runs the ZITADEL server.
+The `zitadel start-from-init`-command first executes [the init phase](#Initialize-the-database), afterwards [the setup phase](#setup-zitadel) and lastly runs the Zitadel server.

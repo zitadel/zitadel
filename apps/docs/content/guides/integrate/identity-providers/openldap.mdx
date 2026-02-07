@@ -1,5 +1,5 @@
 ---
-title: Configure Local OpenLDAP as an Identity Provider in ZITADEL
+title: Configure Local OpenLDAP as an Identity Provider in Zitadel
 sidebar_label: Local OpenLDAP
 ---
 
@@ -14,8 +14,8 @@ import HowLDAPIDPWorks from './_how_ldap_idp_works.mdx'
 
 <Callout type="warn">
 This guide shows you how you can configure an LDAP server locally.
-ZITADEL needs access to the LDAP server, so this won't work in ZITADEL Cloud.
-You have to spin up your own local ZITADEL.
+Zitadel needs access to the LDAP server, so this won't work in Zitadel Cloud.
+You have to spin up your own local Zitadel.
 The easiest way to do so is [by following the Docker Compose installation guide](/self-hosting/deploy/compose).
 </Callout>
 
@@ -63,7 +63,7 @@ volumes:
     driver: local
 ````
 
-Alternatively, you can run LDAP locally. To run LDAP locally to test it with ZITADEL please refer to [OpenLDAP](https://www.openldap.org/) with [slapd](https://www.openldap.org/software/man.cgi?query=slapd).
+Alternatively, you can run LDAP locally. To run LDAP locally to test it with Zitadel please refer to [OpenLDAP](https://www.openldap.org/) with [slapd](https://www.openldap.org/software/man.cgi?query=slapd).
 
 For a quickstart guide please refer to their [official documentation](https://www.openldap.org/doc/admin22/quickstart.html).
 
@@ -177,7 +177,7 @@ The user can be applied after OpenLDAP is running with
 ldapadd -x -h localhost -D "cn=admin,dc=example,dc=com" -f example.ldif -w 'Password1!'
 ```
 
-## ZITADEL Configuration
+## Zitadel Configuration
 
 ### Go to the IdP Providers Overview
 
@@ -205,7 +205,7 @@ Fill in the template fields with the exact values listed below. The fields are d
 
 **LDAP Attributes**: id attributes = "uid"
 
-**StartTLS**: For this example should be left untouched, if this setting is enabled after the initial connection ZITADEL tries to build a TLS connection.
+**StartTLS**: For this example should be left untouched, if this setting is enabled after the initial connection Zitadel tries to build a TLS connection.
 
 **Timeout**: Can be left empty, if this setting is set all connection run with a set timeout, if it is 0s the default timeout of 60s is used.
 
@@ -225,7 +225,7 @@ Fill in the template fields with the exact values listed below. The fields are d
 
 ## Test the setup
 
-<TestSetup components={props.components}  loginscreen="ZITADELs LDAP login"/>
+<TestSetup components={props.components}  loginscreen="Zitadels LDAP login"/>
 
 ![](../../../../public/img/guides/zitadel_login_ldap.png)
 

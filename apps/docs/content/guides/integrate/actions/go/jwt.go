@@ -50,7 +50,7 @@ func validateJWT(ctx context.Context, jwtString string, algorithms []jose.Signat
 
 func main() {
 	ctx := context.Background()
-	// set the issuer to the ZITADEL instance URL
+	// set the issuer to the Zitadel instance URL
 	issuer := "http://localhost:8080"
 
 	// the oidc client library will call the discovery endpoint to get the JWKS URI and supported signing algorithms

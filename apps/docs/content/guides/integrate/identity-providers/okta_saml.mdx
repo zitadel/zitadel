@@ -1,5 +1,5 @@
 ---
-title: Configure OKTA as a SAML Identity Provider in ZITADEL
+title: Configure OKTA as a SAML Identity Provider in Zitadel
 sidebar_label: OKTA SAML
 id: okta-saml
 ---
@@ -14,7 +14,7 @@ import TestSetup from './_test_setup.mdx';
 
 <Intro components={props.components}  provider="OKTA"/>
 
-## ZITADEL Configuration
+## Zitadel Configuration
 
 ### Go to the IdP Providers Overview
 
@@ -22,7 +22,7 @@ import TestSetup from './_test_setup.mdx';
 
 ### Create a new SAML Provider
 
-To be able to create the application in OKTA we need the provider id from ZITADEL.
+To be able to create the application in OKTA we need the provider id from Zitadel.
 1. Create a new SAML Provider with a name and a random text in the Metadata Xml field.
 We will fill that as soon as we have done the configuration in OKTA.
 2. Save Configuration
@@ -33,7 +33,7 @@ As an alternative you can add the SAML identity provider through the API, either
 
 ![](../../../../public/img/guides/zitadel_okta_saml_provider_empty.png)
 
-After you created the SAML Provider in ZITADEL, you can copy the URLs you need to configure in your OKTA application.
+After you created the SAML Provider in Zitadel, you can copy the URLs you need to configure in your OKTA application.
 
 ![](../../../../public/img/guides/zitadel_okta_saml_provider_urls.png)
 
@@ -44,9 +44,9 @@ After you created the SAML Provider in ZITADEL, you can copy the URLs you need t
 1. Log in to your OKTA Account and go to the applications list: `OKTA-DOMAIN/admin/apps/active`
 2. Click on "Create App Integration" and choose "SAML 2.0"
 3. Give the application a name
-4. Click on the ZITADEL URLs that your SAML IDP shows since you created it in ZITADEL and paste them accordingly:
-- **Single sign-on URL**: Paste the *ZITADEL ACS Login Form URL*.
-- **Audience URI (SP Entity ID)**: Paste the *ZITADEL Metadata URL*
+4. Click on the Zitadel URLs that your SAML IDP shows since you created it in Zitadel and paste them accordingly:
+- **Single sign-on URL**: Paste the *Zitadel ACS Login Form URL*.
+- **Audience URI (SP Entity ID)**: Paste the *Zitadel Metadata URL*
 5. Save the configuration
 6. Copy the metadata URL from the details
 
@@ -54,8 +54,8 @@ After you created the SAML Provider in ZITADEL, you can copy the URLs you need t
 
 ### Add Attribute Statements
 
-To send the user data from OKTA to ZITADEL you have to add some attribute mappings in your SAML Settings
-You can define the name by yourself, just ensure you use the same later on in the ZITADEL Action we will add.
+To send the user data from OKTA to Zitadel you have to add some attribute mappings in your SAML Settings
+You can define the name by yourself, just ensure you use the same later on in the Zitadel Action we will add.
 
 Add the following three mappings:
 
@@ -76,9 +76,9 @@ To allow users to authenticate with that app go to the "Assign" Tab.
 
 ![](../../../../public/img/guides/okta_assign_user_to_app.png)
 
-## Finish ZITADEL Configuration
+## Finish Zitadel Configuration
 
-You are now finished with the configuration in OKTA and you can switch back to your identity provider configuration in ZITADEL.
+You are now finished with the configuration in OKTA and you can switch back to your identity provider configuration in Zitadel.
 
 ### Add Metadata Xml
 

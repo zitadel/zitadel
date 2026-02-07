@@ -3,7 +3,7 @@ sequenceDiagram
     autonumber
     participant RO as Resource Owner (User)
     participant App
-    participant AS as Authorization Server (ZITADEL)
+    participant AS as Authorization Server (Zitadel)
     RO-->>App: Open App
     App->>AS: Authorization Request to /authorize
     AS->>RO: redirect to login

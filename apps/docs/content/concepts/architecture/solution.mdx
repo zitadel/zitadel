@@ -42,7 +42,7 @@ Hence our reference design for Kubernetes is to have three application nodes and
 ### Multi Cluster / Region
 
 To scale Zitadel across regions it is recommend to create at least three clusters.
-Each cluster is a fully independent ZITADEL setup.
+Each cluster is a fully independent Zitadel setup.
 To keep the data in sync across all clusters, we recommend using Postgres with read-only replicas as a storage layer.
 Make sure to read our [Production Guide](/self-hosting/manage/production#prefer-postgre-sql) before you decide to use it.
 Consult the [Postgres documentation](https://www.postgresql.org/docs/current/high-availability.html) for more details.

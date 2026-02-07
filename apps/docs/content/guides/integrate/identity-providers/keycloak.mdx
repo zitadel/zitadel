@@ -1,5 +1,5 @@
 ---
-title: Configure Keycloak as an Identity Provider in ZITADEL
+title: Configure Keycloak as an Identity Provider in Zitadel
 sidebar_label: Keycloak generic OIDC
 id: keycloak
 ---
@@ -17,7 +17,7 @@ import TestSetup from './_test_setup.mdx';
 
 <IDPsOverview components={props.components}  templates="Generic OIDC"/>
 
-Click on the ZITADEL Callback URL to copy it to your clipboard.
+Click on the Zitadel Callback URL to copy it to your clipboard.
 You will have to paste it in the Keycloak Client later.
 
 ![](../../../../public/img/guides/zitadel_generic_oidc_create_provider.png)
@@ -30,15 +30,15 @@ You will have to paste it in the Keycloak Client later.
 2. Click on "Create Client"
 3. Choose OpenID Connect as Client Type and give your client an ID
 4. Enable Client authentication and the standard flow and direct access grants as authentication flow
-5. [Paste the ZITADEL Callback URL you copied before](#open-the-generic-oidc-provider-template) to the redirect URIs
+5. [Paste the Zitadel Callback URL you copied before](#open-the-generic-oidc-provider-template) to the redirect URIs
 6. Go to the credentials tab and copy the secret
 
 ![](../../../../public/img/guides/keycloak_add_client.png)
 ![](../../../../public/img/guides/keycloak_client_secret.png)
 
-## ZITADEL configuration
+## Zitadel configuration
 
-1. Go back [to the Generic OIDC Provider template you opened before in ZITADEL](#open-the-generic-oidc-provider-template).
+1. Go back [to the Generic OIDC Provider template you opened before in Zitadel](#open-the-generic-oidc-provider-template).
 2. Add the [client ID and secret created before on your Keycloak Client](#register-a-new-client).
 3. Give the provider a name, e.g. Keycloak. This name will be displayed on the login screen button.
 4. Add the issuer URL of your Keycloak realm with the path /auth/realms/$REALM, e.g. `https://lemur-0.cloud-iam.com/auth/realms/acme`
@@ -47,8 +47,8 @@ You can optionally configure the following settings.
 A useful default will be filled if you don't change anything.
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
-This information will be taken to create/update the user within ZITADEL.
-ZITADEL ensures that at least the `openid`-scope is always sent.
+This information will be taken to create/update the user within Zitadel.
+Zitadel ensures that at least the `openid`-scope is always sent.
 
 **Use PKCE**: If enabled, the provider will use Proof Key for Code Exchange (PKCE) to secure the authorization code flow
 in addition to the client secret.

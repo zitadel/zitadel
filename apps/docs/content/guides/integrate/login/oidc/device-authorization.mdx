@@ -1,11 +1,11 @@
 ---
-title: Integrating Your Application with ZITADEL using RFC 8628 OAuth 2.0 Device Authorization Flow
+title: Integrating Your Application with Zitadel using RFC 8628 OAuth 2.0 Device Authorization Flow
 sidebar_label: Device Authorization Flow
 ---
 
-ZITADEL implements device authorization as per [RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628). This document demonstrates its use.
+Zitadel implements device authorization as per [RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628). This document demonstrates its use.
 
-This documentation aims to guide you through the process of seamlessly integrating your application with ZITADEL, leveraging the capabilities of [RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628). ZITADEL is a powerful identity and access management (IAM) solution that provides robust authentication and authorization services for your applications. RFC 8628, also known as "OAuth 2.0 Device Authorization Grant", offers a standardized protocol for devices with limited input capabilities to obtain user authorization. By following the steps outlined here, you'll be able to empower your application with secure authentication and access control mechanisms provided by ZITADEL, ensuring a smooth and secure user experience.
+This documentation aims to guide you through the process of seamlessly integrating your application with Zitadel, leveraging the capabilities of [RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628). Zitadel is a powerful identity and access management (IAM) solution that provides robust authentication and authorization services for your applications. RFC 8628, also known as "OAuth 2.0 Device Authorization Grant", offers a standardized protocol for devices with limited input capabilities to obtain user authorization. By following the steps outlined here, you'll be able to empower your application with secure authentication and access control mechanisms provided by Zitadel, ensuring a smooth and secure user experience.
 
 ## What is RFC 8628?
 
@@ -13,7 +13,7 @@ This documentation aims to guide you through the process of seamlessly integrati
 
 ## Why Integrate with Zitadel?
 
-ZITADEL offers a comprehensive identity and access management solution, providing features like single sign-on (SSO), multi-factor authentication (MFA), user management, and more. By integrating your application with ZITADEL, you can leverage these powerful features to enhance the security and usability of your application without reinventing the wheel.
+Zitadel offers a comprehensive identity and access management solution, providing features like single sign-on (SSO), multi-factor authentication (MFA), user management, and more. By integrating your application with Zitadel, you can leverage these powerful features to enhance the security and usability of your application without reinventing the wheel.
 
 ## Getting Started
 
@@ -22,33 +22,33 @@ To begin integrating your application with Zitadel using RFC 8628, follow the st
 1. Go to “Organization”/”Projects”.
 2. Under “Applications” click the “New” button.
 
-    <img src="/docs/img/device-auth/device-auth-01.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/docs/img/device-auth/device-auth-01.png" alt="Device Authorization Flow in Zitadel"/>
 
 3. Select “Native” and enter a name for the application, and click “Continue”.
 
-    <img src="/docs/img/device-auth/device-auth-02.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/docs/img/device-auth/device-auth-02.png" alt="Device Authorization Flow in Zitadel"/>
 
 4. Select “Device Code”. Click “Continue”.
 
-    <img src="/docs/img/device-auth/device-auth-03.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/docs/img/device-auth/device-auth-03.png" alt="Device Authorization Flow in Zitadel"/>
 
 5. Check the details and click “Create”.
 
-    <img src="/docs/img/device-auth/device-auth-04.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/docs/img/device-auth/device-auth-04.png" alt="Device Authorization Flow in Zitadel"/>
 
 6. Copy the “Client ID” and store it for later use.
 
-    <img src="/docs/img/device-auth/device-auth-05.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/docs/img/device-auth/device-auth-05.png" alt="Device Authorization Flow in Zitadel"/>
 
 ## Device Client Example
 
-The [ZITADEL OpenID Connect client and server library](https://github.com/zitadel/oidc/) written for Go has a device client example, which can behave and authenticate as a device. In order to run this client, you need a recent version of Go (>=1.20) installed on your device.
+The [Zitadel OpenID Connect client and server library](https://github.com/zitadel/oidc/) written for Go has a device client example, which can behave and authenticate as a device. In order to run this client, you need a recent version of Go (>=1.20) installed on your device.
 
 The example requires two environment variables to be set:
 
 - `ISSUER`: server address of your instance or domain. You can find the issuer URL in the “URLs” section. In this example, it will be set to [https://test-0o6zvq.zitadel.cloud](https://test-0o6zvq.zitadel.cloud). **Do not use a trailing slash!**
 
-    <img src="/docs/img/device-auth/device-auth-06.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/docs/img/device-auth/device-auth-06.png" alt="Device Authorization Flow in Zitadel"/>
 
 - `CLIENT_ID`: the Client ID we obtained earlier.
 
@@ -73,15 +73,15 @@ At this point, the device app starts polling the token endpoint at 5-second inte
 
 When you browse to the given URL and the device code is entered, the authentication flow for a user is started. If you are already logged in, it skips right ahead to the final screen where you can choose to allow or deny the request. If you are not logged in, you will have to enter your credentials for login.
 
-<img src="/docs/img/device-auth/device-auth-07.png" alt="Device Authorization Flow in ZITADEL"/>
+<img src="/docs/img/device-auth/device-auth-07.png" alt="Device Authorization Flow in Zitadel"/>
 
-<img src="/docs/img/device-auth/device-auth-08.png" alt="Device Authorization Flow in ZITADEL"/>
+<img src="/docs/img/device-auth/device-auth-08.png" alt="Device Authorization Flow in Zitadel"/>
 
-<img src="/docs/img/device-auth/device-auth-09.png" alt="Device Authorization Flow in ZITADEL"/>
+<img src="/docs/img/device-auth/device-auth-09.png" alt="Device Authorization Flow in Zitadel"/>
 
-<img src="/docs/img/device-auth/device-auth-10.png" alt="Device Authorization Flow in ZITADEL"/>
+<img src="/docs/img/device-auth/device-auth-10.png" alt="Device Authorization Flow in Zitadel"/>
 
-<img src="/docs/img/device-auth/device-auth-11.png" alt="Device Authorization Flow in ZITADEL"/>
+<img src="/docs/img/device-auth/device-auth-11.png" alt="Device Authorization Flow in Zitadel"/>
 
 When “allow”  is clicked, the device (the CLI in this case) will receive a token on the next poll. A log line will be shown as given below:
 
@@ -93,7 +93,7 @@ At this point, the program terminates as it doesn’t have any other useful purp
 
 ## Code URL
 
-During the start of the authorization flow ,there is a log line printed with the complete response object from ZITADEL that looks like this:
+During the start of the authorization flow ,there is a log line printed with the complete response object from Zitadel that looks like this:
 
 ``` bash
 resp&{dOcbPeysDhT26ZatRh9n7Q KPVZ-DJGG https://test-0o6zvq.zitadel.cloud/device https://test-0o6zvq.zitadel.cloud/device?user_code=GQWC-FWFK 300 5}
@@ -117,7 +117,7 @@ See [here](https://datatracker.ietf.org/doc/html/rfc8628#section-5) for more inf
 
 ## Client library
 
-For Go clients, the ZITADEL OIDC repository already includes device authorization in the `rp` package.
+For Go clients, the Zitadel OIDC repository already includes device authorization in the `rp` package.
 
 Use [rp.DeviceAuthorization](https://pkg.go.dev/github.com/zitadel/oidc/v2/pkg/client/rp#DeviceAuthorization) to start the flow and receive the URL and user code.
 [rp.DeviceAccessToken](https://pkg.go.dev/github.com/zitadel/oidc/v2/pkg/client/rp#DeviceAccessToken) polls the token endpoint and returns the access token once it succeeds.
