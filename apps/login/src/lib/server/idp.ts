@@ -19,7 +19,9 @@ import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
 
-export type RedirectToIdpState = { error?: string | null } | undefined;
+export type RedirectToIdpState =
+  | { error?: string | null; samlData?: { url: string; fields: Record<string, string> } }
+  | undefined;
 
 export async function redirectToIdp(prevState: RedirectToIdpState, formData: FormData): Promise<RedirectToIdpState> {
   const _headers = await headers();
@@ -77,8 +79,16 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
     return { error: "Could not start IDP flow" };
   }
 
+  if (response && "error" in response && response?.error) {
+    return { error: response.error };
+  }
+
   if (response && "redirect" in response && response?.redirect) {
     redirect(response.redirect);
+  }
+
+  if (response && "samlData" in response && response?.samlData) {
+    return { samlData: response.samlData };
   }
 
   return { error: "Unexpected response from IDP flow" };
@@ -95,7 +105,7 @@ export type StartIDPFlowCommand = {
 async function startIDPFlow(command: StartIDPFlowCommand) {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-  const url = await startIdentityProviderFlow({
+  const response = await startIdentityProviderFlow({
     serviceConfig: command.serviceConfig,
     idpId: command.idpId,
     urls: {
@@ -104,11 +114,15 @@ async function startIDPFlow(command: StartIDPFlowCommand) {
     },
   });
 
-  if (!url) {
+  if (!response || !response.url) {
     return { error: "Could not start IDP flow" };
   }
 
-  return { redirect: url };
+  if (response.fields) {
+    return { samlData: { url: response.url, fields: response.fields } };
+  }
+
+  return { redirect: response.url };
 }
 
 export type CreateNewSessionCommand = {
