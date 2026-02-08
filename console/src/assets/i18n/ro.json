@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Utilizatori",
-      "DESCRIPTION": "Un utilizator este o persoană sau o mașină care vă poate accesa aplicațiile.",
+      "DESCRIPTION": "Un utilizator este o persoană sau un cont de serviciu care vă poate accesa aplicațiile.",
       "HUMANS": {
         "TITLE": "Utilizatori",
         "DESCRIPTION": "Utilizatorii se autentifică interactiv într-o sesiune de browser cu o solicitare de autentificare.",
@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organizație",
     "PROJECT": "Proiecte",
     "PROJECTOVERVIEW": "Prezentare generală",
-    "PROJECTGRANTS": "Granturi",
+    "PROJECTGRANTS": "Granturi de proiect",
     "ROLES": "Roluri",
     "GRANTEDPROJECT": "Proiecte acordate",
     "HUMANUSERS": "Utilizatori",
@@ -2053,7 +2053,7 @@
       "DESCRIPTION": "Permiteți altei organizații să vă utilizeze proiectul.",
       "EDITTITLE": "Editați rolurile",
       "CREATE": {
-        "TITLE": "Creați un grant de organizație",
+        "TITLE": "Creează permisiune pentru proiect",
         "SEL_USERS": "Selectați utilizatorii cărora doriți să le acordați acces",
         "SEL_PROJECT": "Căutați un proiect",
         "SEL_ROLES": "Selectați rolurile pe care doriți să le adăugați la grant",
@@ -2063,7 +2063,7 @@
         "ORG_DESCRIPTION": "Sunteți pe cale să acordați un utilizator pentru organizația {{name}}.",
         "ORG_DESCRIPTION_DESC": "Schimbați contextul în antetul de mai sus pentru a acorda un utilizator pentru o altă organizație.",
         "SEL_ORG_FORMFIELD": "Organizație",
-        "FOR_ORG": "Grantul este creat pentru:"
+        "FOR_ORG": "Permisiunea proiectului va fi creată pentru:"
       },
       "DETAIL": {
         "TITLE": "Grant de proiect",
@@ -2176,7 +2176,7 @@
       "DEACTIVATED": "Dezactivat.",
       "CREATED": "Proiect creat.",
       "UPDATED": "Proiect modificat.",
-      "GRANTUPDATED": "Grant modificat.",
+      "GRANTUPDATED": "Grantul proiectului a fost modificat.",
       "DELETED": "Proiect șters."
     }
   },

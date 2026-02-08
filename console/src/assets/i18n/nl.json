@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Gebruikers",
-      "DESCRIPTION": "Een gebruiker is een mens of een machine die toegang kan krijgen tot je applicaties.",
+      "DESCRIPTION": "Een gebruiker is een mens of een serviceaccount die toegang kan krijgen tot je applicaties.",
       "HUMANS": {
         "TITLE": "Gebruikers",
         "DESCRIPTION": "Gebruikers authenticeren interactief in een browsersessie met een loginprompt.",
@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organisatie",
     "PROJECT": "Projecten",
     "PROJECTOVERVIEW": "Overzicht",
-    "PROJECTGRANTS": "Subsidies",
+    "PROJECTGRANTS": "Projecttoewijzingen",
     "ROLES": "Rollen",
     "GRANTEDPROJECT": "Verleende projecten",
     "HUMANUSERS": "Gebruikers",
@@ -2055,7 +2055,7 @@
       "DESCRIPTION": "Sta een andere organisatie toe om uw project te gebruiken.",
       "EDITTITLE": "Bewerk rollen",
       "CREATE": {
-        "TITLE": "Creëer Organisatieverlening",
+        "TITLE": "Projectmachtiging aanmaken",
         "SEL_USERS": "Selecteer de gebruikers aan wie u toegang wilt verlenen",
         "SEL_PROJECT": "Zoek een project",
         "SEL_ROLES": "Selecteer de rollen die u wilt toevoegen aan de verlening",
@@ -2065,7 +2065,7 @@
         "ORG_DESCRIPTION": "U staat op het punt om een gebruiker toe te kennen voor de organisatie {{naam}}.",
         "ORG_DESCRIPTION_DESC": "Schakel de context in de kop hierboven om een gebruiker toe te kennen voor een andere organisatie.",
         "SEL_ORG_FORMFIELD": "Organisatie",
-        "FOR_ORG": "De verlening wordt gecreëerd voor:"
+        "FOR_ORG": "De projectmachtiging wordt aangemaakt voor:"
       },
       "DETAIL": {
         "TITLE": "Projectverlening",
@@ -2178,7 +2178,7 @@
       "DEACTIVATED": "Gedeactiveerd.",
       "CREATED": "Project gecreëerd.",
       "UPDATED": "Project gewijzigd.",
-      "GRANTUPDATED": "Verlening gewijzigd.",
+      "GRANTUPDATED": "Projecttoewijzing gewijzigd.",
       "DELETED": "Project verwijderd."
     }
   },

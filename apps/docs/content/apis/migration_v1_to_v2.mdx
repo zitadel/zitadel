@@ -98,8 +98,8 @@ No major changes have been made to the organization requests.
 When migrating your user management from v1 to v2, the most significant updates involve user states and the initial onboarding process:
 
 - **Unified User Creation Endpoint**:
-  - A significant simplification in v2 is the consolidation of user creation. There is now one primary endpoint for creating users, regardless of whether they are human or machine users.
-  - You can use this single endpoint to provision both human users (individuals interacting with your application) and machine users (e.g., service accounts, API clients), typically by specifying the user type in the request payload.
+  - A significant simplification in v2 is the consolidation of user creation. There is now one primary endpoint for creating users, regardless of whether they are User (Human) or machine users.
+  - You can use this single endpoint to provision both users (individuals interacting with your application) and service accounts (i.e. API clients), typically by specifying the user type in the request payload.
 - **No More "Initial" State**:
   - In v1, new users without a password or verified email were automatically assigned an initial state. This default assumption wasn't always ideal.
   - In v2, this initial state has been removed. All newly created users are now active by default, regardless of their initial attributes.

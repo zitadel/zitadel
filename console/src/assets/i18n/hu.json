@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Felhasználók",
-      "DESCRIPTION": "A felhasználó lehet ember vagy gép, amely hozzáfér az alkalmazásaidhoz.",
+      "DESCRIPTION": "A felhasználó lehet ember vagy szolgáltatásfiók, amely hozzáfér az alkalmazásaidhoz.",
       "HUMANS": {
         "TITLE": "Felhasználók",
         "DESCRIPTION": "A felhasználók interaktívan hitelesítik magukat egy böngésző munkamenetben egy bejelentkezési felhívással.",
@@ -420,7 +420,7 @@
     "ORGANIZATION": "Szervezet",
     "PROJECT": "Projektek",
     "PROJECTOVERVIEW": "Áttekintés",
-    "PROJECTGRANTS": "Támogatások",
+    "PROJECTGRANTS": "Projektengedélyek",
     "ROLES": "Szerepkörök",
     "GRANTEDPROJECT": "Megadott Projektek",
     "HUMANUSERS": "Felhasználók",
@@ -2053,7 +2053,7 @@
       "DESCRIPTION": "Engedd meg egy másik szervezetnek, hogy használja a projektedet.",
       "EDITTITLE": "Szerepkörök szerkesztése",
       "CREATE": {
-        "TITLE": "Szervezet támogatás létrehozása",
+        "TITLE": "Projektengedély létrehozása",
         "SEL_USERS": "Válaszd ki azokat a felhasználókat, akiknek hozzáférést szeretnél biztosítani",
         "SEL_PROJECT": "Keresés egy projektre",
         "SEL_ROLES": "Válaszd ki azokat a szerepköröket, amiket hozzá szeretnél adni a támogatáshoz",
@@ -2063,7 +2063,7 @@
         "ORG_DESCRIPTION": "Arra készülsz, hogy hozzáférést adj egy felhasználónak a(z) {{name}} szervezethez.",
         "ORG_DESCRIPTION_DESC": "Válts a fenti fejlécen, hogy hozzáférést adj egy felhasználónak egy másik szervezethez.",
         "SEL_ORG_FORMFIELD": "Szervezet",
-        "FOR_ORG": "A támogatás azoknak készült:"
+        "FOR_ORG": "A projektengedély a következő számára lesz létrehozva:"
       },
       "DETAIL": {
         "TITLE": "Projekt Támogatás",
@@ -2176,7 +2176,7 @@
       "DEACTIVATED": "Deaktiválva.",
       "CREATED": "Projekt létrehozva.",
       "UPDATED": "Projekt megváltoztatva.",
-      "GRANTUPDATED": "Jogosultság megváltoztatva.",
+      "GRANTUPDATED": "A projektengedély megváltozott.",
       "DELETED": "Projekt törölve."
     }
   },
