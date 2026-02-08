@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Kullanıcılar",
-      "DESCRIPTION": "Kullanıcı, uygulamalarınıza erişebilen bir insan veya makinedir.",
+      "DESCRIPTION": "Kullanıcı, uygulamalarınıza erişebilen bir insan veya hizmet hesabıdır.",
       "HUMANS": {
         "TITLE": "Kullanıcılar",
         "DESCRIPTION": "Kullanıcılar, giriş istemiyle bir tarayıcı oturumunda etkileşimli olarak kimlik doğrulaması yapar.",
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Aktif ve Gelecek Web Anahtarları",
           "DESCRIPTION": "Aktif ve yaklaşan web anahtarlarınız. Yeni bir anahtar etkinleştirmek mevcut olanı devre dışı bırakacaktır.",
-          "NOTE": "Not: JWKs OIDC endpoint önbelleğe alınabilir bir yanıt döndürür (varsayılan 5 dk). Henüz önbelleklerde ve istemcilerde mevcut olmayabileceği için bir anahtarı çok erken etkinleştirmekten kaçının.",
+          "NOTE": "Not: JWKs OIDC endpoint önbelleğe alınabilir bir yanıt döndürür (varsayılan 5 dk). Henüz önbelleklerde ve uygulamalarda mevcut olmayabileceği için bir anahtarı çok erken etkinleştirmekten kaçının.",
           "ACTIVATE": "Sonraki Web Anahtarını Etkinleştir",
           "ACTIVE": "Şu anda aktif",
           "NEXT": "Sırada",
@@ -223,8 +223,8 @@
           "PR": "Bir kullanıcı şifresini sıfırladığında, yeni bir şifre belirlemek için bir bağlantı içeren bir e-posta alacaktır.",
           "VE": "Bir kullanıcı e-posta adresini değiştirdiğinde, yeni adresi doğrulamak için bir bağlantı içeren bir e-posta alacaktır.",
           "VP": "Bir kullanıcı telefon numarasını değiştirdiğinde, yeni numarayı doğrulamak için bir kod içeren bir SMS alacaktır.",
-          "VEO": "Bir kullanıcı e-posta yoluyla Tek Seferlik Şifre yöntemi eklediğinde, e-posta adreslerine gönderilen bir kodu girerek etkinleştirmeleri gerekir.",
-          "VSO": "Bir kullanıcı SMS yoluyla Tek Seferlik Şifre yöntemi eklediğinde, telefon numaralarına gönderilen bir kodu girerek etkinleştirmeleri gerekir.",
+          "VEO": "Bir kullanıcı e-posta yoluyla OTP yöntemi eklediğinde, e-posta adreslerine gönderilen bir kodu girerek etkinleştirmeleri gerekir.",
+          "VSO": "Bir kullanıcı SMS yoluyla OTP yöntemi eklediğinde, telefon numaralarına gönderilen bir kodu girerek etkinleştirmeleri gerekir.",
           "IU": "Bir kullanıcı davet kodu oluşturulduğunda, kimlik doğrulama yöntemlerini belirlemek için bir bağlantı içeren bir e-posta alacaklardır."
         }
       },
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Giriş Formu",
           "DESCRIPTION": "Giriş formunu özelleştirin.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Kullanıcı adı ve Şifreye izin verildi",
-            "DESCRIPTION": "Kullanıcılarınızın kullanıcı adı ve şifreleriyle giriş yapmalarına izin verin. Bu devre dışı bırakılırsa, kullanıcılarınız yalnızca şifresiz kimlik doğrulama veya harici kimlik sağlayıcısı kullanarak giriş yapabilir."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Yerel kimlik doğrulamaya izin verildi",
+            "DESCRIPTION": "Kullanıcılarınızın kullanıcı adı ve şifre veya geçiş anahtarı (passkey) kimlik doğrulaması ile oturum açmasına izin verin. Bu devre dışı bırakılırsa, kullanıcılarınız yalnızca harici bir kimlik sağlayıcı kullanarak oturum açabilir."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Kullanıcı Kaydına izin verildi",
@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organizasyon",
     "PROJECT": "Projeler",
     "PROJECTOVERVIEW": "Genel Bakış",
-    "PROJECTGRANTS": "Yetkilendirmeler",
+    "PROJECTGRANTS": "Proje yetkileri",
     "ROLES": "Roller",
     "GRANTEDPROJECT": "Verilen Projeler",
     "HUMANUSERS": "Kullanıcılar",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Kullanıcıları oluşturma ve yönetme iznine sahiptir",
     "IAM_ADMIN_IMPERSONATOR": "Tüm organizasyonlardan admin ve son kullanıcıların kimliğine bürünme iznine sahiptir",
     "IAM_END_USER_IMPERSONATOR": "Tüm organizasyonlardan son kullanıcıların kimliğine bürünme iznine sahiptir",
-    "IAM_LOGIN_CLIENT": "Giriş istemcilerini yönetme iznine sahiptir",
+    "IAM_LOGIN_CLIENT": "Giriş uygulamalarını yönetme iznine sahiptir",
     "ORG_OWNER": "Tüm organizasyon üzerinde izne sahiptir",
     "ORG_USER_MANAGER": "Organizasyonun kullanıcılarını oluşturma ve yönetme iznine sahiptir",
     "ORG_OWNER_VIEWER": "Tüm organizasyonu gözden geçirme iznine sahiptir",
@@ -851,7 +851,7 @@
       "U2F_NAME": "Kimlik Doğrulayıcı Adı",
       "TYPE": {
         "0": "MFA tanımlanmamış",
-        "1": "Tek Seferlik Şifre (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -884,7 +884,7 @@
       "DESCRIPTION": "Hesabınız için optimal güvenliği sağlamak için ikinci bir faktör ekleyin.",
       "MANAGE_DESCRIPTION": "Kullanıcılarınızın ikinci faktör yöntemlerini yönetin.",
       "ADD": "Faktör Ekle",
-      "OTP": "TOTP için Kimlik Doğrulayıcı Uygulaması (Zamana Dayalı Tek Seferlik Şifre)",
+      "OTP": "TOTP için Kimlik Doğrulayıcı Uygulaması",
       "OTP_DIALOG_TITLE": "OTP Ekle",
       "OTP_DIALOG_DESCRIPTION": "QR kodunu bir kimlik doğrulayıcı uygulamayla tarayın ve OTP yöntemini doğrulamak ve etkinleştirmek için aşağıya kodu girin.",
       "U2F": "Passkey",
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "Faktör başarıyla eklendi!",
       "U2F_ERROR": "Kurulum sırasında bir hata oluştu!",
       "U2F_NAME": "Kimlik Doğrulayıcı Adı",
-      "OTPSMS": "SMS ile OTP (Tek Seferlik Şifre)",
-      "OTPEMAIL": "E-posta ile OTP (Tek Seferlik Şifre)",
-      "SETUPOTPSMSDESCRIPTION": "Bu telefon numarasını OTP (Tek seferlik şifre) ikinci faktörü olarak kurmak istiyor musunuz?",
+      "OTPSMS": "SMS ile OTP",
+      "OTPEMAIL": "E-posta ile OTP",
+      "SETUPOTPSMSDESCRIPTION": "Bu telefon numarasını OTP ikinci faktörü olarak kurmak istiyor musunuz?",
       "OTPSMSSUCCESS": "OTP faktörü başarıyla kuruldu.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Bu yöntemi kullanabilmek için telefonunuzun doğrulanması gerekir.",
       "OTPEMAILSUCCESS": "OTP faktörü başarıyla kuruldu.",
       "TYPE": {
         "0": "MFA tanımlanmamış",
-        "1": "Tek Seferlik Şifre (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -1615,8 +1615,8 @@
         "4": "Şifre Sıfırlama",
         "5": "Passkey Başlatma",
         "6": "Uygulama Gizli Anahtarı",
-        "7": "Tek Kullanımlık Şifre (OTP) - SMS",
-        "8": "Tek Kullanımlık Şifre (OTP) - E-posta"
+        "7": "OTP - SMS",
+        "8": "OTP - E-posta"
       },
       "EXPIRY": "Son kullanma (dakika cinsinden)",
       "INCLUDEDIGITS": "Sayıları Dahil Et",
@@ -1646,8 +1646,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Bayrak etkinleştirilirse, end_session uç noktasında id_token_hint olarak `sid` iddiası olan bir id_token sağlayarak giriş UI'ından tek bir oturumu sonlandırabileceksiniz. Şu anda giriş UI'ında aynı kullanıcı aracısından (tarayıcı) tüm oturumların sonlandırıldığını unutmayın. Oturum API'si aracılığıyla yönetilen oturumlar zaten tek oturumların sonlandırılmasına izin veriyor.",
       "DEBUGOIDCPARENTERROR": "OIDC Üst Hatayı Hata Ayıkla",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Bayrak etkinleştirilirse, OIDC üst hatası konsolda günlüğe kaydedilecektir.",
-      "ENABLEBACKCHANNELLOGOUT": "Arka Kanal Çıkışını Etkinleştir",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Arka Kanal Çıkışı OpenID Connect Arka Kanal Çıkışı 1.0'ı uygular ve OpenID Sağlayıcısında oturum sonlandırma hakkında istemcileri bilgilendirmek için kullanılabilir.",
       "PERMISSIONCHECKV2": "İzin Kontrolü V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Bayrak etkinleştirilirse, yeni API'yi ve özelliklerini kullanabileceksiniz.",
       "STATES": {
@@ -1854,7 +1852,7 @@
         "INIT": "Başlatma",
         "VE": "E-postayı Doğrula",
         "VP": "Telefonu Doğrula",
-        "VSO": "SMS OTP Doğrula",
+        "VSO": "OTP SMS Doğrula",
         "VEO": "E-posta OTP Doğrula",
         "PR": "Şifre Sıfırlama",
         "DC": "Domain Talebi",
@@ -1878,8 +1876,8 @@
         "changedate": "Değişiklik tarihi",
         "username": "Kullanıcı adı",
         "tempUsername": "Geçici kullanıcı adı",
-        "otp": "Tek kullanımlık şifre",
-        "verifyUrl": "Tek kullanımlık şifre URL'sini doğrula",
+        "otp": "OTP",
+        "verifyUrl": "OTP URL'sini doğrula",
         "expiry": "Son kullanma",
         "applicationName": "Uygulama adı"
       },
@@ -2060,7 +2058,7 @@
       "DESCRIPTION": "Başka bir organizasyonun projenizi kullanmasına izin verin.",
       "EDITTITLE": "Rolleri düzenle",
       "CREATE": {
-        "TITLE": "Organizasyon Yetkisi Oluştur",
+        "TITLE": "Proje yetkisi oluştur",
         "SEL_USERS": "Erişim vermek istediğiniz kullanıcıları seçin",
         "SEL_PROJECT": "Bir proje arayın",
         "SEL_ROLES": "Yetkiye eklenmesini istediğiniz rolleri seçin",
@@ -2070,7 +2068,7 @@
         "ORG_DESCRIPTION": "{{name}} organizasyonu için bir kullanıcıyı yetkilendirmek üzeresiniz.",
         "ORG_DESCRIPTION_DESC": "Başka bir organizasyon için kullanıcı yetkilendirmek için yukarıdaki başlıktaki bağlamı değiştirin.",
         "SEL_ORG_FORMFIELD": "Organizasyon",
-        "FOR_ORG": "Yetki şunun için oluşturulur:"
+        "FOR_ORG": "Proje yetkisi şunun için oluşturulacak:"
       },
       "DETAIL": {
         "TITLE": "Proje Yetkisi",
@@ -2183,7 +2181,7 @@
       "DEACTIVATED": "Devre dışı bırakıldı.",
       "CREATED": "Proje oluşturuldu.",
       "UPDATED": "Proje değiştirildi.",
-      "GRANTUPDATED": "Yetki değiştirildi.",
+      "GRANTUPDATED": "Proje yetkisi değiştirildi.",
       "DELETED": "Proje silindi."
     }
   },
@@ -2433,10 +2431,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Bilinmeyen",
-      "1": "Kimlik Doğrulayıcı Uygulama ile Tek Kullanımlık Şifre (TOTP)",
+      "1": "Kimlik Doğrulayıcı Uygulama ile OTP (TOTP)",
       "2": "Passkey",
-      "3": "E-posta ile Tek Kullanımlık Şifre (Email OTP)",
-      "4": "SMS ile Tek Kullanımlık Şifre (SMS OTP)",
+      "3": "E-posta ile OTP (OTP Email)",
+      "4": "SMS ile OTP (OTP SMS)",
       "5": "Kurtarma Kodları"
     }
   },
@@ -2661,8 +2659,8 @@
       "IDTOKENROLEASSERTION": "ID Token içinde kullanıcı rolleri",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Seçilirse, kimliği doğrulanmış kullanıcının istenen rolleri ID token'a eklenir.",
       "IDTOKENUSERINFOASSERTION": "ID Token içinde Kullanıcı Bilgisi",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "İstemcilerin ID token'dan profil, e-posta, telefon ve adres bilgilerini almasını sağlar.",
-      "CLOCKSKEW": "İstemcilerin OP ve istemci saat farklılığını ele almasını sağlar. Süre (0-5s) exp claim'ine eklenecek ve iats, auth_time ve nbf'den çıkarılacaktır.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Uygulamaların ID token'dan profil, e-posta, telefon ve adres bilgilerini almasını sağlar.",
+      "CLOCKSKEW": "Uygulamaların OP ve uygulama saat farklılığını ele almasını sağlar. Süre (0-5s) exp claim'ine eklenecek ve iats, auth_time ve nbf'den çıkarılacaktır.",
       "RECOMMENDED": "önerilen",
       "NOTRECOMMENDED": "önerilmeyen",
       "SELECTION": {
@@ -2680,7 +2678,8 @@
             "DESCRIPTION": "Tek Sayfa Uygulamaları (SPA) ve genel olarak tarayıcılarda çalıştırılan tüm JS framework'leri"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

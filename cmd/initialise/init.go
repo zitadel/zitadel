@@ -3,13 +3,13 @@ package initialise
 import (
 	"context"
 	"embed"
+	"errors"
 	"fmt"
-	"log/slog"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -47,11 +47,15 @@ The user provided by flags needs privileges to
 `,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				if err != nil {
-					slog.Error("zitadel init command failed", "err", err)
-				}
+				logging.OnError(cmd.Context(), err).Error("zitadel init command failed")
 			}()
-			config := MustNewConfig(viper.GetViper())
+			config, shutdown, err := NewConfig(cmd, viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 
 			return InitAll(cmd.Context(), config)
 		},
@@ -79,7 +83,7 @@ func InitAll(ctx context.Context, config *Config) error {
 }
 
 func initialise(ctx context.Context, config database.Config, steps ...func(context.Context, *database.DB) error) error {
-	logging.Info("initialization started")
+	logging.Info(ctx, "initialization started")
 
 	err := ReadStmts()
 	if err != nil {

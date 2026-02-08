@@ -91,12 +91,12 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				expectPushFailed(io.ErrClosedPipe,
 					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
-						feature_v2.SystemEnableBackChannelLogout, true,
+						feature_v2.SystemPermissionCheckV2, true,
 					),
 				),
 			),
 			args: args{context.Background(), &SystemFeatures{
-				EnableBackChannelLogout: gu.Ptr(true),
+				PermissionCheckV2: gu.Ptr(true),
 			}},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -291,7 +291,6 @@ func TestSystemFeatures_isEmpty(t *testing.T) {
 		{name: "UserSchema set", sysFeatures: &SystemFeatures{UserSchema: gu.Ptr(true)}, want: false},
 		{name: "ImprovedPerformance set", sysFeatures: &SystemFeatures{ImprovedPerformance: []feature.ImprovedPerformanceType{}}, want: false},
 		{name: "OIDCSingleV1SessionTermination set", sysFeatures: &SystemFeatures{OIDCSingleV1SessionTermination: gu.Ptr(true)}, want: false},
-		{name: "EnableBackChannelLogout set", sysFeatures: &SystemFeatures{EnableBackChannelLogout: gu.Ptr(true)}, want: false},
 		{name: "LoginV2 set", sysFeatures: &SystemFeatures{LoginV2: &feature.LoginV2{}}, want: false},
 		{name: "PermissionCheckV2 set", sysFeatures: &SystemFeatures{PermissionCheckV2: gu.Ptr(true)}, want: false},
 		{name: "EnableRelationalTables set", sysFeatures: &SystemFeatures{EnableRelationalTables: gu.Ptr(true)}, want: false},
