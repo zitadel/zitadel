@@ -44,5 +44,12 @@ declare namespace NodeJS {
      * Optional: The application name shown in the login and invite emails
      */
     NEXT_PUBLIC_APPLICATION_NAME?: string;
+
+    /**
+     * Optional: Disable automatic email verification code redemption on page load.
+     * Set to "true" to require users to click a Submit button (supports enterprise email link scanners).
+     * Default behavior (undefined) auto-submits codes.
+     */
+    NEXT_PUBLIC_DISABLE_AUTO_VERIFY_EMAIL?: string;
   }
 }
