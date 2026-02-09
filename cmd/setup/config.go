@@ -79,6 +79,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hook.EnumHookFunc(authz.MemberTypeString),
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
@@ -186,6 +187,7 @@ func MustNewSteps(v *viper.Viper) *Steps {
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),

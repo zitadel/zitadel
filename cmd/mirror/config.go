@@ -74,6 +74,7 @@ func mustNewConfig(v *viper.Viper, config any) {
 			hooks.MapHTTPHeaderStringDecode,
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),

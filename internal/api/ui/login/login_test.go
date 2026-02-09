@@ -16,10 +16,10 @@ import (
 func TestConfig_defaultBaseURL(t *testing.T) {
 	t.Parallel()
 
-	config := &DefaultPaths{BasePath: "/basepath"}
+	config := &DefaultPaths{BasePath: &url.URL{Path: "/basepath"}}
 
 	baseCustomURI, err := url.Parse("https://custom")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	tt := []struct {
 		name     string
@@ -43,15 +43,14 @@ func TestConfig_defaultBaseURL(t *testing.T) {
 			expected: "https://origin/basepath",
 		},
 		{
-			name: "LoginV2 required, custom BaseURI",
+			name: "LoginV2 required, absolute custom BaseURI",
 			inputCtx: http.WithDomainContext(
 				authz.NewMockContext("instance1", "org1", "user1",
 					authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: true, BaseURI: baseCustomURI}}),
 				),
 				&http.DomainCtx{Protocol: "https", PublicHost: "origin"},
 			),
-
-			expected: "https://custom/basepath",
+			expected: "https://custom",
 		},
 		{
 			name: "LoginV2 required, custom BaseURI empty string",
@@ -63,13 +62,27 @@ func TestConfig_defaultBaseURL(t *testing.T) {
 			),
 			expected: "https://origin/basepath",
 		},
+		{
+			name: "LoginV2 required, relative custom BaseURI",
+			inputCtx: http.WithDomainContext(
+				authz.NewMockContext("instance1", "org1", "user1",
+					authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: true, BaseURI: &url.URL{Path: "/custom"}}}),
+				),
+				&http.DomainCtx{Protocol: "https", PublicHost: "origin"},
+			),
+			expected: "https://origin/custom",
+		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			result := config.defaultBaseURL(tc.inputCtx)
-			assert.Equal(t, tc.expected, result)
+			if tc.expected == "" {
+				assert.Nil(t, result)
+				return
+			}
+			assert.Equal(t, tc.expected, result.String())
 		})
 	}
 }
@@ -110,8 +123,8 @@ func TestConfig_DefaultEmailCodeURLTemplate(t *testing.T) {
 
 			// Given
 			c := &DefaultPaths{
-				BasePath:      "/basepath",
-				EmailCodePath: "/email-code-path",
+				BasePath:      &url.URL{Path: "/basepath"},
+				EmailCodePath: &url.URL{Path: "/email-code-path"},
 			}
 
 			// Test
@@ -159,8 +172,8 @@ func TestConfig_DefaultPasswordSetURLTemplate(t *testing.T) {
 
 			// Given
 			c := &DefaultPaths{
-				BasePath:        "/basepath",
-				PasswordSetPath: "/password-set-path",
+				BasePath:        &url.URL{Path: "/basepath"},
+				PasswordSetPath: &url.URL{Path: "/password-set-path"},
 			}
 
 			// Test
@@ -208,8 +221,8 @@ func TestConfig_DefaultPasskeySetURLTemplate(t *testing.T) {
 
 			// Given
 			c := &DefaultPaths{
-				BasePath:       "/basepath",
-				PasskeySetPath: "/passkey-set-path",
+				BasePath:       &url.URL{Path: "/basepath"},
+				PasskeySetPath: &url.URL{Path: "/passkey-set-path"},
 			}
 
 			// Test
@@ -257,8 +270,8 @@ func TestConfig_DefaultDomainClaimedURLTemplate(t *testing.T) {
 
 			// Given
 			c := &DefaultPaths{
-				BasePath:          "/basepath",
-				DomainClaimedPath: "/loginname",
+				BasePath:          &url.URL{Path: "/basepath"},
+				DomainClaimedPath: &url.URL{Path: "/loginname"},
 			}
 
 			// Test

@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"net/url"
 	"strings"
 	"time"
 
@@ -25,7 +26,7 @@ type userNotifierLegacy struct {
 	commands     Commands
 	queries      *NotificationQueries
 	channels     types.ChannelChains
-	otpEmailTmpl string
+	otpEmailTmpl *url.URL
 }
 
 func NewUserNotifierLegacy(
@@ -34,7 +35,7 @@ func NewUserNotifierLegacy(
 	commands Commands,
 	queries *NotificationQueries,
 	channels types.ChannelChains,
-	otpEmailTmpl string,
+	otpEmailTmpl *url.URL,
 ) *handler.Handler {
 	return handler.NewHandler(ctx, &config, &userNotifierLegacy{
 		commands:     commands,
@@ -421,8 +422,8 @@ func (u *userNotifierLegacy) reduceOTPEmailCodeAdded(event eventstore.Event) (*h
 	if e.AuthRequestInfo != nil {
 		authRequestID = e.AuthRequestInfo.ID
 	}
-	url := func(code, origin string, _ *query.NotifyUser) (string, error) {
-		return login.OTPLink(origin, authRequestID, code, domain.MFATypeOTPEmail), nil
+	url := func(code string, origin *url.URL, _ *query.NotifyUser) (string, error) {
+		return login.OTPLink(origin.String(), authRequestID, code, domain.MFATypeOTPEmail), nil
 	}
 	return u.reduceOTPEmail(
 		e,
@@ -450,9 +451,9 @@ func (u *userNotifierLegacy) reduceSessionOTPEmailChallenged(event eventstore.Ev
 	if err != nil {
 		return nil, err
 	}
-	url := func(code, origin string, user *query.NotifyUser) (string, error) {
+	url := func(code string, origin *url.URL, user *query.NotifyUser) (string, error) {
 		var buf strings.Builder
-		urlTmpl := origin + u.otpEmailTmpl
+		urlTmpl := origin.ResolveReference(u.otpEmailTmpl).String()
 		if e.URLTmpl != "" {
 			urlTmpl = e.URLTmpl
 		}
@@ -480,7 +481,7 @@ func (u *userNotifierLegacy) reduceOTPEmail(
 	expiry time.Duration,
 	userID,
 	resourceOwner string,
-	urlTmpl func(code, origin string, user *query.NotifyUser) (string, error),
+	urlTmpl func(code string, origin *url.URL, user *query.NotifyUser) (string, error),
 	sentCommand func(ctx context.Context, userID string, resourceOwner string) (err error),
 	eventTypes ...eventstore.EventType,
 ) (*handler.Statement, error) {
@@ -518,12 +519,12 @@ func (u *userNotifierLegacy) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
-	url, err := urlTmpl(plainCode, http_util.DomainContext(ctx).Origin(), notifyUser)
+	link, err := urlTmpl(plainCode, http_util.DomainContext(ctx).OriginURL(), notifyUser)
 	if err != nil {
 		return nil, err
 	}
 	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type())
-	err = notify.SendOTPEmailCode(ctx, url, plainCode, expiry)
+	err = notify.SendOTPEmailCode(ctx, link, plainCode, expiry)
 	if err != nil {
 		if errors.Is(err, &channels.CancelError{}) {
 			// if the notification was canceled, we don't want to return the error, so there is no retry

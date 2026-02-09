@@ -56,58 +56,81 @@ type Config struct {
 }
 
 type DefaultPaths struct {
-	BasePath          string
-	PasswordSetPath   string
-	EmailCodePath     string
-	OTPEmailPath      string
-	PasskeySetPath    string
-	DomainClaimedPath string
+	BasePath          *url.URL
+	PasswordSetPath   *url.URL
+	EmailCodePath     *url.URL
+	OTPEmailPath      *url.URL
+	PasskeySetPath    *url.URL
+	DomainClaimedPath *url.URL
 }
 
-func (c *DefaultPaths) defaultBaseURL(ctx context.Context) string {
+func (c *DefaultPaths) defaultBaseURL(ctx context.Context) *url.URL {
 	loginV2 := authz.GetInstance(ctx).Features().LoginV2
-	if loginV2.Required {
-		// use the origin as default
-		baseURI := http_utils.DomainContext(ctx).Origin()
-		// use custom base URI if defined
-		if loginV2.BaseURI != nil && loginV2.BaseURI.String() != "" {
-			baseURI = loginV2.BaseURI.String()
-		}
-		return baseURI + c.BasePath
+	// In case login v1 is still active, we don't want to return a base URL, as the templates will not be used
+	if !loginV2.Required {
+		return nil
 	}
-	return ""
+	origin := http_utils.DomainContext(ctx).OriginURL()
+	if loginV2.BaseURI == nil || loginV2.BaseURI.String() == "" {
+		// In case the login v2 is enabled without a custom BaseURI,
+		// we use the request origin plus the default base path as the base URL for the templates.
+		return origin.ResolveReference(c.BasePath)
+	}
+	// In case a custom BaseURI is set for login v2, we use it as the base URL for the templates.
+	if loginV2.BaseURI.IsAbs() {
+		return loginV2.BaseURI
+	}
+	// If the custom BaseURI is a relative URL, we join the request origin with the custom BaseURI to form the base URL for the templates.
+	return origin.ResolveReference(loginV2.BaseURI)
+}
+
+// mergeURLs will merge two URLs, where paths, params and fragments are combined.
+// It uses url.ResolveReference, but ensures the base path is always kept (by using a trailing slash)
+// and the second URL's path does not start with a leading slash, to ensure correct merging of the two paths.
+// For example, merging "https://example.com/base" with "/path/to/resource" will result in "https://example.com/base/path/to/resource",
+// as if the base URL is "https://example.com/base/" and the second URL's path is "path/to/resource".
+func mergeURLs(base, path *url.URL) string {
+	u := base.JoinPath(path.Path)
+	queries := u.Query()
+	for key, value := range path.Query() {
+		for _, v := range value {
+			queries.Add(key, v)
+		}
+	}
+	u.RawQuery = queries.Encode()
+	return u.String()
 }
 
 func (c *DefaultPaths) DefaultEmailCodeURLTemplate(ctx context.Context) string {
 	basePath := c.defaultBaseURL(ctx)
-	if basePath == "" {
+	if basePath == nil {
 		return ""
 	}
-	return basePath + c.EmailCodePath
+	return mergeURLs(basePath, c.EmailCodePath)
 }
 
 func (c *DefaultPaths) DefaultPasswordSetURLTemplate(ctx context.Context) string {
 	basePath := c.defaultBaseURL(ctx)
-	if basePath == "" {
+	if basePath == nil {
 		return ""
 	}
-	return c.defaultBaseURL(ctx) + c.PasswordSetPath
+	return mergeURLs(basePath, c.PasswordSetPath)
 }
 
 func (c *DefaultPaths) DefaultPasskeySetURLTemplate(ctx context.Context) string {
 	basePath := c.defaultBaseURL(ctx)
-	if basePath == "" {
+	if basePath == nil {
 		return ""
 	}
-	return c.defaultBaseURL(ctx) + c.PasskeySetPath
+	return mergeURLs(basePath, c.PasskeySetPath)
 }
 
 func (c *DefaultPaths) DefaultDomainClaimedURLTemplate(ctx context.Context) string {
 	basePath := c.defaultBaseURL(ctx)
-	if basePath == "" {
+	if basePath == nil {
 		return ""
 	}
-	return c.defaultBaseURL(ctx) + c.DomainClaimedPath
+	return mergeURLs(basePath, c.DomainClaimedPath)
 }
 
 const (

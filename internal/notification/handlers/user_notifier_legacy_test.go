@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"fmt"
+	"net/url"
 	"testing"
 	"time"
 
@@ -1943,6 +1944,8 @@ type wantLegacySMS struct {
 }
 
 func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields, a args, w wantLegacy) *userNotifierLegacy {
+	otpEmailTemplate, err := url.Parse(defaultOTPEmailTemplate)
+	assert.NoError(t, err)
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	channel := channel_mock.NewMockNotificationChannel(ctrl)
@@ -1972,7 +1975,7 @@ func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			smtpAlg,
 			f.SMSTokenCrypto,
 		),
-		otpEmailTmpl: defaultOTPEmailTemplate,
+		otpEmailTmpl: otpEmailTemplate,
 		channels: &notificationChannels{
 			Chain: *senders.ChainChannels(channel),
 			EmailConfig: &email.Config{
