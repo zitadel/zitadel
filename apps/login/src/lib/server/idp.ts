@@ -15,7 +15,7 @@ import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceConfig } from "../service-url";
-import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
+import { checkEmailVerification, checkPhoneVerification, checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
 
@@ -153,11 +153,18 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
 
   const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-  // check to see if user was verified
+  // check to see if user email was verified
   const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
+  }
+
+  // check to see if user phone was verified (if user has a phone)
+  const phoneVerificationCheck = checkPhoneVerification(session, humanUser, command.organization, command.requestId);
+
+  if (phoneVerificationCheck?.redirect) {
+    return phoneVerificationCheck;
   }
 
   // check if user has MFA methods

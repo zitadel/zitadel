@@ -81,17 +81,15 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
         password: { password: values.password },
       }),
       requestId,
-    })
-      .catch(() => {
-        setError(t("change.errors.couldNotVerifyPassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("change.errors.couldNotVerifyPassword"));
+      setLoading(false);
+      return;
+    });
 
     if (passwordResponse && "error" in passwordResponse && passwordResponse.error) {
       setError(passwordResponse.error);
+      setLoading(false);
       return;
     }
 
@@ -99,6 +97,7 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
       return router.push(passwordResponse.redirect);
     }
 
+    setLoading(false);
     return;
   }
 

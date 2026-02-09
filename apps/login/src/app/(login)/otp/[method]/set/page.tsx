@@ -7,7 +7,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { addOTPEmail, addOTPSMS, getBrandingSettings, getLoginSettings, registerTOTP } from "@/lib/zitadel";
+import { addOTPEmail, addOTPSMS, getBrandingSettings, getLoginSettings, getUserByID, registerTOTP } from "@/lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -86,12 +86,13 @@ export default async function Page(props: {
     if (requestId) {
       paramsToContinue.append("requestId", requestId);
     }
+    // Contact method is not verified, redirect to OTP verification
     urlToContinue = `/otp/${method}?` + paramsToContinue;
-
     // immediately check the OTP on the next page if sms or email was set up
     if (["email", "sms"].includes(method)) {
       return redirect(urlToContinue);
     }
+    
   } else if (requestId && sessionId) {
     if (requestId) {
       paramsToContinue.append("authRequest", requestId);
@@ -117,11 +118,13 @@ export default async function Page(props: {
           </p>
         ) : (
           <p className="ztdl-p">
-            {method === "email"
-              ? "Code via email was successfully added."
-              : method === "sms"
-                ? "Code via SMS was successfully added."
-                : ""}
+            {method === "email" ? (
+              <Translated i18nKey="set.emailOtpAdded" namespace="otp" />
+            ) : method === "sms" ? (
+              <Translated i18nKey="set.smsOtpAdded" namespace="otp" />
+            ) : (
+              ""
+            )}
           </p>
         )}
 
@@ -164,15 +167,15 @@ export default async function Page(props: {
             ></TotpRegister>
           </div>
         ) : (
-          <div className="mt-8 flex w-full flex-row items-center">
-            <BackButton />
-            <span className="flex-grow"></span>
+            <div className="mt-8 flex w-full flex-row items-center">
+              <BackButton />
+              <span className="flex-grow"></span>
 
-            <Link href={urlToContinue}>
-              <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
-                <Translated i18nKey="set.submit" namespace="otp" />
-              </Button>
-            </Link>
+              <Link href={urlToContinue}>
+                <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
+                  <Translated i18nKey="set.submit" namespace="otp" />
+                </Button>
+              </Link>
           </div>
         )}
       </div>
