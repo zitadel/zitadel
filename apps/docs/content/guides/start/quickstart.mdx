@@ -127,7 +127,7 @@ ZITADEL automatically configures the best security settings for your selected fr
     </Tab>
     <Tab value="Hono">
         <AppConfig
-            redirectUrl="http://localhost:3000/auth/callback"
+            redirectUrl="http://localhost:3000/auth/callback/zitadel"
             postLogoutRedirectUrl="http://localhost:3000">
         </AppConfig>
     </Tab>
@@ -140,7 +140,7 @@ ZITADEL automatically configures the best security settings for your selected fr
     <Tab value="NestJS">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback/zitadel"
-            postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
+            postLogoutRedirectUrl="http://localhost:3000">
         </AppConfig>
     </Tab>
     <Tab value="Next.js">
@@ -181,8 +181,8 @@ ZITADEL automatically configures the best security settings for your selected fr
     </Tab>
     <Tab value="Symfony">
         <AppConfig
-            redirectUrl="http://localhost:3000/login_check"
-            postLogoutRedirectUrl="http://localhost:3000/logout">
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="Svelte">
@@ -667,7 +667,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```
     </Tab>
     <Tab value="NestJS">
-        1. Copy+past the .env.example to .env.local
+        1. Copy+paste the .env.example to .env.local
         2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
         ```bash
@@ -685,7 +685,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```
     </Tab>
     <Tab value="Next.js">
-        1. Copy+past the .env.example to .env
+        1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
         ```bash
@@ -704,7 +704,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```
     </Tab>
     <Tab value="Nuxt">
-        1. Copy+past the .env.example to .env
+        1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
         ```bash
@@ -774,7 +774,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
         ```bash
-        PY_ENV=development
+        SPRING_PROFILES_ACTIVE=development
         PORT=3000
         SESSION_SECRET="your-very-secret-and-strong-session-key"
         SESSION_DURATION=3600
