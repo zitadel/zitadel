@@ -455,10 +455,15 @@ export async function changePassword(command: { code?: string; userId: string; p
 
 type CheckSessionAndSetPasswordCommand = {
   sessionId: string;
+  currentPassword: string;
   password: string;
 };
 
-export async function checkSessionAndSetPassword({ sessionId, password }: CheckSessionAndSetPasswordCommand) {
+export async function checkSessionAndSetPassword({
+  sessionId,
+  currentPassword,
+  password,
+}: CheckSessionAndSetPasswordCommand) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
   const t = await getTranslations("password");
@@ -486,26 +491,39 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
     return { error: t("errors.couldNotLoadSession") };
   }
 
+  const loginSettings = await getLoginSettings({
+    serviceConfig,
+    organization: sessionCookie.organization,
+  });
+
+  let lifetime = loginSettings?.passwordCheckLifetime;
+  if (!lifetime || !lifetime.seconds) {
+    lifetime = {
+      seconds: BigInt(60 * 60 * 24),
+      nanos: 0,
+    } as Duration;
+  }
+
+  const checks = create(ChecksSchema, {
+    password: { password: currentPassword },
+  });
+
+  try {
+    await setSessionAndUpdateCookie({
+      recentCookie: sessionCookie,
+      checks,
+      lifetime,
+    });
+  } catch {
+    return { error: t("change.errors.currentPasswordInvalid") };
+  }
+
   const payload = create(SetPasswordRequestSchema, {
     userId: session.factors.user.id,
     newPassword: {
       password,
     },
   });
-
-  // check if the password factor is set and not older than 5 minutes
-  const passwordVerifiedAt = session.factors?.password?.verifiedAt;
-  if (!passwordVerifiedAt) {
-    return { error: t("errors.passwordVerificationMissing") };
-  }
-
-  const passwordVerifiedDate = timestampDate(passwordVerifiedAt);
-  const now = new Date();
-  const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
-
-  if (passwordVerifiedDate < fiveMinutesAgo) {
-    return { error: t("errors.passwordVerificationTooOld") };
-  }
 
   return setPassword({ serviceConfig, payload }).catch((error) => {
     // throw error if failed precondition (ex. User is not yet initialized)
