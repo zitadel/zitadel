@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/embedded"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/integration"
 )
 
@@ -216,12 +215,7 @@ func createHumanUser(t *testing.T, tx database.QueryExecutor, instanceID, orgID 
 				Address: gofakeit.Email(),
 			},
 			Password: domain.HumanPassword{
-				Password: &crypto.CryptoValue{
-					CryptoType: crypto.TypeEncryption,
-					Algorithm:  "aes256",
-					KeyID:      "key-id",
-					Crypted:    []byte("crypted"),
-				},
+				Hash: "hashed-password",
 			},
 		},
 	}

@@ -15,68 +15,7 @@ func (v verification) qualifiedTableName() string {
 	return "zitadel." + v.unqualifiedTableName()
 }
 
-// verified constructs the following changes:
-// - sets the verifiedAt column to the current time or the provided time
-// - sets the pending verification ID column to null
-// - deletes the verification and returns its value to be set
-//
-//	The caller is responsible for resetting the failed attempts counter on the object.
-func (v verification) verified(verified *domain.VerificationTypeVerified, existingTableName string, instanceID, pendingVerificationID, verifiedAt, value database.Column) database.Changes {
-	verifiedAtChange := database.NewChange(verifiedAt, database.NowInstruction)
-	if !verified.VerifiedAt.IsZero() {
-		verifiedAtChange = database.NewChange(verifiedAt, verified.VerifiedAt)
-	}
-
-	return database.NewChanges(
-		verifiedAtChange,
-		database.NewChangeToNull(pendingVerificationID),
-		database.NewCTEChange(
-			func(builder *database.StatementBuilder) {
-				builder.WriteString("DELETE FROM ")
-				builder.WriteString(v.qualifiedTableName())
-				builder.WriteString(" USING ")
-				builder.WriteString(existingTableName)
-				writeCondition(builder, database.And(
-					database.NewColumnCondition(v.instanceIDColumn(), instanceID),
-					database.NewColumnCondition(v.idColumn(), pendingVerificationID),
-				))
-				builder.WriteString(" RETURNING value")
-			}, func(name string) database.Change {
-				return database.NewChangeToStatement(value, func(builder *database.StatementBuilder) {
-					builder.WriteString("SELECT value FROM ")
-					builder.WriteString(name)
-				})
-			},
-		),
-	)
-}
-
-func (v verification) skipped(skipped *domain.VerificationTypeSkipped, verifiedAt, value database.Column) database.Change {
-	skippedAt := database.NewChange(verifiedAt, database.NowInstruction)
-	if !skipped.SkippedAt.IsZero() {
-		skippedAt = database.NewChange(verifiedAt, skipped.SkippedAt)
-	}
-	return database.NewChanges(
-		database.NewChange(value, *skipped.Value),
-		skippedAt,
-	)
-}
-
-func (v verification) failed(existingTableName string, instanceID, verificationID database.Column) database.CTEChange {
-	return database.NewCTEChange(func(builder *database.StatementBuilder) {
-		builder.WriteString("UPDATE ")
-		builder.WriteString(v.qualifiedTableName())
-		builder.WriteString(" SET ")
-		database.NewIncrementColumnChange(v.failedAttemptsColumn(), database.Coalesce(v.failedAttemptsColumn(), 0)).Write(builder)
-		builder.WriteString(" FROM ")
-		builder.WriteString(existingTableName)
-		writeCondition(builder, database.And(
-			database.NewColumnCondition(v.instanceIDColumn(), instanceID),
-			database.NewColumnCondition(v.idColumn(), verificationID),
-		))
-	}, nil)
-}
-
+// init creates a new verification
 func (v verification) init(init *domain.VerificationTypeInit, existingTableName string, verificationID database.Column) database.CTEChange {
 	return database.NewCTEChange(func(builder *database.StatementBuilder) {
 		var (
@@ -93,8 +32,8 @@ func (v verification) init(init *domain.VerificationTypeInit, existingTableName 
 		if init.ID != nil {
 			id = *init.ID
 		}
-		builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, id, value, code, created_at, expiry) SELECT instance_id, id, ")
-		builder.WriteArgs(id, init.Value, init.Code, createdAt, expiry)
+		builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, id, code, created_at, updated_at, expiry) SELECT instance_id, id, ")
+		builder.WriteArgs(id, init.Code, createdAt, createdAt, expiry)
 		builder.WriteString(" FROM ")
 		builder.WriteString(existingTableName)
 		builder.WriteString(" RETURNING id")
@@ -106,22 +45,87 @@ func (v verification) init(init *domain.VerificationTypeInit, existingTableName 
 	})
 }
 
+// updates the given fields of the verification with the given ID. Only non-nil fields get updated.
 func (v verification) update(update *domain.VerificationTypeUpdate, existingTableName string, instanceID, verificationID database.Column) database.CTEChange {
 	changes := make(database.Changes, 0, 3)
-	if update.Value != nil {
-		changes = append(changes, database.NewChange(v.valueColumn(), *update.Value))
-	}
 	if update.Code != nil {
 		changes = append(changes, database.NewChange(v.codeColumn(), *update.Code))
 	}
 	if update.Expiry != nil {
 		changes = append(changes, database.NewChange(v.expiryColumn(), *update.Expiry))
 	}
+	if update.UpdatedAt.IsZero() {
+		changes = append(changes, database.NewChange(v.updatedAtColumn(), database.NowInstruction))
+	} else {
+		changes = append(changes, database.NewChange(v.updatedAtColumn(), update.UpdatedAt))
+	}
 	return database.NewCTEChange(func(builder *database.StatementBuilder) {
 		builder.WriteString("UPDATE ")
 		builder.WriteString(v.qualifiedTableName())
 		builder.WriteString(" SET ")
 		changes.Write(builder)
+		builder.WriteString(" FROM ")
+		builder.WriteString(existingTableName)
+		writeCondition(builder, database.And(
+			database.NewColumnCondition(v.instanceIDColumn(), instanceID),
+			database.NewColumnCondition(v.idColumn(), verificationID),
+		))
+	}, nil)
+}
+
+// verified constructs the following changes:
+// - sets the verifiedAt column to the current time or the provided time
+// - clears the pending verification ID
+// - deletes the verification
+// - resets the failed attempts counter
+func (v verification) verified(verified *domain.VerificationTypeSucceeded, existingTableName string, instanceID, pendingVerificationID, verifiedAt, failedAttempts database.Column) database.Changes {
+	verifiedAtChange := database.NewChange(verifiedAt, database.NowInstruction)
+	if !verified.VerifiedAt.IsZero() {
+		verifiedAtChange = database.NewChange(verifiedAt, verified.VerifiedAt)
+	}
+
+	return database.NewChanges(
+		verifiedAtChange,
+		database.NewChangeToNull(pendingVerificationID),
+		database.NewChange(failedAttempts, 0),
+		database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("DELETE FROM ")
+				builder.WriteString(v.qualifiedTableName())
+				builder.WriteString(" USING ")
+				builder.WriteString(existingTableName)
+				writeCondition(builder, database.And(
+					database.NewColumnCondition(v.instanceIDColumn(), instanceID),
+					database.NewColumnCondition(v.idColumn(), pendingVerificationID),
+				))
+			}, nil,
+		),
+	)
+}
+
+// skipped constructs the following changes:
+// - sets the verifiedAt column to the current time or the provided time
+// - clears the pending verification ID
+// - resets the failed attempts counter
+func (v verification) skipped(skipped *domain.VerificationTypeSkipped, verifiedAt, pendingVerificationID, failedAttempts database.Column) database.Changes {
+	verifiedAtChange := database.NewChange(verifiedAt, database.NowInstruction)
+	if !skipped.SkippedAt.IsZero() {
+		verifiedAtChange = database.NewChange(verifiedAt, skipped.SkippedAt)
+	}
+	return database.NewChanges(
+		verifiedAtChange,
+		database.NewChange(failedAttempts, 0),
+		database.NewChangeToNull(pendingVerificationID),
+	)
+}
+
+// failed increments the failed attempts counter.
+func (v verification) failed(existingTableName string, instanceID, verificationID database.Column) database.CTEChange {
+	return database.NewCTEChange(func(builder *database.StatementBuilder) {
+		builder.WriteString("UPDATE ")
+		builder.WriteString(v.qualifiedTableName())
+		builder.WriteString(" SET ")
+		database.NewIncrementColumnChange(v.failedAttemptsColumn(), database.Coalesce(v.failedAttemptsColumn(), 0)).Write(builder)
 		builder.WriteString(" FROM ")
 		builder.WriteString(existingTableName)
 		writeCondition(builder, database.And(
@@ -143,10 +147,6 @@ func (v verification) idColumn() database.Column {
 	return database.NewColumn(v.unqualifiedTableName(), "id")
 }
 
-func (v verification) valueColumn() database.Column {
-	return database.NewColumn(v.unqualifiedTableName(), "value")
-}
-
 func (v verification) codeColumn() database.Column {
 	return database.NewColumn(v.unqualifiedTableName(), "code")
 }
@@ -161,4 +161,8 @@ func (v verification) failedAttemptsColumn() database.Column {
 
 func (v verification) userIDColumn() database.Column {
 	return database.NewColumn(v.unqualifiedTableName(), "user_id")
+}
+
+func (v verification) updatedAtColumn() database.Column {
+	return database.NewColumn(v.unqualifiedTableName(), "updated_at")
 }

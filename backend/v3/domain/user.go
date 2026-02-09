@@ -4,8 +4,6 @@ import (
 	"time"
 
 	"golang.org/x/text/language"
-
-	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 type User struct {
@@ -85,15 +83,15 @@ const (
 )
 
 type HumanPassword struct {
-	// Password is the hashed password
-	Password *crypto.CryptoValue `json:"password" db:"password"` //TODO: make sure password is not marshalled
+	// Hash is the hashed password
+	Hash string `json:"hash" db:"password_hash"`
 	// IsChangeRequired indicates if the user must change their password
 	IsChangeRequired bool `json:"isChangeRequired,omitempty" db:"is_change_required"`
 	// ChangedAt is the time when the current password was last updated
 	ChangedAt time.Time `json:"changedAt,omitzero" db:"changed_at"`
-	// Unverified is the verification data for setting a new password
+	// PendingVerification is the verification data for setting a new password
 	// If nil, no password change is in progress
-	Unverified *Verification `json:"pendingVerification,omitempty" db:"-"`
+	PendingVerification *Verification `json:"pendingVerification,omitempty" db:"-"`
 	// LastSuccessfullyCheckedAt is the time when the password was last successfully checked
 	LastSuccessfullyCheckedAt *time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"last_successfully_checked_at"`
 	// FailedAttempts is the number of consecutive failed password attempts
@@ -102,21 +100,23 @@ type HumanPassword struct {
 }
 
 type HumanEmail struct {
-	Address    string    `json:"address" db:"address"`
-	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
-	OTP        OTP       `json:"otp" db:"otp"`
-	// Unverified is the verification data for setting a new email
+	Address           string    `json:"address" db:"address"`
+	UnverifiedAddress string    `json:"unverifiedAddress,omitempty" db:"-"`
+	VerifiedAt        time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
+	OTP               OTP       `json:"otp" db:"otp"`
+	// PendingVerification is the verification data for UnverifiedAddress
 	// If nil, no email change is in progress
-	Unverified *Verification `json:"pendingVerification,omitempty" db:"-"`
+	PendingVerification *Verification `json:"pendingVerification,omitempty" db:"-"`
 }
 
 type HumanPhone struct {
-	Number     string    `json:"number" db:"number"`
-	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
-	OTP        OTP       `json:"otp,omitzero" db:"otp"`
-	// Unverified is the verification data for setting a new phone number
+	Number           string    `json:"number" db:"number"`
+	UnverifiedNumber string    `json:"unverifiedNumber,omitempty" db:"-"`
+	VerifiedAt       time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
+	OTP              OTP       `json:"otp,omitzero" db:"otp"`
+	// PendingVerification is the verification data for setting a new phone number
 	// If nil, no phone change is in progress
-	Unverified *Verification `json:"pendingVerification,omitempty" db:"-"`
+	PendingVerification *Verification `json:"pendingVerification,omitempty" db:"-"`
 }
 
 type HumanTOTP struct {

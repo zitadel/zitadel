@@ -13,21 +13,35 @@ import (
 // -------------------------------------------------------------
 
 // SetPhone implements [domain.HumanUserRepository.SetPhone].
-func (u userHuman) SetPhone(verification domain.VerificationType) database.Change {
+func (u userHuman) SetPhone(phone string) database.Change {
+	return database.NewChange(u.phoneColumn(), phone)
+}
+
+// SetUnverifiedPhone implements [domain.HumanUserRepository.SetUnverifiedPhone].
+func (u userHuman) SetUnverifiedPhone(phone string) database.Change {
+	return database.NewChange(u.unverifiedPhoneColumn(), phone)
+}
+
+// SetPhoneVerification implements [domain.HumanUserRepository.SetPhoneVerification].
+func (u userHuman) SetPhoneVerification(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
 	case *domain.VerificationTypeInit:
 		return u.verification.init(typ, existingHumanUser.unqualifiedTableName(), existingHumanUser.phoneVerificationIDColumn())
-	case *domain.VerificationTypeSkipped:
-		return u.verification.skipped(typ, u.phoneVerifiedAtColumn(), u.phoneColumn())
 	case *domain.VerificationTypeUpdate:
 		return u.verification.update(typ, existingHumanUser.unqualifiedTableName(),
 			existingHumanUser.InstanceIDColumn(), existingHumanUser.phoneVerificationIDColumn(),
 		)
-	case *domain.VerificationTypeVerified:
-		return u.verification.verified(typ, existingUser.unqualifiedTableName(), existingUser.InstanceIDColumn(),
-			existingHumanUser.phoneVerificationIDColumn(), u.phoneVerifiedAtColumn(), u.phoneColumn())
+	case *domain.VerificationTypeSucceeded:
+		return database.NewChanges(
+			u.verification.verified(typ, existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(),
+				existingHumanUser.phoneVerificationIDColumn(), u.phoneVerifiedAtColumn(), u.failedSMSOTPAttemptsColumn(),
+			),
+			database.NewChangeToColumn(u.phoneColumn(), u.unverifiedPhoneColumn()),
+		)
 	case *domain.VerificationTypeFailed:
 		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.phoneVerificationIDColumn())
+	case *domain.VerificationTypeSkipped:
+		return u.verification.skipped(typ, u.phoneVerifiedAtColumn(), u.phoneVerificationIDColumn(), u.failedSMSOTPAttemptsColumn())
 	}
 	panic(fmt.Sprintf("type not allowed for phone verification change %T", verification))
 }
@@ -78,8 +92,18 @@ func (u userHuman) ResetPhoneOTPFailedAttempts() database.Change {
 // conditions
 // -------------------------------------------------------------
 
-// PhoneCondition implements [domain.HumanUserRepository.PhoneCondition].
+// PhoneCondition implements [domain.HumanUserRepository].
 func (u userHuman) PhoneCondition(op database.TextOperation, phone string) database.Condition {
+	return database.Or(u.UnverifiedPhoneCondition(op, phone), u.VerifiedPhoneCondition(op, phone))
+}
+
+// UnverifiedPhoneCondition implements [domain.HumanUserRepository].
+func (u userHuman) UnverifiedPhoneCondition(op database.TextOperation, phone string) database.Condition {
+	return database.NewTextCondition(u.unverifiedPhoneColumn(), op, phone)
+}
+
+// VerifiedPhoneCondition implements [domain.HumanUserRepository].
+func (u userHuman) VerifiedPhoneCondition(op database.TextOperation, phone string) database.Condition {
 	return database.NewTextCondition(u.phoneColumn(), op, phone)
 }
 
@@ -89,6 +113,10 @@ func (u userHuman) PhoneCondition(op database.TextOperation, phone string) datab
 
 func (u userHuman) phoneColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "phone")
+}
+
+func (u userHuman) unverifiedPhoneColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "unverified_phone")
 }
 
 func (u userHuman) phoneVerifiedAtColumn() database.Column {

@@ -38,23 +38,25 @@ CREATE TABLE zitadel.users(
     , avatar_key                            TEXT        CHECK ((type = 'machine' AND avatar_key IS NULL)                            OR (type = 'human'))
     , multifactor_initialization_skipped_at TIMESTAMPTZ CHECK ((type = 'machine' AND multifactor_initialization_skipped_at IS NULL) OR (type = 'human'))
 
-    , password                              BYTEA       CHECK ((type = 'machine' AND password IS NULL)                              OR (type = 'human'))
+    , password_hash                         TEXT        CHECK ((type = 'machine' AND password_hash IS NULL)                         OR (type = 'human'))
     , password_change_required              BOOLEAN     CHECK ((type = 'machine' AND password_change_required IS NULL)              OR (type = 'human'))
-    , password_verified_at                  TIMESTAMPTZ CHECK ((type = 'machine' AND password_verified_at IS NULL)                   OR (type = 'human'))
-    , password_verification_id              TEXT        CHECK ((type = 'machine' AND password_verification_id IS NULL)              OR (type = 'human'))
+    , password_verified_at                  TIMESTAMPTZ CHECK ((type = 'machine' AND password_verified_at IS NULL)                  OR (type = 'human'))
+    , password_verification_id              TEXT        CHECK ((type = 'machine' AND password_verification_id IS NULL)              OR (type = 'human')) -- used for reset password flow
     , password_last_successful_check        TIMESTAMPTZ CHECK ((type = 'machine' AND password_last_successful_check IS NULL)        OR (type = 'human'))
     , password_failed_attempts              SMALLINT    CHECK ((type = 'machine' AND password_failed_attempts IS NULL)              OR (type = 'human') AND (password_failed_attempts >= 0))
 
     , email                                 TEXT        CHECK ((type = 'machine' AND email IS NULL)                                 OR (type = 'human'))
+    , unverified_email                       TEXT       CHECK ((type = 'machine' AND unverified_email IS NULL)                      OR (type = 'human')) -- after successful verification this column is not cleared.
     , email_verified_at                     TIMESTAMPTZ CHECK ((type = 'machine' AND email_verified_at IS NULL)                     OR (type = 'human'))
-    , email_verification_id                 TEXT        CHECK ((type = 'machine' AND email_verification_id IS NULL)                 OR (type = 'human'))
+    , email_verification_id                 TEXT        CHECK ((type = 'machine' AND email_verification_id IS NULL)                 OR (type = 'human' AND (email IS DISTINCT FROM unverified_email OR email_verification_id IS NULL)))
     , email_otp_enabled_at                  TIMESTAMPTZ CHECK ((type = 'machine' AND email_otp_enabled_at IS NULL)                  OR (type = 'human'))
     , email_otp_last_successful_check       TIMESTAMPTZ CHECK ((type = 'machine' AND email_otp_last_successful_check IS NULL)       OR (type = 'human'))
     , email_otp_failed_attempts             SMALLINT    CHECK ((type = 'machine' AND email_otp_failed_attempts IS NULL)             OR (type = 'human'))
 
     , phone                                 TEXT        CHECK ((type = 'machine' AND phone IS NULL)                                 OR (type = 'human'))
+    , unverified_phone                      TEXT        CHECK ((type = 'machine' AND unverified_phone IS NULL)                      OR (type = 'human')) -- after successful verification this column is not cleared.
     , phone_verified_at                     TIMESTAMPTZ CHECK ((type = 'machine' AND phone_verified_at IS NULL)                     OR (type = 'human'))
-    , phone_verification_id                 TEXT        CHECK ((type = 'machine' AND phone_verification_id IS NULL)                 OR (type = 'human'))
+    , phone_verification_id                 TEXT        CHECK ((type = 'machine' AND phone_verification_id IS NULL)                 OR (type = 'human' AND (phone IS DISTINCT FROM unverified_phone OR phone_verification_id IS NULL)))
     , sms_otp_enabled_at                    TIMESTAMPTZ CHECK ((type = 'machine' AND sms_otp_enabled_at IS NULL)                    OR (type = 'human'))
     , sms_otp_last_successful_check         TIMESTAMPTZ CHECK ((type = 'machine' AND sms_otp_last_successful_check IS NULL)         OR (type = 'human'))
     , sms_otp_failed_attempts               SMALLINT    CHECK ((type = 'machine' AND sms_otp_failed_attempts IS NULL)               OR (type = 'human'))

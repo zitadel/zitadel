@@ -3,7 +3,6 @@ CREATE TABLE zitadel.verifications(
     , user_id TEXT
     , id TEXT NOT NULL DEFAULT gen_random_uuid()::TEXT
 
-    , value TEXT
     , code BYTEA
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()

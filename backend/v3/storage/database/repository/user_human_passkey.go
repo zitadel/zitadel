@@ -124,10 +124,6 @@ func (u userPasskeyRepo) UpdatePasskey(condition database.Condition, changes ...
 	)
 }
 
-// -------------------------------------------------------------
-// changes
-// -------------------------------------------------------------
-
 // SetPasskeyAttestationType implements [domain.HumanUserRepository.SetPasskeyAttestationType].
 func (u userPasskeyRepo) SetPasskeyAttestationType(attestationType string) database.Change {
 	return database.NewChange(u.attestationTypeColumn(), attestationType)
@@ -176,28 +172,35 @@ func (u userPasskeyRepo) SetPasskeyVerifiedAt(verifiedAt time.Time) database.Cha
 // conditions
 // -------------------------------------------------------------
 
+// ExistsPasskey implements [domain.HumanUserRepository.ExistsPasskey].
 func (u userPasskeyRepo) ExistsPasskey(condition database.Condition) database.Condition {
 	panic("unimplemented")
 }
 
+// PasskeyConditions implements [domain.HumanUserRepository.PasskeyConditions].
 func (u userPasskeyRepo) PasskeyConditions() domain.HumanPasskeyConditions {
-	panic("unimplemented")
+	return u
 }
 
-// PasskeyChallengeCondition implements [domain.HumanUserRepository.PasskeyChallengeCondition].
-func (u userPasskeyRepo) PasskeyChallengeCondition(challenge string) database.Condition {
+// ChallengeCondition implements [domain.HumanPasskeyConditions.ChallengeCondition].
+func (u userPasskeyRepo) ChallengeCondition(challenge string) database.Condition {
 	// TODO: implement passkey challenge condition
 	panic("unimplemented")
 }
 
-// PasskeyIDCondition implements [domain.HumanUserRepository.PasskeyIDCondition].
-func (u userPasskeyRepo) PasskeyIDCondition(passkeyID string) database.Condition {
+// IDCondition implements [domain.HumanPasskeyConditions.IDCondition].
+func (u userPasskeyRepo) IDCondition(passkeyID string) database.Condition {
 	return database.NewTextCondition(u.tokenIDColumn(), database.TextOperationEqual, passkeyID)
 }
 
-// PasskeyKeyIDCondition implements [domain.HumanUserRepository.PasskeyKeyIDCondition].
-func (u userPasskeyRepo) PasskeyKeyIDCondition(keyID string) database.Condition {
+// KeyIDCondition implements [domain.HumanPasskeyConditions.KeyIDCondition].
+func (u userPasskeyRepo) KeyIDCondition(keyID string) database.Condition {
 	return database.NewTextCondition(u.keyIDColumn(), database.TextOperationEqual, keyID)
+}
+
+// TypeCondition implements [domain.HumanPasskeyConditions.TypeCondition].
+func (u userPasskeyRepo) TypeCondition(passkeyType domain.PasskeyType) database.Condition {
+	return database.NewTextCondition(u.typeColumn(), database.TextOperationEqual, string(passkeyType))
 }
 
 // -------------------------------------------------------------

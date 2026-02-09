@@ -85,11 +85,11 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			// Email
 			assert.Equal(t, humanUserRequest.Email.Email, user.Human.Email.Address)
 			assert.NotZero(t, user.Human.Email.VerifiedAt)
-			assert.Nil(t, user.Human.Email.Unverified)
+			assert.Nil(t, user.Human.Email.PendingVerification)
 			// Phone
 			assert.Equal(t, humanUserRequest.Phone.Phone, user.Human.Phone.Number)
 			assert.NotZero(t, user.Human.Phone.VerifiedAt)
-			assert.Nil(t, user.Human.Phone.Unverified)
+			assert.Nil(t, user.Human.Phone.PendingVerification)
 			// Human
 			assert.Equal(t, humanUserRequest.Profile.FirstName, user.Human.FirstName)
 			assert.Equal(t, humanUserRequest.Profile.LastName, user.Human.LastName)
@@ -161,11 +161,11 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			// Email
 			assert.Equal(t, email, user.Human.Email.Address)
 			assert.NotZero(t, user.Human.Email.VerifiedAt)
-			assert.Nil(t, user.Human.Email.Unverified)
+			assert.Nil(t, user.Human.Email.PendingVerification)
 			// Phone
 			assert.Equal(t, email, user.Human.Phone.Number)
 			assert.NotZero(t, user.Human.Phone.VerifiedAt)
-			assert.Nil(t, user.Human.Phone.Unverified)
+			assert.Nil(t, user.Human.Phone.PendingVerification)
 			// Human
 			assert.Equal(t, firstName, user.Human.FirstName)
 			assert.Equal(t, lastName, user.Human.LastName)

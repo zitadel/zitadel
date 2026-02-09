@@ -3,6 +3,7 @@ package repository_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"slices"
 	"testing"
 	"time"
@@ -82,21 +83,26 @@ func Test_user_Get(t *testing.T) {
 			condition: userRepo.IDCondition(human.ID),
 			wantErr:   database.NewMissingConditionError(userRepo.InstanceIDColumn()),
 		},
-		// {
-		// 	name: "not found",
-		// },
-		// {
-		// 	name: "too many",
-		// },
-		// {
-		// 	name: "get human",
-		// },
-		// {
-		// 	name: "get machine",
-		// },
-		// {
-		// 	name: "wrong type results in not found",
-		// },
+		{
+			name:      "not found",
+			condition: userRepo.PrimaryKeyCondition(instanceID, "not-found"),
+			wantErr:   new(database.NoRowFoundError),
+		},
+		{
+			name:      "too many",
+			condition: userRepo.InstanceIDCondition(instanceID),
+			wantErr:   new(database.MultipleRowsFoundError),
+		},
+		{
+			name:      "get human",
+			condition: userRepo.PrimaryKeyCondition(instanceID, human.ID),
+			expected:  human,
+		},
+		{
+			name:      "get machine",
+			condition: userRepo.PrimaryKeyCondition(instanceID, machine.ID),
+			expected:  machine,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -115,7 +121,12 @@ func Test_user_Get(t *testing.T) {
 
 			user, err := userRepo.Get(t.Context(), savepoint, database.WithCondition(tt.condition))
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.expected, user)
+
+			require.Equal(t, tt.expected == nil, user == nil)
+			if tt.expected == nil {
+				return
+			}
+			assertUser(t, tt.expected, user)
 		})
 	}
 }
@@ -123,15 +134,8 @@ func Test_user_Get(t *testing.T) {
 func Test_user_Update(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	t.Cleanup(rollback)
-	// tx := pool
 
-	userRepo := repository.UserRepository().
-		LoadMetadata().
-		// LoadIdentityProviderLinks().
-		LoadKeys().
-		// LoadPasskeys().
-		// LoadVerifications()
-		LoadPATs()
+	userRepo := repository.UserRepository()
 
 	humanRepo := repository.HumanUserRepository()
 	machineRepo := repository.MachineUserRepository()
@@ -438,8 +442,7 @@ func Test_user_Update(t *testing.T) {
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value: gu.Ptr("verificationValue"),
-						ID:    gu.Ptr("verification-id"),
+						ID: gu.Ptr("verification-id"),
 					}),
 				},
 			},
@@ -456,7 +459,6 @@ func Test_user_Update(t *testing.T) {
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value: gu.Ptr("verificationValue"),
 					})
 					return u
 				}(),
@@ -474,8 +476,7 @@ func Test_user_Update(t *testing.T) {
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value: gu.Ptr("verificationValue"),
-						ID:    gu.Ptr("verification-id"),
+						ID: gu.Ptr("verification-id"),
 					}),
 				)
 				return err
@@ -502,7 +503,6 @@ func Test_user_Update(t *testing.T) {
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value:     gu.Ptr("verificationValue"),
 						ExpiresAt: gu.Ptr(now.Add(10 * time.Minute)),
 					})
 					return u
@@ -521,8 +521,7 @@ func Test_user_Update(t *testing.T) {
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value: gu.Ptr("verificationValue"),
-						ID:    gu.Ptr("verification-id"),
+						ID: gu.Ptr("verification-id"),
 					}),
 				)
 				return err
@@ -530,7 +529,7 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetVerification(&domain.VerificationTypeVerified{
+					humanRepo.SetVerification(&domain.VerificationTypeSucceeded{
 						ID:         gu.Ptr("verification-id"),
 						VerifiedAt: now,
 					}),
@@ -557,8 +556,7 @@ func Test_user_Update(t *testing.T) {
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value: gu.Ptr("verificationValue"),
-						ID:    gu.Ptr("verification-id"),
+						ID: gu.Ptr("verification-id"),
 					}),
 				)
 				return err
@@ -585,7 +583,6 @@ func Test_user_Update(t *testing.T) {
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value:          gu.Ptr("verificationValue"),
 						UpdatedAt:      now,
 						FailedAttempts: 1,
 					})
@@ -598,7 +595,8 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetPassword(&domain.VerificationTypeInit{
+					humanRepo.SetResetPasswordVerification(&domain.VerificationTypeInit{
+						ID:        gu.Ptr("pw-id"),
 						CreatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -614,8 +612,10 @@ func Test_user_Update(t *testing.T) {
 				user: func() *domain.User {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
-					u.Human.Password.Unverified = &domain.Verification{
+					u.Human.Password.PendingVerification = &domain.Verification{
+						ID:        "pw-id",
 						CreatedAt: now,
+						UpdatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
 							Algorithm:  "sha-1",
@@ -632,7 +632,8 @@ func Test_user_Update(t *testing.T) {
 			name: "set human password verification update",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetPassword(&domain.VerificationTypeInit{
+					humanRepo.SetResetPasswordVerification(&domain.VerificationTypeInit{
+						ID:        gu.Ptr("pw-id"),
 						CreatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -647,8 +648,9 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetPassword(&domain.VerificationTypeUpdate{
-						Expiry: gu.Ptr(48 * time.Hour),
+					humanRepo.SetResetPasswordVerification(&domain.VerificationTypeUpdate{
+						Expiry:    gu.Ptr(48 * time.Hour),
+						UpdatedAt: now,
 					}),
 				},
 			},
@@ -656,8 +658,10 @@ func Test_user_Update(t *testing.T) {
 				user: func() *domain.User {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
-					u.Human.Password.Unverified = &domain.Verification{
+					u.Human.Password.PendingVerification = &domain.Verification{
+						ID:        "pw-id",
 						CreatedAt: now,
+						UpdatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
 							Algorithm:  "sha-1",
@@ -674,7 +678,8 @@ func Test_user_Update(t *testing.T) {
 			name: "set human password verified",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetPassword(&domain.VerificationTypeInit{
+					humanRepo.SetResetPasswordVerification(&domain.VerificationTypeInit{
+						ID:        gu.Ptr("pw-id"),
 						CreatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -689,9 +694,10 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetPassword(&domain.VerificationTypeVerified{
+					humanRepo.SetResetPasswordVerification(&domain.VerificationTypeSucceeded{
 						VerifiedAt: now,
 					}),
+					humanRepo.SetPassword("hashedPassword"),
 				},
 			},
 			want: want{
@@ -699,12 +705,7 @@ func Test_user_Update(t *testing.T) {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
 					u.Human.Password = domain.HumanPassword{
-						Password: &crypto.CryptoValue{
-							CryptoType: crypto.TypeHash,
-							Algorithm:  "sha-1",
-							KeyID:      "keyID",
-							Crypted:    []byte("cryptedPassword"),
-						},
+						Hash:             "hashedPassword",
 						IsChangeRequired: false,
 						ChangedAt:        now,
 					}
@@ -716,7 +717,8 @@ func Test_user_Update(t *testing.T) {
 			name: "set human password failed",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetPassword(&domain.VerificationTypeInit{
+					humanRepo.SetResetPasswordVerification(&domain.VerificationTypeInit{
+						ID:        gu.Ptr("pw-id"),
 						CreatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -731,7 +733,7 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetPassword(&domain.VerificationTypeFailed{
+					humanRepo.SetResetPasswordVerification(&domain.VerificationTypeFailed{
 						FailedAt: now,
 					}),
 				},
@@ -740,8 +742,10 @@ func Test_user_Update(t *testing.T) {
 				user: func() *domain.User {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
-					u.Human.Password.Unverified = &domain.Verification{
+					u.Human.Password.PendingVerification = &domain.Verification{
+						ID:        "pw-id",
 						CreatedAt: now,
+						UpdatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
 							Algorithm:  "sha-1",
@@ -833,7 +837,9 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetEmail(&domain.VerificationTypeInit{
+					humanRepo.SetUnverifiedEmail("new@email.com"),
+					humanRepo.SetEmailVerification(&domain.VerificationTypeInit{
+						ID:        gu.Ptr("verification-id"),
 						CreatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -841,7 +847,6 @@ func Test_user_Update(t *testing.T) {
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value: gu.Ptr("new@email.com"),
 					}),
 				},
 			},
@@ -849,15 +854,17 @@ func Test_user_Update(t *testing.T) {
 				user: func() *domain.User {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
-					u.Human.Email.Unverified = &domain.Verification{
+					u.Human.Email.UnverifiedAddress = "new@email.com"
+					u.Human.Email.PendingVerification = &domain.Verification{
+						ID:        "verification-id",
 						CreatedAt: now,
+						UpdatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
 							Algorithm:  "sha-1",
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value: gu.Ptr("new@email.com"),
 					}
 					return u
 				}(),
@@ -866,16 +873,18 @@ func Test_user_Update(t *testing.T) {
 		{
 			name: "set human set email verified",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
-				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition, humanRepo.SetEmail(&domain.VerificationTypeInit{
-					CreatedAt: now,
-					Code: &crypto.CryptoValue{
-						CryptoType: crypto.TypeHash,
-						Algorithm:  "sha-1",
-						KeyID:      "keyID",
-						Crypted:    []byte("cryptedCode"),
-					},
-					Value: gu.Ptr("new@email.com"),
-				}),
+				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetUnverifiedEmail("new@email.com"),
+					humanRepo.SetEmailVerification(&domain.VerificationTypeInit{
+						ID:        gu.Ptr("pw-id"),
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+					}),
 				)
 				assert.EqualValues(t, 1, rowCount)
 				return err
@@ -883,7 +892,7 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetEmail(&domain.VerificationTypeVerified{
+					humanRepo.SetEmailVerification(&domain.VerificationTypeSucceeded{
 						VerifiedAt: now,
 					}),
 				},
@@ -892,8 +901,9 @@ func Test_user_Update(t *testing.T) {
 				user: func() *domain.User {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
-					u.Human.Email.Unverified = nil
+					u.Human.Email.PendingVerification = nil
 					u.Human.Email.Address = "new@email.com"
+					u.Human.Email.UnverifiedAddress = "new@email.com"
 					u.Human.Email.VerifiedAt = now
 					return u
 				}(),
@@ -902,33 +912,9 @@ func Test_user_Update(t *testing.T) {
 		{
 			name: "set human set email verification update",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
-				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition, humanRepo.SetEmail(&domain.VerificationTypeInit{
-					CreatedAt: now,
-					Code: &crypto.CryptoValue{
-						CryptoType: crypto.TypeHash,
-						Algorithm:  "sha-1",
-						KeyID:      "keyID",
-						Crypted:    []byte("cryptedCode"),
-					},
-					Value: gu.Ptr("new@email.com"),
-				}),
-				)
-				assert.EqualValues(t, 1, rowCount)
-				return err
-			},
-			args: args{
-				condition: humanCondition,
-				changes: []database.Change{
-					humanRepo.SetEmail(&domain.VerificationTypeUpdate{
-						Expiry: gu.Ptr(10 * time.Minute),
-					}),
-				},
-			},
-			want: want{
-				user: func() *domain.User {
-					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
-					require.NoError(t, err)
-					u.Human.Email.Unverified = &domain.Verification{
+				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetEmailVerification(&domain.VerificationTypeInit{
+						ID:        gu.Ptr("id"),
 						CreatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -936,7 +922,36 @@ func Test_user_Update(t *testing.T) {
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value:     gu.Ptr("new@email.com"),
+					}),
+					humanRepo.SetUnverifiedEmail("new@email.com"),
+				)
+				assert.EqualValues(t, 1, rowCount)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetEmailVerification(&domain.VerificationTypeUpdate{
+						Expiry:    gu.Ptr(10 * time.Minute),
+						UpdatedAt: now,
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Email.UnverifiedAddress = "new@email.com"
+					u.Human.Email.PendingVerification = &domain.Verification{
+						ID:        "id",
+						CreatedAt: now,
+						UpdatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
 						ExpiresAt: gu.Ptr(now.Add(10 * time.Minute)),
 					}
 					return u
@@ -948,9 +963,9 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetEmail(&domain.VerificationTypeSkipped{
+					humanRepo.SetEmail("new@email.com"),
+					humanRepo.SetEmailVerification(&domain.VerificationTypeSkipped{
 						SkippedAt: now,
-						Value:     gu.Ptr("new@email.com"),
 					}),
 				},
 			},
@@ -958,7 +973,7 @@ func Test_user_Update(t *testing.T) {
 				user: func() *domain.User {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
-					u.Human.Email.Unverified = nil
+					u.Human.Email.PendingVerification = nil
 					u.Human.Email.Address = "new@email.com"
 					u.Human.Email.VerifiedAt = now
 					return u
@@ -968,16 +983,18 @@ func Test_user_Update(t *testing.T) {
 		{
 			name: "set human set email verification failed",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
-				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition, humanRepo.SetEmail(&domain.VerificationTypeInit{
-					CreatedAt: now,
-					Code: &crypto.CryptoValue{
-						CryptoType: crypto.TypeHash,
-						Algorithm:  "sha-1",
-						KeyID:      "keyID",
-						Crypted:    []byte("cryptedCode"),
-					},
-					Value: gu.Ptr("new@email.com"),
-				}),
+				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetEmailVerification(&domain.VerificationTypeInit{
+						ID:        gu.Ptr("id"),
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+					}),
+					humanRepo.SetUnverifiedEmail("new@email.com"),
 				)
 				assert.EqualValues(t, 1, rowCount)
 				return err
@@ -985,7 +1002,7 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetEmail(&domain.VerificationTypeFailed{
+					humanRepo.SetEmailVerification(&domain.VerificationTypeFailed{
 						FailedAt: now,
 					}),
 				},
@@ -994,15 +1011,17 @@ func Test_user_Update(t *testing.T) {
 				user: func() *domain.User {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
-					u.Human.Email.Unverified = &domain.Verification{
+					u.Human.Email.UnverifiedAddress = "new@email.com"
+					u.Human.Email.PendingVerification = &domain.Verification{
+						ID:        "id",
 						CreatedAt: now,
+						UpdatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
 							Algorithm:  "sha-1",
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value:          gu.Ptr("new@email.com"),
 						FailedAttempts: 1,
 					}
 					return u
@@ -1108,7 +1127,8 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetPhone(&domain.VerificationTypeInit{
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeInit{
+						ID:        gu.Ptr("id"),
 						CreatedAt: now,
 						Code: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
@@ -1116,8 +1136,8 @@ func Test_user_Update(t *testing.T) {
 							KeyID:      "keyID",
 							Crypted:    []byte("cryptedCode"),
 						},
-						Value: gu.Ptr("+1234567890"),
 					}),
+					humanRepo.SetUnverifiedPhone("+0000000000"),
 				},
 			},
 			want: want{
@@ -1125,15 +1145,17 @@ func Test_user_Update(t *testing.T) {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
 					u.Human.Phone = &domain.HumanPhone{
-						Unverified: &domain.Verification{
+						UnverifiedNumber: "+0000000000",
+						PendingVerification: &domain.Verification{
+							ID:        "id",
 							CreatedAt: now,
+							UpdatedAt: now,
 							Code: &crypto.CryptoValue{
 								CryptoType: crypto.TypeHash,
 								Algorithm:  "sha-1",
 								KeyID:      "keyID",
 								Crypted:    []byte("cryptedCode"),
 							},
-							Value: gu.Ptr("+1234567890"),
 						},
 					}
 					return u
@@ -1144,16 +1166,15 @@ func Test_user_Update(t *testing.T) {
 			name: "set human set phone verified",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetPhone(&domain.VerificationTypeInit{
-						Value: gu.Ptr("+1234567890"),
-					}),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeInit{}),
+					humanRepo.SetUnverifiedPhone("+1234567890"),
 				)
 				return err
 			},
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetPhone(&domain.VerificationTypeVerified{
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeSucceeded{
 						VerifiedAt: now,
 					}),
 				},
@@ -1163,8 +1184,9 @@ func Test_user_Update(t *testing.T) {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
 					u.Human.Phone = &domain.HumanPhone{
-						Number:     "+1234567890",
-						VerifiedAt: now,
+						Number:           "+1234567890",
+						UnverifiedNumber: "+1234567890",
+						VerifiedAt:       now,
 					}
 					return u
 				}(),
@@ -1173,16 +1195,18 @@ func Test_user_Update(t *testing.T) {
 		{
 			name: "set human set phone verification update",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
-				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition, humanRepo.SetPhone(&domain.VerificationTypeInit{
-					CreatedAt: now,
-					Code: &crypto.CryptoValue{
-						CryptoType: crypto.TypeHash,
-						Algorithm:  "sha-1",
-						KeyID:      "keyID",
-						Crypted:    []byte("cryptedCode"),
-					},
-					Value: gu.Ptr("+1234567890"),
-				}),
+				rowCount, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeInit{
+						ID:        gu.Ptr("id"),
+						CreatedAt: now,
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "sha-1",
+							KeyID:      "keyID",
+							Crypted:    []byte("cryptedCode"),
+						},
+					}),
+					humanRepo.SetUnverifiedPhone("+1234567890"),
 				)
 				assert.EqualValues(t, 1, rowCount)
 				return err
@@ -1190,8 +1214,9 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetPhone(&domain.VerificationTypeUpdate{
-						Expiry: gu.Ptr(10 * time.Minute),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeUpdate{
+						Expiry:    gu.Ptr(10 * time.Minute),
+						UpdatedAt: now,
 					}),
 				},
 			},
@@ -1200,15 +1225,17 @@ func Test_user_Update(t *testing.T) {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
 					u.Human.Phone = &domain.HumanPhone{
-						Unverified: &domain.Verification{
+						UnverifiedNumber: "+1234567890",
+						PendingVerification: &domain.Verification{
+							ID:        "id",
 							CreatedAt: now,
+							UpdatedAt: now,
 							Code: &crypto.CryptoValue{
 								CryptoType: crypto.TypeHash,
 								Algorithm:  "sha-1",
 								KeyID:      "keyID",
 								Crypted:    []byte("cryptedCode"),
 							},
-							Value:     gu.Ptr("+1234567890"),
 							ExpiresAt: gu.Ptr(now.Add(10 * time.Minute)),
 						},
 					}
@@ -1221,9 +1248,9 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
+					humanRepo.SetPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{
 						SkippedAt: now,
-						Value:     gu.Ptr("+1234567890"),
 					}),
 				},
 			},
@@ -1243,8 +1270,8 @@ func Test_user_Update(t *testing.T) {
 			name: "set human enable sms otp at",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
-						Value:     gu.Ptr("+1234567890"),
+					humanRepo.SetPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{
 						SkippedAt: now,
 					}),
 				)
@@ -1275,8 +1302,8 @@ func Test_user_Update(t *testing.T) {
 			name: "set human disable sms otp",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
-						Value:     gu.Ptr("+1234567890"),
+					humanRepo.SetPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{
 						SkippedAt: now,
 					}),
 					humanRepo.EnableSMSOTPAt(now),
@@ -1305,8 +1332,8 @@ func Test_user_Update(t *testing.T) {
 			name: "set human last successful sms otp check",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
-						Value:     gu.Ptr("+1234567890"),
+					humanRepo.SetPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{
 						SkippedAt: now,
 					}),
 					humanRepo.EnableSMSOTPAt(now),
@@ -1339,8 +1366,8 @@ func Test_user_Update(t *testing.T) {
 			name: "set human increment sms otp failed attempts",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
-						Value:     gu.Ptr("+1234567890"),
+					humanRepo.SetPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{
 						SkippedAt: now,
 					}),
 					humanRepo.EnableSMSOTPAt(now),
@@ -1373,8 +1400,8 @@ func Test_user_Update(t *testing.T) {
 			name: "set human reset sms otp failed attempts",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetPhone(&domain.VerificationTypeSkipped{
-						Value:     gu.Ptr("+1234567890"),
+					humanRepo.SetPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{
 						SkippedAt: now,
 					}),
 					humanRepo.EnableSMSOTPAt(now),
@@ -1413,9 +1440,11 @@ func Test_user_Update(t *testing.T) {
 			name: "set human remove phone",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetPhone(&domain.VerificationTypeInit{
-						Value: gu.Ptr("+1234567890"),
+					humanRepo.SetPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{
+						SkippedAt: now,
 					}),
+					humanRepo.EnableSMSOTPAt(now),
 				)
 				return err
 			},
@@ -1602,7 +1631,7 @@ func Test_user_Update(t *testing.T) {
 				changes: []database.Change{
 					humanRepo.UpdateIdentityProviderLink(
 						database.And(
-							humanRepo.LinkedIdentityProviderIDCondition("provider-id"),
+							humanRepo.IdentityProviderLinkConditions().ProviderIDCondition("provider-id"),
 						),
 						humanRepo.SetIdentityProviderLinkUsername("updated-username"),
 					),
@@ -1734,7 +1763,7 @@ func Test_user_Update(t *testing.T) {
 				changes: []database.Change{
 					humanRepo.UpdatePasskey(
 						database.And(
-							humanRepo.PasskeyIDCondition("passkey-id"),
+							humanRepo.PasskeyConditions().IDCondition("passkey-id"),
 						),
 						humanRepo.SetPasskeyName("updated-name"),
 					),
@@ -1788,7 +1817,7 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.RemovePasskey(humanRepo.PasskeyIDCondition("passkey-id")),
+					humanRepo.RemovePasskey(humanRepo.PasskeyConditions().IDCondition("passkey-id")),
 				},
 			},
 			want: want{
@@ -2011,13 +2040,11 @@ func assertUser(t *testing.T, expected, actual *domain.User) {
 	assertMetadata(t, expected.Metadata, actual.Metadata)
 
 	if expected.Machine != nil {
-		require.Nil(t, expected.Human)
 		assertMachineUser(t, expected.Machine, actual.Machine)
 		return
 	}
 
 	if expected.Human != nil {
-		require.Nil(t, expected.Machine)
 		assertHumanUser(t, expected.Human, actual.Human)
 		return
 	}
@@ -2032,7 +2059,6 @@ func assertMachineUser(t *testing.T, expected, actual *domain.MachineUser) {
 	assert.Equal(t, expected.Description, actual.Description, "machine description")
 	assert.Equal(t, expected.AccessTokenType, actual.AccessTokenType, "machine access token type")
 	assert.Equal(t, expected.Secret, actual.Secret, "machine secret")
-	require.Len(t, actual.PATs, len(expected.PATs), "machine pats")
 
 	assertPersonalAccessTokens(t, expected.PATs, actual.PATs)
 	assertMachineKeys(t, expected.Keys, actual.Keys)
@@ -2045,66 +2071,92 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 	assert.Equal(t, expected.LastName, actual.LastName, "human last name")
 	assert.Equal(t, expected.Nickname, actual.Nickname, "human nickname")
 	assert.Equal(t, expected.DisplayName, actual.DisplayName, "human display name")
-	assert.Equal(t, expected.AvatarKey, actual.AvatarKey, "human avatar key")
 	assert.Equal(t, expected.PreferredLanguage, actual.PreferredLanguage, "human preferred language")
 	assert.Equal(t, expected.Gender, actual.Gender, "human gender")
+	assert.Equal(t, expected.AvatarKey, actual.AvatarKey, "human avatar key")
 	assert.True(t, expected.MultifactorInitializationSkippedAt.Equal(actual.MultifactorInitializationSkippedAt), "human multifactor initialization skipped at")
 
 	assertHumanEmail(t, expected.Email, actual.Email)
-
-	if expected.Phone == nil {
-		assert.Nil(t, actual.Phone, "human phone nil")
-	} else {
-		require.NotNil(t, actual.Phone, "human phone not nil")
-		assert.Equal(t, expected.Phone.Number, actual.Phone.Number, "human phone number")
-		assert.True(t, expected.Phone.VerifiedAt.Equal(actual.Phone.VerifiedAt), "human phone verified at")
-		assert.True(t, expected.Phone.OTP.EnabledAt.Equal(actual.Phone.OTP.EnabledAt), "human phone otp enabled at")
-		if expected.Phone.OTP.LastSuccessfullyCheckedAt != nil {
-			require.NotNil(t, actual.Phone.OTP.LastSuccessfullyCheckedAt, "human phone otp last successfully checked at not nil")
-			assert.True(t, expected.Phone.OTP.LastSuccessfullyCheckedAt.Equal(*actual.Phone.OTP.LastSuccessfullyCheckedAt), "human phone otp last successfully checked at")
-		} else {
-			assert.Nil(t, actual.Phone.OTP.LastSuccessfullyCheckedAt, "human phone otp last successfully checked at nil")
-		}
-		assertVerification(t, expected.Phone.Unverified, actual.Phone.Unverified, "human phone unverified")
-	}
+	assertHumanPhone(t, expected.Phone, actual.Phone)
 	assertPasskeys(t, expected.Passkeys, actual.Passkeys)
-
-	assert.Equal(t, expected.Password.Password, actual.Password.Password, "human password password")
-	assert.Equal(t, expected.Password.IsChangeRequired, actual.Password.IsChangeRequired, "human password is change required")
-	assertVerification(t, expected.Password.Unverified, actual.Password.Unverified, "human password unverified")
-	assert.Equal(t, expected.Password.FailedAttempts, actual.Password.FailedAttempts, "human password failed attempts")
-
-	if expected.TOTP != nil {
-		require.NotNil(t, actual.TOTP, "human totp not nil")
-		assert.True(t, expected.TOTP.VerifiedAt.Equal(actual.TOTP.VerifiedAt), "human totp verified at")
-		if expected.TOTP.LastSuccessfullyCheckedAt != nil {
-			require.NotNil(t, actual.TOTP.LastSuccessfullyCheckedAt, "human totp last successfully checked at not nil")
-			assert.True(t, expected.TOTP.LastSuccessfullyCheckedAt.Equal(*actual.TOTP.LastSuccessfullyCheckedAt), "human totp last successfully checked at")
-		} else {
-			assert.Nil(t, actual.TOTP.LastSuccessfullyCheckedAt, "human totp last successfully checked at nil")
-		}
-	} else {
-		assert.Nil(t, actual.TOTP, "human totp nil")
-	}
+	assertHumanPassword(t, expected.Password, actual.Password)
+	assertHumanTOTP(t, expected.TOTP, actual.TOTP)
 
 	assertIdentityProviderLinks(t, expected.IdentityProviderLinks, actual.IdentityProviderLinks)
 	assertVerifications(t, expected.Verifications, actual.Verifications)
+}
+
+func assertHumanTOTP(t *testing.T, expected, actual *domain.HumanTOTP) {
+	t.Helper()
+
+	require.Equal(t, expected == nil, actual == nil, "human totp nil check")
+	if expected == nil {
+		return
+	}
+
+	assert.True(t, expected.VerifiedAt.Equal(actual.VerifiedAt), "human totp verified at")
+	assert.Equal(t, expected.Secret, actual.Secret)
+	if expected.LastSuccessfullyCheckedAt != nil {
+		require.NotNil(t, actual.LastSuccessfullyCheckedAt, "human totp last successfully checked at not nil")
+		assert.True(t, expected.LastSuccessfullyCheckedAt.Equal(*actual.LastSuccessfullyCheckedAt), "human totp last successfully checked at")
+	} else {
+		assert.Nil(t, actual.LastSuccessfullyCheckedAt, "human totp last successfully checked at nil")
+	}
+	assert.Equal(t, expected.FailedAttempts, actual.FailedAttempts, "human totp failed attempts")
+}
+
+func assertHumanPassword(t *testing.T, expected, actual domain.HumanPassword) {
+	t.Helper()
+
+	assert.Equal(t, expected.Hash, actual.Hash, "human password hash")
+	assert.Equal(t, expected.IsChangeRequired, actual.IsChangeRequired, "human password is change required")
+	assert.True(t, expected.ChangedAt.Equal(actual.ChangedAt), "human password changed at")
+	assertVerification(t, expected.PendingVerification, actual.PendingVerification, "human password pending verification")
+	if expected.LastSuccessfullyCheckedAt != nil {
+		require.NotNil(t, actual.LastSuccessfullyCheckedAt, "human password last successfully checked at not nil")
+		assert.True(t, expected.LastSuccessfullyCheckedAt.Equal(*actual.LastSuccessfullyCheckedAt), "human password last successfully checked at")
+	} else {
+		assert.Nil(t, actual.LastSuccessfullyCheckedAt, "human password last successfully checked at nil")
+	}
+	assert.Equal(t, expected.FailedAttempts, actual.FailedAttempts, "human password failed attempts")
+}
+
+func assertHumanPhone(t *testing.T, expected, actual *domain.HumanPhone) {
+	t.Helper()
+
+	require.Equal(t, expected == nil, actual == nil, "human phone number nil check")
+	if expected == nil {
+		return
+	}
+
+	assert.Equal(t, expected.Number, actual.Number, "human phone number")
+	assert.Equal(t, expected.UnverifiedNumber, actual.UnverifiedNumber, "human unverified phone number")
+	assert.True(t, expected.VerifiedAt.Equal(actual.VerifiedAt), "human phone verified at")
+	assertOTP(t, expected.OTP, actual.OTP, "human phone otp")
+	assertVerification(t, expected.PendingVerification, actual.PendingVerification, "human phone pending verification")
 }
 
 func assertHumanEmail(t *testing.T, expected, actual domain.HumanEmail) {
 	t.Helper()
 
 	assert.Equal(t, expected.Address, actual.Address, "human email address")
+	assert.Equal(t, expected.UnverifiedAddress, actual.UnverifiedAddress, "human unverified email address")
 	assert.True(t, expected.VerifiedAt.Equal(actual.VerifiedAt), "human email verified at")
-	assert.True(t, expected.OTP.EnabledAt.Equal(actual.OTP.EnabledAt), "human email otp enabled at")
-	if expected.OTP.LastSuccessfullyCheckedAt != nil {
-		require.NotNil(t, actual.OTP.LastSuccessfullyCheckedAt, "human email otp last successfully checked at not nil")
-		assert.True(t, expected.OTP.LastSuccessfullyCheckedAt.Equal(*actual.OTP.LastSuccessfullyCheckedAt), "human email otp last successfully checked at")
-	} else {
-		assert.Nil(t, actual.OTP.LastSuccessfullyCheckedAt, "human email otp last successfully checked at nil")
-	}
+	assertOTP(t, expected.OTP, actual.OTP, "human email otp")
+	assertVerification(t, expected.PendingVerification, actual.PendingVerification, "human email pending verification")
+}
 
-	assertVerification(t, expected.Unverified, actual.Unverified, "human email unverified")
+func assertOTP(t *testing.T, expected, actual domain.OTP, field string) {
+	t.Helper()
+
+	assert.True(t, expected.EnabledAt.Equal(actual.EnabledAt), field+" enabled at")
+	if expected.LastSuccessfullyCheckedAt != nil {
+		require.NotNil(t, actual.LastSuccessfullyCheckedAt, field+" last successfully checked at not nil")
+		assert.True(t, expected.LastSuccessfullyCheckedAt.Equal(*actual.LastSuccessfullyCheckedAt), field+" last successfully checked at")
+	} else {
+		assert.Nil(t, actual.LastSuccessfullyCheckedAt, field+" last successfully checked at nil")
+	}
+	assert.Equal(t, expected.FailedAttempts, actual.FailedAttempts, field+" failed attempts")
 }
 
 func assertCryptoValue(t *testing.T, expected, actual *crypto.CryptoValue, field string) {
@@ -2137,7 +2189,7 @@ func assertPersonalAccessTokens(t *testing.T, expected, actual []*domain.Persona
 		assert.Equal(t, expectedPAT.ID, actualPAT.ID, "pat[%s] id", expectedPAT.ID)
 		assert.True(t, expectedPAT.CreatedAt.Equal(actualPAT.CreatedAt), "pat[%s] created at", expectedPAT.ID)
 		assert.True(t, expectedPAT.ExpiresAt.Equal(actualPAT.ExpiresAt), "pat[%s] expires at", expectedPAT.ID)
-		assert.Equal(t, expectedPAT.Scopes, actualPAT.Scopes, "pat[%s] scopes", expectedPAT.ID)
+		assert.ElementsMatch(t, expectedPAT.Scopes, actualPAT.Scopes, "pat[%s] scopes", expectedPAT.ID)
 	}
 	assert.Empty(t, actual, "unmatched machine pats")
 }
@@ -2156,7 +2208,6 @@ func assertMachineKeys(t *testing.T, expected, actual []*domain.MachineKey) {
 			return false
 		})
 		require.NotNil(t, actualKey, "machine key[%s] not found", expectedKey.ID)
-		assert.Equal(t, expectedKey.ID, actualKey.ID, "machine key[%s] id", expectedKey.ID)
 		assert.Equal(t, expectedKey.PublicKey, actualKey.PublicKey, "machine key[%s] public key", expectedKey.ID)
 		assert.True(t, expectedKey.CreatedAt.Equal(actualKey.CreatedAt), "machine key[%s] created at", expectedKey.ID)
 		assert.True(t, expectedKey.ExpiresAt.Equal(actualKey.ExpiresAt), "machine key[%s] expires at", expectedKey.ID)
@@ -2178,19 +2229,19 @@ func assertPasskeys(t *testing.T, expected, actual []*domain.Passkey) {
 			return false
 		})
 		require.NotNil(t, actualPasskey, "human passkey[%d] not found", i)
-		assert.Equal(t, expectedPasskey.ID, actualPasskey.ID, "human passkey[%d] id", i)
 		assert.Equal(t, expectedPasskey.KeyID, actualPasskey.KeyID, "human passkey[%d] key id", i)
-		assert.Equal(t, expectedPasskey.Type, actualPasskey.Type, "human passkey[%d] type", i)
 		assert.Equal(t, expectedPasskey.Name, actualPasskey.Name, "human passkey[%d] name", i)
+		assert.Equal(t, expectedPasskey.SignCount, actualPasskey.SignCount, "human passkey[%d] sign count", i)
 		assert.Equal(t, expectedPasskey.PublicKey, actualPasskey.PublicKey, "human passkey[%d] public key", i)
 		assert.Equal(t, expectedPasskey.AttestationType, actualPasskey.AttestationType, "human passkey[%d] attestation type", i)
 		assert.Equal(t, expectedPasskey.AuthenticatorAttestationGUID, actualPasskey.AuthenticatorAttestationGUID, "human passkey[%d] authenticator attestation guid", i)
-		assert.Equal(t, expectedPasskey.RelyingPartyID, actualPasskey.RelyingPartyID, "human passkey[%d] relying party id", i)
+		assert.Equal(t, expectedPasskey.Type, actualPasskey.Type, "human passkey[%d] type", i)
 		assert.True(t, expectedPasskey.CreatedAt.Equal(actualPasskey.CreatedAt), "human passkey[%d] created at", i)
 		assert.True(t, expectedPasskey.UpdatedAt.Equal(actualPasskey.UpdatedAt), "human passkey[%d] updated at", i)
 		assert.True(t, expectedPasskey.VerifiedAt.Equal(actualPasskey.VerifiedAt), "human passkey[%d] verified at", i)
-		assert.Equal(t, expectedPasskey.SignCount, actualPasskey.SignCount, "human passkey[%d] sign count", i)
 		assert.Equal(t, expectedPasskey.Challenge, actualPasskey.Challenge, "human passkey[%d] challenge", i)
+		assert.Equal(t, expectedPasskey.RelyingPartyID, actualPasskey.RelyingPartyID, "human passkey[%d] relying party id", i)
+		assertVerification(t, expectedPasskey.Initialization, actualPasskey.Initialization, fmt.Sprintf("human passkey[%d] initialization", i))
 	}
 	assert.Empty(t, actual, "unmatched human passkeys")
 }
@@ -2209,12 +2260,6 @@ func assertVerifications(t *testing.T, expected, actual []*domain.Verification) 
 		})
 		require.NotNil(t, actualVerification, "human verification[%d] not found", i)
 		assert.Equal(t, expectedVerification.ID, actualVerification.ID, "human verification[%d] id", i)
-		if expectedVerification.Value != nil {
-			require.NotNil(t, actualVerification.Value, "human verification[%d] value not nil", i)
-			assert.Equal(t, *expectedVerification.Value, *actualVerification.Value, "human verification[%d] value", i)
-		} else {
-			assert.Nil(t, actualVerification.Value, "human verification[%d] value nil", i)
-		}
 		assert.Equal(t, expectedVerification.Code, actualVerification.Code, "human verification[%d] code", i)
 		if expectedVerification.ExpiresAt != nil {
 			require.NotNil(t, actualVerification.ExpiresAt, "human verification[%d] expires at not nil", i)
@@ -2230,15 +2275,16 @@ func assertVerifications(t *testing.T, expected, actual []*domain.Verification) 
 func assertVerification(t *testing.T, expected, actual *domain.Verification, field string) {
 	t.Helper()
 
+	require.Equal(t, expected == nil, actual == nil, "%s nil check", field)
 	if expected == nil {
-		assert.Nil(t, actual, "%s verification nil", field)
 		return
 	}
 
-	require.NotNil(t, actual, "%s not nil", field)
-	assert.Equal(t, expected.Value, actual.Value, "%s value", field)
+	assert.Equal(t, expected.ID, actual.ID, "%s verification id", field+" id")
 	assertCryptoValue(t, expected.Code, actual.Code, field+" code")
-	assert.Equal(t, expected.Code, actual.Code, "%s code", field)
+	assert.True(t, expected.CreatedAt.Equal(actual.CreatedAt), field+" created at")
+	assert.True(t, expected.UpdatedAt.Equal(actual.UpdatedAt), field+" updated at")
+
 	if expected.ExpiresAt != nil {
 		require.NotNil(t, actual.ExpiresAt, "%s expires at not nil", field)
 		assert.True(t, expected.ExpiresAt.Equal(*actual.ExpiresAt), "%s expires at", field)

@@ -463,10 +463,15 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 		v3Tx := v3_sql.SQLTx(tx)
 
 		userRepo := repository.UserRepository()
-		humanRepo := userRepo.Human()
-		condition := userRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID)
 
-		err := userRepo.Create(ctx, v3Tx, &domain.User{
+		var phone *domain.HumanPhone
+		if e.PhoneNumber != "" {
+			phone = &domain.HumanPhone{
+				UnverifiedNumber: string(e.PhoneNumber),
+			}
+		}
+
+		return userRepo.Create(ctx, v3Tx, &domain.User{
 			InstanceID:     e.Aggregate().InstanceID,
 			OrganizationID: e.Aggregate().ResourceOwner,
 			ID:             e.Aggregate().ID,
@@ -481,76 +486,17 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 				DisplayName:       e.DisplayName,
 				PreferredLanguage: e.PreferredLanguage,
 				Gender:            mapHumanGender(e.Gender),
+				Email: domain.HumanEmail{
+					UnverifiedAddress: string(e.EmailAddress),
+				},
+				Phone: phone,
+				Password: domain.HumanPassword{
+					IsChangeRequired: e.ChangeRequired,
+					ChangedAt:        e.CreatedAt(),
+					Hash:             crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash),
+				},
 			},
 		})
-		if err != nil {
-			return err
-		}
-
-		if password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash); password != "" {
-			_, err = userRepo.Update(ctx, v3Tx,
-				condition,
-				humanRepo.SetPassword(&domain.VerificationTypeSkipped{
-					SkippedAt: e.CreatedAt(),
-					Value:     &password,
-				}),
-			)
-			if err != nil {
-				return err
-			}
-		}
-		if e.ChangeRequired {
-			_, err = userRepo.Update(ctx, v3Tx,
-				condition,
-				humanRepo.SetPasswordChangeRequired(e.ChangeRequired),
-				humanRepo.SetUpdatedAt(e.CreatedAt()),
-			)
-		}
-		return err
-		// &domain.Human{
-		// 	FirstName:         e.FirstName,
-		// 	LastName:          e.LastName,
-		// 	Nickname:          e.NickName,
-		// 	DisplayName:       e.DisplayName,
-		// 	PreferredLanguage: e.PreferredLanguage.String(),
-		// 	Gender:            uint8(e.Gender),
-		// 	User: domain.User{
-		// 		ID:         e.Aggregate().ID,
-		// 		InstanceID: e.Aggregate().InstanceID,
-		// 		OrgID:      e.Aggregate().ResourceOwner,
-		// 		Username:   e.UserName,
-		// 		// TODO check when to set username unique
-		// 		// UsernameOrgUnique: false,
-		// 		State:     domain.UserStateActive,
-		// 		CreatedAt: e.CreationDate(),
-		// 		UpdatedAt: e.CreationDate(),
-		// 	},
-		// 	HumanEmailContact: domain.HumanContact{
-		// 		Type:       gu.Ptr(domain.ContactTypeEmail),
-		// 		Value:      gu.Ptr(string(e.EmailAddress.Normalize())),
-		// 		IsVerified: gu.Ptr(false),
-		// 	},
-		// 	HumanPhoneContact: func() *domain.HumanContact {
-		// 		if e.PhoneNumber == "" {
-		// 			return nil
-		// 		}
-		// 		return &domain.HumanContact{
-		// 			Type:       gu.Ptr(domain.ContactTypePhone),
-		// 			Value:      gu.Ptr(string(e.PhoneNumber)),
-		// 			IsVerified: gu.Ptr(false),
-		// 		}
-		// 	}(),
-		// 	HumanSecurity: domain.HumanSecurity{
-		// 		PasswordChangeRequired: e.ChangeRequired,
-		// 		PasswordChange: func() *time.Time {
-		// 			if !passwordSet {
-		// 				return nil
-		// 			}
-		// 			passwordChange := e.CreatedAt()
-		// 			return &passwordChange
-		// 		}(),
-		// 	},
-		// },
 	}), nil
 }
 
@@ -568,10 +514,15 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 		v3Tx := v3_sql.SQLTx(tx)
 
 		userRepo := repository.UserRepository()
-		humanRepo := userRepo.Human()
-		condition := userRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID)
 
-		err := userRepo.Create(ctx, v3Tx, &domain.User{
+		var phone *domain.HumanPhone
+		if e.PhoneNumber != "" {
+			phone = &domain.HumanPhone{
+				UnverifiedNumber: string(e.PhoneNumber),
+			}
+		}
+
+		return userRepo.Create(ctx, v3Tx, &domain.User{
 			InstanceID:     e.Aggregate().InstanceID,
 			OrganizationID: e.Aggregate().ResourceOwner,
 			ID:             e.Aggregate().ID,
@@ -586,78 +537,17 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 				DisplayName:       e.DisplayName,
 				PreferredLanguage: e.PreferredLanguage,
 				Gender:            mapHumanGender(e.Gender),
+				Email: domain.HumanEmail{
+					UnverifiedAddress: string(e.EmailAddress),
+				},
+				Phone: phone,
+				Password: domain.HumanPassword{
+					IsChangeRequired: e.ChangeRequired,
+					ChangedAt:        e.CreatedAt(),
+					Hash:             crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash),
+				},
 			},
 		})
-		if err != nil {
-			return err
-		}
-
-		if password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash); password != "" {
-			_, err = userRepo.Update(ctx, v3Tx,
-				condition,
-				humanRepo.SetPassword(&domain.VerificationTypeSkipped{
-					SkippedAt: e.CreatedAt(),
-					Value:     &password,
-				}),
-			)
-			if err != nil {
-				return err
-			}
-		}
-		if e.ChangeRequired {
-			_, err = userRepo.Update(ctx, v3Tx,
-				condition,
-				humanRepo.SetPasswordChangeRequired(e.ChangeRequired),
-				humanRepo.SetUpdatedAt(e.CreatedAt()),
-			)
-		}
-		return err
-		// _, err := userRepo.CreateHuman(ctx, v3_sql.SQLTx(tx),
-		// 	&domain.Human{
-		// 		FirstName:         e.FirstName,
-		// 		LastName:          e.LastName,
-		// 		NickName:          e.NickName,
-		// 		DisplayName:       e.DisplayName,
-		// 		PreferredLanguage: e.PreferredLanguage.String(),
-		// 		Gender:            uint8(e.Gender),
-		// 		User: domain.User{
-		// 			ID:         e.Aggregate().ID,
-		// 			InstanceID: e.Aggregate().InstanceID,
-		// 			OrgID:      e.Aggregate().ResourceOwner,
-		// 			Username:   e.UserName,
-		// 			// TODO check when to set username unique
-		// 			// UsernameOrgUnique: false,
-		// 			State:     domain.UserStateActive,
-		// 			CreatedAt: e.CreationDate(),
-		// 			UpdatedAt: e.CreationDate(),
-		// 		},
-		// 		HumanEmailContact: domain.HumanContact{
-		// 			Type:       gu.Ptr(domain.ContactTypeEmail),
-		// 			Value:      gu.Ptr(string(e.EmailAddress.Normalize())),
-		// 			IsVerified: gu.Ptr(false),
-		// 		},
-		// 		HumanPhoneContact: func() *domain.HumanContact {
-		// 			if e.PhoneNumber == "" {
-		// 				return nil
-		// 			}
-		// 			return &domain.HumanContact{
-		// 				Type:       gu.Ptr(domain.ContactTypePhone),
-		// 				Value:      gu.Ptr(string(e.PhoneNumber)),
-		// 				IsVerified: gu.Ptr(false),
-		// 			}
-		// 		}(),
-		// 		HumanSecurity: domain.HumanSecurity{
-		// 			PasswordChangeRequired: e.ChangeRequired,
-		// 			PasswordChange: func() *time.Time {
-		// 				if !passwordSet {
-		// 					return nil
-		// 				}
-		// 				passwordChange := e.CreatedAt()
-		// 				return &passwordChange
-		// 			}(),
-		// 		},
-		// 	},
-		// )
 	}), nil
 }
 
@@ -882,8 +772,8 @@ func (p *userRelationalProjection) reduceHumanPhoneChanged(event eventstore.Even
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetPhone(&domain.VerificationTypeInit{
-				Value:     (*string)(&e.PhoneNumber),
+			repo.SetUnverifiedPhone(string(e.PhoneNumber)),
+			repo.SetPhoneVerification(&domain.VerificationTypeInit{
 				CreatedAt: e.CreatedAt(),
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -929,7 +819,7 @@ func (p *userRelationalProjection) reduceHumanPhoneVerified(event eventstore.Eve
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetPhone(&domain.VerificationTypeVerified{
+			repo.SetPhoneVerification(&domain.VerificationTypeSucceeded{
 				VerifiedAt: e.CreatedAt(),
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -953,7 +843,7 @@ func (p *userRelationalProjection) reduceHumanPhoneCodeAdded(event eventstore.Ev
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetPhone(&domain.VerificationTypeUpdate{
+			repo.SetPhoneVerification(&domain.VerificationTypeUpdate{
 				Code:   e.Code,
 				Expiry: &e.Expiry,
 			}),
@@ -977,7 +867,7 @@ func (p *userRelationalProjection) reduceHumanPhoneVerificationFailed(event even
 		repo := repository.UserRepository().Human()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetPhone(&domain.VerificationTypeFailed{
+			repo.SetPhoneVerification(&domain.VerificationTypeFailed{
 				FailedAt: e.CreatedAt(),
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1001,8 +891,8 @@ func (p *userRelationalProjection) reduceHumanEmailChanged(event eventstore.Even
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetEmail(&domain.VerificationTypeInit{
-				Value:     (*string)(&e.EmailAddress),
+			repo.SetUnverifiedEmail(string(e.EmailAddress)),
+			repo.SetEmailVerification(&domain.VerificationTypeInit{
 				CreatedAt: e.CreatedAt(),
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1025,7 +915,7 @@ func (p *userRelationalProjection) reduceHumanEmailVerified(event eventstore.Eve
 		repo := repository.UserRepository().Human()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetEmail(&domain.VerificationTypeVerified{
+			repo.SetEmailVerification(&domain.VerificationTypeSucceeded{
 				VerifiedAt: e.CreatedAt(),
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1054,7 +944,7 @@ func (p *userRelationalProjection) reduceHumanEmailCodeAdded(event eventstore.Ev
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetEmail(&domain.VerificationTypeUpdate{
+			repo.SetEmailVerification(&domain.VerificationTypeUpdate{
 				Code:   e.Code,
 				Expiry: expiry,
 			}),
@@ -1078,7 +968,7 @@ func (p *userRelationalProjection) reduceHumanEmailVerificationFailed(event even
 		repo := repository.UserRepository().Human()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetEmail(&domain.VerificationTypeFailed{
+			repo.SetEmailVerification(&domain.VerificationTypeFailed{
 				FailedAt: e.CreatedAt(),
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1142,15 +1032,12 @@ func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.E
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-		password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetPasswordChangeRequired(e.ChangeRequired),
-			repo.SetPassword(&domain.VerificationTypeInit{
-				Value:     &password,
-				CreatedAt: e.CreatedAt(),
-			}),
+			repo.SetPassword(crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)),
+			repo.SetResetPasswordVerification(&domain.VerificationTypeSucceeded{VerifiedAt: e.CreatedAt()}),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1176,7 +1063,7 @@ func (p *userRelationalProjection) reduceHumanPasswordCodeAdded(event eventstore
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetPassword(&domain.VerificationTypeUpdate{
+			repo.SetResetPasswordVerification(&domain.VerificationTypeUpdate{
 				Code:   e.Code,
 				Expiry: expiry,
 			}),
@@ -1199,9 +1086,7 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckSucceeded(event event
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetPassword(&domain.VerificationTypeVerified{
-				VerifiedAt: e.CreatedAt(),
-			}),
+			repo.SetLastSuccessfulPasswordCheck(e.CreatedAt()),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1221,9 +1106,7 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckFailed(event eventsto
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetPassword(&domain.VerificationTypeFailed{
-				FailedAt: e.CreatedAt(),
-			}),
+			repo.IncrementPasswordFailedAttempts(),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1243,10 +1126,7 @@ func (p *userRelationalProjection) reduceHumanPasswordHashUpdated(event eventsto
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetPassword(&domain.VerificationTypeSkipped{
-				Value:     &e.EncodedHash,
-				SkippedAt: e.CreatedAt(),
-			}),
+			repo.SetPassword(e.EncodedHash),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1563,7 +1443,6 @@ func (p *userRelationalProjection) reducePasskeyAdded(event eventstore.Event) (*
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-				repo.PasskeyIDCondition(e.WebAuthNTokenID),
 			),
 			repo.AddPasskey(&domain.Passkey{
 				ID:             e.WebAuthNTokenID,
@@ -1601,7 +1480,7 @@ func (p *userRelationalProjection) reducePasskeyVerified(event eventstore.Event)
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.UpdatePasskey(
-				repo.PasskeyIDCondition(e.WebAuthNTokenID),
+				repo.PasskeyConditions().IDCondition(e.WebAuthNTokenID),
 				repo.SetPasskeyKeyID(e.KeyID),
 				repo.SetPasskeyPublicKey(e.PublicKey),
 				repo.SetPasskeyAttestationType(e.AttestationType),
@@ -1637,7 +1516,7 @@ func (p *userRelationalProjection) reducePasskeySignCountSet(event eventstore.Ev
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.UpdatePasskey(
-				repo.PasskeyIDCondition(e.WebAuthNTokenID),
+				repo.PasskeyConditions().IDCondition(e.WebAuthNTokenID),
 				repo.SetPasskeySignCount(e.SignCount),
 			),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1666,8 +1545,8 @@ func (p *userRelationalProjection) reducePasskeyRemoved(event eventstore.Event) 
 		userRepo := repository.UserRepository()
 		humanRepo := userRepo.Human()
 		_, err := userRepo.Update(ctx, v3_sql.SQLTx(tx),
-			userRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.WebAuthNTokenID),
-			humanRepo.RemovePasskey(humanRepo.PasskeyIDCondition(e.WebAuthNTokenID)),
+			userRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			humanRepo.RemovePasskey(humanRepo.PasskeyConditions().IDCondition(e.WebAuthNTokenID)),
 			humanRepo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1735,7 +1614,7 @@ func (p *userRelationalProjection) reducePasskeyInitCodeCheckSucceeded(event eve
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetVerification(&domain.VerificationTypeVerified{
+			repo.SetVerification(&domain.VerificationTypeSucceeded{
 				ID:         &e.ID,
 				VerifiedAt: e.CreatedAt(),
 			}),
@@ -1919,7 +1798,7 @@ func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.UpdateIdentityProviderLink(
 				database.And(
-					repo.LinkedIdentityProviderIDCondition(e.IDPConfigID),
+					// repo.LinkedIdentityProviderIDCondition(e.IDPConfigID),
 					nil, // TODO(adlerhurst): add e.ExternalUserID as condition
 				),
 				repo.SetIdentityProviderLinkUsername(e.ExternalUsername),

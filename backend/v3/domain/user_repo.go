@@ -22,13 +22,6 @@ type UserRepository interface {
 	Human() HumanUserRepository
 	Machine() MachineUserRepository
 
-	LoadMetadata() UserRepository
-	LoadPasskeys() UserRepository
-	LoadIdentityProviderLinks() UserRepository
-	LoadVerifications() UserRepository
-	LoadPATs() UserRepository
-	LoadKeys() UserRepository
-
 	userConditions
 	userChanges
 	userColumns
@@ -100,15 +93,31 @@ type humanConditions interface {
 	NicknameCondition(op database.TextOperation, nickname string) database.Condition
 	DisplayNameCondition(op database.TextOperation, displayName string) database.Condition
 	PreferredLanguageCondition(lang language.Tag) database.Condition
+
+	// EmailCondition searches for the given email in both verified and unverified email columns
 	EmailCondition(op database.TextOperation, email string) database.Condition
+	// UnverifiedEmailCondition searches for the given email in the unverified email column
+	UnverifiedEmailCondition(op database.TextOperation, email string) database.Condition
+	// VerifiedEmailCondition searches for the given email in the verified email column
+	VerifiedEmailCondition(op database.TextOperation, email string) database.Condition
+
+	// PhoneCondition searches for the given phone number in both verified and unverified phone number columns
 	PhoneCondition(op database.TextOperation, phone string) database.Condition
-	PasskeyIDCondition(passkeyID string) database.Condition
-	LinkedIdentityProviderIDCondition(idpID string) database.Condition
-	ProvidedUserIDCondition(providedUserID string) database.Condition
-	ProvidedUsernameCondition(username string) database.Condition
+	// UnverifiedPhoneCondition searches for the given phone number in the unverified phone number column
+	UnverifiedPhoneCondition(op database.TextOperation, phone string) database.Condition
+	// VerifiedPhoneCondition searches for the given phone number in the verified phone number column
+	VerifiedPhoneCondition(op database.TextOperation, phone string) database.Condition
+
+	// PasswordConditions() HumanPasswordConditions
+
+	// TOTPConditions() HumanTOTPConditions
 
 	ExistsPasskey(condition database.Condition) database.Condition
 	PasskeyConditions() HumanPasskeyConditions
+	// ExistsVerification(condition database.Condition) database.Condition
+	// VerificationConditions() HumanVerificationConditions
+	ExistsIdentityProviderLink(condition database.Condition) database.Condition
+	IdentityProviderLinkConditions() HumanIdentityProviderLinkConditions
 }
 
 type humanChanges interface {
@@ -148,8 +157,15 @@ type humanChanges interface {
 }
 
 type humanPasswordChanges interface {
-	// SetPassword sets the password based on the verification
-	SetPassword(verification VerificationType) database.Change
+	// SetPassword overwrites the password field.
+	// It resets the password verification and the last successful password check time.
+	SetPassword(hash string) database.Change
+	// SetResetPassword handles the password reset process based on the verification type:
+	//  * [VerificationTypeInit]: to initialize password reset, a verification will be created. The current password remains unchanged
+	//  * [VerificationTypeSucceeded]: to mark the password as reset and remove the verification. The current password remains unchanged use [humanPasswordChanges.SetPassword] to set the new password.
+	//  * [VerificationTypeUpdate]: to update the existing password reset verification. If a new code is requested, use [VerificationTypeInit].
+	//  * [VerificationTypeFailed]: to increment the failed attempts of the verification.
+	SetResetPasswordVerification(verification VerificationType) database.Change
 	// SetPasswordChangeRequired sets whether a password change is required
 	SetPasswordChangeRequired(required bool) database.Change
 	// SetLastSuccessfulPasswordCheck sets the last successful password check time
@@ -162,12 +178,17 @@ type humanPasswordChanges interface {
 }
 
 type humanEmailChanges interface {
-	// SetEmail sets the email based on the verification
-	// 	* [VerificationTypeInit] to initialize email verification, previously verified email remains verified
-	// 	* [VerificationTypeVerified] to mark email as verified, a verification must exist
-	// 	* [VerificationTypeUpdate] to update email verification, a verification must exist (e.g. resend code)
-	// 	* [VerificationTypeSkipped] to skip email verification, existing verification is removed (e.g. admin set email)
-	SetEmail(verification VerificationType) database.Change
+	// SetEmail sets the verified email address
+	SetEmail(address string) database.Change
+	// SetUnverifiedEmail sets the unverified email address
+	// Make sure to add [humanEmailChanges.SetEmailVerification] to the changes list.
+	SetUnverifiedEmail(address string) database.Change
+	// SetEmailVerification sets the email verification based on the verification
+	// 	* [VerificationTypeInit]: to overwrite a email verification, the previously verified email address remains verified.
+	// 	* [VerificationTypeSucceeded]: to mark the unverified email address as verified and remove the verification.
+	// 	* [VerificationTypeUpdate]: to update the existing email verification. If a new code is requested, use [VerificationTypeInit].
+	//  * [VerificationTypeFailed]: to increment the failed attempts of the verification.
+	SetEmailVerification(verification VerificationType) database.Change
 	// EnableEmailOTPAt enables the email OTP
 	// If enabledAt is zero, it will be set to NOW()
 	EnableEmailOTPAt(enabledAt time.Time) database.Change
@@ -185,12 +206,17 @@ type humanEmailChanges interface {
 }
 
 type humanPhoneChanges interface {
-	// SetPhone sets the phone based on the verification
-	// 	* [VerificationTypeInit] to initialize phone verification, previously verified phone remains verified
-	// 	* [VerificationTypeVerified] to mark phone as verified, a verification must exist
-	// 	* [VerificationTypeUpdate] to update phone verification, a verification must exist (e.g. resend code)
-	// 	* [VerificationTypeSkipped] to skip phone verification, existing verification is removed (e.g. admin set phone)
-	SetPhone(verification VerificationType) database.Change
+	// SetPhone sets the verified phone number
+	SetPhone(number string) database.Change
+	// SetUnverifiedPhone sets the unverified phone number
+	// Make sure to add [humanPhoneChanges.SetPhoneVerification] to the changes list.
+	SetUnverifiedPhone(number string) database.Change
+	// SetPhoneVerification sets the phone verification based on the verification
+	// 	* [VerificationTypeInit]: to overwrite a phone verification, the previously verified phone number remains verified.
+	// 	* [VerificationTypeSucceeded]: to mark the unverified phone number as verified and remove the verification.
+	// 	* [VerificationTypeUpdate]: to update the existing phone verification. If a new code is requested, use [VerificationTypeInit].
+	//  * [VerificationTypeFailed]: to increment the failed attempts of the verification.
+	SetPhoneVerification(verification VerificationType) database.Change
 	// RemovePhone removes the phone number
 	RemovePhone() database.Change
 	// EnableSMSOTPAt enables the SMS OTP
@@ -233,6 +259,12 @@ type identityProviderLinkChanges interface {
 	SetIdentityProviderLinkUsername(username string) database.Change
 	// SetIdentityProviderLinkProvidedID sets the provided user ID for an identity provider link
 	SetIdentityProviderLinkProvidedID(providerID, currentProvidedUserID, newProvidedUserID string) database.Change
+}
+
+type HumanIdentityProviderLinkConditions interface {
+	ProviderIDCondition(providerID string) database.Condition
+	ProvidedUserIDCondition(providedUserID string) database.Condition
+	ProvidedUsernameCondition(op database.TextOperation, username string) database.Condition
 }
 
 type humanColumns interface {
@@ -287,10 +319,10 @@ type machineColumns interface {
 }
 
 type HumanPasskeyConditions interface {
-	PasskeyIDCondition(passkeyID string) database.Condition
-	PasskeyKeyIDCondition(keyID string) database.Condition
-	PasskeyChallengeCondition(challenge string) database.Condition
-	PasskeyTypeCondition(passkeyType PasskeyType) database.Condition
+	IDCondition(passkeyID string) database.Condition
+	// KeyIDCondition(keyID string) database.Condition
+	ChallengeCondition(challenge string) database.Condition
+	TypeCondition(passkeyType PasskeyType) database.Condition
 }
 
 type humanPasskeyChanges interface {

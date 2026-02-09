@@ -18,7 +18,6 @@ func Test_machineUser_create(t *testing.T) {
 	t.Cleanup(rollback)
 
 	userRepo := repository.UserRepository()
-	userRepo = userRepo.LoadKeys().LoadPATs().LoadMetadata()
 
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)

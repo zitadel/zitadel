@@ -12,21 +12,33 @@ import (
 // changes
 // -------------------------------------------------------------
 
-// SetEmail implements [domain.HumanUserRepository.SetEmail].
-func (u userHuman) SetEmail(verification domain.VerificationType) database.Change {
+func (u userHuman) SetEmail(email string) database.Change {
+	return database.NewChange(u.EmailColumn(), email)
+}
+
+func (u userHuman) SetUnverifiedEmail(email string) database.Change {
+	return database.NewChange(u.unverifiedEmailColumn(), email)
+}
+
+// SetEmailVerification implements [domain.HumanUserRepository.SetEmailVerification].
+func (u userHuman) SetEmailVerification(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
 	case *domain.VerificationTypeInit:
 		return u.verification.init(typ, existingHumanUser.unqualifiedTableName(), existingHumanUser.emailVerificationIDColumn())
-	case *domain.VerificationTypeSkipped:
-		return u.verification.skipped(typ, u.emailVerifiedAtColumn(), u.EmailColumn())
 	case *domain.VerificationTypeUpdate:
 		return u.verification.update(typ, existingHumanUser.unqualifiedTableName(),
 			existingHumanUser.InstanceIDColumn(), existingHumanUser.emailVerificationIDColumn())
-	case *domain.VerificationTypeVerified:
-		return u.verification.verified(typ, existingUser.unqualifiedTableName(), existingUser.InstanceIDColumn(),
-			existingHumanUser.emailVerificationIDColumn(), u.emailVerifiedAtColumn(), u.EmailColumn())
+	case *domain.VerificationTypeSucceeded:
+		return database.NewChanges(
+			u.verification.verified(typ, existingUser.unqualifiedTableName(), existingUser.InstanceIDColumn(),
+				existingHumanUser.emailVerificationIDColumn(), u.emailVerifiedAtColumn(), u.failedEmailOTPAttemptsColumn(),
+			),
+			database.NewChangeToColumn(u.EmailColumn(), u.unverifiedEmailColumn()),
+		)
 	case *domain.VerificationTypeFailed:
 		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.emailVerificationIDColumn())
+	case *domain.VerificationTypeSkipped:
+		return u.verification.skipped(typ, u.emailVerifiedAtColumn(), u.emailVerificationIDColumn(), u.failedEmailOTPAttemptsColumn())
 	}
 	panic(fmt.Sprintf("type not allowed for email verification change %T", verification))
 }
@@ -70,6 +82,16 @@ func (u userHuman) EmailCondition(op database.TextOperation, email string) datab
 	return database.NewTextCondition(u.EmailColumn(), op, email)
 }
 
+// UnverifiedEmailCondition implements [domain.HumanUserRepository].
+func (u userHuman) UnverifiedEmailCondition(op database.TextOperation, email string) database.Condition {
+	return database.NewTextCondition(u.unverifiedEmailColumn(), op, email)
+}
+
+// VerifiedEmailCondition implements [domain.HumanUserRepository].
+func (u userHuman) VerifiedEmailCondition(op database.TextOperation, email string) database.Condition {
+	return database.NewTextCondition(u.EmailColumn(), op, email)
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
@@ -77,6 +99,10 @@ func (u userHuman) EmailCondition(op database.TextOperation, email string) datab
 // EmailColumn implements [domain.HumanUserRepository.EmailColumn].
 func (u userHuman) EmailColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "email")
+}
+
+func (u userHuman) unverifiedEmailColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "unverified_email")
 }
 
 func (u userHuman) emailOTPEnabledAtColumn() database.Column {

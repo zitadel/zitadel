@@ -8,7 +8,6 @@ import (
 
 type Verification struct {
 	ID             string              `json:"id" db:"id"`
-	Value          *string             `json:"value" db:"value"`
 	Code           *crypto.CryptoValue `json:"code" db:"code"`
 	CreatedAt      time.Time           `json:"createdAt" db:"created_at"`
 	UpdatedAt      time.Time           `json:"updatedAt" db:"updated_at"`
@@ -32,8 +31,6 @@ type VerificationTypeInit struct {
 	Expiry *time.Duration
 	// Code is the code to be used for verification.
 	Code *crypto.CryptoValue
-	// Value is the value to be set after successful verification.
-	Value *string
 }
 
 // isVerificationType implements [VerificationType].
@@ -41,20 +38,20 @@ func (v *VerificationTypeInit) isVerificationType() {}
 
 var _ VerificationType = (*VerificationTypeInit)(nil)
 
-// VerificationTypeVerified indicates that the verification was successful.
+// VerificationTypeSucceeded indicates that the verification was successful.
 // If VerifiedAt is zero, the current time will be used.
-// If the Value of the verification is present, it is used as the new value to be set.
-type VerificationTypeVerified struct {
+type VerificationTypeSucceeded struct {
 	// ID is the ID of the verification.
 	// The id must be set if the the object can have multiple verifications.
-	ID         *string
+	ID *string
+	// If zero, the current time will be used.
 	VerifiedAt time.Time
 }
 
 // isVerificationType implements [VerificationType].
-func (v *VerificationTypeVerified) isVerificationType() {}
+func (v *VerificationTypeSucceeded) isVerificationType() {}
 
-var _ VerificationType = (*VerificationTypeVerified)(nil)
+var _ VerificationType = (*VerificationTypeSucceeded)(nil)
 
 // VerificationTypeUpdate updates an existing verification.
 // Non-nil fields get updated.
@@ -63,8 +60,9 @@ type VerificationTypeUpdate struct {
 	// The id must be set if the the object can have multiple verifications.
 	ID     *string
 	Code   *crypto.CryptoValue
-	Value  *string
 	Expiry *time.Duration
+	// If zero, the current time will be used.
+	UpdatedAt time.Time
 }
 
 // isVerificationType implements [VerificationType].
@@ -73,13 +71,12 @@ func (v *VerificationTypeUpdate) isVerificationType() {}
 var _ VerificationType = (*VerificationTypeUpdate)(nil)
 
 // VerificationTypeSkipped indicates that the verification was skipped.
-// If Value is present, it is used as the new value to be set.
 type VerificationTypeSkipped struct {
 	// ID is the ID of the verification.
 	// The id must be set if the the object can have multiple verifications.
-	ID        *string
+	ID *string
+	// If zero, the current time will be used.
 	SkippedAt time.Time
-	Value     *string
 }
 
 // isVerificationType implements [VerificationType].
@@ -90,7 +87,8 @@ var _ VerificationType = (*VerificationTypeSkipped)(nil)
 type VerificationTypeFailed struct {
 	// ID is the ID of the verification.
 	// The id must be set if the the object can have multiple verifications.
-	ID       *string
+	ID *string
+	// If zero, the current time will be used.
 	FailedAt time.Time
 }
 

@@ -20,19 +20,13 @@ func Test_humanUser_create(t *testing.T) {
 	t.Cleanup(rollback)
 
 	userRepo := repository.UserRepository()
-	userRepo = userRepo.LoadKeys().LoadPATs()
 
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
 	createdAt := time.Now().Round(time.Second)
 
 	existingUserID := createMachineUser(t, tx, instanceID, orgID)
-	password := &crypto.CryptoValue{
-		CryptoType: crypto.TypeEncryption,
-		Algorithm:  "aes256",
-		KeyID:      "key-id",
-		Crypted:    []byte("crypted"),
-	}
+	password := gofakeit.Password(true, true, true, true, false, 16)
 
 	type args struct {
 		user *domain.User
@@ -68,7 +62,7 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 							Email: domain.HumanEmail{
@@ -93,7 +87,7 @@ func Test_humanUser_create(t *testing.T) {
 								Address: email,
 							},
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 						},
@@ -128,7 +122,7 @@ func Test_humanUser_create(t *testing.T) {
 							AvatarKey:                          "http://localhost:8080/my/profile/picture",
 							MultifactorInitializationSkippedAt: createdAt,
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 							Email: domain.HumanEmail{
@@ -159,7 +153,7 @@ func Test_humanUser_create(t *testing.T) {
 								Address: email,
 							},
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 						},
@@ -194,12 +188,12 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 							Email: domain.HumanEmail{
-								Address: email,
-								Unverified: &domain.Verification{
+								UnverifiedAddress: email,
+								PendingVerification: &domain.Verification{
 									Code: code,
 								},
 							},
@@ -219,14 +213,13 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Email: domain.HumanEmail{
-								Address: email,
-								Unverified: &domain.Verification{
-									Value: &email,
-									Code:  code,
+								UnverifiedAddress: email,
+								PendingVerification: &domain.Verification{
+									Code: code,
 								},
 							},
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 						},
@@ -262,15 +255,15 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 							Email: domain.HumanEmail{
 								Address: email,
 							},
 							Phone: &domain.HumanPhone{
-								Number: phone,
-								Unverified: &domain.Verification{
+								UnverifiedNumber: phone,
+								PendingVerification: &domain.Verification{
 									Code: code,
 								},
 							},
@@ -293,13 +286,13 @@ func Test_humanUser_create(t *testing.T) {
 								Address: email,
 							},
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 							Phone: &domain.HumanPhone{
-								Unverified: &domain.Verification{
-									Value: &phone,
-									Code:  code,
+								UnverifiedNumber: phone,
+								PendingVerification: &domain.Verification{
+									Code: code,
 								},
 							},
 						},
@@ -358,7 +351,7 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 							Email: domain.HumanEmail{
@@ -384,7 +377,7 @@ func Test_humanUser_create(t *testing.T) {
 								Address: email,
 							},
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 							Passkeys: passkeys,
@@ -430,7 +423,7 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 							Email: domain.HumanEmail{
@@ -456,7 +449,7 @@ func Test_humanUser_create(t *testing.T) {
 								Address: email,
 							},
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 							Verifications: verifications,
@@ -486,7 +479,7 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 							Email: domain.HumanEmail{
@@ -515,7 +508,7 @@ func Test_humanUser_create(t *testing.T) {
 								Address: email,
 							},
 							Password: domain.HumanPassword{
-								Password:         password,
+								Hash:             password,
 								IsChangeRequired: true,
 							},
 							TOTP: &domain.HumanTOTP{
