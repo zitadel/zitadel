@@ -52,23 +52,6 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanRegisteredType,
 					Reduce: p.reduceHumanRegistered,
 				},
-
-				// {
-				// 	Event:  user.HumanInitialCodeAddedType,
-				// 	Reduce: p.reduceHumanInitCodeAdded,
-				// },
-				// {
-				// 	Event:  user.UserV1InitialCodeAddedType,
-				// 	Reduce: p.reduceHumanInitCodeAdded,
-				// },
-				// {
-				// 	Event:  user.HumanInitializedCheckSucceededType,
-				// 	Reduce: p.reduceHumanInitCodeSucceeded,
-				// },
-				// {
-				// 	Event:  user.UserV1InitializedCheckSucceededType,
-				// 	Reduce: p.reduceHumanInitCodeSucceeded,
-				// },
 				{
 					Event:  user.UserLockedType,
 					Reduce: p.reduceUserLocked,
@@ -140,7 +123,6 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.UserV1EmailVerificationFailedType,
 					Reduce: p.reduceHumanEmailVerificationFailed,
 				},
-
 				{
 					Event:  user.HumanPhoneChangedType,
 					Reduce: p.reduceHumanPhoneChanged,
@@ -242,33 +224,6 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.MachineKeyRemovedEventType,
 					Reduce: p.reduceMachineKeyRemoved,
 				},
-				// 		{
-				// 			Event:  user.UserV1MFAOTPVerifiedType,
-				// 			Reduce: p.reduceUnsetMFAInitSkipped,
-				// 		},
-				// 		{
-				// 			Event:  user.HumanMFAOTPVerifiedType,
-				// 			Reduce: p.reduceUnsetMFAInitSkipped,
-				// 		},
-				// 		{
-				// 			Event:  user.HumanOTPSMSAddedType,
-				// 			Reduce: p.reduceUnsetMFAInitSkipped,
-				// 		},
-				// 		{
-				// 			Event:  user.HumanOTPEmailAddedType,
-				// 			Reduce: p.reduceUnsetMFAInitSkipped,
-				// 		},
-				// 		{
-				// 			Event:  user.HumanU2FTokenVerifiedType,
-				// 			Reduce: p.reduceUnsetMFAInitSkipped,
-				// 		},
-				// {
-				// 	Event:  user.HumanPasswordlessTokenVerifiedType,
-				// 	Reduce: p.reduceUnsetMFAInitSkipped,
-				// },
-
-				// Pats only on machines
-
 				{
 					Event:  user.UserV1MFAInitSkippedType,
 					Reduce: p.reduceMFAInitSkipped,
@@ -312,7 +267,6 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.MetadataRemovedAllType,
 					Reduce: p.reduceMetadataRemovedAll,
 				},
-
 				{
 					Event:  user.HumanPasswordlessTokenAddedType,
 					Reduce: p.reducePasskeyAdded,
@@ -363,7 +317,6 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanPasswordlessInitCodeRequestedType,
 					Reduce: p.reducePasskeyInitCodeRequested,
 				},
-
 				{
 					Event:  user.UserIDPLinkAddedType,
 					Reduce: p.reduceIDPLinkAdded,
@@ -384,7 +337,6 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.UserIDPExternalUsernameChangedType,
 					Reduce: p.reduceIDPLinkUsernameChanged,
 				},
-
 				{
 					Event:  user.HumanMFAOTPAddedType,
 					Reduce: p.reduceTOTPAdded,
