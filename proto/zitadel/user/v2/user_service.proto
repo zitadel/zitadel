@@ -129,7 +129,7 @@ service UserService {
 
   // Create a User
   //
-  // Create a new human or machine user in the specified organization.
+  // Create a new user or service account in the specified organization.
   //
   // Required permission:
   //   - user.write
@@ -168,11 +168,11 @@ service UserService {
     };
   }
 
-  // Create a new human user
+  // Create a new User (Human)
   //
-  // Deprecated: Use [CreateUser](/docs/reference/api/user/zitadel.user.v2.UserService.CreateUser) to create a new user of type human instead.
+  // Deprecated: Use [CreateUser](/docs/reference/api/user/zitadel.user.v2.UserService.CreateUser) to create a new user.
   //
-  // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
+  // Create/import a new user. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
     option (google.api.http) = {
       post: "/v2/users/human"
@@ -202,7 +202,7 @@ service UserService {
 
   // User by ID
   //
-  // Returns the full user object (human or machine) including the profile, email, etc..
+  // Returns the full user or Service Account including the profile, email, etc..
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
     option (google.api.http) = {
       get: "/v2/users/{user_id}"
@@ -574,9 +574,9 @@ service UserService {
     };
   }
 
-  // Update Human User
+  // Update User (Human)
   //
-  // Deprecated: Use [UpdateUser](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser) to update a user of type human instead.
+  // Deprecated: Use [UpdateUser](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser) to update a user.
   //
   // Update all information from a user.
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
@@ -2138,7 +2138,7 @@ message CreateUserRequest{
   ];
 
   // The username is a unique identifier for the user in the organization.
-  // If not specified, Zitadel sets the username to the email for users of type human and to the user_id for users of type machine.
+  // If not specified, Zitadel sets the username to the email for user and to the user_id for Service Accounts.
   // It is used to identify the user in the organization and can be used for login.
   optional string username = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},

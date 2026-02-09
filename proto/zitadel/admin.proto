@@ -5300,7 +5300,6 @@ message TestEmailProviderSMTPRequest {
         }
     ];
     oneof Auth {
-        option (validate.required) = true;
         SMTPNoAuth none = 9;
         SMTPPlainAuth plain = 10;
         SMTPXOAuth2Auth xoauth2 = 11;

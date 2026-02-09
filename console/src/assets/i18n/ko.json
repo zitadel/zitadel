@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "사용자",
-      "DESCRIPTION": "사용자는 애플리케이션에 액세스할 수 있는 사람 또는 장치입니다.",
+      "DESCRIPTION": "사용자는 애플리케이션에 액세스할 수 있는 사람 또는 서비스 계정입니다.",
       "HUMANS": {
         "TITLE": "사용자",
         "DESCRIPTION": "사용자는 로그인 프롬프트로 브라우저 세션에서 상호 인증을 수행합니다.",
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "로그인 폼",
           "DESCRIPTION": "로그인 폼을 사용자 정의하세요.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "사용자 이름과 비밀번호 허용",
-            "DESCRIPTION": "사용자가 사용자 이름과 비밀번호로 로그인할 수 있도록 허용하세요. 비활성화하면 비밀번호 없는 인증 또는 외부 ID 제공자로만 로그인할 수 있습니다."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "로컬 인증 허용",
+            "DESCRIPTION": "사용자가 사용자 이름과 비밀번호 또는 패스키 인증으로 로그인할 수 있도록 허용합니다. 이 기능이 비활성화되면 사용자는 외부 ID 제공업체를 통해서만 로그인할 수 있습니다."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "사용자 등록 허용",
@@ -420,7 +420,7 @@
     "ORGANIZATION": "조직",
     "PROJECT": "프로젝트",
     "PROJECTOVERVIEW": "개요",
-    "PROJECTGRANTS": "권한 부여",
+    "PROJECTGRANTS": "프로젝트 권한",
     "ROLES": "역할",
     "GRANTEDPROJECT": "부여된 프로젝트",
     "HUMANUSERS": "사용자",
@@ -1643,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "플래그가 활성화되면, `sid` 클레임이 있는 id_token을 사용하여 end_session 엔드포인트에서 로그인 UI의 단일 세션을 종료할 수 있습니다. 현재 동일한 사용자 에이전트(브라우저)에서 모든 세션이 로그인 UI에서 종료됩니다. Session API를 통해 관리된 세션은 이미 단일 세션 종료를 허용합니다.",
       "DEBUGOIDCPARENTERROR": "디버그 OIDC 부모 오류",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "플래그가 활성화되면 OIDC 부모 오류가 콘솔에 기록됩니다.",
-      "ENABLEBACKCHANNELLOGOUT": "백채널 로그아웃 활성화",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "백채널 로그아웃은 OpenID Connect 백채널 로그아웃 1.0을 구현하며, OpenID 제공자에서 세션 종료에 대해 애플리케이션에게 알리는 데 사용할 수 있습니다.",
       "PERMISSIONCHECKV2": "권한 확인 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
       "STATES": {
@@ -2057,7 +2055,7 @@
       "DESCRIPTION": "다른 조직이 프로젝트를 사용할 수 있도록 허용합니다.",
       "EDITTITLE": "역할 수정",
       "CREATE": {
-        "TITLE": "조직 권한 생성",
+        "TITLE": "프로젝트 권한 생성",
         "SEL_USERS": "액세스를 허가할 사용자를 선택하세요",
         "SEL_PROJECT": "프로젝트를 검색하세요",
         "SEL_ROLES": "권한에 추가할 역할을 선택하세요",
@@ -2067,7 +2065,7 @@
         "ORG_DESCRIPTION": "{{name}} 조직의 사용자에게 권한을 부여하려고 합니다.",
         "ORG_DESCRIPTION_DESC": "헤더의 컨텍스트를 전환하여 다른 조직에 대한 사용자 권한을 부여할 수 있습니다.",
         "SEL_ORG_FORMFIELD": "조직",
-        "FOR_ORG": "권한이 생성된 대상:"
+        "FOR_ORG": "프로젝트 권한이 다음을 위해 생성될 예정입니다:"
       },
       "DETAIL": {
         "TITLE": "프로젝트 권한",
@@ -2180,7 +2178,7 @@
       "DEACTIVATED": "비활성화되었습니다.",
       "CREATED": "프로젝트가 생성되었습니다.",
       "UPDATED": "프로젝트가 변경되었습니다.",
-      "GRANTUPDATED": "권한이 변경되었습니다.",
+      "GRANTUPDATED": "프로젝트 권한이 변경되었습니다.",
       "DELETED": "프로젝트가 삭제되었습니다."
     }
   },
@@ -2677,7 +2675,8 @@
             "DESCRIPTION": "단일 페이지 애플리케이션(SPA) 및 브라우저에서 실행되는 모든 JS 프레임워크"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "백채널 로그아웃 URI"
     },
     "API": {
       "INFO": {

@@ -9,7 +9,7 @@ import (
 type Key int
 
 const (
-	// Reserved: 2, 3, 5, 6, 8, 11
+	// Reserved: 2, 3, 5, 6, 8, 11, 12
 
 	KeyUnspecified                    Key = 0
 	KeyLoginDefaultOrg                Key = 1
@@ -17,7 +17,6 @@ const (
 	KeyImprovedPerformance            Key = 7
 	KeyDebugOIDCParentError           Key = 9
 	KeyOIDCSingleV1SessionTermination Key = 10
-	KeyEnableBackChannelLogout        Key = 12
 	KeyLoginV2                        Key = 13
 	KeyPermissionCheckV2              Key = 14
 	KeyManagementConsoleUseV2UserApi  Key = 15
@@ -44,7 +43,6 @@ type Features struct {
 	DebugOIDCParentError           bool                      `json:"debug_oidc_parent_error,omitempty"`
 	OIDCSingleV1SessionTermination bool                      `json:"oidc_single_v1_session_termination,omitempty"`
 	DisableUserTokenEvent          bool                      `json:"disable_user_token_event,omitempty"`
-	EnableBackChannelLogout        bool                      `json:"enable_back_channel_logout,omitempty"`
 	LoginV2                        LoginV2                   `json:"login_v2,omitempty"`
 	PermissionCheckV2              bool                      `json:"permission_check_v2,omitempty"`
 	ConsoleUseV2UserApi            bool                      `json:"console_use_v2_user_api,omitempty"`

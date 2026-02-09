@@ -343,7 +343,7 @@ Errors:
     RequiredFieldsMissing: "Unele câmpuri obligatorii lipsesc"
     Grant:
       AlreadyExists: "Acordarea proiectului există deja"
-      NotFound: "Acordarea nu a fost găsită"
+      NotFound: "Acordarea proiectului nu a fost găsită"
       Invalid: "Acordarea proiectului este invalidă"
       NotExisting: "Acordarea proiectului nu există"
       HasNotExistingRole: "Un rol nu există în proiect"

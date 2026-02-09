@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "用户",
-      "DESCRIPTION": "用户是可以访问你的应用的人或机器。",
+      "DESCRIPTION": "用户是可以访问你的应用的人或服务账户。",
       "HUMANS": {
         "TITLE": "用户",
         "DESCRIPTION": "用户在浏览器会话中通过登录提示进行交互身份验证。",
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "登录表单",
           "DESCRIPTION": "自定义登录表单。",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "允许用户名和密码",
-            "DESCRIPTION": "允许用户使用他们的用户名和密码登录。如果此功能被禁用，你的用户只能使用Passkey认证或外部身份提供者登录。"
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "允许本地身份验证",
+            "DESCRIPTION": "允许您的用户使用其用户名和密码或通行密钥身份验证登录。如果停用此选项，您的用户只能使用外部身份提供商登录。"
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "允许用户注册",
@@ -420,7 +420,7 @@
     "ORGANIZATION": "组织",
     "PROJECT": "项目",
     "PROJECTOVERVIEW": "概览",
-    "PROJECTGRANTS": "授予",
+    "PROJECTGRANTS": "项目授权",
     "ROLES": "角色",
     "GRANTEDPROJECT": "已授予的项目",
     "HUMANUSERS": "用户",
@@ -1646,8 +1646,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
       "DEBUGOIDCPARENTERROR": "调试 OIDC 父错误",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "如果启用该标志，OIDC 父错误将记录在控制台中。",
-      "ENABLEBACKCHANNELLOGOUT": "启用 Backchannel 注销",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知应用程序在 OpenID 提供商处终止会话。",
       "PERMISSIONCHECKV2": "权限检查 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
       "STATES": {
@@ -2060,7 +2058,7 @@
       "DESCRIPTION": "允许其他组织使用您的项目。",
       "EDITTITLE": "编辑角色",
       "CREATE": {
-        "TITLE": "创建组织授权",
+        "TITLE": "创建项目授权",
         "SEL_USERS": "选择您要授予访问权限的用户",
         "SEL_PROJECT": "搜索项目",
         "SEL_ROLES": "选择要添加到授权中的角色",
@@ -2070,7 +2068,7 @@
         "ORG_DESCRIPTION": "您即将授予组织 {{name}} 的用户。",
         "ORG_DESCRIPTION_DESC": "切换上面标题中的上下文以授予另一个组织的用户。",
         "SEL_ORG_FORMFIELD": "组织",
-        "FOR_ORG": "授予组织:"
+        "FOR_ORG": "项目授权将为以下对象创建:"
       },
       "DETAIL": {
         "TITLE": "项目授权",
@@ -2183,7 +2181,7 @@
       "DEACTIVATED": "已停用。",
       "CREATED": "项目已创建。",
       "UPDATED": "项目已修改。",
-      "GRANTUPDATED": "授权已更新。",
+      "GRANTUPDATED": "项目授权已更改。",
       "DELETED": "项目已删除"
     }
   },
@@ -2684,7 +2682,8 @@
             "DESCRIPTION": "单页应用程序 (SPA) 以及通常在浏览器中执行的所有 JS 框架"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "反向通道注销URI"
     },
     "API": {
       "INFO": {
