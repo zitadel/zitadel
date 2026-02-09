@@ -158,9 +158,19 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1n8df", "Errors.Project.App.Invalid")
 	}
 
-	appID, err := c.idGenerator.Next()
+	appID := oidcApp.AppID
+	if appID == "" {
+		appID, err = c.idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
+	}
+	existingApp, err := c.getOIDCAppWriteModel(ctx, oidcApp.AggregateID, appID, resourceOwner)
 	if err != nil {
 		return nil, err
+	}
+	if existingApp.State != domain.AppStateUnspecified {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-lxowmp", "Errors.Project.App.AlreadyExisting")
 	}
 
 	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, appID)

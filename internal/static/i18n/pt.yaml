@@ -341,7 +341,7 @@ Errors:
     RequiredFieldsMissing: "Alguns campos obrigatórios estão faltando"
     Grant:
       AlreadyExists: "A concessão do projeto já existe"
-      NotFound: "Concessão não encontrada"
+      NotFound: "A concessão do projeto não encontrada"
       Invalid: "A concessão do projeto é inválida"
       NotExisting: "A concessão do projeto não existe"
       HasNotExistingRole: "Uma função não existe no projeto"
