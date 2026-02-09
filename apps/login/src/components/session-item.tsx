@@ -12,6 +12,8 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Avatar } from "./avatar";
 import { Translated } from "./translated";
+import { handleServerActionResponse } from "@/lib/client";
+import { AutoSubmitForm } from "./auto-submit-form";
 
 export function isSessionValid(session: Partial<Session>): {
   valid: boolean;
@@ -52,6 +54,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
   }
 
   const { valid, verifiedAt } = isSessionValid(session);
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [_error, setError] = useState<string | null>(null);
 
@@ -59,6 +62,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
 
   return (
     <Tooltip.Root delayDuration={300}>
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <Tooltip.Trigger asChild>
         <button
           onClick={async () => {
@@ -70,36 +74,21 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
 
               const callbackResponse = await continueWithSession(sessionPayload);
 
-              if (callbackResponse && "error" in callbackResponse) {
-                setError(callbackResponse.error);
-                return;
-              }
-
-              if (callbackResponse && "redirect" in callbackResponse) {
-                return router.push(callbackResponse.redirect);
-              }
+              handleServerActionResponse(callbackResponse, router, setSamlData, (e) => setError(e));
             } else if (session.factors?.user) {
               setLoading(true);
-              const res = await sendLoginname({
-                loginName: session.factors?.user?.loginName,
-                organization: session.factors.user.organizationId,
-                requestId: requestId,
-              })
-                .catch(() => {
-                  setError("An internal error occurred");
-                  return;
-                })
-                .finally(() => {
-                  setLoading(false);
+              try {
+                const res = await sendLoginname({
+                  loginName: session.factors?.user?.loginName,
+                  organization: session.factors.user.organizationId,
+                  requestId: requestId,
                 });
 
-              if (res && "redirect" in res && res.redirect) {
-                return router.push(res.redirect);
-              }
-
-              if (res && "error" in res && res.error) {
-                setError(res.error);
-                return;
+                handleServerActionResponse(res, router, setSamlData, (e) => setError(e));
+              } catch {
+                setError("An internal error occurred");
+              } finally {
+                setLoading(false);
               }
             }
           }}
