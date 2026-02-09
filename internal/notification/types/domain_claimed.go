@@ -25,6 +25,7 @@ func (notify Notify) SendDomainClaimed(ctx context.Context, user *query.NotifyUs
 		}); err != nil {
 			return err
 		}
+		url = buf.String()
 	}
 	args := make(map[string]interface{})
 	args["TempUsername"] = username
