@@ -2024,6 +2024,165 @@ func Test_user_Update(t *testing.T) {
 	}
 }
 
+func Test_user_Delete(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	t.Cleanup(rollback)
+
+	userRepo := repository.UserRepository()
+
+	instanceID := createInstance(t, tx)
+	instance2ID := createInstance(t, tx)
+
+	orgID1 := createOrganization(t, tx, instanceID)
+	orgID2 := createOrganization(t, tx, instanceID)
+	orgID3 := createOrganization(t, tx, instance2ID)
+
+	human := &domain.User{
+		ID:             gofakeit.UUID(),
+		InstanceID:     instanceID,
+		OrganizationID: orgID1,
+		Username:       "human-user",
+		State:          domain.UserStateActive,
+		Human: &domain.HumanUser{
+			FirstName:         "John",
+			LastName:          "Doe",
+			DisplayName:       "JohnD",
+			Nickname:          "johnny",
+			PreferredLanguage: language.English,
+			Gender:            domain.HumanGenderMale,
+			AvatarKey:         "https://my.avatar/key",
+			Email: domain.HumanEmail{
+				Address: "john@doe.com",
+			},
+		},
+	}
+	humanCondition := userRepo.PrimaryKeyCondition(instanceID, human.ID)
+
+	machine := &domain.User{
+		ID:             gofakeit.UUID(),
+		InstanceID:     instanceID,
+		OrganizationID: orgID2,
+		Username:       "machine-user",
+		State:          domain.UserStateActive,
+		Machine: &domain.MachineUser{
+			Name:        "My Machine",
+			Description: "This is my machine user",
+		},
+	}
+	machineCondition := userRepo.PrimaryKeyCondition(instanceID, machine.ID)
+
+	instance2Human := &domain.User{
+		ID:             human.ID,
+		InstanceID:     instance2ID,
+		OrganizationID: orgID3,
+		Username:       "human-user",
+		State:          domain.UserStateActive,
+		Human: &domain.HumanUser{
+			FirstName:         "John",
+			LastName:          "Doe",
+			DisplayName:       "JohnD",
+			Nickname:          "johnny",
+			PreferredLanguage: language.English,
+			Gender:            domain.HumanGenderMale,
+			AvatarKey:         "https://my.avatar/key",
+			Email: domain.HumanEmail{
+				Address: "john@doe.com",
+			},
+		},
+	}
+
+	err := userRepo.Create(t.Context(), tx, human)
+	require.NoError(t, err)
+	err = userRepo.Create(t.Context(), tx, instance2Human)
+	require.NoError(t, err)
+	err = userRepo.Create(t.Context(), tx, machine)
+	require.NoError(t, err)
+
+	type args struct {
+		condition database.Condition
+	}
+	type want struct {
+		err      error
+		rowCount int
+	}
+	type test struct {
+		name  string
+		setup func(t *testing.T, tx database.QueryExecutor) error
+		args  args
+		want  want
+	}
+	tests := []test{
+		{
+			name: "delete human user",
+			args: args{
+				condition: humanCondition,
+			},
+			want: want{
+				err:      nil,
+				rowCount: 1,
+			},
+		},
+		{
+			name: "delete machine user",
+			args: args{
+				condition: machineCondition,
+			},
+			want: want{
+				err:      nil,
+				rowCount: 1,
+			},
+		},
+		{
+			name: "delete non-existing user",
+			args: args{
+				condition: userRepo.PrimaryKeyCondition(instanceID, "non-existing-id"),
+			},
+			want: want{
+				err:      nil,
+				rowCount: 0,
+			},
+		},
+		{
+			name: "wrong condition",
+			args: args{
+				condition: userRepo.TypeCondition(domain.UserTypeHuman),
+			},
+			want: want{
+				err:      new(database.MissingConditionError),
+				rowCount: 0,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			t.Cleanup(func() {
+				err := savepoint.Rollback(context.Background())
+				if err != nil {
+					t.Log("rollback savepoint failed", err)
+				}
+			})
+
+			if tt.setup != nil {
+				err := tt.setup(t, savepoint)
+				require.NoError(t, err)
+			}
+
+			rowCount, err := userRepo.Delete(t.Context(), savepoint, tt.args.condition)
+			require.ErrorIs(t, err, tt.want.err)
+			assert.EqualValues(t, tt.want.rowCount, rowCount)
+			if tt.want.err != nil {
+				return
+			}
+
+			user, err := userRepo.Get(t.Context(), savepoint, database.WithCondition(tt.args.condition))
+			assert.ErrorIs(t, err, new(database.NoRowFoundError))
+			assert.Nil(t, user)
+		})
+	}
+}
+
 func assertUser(t *testing.T, expected, actual *domain.User) {
 	t.Helper()
 	assert.Equal(t, expected.InstanceID, actual.InstanceID)
