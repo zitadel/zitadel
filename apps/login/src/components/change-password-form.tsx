@@ -16,6 +16,8 @@ import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { handleServerActionResponse } from "@/lib/client";
+import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs =
   | {
@@ -49,6 +51,7 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   async function submitChange(values: Inputs) {
     setLoading(true);
@@ -93,14 +96,7 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
         setLoading(false);
       });
 
-    if (passwordResponse && "error" in passwordResponse && passwordResponse.error) {
-      setError(passwordResponse.error);
-      return;
-    }
-
-    if (passwordResponse && "redirect" in passwordResponse && passwordResponse.redirect) {
-      return router.push(passwordResponse.redirect);
-    }
+    handleServerActionResponse(passwordResponse as any, router, setSamlData, setError);
 
     return;
   }
@@ -125,7 +121,9 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
     hasMinLength;
 
   return (
-    <form className="w-full">
+    <>
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
+      <form className="w-full">
       <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
         <div className="">
           <TextInput
@@ -190,6 +188,7 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
           {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="change.submit" namespace="password" />
         </Button>
       </div>
-    </form>
+      </form>
+    </>
   );
 }
