@@ -287,7 +287,7 @@ message CreateOIDCApplicationRequest {
 
   // The AccessTokenType defines the type of the access token returned from ZITADEL.
   // Bearer tokens are opaque to clients. JWT tokens are self-contained and can be validated by the client.
-  // Bearer tokens must be introspected at the ZITADEL token endpoint.
+  // Bearer tokens must be introspected at the Zitadel token endpoint.
   OIDCTokenType access_token_type = 9 [(validate.rules).enum = {defined_only: true}];
 
   // If AccessTokenRoleAssertion is enabled, the roles of the user are added to the access token.
@@ -310,7 +310,7 @@ message CreateOIDCApplicationRequest {
   // therefore more vulnerable.
   bool id_token_userinfo_assertion = 12;
 
-  // ClockSkew is used to compensate time differences between the servers of ZITADEL and the application.
+  // ClockSkew is used to compensate time differences between the servers of Zitadel and the application.
   // It is added to the "exp" claim and subtracted from "iat", "auth_time" and "nbf" claims.
   // The default is 0s, the maximum is 5s.
   google.protobuf.Duration clock_skew = 13 [
@@ -515,7 +515,7 @@ message UpdateOIDCApplicationConfigurationRequest {
 
   // The AccessTokenType defines the type of the access token returned from ZITADEL.
   // Bearer tokens are opaque to clients. JWT tokens are self-contained and can be validated by the client.
-  // Bearer tokens must be introspected at the ZITADEL token endpoint.
+  // Bearer tokens must be introspected at the Zitadel token endpoint.
   // If not set, the access token type will not be changed.
   optional OIDCTokenType access_token_type = 9 [(validate.rules).enum = {defined_only: true}];
 
@@ -542,7 +542,7 @@ message UpdateOIDCApplicationConfigurationRequest {
   // If not set, the id token userinfo assertion will not be changed.
   optional bool id_token_userinfo_assertion = 12;
 
-  // ClockSkew is used to compensate time differences between the servers of ZITADEL and the application.
+  // ClockSkew is used to compensate time differences between the servers of Zitadel and the application.
   // It is added to the "exp" claim and subtracted from "iat", "auth_time" and "nbf" claims.
   // The default is 0s, the maximum is 5s.
   // If not set, the clock skew will not be changed.

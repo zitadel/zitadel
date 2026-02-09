@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/muhlemmer/gu"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -238,10 +239,14 @@ Actions:
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			c := &cobra.Command{}
+			c.SetContext(t.Context())
+
 			v := viper.New()
 			v.SetConfigType("yaml")
 			require.NoError(t, v.ReadConfig(strings.NewReader(tt.args.yaml)))
-			got := MustNewConfig(v)
+			got, _, err := NewConfig(c, v)
+			require.NoError(t, err)
 			tt.want(t, got)
 		})
 	}

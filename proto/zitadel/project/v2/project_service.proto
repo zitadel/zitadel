@@ -522,7 +522,7 @@ message AddProjectRoleRequest {
     }
   ];
 
-  // RoleKey identifies the role. It's the only relevant attribute for ZITADEL and
+  // RoleKey identifies the role. It's the only relevant attribute for Zitadel and
   // will be used for authorization checks and as claim in tokens and user info responses.
   string role_key = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -578,7 +578,7 @@ message UpdateProjectRoleRequest {
     }
   ];
 
-  // RoleKey identifies the role. It's the only relevant attribute for ZITADEL and
+  // RoleKey identifies the role. It's the only relevant attribute for Zitadel and
   // will be used for authorization checks and as claim in tokens and user info responses.
   // It cannot be changed. If you need a different key, remove the role and create a new one.
   string role_key = 2 [

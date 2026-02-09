@@ -1,9 +1,9 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Metadata",
     "HOME": {
-      "TITLE": "Mulailah dengan ZITADEL",
+      "TITLE": "Mulailah dengan Zitadel",
       "NEXT": {
         "TITLE": "Langkah Anda selanjutnya",
         "DESCRIPTION": "Selesaikan langkah-langkah berikut untuk mengamankan aplikasi Anda.",
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "Dokumentasi",
-          "DESCRIPTION": "Jelajahi basis pengetahuan ZITADEL untuk membiasakan diri Anda dengan konsep dan ide inti. Pelajari cara kerja ZITADEL dan cara menggunakannya."
+          "DESCRIPTION": "Jelajahi basis pengetahuan Zitadel untuk membiasakan diri Anda dengan konsep dan ide inti. Pelajari cara kerja Zitadel dan cara menggunakannya."
         },
         "EXAMPLES": {
           "TITLE": "Contoh dan Perangkat Pengembangan Perangkat Lunak",
-          "DESCRIPTION": "Jelajahi contoh dan SDK kami untuk menggunakan ZITADEL bersama dengan bahasa dan alat pemrograman favorit Anda."
+          "DESCRIPTION": "Jelajahi contoh dan SDK kami untuk menggunakan Zitadel bersama dengan bahasa dan alat pemrograman favorit Anda."
         }
       }
     },
@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Pengguna",
-      "DESCRIPTION": "Pengguna adalah manusia atau mesin yang dapat mengakses aplikasi Anda.",
+      "DESCRIPTION": "Pengguna adalah manusia atau akun layanan yang dapat mengakses aplikasi Anda.",
       "HUMANS": {
         "TITLE": "Pengguna",
         "DESCRIPTION": "Pengguna mengautentikasi secara interaktif dalam sesi browser dengan perintah login.",
@@ -67,7 +67,7 @@
     },
     "ACTIONS": {
       "TITLE": "Tindakan",
-      "DESCRIPTION": "Jalankan kode khusus pada peristiwa yang terjadi saat pengguna Anda mengautentikasi di ZITADEL. Otomatiskan proses Anda, perkaya metadata pengguna Anda dan token mereka, atau beri tahu sistem eksternal.",
+      "DESCRIPTION": "Jalankan kode khusus pada peristiwa yang terjadi saat pengguna Anda mengautentikasi di Zitadel. Otomatiskan proses Anda, perkaya metadata pengguna Anda dan token mereka, atau beri tahu sistem eksternal.",
       "SCRIPTS": {
         "TITLE": "Skrip",
         "DESCRIPTION": "Tulis kode JavaScript Anda satu kali dan picu dalam beberapa aliran."
@@ -97,23 +97,23 @@
         "NEXT": "Bagaimana sekarang?",
         "SAML": {
           "TITLE": "Konfigurasikan Penyedia Identitas SAML Anda",
-          "DESCRIPTION": "ZITADEL dikonfigurasi. Sekarang Penyedia Identitas SAML Anda memerlukan beberapa konfigurasi. Sebagian besar penyedia mengizinkan Anda mengunggah seluruh XML metadata ZITADEL. Penyedia lain meminta Anda untuk memberikan beberapa URL berbeda saja, misalnya ID entitas (URL metadata), URL Assertion Consumer Service (ACS), atau URL Keluar Tunggal."
+          "DESCRIPTION": "Zitadel dikonfigurasi. Sekarang Penyedia Identitas SAML Anda memerlukan beberapa konfigurasi. Sebagian besar penyedia mengizinkan Anda mengunggah seluruh XML metadata Zitadel. Penyedia lain meminta Anda untuk memberikan beberapa URL berbeda saja, misalnya ID entitas (URL metadata), URL Assertion Consumer Service (ACS), atau URL Keluar Tunggal."
         },
         "CALLBACK": {
           "TITLE": "Konfigurasikan {{ provider }} Penyedia Identitas Anda",
-          "DESCRIPTION": "Sebelum Anda dapat mengonfigurasi ZITADEL, teruskan URL ini ke Penyedia Identitas Anda untuk mengaktifkan pengalihan browser kembali ke ZITADEL setelah autentikasi."
+          "DESCRIPTION": "Sebelum Anda dapat mengonfigurasi Zitadel, teruskan URL ini ke Penyedia Identitas Anda untuk mengaktifkan pengalihan browser kembali ke Zitadel setelah autentikasi."
         },
         "JWT": {
           "TITLE": "Gunakan JWT sebagai Identitas gabungan",
-          "DESCRIPTION": "Penyedia Identitas JWT memungkinkan Anda menggunakan token JWT yang ada sebagai identitas gabungan. Fitur ini berguna jika Anda sudah memiliki penerbit JWT. Dengan IdP JWT, Anda dapat menggunakan JWT ini untuk membuat dan memperbarui pengguna di ZITADEL dengan cepat."
+          "DESCRIPTION": "Penyedia Identitas JWT memungkinkan Anda menggunakan token JWT yang ada sebagai identitas gabungan. Fitur ini berguna jika Anda sudah memiliki penerbit JWT. Dengan IdP JWT, Anda dapat menggunakan JWT ini untuk membuat dan memperbarui pengguna di Zitadel dengan cepat."
         },
         "LDAP": {
-          "TITLE": "Konfigurasikan ZITADEL untuk terhubung ke Penyedia Identitas LDAP Anda",
-          "DESCRIPTION": "Berikan detail koneksi ke server LDAP Anda dan konfigurasikan pemetaan atribut LDAP Anda ke atribut ZITADEL."
+          "TITLE": "Konfigurasikan Zitadel untuk terhubung ke Penyedia Identitas LDAP Anda",
+          "DESCRIPTION": "Berikan detail koneksi ke server LDAP Anda dan konfigurasikan pemetaan atribut LDAP Anda ke atribut Zitadel."
         },
         "AUTOFILL": {
           "TITLE": "Isi otomatis data pengguna",
-          "DESCRIPTION": "Gunakan tindakan untuk meningkatkan pengalaman pengguna Anda. Anda dapat mengisi formulir pendaftaran ZITADEL terlebih dahulu dengan nilai dari penyedia identitas."
+          "DESCRIPTION": "Gunakan tindakan untuk meningkatkan pengalaman pengguna Anda. Anda dapat mengisi formulir pendaftaran Zitadel terlebih dahulu dengan nilai dari penyedia identitas."
         },
         "ACTIVATE": {
           "TITLE": "Aktifkan IdP",
@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Tautan Eksternal",
-        "DESCRIPTION": "Pandu pengguna Anda ke sumber daya eksternal khusus yang ditampilkan di halaman login. Pengguna harus menerima Ketentuan Layanan dan Kebijakan Privasi sebelum mereka dapat mendaftar. Ubah tautan ke dokumentasi Anda atau setel string kosong untuk menyembunyikan tombol dokumentasi dari konsol. Tambahkan tautan eksternal khusus dan teks khusus untuk tautan tersebut di konsol, atau kosongkan untuk menyembunyikan tombol tersebut."
+        "DESCRIPTION": "Pandu pengguna Anda ke sumber daya eksternal khusus yang ditampilkan di halaman login. Pengguna harus menerima Ketentuan Layanan dan Kebijakan Privasi sebelum mereka dapat mendaftar. Ubah tautan ke dokumentasi Anda atau setel string kosong untuk menyembunyikan tombol dokumentasi dari konsol manajemen. Tambahkan tautan eksternal khusus dan teks khusus untuk tautan tersebut di konsol manajemen, atau kosongkan untuk menyembunyikan tombol tersebut."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Pengaturan SMTP",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "Pengaturan SMS",
-        "DESCRIPTION": "Untuk membuka kunci semua fitur ZITADEL, konfigurasikan Twilio untuk mengirim pesan SMS ke pengguna Anda."
+        "DESCRIPTION": "Untuk membuka kunci semua fitur Zitadel, konfigurasikan Twilio untuk mengirim pesan SMS ke pengguna Anda."
       },
       "IAM_EVENTS": {
         "TITLE": "Acara",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "Acara Gagal",
-        "DESCRIPTION": "Halaman ini menampilkan semua peristiwa yang gagal di instans Anda. Jika ZITADEL tidak berperilaku seperti yang Anda harapkan, selalu periksa daftar ini terlebih dahulu."
+        "DESCRIPTION": "Halaman ini menampilkan semua peristiwa yang gagal di instans Anda. Jika Zitadel tidak berperilaku seperti yang Anda harapkan, selalu periksa daftar ini terlebih dahulu."
       },
       "IAM_VIEWS": {
         "TITLE": "Tampilan",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "Pengaturan Keamanan",
-        "DESCRIPTION": "Aktifkan fitur ZITADEL yang dapat berdampak pada keamanan. Anda benar-benar harus mengetahui apa yang Anda lakukan sebelum mengubah pengaturan ini."
+        "DESCRIPTION": "Aktifkan fitur Zitadel yang dapat berdampak pada keamanan. Anda benar-benar harus mengetahui apa yang Anda lakukan sebelum mengubah pengaturan ini."
       },
       "OIDC": {
         "TITLE": "Pengaturan Koneksi OpenID",
@@ -187,11 +187,11 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "Kelola Kunci Web OIDC Anda untuk menandatangani dan memvalidasi token dengan aman untuk instance ZITADEL Anda.",
+        "DESCRIPTION": "Kelola Kunci Web OIDC Anda untuk menandatangani dan memvalidasi token dengan aman untuk instance Zitadel Anda.",
         "TABLE": {
           "TITLE": "Kunci Web Aktif dan Mendatang",
           "DESCRIPTION": "Kunci web Anda yang aktif dan akan datang. Mengaktifkan kunci baru akan menonaktifkan kunci yang sedang digunakan.",
-          "NOTE": "Catatan: Endpoint JWKs OIDC mengembalikan respons yang dapat di-cache (default 5 menit). Hindari mengaktifkan kunci terlalu cepat, karena mungkin belum tersedia di cache dan klien.",
+          "NOTE": "Catatan: Endpoint JWKs OIDC mengembalikan respons yang dapat di-cache (default 5 menit). Hindari mengaktifkan kunci terlalu cepat, karena mungkin belum tersedia di cache dan aplikasi.",
           "ACTIVATE": "Aktifkan Kunci Web Berikutnya",
           "ACTIVE": "Saat ini aktif",
           "NEXT": "Berikutnya dalam antrean",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "Buat Kunci Web Baru",
-          "DESCRIPTION": "Membuat kunci web baru akan menambahkannya ke daftar Anda. ZITADEL secara default menggunakan kunci RSA2048 dengan fungsi hash SHA256.",
+          "DESCRIPTION": "Membuat kunci web baru akan menambahkannya ke daftar Anda. Zitadel secara default menggunakan kunci RSA2048 dengan fungsi hash SHA256.",
           "KEY_TYPE": "Jenis Kunci",
           "BITS": "Bit",
           "HASHER": "Hasher",
@@ -219,12 +219,12 @@
           "DC": "Saat Anda mengklaim domain untuk organisasi Anda, pengguna yang tidak menggunakan domain ini dalam nama loginnya akan diminta untuk mengubah nama loginnya agar sesuai dengan domain yang diklaim.",
           "INIT": "Saat pengguna dibuat, mereka akan menerima email berisi tautan untuk menyetel kata sandinya.",
           "PC": "Ketika pengguna mengubah kata sandinya, mereka akan menerima pemberitahuan tentang perubahan tersebut jika Anda telah mengaktifkannya di pengaturan pemberitahuan.",
-          "PL": "Saat pengguna menambahkan metode autentikasi tanpa kata sandi, mereka harus mengaktifkannya dengan mengeklik tautan di email.",
+          "PL": "Saat pengguna menambahkan metode autentikasi Passkey, mereka harus mengaktifkannya dengan mengeklik tautan di email.",
           "PR": "Saat pengguna menyetel ulang kata sandinya, mereka akan menerima email berisi tautan untuk menyetel kata sandi baru.",
           "VE": "Saat pengguna mengubah alamat emailnya, mereka akan menerima email berisi tautan untuk memverifikasi alamat baru.",
           "VP": "Saat pengguna mengganti nomor teleponnya, mereka akan menerima SMS berisi kode untuk memverifikasi nomor baru.",
-          "VEO": "Ketika pengguna menambahkan Kata Sandi Sekali Pakai melalui metode email, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke alamat email mereka.",
-          "VSO": "Ketika pengguna menambahkan One-Time Password melalui metode SMS, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke nomor telepon mereka.",
+          "VEO": "Ketika pengguna menambahkan OTP melalui metode email, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke alamat email mereka.",
+          "VSO": "Ketika pengguna menambahkan OTP melalui metode SMS, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke nomor telepon mereka.",
           "IU": "Ketika kode undangan pengguna dibuat, mereka akan menerima email dengan tautan untuk mengatur metode otentikasi mereka."
         }
       },
@@ -241,7 +241,7 @@
         },
         "LOGIN_NAME_PATTERN": {
           "TITLE": "Pola Nama Masuk",
-          "DESCRIPTION": "Kontrol pola nama login pengguna Anda. ZITADEL memilih organisasi pengguna Anda segera setelah mereka memasukkan nama login mereka. Oleh karena itu, nama login harus unik di semua organisasi. Jika Anda memiliki pengguna yang memiliki akun di beberapa domain, Anda dapat memastikan keunikan dengan menambahkan nama login Anda ke domain organisasi."
+          "DESCRIPTION": "Kontrol pola nama login pengguna Anda. Zitadel memilih organisasi pengguna Anda segera setelah mereka memasukkan nama login mereka. Oleh karena itu, nama login harus unik di semua organisasi. Jika Anda memiliki pengguna yang memiliki akun di beberapa domain, Anda dapat memastikan keunikan dengan menambahkan nama login Anda ke domain organisasi."
         },
         "DOMAIN_VERIFICATION": {
           "TITLE": "Verifikasi Domain",
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formulir Masuk",
           "DESCRIPTION": "Sesuaikan formulir login.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Nama Pengguna dan Kata Sandi diperbolehkan",
-            "DESCRIPTION": "Izinkan pengguna Anda untuk masuk dengan nama pengguna dan kata sandi mereka. Jika ini dinonaktifkan, pengguna Anda hanya dapat masuk menggunakan autentikasi tanpa kata sandi atau dengan penyedia identitas eksternal."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Otentikasi lokal diizinkan",
+            "DESCRIPTION": "Izinkan pengguna Anda untuk masuk dengan nama pengguna dan kata sandi atau autentikasi passkey. Jika ini dinonaktifkan, pengguna Anda hanya dapat masuk menggunakan penyedia identitas eksternal."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Pendaftaran Pengguna diperbolehkan",
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "Login Eksternal diperbolehkan",
-            "DESCRIPTION": "Izinkan pengguna Anda untuk masuk dengan penyedia identitas eksternal alih-alih menggunakan pengguna ZITADEL untuk masuk."
+            "DESCRIPTION": "Izinkan pengguna Anda untuk masuk dengan penyedia identitas eksternal alih-alih menggunakan pengguna Zitadel untuk masuk."
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "Reset Kata Sandi disembunyikan",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "Mulailah dengan ZITADEL",
-    "DISCLAIMER": "ZITADEL memperlakukan data Anda secara rahasia dan aman.",
+    "WELCOME": "Mulailah dengan Zitadel",
+    "DISCLAIMER": "Zitadel memperlakukan data Anda secara rahasia dan aman.",
     "DISCLAIMERLINK": "Informasi lebih lanjut",
     "DOCUMENTATION": {
-      "DESCRIPTION": "Mulailah dengan ZITADEL dengan cepat."
+      "DESCRIPTION": "Mulailah dengan Zitadel dengan cepat."
     },
     "GETSTARTED": {
-      "DESCRIPTION": "Mulailah dengan ZITADEL dengan cepat."
+      "DESCRIPTION": "Mulailah dengan Zitadel dengan cepat."
     },
     "QUICKSTARTS": {
       "LABEL": "Langkah Pertama",
-      "DESCRIPTION": "Mulailah dengan ZITADEL dengan cepat."
+      "DESCRIPTION": "Mulailah dengan Zitadel dengan cepat."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Jalan pintas",
@@ -366,7 +366,7 @@
     "COMPLETED": "selesai",
     "DISMISS": "Tidak, terima kasih, saya seorang profesional.",
     "CARD": {
-      "TITLE": "Jalankan ZITADEL Anda",
+      "TITLE": "Jalankan Zitadel Anda",
       "DESCRIPTION": "Daftar periksa ini membantu menyiapkan instans Anda dan memandu Anda melalui langkah-langkah paling penting"
     },
     "MILESTONES": {
@@ -392,7 +392,7 @@
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "Masuk ke aplikasi Anda",
-        "description": "Integrasikan aplikasi Anda dengan ZITADEL untuk otentikasi dan uji dengan masuk menggunakan pengguna admin Anda.",
+        "description": "Integrasikan aplikasi Anda dengan Zitadel untuk otentikasi dan uji dengan masuk menggunakan pengguna admin Anda.",
         "action": "Masuk"
       },
       "user.human.added": {
@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organisasi",
     "PROJECT": "Proyek",
     "PROJECTOVERVIEW": "Ringkasan",
-    "PROJECTGRANTS": "Hibah",
+    "PROJECTGRANTS": "Izin proyek",
     "ROLES": "Peran",
     "GRANTEDPROJECT": "Proyek yang Diberikan",
     "HUMANUSERS": "Pengguna",
@@ -438,8 +438,8 @@
     "CUSTOMERPORTAL": "Portal Pelanggan"
   },
   "QUICKSTART": {
-    "TITLE": "Integrasikan ZITADEL ke dalam aplikasi Anda",
-    "DESCRIPTION": "Integrasikan ZITADEL ke dalam aplikasi Anda atau gunakan salah satu sampel kami untuk memulai dalam hitungan menit.",
+    "TITLE": "Integrasikan Zitadel ke dalam aplikasi Anda",
+    "DESCRIPTION": "Integrasikan Zitadel ke dalam aplikasi Anda atau gunakan salah satu sampel kami untuk memulai dalam hitungan menit.",
     "BTN_START": "Buat Aplikasi",
     "BTN_LEARNMORE": "Pelajari Lebih Lanjut",
     "CREATEPROJECTFORAPP": "Buat Proyek {{value}}",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna",
     "IAM_ADMIN_IMPERSONATOR": "Memiliki izin untuk menyamar sebagai admin dan pengguna akhir dari semua organisasi",
     "IAM_END_USER_IMPERSONATOR": "Memiliki izin untuk meniru identitas pengguna akhir dari semua organisasi",
-    "IAM_LOGIN_CLIENT": "Memiliki izin untuk mengelola klien masuk",
+    "IAM_LOGIN_CLIENT": "Memiliki izin untuk mengelola aplikasi masuk",
     "ORG_OWNER": "Memiliki izin atas seluruh organisasi",
     "ORG_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna organisasi",
     "ORG_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh organisasi",
@@ -744,7 +744,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "Instance Anda diblokir.",
-      "DESCRIPTION": "Minta administrator instans ZITADEL Anda untuk memperbarui langganan."
+      "DESCRIPTION": "Minta administrator instans Zitadel Anda untuk memperbarui langganan."
     },
     "INVALID_FORMAT": "Pemformatannya tidak valid.",
     "NOTANEMAIL": "Nilai yang diberikan bukan alamat email.",
@@ -840,19 +840,19 @@
       "TABLESTATE": "Status",
       "NAME": "Nama",
       "EMPTY": "Tidak ada perangkat yang disetel",
-      "TITLE": "Otentikasi Tanpa Kata Sandi",
-      "DESCRIPTION": "Tambahkan Metode Otentikasi berbasis WebAuthn untuk masuk ke ZITADEL tanpa kata sandi.",
+      "TITLE": "Otentikasi Passkey",
+      "DESCRIPTION": "Tambahkan Metode Otentikasi berbasis WebAuthn untuk masuk ke Zitadel dengan Passkey.",
       "MANAGE_DESCRIPTION": "Kelola metode faktor kedua pengguna Anda.",
       "U2F": "Tambahkan metode",
       "U2F_DIALOG_TITLE": "Verifikasi pengautentikasi",
-      "U2F_DIALOG_DESCRIPTION": "Masukkan nama untuk Login tanpa kata sandi yang Anda gunakan",
-      "U2F_SUCCESS": "Auth Tanpa Kata Sandi berhasil dibuat!",
+      "U2F_DIALOG_DESCRIPTION": "Masukkan nama untuk Login Passkey yang Anda gunakan",
+      "U2F_SUCCESS": "Auth Passkey berhasil dibuat!",
       "U2F_ERROR": "Terjadi kesalahan saat penyiapan!",
       "U2F_NAME": "Nama Pengautentikasi",
       "TYPE": {
         "0": "Tidak ada MFA yang ditentukan",
-        "1": "Kata Sandi Satu Kali (OTP)",
-        "2": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya"
+        "1": "OTP",
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Tidak ada negara bagian",
@@ -861,17 +861,17 @@
         "3": "Dihapus"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Hapus Metode Otentikasi Tanpa Kata Sandi",
-        "DELETE_DESCRIPTION": "Anda akan menghapus metode Otentikasi tanpa kata sandi. Apa kamu yakin?",
-        "ADD_TITLE": "Otentikasi Tanpa Kata Sandi",
-        "ADD_DESCRIPTION": "Pilih salah satu opsi yang tersedia untuk membuat metode autentikasi tanpa kata sandi.",
+        "DELETE_TITLE": "Hapus Passkey",
+        "DELETE_DESCRIPTION": "Anda akan menghapus Passkey. Apa kamu yakin?",
+        "ADD_TITLE": "Otentikasi Passkey",
+        "ADD_DESCRIPTION": "Pilih salah satu opsi yang tersedia untuk membuat Passkey.",
         "SEND_DESCRIPTION": "Kirimkan sendiri tautan pendaftaran ke alamat email Anda.",
         "SEND": "Kirim tautan pendaftaran",
         "SENT": "Email berhasil terkirim. Periksa kotak surat Anda untuk melanjutkan pengaturan.",
         "QRCODE_DESCRIPTION": "Hasilkan kode QR untuk dipindai dengan perangkat lain.",
         "QRCODE": "Hasilkan kode QR",
         "QRCODE_SCAN": "Pindai kode QR ini untuk melanjutkan penyiapan di perangkat Anda.",
-        "NEW_DESCRIPTION": "Gunakan perangkat ini untuk mengatur Tanpa Kata Sandi.",
+        "NEW_DESCRIPTION": "Gunakan perangkat ini untuk mengatur Passkey.",
         "NEW": "Tambahkan Baru"
       }
     },
@@ -884,10 +884,10 @@
       "DESCRIPTION": "Tambahkan faktor kedua untuk memastikan keamanan optimal untuk akun Anda.",
       "MANAGE_DESCRIPTION": "Kelola metode faktor kedua pengguna Anda.",
       "ADD": "Tambahkan Faktor",
-      "OTP": "Aplikasi Authenticator untuk TOTP (Kata Sandi Sekali Pakai Berbasis Waktu)",
+      "OTP": "Aplikasi Authenticator untuk TOTP",
       "OTP_DIALOG_TITLE": "Tambahkan OTP",
       "OTP_DIALOG_DESCRIPTION": "Pindai kode QR dengan aplikasi autentikator dan masukkan kode di bawah ini untuk memverifikasi dan mengaktifkan metode OTP.",
-      "U2F": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya",
+      "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verifikasi Faktor",
       "U2F_DIALOG_DESCRIPTION": "Masukkan nama untuk Multifaktor universal yang Anda gunakan.",
       "U2F_SUCCESS": "Faktor berhasil ditambahkan!",
@@ -895,14 +895,14 @@
       "U2F_NAME": "Nama Pengautentikasi",
       "OTPSMS": "OTP (Kata Sandi Sekali Pakai) dengan SMS",
       "OTPEMAIL": "OTP (Kata Sandi Sekali Pakai) dengan Email",
-      "SETUPOTPSMSDESCRIPTION": "Apakah Anda ingin mengatur nomor telepon ini sebagai faktor kedua OTP (One-Time password)?",
+      "SETUPOTPSMSDESCRIPTION": "Apakah Anda ingin mengatur nomor telepon ini sebagai faktor kedua OTP?",
       "OTPSMSSUCCESS": "Faktor OTP diatur dengan sukses.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Ponsel Anda harus diverifikasi untuk menggunakan metode ini.",
       "OTPEMAILSUCCESS": "Faktor OTP diatur dengan sukses.",
       "TYPE": {
         "0": "Tidak ada MFA yang ditentukan",
-        "1": "Kata Sandi Satu Kali (OTP)",
-        "2": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya"
+        "1": "OTP",
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Tidak ada negara bagian",
@@ -970,8 +970,8 @@
       "CHANGEUSERNAME": "memodifikasi",
       "CHANGEUSERNAME_TITLE": "Ubah nama pengguna",
       "CHANGEUSERNAME_DESC": "Masukkan nama baru pada kolom di bawah.",
-      "FIRSTNAME": "Nama Pemberian",
-      "LASTNAME": "Nama keluarga",
+      "FIRSTNAME": "Nama depan",
+      "LASTNAME": "Nama belakang",
       "NICKNAME": "Nama panggilan",
       "DISPLAYNAME": "Nama Tampilan",
       "PREFERREDLOGINNAME": "Nama login pilihan",
@@ -1142,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "Kode verifikasi email terkirim.",
       "OTPREMOVED": "OTP dihapus.",
       "U2FREMOVED": "Faktor dihilangkan.",
-      "PASSWORDLESSREMOVED": "Tanpa kata sandi dihapus.",
+      "PASSWORDLESSREMOVED": "Passkey dihapus.",
       "INITIALPASSWORDSET": "Kata sandi awal ditetapkan.",
       "PASSWORDNOTIFICATIONSENT": "Pemberitahuan perubahan kata sandi terkirim.",
       "PASSWORDCHANGED": "Kata sandi berhasil diubah.",
@@ -1160,7 +1160,7 @@
       "SECRETREMOVED": "Rahasia berhasil dihapus!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Peran Manajer ZITADEL",
+      "TITLE": "Peran Administrator Zitadel",
       "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau IAM.",
       "ORGCONTEXT": "Anda melihat semua organisasi dan proyek yang terkait dengan organisasi yang dipilih saat ini.",
       "USERCONTEXT": "Anda melihat semua organisasi dan proyek yang Anda izinkan. Termasuk organisasi lain.",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Diizinkan Gagal",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Peringatan",
-      "DESCRIPTION": "Jika Anda menonaktifkan setelan ini, hal ini dapat menyebabkan pengguna di organisasi Anda tidak dapat masuk. Selain itu, Anda tidak lagi dapat mengakses konsol untuk menonaktifkan tindakan tersebut. Kami menyarankan untuk membuat pengguna administrator di organisasi terpisah atau menguji skrip terlebih dahulu di lingkungan pengembangan atau organisasi pengembangan."
+      "DESCRIPTION": "Jika Anda menonaktifkan setelan ini, hal ini dapat menyebabkan pengguna di organisasi Anda tidak dapat masuk. Selain itu, Anda tidak lagi dapat mengakses konsol manajemen untuk menonaktifkan tindakan tersebut. Kami menyarankan untuk membuat pengguna administrator di organisasi terpisah atau menguji skrip terlebih dahulu di lingkungan pengembangan atau organisasi pengembangan."
     },
     "SCRIPT": "Naskah",
     "FLOWTYPE": "Tipe Aliran",
@@ -1268,7 +1268,7 @@
     },
     "EVENTSTORE": {
       "TITLE": "Administrasi Penyimpanan IAM",
-      "DESCRIPTION": "Kelola tampilan ZITADEL Anda dan acara yang gagal."
+      "DESCRIPTION": "Kelola tampilan Zitadel Anda dan acara yang gagal."
     },
     "MEMBER": {
       "TITLE": "Manajer",
@@ -1412,7 +1412,7 @@
         "VERIFICATION_HTTP_URL_LABEL": "URL yang diharapkan:",
         "VERIFICATION_HTTP_FILE_LABEL": "Berkas verifikasi:",
         "VERIFICATION_SKIP": "Anda dapat melewati verifikasi untuk saat ini dan terus membuat organisasi Anda, namun untuk menggunakan domain Anda, langkah ini harus diselesaikan!",
-        "VERIFICATION_VALIDATION_DESC": "Jangan hapus kode verifikasi, karena ZITADEL akan memeriksa ulang kepemilikan domain Anda dari waktu ke waktu.",
+        "VERIFICATION_VALIDATION_DESC": "Jangan hapus kode verifikasi, karena Zitadel akan memeriksa ulang kepemilikan domain Anda dari waktu ke waktu.",
         "VERIFICATION_NEWTOKEN_TITLE": "Minta Token Baru",
         "VERIFICATION_VALIDATION_ONGOING": "Metode {{ value }} telah dipilih untuk memverifikasi domain Anda. Klik tombol untuk memicu pemeriksaan verifikasi atau mengatur ulang proses verifikasi.",
         "VERIFICATION_SUCCESSFUL": "Domain berhasil diverifikasi!",
@@ -1555,7 +1555,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1593,7 +1594,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Nomor Pengirim",
         "VERIFYSERVICESID": "ID Layanan Verifikasi",
-        "VERIFYSERVICESID_DESCRIPTION": "Menetapkan ID Layanan Verifikasi memungkinkan penggunaan Layanan Verifikasi Twilio alih-alih Layanan Pesan untuk verifikasi nomor telepon dan SMS OTP.",
+        "VERIFYSERVICESID_DESCRIPTION": "Menetapkan ID Layanan Verifikasi memungkinkan penggunaan Layanan Verifikasi Twilio alih-alih Layanan Pesan untuk verifikasi nomor telepon dan OTP SMS.",
         "ADDED": "Twilio menambahkan dengan sukses.",
         "UPDATED": "Twilio berhasil diperbarui.",
         "REMOVED": "Twilio dihapus",
@@ -1609,10 +1610,10 @@
         "2": "Verifikasi email",
         "3": "Verifikasi telepon",
         "4": "Reset Kata Sandi",
-        "5": "Inisialisasi Tanpa Kata Sandi",
+        "5": "Inisialisasi Passkey",
         "6": "Rahasia Aplikasi",
-        "7": "Kata Sandi Satu Kali (OTP) - SMS",
-        "8": "Kata Sandi Sekali Pakai (OTP) - Email"
+        "7": "OTP - SMS",
+        "8": "OTP - Email"
       },
       "EXPIRY": "Kedaluwarsa (dalam menit)",
       "INCLUDEDIGITS": "Sertakan Angka",
@@ -1634,15 +1635,11 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Masuk Organisasi Default",
       "LOGINDEFAULTORG_DESCRIPTION": "UI login akan menggunakan pengaturan organisasi default (dan bukan dari instance) jika tidak ada konteks organisasi yang ditetapkan",
-      "OIDCTOKENEXCHANGE": "Pertukaran Token OIDC",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktifkan jenis pemberian urn:ietf:params:oauth:grant-type:token-exchange eksperimental untuk titik akhir token OIDC. Pertukaran token dapat digunakan untuk meminta token dengan cakupan yang lebih kecil atau menyamar sebagai pengguna lain. Lihat kebijakan keamanan untuk mengizinkan peniruan identitas pada sebuah instans.",
       "USERSCHEMA": "Skema Pengguna",
       "USERSCHEMA_DESCRIPTION": "Skema Pengguna memungkinkan untuk mengelola skema data pengguna. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
       "ACTIONS": "Tindakan",
       "ACTIONS_DESCRIPTION": "Tindakan v2 memungkinkan untuk mengelola eksekusi dan target data. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
-      "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
       "PERMISSIONCHECKV2": "Permission Check V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
       "STATES": {
@@ -1656,8 +1653,8 @@
         "DISABLED": "\"Dinonaktifkan\" diwariskan"
       },
       "RESET": "Tetapkan semua untuk diwarisi",
-      "CONSOLEUSEV2USERAPI": "Gunakan API V2 di konsol untuk pembuatan pengguna",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal.",
+      "CONSOLEUSEV2USERAPI": "Gunakan API V2 di konsol manajemen untuk pembuatan pengguna",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol manajemen menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Mengaktifkan ini akan mengaktifkan antarmuka login baru berbasis TypeScript dengan keamanan, performa, dan kustomisasi yang lebih baik.",
       "LOGINV2_BASEURI": "URI dasar",
@@ -1685,7 +1682,7 @@
     "NOTIFICATION": {
       "TITLE": "Pemberitahuan",
       "DESCRIPTION": "Menentukan perubahan apa, pemberitahuan akan dikirim.",
-      "PASSWORDCHANGE": "Perubahan kata sandi"
+      "PASSWORDCHANGE": "Kata sandi diubah"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Berikan login gaya pribadi Anda dan ubah perilakunya.",
@@ -1704,7 +1701,7 @@
       "RELEASE": "Melepaskan",
       "DROPFONT": "Letakkan file font di sini",
       "RELEASEFONT": "Melepaskan",
-      "USEOFLOGO": "Logo Anda akan digunakan di Login dan juga email, sedangkan ikon digunakan untuk elemen UI yang lebih kecil seperti pada pengalih organisasi di konsol",
+      "USEOFLOGO": "Logo Anda akan digunakan di Login dan juga email, sedangkan ikon digunakan untuk elemen UI yang lebih kecil seperti pada pengalih organisasi di konsol manajemen",
       "MAXSIZE": "Ukuran maksimum dibatasi hingga 524kB",
       "EMAILNOSVG": "Format file SVG tidak didukung di email. Oleh karena itu unggah logo Anda dalam PNG atau format lain yang didukung.",
       "MAXSIZEEXCEEDED": "Ukuran maksimum terlampaui 524kB.",
@@ -1720,7 +1717,7 @@
       },
       "PREVIEW": {
         "TITLE": "Login",
-        "SECOND": "login dengan Akun ZITADEL Anda.",
+        "SECOND": "login dengan Akun Zitadel Anda.",
         "ERROR": "Pengguna tidak dapat ditemukan!",
         "PRIMARYBUTTON": "Berikutnya",
         "SECONDARYBUTTON": "daftar"
@@ -1760,9 +1757,9 @@
       "POLICYLINK": "Tautan ke Kebijakan Privasi",
       "HELPLINK": "Tautan ke Bantuan",
       "SUPPORTEMAIL": "Email Dukungan",
-      "DOCSLINK": "Tautan Dokumen (Konsol)",
-      "CUSTOMLINK": "Tautan Khusus (Konsol)",
-      "CUSTOMLINKTEXT": "Teks Tautan Khusus (Konsol)",
+      "DOCSLINK": "Tautan Dokumen (Konsol Manajemen)",
+      "CUSTOMLINK": "Tautan Khusus (Konsol Manajemen)",
+      "CUSTOMLINKTEXT": "Teks Tautan Khusus (Konsol Manajemen)",
       "SAVED": "Berhasil disimpan!",
       "RESET_TITLE": "Kembalikan Nilai Default",
       "RESET_DESCRIPTION": "Anda akan memulihkan Tautan default untuk TOS dan Kebijakan Privasi. Apakah Anda benar-benar ingin melanjutkan?"
@@ -1803,7 +1800,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifikasi email selesai",
@@ -1836,10 +1834,10 @@
         "usernameChangeText": "Perubahan nama pengguna",
         "verifyMfaOtpText": "Verifikasi OTP",
         "verifyMfaU2fText": "Verifikasi Faktor Kedua Universal",
-        "passwordlessPromptText": "Perintah Tanpa Kata Sandi",
-        "passwordlessRegistrationDoneText": "Pendaftaran Tanpa Kata Sandi Selesai",
-        "passwordlessRegistrationText": "Pendaftaran Tanpa Kata Sandi",
-        "passwordlessText": "Tanpa kata sandi",
+        "passwordlessPromptText": "Instruksi Passkey",
+        "passwordlessRegistrationDoneText": "Pendaftaran Passkey Selesai",
+        "passwordlessRegistrationText": "Pendaftaran Passkey",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Ikhtisar Pengguna Registrasi Eksternal"
       }
     },
@@ -1849,17 +1847,17 @@
         "INIT": "Inisialisasi",
         "VE": "Verifikasi Email",
         "VP": "Verifikasi Telepon",
-        "VSO": "Verifikasi SMS OTP",
+        "VSO": "Verifikasi OTP SMS",
         "VEO": "Verifikasi OTP Email",
         "PR": "Reset Kata Sandi",
         "DC": "Klaim Domain",
-        "PL": "Tanpa kata sandi",
+        "PL": "Passkey",
         "PC": "Perubahan Kata Sandi",
         "IU": "Mengundang Pengguna"
       },
       "CHIPS": {
-        "firstname": "Nama yang diberikan",
-        "lastname": "Nama keluarga",
+        "firstname": "Nama depan",
+        "lastname": "Nama belakang",
         "code": "Kode",
         "preferredLoginName": "Nama Login Pilihan",
         "displayName": "Nama tampilan",
@@ -1873,8 +1871,8 @@
         "changedate": "Ubah tanggal",
         "username": "Nama belakang",
         "tempUsername": "Nama pengguna sementara",
-        "otp": "Kata sandi satu kali",
-        "verifyUrl": "Verifikasi URL kata sandi satu kali",
+        "otp": "OTP",
+        "verifyUrl": "Verifikasi URL OTP",
         "expiry": "Kedaluwarsa",
         "applicationName": "Nama aplikasi"
       },
@@ -1916,7 +1914,7 @@
       "DEFAULTREDIRECTURI_DESC": "Menentukan ke mana pengguna akan diarahkan jika proses masuk dimulai tanpa konteks aplikasi (misalnya dari email)",
       "ERRORMSGPOPUP": "Tampilkan Kesalahan dalam Dialog",
       "DISABLEWATERMARK": "Sembunyikan Tanda Air",
-      "DISABLEWATERMARK_DESC": "Sembunyikan tanda air Powered by ZITADEL di antarmuka login"
+      "DISABLEWATERMARK_DESC": "Sembunyikan tanda air Powered by Zitadel di antarmuka login"
     },
     "RESET": "Reset ke default Instans",
     "CREATECUSTOM": "Buat Kebijakan Kustom",
@@ -1970,7 +1968,7 @@
       "CREATE_DESC": "Masukkan nama proyek Anda.",
       "ROLE": "Peran",
       "NOITEMS": "Tidak ada proyek",
-      "ZITADELPROJECT": "Ini milik proyek ZITADEL. Hati-hati: Jika Anda membuat perubahan, ZITADEL mungkin tidak berfungsi sebagaimana mestinya.",
+      "ZITADELPROJECT": "Ini milik proyek Zitadel. Hati-hati: Jika Anda membuat perubahan, Zitadel mungkin tidak berfungsi sebagaimana mestinya.",
       "TYPE": {
         "OWNED": "Proyek Milik",
         "OWNED_SINGULAR": "Proyek Milik",
@@ -2055,7 +2053,7 @@
       "DESCRIPTION": "Izinkan organisasi lain untuk menggunakan proyek Anda.",
       "EDITTITLE": "Edit peran",
       "CREATE": {
-        "TITLE": "Buat Hibah Organisasi",
+        "TITLE": "Buat hak akses proyek",
         "SEL_USERS": "Pilih pengguna yang ingin Anda berikan akses",
         "SEL_PROJECT": "Cari proyek",
         "SEL_ROLES": "Pilih peran yang ingin Anda tambahkan ke hibah",
@@ -2065,7 +2063,7 @@
         "ORG_DESCRIPTION": "Anda akan memberikan pengguna untuk organisasi {{name}}.",
         "ORG_DESCRIPTION_DESC": "Ganti konteks pada header di atas untuk memberikan pengguna untuk organisasi lain.",
         "SEL_ORG_FORMFIELD": "Organisasi",
-        "FOR_ORG": "Hibah ini dibuat untuk:"
+        "FOR_ORG": "Hak akses proyek akan dibuat untuk:"
       },
       "DETAIL": {
         "TITLE": "Hibah Proyek",
@@ -2178,7 +2176,7 @@
       "DEACTIVATED": "Dinonaktifkan.",
       "CREATED": "Proyek dibuat.",
       "UPDATED": "Proyek berubah.",
-      "GRANTUPDATED": "Hibah berubah.",
+      "GRANTUPDATED": "Izin proyek telah diubah.",
       "DELETED": "Proyek dihapus."
     }
   },
@@ -2330,8 +2328,8 @@
     "DISPLAYNAMEATTRIBUTE": "Atribut nama tampilan",
     "EMAILATTRIBUTEATTRIBUTE": "Atribut email",
     "EMAILVERIFIEDATTRIBUTE": "Atribut terverifikasi email",
-    "FIRSTNAMEATTRIBUTE": "Atribut nama yang diberikan",
-    "LASTNAMEATTRIBUTE": "Atribut nama keluarga",
+    "FIRSTNAMEATTRIBUTE": "Atribut nama depan",
+    "LASTNAMEATTRIBUTE": "Atribut nama belakang",
     "NICKNAMEATTRIBUTE": "Atribut nama panggilan",
     "PHONEATTRIBUTE": "Atribut telepon",
     "PHONEVERIFIEDATTRIBUTE": "Atribut terverifikasi telepon",
@@ -2353,7 +2351,7 @@
     "DELETE_SELECTION_TITLE": "Hapus IDP",
     "DELETE_SELECTION_DESCRIPTION": "Anda akan menghapus penyedia identitas. Perubahan yang dihasilkan tidak dapat dibatalkan. Apakah Anda benar-benar ingin melakukan ini?",
     "FEDERATEDLOGOUTENABLED": "Logout Federasi Diaktifkan",
-    "FEDERATEDLOGOUTENABLED_DESC": "Jika diaktifkan, pengguna juga akan keluar dari IdP jika pengguna mengakhiri sesi di ZITADEL.",
+    "FEDERATEDLOGOUTENABLED_DESC": "Jika diaktifkan, pengguna juga akan keluar dari IdP jika pengguna mengakhiri sesi di Zitadel.",
     "EMPTY": "Tidak ada pengungsi yang tersedia",
     "OIDC": {
       "GENERAL": "Informasi Umum",
@@ -2403,8 +2401,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Tanpa kata sandi",
-      "MULTIFACTORDESCRIPTION": "Tentukan Multifaktor Anda untuk Otentikasi tanpa kata sandi Anda di sini.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Tentukan Multifaktor Anda untuk Otentikasi Passkey Anda di sini.",
       "SECONDFACTORTITLE": "Otentikasi Multifaktor",
       "SECONDFACTORDESCRIPTION": "Tentukan lebih lanjut kemungkinan faktor yang dapat digunakan untuk mengamankan otentikasi kata sandi Anda."
     },
@@ -2424,14 +2422,14 @@
     "TYPE": "Jenis",
     "MULTIFACTORTYPES": {
       "0": "Tidak dikenal",
-      "1": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya"
+      "1": "Passkey"
     },
     "SECONDFACTORTYPES": {
       "0": "Tidak dikenal",
-      "1": "Kata Sandi Sekali Pakai oleh Aplikasi Authenticator (TOTP)",
-      "2": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya",
-      "3": "Kata Sandi Satu Kali melalui Email (Email OTP)",
-      "4": "Kata Sandi Satu Kali melalui SMS (SMS OTP)",
+      "1": "OTP oleh Aplikasi Authenticator (TOTP)",
+      "2": "Passkey",
+      "3": "OTP melalui Email (OTP Email)",
+      "4": "OTP melalui SMS (OTP SMS)",
       "5": "Kode Pemulihan"
     }
   },
@@ -2446,7 +2444,7 @@
       "DESCRIPTION": "Anda dapat memilih penyedia yang telah ditentukan sebelumnya atau dibuat sendiri untuk autentikasi.",
       "SELECTIDPS": "Penyedia identitas"
     },
-    "PASSWORDLESS": "Login Tanpa Kata Sandi",
+    "PASSWORDLESS": "Login Passkey",
     "PASSWORDLESSTYPE": {
       "0": "Tidak diperbolehkan",
       "1": "Diizinkan"
@@ -2455,7 +2453,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Penyedia SMTP",
-      "DESCRIPTION": "Ini adalah penyedia SMTP untuk instans ZITADEL Anda. Aktifkan yang ingin Anda gunakan untuk mengirim notifikasi ke pengguna Anda.",
+      "DESCRIPTION": "Ini adalah penyedia SMTP untuk instans Zitadel Anda. Aktifkan yang ingin Anda gunakan untuk mengirim notifikasi ke pengguna Anda.",
       "EMPTY": "Tidak ada Penyedia SMTP yang tersedia",
       "ACTIVATED": "Diaktifkan",
       "ACTIVATE": "Aktifkan penyedia",
@@ -2491,11 +2489,11 @@
         "NEXT_STEPS": "Langkah Selanjutnya",
         "ACTIVATE": {
           "TITLE": "Aktifkan Penyedia SMTP Anda",
-          "DESCRIPTION": "ZITADEL tidak dapat menggunakan Penyedia SMTP ini untuk mengirimkan pemberitahuan sampai Anda mengaktifkannya. Jika Anda mengaktifkan penyedia ini, penyedia lain yang aktif sekarang akan dinonaktifkan."
+          "DESCRIPTION": "Zitadel tidak dapat menggunakan Penyedia SMTP ini untuk mengirimkan pemberitahuan sampai Anda mengaktifkannya. Jika Anda mengaktifkan penyedia ini, penyedia lain yang aktif sekarang akan dinonaktifkan."
         },
         "DEACTIVATE": {
           "TITLE": "Nonaktifkan Penyedia SMTP Anda",
-          "DESCRIPTION": "Jika Anda menonaktifkan Penyedia SMTP ini, ZITADEL tidak dapat menggunakannya untuk mengirimkan pemberitahuan sampai Anda mengaktifkannya kembali."
+          "DESCRIPTION": "Jika Anda menonaktifkan Penyedia SMTP ini, Zitadel tidak dapat menggunakannya untuk mengirimkan pemberitahuan sampai Anda mengaktifkannya kembali."
         },
         "SAVE_SETTINGS": "Simpan pengaturan Anda",
         "TEST": {
@@ -2656,8 +2654,8 @@
       "IDTOKENROLEASSERTION": "Peran pengguna di dalam Token ID",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Jika dipilih, peran yang diminta dari pengguna yang diautentikasi akan ditambahkan ke token ID.",
       "IDTOKENUSERINFOASSERTION": "Info Pengguna di dalam Token ID",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Memungkinkan klien untuk mengambil klaim profil, email, telepon dan alamat dari token ID.",
-      "CLOCKSKEW": "Memungkinkan klien untuk menangani kemiringan jam OP dan klien. Durasi (0-5 detik) akan ditambahkan ke klaim exp dan dikurangi dari iats, auth_time, dan nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Memungkinkan aplikasi untuk mengambil klaim profil, email, telepon dan alamat dari token ID.",
+      "CLOCKSKEW": "Memungkinkan aplikasi untuk menangani kemiringan jam OP dan aplikasi. Durasi (0-5 detik) akan ditambahkan ke klaim exp dan dikurangi dari iats, auth_time, dan nbf.",
       "RECOMMENDED": "direkomendasikan",
       "NOTRECOMMENDED": "tidak disarankan",
       "SELECTION": {
@@ -2675,7 +2673,8 @@
             "DESCRIPTION": "Aplikasi Halaman Tunggal (SPA) dan secara umum semua kerangka JS dijalankan di browser"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2787,7 +2786,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Tambahkan Manajer",

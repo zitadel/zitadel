@@ -48,7 +48,7 @@ describe("login", () => {
       data: {
         settings: {
           passkeysType: 1,
-          allowUsernamePassword: true,
+          allowLocalAuthentication: true,
         },
       },
     });
@@ -111,7 +111,7 @@ describe("login", () => {
           },
         });
       });
-      // it("should prompt a user to setup passwordless authentication if passkey is allowed in the login settings", () => {
+      // it("should prompt a user to setup passkey authentication if passkey is allowed in the login settings", () => {
       //   cy.visit("/loginname?loginName=john%40example.com&submit=true");
       //   cy.location("pathname", { timeout: 5 * 60_000 }).should("eq", "/password");
       //   cy.get('input[type="password"]').focus().type("MyStrongPassword!1");
@@ -159,12 +159,12 @@ describe("login", () => {
       });
       stub("zitadel.user.v2.UserService", "ListAuthenticationMethodTypes", {
         data: {
-          authMethodTypes: [2], // 2 for passwordless authentication
+          authMethodTypes: [2], // 2 for passkey authentication
         },
       });
     });
 
-    it("should redirect a user with passwordless authentication to /passkey", () => {
+    it("should redirect a user with passkey authentication to /passkey", () => {
       cy.visit("/loginname?loginName=john%40example.com&submit=true");
       cy.url().should("include", Cypress.config().baseUrl + "/passkey");
     });
