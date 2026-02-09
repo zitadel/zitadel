@@ -46,10 +46,11 @@ declare namespace NodeJS {
     NEXT_PUBLIC_APPLICATION_NAME?: string;
 
     /**
-     * Optional: Disable automatic email verification code redemption on page load.
-     * Set to "true" to require users to click a Submit button (supports enterprise email link scanners).
-     * Default behavior (undefined) auto-submits codes.
+     * Optional: Enable automatic code submission on page load.
+     * Set to "true" to auto-submit verification codes (e.g. email verification, Email OTP).
+     * Default behavior (undefined) requires users to click a Submit button,
+     * which is safer for environments with enterprise email link scanners.
      */
-    NEXT_PUBLIC_DISABLE_AUTO_VERIFY_EMAIL?: string;
+    NEXT_PUBLIC_AUTO_SUBMIT_CODE?: string;
   }
 }
