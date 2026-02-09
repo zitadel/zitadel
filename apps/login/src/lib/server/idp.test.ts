@@ -279,7 +279,7 @@ describe("redirectToIdp", () => {
 
       const result = await redirectToIdp(undefined, formData);
 
-      expect(result).toEqual({ error: "Unexpected response from IDP flow" });
+      expect(result).toEqual({ error: "Could not start IDP flow" });
     });
 
     test("should redirect when IDP flow returns a valid URL", async () => {
