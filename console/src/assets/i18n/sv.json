@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekt",
-      "DESCRIPTION": "Ett projekt är värd för en eller flera applikationer som du kan använda för att autentisera dina användare. Till exempel kan du ha ett enda projekt med 3 applikationer; en för din webbfrontend, en för din mobilapp och en för din backend. Du kan också auktorisera dina användare med projekt. För att tillåta användare från andra organisationer att logga in på dina applikationer, ge dem åtkomst till ditt projekt.<br/><br/>Om du inte kan hitta ett projekt, kontakta projektets ägare eller någon med motsvarande rättigheter för att få åtkomst.",
+      "DESCRIPTION": "Ett projekt är värd för en eller flera applikationer som du kan använda för att autentisera dina användare. Till exempel kan du ha ett enda projekt med 3 applikationer; en för din webbfrontend, en för din mobilapplikation, och en för din backend. Du kan också auktorisera dina användare med projekt. För att tillåta användare från andra organisationer att logga in på dina applikationer, ge dem åtkomst till ditt projekt.<br/><br/>Om du inte kan hitta ett projekt, kontakta projektets ägare eller någon med motsvarande rättigheter för att få åtkomst.",
       "OWNED": {
         "TITLE": "Ägda projekt",
         "DESCRIPTION": "Detta är de projekt du äger. Du kan hantera dessa projekts inställningar, behörigheter och applikationer."
@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Användare",
-      "DESCRIPTION": "En användare är en människa eller en maskin som kan få åtkomst till dina applikationer.",
+      "DESCRIPTION": "En användare är en människa eller ett tjänstkonto som kan få åtkomst till dina applikationer.",
       "HUMANS": {
         "TITLE": "Användare",
         "DESCRIPTION": "Användare autentiserar interaktivt i en webbläsarsession med en inloggningsprompt.",
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Aktiva och framtida webbnycklar",
           "DESCRIPTION": "Dina aktiva och kommande webbnycklar. Aktivering av en ny nyckel kommer att inaktivera den nuvarande.",
-          "NOTE": "Observera: JWKs OIDC-slutpunkten returnerar ett cachebart svar (standard 5 min). Undvik att aktivera en nyckel för tidigt, eftersom den kanske ännu inte är tillgänglig i cache och för klienter.",
+          "NOTE": "Observera: JWKs OIDC-slutpunkten returnerar ett cachebart svar (standard 5 min). Undvik att aktivera en nyckel för tidigt, eftersom den kanske ännu inte är tillgänglig i cache och för applikationer.",
           "ACTIVATE": "Aktivera nästa webbnyckel",
           "ACTIVE": "För närvarande aktiv",
           "NEXT": "Nästa i kön",
@@ -223,8 +223,8 @@
           "PR": "När en användare återställer sitt lösenord, kommer de att få ett mail med en länk för att ställa in ett nytt lösenord.",
           "VE": "När en användare ändrar sin e-postadress, kommer de att få ett mail med en länk för att verifiera den nya adressen.",
           "VP": "När en användare ändrar sitt telefonnummer, kommer de att få ett SMS med en kod för att verifiera det nya numret.",
-          "VEO": "När en användare lägger till en engångslösenord via e-postmetod, måste de aktivera den genom att ange en kod som skickas till deras e-postadress.",
-          "VSO": "När en användare lägger till en engångslösenord via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer.",
+          "VEO": "När en användare lägger till en OTP via e-postmetod, måste de aktivera den genom att ange en kod som skickas till deras e-postadress.",
+          "VSO": "När en användare lägger till en OTP via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer.",
           "IU": "När en inbjudningskod för användare skapas, får de ett e-mail med en länk för att ställa in sin autentiseringsmetod."
         }
       },
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Inloggningsformulär",
           "DESCRIPTION": "Anpassa inloggningsformuläret.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Användarnamn och lösenord tillåtet",
-            "DESCRIPTION": "Tillåt dina användare att logga in med sitt användarnamn och lösenord. Om detta är inaktiverat, kan dina användare endast logga in med Passkey autentisering eller med en extern identitetsleverantör."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Lokal autentisering tillåten",
+            "DESCRIPTION": "Tillåt dina användare att logga in med sitt användarnamn och lösenord eller nyckelautentisering (passkey). Om detta är inaktiverat kan dina användare endast logga in med en extern identitetsleverantör."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Användarregistrering tillåten",
@@ -386,12 +386,12 @@
         "action": "Skapa projekt"
       },
       "APPLICATION_CREATED": {
-        "title": "Registrera din app",
+        "title": "Registrera din applikation",
         "description": "Registrera din webb-, native-, API- eller SAML-applikation och ställ in ett autentiseringsflöde.",
-        "action": "Registrera app"
+        "action": "Registrera applikation"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Logga in på din app",
+        "title": "Logga in på din applikation",
         "description": "Integrera din applikation med Zitadel för autentisering och testa det genom att logga in med din administratörsanvändare.",
         "action": "Logga in"
       },
@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organisation",
     "PROJECT": "Projekt",
     "PROJECTOVERVIEW": "Översikt",
-    "PROJECTGRANTS": "Beviljanden",
+    "PROJECTGRANTS": "Projekttilldelningar",
     "ROLES": "Roller",
     "GRANTEDPROJECT": "Beviljade Projekt",
     "HUMANUSERS": "Användare",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Utvecklingsläge är aktiverat som standard. Du kan uppdatera värden för produktion senare.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Bläddra bland Exempel och SDKs",
-    "DUPLICATEAPPRENAME": "En app med samma namn finns redan. Vänligen välj ett annat namn.",
+    "DUPLICATEAPPRENAME": "En applikation med samma namn finns redan. Vänligen välj ett annat namn.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Byt Ramverk",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Har behörighet att skapa och hantera användare",
     "IAM_ADMIN_IMPERSONATOR": "Har behörighet att imitera administratörer och slutanvändare från alla organisationer",
     "IAM_END_USER_IMPERSONATOR": "Har behörighet att imitera slutanvändare från alla organisationer",
-    "IAM_LOGIN_CLIENT": "Har behörighet att hantera inloggningsklienter",
+    "IAM_LOGIN_CLIENT": "Har behörighet att hantera inloggningsapplikationer",
     "ORG_OWNER": "Har behörighet över hela organisationen",
     "ORG_USER_MANAGER": "Har behörighet att skapa och hantera användare i organisationen",
     "ORG_OWNER_VIEWER": "Har behörighet att granska hela organisationen",
@@ -851,7 +851,7 @@
       "U2F_NAME": "Autentiserarens namn",
       "TYPE": {
         "0": "Ingen MFA definierad",
-        "1": "Engångslösenord (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -884,24 +884,24 @@
       "DESCRIPTION": "Lägg till en andra faktor för att säkerställa optimal säkerhet för ditt konto.",
       "MANAGE_DESCRIPTION": "Hantera användarnas andra faktormetoder.",
       "ADD": "Lägg till faktor",
-      "OTP": "Autentiseringsapp för TOTP (Tidsbaserat engångslösenord)",
+      "OTP": "Autentiseringsapplikation för TOTP",
       "OTP_DIALOG_TITLE": "Lägg till OTP",
-      "OTP_DIALOG_DESCRIPTION": "Skanna QR-koden med en autentiseringsapp och ange koden nedan för att verifiera och aktivera OTP-metoden.",
+      "OTP_DIALOG_DESCRIPTION": "Skanna QR-koden med en autentiseringsapplikation och ange koden nedan för att verifiera och aktivera OTP-metoden.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verifiera faktor",
       "U2F_DIALOG_DESCRIPTION": "Ange ett namn för din använda universella tvåfaktor.",
       "U2F_SUCCESS": "Faktor tillagd framgångsrikt!",
       "U2F_ERROR": "Ett fel inträffade under inställningen!",
       "U2F_NAME": "Autentiserarens namn",
-      "OTPSMS": "OTP (Engångslösenord) med SMS",
-      "OTPEMAIL": "OTP (Engångslösenord) med e-post",
-      "SETUPOTPSMSDESCRIPTION": "Vill du ställa in detta telefonnummer som OTP (Engångslösenord) andra faktor?",
+      "OTPSMS": "OTP med SMS",
+      "OTPEMAIL": "OTP med e-post",
+      "SETUPOTPSMSDESCRIPTION": "Vill du ställa in detta telefonnummer som OTP andra faktor?",
       "OTPSMSSUCCESS": "OTP-faktor inställd med framgång.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Din telefon måste verifieras för att använda denna metod.",
       "OTPEMAILSUCCESS": "OTP-faktor inställd med framgång.",
       "TYPE": {
         "0": "Ingen MFA definierad",
-        "1": "Engångslösenord (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -1615,9 +1615,9 @@
         "3": "Telefonverifiering",
         "4": "Återställning av lösenord",
         "5": "Passkey-initiering",
-        "6": "App-hemlighet",
-        "7": "Engångslösenord (OTP) - SMS",
-        "8": "Engångslösenord (OTP) - E-post"
+        "6": "Applikations-hemlighet",
+        "7": "OTP - SMS",
+        "8": "OTP - E-post"
       },
       "EXPIRY": "Utgång (på minuter)",
       "INCLUDEDIGITS": "Inkludera siffror",
@@ -1639,8 +1639,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Standardorganisation för inloggning",
       "LOGINDEFAULTORG_DESCRIPTION": "Inloggningsgränssnittet kommer att använda inställningarna för standardorganisationen (och inte från instansen) om ingen organisationskontext är inställd",
-      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktivera den experimentella urn:ietf:params:oauth:grant-type:token-exchange grant-typen för OIDC-tokenändpunkten. Tokenutbyte kan användas för att begära tokens med en mindre omfattning eller impersonera andra användare. Se säkerhetspolicyn för att tillåta impersonation på en instans.",
       "USERSCHEMA": "Användarschema",
       "USERSCHEMA_DESCRIPTION": "Användarscheman tillåter att hantera datascheman för användare. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "ACTIONS": "Åtgärder",
@@ -1649,8 +1647,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
       "DEBUGOIDCPARENTERROR": "Debugga OIDC Föräldrafel",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Om flaggan är aktiverad kommer OIDC-föräldrafel att loggas i konsolen.",
-      "ENABLEBACKCHANNELLOGOUT": "Aktivera Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementerar OpenID Connect Back-Channel Logout 1.0 och kan användas för att meddela klienter om sessionens avslutning hos OpenID-leverantören.",
       "PERMISSIONCHECKV2": "Behörighetskontroll V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Om flaggan är aktiverad kan du använda den nya API:n och dess funktioner.",
       "STATES": {
@@ -1857,7 +1853,7 @@
         "INIT": "Initialisering",
         "VE": "Verifiera E-post",
         "VP": "Verifiera Telefon",
-        "VSO": "Verifiera SMS OTP",
+        "VSO": "Verifiera OTP SMS",
         "VEO": "Verifiera E-post OTP",
         "PR": "Återställ Lösenord",
         "DC": "Domänkrav",
@@ -1881,8 +1877,8 @@
         "changedate": "Ändringsdatum",
         "username": "Användarnamn",
         "tempUsername": "Tillfälligt användarnamn",
-        "otp": "Engångslösenord",
-        "verifyUrl": "Verifiera Engångslösenord URL",
+        "otp": "OTP",
+        "verifyUrl": "Verifiera OTP URL",
         "expiry": "Utgångsdatum",
         "applicationName": "Applikationsnamn"
       },
@@ -2063,7 +2059,7 @@
       "DESCRIPTION": "Tillåt en annan organisation att använda ditt projekt.",
       "EDITTITLE": "Redigera roller",
       "CREATE": {
-        "TITLE": "Skapa Organisationsbeviljande",
+        "TITLE": "Skapa projektbehörighet",
         "SEL_USERS": "Välj de användare du vill ge tillgång",
         "SEL_PROJECT": "Sök efter ett projekt",
         "SEL_ROLES": "Välj de roller du vill lägga till i beviljandet",
@@ -2073,7 +2069,7 @@
         "ORG_DESCRIPTION": "Du håller på att bevilja en användare för organisationen {{name}}.",
         "ORG_DESCRIPTION_DESC": "Byt kontext i rubriken ovan för att bevilja en användare för en annan organisation.",
         "SEL_ORG_FORMFIELD": "Organisation",
-        "FOR_ORG": "Beviljandet skapas för:"
+        "FOR_ORG": "Projektbehörigheten kommer att skapas för:"
       },
       "DETAIL": {
         "TITLE": "Projektbeviljande",
@@ -2186,7 +2182,7 @@
       "DEACTIVATED": "Inaktiverad.",
       "CREATED": "Projekt skapat.",
       "UPDATED": "Projekt ändrat.",
-      "GRANTUPDATED": "Bidrag ändrat.",
+      "GRANTUPDATED": "Projekttilldelning ändrat.",
       "DELETED": "Projekt borttaget."
     }
   },
@@ -2435,10 +2431,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Okänd",
-      "1": "Engångslösenord via autentiseringsapp (TOTP)",
+      "1": "OTP via autentiseringsapplikation (TOTP)",
       "2": "Passkey",
-      "3": "Engångslösenord via e-post (E-post OTP)",
-      "4": "Engångslösenord via SMS (SMS OTP)",
+      "3": "E-post OTP",
+      "4": "OTP SMS",
       "5": "Återställningskoder"
     }
   },
@@ -2663,8 +2659,8 @@
       "IDTOKENROLEASSERTION": "Användarroller i ID-token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Om valt, läggs de begärda rollerna för den autentiserade användaren till ID-token.",
       "IDTOKENUSERINFOASSERTION": "Användarinformation i ID-token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Möjliggör för klienter att hämta profil, e-post, telefon och adressanspråk från ID-token.",
-      "CLOCKSKEW": "Möjliggör för klienter att hantera klockförskjutning av OP och klient. Varaktigheten (0-5s) kommer att läggas till exp-anspråket och dras av från iats, auth_time och nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Möjliggör för applikationer att hämta profil, e-post, telefon och adressanspråk från ID-token.",
+      "CLOCKSKEW": "Möjliggör för applikationer att hantera klockförskjutning av OP och applikation. Varaktigheten (0-5s) kommer att läggas till exp-anspråket och dras av från iats, auth_time och nbf.",
       "RECOMMENDED": "rekommenderad",
       "NOTRECOMMENDED": "inte rekommenderad",
       "SELECTION": {
@@ -2682,7 +2678,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) och i allmänhet alla JS-ramverk som körs i webbläsare"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

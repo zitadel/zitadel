@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Utilisateurs",
-      "DESCRIPTION": "Un utilisateur est un humain ou une machine qui peut accéder à vos applications.",
+      "DESCRIPTION": "Un utilisateur est un humain ou compte de service qui peut accéder à vos applications.",
       "HUMANS": {
         "TITLE": "Utilisateurs",
         "DESCRIPTION": "Les utilisateurs s'authentifient de manière interactive dans une session de navigateur avec une invite de connexion.",
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Clés Web Actives et Futures",
           "DESCRIPTION": "Vos clés Web actives et à venir. L'activation d'une nouvelle clé désactivera l'actuelle.",
-          "NOTE": "Remarque : Le point de terminaison JWKs OIDC renvoie une réponse mise en cache (par défaut 5 min). Évitez d'activer une clé trop tôt, car elle pourrait ne pas encore être disponible pour les caches et les clients.",
+          "NOTE": "Remarque : Le point de terminaison JWKs OIDC renvoie une réponse mise en cache (par défaut 5 min). Évitez d'activer une clé trop tôt, car elle pourrait ne pas encore être disponible pour les caches et les applications.",
           "ACTIVATE": "Activer la prochaine Clé Web",
           "ACTIVE": "Actuellement active",
           "NEXT": "Prochaine dans la file d'attente",
@@ -223,8 +223,8 @@
           "PR": "Lorsqu'un utilisateur réinitialise son mot de passe, il recevra un e-mail avec un lien pour définir un nouveau mot de passe.",
           "VE": "Lorsqu'un utilisateur change son adresse e-mail, il recevra un e-mail avec un lien pour vérifier la nouvelle adresse.",
           "VP": "Lorsqu'un utilisateur change son numéro de téléphone, il recevra un SMS avec un code pour vérifier le nouveau numéro.",
-          "VEO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via e-mail, il doit l'activer en entrant un code envoyé à son adresse e-mail.",
-          "VSO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via SMS, il doit l'activer en entrant un code envoyé à son numéro de téléphone.",
+          "VEO": "Lorsqu'un utilisateur ajoute une OTP via e-mail, il doit l'activer en entrant un code envoyé à son adresse e-mail.",
+          "VSO": "Lorsqu'un utilisateur ajoute une OTP via SMS, il doit l'activer en entrant un code envoyé à son numéro de téléphone.",
           "IU": "Lorsqu'un code d'invitation d'utilisateur est créé, il recevra un e-mail avec un lien pour configurer sa méthode d'authentification."
         }
       },
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formulaire de connexion",
           "DESCRIPTION": "Personnalisez le formulaire de connexion",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Nom d'utilisateur et mot de passe autorisés",
-            "DESCRIPTION": "Autorisez vos utilisateurs à se connecter avec leur nom d'utilisateur et mot de passe. Si désactivé, vos utilisateurs pourront uniquement se connecter avec une clé d'accès ou avec un fournisseur d'identité externe"
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Authentification locale autorisée",
+            "DESCRIPTION": "Autorisez vos utilisateurs à se connecter avec leur nom d'utilisateur et leur mot de passe ou via l'authentification par passkey. Si cette option est désactivée, vos utilisateurs ne pourront se connecter qu'en utilisant un fournisseur d'identité externe."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Enregistrement de nouveaux utilisateurs autorisé",
@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organisation",
     "PROJECT": "Projets",
     "PROJECTOVERVIEW": "Vue d'ensemble",
-    "PROJECTGRANTS": "Droits",
+    "PROJECTGRANTS": "Concessions de projet",
     "ROLES": "Rôles",
     "GRANTEDPROJECT": "Projets octroyés",
     "HUMANUSERS": "Utilisateurs",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs",
     "IAM_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de toutes les organisations",
     "IAM_END_USER_IMPERSONATOR": "Est autorisé à usurper l'identité des utilisateurs finaux de toutes les organisations",
-    "IAM_LOGIN_CLIENT": "A la permission de gérer les clients de connexion",
+    "IAM_LOGIN_CLIENT": "A la permission de gérer les applications de connexion",
     "ORG_OWNER": "A le droit de contrôler l'ensemble de l'organisation",
     "ORG_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs de l'organisation",
     "ORG_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'organisation",
@@ -698,7 +698,7 @@
     "TITLE": "Filtre",
     "STATE": "Statut",
     "DISPLAYNAME": "Nom d'affichage de l'utilisateur",
-    "EMAIL": "Courriel",
+    "EMAIL": "E-mail",
     "USERNAME": "Nom de l'utilisateur",
     "ORGNAME": "Nom de l'organisation",
     "ORGID": "ID de l'organisation",
@@ -851,7 +851,7 @@
       "U2F_NAME": "Nom de l'authentificateur",
       "TYPE": {
         "0": "Pas de MFA défini",
-        "1": "Mot de passe à usage unique (OTP)",
+        "1": "OTP",
         "2": "Clé d'accès (Empreinte digitale, clés de sécurité, Face ID et autres)"
       },
       "STATE": {
@@ -884,7 +884,7 @@
       "DESCRIPTION": "Ajoutez un second facteur pour garantir une sécurité optimale de votre compte.",
       "MANAGE_DESCRIPTION": "Gérez les méthodes de second facteur de vos utilisateurs.",
       "ADD": "Ajouter un facteur",
-      "OTP": "Application d'authentification pour TOTP (Time-based One-time password)",
+      "OTP": "Application d'authentification pour TOTP",
       "OTP_DIALOG_TITLE": "Ajouter un TOTP",
       "OTP_DIALOG_DESCRIPTION": "Scannez le code QR avec une application d'authentification et saisissez le code ci-dessous pour vérifier et activer la méthode OTP.",
       "U2F": "Clé d'accès (Empreinte digitale, clés de sécurité, Face ID et autres)",
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "Facteur ajouté avec succès !",
       "U2F_ERROR": "Une erreur s'est produite pendant l'installation !",
       "U2F_NAME": "Nom de l'authentificateur",
-      "OTPSMS": "OTP (One-Time Password) avec SMS",
-      "OTPEMAIL": "OTP (password monouso) cone-mail",
-      "SETUPOTPSMSDESCRIPTION": "Voulez-vous configurer ce numéro de téléphone comme deuxième facteur OTP (mot de passe à usage unique) ?",
+      "OTPSMS": "OTP avec SMS",
+      "OTPEMAIL": "OTP avec e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Voulez-vous configurer ce numéro de téléphone comme deuxième facteur OTP ?",
       "OTPSMSSUCCESS": "OTP Factor mis en place avec succès.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Votre téléphone doit être vérifié pour pouvoir utiliser cette méthode.",
       "OTPEMAILSUCCESS": "OTP Factor mis en place avec succès.",
       "TYPE": {
         "0": "Pas de MFA défini",
-        "1": "Mot de passe à usage unique (OTP)",
+        "1": "OTP",
         "2": "Clé d'accès (Empreinte digitale, clés de sécurité, Face ID et autres)"
       },
       "STATE": {
@@ -960,12 +960,12 @@
     },
     "PROFILE": {
       "TITLE": "Profil",
-      "EMAIL": "Courriel",
+      "EMAIL": "E-mail",
       "PHONE": "Numéro de téléphone",
       "PHONE_HINT": "Utilisez le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone.",
       "PHONE_VERIFIED": "Numéro de téléphone vérifié",
       "SEND_SMS": "Envoyer un SMS de vérification",
-      "SEND_EMAIL": "Envoyer un Courriel",
+      "SEND_EMAIL": "Envoyer un E-mail",
       "USERNAME": "Nom de l'utilisateur",
       "CHANGEUSERNAME": "modifier",
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
@@ -1049,7 +1049,7 @@
     "PHONE": "Numéro de téléphone",
     "PHONEEMPTY": "Pas de numéro de téléphone défini",
     "PHONEVERIFIED": "Numéro de téléphone vérifié.",
-    "EMAILVERIFIED": "Courriel vérifié",
+    "EMAILVERIFIED": "E-mail vérifié",
     "NOTVERIFIED": "non vérifié",
     "PREFERRED_LOGINNAME": "Nom de connexion préféré",
     "ISINITIAL": "L'utilisateur n'est pas encore actif",
@@ -1057,9 +1057,9 @@
       "TITLE": "Informations sur le contact",
       "DESCRIPTION": "Les informations fournies sont utilisées pour vous envoyer des informations importantes, comme dese-mails de réinitialisation de mot de passe.",
       "EMAIL": {
-        "TITLE": "Courriel",
+        "TITLE": "E-mail",
         "VALID": "Validé",
-        "ISVERIFIED": "Courriel vérifié",
+        "ISVERIFIED": "E-mail vérifié",
         "ISVERIFIEDDESC": "Si l'e-mail est indiqué comme vérifié, aucune demande de vérification d'e-mail ne sera effectuée.",
         "RESEND": "Renvoyer l'e-mail de vérification",
         "EDITTITLE": "Modifier l'e-mail",
@@ -1594,7 +1594,7 @@
         "TOKEN": "Jeton",
         "SENDERNUMBER": "Numéro d'expéditeur",
         "VERIFYSERVICESID": "SID du service de vérification",
-        "VERIFYSERVICESID_DESCRIPTION": "Le réglage d'un SID du service de vérification permet d'utiliser le service Twilio Verify au lieu du service de messagerie pour la vérification des numéros de téléphone et des SMS OTP.",
+        "VERIFYSERVICESID_DESCRIPTION": "Le réglage d'un SID du service de vérification permet d'utiliser le service Twilio Verify au lieu du service de messagerie pour la vérification des numéros de téléphone et des OTP SMS.",
         "ADDED": "Twilio a été ajouté avec succès.",
         "UPDATED": "Twilio a été mis à jour avec succès.",
         "REMOVED": "Twilio a été supprimé avec succès",
@@ -1607,13 +1607,13 @@
       "TYPES": "Types de secret",
       "TYPE": {
         "1": "Courrier d'initialisation",
-        "2": "Vérification du courrier électronique",
+        "2": "Vérification du e-mail",
         "3": "Vérification par téléphone",
         "4": "Réinitialisation du mot de passe",
         "5": "Initialisation de clé d'accès",
         "6": "Secret de l'application",
-        "7": "Mot de passe à usage unique (OTP) - SMS",
-        "8": "Mot de passe à usage unique (OTP) -e-mail"
+        "7": "OTP - SMS",
+        "8": "OTP - e-mail"
       },
       "EXPIRY": "Expiration (en minutes)",
       "INCLUDEDIGITS": "Inclure les chiffres",
@@ -1635,8 +1635,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Organisation par défaut de connexion",
       "LOGINDEFAULTORG_DESCRIPTION": "L'interface de connexion utilisera les paramètres de l'organisation par défaut (et non de l'instance) si aucun contexte d'organisation n'est défini.",
-      "OIDCTOKENEXCHANGE": "Échange de jetons OIDC",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Activez le type d'octroi expérimental urn:ietf:params:oauth:grant-type:token-exchange pour le point de terminaison de jeton OIDC. L'échange de jetons peut être utilisé pour demander des jetons avec une portée moindre ou pour usurper d'autres utilisateurs. Consultez la politique de sécurité pour autoriser l'usurpation sur une instance.",
       "USERSCHEMA": "Schéma utilisateur",
       "USERSCHEMA_DESCRIPTION": "Les schémas utilisateur permettent de gérer les schémas de données des utilisateurs. Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "ACTIONS": "Actions",
@@ -1645,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si l'indicateur est activé, vous pourrez terminer une seule session à partir de l'interface utilisateur de connexion en fournissant un id_token avec une revendication `sid` en tant que id_token_hint sur le point de terminaison end_session. Notez que toutes les sessions du même agent utilisateur (navigateur) sont actuellement terminées dans l'interface utilisateur de connexion. Les sessions gérées via l'API de session permettent déjà la terminaison de sessions individuelles.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si le drapeau est activé, l'erreur parent OIDC sera enregistrée dans la console.",
-      "ENABLEBACKCHANNELLOGOUT": "Activer le Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Le Back-Channel Logout implémente OpenID Connect Back-Channel Logout 1.0 et peut être utilisé pour notifier les clients de la fin de session chez le fournisseur OpenID.",
       "PERMISSIONCHECKV2": "Vérification des permissions V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "STATES": {
@@ -1708,7 +1704,7 @@
       "RELEASE": "Communiqué",
       "DROPFONT": "Déposer le fichier de la police ici",
       "RELEASEFONT": "Release",
-      "USEOFLOGO": "Votre logo sera utilisé dans la connexion ainsi que dans les courriels, tandis que l'icône est utilisée pour les petits éléments de l'interface utilisateur, comme le sélecteur d'organisation dans la console de gestion.",
+      "USEOFLOGO": "Votre logo sera utilisé dans la connexion ainsi que dans les e-mails, tandis que l'icône est utilisée pour les petits éléments de l'interface utilisateur, comme le sélecteur d'organisation dans la console de gestion.",
       "MAXSIZE": "La taille maximale est limitée à 524 Ko.",
       "EMAILNOSVG": "Le format de fichier SVG n'est pas supporté dans les e-mails. Téléchargez donc votre logo en PNG ou dans un autre format pris en charge.",
       "MAXSIZEEXCEEDED": "La taille maximale de 524kB est dépassée.",
@@ -1853,8 +1849,8 @@
         "INIT": "Initialisation",
         "VE": "Vérifier l'e-mail",
         "VP": "Vérifier le téléphone",
-        "VSO": "Vérifier SMS OTP",
-        "VEO": "Vérifier l'OTP par courrier électronique",
+        "VSO": "Vérifier OTP SMS",
+        "VEO": "Vérifier l'OTP par e-mail",
         "PR": "Réinitialisation du mot de passe",
         "DC": "Réclamation de domaine",
         "PL": "Clé d'accès",
@@ -1872,13 +1868,13 @@
         "domain": "Domaine",
         "lastEmail": "Dernier e-mail",
         "lastPhone": "Dernier téléphone",
-        "verifiedEmail": "Courriel vérifié",
+        "verifiedEmail": "E-mail vérifié",
         "verifiedPhone": "Téléphone vérifié",
         "changedate": "Date de changement",
         "username": "Nom d'utilisateur",
         "tempUsername": "Nom d'utilisateur temporaire",
-        "otp": "Mot de passe à usage unique",
-        "verifyUrl": "URL pour vérifier le mot de passe à usage unique",
+        "otp": "OTP",
+        "verifyUrl": "URL pour vérifier le OTP",
         "expiry": "Expiration",
         "applicationName": "Nom de l'application"
       },
@@ -1917,7 +1913,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Si l'option est sélectionnée, l'écran du mot de passe sera affiché dans le processus de connexion même si l'utilisateur n'a pas été trouvé. L'erreur sur la vérification du mot de passe ne révélera pas si le nom d'utilisateur ou le mot de passe était erroné.",
       "ALLOWDOMAINDISCOVERY_DESC": "Si l'option est sélectionnée, le suffixe (@domain.com) d'un nom d'utilisateur inconnu saisi sur l'écran de connexion sera comparé aux domaines organisation et redirigera vers l'enregistrement de cette organisation en cas de succès.",
       "DEFAULTREDIRECTURI": "URI de redirection par défaut",
-      "DEFAULTREDIRECTURI_DESC": "Définit l'endroit où l'utilisateur sera redirigé si la connexion a commencé sans contexte d'application (par exemple, à partir du courrier électronique).",
+      "DEFAULTREDIRECTURI_DESC": "Définit l'endroit où l'utilisateur sera redirigé si la connexion a commencé sans contexte d'application (par exemple, à partir du e-mail).",
       "ERRORMSGPOPUP": "Afficher l'erreur dans la boîte de dialogue",
       "DISABLEWATERMARK": "Cacher le filigrane",
       "DISABLEWATERMARK_DESC": "Masquer le filigrane Powered by Zitadel dans l'interface de connexion"
@@ -2059,7 +2055,7 @@
       "DESCRIPTION": "Autoriser une autre organisation à utiliser votre projet.",
       "EDITTITLE": "Rôles d'édition",
       "CREATE": {
-        "TITLE": "Octroyer une organisation",
+        "TITLE": "Créer une concession de projet",
         "SEL_USERS": "Sélectionnez les utilisateurs auxquels vous souhaitez accorder l'accès",
         "SEL_PROJECT": "Rechercher un projet",
         "SEL_ROLES": "Sélectionnez les rôles que vous souhaitez ajouter à l'autorisation.",
@@ -2069,7 +2065,7 @@
         "ORG_DESCRIPTION": "Vous êtes sur le point d'octroyer un utilisateur pour l'organisation {{name}}.",
         "ORG_DESCRIPTION_DESC": "Changez le contexte dans l'en-tête ci-dessus pour accorder un utilisateur pour une autre organisation.",
         "SEL_ORG_FORMFIELD": "Organisation",
-        "FOR_ORG": "L'autorisation est créée pour"
+        "FOR_ORG": "La concession de projet est créée pour:"
       },
       "DETAIL": {
         "TITLE": "Octroyer un projet",
@@ -2182,7 +2178,7 @@
       "DEACTIVATED": "Désactivé.",
       "CREATED": "Projet créé.",
       "UPDATED": "Projet modifié.",
-      "GRANTUPDATED": "Octroi modifié.",
+      "GRANTUPDATED": "Attribution de projet modifiée.",
       "DELETED": "Projet supprimé."
     }
   },
@@ -2288,7 +2284,7 @@
     },
     "AZUREADTENANTTYPE": "Type de locataire",
     "AZUREADTENANTID": "ID du locataire",
-    "EMAILVERIFIED": "Courriel vérifié",
+    "EMAILVERIFIED": "E-mail vérifié",
     "NAMEHINT": "Si elle est spécifiée, elle sera affichée dans l'interface de connexion.",
     "OPTIONAL": "optionnel",
     "LDAPATTRIBUTES": "Attributs LDAP",
@@ -2411,10 +2407,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Inconnu",
-      "1": "One Time Password via une application d'authentification (TOTP)",
+      "1": "OTP par application d'authentification (TOTP)",
       "2": "Clé d'accès",
-      "3": "One Time Password par e-mail (E-mail OTP)",
-      "4": "One Time Password par SMS (SMS OTP)",
+      "3": "OTP par e-mail (OTP Email)",
+      "4": "OTP par SMS (OTP SMS)",
       "5": "Codes de récupération"
     }
   },
@@ -2635,8 +2631,8 @@
       "IDTOKENROLEASSERTION": "Rôles de l'utilisateur dans le jeton d'identification",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Si sélectionné, les rôles demandés à l'utilisateur authentifié sont ajoutés au jeton d'identification. Assurez-vous d'activer le paramètre de projet 'Attribuer des rôles d'utilisateur pendant l'authentification' ou de le demander via une portée personnalisée.",
       "IDTOKENUSERINFOASSERTION": "Informations sur l'utilisateur dans le jeton d'identification",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permet aux clients de récupérer le profil, l'e-mail, le téléphone et l'adresse à partir du jeton d'identification.",
-      "CLOCKSKEW": "Permet aux clients de gérer le décalage d'horloge de l'OP et du client. La durée (0-5s) sera ajoutée à la réclamation exp et soustraite de iats, auth_time et nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permet aux applications de récupérer le profil, l'e-mail, le téléphone et l'adresse à partir du jeton d'identification.",
+      "CLOCKSKEW": "Permet aux applications de gérer le décalage d'horloge de l'OP et de l'application. La durée (0-5s) sera ajoutée à la réclamation exp et soustraite de iats, auth_time et nbf.",
       "RECOMMENDED": "recommandé",
       "NOTRECOMMENDED": "non recommandé",
       "SELECTION": {
@@ -2654,7 +2650,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) et en général tous les frameworks JS exécutés dans les navigateurs"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
