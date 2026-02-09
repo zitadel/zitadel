@@ -74,13 +74,13 @@ ZITADEL automatically configures the best security settings for your selected fr
     <Tab value="Angular">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback"
-            postLogoutRedirectUrl="http://localhost:3000/signedout">
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="Astro">
         <AppConfig
             redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
-            postLogoutRedirectUrl="http://localhost:3000">
+            postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="Django">
@@ -92,7 +92,7 @@ ZITADEL automatically configures the best security settings for your selected fr
     <Tab value="Express.js">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback/zitadel"
-            postLogoutRedirectUrl="http://localhost:3000">
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="FastAPI">
@@ -104,7 +104,7 @@ ZITADEL automatically configures the best security settings for your selected fr
     <Tab value="Fastify">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback/zitadel"
-            postLogoutRedirectUrl="http://localhost:3000">
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="Flask">
@@ -128,19 +128,19 @@ ZITADEL automatically configures the best security settings for your selected fr
     <Tab value="Hono">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback/zitadel"
-            postLogoutRedirectUrl="http://localhost:3000">
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="Laravel">
         <AppConfig
-            redirectUrl="http://localhost:3000/auth/callback/zitadel"
-            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback/zitadel">
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="NestJS">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback/zitadel"
-            postLogoutRedirectUrl="http://localhost:3000">
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="Next.js">
@@ -163,14 +163,14 @@ ZITADEL automatically configures the best security settings for your selected fr
     </Tab>
     <Tab value="React">
         <AppConfig
-            redirectUrl="http://localhost:3000/callback"
-            postLogoutRedirectUrl="http://localhost:3000/">
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000">
         </AppConfig>
     </Tab>
     <Tab value="SolidStart">
         <AppConfig
             redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
-            postLogoutRedirectUrl="http://localhost:3000">
+            postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="Spring">
@@ -188,13 +188,13 @@ ZITADEL automatically configures the best security settings for your selected fr
     <Tab value="Svelte">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback/zitadel"
-            postLogoutRedirectUrl="http://localhost:3000">
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="Vue.js">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback"
-            postLogoutRedirectUrl="http://localhost:3000/">
+            postLogoutRedirectUrl="http://localhost:3000">
         </AppConfig>
     </Tab>
 </FrameworkSelector>
@@ -530,7 +530,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
         ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback/zitadel"
         ZITADEL_POST_LOGIN_URL="/profile"
-        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
         NEXTAUTH_URL="http://localhost:3000"
         ```
     </Tab>
@@ -566,7 +566,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
         ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
         ZITADEL_POST_LOGIN_URL="/profile"
-        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
         ```
     </Tab>
     <Tab value="FastAPI">
@@ -600,7 +600,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
         ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
         ZITADEL_POST_LOGIN_URL="/profile"
-        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
         ```
     </Tab>
     <Tab value="Flask">
@@ -642,19 +642,19 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
         ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
         ZITADEL_POST_LOGIN_URL="/profile"
-        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
         ```
     </Tab>
-    <Tab value="Symfony">
+    <Tab value="Laravel">
         1. Copy+paste the .env.example to .env
-        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
         3. Generate app key, this will update the APP_KEY variable in the .env file
         ```bash
         php artisan key:generate
         ```
 
         ```bash
-        APP_KEY=
+        APP_KEY="your-app-key"
         APP_ENV=local
         APP_DEBUG=true
         SERVER_URL="http://localhost:3000"
@@ -662,7 +662,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         DB_CONNECTION=sqlite
         ZITADEL_DOMAIN="https://your-zitadel-domain"
         ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
-        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CLIENT_SECRET="your-randomly-generated-client-secret"
         ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
         ```
     </Tab>
@@ -681,7 +681,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
         ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
         ZITADEL_POST_LOGIN_URL="/profile"
-        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
         ```
     </Tab>
     <Tab value="Next.js">
@@ -763,9 +763,9 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ZITADEL_DOMAIN="https://your-zitadel-domain"
         ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
         ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
-        ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback/zitadel"
         ZITADEL_POST_LOGIN_URL="/profile"
-        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
         NEXTAUTH_URL="http://localhost:3000"
         ```
     </Tab>
@@ -787,15 +787,16 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     </Tab>
     <Tab value="Symfony">
         1. Copy+paste the .env.example to .env
-        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
         ```bash
-        PORT=3000
-        NG_APP_ZITADEL_DOMAIN="https://your-zitadel-domain"
-        NG_APP_ZITADEL_CLIENT_ID="your-client-id"
-        NG_APP_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
-        NG_APP_ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
-        NG_APP_ZITADEL_POST_LOGIN_URL="/profile"
+        APP_SECRET="your-app-secret-key"
+        SERVER_URL="http://localhost:3000"
+        SERVER_PORT=3000
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-randomly-generated-client-secret"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
         ```
     </Tab>
     <Tab value="Svelte">
@@ -811,7 +812,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
         ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
         ZITADEL_POST_LOGIN_URL="/profile"
-        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
         NEXTAUTH_URL="http://localhost:3000"
         ```
     </Tab>
