@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"gopkg.in/yaml.v3"
+	"sigs.k8s.io/yaml"
 )
 
 func TestSchemaGeneration(t *testing.T) {
@@ -78,46 +78,16 @@ func TestSchemaValidatesDefaults(t *testing.T) {
 		t.Fatalf("failed to parse defaults.yaml: %v", err)
 	}
 
-	defaultsJSON := convertYAMLToJSON(defaults)
-
 	resolved, err := schema.Resolve(nil)
 	if err != nil {
 		t.Fatalf("failed to resolve schema: %v", err)
 	}
 
-	err = resolved.Validate(defaultsJSON)
+	err = resolved.Validate(defaults)
 	if err != nil {
 		t.Logf("Warning: defaults.yaml has validation issues: %v", err)
 		t.Log("This may be expected if defaults.yaml contains fields not in the Config struct")
 	} else {
 		t.Log("defaults.yaml validates successfully against the schema")
-	}
-}
-
-// convertYAMLToJSON recursively converts YAML-parsed data to JSON-compatible types.
-func convertYAMLToJSON(v interface{}) interface{} {
-	switch x := v.(type) {
-	case map[string]interface{}:
-		result := make(map[string]interface{})
-		for k, val := range x {
-			result[k] = convertYAMLToJSON(val)
-		}
-		return result
-	case map[interface{}]interface{}:
-		result := make(map[string]interface{})
-		for k, val := range x {
-			if key, ok := k.(string); ok {
-				result[key] = convertYAMLToJSON(val)
-			}
-		}
-		return result
-	case []interface{}:
-		result := make([]interface{}, len(x))
-		for i, val := range x {
-			result[i] = convertYAMLToJSON(val)
-		}
-		return result
-	default:
-		return v
 	}
 }
