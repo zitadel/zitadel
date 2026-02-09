@@ -75,6 +75,11 @@ CREATE TABLE zitadel.users(
     , access_token_type                     SMALLINT    CHECK ((type = 'human' AND access_token_type IS NULL)                     OR (type = 'machine'))
 );
 
+-- previously created tables
+ALTER TABLE zitadel.identity_provider_intents ADD CONSTRAINT fk_idp_intent_user FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users (instance_id, id) ON DELETE CASCADE;
+ALTER TABLE zitadel.sessions ADD CONSTRAINT fk_session_user FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE;
+ALTER TABLE zitadel.authorizations ADD CONSTRAINT fk_authorization_user FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users (instance_id, id) ON DELETE CASCADE;
+
 -- user
 CREATE UNIQUE INDEX ON zitadel.users(instance_id, organization_id, username) WHERE username_org_unique IS TRUE; --TODO(adlerhurst): does that work if a username is already present on a user without org unique?
 CREATE UNIQUE INDEX ON zitadel.users(instance_id, username) WHERE username_org_unique IS FALSE;

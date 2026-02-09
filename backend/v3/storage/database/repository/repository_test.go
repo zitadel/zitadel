@@ -250,7 +250,7 @@ func createMachineUser(t *testing.T, tx database.QueryExecutor, instanceID, orgI
 	return user.ID
 }
 
-func createHumanUser(t *testing.T, tx database.QueryExecutor, instanceID, orgID string) *domain.User {
+func createHumanUser(t *testing.T, tx database.QueryExecutor, instanceID, orgID string) string {
 	t.Helper()
 	user := &domain.User{
 		InstanceID:     instanceID,
@@ -272,5 +272,5 @@ func createHumanUser(t *testing.T, tx database.QueryExecutor, instanceID, orgID 
 	userRepo := repository.UserRepository()
 	err := userRepo.Create(t.Context(), tx, user)
 	require.NoError(t, err)
-	return user
+	return user.ID
 }

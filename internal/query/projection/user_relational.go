@@ -2145,6 +2145,8 @@ func mapHumanGender(gender old_domain.Gender) domain.HumanGender {
 		return domain.HumanGenderMale
 	case old_domain.GenderDiverse:
 		return domain.HumanGenderDiverse
+	case old_domain.GenderUnspecified:
+		fallthrough
 	default:
 		return domain.HumanGenderUnspecified
 	}

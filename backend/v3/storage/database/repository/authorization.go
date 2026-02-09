@@ -59,17 +59,29 @@ func (a authorization) Create(ctx context.Context, client database.QueryExecutor
 		updatedAt = authorization.UpdatedAt
 	}
 
-	builder := database.NewStatementBuilder(insertAuthorizationWithRolesStmt,
-		authorization.InstanceID,
-		authorization.ID,
-		authorization.UserID,
-		authorization.GrantID,
-		authorization.ProjectID,
-		authorization.State,
-		createdAt,
-		updatedAt,
-		authorization.Roles,
+	// builder := database.NewStatementBuilder("INSERT INTO zitadel.authorizations (instance_id, id, user_id, grant_id, project_id, state, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, ",
+	// 	authorization.InstanceID, authorization.ID, authorization.UserID, authorization.GrantID, authorization.ProjectID, authorization.State,
+	// )
+	// builder.WriteArgs(createdAt, updatedAt)
+	// builder.WriteString(") RETURNING created_at, updated_at INSERT INTO zitadel.authorization_roles (instance_id, authorization_id, grant_id, project_id, role_key) SELECT instance_id, id, grant_id, project_id, unnest(")
+	builder := database.NewStatementBuilder("WITH roles AS (INSERT INTO zitadel.authorization_roles (instance_id, authorization_id, grant_id, project_id, role_key)"+
+		" VALUES ($1, $2, $3, $4, unnest($5::text[]))) INSERT INTO zitadel.authorizations (instance_id, id, grant_id, project_id, user_id, state, created_at, updated_at) VALUES ($1, $2, $3, $4, $6, $7, ",
+		authorization.InstanceID, authorization.ID, authorization.GrantID, authorization.ProjectID, authorization.Roles, authorization.UserID, authorization.State,
 	)
+	builder.WriteArgs(createdAt, updatedAt)
+	builder.WriteString(") RETURNING created_at, updated_at")
+
+	// builder := database.NewStatementBuilder(insertAuthorizationWithRolesStmt,
+	// 	authorization.InstanceID,
+	// 	authorization.ID,
+	// 	authorization.UserID,
+	// 	authorization.GrantID,
+	// 	authorization.ProjectID,
+	// 	authorization.State,
+	// 	createdAt,
+	// 	updatedAt,
+	// 	authorization.Roles,
+	// )
 
 	if err := client.QueryRow(
 		ctx,
