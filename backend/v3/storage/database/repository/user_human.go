@@ -51,7 +51,6 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 		"last_name":       user.Human.LastName,
 		"created_at":      createdAt,
 		"updated_at":      createdAt,
-		"email":           user.Human.Email.Address,
 	}
 	if !user.Human.MultifactorInitializationSkippedAt.IsZero() {
 		columnValues["multifactor_initialization_skipped_at"] = user.Human.MultifactorInitializationSkippedAt
@@ -62,6 +61,9 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 	if user.Human.Password.Hash != "" {
 		columnValues["password_hash"] = user.Human.Password.Hash
 		columnValues["password_verified_at"] = createdAt
+		if !user.Human.Password.ChangedAt.IsZero() {
+			columnValues["password_verified_at"] = user.Human.Password.ChangedAt
+		}
 	}
 	if user.Human.Password.IsChangeRequired {
 		columnValues["password_change_required"] = true
@@ -86,6 +88,9 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 			CreatedAt: user.CreatedAt,
 			Code:      user.Human.Email.PendingVerification.Code,
 		}
+		if user.Human.Email.PendingVerification.ID != "" {
+			verification.ID = &user.Human.Email.PendingVerification.ID
+		}
 		if user.Human.Email.PendingVerification.ExpiresAt != nil && !user.Human.Email.PendingVerification.ExpiresAt.IsZero() {
 			verification.Expiry = gu.Ptr(time.Since(*user.Human.Email.PendingVerification.ExpiresAt))
 		}
@@ -94,10 +99,11 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 		columnValues["email_verification_id"] = func(builder *database.StatementBuilder) {
 			builder.WriteString(`(SELECT id FROM email_verification)`)
 		}
-		columnValues["unverified_email"] = user.Human.Email.Address
+		columnValues["unverified_email"] = user.Human.Email.UnverifiedAddress
 	} else {
 		columnValues["email"] = user.Human.Email.Address
-		columnValues["unverified_email"] = user.Human.Email.Address
+		columnValues["unverified_email"] = user.Human.Email.UnverifiedAddress
+		columnValues["email_verified_at"] = createdAt
 		if !user.Human.Email.VerifiedAt.IsZero() {
 			columnValues["email_verified_at"] = user.Human.Email.VerifiedAt
 		}
@@ -108,6 +114,9 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 				CreatedAt: user.CreatedAt,
 				Code:      user.Human.Phone.PendingVerification.Code,
 			}
+			if user.Human.Phone.PendingVerification.ID != "" {
+				verification.ID = &user.Human.Phone.PendingVerification.ID
+			}
 			if user.Human.Phone.PendingVerification.ExpiresAt != nil && !user.Human.Phone.PendingVerification.ExpiresAt.IsZero() {
 				verification.Expiry = gu.Ptr(time.Since(*user.Human.Phone.PendingVerification.ExpiresAt))
 			}
@@ -116,10 +125,11 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 			columnValues["phone_verification_id"] = func(builder *database.StatementBuilder) {
 				builder.WriteString(`(SELECT id FROM phone_verification)`)
 			}
-			columnValues["unverified_phone"] = user.Human.Phone.Number
+			columnValues["unverified_phone"] = user.Human.Phone.UnverifiedNumber
 		} else {
 			columnValues["phone"] = user.Human.Phone.Number
-			columnValues["unverified_phone"] = user.Human.Phone.Number
+			columnValues["unverified_phone"] = user.Human.Phone.UnverifiedNumber
+			columnValues["phone_verified_at"] = createdAt
 			if !user.Human.Phone.VerifiedAt.IsZero() {
 				columnValues["phone_verified_at"] = user.Human.Phone.VerifiedAt
 			}

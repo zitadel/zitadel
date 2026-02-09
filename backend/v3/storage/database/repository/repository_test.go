@@ -29,6 +29,7 @@ func runTests(m *testing.M) int {
 	var err error
 	ctx := context.Background()
 	pool, stop, err = newEmbeddedDB(ctx)
+	defer stop()
 	if err != nil {
 		log.Printf("error with embedded postgres database: %v", err)
 		return 1
@@ -63,13 +64,13 @@ func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), er
 
 	pool_, err := connector.Connect(ctx)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to connect to embedded postgres: %w", err)
+		return nil, stop, fmt.Errorf("unable to connect to embedded postgres: %w", err)
 	}
 	pool = pool_.(database.PoolTest)
 
 	err = pool.MigrateTest(ctx)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to migrate database: %w", err)
+		return nil, stop, fmt.Errorf("unable to migrate database: %w", err)
 	}
 	return pool, stop, err
 }
