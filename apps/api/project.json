@@ -91,6 +91,25 @@
                 "generate-statik"
             ]
         },
+        "generate-schema": {
+            "description": "Generates JSON schema for the ZITADEL configuration",
+            "dependsOn": [
+                "generate"
+            ],
+            "command": "mkdir -p .artifacts/pack && CGO_ENABLED=0 go run ./cmd/schema/...",
+            "cache": true,
+            "inputs": [
+                "{workspaceRoot}/cmd/start/config.go",
+                "{workspaceRoot}/cmd/schema/**/*",
+                "{workspaceRoot}/internal/**/config*.go",
+                "{workspaceRoot}/backend/**/config*.go",
+                "{workspaceRoot}/internal/**/*Config*.go",
+                "{workspaceRoot}/backend/**/*Config*.go"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-config-schema.json"
+            ]
+        },
         "lint-install": {
             "description": "Installs golangci-lint binary for linting. Using go install is not recommended in the official docs, because this can produce non-deterministic results.",
             "cache": true,
