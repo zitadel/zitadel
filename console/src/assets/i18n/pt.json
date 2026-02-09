@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Usuários",
-      "DESCRIPTION": "Um usuário é um humano ou uma máquina que pode acessar seus aplicativos.",
+      "DESCRIPTION": "Um usuário é um humano ou uma conta de serviço que pode acessar seus aplicativos.",
       "HUMANS": {
         "TITLE": "Usuários",
         "DESCRIPTION": "Os usuários são autenticados interativamente em uma sessão do navegador com um prompt de login.",
@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organização",
     "PROJECT": "Projetos",
     "PROJECTOVERVIEW": "Visão Geral",
-    "PROJECTGRANTS": "Autorizações",
+    "PROJECTGRANTS": "Concessões de projeto",
     "ROLES": "Funções",
     "GRANTEDPROJECT": "Projetos Concedidos",
     "HUMANUSERS": "Usuários",
@@ -2055,7 +2055,7 @@
       "DESCRIPTION": "Permite que outra organização use o seu projeto.",
       "EDITTITLE": "Editar funções",
       "CREATE": {
-        "TITLE": "Criar Concessão de Organização",
+        "TITLE": "Criar Concessão de projecto",
         "SEL_USERS": "Selecione os usuários aos quais deseja conceder acesso",
         "SEL_PROJECT": "Buscar um projeto",
         "SEL_ROLES": "Selecione as funções que deseja adicionar à concessão",
@@ -2067,7 +2067,7 @@
         "ORG_DESCRIPTION_DESC": "Altere o contexto no cabeçalho acima para conceder um usuário para outra organização.",
         "SEL_ORG_FORMFIELD": "Domínio Completo",
         "SEL_ORG_BUTTON": "Buscar Organização",
-        "FOR_ORG": "A concessão é criada para:"
+        "FOR_ORG": "A concessão do projeto será criada para:"
       },
       "DETAIL": {
         "TITLE": "Concessão de Projeto",
@@ -2180,7 +2180,7 @@
       "DEACTIVATED": "Desativado.",
       "CREATED": "Projeto criado.",
       "UPDATED": "Projeto alterado.",
-      "GRANTUPDATED": "Concessão alterada.",
+      "GRANTUPDATED": "Concessão de projeto alterada.",
       "DELETED": "Projeto excluído."
     }
   },
