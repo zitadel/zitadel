@@ -4,5 +4,3 @@ plugins:
     out: .
     opt:
       - format=json
-
-  
