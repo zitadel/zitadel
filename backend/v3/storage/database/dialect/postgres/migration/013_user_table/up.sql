@@ -92,7 +92,6 @@ CREATE INDEX idx_human_phone ON zitadel.users (phone);
 CREATE INDEX idx_human_phone_lower ON zitadel.users (lower(phone));
 
 -- human
-
 CREATE UNIQUE INDEX ON zitadel.users(password_verification_id) WHERE password_verification_id IS NOT NULL;
 CREATE UNIQUE INDEX ON zitadel.users(email_verification_id) WHERE email_verification_id IS NOT NULL;
 CREATE UNIQUE INDEX ON zitadel.users(phone_verification_id) WHERE phone_verification_id IS NOT NULL;
@@ -174,7 +173,7 @@ CREATE TYPE zitadel.passkey_type AS ENUM (
     , 'u2f'
 );
 
-CREATE TABLE zitadel.human_passkeys(
+CREATE TABLE zitadel.user_passkeys(
     instance_id TEXT NOT NULL
     , token_id TEXT NOT NULL
     , key_id TEXT NOT NULL
@@ -202,7 +201,7 @@ CREATE TABLE zitadel.human_passkeys(
 -- identity provider links
 -- ----------------------------------------------------------------
 
-CREATE TABLE zitadel.identity_provider_links(
+CREATE TABLE zitadel.user_identity_provider_links(
     instance_id TEXT NOT NULL
     , identity_provider_id TEXT NOT NULL
     , user_id TEXT NOT NULL

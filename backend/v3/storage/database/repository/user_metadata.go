@@ -7,10 +7,10 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-type userMetadataRepo struct{}
+type userMetadata struct{}
 
 // AddMetadata implements [domain.UserRepository.AddMetadata].
-func (u userMetadataRepo) AddMetadata(metadata ...*domain.Metadata) database.Change {
+func (u userMetadata) AddMetadata(metadata ...*domain.Metadata) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
 			builder.WriteString("INSERT INTO zitadel.user_metadata(instance_id, user_id, key, value, created_at, updated_at)")
@@ -52,8 +52,20 @@ func (u userMetadataRepo) AddMetadata(metadata ...*domain.Metadata) database.Cha
 	)
 }
 
+func (userMetadata) qualifiedTableName() string {
+	return "zitadel.user_metadata"
+}
+
+func (userMetadata) unqualifiedTableName() string {
+	return "user_metadata"
+}
+
+// -------------------------------------------------------------
+// conditions
+// -------------------------------------------------------------
+
 // RemoveMetadata implements [domain.UserRepository.RemoveMetadata].
-func (u userMetadataRepo) RemoveMetadata(condition database.Condition) database.Change {
+func (u userMetadata) RemoveMetadata(condition database.Condition) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
 			builder.WriteString("DELETE FROM zitadel.user_metadata USING ")
@@ -68,42 +80,38 @@ func (u userMetadataRepo) RemoveMetadata(condition database.Condition) database.
 	)
 }
 
-type userMetadataConditions struct {
-	userMetadataRepo
+func (u userMetadata) MetadataConditions() domain.UserMetadataConditions {
+	return u
 }
 
 // MetadataKeyCondition implements [domain.UserMetadataConditions].
-func (u userMetadataConditions) MetadataKeyCondition(op database.TextOperation, key string) database.Condition {
+func (u userMetadata) MetadataKeyCondition(op database.TextOperation, key string) database.Condition {
 	return database.NewTextCondition(u.keyColumn(), op, key)
 }
 
 // MetadataValueCondition implements [domain.UserMetadataConditions].
-func (u userMetadataConditions) MetadataValueCondition(op database.BytesOperation, value []byte) database.Condition {
+func (u userMetadata) MetadataValueCondition(op database.BytesOperation, value []byte) database.Condition {
 	return database.NewBytesCondition[[]byte](database.SHA256Column(u.valueColumn()), op, database.SHA256Value(value))
 }
 
-var _ domain.UserMetadataConditions = (*userMetadataConditions)(nil)
+var _ domain.UserMetadataConditions = (*userMetadata)(nil)
 
-func (userMetadataRepo) qualifiedTableName() string {
-	return "zitadel.user_metadata"
-}
+// -------------------------------------------------------------
+// columns
+// -------------------------------------------------------------
 
-func (userMetadataRepo) unqualifiedTableName() string {
-	return "user_metadata"
-}
-
-func (u userMetadataRepo) instanceIDColumn() database.Column {
+func (u userMetadata) instanceIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "instance_id")
 }
 
-func (u userMetadataRepo) userIDColumn() database.Column {
+func (u userMetadata) userIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "user_id")
 }
 
-func (u userMetadataRepo) keyColumn() database.Column {
+func (u userMetadata) keyColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "key")
 }
 
-func (u userMetadataRepo) valueColumn() database.Column {
+func (u userMetadata) valueColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "value")
 }

@@ -131,6 +131,617 @@ func Test_user_Get(t *testing.T) {
 	}
 }
 
+// Test_user_ListConditions verifies the correct behavior of all conditions.
+func Test_user_ListConditions(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	t.Cleanup(rollback)
+
+	userRepo := repository.UserRepository()
+	// humanRepo := repository.HumanUserRepository()
+	// machineRepo := repository.MachineUserRepository()
+
+	instanceID1 := createInstance(t, tx)
+	instance1OrgID1 := createOrganization(t, tx, instanceID1)
+	instance1OrgID2 := createOrganization(t, tx, instanceID1)
+
+	instanceID2 := createInstance(t, tx)
+	instance2OrgID1 := createOrganization(t, tx, instanceID2)
+
+	users := []*domain.User{
+		{
+			ID:             "h1",
+			InstanceID:     instanceID1,
+			OrganizationID: instance1OrgID1,
+			Username:       "human-user-1",
+			State:          domain.UserStateActive,
+			Human: &domain.HumanUser{
+				FirstName:         "aa",
+				LastName:          "bb",
+				DisplayName:       "aa bb",
+				Nickname:          "aabb",
+				PreferredLanguage: language.English,
+				Gender:            domain.HumanGenderDiverse,
+				AvatarKey:         "https://my.avatar/key",
+				Email: domain.HumanEmail{
+					Address:    "aa.bb@example.com",
+					VerifiedAt: time.Now(),
+				},
+			},
+		},
+		{
+			ID:             "h2",
+			InstanceID:     instanceID1,
+			OrganizationID: instance1OrgID2,
+			Username:       "human-user-2",
+			State:          domain.UserStateActive,
+			Human: &domain.HumanUser{
+				FirstName:         "aaa",
+				LastName:          "bbb",
+				DisplayName:       "aaa bbb",
+				Nickname:          "aaabbb",
+				PreferredLanguage: language.German,
+				Gender:            domain.HumanGenderFemale,
+				Email: domain.HumanEmail{
+					Address: "aaa@bbb.com",
+				},
+			},
+		},
+		{
+			ID:             "h3",
+			InstanceID:     instanceID2,
+			OrganizationID: instance2OrgID1,
+			Username:       "human-user-3",
+			State:          domain.UserStateActive,
+			Human: &domain.HumanUser{
+				FirstName:   "aaaa",
+				LastName:    "bbbb",
+				DisplayName: "aaaa bbbb",
+				Email: domain.HumanEmail{
+					Address: "aaaa.bbbb@example.com",
+				},
+			},
+		},
+		{
+			ID:             "m1",
+			InstanceID:     instanceID1,
+			OrganizationID: instance1OrgID1,
+			Username:       "machine-user-1",
+			State:          domain.UserStateActive,
+			Machine: &domain.MachineUser{
+				Name:        "machine-user-1",
+				Description: "This is my machine user",
+			},
+		},
+		{
+			ID:             "m2",
+			InstanceID:     instanceID1,
+			OrganizationID: instance1OrgID2,
+			Username:       "machine-user-2",
+			State:          domain.UserStateActive,
+			Machine: &domain.MachineUser{
+				Name: "machine-user-2",
+			},
+		},
+		{
+			ID:             "m3",
+			InstanceID:     instanceID2,
+			OrganizationID: instance2OrgID1,
+			Username:       "machine-user-3",
+			State:          domain.UserStateActive,
+			Machine: &domain.MachineUser{
+				Name: "machine-user-3",
+			},
+		},
+	}
+
+	for _, user := range users {
+		err := userRepo.Create(t.Context(), tx, user)
+		require.NoError(t, err)
+	}
+
+	type want struct {
+		err error
+		ids []string
+	}
+	tests := []struct {
+		name  string
+		setup func(t *testing.T, tx database.Transaction)
+		opts  []database.QueryOption
+		want  want
+	}{
+		{
+			name: "by instance id",
+			opts: []database.QueryOption{
+				database.WithCondition(userRepo.InstanceIDCondition(instanceID1)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1", "h2", "m1", "m2"},
+			},
+		},
+		{
+			name: "by primary key",
+			opts: []database.QueryOption{
+				database.WithCondition(userRepo.PrimaryKeyCondition(instanceID1, "h1")),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+		{
+			name: "by organization id",
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					userRepo.OrganizationIDCondition(instance1OrgID1),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1", "m1"},
+			},
+		},
+		{
+			name: "by id",
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					userRepo.IDCondition("h1"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+		{
+			name: "by username",
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					userRepo.UsernameCondition(database.TextOperationStartsWith, "human-user-"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1", "h2"},
+			},
+		},
+		{
+			name: "by state",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					userRepo.SetState(domain.UserStateInactive),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					userRepo.SetState(domain.UserStateInitial),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "m1"),
+					userRepo.SetState(domain.UserStateLocked),
+				)
+				require.NoError(t, err)
+
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					userRepo.StateCondition(domain.UserStateActive),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"m2"},
+			},
+		},
+		{
+			name: "by type",
+			setup: func(t *testing.T, tx database.Transaction) {
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					userRepo.TypeCondition(domain.UserTypeMachine),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"m1", "m2"},
+			},
+		},
+		// {
+		// 	name: "by login name",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+
+		{
+			name: "by metadata key",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					userRepo.AddMetadata(
+						&domain.Metadata{
+							InstanceID: instanceID1,
+							Key:        "key1",
+							Value:      []byte("value"),
+						},
+						&domain.Metadata{
+							InstanceID: instanceID1,
+							Key:        "key2",
+							Value:      []byte("value"),
+						},
+					),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					userRepo.AddMetadata(
+						&domain.Metadata{
+							InstanceID: instanceID1,
+							Key:        "key2",
+							Value:      []byte("value"),
+						},
+					),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					userRepo.ExistsMetadata(
+						userRepo.MetadataConditions().MetadataKeyCondition(database.TextOperationEqual, "key1"),
+					),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+		// {
+		// 	name: "by metadata value",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by metadata key and value",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+
+		// {
+		// 	name: "by display name",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by first name",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by last name",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by nick name",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by preferred language",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by phone",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by unverified phone",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by verified phone",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by passkey challenge",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by passkey id",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by passkey key id",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by passkey type",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by idp link provider id",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by idp link provided user id",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by idp link username",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by email",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by unverified email",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		// {
+		// 	name: "by verified email",
+		// 	setup: func(t *testing.T, tx database.Transaction) {
+		// 	},
+		// 	opts: []database.QueryOption{
+		// 	database.WithCondition(database.And(
+		// 		userRepo.InstanceIDCondition(instanceID1),
+		// 	)),
+		// },
+		// 	want: want{
+		// 		err: nil,
+		// 		ids: []string{},
+		// 	},
+		// },
+		{
+			name: "list none",
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition("non-existing-instance-id"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{},
+			},
+		},
+		{
+			name: "missing instance id condition",
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.IDCondition("h1"),
+				)),
+			},
+			want: want{
+				err: database.NewMissingConditionError(userRepo.InstanceIDColumn()),
+				ids: []string{},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			t.Cleanup(func() {
+				err := savepoint.Rollback(context.Background())
+				if err != nil {
+					t.Log("rollback savepoint failed", err)
+				}
+			})
+			if tt.setup != nil {
+				tt.setup(t, savepoint)
+			}
+
+			gotten, err := userRepo.List(t.Context(), savepoint, append(tt.opts, database.WithOrderByAscending(userRepo.IDColumn()))...)
+			require.ErrorIs(t, err, tt.want.err)
+			if tt.want.err != nil {
+				return
+			}
+
+			require.Len(t, gotten, len(tt.want.ids))
+			for i, expectedID := range tt.want.ids {
+				assert.Equal(t, expectedID, gotten[i].ID)
+			}
+		})
+	}
+}
+
 func Test_user_Update(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	t.Cleanup(rollback)

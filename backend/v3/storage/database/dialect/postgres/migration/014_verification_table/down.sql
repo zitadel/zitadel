@@ -1,9 +1,6 @@
-ALTER TABLE zitadel.users DROP CONSTRAINT fk_unverified_password;
-ALTER TABLE zitadel.users DROP CONSTRAINT fk_unverified_email;
-ALTER TABLE zitadel.users DROP CONSTRAINT fk_unverified_phone;
-ALTER TABLE zitadel.users DROP CONSTRAINT fk_email_otp_verification;
-ALTER TABLE zitadel.users DROP CONSTRAINT fk_sms_otp_verification;
-ALTER TABLE zitadel.human_passkeys DROP CONSTRAINT fk_init_verification
+ALTER TABLE zitadel.users DROP CONSTRAINT IF EXISTS fk_unverified_password;
+ALTER TABLE zitadel.users DROP CONSTRAINT IF EXISTS fk_unverified_email;
+ALTER TABLE zitadel.users DROP CONSTRAINT IF EXISTS fk_unverified_phone;
 
-DROP FUNCTION IF EXISTS zitadel.cleanup_verification(TEXT, TEXT);
-DROP TABLE IF EXISTS zitadel.verifications;
+DROP TABLE IF EXISTS zitadel.verifications CASCADE;
+DROP FUNCTION IF EXISTS zitadel.ensure_user_verification_integrity();

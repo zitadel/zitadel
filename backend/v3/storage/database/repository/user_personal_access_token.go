@@ -5,10 +5,10 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-type personalAccessTokenRepo struct{}
+type userPersonalAccessToken struct{}
 
 // AddPersonalAccessToken implements [domain.MachineUserRepository].
-func (personalAccessTokenRepo) AddPersonalAccessToken(pat *domain.PersonalAccessToken) database.Change {
+func (userPersonalAccessToken) AddPersonalAccessToken(pat *domain.PersonalAccessToken) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
 			builder.WriteString("INSERT INTO zitadel.user_personal_access_tokens (" +
@@ -27,7 +27,7 @@ func (personalAccessTokenRepo) AddPersonalAccessToken(pat *domain.PersonalAccess
 }
 
 // RemovePersonalAccessToken implements [domain.MachineUserRepository].
-func (personalAccessTokenRepo) RemovePersonalAccessToken(id string) database.Change {
+func (userPersonalAccessToken) RemovePersonalAccessToken(id string) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
 			builder.WriteString("DELETE FROM zitadel.user_personal_access_tokens WHERE " +
@@ -39,18 +39,18 @@ func (personalAccessTokenRepo) RemovePersonalAccessToken(id string) database.Cha
 	)
 }
 
-func (personalAccessTokenRepo) qualifiedTableName() string {
+func (userPersonalAccessToken) qualifiedTableName() string {
 	return "zitadel.user_personal_access_tokens"
 }
 
-func (personalAccessTokenRepo) unqualifiedTableName() string {
+func (userPersonalAccessToken) unqualifiedTableName() string {
 	return "user_personal_access_tokens"
 }
 
-func (u personalAccessTokenRepo) instanceIDColumn() database.Column {
+func (u userPersonalAccessToken) instanceIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "instance_id")
 }
 
-func (u personalAccessTokenRepo) userIDColumn() database.Column {
+func (u userPersonalAccessToken) userIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "user_id")
 }

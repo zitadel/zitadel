@@ -5,14 +5,14 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-type userIdentityProviderLinkRepo struct{}
+type userIdentityProviderLink struct{}
 
-func (u userIdentityProviderLinkRepo) unqualifiedTableName() string {
-	return "identity_provider_links"
+func (u userIdentityProviderLink) unqualifiedTableName() string {
+	return "user_identity_provider_links"
 }
 
-func (u userIdentityProviderLinkRepo) qualifiedTableName() string {
-	return "zitadel.identity_provider_links"
+func (u userIdentityProviderLink) qualifiedTableName() string {
+	return "zitadel.user_identity_provider_links"
 }
 
 // -------------------------------------------------------------
@@ -20,7 +20,7 @@ func (u userIdentityProviderLinkRepo) qualifiedTableName() string {
 // -------------------------------------------------------------
 
 // AddIdentityProviderLink implements [domain.HumanUserRepository.AddIdentityProviderLink].
-func (u userIdentityProviderLinkRepo) AddIdentityProviderLink(link *domain.IdentityProviderLink) database.Change {
+func (u userIdentityProviderLink) AddIdentityProviderLink(link *domain.IdentityProviderLink) database.Change {
 	var createdAt, updatedAt any = database.NowInstruction, database.NowInstruction
 	if !link.CreatedAt.IsZero() {
 		createdAt = link.CreatedAt
@@ -53,10 +53,10 @@ func (u userIdentityProviderLinkRepo) AddIdentityProviderLink(link *domain.Ident
 }
 
 // UpdateIdentityProviderLink implements [domain.HumanUserRepository.UpdateIdentityProviderLink].
-func (u userIdentityProviderLinkRepo) UpdateIdentityProviderLink(condition database.Condition, changes ...database.Change) database.Change {
+func (u userIdentityProviderLink) UpdateIdentityProviderLink(condition database.Condition, changes ...database.Change) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE zitadel.identity_provider_links SET ")
+			builder.WriteString("UPDATE zitadel.user_identity_provider_links SET ")
 			database.Changes(changes).Write(builder)
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
@@ -70,7 +70,7 @@ func (u userIdentityProviderLinkRepo) UpdateIdentityProviderLink(condition datab
 }
 
 // RemoveIdentityProviderLink implements [domain.HumanUserRepository.RemoveIdentityProviderLink].
-func (u userIdentityProviderLinkRepo) RemoveIdentityProviderLink(providerID string, providedUserID string) database.Change {
+func (u userIdentityProviderLink) RemoveIdentityProviderLink(providerID string, providedUserID string) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
 			builder.WriteString("DELETE FROM ")
@@ -102,12 +102,12 @@ func (u userIdentityProviderLinkRepo) RemoveIdentityProviderLink(providerID stri
 }
 
 // SetIdentityProviderLinkUsername implements [domain.HumanUserRepository.SetIdentityProviderLinkUsername].
-func (u userIdentityProviderLinkRepo) SetIdentityProviderLinkUsername(username string) database.Change {
+func (u userIdentityProviderLink) SetIdentityProviderLinkUsername(username string) database.Change {
 	return database.NewChange(u.providedUsernameColumn(), username)
 }
 
 // SetIdentityProviderLinkProvidedID implements [domain.HumanUserRepository.SetIdentityProviderLinkProvidedID].
-func (u userIdentityProviderLinkRepo) SetIdentityProviderLinkProvidedID(providerID string, currentProvidedUserID string, newProvidedUserID string) database.Change {
+func (u userIdentityProviderLink) SetIdentityProviderLinkProvidedID(providerID string, currentProvidedUserID string, newProvidedUserID string) database.Change {
 	return database.NewChange(u.providedUserIDColumn(), newProvidedUserID)
 }
 
@@ -116,27 +116,27 @@ func (u userIdentityProviderLinkRepo) SetIdentityProviderLinkProvidedID(provider
 // -------------------------------------------------------------
 
 // ExistsIdentityProviderLink implements [domain.HumanUserRepository.ExistsIdentityProviderLink].
-func (u userIdentityProviderLinkRepo) ExistsIdentityProviderLink(condition database.Condition) database.Condition {
+func (u userIdentityProviderLink) ExistsIdentityProviderLink(condition database.Condition) database.Condition {
 	panic("unimplemented")
 }
 
 // IdentityProviderLinkConditions implements [domain.HumanUserRepository.IdentityProviderLinkConditions].
-func (u userIdentityProviderLinkRepo) IdentityProviderLinkConditions() domain.HumanIdentityProviderLinkConditions {
+func (u userIdentityProviderLink) IdentityProviderLinkConditions() domain.HumanIdentityProviderLinkConditions {
 	return u
 }
 
 // ProviderIDCondition implements [domain.HumanUserRepository.ProviderIDCondition].
-func (u userIdentityProviderLinkRepo) ProviderIDCondition(idpID string) database.Condition {
+func (u userIdentityProviderLink) ProviderIDCondition(idpID string) database.Condition {
 	return database.NewTextCondition(u.providerIDColumn(), database.TextOperationEqual, idpID)
 }
 
 // ProvidedUserIDCondition implements [domain.HumanUserRepository.ProvidedUserIDCondition].
-func (u userIdentityProviderLinkRepo) ProvidedUserIDCondition(providedUserID string) database.Condition {
+func (u userIdentityProviderLink) ProvidedUserIDCondition(providedUserID string) database.Condition {
 	return database.NewTextCondition(u.providedUserIDColumn(), database.TextOperationEqual, providedUserID)
 }
 
 // ProvidedUsernameCondition implements [domain.HumanUserRepository.ProvidedUsernameCondition].
-func (u userIdentityProviderLinkRepo) ProvidedUsernameCondition(op database.TextOperation, username string) database.Condition {
+func (u userIdentityProviderLink) ProvidedUsernameCondition(op database.TextOperation, username string) database.Condition {
 	return database.NewTextCondition(u.providedUsernameColumn(), op, username)
 }
 
@@ -144,21 +144,21 @@ func (u userIdentityProviderLinkRepo) ProvidedUsernameCondition(op database.Text
 // columns
 // -------------------------------------------------------------
 
-func (u userIdentityProviderLinkRepo) instanceIDColumn() database.Column {
+func (u userIdentityProviderLink) instanceIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "instance_id")
 }
-func (u userIdentityProviderLinkRepo) userIDColumn() database.Column {
+func (u userIdentityProviderLink) userIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "user_id")
 }
 
-func (u userIdentityProviderLinkRepo) providerIDColumn() database.Column {
+func (u userIdentityProviderLink) providerIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "identity_provider_id")
 }
 
-func (u userIdentityProviderLinkRepo) providedUserIDColumn() database.Column {
+func (u userIdentityProviderLink) providedUserIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "provided_user_id")
 }
 
-func (u userIdentityProviderLinkRepo) providedUsernameColumn() database.Column {
+func (u userIdentityProviderLink) providedUsernameColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "provided_username")
 }

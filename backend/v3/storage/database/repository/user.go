@@ -25,11 +25,11 @@ func MachineUserRepository() domain.MachineUserRepository {
 type user struct {
 	verification verification
 	tableName    string
-	machineKeyRepo
-	personalAccessTokenRepo
-	userMetadataRepo
-	userPasskeyRepo
-	userIdentityProviderLinkRepo
+	machineKey
+	userPersonalAccessToken
+	userMetadata
+	userPasskey
+	userIdentityProviderLink
 }
 
 func (u user) HumanRepository() domain.HumanUserRepository {
@@ -88,9 +88,9 @@ var queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, 
 	`, 'email', jsonb_build_object('address', users.email, 'unverifiedAddress', users.unverified_email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.email_otp_last_successful_check, 'failedAttempts', users.email_otp_failed_attempts), 'pendingVerification', ` + verificationQuery(userHuman{}.emailVerificationIDColumn()) + `)` +
 	`, 'phone', CASE WHEN users.phone IS NOT NULL OR users.phone_verification_id IS NOT NULL THEN jsonb_build_object('number', users.phone, 'unverifiedNumber', users.unverified_phone, 'verifiedAt', users.phone_verified_at, 'otp', jsonb_build_object('enabledAt', users.sms_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.sms_otp_last_successful_check, 'failedAttempts', users.sms_otp_failed_attempts), 'pendingVerification', ` + verificationQuery(userHuman{}.phoneVerificationIDColumn()) + `) ELSE NULL END` +
 	`, 'totp', CASE WHEN users.totp_secret IS NOT NULL THEN jsonb_build_object('secret', encode(users.totp_secret, 'base64'), 'verifiedAt', users.totp_verified_at, 'lastSuccessfullyCheckedAt', users.totp_last_successful_check) ELSE NULL END` +
-	`, 'passkeys', jsonb_agg(DISTINCT jsonb_build_object('id', human_passkeys.token_id, 'keyId', encode(human_passkeys.key_id::BYTEA, 'base64'), 'type', human_passkeys.type, 'name', human_passkeys.name, 'signCount', human_passkeys.sign_count, 'challenge', encode(human_passkeys.challenge, 'base64'), 'publicKey', encode(human_passkeys.public_key, 'base64'), 'attestationType', human_passkeys.attestation_type, 'aaGuid', encode(human_passkeys.authenticator_attestation_guid, 'base64'), 'rpId', human_passkeys.relying_party_id, 'createdAt', human_passkeys.created_at, 'updatedAt', human_passkeys.updated_at, 'verifiedAt', human_passkeys.verified_at)) FILTER (WHERE human_passkeys.user_id IS NOT NULL)` +
+	`, 'passkeys', jsonb_agg(DISTINCT jsonb_build_object('id', user_passkeys.token_id, 'keyId', encode(user_passkeys.key_id::BYTEA, 'base64'), 'type', user_passkeys.type, 'name', user_passkeys.name, 'signCount', user_passkeys.sign_count, 'challenge', encode(user_passkeys.challenge, 'base64'), 'publicKey', encode(user_passkeys.public_key, 'base64'), 'attestationType', user_passkeys.attestation_type, 'aaGuid', encode(user_passkeys.authenticator_attestation_guid, 'base64'), 'rpId', user_passkeys.relying_party_id, 'createdAt', user_passkeys.created_at, 'updatedAt', user_passkeys.updated_at, 'verifiedAt', user_passkeys.verified_at)) FILTER (WHERE user_passkeys.user_id IS NOT NULL)` +
 	`, 'verifications', (SELECT jsonb_agg(jsonb_build_object('id', verifications.id, 'code', encode(verifications.code, 'escape')::JSONB, 'createdAt', verifications.created_at, 'updatedAt', verifications.updated_at, 'expiresAt', verifications.created_at+verifications.expiry, 'failedAttempts', verifications.failed_attempts)) FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.user_id = users.id AND verifications.id NOT IN (COALESCE(users.password_verification_id, ''), COALESCE(users.email_verification_id, ''), COALESCE(users.phone_verification_id, '')))` +
-	`, 'identityProviderLinks', jsonb_agg(DISTINCT jsonb_build_object('providerId', identity_provider_links.identity_provider_id, 'providedUserId', identity_provider_links.provided_user_id, 'providedUsername', identity_provider_links.provided_username, 'createdAt', identity_provider_links.created_at, 'updatedAt', identity_provider_links.updated_at)) FILTER (WHERE identity_provider_links.user_id IS NOT NULL)` +
+	`, 'identityProviderLinks', jsonb_agg(DISTINCT jsonb_build_object('providerId', user_identity_provider_links.identity_provider_id, 'providedUserId', user_identity_provider_links.provided_user_id, 'providedUsername', user_identity_provider_links.provided_username, 'createdAt', user_identity_provider_links.created_at, 'updatedAt', user_identity_provider_links.updated_at)) FILTER (WHERE user_identity_provider_links.user_id IS NOT NULL)` +
 	`) END AS human FROM zitadel.users`
 
 func verificationQuery(column database.Column) string {
@@ -105,17 +105,8 @@ func verificationQuery(column database.Column) string {
 
 // Get implements [domain.UserRepository.Get].
 func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
-	opts = append(opts,
-		u.joinMachineKeys(),
-		u.joinPATs(),
-		u.joinMetadata(),
-		u.joinVerifications(),
-		u.joinPasskeys(),
-		u.joinIdentityProviderLinks(),
-		database.WithGroupBy(u.PrimaryKeyColumns()...),
-	)
 	options := new(database.QueryOpts)
-	for _, opt := range opts {
+	for _, opt := range u.appendQueryOpts(opts) {
 		opt(options)
 	}
 
@@ -131,17 +122,8 @@ func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...da
 
 // List implements [domain.UserRepository.List].
 func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.User, error) {
-	opts = append(opts,
-		u.joinMachineKeys(),
-		u.joinPATs(),
-		u.joinMetadata(),
-		u.joinVerifications(),
-		u.joinPasskeys(),
-		database.WithGroupBy(u.PrimaryKeyColumns()...),
-	)
-
 	options := new(database.QueryOpts)
-	for _, opt := range opts {
+	for _, opt := range u.appendQueryOpts(opts) {
 		opt(options)
 	}
 
@@ -153,6 +135,18 @@ func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...d
 	options.Write(builder)
 
 	return scanUsers(ctx, client, builder)
+}
+
+func (u user) appendQueryOpts(opts []database.QueryOption) []database.QueryOption {
+	return append(opts,
+		u.joinMachineKeys(),
+		u.joinPATs(),
+		u.joinMetadata(),
+		u.joinVerifications(),
+		u.joinPasskeys(),
+		u.joinIdentityProviderLinks(),
+		database.WithGroupBy(u.PrimaryKeyColumns()...),
+	)
 }
 
 // Update implements [domain.UserRepository.Update].
@@ -221,18 +215,6 @@ func (u user) clearUpdatedAt() database.Change {
 // conditions
 // -------------------------------------------------------------
 
-// ExistsMetadata implements [domain.UserRepository.ExistsMetadata].
-func (u user) ExistsMetadata(condition database.Condition) database.Condition {
-	return database.Exists(
-		u.userMetadataRepo.qualifiedTableName(),
-		database.And(
-			database.NewColumnCondition(u.InstanceIDColumn(), u.userMetadataRepo.instanceIDColumn()),
-			database.NewColumnCondition(u.IDColumn(), u.userMetadataRepo.userIDColumn()),
-			condition,
-		),
-	)
-}
-
 // IDCondition implements [domain.UserRepository.IDCondition].
 func (u user) IDCondition(userID string) database.Condition {
 	return database.NewTextCondition(u.IDColumn(), database.TextOperationEqual, userID)
@@ -246,10 +228,6 @@ func (u user) InstanceIDCondition(instanceID string) database.Condition {
 // LoginNameCondition implements [domain.UserRepository.LoginNameCondition].
 func (u user) LoginNameCondition(op database.TextOperation, loginName string) database.Condition {
 	panic("unimplemented")
-}
-
-func (u user) MetadataConditions() domain.UserMetadataConditions {
-	return userMetadataConditions{userMetadataRepo: u.userMetadataRepo}
 }
 
 // OrganizationIDCondition implements [domain.UserRepository.OrganizationIDCondition].
@@ -278,6 +256,18 @@ func (u user) TypeCondition(userType domain.UserType) database.Condition {
 // UsernameCondition implements [domain.UserRepository.UsernameCondition].
 func (u user) UsernameCondition(op database.TextOperation, username string) database.Condition {
 	return database.NewTextCondition(u.UsernameColumn(), op, username)
+}
+
+// ExistsMetadata implements [domain.UserRepository.ExistsMetadata].
+func (u user) ExistsMetadata(condition database.Condition) database.Condition {
+	return database.Exists(
+		u.userMetadata.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(u.InstanceIDColumn(), u.userMetadata.instanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.userMetadata.userIDColumn()),
+			condition,
+		),
+	)
 }
 
 // -------------------------------------------------------------
@@ -397,42 +387,47 @@ func (u user) Human() domain.HumanUserRepository {
 	return userHuman{user: u}
 }
 
+// Machine implements [domain.UserRepository.Machine].
+func (u user) Machine() domain.MachineUserRepository {
+	return userMachine{user: u}
+}
+
 func (u user) joinMachineKeys() database.QueryOption {
 	return database.WithLeftJoin(
-		u.machineKeyRepo.qualifiedTableName(),
+		u.machineKey.qualifiedTableName(),
 		database.And(
-			database.NewColumnCondition(u.InstanceIDColumn(), u.machineKeyRepo.instanceIDColumn()),
-			database.NewColumnCondition(u.IDColumn(), u.machineKeyRepo.userIDColumn()),
+			database.NewColumnCondition(u.InstanceIDColumn(), u.machineKey.instanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.machineKey.userIDColumn()),
 		),
 	)
 }
 
 func (u user) joinPATs() database.QueryOption {
 	return database.WithLeftJoin(
-		u.personalAccessTokenRepo.qualifiedTableName(),
+		u.userPersonalAccessToken.qualifiedTableName(),
 		database.And(
-			database.NewColumnCondition(u.InstanceIDColumn(), u.personalAccessTokenRepo.instanceIDColumn()),
-			database.NewColumnCondition(u.IDColumn(), u.personalAccessTokenRepo.userIDColumn()),
+			database.NewColumnCondition(u.InstanceIDColumn(), u.userPersonalAccessToken.instanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.userPersonalAccessToken.userIDColumn()),
 		),
 	)
 }
 
 func (u user) joinMetadata() database.QueryOption {
 	return database.WithLeftJoin(
-		u.userMetadataRepo.qualifiedTableName(),
+		u.userMetadata.qualifiedTableName(),
 		database.And(
-			database.NewColumnCondition(u.InstanceIDColumn(), u.userMetadataRepo.instanceIDColumn()),
-			database.NewColumnCondition(u.IDColumn(), u.userMetadataRepo.userIDColumn()),
+			database.NewColumnCondition(u.InstanceIDColumn(), u.userMetadata.instanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.userMetadata.userIDColumn()),
 		),
 	)
 }
 
 func (u user) joinPasskeys() database.QueryOption {
 	return database.WithLeftJoin(
-		u.userPasskeyRepo.qualifiedTableName(),
+		u.userPasskey.qualifiedTableName(),
 		database.And(
-			database.NewColumnCondition(u.InstanceIDColumn(), u.userPasskeyRepo.instanceIDColumn()),
-			database.NewColumnCondition(u.IDColumn(), u.userPasskeyRepo.userIDColumn()),
+			database.NewColumnCondition(u.InstanceIDColumn(), u.userPasskey.instanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.userPasskey.userIDColumn()),
 		),
 	)
 }
@@ -449,15 +444,10 @@ func (u user) joinVerifications() database.QueryOption {
 
 func (u user) joinIdentityProviderLinks() database.QueryOption {
 	return database.WithLeftJoin(
-		u.userIdentityProviderLinkRepo.qualifiedTableName(),
+		u.userIdentityProviderLink.qualifiedTableName(),
 		database.And(
-			database.NewColumnCondition(u.InstanceIDColumn(), u.userIdentityProviderLinkRepo.instanceIDColumn()),
-			database.NewColumnCondition(u.IDColumn(), u.userIdentityProviderLinkRepo.userIDColumn()),
+			database.NewColumnCondition(u.InstanceIDColumn(), u.userIdentityProviderLink.instanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.userIdentityProviderLink.userIDColumn()),
 		),
 	)
-}
-
-// Machine implements [domain.UserRepository.Machine].
-func (u user) Machine() domain.MachineUserRepository {
-	return userMachine{user: u}
 }

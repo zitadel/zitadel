@@ -9,8 +9,8 @@ import (
 
 type userMachine struct {
 	user
-	machineKeyRepo
-	personalAccessTokenRepo
+	machineKey
+	userPersonalAccessToken
 }
 
 func (u userMachine) create(ctx context.Context, builder *database.StatementBuilder, client database.QueryExecutor, user *domain.User) error {
@@ -56,6 +56,10 @@ func (u userMachine) Update(ctx context.Context, client database.QueryExecutor, 
 	return u.user.Update(ctx, client, condition, changes...)
 }
 
+// -------------------------------------------------------------
+// changes
+// -------------------------------------------------------------
+
 // SetAccessTokenType implements [domain.MachineUserRepository].
 func (u userMachine) SetAccessTokenType(tokenType domain.AccessTokenType) database.Change {
 	return database.NewChange(u.accessTokenTypeColumn(), tokenType)
@@ -77,6 +81,10 @@ func (u userMachine) SetSecret(secret *string) database.Change {
 }
 
 var _ domain.MachineUserRepository = (*userMachine)(nil)
+
+// -------------------------------------------------------------
+// columns
+// -------------------------------------------------------------
 
 func (u userMachine) nameColumn() database.Column {
 	return database.NewColumn(u.user.unqualifiedTableName(), "name")
