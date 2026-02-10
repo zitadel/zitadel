@@ -23,31 +23,46 @@ const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content');
 
 /**
  * Workaround for fumadocs-openapi bug: when a schema has both root-level
- * `required` fields AND `oneOf`/`anyOf`, fumadocs' `...item` spread overwrites
+ * `required` fields AND `one Of`/`anyOf`, fumadocs' `...item` spread overwrites
  * `schema.required` with `item.required`, losing root-level required fields.
  *
  * Fix: merge parent `required` into each variant and remove from parent.
+ * Handles both direct oneOf and allOf-wrapped oneOf patterns.
  */
-function fixSchemaRequired(schema: any): void {
+function fixSchemaRequired(schema: any, parentRequired: string[] = []): void {
   if (!schema || typeof schema !== 'object') return;
 
+  // Combine parent required with this level's required
+  const effectiveRequired = [...new Set([...parentRequired, ...(schema.required ?? [])])];
+
+  // Pattern 1: Direct oneOf/anyOf with required at same level
   const union = schema.oneOf ?? schema.anyOf;
-  if (Array.isArray(union) && Array.isArray(schema.required) && schema.required.length > 0) {
+  if (Array.isArray(union) && effectiveRequired.length > 0) {
     for (const variant of union) {
       if (typeof variant !== 'object' || variant === null) continue;
-      variant.required = [...new Set([...schema.required, ...(variant.required ?? [])])];
+      variant.required = [...new Set([...effectiveRequired, ...(variant.required ?? [])])];
     }
     delete schema.required;
   }
 
+  // Pattern 2: allOf containing oneOf - propagate required through allOf
+  if (Array.isArray(schema.allOf) && effectiveRequired.length > 0) {
+    for (const item of schema.allOf) {
+      // Pass down the required from this level
+      fixSchemaRequired(item, effectiveRequired);
+    }
+    // Remove required from parent since we pushed it down
+    if (schema.required) delete schema.required;
+  }
+
   // Recurse into nested schemas
   for (const prop of Object.values(schema.properties ?? {})) {
-    fixSchemaRequired(prop);
+    fixSchemaRequired(prop, []);
   }
   for (const item of (schema.oneOf ?? schema.anyOf ?? schema.allOf ?? [])) {
-    fixSchemaRequired(item);
+    fixSchemaRequired(item, parentRequired);
   }
-  if (schema.items) fixSchemaRequired(schema.items);
+  if (schema.items) fixSchemaRequired(schema.items, []);
 }
 
 function fixOneOfRequired(doc: any): void {
