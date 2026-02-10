@@ -58,16 +58,6 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 	if !user.Human.PreferredLanguage.IsRoot() {
 		columnValues["preferred_language"] = user.Human.PreferredLanguage
 	}
-	if user.Human.Password.Hash != "" {
-		columnValues["password_hash"] = user.Human.Password.Hash
-		columnValues["password_verified_at"] = createdAt
-		if !user.Human.Password.ChangedAt.IsZero() {
-			columnValues["password_verified_at"] = user.Human.Password.ChangedAt
-		}
-	}
-	if user.Human.Password.IsChangeRequired {
-		columnValues["password_change_required"] = true
-	}
 	if user.Human.DisplayName != "" {
 		columnValues["display_name"] = user.Human.DisplayName
 	}
@@ -80,8 +70,35 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 	if user.Human.AvatarKey != "" {
 		columnValues["avatar_key"] = user.Human.AvatarKey
 	}
+	if user.Human.Password.IsChangeRequired {
+		columnValues["password_change_required"] = true
+	}
 
 	ctes := make(map[string]database.CTEChange)
+
+	if user.Human.Password.PendingVerification != nil {
+		verification := &domain.VerificationTypeInit{
+			CreatedAt: user.CreatedAt,
+			Code:      user.Human.Password.PendingVerification.Code,
+		}
+		if user.Human.Password.PendingVerification.ID != "" {
+			verification.ID = &user.Human.Password.PendingVerification.ID
+		}
+		if user.Human.Password.PendingVerification.ExpiresAt != nil && !user.Human.Password.PendingVerification.ExpiresAt.IsZero() {
+			verification.Expiry = gu.Ptr(time.Since(*user.Human.Password.PendingVerification.ExpiresAt))
+		}
+
+		ctes["password_verification"] = u.SetResetPasswordVerification(verification).(database.CTEChange)
+		columnValues["password_verification_id"] = func(builder *database.StatementBuilder) {
+			builder.WriteString(`(SELECT id FROM password_verification)`)
+		}
+	} else {
+		columnValues["password_hash"] = user.Human.Password.Hash
+		columnValues["password_verified_at"] = createdAt
+		if !user.Human.Password.ChangedAt.IsZero() {
+			columnValues["password_verified_at"] = user.Human.Password.ChangedAt
+		}
+	}
 
 	if user.Human.Email.PendingVerification != nil {
 		verification := &domain.VerificationTypeInit{
@@ -158,6 +175,10 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 			CreatedAt: user.CreatedAt,
 			Code:      verification.Code,
 		}).(database.CTEChange)
+	}
+
+	for i, metadata := range user.Metadata {
+		ctes[fmt.Sprintf("metadata_%d", i)] = u.AddMetadata(metadata).(database.CTEChange)
 	}
 
 	// write CTE changes
