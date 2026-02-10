@@ -44,5 +44,13 @@ declare namespace NodeJS {
      * Optional: The application name shown in the login and invite emails
      */
     NEXT_PUBLIC_APPLICATION_NAME?: string;
+
+    /**
+     * Optional: Enable automatic code submission on page load.
+     * Set to "true" to auto-submit verification codes (e.g. email verification, Email OTP).
+     * Default behavior (undefined) requires users to click a Submit button,
+     * which is safer for environments with enterprise email link scanners.
+     */
+    NEXT_PUBLIC_AUTO_SUBMIT_CODE?: string;
   }
 }
