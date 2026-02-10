@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { SMTPProviderComponent } from './smtp-provider.component';
 
-const routes: Routes = [{ path: ':provider/create', component: SMTPProviderComponent }];
+const routes: Routes = [{ path: ':provider', component: SMTPProviderComponent }];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

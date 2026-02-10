@@ -16,5 +16,5 @@ import { MatIcon } from '@angular/material/icon';
 })
 export class NotificationSMTPProviderComponent {
   protected readonly PolicyComponentServiceType = PolicyComponentServiceType;
-  protected readonly providers = SMTPKnownProviders;
+  protected readonly providers = { ...SMTPKnownProviders, generic: { description: 'generic' } } as const;
 }

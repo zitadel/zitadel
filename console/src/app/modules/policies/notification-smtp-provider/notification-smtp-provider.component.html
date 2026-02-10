@@ -15,12 +15,12 @@
     <div>
       <a
         class="item card"
-        [routerLink]="['/instance', 'smtpprovider', id, 'create']"
+        [routerLink]="['/instance', 'smtpprovider', id]"
       >
-      @if (provider.name !== "generic") {
-          <img class="smtp-logo" [src]="provider.image" [alt]="provider.name"/>
+      @if (provider.description !== "generic") {
+          <img class="smtp-logo" [src]="provider.image" [alt]="provider.description"/>
           <div class="text-container">
-            <span class="title">{{ provider.name | titlecase }} </span>
+            <span class="title">{{ provider.description | titlecase }} </span>
           </div>
       } @else {
           <div class="smtp-icon">
