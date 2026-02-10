@@ -21,6 +21,48 @@ const OPENAPI_ROOT = join(ROOT_DIR, 'openapi');
 const CONTENT_ROOT = join(ROOT_DIR, 'content');
 const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content');
 
+/**
+ * Workaround for fumadocs-openapi bug: when a schema has both root-level
+ * `required` fields AND `oneOf`/`anyOf`, fumadocs' `...item` spread overwrites
+ * `schema.required` with `item.required`, losing root-level required fields.
+ *
+ * Fix: merge parent `required` into each variant and remove from parent.
+ */
+function fixSchemaRequired(schema: any): void {
+  if (!schema || typeof schema !== 'object') return;
+
+  const union = schema.oneOf ?? schema.anyOf;
+  if (Array.isArray(union) && Array.isArray(schema.required) && schema.required.length > 0) {
+    for (const variant of union) {
+      if (typeof variant !== 'object' || variant === null) continue;
+      variant.required = [...new Set([...schema.required, ...(variant.required ?? [])])];
+    }
+    delete schema.required;
+  }
+
+  // Recurse into nested schemas
+  for (const prop of Object.values(schema.properties ?? {})) {
+    fixSchemaRequired(prop);
+  }
+  for (const item of (schema.oneOf ?? schema.anyOf ?? schema.allOf ?? [])) {
+    fixSchemaRequired(item);
+  }
+  if (schema.items) fixSchemaRequired(schema.items);
+}
+
+function fixOneOfRequired(doc: any): void {
+  for (const schema of Object.values(doc.components?.schemas ?? {})) {
+    fixSchemaRequired(schema);
+  }
+  for (const pathItem of Object.values(doc.paths ?? {})) {
+    for (const op of Object.values(pathItem as Record<string, any>)) {
+      if (!op || typeof op !== 'object') continue;
+      const bodySchema = (op as any)?.requestBody?.content?.['application/json']?.schema;
+      if (bodySchema) fixSchemaRequired(bodySchema);
+    }
+  }
+}
+
 async function generateVersionApiDocs(version: string) {
   const sourceRoot = join(OPENAPI_ROOT, version);
   if (!existsSync(sourceRoot)) return;
@@ -41,6 +83,10 @@ async function generateVersionApiDocs(version: string) {
     const doc = JSON.parse(content) as any;
 
     if (!doc.paths || Object.keys(doc.paths).length === 0) continue;
+
+    // Fix required fields lost during fumadocs oneOf rendering
+    fixOneOfRequired(doc);
+    writeFileSync(fullPath, JSON.stringify(doc, null, 2));
 
     let service = basename(specPath, '.openapi.json');
     if (service.endsWith('_service')) {
