@@ -47,7 +47,7 @@ func ProjectSetMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal global org set")
+		return nil, zerrors.ThrowInternal(err, "INST-cdFZH", "unable to unmarshal global org set")
 	}
 
 	return e, nil
@@ -91,7 +91,7 @@ func ManagementConsoleSetMapper(event eventstore.Event) (eventstore.Event, error
 	}
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal management console set")
+		return nil, zerrors.ThrowInternal(err, "INST-cdFZH", "unable to unmarshal management console set")
 	}
 
 	return e, nil
