@@ -4,8 +4,8 @@ sidebar_label: Opaque tokens
 ---
 
 In the context of application security, robust authentication mechanisms are essential for safeguarding sensitive data and ensuring user trust.
-Opaque tokens, the default token type within the ZITADEL platform, play a crucial role in bolstering security measures.
-This documentation elucidates the principles behind opaque tokens, their implementation within ZITADEL, and their advantages over alternative token types.
+Opaque tokens, the default token type within the Zitadel platform, play a crucial role in bolstering security measures.
+This documentation elucidates the principles behind opaque tokens, their implementation within Zitadel, and their advantages over alternative token types.
 
 ## What are Opaque Tokens?
 
@@ -14,19 +14,19 @@ Instead, they serve as opaque references to session data stored securely on the 
 
 ## Authentication Workflow with Opaque Tokens
 
-1. **Token Generation**: When a user initiates an authentication process within an application integrated with ZITADEL, the authentication server generates a unique opaque token associated with the user's session.
+1. **Token Generation**: When a user initiates an authentication process within an application integrated with Zitadel, the authentication server generates a unique opaque token associated with the user's session.
 
 2. **Token Presentation**: The generated opaque token is provided to the client, which subsequently presents it during requests to access protected resources within the application.
 
 3. **Token Verification**: Upon receiving the opaque token, the application server interacts with the authorization server to validate its authenticity and retrieve detailed information about the user's session. This process ensures the integrity of the authentication flow and verifies the user's permissions to access requested resources.
 
-## Benefits of Opaque Tokens in ZITADEL
+## Benefits of Opaque Tokens in Zitadel
 
 1. **Reduced Token Exposure**: Opaque tokens mitigate the risk of token exposure since they do not contain sensitive user information directly. This reduces the likelihood of token-based attacks and enhances overall security posture.
 
 2. **Enhanced Server-side Control**: With opaque tokens, validation occurs server-side, granting administrators greater control over authentication flows and access policies. This centralized approach facilitates comprehensive monitoring and enforcement of security measures, including server-side single-logout across all applications.
 
-3. **Protection Against Token Tampering**: Opaque tokens prevent unauthorized manipulation of token contents, thereby ensuring the integrity and authenticity of authentication processes. This protection against token tampering further strengthens the security of applications integrated with ZITADEL.
+3. **Protection Against Token Tampering**: Opaque tokens prevent unauthorized manipulation of token contents, thereby ensuring the integrity and authenticity of authentication processes. This protection against token tampering further strengthens the security of applications integrated with Zitadel.
 
 ## Opaque Tokens vs. JWT Tokens
 
@@ -59,7 +59,7 @@ Two common types of tokens used in authentication protocols are opaque tokens an
 
 ## Conclusion
 
-In conclusion, opaque tokens represent a foundational component in fortifying application security within ZITADEL.
+In conclusion, opaque tokens represent a foundational component in fortifying application security within Zitadel.
 By leveraging opaque tokens, organizations can establish robust authentication mechanisms, mitigate security risks, and maintain stringent control over access policies.
 As organizations navigate the complex landscape of application security, integrating technologies such as opaque tokens becomes imperative for safeguarding sensitive data and fostering user trust.
 

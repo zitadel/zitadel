@@ -1,9 +1,9 @@
 ---
-title: Log in with ZITADEL on Atlassian through SAML 2.0
+title: Log in with Zitadel on Atlassian through SAML 2.0
 sidebar_label: Atlassian
 ---
 
-This guide shows how to enable login with ZITADEL on Atlassian.
+This guide shows how to enable login with Zitadel on Atlassian.
 
 It covers how to:
 
@@ -12,12 +12,12 @@ It covers how to:
 
 Prerequisites:
 
-- existing ZITADEL Instance, if not present follow [this guide](/guides/start/quickstart)
-- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
-- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
+- existing Zitadel Instance, if not present follow [this guide](/guides/start/quickstart)
+- existing Zitadel Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
+- existing Zitadel project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
 - existing Atlassian Access setup, including verified domain
 
-> We have to switch between ZITADEL and Atlassian. If the headings begin with "ZITADEL" switch to the ZITADEL
+> We have to switch between Zitadel and Atlassian. If the headings begin with "Zitadel" switch to the Zitadel
 > Management Console and
 > if the headings start with "Atlassian" please switch to the Atlassian Admin GUI.
 
@@ -60,7 +60,7 @@ Set or replace the variables with the values from the next screen as follows:
 
 ![](../../../../public/img/saml/atlassian/atlassian-04.png)
 
-## **ZITADEL**: Create the application
+## **Zitadel**: Create the application
 
 In your existing project:
 
@@ -70,7 +70,7 @@ Press the "+"-button to add an application
 Fill in a name for the application and chose the SAML type, then click "Continue".
 ![](../../../../public/img/saml/zitadel/application_saml.png)
 
-Either fill in the URL where ZITADEL can read the metadata from, or upload the metadata XML directly, then click "Continue".
+Either fill in the URL where Zitadel can read the metadata from, or upload the metadata XML directly, then click "Continue".
 ![](../../../../public/img/saml/zitadel/application_saml_metadata.png)
 
 Check your application, if everything is correct, press "Create".
@@ -89,9 +89,9 @@ Add members to your policy.
 
 Now you should be all set to verify your setup:
 
-- Create an user in ZITADEL with the same email address as a member in your authentication policy.
+- Create an user in Zitadel with the same email address as a member in your authentication policy.
 - In a new browser session go to https://id.atlassian.com
 - Enter the user's email address
-- You should be redirected to ZITADEL's Login screen
+- You should be redirected to Zitadel's Login screen
 - Enter the email address and password
 - Continue and you should be redirected back to Atlassian

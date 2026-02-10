@@ -1,20 +1,20 @@
 ---
-title: Self Service in ZITADEL
+title: Self Service in Zitadel
 sidebar_label: Self Service
 ---
 
-ZITADEL allows users to perform many tasks themselves.
-For these tasks we either provide a user interface, or the tasks can be initiated or completed through ZITADEL's APIs.
+Zitadel allows users to perform many tasks themselves.
+For these tasks we either provide a user interface, or the tasks can be initiated or completed through Zitadel's APIs.
 
 It is important to understand that, depending on your use case, there will exist different user-types that want to perform different actions:
 
 - `Users` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators, etc. There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
-- `Managers` are users with a [special administrator role](../../guides/manage/console/managers) within ZITADEL and can perform administrative actions such as system configuration or granting access rights to users.
+- `Managers` are users with a [special administrator role](../../guides/manage/console/managers) within Zitadel and can perform administrative actions such as system configuration or granting access rights to users.
 
 All self-service interfaces are available in different [languages](/guides/manage/customize/texts#internationalization-i-18-n).
 
 <Callout>
-ZITADEL covers the typical "CIAM" self-service capabilities as well as delegated access management for multi-tenancy scenarios. Please refer to the section [Managers](#managers).
+Zitadel covers the typical "CIAM" self-service capabilities as well as delegated access management for multi-tenancy scenarios. Please refer to the section [Managers](#managers).
 </Callout>
 
 ## Registration
@@ -46,11 +46,11 @@ An external identity provider can be a Social Login Provider or a pre-configured
 
 - Information from the external identity provider is used to pre-fill the profile information
 - User can update the profile information
-- An account is created within ZITADEL and linked with the external identity provider
+- An account is created within Zitadel and linked with the external identity provider
 
 #### Account Linking
 
-When you log in with an external identity provider, and the user does not exist in ZITADEL, then an autoregister flow is triggered. The user is presented with two options:
+When you log in with an external identity provider, and the user does not exist in Zitadel, then an autoregister flow is triggered. The user is presented with two options:
 
 - Create a new account: A new account will be created as stated above
 - Autolink: The user is prompted to log in with an existing [local account](#local-account). If successful, the existing identity from the external identity provider will be linked with the local account. A user can now log in with either the local account or any of the linked external accounts.
@@ -78,7 +78,7 @@ An application can also implement this by calling the [specific endpoint](/apis/
 ## Profile
 
 These actions are available for authenticated users only.
-ZITADEL provides a self-service UI for the user profile out-of-the box under the path _$CUSTOM_DOMAIN/ui/console/users/me_.
+Zitadel provides a self-service UI for the user profile out-of-the box under the path _$CUSTOM_DOMAIN/ui/console/users/me_.
 You can also implement your own version in your application by using our APIs.
 
 ### Change password
@@ -130,7 +130,7 @@ The user can log in with any of the linked accounts.
 
 It is important to note that a `Manager` is not simply an administrative user, but can be used to create much more advanced scenarios such as delegating administration of a whole organization to a user, acting then as administrator and permission manager of that user group.
 
-Thus, we will explain service for two of the most common scenarios in ZITADEL:
+Thus, we will explain service for two of the most common scenarios in Zitadel:
 
 - `Managers in isolation`: Granting administrative permissions within a single organization context.
 - `Managers in delegation`: Granting administrative permissions to a user from a different organization where the organizations depend on each other
@@ -152,5 +152,5 @@ Given such as set up the owner might want to give one administrative user of the
 Equipped with this Administrator Role, the user can perform actions like configuring their own SSO/Identity Provider, set security policy for their organization, customize branding, or assign project or Administrator roles to other users.
 
 An `ORG_OWNER` can also not only delegate Administrator roles to other users [as described in the earlier section](#managers-in-isolation) but also manage all aspects of their own organization as well as authorize users to use the granted project.
-With ZITADEL there is no need to replicate all settings and projects across organizations.
+With Zitadel there is no need to replicate all settings and projects across organizations.
 Instead, you could set up the project in one organization, delegate it to different organizations, and then appoint users as Managers of that organization to allow for self-service in a multi-tenancy scenario.

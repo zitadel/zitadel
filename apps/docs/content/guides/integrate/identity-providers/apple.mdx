@@ -1,5 +1,5 @@
 ---
-title: Configure Apple as an Identity Provider in ZITADEL
+title: Configure Apple as an Identity Provider in Zitadel
 sidebar_label: Apple
 ---
 
@@ -16,7 +16,7 @@ import TestSetup from './_test_setup.mdx';
 
 <IDPsOverview components={props.components}  templates="Apple"/>
 
-Click on the ZITADEL Callback URL to copy it to your clipboard.
+Click on the Zitadel Callback URL to copy it to your clipboard.
 You will have to paste it in the Apple service later.
 
 ![](../../../../public/img/guides/zitadel_apple_create_provider.png)
@@ -41,7 +41,7 @@ You will have to paste it in the Apple service later.
 6. Choose the previously created App in the Primary App ID List
 7. Add your Custom Domain in the domains and subdomains field
  - Example domain for `https://acme-gzoe4x.zitadel.cloud` would look like this:  `acme-gzoe4x.zitadel.cloud`
-8. [Paste the ZITADEL Callback URL you copied before](#open-the-apple-identity-provider-template) to the Return URLs
+8. [Paste the Zitadel Callback URL you copied before](#open-the-apple-identity-provider-template) to the Return URLs
 
 ![](../../../../public/img/guides/apple_service_create.png)
 
@@ -54,9 +54,9 @@ You will have to paste it in the Apple service later.
 5. Choose your app from the list
 6. Register the key and download it
 
-## ZITADEL Configuration
+## Zitadel Configuration
 
-Go back [to the Apple provider template you opened before in ZITADEL](#open-the-apple-identity-provider-template).
+Go back [to the Apple provider template you opened before in Zitadel](#open-the-apple-identity-provider-template).
 
 1. Add the Client ID, this is [the identifier of the service you created in your Apple Account](#register-a-new-service)
 2. Fill the Team ID, you can find it when you login to your Apple Developer account, in your membership
@@ -65,7 +65,7 @@ Go back [to the Apple provider template you opened before in ZITADEL](#open-the-
 You can optionally configure the following settings.
 A useful default will be filled if you don't change anything.
 
-**Scopes**: The scopes define which scopes will be sent to the provider, `name` and `email` are prefilled. This information will be taken to create/update the user within ZITADEL.
+**Scopes**: The scopes define which scopes will be sent to the provider, `name` and `email` are prefilled. This information will be taken to create/update the user within Zitadel.
 
 <GeneralConfigDescription components={props.components}  provider_account="Apple account" />
 

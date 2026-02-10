@@ -1,9 +1,9 @@
 ---
-title: ZITADEL with Go
+title: Zitadel with Go
 sidebar_label: Go
 ---
 
-This integration guide demonstrates the recommended way to incorporate ZITADEL into your Go web application.
+This integration guide demonstrates the recommended way to incorporate Zitadel into your Go web application.
 It explains how to enable user login in your application and how to fetch data from the user info endpoint.
 
 > ℹ️ These examples and guides are based on our official [Go SDK](https://github.com/zitadel/zitadel-go).
@@ -17,7 +17,7 @@ By the end of this guide, your application will have login functionality and wil
 
 ## Set up application
 
-Before we begin developing our application, we need to perform a few configuration steps in the ZITADEL Console.
+Before we begin developing our application, we need to perform a few configuration steps in the Zitadel Console.
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select the **Web** application type and continue.
 
@@ -29,7 +29,7 @@ We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth
 
 ### Redirect URIs
 
-The Redirect URIs field tells ZITADEL where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
+The Redirect URIs field tells Zitadel where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 The Post-logout redirect send the users back to a route on your application after they have logged out.
 
 > If you are following along with the [example](https://github.com/zitadel/zitadel-go), set the dev mode to `true`, the Redirect URIs to `http://localhost:8089/auth/callback` and Post-logout redirect URI to [http://localhost:8089/](http://localhost:8089/)>.
@@ -46,11 +46,11 @@ After successful creation of the app, a pop-up will appear displaying the app's 
 
 ## Go setup
 
-Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Go application.
+Now that you have configured your web application on the Zitadel side, you can proceed with the integration of your Go application.
 
-### Install ZITADEL Go SDK
+### Install Zitadel Go SDK
 
-To connect with ZITADEL, you need to install an OAuth/OIDC client. Run the following command:
+To connect with Zitadel, you need to install an OAuth/OIDC client. Run the following command:
 
 ```bash
 go get -u github.com/zitadel/zitadel-go/v3
@@ -122,10 +122,10 @@ https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/profile.ht
 ### Start your application
 
 You will need to provide some values for the program to run:
-- `domain`: Your ZITADEL Custom Domain, e.g. my-domain.zitadel.cloud
+- `domain`: Your Zitadel Custom Domain, e.g. my-domain.zitadel.cloud
 - `key`: Random secret string. Used for symmetric encryption of state parameters, cookies and PKCE.
-- `clientID`: The clientID provided by ZITADEL
-- `redirectURI`: The redirectURI registered at ZITADEL
+- `clientID`: The clientID provided by Zitadel
+- `redirectURI`: The redirectURI registered at Zitadel
 - `port`: The port on which the API will be accessible, default it 8089
 
 ```bash
@@ -142,13 +142,13 @@ If you then visit on http://localhost:8089 you should get the following screen:
 
 ![](../../../public/img/go/app-home.png)
 
-By clicking on `Login` you will be redirected to your ZITADEL instance. After login with your existing user you will be presented the profile page:
+By clicking on `Login` you will be redirected to your Zitadel instance. After login with your existing user you will be presented the profile page:
 
 ![](../../../public/img/go/app-profile.png)
 
 ## Completion
 
-Congratulations! You have successfully integrated your Go application with ZITADEL!
+Congratulations! You have successfully integrated your Go application with Zitadel!
 
 If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-go) application.
 This application includes all the functionalities mentioned in this quickstart.

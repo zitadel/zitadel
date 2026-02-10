@@ -1,8 +1,8 @@
 ---
-title: The ZITADEL Quick Start Guide
-description: Learn how to integrate OIDC PKCE authentication in your application using ZITADEL in under 5 minutes.
+title: The Zitadel Quick Start Guide
+description: Learn how to integrate OIDC PKCE authentication in your application using Zitadel in under 5 minutes.
 sidebar_label: Quick Start Guide
-keywords: [ZITADEL, OIDC, PKCE, Authentication, Identity Management]
+keywords: [Zitadel, OIDC, PKCE, Authentication, Identity Management]
 ---
 
 import { Tab } from 'fumadocs-ui/components/tabs';
@@ -12,13 +12,13 @@ import AppValues from './_app_values.mdx';
 
 In this guide, you’ll set up a Zitadel account and authenticate your first example application.
 
-## Get Started with ZITADEL Cloud
+## Get Started with Zitadel Cloud
 
-Set up your ZITADEL account and organization to begin managing identities for your applications.
+Set up your Zitadel account and organization to begin managing identities for your applications.
 
 ### 1. Create your Account and Organization
 
-You first need access to the ZITADEL Cloud Customer Portal.
+You first need access to the Zitadel Cloud Customer Portal.
 This is the administrative hub for managing your billing, teams, and instances.
 1. **Sign Up**: Go to [zitadel.com](http://zitadel.com) and select Sign Up.
 2. **Onboarding**: Follow the prompts to verify your email and set up your Portal Team.
@@ -34,7 +34,7 @@ Complete the brief onboarding questions.
 This data helps us prioritize the development of new features, SDKs, and integrations that matter most to our community.
 ![Onboarding Questions](../../../public/img/guides/quickstart/onboarding_questions.png)
 
-### 3. Create your ZITADEL instance
+### 3. Create your Zitadel instance
 
 An [Instance](/concepts/structure/instance) is a fully isolated identity environment with its own users, policies, and data.
 Most developers use separate instances to isolate Development, Test, and Production workflows.
@@ -51,7 +51,7 @@ Follow these steps to deploy your first instance:
 
 ### 4. Create your Project and Application
 
-In ZITADEL, [**Applications**](/guides/manage/console/applications-overview) are grouped into [**Projects**](/guides/manage/console/projects-overview).
+In Zitadel, [**Applications**](/guides/manage/console/applications-overview) are grouped into [**Projects**](/guides/manage/console/projects-overview).
 This allows multiple applications (like a React frontend and a Go backend) to share the same roles and authorizations.
 
 #### Launch the Management Console
@@ -67,7 +67,7 @@ Log in using the Admin credentials you just created.
 ![Project Name and Framework/Language](../../../public/img/guides/quickstart/create_project_react.png)
 
 #### Step 2: Review Default Configuration
-ZITADEL automatically configures the best security settings for your selected framework.
+Zitadel automatically configures the best security settings for your selected framework.
 
 <FrameworkSelector>
     <Tab value="Angular">
@@ -143,16 +143,16 @@ ZITADEL automatically configures the best security settings for your selected fr
 </FrameworkSelector>
 
 
-## Integrate ZITADEL into your App
+## Integrate Zitadel into your App
 
 ### How the Authentication Flow Works
 
-ZITADEL handles the complexity of the OIDC handshake so your app stays secure without manual token management.
-1. **Login**: App redirects the user to ZITADEL with a PKCE challenge.
-2. **Auth**: User authenticates on the ZITADEL hosted login page.
-3. **Exchange**: ZITADEL returns an Auth Code, which the app exchanges for an Access Token.
+Zitadel handles the complexity of the OIDC handshake so your app stays secure without manual token management.
+1. **Login**: App redirects the user to Zitadel with a PKCE challenge.
+2. **Auth**: User authenticates on the Zitadel hosted login page.
+3. **Exchange**: Zitadel returns an Auth Code, which the app exchanges for an Access Token.
 4. **Tokens**: The app shows the Access and ID Token
-5. **Logout**: The app clears local tokens and terminates the ZITADEL session.
+5. **Logout**: The app clears local tokens and terminates the Zitadel session.
 
 ### 1. Prerequisites
 
@@ -402,7 +402,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 </FrameworkSelector>
 
 ## Success! 🚀
-You’ve successfully integrated ZITADEL into an application.
+You’ve successfully integrated Zitadel into an application.
 
 <Callout type="warn" title="Prevent Misconfiguration Lockouts">
   Login policy misconfigurations that occur during the testing phase can easily lead to a [lockout](/legal/policies/account-lockout-policy). To ensure you don't lose access to your instance:
@@ -416,6 +416,6 @@ You’ve successfully integrated ZITADEL into an application.
 - [**Example Applications**](/examples/introduction): Find more comprehensive guides and examples for the different frameworks
 - [**SSO**](/guides/integrate/services): Learn how to add SSO to your services
 - [**Customize the UI**](/guides/manage/customize/branding): Make the login page your own with Branding.
-- [**Explore the API**](/apis/introduction): Check out the ZITADEL API Reference for advanced integrations.
+- [**Explore the API**](/apis/introduction): Check out the Zitadel API Reference for advanced integrations.
 
 Need help? Join our [Discord community](https://zitadel.com/chat) or explore the full Documentation. Happy coding!

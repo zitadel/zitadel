@@ -1,5 +1,5 @@
 ---
-title: Log in with ZITADEL on Google Cloud with Workforce Identity Federation (OIDC)
+title: Log in with Zitadel on Google Cloud with Workforce Identity Federation (OIDC)
 sidebar_label: Google Cloud
 ---
 
@@ -9,27 +9,27 @@ This guide shows how to login users and assign roles with [Workforce Identity Fe
 
 It covers how to:
 
-- create and configure your application in ZITADEL
+- create and configure your application in Zitadel
 - configure an Action to transform claims
 - create and configure the connection to Google Cloud with Workforce Identity Federation using OpenID Connect (OIDC)
 
 Prerequisites:
 
-- existing ZITADEL Instance, if not present follow [this guide](/guides/start/quickstart)
-- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
-- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
+- existing Zitadel Instance, if not present follow [this guide](/guides/start/quickstart)
+- existing Zitadel Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
+- existing Zitadel project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
 - prerequisites on Google Cloud side [in the configuration guide](https://cloud.google.com/iam/docs/configuring-workforce-identity-federation).
 
-> We have to switch between ZITADEL and a Google Cloud. If the headings begin with "ZITADEL" switch to the ZITADEL Management Console and if
+> We have to switch between Zitadel and a Google Cloud. If the headings begin with "Zitadel" switch to the Zitadel Management Console and if
 > the headings start with "Google Cloud" please refer to the configuration guide on Google Cloud.
 
 ## **Google Cloud**: Configure
 
 Follow the steps **Before you begin**,  **Required roles**, and **create a workforce identity pool** (OIDC) in the [in the configuration guide](https://cloud.google.com/iam/docs/configuring-workforce-identity-federation).
 
-Before you create the workforce identity pool provider you should create your application in ZITADEL.
+Before you create the workforce identity pool provider you should create your application in Zitadel.
 
-## **ZITADEL**: Create the application
+## **Zitadel**: Create the application
 
 In your existing project:
 
@@ -52,7 +52,7 @@ You need to add the redirect URL and configure token settings after creating the
 
 ![](../../../../public/img/guides/integrate/services/google-cloud-create-app.png)
 
-## **ZITADEL**: Redirect url
+## **Zitadel**: Redirect url
 
 ![](../../../../public/img/guides/integrate/services/google-cloud-redirect-url.png)
 
@@ -65,7 +65,7 @@ Save the settings.
 Make sure to replace the `WORKFORCE_POOL_ID` and `WORKFORCE_PROVIDER_ID` with your values in the redirect url
 </Callout>
 
-## **ZITADEL**: Token settings
+## **Zitadel**: Token settings
 
 ![](../../../../public/img/guides/integrate/services/google-cloud-token-settings.png)
 
@@ -78,13 +78,13 @@ After creating, go to the application settings "Token settings" and configure as
 
 Save the settings.
 
-## **ZITADEL**: Custom claims
+## **Zitadel**: Custom claims
 
 Go to your project and create roles according to the Groups in Google Cloud.
-Authorize a test user by assigning roles in ZITADEL.
+Authorize a test user by assigning roles in Zitadel.
 
 Google Cloud expects some claims, including groups, in a specific format as [described here](https://cloud.google.com/iam/docs/workforce-identity-federation#attribute-mappings).
-Claims can be transformed in ZITADEL with [Actions](/guides/manage/console/actions-overview).
+Claims can be transformed in Zitadel with [Actions](/guides/manage/console/actions-overview).
 
 Create an Action with the following code to flatten the roles and include the claim for the users' display name.
 
@@ -127,4 +127,4 @@ And add the the Action Script to the following Flow and Trigger:
 
 ## **Google Cloud**: Create a WIP provider
 
-Complete the steps  in the [in the configuration guide](https://cloud.google.com/iam/docs/configuring-workforce-identity-federation) with the `ISSUER_URI` and `CLIENT_ID` from ZITADEL.
+Complete the steps  in the [in the configuration guide](https://cloud.google.com/iam/docs/configuring-workforce-identity-federation) with the `ISSUER_URI` and `CLIENT_ID` from Zitadel.

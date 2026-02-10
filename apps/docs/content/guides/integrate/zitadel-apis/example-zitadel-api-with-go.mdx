@@ -1,10 +1,10 @@
 ---
-title: Integrate ZITADEL APIs into a Go Application
+title: Integrate Zitadel APIs into a Go Application
 sidebar_label: Example Go
 ---
 
-This integration guide shows you how to integrate **ZITADEL** into your Go application.
-It demonstrates how to fetch some data from the ZITADEL management API.
+This integration guide shows you how to integrate **Zitadel** into your Go application.
+It demonstrates how to fetch some data from the Zitadel management API.
 
 > ℹ️ These examples and guides are based on our official [Go SDK](https://github.com/zitadel/zitadel-go).
 >
@@ -16,10 +16,10 @@ At the end of the guide you should have an application able to read the details 
 
 ## Prerequisites
 
-The client [SDK](https://github.com/zitadel/zitadel-go) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API using our [Go SDK](https://github.com/zitadel/zitadel-go).
+The client [SDK](https://github.com/zitadel/zitadel-go) will handle all necessary OAuth 2.0 requests and send the required headers to the Zitadel API using our [Go SDK](https://github.com/zitadel/zitadel-go).
 All that is required, is a service account with an Org Owner (or another role, depending on the needed api requests) role assigned and its key JSON.
 
-However, we recommend you read the guide on [how to access ZITADEL API](/guides/integrate/zitadel-apis/access-zitadel-apis)) and the associated guides for a basic knowledge of :
+However, we recommend you read the guide on [how to access Zitadel API](/guides/integrate/zitadel-apis/access-zitadel-apis)) and the associated guides for a basic knowledge of :
  - [Recommended Authorization Flows](/guides/integrate/login/oidc/oauth-recommended-flows)
  - [Service Users](/guides/integrate/service-accounts/authenticate-service-accounts)
 
@@ -66,13 +66,13 @@ This will output something similar to:
 
 ## Completion
 
-You have successfully used the ZITADEL Go SDK to call the management API!
+You have successfully used the Zitadel Go SDK to call the management API!
 
 If you encountered an error (e.g. `code = PermissionDenied desc = No matching permissions found`),
 ensure your service user has the required permissions by assigning the `ORG_OWNER` or `ORG_OWNER_VIEWER` role
 and check the mentioned [guides](#prerequisites) at the beginning.
 
-If you've run into any other problem, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/zitadel/zitadel/issues) or in the [SDK](https://github.com/zitadel/zitadel-go/issues).
+If you've run into any other problem, don't hesitate to contact us or raise an issue on [Zitadel](https://github.com/zitadel/zitadel/issues) or in the [SDK](https://github.com/zitadel/zitadel-go/issues).
 
 ### Whats next?
 

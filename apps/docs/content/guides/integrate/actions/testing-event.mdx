@@ -2,20 +2,20 @@
 title: Test Actions Event
 ---
 
-This guide shows you how to leverage the ZITADEL actions feature to react to events in your ZITADEL instance.
+This guide shows you how to leverage the Zitadel actions feature to react to events in your Zitadel instance.
 You can use the actions feature to create a target that will be called when a specific event occurs.
-This is useful for integrating with other systems or for triggering workflows based on events in ZITADEL.
+This is useful for integrating with other systems or for triggering workflows based on events in Zitadel.
 
 ## Prerequisites
 
 Before you start, make sure you have everything set up correctly.
 
-- You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
-- Your ZITADEL instance needs to have the actions feature enabled.
+- You need to be at least a Zitadel [_IAM_OWNER_](/guides/manage/console/managers)
+- Your Zitadel instance needs to have the actions feature enabled.
 
 <Callout>
-Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
-In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
+Note that this guide assumes that Zitadel is running on the same machine as the target and can be reached via `localhost`.
+In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from Zitadel.
 </Callout>
 
 ## Start example target
@@ -92,7 +92,7 @@ Save the returned ID to set in the execution.
 
 ## Set execution
 
-To configure ZITADEL to call the target when an event occurs, you need to set an execution and define the event
+To configure Zitadel to call the target when an event occurs, you need to set an execution and define the event
 condition.
 
 See [Set an execution](/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
@@ -117,7 +117,7 @@ curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/executions' \
 ## Example call
 
 Now that you have set up the target and execution, you can test it by creating a user through the Management Console UI or
-by calling the ZITADEL API to create a user.
+by calling the Zitadel API to create a user.
 
 ```shell
 curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/users/new' \
@@ -190,6 +190,6 @@ The event_payload is base64 encoded and has the following content:
 
 ## Conclusion
 
-You have successfully set up a target and execution to react to events in your ZITADEL instance.
-This feature can now be used to integrate with your existing systems to create custom workflows or automate tasks based on events in ZITADEL.
+You have successfully set up a target and execution to react to events in your Zitadel instance.
+This feature can now be used to integrate with your existing systems to create custom workflows or automate tasks based on events in Zitadel.
 Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

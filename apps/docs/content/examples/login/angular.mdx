@@ -1,18 +1,18 @@
 ---
-title: ZITADEL with Angular
+title: Zitadel with Angular
 sidebar_label: Angular
 ---
 
-This integration guide demonstrates the recommended way to incorporate ZITADEL into your Angular application.
+This integration guide demonstrates the recommended way to incorporate Zitadel into your Angular application.
 It explains how to enable user login in your application and how to fetch data from the user info endpoint.
 
 By the end of this guide, your application will have login functionality and will be able to access the current user's profile.
 
-> This documentation references our [example](https://github.com/zitadel/zitadel-angular) on GitHub. Please note that we wrote the ZITADEL Management Console in Angular, so you can also use that as a reference.
+> This documentation references our [example](https://github.com/zitadel/zitadel-angular) on GitHub. Please note that we wrote the Zitadel Management Console in Angular, so you can also use that as a reference.
 
 ## Set up application and obtain keys
 
-Before we begin developing our application, we need to perform a few configuration steps in the ZITADEL Console.
+Before we begin developing our application, we need to perform a few configuration steps in the Zitadel Console.
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select the **User Agent** application type and continue.
 We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all SPA applications.
@@ -21,7 +21,7 @@ We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth
 
 ### Redirect URIs
 
-The Redirect URIs field tells ZITADEL where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
+The Redirect URIs field tells Zitadel where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 The Post-logout redirect send the users back to a route on your application after they have logged out.
 
 > If you are following along with the [example](https://github.com/zitadel/zitadel-angular), set the dev mode to `true`, the Redirect URIs to `http://localhost:4200/auth/callback` and Post redirect URI to `http://localhost:4200/signedout`.
@@ -34,11 +34,11 @@ After successful creation of the app, a pop-up will appear displaying the app's 
 
 ## Angular setup
 
-Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Angular application.
+Now that you have configured your web application on the Zitadel side, you can proceed with the integration of your Angular application.
 
 ### Install Angular dependencies
 
-To connect with ZITADEL, you need to install an OAuth/OIDC client. Run the following command:
+To connect with Zitadel, you need to install an OAuth/OIDC client. Run the following command:
 
 ```bash
 npm install angular-oauth2-oidc
@@ -60,7 +60,7 @@ You can use Angular’s schematics to do so:
 ng g service services/authentication
 ```
 
-Copy the following code to your service. This code provides a function `authenticate()`, which redirects the user to ZITADEL. After a successful login, ZITADEL redirects the user back to the redirect URI configured in _AuthModule_ and ZITADEL Console. Ensure that both correspond, otherwise ZITADEL will throw an error.
+Copy the following code to your service. This code provides a function `authenticate()`, which redirects the user to Zitadel. After a successful login, Zitadel redirects the user back to the redirect URI configured in _AuthModule_ and Zitadel Console. Ensure that both correspond, otherwise Zitadel will throw an error.
 
 ```ts reference
 https://github.com/zitadel/zitadel-angular/blob/main/src/app/services/authentication.service.ts
@@ -103,7 +103,7 @@ Do the same for the guard:
 ng g guard guards/auth
 ```
 
-This code shows the _AuthGuard_ used in ZITADEL Console.
+This code shows the _AuthGuard_ used in Zitadel Console.
 
 ```ts reference
 https://github.com/zitadel/zitadel-angular/blob/main/src/app/guards/auth.guard.ts
@@ -131,7 +131,7 @@ https://github.com/zitadel/zitadel-angular/blob/main/src/app/components/user/use
 
 ### Display user information
 
-To fetch user data, you need to call the ZITADEL's user info endpoint. This data contains sensitive information and artifacts related to the current user's identity and the scopes you defined in your _AuthConfig_.
+To fetch user data, you need to call the Zitadel's user info endpoint. This data contains sensitive information and artifacts related to the current user's identity and the scopes you defined in your _AuthConfig_.
 Our _AuthenticationService_ already includes a method called _getOIDCUser()_. You can call it wherever you need this information.
 
 ```ts reference
@@ -157,7 +157,7 @@ This line automatically refreshes a token before it expires.
 
 ## Completion
 
-Congratulations! You have successfully integrated your Angular application with ZITADEL!
+Congratulations! You have successfully integrated your Angular application with Zitadel!
 
 If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-angular) application. This application includes all the functionalities mentioned in this quick-start. You can start by cloning the repository and replacing the _AuthConfig_ in the _AppModule_ with your own configuration. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel).
 
@@ -165,6 +165,6 @@ If you get stuck, consider checking out our [example](https://github.com/zitadel
 
 ### What's next?
 
-Now that you have enabled authentication, it's time for you to add authorization to your application using ZITADEL APIs. To do this, you can refer to the [docs](/apis/introduction) or check out the ZITADEL Management Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
+Now that you have enabled authentication, it's time for you to add authorization to your application using Zitadel APIs. To do this, you can refer to the [docs](/apis/introduction) or check out the Zitadel Management Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
 
 For more information on how to create an Angular application, you can refer to [Angular](https://angular.io/start). If you want to learn more about the OAuth/OIDC library used above, consider reading the docs at [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).

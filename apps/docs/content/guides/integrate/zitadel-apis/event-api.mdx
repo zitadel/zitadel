@@ -1,15 +1,15 @@
 ---
-title: Get Events from ZITADEL
+title: Get Events from Zitadel
 sidebar_label: Event API
 ---
 
-ZITADEL leverages the power of eventsourcing, meaning every action and change within the system generates a corresponding event that is stored in the database.
-To provide you with greater flexibility and access to these events, ZITADEL has introduced an Event API.
+Zitadel leverages the power of eventsourcing, meaning every action and change within the system generates a corresponding event that is stored in the database.
+To provide you with greater flexibility and access to these events, Zitadel has introduced an Event API.
 This API allows you to easily retrieve and utilize the events generated within the system, enabling you to integrate them into your own system and respond to specific events as they occur.
 
 You need to assign a user the [administrator role](/guides/manage/console/managers) IAM_OWNER_VIEWER or IAM_OWNER to access the Event API.
 
-If you like to know more about eventsourcing/eventstore and how this works in ZITADEL, head over to our [concepts](/concepts/eventstore/overview).
+If you like to know more about eventsourcing/eventstore and how this works in Zitadel, head over to our [concepts](/concepts/eventstore/overview).
 ## Request Events
 
 Call the [ListEvents](/reference/api/admin/zitadel.admin.v1.AdminService.ListEvents) endpoint in the Administration API to get all the events you need.
@@ -30,7 +30,7 @@ curl --request POST \
 
 ## Get event types
 
-To be able to filter for the different event types ZITADEL knows, you can request the [EventTypesList](/reference/api/admin/zitadel.admin.v1.AdminService.ListEventTypes)
+To be able to filter for the different event types Zitadel knows, you can request the [EventTypesList](/reference/api/admin/zitadel.admin.v1.AdminService.ListEventTypes)
 
 ```bash
 curl --request POST \
@@ -40,7 +40,7 @@ curl --request POST \
 '
 ```
 
-The response will give you a list of event types. The type is what the event is called in ZITADEL itself (technical).
+The response will give you a list of event types. The type is what the event is called in Zitadel itself (technical).
 You can also find a translation for the event to better reflect it for an enduser perspective.
 
 The following example shows you the event types for a password check (failed/succeeded).
@@ -66,7 +66,7 @@ The following example shows you the event types for a password check (failed/suc
 
 ## Get aggregate types
 
-To be able to filter for the different aggregate types (resources) ZITADEL knows, you can request the [AggregateTypesList](/reference/api/admin/zitadel.admin.v1.AdminService.ListAggregateTypes)
+To be able to filter for the different aggregate types (resources) Zitadel knows, you can request the [AggregateTypesList](/reference/api/admin/zitadel.admin.v1.AdminService.ListAggregateTypes)
 
 ```bash
 curl --request POST \
@@ -75,7 +75,7 @@ curl --request POST \
   --header 'Content-Type: application/json'
 ```
 
-The response will give you a list of aggregate types. The type is what the aggregate is called in ZITADEL itself (technical).
+The response will give you a list of aggregate types. The type is what the aggregate is called in Zitadel itself (technical).
 You can also find a translation for the aggregate to better reflect it for an enduser perspective.
 
 The following example shows you the aggregate type for the user.
@@ -94,7 +94,7 @@ The following example shows you the aggregate type for the user.
 
 ## Example: Get user changes since a specific date
 
-Assuming you use ZITADEL as your single source of truth for your user data.
+Assuming you use Zitadel as your single source of truth for your user data.
 Now you like to react to changes on the users to update data in other your other systems.
 
 This example shows you how to get all events from users, filtered with the creation_date (e.g since last day/hour, etc).

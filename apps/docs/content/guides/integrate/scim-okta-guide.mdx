@@ -2,23 +2,23 @@
 title: SCIM Provisioning from Okta
 ---
 
-This guide provides step-by-step instructions to configure SCIM provisioning from Okta into ZITADEL.
+This guide provides step-by-step instructions to configure SCIM provisioning from Okta into Zitadel.
 
 ## Pre-requisites:
 
-* Access to your ZITADEL Organization with an **Org Owner** role.
+* Access to your Zitadel Organization with an **Org Owner** role.
 
 * Access to your Okta Admin dashboard.
 
-* An existing **SAML app integration** between Okta (Identity Provider) and ZITADEL (Service Provider).
+* An existing **SAML app integration** between Okta (Identity Provider) and Zitadel (Service Provider).
 
-## Step 1: Set Up SCIM Provisioning in ZITADEL
+## Step 1: Set Up SCIM Provisioning in Zitadel
 
-SCIM provisioning in ZITADEL is accomplished by authenticating a Service User with appropriate permissions.
+SCIM provisioning in Zitadel is accomplished by authenticating a Service User with appropriate permissions.
 
 1. **Create a Service User**:
 
-   * Follow [this guide](https://zitadel.com/docs/guides/manage/console/users-overview) to create a Service User within your ZITADEL Organization.
+   * Follow [this guide](https://zitadel.com/docs/guides/manage/console/users-overview) to create a Service User within your Zitadel Organization.
 
 2. **Assign the Role**:
 
@@ -40,7 +40,7 @@ Follow these precise steps to configure SCIM provisioning in Okta:
 
 1. Log in to your Okta Admin Console.
 
-2. Navigate to **Applications** → **Application** and the existing **SAML app** linked to ZITADEL.
+2. Navigate to **Applications** → **Application** and the existing **SAML app** linked to Zitadel.
 
 3. Select the **General** tab, then choose **Edit** for **App Settings**.
 
@@ -74,7 +74,7 @@ Like the example in the above image:
 
 11. Provide the authentication details according to your chosen method:
 
-    * For **HTTP Header (PAT)**, enter the PAT token generated from ZITADEL.
+    * For **HTTP Header (PAT)**, enter the PAT token generated from Zitadel.
 
     * For **OAuth 2**, provide the client credentials (Client ID, Client Secret, token URL, authorization URL).
 
@@ -102,7 +102,7 @@ Review and adjust attribute mappings in Okta as needed:
 
 * Assign the configured application to test users/groups in Okta.
 
-* Verify that users are automatically provisioned into ZITADEL by checking under **Users** in your ZITADEL console.
+* Verify that users are automatically provisioned into Zitadel by checking under **Users** in your Zitadel console.
 
 * Validate attribute synchronization and lifecycle management (activation, updates, deactivation).
 
@@ -110,10 +110,10 @@ Review and adjust attribute mappings in Okta as needed:
 
 * [Authenticate users with SAML](https://zitadel.com/docs/guides/integrate/login/saml)
 
-* [ZITADEL: Creating Service Users](https://zitadel.com/docs/guides/manage/console/users-overview)
+* [Zitadel: Creating Service Users](https://zitadel.com/docs/guides/manage/console/users-overview)
 
-* [ZITADEL: Service User Authentication](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts)
+* [Zitadel: Service User Authentication](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts)
 
-* [ZITADEL SCIM 2.0 API Endpoints](https://zitadel.com/docs/apis/scim2)
+* [Zitadel SCIM 2.0 API Endpoints](https://zitadel.com/docs/apis/scim2)
 
 * [SCIM v2.0 (Preview) docs](https://zitadel.com/docs/guides/manage/user/scim2)

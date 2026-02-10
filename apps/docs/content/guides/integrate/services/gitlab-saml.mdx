@@ -1,9 +1,9 @@
 ---
-title: Log in with ZITADEL on Gitlab through SAML 2.0
+title: Log in with Zitadel on Gitlab through SAML 2.0
 sidebar_label: Gitlab
 ---
 
-This guide shows how to enable login with ZITADEL on Gitlab.
+This guide shows how to enable login with Zitadel on Gitlab.
 
 It covers how to:
 
@@ -12,12 +12,12 @@ It covers how to:
 
 Prerequisites:
 
-- existing ZITADEL Instance, if not present follow [this guide](/guides/start/quickstart)
-- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
-- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
+- existing Zitadel Instance, if not present follow [this guide](/guides/start/quickstart)
+- existing Zitadel Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
+- existing Zitadel project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
 - existing Gitlab SaaS Setup in the premium tier
 
-> We have to switch between ZITADEL and Gitlab. If the headings begin with "ZITADEL" switch to the ZITADEL
+> We have to switch between Zitadel and Gitlab. If the headings begin with "Zitadel" switch to the Zitadel
 > Management Console and
 > if the headings start with "Gitlab" please switch to the Gitlab GUI.
 
@@ -31,7 +31,7 @@ Select on the menu Settings and then SAML SSO.
 Copy `GitLab metadata URL` for the next step.
 ![](../../../../public/img/saml/gitlab/gitlab-01.png)
 
-## **ZITADEL**: Create the application
+## **Zitadel**: Create the application
 
 In your existing project:
 
@@ -62,7 +62,7 @@ Save the changes.
 
 Once you saved the changes, click on the button "Verify SAML configuration".
 
-You should be redirected to ZITADEL.
+You should be redirected to Zitadel.
 Login with your user.
 After that you should be redirected back to GitLab and you can inspect the Response Output.
 ![](../../../../public/img/saml/gitlab/gitlab-03.png)

@@ -4,7 +4,7 @@ import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions } from '@/lib/layout.shared';
 import { buildCustomTree } from '@/lib/custom-tree';
 import rawVersions from '@/content/versions.json';
- 
+
 const versions = rawVersions as any[];
 import { VersionSelector } from '@/components/version-selector';
 
@@ -31,7 +31,7 @@ export default async function Layout(props: { children: ReactNode; params: Promi
     // Hoist the version folder to root to flatten sidebar
     // versionSource.pageTree -> [ v4.10 folder, v4.9 folder ... ]
     // We want the children of the specific version folder.
-     
+
     const children = (versionSource.pageTree as any).children || [];
 
     const versionFolder = children.find((node: any) => {
@@ -69,6 +69,7 @@ export default async function Layout(props: { children: ReactNode; params: Promi
     <DocsLayout
       tree={tree}
       {...baseOptions()}
+      themeSwitch={{ enabled: false }}
       sidebar={{
         banner: (
           <VersionSelector />

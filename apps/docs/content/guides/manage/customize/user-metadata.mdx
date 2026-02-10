@@ -3,7 +3,7 @@ title: User Metadata
 ---
 
 This guide shows you how to request metadata from a user.
-ZITADEL offers multiple methods to retrieve metadata.
+Zitadel offers multiple methods to retrieve metadata.
 Pick the one that works best for your solution.
 
 ## Use cases for metadata
@@ -85,7 +85,7 @@ For that you need to enable "User Info inside ID Token" in your application's se
 
 ![](../../../../public/img/console_projects_application_token_settings.png)
 
-Now request a new token from ZITADEL by logging in with the user that has metadata attached.
+Now request a new token from Zitadel by logging in with the user that has metadata attached.
 Make sure you log into the correct client/application where you enabled the settings.
 
 The result will give you something like:
@@ -148,7 +148,7 @@ You can use the authentication service to request and search for the user's meta
 
 The introspection endpoint and the token endpoint in the examples above do not require a special scope to access.
 Yet when accessing the authentication service, you need to pass the [reserved scope](/apis/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:org:project:id:zitadel:aud` along with the authentication request.
-This scope allows the user to access ZITADEL's APIs, specifically the authentication API that we need for this method.
+This scope allows the user to access Zitadel's APIs, specifically the authentication API that we need for this method.
 Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example application](/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 <Callout title="Invalid audience">
@@ -180,7 +180,7 @@ curl -L -X POST "https://${CUSTOM_DOMAIN}/auth/v1/users/me/metadata/_search" \
 ```
 
 Replace `${ACCESS_TOKEN}` with your user's access token.
-Replace `${CUSTOM_DOMAIN}` with your ZITADEL instance's url.
+Replace `${CUSTOM_DOMAIN}` with your Zitadel instance's url.
 Replace `${METADATA_KEY}` with they key you want to search for (f.e. "ContractNumber")
 
 <Callout title="Get all metadata">

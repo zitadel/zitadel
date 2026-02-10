@@ -1,9 +1,9 @@
 ---
-title: ZITADEL with Java Spring Boot
+title: Zitadel with Java Spring Boot
 sidebar_label: Java Spring Boot
 ---
 
-This integration guide shows you how to integrate **ZITADEL** into your Java Spring Boot API. It demonstrates how to secure your API using
+This integration guide shows you how to integrate **Zitadel** into your Java Spring Boot API. It demonstrates how to secure your API using
 OAuth 2 Token Introspection.
 
 At the end of the guide you should have an API with a protected endpoint.
@@ -15,7 +15,7 @@ You can either create your own application or directly run the example by provid
 
 ## Set up application
 
-Before we begin developing our API, we need to perform a few configuration steps in the ZITADEL Console.
+Before we begin developing our API, we need to perform a few configuration steps in the Zitadel Console.
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select the **API** application type and continue.
 
@@ -31,13 +31,13 @@ After successful creation of the app, a pop-up will appear displaying the app's 
 
 ## Spring Setup
 
-Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Spring application.
+Now that you have configured your web application on the Zitadel side, you can proceed with the integration of your Spring application.
 This guide will reference the [example repository](https://github.com/zitadel/zitadel-java) and explain the necessary steps taken in there.
 If your starting from scratch, you can use the Spring Initializer with the [following setup](https://start.spring.io/#!type=maven-project&language=java&platformVersion=3.2.1&packaging=jar&jvmVersion=17&dependencies=web,lombok,oauth2-resource-server) as a base.
 
 ### Support class
 
-To be able to take the most out of ZITADELs RBAC, we first need to create a CustomAuthorityOpaqueTokenIntrospector, that will
+To be able to take the most out of Zitadels RBAC, we first need to create a CustomAuthorityOpaqueTokenIntrospector, that will
 customize the introspection behavior and map the role claims (`urn:zitadel:iam:org:project:roles`)
 into Spring Security `authiorities`, which can be used later on to determine the granted permissions.
 
@@ -65,7 +65,7 @@ For the authorization (and the server in general) to work, the application needs
 https://github.com/zitadel/zitadel-java/blob/main/api/src/main/resources/application.yml
 ```
 
-Note that the `introspection-uri`, `client-id` and `client-secret` are only placeholders. You can either change them in here using the values provided by ZITADEL
+Note that the `introspection-uri`, `client-id` and `client-secret` are only placeholders. You can either change them in here using the values provided by Zitadel
 or pass them later on as arguments when starting the application.
 
 ### Create example API
@@ -220,7 +220,7 @@ Date: Mon, 15 Jan 2024 09:24:39 GMT
 
 ### Add administrator role
 
-So let's create the role and grant it to the user. To do so, go to your project in ZITADEL Management Console
+So let's create the role and grant it to the user. To do so, go to your project in Zitadel Management Console
 and create the role by selecting `Roles` in the navigation and then clicking on the `New Role` button.
 Finally, create the role as shown below:
 

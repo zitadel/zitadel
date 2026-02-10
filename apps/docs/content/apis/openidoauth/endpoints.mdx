@@ -1,5 +1,5 @@
 ---
-title: OpenID Connect Endpoints in ZITADEL
+title: OpenID Connect Endpoints in Zitadel
 sidebar_label: OpenID Connect Endpoints
 ---
 
@@ -106,7 +106,7 @@ no additional parameters required
 
 #### Response modes
 
-ZITADEL supports the following `response_mode` values. When no response mode is requested, the response mode is chosen based on the configured Response Type of the application.
+Zitadel supports the following `response_mode` values. When no response mode is requested, the response mode is chosen based on the configured Response Type of the application.
 As per [OpenID Connect Core 1.0, Section 3.1.2.1](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest):
 
 > The use of this parameter is NOT RECOMMENDED when the Response Mode that would be requested is the default mode specified for the Response Type.
@@ -115,7 +115,7 @@ As per [OpenID Connect Core 1.0, Section 3.1.2.1](https://openid.net/specs/openi
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | query         | Encode the returned parameters in the URL query string. This is the default when the Response type is `code`, for example [Web applications](/guides/manage/console/applications-overview#web).                                                                                                                                     |
 | fragment      | Encode the returned parameters in the URL fragment. This is the default when the Response Type is `id_token`, for example implicit [User Agent apps](/guides/manage/console/applications-overview#user-agent). This mode will not work for server-side applications, because fragments are never sent by the browser to the server. |
-| form_post[^1] | ZITADEL serves a small JavaScript to the browser which will send the returned parameters to the `redirect_uri` using HTTP POST. This mode only works for server-side applications and user agents which support / allow JavaScript.                                                                                             |
+| form_post[^1] | Zitadel serves a small JavaScript to the browser which will send the returned parameters to the `redirect_uri` using HTTP POST. This mode only works for server-side applications and user agents which support / allow JavaScript.                                                                                             |
 
 [^1]: Implements [OAuth 2.0 Form Post Response Mode](https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
 
@@ -254,7 +254,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
 | grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                   |
 | assertion  | JWT built and signed according to [Using JWTs for Authorization Grants](./grant-types#using-jw-ts-as-authorization-grants) |
-| scope      | [Scopes](./scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`        |
+| scope      | [Scopes](./scopes) you would like to request from Zitadel. Scopes are space delimited, e.g. `openid email profile`        |
 
 ```bash
 curl --request POST \
@@ -285,7 +285,7 @@ See [offline_access Scope](./scopes#standard-scopes) for how to request a `refre
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | grant_type    | Must be `refresh_token`                                                                                                                                                                                                                                                                                         |
 | refresh_token | The refresh_token previously issued in the last authorization_code or refresh_token request.                                                                                                                                                                                                                    |
-| scope         | [Scopes](./scopes) you would like to request from ZITADEL for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
+| scope         | [Scopes](./scopes) you would like to request from Zitadel for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
@@ -349,7 +349,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 | Parameter  | Description                                                                                                |
 | ---------- | ---------------------------------------------------------------------------------------------------------- |
 | grant_type | Must be `client_credentials`                                                                               |
-| scope      | [Scopes](./scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid profile` |
+| scope      | [Scopes](./scopes) you would like to request from Zitadel. Scopes are space delimited, e.g. `openid profile` |
 
 Additionally, you need to authenticate your client by either sending `client_id` and `client_secret` as Basic Auth Header.
 Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
@@ -391,7 +391,7 @@ curl --request POST \
 
 ### Token Exchange grant
 
-The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. ZITADEL also provides a [token exchange guide](/guides/integrate/token-exchange) with more details on using the Token Exchange Grant.
+The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. Zitadel also provides a [token exchange guide](/guides/integrate/token-exchange) with more details on using the Token Exchange Grant.
 
 #### Request parameters
 
@@ -535,7 +535,7 @@ If `active` is **true**, further information will be provided:
 | nbf        | Time the token must not be used before (as unix time)                 |
 | scope      | Space delimited list of scopes granted to the token                   |
 | token_type | Type of the inspected token. Value is always `Bearer`                 |
-| username   | ZITADEL's login name of the user. Consist of `username@primarydomain` |
+| username   | Zitadel's login name of the user. Consist of `username@primarydomain` |
 
 Additionally and depending on the granted scopes, information about the authorized user is provided.
 Check the [Claims](./claims) page if a specific claims might be returned and for detailed description.
@@ -619,7 +619,7 @@ Send your `client_id` as parameters in the body:
 </Tab>
 <Tab value="private_key_jwt">
 
-Send a `client_assertion` as JWT for ZITADEL to verify the signature against the registered public key.
+Send a `client_assertion` as JWT for Zitadel to verify the signature against the registered public key.
 
 | Parameter             | Description                                                                                                   |
 | --------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -664,13 +664,13 @@ If neither an `id_token_hint` nor a `client_id` parameter is provided, the `post
 
 `${CUSTOM_DOMAIN}/oauth/v2/keys`
 
-The endpoint returns a JSON Web Key Set (JWKS) containing the public keys that can be used to locally validate JWTs you received from ZITADEL.
+The endpoint returns a JSON Web Key Set (JWKS) containing the public keys that can be used to locally validate JWTs you received from Zitadel.
 The alternative would be to validate tokens with the [introspection endpoint](#introspection-endpoint).
 
 ### Key rotation
 
 Keys are automatically rotated on a regular basis or on demand, meaning keys can change in irregular intervals.
-ZITADEL ensures that a proper `kid` is set with each key.
+Zitadel ensures that a proper `kid` is set with each key.
 
 <Callout title="Keys rotate without prior notice">
 Be aware that these keys can be rotated without any prior notice.
@@ -687,4 +687,4 @@ This might result in being rate limited for a large number of requests that come
 
 ## OAuth 2.0 metadata
 
-**ZITADEL** does not yet provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](https://openid.net/specs/openid-connect-discovery-1_0.html).
+**Zitadel** does not yet provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](https://openid.net/specs/openid-connect-discovery-1_0.html).

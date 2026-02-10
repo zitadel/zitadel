@@ -1,18 +1,18 @@
-@import 'tailwindcss';
+@import '@zitadel/theme/styles/v4-theme.css';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
 @import 'fumadocs-openapi/css/preset.css';
 
 @theme {
     /* 1. REGISTER STANDARD UTILITIES */
-    --color-background: hsl(var(--background));
-    --color-foreground: hsl(var(--foreground));
+    /* --color-background: hsl(var(--background)); */
+    /* --color-foreground: hsl(var(--foreground)); */
     --color-card: hsl(var(--card));
     --color-card-foreground: hsl(var(--card-foreground));
     --color-popover: hsl(var(--popover));
     --color-popover-foreground: hsl(var(--popover-foreground));
-    --color-primary: hsl(var(--primary));
-    --color-primary-foreground: hsl(var(--primary-foreground));
+    /* --color-primary: hsl(var(--primary)); */
+    /* --color-primary-foreground: hsl(var(--primary-foreground)); */
     --color-secondary: hsl(var(--secondary));
     --color-secondary-foreground: hsl(var(--secondary-foreground));
     --color-muted: hsl(var(--muted));
@@ -26,10 +26,106 @@
     --color-ring: hsl(var(--ring));
 
     /* 2. MAP FUMADOCS VARIABLES */
-    --color-fd-primary: var(--color-primary);
-    --color-fd-primary-foreground: var(--color-primary-foreground);
+    --color-fd-primary: var(--color-text-critical);
+    --color-fd-primary-foreground: var(--color-surface-black-primary);
+
+    /* BACKGROUNDS */
     --color-fd-background: var(--color-background);
     --color-fd-foreground: var(--color-foreground);
+
+    /* CARDS */
+    --color-fd-card: var(--color-card);
+    --color-fd-card-foreground: var(--color-card-foreground);
+    --color-fd-popover: var(--color-popover);
+    --color-fd-popover-foreground: var(--color-popover-foreground);
+
+    /* CALLOUTS */
+    --color-fd-info: var(--color-text-critical);
+    --color-fd-warn: #f59e0b;
+    --color-fd-error: #ef4444;
+
+    /* MUTED */
+    --color-fd-muted: var(--color-muted);
+    --color-fd-muted-foreground: var(--color-muted-foreground);
+
+    /* ACCENT */
+    --color-fd-accent: var(--color-accent);
+    --color-fd-accent-foreground: var(--color-accent-foreground);
+
+    /* BORDER */
+    --color-fd-border: var(--color-border);
+    --color-fd-ring: var(--color-ring);
+
+    --color-zitadelorange: #f25543;
+    --font-sans: var(--font-lato), "Lato", "ui-sans-serif", "system-ui";
+}
+
+/* --- LIGHT MODE VARIABLES --- */
+:root {
+    /* --primary: 230 59% 58%; */
+    /* --primary-foreground: 0 0% 100%; */
+
+    --background: 240 4% 6%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 93%;
+    --card-foreground: 0 0% 10%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 0 0% 92%;
+    --accent-foreground: 230 59% 58%;
+
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 230 59% 58%;
+
+    --radius: 0.5rem;
+    --overlaycolor: rgba(0, 0, 0, 0.05);
+}
+
+/* --- DARK MODE VARIABLES --- */
+:root[class~="dark"],
+[data-theme="dark"] {
+    /* --primary: 340 100% 56%; */
+    /* --primary-foreground: 0 0% 100%; */
+
+    --background: 240 4% 6%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 4% 10%;
+    --card-foreground: 0 0% 98%;
+
+    --muted: 240 4% 12%;
+    --muted-foreground: 240 5% 70%;
+
+    --accent: 240 4% 15%;
+    --accent-foreground: 12 90% 65%;
+
+    --secondary: 240 4% 14%;
+    --secondary-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 4% 20%;
+    --input: 240 4% 20%;
+    --ring: 12 90% 56%;
+
+    --overlaycolor: #ffffff15;
+
+    /* FORCE OVERRIDE for Fumadocs Variables */
+    --color-fd-background: var(--color-background);
+    --color-fd-foreground: var(--color-foreground);
+    --color-fd-primary: var(--color-text-critical);
+    --color-fd-primary-foreground: var(--color-surface-black-primary);
     --color-fd-card: var(--color-card);
     --color-fd-card-foreground: var(--color-card-foreground);
     --color-fd-popover: var(--color-popover);
@@ -40,99 +136,27 @@
     --color-fd-accent-foreground: var(--color-accent-foreground);
     --color-fd-border: var(--color-border);
     --color-fd-ring: var(--color-ring);
-
-    --color-zitadelpink: #ff2069;
-    --font-sans: var(--font-lato), "Lato", "ui-sans-serif", "system-ui";
-}
-
-/* --- LIGHT MODE VARIABLES --- */
-:root {
-    --primary: 230 59% 58%; 
-    --primary-foreground: 0 0% 100%;
-    
-    --background: 0 0% 98%;   
-    --foreground: 0 0% 10%;   
-    
-    --card: 0 0% 93%;         
-    --card-foreground: 0 0% 10%;
-    
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    
-    --accent: 0 0% 92%;
-    --accent-foreground: 230 59% 58%;
-    
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 230 59% 58%;
-    
-    --radius: 0.5rem;
-    --overlaycolor: #6c90b420; 
-}
-
-/* --- DARK MODE VARIABLES --- */
-:root[class~="dark"], [data-theme="dark"] {
-    --primary: 340 100% 56%; 
-    --primary-foreground: 0 0% 100%;
-    
-    --background: 235 45% 14%; 
-    --foreground: 0 0% 98%;
-    
-    --card: 220 40% 25%;       
-    --card-foreground: 0 0% 98%;
-    
-    --muted: 230 43% 15%;
-    --muted-foreground: 230 20% 70%;
-    
-    --accent: 230 43% 20%;
-    --accent-foreground: 340 100% 65%;
-    
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 230 43% 25%;
-    --input: 230 43% 25%;
-    --ring: 340 100% 56%;
-    
-    --overlaycolor: #ffffff15;
-
-    /* FORCE OVERRIDE for Fumadocs Variables */
-    --color-fd-background: hsl(var(--background));
-    --color-fd-foreground: hsl(var(--foreground));
-    --color-fd-primary: hsl(var(--primary));
-    --color-fd-primary-foreground: hsl(var(--primary-foreground));
-    --color-fd-card: hsl(var(--card));
-    --color-fd-card-foreground: hsl(var(--card-foreground));
-    --color-fd-popover: hsl(var(--card));
-    --color-fd-popover-foreground: hsl(var(--foreground));
-    --color-fd-muted: hsl(var(--muted));
-    --color-fd-muted-foreground: hsl(var(--muted-foreground));
-    --color-fd-accent: hsl(var(--accent));
-    --color-fd-accent-foreground: hsl(var(--accent-foreground));
-    --color-fd-border: hsl(var(--border));
-    --color-fd-ring: hsl(var(--ring));
 }
 
 @layer components {
 
     /* 1. VISIBILITY HELPERS */
-    .hideondark { display: block !important; }
-    .hideonlight { display: none !important; }
-
-    :root[class~="dark"] .hideondark, [data-theme="dark"] .hideondark { 
-        display: none !important; 
+    .hideondark {
+        display: block !important;
     }
-    :root[class~="dark"] .hideonlight, [data-theme="dark"] .hideonlight { 
-        display: block !important; 
+
+    .hideonlight {
+        display: none !important;
+    }
+
+    :root[class~="dark"] .hideondark,
+    [data-theme="dark"] .hideondark {
+        display: none !important;
+    }
+
+    :root[class~="dark"] .hideonlight,
+    [data-theme="dark"] .hideonlight {
+        display: block !important;
     }
 
     /* 2. MAIN CARD LAYOUT (Tile Wrapper) */
@@ -140,26 +164,26 @@
         @apply flex flex-row flex-wrap gap-6 my-6;
     }
 
-    .tile-wrapper > * {
+    .tile-wrapper>* {
         @apply flex flex-col items-center text-center rounded-lg border relative;
-        
-        background-color: hsl(var(--card)) !important;
-        border-color: hsl(var(--border));
+
+        background-color: var(--color-card) !important;
+        border-color: var(--color-border);
 
         justify-content: flex-start;
         min-width: 160px;
         min-height: 180px;
         padding: 2rem;
-        padding-bottom: 3rem; 
+        padding-bottom: 3rem;
     }
 
-    .tile-wrapper > * > :last-child {
-        margin-top: auto; 
+    .tile-wrapper>*> :last-child {
+        margin-top: auto;
     }
 
-    .tile-wrapper > * > h3, 
-    .tile-wrapper > * > h4, 
-    .tile-wrapper > * > strong {
+    .tile-wrapper>*>h3,
+    .tile-wrapper>*>h4,
+    .tile-wrapper>*>strong {
         @apply mt-0;
     }
 
@@ -167,21 +191,53 @@
     .custom-rounded {
         @apply flex items-center justify-center p-2 rounded-full w-14 h-14 shrink-0 m-0;
     }
-    .custom-rounded svg { 
-        @apply fill-white h-7 w-7; 
+
+    .custom-rounded svg {
+        @apply fill-white h-7 w-7;
     }
+
     .custom-rounded i {
         @apply text-white;
     }
 
     /* Gradients */
-    .custom-rounded-start { background: linear-gradient(40deg, #059669 30%, #047857); }
-    .custom-rounded-password { background: linear-gradient(40deg, #f59e0b 30%, #b45309); }
-    .custom-rounded-login, .custom-rounded-register { background: linear-gradient(40deg, #059669 30%, #047857); }
-    .custom-rounded-privatelabel, .custom-rounded-phone, .custom-rounded-email, .custom-rounded-storage, .custom-rounded-service { background: linear-gradient(40deg, #ff2069 30%, #cc1a54); }
-    .custom-rounded-split { background: linear-gradient(40deg, #ff2069, #cc1a54); }
-    .custom-rounded-texts, .custom-rounded-help, .custom-rounded-architecture { background: linear-gradient(40deg, #dc2626 30%, #db2777); }
-    .custom-rounded-system, .custom-rounded-apis, .custom-rounded-policy, .custom-rounded-instance { background: linear-gradient(40deg, #1f2937, #111827); }
+    .custom-rounded-start {
+        background: linear-gradient(40deg, #059669 30%, #047857);
+    }
+
+    .custom-rounded-password {
+        background: linear-gradient(40deg, #f59e0b 30%, #b45309);
+    }
+
+    .custom-rounded-login,
+    .custom-rounded-register {
+        background: linear-gradient(40deg, #059669 30%, #047857);
+    }
+
+    .custom-rounded-privatelabel,
+    .custom-rounded-phone,
+    .custom-rounded-email,
+    .custom-rounded-storage,
+    .custom-rounded-service {
+        background: linear-gradient(40deg, var(--color-text-critical) 30%, #cc1a54);
+    }
+
+    .custom-rounded-split {
+        background: linear-gradient(40deg, #ff2069, #cc1a54);
+    }
+
+    .custom-rounded-texts,
+    .custom-rounded-help,
+    .custom-rounded-architecture {
+        background: linear-gradient(40deg, #dc2626 30%, #db2777);
+    }
+
+    .custom-rounded-system,
+    .custom-rounded-apis,
+    .custom-rounded-policy,
+    .custom-rounded-instance {
+        background: linear-gradient(40deg, #1f2937, #111827);
+    }
 
     /* 4. B2B / DIAGRAM LAYOUTS (Fixes the B2B Component) */
     .flexrowbetween {
@@ -192,18 +248,26 @@
         @apply w-8 h-8 shrink-0 text-muted-foreground;
     }
 
-    .b2borg, .b2bproject, .b2bapp, .b2buser {
+    .b2borg,
+    .b2bproject,
+    .b2bapp,
+    .b2buser {
         @apply rounded-xl p-4 border text-left;
         background: var(--overlaycolor);
         border-color: hsl(var(--border));
     }
-    
-    .b2buser { @apply mt-4; }
-    
-    .b2borg span, .b2bproject span, .b2bapp span, .b2buser span {
+
+    .b2buser {
+        @apply mt-4;
+    }
+
+    .b2borg span,
+    .b2bproject span,
+    .b2bapp span,
+    .b2buser span {
         @apply ml-4 mb-2 block font-semibold;
     }
-    
+
     /* Specific styling for the role text */
     .b2bprojectrole {
         @apply mt-2 ml-4 block text-sm opacity-80 font-normal;
@@ -215,14 +279,14 @@
         background-color: hsl(var(--card)) !important;
         border-color: hsl(var(--border)) !important;
     }
-    
+
     a.\@max-lg\:col-span-full:hover {
         @apply shadow-sm;
         border-color: hsl(var(--primary)) !important;
-        background-color: hsl(var(--card)) !important; 
+        background-color: hsl(var(--card)) !important;
     }
 
-    a.\@max-lg\:col-span-full > div:first-child {
+    a.\@max-lg\:col-span-full>div:first-child {
         @apply flex items-center gap-3;
     }
 
@@ -234,7 +298,7 @@
         margin-bottom: 0 !important;
         margin-top: 0 !important;
     }
-    
+
     a.\@max-lg\:col-span-full p.text-fd-muted-foreground {
         @apply mt-2 text-sm opacity-80;
     }
@@ -243,8 +307,10 @@
     /* Fixes aspect ratio for ReactPlayer embeds */
     .player-wrapper {
         @apply relative mb-8;
-        padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        padding-top: 56.25%;
+        /* 16:9 Aspect Ratio */
     }
+
     .react-player {
         @apply absolute top-0 left-0;
     }
@@ -252,47 +318,51 @@
     /* 7. GET STARTED BUTTON */
     .get-started {
         @apply inline-flex items-center justify-center px-6 py-2 rounded-full font-bold border-2 transition-all;
-        border-color: #ff2069;
-        background-color: #ff2069;
-        color: white;
+        border-color: var(--color-text-critical);
+        background-color: var(--color-text-critical);
+        color: var(--color-surface-black-primary);
     }
+
     .get-started:hover {
         @apply opacity-90;
-        color: white !important;
+        color: var(--color-surface-black-primary) !important;
     }
-    
+
     /* Target any div that uses the callout color variable */
     div[style*="--callout-color"] {
         @apply rounded-lg shadow-sm mb-4;
-        
+
         /* Force Docusaurus Layout: Left Border Only */
-        border: 1px solid rgba(0,0,0,0.05) !important;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
         border-left-width: 4px !important;
-        
+
         /* Hide the default Fumadocs vertical colored bar inside */
-        & > div[role="none"] {
+        &>div[role="none"] {
             display: none !important;
         }
     }
 
-    /* --- INFO (Blue) --- */
+    /* --- INFO (Orange/Brand) --- */
     /* We match the variable name in the style string */
     div[style*="--color-fd-info"] {
-        background-color: #eff6ff !important;
-        border-left-color: #3b82f6 !important;
-        color: #1e3a8a !important;
+        background-color: #fff7ed !important;
+        border-left-color: var(--color-text-critical) !important;
+        color: #7c2d12 !important;
     }
+
     div[style*="--color-fd-info"] svg {
-        color: #3b82f6 !important;
-        fill: transparent !important; /* Remove fill to look cleaner */
+        color: var(--color-text-critical) !important;
+        fill: transparent !important;
+        /* Remove fill to look cleaner */
     }
+
     /* Dark Mode Info */
     :is(.dark div[style*="--color-fd-info"]) {
-        background-color: rgba(59, 130, 246, 0.1) !important;
-        color: #dbeafe !important;
-        border-top-color: rgba(255,255,255,0.05) !important;
-        border-right-color: rgba(255,255,255,0.05) !important;
-        border-bottom-color: rgba(255,255,255,0.05) !important;
+        background-color: rgba(242, 85, 67, 0.1) !important;
+        color: #fef3c7 !important;
+        border-top-color: rgba(255, 255, 255, 0.05) !important;
+        border-right-color: rgba(255, 255, 255, 0.05) !important;
+        border-bottom-color: rgba(255, 255, 255, 0.05) !important;
     }
 
     /* --- WARNING (Amber) --- */
@@ -301,17 +371,19 @@
         border-left-color: #f59e0b !important;
         color: #78350f !important;
     }
+
     div[style*="--color-fd-warn"] svg {
         color: #f59e0b !important;
         fill: transparent !important;
     }
+
     /* Dark Mode Warning */
     :is(.dark div[style*="--color-fd-warn"]) {
-        background-color: rgba(245, 158, 11, 0.1) !important;
+        background-color: rgba(245, 158, 11, 0.08) !important;
         color: #fef3c7 !important;
-        border-top-color: rgba(255,255,255,0.05) !important;
-        border-right-color: rgba(255,255,255,0.05) !important;
-        border-bottom-color: rgba(255,255,255,0.05) !important;
+        border-top-color: rgba(255, 255, 255, 0.04) !important;
+        border-right-color: rgba(255, 255, 255, 0.04) !important;
+        border-bottom-color: rgba(255, 255, 255, 0.04) !important;
     }
 
     /* --- ERROR (Red) --- */
@@ -320,89 +392,128 @@
         border-left-color: #ef4444 !important;
         color: #7f1d1d !important;
     }
+
     div[style*="--color-fd-error"] svg {
         color: #ef4444 !important;
         fill: transparent !important;
     }
+
     /* Dark Mode Error */
     :is(.dark div[style*="--color-fd-error"]) {
-        background-color: rgba(239, 68, 68, 0.12) !important;
+        background-color: rgba(239, 68, 68, 0.1) !important;
         color: #fee2e2 !important;
-        border-top-color: rgba(255,255,255,0.05) !important;
-        border-right-color: rgba(255,255,255,0.05) !important;
-        border-bottom-color: rgba(255,255,255,0.05) !important;
+        border-top-color: rgba(255, 255, 255, 0.04) !important;
+        border-right-color: rgba(255, 255, 255, 0.04) !important;
+        border-bottom-color: rgba(255, 255, 255, 0.04) !important;
     }
-    
+
     /* --- TITLE BOLD --- */
-    div[style*="--callout-color"] strong, 
+    div[style*="--callout-color"] strong,
     div[style*="--callout-color"] p:first-child strong {
         font-weight: 700 !important;
     }
 }
 
 @layer base {
+
     /* HEADINGS */
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         font-family: var(--font-sans);
-        color: hsl(var(--foreground)) !important; 
+        color: hsl(var(--foreground)) !important;
         margin-bottom: 1rem;
         letter-spacing: -0.025em;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
 
-    h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
-        color: inherit !important; 
+    h1 a,
+    h2 a,
+    h3 a,
+    h4 a,
+    h5 a,
+    h6 a {
+        color: inherit !important;
         text-decoration: none !important;
     }
 
-    h1 { 
-        font-size: 3.5rem !important; 
-        font-weight: 700 !important; 
-        line-height: 1.1 !important; 
-        margin-bottom: 1.5rem !important; 
+    h1 {
+        font-size: 3.5rem !important;
+        font-weight: 700 !important;
+        line-height: 1.1 !important;
+        margin-bottom: 1.5rem !important;
     }
 
-    h2 { 
-        font-size: 2.25rem !important; 
-        font-weight: 600 !important; 
-        margin-top: 3rem !important; 
-        margin-bottom: 1rem !important; 
-        padding-bottom: 0.5rem !important; 
-        border-bottom: 1px solid hsl(var(--border)) !important; 
+    h2 {
+        font-size: 2.25rem !important;
+        font-weight: 600 !important;
+        margin-top: 3rem !important;
+        margin-bottom: 1rem !important;
+        padding-bottom: 0.5rem !important;
+        border-bottom: 1px solid hsl(var(--border)) !important;
     }
 
-    h3 { 
-        font-size: 2rem !important; 
-        font-weight: 600 !important; 
-        margin-top: 2.5rem !important; 
-        margin-bottom: 1rem !important; 
+    h3 {
+        font-size: 2rem !important;
+        font-weight: 600 !important;
+        margin-top: 2.5rem !important;
+        margin-bottom: 1rem !important;
     }
 
-    h4 { 
-        font-size: 1.5rem !important; 
-        font-weight: 600 !important; 
-        margin-top: 2.5rem !important; 
-        margin-bottom: 1rem !important; 
+    h4 {
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+        margin-top: 2.5rem !important;
+        margin-bottom: 1rem !important;
     }
 
-    p { 
-        font-size: 1rem; 
-        line-height: 1.7; 
-        margin-bottom: 1.5rem; 
+    p {
+        font-size: 1rem;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
     }
-    
-    html, body {
+
+    html,
+    body {
         background-color: hsl(var(--background));
         color: hsl(var(--foreground));
     }
-    
+
     a {
-        color: hsl(var(--primary));
+        color: var(--color-text-critical);
         text-decoration: none;
         transition: opacity 0.2s;
     }
+
     a:hover {
         opacity: 0.8;
+    }
+
+    /* 8. EXTERNAL COMPONENTS BRANDING FIXES */
+    /* Remove blueish glow from Inkeep search host if present */
+    #preact-border-shadow-host {
+        display: none !important;
+    }
+
+    /* CODE BLOCKS BRANDING */
+    pre,
+    code {
+        background-color: transparent !important;
+    }
+
+    div[data-rehype-pretty-code-fragment] pre,
+    .fd-code-block pre,
+    figure.bg-fd-card,
+    figure.shiki {
+        background-color: #0f0f11 !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+    div[data-rehype-pretty-code-fragment] code {
+        background-color: transparent !important;
     }
 }
