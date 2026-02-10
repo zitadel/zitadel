@@ -45,7 +45,7 @@ GET: /instance/policy/label/font/_preview
 
 POST: /instance/policy/label/icon
 
-### UploadDefaultLabelPolicyIcon()
+### UploadDefaultLabelPolicyIconDark()
 
 > UploadDefaultLabelPolicyIconDark()
 
@@ -59,7 +59,7 @@ POST: /instance/policy/label/icon/dark
 
 GET: /instance/policy/label/icon
 
-### GetDefaultLabelPolicyIcon()
+### GetDefaultLabelPolicyIconDark()
 
 > GetDefaultLabelPolicyIconDark()
 
@@ -73,7 +73,7 @@ GET: /instance/policy/label/icon/dark
 
 GET: /instance/policy/label/icon/_preview
 
-### GetPreviewDefaultLabelPolicyIcon()
+### GetPreviewDefaultLabelPolicyIconDark()
 
 > GetPreviewDefaultLabelPolicyIconDark()
 
@@ -89,7 +89,7 @@ GET: /instance/policy/label/icon/dark/_preview
 
 POST: /instance/policy/label/logo
 
-### UploadDefaultLabelPolicyLogo()
+### UploadDefaultLabelPolicyLogoDark()
 
 > UploadDefaultLabelPolicyLogoDark()
 
@@ -103,7 +103,7 @@ POST: /instance/policy/label/logo/dark
 
 GET: /instance/policy/label/logo
 
-### GetDefaultLabelPolicyLogo()
+### GetDefaultLabelPolicyLogoDark()
 
 > GetDefaultLabelPolicyLogoDark()
 
@@ -117,7 +117,7 @@ GET: /instance/policy/label/logo/dark
 
 GET: /instance/policy/label/logo/_preview
 
-### GetPreviewDefaultLabelPolicyLogo()
+### GetPreviewDefaultLabelPolicyLogoDark()
 
 > GetPreviewDefaultLabelPolicyLogoDark()
 
@@ -161,7 +161,7 @@ GET: /org/policy/label/font/_preview
 
 POST: /org/policy/label/icon
 
-### UploadOrgLabelPolicyIcon()
+### UploadOrgLabelPolicyIconDark()
 
 > UploadOrgLabelPolicyIconDark()
 
@@ -175,7 +175,7 @@ POST: /org/policy/label/icon/dark
 
 GET: /org/policy/label/icon
 
-### GetOrgLabelPolicyIcon()
+### GetOrgLabelPolicyIconDark()
 
 > GetOrgLabelPolicyIconDark()
 
@@ -189,7 +189,7 @@ GET: /org/policy/label/icon/dark
 
 GET: /org/policy/label/icon/_preview
 
-### GetPreviewOrgLabelPolicyIcon()
+### GetPreviewOrgLabelPolicyIconDark()
 
 > GetPreviewOrgLabelPolicyIconDark()
 
@@ -205,7 +205,7 @@ GET: /org/policy/label/icon/dark/_preview
 
 POST: /org/policy/label/logo
 
-### UploadOrgLabelPolicyLogo()
+### UploadOrgLabelPolicyLogoDark()
 
 > UploadOrgLabelPolicyLogoDark()
 
@@ -219,7 +219,7 @@ POST: /org/policy/label/logo/dark
 
 GET: /org/policy/label/logo
 
-### GetOrgLabelPolicyLogo()
+### GetOrgLabelPolicyLogoDark()
 
 > GetOrgLabelPolicyLogoDark()
 
@@ -233,7 +233,7 @@ GET: /org/policy/label/logo/dark
 
 GET: /org/policy/label/logo/_preview
 
-### GetPreviewOrgLabelPolicyLogo()
+### GetPreviewOrgLabelPolicyLogoDark()
 
 > GetPreviewOrgLabelPolicyLogoDark()
 
