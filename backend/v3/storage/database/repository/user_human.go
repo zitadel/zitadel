@@ -92,7 +92,7 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 		columnValues["password_verification_id"] = func(builder *database.StatementBuilder) {
 			builder.WriteString(`(SELECT id FROM password_verification)`)
 		}
-	} else {
+	} else if user.Human.Password.Hash != "" {
 		columnValues["password_hash"] = user.Human.Password.Hash
 		columnValues["password_verified_at"] = createdAt
 		if !user.Human.Password.ChangedAt.IsZero() {
@@ -117,7 +117,7 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 			builder.WriteString(`(SELECT id FROM email_verification)`)
 		}
 		columnValues["unverified_email"] = user.Human.Email.UnverifiedAddress
-	} else {
+	} else if user.Human.Email.Address != "" {
 		columnValues["email"] = user.Human.Email.Address
 		columnValues["unverified_email"] = user.Human.Email.UnverifiedAddress
 		columnValues["email_verified_at"] = createdAt
@@ -143,7 +143,7 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 				builder.WriteString(`(SELECT id FROM phone_verification)`)
 			}
 			columnValues["unverified_phone"] = user.Human.Phone.UnverifiedNumber
-		} else {
+		} else if user.Human.Phone.Number != "" {
 			columnValues["phone"] = user.Human.Phone.Number
 			columnValues["unverified_phone"] = user.Human.Phone.UnverifiedNumber
 			columnValues["phone_verified_at"] = createdAt
