@@ -31,7 +31,7 @@ Zitadel prior to the listed version had a precision bug. The `position` column u
 
 ## Impact
 
-During a past attempt to fix this, we got reports of failing projections inside Zitadel. Because the precision became exact certain compare operations like *equal*, *less then*, etc. would now return different results. This was because the values in `current_states` would already have lost precision from a broken version. This might happen to **some** deployments or projections: there is only a small probability.
+During a past attempt to fix this, we got reports of failing projections inside Zitadel. Because the precision became exact certain compare operations like *equal*, *less than*, etc. would now return different results. This was because the values in `current_states` would already have lost precision from a broken version. This might happen to **some** deployments or projections: there is only a small probability.
 
 We are releasing the fix again and your system might get affected.
 

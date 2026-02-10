@@ -63,7 +63,7 @@ func (e *BaseEvent) Type() EventType {
 	return e.EventType
 }
 
-// Sequence is a counting unique number of the event
+// Sequence is an increasing number unique for the event
 func (e *BaseEvent) Sequence() uint64 {
 	return e.Seq
 }
