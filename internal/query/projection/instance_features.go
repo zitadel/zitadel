@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	InstanceFeatureTable = "projections.instance_features3"
+	InstanceFeatureTable = "projections.instance_features5"
 
 	InstanceFeatureInstanceIDCol   = "instance_id"
 	InstanceFeatureKeyCol          = "key"
@@ -69,10 +69,6 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
-				Event:  feature_v2.InstanceTokenExchangeEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
 				Event:  feature_v2.InstanceImprovedPerformanceEventType,
 				Reduce: reduceInstanceSetFeature[[]feature.ImprovedPerformanceType],
 			},
@@ -82,10 +78,6 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 			},
 			{
 				Event:  feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
-				Event:  feature_v2.InstanceEnableBackChannelLogout,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{

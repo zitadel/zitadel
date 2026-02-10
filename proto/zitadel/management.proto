@@ -32,7 +32,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         title: "Management API";
         version: "1.0";
-        description: "The management API is as the name states the interface where systems can mutate IAM objects like organizations, projects, clients, users and so on if they have the necessary access rights.";
+        description: "The management API is as the name states the interface where systems can mutate IAM objects like organizations, projects, applications, users and so on if they have the necessary access rights.";
         contact:{
             name: "ZITADEL"
             url: "https://zitadel.com"
@@ -49,7 +49,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Applications",
-            description: "Applications are the entry point to your project. Users either login into one of your clients and interact with them directly or use one of your APIs. All applications share the roles and authorizations of their project."
+            description: "Applications are the entry point to your project. Users either login into one of your applications and interact with them directly or use one of your APIs. All applications share the roles and authorizations of their project."
         },
         {
             name: "Authentication Methods"
@@ -284,7 +284,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 ListUsers with InUserIDQuery](apis/resources/user_service_v2/user-service-list-users.api.mdx) instead.
     //
-    // Returns the full user object (human or machine) including the profile, email, etc.
+    // Returns the full user or Service Account including the profile, email, etc.
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -444,7 +444,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) instead.
     //
-    // Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
+    // Create a new user. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human"
@@ -473,7 +473,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 UpdateHumanUser](apis/resources/user_service_v2/user-service-update-human-user.api.mdx) instead.
     //
-    // Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
+    // Create/import a new user. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human/_import"
@@ -1454,7 +1454,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 RemoveTOTP](apis/resources/user_service_v2/user-service-remove-totp.api.mdx) instead.
     //
-    // Remove the configured One-Time Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.
+    // Remove the configured OTP as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.
     rpc RemoveHumanAuthFactorOTP(RemoveHumanAuthFactorOTPRequest) returns (RemoveHumanAuthFactorOTPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp"
@@ -1524,7 +1524,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 RemoveOTPSMS](apis/resources/user_service_v2/user-service-remove-otpsms.api.mdx) instead.
     //
-    // Remove the configured One-Time Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
+    // Remove the configured OTP SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
     rpc RemoveHumanAuthFactorOTPSMS(RemoveHumanAuthFactorOTPSMSRequest) returns (RemoveHumanAuthFactorOTPSMSResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_sms"
@@ -1559,7 +1559,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 RemoveOTPEmail](apis/resources/user_service_v2/user-service-remove-otp-email.api.mdx) instead.
     //
-    // Remove the configured One-Time Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
+    // Remove the configured OTP Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
     rpc RemoveHumanAuthFactorOTPEmail(RemoveHumanAuthFactorOTPEmailRequest) returns (RemoveHumanAuthFactorOTPEmailResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_email"
@@ -6493,8 +6493,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Custom Verify SMS OTP Message Text";
-            description: "Get the custom text of the verify SMS OTP message that is set on the organization. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Custom Verify OTP SMS Message Text";
+            description: "Get the custom text of the verify OTP SMS message that is set on the organization. The message is sent when an OTP SMS should be verified and a notification provider is configured."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6517,8 +6517,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Default Verify SMS OTP Message Text";
-            description: "Get the default text of the verify SMS OTP message that is set on the instance or as translation files in Zitadel itself. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Default Verify OTP SMS Message Text";
+            description: "Get the default text of the verify OTP SMS message that is set on the instance or as translation files in Zitadel itself. The message is sent when an OTP SMS should be verified and a notification provider is configured."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6542,8 +6542,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Set Custom Verify SMS OTP Reset Message Text";
-            description: "Set the custom text of the verify SMS OTP message for the organization. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            summary: "Set Custom Verify OTP SMS Reset Message Text";
+            description: "Set the custom text of the verify OTP SMS message for the organization. The message is sent when an OTP SMS should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6566,8 +6566,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Reset Custom Verify SMS OTP Message Text to Default";
-            description: "Removes the custom text of the verify SMS OTP message from the organization and therefore the default texts will trigger for the users afterward."
+            summary: "Reset Custom Verify OTP SMS Message Text to Default";
+            description: "Removes the custom text of the verify OTP SMS message from the organization and therefore the default texts will trigger for the users afterward."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6590,8 +6590,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Custom Verify Email OTP Message Text";
-            description: "Get the custom text of the verify Email OTP message that is set on the organization. The message is sent when an Email One-time password should be verified and a notification provider is configured."
+            summary: "Get Custom Verify OTP Email Message Text";
+            description: "Get the custom text of the verify OTP Email message that is set on the organization. The message is sent when an OTP Email Email should be verified and a notification provider is configured."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6614,8 +6614,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Default Verify Email OTP Message Text";
-            description: "Get the default text of the verify Email OTP message that is set on the instance or as translation files in Zitadel itself. The message is sent when an Email One-time password should be verified and a notification provider is configured."
+            summary: "Get Default Verify OTP Email Message Text";
+            description: "Get the default text of the verify OTP Email message that is set on the instance or as translation files in Zitadel itself. The message is sent when an OTP Email Email should be verified and a notification provider is configured."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6639,8 +6639,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Set Custom Verify Email OTP Reset Message Text";
-            description: "Set the custom text of the verify Email OTP message for the organization. The message is sent when an Email One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            summary: "Set Custom Verify OTP Email Reset Message Text";
+            description: "Set the custom text of the verify OTP Email message for the organization. The message is sent when an OTP Email Email should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6663,8 +6663,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Reset Custom Verify Email OTP Message Text to Default";
-            description: "Removes the custom text of the verify Email OTP message from the organization and therefore the default texts will trigger for the users afterward."
+            summary: "Reset Custom Verify OTP Email Message Text to Default";
+            description: "Removes the custom text of the verify OTP Email message from the organization and therefore the default texts will trigger for the users afterward."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -12209,7 +12209,7 @@ message SetCustomVerifySMSOTPMessageTextRequest {
     string text = 2 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please visit {{ .VerifyURL }} or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
+            example: "\"Please visit {{ .VerifyURL }} or copy the OTP {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
             max_length: 800;
         }
     ];
@@ -12253,21 +12253,21 @@ message SetCustomVerifyEmailOTPMessageTextRequest {
     string title = 2 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ZITADEL - One-time Password\""
+            example: "\"ZITADEL - OTP\""
             max_length: 500;
         }
     ];
     string pre_header = 3 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify One-time Password \""
+            example: "\"Verify OTP \""
             max_length: 500;
         }
     ];
     string subject = 4 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify One-time Password\""
+            example: "\"Verify OTP\""
             max_length: 500;
         }
     ];
@@ -12281,7 +12281,7 @@ message SetCustomVerifyEmailOTPMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please use the \\\"Authenticate\\\" button or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
+            example: "\"Please use the \\\"Authenticate\\\" button or copy the OTP {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
             max_length: 10000;
         }
     ];
