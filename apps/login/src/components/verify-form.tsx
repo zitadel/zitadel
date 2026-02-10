@@ -2,6 +2,7 @@
 
 import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
+import { handleServerActionResponse } from "@/lib/client";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -12,6 +13,7 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs = {
   code: string;
@@ -39,6 +41,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const t = useTranslations("verify");
 
   const [error, setError] = useState<string>("");
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -80,29 +83,21 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
       setError("");
       setLoading(true);
 
-      const response = await sendVerification({
-        code: value.code,
-        userId,
-        isInvite: isInvite,
-        loginName: loginName,
-        organization: organization,
-        requestId: requestId,
-      })
-        .catch(() => {
-          setError(t("errors.couldNotVerifyUser"));
-          return;
-        })
-        .finally(() => {
-          setLoading(false);
+      try {
+        const response = await sendVerification({
+          code: value.code,
+          userId,
+          isInvite: isInvite,
+          loginName: loginName,
+          organization: organization,
+          requestId: requestId,
         });
 
-      if (response && "error" in response && response?.error) {
-        setError(response.error);
-        return;
-      }
-
-      if (response && "redirect" in response && response?.redirect) {
-        return router.push(response?.redirect);
+        handleServerActionResponse(response, router, setSamlData, setError);
+      } catch {
+        setError(t("errors.couldNotVerifyUser"));
+      } finally {
+        setLoading(false);
       }
     },
     [isInvite, userId],
@@ -117,6 +112,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
 
   return (
     <>
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         <Alert type={AlertType.INFO}>
           <div className="flex flex-row">
