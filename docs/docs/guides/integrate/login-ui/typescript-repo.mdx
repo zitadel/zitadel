@@ -145,4 +145,7 @@ Also ensure your login domain is registered on your instance by adding it as a [
 
 If you want to enforce users to have their email verified, you can set the optional `EMAIL_VERIFICATION` variable to `true` in your environment and your users will be enforced to verify their email address before they can log in.
 
-![Deploy to Vercel](/img/deploy-to-vercel.png)
+By default, verification codes are not automatically submitted on page load. This protects against enterprise email link scanners that pre-fetch URLs and could inadvertently consume one-time codes before users click them.
+If you want to enable automatic code submission (e.g. for a smoother UX when link scanners are not a concern), set `NEXT_PUBLIC_AUTO_SUBMIT_CODE` to `true`.
+
+![](../../../../public/img/deploy-to-vercel.png)
