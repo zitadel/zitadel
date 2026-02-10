@@ -2,7 +2,7 @@
  * Utility functions for working with TypeScript enums in Angular forms
  *
  * Example usage:
- * ```typescript
+ * ```TypeScript
  * // Get dropdown options
  * const bindingOptions = getEnumKeys(SAMLBinding);
  *
@@ -25,7 +25,7 @@ type NumericEnum = Record<string, string | number> & Record<number, string>;
  * @param enumObject The enum object
  * @returns Array of string keys
  * @example
- * ```typescript
+ * ```TypeScript
  * const bindingOptions = getEnumKeys(SAMLBinding);
  * // Returns: ['SAML_BINDING_UNSPECIFIED', 'SAML_BINDING_POST', ...]
  * ```
@@ -40,7 +40,7 @@ export function getEnumKeys<T extends NumericEnum>(enumObject: T): (keyof T)[] {
  * @param value The numeric enum value
  * @returns The corresponding string key or undefined if not found
  * @example
- * ```typescript
+ * ```TypeScript
  * const key = getEnumKeyFromValue(SAMLBinding, 1);
  * // Returns: 'SAML_BINDING_POST'
  * ```
@@ -55,7 +55,7 @@ export function getEnumKeyFromValue<T extends NumericEnum>(enumObject: T, value:
  * @param enumMappings Object mapping config property names to enum objects
  * @returns Modified config object with string keys
  * @example
- * ```typescript
+ * ```TypeScript
  * const formConfig = convertEnumValuesToKeys(samlConfig, {
  *   binding: SAMLBinding,
  *   nameIdFormat: SAMLNameIDFormat

@@ -10,7 +10,7 @@ import permissionData from "../../../../../../cmd/defaults.yaml";
 
 <ManagerDescription components={props.components}  name="ManagerDescription" />
 
-To configure managers in ZITADEL go to the resource where you like to add it (e.g Instance, Organization, Project, GrantedProject).
+To configure managers in ZITADEL go to the resource where you like to add it (e.g. Instance, Organization, Project, GrantedProject).
 In the right part of the management console you can find **MANAGERS** in the details part. Here you have a list of the current managers and can add a new one.
 
 <img alt="Managers" src="/docs/img/guides/console/managers.png" width="200px" />
@@ -20,14 +20,14 @@ In the right part of the management console you can find **MANAGERS** in the det
 ## Roles
 
 | Name                          | Role                          | Description                                                                                                  |
-| ----------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
+|-------------------------------|-------------------------------|--------------------------------------------------------------------------------------------------------------|
 | IAM Owner                     | IAM_OWNER                     | Manage the IAM, manage all organizations with their content                                                  |
 | IAM Owner Viewer              | IAM_OWNER_VIEWER              | View the IAM and view all organizations with their content                                                   |
 | IAM Org Manager               | IAM_ORG_MANAGER               | Manage all organizations including their policies, projects and users                                        |
 | IAM User Manager              | IAM_USER_MANAGER              | Manage all users and their authorizations over all organizations                                             |
 | IAM Admin Impersonator        | IAM_ADMIN_IMPERSONATOR        | Allow impersonation of admin and end users from all organizations                                            |
 | IAM Impersonator              | IAM_END_USER_IMPERSONATOR     | Allow impersonation of end users from all organizations                                                      |
-| IAM Login Client              | IAM_LOGIN_CLIENT              | Get all permissions needed to implement your own Login UI.                                                    |
+| IAM Login Client              | IAM_LOGIN_CLIENT              | Get all permissions needed to implement your own Login UI.                                                   |
 | Org Owner                     | ORG_OWNER                     | Manage everything within an organization                                                                     |
 | Org Owner Viewer              | ORG_OWNER_VIEWER              | View everything within an organization                                                                       |
 | Org User Manager              | ORG_USER_MANAGER              | Manage users and their authorizations within an organization                                                 |
@@ -44,7 +44,7 @@ In the right part of the management console you can find **MANAGERS** in the det
 
 ## Configure roles
 
-If you run a self hosted ZITADEL instance you can define your custom roles by overwriting the defaults.yaml
+If you run a self-hosted ZITADEL instance you can define your custom roles by overwriting the defaults.yaml
 In the InternalAuthZ section you will find all the roles and which permissions they have.
 
 Example:

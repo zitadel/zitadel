@@ -21,7 +21,7 @@ Also check if "block all cookies" is active. If so please disable this setting.
 
 To make sure, that your new settings will trigger, please restart your mobile phone and try it again.
 
-**Settings > Safari > Advanced > Experimental Features > disable: „SameSite strict enforcement (ITP)“**
+**Settings > Safari > Advanced > Experimental Features > disable: "SameSite strict enforcement (ITP)"**
 
 ![Same Site Strict Enforcement](../../public/img/manuals/errors/same-site-strict.png)
 
@@ -50,7 +50,7 @@ End-users authenticate to an application in your frontend project.
 The frontend then sends requests to the backend, validates the token with ZITADEL's introspection endpoint, and returns a payload to the frontend.
 The backend returns the error `invalid audience (APP-Zxfako)`.
 
-You must add the scope `urn:zitadel:iam:org:project:id:{projectId}:aud` to the auth request that is send from the front end.
+You must add the scope `urn:zitadel:iam:org:project:id:{projectId}:aud` to the auth request that is sent from the front end.
 Replace `projectId` with the projectId of your backend.
 
 ### Accessing ZITADEL's APIs
@@ -59,7 +59,7 @@ You have a project for a frontend application.
 The application should also access the API of your ZITADEL, for example to pull a list of all users and display them on a user page.
 End-users authenticate to the application in the frontend project, but when calling the management API you get the error `invalid audience (APP-Zxfako)`.
 
-You must add the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to the auth request that is send from the front end.
+You must add the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to the auth request that is sent from the front end.
 
 When accessing your ZITADEL instance's APIs they act as a resource server.
 You can check the Management Console or via API and see that when you open your default organization there exists a project "ZITADEL" that contains different applications for each API and the Console.
@@ -68,11 +68,11 @@ Instead of `urn:zitadel:iam:org:project:id:zitadel:aud` you could also use `urn:
 
 ## WebFinger requirement for Tailscale
 
-The WebFinger requirement and setup is a step a user has to take outside of their IdP set-up. WebFinger is a protocol which supports the ability for OIDC issuer discovery, and we use it to prove that the user has administrative control over the domain and to retrieve the issuer. This is a requirement we have in place for all users, regardless of their IdP, who use custom OIDC with Tailscale.
+The WebFinger requirement and setup is a step a user has to take outside their IdP set-up. WebFinger is a protocol which supports the ability for OIDC issuer discovery, and we use it to prove that the user has administrative control over the domain and to retrieve the issuer. This is a requirement we have in place for all users, regardless of their IdP, who use custom OIDC with Tailscale.
 
-On their Custom Domain, e.g example.com, users need to host a WebFinger endpoint at https://example.com/.well-known/webfinger. When queried, this endpoint returns a JSON response detailing the issuer. Users would need to host the endpoint with the link to the ZITADEL issuer. Tailscale only looks up this endpoint once when a user signs up, and will only look up this endpoint again if the user needs to make a configuration change to their identity provider.
+On their Custom Domain, e.g. example.com, users need to host a WebFinger endpoint at https://example.com/.well-known/webfinger. When queried, this endpoint returns a JSON response detailing the issuer. Users would need to host the endpoint with the link to the ZITADEL issuer. Tailscale only looks up this endpoint once when a user signs up, and will only look up this endpoint again if the user needs to make a configuration change to their identity provider.
 
-The requirements and a set up guide is detailed in the [Tailscale documentation](https://tailscale.com/kb/1240/sso-custom-oidc/).
+The requirements and a set-up guide is detailed in the [Tailscale documentation](https://tailscale.com/kb/1240/sso-custom-oidc/).
 
 ## Login not possible. The organization of the user must be granted to the project
 
@@ -103,7 +103,7 @@ You do have two possibilities.
 1. Go to the organization, who owns the project, where the user tries to authenticate.
 2. Navigate to the Project Grants page of the needed project
 3. Click on the "New" button
-4. Search for the organization to which you want to grant the project (e.g Organization B)
+4. Search for the organization to which you want to grant the project (e.g. Organization B)
 5. Select the roles you want to grant
 6. Click save
 
