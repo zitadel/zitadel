@@ -140,11 +140,17 @@
 		"external": true
 	},
 	{
-		"title": ".Net",
+		"title": ".Net SDK",
 		"imgSrcDark": "/docs/img/tech/dotnet.svg",
 		"docsLink": "https://github.com/smartive/zitadel-net",
 		"external": true,
 		"client": true
+	},
+	{
+		"id": "dotnet",
+		"title": ".NET",
+		"imgSrcDark": "/docs/img/tech/dotnet.svg",
+		"docsLink": "/docs/sdk-examples/dotnet"
 	},
 	{
 		"title": "Passport.js",
