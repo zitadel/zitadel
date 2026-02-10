@@ -13,23 +13,20 @@
     @let id = providerEntry.key;
     @let provider = providerEntry.value;
     <div>
-      <a
-        class="item card"
-        [routerLink]="['/instance', 'smtpprovider', id]"
-      >
-      @if (provider.description !== "generic") {
-          <img class="smtp-logo" [src]="provider.image" [alt]="provider.description"/>
+      <a class="item card" [routerLink]="['/instance', 'smtpprovider', id]">
+        @if (provider.description !== 'generic') {
+          <img class="smtp-logo" [src]="provider.image" [alt]="provider.description" />
           <div class="text-container">
             <span class="title">{{ provider.description | titlecase }} </span>
           </div>
-      } @else {
+        } @else {
           <div class="smtp-icon">
-            <mat-icon class="icon" svgIcon="mdi_smtp"/>
+            <mat-icon class="icon" svgIcon="mdi_smtp" />
           </div>
           <div class="text-container">
             <span class="title">Generic SMTP</span>
           </div>
-      }
+        }
       </a>
     </div>
   }
