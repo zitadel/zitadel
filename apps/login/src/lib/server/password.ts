@@ -13,7 +13,7 @@ import {
   setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
-import { create, Duration, timestampDate } from "@zitadel/client";
+import { create, Duration } from "@zitadel/client";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
