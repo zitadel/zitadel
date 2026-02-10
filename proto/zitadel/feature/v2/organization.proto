@@ -3,6 +3,7 @@ syntax = "proto3";
 package zitadel.feature.v2;
 
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/field_behavior.proto";
 import "validate/validate.proto";
 
 import "zitadel/object/v2/object.proto";
@@ -17,7 +18,8 @@ message SetOrganizationFeaturesRequest {
       min_length: 1;
       max_length: 200;
       example: "\"69629023906488334\"";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
 }
 
@@ -32,7 +34,8 @@ message ResetOrganizationFeaturesRequest {
       min_length: 1;
       max_length: 200;
       example: "\"69629023906488334\"";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
 }
 
@@ -47,7 +50,8 @@ message GetOrganizationFeaturesRequest {
       min_length: 1;
       max_length: 200;
       example: "\"69629023906488334\"";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
   bool inheritance = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
