@@ -411,7 +411,7 @@ Errors:
       NotChanged: "Default Password Lockout Policy has not been changed"
     DomainPolicy:
       NotFound: "Organization Domain Policy not found"
-      Empty: "Organization Domain Policy is empty"
+      Empty: "The Organization Domain Policy is empty"
       NotExisting: "Organization Domain Policy not existing"
       AlreadyExists: "Organization Domain Policy already exists"
       NotChanged: "Organization Domain Policy has not been changed"

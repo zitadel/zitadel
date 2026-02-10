@@ -412,8 +412,8 @@ Errors:
       NotFound: "Impostazioni di dominio dell'organizzazione non trovate"
       Empty: "Impostazioni di dominio dell'organizzazione mancanti"
       NotExisting: "Impostazioni di dominio dell'organizzazione non esistenti"
-      AlreadyExists: "Impostazioni di dominio dell'organizzazione già esistenti"
-      NotChanged: "Impostazioni di dominio dell'organizzazione non sono state cambiate"
+      AlreadyExists: "Le impostazioni di dominio dell'organizzazione esistono già"
+      NotChanged: "Le impostazioni di dominio dell'organizzazione non sono state cambiate"
     NotificationPolicy:
       NotFound: "Impostazioni di notifica predefinite non trovate"
       NotChanged: "Impostazioni di notifica predefinite non è stato cambiato"
