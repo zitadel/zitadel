@@ -2,6 +2,7 @@ package connect_middleware
 
 import (
 	"context"
+	"errors"
 
 	"connectrpc.com/connect"
 
@@ -18,7 +19,15 @@ func RequestIDHandler() connect.UnaryInterceptorFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
 			reqCtx, id := instrumentation.NewRequestID(ctx, call.FromContext(ctx))
 			resp, err := next(reqCtx, req)
-			resp.Header().Set(http_util.XRequestID, id.String())
+			if resp != nil {
+				resp.Header().Set(http_util.XRequestID, id.String())
+			}
+
+			var target *connect.Error
+			if errors.As(err, &target) {
+				// adds the request ID to the error response trailer
+				target.Meta().Set(http_util.XRequestID, id.String())
+			}
 			return resp, err
 		}
 	}

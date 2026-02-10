@@ -19,8 +19,9 @@ func RequestIDHandler() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		reqCtx, id := instrumentation.NewRequestID(ctx, call.FromContext(ctx))
 		md := metadata.New(map[string]string{http_util.XRequestID: id.String()})
+
 		err := grpc.SetHeader(reqCtx, md)
-		logging.OnError(ctx, err).Warn("cannot set request ID to response header")
+		logging.OnError(reqCtx, err).Warn("cannot set request ID to response header")
 
 		return handler(reqCtx, req)
 	}
