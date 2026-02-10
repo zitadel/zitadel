@@ -55,7 +55,7 @@ export function getEnumKeyFromValue<T extends NumericEnum>(enumObject: T, value:
  * @param enumMappings Object mapping config property names to enum objects
  * @returns Modified config object with string keys
  * @example
- * ```TypeScript
+ * ```typescript
  * const formConfig = convertEnumValuesToKeys(samlConfig, {
  *   binding: SAMLBinding,
  *   nameIdFormat: SAMLNameIDFormat
