@@ -128,7 +128,7 @@ service IdentityProviderService {
 }
 
 message GetIDPByIDRequest {
-  string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}, (google.api.field_behavior) = REQUIRED];
 }
 
 message GetIDPByIDResponse {

@@ -526,7 +526,8 @@ message AddUsersToGroupRequest {
     (validate.rules).repeated = {min_items: 1, items: {string: {min_len: 1, max_len: 200}}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[\"69629023906488334\",\"69622366012355662\"]";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
 }
 
@@ -554,7 +555,8 @@ message RemoveUsersFromGroupRequest {
     (validate.rules).repeated = {min_items: 1, items: {string: {min_len: 1, max_len: 200}}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[\"69629023906488334\",\"69622366012355662\"]";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
 }
 

@@ -809,7 +809,8 @@ message GetHostedLoginTranslationRequest {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 2;
       example: "\"fr-FR\"";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
 
   // if set to true, higher levels are ignored, if false higher levels are merged into the file
@@ -853,7 +854,8 @@ message SetHostedLoginTranslationRequest {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 2;
       example: "\"fr-FR\"";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
 
   // Translations should contain the translations in the specified locale.
