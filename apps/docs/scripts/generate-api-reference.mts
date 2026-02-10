@@ -23,7 +23,7 @@ const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content');
 
 /**
  * Workaround for fumadocs-openapi bug: when a schema has both root-level
- * `required` fields AND `one Of`/`anyOf`, fumadocs' `...item` spread overwrites
+ * `required` fields AND `oneOf`/`anyOf`, fumadocs' `...item` spread overwrites
  * `schema.required` with `item.required`, losing root-level required fields.
  *
  * Fix: merge parent `required` into each variant and remove from parent.
