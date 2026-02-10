@@ -196,10 +196,6 @@ Errors:
     RefreshToken:
       Invalid: "Yenileme Token'ı geçersiz"
       NotFound: "Yenileme Token'ı bulunamadı"
-  Instance:
-    NotFound: "Instance bulunamadı"
-    AlreadyExists: "Instance zaten mevcut"
-    NotChanged: "Instance değişmedi"
   Org:
     AlreadyExists: "Organizasyon adı zaten alınmış"
     Invalid: "Organizasyon geçersiz"
@@ -346,6 +342,8 @@ Errors:
       NotActive: "Proje yetkisi aktif değil"
       NotInactive: "Proje yetkisi pasif değil"
   Instance:
+    AlreadyExists: "Instance zaten mevcut"
+    NotChanged: "Instance değişmedi"
     NotFound: "Instance bulunamadı. Domain'in doğru olduğundan emin olun. Kontrol edin https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roller değişmedi"

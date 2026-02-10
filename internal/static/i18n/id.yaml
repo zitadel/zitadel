@@ -195,10 +195,6 @@ Errors:
     RefreshToken:
       Invalid: "Token Penyegaran tidak valid"
       NotFound: "Token Penyegaran tidak ditemukan"
-  Instance:
-    NotFound: "Contoh tidak ditemukan"
-    AlreadyExists: "Contoh sudah ada"
-    NotChanged: "Contoh tidak berubah"
   Org:
     AlreadyExists: "Nama atau ID organisasi sudah digunakan"
     Invalid: "Organisasi tidak valid"
@@ -345,7 +341,9 @@ Errors:
       NotActive: "Hibah proyek tidak aktif"
       NotInactive: "Hibah proyek bukannya tidak aktif"
   Instance:
-    NotFound: "Instans tidak ditemukan. Pastikan Anda memiliki domain yang benar. Lihat https://zitadel.com/docs/apis/introduction#domains"
+    AlreadyExists: "Contoh sudah ada"
+    NotChanged: "Contoh tidak berubah"
+    NotFound: "Contoh tidak ditemukan. Pastikan Anda memiliki domain yang benar. Lihat https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Peran belum diubah"
     MemberInvalid: "Anggota tidak valid"
