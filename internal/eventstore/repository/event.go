@@ -48,7 +48,7 @@ type Event struct {
 	// it's used in read models to reduce the events in the correct definition
 	Version eventstore.Version
 	// AggregateID id is the unique identifier of the aggregate
-	// the client must generate it by its own
+	// the client must generate it on its own
 	AggregateID string
 	// AggregateType describes the meaning of the aggregate for this event
 	// it could an object like user

@@ -340,7 +340,7 @@ The legacy keys will disappear once they expire.
 As web keys can be created and distributed ahead of time, it is safe for JWKS responses to be cached at intermediate proxies.
 Once the `web_key` feature is enabled, ZITADEL will send a `Cache-Control` header which allows caching.
 
-By default, and in ZITADEL Cloud we allow 5 minutes of caching:
+By default, and in ZITADEL, Cloud we allow 5 minutes of caching:
 
 ```
 Cache-Control: max-age=300, must-revalidate
