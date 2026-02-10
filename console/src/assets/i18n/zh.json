@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "用户",
-      "DESCRIPTION": "用户是可以访问你的应用的人或机器。",
+      "DESCRIPTION": "用户是可以访问你的应用的人或服务账户。",
       "HUMANS": {
         "TITLE": "用户",
         "DESCRIPTION": "用户在浏览器会话中通过登录提示进行交互身份验证。",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "组织",
     "PROJECT": "项目",
     "PROJECTOVERVIEW": "概览",
-    "PROJECTGRANTS": "授予",
+    "PROJECTGRANTS": "项目授权",
     "ROLES": "角色",
     "GRANTEDPROJECT": "已授予的项目",
     "HUMANUSERS": "用户",
     "MACHINEUSERS": "服务用户",
     "LOGOUT": "退出所有账户",
     "NEWORG": "创建组织",
-    "IAMADMIN": "您是 IAM 管理员。请注意您具有扩展权限。",
+    "IAMADMIN": "您是实例管理员。请注意您具有扩展权限。",
     "SHOWORGS": "查看所有组织",
     "GRANTS": "授权",
     "ACTIONS": "认证流程",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel 管理员角色",
-      "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或 IAM 详细信息页面上修改它们。",
+      "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或实例详细信息页面上修改它们。",
       "ORGCONTEXT": "您会看到与当前所选组织相关的所有组织和项目。",
       "USERCONTEXT": "您会看到您被授权的所有组织和项目。包括其他组织。",
       "CREATIONDATE": "创建于",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "管理您的全局策略和管理访问设置。"
     },
     "EVENTSTORE": {
-      "TITLE": "IAM 存储管理",
+      "TITLE": "实例存储管理",
       "DESCRIPTION": "管理您的 Zitadel 视图和失败的事件。"
     },
     "MEMBER": {
@@ -1646,8 +1646,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
       "DEBUGOIDCPARENTERROR": "调试 OIDC 父错误",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "如果启用该标志，OIDC 父错误将记录在控制台中。",
-      "ENABLEBACKCHANNELLOGOUT": "启用 Backchannel 注销",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知应用程序在 OpenID 提供商处终止会话。",
       "PERMISSIONCHECKV2": "权限检查 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
       "STATES": {
@@ -2060,7 +2058,7 @@
       "DESCRIPTION": "允许其他组织使用您的项目。",
       "EDITTITLE": "编辑角色",
       "CREATE": {
-        "TITLE": "创建组织授权",
+        "TITLE": "创建项目授权",
         "SEL_USERS": "选择您要授予访问权限的用户",
         "SEL_PROJECT": "搜索项目",
         "SEL_ROLES": "选择要添加到授权中的角色",
@@ -2070,7 +2068,7 @@
         "ORG_DESCRIPTION": "您即将授予组织 {{name}} 的用户。",
         "ORG_DESCRIPTION_DESC": "切换上面标题中的上下文以授予另一个组织的用户。",
         "SEL_ORG_FORMFIELD": "组织",
-        "FOR_ORG": "授予组织:"
+        "FOR_ORG": "项目授权将为以下对象创建:"
       },
       "DETAIL": {
         "TITLE": "项目授权",
@@ -2183,7 +2181,7 @@
       "DEACTIVATED": "已停用。",
       "CREATED": "项目已创建。",
       "UPDATED": "项目已修改。",
-      "GRANTUPDATED": "授权已更新。",
+      "GRANTUPDATED": "项目授权已更改。",
       "DELETED": "项目已删除"
     }
   },
@@ -2684,7 +2682,8 @@
             "DESCRIPTION": "单页应用程序 (SPA) 以及通常在浏览器中执行的所有 JS 框架"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "反向通道注销URI"
     },
     "API": {
       "INFO": {
@@ -2803,7 +2802,7 @@
     "ADD": "添加管理者",
     "CREATIONTYPE": "创建类型",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "实例",
       "2": "Organization",
       "0": "Owned Project",
       "1": "Granted Project",

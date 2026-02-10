@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Uživatelé",
-      "DESCRIPTION": "Uživatel je člověk nebo stroj, který může přistupovat k vašim aplikacím.",
+      "DESCRIPTION": "Uživatel je člověk nebo účet služby, který může přistupovat k vašim aplikacím.",
       "HUMANS": {
         "TITLE": "Uživatelé",
         "DESCRIPTION": "Uživatelé se autentizují interaktivně v prohlížečové relaci s výzvou k přihlášení.",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "Organizace",
     "PROJECT": "Projekty",
     "PROJECTOVERVIEW": "Přehled",
-    "PROJECTGRANTS": "Pověření",
+    "PROJECTGRANTS": "Grantové projekty",
     "ROLES": "Role",
     "GRANTEDPROJECT": "Pověřené projekty",
     "HUMANUSERS": "Uživatelé",
     "MACHINEUSERS": "Systémoví uživatelé",
     "LOGOUT": "Odhlásit všechny uživatele",
     "NEWORG": "Nová organizace",
-    "IAMADMIN": "Jste administrátor IAM. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
+    "IAMADMIN": "Jste administrátor instance. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
     "SHOWORGS": "Zobrazit všechny organizace",
     "GRANTS": "Autorizace",
     "ACTIONS": "Akce",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Role správce Zitadel",
-      "DESCRIPTION": "Zde jsou všechna členská oprávnění uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo IAM.",
+      "DESCRIPTION": "Zde jsou všechna členská oprávnění uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo instance.",
       "ORGCONTEXT": "Vidíte všechny organizace a projekty, které souvisí s aktuálně vybranou organizací.",
       "USERCONTEXT": "Vidíte všechny organizace a projekty, na které máte oprávnění. Včetně jiných organizací.",
       "CREATIONDATE": "Datum vytvoření",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Spravujte vaše globální politiky a nastavení přístupu k managementu."
     },
     "EVENTSTORE": {
-      "TITLE": "Administrace úložiště systému IAM",
+      "TITLE": "Administrace úložiště systému Instance",
       "DESCRIPTION": "Správa nastavení ukládání systému ZIDATEL."
     },
     "MEMBER": {
@@ -1643,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Pokud je příznak aktivován, budete moci ukončit jedinou relaci z rozhraní pro přihlášení zadáním id_token s nárokem `sid` jako id_token_hint na koncovém bodu end_session. Poznamenejte si, že v současné době jsou v rozhraní pro přihlášení ukončeny všechny relace ze stejného uživatelského agenta (prohlížeče). Relace spravované prostřednictvím rozhraní API relace již umožňují ukončení jednotlivých relací.",
       "DEBUGOIDCPARENTERROR": "Debugování chyby rodiče OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Pokud je příznak povolen, chyba rodiče OIDC bude zaznamenána v konzoli.",
-      "ENABLEBACKCHANNELLOGOUT": "Povolit Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování aplikací o ukončení relace u poskytovatele OpenID.",
       "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
@@ -2058,7 +2056,7 @@
       "DESCRIPTION": "Umožněte jiné organizaci využívat váš projekt.",
       "EDITTITLE": "Upravit oprávnění",
       "CREATE": {
-        "TITLE": "Vytvořit povolení pro organizaci",
+        "TITLE": "Vytvořit projektové oprávnění",
         "SEL_USERS": "Vyberte uživatele, kterým chcete povolit přístup",
         "SEL_PROJECT": "Vyhledejte projekt",
         "SEL_ROLES": "Vyberte role, které chcete do povolení přidat",
@@ -2068,7 +2066,7 @@
         "ORG_DESCRIPTION": "Chystáte se povolit uživateli organizace {{name}} přístup.",
         "ORG_DESCRIPTION_DESC": "Změňte kontext v hlavičce výše pro povolení přístupu uživateli jiné organizace.",
         "SEL_ORG_FORMFIELD": "Organizace",
-        "FOR_ORG": "Povolení je vytvořeno pro:"
+        "FOR_ORG": "Projektové oprávnění bude vytvořeno pro:"
       },
       "DETAIL": {
         "TITLE": "Povolení k projektu",
@@ -2181,7 +2179,7 @@
       "DEACTIVATED": "Deaktivováno.",
       "CREATED": "Projekt vytvořen.",
       "UPDATED": "Projekt změněn.",
-      "GRANTUPDATED": "Povolení změněno.",
+      "GRANTUPDATED": "Grant projektu změněno.",
       "DELETED": "Projekt smazán."
     }
   },
@@ -2660,7 +2658,8 @@
             "DESCRIPTION": "Single Page Aplikace (SPA) a obecně všechny JS frameworky spouštěné v prohlížečích"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2779,7 +2778,7 @@
     "ADD": "Přidat manažera",
     "CREATIONTYPE": "Typ vytvoření",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instance",
       "2": "Organizace",
       "0": "Vlastní projekt",
       "1": "Přidělený projekt",

@@ -284,10 +284,6 @@ Errors:
       Empty: "Politica de vârstă a parolei este goală"
       NotExisting: "Politica de vârstă a parolei nu există"
       AlreadyExists: "Politica de vârstă a parolei există deja"
-    OrgIAMPolicy:
-      Empty: "Politica IAM a organizației este goală"
-      NotExisting: "Politica IAM a organizației nu există"
-      AlreadyExists: "Politica IAM a organizației există deja"
     NotificationPolicy:
       NotFound: "Politica de notificare nu a fost găsită"
       NotChanged: "Politica de notificare nu a fost schimbată"
@@ -343,13 +339,13 @@ Errors:
     RequiredFieldsMissing: "Unele câmpuri obligatorii lipsesc"
     Grant:
       AlreadyExists: "Acordarea proiectului există deja"
-      NotFound: "Acordarea nu a fost găsită"
+      NotFound: "Acordarea proiectului nu a fost găsită"
       Invalid: "Acordarea proiectului este invalidă"
       NotExisting: "Acordarea proiectului nu există"
       HasNotExistingRole: "Un rol nu există în proiect"
       NotActive: "Acordarea proiectului nu este activă"
       NotInactive: "Acordarea proiectului nu este inactivă"
-  IAM:
+  Instance:
     NotFound: "Instanța nu a fost găsită. Asigurați-vă că aveți domeniul corect. Consultați https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Rolurile nu au fost schimbate"
@@ -357,8 +353,6 @@ Errors:
     MemberAlreadyExisting: "Membrul există deja"
     MemberNotExisting: "Membrul nu există"
     IDMissing: "Id lipsă"
-    IAMProjectIDMissing: "ID-ul proiectului IAM lipsește"
-    IamProjectAlreadySet: "ID-ul proiectului IAM a fost deja setat"
     IdpInvalid: "Configurația IDP este invalidă"
     IdpNotExisting: "Configurația IDP nu există"
     OIDCConfigInvalid: "Configurația OIDC IDP este invalidă"

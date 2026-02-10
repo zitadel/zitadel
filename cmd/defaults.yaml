@@ -691,7 +691,7 @@ SCIM:
     - Name: Zitadel authentication token
       Description: Authentication scheme using the OAuth Bearer Token Standard
       SpecUri: https://www.rfc-editor.org/info/rfc6750
-      DocumentationUri: https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users
+      DocumentationUri: https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts
       Type: oauthbearertoken
   # default values whether an email/phone is considered verified when a users email/phone is created or updated
   EmailVerified: true # ZITADEL_SCIM_EMAILVERIFIED
@@ -1291,7 +1291,6 @@ DefaultInstance:
     #   - 5 # OrgDomainVerified
     DebugOIDCParentError: # ZITADEL_DEFAULTINSTANCE_FEATURES_DEBUGOIDCPARENTERROR
     OIDCSingleV1SessionTermination: # ZITADEL_DEFAULTINSTANCE_FEATURES_OIDCSINGLEV1SESSIONTERMINATION
-    EnableBackChannelLogout: # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLEBACKCHANNELLOGOUT
     LoginV2:
       Required: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED
       BaseURI: # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI

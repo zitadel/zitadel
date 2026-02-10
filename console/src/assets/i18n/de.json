@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Benutzer",
-      "DESCRIPTION": "Ein Benutzer ist ein Mensch oder ein Computer, der auf deine Anwendungen zugreifen kann.",
+      "DESCRIPTION": "Ein Benutzer ist ein Mensch oder ein Servicekonto, das auf deine Anwendungen zugreifen kann.",
       "HUMANS": {
         "TITLE": "Benutzer",
         "DESCRIPTION": "Benutzer authentifizieren sich interaktiv in einer Browsersitzung mit einem Login-Formular.",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "Organisation",
     "PROJECT": "Projekte",
     "PROJECTOVERVIEW": "Übersicht",
-    "PROJECTGRANTS": "Berechtigte Organisationen",
+    "PROJECTGRANTS": "Projektberechtigungen",
     "ROLES": "Rollen",
     "GRANTEDPROJECT": "Berechtigte Projekte",
     "HUMANUSERS": "Benutzer",
     "MACHINEUSERS": "Service-Benutzer",
     "LOGOUT": "Alle Benutzer abmelden",
     "NEWORG": "Neue Organisation",
-    "IAMADMIN": "Du bist ein IAM-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
+    "IAMADMIN": "Du bist ein Instanz-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
     "SHOWORGS": "Alle Organisationen anzeigen",
     "GRANTS": "Berechtigungen",
     "ACTIONS": "Aktionen",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel-Administratorrollen",
-      "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder IAM-Detailseite aufrufen und modifizieren.",
+      "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder Instanz-Detailseite aufrufen und modifizieren.",
       "ORGCONTEXT": "Sie sehen alle Organisationen und Projekte, die mit der aktuell gewählten Organisation in Verbindung stehen.",
       "USERCONTEXT": "Sie sehen alle Organisationen und Projekte auf denen Sie berechtigt sind inklusive aller zur Auswahl stehenden Organisationen.",
       "CREATIONDATE": "Erstellungsdatum",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Verwalte die globalen Richtlinien und Zugangseinstellungen."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Speicher Administration",
+      "TITLE": "Instanz Speicher Administration",
       "DESCRIPTION": "Verwalte Speicher-Einstellungen von Zitadel."
     },
     "MEMBER": {
@@ -1643,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Wenn das Flag aktiviert ist, können Sie eine einzelne Sitzung über die Login-Benutzeroberfläche beenden, indem Sie einen id_token mit einem `sid` Claim als id_token_hint am Endpunkt end_session übergeben. Beachten Sie, dass derzeit alle Sitzungen desselben Benutzeragenten (Browser) in der Login-Benutzeroberfläche beendet werden. Sitzungen, die über die Session API verwaltet werden, ermöglichen bereits die Beendigung einzelner Sitzungen.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Wenn die Flagge aktiviert ist, wird der OIDC-Elternfehler in der Konsole protokolliert.",
-      "ENABLEBACKCHANNELLOGOUT": "Backchannel-Logout aktivieren",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Der Back-Channel-Logout implementiert OpenID Connect Back-Channel Logout 1.0 und kann verwendet werden, um Anwendungen über die Beendigung der Sitzung beim OpenID-Provider zu benachrichtigen.",
       "PERMISSIONCHECKV2": "Berechtigungsprüfung V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "STATES": {
@@ -2057,7 +2055,7 @@
       "DESCRIPTION": "Gewähre einer anderen Organisation Zugriff auf dieses Projekt.",
       "EDITTITLE": "Rollen editieren",
       "CREATE": {
-        "TITLE": "Organisation berechtigen",
+        "TITLE": "Projektberechtigung erstellen",
         "SEL_USERS": "Selektiere die gewünschten Benutzer für das Erstellen der Berechtigung.",
         "SEL_ROLES": "Selektiere die gewünschten Rollen für das Erstellen der Berechtigung.",
         "SEL_PROJECT": "Suchen nach Projekt",
@@ -2067,7 +2065,7 @@
         "ORG_DESCRIPTION": "Du bist im Begriff, einen Benutzer für die Organisation {{name}} zu berechtigen.",
         "ORG_DESCRIPTION_DESC": "Wechsle den Kontext, um die Organisation zu wechseln.",
         "SEL_ORG_FORMFIELD": "Organisation",
-        "FOR_ORG": "Die Berechtigung wird erstellt für:"
+        "FOR_ORG": "Die Projektberechtigung wird erstellt für:"
       },
       "DETAIL": {
         "TITLE": "Projektberechtigung",
@@ -2651,7 +2649,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) und grundsätzlich alle im Browser aufgeführten JS-Frameworks"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2770,7 +2769,7 @@
     "ADD": "Manager hinzufügen",
     "CREATIONTYPE": "Erstelltyp",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instanz",
       "2": "Organisation",
       "0": "Eigenes Projekt",
       "1": "Berechtigtes Projekt",

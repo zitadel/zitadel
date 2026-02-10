@@ -284,10 +284,6 @@ Errors:
       Empty: "سياسة عمر كلمة المرور فارغة"
       NotExisting: "سياسة عمر كلمة المرور غير موجودة"
       AlreadyExists: "سياسة عمر كلمة المرور موجودة بالفعل"
-    OrgIAMPolicy:
-      Empty: "سياسة IAM للمنظمة فارغة"
-      NotExisting: "سياسة IAM للمنظمة غير موجودة"
-      AlreadyExists: "سياسة IAM للمنظمة موجودة بالفعل"
     NotificationPolicy:
       NotFound: "سياسة الإشعارات غير موجودة"
       NotChanged: "سياسة الإشعارات لم تتغير"
@@ -342,14 +338,14 @@ Errors:
         NotFound: "مفتاح التطبيق غير موجود"
     RequiredFieldsMissing: "بعض الحقول المطلوبة مفقودة"
     Grant:
-      AlreadyExists: "منح المشروع موجود بالفعل"
-      NotFound: "المنح غير موجود"
-      Invalid: "منح المشروع غير صالح"
-      NotExisting: "منح المشروع غير موجود"
-      HasNotExistingRole: "دور واحد غير موجود في المشروع"
-      NotActive: "منح المشروع ليس نشطاً"
-      NotInactive: "منح المشروع ليس معطلاً"
-  IAM:
+      AlreadyExists: "منحة المشروع موجودة بالفعل"
+      NotFound: "لم يتم العثور على منحة المشروع"
+      Invalid: "منحة المشروع غير صالحة"
+      NotExisting: "منحة المشروع غير موجودة"
+      HasNotExistingRole: "يوجد دور غير موجود في المشروع"
+      NotActive: "منحة المشروع غير نشطة"
+      NotInactive: "منحة المشروع غير معطلة"
+  Instance:
     NotFound: "المثيل غير موجود. تأكد من أن النطاق صحيح. تحقق من https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "الأدوار لم تتغير"
@@ -357,8 +353,6 @@ Errors:
     MemberAlreadyExisting: "العضو موجود بالفعل"
     MemberNotExisting: "العضو غير موجود"
     IDMissing: "المعرف مفقود"
-    IAMProjectIDMissing: "معرف مشروع IAM مفقود"
-    IamProjectAlreadySet: "تم تعيين معرف مشروع IAM بالفعل"
     IdpInvalid: "تكوين IDP غير صالح"
     IdpNotExisting: "تكوين IDP غير موجود"
     OIDCConfigInvalid: "تكوين OIDC IDP غير صالح"

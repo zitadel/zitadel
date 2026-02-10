@@ -283,10 +283,6 @@ Errors:
       Empty: "La política de antigüedad de la contraseña está vacía"
       NotExisting: "La política de antigüedad de la contraseña no existe"
       AlreadyExists: "La política de antigüedad de la contraseña ya existe"
-    OrgIAMPolicy:
-      Empty: "La política de IAM de la organización está vacía"
-      NotExisting: "La política de IAM de la organización no existe"
-      AlreadyExists: "La política de IAM de la organización ya existe"
     NotificationPolicy:
       NotFound: "Política de notificación no encontrada"
       NotChanged: "La política de notificación no ha cambiado"
@@ -342,13 +338,13 @@ Errors:
     RequiredFieldsMissing: "Faltan algunos campos requeridos"
     Grant:
       AlreadyExists: "La concesión del proyecto ya existe"
-      NotFound: "Concesión no encontrada"
+      NotFound: "Concesión del proyecto no encontrada"
       Invalid: "La concesión del proyecto no es válida"
       NotExisting: "La concesión del proyecto no existe"
       HasNotExistingRole: "Un rol no existe en el proyecto"
       NotActive: "La concesión del proyecto no está activa"
       NotInactive: "La concesión del proyecto no está inactiva"
-  IAM:
+  Instance:
     NotFound: "Instancia no encontrada. Asegúrate de que tienes el dominio correcto. Consulta https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Los roles no han cambiado"
@@ -356,8 +352,6 @@ Errors:
     MemberAlreadyExisting: "El miembro ya existe"
     MemberNotExisting: "El miembro no existe"
     IDMissing: "Falta Id"
-    IAMProjectIDMissing: "Falta id del proyecto IAM"
-    IamProjectAlreadySet: "El id del proyecto IAM ya se ha establecido"
     IdpInvalid: "La configuración IDP no es válida"
     IdpNotExisting: "La configuración IDP no existe"
     OIDCConfigInvalid: "La configuración OIDC IDP no es válida"

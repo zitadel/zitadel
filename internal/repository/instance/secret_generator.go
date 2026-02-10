@@ -83,7 +83,7 @@ func SecretGeneratorAddedEventMapper(event eventstore.Event) (eventstore.Event, 
 	}
 	err := event.Unmarshal(secretGeneratorAdded)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-en9f4", "unable to unmarshal secret generator added")
+		return nil, zerrors.ThrowInternal(err, "INST-en9f4", "unable to unmarshal secret generator added")
 	}
 
 	return secretGeneratorAdded, nil
@@ -116,7 +116,7 @@ func NewSecretGeneratorChangeEvent(
 	changes []SecretGeneratorChanges,
 ) (*SecretGeneratorChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-j2jfw", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INST-j2jfw", "Errors.NoChangesFound")
 	}
 	changeEvent := &SecretGeneratorChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -177,7 +177,7 @@ func SecretGeneratorChangedEventMapper(event eventstore.Event) (eventstore.Event
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-2m09e", "unable to unmarshal secret generator changed")
+		return nil, zerrors.ThrowInternal(err, "INST-2m09e", "unable to unmarshal secret generator changed")
 	}
 
 	return e, nil
@@ -219,7 +219,7 @@ func SecretGeneratorRemovedEventMapper(event eventstore.Event) (eventstore.Event
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-m09ke", "unable to unmarshal secret generator removed")
+		return nil, zerrors.ThrowInternal(err, "INST-m09ke", "unable to unmarshal secret generator removed")
 	}
 
 	return e, nil

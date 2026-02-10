@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Utilizatori",
-      "DESCRIPTION": "Un utilizator este o persoană sau o mașină care vă poate accesa aplicațiile.",
+      "DESCRIPTION": "Un utilizator este o persoană sau un cont de serviciu care vă poate accesa aplicațiile.",
       "HUMANS": {
         "TITLE": "Utilizatori",
         "DESCRIPTION": "Utilizatorii se autentifică interactiv într-o sesiune de browser cu o solicitare de autentificare.",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "Organizație",
     "PROJECT": "Proiecte",
     "PROJECTOVERVIEW": "Prezentare generală",
-    "PROJECTGRANTS": "Granturi",
+    "PROJECTGRANTS": "Granturi de proiect",
     "ROLES": "Roluri",
     "GRANTEDPROJECT": "Proiecte acordate",
     "HUMANUSERS": "Utilizatori",
     "MACHINEUSERS": "Utilizatori de servicii",
     "LOGOUT": "Deconectați toți utilizatorii",
     "NEWORG": "Organizație nouă",
-    "IAMADMIN": "Sunteți administrator IAM. Rețineți că aveți permisiuni extinse.",
+    "IAMADMIN": "Sunteți administrator de instanță. Rețineți că aveți permisiuni extinse.",
     "SHOWORGS": "Afișați toate organizațiile",
     "GRANTS": "Autorizații",
     "ACTIONS": "Acțiuni",
@@ -1159,7 +1159,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Rolurile administratorilor Zitadel",
-      "DESCRIPTION": "Acestea sunt toate granturile de membru ale utilizatorului. Puteți să le modificați și în paginile de detalii ale organizației, proiectului sau IAM.",
+      "DESCRIPTION": "Acestea sunt toate granturile de membru ale utilizatorului. Puteți să le modificați și în paginile de detalii ale organizației, proiectului sau instanță.",
       "ORGCONTEXT": "Vedeți toate organizațiile și proiectele care sunt legate de organizația selectată în prezent.",
       "USERCONTEXT": "Vedeți toate organizațiile și proiectele la care sunteți autorizat. Inclusiv alte organizații.",
       "CREATIONDATE": "Data creării",
@@ -1265,7 +1265,7 @@
       "DESCRIPTION": "Gestionați-vă politicile globale și setările de acces pentru gestionare."
     },
     "EVENTSTORE": {
-      "TITLE": "Administrarea stocării IAM",
+      "TITLE": "Administrarea stocării Instanță",
       "DESCRIPTION": "Gestionați-vă vizualizările Zitadel și evenimentele eșuate."
     },
     "MEMBER": {
@@ -1641,8 +1641,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Dacă indicatorul este activat, veți putea termina o singură sesiune din UI-ul de conectare furnizând un id_token cu o revendicare sid ca id_token_hint pe endpointul end_session. Rețineți că în prezent toate sesiunile de la același agent utilizator (browser) sunt terminate în UI-ul de conectare. Sesiunile gestionate prin API-ul Session permit deja terminarea sesiunilor individuale.",
       "DEBUGOIDCPARENTERROR": "Eroare de Depanare Părinte OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Dacă steagul este activat, eroarea părinte OIDC va fi înregistrată în consolă.",
-      "ENABLEBACKCHANNELLOGOUT": "Activează Logout Backchannel",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Logout-ul Back-Channel implementează OpenID Connect Back-Channel Logout 1.0 și poate fi folosit pentru a notifica aplicațiile despre terminarea sesiunii la Producătorul OpenID.",
       "PERMISSIONCHECKV2": "Verificare Permisiuni V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Dacă steagul este activat, veți putea folosi noua API și funcțiile sale.",
       "STATES": {
@@ -2055,7 +2053,7 @@
       "DESCRIPTION": "Permiteți altei organizații să vă utilizeze proiectul.",
       "EDITTITLE": "Editați rolurile",
       "CREATE": {
-        "TITLE": "Creați un grant de organizație",
+        "TITLE": "Creează permisiune pentru proiect",
         "SEL_USERS": "Selectați utilizatorii cărora doriți să le acordați acces",
         "SEL_PROJECT": "Căutați un proiect",
         "SEL_ROLES": "Selectați rolurile pe care doriți să le adăugați la grant",
@@ -2065,7 +2063,7 @@
         "ORG_DESCRIPTION": "Sunteți pe cale să acordați un utilizator pentru organizația {{name}}.",
         "ORG_DESCRIPTION_DESC": "Schimbați contextul în antetul de mai sus pentru a acorda un utilizator pentru o altă organizație.",
         "SEL_ORG_FORMFIELD": "Organizație",
-        "FOR_ORG": "Grantul este creat pentru:"
+        "FOR_ORG": "Permisiunea proiectului va fi creată pentru:"
       },
       "DETAIL": {
         "TITLE": "Grant de proiect",
@@ -2178,7 +2176,7 @@
       "DEACTIVATED": "Dezactivat.",
       "CREATED": "Proiect creat.",
       "UPDATED": "Proiect modificat.",
-      "GRANTUPDATED": "Grant modificat.",
+      "GRANTUPDATED": "Grantul proiectului a fost modificat.",
       "DELETED": "Proiect șters."
     }
   },
@@ -2673,7 +2671,8 @@
             "DESCRIPTION": "Aplicații cu o singură pagină (SPA) și în general toate cadrele JS executate în browsere"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2792,7 +2791,7 @@
     "ADD": "Adăugați un manager",
     "CREATIONTYPE": "Tip creare",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instanță",
       "2": "Organizație",
       "0": "Proiect deținut",
       "1": "Proiect acordat",

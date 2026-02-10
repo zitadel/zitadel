@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Gebruikers",
-      "DESCRIPTION": "Een gebruiker is een mens of een machine die toegang kan krijgen tot je applicaties.",
+      "DESCRIPTION": "Een gebruiker is een mens of een serviceaccount die toegang kan krijgen tot je applicaties.",
       "HUMANS": {
         "TITLE": "Gebruikers",
         "DESCRIPTION": "Gebruikers authenticeren interactief in een browsersessie met een loginprompt.",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "Organisatie",
     "PROJECT": "Projecten",
     "PROJECTOVERVIEW": "Overzicht",
-    "PROJECTGRANTS": "Subsidies",
+    "PROJECTGRANTS": "Projecttoewijzingen",
     "ROLES": "Rollen",
     "GRANTEDPROJECT": "Verleende projecten",
     "HUMANUSERS": "Gebruikers",
     "MACHINEUSERS": "Servicegebruikers",
     "LOGOUT": "Alle gebruikers uitloggen",
     "NEWORG": "Nieuwe organisatie",
-    "IAMADMIN": "U bent een IAM-beheerder. Let op: u heeft uitgebreide rechten.",
+    "IAMADMIN": "U bent een instantie-beheerder. Let op: u heeft uitgebreide rechten.",
     "SHOWORGS": "Toon alle organisaties",
     "GRANTS": "Machtigingen",
     "ACTIONS": "Acties",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel Beheerdersrollen",
-      "DESCRIPTION": "Dit zijn alle lidmaatschapstoewijzingen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of IAM.",
+      "DESCRIPTION": "Dit zijn alle lidmaatschapstoewijzingen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of instantie.",
       "ORGCONTEXT": "U ziet alle organisaties en projecten die gerelateerd zijn aan de momenteel geselecteerde organisatie.",
       "USERCONTEXT": "U ziet alle organisaties en projecten waarvoor u gemachtigd bent. Inclusief andere organisaties.",
       "CREATIONDATE": "Aanmaakdatum",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Beheer uw wereldwijde beleid en beheer toegangsinstellingen."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Opslagbeheer",
+      "TITLE": "Instantie Opslagbeheer",
       "DESCRIPTION": "Beheer uw Zitadel-weergaven en mislukte evenementen."
     },
     "MEMBER": {
@@ -1643,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Ouderfout",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Als de vlag is ingeschakeld, wordt de OIDC-ouderfout in de console geregistreerd.",
-      "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout inschakelen",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om applicaties te informeren over het beëindigen van de sessie bij de OpenID-provider.",
       "PERMISSIONCHECKV2": "Permissiecontrole V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
       "STATES": {
@@ -2057,7 +2055,7 @@
       "DESCRIPTION": "Sta een andere organisatie toe om uw project te gebruiken.",
       "EDITTITLE": "Bewerk rollen",
       "CREATE": {
-        "TITLE": "Creëer Organisatieverlening",
+        "TITLE": "Projectmachtiging aanmaken",
         "SEL_USERS": "Selecteer de gebruikers aan wie u toegang wilt verlenen",
         "SEL_PROJECT": "Zoek een project",
         "SEL_ROLES": "Selecteer de rollen die u wilt toevoegen aan de verlening",
@@ -2067,7 +2065,7 @@
         "ORG_DESCRIPTION": "U staat op het punt om een gebruiker toe te kennen voor de organisatie {{naam}}.",
         "ORG_DESCRIPTION_DESC": "Schakel de context in de kop hierboven om een gebruiker toe te kennen voor een andere organisatie.",
         "SEL_ORG_FORMFIELD": "Organisatie",
-        "FOR_ORG": "De verlening wordt gecreëerd voor:"
+        "FOR_ORG": "De projectmachtiging wordt aangemaakt voor:"
       },
       "DETAIL": {
         "TITLE": "Projectverlening",
@@ -2180,7 +2178,7 @@
       "DEACTIVATED": "Gedeactiveerd.",
       "CREATED": "Project gecreëerd.",
       "UPDATED": "Project gewijzigd.",
-      "GRANTUPDATED": "Verlening gewijzigd.",
+      "GRANTUPDATED": "Projecttoewijzing gewijzigd.",
       "DELETED": "Project verwijderd."
     }
   },
@@ -2670,7 +2668,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) en over het algemeen alle JS-frameworks die in browsers worden uitgevoerd"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2789,7 +2788,7 @@
     "ADD": "Voeg een Manager toe",
     "CREATIONTYPE": "Creatietype",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instantie",
       "2": "Organisatie",
       "0": "Eigendom Project",
       "1": "Verleend Project",

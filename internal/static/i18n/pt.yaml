@@ -282,10 +282,6 @@ Errors:
       Empty: "A Política de Idade de Senha está vazia"
       NotExisting: "A Política de Idade de Senha não existe"
       AlreadyExists: "A Política de Idade de Senha já existe"
-    OrgIAMPolicy:
-      Empty: "A Política de IAM da Organização está vazia"
-      NotExisting: "A Política de IAM da Organização não existe"
-      AlreadyExists: "A Política de IAM da Organização já existe"
     NotificationPolicy:
       NotFound: "Política de Notificação não encontrada"
       NotChanged: "Política de Notificação não alterada"
@@ -341,22 +337,20 @@ Errors:
     RequiredFieldsMissing: "Alguns campos obrigatórios estão faltando"
     Grant:
       AlreadyExists: "A concessão do projeto já existe"
-      NotFound: "Concessão não encontrada"
+      NotFound: "A concessão do projeto não encontrada"
       Invalid: "A concessão do projeto é inválida"
       NotExisting: "A concessão do projeto não existe"
       HasNotExistingRole: "Uma função não existe no projeto"
       NotActive: "A concessão do projeto não está ativa"
       NotInactive: "A concessão do projeto não está inativa"
-  IAM:
-    NotFound: "IAM não encontrado. Verifique se você tem o domínio correto. Consulte https://zitadel.com/docs/apis/introduction#domains"
+  Instance:
+    NotFound: "Instância não encontrada. Verifique se você tem o domínio correto. Consulte https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "As funções não foram alteradas"
     MemberInvalid: "O membro é inválido"
     MemberAlreadyExisting: "O membro já existe"
     MemberNotExisting: "O membro não existe"
     IDMissing: "ID ausente"
-    IAMProjectIDMissing: "ID do projeto IAM ausente"
-    IamProjectAlreadySet: "O ID do projeto IAM já foi definido"
     IdpInvalid: "A configuração de IDP é inválida"
     IdpNotExisting: "A configuração de IDP não existe"
     OIDCConfigInvalid: "A configuração de IDP OIDC é inválida"
@@ -414,11 +408,11 @@ Errors:
       Empty: "Política de Bloqueio de Senha Padrão vazia"
       NotChanged: "Política de Bloqueio de Senha Padrão não foi alterada"
     DomainPolicy:
-      NotFound: "Política IAM da Organização não encontrada"
-      Empty: "Política IAM da Organização está vazia"
-      NotExisting: "Política IAM da Organização não existente"
-      AlreadyExists: "Política IAM da Organização já existe"
-      NotChanged: "Política IAM da Organização não foi alterada"
+      NotFound: "Política de Domínio da Organização não encontrada"
+      Empty: "Política de Domínio da Organização está vazia"
+      NotExisting: "Política de Domínio da Organização não existente"
+      AlreadyExists: "Política de Domínio da Organização já existe"
+      NotChanged: "Política de Domínio da Organização não foi alterada"
     NotificationPolicy:
       NotFound: "Política de Notificação Padrão não encontrada"
       NotChanged: "Política de Notificação Padrão não foi alterada"

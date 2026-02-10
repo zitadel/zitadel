@@ -18,7 +18,7 @@ func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain
 	}
 
 	if existingConfig.State == domain.IDPConfigStateRemoved || existingConfig.State == domain.IDPConfigStateUnspecified {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-2m00d", "Errors.IAM.IDPConfig.AlreadyExists")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-2m00d", "Errors.Instance.IDPConfig.AlreadyExists")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingConfig.WriteModel)
@@ -34,7 +34,7 @@ func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-3n9gg", "Errors.IAM.IDPConfig.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-3n9gg", "Errors.Instance.IDPConfig.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)

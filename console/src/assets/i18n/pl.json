@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Użytkownicy",
-      "DESCRIPTION": "Użytkownik to człowiek lub maszyna, która może uzyskać dostęp do twoich aplikacji.",
+      "DESCRIPTION": "Użytkownik to człowiek lub konto usługi, które może uzyskać dostęp do twoich aplikacji.",
       "HUMANS": {
         "TITLE": "Użytkownicy",
         "DESCRIPTION": "Użytkownicy uwierzytelniają się interaktywnie w sesji przeglądarki z monitem logowania.",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "Organizacja",
     "PROJECT": "Projekty",
     "PROJECTOVERVIEW": "Przegląd",
-    "PROJECTGRANTS": "Uprawnienia",
+    "PROJECTGRANTS": "Przyznania projektu",
     "ROLES": "Role",
     "GRANTEDPROJECT": "Uprawnione projekty",
     "HUMANUSERS": "Użytkownicy",
     "MACHINEUSERS": "Użytkownicy usług",
     "LOGOUT": "Wyloguj Wszystkich Użytkowników",
     "NEWORG": "Nowa Organizacja",
-    "IAMADMIN": "Jesteś administratorem IAM. Zauważ, że masz rozszerzone uprawnienia.",
+    "IAMADMIN": "Jesteś administratorem instancja. Zauważ, że masz rozszerzone uprawnienia.",
     "SHOWORGS": "Pokaż wszystkie organizacje",
     "GRANTS": "Autoryzacje",
     "ACTIONS": "Akcje",
@@ -1160,7 +1160,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Role administratora Zitadel",
-      "DESCRIPTION": "To są wszystkie uprawnienia członków użytkownika. Możesz je również modyfikować na stronach szczegółów organizacji, projektu lub IAM.",
+      "DESCRIPTION": "To są wszystkie uprawnienia członków użytkownika. Możesz je również modyfikować na stronach szczegółów organizacji, projektu lub instancja.",
       "ORGCONTEXT": "Widzisz wszystkie organizacje i projekty, które są związane z aktualnie wybraną organizacją.",
       "USERCONTEXT": "Widzisz wszystkie organizacje i projekty, do których masz dostęp. Włączając inne organizacje.",
       "CREATIONDATE": "Data utworzenia",
@@ -1266,7 +1266,7 @@
       "DESCRIPTION": "Zarządzaj swoimi globalnymi politykami i ustawieniami dostępu do zarządzania."
     },
     "EVENTSTORE": {
-      "TITLE": "Administracja magazynem IAM",
+      "TITLE": "Administracja magazynem Instancja",
       "DESCRIPTION": "Zarządzaj swoimi widokami Zitadel i nieudanymi zdarzeniami."
     },
     "MEMBER": {
@@ -1642,8 +1642,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Jeśli flaga jest włączona, będziesz mógł zakończyć pojedynczą sesję z interfejsu użytkownika logowania, podając id_token z roszczeniem `sid` jako id_token_hint w punkcie końcowym end_session. Należy pamiętać, że obecnie wszystkie sesje z tego samego agenta użytkownika (przeglądarki) są kończone w interfejsie użytkownika logowania. Sesje zarządzane za pomocą interfejsu API sesji już pozwalają na zakończenie pojedynczych sesji.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Błąd nadrzędny",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Jeśli flaga jest włączona, błąd nadrzędny OIDC zostanie zarejestrowany w konsoli.",
-      "ENABLEBACKCHANNELLOGOUT": "Włącz Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 i może być używany do powiadamiania aplikacji o zakończeniu sesji u dostawcy OpenID.",
       "PERMISSIONCHECKV2": "Sprawdzanie uprawnień V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Jeśli flaga jest włączona, będziesz mógł korzystać z nowego API i jego funkcji.",
       "STATES": {
@@ -2056,7 +2054,7 @@
       "DESCRIPTION": "Zezwól innej organizacji na korzystanie z Twojego projektu.",
       "EDITTITLE": "Edytuj role",
       "CREATE": {
-        "TITLE": "Udziel dostęp organizacji",
+        "TITLE": "Utwórz uprawnienie do projektu",
         "SEL_USERS": "Wybierz użytkowników, którym chcesz udzielić dostępu",
         "SEL_PROJECT": "Wyszukaj projekt",
         "SEL_ROLES": "Wybierz role, które mają zostać dodane do udzielenia ",
@@ -2066,7 +2064,7 @@
         "ORG_DESCRIPTION": "Masz zamiar udzielić użytkownikowi dostęp dla organizacji {{name}}.",
         "ORG_DESCRIPTION_DESC": "Przełącz kontekst w nagłówku powyżej, aby udzielić użytkownikowi dostępu dla innej organizacji.",
         "SEL_ORG_FORMFIELD": "Organizacja",
-        "FOR_ORG": "Dostęp udzielany:"
+        "FOR_ORG": "Uprawnienie do projektu zostanie utworzone dla:"
       },
       "DETAIL": {
         "TITLE": "Udzielone uprawnienia do projektu",
@@ -2179,7 +2177,7 @@
       "DEACTIVATED": "Dezaktywowano.",
       "CREATED": "Projekt utworzony.",
       "UPDATED": "Projekt zmieniony.",
-      "GRANTUPDATED": "Udzielony dostęp zmieniony.",
+      "GRANTUPDATED": "Przyznanie projektu zostało zmienione.",
       "DELETED": "Projekt usunięty."
     }
   },
@@ -2651,7 +2649,8 @@
             "DESCRIPTION": "Aplikacje jednoszczelinowe (SPA) i ogólnie wszystkie frameworki JS wykonywane w przeglądarkach"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2770,7 +2769,7 @@
     "ADD": "Dodaj managera",
     "CREATIONTYPE": "Typ utworzenia",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instancja",
       "2": "Organizacja",
       "0": "Własny projekt",
       "1": "Nadany projekt",

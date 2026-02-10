@@ -12,7 +12,7 @@ Roles are critical to managing permissions in a single-tenant or multi-tenant ap
 
 ## Assign roles and memberships
 
-Human or service users can be assigned roles. You can do this via the ZITADEL Management Console or the ZITADEL APIs. As mentioned earlier, there are two types of roles in ZITADEL. You can have your own application-specific roles, and alternatively, ZITADEL also has administrator roles, such as `ORG_OWNER` and `IAM_OWNER`.
+Users or service accounts can be assigned roles. You can do this via the ZITADEL Management Console or the ZITADEL APIs. As mentioned earlier, there are two types of roles in ZITADEL. You can have your own application-specific roles, and alternatively, ZITADEL also has administrator roles, such as `ORG_OWNER` and `IAM_OWNER`.
 
 Follow the links below to assign roles to your users.
 
@@ -27,12 +27,12 @@ Roles can be requested via our auth and management APIs, from userinfo endpoint 
 
 ### Generate a token
 
-You must first of all generate a token for the user. For human users, the typical approach involves using a front-end application and logging in through the browser or device. An access token will be returned after they log in successfully. A machine user will use a script or other program to generate a token using the JWT profile or client credentials grant types.
+You must first of all generate a token for the user. For users, the typical approach involves using a front-end application and logging in through the browser or device. An access token will be returned after they log in successfully. A service account will use a script or other program to generate a token using the JWT profile or client credentials grant types.
 
 How to generate a token:
 
-- [Generate tokens for human users](/guides/integrate/login/oidc/login-users)
-- [Generate tokens for service users](/guides/integrate/service-users/authenticate-service-users)
+- [Generate tokens for users](/guides/integrate/login/oidc/login-users)
+- [Generate tokens for service accounts](/guides/integrate/service-accounts/authenticate-service-accounts)
 
 In order to access role information via the token you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL management console before requesting the token.
 

@@ -283,10 +283,6 @@ Errors:
       Empty: "Standaard Wachtwoord Leeftijd Beleid is leeg"
       NotExisting: "Standaard Wachtwoord Leeftijd Beleid bestaat niet"
       AlreadyExists: "Standaard Wachtwoord Leeftijd Beleid bestaat al"
-    OrgIAMPolicy:
-      Empty: "Org IAM Beleid is leeg"
-      NotExisting: "Org IAM Beleid bestaat niet"
-      AlreadyExists: "Org IAM Beleid bestaat al"
     NotificationPolicy:
       NotFound: "Standaard Notificatie Beleid niet gevonden"
       NotChanged: "Standaard Notificatie Beleid is niet veranderd"
@@ -342,22 +338,20 @@ Errors:
     RequiredFieldsMissing: "Enkele vereiste velden ontbreken"
     Grant:
       AlreadyExists: "Projecttoekenning bestaat al"
-      NotFound: "Toekenning niet gevonden"
+      NotFound: "Projecttoekenning niet gevonden"
       Invalid: "Projecttoekenning is ongeldig"
       NotExisting: "Projecttoekenning bestaat niet"
       HasNotExistingRole: "Een rol bestaat niet op project"
       NotActive: "Projecttoekenning is niet actief"
       NotInactive: "Projecttoekenning is niet gedeactiveerd"
-  IAM:
-    NotFound: "IAM niet gevonden. Zorg ervoor dat u het juiste domein heeft. Kijk op https://zitadel.com/docs/apis/introduction#domains"
+  Instance:
+    NotFound: "Instantie niet gevonden. Zorg ervoor dat u het juiste domein heeft. Kijk op https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Rollen zijn niet veranderd"
     MemberInvalid: "Lid is ongeldig"
     MemberAlreadyExisting: "Lid bestaat al"
     MemberNotExisting: "Lid bestaat niet"
     IDMissing: "ID ontbreekt"
-    IAMProjectIDMissing: "IAM project id ontbreekt"
-    IamProjectAlreadySet: "IAM project id is al ingesteld"
     IdpInvalid: "IDP-configuratie is ongeldig"
     IdpNotExisting: "IDP-configuratie bestaat niet"
     OIDCConfigInvalid: "OIDC IDP-configuratie is ongeldig"
@@ -415,11 +409,11 @@ Errors:
       Empty: "Standaard Wachtwoord Lockout Beleid is leeg"
       NotChanged: "Standaard Wachtwoord Lockout Beleid is niet veranderd"
     DomainPolicy:
-      NotFound: "Org IAM Beleid niet gevonden"
-      Empty: "Org IAM Beleid is leeg"
-      NotExisting: "Org IAM Beleid bestaat niet"
-      AlreadyExists: "Org IAM Beleid bestaat al"
-      NotChanged: "Org IAM Beleid is niet veranderd"
+      NotFound: "Organisatie Domein Beleid niet gevonden"
+      Empty: "Organisatie Domein Beleid is leeg"
+      NotExisting: "Organisatie Domein Beleid bestaat niet"
+      AlreadyExists: "Organisatie Domein Beleid bestaat al"
+      NotChanged: "Organisatie Domein Beleid is niet veranderd"
     NotificationPolicy:
       NotFound: "Standaard Notificatie Beleid niet gevonden"
       NotChanged: "Standaard Notificatie Beleid is niet veranderd"

@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Pengguna",
-      "DESCRIPTION": "Pengguna adalah manusia atau mesin yang dapat mengakses aplikasi Anda.",
+      "DESCRIPTION": "Pengguna adalah manusia atau akun layanan yang dapat mengakses aplikasi Anda.",
       "HUMANS": {
         "TITLE": "Pengguna",
         "DESCRIPTION": "Pengguna mengautentikasi secara interaktif dalam sesi browser dengan perintah login.",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "Organisasi",
     "PROJECT": "Proyek",
     "PROJECTOVERVIEW": "Ringkasan",
-    "PROJECTGRANTS": "Hibah",
+    "PROJECTGRANTS": "Izin proyek",
     "ROLES": "Peran",
     "GRANTEDPROJECT": "Proyek yang Diberikan",
     "HUMANUSERS": "Pengguna",
     "MACHINEUSERS": "Pengguna Layanan",
     "LOGOUT": "Logout Semua Pengguna",
     "NEWORG": "Organisasi Baru",
-    "IAMADMIN": "Anda adalah Administrator IAM. Perhatikan bahwa Anda memiliki izin yang diperluas.",
+    "IAMADMIN": "Anda adalah Administrator instance. Perhatikan bahwa Anda memiliki izin yang diperluas.",
     "SHOWORGS": "Tampilkan Semua Organisasi",
     "GRANTS": "Otorisasi",
     "ACTIONS": "Tindakan",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Peran Administrator Zitadel",
-      "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau IAM.",
+      "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau instance.",
       "ORGCONTEXT": "Anda melihat semua organisasi dan proyek yang terkait dengan organisasi yang dipilih saat ini.",
       "USERCONTEXT": "Anda melihat semua organisasi dan proyek yang Anda izinkan. Termasuk organisasi lain.",
       "CREATIONDATE": "Tanggal Pembuatan",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Kelola Kebijakan global dan Pengaturan Akses Manajemen Anda."
     },
     "EVENTSTORE": {
-      "TITLE": "Administrasi Penyimpanan IAM",
+      "TITLE": "Administrasi Penyimpanan Instance",
       "DESCRIPTION": "Kelola tampilan Zitadel Anda dan acara yang gagal."
     },
     "MEMBER": {
@@ -1640,8 +1640,6 @@
       "ACTIONS": "Tindakan",
       "ACTIONS_DESCRIPTION": "Tindakan v2 memungkinkan untuk mengelola eksekusi dan target data. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
-      "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify applications about session termination at the OpenID Provider.",
       "PERMISSIONCHECKV2": "Permission Check V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
       "STATES": {
@@ -2055,7 +2053,7 @@
       "DESCRIPTION": "Izinkan organisasi lain untuk menggunakan proyek Anda.",
       "EDITTITLE": "Edit peran",
       "CREATE": {
-        "TITLE": "Buat Hibah Organisasi",
+        "TITLE": "Buat hak akses proyek",
         "SEL_USERS": "Pilih pengguna yang ingin Anda berikan akses",
         "SEL_PROJECT": "Cari proyek",
         "SEL_ROLES": "Pilih peran yang ingin Anda tambahkan ke hibah",
@@ -2065,7 +2063,7 @@
         "ORG_DESCRIPTION": "Anda akan memberikan pengguna untuk organisasi {{name}}.",
         "ORG_DESCRIPTION_DESC": "Ganti konteks pada header di atas untuk memberikan pengguna untuk organisasi lain.",
         "SEL_ORG_FORMFIELD": "Organisasi",
-        "FOR_ORG": "Hibah ini dibuat untuk:"
+        "FOR_ORG": "Hak akses proyek akan dibuat untuk:"
       },
       "DETAIL": {
         "TITLE": "Hibah Proyek",
@@ -2178,7 +2176,7 @@
       "DEACTIVATED": "Dinonaktifkan.",
       "CREATED": "Proyek dibuat.",
       "UPDATED": "Proyek berubah.",
-      "GRANTUPDATED": "Hibah berubah.",
+      "GRANTUPDATED": "Izin proyek telah diubah.",
       "DELETED": "Proyek dihapus."
     }
   },
@@ -2675,7 +2673,8 @@
             "DESCRIPTION": "Aplikasi Halaman Tunggal (SPA) dan secara umum semua kerangka JS dijalankan di browser"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2797,7 +2796,7 @@
       "0": "Proyek Milik",
       "1": "Proyek yang Diberikan",
       "2": "Organisasi",
-      "3": "SAYA",
+      "3": "Instance",
       "4": "Proyek"
     },
     "EDITROLE": "Edit peran",

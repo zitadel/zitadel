@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Utilisateurs",
-      "DESCRIPTION": "Un utilisateur est un humain ou une machine qui peut accéder à vos applications.",
+      "DESCRIPTION": "Un utilisateur est un humain ou compte de service qui peut accéder à vos applications.",
       "HUMANS": {
         "TITLE": "Utilisateurs",
         "DESCRIPTION": "Les utilisateurs s'authentifient de manière interactive dans une session de navigateur avec une invite de connexion.",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "Organisation",
     "PROJECT": "Projets",
     "PROJECTOVERVIEW": "Vue d'ensemble",
-    "PROJECTGRANTS": "Droits",
+    "PROJECTGRANTS": "Concessions de projet",
     "ROLES": "Rôles",
     "GRANTEDPROJECT": "Projets octroyés",
     "HUMANUSERS": "Utilisateurs",
     "MACHINEUSERS": "Utilisateurs de services",
     "LOGOUT": "Déconnexion de tous les utilisateurs",
     "NEWORG": "Nouvelle organisation",
-    "IAMADMIN": "Vous êtes un administrateur IAM. Notez que vous disposez de permissions étendues.",
+    "IAMADMIN": "Vous êtes un administrateur d'instance. Notez que vous disposez de permissions étendues.",
     "SHOWORGS": "Afficher toutes les organisations",
     "GRANTS": "Autorisations",
     "ACTIONS": "Actions",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Rôles d'administrateur Zitadel",
-      "DESCRIPTION": "Il s'agit de toutes les attributions des membres de l'utilisateur. Vous pouvez également les modifier sur les pages de détails de l'organisation, du projet ou de l'IAM.",
+      "DESCRIPTION": "Il s'agit de toutes les attributions des membres de l'utilisateur. Vous pouvez également les modifier sur les pages de détails de l'organisation, du projet ou de l'instance.",
       "ORGCONTEXT": "Vous voyez toutes les organisations et tous les projets qui sont liés à l'organisation actuellement sélectionnée.",
       "USERCONTEXT": "Vous voyez toutes les organisations et tous les projets auxquels vous êtes autorisé. Y compris les autres organisations.",
       "CREATIONDATE": "Date de création",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Gérer vos politiques globales et vos paramètres d'accès à la gestion."
     },
     "EVENTSTORE": {
-      "TITLE": "Administration du stockage IAM",
+      "TITLE": "Administration du stockage instance",
       "DESCRIPTION": "Gérez vos vues Zitadel et les événements échoués."
     },
     "MEMBER": {
@@ -1643,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si l'indicateur est activé, vous pourrez terminer une seule session à partir de l'interface utilisateur de connexion en fournissant un id_token avec une revendication `sid` en tant que id_token_hint sur le point de terminaison end_session. Notez que toutes les sessions du même agent utilisateur (navigateur) sont actuellement terminées dans l'interface utilisateur de connexion. Les sessions gérées via l'API de session permettent déjà la terminaison de sessions individuelles.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si le drapeau est activé, l'erreur parent OIDC sera enregistrée dans la console.",
-      "ENABLEBACKCHANNELLOGOUT": "Activer le Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Le Back-Channel Logout implémente OpenID Connect Back-Channel Logout 1.0 et peut être utilisé pour notifier les applications de la fin de session chez le fournisseur OpenID.",
       "PERMISSIONCHECKV2": "Vérification des permissions V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "STATES": {
@@ -2057,7 +2055,7 @@
       "DESCRIPTION": "Autoriser une autre organisation à utiliser votre projet.",
       "EDITTITLE": "Rôles d'édition",
       "CREATE": {
-        "TITLE": "Octroyer une organisation",
+        "TITLE": "Créer une concession de projet",
         "SEL_USERS": "Sélectionnez les utilisateurs auxquels vous souhaitez accorder l'accès",
         "SEL_PROJECT": "Rechercher un projet",
         "SEL_ROLES": "Sélectionnez les rôles que vous souhaitez ajouter à l'autorisation.",
@@ -2067,7 +2065,7 @@
         "ORG_DESCRIPTION": "Vous êtes sur le point d'octroyer un utilisateur pour l'organisation {{name}}.",
         "ORG_DESCRIPTION_DESC": "Changez le contexte dans l'en-tête ci-dessus pour accorder un utilisateur pour une autre organisation.",
         "SEL_ORG_FORMFIELD": "Organisation",
-        "FOR_ORG": "L'autorisation est créée pour"
+        "FOR_ORG": "La concession de projet est créée pour:"
       },
       "DETAIL": {
         "TITLE": "Octroyer un projet",
@@ -2180,7 +2178,7 @@
       "DEACTIVATED": "Désactivé.",
       "CREATED": "Projet créé.",
       "UPDATED": "Projet modifié.",
-      "GRANTUPDATED": "Octroi modifié.",
+      "GRANTUPDATED": "Attribution de projet modifiée.",
       "DELETED": "Projet supprimé."
     }
   },
@@ -2652,7 +2650,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) et en général tous les frameworks JS exécutés dans les navigateurs"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2771,7 +2770,7 @@
     "ADD": "Ajouter un responsable",
     "CREATIONTYPE": "Type de création",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instance",
       "2": "Organisation",
       "0": "Projet Détenu",
       "1": "Projet Octroyé",
