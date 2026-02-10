@@ -448,7 +448,7 @@ If you want to impersonate users by Token Exchange, the security settings of the
 
 #### Impersonation permissions
 
-Next we need to configure which users are allowed to impersonate other users. ZITADEL provides 4 [management roles](/guides/manage/console/managers):
+Next, we need to configure which users are allowed to impersonate other users. ZITADEL provides 4 [management roles](/guides/manage/console/administrators):
 
 | Name                   | Role                      | Description                                                       |
 | ---------------------- | ------------------------- | ----------------------------------------------------------------- |
@@ -463,8 +463,8 @@ Next we need to configure which users are allowed to impersonate other users. ZI
 
 #### Authenticated impersonator tokens
 
-At this point the _portal_ web-app must have completed a code-flow login for an user with the `ORG_END_USER_IMPERSONATOR` ZITADEL role. The impersonator does not have a profile. In this case we only need the `openid` scope.
-However, as we cannot extend audience during token exchange, it is important that the project scopes are requested for the impersonator during login.
+At this point the _portal_ web-app must have completed a code-flow login for a user with the `ORG_END_USER_IMPERSONATOR` ZITADEL role. The impersonator does not have a profile. In this case we only need the `openid` scope.
+However, as we cannot extend the audience during token exchange, it is important that the project scopes are requested for the impersonator during login.
 
 ```
 openid urn:zitadel:iam:org:project:id:259254020357488642:aud urn:zitadel:iam:org:project:id:259256588127174658:aud urn:zitadel:iam:org:project:id:zitadel:aud
@@ -687,7 +687,7 @@ curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
 -d 'scope=openid profile email offline_access' | jq
 ```
 
-Response with refresh token:
+Response with a refresh token:
 
 ```bash
 {
@@ -723,7 +723,7 @@ The response now caries an opaque token again, because that is what is configure
 }
 ```
 
-If we inspect the ID token we can see that the actor claim is preserved, even after token refresh:
+If we inspect the ID token, we can see that the actor claim is preserved, even after token refresh:
 
 ```json
 {
@@ -857,7 +857,7 @@ Above we gave some of the most straightforward use cases. Of course, you can com
 
 ## Audit trail
 
-In the user view of the management console we can see whenever a new access token is created for a user.
+In the user view of the management console, we can see whenever a new access token is created for a user.
 The existing `Access Token created` event is also used in the case of a token exchange.
 When there was an `actor_token` present during token exchange, we also log a `User impersonated` event.
 
@@ -878,4 +878,4 @@ In the [instance event list](/concepts/eventstore/overview) the `User impersonat
 ## Finishing notes
 
 The current implementation of the Token Exchange grant was our first iteration on the subject.
-We love to hear feedback from our user! This is a [GitHub discussion](https://github.com/zitadel/zitadel/discussions/7624) opened specifically for this purpose.
+We love to hear feedback from our users! This is a [GitHub discussion](https://github.com/zitadel/zitadel/discussions/7624) opened specifically for this purpose.

@@ -47,7 +47,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/manage/console/projects-overview",
           "guides/manage/console/applications-overview",
           "guides/manage/console/users-overview",
-          "concepts/structure/managers",
+          "concepts/structure/administrators",
         ],
       },
       {
@@ -679,7 +679,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/manage/console/roles",
           "guides/integrate/retrieve-user-roles",
           "concepts/structure/granted_projects",
-          "guides/manage/console/managers",
+          "guides/manage/console/administrators",
         ],
       },
       {

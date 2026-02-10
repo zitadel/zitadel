@@ -3,11 +3,11 @@ title: Prevent users from accessing ZITADEL Management Console
 sidebar_label: Limit access to management console
 ---
 
-ZITADEL includes a management console that allows Managers to configure all resources. All uses, including end-users, by default, view and manage their profile information.
+ZITADEL includes a management console that allows Administrators to configure all resources. All uses, including end-users, by default, view and manage their profile information.
 In some use cases you want to prevent users from accessing the management console, this could be:
 - User management is integrated into your own app
 - Users login via SSO and should not be able to change their data in the Management Console
-- Only managers should be able to access Management Console to manage their users
+- Only administrators should be able to access Management Console to manage their users
 
 At the moment it is not possible to simply disable the Management Console, but with the configuration described in this guide, you can prevent users from accessing the Console.
 
@@ -33,7 +33,7 @@ By default, this setting is disabled, so all users can access the project.
 
 ![](../../../public/img/guides/solution-scenarios/console-check-project-auth.png)
 
-Start by granting the organization of your managers, that should be able to access the Management Console, the [default project](/guides/manage/console/projects-overview#the-default-project):
+Start by granting the organization of your administrators that should be able to access the Management Console, the [default project](/guides/manage/console/projects-overview#the-default-project):
 
 1. Click on the default-project > Grants > New +
    ![](../../../public/img/guides/solution-scenarios/console-zitadel-project-grants.png)

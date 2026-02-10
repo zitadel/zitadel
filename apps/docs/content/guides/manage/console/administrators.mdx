@@ -1,21 +1,21 @@
 ---
-title: ZITADEL Managers
-sidebar_label: Managers
+title: ZITADEL Administrators
+sidebar_label: Administrators
 ---
 
-import ManagerDescription from "../../../concepts/structure/_manager_description.mdx";
-import AddManager from "./_add_manager.mdx";
+import AdministratorDescription from "../../../concepts/structure/_manager_description.mdx";
+import AddAdministrator from "./_add_manager.mdx";
 import PermissionTable from '@/components/PermissionTable';
 import permissionData from "../../../../../../cmd/defaults.yaml";
 
-<ManagerDescription components={props.components}  name="ManagerDescription" />
+<AdministratorDescription components={props.components}  name="AdministratorDescription" />
 
-To configure managers in ZITADEL go to the resource where you like to add it (e.g Instance, Organization, Project, GrantedProject).
-In the right part of the management console you can find **MANAGERS** in the details part. Here you have a list of the current managers and can add a new one.
+To configure administrators in ZITADEL, go to the resource where you like to add it (e.g., Instance, Organization, Project, GrantedProject).
+In the right part of the management console you can find **ADMINISTRATORS** in the details part. Here you have a list of the current administrators and can add a new one.
 
-<img alt="Managers" src="/docs/img/guides/console/managers.png" width="200px" />
+<img alt="Administrators" src="/docs/img/guides/console/administrators.png" width="200px" />
 
-<AddManager components={props.components}  name="AddManager" />
+<AddAdministrator components={props.components}  name="AddAdministrator" />
 
 ## Roles
 
@@ -44,7 +44,7 @@ In the right part of the management console you can find **MANAGERS** in the det
 
 ## Configure roles
 
-If you run a self hosted ZITADEL instance you can define your custom roles by overwriting the defaults.yaml
+If you run a self-hosted ZITADEL instance, you can define your custom roles by overwriting the defaults.yaml
 In the InternalAuthZ section you will find all the roles and which permissions they have.
 
 Example:

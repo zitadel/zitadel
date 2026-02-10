@@ -766,7 +766,7 @@
       "KEYS": "Anahtarlar",
       "PAT": "Kişisel Erişim Token'ları",
       "USERGRANTS": "Yetkilendirmeler",
-      "MEMBERSHIPS": "Üyelikler",
+      "MEMBERSHIPS": "Yönetici Rolleri",
       "METADATA": "Meta Veri"
     },
     "TITLE": "Kişisel Bilgiler",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel Yönetici Rolleri",
-      "DESCRIPTION": "Bunlar kullanıcının tüm üyelik yetkileridir. Bunları organizasyon, proje veya IAM detay sayfalarında da değiştirebilirsiniz.",
+      "DESCRIPTION": "Bunlar kullanıcının tüm yönetici rolleridir. Bunları organizasyon, proje veya IAM detay sayfalarında da değiştirebilirsiniz.",
       "ORGCONTEXT": "Şu anda seçili organizasyonla ilişkili tüm organizasyonları ve projeleri görüyorsunuz.",
       "USERCONTEXT": "Yetkiniz olan tüm organizasyonları ve projeleri görüyorsunuz. Diğer organizasyonlar dahil.",
       "CREATIONDATE": "Oluşturma Tarihi",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Kaldır",
       "TYPE": "Tür",
       "ORGID": "Organizasyon ID",
-      "UPDATED": "Üyelik güncellendi.",
+      "UPDATED": "Yönetici rolü güncellendi.",
       "NOPERMISSIONTOEDIT": "Rolleri düzenlemek için gerekli izinlere sahip değilsiniz!",
       "TYPES": {
         "UNKNOWN": "Bilinmeyen",
@@ -1933,7 +1933,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "Organizasyon",
-    "DESCRIPTION": "Burada organizasyonunuzun yapılandırmasını düzenleyebilir ve üyeleri yönetebilirsiniz.",
+    "DESCRIPTION": "Burada organizasyonunuzun yapılandırmasını düzenleyebilir ve yöneticileri yönetebilirsiniz.",
     "DETAIL": {
       "TITLE": "Detay",
       "NAME": "Ad",
@@ -1945,13 +1945,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Üyeler",
+      "TITLE": "Yöneticiler",
       "USERNAME": "Kullanıcı Adı",
       "DISPLAYNAME": "Görünen Ad",
       "LOGINNAME": "Giriş Adı",
       "EMAIL": "E-posta",
       "ROLES": "Roller",
-      "ADD": "Üye Ekle",
+      "ADD": "Yönetici Ekle",
       "ADDDESCRIPTION": "Eklenecek kullanıcıların adlarını girin."
     },
     "TABLE": {
@@ -2843,7 +2843,7 @@
       "UPDATED": "Yetkilendirme güncellendi.",
       "REMOVED": "Yetkilendirme kaldırıldı",
       "BULKREMOVED": "Yetkilendirmeler kaldırıldı.",
-      "CANTSHOWINFO": "Bu kullanıcının ait olduğu organizasyonun üyesi olmadığınız için bu kullanıcının profilini ziyaret edemezsiniz"
+      "CANTSHOWINFO": "Bu kullanıcının ait olduğu organizasyonun yöneticisi olmadığınız için bu kullanıcının profilini ziyaret edemezsiniz"
     },
     "DIALOG": {
       "DELETE_TITLE": "Yetkilendirmeyi sil",
