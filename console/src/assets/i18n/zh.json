@@ -766,7 +766,7 @@
       "KEYS": "秘钥",
       "PAT": "个人访问令牌",
       "USERGRANTS": "授权",
-      "MEMBERSHIPS": " ",
+      "MEMBERSHIPS": "管理员角色",
       "METADATA": "元数据"
     },
     "TITLE": "个人信息",
