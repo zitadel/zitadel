@@ -19,7 +19,11 @@ func (u machineKey) AddKey(key *domain.MachineKey) database.Change {
 			if !key.CreatedAt.IsZero() {
 				createdAt = key.CreatedAt
 			}
-			builder.WriteArgs(key.ID, createdAt, key.ExpiresAt, key.Type, key.PublicKey)
+			var expiresAt any = database.NullInstruction
+			if !key.ExpiresAt.IsZero() {
+				expiresAt = key.ExpiresAt
+			}
+			builder.WriteArgs(key.ID, createdAt, expiresAt, key.Type, key.PublicKey)
 			builder.WriteString(" FROM existing_user")
 		},
 		nil,

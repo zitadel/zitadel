@@ -19,7 +19,11 @@ func (userPersonalAccessToken) AddPersonalAccessToken(pat *domain.PersonalAccess
 			if !pat.CreatedAt.IsZero() {
 				createdAt = pat.CreatedAt
 			}
-			builder.WriteArgs(pat.ID, createdAt, pat.ExpiresAt, pat.Scopes)
+			var expiresAt any = database.NullInstruction
+			if !pat.ExpiresAt.IsZero() {
+				expiresAt = pat.ExpiresAt
+			}
+			builder.WriteArgs(pat.ID, createdAt, expiresAt, pat.Scopes)
 			builder.WriteString(" FROM existing_user")
 		},
 		nil,

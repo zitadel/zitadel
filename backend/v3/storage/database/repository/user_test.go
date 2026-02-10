@@ -131,6 +131,388 @@ func Test_user_Get(t *testing.T) {
 	}
 }
 
+func Test_user_List(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	t.Cleanup(rollback)
+
+	userRepo := repository.UserRepository()
+	// humanRepo := repository.HumanUserRepository()
+	// machineRepo := repository.MachineUserRepository()
+
+	instanceID := createInstance(t, tx)
+
+	orgID1 := createOrganization(t, tx, instanceID)
+	orgID2 := createOrganization(t, tx, instanceID)
+
+	idpID := createIdentityProvider(t, tx, instanceID, orgID1)
+
+	now := time.Now().Round(time.Second)
+
+	human1 := &domain.User{
+		ID:             "h1",
+		InstanceID:     instanceID,
+		OrganizationID: orgID1,
+		Username:       "human-user-1",
+		State:          domain.UserStateActive,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+		Human: &domain.HumanUser{
+			FirstName:         "John",
+			LastName:          "Doe",
+			DisplayName:       "JohnD",
+			Nickname:          "johnny",
+			PreferredLanguage: language.English,
+			Gender:            domain.HumanGenderMale,
+			AvatarKey:         "https://my.avatar/key",
+			Email: domain.HumanEmail{
+				Address:    "john@doe.com",
+				VerifiedAt: now,
+			},
+			Phone: &domain.HumanPhone{
+				Number:     "+1234567890",
+				VerifiedAt: now,
+			},
+			Passkeys: []*domain.Passkey{
+				{
+					ID:                           "passkey-1",
+					CreatedAt:                    now,
+					UpdatedAt:                    now,
+					VerifiedAt:                   now,
+					Challenge:                    []byte("challenge2"),
+					KeyID:                        "key-id2",
+					Name:                         "u2f",
+					Type:                         domain.PasskeyTypeU2F,
+					PublicKey:                    []byte("public key"),
+					AuthenticatorAttestationGUID: []byte("aaguid"),
+					AttestationType:              "attestation type",
+					RelyingPartyID:               "rpid",
+				},
+			},
+			Password: domain.HumanPassword{
+				Hash:      "password-hash",
+				ChangedAt: now,
+			},
+			TOTP: &domain.HumanTOTP{
+				VerifiedAt: now,
+				Secret:     []byte("secret"),
+			},
+			IdentityProviderLinks: []*domain.IdentityProviderLink{
+				{
+					ProviderID:       idpID,
+					ProvidedUserID:   "provided-id-h1",
+					ProvidedUsername: "provided-username-h1",
+					CreatedAt:        now,
+					UpdatedAt:        now,
+				},
+			},
+			Verifications: []*domain.Verification{
+				{
+					ID: "h1-v1",
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeHash,
+						Algorithm:  "aes-256",
+						KeyID:      "key-id",
+						Crypted:    []byte("asdf"),
+					},
+					CreatedAt: now,
+					UpdatedAt: now,
+				},
+			},
+		},
+		Metadata: []*domain.Metadata{
+			{
+				InstanceID: instanceID,
+				Key:        "key1",
+				Value:      []byte("asdf"),
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+			{
+				InstanceID: instanceID,
+				Key:        "key2",
+				Value:      []byte("123"),
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+		},
+	}
+	human2 := &domain.User{
+		ID:             "h2",
+		InstanceID:     instanceID,
+		OrganizationID: orgID1,
+		Username:       "human-user-2",
+		State:          domain.UserStateActive,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+		Human: &domain.HumanUser{
+			FirstName:         "Jane",
+			LastName:          "Doe",
+			DisplayName:       "JaneD",
+			Nickname:          "janie",
+			PreferredLanguage: language.English,
+			Gender:            domain.HumanGenderFemale,
+			AvatarKey:         "https://my.avatar/key",
+			Email: domain.HumanEmail{
+				UnverifiedAddress: "jane@doe.com",
+				PendingVerification: &domain.Verification{
+					ID:        "h2-email",
+					CreatedAt: now,
+					UpdatedAt: now,
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeHash,
+						Algorithm:  "aes-256",
+						KeyID:      "key-id",
+						Crypted:    []byte("asdf"),
+					},
+				},
+			},
+			Phone: &domain.HumanPhone{
+				UnverifiedNumber: "+1234567890",
+				PendingVerification: &domain.Verification{
+					ID:        "h2-phone",
+					CreatedAt: now,
+					UpdatedAt: now,
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeHash,
+						Algorithm:  "aes-256",
+						KeyID:      "key-id",
+						Crypted:    []byte("asdf"),
+					},
+				},
+			},
+			Passkeys: []*domain.Passkey{
+				{
+					ID:                           "passkey-2",
+					CreatedAt:                    now,
+					UpdatedAt:                    now,
+					VerifiedAt:                   now,
+					Challenge:                    []byte("challenge2"),
+					KeyID:                        "key-id3",
+					Name:                         "u2f",
+					Type:                         domain.PasskeyTypeU2F,
+					PublicKey:                    []byte("public key"),
+					AuthenticatorAttestationGUID: []byte("aaguid"),
+					AttestationType:              "attestation type",
+					RelyingPartyID:               "rpid",
+				},
+			},
+			Password: domain.HumanPassword{
+				PendingVerification: &domain.Verification{
+					ID:        "h2-pw",
+					CreatedAt: now,
+					UpdatedAt: now,
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeHash,
+						Algorithm:  "aes-256",
+						KeyID:      "key-id",
+						Crypted:    []byte("asdf"),
+					},
+				},
+			},
+			TOTP: &domain.HumanTOTP{
+				VerifiedAt: now,
+				Secret:     []byte("secret"),
+			},
+			IdentityProviderLinks: []*domain.IdentityProviderLink{
+				{
+					ProviderID:       idpID,
+					ProvidedUserID:   "provided-id-h2",
+					ProvidedUsername: "provided-username-h2",
+					CreatedAt:        now,
+					UpdatedAt:        now,
+				},
+			},
+			Verifications: []*domain.Verification{
+				{
+					ID: "h2-v1",
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeHash,
+						Algorithm:  "aes-256",
+						KeyID:      "key-id",
+						Crypted:    []byte("asdf"),
+					},
+					CreatedAt: now,
+					UpdatedAt: now,
+				},
+			},
+		},
+		Metadata: []*domain.Metadata{
+			{
+				InstanceID: instanceID,
+				Key:        "key1",
+				Value:      []byte("asdf"),
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+			{
+				InstanceID: instanceID,
+				Key:        "key2",
+				Value:      []byte("123"),
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+		},
+	}
+
+	machine1 := &domain.User{
+		ID:             "m1",
+		InstanceID:     instanceID,
+		OrganizationID: orgID2,
+		Username:       "machine-user-1",
+		State:          domain.UserStateActive,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+		Machine: &domain.MachineUser{
+			Name:            "My Machine",
+			Description:     "This is my machine user",
+			Secret:          []byte("asdf"),
+			AccessTokenType: domain.AccessTokenTypeJWT,
+			PATs: []*domain.PersonalAccessToken{
+				{
+					ID:        "pat1",
+					CreatedAt: now,
+					Scopes:    []string{"scope1", "scope2"},
+				},
+			},
+			Keys: []*domain.MachineKey{
+				{
+					ID:        "mk1",
+					PublicKey: []byte("asdf"),
+					CreatedAt: now,
+					Type:      domain.MachineKeyTypeJSON,
+				},
+			},
+		},
+		Metadata: []*domain.Metadata{
+			{
+				InstanceID: instanceID,
+				Key:        "key1",
+				Value:      []byte("asdf"),
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+			{
+				InstanceID: instanceID,
+				Key:        "key2",
+				Value:      []byte("123"),
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+		},
+	}
+
+	machine2 := &domain.User{
+		ID:             "m2",
+		InstanceID:     instanceID,
+		OrganizationID: orgID2,
+		Username:       "machine-user-2",
+		State:          domain.UserStateActive,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+		Machine: &domain.MachineUser{
+			Name:            "My Machine 2",
+			Description:     "This is my machine user 2",
+			Secret:          []byte("asdf"),
+			AccessTokenType: domain.AccessTokenTypeJWT,
+			PATs: []*domain.PersonalAccessToken{
+				{
+					ID:        "pat2",
+					CreatedAt: now,
+					Scopes:    []string{"scope1", "scope2"},
+				},
+			},
+			Keys: []*domain.MachineKey{
+				{
+					ID:        "mk2",
+					PublicKey: []byte("asdf"),
+					CreatedAt: now,
+					Type:      domain.MachineKeyTypeJSON,
+				},
+			},
+		},
+		Metadata: []*domain.Metadata{
+			{
+				InstanceID: instanceID,
+				Key:        "key1",
+				Value:      []byte("asdf"),
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+			{
+				InstanceID: instanceID,
+				Key:        "key2",
+				Value:      []byte("123"),
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+		},
+	}
+
+	err := userRepo.Create(t.Context(), tx, human1)
+	require.NoError(t, err)
+	err = userRepo.Create(t.Context(), tx, human2)
+	require.NoError(t, err)
+	err = userRepo.Create(t.Context(), tx, machine1)
+	require.NoError(t, err)
+	err = userRepo.Create(t.Context(), tx, machine2)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		wantErr   error
+		expected  []*domain.User
+	}{
+		{
+			name:      "incomplete condition",
+			condition: userRepo.IDCondition(human1.ID),
+			wantErr:   database.NewMissingConditionError(userRepo.InstanceIDColumn()),
+		},
+		{
+			name:      "get human 1",
+			condition: userRepo.PrimaryKeyCondition(instanceID, human1.ID),
+			expected:  []*domain.User{human1},
+		},
+		{
+			name: "get humans",
+			condition: database.And(
+				userRepo.InstanceIDCondition(instanceID),
+				userRepo.TypeCondition(domain.UserTypeHuman),
+			),
+			expected: []*domain.User{human1, human2},
+		},
+		{
+			name:      "get machine 1",
+			condition: userRepo.PrimaryKeyCondition(instanceID, machine1.ID),
+			expected:  []*domain.User{machine1},
+		},
+		{
+			name: "get machines",
+			condition: database.And(
+				userRepo.InstanceIDCondition(instanceID),
+				userRepo.TypeCondition(domain.UserTypeMachine),
+			),
+			expected: []*domain.User{machine1, machine2},
+		},
+		{
+			name:      "get all",
+			condition: userRepo.InstanceIDCondition(instanceID),
+			expected:  []*domain.User{human1, human2, machine1, machine2},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotten, err := userRepo.List(t.Context(), tx, database.WithCondition(tt.condition), database.WithOrderByAscending(userRepo.UsernameColumn()))
+			require.ErrorIs(t, err, tt.wantErr)
+			if tt.wantErr != nil {
+				return
+			}
+
+			assertUsers(t, tt.expected, gotten)
+		})
+	}
+}
+
 // Test_user_ListConditions verifies the correct behavior of all conditions.
 func Test_user_ListConditions(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
@@ -3285,6 +3667,14 @@ func Test_user_Delete(t *testing.T) {
 			assert.ErrorIs(t, err, new(database.NoRowFoundError))
 			assert.Nil(t, user)
 		})
+	}
+}
+
+func assertUsers(t *testing.T, expected, actual []*domain.User) {
+	t.Helper()
+	require.Len(t, actual, len(expected))
+	for i := range expected {
+		assertUser(t, expected[i], actual[i])
 	}
 }
 
