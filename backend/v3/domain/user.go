@@ -173,7 +173,7 @@ const (
 
 type Passkey struct {
 	ID                           string      `json:"id" db:"id"`
-	KeyID                        []byte      `json:"keyId" db:"key_id"`
+	KeyID                        string      `json:"keyId" db:"key_id"`
 	Name                         string      `json:"name" db:"name"`
 	SignCount                    uint32      `json:"signCount" db:"sign_count"`
 	PublicKey                    []byte      `json:"publicKey" db:"public_key"`

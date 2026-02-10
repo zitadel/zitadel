@@ -79,7 +79,7 @@ func (u userHuman) ResetEmailOTPFailedAttempts() database.Change {
 
 // EmailCondition implements [domain.HumanUserRepository.EmailCondition].
 func (u userHuman) EmailCondition(op database.TextOperation, email string) database.Condition {
-	return database.NewTextCondition(u.EmailColumn(), op, email)
+	return database.Or(u.VerifiedEmailCondition(op, email), u.UnverifiedEmailCondition(op, email))
 }
 
 // UnverifiedEmailCondition implements [domain.HumanUserRepository].

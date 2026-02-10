@@ -115,11 +115,6 @@ func (u userIdentityProviderLink) SetIdentityProviderLinkProvidedID(providerID s
 // conditions
 // -------------------------------------------------------------
 
-// ExistsIdentityProviderLink implements [domain.HumanUserRepository.ExistsIdentityProviderLink].
-func (u userIdentityProviderLink) ExistsIdentityProviderLink(condition database.Condition) database.Condition {
-	panic("unimplemented")
-}
-
 // IdentityProviderLinkConditions implements [domain.HumanUserRepository.IdentityProviderLinkConditions].
 func (u userIdentityProviderLink) IdentityProviderLinkConditions() domain.HumanIdentityProviderLinkConditions {
 	return u

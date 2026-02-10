@@ -137,12 +137,13 @@ func Test_user_ListConditions(t *testing.T) {
 	t.Cleanup(rollback)
 
 	userRepo := repository.UserRepository()
-	// humanRepo := repository.HumanUserRepository()
+	humanRepo := repository.HumanUserRepository()
 	// machineRepo := repository.MachineUserRepository()
 
 	instanceID1 := createInstance(t, tx)
 	instance1OrgID1 := createOrganization(t, tx, instanceID1)
 	instance1OrgID2 := createOrganization(t, tx, instanceID1)
+	idpID := createIdentityProvider(t, tx, instanceID1, instance1OrgID1)
 
 	instanceID2 := createInstance(t, tx)
 	instance2OrgID1 := createOrganization(t, tx, instanceID2)
@@ -249,6 +250,7 @@ func Test_user_ListConditions(t *testing.T) {
 		opts  []database.QueryOption
 		want  want
 	}{
+		// user conditions
 		{
 			name: "by instance id",
 			opts: []database.QueryOption{
@@ -366,6 +368,7 @@ func Test_user_ListConditions(t *testing.T) {
 		// 	},
 		// },
 
+		// metadata conditions
 		{
 			name: "by metadata key",
 			setup: func(t *testing.T, tx database.Transaction) {
@@ -408,287 +411,778 @@ func Test_user_ListConditions(t *testing.T) {
 				ids: []string{"h1"},
 			},
 		},
-		// {
-		// 	name: "by metadata value",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by metadata key and value",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
+		{
+			name: "by metadata value",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					userRepo.AddMetadata(
+						&domain.Metadata{
+							InstanceID: instanceID1,
+							Key:        "key1",
+							Value:      []byte("123"),
+						},
+						&domain.Metadata{
+							InstanceID: instanceID1,
+							Key:        "key2",
+							Value:      []byte("value"),
+						},
+					),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					userRepo.AddMetadata(
+						&domain.Metadata{
+							InstanceID: instanceID1,
+							Key:        "key2",
+							Value:      []byte("value1"),
+						},
+					),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID2, "h3"),
+					userRepo.AddMetadata(
+						&domain.Metadata{
+							InstanceID: instanceID2,
+							Key:        "key2",
+							Value:      []byte("value"),
+						},
+					),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					userRepo.ExistsMetadata(
+						userRepo.MetadataConditions().MetadataValueCondition(database.BytesOperationEqual, []byte("value")),
+					),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+		{
+			name: "by metadata key and value",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					userRepo.AddMetadata(
+						&domain.Metadata{
+							InstanceID: instanceID1,
+							Key:        "key1",
+							Value:      []byte("123"),
+						},
+						&domain.Metadata{
+							InstanceID: instanceID1,
+							Key:        "key2",
+							Value:      []byte("value"),
+						},
+					),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					userRepo.AddMetadata(
+						&domain.Metadata{
+							InstanceID: instanceID1,
+							Key:        "key2",
+							Value:      []byte("value1"),
+						},
+					),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID2, "h3"),
+					userRepo.AddMetadata(
+						&domain.Metadata{
+							InstanceID: instanceID2,
+							Key:        "key1",
+							Value:      []byte("value"),
+						},
+					),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					userRepo.ExistsMetadata(
+						database.And(
+							userRepo.MetadataConditions().MetadataKeyCondition(database.TextOperationEqual, "key1"),
+							userRepo.MetadataConditions().MetadataValueCondition(database.BytesOperationEqual, []byte("123")),
+						),
+					),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
 
-		// {
-		// 	name: "by display name",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by first name",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by last name",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by nick name",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by preferred language",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by phone",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by unverified phone",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by verified phone",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by passkey challenge",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by passkey id",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by passkey key id",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by passkey type",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by idp link provider id",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by idp link provided user id",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by idp link username",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by email",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by unverified email",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
-		// {
-		// 	name: "by verified email",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
+		// human conditions
+		{
+			name: "by display name",
+			setup: func(t *testing.T, tx database.Transaction) {
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.DisplayNameCondition(database.TextOperationEndsWith, " bbb"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h2"},
+			},
+		},
+		{
+			name: "by first name",
+			setup: func(t *testing.T, tx database.Transaction) {
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.FirstNameCondition(database.TextOperationEqual, "aa"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+		{
+			name: "by last name",
+			setup: func(t *testing.T, tx database.Transaction) {
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.LastNameCondition(database.TextOperationNotEqual, "bb"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h2"},
+			},
+		},
+		{
+			name: "by nickname",
+			setup: func(t *testing.T, tx database.Transaction) {
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.NicknameCondition(database.TextOperationContains, "aabb"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1", "h2"},
+			},
+		},
+		{
+			name: "by preferred language",
+			setup: func(t *testing.T, tx database.Transaction) {
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.PreferredLanguageCondition(language.German),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h2"},
+			},
+		},
+
+		// phone conditions
+		{
+			name: "by phone",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.SetPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{}),
+				)
+				require.NoError(t, err)
+				_, err = humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.SetUnverifiedPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeInit{
+						Expiry: gu.Ptr(5 * time.Minute),
+					}),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.PhoneCondition(database.TextOperationEqual, "+1234567890"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1", "h2"},
+			},
+		},
+		{
+			name: "by unverified phone",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.SetPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{}),
+				)
+				require.NoError(t, err)
+				_, err = humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.SetUnverifiedPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeInit{
+						Expiry: gu.Ptr(5 * time.Minute),
+					}),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.UnverifiedPhoneCondition(database.TextOperationEqual, "+1234567890"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h2"},
+			},
+		},
+		{
+			name: "by verified phone",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.SetPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{}),
+				)
+				require.NoError(t, err)
+				_, err = humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.SetUnverifiedPhone("+1234567890"),
+					humanRepo.SetPhoneVerification(&domain.VerificationTypeInit{
+						Expiry: gu.Ptr(5 * time.Minute),
+					}),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.VerifiedPhoneCondition(database.TextOperationEqual, "+1234567890"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+
+		// human email conditions
+		{
+			name: "by email",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.SetEmail("test@email.com"),
+					humanRepo.SetEmailVerification(&domain.VerificationTypeSkipped{}),
+				)
+				require.NoError(t, err)
+				_, err = humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.SetUnverifiedEmail("test@email.com"),
+					humanRepo.SetEmailVerification(&domain.VerificationTypeInit{
+						Expiry: gu.Ptr(5 * time.Minute),
+					}),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.EmailCondition(database.TextOperationEqual, "test@email.com"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1", "h2"},
+			},
+		},
+		{
+			name: "by unverified email",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.SetEmail("test@email.com"),
+					humanRepo.SetEmailVerification(&domain.VerificationTypeSkipped{}),
+				)
+				require.NoError(t, err)
+				_, err = humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.SetUnverifiedEmail("test@email.com"),
+					humanRepo.SetEmailVerification(&domain.VerificationTypeInit{
+						Expiry: gu.Ptr(5 * time.Minute),
+					}),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.UnverifiedEmailCondition(database.TextOperationEqual, "test@email.com"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h2"},
+			},
+		},
+		{
+			name: "by verified email",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.SetEmail("test@email.com"),
+					humanRepo.SetEmailVerification(&domain.VerificationTypeSkipped{}),
+				)
+				require.NoError(t, err)
+				_, err = humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.SetUnverifiedEmail("test@email.com"),
+					humanRepo.SetEmailVerification(&domain.VerificationTypeInit{
+						Expiry: gu.Ptr(5 * time.Minute),
+					}),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.VerifiedEmailCondition(database.TextOperationEqual, "test@email.com"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+
+		// passkey conditions
+		{
+			name: "by passkey same challenge",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-1",
+							Challenge:                    []byte("challenge1"),
+							KeyID:                        "key-id",
+							Name:                         "passwordless",
+							Type:                         domain.PasskeyTypePasswordless,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-2",
+							Challenge:                    []byte("challenge2"),
+							KeyID:                        "key-id2",
+							Name:                         "u2f",
+							Type:                         domain.PasskeyTypeU2F,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-3",
+							Challenge:                    []byte("challenge1"),
+							KeyID:                        "key-id",
+							Name:                         "passwordless",
+							Type:                         domain.PasskeyTypePasswordless,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.ExistsPasskey(humanRepo.PasskeyConditions().ChallengeCondition([]byte("challenge1"))),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1", "h2"},
+			},
+		},
+		{
+			name: "by passkey challenge",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-1",
+							Challenge:                    []byte("challenge1"),
+							KeyID:                        "key-id",
+							Name:                         "passwordless",
+							Type:                         domain.PasskeyTypePasswordless,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-2",
+							Challenge:                    []byte("challenge2"),
+							KeyID:                        "key-id2",
+							Name:                         "u2f",
+							Type:                         domain.PasskeyTypeU2F,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-3",
+							Challenge:                    []byte("challenge3"),
+							KeyID:                        "key-id",
+							Name:                         "passwordless",
+							Type:                         domain.PasskeyTypePasswordless,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.ExistsPasskey(humanRepo.PasskeyConditions().ChallengeCondition([]byte("challenge1"))),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+		{
+			name: "by passkey id",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-1",
+							Challenge:                    []byte("challenge1"),
+							KeyID:                        "key-id",
+							Name:                         "passwordless",
+							Type:                         domain.PasskeyTypePasswordless,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-2",
+							Challenge:                    []byte("challenge2"),
+							KeyID:                        "key-id2",
+							Name:                         "u2f",
+							Type:                         domain.PasskeyTypeU2F,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-3",
+							Challenge:                    []byte("challenge3"),
+							KeyID:                        "key-id",
+							Name:                         "passwordless",
+							Type:                         domain.PasskeyTypePasswordless,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.ExistsPasskey(humanRepo.PasskeyConditions().IDCondition("passkey-1")),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+		{
+			name: "by passkey key id",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-1",
+							Challenge:                    []byte("challenge1"),
+							KeyID:                        "key-id",
+							Name:                         "passwordless",
+							Type:                         domain.PasskeyTypePasswordless,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-2",
+							Challenge:                    []byte("challenge2"),
+							KeyID:                        "key-id2",
+							Name:                         "u2f",
+							Type:                         domain.PasskeyTypeU2F,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-3",
+							Challenge:                    []byte("challenge3"),
+							KeyID:                        "key-id",
+							Name:                         "passwordless",
+							Type:                         domain.PasskeyTypePasswordless,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.ExistsPasskey(humanRepo.PasskeyConditions().KeyIDCondition("key-id")),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1", "h2"},
+			},
+		},
+		{
+			name: "by passkey type",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-1",
+							Challenge:                    []byte("challenge1"),
+							KeyID:                        "key-id",
+							Name:                         "passwordless",
+							Type:                         domain.PasskeyTypePasswordless,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-2",
+							Challenge:                    []byte("challenge2"),
+							KeyID:                        "key-id2",
+							Name:                         "u2f",
+							Type:                         domain.PasskeyTypeU2F,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.AddPasskey(
+						&domain.Passkey{
+							ID:                           "passkey-3",
+							Challenge:                    []byte("challenge3"),
+							KeyID:                        "key-id",
+							Name:                         "passwordless",
+							Type:                         domain.PasskeyTypePasswordless,
+							PublicKey:                    []byte("public key"),
+							AuthenticatorAttestationGUID: []byte("aaguid"),
+							AttestationType:              "attestation type",
+							RelyingPartyID:               "rpid",
+						},
+					),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.ExistsPasskey(humanRepo.PasskeyConditions().TypeCondition(domain.PasskeyTypeU2F)),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+
+		// idp link conditions
+		{
+			name: "by idp link provider id",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       idpID,
+						ProvidedUserID:   "provided-id-h1",
+						ProvidedUsername: "provided-username-h1",
+					}),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       idpID,
+						ProvidedUserID:   "provided-id-h1-2",
+						ProvidedUsername: "provided-username-h1-2",
+					}),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       idpID,
+						ProvidedUserID:   "provided-id-h2-2",
+						ProvidedUsername: "provided-username-h2-2",
+					}),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.ExistsIdentityProviderLink(humanRepo.IdentityProviderLinkConditions().ProviderIDCondition(idpID)),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1", "h2"},
+			},
+		},
+		{
+			name: "by idp link provided user id",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       idpID,
+						ProvidedUserID:   "provided-id-h1",
+						ProvidedUsername: "provided-username-h1",
+					}),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       idpID,
+						ProvidedUserID:   "provided-id-h1-2",
+						ProvidedUsername: "provided-username-h1-2",
+					}),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       idpID,
+						ProvidedUserID:   "provided-id-h2-2",
+						ProvidedUsername: "provided-username-h2-2",
+					}),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.ExistsIdentityProviderLink(humanRepo.IdentityProviderLinkConditions().ProvidedUserIDCondition("provided-id-h1-2")),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+		{
+			name: "by idp link username",
+			setup: func(t *testing.T, tx database.Transaction) {
+				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       idpID,
+						ProvidedUserID:   "provided-id-h1",
+						ProvidedUsername: "provided-username-h1",
+					}),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       idpID,
+						ProvidedUserID:   "provided-id-h1-2",
+						ProvidedUsername: "provided-username-h1",
+					}),
+				)
+				require.NoError(t, err)
+				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
+					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+						ProviderID:       idpID,
+						ProvidedUserID:   "provided-id-h2-2",
+						ProvidedUsername: "provided-username-h2-2",
+					}),
+				)
+				require.NoError(t, err)
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					humanRepo.ExistsIdentityProviderLink(humanRepo.IdentityProviderLinkConditions().ProvidedUsernameCondition(database.TextOperationStartsWith, "provided-username-h1")),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h1"},
+			},
+		},
+
 		{
 			name: "list none",
 			opts: []database.QueryOption{
@@ -2317,7 +2811,7 @@ func Test_user_Update(t *testing.T) {
 						CreatedAt:                    now,
 						UpdatedAt:                    now,
 						VerifiedAt:                   now,
-						KeyID:                        []byte("keyID"),
+						KeyID:                        "keyID",
 						Name:                         "name",
 						AttestationType:              "attestation-type",
 						AuthenticatorAttestationGUID: []byte("aa guid"),
@@ -2337,7 +2831,7 @@ func Test_user_Update(t *testing.T) {
 						CreatedAt:                    now,
 						UpdatedAt:                    now,
 						VerifiedAt:                   now,
-						KeyID:                        []byte("keyID"),
+						KeyID:                        "keyID",
 						Name:                         "name",
 						AttestationType:              "attestation-type",
 						AuthenticatorAttestationGUID: []byte("aa guid"),
@@ -2359,7 +2853,7 @@ func Test_user_Update(t *testing.T) {
 						CreatedAt:                    now,
 						UpdatedAt:                    now,
 						VerifiedAt:                   now,
-						KeyID:                        []byte("keyID"),
+						KeyID:                        "keyID",
 						Name:                         "name",
 						AttestationType:              "attestation-type",
 						AuthenticatorAttestationGUID: []byte("aa guid"),
@@ -2392,7 +2886,7 @@ func Test_user_Update(t *testing.T) {
 							CreatedAt:                    now,
 							UpdatedAt:                    now,
 							VerifiedAt:                   now,
-							KeyID:                        []byte("keyID"),
+							KeyID:                        "keyID",
 							Name:                         "updated-name",
 							AttestationType:              "attestation-type",
 							AuthenticatorAttestationGUID: []byte("aa guid"),
@@ -2415,7 +2909,7 @@ func Test_user_Update(t *testing.T) {
 						CreatedAt:                    now,
 						UpdatedAt:                    now,
 						VerifiedAt:                   now,
-						KeyID:                        []byte("keyID"),
+						KeyID:                        "keyID",
 						Name:                         "name",
 						AttestationType:              "attestation-type",
 						AuthenticatorAttestationGUID: []byte("aa guid"),

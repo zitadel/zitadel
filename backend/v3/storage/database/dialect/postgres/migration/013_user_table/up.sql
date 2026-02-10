@@ -197,6 +197,12 @@ CREATE TABLE zitadel.user_passkeys(
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
 );
 
+CREATE INDEX idx_user_passkeys_challenge ON zitadel.user_passkeys (sha256(challenge));
+CREATE INDEX idx_user_passkeys_key_id ON zitadel.user_passkeys (key_id);
+CREATE INDEX idx_user_passkeys_type ON zitadel.user_passkeys (type);
+
+-- CREATE INDEX idx_user_metadata_key ON zitadel.user_metadata (key);
+-- CREATE INDEX idx_user_metadata_value ON zitadel.user_metadata (sha256(value));
 -- ----------------------------------------------------------------
 -- identity provider links
 -- ----------------------------------------------------------------

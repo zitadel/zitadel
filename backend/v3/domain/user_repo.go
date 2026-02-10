@@ -320,8 +320,8 @@ type machineColumns interface {
 
 type HumanPasskeyConditions interface {
 	IDCondition(passkeyID string) database.Condition
-	// KeyIDCondition(keyID string) database.Condition
-	ChallengeCondition(challenge string) database.Condition
+	KeyIDCondition(keyID string) database.Condition
+	ChallengeCondition(challenge []byte) database.Condition
 	TypeCondition(passkeyType PasskeyType) database.Condition
 }
 

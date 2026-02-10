@@ -172,20 +172,14 @@ func (u userPasskey) SetPasskeyVerifiedAt(verifiedAt time.Time) database.Change 
 // conditions
 // -------------------------------------------------------------
 
-// ExistsPasskey implements [domain.HumanUserRepository.ExistsPasskey].
-func (u userPasskey) ExistsPasskey(condition database.Condition) database.Condition {
-	panic("unimplemented")
-}
-
 // PasskeyConditions implements [domain.HumanUserRepository.PasskeyConditions].
 func (u userPasskey) PasskeyConditions() domain.HumanPasskeyConditions {
 	return u
 }
 
 // ChallengeCondition implements [domain.HumanPasskeyConditions.ChallengeCondition].
-func (u userPasskey) ChallengeCondition(challenge string) database.Condition {
-	// TODO: implement passkey challenge condition
-	panic("unimplemented")
+func (u userPasskey) ChallengeCondition(challenge []byte) database.Condition {
+	return database.NewBytesCondition[[]byte](database.SHA256Column(u.challengeColumn()), database.BytesOperationEqual, database.SHA256Value(challenge))
 }
 
 // IDCondition implements [domain.HumanPasskeyConditions.IDCondition].
@@ -200,7 +194,7 @@ func (u userPasskey) KeyIDCondition(keyID string) database.Condition {
 
 // TypeCondition implements [domain.HumanPasskeyConditions.TypeCondition].
 func (u userPasskey) TypeCondition(passkeyType domain.PasskeyType) database.Condition {
-	return database.NewTextCondition(u.typeColumn(), database.TextOperationEqual, string(passkeyType))
+	return database.NewTextCondition(u.typeColumn(), database.TextOperationEqual, passkeyType.String())
 }
 
 // -------------------------------------------------------------
