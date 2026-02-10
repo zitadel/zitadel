@@ -284,10 +284,6 @@ Errors:
       Empty: "비밀번호 만료 정책이 비어 있습니다"
       NotExisting: "비밀번호 만료 정책이 존재하지 않습니다"
       AlreadyExists: "비밀번호 만료 정책이 이미 존재합니다"
-    OrgIAMPolicy:
-      Empty: "조직 IAM 정책이 비어 있습니다"
-      NotExisting: "조직 IAM 정책이 존재하지 않습니다"
-      AlreadyExists: "조직 IAM 정책이 이미 존재합니다"
     NotificationPolicy:
       NotFound: "알림 정책을 찾을 수 없습니다"
       NotChanged: "알림 정책이 변경되지 않았습니다"
@@ -349,7 +345,7 @@ Errors:
       HasNotExistingRole: "프로젝트에 존재하지 않는 역할이 있습니다"
       NotActive: "프로젝트 권한이 활성 상태가 아닙니다"
       NotInactive: "프로젝트 권한이 비활성 상태가 아닙니다"
-  IAM:
+  Instance:
     NotFound: "인스턴스를 찾을 수 없습니다. 도메인이 올바른지 확인하십시오. https://zitadel.com/docs/apis/introduction#domains 를 참조하세요"
     Member:
       RolesNotChanged: "역할이 변경되지 않았습니다"
@@ -357,8 +353,6 @@ Errors:
     MemberAlreadyExisting: "구성원이 이미 존재합니다"
     MemberNotExisting: "구성원이 존재하지 않습니다"
     IDMissing: "ID가 누락되었습니다"
-    IAMProjectIDMissing: "IAM 프로젝트 ID가 누락되었습니다"
-    IamProjectAlreadySet: "IAM 프로젝트 ID가 이미 설정되었습니다"
     IdpInvalid: "IDP 설정이 유효하지 않습니다"
     IdpNotExisting: "IDP 설정이 존재하지 않습니다"
     OIDCConfigInvalid: "OIDC IDP 설정이 유효하지 않습니다"
@@ -416,11 +410,11 @@ Errors:
       Empty: "기본 비밀번호 잠금 정책이 비어 있습니다"
       NotChanged: "기본 비밀번호 잠금 정책이 변경되지 않았습니다"
     DomainPolicy:
-      NotFound: "조직 IAM 정책을 찾을 수 없습니다"
-      Empty: "조직 IAM 정책이 비어 있습니다"
-      NotExisting: "조직 IAM 정책이 존재하지 않습니다"
-      AlreadyExists: "조직 IAM 정책이 이미 존재합니다"
-      NotChanged: "조직 IAM 정책이 변경되지 않았습니다"
+      NotFound: "조직 도메인 정책을 찾을 수 없습니다"
+      Empty: "조직 도메인 정책이 비어 있습니다"
+      NotExisting: "조직 도메인 정책이 존재하지 않습니다"
+      AlreadyExists: "조직 도메인 정책이 이미 존재합니다"
+      NotChanged: "조직 도메인 정책이 변경되지 않았습니다"
     NotificationPolicy:
       NotFound: "기본 알림 정책을 찾을 수 없습니다"
       NotChanged: "기본 알림 정책이 변경되지 않았습니다"
