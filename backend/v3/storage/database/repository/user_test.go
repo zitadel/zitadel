@@ -33,12 +33,16 @@ func Test_user_Get(t *testing.T) {
 	orgID1 := createOrganization(t, tx, instanceID)
 	orgID2 := createOrganization(t, tx, instanceID)
 
+	now := time.Now().Round(time.Millisecond)
+
 	human := &domain.User{
 		ID:             gofakeit.UUID(),
 		InstanceID:     instanceID,
 		OrganizationID: orgID1,
 		Username:       "human-user",
 		State:          domain.UserStateActive,
+		CreatedAt:      now,
+		UpdatedAt:      now,
 		Human: &domain.HumanUser{
 			FirstName:         "John",
 			LastName:          "Doe",
@@ -49,7 +53,7 @@ func Test_user_Get(t *testing.T) {
 			AvatarKey:         "https://my.avatar/key",
 			Email: domain.HumanEmail{
 				Address:    "john@doe.com",
-				VerifiedAt: time.Now(),
+				VerifiedAt: now,
 			},
 		},
 	}
@@ -60,6 +64,8 @@ func Test_user_Get(t *testing.T) {
 		OrganizationID: orgID2,
 		Username:       "machine-user",
 		State:          domain.UserStateActive,
+		CreatedAt:      now,
+		UpdatedAt:      now,
 		Machine: &domain.MachineUser{
 			Name:        "My Machine",
 			Description: "This is my machine user",
@@ -146,7 +152,7 @@ func Test_user_List(t *testing.T) {
 
 	idpID := createIdentityProvider(t, tx, instanceID, orgID1)
 
-	now := time.Now().Round(time.Second)
+	now := time.Now().Round(time.Millisecond)
 
 	human1 := &domain.User{
 		ID:             "h1",
@@ -530,6 +536,8 @@ func Test_user_ListConditions(t *testing.T) {
 	instanceID2 := createInstance(t, tx)
 	instance2OrgID1 := createOrganization(t, tx, instanceID2)
 
+	now := time.Now().Round(time.Millisecond)
+
 	users := []*domain.User{
 		{
 			ID:             "h1",
@@ -547,7 +555,7 @@ func Test_user_ListConditions(t *testing.T) {
 				AvatarKey:         "https://my.avatar/key",
 				Email: domain.HumanEmail{
 					Address:    "aa.bb@example.com",
-					VerifiedAt: time.Now(),
+					VerifiedAt: now,
 				},
 			},
 		},
@@ -3389,8 +3397,8 @@ func Test_user_Update(t *testing.T) {
 				ID:        gofakeit.UUID(),
 				PublicKey: []byte("public-key"),
 				Type:      domain.MachineKeyTypeJSON,
-				ExpiresAt: time.Now().Add(24 * time.Hour),
-				CreatedAt: time.Now(),
+				ExpiresAt: now.Add(24 * time.Hour),
+				CreatedAt: now,
 			}
 			return test{
 				name: "set machine add key",
@@ -3418,8 +3426,8 @@ func Test_user_Update(t *testing.T) {
 						ID:        "key-to-remove",
 						PublicKey: []byte("public-key"),
 						Type:      domain.MachineKeyTypeJSON,
-						ExpiresAt: time.Now().Add(24 * time.Hour),
-						CreatedAt: time.Now(),
+						ExpiresAt: now.Add(24 * time.Hour),
+						CreatedAt: now,
 					}),
 				)
 				assert.EqualValues(t, 1, rowCount)
@@ -3439,8 +3447,8 @@ func Test_user_Update(t *testing.T) {
 			pat := &domain.PersonalAccessToken{
 				ID:        gofakeit.UUID(),
 				Scopes:    []string{"openid", "profile"},
-				ExpiresAt: time.Now().Add(24 * time.Hour),
-				CreatedAt: time.Now(),
+				ExpiresAt: now.Add(24 * time.Hour),
+				CreatedAt: now,
 			}
 			return test{
 				name: "set machine add personal access token",
@@ -3467,8 +3475,8 @@ func Test_user_Update(t *testing.T) {
 					machineRepo.AddPersonalAccessToken(&domain.PersonalAccessToken{
 						ID:        "pat-to-remove",
 						Scopes:    []string{"openid", "profile"},
-						ExpiresAt: time.Now().Add(24 * time.Hour),
-						CreatedAt: time.Now(),
+						ExpiresAt: now.Add(24 * time.Hour),
+						CreatedAt: now,
 					}),
 				)
 				assert.EqualValues(t, 1, rowCount)

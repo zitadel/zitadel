@@ -67,7 +67,7 @@ func TestChangeWrite(t *testing.T) {
 			name:   "increment change",
 			change: NewIncrementColumnChange(NewColumn("table", "counter"), NewColumn("table", "counter")),
 			want: want{
-				stmt: "counter = counter + 1",
+				stmt: "counter = table.counter + 1",
 			},
 		},
 	} {
