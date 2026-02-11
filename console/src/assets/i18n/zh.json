@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "用户",
-      "DESCRIPTION": "用户是可以访问你的应用的人或机器。",
+      "DESCRIPTION": "用户是可以访问你的应用的人或服务账户。",
       "HUMANS": {
         "TITLE": "用户",
         "DESCRIPTION": "用户在浏览器会话中通过登录提示进行交互身份验证。",
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "活动和未来的 Web 密钥",
           "DESCRIPTION": "您的当前活动和即将启用的 Web 密钥。激活新密钥将会停用当前密钥。",
-          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认 5 分钟）。请避免过早激活密钥，否则它可能尚未在缓存或客户端中可用。",
+          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认 5 分钟）。请避免过早激活密钥，否则它可能尚未在缓存或应用中可用。",
           "ACTIVATE": "激活下一个 Web 密钥",
           "ACTIVE": "当前活动",
           "NEXT": "队列中的下一个",
@@ -223,8 +223,8 @@
           "PR": "当用户重置其密码时，他们将收到一封带有设置新密码链接的电子邮件。",
           "VE": "当用户更改其电子邮件地址时，他们将收到一封带有验证新地址链接的电子邮件。",
           "VP": "当用户更改其电话号码时，他们将收到一条带有验证新号码的代码的短信。",
-          "VEO": "当用户通过电子邮件方式添加一次性密码时，他们需要通过输入发送到其电子邮件地址的代码来激活它。",
-          "VSO": "当用户通过短信方式添加一次性密码时，他们需要通过输入发送到其电话号码的代码来激活它。",
+          "VEO": "当用户通过电子邮件方式添加 OTP 时，他们需要通过输入发送到其电子邮件地址的代码来激活它。",
+          "VSO": "当用户通过短信方式添加 OTP 时，他们需要通过输入发送到其电话号码的代码来激活它。",
           "IU": "当创建用户邀请代码时，他们将收到一封包含设置其身份验证方法的链接的电子邮件。"
         }
       },
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "登录表单",
           "DESCRIPTION": "自定义登录表单。",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "允许用户名和密码",
-            "DESCRIPTION": "允许用户使用他们的用户名和密码登录。如果此功能被禁用，你的用户只能使用Passkey认证或外部身份提供者登录。"
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "允许本地身份验证",
+            "DESCRIPTION": "允许您的用户使用其用户名和密码或通行密钥身份验证登录。如果停用此选项，您的用户只能使用外部身份提供商登录。"
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "允许用户注册",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "组织",
     "PROJECT": "项目",
     "PROJECTOVERVIEW": "概览",
-    "PROJECTGRANTS": "授予",
+    "PROJECTGRANTS": "项目授权",
     "ROLES": "角色",
     "GRANTEDPROJECT": "已授予的项目",
     "HUMANUSERS": "用户",
     "MACHINEUSERS": "服务用户",
     "LOGOUT": "退出所有账户",
     "NEWORG": "创建组织",
-    "IAMADMIN": "您是 IAM 管理员。请注意您具有扩展权限。",
+    "IAMADMIN": "您是实例管理员。请注意您具有扩展权限。",
     "SHOWORGS": "查看所有组织",
     "GRANTS": "授权",
     "ACTIONS": "认证流程",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "默认情况下启用开发模式。您可以稍后更新生产值。",
     "GUIDE": "指南",
     "BROWSEEXAMPLES": "浏览示例",
-    "DUPLICATEAPPRENAME": "具有相同 neme 的应用程序已经存在。请选择不同的名称。",
+    "DUPLICATEAPPRENAME": "具有相同名称的应用程序已经存在。请选择不同的名称。",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "变革框架",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "有权创建和管理用户",
     "IAM_ADMIN_IMPERSONATOR": "有权模拟所有组织的管理员和最终用户",
     "IAM_END_USER_IMPERSONATOR": "有权模拟所有组织的最终用户",
-    "IAM_LOGIN_CLIENT": "具有管理登录客户端的权限",
+    "IAM_LOGIN_CLIENT": "具有管理登录应用程序的权限",
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
@@ -851,7 +851,7 @@
       "U2F_NAME": "身份验证器名称",
       "TYPE": {
         "0": "未定义 MFA",
-        "1": "一次性密码 (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "身份验证因子添加成功！",
       "U2F_ERROR": "安装过程中发生错误！",
       "U2F_NAME": "身份验证器名称",
-      "OTPSMS": "带短信的 OTP（一次性密码）",
-      "OTPEMAIL": "带电子邮件的 OTP（一次性密码）",
-      "SETUPOTPSMSDESCRIPTION": "您想将此电话号码设置为 OTP（一次性密码）第二因素吗？",
+      "OTPSMS": "带短信的 OTP",
+      "OTPEMAIL": "带电子邮件的 OTP",
+      "SETUPOTPSMSDESCRIPTION": "您想将此电话号码设置为 OTP 第二因素吗？",
       "OTPSMSSUCCESS": "OTP 因子设置成功。",
       "OTPSMSPHONEMUSTBEVERIFIED": "您的手机必须经过验证才能使用此方法。",
       "OTPEMAILSUCCESS": "OTP 因子设置成功。",
       "TYPE": {
         "0": "未定义 MFA",
-        "1": "一次性密码 (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel 管理员角色",
-      "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或 IAM 详细信息页面上修改它们。",
+      "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或实例详细信息页面上修改它们。",
       "ORGCONTEXT": "您会看到与当前所选组织相关的所有组织和项目。",
       "USERCONTEXT": "您会看到您被授权的所有组织和项目。包括其他组织。",
       "CREATIONDATE": "创建于",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "管理您的全局策略和管理访问设置。"
     },
     "EVENTSTORE": {
-      "TITLE": "IAM 存储管理",
+      "TITLE": "实例存储管理",
       "DESCRIPTION": "管理您的 Zitadel 视图和失败的事件。"
     },
     "MEMBER": {
@@ -1614,9 +1614,9 @@
         "3": "电话号码验证",
         "4": "重置密码",
         "5": "Passkey 初始化",
-        "6": "App 验证",
-        "7": "一次性密码 (OTP) - SMS",
-        "8": "一次性密码 (OTP) - 电子邮件"
+        "6": "应用密钥",
+        "7": "OTP - SMS",
+        "8": "OTP - 电子邮件"
       },
       "EXPIRY": "过期时间 (以分钟为单位)",
       "INCLUDEDIGITS": "包含数字",
@@ -1638,8 +1638,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "登录默认组织",
       "LOGINDEFAULTORG_DESCRIPTION": "如果没有设置组织上下文，登录界面将使用默认组织的设置（而不是实例的设置）",
-      "OIDCTOKENEXCHANGE": "OIDC 令牌交换",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "启用 OIDC 令牌端点的实验性 urn:ietf:params:oauth:grant-type:token-exchange 授权类型。令牌交换可用于请求具有较少范围的令牌或模拟其他用户。请参阅安全策略以允许在实例上模拟。",
       "USERSCHEMA": "用户架构",
       "USERSCHEMA_DESCRIPTION": "用户架构允许管理用户的数据架构。如果启用此标志，您将可以使用新的 API 及其功能。",
       "ACTIONS": "操作",
@@ -1648,8 +1646,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
       "DEBUGOIDCPARENTERROR": "调试 OIDC 父错误",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "如果启用该标志，OIDC 父错误将记录在控制台中。",
-      "ENABLEBACKCHANNELLOGOUT": "启用 Backchannel 注销",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知客户端在 OpenID 提供商处终止会话。",
       "PERMISSIONCHECKV2": "权限检查 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
       "STATES": {
@@ -1856,8 +1852,8 @@
         "INIT": "初始化",
         "VE": "验证电子邮箱",
         "VP": "验证手机号码",
-        "VSO": "验证短信一次性密码",
-        "VEO": "验证电子邮件一次性密码",
+        "VSO": "验证短信 OTP",
+        "VEO": "验证电子邮件 OTP",
         "PR": "重置密码",
         "DC": "域名声明",
         "PL": "Passkey",
@@ -1880,8 +1876,8 @@
         "changedate": "修改于",
         "username": "用户名",
         "tempUsername": "临时用户名",
-        "otp": "一次性密码",
-        "verifyUrl": "验证一次性密码的URL",
+        "otp": "OTP",
+        "verifyUrl": "验证 OTP 的 URL",
         "expiry": "过期时间",
         "applicationName": "应用程序名称"
       },
@@ -2062,7 +2058,7 @@
       "DESCRIPTION": "允许其他组织使用您的项目。",
       "EDITTITLE": "编辑角色",
       "CREATE": {
-        "TITLE": "创建组织授权",
+        "TITLE": "创建项目授权",
         "SEL_USERS": "选择您要授予访问权限的用户",
         "SEL_PROJECT": "搜索项目",
         "SEL_ROLES": "选择要添加到授权中的角色",
@@ -2072,7 +2068,7 @@
         "ORG_DESCRIPTION": "您即将授予组织 {{name}} 的用户。",
         "ORG_DESCRIPTION_DESC": "切换上面标题中的上下文以授予另一个组织的用户。",
         "SEL_ORG_FORMFIELD": "组织",
-        "FOR_ORG": "授予组织:"
+        "FOR_ORG": "项目授权将为以下对象创建:"
       },
       "DETAIL": {
         "TITLE": "项目授权",
@@ -2185,7 +2181,7 @@
       "DEACTIVATED": "已停用。",
       "CREATED": "项目已创建。",
       "UPDATED": "项目已修改。",
-      "GRANTUPDATED": "授权已更新。",
+      "GRANTUPDATED": "项目授权已更改。",
       "DELETED": "项目已删除"
     }
   },
@@ -2439,10 +2435,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "未知",
-      "1": "身份验证应用程序的一次性密码（TOTP）",
+      "1": "身份验证应用程序的 OTP（TOTP）",
       "2": "Passkey",
-      "3": "电子邮件一次性密码（email OTP）",
-      "4": "短信一次性密码（SMS OTP）",
+      "3": "电子邮件 OTP (OTP email)",
+      "4": "短信 OTP (OTP SMS)",
       "5": "恢复码"
     }
   },
@@ -2667,8 +2663,8 @@
       "IDTOKENROLEASSERTION": "在 ID Token 中包含用户角色",
       "IDTOKENROLEASSERTION_DESCRIPTION": "如果勾选，则已验证用户的请求角色将添加到 ID Token 中。",
       "IDTOKENUSERINFOASSERTION": "在 ID Token 中包含用户信息",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "使客户端能够从 ID Token 中读取个人资料、电子邮件、电话和地址声明。",
-      "CLOCKSKEW": "使客户端能够处理 OP 和客户端的时钟偏差。持续时间（0-5 秒）将添加到 exp 声明中，并从 iats、auth_time 和 nbf 中减去。",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "使应用程序能够从 ID Token 中读取个人资料、电子邮件、电话和地址声明。",
+      "CLOCKSKEW": "使应用程序能够处理 OP 和应用程序的时钟偏差。持续时间（0-5 秒）将添加到 exp 声明中，并从 iats、auth_time 和 nbf 中减去。",
       "RECOMMENDED": "推荐的",
       "NOTRECOMMENDED": "不推荐的",
       "SELECTION": {
@@ -2686,7 +2682,8 @@
             "DESCRIPTION": "单页应用程序 (SPA) 以及通常在浏览器中执行的所有 JS 框架"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "反向通道注销URI"
     },
     "API": {
       "INFO": {
@@ -2805,7 +2802,7 @@
     "ADD": "添加管理者",
     "CREATIONTYPE": "创建类型",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "实例",
       "2": "Organization",
       "0": "Owned Project",
       "1": "Granted Project",

@@ -143,7 +143,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-        const url = await startIdentityProviderFlow({
+        const response = await startIdentityProviderFlow({
           serviceConfig,
           idpId: activeIdps[0].id,
           urls: {
@@ -156,11 +156,15 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           },
         });
 
-        if (!url) {
+        if (!response || !response.url) {
           return { error: t("errors.couldNotStartIDPFlow") };
         }
 
-        return { redirect: url };
+        if (response.fields) {
+          return { samlData: { url: response.url, fields: response.fields } };
+        }
+
+        return { redirect: response.url };
       }
     }
 
@@ -198,7 +202,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-      const url = await startIdentityProviderFlow({
+      const response = await startIdentityProviderFlow({
         serviceConfig,
         idpId: idp.id,
         urls: {
@@ -211,11 +215,15 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         },
       });
 
-      if (!url) {
+      if (!response || !response.url) {
         return { error: t("errors.couldNotStartIDPFlow") };
       }
 
-      return { redirect: url };
+      if (response.fields) {
+        return { samlData: { url: response.url, fields: response.fields } };
+      }
+
+      return { redirect: response.url };
     }
   };
 
@@ -336,7 +344,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const method = methods.authMethodTypes[0];
       switch (method) {
         case AuthenticationMethodType.PASSWORD: // user has only password as auth method
-          if (!userLoginSettings?.allowUsernamePassword) {
+          if (!userLoginSettings?.allowLocalAuthentication) {
             // Check if user has IDPs available as alternative, that could eventually be used to register/link.
             const idpResp = await redirectUserToIDP(userId, organization);
             if (idpResp?.redirect) {
@@ -348,7 +356,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             }
 
             return {
-              error: t("errors.usernamePasswordNotAllowed"),
+              error: t("errors.localAuthenticationNotAllowed"),
             };
           }
 
@@ -371,7 +379,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           };
 
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
-          if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED) {
+          if (
+            userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED ||
+            !userLoginSettings?.allowLocalAuthentication
+          ) {
             if (command.ignoreUnknownUsernames) {
               return preventUserEnumeration(command.organization);
             }
@@ -406,12 +417,16 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
     } else {
       // prefer passkey in favor of other methods
-      if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSKEY)) {
+      if (
+        methods.authMethodTypes.includes(AuthenticationMethodType.PASSKEY) &&
+        userLoginSettings?.passkeysType !== PasskeysType.NOT_ALLOWED &&
+        userLoginSettings?.allowLocalAuthentication
+      ) {
         const passkeyParams = new URLSearchParams({
           loginName: command.ignoreUnknownUsernames
             ? command.loginName
             : (session?.factors?.user?.loginName ?? user.preferredLoginName),
-          altPassword: `${methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD) && userLoginSettings?.allowUsernamePassword}`, // show alternative password option only if allowed
+          altPassword: `${methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD) && userLoginSettings?.allowLocalAuthentication}`, // show alternative password option only if allowed
         });
 
         if (command.requestId) {
@@ -427,12 +442,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         return redirectUserToIDP(userId, organization);
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
         // Check if password authentication is allowed
-        if (!userLoginSettings?.allowUsernamePassword) {
+        if (!userLoginSettings?.allowLocalAuthentication) {
           if (command.ignoreUnknownUsernames) {
             return preventUserEnumeration(command.organization);
           }
           return {
-            error: "Username Password not allowed! Contact your administrator for more information.",
+            error: t("errors.localAuthenticationNotAllowed"),
           };
         }
 
@@ -497,7 +512,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   }
 
   // user not found, check if register is enabled on instance / organization context
-  if (effectiveLoginSettings?.allowRegister && !effectiveLoginSettings?.allowUsernamePassword) {
+  if (effectiveLoginSettings?.allowRegister && !effectiveLoginSettings?.allowLocalAuthentication) {
     console.log("redirecting to IDP (register allowed, password not allowed)");
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);
     if (resp) {
@@ -506,7 +521,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     console.log("IDP redirect failed, returning user not found");
 
     return preventUserEnumeration(discoveredOrganization);
-  } else if (effectiveLoginSettings?.allowRegister && effectiveLoginSettings?.allowUsernamePassword) {
+  } else if (effectiveLoginSettings?.allowRegister && effectiveLoginSettings?.allowLocalAuthentication) {
     console.log("register and password both allowed");
     // do not register user if ignoreUnknownUsernames is set
     if (discoveredOrganization && !effectiveLoginSettings?.ignoreUnknownUsernames) {

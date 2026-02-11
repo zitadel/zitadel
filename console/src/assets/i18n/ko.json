@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "프로젝트",
-      "DESCRIPTION": "프로젝트는 하나 이상의 애플리케이션을 호스팅하여 사용자를 인증할 수 있습니다. 예를 들어, 웹 프론트엔드, 모바일 앱, 백엔드용으로 각각 하나씩, 총 3개의 애플리케이션을 가진 단일 프로젝트를 가질 수 있습니다. 또한 프로젝트를 통해 사용자에게 권한을 부여할 수 있습니다. 다른 조직의 사용자가 애플리케이션에 로그인할 수 있도록 프로젝트에 대한 액세스를 부여하세요.<br/><br/>프로젝트를 찾을 수 없는 경우 프로젝트 소유자 또는 관련 권한이 있는 사람에게 문의하여 액세스를 얻으세요.",
+      "DESCRIPTION": "프로젝트는 하나 이상의 애플리케이션을 호스팅하여 사용자를 인증할 수 있습니다. 예를 들어, 웹 프론트엔드, 모바일 애플리케이션, 백엔드용으로 각각 하나씩, 총 3개의 애플리케이션을 가진 단일 프로젝트를 가질 수 있습니다. 또한 프로젝트를 통해 사용자에게 권한을 부여할 수 있습니다. 다른 조직의 사용자가 애플리케이션에 로그인할 수 있도록 프로젝트에 대한 액세스를 부여하세요.<br/><br/>프로젝트를 찾을 수 없는 경우 프로젝트 소유자 또는 관련 권한이 있는 사람에게 문의하여 액세스를 얻으세요.",
       "OWNED": {
         "TITLE": "소유한 프로젝트",
         "DESCRIPTION": "이 프로젝트는 사용자가 소유한 프로젝트입니다. 프로젝트 설정, 권한 및 애플리케이션을 관리할 수 있습니다."
@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "사용자",
-      "DESCRIPTION": "사용자는 애플리케이션에 액세스할 수 있는 사람 또는 장치입니다.",
+      "DESCRIPTION": "사용자는 애플리케이션에 액세스할 수 있는 사람 또는 서비스 계정입니다.",
       "HUMANS": {
         "TITLE": "사용자",
         "DESCRIPTION": "사용자는 로그인 프롬프트로 브라우저 세션에서 상호 인증을 수행합니다.",
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "활성 및 예정된 웹 키",
           "DESCRIPTION": "현재 활성화된 웹 키와 앞으로 활성화될 웹 키입니다. 새로운 키를 활성화하면 기존 키는 비활성화됩니다.",
-          "NOTE": "참고: JWKs OIDC 엔드포인트는 캐시 가능한 응답을 반환합니다 (기본값: 5분). 키를 너무 빨리 활성화하면 캐시 및 클라이언트에서 아직 사용할 수 없을 수 있습니다.",
+          "NOTE": "참고: JWKs OIDC 엔드포인트는 캐시 가능한 응답을 반환합니다 (기본값: 5분). 키를 너무 빨리 활성화하면 캐시 및 애플리케이션에서 아직 사용할 수 없을 수 있습니다.",
           "ACTIVATE": "다음 웹 키 활성화",
           "ACTIVE": "현재 활성화됨",
           "NEXT": "대기 중인 다음 키",
@@ -223,8 +223,8 @@
           "PR": "사용자가 비밀번호를 재설정할 때 새 비밀번호를 설정할 수 있는 링크가 포함된 이메일을 받습니다.",
           "VE": "사용자가 이메일 주소를 변경할 때, 새 주소를 확인할 수 있는 링크가 포함된 이메일을 받습니다.",
           "VP": "사용자가 전화번호를 변경할 때, 새 번호를 확인할 수 있는 코드가 포함된 SMS를 받습니다.",
-          "VEO": "사용자가 이메일을 통해 일회성 비밀번호를 추가할 때, 이메일 주소로 전송된 코드를 입력하여 활성화해야 합니다.",
-          "VSO": "사용자가 SMS를 통해 일회성 비밀번호를 추가할 때, 전화번호로 전송된 코드를 입력하여 활성화해야 합니다.",
+          "VEO": "사용자가 이메일을 통해 OTP를 추가할 때, 이메일 주소로 전송된 코드를 입력하여 활성화해야 합니다.",
+          "VSO": "사용자가 SMS를 통해 OTP를 추가할 때, 전화번호로 전송된 코드를 입력하여 활성화해야 합니다.",
           "IU": "사용자 초대 코드가 생성되면 인증 방법을 설정할 수 있는 링크가 포함된 이메일을 받습니다."
         }
       },
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "로그인 폼",
           "DESCRIPTION": "로그인 폼을 사용자 정의하세요.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "사용자 이름과 비밀번호 허용",
-            "DESCRIPTION": "사용자가 사용자 이름과 비밀번호로 로그인할 수 있도록 허용하세요. 비활성화하면 비밀번호 없는 인증 또는 외부 ID 제공자로만 로그인할 수 있습니다."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "로컬 인증 허용",
+            "DESCRIPTION": "사용자가 사용자 이름과 비밀번호 또는 패스키 인증으로 로그인할 수 있도록 허용합니다. 이 기능이 비활성화되면 사용자는 외부 ID 제공업체를 통해서만 로그인할 수 있습니다."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "사용자 등록 허용",
@@ -386,12 +386,12 @@
         "action": "프로젝트 생성"
       },
       "APPLICATION_CREATED": {
-        "title": "앱 등록",
+        "title": "애플리케이션 등록",
         "description": "웹, 네이티브, API 또는 SAML 애플리케이션을 등록하고 인증 플로우를 설정하세요.",
-        "action": "앱 등록"
+        "action": "애플리케이션 등록"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "앱에 로그인",
+        "title": "애플리케이션에 로그인",
         "description": "Zitadel로 애플리케이션을 통합하고 관리자 사용자로 로그인하여 테스트하세요.",
         "action": "로그인"
       },
@@ -420,14 +420,14 @@
     "ORGANIZATION": "조직",
     "PROJECT": "프로젝트",
     "PROJECTOVERVIEW": "개요",
-    "PROJECTGRANTS": "권한 부여",
+    "PROJECTGRANTS": "프로젝트 권한",
     "ROLES": "역할",
     "GRANTEDPROJECT": "부여된 프로젝트",
     "HUMANUSERS": "사용자",
     "MACHINEUSERS": "서비스 사용자",
     "LOGOUT": "모든 사용자 로그아웃",
     "NEWORG": "새 조직",
-    "IAMADMIN": "IAM 관리자입니다. 확장된 권한이 부여되었습니다.",
+    "IAMADMIN": "인스턴스 관리자입니다. 확장된 권한이 부여되었습니다.",
     "SHOWORGS": "모든 조직 보기",
     "GRANTS": "권한",
     "ACTIONS": "작업",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "개발 모드가 기본으로 활성화되어 있습니다. 운영 환경에서는 나중에 설정 값을 변경할 수 있습니다.",
     "GUIDE": "가이드",
     "BROWSEEXAMPLES": "예제 및 SDK 둘러보기",
-    "DUPLICATEAPPRENAME": "같은 이름의 앱이 이미 존재합니다. 다른 이름을 선택하세요.",
+    "DUPLICATEAPPRENAME": "같은 이름의 애플리케이션이 이미 존재합니다. 다른 이름을 선택하세요.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "프레임워크 변경",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "IAM_ADMIN_IMPERSONATOR": "모든 조직의 관리자와 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "IAM_END_USER_IMPERSONATOR": "모든 조직의 최종 사용자를 대리할 수 있는 권한이 있습니다",
-    "IAM_LOGIN_CLIENT": "로그인 클라이언트를 관리할 수 있는 권한이 있습니다",
+    "IAM_LOGIN_CLIENT": "로그인 애플리케이션을 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER": "조직에 대한 전체 권한이 있습니다",
     "ORG_USER_MANAGER": "조직의 사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER_VIEWER": "조직 전체를 검토할 수 있는 권한이 있습니다",
@@ -851,7 +851,7 @@
       "U2F_NAME": "인증기 이름",
       "TYPE": {
         "0": "다중 인증 미정의",
-        "1": "일회용 비밀번호 (OTP)",
+        "1": "OTP",
         "2": "지문, 보안 키, Face ID 및 기타"
       },
       "STATE": {
@@ -884,24 +884,24 @@
       "DESCRIPTION": "계정의 보안을 위해 두 번째 인증 요소를 추가하세요.",
       "MANAGE_DESCRIPTION": "사용자의 두 번째 인증 방법을 관리하세요.",
       "ADD": "인증 요소 추가",
-      "OTP": "TOTP (시간 기반 일회용 비밀번호)용 인증 앱",
+      "OTP": "TOTP용 인증 애플리케이션",
       "OTP_DIALOG_TITLE": "OTP 추가",
-      "OTP_DIALOG_DESCRIPTION": "인증 앱으로 QR 코드를 스캔하고, 아래에 코드를 입력하여 OTP 방법을 검증하고 활성화하세요.",
+      "OTP_DIALOG_DESCRIPTION": "인증 애플리케이션으로 QR 코드를 스캔하고, 아래에 코드를 입력하여 OTP 방법을 검증하고 활성화하세요.",
       "U2F": "지문, 보안 키, Face ID 및 기타",
       "U2F_DIALOG_TITLE": "인증 요소 확인",
       "U2F_DIALOG_DESCRIPTION": "사용할 다중 인증의 이름을 입력하세요.",
       "U2F_SUCCESS": "인증 요소가 성공적으로 추가되었습니다!",
       "U2F_ERROR": "설정 중 오류가 발생했습니다!",
       "U2F_NAME": "인증기 이름",
-      "OTPSMS": "SMS를 통한 OTP (일회용 비밀번호)",
-      "OTPEMAIL": "이메일을 통한 OTP (일회용 비밀번호)",
-      "SETUPOTPSMSDESCRIPTION": "이 전화번호를 OTP (일회용 비밀번호) 두 번째 인증 요소로 설정하시겠습니까?",
+      "OTPSMS": "SMS를 통한 OTP",
+      "OTPEMAIL": "이메일을 통한 OTP",
+      "SETUPOTPSMSDESCRIPTION": "이 전화번호를 OTP 두 번째 인증 요소로 설정하시겠습니까?",
       "OTPSMSSUCCESS": "OTP 인증 요소가 성공적으로 설정되었습니다.",
       "OTPSMSPHONEMUSTBEVERIFIED": "이 방법을 사용하려면 전화번호를 확인해야 합니다.",
       "OTPEMAILSUCCESS": "OTP 인증 요소가 성공적으로 설정되었습니다.",
       "TYPE": {
         "0": "다중 인증 미정의",
-        "1": "일회용 비밀번호 (OTP)",
+        "1": "OTP",
         "2": "지문, 보안 키, Face ID 및 기타"
       },
       "STATE": {
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel 관리자 역할",
-      "DESCRIPTION": "이 사용자의 모든 멤버 권한입니다. 조직, 프로젝트 또는 IAM 세부 페이지에서 수정할 수도 있습니다.",
+      "DESCRIPTION": "이 사용자의 모든 멤버 권한입니다. 조직, 프로젝트 또는 인스턴스 세부 페이지에서 수정할 수도 있습니다.",
       "ORGCONTEXT": "현재 선택된 조직과 관련된 모든 조직과 프로젝트를 볼 수 있습니다.",
       "USERCONTEXT": "사용 권한이 있는 모든 조직과 프로젝트를 볼 수 있습니다. 다른 조직도 포함됩니다.",
       "CREATIONDATE": "생성 날짜",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "전역 정책 및 관리 액세스 설정을 관리합니다."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM 스토리지 관리",
+      "TITLE": "인스턴스 스토리지 관리",
       "DESCRIPTION": "Zitadel 뷰 및 실패한 이벤트를 관리합니다."
     },
     "MEMBER": {
@@ -1611,9 +1611,9 @@
         "3": "전화 검증",
         "4": "비밀번호 재설정",
         "5": "패스키 초기화",
-        "6": "앱 시크릿",
-        "7": "일회성 비밀번호 (OTP) - SMS",
-        "8": "일회성 비밀번호 (OTP) - 이메일"
+        "6": "애플리케이션 시크릿",
+        "7": "OTP - SMS",
+        "8": "OTP - 이메일"
       },
       "EXPIRY": "만료 시간 (분)",
       "INCLUDEDIGITS": "숫자 포함",
@@ -1635,8 +1635,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "로그인 기본 조직",
       "LOGINDEFAULTORG_DESCRIPTION": "조직 컨텍스트가 설정되지 않은 경우 로그인 UI가 기본 조직의 설정을 사용합니다 (인스턴스에서 설정되지 않음).",
-      "OIDCTOKENEXCHANGE": "OIDC 토큰 교환",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "OIDC 토큰 엔드포인트의 실험적 urn:ietf:params:oauth:grant-type:token-exchange 허용을 활성화합니다. 토큰 교환을 통해 범위가 좁은 토큰을 요청하거나 다른 사용자를 가장할 수 있습니다. 인스턴스에서 가장을 허용하는 보안 정책을 확인하세요.",
       "USERSCHEMA": "사용자 스키마",
       "USERSCHEMA_DESCRIPTION": "사용자 스키마를 통해 사용자의 데이터 스키마를 관리할 수 있습니다. 플래그가 활성화되면 새 API 및 기능을 사용할 수 있습니다.",
       "ACTIONS": "액션",
@@ -1645,8 +1643,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "플래그가 활성화되면, `sid` 클레임이 있는 id_token을 사용하여 end_session 엔드포인트에서 로그인 UI의 단일 세션을 종료할 수 있습니다. 현재 동일한 사용자 에이전트(브라우저)에서 모든 세션이 로그인 UI에서 종료됩니다. Session API를 통해 관리된 세션은 이미 단일 세션 종료를 허용합니다.",
       "DEBUGOIDCPARENTERROR": "디버그 OIDC 부모 오류",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "플래그가 활성화되면 OIDC 부모 오류가 콘솔에 기록됩니다.",
-      "ENABLEBACKCHANNELLOGOUT": "백채널 로그아웃 활성화",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "백채널 로그아웃은 OpenID Connect 백채널 로그아웃 1.0을 구현하며, OpenID 제공자에서 세션 종료에 대해 클라이언트에게 알리는 데 사용할 수 있습니다.",
       "PERMISSIONCHECKV2": "권한 확인 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
       "STATES": {
@@ -1853,7 +1849,7 @@
         "INIT": "초기화",
         "VE": "이메일 확인",
         "VP": "전화 확인",
-        "VSO": "SMS OTP 확인",
+        "VSO": "OTP SMS 확인",
         "VEO": "이메일 OTP 확인",
         "PR": "비밀번호 재설정",
         "DC": "도메인 클레임",
@@ -1877,8 +1873,8 @@
         "changedate": "변경 날짜",
         "username": "사용자 이름",
         "tempUsername": "임시 사용자 이름",
-        "otp": "일회용 비밀번호",
-        "verifyUrl": "일회용 비밀번호 확인 URL",
+        "otp": "OTP",
+        "verifyUrl": "OTP 확인 URL",
         "expiry": "만료",
         "applicationName": "애플리케이션 이름"
       },
@@ -2059,7 +2055,7 @@
       "DESCRIPTION": "다른 조직이 프로젝트를 사용할 수 있도록 허용합니다.",
       "EDITTITLE": "역할 수정",
       "CREATE": {
-        "TITLE": "조직 권한 생성",
+        "TITLE": "프로젝트 권한 생성",
         "SEL_USERS": "액세스를 허가할 사용자를 선택하세요",
         "SEL_PROJECT": "프로젝트를 검색하세요",
         "SEL_ROLES": "권한에 추가할 역할을 선택하세요",
@@ -2069,7 +2065,7 @@
         "ORG_DESCRIPTION": "{{name}} 조직의 사용자에게 권한을 부여하려고 합니다.",
         "ORG_DESCRIPTION_DESC": "헤더의 컨텍스트를 전환하여 다른 조직에 대한 사용자 권한을 부여할 수 있습니다.",
         "SEL_ORG_FORMFIELD": "조직",
-        "FOR_ORG": "권한이 생성된 대상:"
+        "FOR_ORG": "프로젝트 권한이 다음을 위해 생성될 예정입니다:"
       },
       "DETAIL": {
         "TITLE": "프로젝트 권한",
@@ -2182,7 +2178,7 @@
       "DEACTIVATED": "비활성화되었습니다.",
       "CREATED": "프로젝트가 생성되었습니다.",
       "UPDATED": "프로젝트가 변경되었습니다.",
-      "GRANTUPDATED": "권한이 변경되었습니다.",
+      "GRANTUPDATED": "프로젝트 권한이 변경되었습니다.",
       "DELETED": "프로젝트가 삭제되었습니다."
     }
   },
@@ -2432,10 +2428,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "알 수 없음",
-      "1": "인증 앱을 통한 일회성 비밀번호(TOTP)",
+      "1": "인증 애플리케이션을 통한 OTP (TOTP)",
       "2": "지문, 보안 키, Face ID 및 기타",
-      "3": "이메일을 통한 일회성 비밀번호(이메일 OTP)",
-      "4": "SMS를 통한 일회성 비밀번호(SMS OTP)",
+      "3": "이메일을 통한 OTP (OTP Email)",
+      "4": "SMS를 통한 OTP (OTP SMS)",
       "5": "복구 코드"
     }
   },
@@ -2660,8 +2656,8 @@
       "IDTOKENROLEASSERTION": "ID 토큰에 사용자 역할 추가",
       "IDTOKENROLEASSERTION_DESCRIPTION": "선택 시 인증된 사용자의 요청된 역할이 ID 토큰에 추가됩니다.",
       "IDTOKENUSERINFOASSERTION": "ID 토큰 내 사용자 정보",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "클라이언트가 ID 토큰에서 프로필, 이메일, 전화번호 및 주소 클레임을 검색할 수 있습니다.",
-      "CLOCKSKEW": "OP와 클라이언트 간의 시간 오차를 처리할 수 있도록 허용합니다. (0-5초) 동안 exp 클레임에 추가되고 iats, auth_time 및 nbf에서 감소됩니다.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "애플리케이션이 ID 토큰에서 프로필, 이메일, 전화번호 및 주소 클레임을 검색할 수 있습니다.",
+      "CLOCKSKEW": "OP와 애플리케이션 간의 시간 오차를 처리할 수 있도록 허용합니다. (0-5초) 동안 exp 클레임에 추가되고 iats, auth_time 및 nbf에서 감소됩니다.",
       "RECOMMENDED": "권장",
       "NOTRECOMMENDED": "권장하지 않음",
       "SELECTION": {
@@ -2679,7 +2675,8 @@
             "DESCRIPTION": "단일 페이지 애플리케이션(SPA) 및 브라우저에서 실행되는 모든 JS 프레임워크"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "백채널 로그아웃 URI"
     },
     "API": {
       "INFO": {
@@ -2794,7 +2791,7 @@
     "ADD": "매니저 추가",
     "CREATIONTYPE": "생성 유형",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "인스턴스",
       "2": "조직",
       "0": "소유 프로젝트",
       "1": "부여된 프로젝트",

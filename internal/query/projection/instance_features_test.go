@@ -38,7 +38,7 @@ func TestInstanceFeaturesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.instance_features3 (instance_id, key, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, key) DO UPDATE SET (creation_date, change_date, sequence, value) = (projections.instance_features3.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
+							expectedStmt: "INSERT INTO projections.instance_features5 (instance_id, key, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, key) DO UPDATE SET (creation_date, change_date, sequence, value) = (projections.instance_features5.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"user_schema",
@@ -69,7 +69,7 @@ func TestInstanceFeaturesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.instance_features3 (instance_id, key, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, key) DO UPDATE SET (creation_date, change_date, sequence, value) = (projections.instance_features3.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
+							expectedStmt: "INSERT INTO projections.instance_features5 (instance_id, key, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, key) DO UPDATE SET (creation_date, change_date, sequence, value) = (projections.instance_features5.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"login_default_org",
@@ -100,7 +100,7 @@ func TestInstanceFeaturesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.instance_features3 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.instance_features5 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -126,7 +126,7 @@ func TestInstanceFeaturesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.instance_features3 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.instance_features5 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
