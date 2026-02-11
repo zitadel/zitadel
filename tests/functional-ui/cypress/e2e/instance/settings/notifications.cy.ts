@@ -37,7 +37,7 @@ describe('instance notifications', () => {
         cy.visit(smtpPath);
         cy.get(`a:contains('Mailgun')`).click();
         cy.get('input[name="description"]').should('be.enabled').clear().type(provider.description);
-        cy.get('input[name="hostAndPort"]').should('have.value', 'smtp.mailgun.org:587');
+        cy.get('input[name="hostAndPort"]').should('have.value', 'smtp.mailgun.org:465');
         cy.get('input[name="smtp-user"]').should('be.enabled').clear().type('user@example.com');
         cy.get('input[name="smtp-password"]').should('be.enabled').clear().type('password');
         cy.get('[data-e2e="continue-to-2nd-form"]').should('be.enabled').click();
@@ -48,7 +48,7 @@ describe('instance notifications', () => {
         cy.get('[data-e2e="create-button"]').should('be.enabled').click();
         cy.shouldConfirmSuccess();
         cy.get('[data-e2e="close-button"]').should('be.enabled').click();
-        cy.get(provider.rowSelector).contains('smtp.mailgun.org:587');
+        cy.get(provider.rowSelector).contains('smtp.mailgun.org:465');
         cy.get(provider.rowSelector).contains('sender1@example.com');
       });
     });
@@ -58,7 +58,7 @@ describe('instance notifications', () => {
         cy.visit(smtpPath);
         cy.get(`a:contains('Mailgun')`).click();
         cy.get('input[name="description"]').should('be.enabled').clear().type(provider.description);
-        cy.get('input[name="hostAndPort"]').should('have.value', 'smtp.mailgun.org:587');
+        cy.get('input[name="hostAndPort"]').should('have.value', 'smtp.mailgun.org:465');
         cy.get('input[name="smtp-user"]').should('be.enabled').clear().type('user@example.com');
         cy.get('input[name="smtp-password"]').should('be.enabled').clear().type('password');
         cy.get('[data-e2e="continue-to-2nd-form"]').should('be.enabled').click();
@@ -72,7 +72,7 @@ describe('instance notifications', () => {
         cy.shouldConfirmSuccess();
         cy.get('[data-e2e="close-button"]').click();
         cy.get(provider.rowSelector).find('[data-e2e="active-provider"]');
-        cy.get(provider.rowSelector).contains('smtp.mailgun.org:587');
+        cy.get(provider.rowSelector).contains('smtp.mailgun.org:465');
         cy.get(provider.rowSelector).contains('sender1@example.com');
       });
     });
