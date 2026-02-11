@@ -10,7 +10,8 @@ import { FrameworkSelector } from '@/components/framework_selector';
 import AppConfig from './_app_config.mdx';
 import AppValues from './_app_values.mdx';
 
-In this guide, you’ll set up a Zitadel account and authenticate your first example application.
+In this guide, you’ll set up a Zitadel account and configure it to work with our pre-built example applications.
+You can simply clone the repository, follow the console setup, and have a working authentication flow in minutes.
 
 ## Get Started with ZITADEL Cloud
 
@@ -73,7 +74,43 @@ ZITADEL automatically configures the best security settings for your selected fr
     <Tab value="Angular">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback"
-            postLogoutRedirectUrl="http://localhost:3000/signedout">
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="Astro">
+        <AppConfig
+            redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="Django">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="Express.js">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="FastAPI">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="Fastify">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="Flask">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="Flutter">
@@ -88,28 +125,76 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:8089">
         </AppConfig>
     </Tab>
+    <Tab value="Hono">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="Laravel">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="NestJS">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
+        </AppConfig>
+    </Tab>
     <Tab value="Next.js">
         <AppConfig
             redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
             postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
         </AppConfig>
     </Tab>
+    <Tab value="Nuxt">
+        <AppConfig
+            redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000">
+        </AppConfig>
+    </Tab>
+    <Tab value="Qwik">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
+        </AppConfig>
+    </Tab>
     <Tab value="React">
         <AppConfig
-            redirectUrl="http://localhost:3000/callback"
-            postLogoutRedirectUrl="http://localhost:3000/">
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000">
+        </AppConfig>
+    </Tab>
+    <Tab value="SolidStart">
+        <AppConfig
+            redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="Spring">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="Symfony">
         <AppConfig
-            redirectUrl="http://localhost:8000/login_check"
-            postLogoutRedirectUrl="http://localhost:8000/logout">
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="Svelte">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
         </AppConfig>
     </Tab>
     <Tab value="Vue.js">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback"
-            postLogoutRedirectUrl="http://localhost:3000/">
+            postLogoutRedirectUrl="http://localhost:3000">
         </AppConfig>
     </Tab>
 </FrameworkSelector>
@@ -120,25 +205,67 @@ ZITADEL automatically configures the best security settings for your selected fr
 
 <FrameworkSelector>
     <Tab value="Angular">
-        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+        <AppValues valueCount="two" clientSecret={false} ></AppValues>
+    </Tab>
+    <Tab value="Astro">
+        <AppValues valueCount="three" clientSecret={true} ></AppValues>
+    </Tab>
+    <Tab value="Django">
+        <AppValues valueCount="two" clientSecret={false}></AppValues>
+    </Tab>
+    <Tab value="Express.js">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="FastAPI">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="Fastify">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="Flask">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="Flutter">
-        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+        <AppValues valueCount="two" clientSecret={false}></AppValues>
     </Tab>
     <Tab value="Go">
-        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+        <AppValues valueCount="two" clientSecret={false}></AppValues>
+    </Tab>
+    <Tab value="Hono">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="Laravel">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="NestJS">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="Next.js">
-        <AppValues valueCount="three" clientSecret={true} projectID={false}></AppValues>
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="Nuxt">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="Qwik">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="React">
-        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+        <AppValues valueCount="two" clientSecret={false}></AppValues>
+    </Tab>
+    <Tab value="SolidStart">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="Spring">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="Symfony">
-        <AppValues valueCount="three" clientSecret={true} projectID={false}></AppValues>
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
+    <Tab value="Svelte">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
     </Tab>
     <Tab value="Vue.js">
-        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+        <AppValues valueCount="two" clientSecret={false}></AppValues>
     </Tab>
 </FrameworkSelector>
 
@@ -159,32 +286,85 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 <FrameworkSelector>
     <Tab value="Angular">
         - [Node.js](https://nodejs.org/)
-        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+        - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="Astro">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="Django">
+        - [Python](https://www.python.org/)
+        - [Poetry](https://python-poetry.org/)
+    </Tab>
+    <Tab value="Express.js">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="FastAPI">
+        - [Python](https://www.python.org/)
+        - [Poetry](https://python-poetry.org/)
+    </Tab>
+    <Tab value="Fastify">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="Flask">
+        - [Python](https://www.python.org/)
+        - [Poetry](https://python-poetry.org/)
     </Tab>
     <Tab value="Flutter">
         - [Flutter](https://docs.flutter.dev/install)
-        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
     </Tab>
     <Tab value="Go">
         - [Go](https://go.dev/)
-        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="Hono">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="Laravel">
+        - [PHP](https://www.php.net/)
+        - [Composer](https://getcomposer.org/)
+    </Tab>
+    <Tab value="NestJS">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
     </Tab>
     <Tab value="Next.js">
         - [Node.js](https://nodejs.org/)
-        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+        - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="Nuxt">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="Qwik">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
     </Tab>
     <Tab value="React">
         - [Node.js](https://nodejs.org/)
-        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+        - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="SolidStart">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="Spring">
+        - [Java Development Kit (JDK)](https://www.java.com/en/)
+        - [Maven](https://maven.apache.org/)
     </Tab>
     <Tab value="Symfony">
         - [PHP](https://www.php.net/)
         - [Composer](https://getcomposer.org/)
-        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="Svelte">
+        - [Node.js](https://nodejs.org/)
+        - [npm](https://www.npmjs.com/)
     </Tab>
     <Tab value="Vue.js">
         - [Node.js](https://nodejs.org/)
-        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+        - [npm](https://www.npmjs.com/)
     </Tab>
 </FrameworkSelector>
 
@@ -197,6 +377,42 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         cd example-auth-angular
         ```
     </Tab>
+    <Tab value="Astro">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-astro.git
+        cd example-auth-astro
+        ```
+    </Tab>
+    <Tab value="Django">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-django.git
+        cd example-auth-django
+        ```
+    </Tab>
+    <Tab value="Express.js">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-expressjs.git
+        cd example-auth-expressjs
+        ```
+    </Tab>
+    <Tab value="FastAPI">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-fastapi.git
+        cd example-auth-fastapi
+        ```
+    </Tab>
+    <Tab value="Fastify">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-fastify.git
+        cd example-auth-fastify
+        ```
+    </Tab>
+    <Tab value="Flask">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-flask.git
+        cd example-auth-flask
+        ```
+    </Tab>
     <Tab value="Flutter">
         ```bash
         git clone https://github.com/zitadel/zitadel_flutter.git
@@ -206,13 +422,43 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     <Tab value="Go">
         ```bash
         git clone https://github.com/zitadel/zitadel-go.git
-        cd zitadel_go
+        cd zitadel-go
+        ```
+    </Tab>
+    <Tab value="Hono">
+        ```bash
+        git clone https://github.com/zitadel/zitadel-auth-hono.git
+        cd zitadel-auth-hono
+        ```
+    </Tab>
+    <Tab value="Laravel">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-laravel.git
+        cd example-auth-laravel
+        ```
+    </Tab>
+    <Tab value="NestJS">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-nestjs.git
+        cd example-auth-nestjs
         ```
     </Tab>
     <Tab value="Next.js">
         ```bash
-        git clone git@github.com:zitadel/example-auth-nextjs.git
+        git clone https://github.com/zitadel/example-auth-nextjs.git
         cd example-auth-nextjs
+        ```
+    </Tab>
+    <Tab value="Nuxt">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-nuxtjs.git
+        cd example-auth-nuxtjs
+        ```
+    </Tab>
+    <Tab value="Qwik">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-qwik.git
+        cd example-auth-qwik
         ```
     </Tab>
     <Tab value="React">
@@ -221,15 +467,33 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         cd example-auth-react
         ```
     </Tab>
+    <Tab value="SolidStart">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-solidstart.git
+        cd example-auth-solidstart
+        ```
+    </Tab>
+    <Tab value="Spring">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-spring.git
+        cd example-auth-spring
+        ```
+    </Tab>
     <Tab value="Symfony">
         ```bash
         git clone https://github.com/zitadel/example-auth-symfony.git
         cd example-auth-symfony
         ```
     </Tab>
+    <Tab value="Svelte">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-sveltekit.git
+        cd example-auth-sveltekit
+        ```
+    </Tab>
     <Tab value="Vue.js">
         ```bash
-        git clone git@github.com:zitadel/example-auth-vuejs.git
+        git clone https://github.com/zitadel/example-auth-vuejs.git
         cd example-auth-vuejs
         ```
     </Tab>
@@ -240,7 +504,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 <FrameworkSelector>
     <Tab value="Angular">
 
-        1. Copy+paste the .env.example to .env.local
+        1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
         ```bash
@@ -252,6 +516,110 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         NG_APP_ZITADEL_POST_LOGIN_URL="/profile"
         ```
     </Tab>
+    <Tab value="Astro">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
+        NEXTAUTH_URL="http://localhost:3000"
+        ```
+    </Tab>
+    <Tab value="Django">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        PY_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-randomly-generated-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+
+        ```
+    </Tab>
+    <Tab value="Express.js">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        ```
+    </Tab>
+    <Tab value="FastAPI">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        PY_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        ```
+    </Tab>
+    <Tab value="Fastify">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        ```
+    </Tab>
+    <Tab value="Flask">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        PY_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        ```
+    </Tab>
     <Tab value="Flutter">
         No action required for this step.
         The issuer and client Id will be passed directly when running the app (next step)
@@ -260,8 +628,64 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         No action required for this step.
         The issuer and client Id will be passed directly when running the app (next step)
     </Tab>
+    <Tab value="Hono">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        ```
+    </Tab>
+    <Tab value="Laravel">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+        3. Generate app key, this will update the APP_KEY variable in the .env file
+        ```bash
+        php artisan key:generate
+        ```
+
+        ```bash
+        APP_KEY="your-app-key"
+        APP_ENV=local
+        APP_DEBUG=true
+        SERVER_URL="http://localhost:3000"
+        SERVER_PORT=3000
+        DB_CONNECTION=sqlite
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-randomly-generated-client-secret"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        ```
+    </Tab>
+    <Tab value="NestJS">
+        1. Copy+paste the .env.example to .env.local
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_SALT="your-very-secret-and-strong-session-salt"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        ```
+    </Tab>
     <Tab value="Next.js">
-        1. Copy+past the .env.example to .env.local
+        1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
         ```bash
@@ -279,6 +703,40 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
         ```
     </Tab>
+    <Tab value="Nuxt">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
+        NEXTAUTH_URL="http://localhost:3000"
+        ```
+    </Tab>
+    <Tab value="Qwik">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        VITE_PORT=3000
+        VITE_SESSION_SECRET="your-very-secret-and-strong-session-key"
+        VITE_SESSION_DURATION=3600
+        VITE_ZITADEL_DOMAIN="https://your-zitadel-domain"
+        VITE_ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        VITE_ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        VITE_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
+        VITE_ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
+        ```
+    </Tab>
     <Tab value="React">
         1. Copy+paste the .env.example to .env
         2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
@@ -293,18 +751,69 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         VITE_ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
         ```
     </Tab>
-    <Tab value="Symfony">
-
+    <Tab value="SolidStart">
         1. Copy+paste the .env.example to .env
-        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
         ```bash
+        NODE_ENV=development
         PORT=3000
-        NG_APP_ZITADEL_DOMAIN="https://your-zitadel-domain"
-        NG_APP_ZITADEL_CLIENT_ID="your-client-id"
-        NG_APP_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
-        NG_APP_ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
-        NG_APP_ZITADEL_POST_LOGIN_URL="/profile"
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
+        NEXTAUTH_URL="http://localhost:3000"
+        ```
+    </Tab>
+    <Tab value="Spring">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        SPRING_PROFILES_ACTIVE=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-randomly-generated-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        ```
+    </Tab>
+    <Tab value="Symfony">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        APP_SECRET="your-app-secret-key"
+        SERVER_URL="http://localhost:3000"
+        SERVER_PORT=3000
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-randomly-generated-client-secret"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        ```
+    </Tab>
+    <Tab value="Svelte">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        # Example: https://my-org-a1b2c3.zitadel.cloud
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-zitadel-application-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        NEXTAUTH_URL="http://localhost:3000"
         ```
     </Tab>
     <Tab value="Vue.js">
@@ -329,13 +838,66 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 <FrameworkSelector>
     <Tab value="Angular">
         ```bash
-        npm install
-        npm run dev
+        make start
         ```
 
-        Your app will be live at `http://localhost:4200`.
+        Your app will be live at `http://localhost:3000`.
 
         ![Angular Example App](../../../public/img/guides/quickstart/angular_example_app.png)
+    </Tab>
+    <Tab value="Astro">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Astro Example App](../../../public/img/guides/quickstart/astro_example_app.png)
+    </Tab>
+    <Tab value="Django">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Django Example App](../../../public/img/guides/quickstart/django_example_app.png)
+    </Tab>
+    <Tab value="Express.js">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Express.js Example App](../../../public/img/guides/quickstart/expressjs_example_app.png)
+    </Tab>
+    <Tab value="Fastify">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Fastify Example App](../../../public/img/guides/quickstart/fastify_example_app.png)
+    </Tab>
+    <Tab value="FastAPI">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![FastAPI Example App](../../../public/img/guides/quickstart/fastapi_example_app.png)
+    </Tab>
+    <Tab value="Flask">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Flask Example App](../../../public/img/guides/quickstart/flask_example_app.png)
     </Tab>
     <Tab value="Flutter">
         Make sure to replace the [zitadel_issuer] and [zitadel_client_id] with your own value before running the command
@@ -357,42 +919,109 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
         ![Go Example App](../../../public/img/guides/quickstart/go_example_app.png)
     </Tab>
+    <Tab value="Hono">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Hono Example App](../../../public/img/guides/quickstart/hono_example_app.png)
+    </Tab>
+    <Tab value="Laravel">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Laravel Example App](../../../public/img/guides/quickstart/laravel_example_app.png)
+    </Tab>
+    <Tab value="NestJS">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![NestJS Example App](../../../public/img/guides/quickstart/nestjs_example_app.png)
+
+    </Tab>
     <Tab value="Next.js">
         ```bash
-        npm install
-
-        npm run dev
+        make start
         ```
 
         Your app will be live at `http://localhost:3000`.
 
         ![Next.js Example App](../../../public/img/guides/quickstart/next_example_app.png)
+    </Tab>
+    <Tab value="Nuxt">
+        ```bash
+        make start
+        ```
 
+        Your app will be live at `http://localhost:3000`.
+
+        ![Nuxt Example App](../../../public/img/guides/quickstart/nuxt_example_app.png)
+    </Tab>
+    <Tab value="Qwik">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Qwik Example App](../../../public/img/guides/quickstart/qwik_example_app.png)
     </Tab>
     <Tab value="React">
         ```bash
-        npm install
-        npm run dev
+        make start
         ```
 
         Your app will be live at `http://localhost:3000`.
 
         ![React Example App](../../../public/img/guides/quickstart/react_example_app.png)
     </Tab>
-    <Tab value="Symfony">
+    <Tab value="SolidStart">
         ```bash
-        composer install
-        composer run dev
+        make start
         ```
 
         Your app will be live at `http://localhost:3000`.
 
-        ![Angular Example App](../../../public/img/guides/quickstart/symfony_example_app.png)
+        ![SolidStart Example App](../../../public/img/guides/quickstart/solidstart_example_app.png)
+    </Tab>
+    <Tab value="Spring">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Spring Example App](../../../public/img/guides/quickstart/spring_example_app.png)
+    </Tab>
+    <Tab value="Symfony">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Symfony Example App](../../../public/img/guides/quickstart/symfony_example_app.png)
+    </Tab>
+    <Tab value="Svelte">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Svelte Example App](../../../public/img/guides/quickstart/sveltekit_example_app.png)
     </Tab>
     <Tab value="Vue.js">
         ```bash
-        npm install
-        npm run dev
+        make start
         ```
 
         Your app will be live at `http://localhost:3000`.
@@ -409,7 +1038,7 @@ You’ve successfully integrated ZITADEL into an application.
 
   1.  **Generate a backup PAT:** Create a [Service User Personal Access Token](/guides/integrate/service-accounts/personal-access-token) with the [`IAM_OWNER`](/guides/manage/console/managers) role to revert any login UI misconfigurations using the API.
   2.  **Add a second Instance Manager:** Always designate at least one [**second instance manager**](/guides/manage/console/managers).
-  
+
 </Callout>
 
 ### What’s next?
