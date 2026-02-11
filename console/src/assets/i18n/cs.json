@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Systémoví uživatelé",
     "LOGOUT": "Odhlásit všechny uživatele",
     "NEWORG": "Nová organizace",
-    "IAMADMIN": "Jste administrátor IAM. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
+    "IAMADMIN": "Jste administrátor instance. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
     "SHOWORGS": "Zobrazit všechny organizace",
     "GRANTS": "Autorizace",
     "ACTIONS": "Akce",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Role správce Zitadel",
-      "DESCRIPTION": "Zde jsou všechna členská oprávnění uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo IAM.",
+      "DESCRIPTION": "Zde jsou všechna členská oprávnění uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo instance.",
       "ORGCONTEXT": "Vidíte všechny organizace a projekty, které souvisí s aktuálně vybranou organizací.",
       "USERCONTEXT": "Vidíte všechny organizace a projekty, na které máte oprávnění. Včetně jiných organizací.",
       "CREATIONDATE": "Datum vytvoření",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Spravujte vaše globální politiky a nastavení přístupu k managementu."
     },
     "EVENTSTORE": {
-      "TITLE": "Administrace úložiště systému IAM",
+      "TITLE": "Administrace úložiště systému Instance",
       "DESCRIPTION": "Správa nastavení ukládání systému ZIDATEL."
     },
     "MEMBER": {
@@ -2778,7 +2778,7 @@
     "ADD": "Přidat manažera",
     "CREATIONTYPE": "Typ vytvoření",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instance",
       "2": "Organizace",
       "0": "Vlastní projekt",
       "1": "Přidělený projekt",
