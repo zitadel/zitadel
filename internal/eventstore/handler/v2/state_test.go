@@ -137,7 +137,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			h := &Handler{
 				projection: tt.fields.projection,
 			}
-			err = h.setState(tx, tt.args.updatedState)
+			err = h.setState(t.Context(), tx, tt.args.updatedState)
 
 			tt.isErr(t, err)
 			tt.fields.mock.Assert(t)

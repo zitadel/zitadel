@@ -105,7 +105,7 @@ func TestGetInstance(t *testing.T) {
 				inputContext:      ctxWithSysAuthZ,
 				inputInstanceID:   "invalid",
 				expectedErrorCode: codes.NotFound,
-				expectedErrorMsg:  "Errors.IAM.NotFound (QUERY-n0wng)",
+				expectedErrorMsg:  "Errors.Instance.NotFound (QUERY-n0wng)",
 			},
 		}
 
@@ -165,7 +165,7 @@ func TestListInstances(t *testing.T) {
 
 	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
-	relTableState := integration.RelationalTablesEnableMatrix()
+	relTableState := integration.RelationalTablesEnableMatrix(t, ctx, ctxWithSysAuthZ)
 
 	tt := []struct {
 		testName          string
@@ -222,16 +222,13 @@ func TestListInstances(t *testing.T) {
 	}
 
 	for _, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
 
 		for _, tc := range tt {
 			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
-			if tc.testName == "when unauthZ context should return unauthZ error" && stateCase.State == "when relational tables are enabled" {
+			if tc.testName == "when unauthZ context should return unauthZ error" && stateCase.Name == "when relational tables are enabled" {
 				continue
 			}
-			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.Name, tc.testName), func(t *testing.T) {
 				// Test
 				res, err := inst.Client.InstanceV2.ListInstances(tc.inputContext, tc.inputRequest)
 
@@ -251,7 +248,6 @@ func TestListInstances(t *testing.T) {
 			})
 		}
 	}
-
 }
 
 func TestListCustomDomains(t *testing.T) {

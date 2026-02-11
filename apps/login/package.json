@@ -15,11 +15,6 @@
     "lint-staged": "lint-staged",
     "clean": "rm -rf node_modules .next cypress"
   },
-  "pnpm": {
-    "overrides": {
-      "form-data@>=4.0.0 <4.0.4": ">=4.0.4"
-    }
-  },
   "git": {
     "pre-commit": "lint-staged"
   },
@@ -34,6 +29,7 @@
     "clsx": "^2.1.1",
     "copy-to-clipboard": "^3.3.3",
     "deepmerge": "^4.3.1",
+    "escape-html": "^1.0.3",
     "lucide-react": "^0.562.0",
     "moment": "^2.30.1",
     "next": "15.5.10",
@@ -58,6 +54,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^22.19.7",
+    "@types/escape-html": "^1.0.4",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@types/tinycolor2": "^1.4.6",

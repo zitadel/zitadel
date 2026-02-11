@@ -4,8 +4,8 @@ with features as (
 		coalesce(i.value, s.value)
 	) features
 	from (select $1::text instance_id) x
-	cross join projections.system_features2 s
-	full outer join projections.instance_features3 i using (key, instance_id)
+	cross join projections.system_features4 s
+	full outer join projections.instance_features5 i using (key, instance_id)
 	group by instance_id
 ), external_domains as (
 	select instance_id, array_agg(domain) as domains

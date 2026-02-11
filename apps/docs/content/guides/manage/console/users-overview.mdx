@@ -1,0 +1,107 @@
+---
+title: Users
+sidebar_label: Users
+sidebar_position: 3
+---
+
+import CreateUser from './_create-user.mdx';
+
+## Overview
+
+ZITADEL supports authentication and authorization for different user types. We mainly differentiate between **users** (interactive) and **Service Accounts** (machine-to-machine).
+
+<img src="/docs/img/guides/console/usersmenu.png" width="420px" alt="User types" />
+
+## Types of Users
+
+### Users (Human)
+Users represent actual people who log in via an interactive interface (e.g., a login page).
+* **Profile:** Has an email address, password, and optional profile data (phone, nickname, gender, language).
+* **Authentication:** Can authenticate via password, multiple factors (MFA), or passwordless authentication (Passkeys).
+* **Flow:** The application redirects the user to ZITADEL, which handles the credentials and issues a token to the application.
+
+Read more on how to [login users with ZITADEL](/guides/integrate/login/login-users).
+
+### Service Accounts
+Service accounts represent machines, backend services, or IoT devices requiring non-interactive access.
+* **Profile:** Only has a name, description, and username.
+* **Authentication:** Authenticates via **JWT Profile** or **Personal Access Tokens (PAT)**. Both methods support expiration settings.
+* **Usage:** Primarily used to gain access to the ZITADEL Management API or to secure backend-to-backend communication.
+
+To see how service users are utilized in practice, check out our [NextJS B2B Demo application](https://github.com/zitadel/zitadel-nextjs-b2b).
+
+### Federated Users
+Federated users are identities managed by a third-party Identity Provider (IdP) such as Google, Azure AD, or GitHub.
+* **Identity Brokering:** Users log in via the external IdP ("Single Sign-On").
+* **Account Linking:** Federated identities are [linked](../../../concepts/features/account-linking) to internal ZITADEL users to facilitate role assignment and audit trails.
+
+### External Users
+In a multi-tenancy architecture, users are typically isolated within [Organizations](./organizations-overview).
+However, using [External User Grants](../../../concepts/features/external-user-grant), an organization can invite users from *another* organization to access their projects. These invited users are referred to as **External Users** within the context of the inviting organization.
+
+### Managers
+Any user—whether User or Service Account—can be assigned an [Administrator Role](/concepts/structure/managers).
+A user with an administrator role is not just an end-user of your application but also has permissions to manage specific aspects of the ZITADEL instance, organization, or project (e.g., `ORG_OWNER`, `PROJECT_OWNER`).
+
+## Considerations
+
+### Uniqueness of Users
+* **Scope:** Users exist strictly within **one** [Organization](./organizations-overview). It is currently not possible to move users between organizations.
+* **Identifier:** User accounts are uniquely identified by their `id` or their `loginname` combined with the `organization domain` (e.g., `road.runner@acme.zitadel.local`).
+* **Emails:** You can reuse the same email address for different user accounts across organizations.
+
+### Structuring User Pools
+How you organize users depends on your scenario:
+
+* **B2B / Multi-Tenancy:** We recommend creating separate organizations for each business customer (e.g., based on their domain). Grant your projects to these organizations so they can manage their own users.
+* **B2C / CIAM:** You might want to store all users in a single organization and enable a specific set of social logins for that organization.
+
+<Callout type="info">
+You can only verify a domain (e.g., `acme.com`) on **one** organization. If multiple teams share the same email domain but need separate management, they might need to be consolidated into a single organization.
+</Callout>
+
+### Hierarchy
+ZITADEL does not enforce a native hierarchy or inheritance for users or organizations. We recommend structuring users along the smallest unit of groups (Organizations). You can use organization metadata or your own business logic to map complex hierarchies if needed.
+
+## Managing Users
+
+### Create User
+
+<CreateUser components={props.components} />
+
+### Metadata
+ZITADEL provides a key-value storage system for users, which is essential for building complex applications.
+
+**Example Use Case:**
+In a Point of Sales application, you could add a `stripeCustomerId` as a metadata key to a user. Your client application can then read this metadata to fetch payment details directly from the Stripe API.
+
+<img
+  width="460px"
+  src="/docs/img/guides/console/usermetadata.png"
+  alt="User Metadata"
+/>
+
+**Accessing Metadata:**
+Metadata can be requested via the Auth and Management APIs, the Userinfo endpoint, or asserted directly into the ID Token.
+
+1.  **Userinfo Endpoint:** Add the scope `urn:zitadel:iam:user:metadata` to your authentication request.
+2.  **ID Token:** To include metadata in the token, navigate to your **Application Settings** and toggle **User Info inside ID Token**.
+
+<img
+  src="/docs/img/guides/console/appidtokensettings.png"
+  width="650px"
+  alt="ID Token settings"
+/>
+
+### Authorizations
+User authorizations (roles) are displayed on user profile pages.
+
+To access these roles in your application:
+* **Userinfo Endpoint:** Check the **Assert roles on authentication** box in your [Project Settings](./roles#authorizations).
+* **ID Token:** Toggle **User roles inside ID Token** in your [Application Settings](./applications-overview).
+
+## References
+
+- [Manage users in the Management Console](./users-overview#managing-users)
+- [Migrate to ZITADEL](/guides/migrate/introduction)
+- [User onboarding and registration](/guides/integrate/onboarding)
