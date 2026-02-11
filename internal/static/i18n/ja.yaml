@@ -284,10 +284,6 @@ Errors:
       Empty: "パスワード期限ポリシーは空です"
       NotExisting: "パスワード期限ポリシーは存在しません"
       AlreadyExists: "パスワード期限ポリシーはすでに存在しています"
-    OrgIAMPolicy:
-      Empty: "組織IAMポリシーは空です"
-      NotExisting: "組織IAMポリシーは存在しません"
-      AlreadyExists: "組織IAMポリシーはすでに存在しています"
     NotificationPolicy:
       NotFound: "通知ポリシーが見つかりません"
       NotChanged: "通知ポリシーは変更されていません"
@@ -349,16 +345,14 @@ Errors:
       HasNotExistingRole: "プロジェクトに1つのロールが存在しません"
       NotActive: "プロジェクトグラントはアクティブではありません"
       NotInactive: "プロジェクトグラントは非アクティブではありません"
-  IAM:
-    NotFound: "IAMが見つかりません。正しいドメインを持っていることを確認してください。 https://zitadel.com/docs/apis/introduction#domains を参照してください"
+  Instance:
+    NotFound: "インスタンスが見つかりません。正しいドメインを持っていることを確認してください。 https://zitadel.com/docs/apis/introduction#domains を参照してください"
     Member:
       RolesNotChanged: "ロールは変更されていません"
     MemberInvalid: "無効なメンバーです"
     MemberAlreadyExisting: "メンバーはすでに存在します"
     MemberNotExisting: "メンバーは存在しません"
     IDMissing: "IDがありません"
-    IAMProjectIDMissing: "IAMプロジェクトIDがありません"
-    IamProjectAlreadySet: "IAMプロジェクトIDはすでに設定されています"
     IdpInvalid: "無効なIDP構成です"
     IdpNotExisting: "IDP構成は存在しません"
     OIDCConfigInvalid: "無効なOIDC IDP構成です"
@@ -416,11 +410,11 @@ Errors:
       Empty: "デフォルトのパスワードロックアウトポリシーが空です"
       NotChanged: "デフォルトのパスワードロックアウトポリシーは変更されていません"
     DomainPolicy:
-      NotFound: "組織IAMポリシーは見つかりません"
-      Empty: "組織IAMポリシーは空です"
-      NotExisting: "組織IAMポリシーは存在しません"
-      AlreadyExists: "組織IAMポリシーはすでに存在しています"
-      NotChanged: "組織IAMポリシーは変更されていません"
+      NotFound: "組織ドメインポリシーは見つかりません"
+      Empty: "組織ドメインポリシーは空です"
+      NotExisting: "組織ドメインポリシーは存在しません"
+      AlreadyExists: "組織ドメインポリシーはすでに存在しています"
+      NotChanged: "組織ドメインポリシーは変更されていません"
     NotificationPolicy:
       NotFound: "デフォルトの通知ポリシーが見つかりません"
       NotChanged: "デフォルトの通知ポリシーは変更されていません"

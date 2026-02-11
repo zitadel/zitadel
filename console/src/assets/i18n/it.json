@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Utenti di servizio",
     "LOGOUT": "Esci con tutti gli utenti",
     "NEWORG": "Nuova organizzazione",
-    "IAMADMIN": "Sei un amministratore IAM. Nota che hai autorizzazioni estese.",
+    "IAMADMIN": "Sei un amministratore d'istanza. Nota che hai autorizzazioni estese.",
     "SHOWORGS": "Mostra tutte le organizzazioni",
     "GRANTS": "Autorizzazioni",
     "ACTIONS": "Azioni",
@@ -1159,8 +1159,8 @@
       "SECRETREMOVED": "Secret rimosso con successo!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Ruoli di amministratore Zitadel",
-      "DESCRIPTION": "Questi sono tutti i ruoli di amministratore dell'utente. Puoi modificarli anche nelle pagine di dettaglio dell'organizzazione, del progetto o di sistema.",
+      "TITLE": "Ruoli dell'amministratore Zitadel",
+      "DESCRIPTION": "Questi sono tutti i ruoli di amministratore dell'utente. Puoi modificarli anche nelle pagine di dettaglio dell'organizzazione, del progetto o dell'istanza.",
       "ORGCONTEXT": "Vedi tutti i progetti che sono collegati all'organizzazione attualmente selezionata.",
       "USERCONTEXT": "Vedi tutte le organizzazioni e i progetti a cui sei autorizzato. Comprese le altre organizzazioni.",
       "CREATIONDATE": "Data di creazione",
@@ -1266,7 +1266,7 @@
       "DESCRIPTION": "Gestisci le impostazioni del sistema e le impostazioni d'accesso."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Eventstore",
+      "TITLE": "Istanza Eventstore",
       "DESCRIPTION": "Gestisci i view di Zitadel e gli eventi falliti."
     },
     "MEMBER": {
@@ -2770,7 +2770,7 @@
     "ADD": "Aggiungi un amministratore",
     "CREATIONTYPE": "Tipo di creazione",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Istanza",
       "2": "Organizzazione",
       "0": "Progetto proprio",
       "1": "Progetto delegato",

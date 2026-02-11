@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Usuários de Serviço",
     "LOGOUT": "Encerrar Sessão de Todos os Usuários",
     "NEWORG": "Nova Organização",
-    "IAMADMIN": "Você é um Administrador IAM. Observe que você possui permissões estendidas.",
+    "IAMADMIN": "Você é um Administrador de instância. Observe que você possui permissões estendidas.",
     "SHOWORGS": "Mostrar Todas as Organizações",
     "GRANTS": "Autorizações",
     "ACTIONS": "Ações",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Funções de administrador do Zitadel",
-      "DESCRIPTION": "Essas são todas as funções de administrador do usuário. Você também pode modificá-las nas páginas de detalhes da organização, projeto ou IAM.",
+      "DESCRIPTION": "Essas são todas as funções de administrador do usuário. Você também pode modificá-las nas páginas de detalhes da organização, projeto ou instância.",
       "ORGCONTEXT": "Você vê todas as organizações e projetos relacionados à organização atualmente selecionada.",
       "USERCONTEXT": "Você vê todas as organizações e projetos para os quais está autorizado. Incluindo outras organizações.",
       "CREATIONDATE": "Data de Criação",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Gerencie as políticas globais e configurações de acesso à gerência."
     },
     "EVENTSTORE": {
-      "TITLE": "Administração de armazenamento IAM",
+      "TITLE": "Administração de armazenamento Instância",
       "DESCRIPTION": "Gerencie as visualizações do Zitadel e eventos falhados."
     },
     "MEMBER": {
@@ -2765,7 +2765,7 @@
     "ADD": "Adicionar um Administrador",
     "CREATIONTYPE": "Tipo de Criação",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instância",
       "2": "Organização",
       "0": "Projeto Próprio",
       "1": "Projeto Concedido",
