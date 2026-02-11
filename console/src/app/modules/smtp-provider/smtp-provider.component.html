@@ -70,7 +70,7 @@
             />
           </cnsl-form-field>
 
-          <mat-checkbox class="smtp-checkbox" [formControl]="state.mainForm.controls.xoauth2"> xoauth2 </mat-checkbox>
+          <mat-checkbox class="smtp-checkbox" [formControl]="state.mainForm.controls.xoauth2">XOAUTH2</mat-checkbox>
 
           <cnsl-form-field class="smtp-form-field" label="User">
             <cnsl-label>{{ 'SETTING.SMTP.USER' | translate }}</cnsl-label>
@@ -86,19 +86,19 @@
 
           @if ('tokenEndpoint' in state.authForm.controls) {
             <cnsl-form-field class="smtp-form-field" label="tokenEndpoint">
-              <cnsl-label>tokenEndpoint</cnsl-label>
+              <cnsl-label>Token Endpoint</cnsl-label>
               <input cnslInput name="token-endpoint" [formControl]="state.authForm.controls.tokenEndpoint" required />
             </cnsl-form-field>
             <cnsl-form-field class="smtp-form-field" label="scopes">
-              <cnsl-label>scopes comma separated</cnsl-label>
+              <cnsl-label>Scopes comma separated</cnsl-label>
               <input cnslInput name="scopes" [formControl]="state.authForm.controls.scopes" required />
             </cnsl-form-field>
             <cnsl-form-field class="smtp-form-field" label="clientId">
-              <cnsl-label>clientId</cnsl-label>
+              <cnsl-label>Client ID</cnsl-label>
               <input cnslInput name="client-id" [formControl]="state.authForm.controls.clientId" required />
             </cnsl-form-field>
             <cnsl-form-field class="smtp-form-field" label="clientSecret">
-              <cnsl-label>clientSecret</cnsl-label>
+              <cnsl-label>Client Secret</cnsl-label>
               <input
                 cnslInput
                 type="password"
