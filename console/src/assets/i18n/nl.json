@@ -766,7 +766,7 @@
       "KEYS": "Sleutels",
       "PAT": "Persoonlijke toegangstokens",
       "USERGRANTS": "Machtigingen",
-      "MEMBERSHIPS": "Lidmaatschappen",
+      "MEMBERSHIPS": "Beheerdersrollen",
       "METADATA": "Metadata"
     },
     "TITLE": "Persoonlijke informatie",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel Beheerdersrollen",
-      "DESCRIPTION": "Dit zijn alle lidmaatschapstoewijzingen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of instantie.",
+      "DESCRIPTION": "Dit zijn alle toewijzingen van beheerdersrollen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of instantie.",
       "ORGCONTEXT": "U ziet alle organisaties en projecten die gerelateerd zijn aan de momenteel geselecteerde organisatie.",
       "USERCONTEXT": "U ziet alle organisaties en projecten waarvoor u gemachtigd bent. Inclusief andere organisaties.",
       "CREATIONDATE": "Aanmaakdatum",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Verwijderen",
       "TYPE": "Type",
       "ORGID": "Organisatie ID",
-      "UPDATED": "Het lidmaatschap is bijgewerkt.",
+      "UPDATED": "Beheerdersrol bijgewerkt.",
       "NOPERMISSIONTOEDIT": "U mist de benodigde rechten om rollen te bewerken!",
       "TYPES": {
         "UNKNOWN": "Onbekend",
@@ -1450,7 +1450,7 @@
     },
     "MEMBER": {
       "TITLE": "Organisatie Beheerders",
-      "DESCRIPTION": "Definieer de gebruikers die de voorkeuren van uw organisaties kunnen wijzigen."
+      "DESCRIPTION": "Definieer de beheerders die de voorkeuren van uw organisaties kunnen wijzigen."
     },
     "TOAST": {
       "UPDATED": "Organisatie succesvol bijgewerkt.",
@@ -1942,14 +1942,14 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Leden",
+      "TITLE": "Beheerders",
       "USERNAME": "Gebruikersnaam",
       "DISPLAYNAME": "Weergavenaam",
       "LOGINNAME": "Login Naam",
       "EMAIL": "E-mail",
       "ROLES": "Rollen",
-      "ADD": "Lid toevoegen",
-      "ADDDESCRIPTION": "Voer de namen van de gebruikers in die moeten worden toegevoegd."
+      "ADD": "Beheerder toevoegen",
+      "ADDDESCRIPTION": "Voer de namen van de beheerders in die moeten worden toegevoegd."
     },
     "TABLE": {
       "TOTAL": "Totaal aantal",
@@ -2039,9 +2039,9 @@
       "NAME": "Nieuwe naam"
     },
     "MEMBER": {
-      "TITLE": "Managers",
-      "TITLEDESC": "Managers kunnen wijzigingen aanbrengen in dit project op basis van hun rol.",
-      "DESCRIPTION": "Deze managers kunnen mogelijk uw project bewerken.",
+      "TITLE": "Beheerders",
+      "TITLEDESC": "Beheerders kunnen wijzigingen aanbrengen in dit project op basis van hun rol.",
+      "DESCRIPTION": "Deze beheerders kunnen mogelijk uw project bewerken.",
       "USERNAME": "Gebruikersnaam",
       "DISPLAYNAME": "Weergavenaam",
       "LOGINNAME": "Loginnaam",
@@ -2069,9 +2069,9 @@
       },
       "DETAIL": {
         "TITLE": "Projectverlening",
-        "DESC": "U kunt selecteren welke rollen kunnen worden gebruikt door de gespecificeerde organisatie, en managers kiezen",
-        "MEMBERTITLE": "Managers",
-        "MEMBERDESC": "Dit zijn de managers van de verleende organisatie. Voeg hier gebruikers toe die toegang moeten krijgen om de gegevens van het project te bewerken.",
+        "DESC": "U kunt selecteren welke rollen kunnen worden gebruikt door de gespecificeerde organisatie, en beheerders kiezen",
+        "MEMBERTITLE": "Beheerders",
+        "MEMBERDESC": "Dit zijn de beheerders van de verleende organisatie. Voeg hier beheerders toe die toegang moeten krijgen om de gegevens van het project te bewerken.",
         "PROJECTNAME": "Projectnaam",
         "GRANTEDORG": "Verleende Organisatie",
         "RESOURCEOWNER": "Resource Eigenaar"
@@ -2084,7 +2084,7 @@
       "ALL": "Alles",
       "SHOWDETAIL": "Toon details",
       "USER": "Gebruiker",
-      "MEMBERS": "Managers",
+      "MEMBERS": "Beheerders",
       "ORG": "Organisatie",
       "PROJECTNAME": "Projectnaam",
       "GRANTEDORG": "Verleende Organisatie",
@@ -2102,9 +2102,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Projectverlening gecreëerd.",
         "PROJECTGRANTADDED": "Projectverlening gecreëerd.",
         "PROJECTGRANTCHANGED": "Projectverlening gewijzigd.",
-        "PROJECTGRANTMEMBERADDED": "Verlening Manager toegevoegd.",
-        "PROJECTGRANTMEMBERCHANGED": "Verlening Manager gewijzigd.",
-        "PROJECTGRANTMEMBERREMOVED": "Verlening Manager verwijderd.",
+        "PROJECTGRANTMEMBERADDED": "Verlening Beheerder toegevoegd.",
+        "PROJECTGRANTMEMBERCHANGED": "Verlening Beheerder gewijzigd.",
+        "PROJECTGRANTMEMBERREMOVED": "Verlening Beheerder verwijderd.",
         "PROJECTGRANTUPDATED": "Projectverlening bijgewerkt"
       },
       "DIALOG": {
@@ -2167,10 +2167,10 @@
       "EMPTY": "Geen project gevonden"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager verwijderd.",
-      "MEMBERSADDED": "Managers toegevoegd.",
-      "MEMBERADDED": "Manager toegevoegd.",
-      "MEMBERCHANGED": "Manager gewijzigd.",
+      "MEMBERREMOVED": "Beheerder verwijderd.",
+      "MEMBERSADDED": "Beheerders toegevoegd.",
+      "MEMBERADDED": "Beheerder toegevoegd.",
+      "MEMBERCHANGED": "Beheerder gewijzigd.",
       "ROLESCREATED": "Rollen gecreëerd.",
       "ROLEREMOVED": "Rol verwijderd.",
       "ROLECHANGED": "Rol gewijzigd.",
@@ -2785,7 +2785,7 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "Voeg een Manager toe",
+    "ADD": "Voeg een Beheerder toe",
     "CREATIONTYPE": "Creatietype",
     "CREATIONTYPES": {
       "3": "Instantie",
@@ -2797,8 +2797,8 @@
     "EDITROLE": "Bewerk rollen",
     "EDITFOR": "Bewerk de rollen voor de gebruiker: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Verwijder Manager",
-      "DELETE_DESCRIPTION": "U staat op het punt om een manager te verwijderen. Weet u het zeker?"
+      "DELETE_TITLE": "Verwijder Beheerder",
+      "DELETE_DESCRIPTION": "U staat op het punt om een beheerder te verwijderen. Weet u het zeker?"
     },
     "SHOWDETAILS": "Klik om details te tonen."
   },

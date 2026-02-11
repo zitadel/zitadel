@@ -766,7 +766,7 @@
       "KEYS": "Kunci",
       "PAT": "Token Akses Pribadi",
       "USERGRANTS": "Otorisasi",
-      "MEMBERSHIPS": "Keanggotaan",
+      "MEMBERSHIPS": "Peran Administrator",
       "METADATA": "Metadata"
     },
     "TITLE": "Informasi Pribadi",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Peran Administrator Zitadel",
-      "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau instance.",
+      "DESCRIPTION": "Ini semua adalah peran administrator dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau instance.",
       "ORGCONTEXT": "Anda melihat semua organisasi dan proyek yang terkait dengan organisasi yang dipilih saat ini.",
       "USERCONTEXT": "Anda melihat semua organisasi dan proyek yang Anda izinkan. Termasuk organisasi lain.",
       "CREATIONDATE": "Tanggal Pembuatan",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Menghapus",
       "TYPE": "Jenis",
       "ORGID": "ID Organisasi",
-      "UPDATED": "Keanggotaan telah diperbarui.",
+      "UPDATED": "Peran administrator telah diperbarui.",
       "NOPERMISSIONTOEDIT": "Anda kehilangan izin yang diperlukan untuk mengedit peran!",
       "TYPES": {
         "UNKNOWN": "Tidak dikenal",
@@ -1271,8 +1271,8 @@
       "DESCRIPTION": "Kelola tampilan Zitadel Anda dan acara yang gagal."
     },
     "MEMBER": {
-      "TITLE": "Manajer",
-      "DESCRIPTION": "Manajer ini diizinkan untuk membuat perubahan pada instance Anda."
+      "TITLE": "Administrator",
+      "DESCRIPTION": "Administrator ini diizinkan untuk membuat perubahan pada instance Anda."
     },
     "PAGES": {
       "STATE": "Status",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manajer dihapus.",
-      "MEMBERSADDED": "Manajer menambahkan.",
-      "MEMBERADDED": "Manajer menambahkan.",
-      "MEMBERCHANGED": "Manajer berubah.",
+      "MEMBERREMOVED": "Administrator dihapus.",
+      "MEMBERSADDED": "Administrator menambahkan.",
+      "MEMBERADDED": "Administrator menambahkan.",
+      "MEMBERCHANGED": "Administrator berubah.",
       "ROLEREMOVED": "Peran dihapus.",
       "ROLECHANGED": "Peran berubah.",
       "REACTIVATED": "Diaktifkan kembali",
@@ -1449,7 +1449,7 @@
       "2": "Dinonaktifkan"
     },
     "MEMBER": {
-      "TITLE": "Manajer Organisasi",
+      "TITLE": "Administrator Organisasi",
       "DESCRIPTION": "Tentukan pengguna yang dapat mengubah preferensi organisasi Anda."
     },
     "TOAST": {
@@ -1458,9 +1458,9 @@
       "REACTIVATED": "Organisasi diaktifkan kembali.",
       "DOMAINADDED": "Menambahkan domain.",
       "DOMAINREMOVED": "Domain dihapus.",
-      "MEMBERADDED": "Manajer menambahkan.",
-      "MEMBERREMOVED": "Manajer dihapus.",
-      "MEMBERCHANGED": "Manajer berubah.",
+      "MEMBERADDED": "Administrator menambahkan.",
+      "MEMBERREMOVED": "Administrator dihapus.",
+      "MEMBERCHANGED": "Administrator berubah.",
       "SETPRIMARY": "Kumpulan domain primer.",
       "DELETED": "Organisasi berhasil dihapus",
       "DEFAULTORGNOTFOUND": "Organisasi default tidak ditemukan",
@@ -1940,13 +1940,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Anggota",
+      "TITLE": "Administrator",
       "USERNAME": "Nama belakang",
       "DISPLAYNAME": "Nama Tampilan",
       "LOGINNAME": "Nama Masuk",
       "EMAIL": "E-mail",
       "ROLES": "Peran",
-      "ADD": "Tambahkan Anggota",
+      "ADD": "Tambahkan Administrator",
       "ADDDESCRIPTION": "Masukkan nama pengguna yang akan ditambahkan."
     },
     "TABLE": {
@@ -2037,9 +2037,9 @@
       "NAME": "Nama Baru"
     },
     "MEMBER": {
-      "TITLE": "Manajer",
-      "TITLEDESC": "Manajer dapat membuat perubahan pada proyek ini berdasarkan peran mereka.",
-      "DESCRIPTION": "Manajer ini mungkin dapat mengedit proyek Anda.",
+      "TITLE": "Administrator",
+      "TITLEDESC": "Administrator dapat membuat perubahan pada proyek ini berdasarkan peran mereka.",
+      "DESCRIPTION": "Administrator ini mungkin dapat mengedit proyek Anda.",
       "USERNAME": "Nama belakang",
       "DISPLAYNAME": "Nama Tampilan",
       "LOGINNAME": "Nama login",
@@ -2067,9 +2067,9 @@
       },
       "DETAIL": {
         "TITLE": "Hibah Proyek",
-        "DESC": "Anda dapat memilih peran mana yang dapat digunakan oleh organisasi tertentu, dan memilih manajer",
-        "MEMBERTITLE": "Manajer",
-        "MEMBERDESC": "Ini adalah manajer dari organisasi yang diberikan. Tambahkan pengguna di sini yang harus mendapatkan akses untuk mengedit data proyek.",
+        "DESC": "Anda dapat memilih peran mana yang dapat digunakan oleh organisasi tertentu, dan memilih administrator",
+        "MEMBERTITLE": "Administrator",
+        "MEMBERDESC": "Ini adalah administrator dari organisasi yang diberikan. Tambahkan pengguna di sini yang harus mendapatkan akses untuk mengedit data proyek.",
         "PROJECTNAME": "Nama Proyek",
         "GRANTEDORG": "Organisasi yang Diberikan",
         "RESOURCEOWNER": "Pemilik Sumber Daya"
@@ -2082,7 +2082,7 @@
       "ALL": "Semua",
       "SHOWDETAIL": "Tampilkan Detail",
       "USER": "Pengguna",
-      "MEMBERS": "Manajer",
+      "MEMBERS": "Administrator",
       "ORG": "Organisasi",
       "PROJECTNAME": "Nama Proyek",
       "GRANTEDORG": "Organisasi yang Diberikan",
@@ -2100,9 +2100,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Hibah proyek dibuat.",
         "PROJECTGRANTADDED": "Hibah proyek dibuat.",
         "PROJECTGRANTCHANGED": "Hibah proyek berubah.",
-        "PROJECTGRANTMEMBERADDED": "Manajer hibah menambahkan.",
-        "PROJECTGRANTMEMBERCHANGED": "Manajer hibah berubah.",
-        "PROJECTGRANTMEMBERREMOVED": "Manajer hibah dihapus.",
+        "PROJECTGRANTMEMBERADDED": "Administrator hibah menambahkan.",
+        "PROJECTGRANTMEMBERCHANGED": "Administrator hibah berubah.",
+        "PROJECTGRANTMEMBERREMOVED": "Administrator hibah dihapus.",
         "PROJECTGRANTUPDATED": "Hibah Proyek diperbarui"
       },
       "DIALOG": {
@@ -2165,10 +2165,10 @@
       "EMPTY": "Tidak ada proyek yang ditemukan"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manajer dihapus.",
-      "MEMBERSADDED": "Manajer menambahkan.",
-      "MEMBERADDED": "Manajer menambahkan.",
-      "MEMBERCHANGED": "Manajer berubah.",
+      "MEMBERREMOVED": "Administrator dihapus.",
+      "MEMBERSADDED": "Administrator menambahkan.",
+      "MEMBERADDED": "Administrator menambahkan.",
+      "MEMBERCHANGED": "Administrator berubah.",
       "ROLESCREATED": "Peran dibuat.",
       "ROLEREMOVED": "Peran dihapus.",
       "ROLECHANGED": "Peran berubah.",
@@ -2790,7 +2790,7 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "Tambahkan Manajer",
+    "ADD": "Tambahkan Administrator",
     "CREATIONTYPE": "Jenis Penciptaan",
     "CREATIONTYPES": {
       "0": "Proyek Milik",
@@ -2802,8 +2802,8 @@
     "EDITROLE": "Edit peran",
     "EDITFOR": "Edit peran pengguna: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Hapus Manajer",
-      "DELETE_DESCRIPTION": "Anda akan menghapus pengelola. Apa kamu yakin?"
+      "DELETE_TITLE": "Hapus Administrator",
+      "DELETE_DESCRIPTION": "Anda akan menghapus administrator. Apa kamu yakin?"
     },
     "SHOWDETAILS": "Klik untuk menampilkan detail."
   },
@@ -2838,7 +2838,7 @@
       "UPDATED": "Otorisasi diperbarui.",
       "REMOVED": "Otorisasi dihapus",
       "BULKREMOVED": "Otorisasi dihapus.",
-      "CANTSHOWINFO": "Anda tidak dapat mengunjungi profil pengguna ini karena Anda bukan anggota organisasi tempat pengguna ini berada"
+      "CANTSHOWINFO": "Anda tidak dapat mengunjungi profil pengguna ini karena Anda bukan administrator organisasi tempat pengguna ini berada"
     },
     "DIALOG": {
       "DELETE_TITLE": "Hapus otorisasi",
