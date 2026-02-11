@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
-  AddProjectRequestSchema,
-  AddProjectResponse,
+  AddOrgResponse,
+  DeactivateOrgResponse,
   GenerateMachineSecretRequestSchema,
   GenerateMachineSecretResponse,
   GetDefaultPasswordComplexityPolicyResponse,
@@ -11,8 +11,10 @@ import {
   GetPasswordComplexityPolicyResponse,
   ListUserMetadataRequestSchema,
   ListUserMetadataResponse,
+  ReactivateOrgResponse,
   RemoveMachineSecretRequestSchema,
   RemoveMachineSecretResponse,
+  RemoveOrgResponse,
   RemoveUserMetadataRequestSchema,
   RemoveUserMetadataResponse,
   ResendHumanEmailVerificationRequestSchema,
@@ -21,12 +23,15 @@ import {
   ResendHumanInitializationResponse,
   ResendHumanPhoneVerificationRequestSchema,
   ResendHumanPhoneVerificationResponse,
+  SendHumanResetPasswordNotificationRequest_Type,
   SendHumanResetPasswordNotificationRequestSchema,
   SendHumanResetPasswordNotificationResponse,
   SetUserMetadataRequestSchema,
   SetUserMetadataResponse,
   UpdateMachineRequestSchema,
   UpdateMachineResponse,
+  UpdateOrgRequestSchema,
+  UpdateOrgResponse,
 } from '@zitadel/proto/zitadel/management_pb';
 import { MessageInitShape, create } from '@bufbuild/protobuf';
 
@@ -100,7 +105,23 @@ export class NewMgmtService {
     return this.grpcService.mgmtNew.getDefaultPasswordComplexityPolicy({});
   }
 
-  public addProject(req: MessageInitShape<typeof AddProjectRequestSchema>): Promise<AddProjectResponse> {
-    return this.grpcService.mgmtNew.addProject(req);
+  public updateOrg(req: MessageInitShape<typeof UpdateOrgRequestSchema>): Promise<UpdateOrgResponse> {
+    return this.grpcService.mgmtNew.updateOrg(req);
+  }
+
+  public removeOrg(): Promise<RemoveOrgResponse> {
+    return this.grpcService.mgmtNew.removeOrg({});
+  }
+
+  public reactivateOrg(): Promise<ReactivateOrgResponse> {
+    return this.grpcService.mgmtNew.reactivateOrg({});
+  }
+
+  public deactivateOrg(): Promise<DeactivateOrgResponse> {
+    return this.grpcService.mgmtNew.deactivateOrg({});
+  }
+
+  public addOrg(name: string): Promise<AddOrgResponse> {
+    return this.grpcService.mgmtNew.addOrg({ name });
   }
 }

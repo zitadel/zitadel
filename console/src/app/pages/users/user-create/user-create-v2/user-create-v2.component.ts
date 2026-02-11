@@ -45,6 +45,7 @@ type AuthenticationFactor =
   templateUrl: './user-create-v2.component.html',
   styleUrls: ['./user-create-v2.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class UserCreateV2Component implements OnInit {
   protected readonly loading = signal(false);
@@ -182,12 +183,11 @@ export class UserCreateV2Component implements OnInit {
   private async createUserV2Try(authenticationFactor: AuthenticationFactor) {
     this.loading.set(true);
 
-    const org = await this.authService.getActiveOrg();
-
+    const activeOrg = await this.authService.getActiveOrg();
     const userValues = this.userForm.getRawValue();
 
     const humanReq: MessageInitShape<typeof AddHumanUserRequestSchema> = {
-      organization: { org: { case: 'orgId', value: org.id } },
+      organization: { org: { case: 'orgId', value: activeOrg.id } },
       username: userValues.userName,
       profile: {
         givenName: userValues.firstName,

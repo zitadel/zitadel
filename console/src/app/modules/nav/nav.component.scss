@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 @mixin nav-theme($theme) {
   $primary: map-get($theme, primary);
   $warn: map-get($theme, warn);
@@ -17,7 +19,7 @@
     height: auto;
     position: relative;
     align-items: flex-start;
-    transform: transale3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
     transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
 
     .nav-row {

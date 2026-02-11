@@ -10,6 +10,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
   templateUrl: './actions-two-targets-table.component.html',
   styleUrls: ['./actions-two-targets-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ActionsTwoTargetsTableComponent {
   @Output()

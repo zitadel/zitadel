@@ -39,7 +39,7 @@
     <div class="cnsl-action-button">
       <mat-icon class="icon">add</mat-icon>
       <span>{{ 'GRANTS.ADD_BTN' | translate }}</span>
-      <cnsl-action-keys (actionTriggered)="gotoCreateLink(routerLink)" [type]="ActionKeysType.ADD"></cnsl-action-keys>
+      <cnsl-action-keys (actionTriggered)="router.navigate(routerLink)" [type]="ActionKeysType.ADD"></cnsl-action-keys>
     </div>
   </a>
 
