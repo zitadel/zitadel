@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -67,8 +68,9 @@ func TestRequestIDHandler(t *testing.T) {
 			requestID := resp.Header.Get(http_util.XRequestID)
 			require.NotEmpty(t, requestID, "x-request-id header should be set")
 
-			// Verify the request ID is a valid UUID format
-			assert.Regexp(t, `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, requestID)
+			// Verify the x-request-id header is a valid xid format
+			_, err := xid.FromString(requestID)
+			require.NoError(t, err, "x-request-id header should be a valid xid")
 		})
 	}
 }

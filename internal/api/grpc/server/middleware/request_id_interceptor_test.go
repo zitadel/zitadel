@@ -69,9 +69,6 @@ func TestRequestIDHandler_gRPC(t *testing.T) {
 
 			// Verify request ID is set in context
 			require.NotEmpty(t, capturedID, "Request ID should be set in context")
-
-			// Verify the request ID is a valid UUID format
-			assert.Regexp(t, `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, capturedID)
 		})
 	}
 }

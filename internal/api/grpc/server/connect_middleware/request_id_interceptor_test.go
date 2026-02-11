@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"connectrpc.com/connect"
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -83,7 +84,8 @@ func TestRequestIDHandler_Connect(t *testing.T) {
 				if assert.ErrorAs(t, err, &connectErr) {
 					requestID := connectErr.Meta().Get(http_util.XRequestID)
 					require.NotEmpty(t, requestID, "Request ID should be set in error metadata")
-					assert.Regexp(t, `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, requestID)
+					_, err := xid.FromString(requestID)
+					require.NoError(t, err, "Request ID in error metadata should be a valid xid")
 					assert.Equal(t, capturedID, requestID, "Request ID in context should match error metadata")
 				}
 			} else {
@@ -93,7 +95,8 @@ func TestRequestIDHandler_Connect(t *testing.T) {
 				// Verify request ID is set in response header
 				requestID := resp.Header().Get(http_util.XRequestID)
 				require.NotEmpty(t, requestID, "Request ID should be set in response header")
-				assert.Regexp(t, `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, requestID)
+				_, err := xid.FromString(requestID)
+				require.NoError(t, err, "Request ID in response header should be a valid xid")
 				assert.Equal(t, capturedID, requestID, "Request ID in context should match header")
 			}
 
