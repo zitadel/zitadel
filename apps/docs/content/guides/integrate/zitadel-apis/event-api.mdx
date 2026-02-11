@@ -7,7 +7,7 @@ ZITADEL leverages the power of eventsourcing, meaning every action and change wi
 To provide you with greater flexibility and access to these events, ZITADEL has introduced an Event API.
 This API allows you to easily retrieve and utilize the events generated within the system, enabling you to integrate them into your own system and respond to specific events as they occur.
 
-You need to assign a user the [administrator role](/guides/manage/console/managers) IAM_OWNER_VIEWER or IAM_OWNER to access the Event API.
+You need to assign a user the [administrator role](/guides/manage/console/administrators) IAM_OWNER_VIEWER or IAM_OWNER to access the Event API.
 
 If you like to know more about eventsourcing/eventstore and how this works in ZITADEL, head over to our [concepts](/concepts/eventstore/overview).
 ## Request Events
@@ -119,8 +119,8 @@ curl --request POST \
 ### OIDC session
 
 The following example shows you how you could use the events search to get all events where a user has authenticated using OIDC.
-Also we include the refresh tokens in this example to know when the user has received a new token.
-Sessions without tokens events may by created during implicit flow with ID Token only, which do not create an access token.
+Also, we include the refresh tokens in this example to know when the user has received a new token.
+Sessions without tokens events may by created during implicit flow with ID Token only, which does not create an access token.
 
 ```bash
 curl --request POST \
@@ -170,9 +170,9 @@ The following example shows you how you could use the events search to find out 
 You have to include all the event types that tell you that a login attempt has failed.
 In this case these are the following events:
 - Password verification failed
-- OTP check failed (Authenticator Apps like Authy, Google Authenticator, etc)
-- Universal Second Factor (U2F) check failed (FaceID, WindowsHello, FingerPrint, etc)
-- Passkey check failed (FaceID, WindowsHello, FingerPrint, etc)
+- OTP check failed (Authenticator Apps like Authy, Google Authenticator, etc.)
+- Universal Second Factor (U2F) check failed (FaceID, WindowsHello, FingerPrint, etc.)
+- Passkey check failed (FaceID, WindowsHello, FingerPrint, etc.)
 
 ```bash
 curl --request POST \
