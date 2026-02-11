@@ -233,7 +233,7 @@ export class SMTPProviderComponent {
         const form = this.fb.group({
           password: new FormControl('', {
             nonNullable: true,
-            validators: 'config' in state ? [] : [requiredValidator],
+            validators: [],
           }),
         });
 
@@ -329,10 +329,6 @@ export class SMTPProviderComponent {
     }
 
     const config = resp.config.config.value;
-
-    if (!config.Auth.case || config.Auth.case === 'none') {
-      throw new Error('None auth not supported' + resp.config.id);
-    }
 
     return {
       ...resp.config,
