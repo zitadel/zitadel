@@ -414,7 +414,9 @@ func Test_smtpToPb(t *testing.T) {
 			},
 			res: &settings_pb.EmailProvider_Smtp{
 				Smtp: &settings_pb.EmailProviderSMTP{
-					Auth: &settings_pb.EmailProviderSMTP_None{},
+					Auth: &settings_pb.EmailProviderSMTP_None{
+						None: &settings_pb.SMTPNoAuth{},
+					},
 				},
 			},
 		},
