@@ -397,7 +397,7 @@ export class SMTPProviderComponent {
             case: 'xoauth2',
             value: {
               tokenEndpoint: authValues.tokenEndpoint,
-              scopes: authValues.scopes.split(','),
+              scopes: authValues.scopes.replace(/\s/g, '').split(','),
               OAuth2Type: {
                 case: 'clientCredentials',
                 value: {
