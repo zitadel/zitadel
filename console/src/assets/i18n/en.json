@@ -2403,7 +2403,9 @@
     "ISIDTOKENMAPPING": "Map from the ID token",
     "ISIDTOKENMAPPING_DESC": "If selected, provider information gets mapped from the ID token, not from the userinfo endpoint.",
     "USEPKCE": "Use PKCE",
-    "USEPKCE_DESC": "Determines whether the code_challenge and code_challenge_method params are included in the auth request"
+    "USEPKCE_DESC": "Determines whether the code_challenge and code_challenge_method params are included in the auth request",
+    "ICONURL": "Icon URL",
+    "BACKGROUNDCOLOR": "Background Color"
   },
   "MFA": {
     "LIST": {

@@ -17,6 +17,8 @@ type OIDCIDPAddedEvent struct {
 	Scopes           []string            `json:"scopes,omitempty"`
 	IsIDTokenMapping bool                `json:"idTokenMapping,omitempty"`
 	UsePKCE          bool                `json:"usePKCE,omitempty"`
+	IconURL          string              `json:"iconUrl,omitempty"`
+	BackgroundColor  string              `json:"backgroundColor,omitempty"`
 	Options
 }
 
@@ -29,6 +31,7 @@ func NewOIDCIDPAddedEvent(
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
 	isIDTokenMapping, usePKCE bool,
+	iconURL, backgroundColor string,
 	options Options,
 ) *OIDCIDPAddedEvent {
 	return &OIDCIDPAddedEvent{
@@ -41,6 +44,8 @@ func NewOIDCIDPAddedEvent(
 		Scopes:           scopes,
 		IsIDTokenMapping: isIDTokenMapping,
 		UsePKCE:          usePKCE,
+		IconURL:          iconURL,
+		BackgroundColor:  backgroundColor,
 		Options:          options,
 	}
 }
@@ -77,6 +82,8 @@ type OIDCIDPChangedEvent struct {
 	Scopes           []string            `json:"scopes,omitempty"`
 	IsIDTokenMapping *bool               `json:"idTokenMapping,omitempty"`
 	UsePKCE          *bool               `json:"usePKCE,omitempty"`
+	IconURL          *string             `json:"iconUrl,omitempty"`
+	BackgroundColor  *string             `json:"backgroundColor,omitempty"`
 	OptionChanges
 }
 
@@ -145,6 +152,18 @@ func ChangeOIDCIsIDTokenMapping(idTokenMapping bool) func(*OIDCIDPChangedEvent) 
 func ChangeOIDCUsePKCE(usePKCE bool) func(*OIDCIDPChangedEvent) {
 	return func(e *OIDCIDPChangedEvent) {
 		e.UsePKCE = &usePKCE
+	}
+}
+
+func ChangeOIDCIconURL(iconURL string) func(*OIDCIDPChangedEvent) {
+	return func(e *OIDCIDPChangedEvent) {
+		e.IconURL = &iconURL
+	}
+}
+
+func ChangeOIDCBackgroundColor(backgroundColor string) func(*OIDCIDPChangedEvent) {
+	return func(e *OIDCIDPChangedEvent) {
+		e.BackgroundColor = &backgroundColor
 	}
 }
 

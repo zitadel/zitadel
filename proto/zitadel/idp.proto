@@ -380,6 +380,20 @@ message GenericOIDCConfig {
             example: "true";
         }
     ];
+    // Optional URL to an icon for the provider button on the login screen.
+    string icon_url = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://example.com/icon.png\"";
+            description: "URL to an icon image for the identity provider button";
+        }
+    ];
+    // Optional background color for the provider button (e.g. hex color \"#1976d2\").
+    string background_color = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"#1976d2\"";
+            description: "Background color for the identity provider button";
+        }
+    ];
 }
 
 message GitHubConfig {

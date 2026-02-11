@@ -203,6 +203,10 @@ message GenericOIDCConfig {
         example:
           "true";
       } ];
+  // Optional URL to an icon for the provider button on the login screen.
+  string icon_url = 5;
+  // Optional background color for the provider button (e.g. hex color).
+  string background_color = 6;
 }
 
 message GitHubConfig {
@@ -356,6 +360,10 @@ message Options {
   // Enable if users should get prompted to link an existing Zitadel user to an
   // external account if the selected attribute matches.
   AutoLinkingOption auto_linking = 5;
+  // Optional URL to an icon for the provider button on the login screen.
+  string icon_url = 6;
+  // Optional background color for the provider button (e.g. hex color).
+  string background_color = 7;
 }
 
 enum AutoLinkingOption {

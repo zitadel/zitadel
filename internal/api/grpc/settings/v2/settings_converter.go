@@ -190,17 +190,24 @@ func identityProvidersToPb(idps []*query.IDPLoginPolicyLink) []*settings.Identit
 }
 
 func identityProviderToPb(idp *query.IDPLoginPolicyLink) *settings.IdentityProvider {
+	opts := &idp_pb.Options{
+		IsLinkingAllowed:  idp.IsLinkingAllowed,
+		IsCreationAllowed: idp.IsCreationAllowed,
+		IsAutoCreation:    idp.IsAutoCreation,
+		IsAutoUpdate:      idp.IsAutoUpdate,
+		AutoLinking:       idp_api.AutoLinkingOptionToPb(idp.AutoLinking),
+	}
+	if idp.IconURL != "" {
+		opts.IconUrl = idp.IconURL
+	}
+	if idp.BackgroundColor != "" {
+		opts.BackgroundColor = idp.BackgroundColor
+	}
 	return &settings.IdentityProvider{
-		Id:   idp.IDPID,
-		Name: domain.IDPName(idp.IDPName, idp.IDPType),
-		Type: idpTypeToPb(idp.IDPType),
-		Options: &idp_pb.Options{
-			IsLinkingAllowed:  idp.IsLinkingAllowed,
-			IsCreationAllowed: idp.IsCreationAllowed,
-			IsAutoCreation:    idp.IsAutoCreation,
-			IsAutoUpdate:      idp.IsAutoUpdate,
-			AutoLinking:       idp_api.AutoLinkingOptionToPb(idp.AutoLinking),
-		},
+		Id:      idp.IDPID,
+		Name:    domain.IDPName(idp.IDPName, idp.IDPType),
+		Type:    idpTypeToPb(idp.IDPType),
+		Options: opts,
 	}
 }
 

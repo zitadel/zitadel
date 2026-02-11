@@ -107,6 +107,15 @@
             </cnsl-info-section>
           </div>
 
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.ICONURL' | translate }}</cnsl-label>
+            <input cnslInput formControlName="iconUrl" type="url" placeholder="https://example.com/icon.png" />
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.BACKGROUNDCOLOR' | translate }}</cnsl-label>
+            <input cnslInput formControlName="backgroundColor" type="text" placeholder="#1976d2" />
+          </cnsl-form-field>
+
           <cnsl-provider-options
             [initialOptions]="provider?.config?.options"
             (optionsChanged)="options = $event"

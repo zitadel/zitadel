@@ -182,6 +182,7 @@ type Steps struct {
 	s67SyncMemberRoleFields                 *SyncMemberRoleFields
 	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
 	s69CacheTablesLogged                    *CacheTablesLogged
+	s70IDPTemplate6OIDCBranding             *IDPTemplate6OIDCBranding
 }
 
 func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {

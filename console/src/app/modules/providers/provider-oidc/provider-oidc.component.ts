@@ -87,6 +87,8 @@ export class ProviderOIDCComponent {
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
       isIdTokenMapping: new UntypedFormControl(),
       usePkce: new UntypedFormControl(false),
+      iconUrl: new UntypedFormControl(''),
+      backgroundColor: new UntypedFormControl(''),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
@@ -168,6 +170,12 @@ export class ProviderOIDCComponent {
     req.setProviderOptions(this.options);
     req.setIsIdTokenMapping(this.isIdTokenMapping?.value);
     req.setUsePkce(this.usePkce?.value);
+    if (this.iconUrl?.value) {
+      req.setIconUrl(this.iconUrl.value);
+    }
+    if (this.backgroundColor?.value) {
+      req.setBackgroundColor(this.backgroundColor.value);
+    }
 
     this.loading = true;
     this.service
@@ -197,6 +205,12 @@ export class ProviderOIDCComponent {
       req.setProviderOptions(this.options);
       req.setIsIdTokenMapping(this.isIdTokenMapping?.value);
       req.setUsePkce(this.usePkce?.value);
+      if (this.iconUrl?.value !== undefined) {
+        req.setIconUrl(this.iconUrl.value);
+      }
+      if (this.backgroundColor?.value !== undefined) {
+        req.setBackgroundColor(this.backgroundColor.value);
+      }
 
       this.loading = true;
       this.service
@@ -268,5 +282,13 @@ export class ProviderOIDCComponent {
 
   public get usePkce(): AbstractControl | null {
     return this.form.get('usePkce');
+  }
+
+  public get iconUrl(): AbstractControl | null {
+    return this.form.get('iconUrl');
+  }
+
+  public get backgroundColor(): AbstractControl | null {
+    return this.form.get('backgroundColor');
   }
 }

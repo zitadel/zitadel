@@ -734,6 +734,8 @@ func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, writeModel *OrgOI
 					provider.Scopes,
 					provider.IsIDTokenMapping,
 					provider.UsePKCE,
+					provider.IconURL,
+					provider.BackgroundColor,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -779,6 +781,8 @@ func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, writeModel *Or
 				provider.Scopes,
 				provider.IsIDTokenMapping,
 				provider.UsePKCE,
+				provider.IconURL,
+				provider.BackgroundColor,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {

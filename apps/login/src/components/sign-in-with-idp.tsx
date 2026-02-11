@@ -36,7 +36,9 @@ export function SignInWithIdp({
   const [state, action, _isPending] = useActionState(redirectToIdp, {});
 
   const renderIDPButton = (idp: IdentityProvider, index: number) => {
-    const { id, name, type } = idp;
+    const { id, name, type, options } = idp;
+    const iconUrl = options?.iconUrl ?? "";
+    const backgroundColor = options?.backgroundColor ?? "";
 
     const components: Partial<Record<IdentityProviderType, (props: SignInWithIdentityProviderProps) => ReactNode>> = {
       [IdentityProviderType.APPLE]: SignInWithApple,
@@ -62,7 +64,12 @@ export function SignInWithIdp({
         <input type="hidden" name="organization" value={organization} />
         {sessionId && <input type="hidden" name="sessionId" value={sessionId} />}
         {postErrorRedirectUrl && <input type="hidden" name="postErrorRedirectUrl" value={postErrorRedirectUrl} />}
-        <Component key={id} name={name} />
+        <Component
+          key={id}
+          name={name}
+          iconUrl={iconUrl || undefined}
+          backgroundColor={backgroundColor || undefined}
+        />
       </form>
     ) : null;
   };

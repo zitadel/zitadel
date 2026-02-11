@@ -23,6 +23,9 @@ type IDPLoginPolicyLink struct {
 	IsAutoCreation    bool
 	IsAutoUpdate      bool
 	AutoLinking       domain.AutoLinkingOption
+	// OIDC provider branding (only set when IDPType is OIDC)
+	IconURL          string
+	BackgroundColor  string
 }
 
 type IDPLoginPolicyLinks struct {
@@ -137,9 +140,12 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, resourceOwner string) 
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
 			IDPTemplateAutoLinkingCol.identifier(),
+			OIDCIconURLCol.identifier(),
+			OIDCBackgroundColorCol.identifier(),
 			countColumn.identifier()).
 			From(idpLoginPolicyLinkTable.identifier()).
 			LeftJoin(join(IDPTemplateIDCol, IDPLoginPolicyLinkIDPIDCol)).
+			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
 			RightJoin("("+resourceOwnerQuery+") AS "+idpLoginPolicyOwnerTable.alias+" ON "+
 				idpLoginPolicyOwnerIDCol.identifier()+" = "+IDPLoginPolicyLinkResourceOwnerCol.identifier()+" AND "+
 				idpLoginPolicyOwnerInstanceIDCol.identifier()+" = "+IDPLoginPolicyLinkInstanceIDCol.identifier(),
@@ -159,6 +165,8 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, resourceOwner string) 
 					isAutoCreation    = sql.NullBool{}
 					isAutoUpdate      = sql.NullBool{}
 					autoLinking       = sql.NullInt16{}
+					iconURL           = sql.NullString{}
+					backgroundColor   = sql.NullString{}
 				)
 				err := rows.Scan(
 					&link.IDPID,
@@ -170,6 +178,8 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, resourceOwner string) 
 					&isAutoCreation,
 					&isAutoUpdate,
 					&autoLinking,
+					&iconURL,
+					&backgroundColor,
 					&count,
 				)
 				if err != nil {
@@ -203,6 +213,12 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, resourceOwner string) 
 					link.AutoLinking = domain.AutoLinkingOption(autoLinking.Int16)
 				} else {
 					link.AutoLinking = domain.AutoLinkingOptionUnspecified
+				}
+				if iconURL.Valid {
+					link.IconURL = iconURL.String
+				}
+				if backgroundColor.Valid {
+					link.BackgroundColor = backgroundColor.String
 				}
 				links = append(links, link)
 			}
