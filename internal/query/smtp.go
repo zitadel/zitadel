@@ -468,7 +468,7 @@ func (c sqlSmtpConfig) set(smtpConfig *SMTPConfig) {
 
 	xoauth2Auth := &XOAuth2Auth{
 		TokenEndpoint: c.xoauth2AuthTokenEndpoint.String,
-		Scopes:        c.xoauth2AuthScope,
+		Scopes:        []string(c.xoauth2AuthScope),
 		ClientCredentials: &XOAuthClientCredentials{
 			ClientId:     c.xoauth2AuthClientCredentialsClientId.String,
 			ClientSecret: c.xoauth2AuthClientClientCredentialsSecret,
