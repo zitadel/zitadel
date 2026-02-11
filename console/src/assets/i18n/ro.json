@@ -53,9 +53,9 @@
         "METADATA": "Adăugați atribute personalizate utilizatorului, cum ar fi departamentul. Puteți utiliza aceste informații în acțiunile dvs."
       },
       "MACHINES": {
-        "TITLE": "Utilizatori de servicii",
-        "DESCRIPTION": "Utilizatorii de servicii se autentifică non-interactiv folosind un token JWT bearer semnat cu o cheie privată. De asemenea, pot utiliza un token de acces personal.",
-        "METADATA": "Adăugați atribute personalizate utilizatorului, cum ar fi sistemul de autentificare. Puteți utiliza aceste informații în acțiunile dvs."
+        "TITLE": "Conturi de serviciu",
+        "DESCRIPTION": "Conturile de serviciu se autentifică non-interactiv folosind un token JWT bearer semnat cu o cheie privată. De asemenea, pot utiliza un token de acces personal.",
+        "METADATA": "Adăugați atribute personalizate contului, cum ar fi sistemul de autentificare. Puteți utiliza aceste informații în acțiunile dvs."
       },
       "SELF": {
         "METADATA": "Adăugați atribute personalizate utilizatorului dvs., cum ar fi departamentul. Puteți utiliza aceste informații în acțiunile organizațiilor dvs."
@@ -424,7 +424,7 @@
     "ROLES": "Roluri",
     "GRANTEDPROJECT": "Proiecte acordate",
     "HUMANUSERS": "Utilizatori",
-    "MACHINEUSERS": "Utilizatori de servicii",
+    "MACHINEUSERS": "Conturi de serviciu",
     "LOGOUT": "Deconectați toți utilizatorii",
     "NEWORG": "Organizație nouă",
     "IAMADMIN": "Sunteți administrator de instanță. Rețineți că aveți permisiuni extinse.",
