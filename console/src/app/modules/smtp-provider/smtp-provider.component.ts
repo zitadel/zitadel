@@ -233,7 +233,7 @@ export class SMTPProviderComponent {
         const form = this.fb.group({
           password: new FormControl('', {
             nonNullable: true,
-            validators: [],
+            validators: 'defaults' in state ? [requiredValidator] : [],
           }),
         });
 
@@ -298,7 +298,9 @@ export class SMTPProviderComponent {
         typeof configOrProvider === 'string'
           ? ({
               case: 'defaults',
-              defaults: SMTPKnownProviders[configOrProvider as keyof typeof SMTPKnownProviders],
+              defaults: SMTPKnownProviders[configOrProvider as keyof typeof SMTPKnownProviders] as
+                | (typeof SMTPKnownProviders)[keyof typeof SMTPKnownProviders]
+                | undefined,
             } as const)
           : ({ case: 'config', config: this.getConfig(configOrProvider) } as const);
 
@@ -306,7 +308,7 @@ export class SMTPProviderComponent {
         return {
           queryKey,
           queryFn: (async () => idOrProvider) as typeof queryFn,
-          cacheTime: 0,
+          gcTime: 0,
           select,
         } as const;
       }
@@ -471,7 +473,7 @@ export class SMTPProviderComponent {
               case: 'xoauth2',
               value: {
                 tokenEndpoint: authValues.tokenEndpoint,
-                scopes: authValues.scopes.split(','),
+                scopes: authValues.scopes.replace(/\s/g, '').split(','),
                 OAuth2Type: {
                   case: 'clientCredentials',
                   value: {
