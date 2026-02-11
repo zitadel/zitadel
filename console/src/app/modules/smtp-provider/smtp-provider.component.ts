@@ -452,13 +452,7 @@ export class SMTPProviderComponent {
   }
 
   protected buildTestEmailConfigurationMutation(stateSignal: typeof this.state) {
-    const reqSignal = computed(() => {
-      const state = stateSignal();
-
-      if (!state) {
-        return {};
-      }
-
+    const buildRequest = (state: State, receiverAddress: string) => {
       const authValues = state.authForm.getRawValue();
       const { user, tls, host } = state.mainForm.getRawValue();
       const { senderAddress, senderName } = state.senderForm.getRawValue();
@@ -471,7 +465,7 @@ export class SMTPProviderComponent {
           host,
           user,
           tls,
-          receiverAddress: this.email(),
+          receiverAddress,
         };
       }
 
@@ -502,14 +496,21 @@ export class SMTPProviderComponent {
         user,
         tls,
         Auth,
-        receiverAddress: this.email(),
+        receiverAddress,
       };
-    });
+    };
 
     return injectMutation(() => {
-      const req = reqSignal();
+      const state = stateSignal();
+      const email = this.email();
+
       return {
-        mutationFn: () => this.newAdminService.testEmailProviderSMTP(req),
+        mutationFn: () => {
+          if (!state) {
+            throw new Error('Invalid state');
+          }
+          return this.newAdminService.testEmailProviderSMTP(buildRequest(state, email));
+        },
       };
     });
   }
