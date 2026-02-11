@@ -45,7 +45,6 @@ export class NewAdminService {
   }
 
   public testEmailProviderSMTP(req: MessageInitShape<typeof TestEmailProviderSMTPRequestSchema>) {
-    this.grpcService.adminNew.testEmailProviderSMTP;
     return this.grpcService.adminNew.testEmailProviderSMTP(req);
   }
 
