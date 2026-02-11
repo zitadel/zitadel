@@ -136,8 +136,8 @@ export const outlook = {
     placeholder: 'your outlook.com email address',
   },
   auth: {
-    case: 'plain',
-    password: { value: '', placeholder: 'Your outlook.com password' },
+    case: 'xoauth2',
+    scopes: 'https://outlook.office.com/SMTP.Send',
   },
   image: './assets/images/smtp/outlook.svg',
   senderEmailPlaceholder: 'Your outlook.com email address',
