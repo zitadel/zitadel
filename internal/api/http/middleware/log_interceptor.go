@@ -10,7 +10,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
-// LogHandler is a gPRC interceptor that logs the request details
+// LogHandler is an HTTP middleware that logs the request details
 // including protocol, domain, service, HTTP method, path, response code, and duration.
 // It depends on [CallDurationHandler] and [RequestIDHandler] to set the request start time and ID in the context.
 func LogHandler(service string, ignoredPrefix ...string) func(http.Handler) http.Handler {
@@ -30,7 +30,7 @@ func LogHandler(service string, ignoredPrefix ...string) func(http.Handler) http
 				slog.String("protocol", "http"),
 				slog.Any("domain", http_util.DomainContext(ctx)),
 				slog.String("service", service),
-				slog.String("http_method", r.Method), // gRPC always uses POST
+				slog.String("http_method", r.Method),
 				slog.String("path", r.URL.Path),
 				slog.Int("status", sw.status),
 				slog.Duration("duration", call.Took(ctx)),

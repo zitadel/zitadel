@@ -16,7 +16,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
-// LogHandler is a gPRC interceptor that logs the request details
+// LogHandler is a gRPC interceptor that logs the request details
 // including protocol, domain, service, HTTP method, path, response code, and duration.
 // It depends on [CallDurationHandler] and [RequestIDHandler] to set the request start time and ID in the context.
 func LogHandler(ignoredMethodSuffixes ...string) grpc.UnaryServerInterceptor {
