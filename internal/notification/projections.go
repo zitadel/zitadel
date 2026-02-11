@@ -3,7 +3,6 @@ package notification
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/zitadel/logging"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/query"
@@ -27,6 +27,7 @@ func Register(
 	ctx context.Context,
 	userHandlerCustomConfig, quotaHandlerCustomConfig, telemetryHandlerCustomConfig, backChannelLogoutHandlerCustomConfig projection.CustomConfig,
 	notificationWorkerConfig handlers.WorkerConfig,
+	backChannelLogoutWorkerConfig *handlers.BackChannelLogoutWorkerConfig,
 	telemetryCfg handlers.TelemetryPusherConfig,
 	externalDomain string,
 	externalPort uint16,
@@ -35,8 +36,7 @@ func Register(
 	queries *query.Queries,
 	es *eventstore.Eventstore,
 	otpEmailTmpl, fileSystemPath string,
-	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
-	tokenLifetime time.Duration,
+	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
 	queue *queue.Queue,
 ) {
 	if !notificationWorkerConfig.LegacyEnabled {
@@ -53,18 +53,16 @@ func Register(
 	projections = append(projections, handlers.NewBackChannelLogoutNotifier(
 		ctx,
 		projection.ApplyCustomConfig(backChannelLogoutHandlerCustomConfig),
-		commands,
 		q,
-		es,
-		keysEncryptionAlg,
-		c,
-		tokenLifetime,
+		queue,
+		backChannelLogoutWorkerConfig.MaxAttempts,
 	))
+	queue.AddWorkers(ctx, handlers.NewBackChannelLogoutWorker(commands, q, es, queue, c, backChannelLogoutWorkerConfig, id.SonyFlakeGenerator()))
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}
 	if !notificationWorkerConfig.LegacyEnabled {
-		queue.AddWorkers(handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c))
+		queue.AddWorkers(ctx, handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c))
 	}
 }
 

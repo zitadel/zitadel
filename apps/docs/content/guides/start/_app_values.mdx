@@ -1,0 +1,36 @@
+import ProjectClientIdImg from '@pub/img/guides/quickstart/project_client_id.png'
+import ProjectClientIdSecretImg from '@pub/img/guides/quickstart/project_client_id_secret.png'
+import ProjectUrlsImg from '@pub/img/guides/quickstart/project_urls.png'
+import ProjectProjectIdImg from '@pub/img/guides/quickstart/project_project_id.png'
+
+export default function AppValue({ valueCount, clientSecret }) {
+    return (
+        <div>
+            <p>
+                To connect your application to ZITADEL, you need {valueCount} primary configuration values.
+                These are typically stored as environment variables in your project.
+            </p>
+            <ol>
+                {!!clientSecret == false && (<li>
+                    <b>Client ID</b> Navigate to Configurations in the left sidebar. This is the unique public identifier for your React application.
+                    <img
+                        src={ProjectClientIdImg.src} alt="Get Client ID"/>
+                </li>)}
+                {!!clientSecret && (<li>
+                    <b>Client ID & Client Secret</b> Copy the client id and secret from the modal. The client id is the unique public identifier for your application.
+                    Note: If you missed copy the secret, you can generate a new one in the Actions dropdown.
+                    <img
+                        src={ProjectClientIdSecretImg.src} alt="Get Client ID and Secret"/>
+                </li>)}
+                <li>
+                    <b>Issuer URL</b> Click on URLs in the left sidebar to find your <b>Discovery Endpoint</b>.
+                    - The Value: Copy the issuer URL (e.g., https://your-instance.zitadel.cloud).
+                    - Why it matters: ZITADEL supports OIDC Discovery. By providing just the Issuer URL to your SDK, the library automatically finds the login, logout, and token endpoints for you.
+
+                    <img src={ProjectUrlsImg.src} alt="Get URLs"/>
+                </li>
+            </ol>
+        </div>
+
+    );
+}

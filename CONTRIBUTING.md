@@ -129,7 +129,7 @@ The code consists of the following parts:
 | API definitions    | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#contribute-to-api)             |
 | Management Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-to-frontend)   |
 | Login              | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#contribute-to-frontend)   |
-| Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#contribute-to-frontend)   |
+| Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./apps/docs](./apps/docs)                          | [Contribute to Frontend](#contribute-to-frontend)   |
 | translations       | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#contribute-translations) |
 
 Please follow the guides to validate and test the code before you contribute.
@@ -423,7 +423,7 @@ If you don't want to build and run a local API, you can just run the Login devel
 
 ```env
 ZITADEL_API_URL=https://[your-cloud-instance-domain]
-ZITADEL_SERVICE_USER_TOKEN=[personal access token for an IAM Login Client]
+ZITADEL_SERVICE_USER_TOKEN=[personal access token for an instance Login Client]
 ```
 
 3. Start the development server.
@@ -582,62 +582,9 @@ pnpm nx run @zitadel/client:build  # Build after changes
 
 ### Contribute to Docs
 
-Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Nx** for development and build processes.
+Project documentation is located under [./apps/docs](./apps/docs).
+Please refer to the [Docs README](./apps/docs/README.md) for detailed instructions on how to contribute to the documentation.
 
-To start developing, make sure you followed the [quick start](#quick-start) steps.
-
-#### Local Development
-
-```bash
-# Start development server (recommended)
-pnpm nx run @zitadel/docs:dev
-
-# Or start production server
-pnpm nx run @zitadel/docs:prod
-```
-
-The Docs build process automatically:
-
-1. Downloads required protoc plugins
-2. Generates gRPC documentation from proto files
-3. Generates API documentation from OpenAPI specs
-4. Copies configuration files
-5. Builds the Docusaurus site
-
-#### Local testing
-
-The documentation server will be available at http://localhost:3000 with live reload for fast development feedback.
-
-#### Style guide
-
-- **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
-- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "\_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
-- **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as separate file and make use of embedded files to import it into other docs pages.
-- **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
-
-Following the [Google style guide](https://developers.google.com/style) is highly recommended. Its clear and concise guidelines ensure consistency and effective communication within the wider developer community.
-
-The style guide covers a lot of material, so their [highlights](https://developers.google.com/style/highlights) page provides an overview of its most important points. Some of the points stated in the highlights that we care about most are given below:
-
-- Be conversational and friendly without being frivolous.
-- Use sentence case for document titles and section headings.
-- Use active voice: make clear who's performing the action.
-- Use descriptive link text.
-
-#### Docs pull request
-
-When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
-Scope can be left empty (omit the brackets) or refer to the top navigation sections.
-
-#### Pass Quality Checks
-
-Verify the Docs build correctly.
-
-```bash
-pnpm nx run @zitadel/docs:build
-```
-
-Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
 ## Contribute Translations
 
@@ -657,7 +604,7 @@ You also have to add some changes to the following files:
 - [Register Local File](./console/src/app/app.module.ts) - Import and register the Angular locale, register `i18n-iso-countries` locale
 - [Exclude from Angular prebundle](./console/angular.json) - Add `i18n-iso-countries/langs/<locale>.json` to `prebundle.exclude`
 - [Add Supported Language](./console/src/app/utils/language.ts)
-- [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
+- [Customized Text Docs](./apps/docs/docs/guides/manage/customize/texts.md)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
 
 ### Login v2 (Next.js)
@@ -737,7 +684,7 @@ The category shows which part of Zitadel is affected.
 - **category: backend**: The backend includes the APIs, event store, command and query side. This is developed in golang.
 - **category: ci**: ci is all about continuous integration and pipelines.
 - **category: design**: All about the ux/ui of Zitadel
-- **category: docs**: Adjustments or new documentations, this can be found in the docs folder.
+- **category: docs**: Adjustments or new documentations, this can be found in the apps/docs folder.
 - **category: frontend**: The frontend concerns on the one hand the Zitadel Management Console (Angular) and on the other hand the Login (gohtml)
 - **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
 - **category: translation**: Everything concerning translations or new languages

@@ -7,13 +7,12 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/jackc/pgx/v5/pgconn"
-	slogctx "github.com/veqryn/slog-context"
-	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/protoadapt"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/message"
@@ -27,13 +26,13 @@ func ZITADELToGRPCError(ctx context.Context, err error) error {
 	code, key, id, lvl := extractError(err)
 	msg := key
 	msg += " (" + id + ")"
-	slogctx.FromCtx(ctx).Log(ctx, lvl, msg, "err", err, "code", code)
+	logging.Log(ctx, lvl, msg, "err", err, "code", code)
 
 	errorInfo := getErrorInfo(id, key, err)
 
 	s, err := status.New(code, msg).WithDetails(errorInfo)
 	if err != nil {
-		logging.WithError(err).WithField("logID", "GRPC-gIeRw").Debug("unable to add detail")
+		logging.WithError(ctx, err).Debug("unable to add error detail")
 		return status.New(code, msg).Err()
 	}
 
@@ -48,13 +47,13 @@ func ZITADELToConnectError(ctx context.Context, err error) error {
 	if errors.As(err, &connectError) {
 		// Connect error may be returned by other middlewares,
 		// so we assume it's a client error and log as warning.
-		slogctx.FromCtx(ctx).WarnContext(ctx, connectError.Message(), "err", connectError.Unwrap(), "code", connectError.Code())
+		logging.Warn(ctx, connectError.Message(), "err", connectError.Unwrap(), "code", connectError.Code())
 		return err
 	}
 	code, key, id, lvl := extractError(err)
 	msg := key
 	msg += " (" + id + ")"
-	slogctx.FromCtx(ctx).Log(ctx, lvl, msg, "err", err)
+	logging.Log(ctx, lvl, msg, "err", err)
 
 	errorInfo := getErrorInfo(id, key, err)
 
