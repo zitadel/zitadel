@@ -786,7 +786,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 									success,
 									failure,
 									"idp",
-									"",
+									"hint@example.com",
 									nil,
 								)
 							}(),
@@ -809,6 +809,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 				idpID:       "idp",
 				callbackURL: "url",
 				samlRootURL: "samlurl",
+				loginHint:   "hint@example.com",
 			},
 			res{
 				url: "http://localhost:8000/sso",
@@ -880,7 +881,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 									success,
 									failure,
 									"idp",
-									"",
+									"user123",
 									nil,
 								)
 							}(),
@@ -903,6 +904,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 				idpID:       "idp",
 				callbackURL: "url",
 				samlRootURL: "samlurl",
+				loginHint:   "user123",
 			},
 			res{
 				url: "http://localhost:8000/sso",
