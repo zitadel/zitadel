@@ -5,13 +5,15 @@
  * - AUDIENCE: The API audience for JWT authentication
  * - SYSTEM_USER_ID: The system user's ID
  * - SYSTEM_USER_PRIVATE_KEY: The private key for JWT signing
+ * - SYSTEM_USER_PRIVATE_KEY_FILE: The private key file path for JWT signing
  *
  * Both multi-tenant and self-hosted deployments can use system user authentication.
  *
  * @returns true if system user credentials are present, false otherwise
  */
 export function hasSystemUserCredentials(): boolean {
-  return !!process.env.AUDIENCE && !!process.env.SYSTEM_USER_ID && !!process.env.SYSTEM_USER_PRIVATE_KEY;
+  return !!process.env.AUDIENCE && !!process.env.SYSTEM_USER_ID &&
+    (!!process.env.SYSTEM_USER_PRIVATE_KEY || !!process.env.SYSTEM_USER_PRIVATE_KEY_FILE);
 }
 
 /**
