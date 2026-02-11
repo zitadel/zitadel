@@ -1327,7 +1327,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				userID:     "user1",
@@ -1383,7 +1383,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code2}}"),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code2}}"),
 			},
 			args: args{
 				userID:     "user1",
@@ -1585,7 +1585,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				userID:        "user1",
@@ -1737,7 +1737,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				userID:        "user1",

@@ -519,7 +519,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("emailverify", time.Hour),
-				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -669,7 +669,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				newCode:            mockEncryptedCode("emailCode", time.Hour),
-				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
+				loginPaths:         expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1568,7 +1568,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("mailVerify", time.Hour),
-				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2617,8 +2617,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				newCode:         mockEncryptedCode("emailCode", time.Hour),
-				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
-				tarpit: expectTarpit(0),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2807,8 +2807,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				newCode:         mockEncryptedCode("emailCode", time.Hour),
-				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
-				tarpit: expectTarpit(0),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
