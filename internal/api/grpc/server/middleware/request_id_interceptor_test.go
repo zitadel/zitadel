@@ -43,12 +43,12 @@ func TestRequestIDHandler_gRPC(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
-			
+
 			// Setup context with call duration if needed
 			if tt.setupContext {
 				ctx = call.WithTimestamp(ctx)
 			}
-			
+
 			// Create a handler that captures the request ID from context
 			var capturedID string
 			handler := func(ctx context.Context, req interface{}) (interface{}, error) {
@@ -57,19 +57,19 @@ func TestRequestIDHandler_gRPC(t *testing.T) {
 				capturedID = id.String()
 				return tt.handler(ctx, req)
 			}
-			
+
 			interceptor := RequestIDHandler()
 			_, err := interceptor(ctx, &mockReq{}, mockInfo("/test"), handler)
-			
+
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
 			}
-			
+
 			// Verify request ID is set in context
 			require.NotEmpty(t, capturedID, "Request ID should be set in context")
-			
+
 			// Verify the request ID is a valid UUID format
 			assert.Regexp(t, `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, capturedID)
 		})
@@ -81,7 +81,7 @@ func TestRequestIDHandler_gRPC_HeaderSet(t *testing.T) {
 	// This is verified indirectly through SetHeader call
 	// We can't directly test the metadata since it requires a real gRPC context
 	ctx := call.WithTimestamp(context.Background())
-	
+
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		// Try to get headers that were set
 		md, ok := metadata.FromOutgoingContext(ctx)
@@ -93,7 +93,7 @@ func TestRequestIDHandler_gRPC_HeaderSet(t *testing.T) {
 		}
 		return req, nil
 	}
-	
+
 	interceptor := RequestIDHandler()
 	_, err := interceptor(ctx, &mockReq{}, mockInfo("/test"), handler)
 	require.NoError(t, err)
