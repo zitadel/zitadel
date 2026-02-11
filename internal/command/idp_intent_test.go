@@ -49,6 +49,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 		successURL   string
 		failureURL   string
 		instanceID   string
+		loginHint    string
 		idpArguments map[string]any
 	}
 	type res struct {
@@ -202,6 +203,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 								success,
 								failure,
 								"idp",
+								"",
 								nil,
 							)
 						}(),
@@ -257,6 +259,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 								success,
 								failure,
 								"idp",
+								"",
 								map[string]interface{}{
 									"verifier": "pkceOAuthVerifier",
 								},
@@ -317,6 +320,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 								success,
 								failure,
 								"idp",
+								"",
 								map[string]interface{}{
 									"verifier": "pkceOAuthVerifier",
 								},
@@ -377,6 +381,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 								success,
 								failure,
 								"idp",
+								"",
 								map[string]interface{}{
 									"verifier": "pkceOAuthVerifier",
 								},
@@ -408,7 +413,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
-			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.intentID, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.instanceID, tt.args.idpArguments)
+			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.intentID, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.instanceID, tt.args.loginHint, tt.args.idpArguments)
 			require.ErrorIs(t, err, tt.res.err)
 			if intentWriteModel != nil {
 				assert.Equal(t, tt.res.intentID, intentWriteModel.AggregateID)
@@ -429,6 +434,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 	type args struct {
 		ctx         context.Context
 		idpID       string
+		loginHint   string
 		callbackURL string
 		samlRootURL string
 	}
@@ -681,7 +687,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 				idGenerator:         tt.fields.idGenerator,
 			}
-			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL)
+			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL, tt.args.loginHint)
 			require.ErrorIs(t, err, tt.res.err)
 
 			var got idp.Auth
@@ -705,6 +711,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 		idpID       string
 		callbackURL string
 		samlRootURL string
+		loginHint   string
 	}
 	type res struct {
 		url    string
@@ -779,6 +786,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 									success,
 									failure,
 									"idp",
+									"",
 									nil,
 								)
 							}(),
@@ -872,6 +880,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 									success,
 									failure,
 									"idp",
+									"",
 									nil,
 								)
 							}(),
@@ -911,7 +920,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 				idGenerator:         tt.fields.idGenerator,
 			}
-			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL)
+			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL, tt.args.loginHint)
 			require.ErrorIs(t, err, tt.res.err)
 
 			auth, err := session.GetAuth(tt.args.ctx)
