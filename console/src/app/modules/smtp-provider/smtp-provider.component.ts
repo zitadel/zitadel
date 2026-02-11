@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, computed, effect, inject, linkedSignal, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, linkedSignal, Signal, viewChild } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { requiredValidator } from '../form-field/validators/validators';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -144,8 +144,7 @@ export class SMTPProviderComponent {
       mainForm,
       senderForm,
       senderEmailPlaceholder: 'sender@example.com',
-      id: config.id,
-      active: config.state,
+      config,
     };
   }
 
@@ -234,25 +233,49 @@ export class SMTPProviderComponent {
         const form = this.fb.group({
           password: new FormControl('', {
             nonNullable: true,
-            validators: 'id' in state ? [] : [requiredValidator],
+            validators: 'config' in state ? [] : [requiredValidator],
           }),
         });
 
-        if ('id' in state) {
+        if ('config' in state) {
           form.controls.password.disable();
         }
 
         return form;
       }
 
-      const scopes = 'defaults' in state && state.defaults.auth.case === 'xoauth2' ? state.defaults.auth.scopes : '';
+      const defaultValues =
+        'config' in state && state.config.config.value.Auth.case === 'xoauth2'
+          ? {
+              tokenEndpoint: state.config.config.value.Auth.value.tokenEndpoint,
+              scopes: state.config.config.value.Auth.value.scopes.join(','),
+              clientId: state.config.config.value.Auth.value.OAuth2Type.value?.clientId ?? '',
+            }
+          : 'defaults' in state && state.defaults.auth.case === 'xoauth2'
+            ? { scopes: state.defaults.auth.scopes }
+            : {};
 
-      return this.fb.group({
-        tokenEndpoint: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
-        scopes: new FormControl(scopes, { nonNullable: true, validators: [requiredValidator] }),
-        clientId: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
-        clientSecret: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      const form = this.fb.group({
+        tokenEndpoint: new FormControl<string>(defaultValues.tokenEndpoint ?? '', {
+          nonNullable: true,
+          validators: [requiredValidator],
+        }),
+        scopes: new FormControl<string>(defaultValues.scopes ?? '', { nonNullable: true, validators: [requiredValidator] }),
+        clientId: new FormControl<string>(defaultValues.clientId ?? '', {
+          nonNullable: true,
+          validators: [requiredValidator],
+        }),
+        clientSecret: new FormControl<string>('', { nonNullable: true, validators: [requiredValidator] }),
       });
+
+      if ('config' in state) {
+        form.controls.tokenEndpoint.disable();
+        form.controls.scopes.disable();
+        form.controls.clientId.disable();
+        form.controls.clientSecret.disable();
+      }
+
+      return form;
     });
   }
 
@@ -359,9 +382,9 @@ export class SMTPProviderComponent {
     const { user, tls, host, description } = state.mainForm.getRawValue();
     const { senderAddress, senderName, replyToAddress } = state.senderForm.getRawValue();
 
-    if ('id' in state) {
+    if ('config' in state) {
       return this.newAdminService.updateEmailProviderSMTP({
-        id: state.id as string,
+        id: state.config.id,
         description,
         senderAddress,
         senderName,
@@ -440,9 +463,9 @@ export class SMTPProviderComponent {
       const { user, tls, host } = state.mainForm.getRawValue();
       const { senderAddress, senderName } = state.senderForm.getRawValue();
 
-      if ('id' in state) {
+      if ('config' in state) {
         return {
-          id: state.id as string,
+          id: state.config.id,
           senderAddress,
           senderName,
           host,
