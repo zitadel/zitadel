@@ -36,7 +36,7 @@ Before running this example, you need to create and configure a PKCE application
 1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
 2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/api/auth/callback/zitadel` for development)
-4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/`)
+4. Configure post-logout redirect URIs (e.g., `http://localhost:3000`)
 5. Copy your **Client ID** for use in the next steps
 
 > **Note:** Make sure to enable **Dev Mode** in the ZITADEL Management Console if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
@@ -55,7 +55,7 @@ Once you have your Zitadel application configured:
    ZITADEL_CLIENT_ID=your-client-id
    ZITADEL_CLIENT_SECRET=your-randomly-generated-client-secret
    ZITADEL_CALLBACK_URL=http://localhost:3000/api/auth/callback/zitadel
-   ZITADEL_POST_LOGOUT_URL=http://localhost:3000/
+   ZITADEL_POST_LOGOUT_URL=http://localhost:3000
    AUTH_ORIGIN=http://localhost:3000
 ```
 Replace these values with:
