@@ -186,10 +186,15 @@ func activeIdentityProvidersToQuery(req *settings.GetActiveIdentityProvidersRequ
 
 func (s *Server) GetGeneralSettings(ctx context.Context, _ *connect.Request[settings.GetGeneralSettingsRequest]) (*connect.Response[settings.GetGeneralSettingsResponse], error) {
 	instance := authz.GetInstance(ctx)
+	allowedLangauges := instance.AllowedLanguages()
+	if len(allowedLangauges) == 0 {
+		allowedLangauges = i18n.SupportedLanguages()
+	}
 	return connect.NewResponse(&settings.GetGeneralSettingsResponse{
 		SupportedLanguages: domain.LanguagesToStrings(i18n.SupportedLanguages()),
 		DefaultOrgId:       instance.DefaultOrganisationID(),
 		DefaultLanguage:    instance.DefaultLanguage().String(),
+		AllowedLanguages:   domain.LanguagesToStrings(allowedLangauges),
 	}), nil
 }
 
