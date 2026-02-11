@@ -72,7 +72,7 @@ export const mailjet = {
   senderEmailPlaceholder: 'An authorized domain or email address',
 } as const;
 
-mailgun satisfies ProviderDefaultSettings;
+mailjet satisfies ProviderDefaultSettings;
 
 export const postmark = {
   description: 'postmark',
