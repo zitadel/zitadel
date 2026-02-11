@@ -186,7 +186,7 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if err != nil {
 		return err
 	}
-	// machine users do not have interactive logins, so we don't check for MFA requirements
+	// service accounts do not have interactive logins, so we don't check for MFA requirements
 	if requirements.UserType == domain.UserTypeMachine {
 		return nil
 	}

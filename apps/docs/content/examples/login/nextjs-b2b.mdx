@@ -59,20 +59,20 @@ To setup the needed roles for your project, navigate to your `Portal` project, a
 Now in the `General` section of the Portal project, make sure to enable `Assert Roles on Authentication`.
 This makes sure that roles, which is used by the application to enable UI components, are set in your OIDC ID Token.
 
-### Service User
+### Service Account
 
-To make the application work you need a service user which loads granted-projects and user-grants for you.
-In the B2B-Demo organization, navigate to `Users` in navigation of Management Console, click on `Service Users` and create a new user.
+To make the application work you need a service account which loads granted-projects and user-grants for you.
+In the B2B-Demo organization, navigate to `Users` in navigation of Management Console, click on `Service Accounts` and create a new user.
 Let's set its username to `nextjs` and its name to `NextJS`. Then press `create`.
 
 On the detail page of that user, navigate to "Personal Access Tokens" and add a new entry, set an optional expiration date.
 
 Copy the generated Token as you will need this in your environment configuration file later.
 
-Go back to the `Portal` project and add the Service User as Manager (top right).
+Go back to the `Portal` project and add the Service Account as Manager (top right).
 Make sure to select `Project Owner Viewer` as the management role.
 
-To show granted projects, go to the `Demo-Vendor` organization and add the Service User as `Org Project Permission Editor` Manager.
+To show granted projects, go to the `Demo-Vendor` organization and add the Service Account as `Org Project Permission Editor` Manager.
 
 ## Configuration
 
@@ -104,7 +104,7 @@ Replace the values as follows
 
 `ZITADEL_CLIENT_ID`: Having the project `Portal` selected, click on the Application `portal-web`. `${CLIENT_ID}` is displayed as a field in the OIDC configuration, labelled "Client ID" and has the format `12345678@portal`.
 
-`SERVICE_ACCOUNT_ACCESS_TOKEN`: Set up a service user, add a Personal Access Token and copy the secret here (see below).
+`SERVICE_ACCOUNT_ACCESS_TOKEN`: Set up a service account, add a Personal Access Token and copy the secret here (see below).
 
 ## Install and Run
 
