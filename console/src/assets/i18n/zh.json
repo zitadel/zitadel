@@ -427,7 +427,7 @@
     "MACHINEUSERS": "服务用户",
     "LOGOUT": "退出所有账户",
     "NEWORG": "创建组织",
-    "IAMADMIN": "您是 IAM 管理员。请注意您具有扩展权限。",
+    "IAMADMIN": "您是实例管理员。请注意您具有扩展权限。",
     "SHOWORGS": "查看所有组织",
     "GRANTS": "授权",
     "ACTIONS": "认证流程",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel 管理员角色",
-      "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或 IAM 详细信息页面上修改它们。",
+      "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或实例详细信息页面上修改它们。",
       "ORGCONTEXT": "您会看到与当前所选组织相关的所有组织和项目。",
       "USERCONTEXT": "您会看到您被授权的所有组织和项目。包括其他组织。",
       "CREATIONDATE": "创建于",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "管理您的全局策略和管理访问设置。"
     },
     "EVENTSTORE": {
-      "TITLE": "IAM 存储管理",
+      "TITLE": "实例存储管理",
       "DESCRIPTION": "管理您的 Zitadel 视图和失败的事件。"
     },
     "MEMBER": {
@@ -2802,7 +2802,7 @@
     "ADD": "添加管理者",
     "CREATIONTYPE": "创建类型",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "实例",
       "2": "Organization",
       "0": "Owned Project",
       "1": "Granted Project",

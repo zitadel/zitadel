@@ -284,10 +284,6 @@ Errors:
       Empty: "Password Age Policy is empty"
       NotExisting: "Password Age Policy doesn't exist"
       AlreadyExists: "Password Age Policy already exists"
-    OrgIAMPolicy:
-      Empty: "Org IAM Policy is empty"
-      NotExisting: "Org IAM Policy doesn't exist"
-      AlreadyExists: "Org IAM Policy already exists"
     NotificationPolicy:
       NotFound: "Notification Policy not found"
       NotChanged: "Notification Policy not changed"
@@ -349,7 +345,7 @@ Errors:
       HasNotExistingRole: "One role doesn't exist on project"
       NotActive: "Project Grant is not active"
       NotInactive: "Project Grant is not inactive"
-  IAM:
+  Instance:
     NotFound: "Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roles have not been changed"
@@ -357,8 +353,6 @@ Errors:
     MemberAlreadyExisting: "Member already exists"
     MemberNotExisting: "Member does not exist"
     IDMissing: "Id missing"
-    IAMProjectIDMissing: "IAM project id missing"
-    IamProjectAlreadySet: "IAM project id has already been set"
     IdpInvalid: "IDP configuration is invalid"
     IdpNotExisting: "IDP configuration does not exist"
     OIDCConfigInvalid: "OIDC IDP configuration is invalid"
@@ -416,11 +410,11 @@ Errors:
       Empty: "Default Password Lockout Policy empty"
       NotChanged: "Default Password Lockout Policy has not been changed"
     DomainPolicy:
-      NotFound: "Org IAM Policy not found"
-      Empty: "Org IAM Policy is empty"
-      NotExisting: "Org IAM Policy not existing"
-      AlreadyExists: "Org IAM Policy already exists"
-      NotChanged: "Org IAM Policy has not been changed"
+      NotFound: "Organization Domain Policy not found"
+      Empty: "The Organization Domain Policy is empty"
+      NotExisting: "Organization Domain Policy not existing"
+      AlreadyExists: "Organization Domain Policy already exists"
+      NotChanged: "Organization Domain Policy has not been changed"
     NotificationPolicy:
       NotFound: "Default Notification Policy not found"
       NotChanged: "Default Notification Policy not changed"
