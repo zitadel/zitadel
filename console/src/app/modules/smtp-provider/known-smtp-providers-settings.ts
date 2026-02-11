@@ -129,15 +129,15 @@ export const brevo = {
 brevo satisfies ProviderDefaultSettings;
 
 export const outlook = {
-  description: 'outlook.com',
-  host: 'smtp-mail.outlook.com:587',
+  description: 'Microsoft Exchange Online',
+  host: 'smtp.office365.com:587',
   user: {
     value: '',
     placeholder: 'your outlook.com email address',
   },
   auth: {
-    case: 'xoauth2',
-    scopes: 'https://outlook.office.com/SMTP.Send',
+    case: 'plain',
+    password: { value: '', placeholder: 'Your outlook.com password' },
   },
   image: './assets/images/smtp/outlook.svg',
   senderEmailPlaceholder: 'Your outlook.com email address',
