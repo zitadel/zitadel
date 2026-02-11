@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -451,7 +451,7 @@ type sqlSmtpConfig struct {
 	xoauth2AuthClientCredentialsClientId     sql.NullString
 	xoauth2AuthClientClientCredentialsSecret *crypto.CryptoValue
 	xoauth2AuthTokenEndpoint                 sql.NullString
-	xoauth2AuthScope                         sql.NullString
+	xoauth2AuthScope                         database.TextArray[string]
 }
 
 func (c sqlSmtpConfig) set(smtpConfig *SMTPConfig) {
@@ -466,13 +466,9 @@ func (c sqlSmtpConfig) set(smtpConfig *SMTPConfig) {
 		plainAuth = nil
 	}
 
-	scopes := strings.Split(c.xoauth2AuthScope.String, " ")
-	if len(scopes) == 1 && scopes[0] == "" {
-		scopes = nil
-	}
 	xoauth2Auth := &XOAuth2Auth{
 		TokenEndpoint: c.xoauth2AuthTokenEndpoint.String,
-		Scopes:        scopes,
+		Scopes:        c.xoauth2AuthScope,
 		ClientCredentials: &XOAuthClientCredentials{
 			ClientId:     c.xoauth2AuthClientCredentialsClientId.String,
 			ClientSecret: c.xoauth2AuthClientClientCredentialsSecret,
