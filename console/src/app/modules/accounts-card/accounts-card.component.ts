@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, NgIterable, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthConfig } from 'angular-oauth2-oidc';
 import { SessionState as V1SessionState, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
@@ -38,6 +38,7 @@ interface V1AndV2Session {
   selector: 'cnsl-accounts-card',
   templateUrl: './accounts-card.component.html',
   styleUrls: ['./accounts-card.component.scss'],
+  standalone: false,
 })
 export class AccountsCardComponent {
   @Input({ required: true })
@@ -146,22 +147,22 @@ export class AccountsCardComponent {
     this.closedCard.emit();
   }
 
-  public selectAccount(loginHint: string): void {
+  public async selectAccount(loginHint: string): Promise<void> {
     const configWithPrompt: Partial<AuthConfig> = {
       customQueryParams: {
         login_hint: loginHint,
       },
     };
-    this.authService.authenticate(configWithPrompt).then();
+    await this.authService.authenticate(configWithPrompt);
   }
 
-  public selectNewAccount(): void {
+  public async selectNewAccount(): Promise<void> {
     const configWithPrompt: Partial<AuthConfig> = {
       customQueryParams: {
         prompt: 'login',
-      } as any,
+      },
     };
-    this.authService.authenticate(configWithPrompt).then();
+    await this.authService.authenticate(configWithPrompt);
   }
 
   public logout(): void {

@@ -1,28 +1,25 @@
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { AddProjectRequest, AddProjectResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { NewMgmtService } from 'src/app/services/new-mgmt.service';
-import { UserService } from 'src/app/services/user.service';
-import { FormBuilder, FormControl, Validators } from '@angular/forms';
-import { User } from '@zitadel/proto/zitadel/user/v2/user_pb';
 
 @Component({
   selector: 'cnsl-project-create',
   templateUrl: './project-create.component.html',
   styleUrls: ['./project-create.component.scss'],
+  standalone: false,
 })
 export class ProjectCreateComponent {
-  protected readonly form: ReturnType<typeof this.buildForm>;
+  public project: AddProjectRequest.AsObject = new AddProjectRequest().toObject();
 
   constructor(
-    private readonly router: Router,
-    private readonly toast: ToastService,
-    private readonly newMgmtService: NewMgmtService,
-    private readonly fb: FormBuilder,
-    protected readonly location: Location,
-    protected readonly userService: UserService,
+    private router: Router,
+    private toast: ToastService,
+    private mgmtService: ManagementService,
+    private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
     const bread: Breadcrumb = {
@@ -30,31 +27,21 @@ export class ProjectCreateComponent {
       routerLink: ['/org'],
     };
     breadcrumbService.setBreadcrumb([bread]);
-
-    this.form = this.buildForm();
   }
 
-  private buildForm() {
-    return this.fb.group({
-      name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-      selfAccount: new FormControl(true, { nonNullable: true, validators: [Validators.required] }),
-    });
-  }
-
-  protected saveProject(user: User): void {
-    const { name, selfAccount } = this.form.getRawValue();
-
-    this.newMgmtService
-      .addProject({
-        name,
-        admins: selfAccount ? [{ userId: user.userId }] : undefined,
-      })
-      .then((resp) => {
+  public saveProject(): void {
+    this.mgmtService
+      .addProject(this.project)
+      .then((resp: AddProjectResponse.AsObject) => {
         this.toast.showInfo('PROJECT.TOAST.CREATED', true);
-        return this.router.navigate(['projects', resp.id], { queryParams: { new: true } });
+        this.router.navigate(['projects', resp.id], { queryParams: { new: true } });
       })
       .catch((error) => {
         this.toast.showError(error);
       });
+  }
+
+  public close(): void {
+    this._location.back();
   }
 }
