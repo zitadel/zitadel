@@ -16,6 +16,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
@@ -472,6 +473,7 @@ type authzInstance struct {
 	ExternalDomains        database.TextArray[string] `json:"external_domains,omitempty"`
 	TrustedDomains         database.TextArray[string] `json:"trusted_domains,omitempty"`
 	ExecutionTargets       target_domain.Router       `json:"execution_targets,omitzero"`
+	AllowedLangs           []language.Tag             `json:"allowed_langs,omitempty"`
 }
 
 type csp struct {
@@ -497,6 +499,10 @@ func (i *authzInstance) ManagementConsoleApplicationID() string {
 
 func (i *authzInstance) DefaultLanguage() language.Tag {
 	return i.DefaultLang
+}
+
+func (i *authzInstance) AllowedLanguages() []language.Tag {
+	return i.AllowedLangs
 }
 
 func (i *authzInstance) DefaultOrganisationID() string {
@@ -566,6 +572,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			block                 sql.NullBool
 			features              []byte
 			executionTargetsBytes []byte
+			allowedLanguages      database.TextArray[string]
 		)
 		err := row.Scan(
 			&instance.ID,
@@ -583,6 +590,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			&instance.ExternalDomains,
 			&instance.TrustedDomains,
 			&executionTargetsBytes,
+			&allowedLanguages,
 		)
 		if errors.Is(err, sql.ErrNoRows) {
 			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.Instance.NotFound")
@@ -611,6 +619,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			}
 			instance.ExecutionTargets = target_domain.NewRouter(targets)
 		}
+		instance.AllowedLangs = domain.StringsToLanguages(allowedLanguages)
 		return nil
 	}
 }
