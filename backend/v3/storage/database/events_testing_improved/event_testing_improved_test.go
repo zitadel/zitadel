@@ -96,7 +96,7 @@ func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), er
 	return pool, stop, err
 }
 
-func TestMyTest(t *testing.T) {
+func TestDomainAddedEvent(t *testing.T) {
 	ctx := t.Context()
 	instanceDomainRepo := repository.InstanceDomainRepository()
 	instanceRepo := repository.InstanceRepository()
@@ -129,11 +129,7 @@ func TestMyTest(t *testing.T) {
 			),
 		)
 		require.NoError(t, err)
-		// event instance.domain.added
 		assert.Equal(t, "test-domain.com", domain.Domain)
 		assert.Equal(t, "123", domain.InstanceID)
-		// assert.False(t, *domain.IsPrimary)
-		// assert.WithinRange(t, domain.CreatedAt, beforeAdd, afterAdd)
-		// assert.WithinRange(t, domain.UpdatedAt, beforeAdd, afterAdd)
 	}, retryDuration, tick)
 }
