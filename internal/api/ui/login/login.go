@@ -75,6 +75,9 @@ func (c *DefaultPaths) defaultBaseURL(ctx context.Context) *url.URL {
 	if loginV2.BaseURI == nil || loginV2.BaseURI.String() == "" {
 		// In case the login v2 is enabled without a custom BaseURI,
 		// we use the request origin plus the default base path as the base URL for the templates.
+		if c.BasePath == nil {
+			return origin
+		}
 		return origin.ResolveReference(c.BasePath)
 	}
 	// In case a custom BaseURI is set for login v2, we use it as the base URL for the templates.
@@ -85,11 +88,11 @@ func (c *DefaultPaths) defaultBaseURL(ctx context.Context) *url.URL {
 	return origin.ResolveReference(loginV2.BaseURI)
 }
 
-// mergeURLs will merge two URLs, where paths, params and fragments are combined.
-// It uses url.ResolveReference, but ensures the base path is always kept (by using a trailing slash)
-// and the second URL's path does not start with a leading slash, to ensure correct merging of the two paths.
-// For example, merging "https://example.com/base" with "/path/to/resource" will result in "https://example.com/base/path/to/resource",
-// as if the base URL is "https://example.com/base/" and the second URL's path is "path/to/resource".
+// mergeURLs will merge two URLs, where the path is joined and query parameters are combined.
+// It uses (*url.URL).JoinPath on the base URL and the second URL's Path field to build the resulting path,
+// and then merges the query parameters from both URLs using [mergeQueries], preserving existing values and placeholders.
+// Fragments are not modified or combined by this function.
+// For example, merging "https://example.com/base" with a URL whose path is "/path/to/resource" will result in "https://example.com/base/path/to/resource".
 func mergeURLs(base, path *url.URL) string {
 	if base == nil && path == nil {
 		return ""
@@ -105,6 +108,10 @@ func mergeURLs(base, path *url.URL) string {
 	return u.String()
 }
 
+// mergeQueries will merge two sets of query parameters, preserving existing values and placeholders.
+// It takes two url.Values, where the first one is considered the base and the second one is merged into it.
+// The resulting query string will contain all unique key-value pairs from both sets of query parameters.
+// If a value contains placeholders in the format "{{placeholder}}", they are preserved in the final query string without being URL-encoded.
 func mergeQueries(base, path url.Values) string {
 	placeholders := map[string]string{}
 	for _, value := range base {
@@ -165,6 +172,9 @@ func (c *DefaultPaths) DefaultDomainClaimedURLTemplate(ctx context.Context) stri
 }
 
 func (c *DefaultPaths) DefaultOTPEmailURLTemplate(origin *url.URL) string {
+	if c.BasePath == nil {
+		return mergeURLs(origin, c.OTPEmailPath)
+	}
 	return mergeURLs(origin.ResolveReference(c.BasePath), c.OTPEmailPath)
 }
 
