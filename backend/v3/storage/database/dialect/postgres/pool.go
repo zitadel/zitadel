@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 
@@ -123,7 +122,7 @@ func (p *pgxPool) Migrate(ctx context.Context) error {
 }
 
 // Migrate implements [database.PoolTest].
-func (p *pgxPool) MigrateTest(ctx context.Context, typeRegistration func(ctx context.Context, conn *pgx.Conn) error) error {
+func (p *pgxPool) MigrateTest(ctx context.Context) error {
 	client, err := p.Pool.Acquire(ctx)
 	if err != nil {
 		return err
@@ -135,9 +134,6 @@ func (p *pgxPool) MigrateTest(ctx context.Context, typeRegistration func(ctx con
 	if !isMigrated {
 		return err
 	}
-	if typeRegistration != nil {
-		err = typeRegistration(ctx, client.Conn())
-	}
 
-	return err
+	return nil
 }

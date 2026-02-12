@@ -52,7 +52,7 @@ func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), er
 	}
 	pool = pool_.(database.PoolTest)
 
-	err = pool.MigrateTest(ctx, nil)
+	err = pool.MigrateTest(ctx)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to migrate database: %w", err)
 	}

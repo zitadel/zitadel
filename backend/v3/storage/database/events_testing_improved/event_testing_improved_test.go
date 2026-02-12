@@ -9,11 +9,14 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
+	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/embedded"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	// Trigger migration registration
@@ -74,13 +77,18 @@ func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), er
 		return nil, nil, fmt.Errorf("unable to start embedded postgres: %w", err)
 	}
 
-	dummyPool, err := connector.Connect(ctx)
+	dummyPool, err := connector.Connect(ctx, postgres.WithAfterConnectFunc(func(ctx context.Context, c *pgx.Conn) error {
+		// TODO(IAM-Marco): I am not sure whether this is needed or not. I speculate it is used for the ES table to handle
+		// the `position` column. Without it, I imagine that events might not be in the right order (because of position having low res).
+		pgxdecimal.Register(c.TypeMap())
+		return es_v3.RegisterEventstoreTypes(ctx, c)
+	}))
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to connect to embedded postgres: %w", err)
 	}
 
 	pool = dummyPool.(database.PoolTest)
-	err = pool.MigrateTest(ctx, es_v3.RegisterEventstoreTypes)
+	err = pool.MigrateTest(ctx)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to migrate database: %w", err)
 	}
