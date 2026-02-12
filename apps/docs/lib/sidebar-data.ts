@@ -291,13 +291,24 @@ export const guidesSidebar: readonly SidebarItem[] = [
       },
       {
         type: "category",
-        label: "SDKs",
+        label: "SDKs & Integrations",
         items: [
           "sdk-examples/introduction",
           {
             type: "category",
-            label: "Frontend (SPA)",
+            label: "Frontend & Mobile (OIDC/PKCE)",
             items: [
+              "sdk-examples/go",
+              {
+                type: "link",
+                label: ".NET (MAUI/Xamarin)",
+                href: "https://github.com/smartive/zitadel-net",
+              },
+              {
+                type: "link",
+                label: "NextAuth",
+                href: "https://next-auth.js.org/providers/zitadel",
+              },
               {
                 type: "link",
                 label: "React",
@@ -312,7 +323,24 @@ export const guidesSidebar: readonly SidebarItem[] = [
           },
           {
             type: "category",
-            label: "Mobile & Native",
+            label: "Backend & API",
+            items: [
+              {
+                type: "link",
+                label: ".NET (MAUI/Xamarin)",
+                href: "https://github.com/smartive/zitadel-net",
+              },
+              "sdk-examples/go",
+              {
+                type: "link",
+                label: "Passport.js",
+                href: "https://github.com/buehler/node-passport-zitadel",
+              },
+            ],
+          },
+          {
+            type: "category",
+            label: "Management API Clients",
             items: [
               {
                 type: "link",
@@ -321,56 +349,23 @@ export const guidesSidebar: readonly SidebarItem[] = [
               },
               {
                 type: "link",
-                label: ".NET (MAUI/Xamarin)",
-                href: "https://github.com/smartive/zitadel-net",
-              },
-            ],
-          },
-          {
-            type: "category",
-            label: "Full-Stack / SSR",
-            items: [
-              {
-                type: "link",
-                label: "NextAuth",
-                href: "https://next-auth.js.org/providers/zitadel",
-              },
-            ],
-          },
-          {
-            type: "category",
-            label: "Backend & API",
-            items: [
-              {
-                type: "link",
                 label: "Elixir",
                 href: "https://github.com/maennchen/zitadel_api",
               },
               "sdk-examples/go",
               "sdk-examples/client-libraries/java",
               {
-                type: "category",
-                label: "Node.js",
-                items: [
-                  "sdk-examples/client-libraries/node",
-                  {
-                    type: "link",
-                    label: "Passport.js",
-                    href: "https://github.com/buehler/node-passport-zitadel",
-                  },
-                  {
-                    type: "link",
-                    label: "Node.js (Community)",
-                    href: "https://www.npmjs.com/package/@zitadel/node",
-                  },
-                ],
+                type: "link",
+                label: ".NET (MAUI/Xamarin)",
+                href: "https://github.com/smartive/zitadel-net",
               },
-              "sdk-examples/client-libraries/php",
+              "sdk-examples/client-libraries/node",
               {
                 type: "link",
-                label: "Pylon",
-                href: "https://github.com/getcronit/pylon",
+                label: "Node.js (Community)",
+                href: "https://github.com/smartive/zitadel-node",
               },
+              "sdk-examples/client-libraries/php",
               "sdk-examples/client-libraries/python",
               "sdk-examples/client-libraries/ruby",
               {
