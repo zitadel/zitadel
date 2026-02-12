@@ -64,7 +64,7 @@ As long as the Management Console still calls v1 APIs, it needs to import client
 
 ### <a name="v1-stubs"></a>Legacy v1 API (Traditional Protobuf)
 
-- Uses local `buf.gen.yaml` configuration
+- Uses local `buf.gen.yaml` settings
 - Generates traditional Google protobuf JavaScript classes extending `jspb.Message`
 - Uses plugins: `protocolbuffers/js`, `grpc/web`, `grpc-ecosystem/openapiv2`
 - Output: `src/app/proto/generated/`

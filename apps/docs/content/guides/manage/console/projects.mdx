@@ -74,11 +74,11 @@ If you have different designs for your organizations or probably and use project
 
 You can choose from
 
-| Setting                                | Description                                                                                                                                                                                                                                                  |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Unspecified                            | If nothing is specified the default will trigger. (System settings)                                                                                                                                                                                          |
-| Enforce project's policy  | This setting will enforce the private labeling of the organization of the project through the whole login process.                                                                                                                          |
-| Allow login user policy | With this setting first the private labeling of the organization of the project will trigger. As soon as the user and its organization is identified by ZITADEL, the settings will change to the organization of the user. |
+| Setting                  | Description                                                                                                                                                                                                                |
+|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Unspecified              | If nothing is specified the default will trigger. (Organization settings)                                                                                                                                                  |
+| Enforce project's policy | This setting will enforce the private labeling of the organization of the project through the whole login process.                                                                                                         |
+| Allow login user policy  | With this setting first the private labeling of the organization of the project will trigger. As soon as the user and its organization is identified by ZITADEL, the settings will change to the organization of the user. |
 
 In a B2B use case, you would typically use the organization setting. If you want to omit organization detection, you can preselect an organization with the [primary domain scope](/apis/openidoauth/scopes#reserved-scopes) (ex. `urn:zitadel:iam:org:domain:primary:{domainname}`).
 

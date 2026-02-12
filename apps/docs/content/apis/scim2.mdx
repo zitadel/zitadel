@@ -15,7 +15,7 @@ The base URL for the SCIM endpoint in Zitadel is: `https://${CUSTOM_DOMAIN}/scim
 
 | Endpoint                                                                | Remarks                                                    |
 |-------------------------------------------------------------------------|------------------------------------------------------------|
-| `GET /scim/v2/{orgId}/ServiceProviderConfig`                            | Retrieve the configuration of the Zitadel service provider |
+| `GET /scim/v2/{orgId}/ServiceProviderConfig`                            | Retrieve the settings of the Zitadel service provider |
 | `GET /scim/v2/{orgId}/Schemas`                                          | Retrieve all supported schemas                             |
 | `GET /scim/v2/{orgId}/Schemas/{id}`                                     | Retrieve a known supported schema                          |
 | `GET /scim/v2/{orgId}/ResourceTypes`                                    | Retrieve all supported resource types                      |
@@ -781,7 +781,7 @@ curl -X POST "https://${DOMAIN}/scim/v2/${ORG_ID}/Bulk" \
 </details>
 
 <details>
-<summary>`GET /ServiceProviderConfig`: Get service provider configuration</summary>
+<summary>`GET /ServiceProviderConfig`: Get service provider settings</summary>
 
 ```bash
 curl -G "https://${DOMAIN}/scim/v2/${ORG_ID}/ServiceProviderConfig" \
@@ -848,7 +848,7 @@ which aids pinpointing the source of the error in the system.
 
 ## Resources
 
-- **[Zitadel SCIM Documentation](/guides/manage/user/scim2)**: Documentation of Zitadel's SCIM implementation, including configuration details and known limitations.
+- **[Zitadel SCIM Documentation](/guides/manage/user/scim2)**: Documentation of Zitadel's SCIM implementation, including settings and known limitations.
 - **[SCIM](https://scim.cloud/)**: The Webpage of SCIM.
 - **[RFC7643](https://tools.ietf.org/html/rfc7643) Core Schema**:
   The Core Schema provides a platform-neutral schema and extension model for representing users and groups.

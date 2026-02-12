@@ -84,19 +84,19 @@ After selecting your Apps Type and Authentication Method, you may need to specif
 
 If your application doesn't support the OIDC standard, but SAML this is the right application type to choose. SAML is an open standard used for authentication based on XML.
 
-After entering a name and choosing the application type "SAML", you will get to the SAML configuration screen.
+After entering a name and choosing the application type "SAML", you will get to the SAML settings screen.
 
 You can either add a link to a SAML metadata file or upload it directly.
 SAML metadata is an XML document which contains information necessary for interaction with SAML-enabled identity or service providers.
 
-You can find some example configurations for SAML 2.0 in our [integrate services](/guides/integrate/services) guides
+You can find some example settings for SAML 2.0 in our [integrate services](/guides/integrate/services) guides
 
 ## Redirect URIs
 
 App Types with User interaction (Web, Native and User Agent) require redirect URIs.
 Those redirects URIs are used to redirect the user back to your application on successful login.
 
-These URIs are defined in your application code and are checked by ZITADEL if they correspond to your applications configuration.
+These URIs are defined in your application code and are checked by ZITADEL if they correspond to your applications settings.
 Redirect URIs are checked during the login process.
 Native applications can use a different protocol than http or https in order to redirect your user.
 
@@ -109,7 +109,7 @@ Native applications can use a different protocol than http or https in order to 
 ### Development mode
 
 In order to develop locally, or you want to redirect users to any other protocol than https://, you must enable **Development mode**.
-When disabled only https is allowed, as ZITADEL's configuration is secure by default.
+When disabled only https is allowed, as ZITADEL's settings are secure by default.
 
 <img
   alt="Development mode"
@@ -140,14 +140,14 @@ pattern you're looking for is `path/to/**/*.txt`.
 
 > When IPv6 URIs are used as redirects in development mode, square brackets must be escaped as they are also Special Terms for globs. `http://\[::1\]:80`
 
-## Review Configuration
+## Review Settings
 
 <ReviewConfig components={props.components}  authType="code" />
 
 ## Application settings
 
-After creating the application, you can still change its configuration if you for example need a offline_access support (Refresh token).
-You can easily change your authentication method via the colored toggle on top or directly change configuration via the input and dropdown fields.
+After creating the application, you can still change its settings if you for example need a offline_access support (Refresh token).
+You can easily change your authentication method via the colored toggle on top or directly change settings via the input and dropdown fields.
 
 > Note: Changing application type is not possible. In this case you have to create a new application.
 

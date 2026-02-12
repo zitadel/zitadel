@@ -46,7 +46,7 @@ Follow these steps to deploy your first instance:
 3. **Locality**: Select your Region.
   - Note: Choosing a region close to your users minimizes latency and helps with data residency compliance.
 4. **Admin Setup**: Create your Instance Administrator. This user has "root" permissions to manage all organizations, policies, and settings within this specific instance.
-5. **Deploy**: Review your configuration and click Create Instance.
+5. **Deploy**: Review your settings and click Create Instance.
 
 ![Create Instance](../../../public/img/guides/quickstart/cloud_create_instance.png)
 
@@ -67,7 +67,7 @@ Log in using the Admin credentials you just created.
 - **Continue**: Click the Continue button.
 ![Project Name and Framework/Language](../../../public/img/guides/quickstart/create_project_react.png)
 
-#### Step 2: Review Default Configuration
+#### Step 2: Review Default Settings
 ZITADEL automatically configures the best security settings for your selected framework.
 
 <FrameworkSelector>
@@ -1033,10 +1033,10 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 ## Success! 🚀
 You’ve successfully integrated ZITADEL into an application.
 
-<Callout type="warn" title="Prevent Misconfiguration Lockouts">
-  Login policy misconfigurations that occur during the testing phase can easily lead to a [lockout](/legal/policies/account-lockout-policy). To ensure you don't lose access to your instance:
+<Callout type="warn" title="Prevent Settings Misconfiguration Lockouts">
+  Login policy settings misconfigurations that occur during the testing phase can easily lead to a [lockout](/legal/policies/account-lockout-policy). To ensure you don't lose access to your instance:
 
-  1.  **Generate a backup PAT:** Create a [Service User Personal Access Token](/guides/integrate/service-accounts/personal-access-token) with the [`IAM_OWNER`](/guides/manage/console/administrators) role to revert any login UI misconfigurations using the API.
+  1.  **Generate a backup PAT:** Create a [Service User Personal Access Token](/guides/integrate/service-accounts/personal-access-token) with the [`IAM_OWNER`](/guides/manage/console/administrators) role to revert any login UI settings misconfigurations using the API.
   2.  **Add a second Instance Administrator:** Always designate at least one [**second instance administrator**](/guides/manage/console/administrators).
 </Callout>
 
