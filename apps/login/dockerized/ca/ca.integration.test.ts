@@ -8,6 +8,7 @@ import { generateCertificates } from "./utils/tls.ts";
 
 const TEST_DIR = path.dirname(new URL(import.meta.url).pathname);
 const OUTPUT_DIR = path.join(TEST_DIR, "output");
+const CERTS_DIR = path.join(OUTPUT_DIR, "certs");
 const LOGIN_APP_DIR = path.join(TEST_DIR, "../..");
 
 async function bundleMockServer(): Promise<string> {
@@ -64,13 +65,13 @@ describe("Custom CA Certificate Integration", () => {
     if (fs.existsSync(OUTPUT_DIR)) {
       fs.rmSync(OUTPUT_DIR, { recursive: true });
     }
-    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+    fs.mkdirSync(CERTS_DIR, { recursive: true });
 
-    certs = generateCertificates({
-      outputDir: OUTPUT_DIR,
-      serverCommonName: "mock-zitadel",
-      serverAltNames: ["mock-zitadel", "localhost", "127.0.0.1"],
-    });
+    certs = generateCertificates();
+
+    fs.writeFileSync(path.join(CERTS_DIR, "ca.crt"), certs.ca.cert);
+    fs.writeFileSync(path.join(CERTS_DIR, "server.key"), certs.server.key);
+    fs.writeFileSync(path.join(CERTS_DIR, "server.crt"), certs.server.cert);
 
     mockServerBundle = await bundleMockServer();
 
@@ -81,8 +82,8 @@ describe("Custom CA Certificate Integration", () => {
       .withNetworkAliases("mock-zitadel")
       .withCopyFilesToContainer([
         { source: mockServerBundle, target: "/app/server.js" },
-        { source: certs.paths.serverKey, target: "/certs/server.key" },
-        { source: certs.paths.serverCert, target: "/certs/server.crt" },
+        { source: path.join(CERTS_DIR, "server.key"), target: "/certs/server.key" },
+        { source: path.join(CERTS_DIR, "server.crt"), target: "/certs/server.crt" },
       ])
       .withBindMounts([{ source: OUTPUT_DIR, target: "/output" }])
       .withCommand(["node", "/app/server.js"])
@@ -117,7 +118,7 @@ describe("Custom CA Certificate Integration", () => {
         })
         .withCopyFilesToContainer([
           {
-            source: certs.paths.caCert,
+            source: path.join(CERTS_DIR, "ca.crt"),
             target: "/etc/ssl/certs/custom-ca.crt",
           },
         ])
