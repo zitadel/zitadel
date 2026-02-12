@@ -37,14 +37,14 @@ func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, loginText *do
 
 func (c *Commands) RemoveCustomInstanceLoginTexts(ctx context.Context, lang language.Tag) (*domain.ObjectDetails, error) {
 	if lang == language.Und {
-		return nil, zerrors.ThrowInvalidArgument(nil, "IAM-Gfbg3", "Errors.CustomText.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-Gfbg3", "Errors.CustomText.Invalid")
 	}
 	customText, err := c.defaultLoginTextWriteModelByID(ctx, lang)
 	if err != nil {
 		return nil, err
 	}
 	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "IAM-fru44", "Errors.CustomText.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INST-fru44", "Errors.CustomText.NotFound")
 	}
 	iamAgg := InstanceAggregateFromWriteModel(&customText.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewCustomTextTemplateRemovedEvent(ctx, iamAgg, domain.LoginCustomText, lang))

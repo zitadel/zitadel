@@ -123,7 +123,7 @@ func (c *ChangeOrgMember) IsValid(zitadelRoles []authz.RoleMapping) error {
 		return zerrors.ThrowInvalidArgument(nil, "Org-LiaZi", "Errors.Org.MemberInvalid")
 	}
 	if len(domain.CheckForInvalidRoles(c.Roles, domain.OrgRolePrefix, zitadelRoles)) > 0 {
-		return zerrors.ThrowInvalidArgument(nil, "IAM-m9fG8", "Errors.Org.MemberInvalid")
+		return zerrors.ThrowInvalidArgument(nil, "INST-m9fG8", "Errors.Org.MemberInvalid")
 	}
 
 	return nil

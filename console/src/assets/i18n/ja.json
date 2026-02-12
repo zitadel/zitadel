@@ -427,7 +427,7 @@
     "MACHINEUSERS": "サービスユーザー",
     "LOGOUT": "すべてのユーザーをログアウトする",
     "NEWORG": "新しい組織",
-    "IAMADMIN": "あなたはIAM管理者です。広範囲の権限があることに注意してください。",
+    "IAMADMIN": "あなたはインスタンス管理者です。広範囲の権限があることに注意してください。",
     "SHOWORGS": "すべての組織を表示する",
     "GRANTS": "認可",
     "ACTIONS": "アクション",
@@ -766,7 +766,7 @@
       "KEYS": "キー",
       "PAT": "個人用アクセス トークン",
       "USERGRANTS": "認可",
-      "MEMBERSHIPS": "メンバーシップ",
+      "MEMBERSHIPS": "管理者ロール",
       "METADATA": "メタデータ"
     },
     "TITLE": "個人情報",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel管理者ロール",
-      "DESCRIPTION": "ユーザーのメンバーグラント一覧です。組織、プロジェクト、IAMの詳細ページでも変更することができます。",
+      "DESCRIPTION": "ユーザーのメンバーグラント一覧です。組織、プロジェクト、インスタンスの詳細ページでも変更することができます。",
       "ORGCONTEXT": "現在選択されている組織に関連するすべての組織とプロジェクトが表示されます。",
       "USERCONTEXT": "自分が権限を持つすべての組織やプロジェクトが表示されます。他の組織も含みます。",
       "CREATIONDATE": "作成日",
@@ -1170,7 +1170,7 @@
       "REMOVE": "削除",
       "TYPE": "タイプ",
       "ORGID": "組織ID",
-      "UPDATED": "メンバーシップが更新されました。",
+      "UPDATED": "管理者ロールが更新されました。",
       "NOPERMISSIONTOEDIT": "ロールを編集するために必要な権限がありません！",
       "TYPES": {
         "UNKNOWN": "不明",
@@ -1267,12 +1267,12 @@
       "DESCRIPTION": "グローバルポリシーと管理アクセス設定を管理します。"
     },
     "EVENTSTORE": {
-      "TITLE": "IAMストレージ管理",
+      "TITLE": "インスタンスストレージ管理",
       "DESCRIPTION": "Zitadelのビューと失敗したイベントを管理します。"
     },
     "MEMBER": {
-      "TITLE": "マネージャー",
-      "DESCRIPTION": "これらのマネージャーは、インスタンスで変更を加えることができます。"
+      "TITLE": "管理者",
+      "DESCRIPTION": "これらの管理者は、インスタンスで変更を加えることができます。"
     },
     "PAGES": {
       "STATE": "ステータス",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "マネージャーが削除されました。",
-      "MEMBERSADDED": "マネージャーが追加されました。",
-      "MEMBERADDED": "マネージャーが追加されました。",
-      "MEMBERCHANGED": "マネージャーが変更されました。",
+      "MEMBERREMOVED": "管理者が削除されました。",
+      "MEMBERSADDED": "管理者が追加されました。",
+      "MEMBERADDED": "管理者が追加されました。",
+      "MEMBERCHANGED": "管理者が変更されました。",
       "ROLEREMOVED": "ロールが削除されました。",
       "ROLECHANGED": "ロールが変更されました。",
       "REACTIVATED": "アクティブになりました。",
@@ -1449,7 +1449,7 @@
       "2": "非アクティブ"
     },
     "MEMBER": {
-      "TITLE": "組織マネージャー",
+      "TITLE": "組織管理者",
       "DESCRIPTION": "組織の設定を変更できるユーザーを定義します。"
     },
     "TOAST": {
@@ -1458,9 +1458,9 @@
       "REACTIVATED": "組織がアクティブになりました。",
       "DOMAINADDED": "ドメインを追加しました。",
       "DOMAINREMOVED": "ドメインを削除しました。",
-      "MEMBERADDED": "マネージャーが追加されました。",
-      "MEMBERREMOVED": "マネージャーが削除されました。",
-      "MEMBERCHANGED": "マネージャーが変更されました。",
+      "MEMBERADDED": "管理者が追加されました。",
+      "MEMBERREMOVED": "管理者が削除されました。",
+      "MEMBERCHANGED": "管理者が変更されました。",
       "SETPRIMARY": "プライマリドメインが設定されました。",
       "DELETED": "組織が正常に削除されました。",
       "DEFAULTORGNOTFOUND": "デフォルトの組織が見つかりませんでした",
@@ -1942,13 +1942,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "メンバー",
+      "TITLE": "管理者",
       "USERNAME": "ユーザー名",
       "DISPLAYNAME": "表示名",
       "LOGINNAME": "ログイン名",
       "EMAIL": "Eメール",
       "ROLES": "ロール",
-      "ADD": "メンバーを追加する",
+      "ADD": "管理者を追加する",
       "ADDDESCRIPTION": "追加するユーザーの名前を入力します。"
     },
     "TABLE": {
@@ -2039,9 +2039,9 @@
       "NAME": "新しいプロジェクト名"
     },
     "MEMBER": {
-      "TITLE": "マネージャー",
-      "TITLEDESC": "マネージャーは、自分のロールに基づいてこのプロジェクトに変更を加えることができます。",
-      "DESCRIPTION": "これらのマネージャーは、プロジェクトを編集できます。",
+      "TITLE": "管理者",
+      "TITLEDESC": "管理者は、自分のロールに基づいてこのプロジェクトに変更を加えることができます。",
+      "DESCRIPTION": "これらの管理者は、プロジェクトを編集できます。",
       "USERNAME": "ユーザー名",
       "DISPLAYNAME": "表示名",
       "LOGINNAME": "ログイン名",
@@ -2069,9 +2069,9 @@
       },
       "DETAIL": {
         "TITLE": "プロジェクトグラント",
-        "DESC": "指定された組織で使用できるロールを選択し、マネージャーを選出します。",
-        "MEMBERTITLE": "マネージャー",
-        "MEMBERDESC": "これらは、グラントされた組織のマネージャーです。プロジェクトの設定を編集するためにアクセスできるユーザーをここに追加します。",
+        "DESC": "指定された組織で使用できるロールを選択し、管理者を選出します。",
+        "MEMBERTITLE": "管理者",
+        "MEMBERDESC": "これらは、グラントされた組織の管理者です。プロジェクトの設定を編集するためにアクセスできるユーザーをここに追加します。",
         "PROJECTNAME": "プロジェクト名",
         "GRANTEDORG": "グラントされた組織",
         "RESOURCEOWNER": "リソース所有者"
@@ -2084,7 +2084,7 @@
       "ALL": "全て",
       "SHOWDETAIL": "詳細を表示",
       "USER": "ユーザー",
-      "MEMBERS": "マネージャー",
+      "MEMBERS": "管理者",
       "ORG": "組織",
       "PROJECTNAME": "プロジェクト名",
       "GRANTEDORG": "グラントされた組織",
@@ -2102,9 +2102,9 @@
         "PROJECTGRANTUSERGRANTADDED": "プロジェクトグラントが作成されました。",
         "PROJECTGRANTADDED": "プロジェクトグラントが作成されました。",
         "PROJECTGRANTCHANGED": "プロジェクトグラントが変更されました。",
-        "PROJECTGRANTMEMBERADDED": "グラントマネージャーが追加されました。",
-        "PROJECTGRANTMEMBERCHANGED": "グラントマネージャーが変更されました。",
-        "PROJECTGRANTMEMBERREMOVED": "グラントマネージャーが削除されました。",
+        "PROJECTGRANTMEMBERADDED": "グラント管理者が追加されました。",
+        "PROJECTGRANTMEMBERCHANGED": "グラント管理者が変更されました。",
+        "PROJECTGRANTMEMBERREMOVED": "グラント管理者が削除されました。",
         "PROJECTGRANTUPDATED": "プロジェクトグラントが更新されました。"
       },
       "DIALOG": {
@@ -2167,10 +2167,10 @@
       "EMPTY": "プロジェクトは見つかりません"
     },
     "TOAST": {
-      "MEMBERREMOVED": "マネージャーが削除されました。",
-      "MEMBERSADDED": "マネージャーが追加されました。",
-      "MEMBERADDED": "マネージャーが追加されました。",
-      "MEMBERCHANGED": "マネージャーが変更されました。",
+      "MEMBERREMOVED": "管理者が削除されました。",
+      "MEMBERSADDED": "管理者が追加されました。",
+      "MEMBERADDED": "管理者が追加されました。",
+      "MEMBERCHANGED": "管理者が変更されました。",
       "ROLESCREATED": "ロールが作成されました。",
       "ROLEREMOVED": "ロールが削除されました。",
       "ROLECHANGED": "ロールが変更されました。",
@@ -2792,20 +2792,20 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "マネージャーを追加する",
+    "ADD": "管理者を追加する",
     "CREATIONTYPE": "作成タイプ",
     "CREATIONTYPES": {
       "0": "所有プロジェクト",
       "1": "グラントされたプロジェクト",
       "2": "組織",
-      "3": "IAM",
+      "3": "インスタンス",
       "4": "プロジェクト"
     },
     "EDITROLE": "ロールを編集する",
     "EDITFOR": "ユーザーのロールを編集する：{{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "マネージャーの削除",
-      "DELETE_DESCRIPTION": "マネージャーを削除しようとしています。本当によろしいですか？"
+      "DELETE_TITLE": "管理者の削除",
+      "DELETE_DESCRIPTION": "管理者を削除しようとしています。本当によろしいですか？"
     },
     "SHOWDETAILS": "クリックして詳細を表示します。"
   },
@@ -2840,7 +2840,7 @@
       "UPDATED": "認可が更新されました。",
       "REMOVED": "認可が削除されました",
       "BULKREMOVED": "認可が削除されました。",
-      "CANTSHOWINFO": "このユーザーが所属する組織のメンバーではないため、このユーザーのプロフィールにアクセスできません"
+      "CANTSHOWINFO": "このユーザーが所属する組織の管理者ではないため、このユーザーのプロフィールにアクセスできません"
     },
     "DIALOG": {
       "DELETE_TITLE": "認可の削除",

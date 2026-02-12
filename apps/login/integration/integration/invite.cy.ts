@@ -93,6 +93,7 @@ describe("verify invite", () => {
     stub("zitadel.user.v2.UserService", "VerifyInviteCode");
 
     cy.visit("/verify?userId=221394658884845598&code=abc&invite=true");
+    cy.get("[data-testid=submit-button]").click();
     cy.url().should("include", Cypress.config().baseUrl + "/authenticator/set");
   });
 
@@ -105,6 +106,7 @@ describe("verify invite", () => {
     // TODO: Avoid uncaught exception in application
     cy.once("uncaught:exception", () => false);
     cy.visit("/verify?userId=221394658884845598&code=abc&invite=true");
+    cy.get("[data-testid=submit-button]").click();
     cy.contains("Could not verify invite", { timeout: 10_000 });
   });
 });

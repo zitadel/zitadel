@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Systémoví uživatelé",
     "LOGOUT": "Odhlásit všechny uživatele",
     "NEWORG": "Nová organizace",
-    "IAMADMIN": "Jste administrátor IAM. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
+    "IAMADMIN": "Jste administrátor instance. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
     "SHOWORGS": "Zobrazit všechny organizace",
     "GRANTS": "Autorizace",
     "ACTIONS": "Akce",
@@ -766,7 +766,7 @@
       "KEYS": "Klíče",
       "PAT": "Osobní přístupové tokeny",
       "USERGRANTS": "Oprávnění",
-      "MEMBERSHIPS": "Členství",
+      "MEMBERSHIPS": "Role správce",
       "METADATA": "Metadata"
     },
     "TITLE": "Osobní informace",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Role správce Zitadel",
-      "DESCRIPTION": "Zde jsou všechna členská oprávnění uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo IAM.",
+      "DESCRIPTION": "Zde jsou všechny role správce uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo instance.",
       "ORGCONTEXT": "Vidíte všechny organizace a projekty, které souvisí s aktuálně vybranou organizací.",
       "USERCONTEXT": "Vidíte všechny organizace a projekty, na které máte oprávnění. Včetně jiných organizací.",
       "CREATIONDATE": "Datum vytvoření",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Odebrat",
       "TYPE": "Typ",
       "ORGID": "ID organizace",
-      "UPDATED": "Členství bylo aktualizováno.",
+      "UPDATED": "Role správce byla aktualizována.",
       "NOPERMISSIONTOEDIT": "Nemáte potřebná oprávnění pro úpravu rolí!",
       "TYPES": {
         "UNKNOWN": "Neznámý",
@@ -1267,12 +1267,12 @@
       "DESCRIPTION": "Spravujte vaše globální politiky a nastavení přístupu k managementu."
     },
     "EVENTSTORE": {
-      "TITLE": "Administrace úložiště systému IAM",
+      "TITLE": "Administrace úložiště systému Instance",
       "DESCRIPTION": "Správa nastavení ukládání systému ZIDATEL."
     },
     "MEMBER": {
-      "TITLE": "Manažeři",
-      "DESCRIPTION": "Tito manažeři mají oprávnění provádět změny ve vaší instanci."
+      "TITLE": "Správci",
+      "DESCRIPTION": "Tito správci mají oprávnění provádět změny ve vaší instanci."
     },
     "PAGES": {
       "STATE": "Stav",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manažer odstraněn.",
-      "MEMBERSADDED": "Manažeři přidáni.",
-      "MEMBERADDED": "Manažer přidán.",
-      "MEMBERCHANGED": "Manažer změněn.",
+      "MEMBERREMOVED": "Správce odstraněn.",
+      "MEMBERSADDED": "Správci přidáni.",
+      "MEMBERADDED": "Správce přidán.",
+      "MEMBERCHANGED": "Správce změněn.",
       "ROLEREMOVED": "Role odstraněna.",
       "ROLECHANGED": "Role změněna.",
       "REACTIVATED": "Reaktivováno",
@@ -1449,7 +1449,7 @@
       "2": "Deaktivováno"
     },
     "MEMBER": {
-      "TITLE": "Manažeři organizace",
+      "TITLE": "Správci organizace",
       "DESCRIPTION": "Definujte uživatele, kteří mohou měnit preference vaší organizace."
     },
     "TOAST": {
@@ -1458,9 +1458,9 @@
       "REACTIVATED": "Organizace reaktivována.",
       "DOMAINADDED": "Doména přidána.",
       "DOMAINREMOVED": "Doména odstraněna.",
-      "MEMBERADDED": "Manažer přidán.",
-      "MEMBERREMOVED": "Manažer odstraněn.",
-      "MEMBERCHANGED": "Manažer změněn.",
+      "MEMBERADDED": "Správce přidán.",
+      "MEMBERREMOVED": "Správce odstraněn.",
+      "MEMBERCHANGED": "Správce změněn.",
       "SETPRIMARY": "Nastavena primární doména.",
       "DELETED": "Organizace úspěšně smazána",
       "DEFAULTORGNOTFOUND": "Výchozí organizace nebyla nalezena",
@@ -1943,13 +1943,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Členové",
+      "TITLE": "Správci",
       "USERNAME": "Uživatelské jméno",
       "DISPLAYNAME": "Zobrazované jméno",
       "LOGINNAME": "Přihlašovací jméno",
       "EMAIL": "E-mail",
       "ROLES": "Role",
-      "ADD": "Přidat člena",
+      "ADD": "Přidat správce",
       "ADDDESCRIPTION": "Zadejte jména uživatelů, kteří mají být přidáni."
     },
     "TABLE": {
@@ -2775,10 +2775,10 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "Přidat manažera",
+    "ADD": "Přidat správce",
     "CREATIONTYPE": "Typ vytvoření",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instance",
       "2": "Organizace",
       "0": "Vlastní projekt",
       "1": "Přidělený projekt",
@@ -2787,8 +2787,8 @@
     "EDITROLE": "Upravit role",
     "EDITFOR": "Upravit role pro uživatele: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Odebrat manažera",
-      "DELETE_DESCRIPTION": "Chystáte se odebrat manažera. Jste si jisti?"
+      "DELETE_TITLE": "Odebrat správce",
+      "DELETE_DESCRIPTION": "Chystáte se odebrat správce. Jste si jisti?"
     },
     "SHOWDETAILS": "Zobrazit detaily"
   },
@@ -2823,7 +2823,7 @@
       "UPDATED": "Autorizace aktualizována.",
       "REMOVED": "Autorizace odebrána",
       "BULKREMOVED": "Autorizace odebrány.",
-      "CANTSHOWINFO": "Nemůžete navštívit profil tohoto uživatele, protože nejste členem organizace, do které tento uživatel patří"
+      "CANTSHOWINFO": "Nemůžete navštívit profil tohoto uživatele, protože nejste správcem organizace, do které tento uživatel patří"
     },
     "DIALOG": {
       "DELETE_TITLE": "Smazat autorizaci",
