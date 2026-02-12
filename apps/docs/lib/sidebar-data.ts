@@ -88,14 +88,14 @@ export const guidesSidebar: readonly SidebarItem[] = [
                 "Quickstart guides for integrating ZITADEL authentication into frontend single-page applications.",
             },
             items: [
+              "sdk-examples/angular",
+              "sdk-examples/react",
               {
                 type: "link",
                 label: "Vanilla-JS",
                 href: "https://github.com/zitadel/zitadel-vanilla-js",
               },
-              "examples/login/react",
-              "examples/login/angular",
-              "examples/login/vue",
+              "sdk-examples/vue",
             ],
           },
           {
@@ -123,8 +123,17 @@ export const guidesSidebar: readonly SidebarItem[] = [
                 "Quickstart guides for integrating ZITADEL authentication into Full-Stack / SSR applications.",
             },
             items: [
-              "examples/login/nextjs",
+              "sdk-examples/astro",
+              "sdk-examples/expressjs",
+              "sdk-examples/flask",
+              "sdk-examples/fastapi",
+              "sdk-examples/fastify",
+              "sdk-examples/nextjs",
               "examples/login/nextjs-b2b",
+              "sdk-examples/nuxtjs",
+              "sdk-examples/qwik",
+              "sdk-examples/solidstart",
+              "sdk-examples/sveltekit",
             ],
           },
           {
@@ -138,10 +147,10 @@ export const guidesSidebar: readonly SidebarItem[] = [
                 "Quickstart guides for integrating ZITADEL authentication into Web App (Server-Side) applications.",
             },
             items: [
-              "examples/login/symfony",
-              "examples/login/java-spring",
-              "examples/login/python-django",
-              "examples/login/go"
+              "sdk-examples/django",
+              "examples/login/go",
+              "sdk-examples/symfony",
+              "sdk-examples/spring",
             ],
           },
           {
@@ -157,10 +166,9 @@ export const guidesSidebar: readonly SidebarItem[] = [
             items: [
               "examples/secure-api/go",
               "examples/secure-api/java-spring",
-              "examples/secure-api/python-django",
-              "examples/secure-api/python-flask",
               "examples/secure-api/nodejs-nestjs",
               "examples/secure-api/pylon",
+              "examples/secure-api/python-django",
             ],
           },
         ],
@@ -288,9 +296,16 @@ export const guidesSidebar: readonly SidebarItem[] = [
             type: "category",
             label: "Frontend (SPA)",
             items: [
-              "sdk-examples/react",
-              "sdk-examples/angular",
-              "sdk-examples/vue",
+              {
+                type: "link",
+                label: "React",
+                href: "https://github.com/zitadel/zitadel-react",
+              },
+              {
+                type: "link",
+                label: "Vue",
+                href: "https://github.com/zitadel/zitadel-vue",
+              },
             ],
           },
           {
@@ -313,12 +328,6 @@ export const guidesSidebar: readonly SidebarItem[] = [
             type: "category",
             label: "Full-Stack / SSR",
             items: [
-              "sdk-examples/nextjs",
-              "sdk-examples/nuxtjs",
-              "sdk-examples/sveltekit",
-              "sdk-examples/qwik",
-              "sdk-examples/solidstart",
-              "sdk-examples/astro",
               {
                 type: "link",
                 label: "NextAuth",
@@ -335,9 +344,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
                 label: "Node.js",
                 items: [
                   "sdk-examples/client-libraries/node",
-                  "sdk-examples/expressjs",
-                  "sdk-examples/fastify",
-                  "sdk-examples/hono",
+
                   "sdk-examples/nestjs",
                   {
                     type: "link",
@@ -351,16 +358,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
                   },
                 ],
               },
-              {
-                type: "category",
-                label: "Python",
-                items: [
-                  "sdk-examples/client-libraries/python",
-                  "sdk-examples/flask",
-                  "sdk-examples/django",
-                  "sdk-examples/fastapi",
-                ],
-              },
+              "sdk-examples/client-libraries/python",
               {
                 type: "category",
                 label: "Go",
@@ -370,8 +368,6 @@ export const guidesSidebar: readonly SidebarItem[] = [
                 type: "category",
                 label: "Java",
                 items: [
-                  "sdk-examples/java",
-                  "sdk-examples/spring",
                   "sdk-examples/client-libraries/java",
                 ],
               },
@@ -379,7 +375,6 @@ export const guidesSidebar: readonly SidebarItem[] = [
                 type: "category",
                 label: "PHP",
                 items: [
-                  "sdk-examples/symfony",
                   "sdk-examples/laravel",
                   "sdk-examples/client-libraries/php",
                 ],
