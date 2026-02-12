@@ -283,10 +283,6 @@ Errors:
       Empty: "La politique d'âge du mot de passe est vide"
       NotExisting: "La politique d'âge des mots de passe n'existe pas"
       AlreadyExists: "La politique relative à l'âge du mot de passe existe déjà"
-    OrgIAMPolicy:
-      Empty: "La politique IAM d'Org est vide"
-      NotExisting: "La politique Org IAM n'existe pas"
-      AlreadyExists: "La politique IAM d'Org existe déjà"
     NotificationPolicy:
       NotFound: "La politique notification n'a pas été trouvée"
       NotChanged: "La politique notification n'a pas été modifiée"
@@ -348,7 +344,7 @@ Errors:
       HasNotExistingRole: "Un rôle n'existe pas sur le projet"
       NotActive: "La concession du projet n'est pas active"
       NotInactive: "La concession du projet n'est pas inactive"
-  IAM:
+  Instance:
     NotFound: "IAM non trouvé. Assurez-vous que vous avez la bonne organisation. Vérifiez https://zitadel.com/docs/apis/introduction#organizations"
     Member:
       RolesNotChanged: "Les rôles n'ont pas été modifiés"
@@ -356,8 +352,6 @@ Errors:
     MemberAlreadyExisting: "Le membre existe déjà"
     MemberNotExisting: "Le membre n'existe pas"
     IDMissing: "Id manquant"
-    IAMProjectIDMissing: "Id de projet IAM manquant"
-    IamProjectAlreadySet: "L'identifiant du projet IAM a déjà été défini"
     IdpInvalid: "La configuration IDP n'est pas valide"
     IdpNotExisting: "La configuration IDP n'existe pas"
     OIDCConfigInvalid: "La configuration IDP de l'OIDC n'est pas valide"
@@ -415,11 +409,11 @@ Errors:
       Empty: "Politique de verrouillage par mot de passe par défaut vide"
       NotChanged: "La politique de verrouillage par mot de passe par défaut n'a pas été modifiée."
     DomainPolicy:
-      NotFound: "Politique IAM Org non trouvée"
-      Empty: "La politique Org IAM est vide"
-      NotExisting: "La politique IAM d'Org n'existe pas"
-      AlreadyExists: "La politique IAM d'Org existe déjà"
-      NotChanged: "La politique IAM d'Org n'a pas été modifiée"
+      NotFound: "Politique de domaine de l'organisation non trouvée"
+      Empty: "La politique de domaine de l'organisation est vide"
+      NotExisting: "La politique de domaine de l'organisation n'existe pas"
+      AlreadyExists: "La politique de domaine de l'organisation existe déjà"
+      NotChanged: "La politique de domaine de l'organisation n'a pas été modifiée"
     NotificationPolicy:
       NotFound: "La politique de notification par défaut n'a pas été trouvée"
       NotChanged: "La politique de notification par défaut n'a pas été modifiée"
