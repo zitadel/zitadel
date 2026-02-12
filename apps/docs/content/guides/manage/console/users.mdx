@@ -18,7 +18,7 @@ A service account only has a name and a description aside his username.
 A service account can be authenticated with JWT profile or Personal Access Tokens. Both methods can specify an expiry.
 A user can authenticate itself with his password, add multiple factors for additional security, and enable passkey authentication.
 
-Service users are primarily used to gain access for a backend service or iot device. The fact that service accounts can also be ZITADEL managers is used to restrict access to specific projects or organizations.
+Service users are primarily used to gain access for a backend service or iot device. The fact that service accounts can also be ZITADEL administrators is used to restrict access to specific projects or organizations.
 To get an understanding on how service accounts are used, take a look at our NextJS B2B Demo application.
 
 ## Create User
@@ -39,10 +39,10 @@ Just navigate to the section **Metadata** and click on **edit**.
   alt="User Metadata"
 />
 
-Metadata can requested via our auth and management APIs, from userinfo endpoint or ID Token.
+Metadata can be requested via our auth and management APIs, from userinfo endpoint or ID Token.
 To get your metadata from the userinfo endpoint, add `urn:zitadel:iam:user:metadata` to your authentication request. Take a look at our reserved scopes [here](/apis/openidoauth/scopes#reserved-scopes) or take a look at our [metadata guide](../customize/user-metadata).
 
-You can then toggle **User Info inside ID Token** in your application settings, if you need this information in the ID Token too.
+You can then toggle **User Info inside ID Token** in your application settings if you need this information in the ID Token too.
 
 <img
   src="/docs/img/guides/console/appidtokensettings.png"

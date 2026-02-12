@@ -408,6 +408,19 @@ func Test_smtpToPb(t *testing.T) {
 			},
 		},
 		{
+			name: "no auth must map to none",
+			args: args{
+				req: &query.SMTP{},
+			},
+			res: &settings_pb.EmailProvider_Smtp{
+				Smtp: &settings_pb.EmailProviderSMTP{
+					Auth: &settings_pb.EmailProviderSMTP_None{
+						None: &settings_pb.SMTPNoAuth{},
+					},
+				},
+			},
+		},
+		{
 			name: "plain auth must map to plain",
 			args: args{
 				req: &query.SMTP{
