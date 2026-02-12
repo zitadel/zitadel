@@ -143,7 +143,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-        const url = await startIdentityProviderFlow({
+        const response = await startIdentityProviderFlow({
           serviceConfig,
           idpId: activeIdps[0].id,
           urls: {
@@ -156,11 +156,15 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           },
         });
 
-        if (!url) {
+        if (!response || !response.url) {
           return { error: t("errors.couldNotStartIDPFlow") };
         }
 
-        return { redirect: url };
+        if (response.fields) {
+          return { samlData: { url: response.url, fields: response.fields } };
+        }
+
+        return { redirect: response.url };
       }
     }
 
@@ -198,7 +202,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-      const url = await startIdentityProviderFlow({
+      const response = await startIdentityProviderFlow({
         serviceConfig,
         idpId: idp.id,
         urls: {
@@ -211,11 +215,15 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         },
       });
 
-      if (!url) {
+      if (!response || !response.url) {
         return { error: t("errors.couldNotStartIDPFlow") };
       }
 
-      return { redirect: url };
+      if (response.fields) {
+        return { samlData: { url: response.url, fields: response.fields } };
+      }
+
+      return { redirect: response.url };
     }
   };
 
