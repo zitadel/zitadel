@@ -128,6 +128,8 @@ export const guidesSidebar: readonly SidebarItem[] = [
               "sdk-examples/flask",
               "sdk-examples/fastapi",
               "sdk-examples/fastify",
+              "sdk-examples/laravel",
+              "sdk-examples/nestjs",
               "sdk-examples/nextjs",
               "examples/login/nextjs-b2b",
               "sdk-examples/nuxtjs",
@@ -340,12 +342,17 @@ export const guidesSidebar: readonly SidebarItem[] = [
             label: "Backend & API",
             items: [
               {
+                type: "link",
+                label: "Elixir",
+                href: "https://github.com/maennchen/zitadel_api",
+              },
+              "sdk-examples/go",
+              "sdk-examples/client-libraries/java",
+              {
                 type: "category",
                 label: "Node.js",
                 items: [
                   "sdk-examples/client-libraries/node",
-
-                  "sdk-examples/nestjs",
                   {
                     type: "link",
                     label: "Passport.js",
@@ -358,48 +365,18 @@ export const guidesSidebar: readonly SidebarItem[] = [
                   },
                 ],
               },
+              "sdk-examples/client-libraries/php",
+              {
+                type: "link",
+                label: "Pylon",
+                href: "https://github.com/getcronit/pylon",
+              },
               "sdk-examples/client-libraries/python",
+              "sdk-examples/client-libraries/ruby",
               {
-                type: "category",
-                label: "Go",
-                items: ["sdk-examples/go"],
-              },
-              {
-                type: "category",
-                label: "Java",
-                items: [
-                  "sdk-examples/client-libraries/java",
-                ],
-              },
-              {
-                type: "category",
-                label: "PHP",
-                items: [
-                  "sdk-examples/laravel",
-                  "sdk-examples/client-libraries/php",
-                ],
-              },
-              {
-                type: "category",
-                label: "Other Languages",
-                items: [
-                  "sdk-examples/client-libraries/ruby",
-                  {
-                    type: "link",
-                    label: "Elixir",
-                    href: "https://github.com/maennchen/zitadel_api",
-                  },
-                  {
-                    type: "link",
-                    label: "Rust",
-                    href: "https://github.com/smartive/zitadel-rust",
-                  },
-                  {
-                    type: "link",
-                    label: "Pylon",
-                    href: "https://github.com/getcronit/pylon",
-                  },
-                ],
+                type: "link",
+                label: "Rust",
+                href: "https://github.com/smartive/zitadel-rust",
               },
             ],
           },
