@@ -238,7 +238,7 @@ func projections(
 		commands,
 		queries,
 		es,
-		config.Login.DefaultPaths.OTPEmailPath,
+		config.Login.DefaultPaths.DefaultOTPEmailURLTemplate,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,

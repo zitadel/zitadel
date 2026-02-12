@@ -1922,8 +1922,6 @@ type wantWorker struct {
 }
 
 func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields) *userNotifier {
-	otpEmailTemplate, err := url.Parse(defaultOTPEmailTemplate)
-	assert.NoError(t, err)
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	return &userNotifier{
@@ -1939,7 +1937,9 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			smtpAlg,
 			f.SMSTokenCrypto,
 		),
-		otpEmailTmpl: otpEmailTemplate,
+		otpEmailTmpl: func(origin *url.URL) string {
+			return origin.String() + defaultOTPEmailTemplate
+		},
 	}
 }
 

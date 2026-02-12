@@ -282,3 +282,122 @@ func TestConfig_DefaultDomainClaimedURLTemplate(t *testing.T) {
 		})
 	}
 }
+
+func Test_mergeURLs(t *testing.T) {
+	type args struct {
+		base *url.URL
+		path *url.URL
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "both base and path are nil, return empty string",
+			args: args{
+				base: nil,
+				path: nil,
+			},
+			want: "",
+		},
+		{
+			name: "base is nil, path is set, return path",
+			args: args{
+				base: nil,
+				path: &url.URL{Path: "/path"},
+			},
+			want: "/path",
+		},
+		{
+			name: "base is set, path is nil, return base",
+			args: args{
+				base: &url.URL{Path: "/base"},
+				path: nil,
+			},
+			want: "/base",
+		},
+		{
+			name: "both base and path are set, return merged path",
+			args: args{
+				base: &url.URL{Path: "/base"},
+				path: &url.URL{Path: "/path"},
+			},
+			want: "/base/path",
+		},
+		{
+			name: "both base and path are set incl. placeholders, return merged path",
+			args: args{
+				base: &url.URL{Path: "/base", RawQuery: "query={{.Placeholder}}"},
+				path: &url.URL{Path: "/path", RawQuery: "query={{.Placeholder1}}&query2={{.Placeholder2}}"},
+			},
+			want: "/base/path?query={{.Placeholder}}&query={{.Placeholder1}}&query2={{.Placeholder2}}",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := mergeURLs(tt.args.base, tt.args.path)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_mergeQueries(t *testing.T) {
+	type args struct {
+		base url.Values
+		path url.Values
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "both base and path are empty, return empty string",
+			args: args{
+				base: map[string][]string{},
+				path: map[string][]string{},
+			},
+			want: "",
+		},
+		{
+			name: "base is empty, path is set, return path",
+			args: args{
+				base: map[string][]string{},
+				path: map[string][]string{
+					"query": {"{{.Placeholder1}}", "{{.Placeholder2}}"},
+				},
+			},
+			want: "query={{.Placeholder1}}&query={{.Placeholder2}}",
+		},
+		{
+			name: "base is set, path is empty, return base",
+			args: args{
+				base: map[string][]string{
+					"query": {"{{.Placeholder}}"},
+				},
+				path: map[string][]string{},
+			},
+			want: "query={{.Placeholder}}",
+		},
+		{
+			name: "both base and path are set, return merged query",
+			args: args{
+				base: map[string][]string{
+					"query":  {"{{.Placeholder}}"},
+					"query2": {"{{.Placeholder}}"},
+				},
+				path: map[string][]string{
+					"query":  {"{{.Placeholder1}}"},
+					"query2": {"{{.Placeholder}}", "{{.Placeholder2}}"},
+				},
+			},
+			want: "query={{.Placeholder}}&query={{.Placeholder1}}&query2={{.Placeholder}}&query2={{.Placeholder2}}",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, mergeQueries(tt.args.base, tt.args.path), "mergeQueries(%v, %v)", tt.args.base, tt.args.path)
+		})
+	}
+}

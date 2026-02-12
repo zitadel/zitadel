@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 
@@ -90,15 +91,45 @@ func (c *DefaultPaths) defaultBaseURL(ctx context.Context) *url.URL {
 // For example, merging "https://example.com/base" with "/path/to/resource" will result in "https://example.com/base/path/to/resource",
 // as if the base URL is "https://example.com/base/" and the second URL's path is "path/to/resource".
 func mergeURLs(base, path *url.URL) string {
+	if base == nil && path == nil {
+		return ""
+	}
+	if base == nil {
+		return path.String()
+	}
+	if path == nil {
+		return base.String()
+	}
 	u := base.JoinPath(path.Path)
-	queries := u.Query()
-	for key, value := range path.Query() {
+	u.RawQuery = mergeQueries(u.Query(), path.Query())
+	return u.String()
+}
+
+func mergeQueries(base, path url.Values) string {
+	placeholders := map[string]string{}
+	for _, value := range base {
 		for _, v := range value {
-			queries.Add(key, v)
+			if strings.Contains(v, "{{") && strings.Contains(v, "}}") {
+				placeholders[url.QueryEscape(v)] = v
+			}
 		}
 	}
-	u.RawQuery = queries.Encode()
-	return u.String()
+	for key, value := range path {
+		baseValues, ok := base[key]
+		for _, v := range value {
+			if !ok || !slices.Contains(baseValues, v) {
+				base.Add(key, v)
+			}
+			if strings.Contains(v, "{{") && strings.Contains(v, "}}") {
+				placeholders[url.QueryEscape(v)] = v
+			}
+		}
+	}
+	raw := base.Encode()
+	for esc, orig := range placeholders {
+		raw = strings.ReplaceAll(raw, esc, orig)
+	}
+	return raw
 }
 
 func (c *DefaultPaths) DefaultEmailCodeURLTemplate(ctx context.Context) string {
@@ -131,6 +162,10 @@ func (c *DefaultPaths) DefaultDomainClaimedURLTemplate(ctx context.Context) stri
 		return ""
 	}
 	return mergeURLs(basePath, c.DomainClaimedPath)
+}
+
+func (c *DefaultPaths) DefaultOTPEmailURLTemplate(origin *url.URL) string {
+	return mergeURLs(origin.ResolveReference(c.BasePath), c.OTPEmailPath)
 }
 
 const (

@@ -90,7 +90,7 @@ const (
 
 type userNotifier struct {
 	queries      *NotificationQueries
-	otpEmailTmpl *url.URL
+	otpEmailTmpl func(origin *url.URL) string
 
 	queue       Queue
 	maxAttempts uint8
@@ -102,7 +102,7 @@ func NewUserNotifier(
 	commands Commands,
 	queries *NotificationQueries,
 	channels types.ChannelChains,
-	otpEmailTmpl *url.URL,
+	otpEmailTmpl func(origin *url.URL) string,
 	workerConfig WorkerConfig,
 	queue Queue,
 ) *handler.Handler {
@@ -560,7 +560,7 @@ func (u *userNotifier) otpEmailTemplate(origin *url.URL, e *session.OTPEmailChal
 	if e.URLTmpl != "" {
 		return e.URLTmpl
 	}
-	return origin.ResolveReference(u.otpEmailTmpl).String()
+	return u.otpEmailTmpl(origin)
 }
 
 func otpArgs(ctx context.Context, expiry time.Duration) *domain.NotificationArguments {

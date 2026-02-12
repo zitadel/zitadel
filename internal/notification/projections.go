@@ -36,7 +36,7 @@ func Register(
 	commands *command.Commands,
 	queries *query.Queries,
 	es *eventstore.Eventstore,
-	otpEmailTmpl *url.URL,
+	otpEmailTmpl func(origin *url.URL) string,
 	fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
 	queue *queue.Queue,

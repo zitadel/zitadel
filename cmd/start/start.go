@@ -328,7 +328,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		commands,
 		queries,
 		eventstoreClient,
-		config.Login.DefaultPaths.OTPEmailPath,
+		config.Login.DefaultPaths.DefaultOTPEmailURLTemplate,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,

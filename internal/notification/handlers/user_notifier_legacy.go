@@ -26,7 +26,7 @@ type userNotifierLegacy struct {
 	commands     Commands
 	queries      *NotificationQueries
 	channels     types.ChannelChains
-	otpEmailTmpl *url.URL
+	otpEmailTmpl func(origin *url.URL) string
 }
 
 func NewUserNotifierLegacy(
@@ -35,7 +35,7 @@ func NewUserNotifierLegacy(
 	commands Commands,
 	queries *NotificationQueries,
 	channels types.ChannelChains,
-	otpEmailTmpl *url.URL,
+	otpEmailTmpl func(origin *url.URL) string,
 ) *handler.Handler {
 	return handler.NewHandler(ctx, &config, &userNotifierLegacy{
 		commands:     commands,
@@ -453,9 +453,9 @@ func (u *userNotifierLegacy) reduceSessionOTPEmailChallenged(event eventstore.Ev
 	}
 	url := func(code string, origin *url.URL, user *query.NotifyUser) (string, error) {
 		var buf strings.Builder
-		urlTmpl := origin.ResolveReference(u.otpEmailTmpl).String()
-		if e.URLTmpl != "" {
-			urlTmpl = e.URLTmpl
+		urlTmpl := e.URLTmpl
+		if urlTmpl == "" {
+			urlTmpl = u.otpEmailTmpl(origin)
 		}
 		if err := domain.RenderOTPEmailURLTemplate(&buf, urlTmpl, code, user.ID, user.PreferredLoginName, user.DisplayName, e.Aggregate().ID, user.PreferredLanguage); err != nil {
 			return "", err
