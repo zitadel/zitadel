@@ -589,6 +589,68 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 			},
 		},
 		{
+			"oauth auth redirect with login_hint",
+			fields{
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								"auth",
+								"token",
+								"user",
+								"idAttribute",
+								nil,
+								true,
+								rep_idp.Options{},
+							)),
+					),
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								"auth",
+								"token",
+								"user",
+								"idAttribute",
+								nil,
+								true,
+								rep_idp.Options{},
+							)),
+					),
+				),
+				idGenerator: mock.ExpectID(t, "id"),
+			},
+			args{
+				ctx:         authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
+				idpID:       "idp",
+				callbackURL: "url",
+				loginHint:   "user@example.com",
+			},
+			res{
+				auth: &idp.RedirectAuth{RedirectURL: "auth?client_id=clientID&login_hint=user%40example.com&redirect_uri=url&response_type=code&state=id"},
+			},
+		},
+		{
 			"migrated and push",
 			fields{
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
