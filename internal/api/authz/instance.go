@@ -11,7 +11,10 @@ import (
 	"github.com/zitadel/zitadel/internal/feature"
 )
 
-var emptyInstance = &instance{}
+var (
+	emptyInstance          = &instance{}
+	_             Instance = (*instance)(nil)
+)
 
 type Instance interface {
 	InstanceID() string
