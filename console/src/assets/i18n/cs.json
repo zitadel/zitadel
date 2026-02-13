@@ -9,7 +9,7 @@
         "DESCRIPTION": "Dokončete následující kroky pro zabezpečení vaší aplikace.",
         "CREATE_PROJECT": {
           "TITLE": "Vytvořit projekt",
-          "DESCRIPTION": "Přidejte projekt a definujte jeho role a oprávnění."
+          "DESCRIPTION": "Přidejte projekt a definujte jeho role a přiřazení rolí."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Projekt hostí jednu nebo více aplikací, které můžete použít k autentizaci vašich uživatelů. Například můžete mít jeden projekt se 3 aplikacemi; jednu pro váš webový frontend, jednu pro vaši mobilní aplikaci a jednu pro váš backend. Také můžete autorizovat vaše uživatele s projekty. Aby mohli uživatelé z jiných organizací přihlásit do vašich aplikací, udělte jim přístup k vašemu projektu.<br/><br/>Pokud nenajdete projekt, kontaktujte vlastníka projektu nebo někoho s odpovídajícími právy pro získání přístupu.",
       "OWNED": {
         "TITLE": "Vlastněné projekty",
-        "DESCRIPTION": "Toto jsou projekty, které vlastníte. Můžete spravovat nastavení těchto projektů, oprávnění a aplikace."
+        "DESCRIPTION": "Toto jsou projekty, které vlastníte. Můžete spravovat nastavení těchto projektů, přiřazení rolí a aplikace."
       },
       "GRANTED": {
         "TITLE": "Přidělené projekty",
@@ -61,9 +61,9 @@
         "METADATA": "Přidejte vlastní atributy k vašemu uživateli, jako je vaše oddělení. Tyto informace můžete využít v akcích vaší organizace."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Autorizace",
-      "DESCRIPTION": "Autorizace definují přístupová práva uživatele k projektu. Můžete uživateli udělit přístup k projektu a definovat role uživatele v rámci toho projektu."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Přiřazení rolí",
+      "DESCRIPTION": "Přiřazení rolí definují přístupová práva uživatele k projektu. Můžete uživateli udělit přístup k projektu a definovat role uživatele v rámci toho projektu."
     },
     "ACTIONS": {
       "TITLE": "Akce",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Vytvořte projekt",
-        "description": "Přidejte projekt a definujte jeho role a oprávnění.",
+        "description": "Přidejte projekt a definujte jeho role a přiřazení rolí.",
         "action": "Vytvořit projekt"
       },
       "APPLICATION_CREATED": {
@@ -401,9 +401,9 @@
         "action": "Přidat uživatele"
       },
       "user.grant.added": {
-        "title": "Přidělit uživatelům přístup",
+        "title": "Přiřadit role uživatelům",
         "description": "Umožněte uživatelům přístup k vaší aplikaci a nastavte jejich role.",
-        "action": "Přidělit uživatelské přístupy"
+        "action": "Přiřadit role uživatelům"
       }
     }
   },
@@ -429,7 +429,7 @@
     "NEWORG": "Nová organizace",
     "IAMADMIN": "Jste administrátor instance. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
     "SHOWORGS": "Zobrazit všechny organizace",
-    "GRANTS": "Autorizace",
+    "GRANTS": "Přiřazení rolí",
     "ACTIONS": "Akce",
     "PRIVACY": "Soukromí",
     "TOS": "Podmínky služby",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
     "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",
     "ORG_SETTINGS_MANAGER": "Má oprávnění spravovat nastavení organizace",
-    "ORG_USER_PERMISSION_EDITOR": "Má oprávnění spravovat uživatelská pověření",
+    "ORG_USER_PERMISSION_EDITOR": "Má oprávnění spravovat přiřazení rolí",
     "ORG_PROJECT_PERMISSION_EDITOR": "Má oprávnění spravovat pověření projektu",
     "ORG_PROJECT_CREATOR": "Má oprávnění vytvářet své vlastní projekty a podřízená nastavení",
     "ORG_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele z organizace",
@@ -724,7 +724,7 @@
       "ME": "Přejít na vlastní profil",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects - Projekty",
       "USERS": "<strong>G</strong>o to <strong>U</strong>sers - Uživatelé",
-      "USERGRANTS": "<strong>G</strong>o to <strong>A</strong>uthorizations - Oprávnění",
+      "USERGRANTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments - Přiřazení rolí",
       "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows - Akce a postupy",
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains - Domény"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Heslo a zabezpečení",
       "KEYS": "Klíče",
       "PAT": "Osobní přístupové tokeny",
-      "USERGRANTS": "Oprávnění",
+      "USERGRANTS": "Přiřazení rolí",
       "MEMBERSHIPS": "Role správce",
       "METADATA": "Metadata"
     },
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "Ověřovací kód"
     },
     "GRANTS": {
-      "TITLE": "Uživatelské oprávnění",
+      "TITLE": "Přiřazení rolí",
       "DESCRIPTION": "Udělte tomuto uživateli přístup k určitým projektům",
       "CREATE": {
-        "TITLE": "Vytvořit uživatelské oprávnění",
+        "TITLE": "Vytvořit přiřazení role",
         "DESCRIPTION": "Vyhledejte organizaci, projekt a příslušné role projektu."
       },
       "PROJECTNAME": "Název projektu",
@@ -1119,8 +1119,8 @@
       "ADDITIONAL-EXTERNAL": "Přihlašovací jméno (externí organizace)"
     },
     "TARGET": {
-      "SELF": "Pokud chcete udělit oprávnění uživateli z jiné organizace",
-      "EXTERNAL": "Udělit oprávnění uživateli vaší organizace",
+      "SELF": "Pokud chcete přiřadit roli uživateli z jiné organizace",
+      "EXTERNAL": "Pro přiřazení role uživateli z vaší organizace",
       "CLICKHERE": "klikněte zde"
     },
     "SIGNEDOUT": "Byli jste odhlášeni. Klikněte na tlačítko „Přihlásit se“ pro opětovné přihlášení.",
@@ -2516,7 +2516,7 @@
       "DATECHANGED": "Změněno",
       "URLS": "URL adresy",
       "DELETE": "Smazat aplikaci",
-      "JUMPTOPROJECT": "Chcete-li nakonfigurovat role, oprávnění a další, přejděte do projektu.",
+      "JUMPTOPROJECT": "Chcete-li nakonfigurovat role, přiřazení rolí a další, přejděte do projektu.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {
@@ -2794,42 +2794,42 @@
   },
   "ROLESLABEL": "Role",
   "GRANTS": {
-    "TITLE": "Autorizace",
-    "DESC": "To jsou všechny autorizace vaší organizace.",
-    "DELETE": "Smazat autorizaci",
-    "EMPTY": "Nebyla nalezena žádná autorizace",
-    "ADD": "Vytvořit autorizaci",
+    "TITLE": "Přiřazení rolí",
+    "DESC": "To jsou všechny přiřazení rolí vaší organizace.",
+    "DELETE": "Smazat přiřazení role",
+    "EMPTY": "Nebylo nalezeno žádné přiřazení role",
+    "ADD": "Vytvořit přiřazení role",
     "ADD_BTN": "Nové",
     "PROJECT": {
-      "TITLE": "Autorizace",
-      "DESCRIPTION": "Definujte autorizace pro určený projekt. Všimněte si, že můžete vidět pouze záznamy projektů a uživatelů, pro které máte oprávnění."
+      "TITLE": "Přiřazení role",
+      "DESCRIPTION": "Definujte přiřazení role pro určený projekt. Všimněte si, že můžete vidět pouze záznamy projektů a uživatelů, pro které máte oprávnění."
     },
     "USER": {
-      "TITLE": "Autorizace",
-      "DESCRIPTION": "Definujte autorizace pro určeného uživatele. Všimněte si, že můžete vidět pouze záznamy projektů a uživatelů, pro které máte oprávnění."
+      "TITLE": "Přiřazení role",
+      "DESCRIPTION": "Definujte přiřazení role pro určeného uživatele. Všimněte si, že můžete vidět pouze záznamy projektů a uživatelů, pro které máte oprávnění."
     },
     "CREATE": {
-      "TITLE": "Vytvořit autorizaci",
+      "TITLE": "Vytvořit přiřazení role",
       "DESCRIPTION": "Vyhledejte organizaci, projekt a odpovídající role."
     },
     "EDIT": {
-      "TITLE": "Změnit autorizaci"
+      "TITLE": "Změnit přiřazení role"
     },
     "DETAIL": {
-      "TITLE": "Detail autorizace",
-      "DESCRIPTION": "Zde můžete vidět všechny detaily autorizace."
+      "TITLE": "Detail přiřazení role",
+      "DESCRIPTION": "Zde můžete vidět všechny detaily přiřazení role."
     },
     "TOAST": {
-      "UPDATED": "Autorizace aktualizována.",
-      "REMOVED": "Autorizace odebrána",
-      "BULKREMOVED": "Autorizace odebrány.",
+      "UPDATED": "Přiřazení role aktualizováno.",
+      "REMOVED": "Přiřazení role odebráno",
+      "BULKREMOVED": "Přiřazení rolí odebrány.",
       "CANTSHOWINFO": "Nemůžete navštívit profil tohoto uživatele, protože nejste správcem organizace, do které tento uživatel patří"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Smazat autorizaci",
-      "DELETE_DESCRIPTION": "Chystáte se smazat autorizaci. Chcete pokračovat?",
-      "BULK_DELETE_TITLE": "Smazat autorizace",
-      "BULK_DELETE_DESCRIPTION": "Chystáte se smazat více autorizací. Chcete pokračovat?"
+      "DELETE_TITLE": "Smazat přiřazení role",
+      "DELETE_DESCRIPTION": "Chystáte se smazat přiřazení role. Chcete pokračovat?",
+      "BULK_DELETE_TITLE": "Smazat přiřazení rolí",
+      "BULK_DELETE_DESCRIPTION": "Chystáte se smazat více přiřazení rolí. Chcete pokračovat?"
     }
   },
   "CHANGES": {
