@@ -1,0 +1,12 @@
+Administrators are [users or service accounts](/guides/manage/console/users-overview) who have permission to manage resources within ZITADEL.
+
+Administrator permissions can be assigned to different levels in ZITADEL:
+
+- **IAM Administrators**: This is the highest level. Users with IAM Administrator roles are able to manage the whole [Instance](/concepts/structure/instance).
+- **Organization Administrators**: Administrators at the Organization level are able to view or manage everything, according to their permissions, within the granted [Organization](/guides/manage/console/organizations-overview).
+- **Project Administrators**: In this level the user is able to manage a [project](/guides/manage/console/projects-overview).
+- **Project Grant Administrators**: The project grant administrator manages [projects granted](/concepts/structure/granted_projects) by another organization.
+
+The scope of the administrators is restricted based on their level.
+Which means that an administrator, assigned to one organization, will have access only to the resources and configurations of that organization.
+Only the Administrators on the instance level can view resources, such as users, across all organizations.

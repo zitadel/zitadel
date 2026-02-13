@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Benutzer",
-      "DESCRIPTION": "Ein Benutzer ist ein Mensch oder ein Computer, der auf deine Anwendungen zugreifen kann.",
+      "DESCRIPTION": "Ein Benutzer ist ein Mensch oder ein Servicekonto, das auf deine Anwendungen zugreifen kann.",
       "HUMANS": {
         "TITLE": "Benutzer",
         "DESCRIPTION": "Benutzer authentifizieren sich interaktiv in einer Browsersitzung mit einem Login-Formular.",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "Organisation",
     "PROJECT": "Projekte",
     "PROJECTOVERVIEW": "Übersicht",
-    "PROJECTGRANTS": "Berechtigte Organisationen",
+    "PROJECTGRANTS": "Projektberechtigungen",
     "ROLES": "Rollen",
     "GRANTEDPROJECT": "Berechtigte Projekte",
     "HUMANUSERS": "Benutzer",
     "MACHINEUSERS": "Service-Benutzer",
     "LOGOUT": "Alle Benutzer abmelden",
     "NEWORG": "Neue Organisation",
-    "IAMADMIN": "Du bist ein IAM-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
+    "IAMADMIN": "Du bist ein Instanz-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
     "SHOWORGS": "Alle Organisationen anzeigen",
     "GRANTS": "Berechtigungen",
     "ACTIONS": "Aktionen",
@@ -766,7 +766,7 @@
       "KEYS": "Schlüssel",
       "PAT": "Personal Access Tokens",
       "USERGRANTS": "Berechtigungen",
-      "MEMBERSHIPS": "Mitgliedschaften",
+      "MEMBERSHIPS": "Administrator-Rollen",
       "METADATA": "Metadaten"
     },
     "TITLE": "Persönliche Informationen",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel-Administratorrollen",
-      "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder IAM-Detailseite aufrufen und modifizieren.",
+      "DESCRIPTION": "Dies sind alle Administrator-Rollen des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder Instanz-Detailseite aufrufen und modifizieren.",
       "ORGCONTEXT": "Sie sehen alle Organisationen und Projekte, die mit der aktuell gewählten Organisation in Verbindung stehen.",
       "USERCONTEXT": "Sie sehen alle Organisationen und Projekte auf denen Sie berechtigt sind inklusive aller zur Auswahl stehenden Organisationen.",
       "CREATIONDATE": "Erstellungsdatum",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Entfernen",
       "TYPE": "Typ",
       "ORGID": "Organisation ID",
-      "UPDATED": "Mitgliedschaft wurde geändert.",
+      "UPDATED": "Administrator-Rolle wurde geändert.",
       "NOPERMISSIONTOEDIT": "Ihnen fehlt die benötigte Berechtigung, um Rollen zu ändern!",
       "TYPES": {
         "UNKNOWN": "Unbekannt",
@@ -1267,12 +1267,12 @@
       "DESCRIPTION": "Verwalte die globalen Richtlinien und Zugangseinstellungen."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Speicher Administration",
+      "TITLE": "Instanz Speicher Administration",
       "DESCRIPTION": "Verwalte Speicher-Einstellungen von Zitadel."
     },
     "MEMBER": {
-      "TITLE": "Manager",
-      "DESCRIPTION": "Diese Manager können instanzweite Einstellungen vornehmen."
+      "TITLE": "Administratoren",
+      "DESCRIPTION": "Diese Administratoren können instanzweite Einstellungen vornehmen."
     },
     "PAGES": {
       "STATE": "Status",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager entfernt.",
-      "MEMBERSADDED": "Manager hinzugefügt.",
-      "MEMBERADDED": "Manager hinzugefügt.",
-      "MEMBERCHANGED": "Manager geändert.",
+      "MEMBERREMOVED": "Administrator entfernt.",
+      "MEMBERSADDED": "Administratoren hinzugefügt.",
+      "MEMBERADDED": "Administrator hinzugefügt.",
+      "MEMBERCHANGED": "Administrator geändert.",
       "ROLEREMOVED": "Rolle entfernt.",
       "ROLECHANGED": "Rolle geändert.",
       "REACTIVATED": "Reaktiviert.",
@@ -1449,7 +1449,7 @@
       "2": "Inaktiv"
     },
     "MEMBER": {
-      "TITLE": "Manager der Organisation verwalten",
+      "TITLE": "Administratoren der Organisation verwalten",
       "DESCRIPTION": "Definiere hier die Benutzer, die Operationen auf Deinen Organisationen vornehmen dürfen."
     },
     "TOAST": {
@@ -1458,9 +1458,9 @@
       "REACTIVATED": "Organisation reaktiviert.",
       "DOMAINADDED": "Domain hinzugefügt.",
       "DOMAINREMOVED": "Domain entfernt.",
-      "MEMBERADDED": "Manager hinzugefügt.",
-      "MEMBERREMOVED": "Manager entfernt.",
-      "MEMBERCHANGED": "Manager geändert.",
+      "MEMBERADDED": "Administrator hinzugefügt.",
+      "MEMBERREMOVED": "Administrator entfernt.",
+      "MEMBERCHANGED": "Administrator geändert.",
       "SETPRIMARY": "Primäre Domain gesetzt.",
       "DELETED": "Organisation erfolgreich gelöscht",
       "DEFAULTORGNOTFOUND": "Die Standardorganisation wurde nicht gefunden",
@@ -1942,13 +1942,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Mitglieder",
+      "TITLE": "Administratoren",
       "USERNAME": "Benutzername",
       "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Loginname",
       "EMAIL": "E-Mail",
       "ROLES": "Rollen",
-      "ADD": "Mitglied hinzufügen",
+      "ADD": "Administrator hinzufügen",
       "ADDDESCRIPTION": "Gebe die E-Mail-Adressen der hinzuzufügenden Benutzer ein."
     },
     "TABLE": {
@@ -2039,9 +2039,9 @@
       "NAME": "Projektname"
     },
     "MEMBER": {
-      "TITLE": "Manager",
-      "TITLEDESC": "Manager können Änderungen an diesem Projekt vornehmen, wenn sie die nötigen Rollen haben.",
-      "DESCRIPTION": "Diese Manager können unter Umständen Ihre Projekteinstellungen verändern.",
+      "TITLE": "Administratoren",
+      "TITLEDESC": "Administratoren können Änderungen an diesem Projekt vornehmen, wenn sie die nötigen Rollen haben.",
+      "DESCRIPTION": "Diese Administratoren können unter Umständen Ihre Projekteinstellungen verändern.",
       "USERNAME": "Benutzername",
       "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Loginname",
@@ -2055,7 +2055,7 @@
       "DESCRIPTION": "Gewähre einer anderen Organisation Zugriff auf dieses Projekt.",
       "EDITTITLE": "Rollen editieren",
       "CREATE": {
-        "TITLE": "Organisation berechtigen",
+        "TITLE": "Projektberechtigung erstellen",
         "SEL_USERS": "Selektiere die gewünschten Benutzer für das Erstellen der Berechtigung.",
         "SEL_ROLES": "Selektiere die gewünschten Rollen für das Erstellen der Berechtigung.",
         "SEL_PROJECT": "Suchen nach Projekt",
@@ -2065,13 +2065,13 @@
         "ORG_DESCRIPTION": "Du bist im Begriff, einen Benutzer für die Organisation {{name}} zu berechtigen.",
         "ORG_DESCRIPTION_DESC": "Wechsle den Kontext, um die Organisation zu wechseln.",
         "SEL_ORG_FORMFIELD": "Organisation",
-        "FOR_ORG": "Die Berechtigung wird erstellt für:"
+        "FOR_ORG": "Die Projektberechtigung wird erstellt für:"
       },
       "DETAIL": {
         "TITLE": "Projektberechtigung",
-        "DESC": "Hier kannst Du die Eigenschaften der gewählten Organisationsberechtigung prüfen und Manager editieren.",
-        "MEMBERTITLE": "Berechtigte Manager der Organisation",
-        "MEMBERDESC": "Dies sind die Manager der berechtigten Organisation. Wähle die Benutzer, die Zugriff zum Bearbeiten der jeweiligen Zugänge erhalten sollen.",
+        "DESC": "Hier kannst Du die Eigenschaften der gewählten Organisationsberechtigung prüfen und Administratoren editieren.",
+        "MEMBERTITLE": "Berechtigte Administratoren der Organisation",
+        "MEMBERDESC": "Dies sind die Administratoren der berechtigten Organisation. Wähle die Benutzer, die Zugriff zum Bearbeiten der jeweiligen Zugänge erhalten sollen.",
         "PROJECTNAME": "Projektname",
         "GRANTEDORG": "Berechtigte Organisation",
         "RESOURCEOWNER": "Besitzer"
@@ -2084,7 +2084,7 @@
       "ALL": "Alle",
       "SHOWDETAIL": "Details anzeigen",
       "USER": "Benutzer",
-      "MEMBERS": "Manager",
+      "MEMBERS": "Administratoren",
       "ORG": "Organisation",
       "PROJECTNAME": "Projektname",
       "GRANTEDORG": "Berechtigte Organisation",
@@ -2102,9 +2102,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Projektberechtigung erstellt.",
         "PROJECTGRANTADDED": "Projektberechtigung erstellt.",
         "PROJECTGRANTCHANGED": "Projektberechtigung geändert.",
-        "PROJECTGRANTMEMBERADDED": "Berechtigungsmanager hinzugefügt.",
-        "PROJECTGRANTMEMBERCHANGED": "Berechtigungsmanager verändert.",
-        "PROJECTGRANTMEMBERREMOVED": "Berechtigungsmanager entfernt.",
+        "PROJECTGRANTMEMBERADDED": "Berechtigungsadministrator hinzugefügt.",
+        "PROJECTGRANTMEMBERCHANGED": "Berechtigungsadministrator verändert.",
+        "PROJECTGRANTMEMBERREMOVED": "Berechtigungsadministrator entfernt.",
         "PROJECTGRANTUPDATED": "Projektberechtigung geändert."
       },
       "DIALOG": {
@@ -2167,10 +2167,10 @@
       "EMPTY": "Kein Projekt gefunden"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager entfernt.",
-      "MEMBERSADDED": "Manager hinzugefügt.",
-      "MEMBERADDED": "Manager hinzugefügt.",
-      "MEMBERCHANGED": "Manager geändert.",
+      "MEMBERREMOVED": "Administrator entfernt.",
+      "MEMBERSADDED": "Administratoren hinzugefügt.",
+      "MEMBERADDED": "Administrator hinzugefügt.",
+      "MEMBERCHANGED": "Administrator geändert.",
       "ROLESCREATED": "Rollen erstellt.",
       "ROLEREMOVED": "Rolle entfernt.",
       "ROLECHANGED": "Rolle geändert.",
@@ -2766,10 +2766,10 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "Manager hinzufügen",
+    "ADD": "Administrator hinzufügen",
     "CREATIONTYPE": "Erstelltyp",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instanz",
       "2": "Organisation",
       "0": "Eigenes Projekt",
       "1": "Berechtigtes Projekt",
@@ -2778,8 +2778,8 @@
     "EDITROLE": "Rollen bearbeiten",
     "EDITFOR": "Bearbeiten Sie die Rollen für den Benutzer: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Manager entfernen",
-      "DELETE_DESCRIPTION": "Sie sind im Begriff einen Manager zu entfernen. Wollen Sie fortfahren?"
+      "DELETE_TITLE": "Administrator entfernen",
+      "DELETE_DESCRIPTION": "Sie sind im Begriff einen Administrator zu entfernen. Wollen Sie fortfahren?"
     },
     "SHOWDETAILS": "Details anzeigen"
   },
@@ -2814,7 +2814,7 @@
       "UPDATED": "Berechtigung geändert.",
       "REMOVED": "Berechtigung entfernt.",
       "BULKREMOVED": "Berechtigungen entfernt.",
-      "CANTSHOWINFO": "Sie können das Profil dieses Benutzers nicht besuchen, da Sie kein Mitglied der Organisation sind, zu der dieser Benutzer gehört"
+      "CANTSHOWINFO": "Sie können das Profil dieses Benutzers nicht besuchen, da Sie kein Administrator der Organisation sind, zu der dieser Benutzer gehört"
     },
     "DIALOG": {
       "DELETE_TITLE": "Authorisierung löschen",

@@ -8,22 +8,22 @@ import CreateUser from './_create-user.mdx';
 
 ## Overview
 
-ZITADEL supports authentication and authorization for different user types. We mainly differentiate between **Human Users** (interactive) and **Service Users** (machine-to-machine).
+ZITADEL supports authentication and authorization for different user types. We mainly differentiate between **users** (interactive) and **Service Accounts** (machine-to-machine).
 
 <img src="/docs/img/guides/console/usersmenu.png" width="420px" alt="User types" />
 
 ## Types of Users
 
-### Human Users
-Human users represent actual people who log in via an interactive interface (e.g., a login page).
+### Users (Human)
+Users represent actual people who log in via an interactive interface (e.g., a login page).
 * **Profile:** Has an email address, password, and optional profile data (phone, nickname, gender, language).
 * **Authentication:** Can authenticate via password, multiple factors (MFA), or passwordless authentication (Passkeys).
 * **Flow:** The application redirects the user to ZITADEL, which handles the credentials and issues a token to the application.
 
 Read more on how to [login users with ZITADEL](/guides/integrate/login/login-users).
 
-### Service Users (Machine Accounts)
-Service users represent machines, backend services, or IoT devices requiring non-interactive access.
+### Service Accounts
+Service accounts represent machines, backend services, or IoT devices requiring non-interactive access.
 * **Profile:** Only has a name, description, and username.
 * **Authentication:** Authenticates via **JWT Profile** or **Personal Access Tokens (PAT)**. Both methods support expiration settings.
 * **Usage:** Primarily used to gain access to the ZITADEL Management API or to secure backend-to-backend communication.
@@ -39,8 +39,8 @@ Federated users are identities managed by a third-party Identity Provider (IdP) 
 In a multi-tenancy architecture, users are typically isolated within [Organizations](./organizations-overview).
 However, using [External User Grants](../../../concepts/features/external-user-grant), an organization can invite users from *another* organization to access their projects. These invited users are referred to as **External Users** within the context of the inviting organization.
 
-### Managers
-Any user—whether Human or Service User—can be assigned an [Administrator Role](/concepts/structure/managers).
+### Administrators
+Any user—whether User or Service Account—can be assigned an [Administrator Role](/concepts/structure/administrators).
 A user with an administrator role is not just an end-user of your application but also has permissions to manage specific aspects of the ZITADEL instance, organization, or project (e.g., `ORG_OWNER`, `PROJECT_OWNER`).
 
 ## Considerations

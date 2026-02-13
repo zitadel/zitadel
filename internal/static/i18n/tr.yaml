@@ -284,10 +284,6 @@ Errors:
       Empty: "Şifre Yaş Politikası boş"
       NotExisting: "Şifre Yaş Politikası mevcut değil"
       AlreadyExists: "Şifre Yaş Politikası zaten mevcut"
-    OrgIAMPolicy:
-      Empty: "Org IAM Politikası boş"
-      NotExisting: "Org IAM Politikası mevcut değil"
-      AlreadyExists: "Org IAM Politikası zaten mevcut"
     NotificationPolicy:
       NotFound: "Bildirim Politikası bulunamadı"
       NotChanged: "Bildirim Politikası değişmedi"
@@ -343,13 +339,13 @@ Errors:
     RequiredFieldsMissing: "Bazı gerekli alanlar eksik"
     Grant:
       AlreadyExists: "Proje yetkisi zaten mevcut"
-      NotFound: "Yetki bulunamadı"
+      NotFound: "Proje yetkisi bulunamadı"
       Invalid: "Proje yetkisi geçersiz"
       NotExisting: "Proje yetkisi mevcut değil"
       HasNotExistingRole: "Projede bulunmayan bir rol var"
       NotActive: "Proje yetkisi aktif değil"
       NotInactive: "Proje yetkisi pasif değil"
-  IAM:
+  Instance:
     NotFound: "Instance bulunamadı. Domain'in doğru olduğundan emin olun. Kontrol edin https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roller değişmedi"
@@ -357,8 +353,6 @@ Errors:
     MemberAlreadyExisting: "Üye zaten mevcut"
     MemberNotExisting: "Üye mevcut değil"
     IDMissing: "Id eksik"
-    IAMProjectIDMissing: "IAM proje id eksik"
-    IamProjectAlreadySet: "IAM proje id zaten ayarlanmış"
     IdpInvalid: "IDP yapılandırması geçersiz"
     IdpNotExisting: "IDP yapılandırması mevcut değil"
     OIDCConfigInvalid: "OIDC IDP yapılandırması geçersiz"

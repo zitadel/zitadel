@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Kullanıcılar",
-      "DESCRIPTION": "Kullanıcı, uygulamalarınıza erişebilen bir insan veya makinedir.",
+      "DESCRIPTION": "Kullanıcı, uygulamalarınıza erişebilen bir insan veya hizmet hesabıdır.",
       "HUMANS": {
         "TITLE": "Kullanıcılar",
         "DESCRIPTION": "Kullanıcılar, giriş istemiyle bir tarayıcı oturumunda etkileşimli olarak kimlik doğrulaması yapar.",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "Organizasyon",
     "PROJECT": "Projeler",
     "PROJECTOVERVIEW": "Genel Bakış",
-    "PROJECTGRANTS": "Yetkilendirmeler",
+    "PROJECTGRANTS": "Proje yetkileri",
     "ROLES": "Roller",
     "GRANTEDPROJECT": "Verilen Projeler",
     "HUMANUSERS": "Kullanıcılar",
     "MACHINEUSERS": "Servis Kullanıcıları",
     "LOGOUT": "Tüm Kullanıcıları Çıkış Yap",
     "NEWORG": "Yeni Organizasyon",
-    "IAMADMIN": "IAM Yöneticisisiniz. Genişletilmiş izinleriniz olduğunu unutmayın.",
+    "IAMADMIN": "instans Yöneticisisiniz. Genişletilmiş izinleriniz olduğunu unutmayın.",
     "SHOWORGS": "Tüm Organizasyonları Göster",
     "GRANTS": "Yetkilendirmeler",
     "ACTIONS": "Eylemler",
@@ -766,7 +766,7 @@
       "KEYS": "Anahtarlar",
       "PAT": "Kişisel Erişim Token'ları",
       "USERGRANTS": "Yetkilendirmeler",
-      "MEMBERSHIPS": "Üyelikler",
+      "MEMBERSHIPS": "Yönetici Rolleri",
       "METADATA": "Meta Veri"
     },
     "TITLE": "Kişisel Bilgiler",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel Yönetici Rolleri",
-      "DESCRIPTION": "Bunlar kullanıcının tüm üyelik yetkileridir. Bunları organizasyon, proje veya IAM detay sayfalarında da değiştirebilirsiniz.",
+      "DESCRIPTION": "Bunlar kullanıcının tüm yönetici rolleridir. Bunları organizasyon, proje veya instans detay sayfalarında da değiştirebilirsiniz.",
       "ORGCONTEXT": "Şu anda seçili organizasyonla ilişkili tüm organizasyonları ve projeleri görüyorsunuz.",
       "USERCONTEXT": "Yetkiniz olan tüm organizasyonları ve projeleri görüyorsunuz. Diğer organizasyonlar dahil.",
       "CREATIONDATE": "Oluşturma Tarihi",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Kaldır",
       "TYPE": "Tür",
       "ORGID": "Organizasyon ID",
-      "UPDATED": "Üyelik güncellendi.",
+      "UPDATED": "Yönetici rolü güncellendi.",
       "NOPERMISSIONTOEDIT": "Rolleri düzenlemek için gerekli izinlere sahip değilsiniz!",
       "TYPES": {
         "UNKNOWN": "Bilinmeyen",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Küresel Politikalarınızı ve Yönetim Erişim Ayarlarınızı yönetin."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Depolama Yönetimi",
+      "TITLE": "İnstans Depolama Yönetimi",
       "DESCRIPTION": "Zitadel görünümlerinizi ve başarısız olaylarınızı yönetin."
     },
     "MEMBER": {
@@ -1933,7 +1933,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "Organizasyon",
-    "DESCRIPTION": "Burada organizasyonunuzun yapılandırmasını düzenleyebilir ve üyeleri yönetebilirsiniz.",
+    "DESCRIPTION": "Burada organizasyonunuzun yapılandırmasını düzenleyebilir ve yöneticileri yönetebilirsiniz.",
     "DETAIL": {
       "TITLE": "Detay",
       "NAME": "Ad",
@@ -1945,13 +1945,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Üyeler",
+      "TITLE": "Yöneticiler",
       "USERNAME": "Kullanıcı Adı",
       "DISPLAYNAME": "Görünen Ad",
       "LOGINNAME": "Giriş Adı",
       "EMAIL": "E-posta",
       "ROLES": "Roller",
-      "ADD": "Üye Ekle",
+      "ADD": "Yönetici Ekle",
       "ADDDESCRIPTION": "Eklenecek kullanıcıların adlarını girin."
     },
     "TABLE": {
@@ -2058,7 +2058,7 @@
       "DESCRIPTION": "Başka bir organizasyonun projenizi kullanmasına izin verin.",
       "EDITTITLE": "Rolleri düzenle",
       "CREATE": {
-        "TITLE": "Organizasyon Yetkisi Oluştur",
+        "TITLE": "Proje yetkisi oluştur",
         "SEL_USERS": "Erişim vermek istediğiniz kullanıcıları seçin",
         "SEL_PROJECT": "Bir proje arayın",
         "SEL_ROLES": "Yetkiye eklenmesini istediğiniz rolleri seçin",
@@ -2068,7 +2068,7 @@
         "ORG_DESCRIPTION": "{{name}} organizasyonu için bir kullanıcıyı yetkilendirmek üzeresiniz.",
         "ORG_DESCRIPTION_DESC": "Başka bir organizasyon için kullanıcı yetkilendirmek için yukarıdaki başlıktaki bağlamı değiştirin.",
         "SEL_ORG_FORMFIELD": "Organizasyon",
-        "FOR_ORG": "Yetki şunun için oluşturulur:"
+        "FOR_ORG": "Proje yetkisi şunun için oluşturulacak:"
       },
       "DETAIL": {
         "TITLE": "Proje Yetkisi",
@@ -2181,7 +2181,7 @@
       "DEACTIVATED": "Devre dışı bırakıldı.",
       "CREATED": "Proje oluşturuldu.",
       "UPDATED": "Proje değiştirildi.",
-      "GRANTUPDATED": "Yetki değiştirildi.",
+      "GRANTUPDATED": "Proje yetkisi değiştirildi.",
       "DELETED": "Proje silindi."
     }
   },
@@ -2798,7 +2798,7 @@
     "ADD": "Yönetici Ekle",
     "CREATIONTYPE": "Oluşturma Türü",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "İnstans",
       "2": "Organizasyon",
       "0": "Sahip Olunan Proje",
       "1": "Verilen Proje",
@@ -2843,7 +2843,7 @@
       "UPDATED": "Yetkilendirme güncellendi.",
       "REMOVED": "Yetkilendirme kaldırıldı",
       "BULKREMOVED": "Yetkilendirmeler kaldırıldı.",
-      "CANTSHOWINFO": "Bu kullanıcının ait olduğu organizasyonun üyesi olmadığınız için bu kullanıcının profilini ziyaret edemezsiniz"
+      "CANTSHOWINFO": "Bu kullanıcının ait olduğu organizasyonun yöneticisi olmadığınız için bu kullanıcının profilini ziyaret edemezsiniz"
     },
     "DIALOG": {
       "DELETE_TITLE": "Yetkilendirmeyi sil",

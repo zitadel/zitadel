@@ -90,7 +90,7 @@ func NewSMSConfigTwilioChangedEvent(
 	changes []SMSConfigTwilioChanges,
 ) (*SMSConfigTwilioChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-smn8e", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INST-smn8e", "Errors.NoChangesFound")
 	}
 	changeEvent := &SMSConfigTwilioChangedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -238,7 +238,7 @@ func NewSMSConfigHTTPChangedEvent(
 	changes []SMSConfigHTTPChanges,
 ) (*SMSConfigHTTPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-smn8e", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INST-smn8e", "Errors.NoChangesFound")
 	}
 	changeEvent := &SMSConfigHTTPChangedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(

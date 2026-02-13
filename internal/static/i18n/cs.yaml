@@ -283,10 +283,6 @@ Errors:
       Empty: "Politika stáří hesla je prázdná"
       NotExisting: "Politika stáří hesla neexistuje"
       AlreadyExists: "Politika stáří hesla již existuje"
-    OrgIAMPolicy:
-      Empty: "Politika IAM organizace je prázdná"
-      NotExisting: "Politika IAM organizace neexistuje"
-      AlreadyExists: "Politika IAM organizace již existuje"
     NotificationPolicy:
       NotFound: "Politika oznámení nenalezena"
       NotChanged: "Politika oznámení nezměněna"
@@ -342,13 +338,13 @@ Errors:
     RequiredFieldsMissing: "Některá povinná pole chybí"
     Grant:
       AlreadyExists: "Grant projektu již existuje"
-      NotFound: "Grant nebyl nalezen"
+      NotFound: "Grant projektu nebyl nalezen"
       Invalid: "Grant projektu je neplatný"
       NotExisting: "Grant projektu neexistuje"
       HasNotExistingRole: "Jedna z rolí v projektu neexistuje"
       NotActive: "Grant projektu není aktivní"
       NotInactive: "Grant projektu není neaktivní"
-  IAM:
+  Instance:
     NotFound: "Instance nebyla nalezena. Ujistěte se, že jste získali správnou doménu. Podívejte se na https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Role nebyly změněny"
@@ -356,8 +352,6 @@ Errors:
     MemberAlreadyExisting: "Člen již existuje"
     MemberNotExisting: "Člen neexistuje"
     IDMissing: "Chybí Id"
-    IAMProjectIDMissing: "Chybí Id IAM projektu"
-    IamProjectAlreadySet: "Id IAM projektu bylo již nastaveno"
     IdpInvalid: "Konfigurace IDP je neplatná"
     IdpNotExisting: "Konfigurace IDP neexistuje"
     OIDCConfigInvalid: "Konfigurace OIDC IDP je neplatná"

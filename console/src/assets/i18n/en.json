@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Users",
-      "DESCRIPTION": "A user is a human or a machine that can access your applications.",
+      "DESCRIPTION": "A user is a human or a service account that can access your applications.",
       "HUMANS": {
         "TITLE": "Users",
         "DESCRIPTION": "Users authenticate interactively in a browser session with a login prompt.",
@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organization",
     "PROJECT": "Projects",
     "PROJECTOVERVIEW": "Overview",
-    "PROJECTGRANTS": "Grants",
+    "PROJECTGRANTS": "Project Grants",
     "ROLES": "Roles",
     "GRANTEDPROJECT": "Granted Projects",
     "HUMANUSERS": "Users",
@@ -767,7 +767,7 @@
       "KEYS": "Keys",
       "PAT": "Personal Access Tokens",
       "USERGRANTS": "Authorizations",
-      "MEMBERSHIPS": "Memberships",
+      "MEMBERSHIPS": "Administrator Roles",
       "METADATA": "Metadata"
     },
     "TITLE": "Personal Information",
@@ -1162,7 +1162,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel Administrator Roles",
-      "DESCRIPTION": "These are all member grants of the user. You can modify them also on organization, project, or IAM detail pages.",
+      "DESCRIPTION": "These are all administrator roles of the user. You can modify them also on organization, project, or IAM detail pages.",
       "ORGCONTEXT": "You see all organizations and projects that are related to the currently selected organization.",
       "USERCONTEXT": "You see all organizations and projects to which you are authorized. Including other organizations.",
       "CREATIONDATE": "Creation Date",
@@ -1171,7 +1171,7 @@
       "REMOVE": "Remove",
       "TYPE": "Type",
       "ORGID": "Organization ID",
-      "UPDATED": "The membership was updated.",
+      "UPDATED": "The administrator role was updated.",
       "NOPERMISSIONTOEDIT": "You are missing the required permissions to edit roles!",
       "TYPES": {
         "UNKNOWN": "Unknown",
@@ -1272,8 +1272,8 @@
       "DESCRIPTION": "Manage your Zitadel views and failed events."
     },
     "MEMBER": {
-      "TITLE": "Managers",
-      "DESCRIPTION": "These Managers are allowed to make changes in your instance."
+      "TITLE": "Administrators",
+      "DESCRIPTION": "These administrators are allowed to make changes in your instance."
     },
     "PAGES": {
       "STATE": "Status",
@@ -1362,10 +1362,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERSADDED": "Managers added.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERCHANGED": "Manager changed.",
+      "MEMBERREMOVED": "Administrator removed.",
+      "MEMBERSADDED": "Administrators added.",
+      "MEMBERADDED": "Administrator added.",
+      "MEMBERCHANGED": "Administrator changed.",
       "ROLEREMOVED": "Role removed.",
       "ROLECHANGED": "Role changed.",
       "REACTIVATED": "Reactivated",
@@ -1450,7 +1450,7 @@
       "2": "Deactivated"
     },
     "MEMBER": {
-      "TITLE": "Organization Managers",
+      "TITLE": "Organization Administrators",
       "DESCRIPTION": "Define the users who can change your organizations preferences."
     },
     "TOAST": {
@@ -1459,9 +1459,9 @@
       "REACTIVATED": "Organization reactivated.",
       "DOMAINADDED": "Added domain.",
       "DOMAINREMOVED": "Removed domain.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERCHANGED": "Manager changed.",
+      "MEMBERADDED": "Administrator added.",
+      "MEMBERREMOVED": "Administrator removed.",
+      "MEMBERCHANGED": "Administrator changed.",
       "SETPRIMARY": "Primary domain set.",
       "DELETED": "Organization deleted successfully",
       "DEFAULTORGNOTFOUND": "The default organization was not found",
@@ -1946,13 +1946,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Members",
+      "TITLE": "Administrators",
       "USERNAME": "User Name",
       "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Login Name",
       "EMAIL": "E-mail",
       "ROLES": "Roles",
-      "ADD": "Add Member",
+      "ADD": "Add an Administrator",
       "ADDDESCRIPTION": "Enter the names of the users to be added."
     },
     "TABLE": {
@@ -2043,9 +2043,9 @@
       "NAME": "New Name"
     },
     "MEMBER": {
-      "TITLE": "Managers",
-      "TITLEDESC": "Managers can make changes to this project based on their role.",
-      "DESCRIPTION": "These managers may be able to edit your project.",
+      "TITLE": "Administrators",
+      "TITLEDESC": "Administrators can make changes to this project based on their role.",
+      "DESCRIPTION": "These administrators may be able to edit your project.",
       "USERNAME": "User Name",
       "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Loginname",
@@ -2059,23 +2059,23 @@
       "DESCRIPTION": "Allow another organization to use your project.",
       "EDITTITLE": "Edit roles",
       "CREATE": {
-        "TITLE": "Create Organization Grant",
+        "TITLE": "Create Project Grant",
         "SEL_USERS": "Select the users you wish to grant access",
         "SEL_PROJECT": "Search for a project",
-        "SEL_ROLES": "Select the roles you want to be added to the grant",
+        "SEL_ROLES": "Select the roles you want to be added to the project grant",
         "SEL_USER": "Select users",
         "SEL_ORG": "Search an organization",
         "SEL_ORG_DESC": "Search the organization to grant.",
         "ORG_DESCRIPTION": "You are about to grant a user for the organization {{name}}.",
         "ORG_DESCRIPTION_DESC": "Switch the context in the header above to grant a user for another organization.",
         "SEL_ORG_FORMFIELD": "Organization",
-        "FOR_ORG": "The grant is created for:"
+        "FOR_ORG": "The project grant is created for:"
       },
       "DETAIL": {
         "TITLE": "Project Grant",
-        "DESC": "You can select which roles can be used by the specified organization, and elect managers",
-        "MEMBERTITLE": "Managers",
-        "MEMBERDESC": "These are the managers of the granted organization. Add users here who should gain access to edit the data of the project.",
+        "DESC": "You can select which roles can be used by the specified organization, and elect administrators",
+        "MEMBERTITLE": "Administrators",
+        "MEMBERDESC": "These are the administrators of the granted organization. Add users here who should gain access to edit the data of the project.",
         "PROJECTNAME": "Project Name",
         "GRANTEDORG": "Granted Organization",
         "RESOURCEOWNER": "Resource Owner"
@@ -2088,7 +2088,7 @@
       "ALL": "All",
       "SHOWDETAIL": "Show Details",
       "USER": "User",
-      "MEMBERS": "Managers",
+      "MEMBERS": "Administrators",
       "ORG": "Organization",
       "PROJECTNAME": "Project Name",
       "GRANTEDORG": "Granted Organization",
@@ -2103,16 +2103,16 @@
       "NOROLES": "No roles",
       "TYPE": "Type",
       "TOAST": {
-        "PROJECTGRANTUSERGRANTADDED": "Project grant created.",
-        "PROJECTGRANTADDED": "Project grant created.",
-        "PROJECTGRANTCHANGED": "Project grant changed.",
-        "PROJECTGRANTMEMBERADDED": "Grant manager added.",
-        "PROJECTGRANTMEMBERCHANGED": "Grant manager changed.",
-        "PROJECTGRANTMEMBERREMOVED": "Grant manager removed.",
+        "PROJECTGRANTUSERGRANTADDED": "Project Grant created.",
+        "PROJECTGRANTADDED": "Project Grant created.",
+        "PROJECTGRANTCHANGED": "Project Grant changed.",
+        "PROJECTGRANTMEMBERADDED": "Grant administrator added.",
+        "PROJECTGRANTMEMBERCHANGED": "Grant administrator changed.",
+        "PROJECTGRANTMEMBERREMOVED": "Grant administrator removed.",
         "PROJECTGRANTUPDATED": "Project Grant updated"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Delete project grant",
+        "DELETE_TITLE": "Delete Project Grant",
         "DELETE_DESCRIPTION": "You are about to delete a project grant. Are you sure?"
       },
       "ROLES": "Project Roles"
@@ -2127,7 +2127,7 @@
       "ADDNEWLINE": "Add additional role",
       "KEY": "Key",
       "TITLE": "Roles",
-      "DESCRIPTION": "Define some roles which can be used to create project-grants.",
+      "DESCRIPTION": "Define some roles which can be used to create project grants.",
       "NAME": "Name",
       "DISPLAY_NAME": "Display Name",
       "GROUP": "Group",
@@ -2171,10 +2171,10 @@
       "EMPTY": "No project found"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERSADDED": "Managers added.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERCHANGED": "Manager changed.",
+      "MEMBERREMOVED": "Administrator removed.",
+      "MEMBERSADDED": "Administrators added.",
+      "MEMBERADDED": "Administrator added.",
+      "MEMBERCHANGED": "Administrator changed.",
       "ROLESCREATED": "Roles created.",
       "ROLEREMOVED": "Role removed.",
       "ROLECHANGED": "Role changed.",
@@ -2182,7 +2182,7 @@
       "DEACTIVATED": "Deactivated.",
       "CREATED": "Project created.",
       "UPDATED": "Project changed.",
-      "GRANTUPDATED": "Grant changed.",
+      "GRANTUPDATED": "Project Grant changed.",
       "DELETED": "Project deleted."
     }
   },
@@ -2796,7 +2796,7 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "Add a Manager",
+    "ADD": "Add an Administrator",
     "CREATIONTYPE": "Creation Type",
     "CREATIONTYPES": {
       "3": "IAM",
@@ -2808,8 +2808,8 @@
     "EDITROLE": "Edit roles",
     "EDITFOR": "Edit the roles for the user: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Remove Manager",
-      "DELETE_DESCRIPTION": "You are about to remove a manager. Are you sure?"
+      "DELETE_TITLE": "Remove Administrator",
+      "DELETE_DESCRIPTION": "You are about to remove an administrator. Are you sure?"
     },
     "SHOWDETAILS": "Click to show details."
   },
@@ -2844,7 +2844,7 @@
       "UPDATED": "Authorization updated.",
       "REMOVED": "Authorization removed",
       "BULKREMOVED": "Authorizations removed.",
-      "CANTSHOWINFO": "You cannot visit this user's profile as you are not a member of the organization where this user belongs to"
+      "CANTSHOWINFO": "You cannot visit this user's profile as you are not an administrator of the organization where this user belongs to"
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete authorization",

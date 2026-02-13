@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "用户",
-      "DESCRIPTION": "用户是可以访问你的应用的人或机器。",
+      "DESCRIPTION": "用户是可以访问你的应用的人或服务账户。",
       "HUMANS": {
         "TITLE": "用户",
         "DESCRIPTION": "用户在浏览器会话中通过登录提示进行交互身份验证。",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "组织",
     "PROJECT": "项目",
     "PROJECTOVERVIEW": "概览",
-    "PROJECTGRANTS": "授予",
+    "PROJECTGRANTS": "项目授权",
     "ROLES": "角色",
     "GRANTEDPROJECT": "已授予的项目",
     "HUMANUSERS": "用户",
     "MACHINEUSERS": "服务用户",
     "LOGOUT": "退出所有账户",
     "NEWORG": "创建组织",
-    "IAMADMIN": "您是 IAM 管理员。请注意您具有扩展权限。",
+    "IAMADMIN": "您是实例管理员。请注意您具有扩展权限。",
     "SHOWORGS": "查看所有组织",
     "GRANTS": "授权",
     "ACTIONS": "认证流程",
@@ -766,7 +766,7 @@
       "KEYS": "秘钥",
       "PAT": "个人访问令牌",
       "USERGRANTS": "授权",
-      "MEMBERSHIPS": "成员身份",
+      "MEMBERSHIPS": "管理员角色",
       "METADATA": "元数据"
     },
     "TITLE": "个人信息",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel 管理员角色",
-      "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或 IAM 详细信息页面上修改它们。",
+      "DESCRIPTION": "这些都是用户管理员角色。您还可以在组织、项目或实例详细信息页面上修改它们。",
       "ORGCONTEXT": "您会看到与当前所选组织相关的所有组织和项目。",
       "USERCONTEXT": "您会看到您被授权的所有组织和项目。包括其他组织。",
       "CREATIONDATE": "创建于",
@@ -1170,7 +1170,7 @@
       "REMOVE": "删除",
       "TYPE": "类型",
       "ORGID": "组织 ID",
-      "UPDATED": "成员授权已更新。",
+      "UPDATED": "管理员角色已更新。",
       "NOPERMISSIONTOEDIT": "您缺少编辑角色所需的权限！",
       "TYPES": {
         "UNKNOWN": "未知",
@@ -1267,12 +1267,12 @@
       "DESCRIPTION": "管理您的全局策略和管理访问设置。"
     },
     "EVENTSTORE": {
-      "TITLE": "IAM 存储管理",
+      "TITLE": "实例存储管理",
       "DESCRIPTION": "管理您的 Zitadel 视图和失败的事件。"
     },
     "MEMBER": {
-      "TITLE": "管理者",
-      "DESCRIPTION": "这些管理者可以在您的实例中进行更改。"
+      "TITLE": "管理员",
+      "DESCRIPTION": "这些管理员可以在您的实例中进行更改。"
     },
     "PAGES": {
       "STATE": "状态",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "管理者已删除。",
-      "MEMBERSADDED": "已添加多个管理者。",
-      "MEMBERADDED": "管理者已添加。",
-      "MEMBERCHANGED": "管理者已改变。",
+      "MEMBERREMOVED": "管理员已删除。",
+      "MEMBERSADDED": "已添加多个管理员。",
+      "MEMBERADDED": "管理员已添加。",
+      "MEMBERCHANGED": "管理员已改变。",
       "ROLEREMOVED": "角色已删除。",
       "ROLECHANGED": "角色已更改。",
       "REACTIVATED": "重新激活",
@@ -1449,7 +1449,7 @@
       "2": "停用"
     },
     "MEMBER": {
-      "TITLE": "组织管理者",
+      "TITLE": "组织管理员",
       "DESCRIPTION": "定义可以更改组织首选项的用户。"
     },
     "TOAST": {
@@ -1458,9 +1458,9 @@
       "REACTIVATED": "组织重新启用。",
       "DOMAINADDED": "域名已添加。",
       "DOMAINREMOVED": "域名已删除。",
-      "MEMBERADDED": "管理者已添加。",
-      "MEMBERREMOVED": "管理者已删除。",
-      "MEMBERCHANGED": "管理者以改变。",
+      "MEMBERADDED": "管理员已添加。",
+      "MEMBERREMOVED": "管理员已删除。",
+      "MEMBERCHANGED": "管理员以改变。",
       "SETPRIMARY": "已设为主域名。",
       "DELETED": "成功删除的组织",
       "DEFAULTORGNOTFOUND": "未找到默认组织",
@@ -1933,7 +1933,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "组织",
-    "DESCRIPTION": "您可以在此处编辑组织的配置并管理成员。",
+    "DESCRIPTION": "您可以在此处编辑组织的配置并管理管理员。",
     "DETAIL": {
       "TITLE": "详情",
       "NAME": "名称",
@@ -1945,13 +1945,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "成员",
+      "TITLE": "管理员",
       "USERNAME": "用户名",
       "DISPLAYNAME": "展示名称",
       "LOGINNAME": "登录名称",
       "EMAIL": "电子邮件",
       "ROLES": "角色",
-      "ADD": "添加成员",
+      "ADD": "添加管理员",
       "ADDDESCRIPTION": "输入要添加的用户的名称。"
     },
     "TABLE": {
@@ -2042,9 +2042,9 @@
       "NAME": "新名称"
     },
     "MEMBER": {
-      "TITLE": "管理者",
-      "TITLEDESC": "管理者可以根据他们的角色对此项目进行更改。",
-      "DESCRIPTION": "这些管理者可能能够编辑您的项目。",
+      "TITLE": "管理员",
+      "TITLEDESC": "管理员可以根据他们的角色对此项目进行更改。",
+      "DESCRIPTION": "这些管理员可能能够编辑您的项目。",
       "USERNAME": "用户名",
       "DISPLAYNAME": "展示名称",
       "LOGINNAME": "登录名称",
@@ -2058,7 +2058,7 @@
       "DESCRIPTION": "允许其他组织使用您的项目。",
       "EDITTITLE": "编辑角色",
       "CREATE": {
-        "TITLE": "创建组织授权",
+        "TITLE": "创建项目授权",
         "SEL_USERS": "选择您要授予访问权限的用户",
         "SEL_PROJECT": "搜索项目",
         "SEL_ROLES": "选择要添加到授权中的角色",
@@ -2068,13 +2068,13 @@
         "ORG_DESCRIPTION": "您即将授予组织 {{name}} 的用户。",
         "ORG_DESCRIPTION_DESC": "切换上面标题中的上下文以授予另一个组织的用户。",
         "SEL_ORG_FORMFIELD": "组织",
-        "FOR_ORG": "授予组织:"
+        "FOR_ORG": "项目授权将为以下对象创建:"
       },
       "DETAIL": {
         "TITLE": "项目授权",
-        "DESC": "您可以选择指定组织可以使用哪些角色，并选择管理者",
-        "MEMBERTITLE": "管理者",
-        "MEMBERDESC": "这些是被授予组织的管理者。在此处添加应有权编辑项目数据的用户。",
+        "DESC": "您可以选择指定组织可以使用哪些角色，并选择管理员",
+        "MEMBERTITLE": "管理员",
+        "MEMBERDESC": "这些是被授予组织的管理员。在此处添加应有权编辑项目数据的用户。",
         "PROJECTNAME": "项目名称",
         "GRANTEDORG": "授予组织",
         "RESOURCEOWNER": "资源所有者"
@@ -2087,7 +2087,7 @@
       "ALL": "所有",
       "SHOWDETAIL": "显示详细资料",
       "USER": "用户",
-      "MEMBERS": "管理者",
+      "MEMBERS": "管理员",
       "ORG": "组织",
       "PROJECTNAME": "项目名称",
       "GRANTEDORG": "授予组织",
@@ -2105,9 +2105,9 @@
         "PROJECTGRANTUSERGRANTADDED": "项目授权已创建。",
         "PROJECTGRANTADDED": "项目授权已创建。",
         "PROJECTGRANTCHANGED": "项目授权已更改",
-        "PROJECTGRANTMEMBERADDED": "授权管理者已添加",
-        "PROJECTGRANTMEMBERCHANGED": "授权管理者已更改。",
-        "PROJECTGRANTMEMBERREMOVED": "授权管理者已删除。",
+        "PROJECTGRANTMEMBERADDED": "授权管理员已添加",
+        "PROJECTGRANTMEMBERCHANGED": "授权管理员已更改。",
+        "PROJECTGRANTMEMBERREMOVED": "授权管理员已删除。",
         "PROJECTGRANTUPDATED": "项目授权已更新。"
       },
       "DIALOG": {
@@ -2170,10 +2170,10 @@
       "EMPTY": "未找到项目"
     },
     "TOAST": {
-      "MEMBERREMOVED": "管理者已删除。",
-      "MEMBERSADDED": "管理者已添加。",
-      "MEMBERADDED": "管理者已添加。",
-      "MEMBERCHANGED": "管理者已更改。",
+      "MEMBERREMOVED": "管理员已删除。",
+      "MEMBERSADDED": "管理员已添加。",
+      "MEMBERADDED": "管理员已添加。",
+      "MEMBERCHANGED": "管理员已更改。",
       "ROLESCREATED": "角色已创建。",
       "ROLEREMOVED": "角色已删除。",
       "ROLECHANGED": "角色已更改。",
@@ -2181,7 +2181,7 @@
       "DEACTIVATED": "已停用。",
       "CREATED": "项目已创建。",
       "UPDATED": "项目已修改。",
-      "GRANTUPDATED": "授权已更新。",
+      "GRANTUPDATED": "项目授权已更改。",
       "DELETED": "项目已删除"
     }
   },
@@ -2799,10 +2799,10 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "添加管理者",
+    "ADD": "添加管理员",
     "CREATIONTYPE": "创建类型",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "实例",
       "2": "Organization",
       "0": "Owned Project",
       "1": "Granted Project",
@@ -2811,8 +2811,8 @@
     "EDITROLE": "编辑角色",
     "EDITFOR": "编辑用户：{{value}} 的角色",
     "DIALOG": {
-      "DELETE_TITLE": "删除管理者",
-      "DELETE_DESCRIPTION": "您即将删除管理者。你确定吗？"
+      "DELETE_TITLE": "删除管理员",
+      "DELETE_DESCRIPTION": "您即将删除管理员。你确定吗？"
     },
     "SHOWDETAILS": "点击显示详情。"
   },
@@ -2847,7 +2847,7 @@
       "UPDATED": "授权已更新。",
       "REMOVED": "已移除授权。",
       "BULKREMOVED": "已移除授权。",
-      "CANTSHOWINFO": "您无法访问该用户的个人资料，因为您不是该用户所属组织的成员"
+      "CANTSHOWINFO": "您无法访问该用户的个人资料，因为您不是该用户所属组织的管理员"
     },
     "DIALOG": {
       "DELETE_TITLE": "删除授权",

@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Utilisateurs",
-      "DESCRIPTION": "Un utilisateur est un humain ou une machine qui peut accéder à vos applications.",
+      "DESCRIPTION": "Un utilisateur est un humain ou compte de service qui peut accéder à vos applications.",
       "HUMANS": {
         "TITLE": "Utilisateurs",
         "DESCRIPTION": "Les utilisateurs s'authentifient de manière interactive dans une session de navigateur avec une invite de connexion.",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "Organisation",
     "PROJECT": "Projets",
     "PROJECTOVERVIEW": "Vue d'ensemble",
-    "PROJECTGRANTS": "Droits",
+    "PROJECTGRANTS": "Concessions de projet",
     "ROLES": "Rôles",
     "GRANTEDPROJECT": "Projets octroyés",
     "HUMANUSERS": "Utilisateurs",
     "MACHINEUSERS": "Utilisateurs de services",
     "LOGOUT": "Déconnexion de tous les utilisateurs",
     "NEWORG": "Nouvelle organisation",
-    "IAMADMIN": "Vous êtes un administrateur IAM. Notez que vous disposez de permissions étendues.",
+    "IAMADMIN": "Vous êtes un administrateur d'instance. Notez que vous disposez de permissions étendues.",
     "SHOWORGS": "Afficher toutes les organisations",
     "GRANTS": "Autorisations",
     "ACTIONS": "Actions",
@@ -766,7 +766,7 @@
       "KEYS": "Clés",
       "PAT": "Jetons d'accès personnels",
       "USERGRANTS": "Autorisations",
-      "MEMBERSHIPS": "Adhésions",
+      "MEMBERSHIPS": "Rôles d'administrateur",
       "METADATA": "Métadonnées"
     },
     "TITLE": "Informations personnelles",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Rôles d'administrateur Zitadel",
-      "DESCRIPTION": "Il s'agit de toutes les attributions des membres de l'utilisateur. Vous pouvez également les modifier sur les pages de détails de l'organisation, du projet ou de l'IAM.",
+      "DESCRIPTION": "Il s'agit de tous les rôles d'administrateur de l'utilisateur. Vous pouvez également les modifier sur les pages de détails de l'organisation, du projet ou de l'instance.",
       "ORGCONTEXT": "Vous voyez toutes les organisations et tous les projets qui sont liés à l'organisation actuellement sélectionnée.",
       "USERCONTEXT": "Vous voyez toutes les organisations et tous les projets auxquels vous êtes autorisé. Y compris les autres organisations.",
       "CREATIONDATE": "Date de création",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Supprimer",
       "TYPE": "Type",
       "ORGID": "ID de l'organisation",
-      "UPDATED": "L'adhésion a été mise à jour.",
+      "UPDATED": "Le rôle d'administrateur a été mis à jour.",
       "NOPERMISSIONTOEDIT": "Il vous manque les autorisations nécessaires pour modifier les rôles !",
       "TYPES": {
         "UNKNOWN": "Inconnu",
@@ -1267,12 +1267,12 @@
       "DESCRIPTION": "Gérer vos politiques globales et vos paramètres d'accès à la gestion."
     },
     "EVENTSTORE": {
-      "TITLE": "Administration du stockage IAM",
+      "TITLE": "Administration du stockage instance",
       "DESCRIPTION": "Gérez vos vues Zitadel et les événements échoués."
     },
     "MEMBER": {
-      "TITLE": "Responsables",
-      "DESCRIPTION": "Ces responsables sont autorisés à effectuer des changements dans votre instance."
+      "TITLE": "Administrateurs",
+      "DESCRIPTION": "Ces administrateurs sont autorisés à effectuer des changements dans votre instance."
     },
     "PAGES": {
       "STATE": "Statut",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Responsable supprimé.",
-      "MEMBERSADDED": "Responsable ajoutés.",
-      "MEMBERADDED": "Responsable ajouté.",
-      "MEMBERCHANGED": "Responsable modifié.",
+      "MEMBERREMOVED": "Administrateur supprimé.",
+      "MEMBERSADDED": "Administrateurs ajoutés.",
+      "MEMBERADDED": "Administrateur ajouté.",
+      "MEMBERCHANGED": "Administrateur modifié.",
       "ROLEREMOVED": "Rôle supprimé.",
       "ROLECHANGED": "Rôle modifié.",
       "REACTIVATED": "Réactivé",
@@ -1449,7 +1449,7 @@
       "2": "Désactivé"
     },
     "MEMBER": {
-      "TITLE": "Responsables de l'organisation",
+      "TITLE": "Administrateurs de l'organisation",
       "DESCRIPTION": "Définissez les utilisateurs qui peuvent modifier les préférences de votre organisation."
     },
     "TOAST": {
@@ -1458,9 +1458,9 @@
       "REACTIVATED": "Organisation réactivée.",
       "DOMAINADDED": "Domaine ajouté.",
       "DOMAINREMOVED": "Domaine supprimé.",
-      "MEMBERADDED": "Responsable ajouté.",
-      "MEMBERREMOVED": "Responsable supprimé.",
-      "MEMBERCHANGED": "Responsable modifié.",
+      "MEMBERADDED": "Administrateur ajouté.",
+      "MEMBERREMOVED": "Administrateur supprimé.",
+      "MEMBERCHANGED": "Administrateur modifié.",
       "SETPRIMARY": "Domaine primaire défini.",
       "DELETED": "Organisation supprimée avec succès",
       "DEFAULTORGNOTFOUND": "L'organisation par défaut est introuvable",
@@ -1942,13 +1942,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Membres",
+      "TITLE": "Administrateurs",
       "USERNAME": "Nom d'utilisateur",
       "DISPLAYNAME": "Nom d'affichage",
       "LOGINNAME": "Nom de connexion",
       "EMAIL": "E-mail",
       "ROLES": "Rôles",
-      "ADD": "Ajouter un membre",
+      "ADD": "Ajouter un administrateur",
       "ADDDESCRIPTION": "Saisissez les noms des utilisateurs à ajouter."
     },
     "TABLE": {
@@ -2039,9 +2039,9 @@
       "NAME": "Nouveau nom"
     },
     "MEMBER": {
-      "TITLE": "Responsables",
-      "TITLEDESC": "Les responsables peuvent apporter des modifications à ce projet en fonction de leur rôle.",
-      "DESCRIPTION": "Ces responsables peuvent être en mesure de modifier votre projet.",
+      "TITLE": "Administrateurs",
+      "TITLEDESC": "Les administrateurs peuvent apporter des modifications à ce projet en fonction de leur rôle.",
+      "DESCRIPTION": "Ces administrateurs peuvent être en mesure de modifier votre projet.",
       "USERNAME": "Nom d'utilisateur",
       "DISPLAYNAME": "Nom d'affichage",
       "LOGINNAME": "Nom de connexion",
@@ -2055,7 +2055,7 @@
       "DESCRIPTION": "Autoriser une autre organisation à utiliser votre projet.",
       "EDITTITLE": "Rôles d'édition",
       "CREATE": {
-        "TITLE": "Octroyer une organisation",
+        "TITLE": "Créer une concession de projet",
         "SEL_USERS": "Sélectionnez les utilisateurs auxquels vous souhaitez accorder l'accès",
         "SEL_PROJECT": "Rechercher un projet",
         "SEL_ROLES": "Sélectionnez les rôles que vous souhaitez ajouter à l'autorisation.",
@@ -2065,13 +2065,13 @@
         "ORG_DESCRIPTION": "Vous êtes sur le point d'octroyer un utilisateur pour l'organisation {{name}}.",
         "ORG_DESCRIPTION_DESC": "Changez le contexte dans l'en-tête ci-dessus pour accorder un utilisateur pour une autre organisation.",
         "SEL_ORG_FORMFIELD": "Organisation",
-        "FOR_ORG": "L'autorisation est créée pour"
+        "FOR_ORG": "La concession de projet est créée pour:"
       },
       "DETAIL": {
         "TITLE": "Octroyer un projet",
-        "DESC": "Vous pouvez sélectionner les rôles qui peuvent être utilisés par l'organisation spécifiée, et élire les responsables.",
-        "MEMBERTITLE": "Responsables",
-        "MEMBERDESC": "Il s'agit des responsables de l'organisation accordée. Ajoutez ici les utilisateurs qui doivent avoir accès à la modification des données du projet.",
+        "DESC": "Vous pouvez sélectionner les rôles qui peuvent être utilisés par l'organisation spécifiée, et élire les administrateurs.",
+        "MEMBERTITLE": "Administrateurs",
+        "MEMBERDESC": "Il s'agit des administrateurs de l'organisation accordée. Ajoutez ici les utilisateurs qui doivent avoir accès à la modification des données du projet.",
         "PROJECTNAME": "Nom du projet",
         "GRANTEDORG": "Organisation autorisée",
         "RESOURCEOWNER": "Propriétaire des ressources"
@@ -2084,7 +2084,7 @@
       "ALL": "Tous",
       "SHOWDETAIL": "Afficher les détails",
       "USER": "Utilisateur",
-      "MEMBERS": "Responsables",
+      "MEMBERS": "Administrateurs",
       "ORG": "Organisation",
       "PROJECTNAME": "Nom du projet",
       "GRANTEDORG": "Organisation octroyée",
@@ -2102,9 +2102,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Octroi de projet créée.",
         "PROJECTGRANTADDED": "Octroi de projet créé.",
         "PROJECTGRANTCHANGED": "Octroi de projet modifiée.",
-        "PROJECTGRANTMEMBERADDED": "Responsable d'octrois ajouté.",
-        "PROJECTGRANTMEMBERCHANGED": "Responsable d'octrois modifié.",
-        "PROJECTGRANTMEMBERREMOVED": "Responsable d'octrois supprimé.",
+        "PROJECTGRANTMEMBERADDED": "Administrateur d'octrois ajouté.",
+        "PROJECTGRANTMEMBERCHANGED": "Administrateur d'octrois modifié.",
+        "PROJECTGRANTMEMBERREMOVED": "Administrateur d'octrois supprimé.",
         "PROJECTGRANTUPDATED": "Octroi de projet mise à jour"
       },
       "DIALOG": {
@@ -2167,10 +2167,10 @@
       "EMPTY": "Aucun projet trouvé"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Responsable supprimé.",
-      "MEMBERSADDED": "Responsables ajoutés.",
-      "MEMBERADDED": "Responsable ajouté.",
-      "MEMBERCHANGED": "Responsable modifié.",
+      "MEMBERREMOVED": "Administrateur supprimé.",
+      "MEMBERSADDED": "Administrateurs ajoutés.",
+      "MEMBERADDED": "Administrateur ajouté.",
+      "MEMBERCHANGED": "Administrateur modifié.",
       "ROLESCREATED": "Rôles créés.",
       "ROLEREMOVED": "Rôle supprimé.",
       "ROLECHANGED": "Rôle modifié.",
@@ -2178,7 +2178,7 @@
       "DEACTIVATED": "Désactivé.",
       "CREATED": "Projet créé.",
       "UPDATED": "Projet modifié.",
-      "GRANTUPDATED": "Octroi modifié.",
+      "GRANTUPDATED": "Attribution de projet modifiée.",
       "DELETED": "Projet supprimé."
     }
   },
@@ -2767,10 +2767,10 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "Ajouter un responsable",
+    "ADD": "Ajouter un administrateur",
     "CREATIONTYPE": "Type de création",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instance",
       "2": "Organisation",
       "0": "Projet Détenu",
       "1": "Projet Octroyé",
@@ -2779,8 +2779,8 @@
     "EDITROLE": "Modifier les rôles",
     "EDITFOR": "Modifier les rôles de l'utilisateur",
     "DIALOG": {
-      "DELETE_TITLE": "Supprimer un responsable",
-      "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer un responsable. Etes-vous sûr ?"
+      "DELETE_TITLE": "Supprimer un administrateur",
+      "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer un administrateur. Etes-vous sûr ?"
     },
     "SHOWDETAILS": "Cliquez pour afficher les détails."
   },
