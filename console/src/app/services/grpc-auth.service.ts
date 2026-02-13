@@ -249,7 +249,7 @@ export class GrpcAuthService {
 
       if (orgs.length === 0) {
         this._activeOrgChanged.next(undefined);
-        return Promise.resolve(undefined)
+        return undefined;
       }
 
       const orgToSet = orgs.find((element) => element.id !== '0' && element.name !== '');
