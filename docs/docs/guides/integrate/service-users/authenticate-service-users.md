@@ -130,7 +130,7 @@ However, [client credentials authentication](./client-credentials.md) might be c
 * [Service User API reference](/docs/apis/resources/mgmt/user-machine)
 * [OIDC JWT with private key](/docs/apis/openidoauth/authn-methods#jwt-with-private-key) authentication method reference
 * [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
-* Validate access tokens with [token introspection with private key jwt](../token-introspection/private-key-jwt.mdx)
+* Validate access tokens with [token introspection with private key jwt](../token-introspection/private-key-jwt)
 
 import DocCardList from '@theme/DocCardList';
 

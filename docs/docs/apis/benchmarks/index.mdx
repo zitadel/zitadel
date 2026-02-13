@@ -20,7 +20,7 @@ The primary goal is to assess if ZITADEL can scale to required proportion. The g
 
 ## Procedure
 
-First we determine the “target” of our load-test. The target is expressed as a make recipe in the load-test [Makefile](https://github.com/zitadel/zitadel/blob/main/load-test/Makefile). See also the load-test [readme](https://github.com/zitadel/zitadel/blob/main/load-test/README.md) on how to configure and run load-tests.  
+First we determine the “target” of our load-test. The target is expressed as a make recipe in the benchmark [Makefile](https://github.com/zitadel/zitadel/blob/main/benchmark/Makefile). See also the benchmark [readme](https://github.com/zitadel/zitadel/blob/main/benchmark/README.md) on how to configure and run load-tests.  
 A target should be tested for longer periods of time, as it might take time for certain metrics to show up. For example, cloud SQL samples query insights. A runtime of at least **30 minutes** is advised at the moment.
 
 After each iteration of load-test, we should consult the [After test procedure](#after-test-procedure) to conclude an outcome:
@@ -72,7 +72,7 @@ The following metrics must be collected for each test iteration. The metrics are
 
 #### Make recipes
 
-Details about the tests implemented can be found in [this readme](https://github.com/zitadel/zitadel/blob/main/load-test/README.md#test).
+Details about the tests implemented can be found in [this readme](https://github.com/zitadel/zitadel/blob/main/benchmark/README.md#test).
 
 ### Test conclusion
 
