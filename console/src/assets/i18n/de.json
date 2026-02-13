@@ -1581,7 +1581,7 @@
       "ADDPROVIDER": "Anbieter hinzufügen",
       "ADDPROVIDERDESCRIPTION": "Wählen Sie einen der verfügbaren Anbieter und geben Sie die erforderlichen Daten ein.",
       "REMOVEPROVIDER": "Anbieter entfernen",
-      "REMOVEPROVIDER_DESC": "Sie sind im Begriff eine Konfiguration zu löschen. Wollen Sie fortfahren?",
+      "REMOVEPROVIDER_DESC": "Sie sind im Begriff einen Provider zu löschen. Wollen Sie fortfahren?",
       "SMSPROVIDERSTATE": {
         "0": "Unbekannt",
         "1": "Aktiv",
@@ -2238,7 +2238,7 @@
     },
     "DETAIL": {
       "TITLE": "Identitäts Provider",
-      "DESCRIPTION": "Bearbeite deine Providerkonfiguration",
+      "DESCRIPTION": "Bearbeite deine Provider-Einstellungen",
       "DATECREATED": "Erstellt",
       "DATECHANGED": "Geändert"
     },
@@ -2349,7 +2349,7 @@
     "FEDERATEDLOGOUTENABLED_DESC": "Wenn aktiviert, wird der Benutzer auch vom IdP abgemeldet, wenn der Benutzer die Sitzung in Zitadel beendet.",
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
-      "TITLE": "OIDC Konfiguration",
+      "TITLE": "OIDC Einstellungen",
       "DESCRIPTION": "Geben Sie die Daten OIDC Identitätsanbieter ein."
     },
     "OAUTH": {
@@ -2357,7 +2357,7 @@
       "DESCRIPTION": "Geben Sie die Daten OAuth Identity Providers ein."
     },
     "JWT": {
-      "TITLE": "JWT Konfiguration",
+      "TITLE": "JWT Einstellungen",
       "DESCRIPTION": "Geben Sie die Daten JWT Identitätsanbieter ein. ",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
@@ -2518,7 +2518,7 @@
       },
       "DIALOG": {
         "CONFIG": {
-          "TITLE": "OIDC Konfiguration ändern"
+          "TITLE": "OIDC Einstellungen ändern"
         },
         "DELETE": {
           "TITLE": "App löschen",
@@ -2575,7 +2575,7 @@
       "COMMAORENTERSEPERATION": "mit ↵ trennen",
       "POSTREDIRECTTITLE": "Das ist die Weiterleitung nach einem Log-out.",
       "TYPEREQUIRED": "Der Typ ist notwendig.",
-      "TITLE": "OIDC-Konfiguration",
+      "TITLE": "OIDC-Einstellungen",
       "CLIENTID": "Client ID",
       "CLIENTSECRET": "Client Secret",
       "CLIENTSECRET_NOSECRET": "Bei ihrem gewählten Authentication Flow wird kein Secret benötigt und steht daher nicht zur Verfügung.",
@@ -2671,8 +2671,8 @@
         "TITLE": "SAML",
         "DESCRIPTION": "SAML Applikationen"
       },
-      "CONFIGSECTION": "SAML Konfiguration",
-      "CHOOSEMETADATASOURCE": "Stellen Sie Ihre SAML-Konfiguration mit einer der folgenden Optionen bereit:",
+      "CONFIGSECTION": "SAML Einstellungen",
+      "CHOOSEMETADATASOURCE": "Stellen Sie Ihre SAML-Einstellungen mit einer der folgenden Optionen bereit:",
       "METADATAOPT1": "Option 1: Geben Sie die URL an, unter der sich die Metadatendatei befindet",
       "METADATAOPT2": "Option 2: Laden Sie eine Datei hoch, die Ihre XML-Metadaten enthält",
       "METADATAOPT3": "Option 3: Erstellen Sie spontan eine minimale Metadatendatei mit ENTITYID und ACS-URL",
