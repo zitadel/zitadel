@@ -6,7 +6,7 @@ This integration guide shows you the basic OpenID Connect integration with ZITAD
 
 ## Setup PKCE client in ZITADEL
 
-- Go to your organization and setup a new application with the type PKCE
+- Go to your organization and set up a new application with the type PKCE
 - When created go to the "Redirect Settings" and *enable Development Mode*
 - Add the Redirect Uri, f.e. `http://localhost:8080/secure/callback`
 - Add the Post Logout Uri, f.e. `http://localhost:8080/index.html`
@@ -38,14 +38,14 @@ OIDCPKCEMethod S256
 
 With the following parameters
 
-| Parameter | Description | Example value|
-|---|---|---|
-| OIDCProviderMetadataURL | Is the url to the discovery endpoint | `https://${CUSTOM_DOMAIN}/.well-known/openid-configuration` |
-| OIDCClientID | Is the ID of the zitadel application. You can find it on the settings page of the application.  | 123456789123@apache_test |
-| OIDCRedirectURI | Users will be redirected to this page after successful login. If you are using localhost or any other non-https endpoint, make sure to enable development mode in ZITADEL. | https://mysecureapp.io/secure/callback |
-| OIDCCryptoPassphrase | Create a secure passphrase. Consult the module's documentation for more details. | ... |
-| OIDCScope | OpenID Connect scopes that should be included. You can find a list of [all scopes](/apis/openidoauth/scopes) in our documentation. | "openid profile" |
-| OIDCPKCEMethod | The method should be set to `S256` | S256 |
+| Parameter               | Description                                                                                                                                                                | Example value                                               |
+|-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+| OIDCProviderMetadataURL | Is the url to the discovery endpoint                                                                                                                                       | `https://${CUSTOM_DOMAIN}/.well-known/openid-configuration` |
+| OIDCClientID            | Is the ID of the zitadel application. You can find it on the settings page of the application.                                                                             | 123456789123@apache_test                                    |
+| OIDCRedirectURI         | Users will be redirected to this page after successful login. If you are using localhost or any other non-https endpoint, make sure to enable development mode in ZITADEL. | https://mysecureapp.io/secure/callback                      |
+| OIDCCryptoPassphrase    | Create a secure passphrase. Consult the module's documentation for more details.                                                                                           | ...                                                         |
+| OIDCScope               | OpenID Connect scopes that should be included. You can find a list of [all scopes](/apis/openidoauth/scopes) in our documentation.                                         | "openid profile"                                            |
+| OIDCPKCEMethod          | The method should be set to `S256`                                                                                                                                         | S256                                                        |
 
 ### Secure a route
 

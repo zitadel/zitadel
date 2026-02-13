@@ -21,7 +21,7 @@ Last updated: 2025-05-19
 
 ### Background
 
-Zitadel uses a eventstore table as main source of truth for state changes.
+Zitadel uses an eventstore table as main source of truth for state changes.
 Projections are tables which provide alternative views of state, which are built using events.
 In order to know which events are reduced into projections, we use a `position` column in the eventstore and a dedicated table which records the current state.
 
@@ -31,7 +31,7 @@ Zitadel prior to the listed version had a precision bug. The `position` column u
 
 ## Impact
 
-During a past attempt to fix this, we got reports of failing projections inside Zitadel. Because the precision became exact certain compare operations like *equal*, *less then*, etc would now return different results. This was because the values in `current_states` would already have lost precision from a broken version. This might happen to **some** deployments or projections: there is only a small probability.
+During a past attempt to fix this, we got reports of failing projections inside Zitadel. Because the precision became exact certain compare operations like *equal*, *less than*, etc. would now return different results. This was because the values in `current_states` would already have lost precision from a broken version. This might happen to **some** deployments or projections: there is only a small probability.
 
 We are releasing the fix again and your system might get affected.
 

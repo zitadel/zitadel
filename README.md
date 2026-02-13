@@ -187,7 +187,7 @@ Use our Login widget to allow easy and secure access to your applications and en
 
 ### Management Console
 
-Use [Console](https://zitadel.com/docs/guides/manage/console/console-overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
+Use [Console](https://zitadel.com/docs/guides/manage/console/console-overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to set up organizations, projects and applications.
 
 [![Console Showcase](https://user-images.githubusercontent.com/1366906/223663344-67038d5f-4415-4285-ab20-9a4d397e2138.gif)](http://www.youtube.com/watch?v=RPpHktAcCtk "Console Showcase")
 

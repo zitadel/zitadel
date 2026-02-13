@@ -17,13 +17,13 @@ they are reduced into projections in bulk batches. Projections allow for efficie
 
 We've investigated multiple reports of outdated projections.
 For example created users missing in get requests, or missing data after a ZITADEL upgrade[^1].
-The conclusion is that the transaction in which we perform a bulk of queries can timeout.
+The conclusion is that the transaction in which we perform a bulk of queries can time out.
 The old setting defined a transaction duration of 500ms for a bulk of 200 events.
 A single event may create multiple statements in a single projection.
 A timeout may occur even if the actual bulk size is less than 200,
-which then results in more back-pressure on a busy system, leading to more timeouts and effectively dead-locking a projection.
+which then results in more back-pressure on a busy system, leading to more timeouts and effectively deadlocking a projection.
 
-Increasing or disabling the projection transaction duration solved dead-locks in all reported cases.
+Increasing or disabling the projection transaction duration solved deadlocks in all reported cases.
 We've decided to increase the transaction duration to 1 minute.
 Due to the high value it is functionally similar to disabling,
 however it still provides a safety net for transaction that do freeze,
@@ -39,7 +39,7 @@ This change was submitted in the following PR:
 
 ## Mitigation
 
-If you have a custom configuration for projections, this update will not apply to your system or some projections. When encountering projection dead-lock consider increasing the timeout to the new default value.
+If you have a custom configuration for projections, this update will not apply to your system or some projections. When encountering projection deadlock consider increasing the timeout to the new default value.
 
 Note that entries under `Customizations` overwrite the global settings for a single projection.
 

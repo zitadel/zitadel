@@ -58,7 +58,7 @@ On the user view, switch to *Service Accounts* and create a new one.
 
 ![](../../../public/img/go/api-service_user_panel.png)
 
-Give the service account a name and a user name. Select `Bearer` as *Access Token Type*.
+Give the service account a name and a username. Select `Bearer` as *Access Token Type*.
 
 ![](../../../public/img/go/api-create_service_user.png)
 
@@ -91,7 +91,7 @@ Create a new go file with the content below. This will create an API with three 
 
 If authorization is required, the token must not be expired and the API has to be part of the audience (either client_id or project_id).
 
-For tests we will use a Personal Access Token.
+For tests, we will use a Personal Access Token.
 
 ```go reference
 https://github.com/zitadel/zitadel-go/blob/next/example/api/http/main.go
