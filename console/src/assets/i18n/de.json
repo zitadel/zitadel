@@ -1581,7 +1581,7 @@
       "ADDPROVIDER": "Anbieter hinzufügen",
       "ADDPROVIDERDESCRIPTION": "Wählen Sie einen der verfügbaren Anbieter und geben Sie die erforderlichen Daten ein.",
       "REMOVEPROVIDER": "Anbieter entfernen",
-      "REMOVEPROVIDER_DESC": "Sie sind im Begriff einen Provider zu löschen. Wollen Sie fortfahren?",
+      "REMOVEPROVIDER_DESC": "Sie sind im Begriff einen Anbieter zu löschen. Wollen Sie fortfahren?",
       "SMSPROVIDERSTATE": {
         "0": "Unbekannt",
         "1": "Aktiv",
