@@ -197,7 +197,7 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyMetadata(req, null).then((resp) => resp.toObject());
   }
 
-  public async getActiveOrg(id?: string): Promise<Org.AsObject> {
+  public async getActiveOrg(id?: string): Promise<Org.AsObject | undefined> {
     if (id) {
       const find = this.cachedOrgs.getValue().find((tmp) => tmp.id === id);
       if (find) {
@@ -249,7 +249,7 @@ export class GrpcAuthService {
 
       if (orgs.length === 0) {
         this._activeOrgChanged.next(undefined);
-        return Promise.reject(new Error('No organizations found!'));
+        return Promise.resolve(undefined)
       }
 
       const orgToSet = orgs.find((element) => element.id !== '0' && element.name !== '');
