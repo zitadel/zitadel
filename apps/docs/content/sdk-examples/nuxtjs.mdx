@@ -31,7 +31,7 @@ The example implements secure [session management](https://authjs.dev/concepts/s
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/console-overview). Follow the PKCE application setup guide to:
 
 1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects-overview)
 2. Configure it to use the PKCE authentication method
@@ -59,7 +59,7 @@ Once you have your Zitadel application configured:
    AUTH_ORIGIN=http://localhost:3000
 ```
 Replace these values with:
-   - Your actual Zitadel instance URL (the **Issuer** from your [Zitadel instance settings](https://zitadel.com/docs/guides/manage/console/overview))
+   - Your actual Zitadel instance URL (the **Issuer** from your [Zitadel instance settings](https://zitadel.com/docs/guides/manage/console/console-overview))
    - The **Client ID** you copied when creating the application
    - A randomly generated **NUXT_AUTH_SECRET** for session encryption (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
    - The **callback URI** you configured in the PKCE setup (must match exactly)
