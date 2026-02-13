@@ -1,6 +1,6 @@
 module github.com/zitadel/zitadel
 
-go 1.25
+go 1.26
 
 require (
 	cloud.google.com/go/profiler v0.4.3
