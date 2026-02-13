@@ -3,6 +3,7 @@ package notification
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/zitadel/logging"
 
@@ -35,7 +36,8 @@ func Register(
 	commands *command.Commands,
 	queries *query.Queries,
 	es *eventstore.Eventstore,
-	otpEmailTmpl, fileSystemPath string,
+	otpEmailTmpl func(origin *url.URL) string,
+	fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
 	queue *queue.Queue,
 ) {
