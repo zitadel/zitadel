@@ -2816,7 +2816,7 @@
   "ROLESLABEL": "Roles",
   "GRANTS": {
     "TITLE": "Role Assignments",
-    "DESC": "These are all the roles assigned on your organization.",
+    "DESC": "These are all the role assignments on your organization.",
     "DELETE": "Delete Role Assignment",
     "EMPTY": "No role assignment found",
     "ADD": "Create Role Assignment",

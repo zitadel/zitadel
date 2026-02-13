@@ -79,7 +79,7 @@ Using the POS example above: You could grant the `POS` project to a partner orga
 ### How to Grant a Project
 
 1.  Navigate to the Project you want to share (e.g., `POS`).
-2.  In the **Grants** section, click **New**.
+2.  In the **Project Grants** section, click **New**.
 
 <img src="/docs/img/guides/console/grantsmenu.png" alt="Grants" width="170px" />
 
@@ -119,7 +119,7 @@ You can configure strict security checks regarding roles during authentication.
 />
 
 * **Assert Roles on Authentication:** Role information is sent from the Userinfo endpoint (and in tokens, depending on app settings).
-* **Check Role Assignment on Authentication:** Users are **only** allowed to login if they have at least one role assigned for this project. If they have no roles, access is denied immediately.
+* **Check Role Assignment on Authentication:** Users are **only** allowed to log in if they have at least one role assigned for this project. If they have no roles, access is denied immediately.
 * **Check for Project on Authentication:** Checks if the user's organization actually has a grant for this project. If not, the user cannot be authenticated.
 
 ### Roles in Tokens
