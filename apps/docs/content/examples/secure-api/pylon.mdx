@@ -4,8 +4,8 @@ sidebar_label: Pylon
 ---
 
 import AppJWT from "../imports/_app_jwt.mdx";
-import ServiceuserJWT from "../imports/_serviceuser_jwt.mdx";
-import ServiceuserRole from "../imports/_serviceuser_role.mdx";
+import ServiceAccountJWT from "../imports/_serviceaccount_jwt.mdx";
+import ServiceAccountRole from "../imports/_serviceaccount_role.mdx";
 
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your [Pylon](https://pylon.cronit.io) service.
 It explains how to check the token validity in the API and how to check for permissions.
@@ -20,13 +20,13 @@ Before we can start building our application, we have to do a few configuration 
 
 <AppJWT components={props.components}  />
 
-### Create Serviceuser
+### Create Service Account
 
-<ServiceuserJWT components={props.components}  />
+<ServiceAccountJWT components={props.components}  />
 
-### Give Serviceuser an authorization
+### Give Service Account an authorization
 
-<ServiceuserRole components={props.components}  />
+<ServiceAccountRole components={props.components}  />
 
 ### Prerequisites
 
@@ -36,9 +36,9 @@ At the end you should have the following for the API:
 - `.json`-key-file for the API, from the application
 - ID of the project
 
-And the following from the Serviceuser:
+And the following from the Service Account:
 
-- `.json`-key-file from the serviceuser
+- `.json`-key-file from the service account
 
 ## Setup new Pylon service
 
@@ -263,7 +263,7 @@ To call the API you need an access token, which is then verified by ZITADEL.
 Please follow [this guide here](/guides/integrate/token-introspection/private-key-jwt), ignoring the first step as we already have the `.json`-key-file from the serviceaccount.
 
 <Callout>
-You can also create a PAT for the serviceuser and use it to test the API. For this, follow [this guide](/guides/integrate/service-accounts/personal-access-token#create-a-service-user-with-a-pat).
+You can also create a PAT for the service account and use it to test the API. For this, follow [this guide](/guides/integrate/service-accounts/personal-access-token#create-a-service-account-with-a-pat).
 </Callout>
 
 Optionally set the token as an environment variable:

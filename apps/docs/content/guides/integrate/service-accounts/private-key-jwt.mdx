@@ -1,23 +1,23 @@
 ---
-title: Configure private key JWT authentication for service users
+title: Configure private key JWT authentication for service accounts
 sidebar_label: Private key JWT authentication
 ---
 
-This guide explains how developers can use private key JWT authentication to secure communication between service users and client applications in ZITADEL.
+This guide explains how developers can use private key JWT authentication to secure communication between service accounts and client applications in ZITADEL.
 
 In ZITADEL, the `urn:ietf:params:oauth:grant-type:jwt-bearer` (**"JWT bearer token with private key"**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant type is used for non-interactive authentication.
 
-Read more about the [different authentication methods for service users](./authenticate-service-accounts), including their benefits, drawbacks, and security considerations.
+Read more about the [different authentication methods for service accounts](./authenticate-service-accounts), including their benefits, drawbacks, and security considerations.
 
 #### How private key JWT authentication works
 
-1. Generate a private/public key pair associated with the service user.
+1. Generate a private/public key pair associated with the service account.
 2. The authorization server stores the public key.
 3. The authorization server returns the private key as a JSON file.
 4. The developer configures the client application to use the private key.
-5. The client creates a JWT assertion with the subject set to the service user and signs the JWT with the private key.
+5. The client creates a JWT assertion with the subject set to the service account and signs the JWT with the private key.
 6. The client application requests a token from ZITADEL by sending the `client_assertion`.
-7. The authorization server validates the signature using the service user's public key.
+7. The authorization server validates the signature using the service account's public key.
 8. The authorization server returns an OAuth `access_token`.
 9. The client sends an API request, including the `access_token` in the Authorization header.
 10. The resource server validates the JWT with [token introspection](../token-introspection/).
@@ -28,32 +28,32 @@ Read more about the [different authentication methods for service users](./authe
 
 A code library or framework that supports JWT generation and verification (such as `pyjwt` for Python or `jsonwebtoken` for Node.js).
 
-## Steps to authenticate a Service User with private JWT
+## Steps to authenticate a Service Account with private JWT
 
-Follow these steps to authenticate a service user and obtain an access token for subsequent requests.
+Follow these steps to authenticate a service account and obtain an access token for subsequent requests.
 
-### 1. Create a Service User
+### 1. Create a Service Account
 
-1. Navigate to **Service Users**.
+1. Navigate to **Service Accounts**.
 2. Click on **New**.
 3. Enter a username and a display name.
 4. Click on **Create**.
 
-### 2. Register a private key for your service user
+### 2. Register a private key for your service account
 
 You can let ZITADEL generate a private key for you, **or** upload your own (externally generated) public key. Choose one of the following:
 
 #### Option A: Generate and download a private key from ZITADEL
 
-1. Open the ZITADEL web console and go to your service user.
+1. Open the ZITADEL web console and go to your service account.
 2. Click on the **Keys** tab.
 3. Click **New**.
 4. Optionally set an expiration date for the key, or leave empty for no expiration.
 5. Click **Download** and save the JSON key file securely.
 
-#### Option B: Register an existing public key for your service user
+#### Option B: Register an existing public key for your service account
 
-If you already have a key pair, you can upload the public key for your service user. For example, to generate a key pair using OpenSSL:
+If you already have a key pair, you can upload the public key for your service account. For example, to generate a key pair using OpenSSL:
 
 ```bash
 # generate key pair
@@ -73,7 +73,7 @@ If you generate a key in ZITADEL, make sure to download and securely store the k
 If you set an expiration date when generating a key in ZITADEL, that key will expire at midnight on the specified day.
 </Callout>
 
-![](../../../../public/img/console_serviceusers_new_key.gif)
+![](../../../../public/img/console_serviceaccounts_new_key.gif)
 
 If you let ZITADEL generate a key for you and download the JSON file, it will look similar to the example below. In this ZITADEL-generated key file, the `key` property contains the _private_ key for your service account. Store this JSON securely and never share your private key. ZITADEL automatically stores the public key component, so you do not need to upload it.
 
@@ -130,7 +130,7 @@ There are also [many libraries](https://jwt.io/#libraries-io) available for gene
 import jwt
 import datetime
 
-# Replace with your service user ID and private key
+# Replace with your service account ID and private key
 service_user_id = "your_service_user_id"
 private_key = "-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY\n-----END PRIVATE KEY-----"
 key_id = "your_key_id"
@@ -178,7 +178,7 @@ curl --request POST \
 If you want to access ZITADEL APIs, make sure to include the required scope `urn:zitadel:iam:org:project:id:zitadel:aud`.
 See our guide on [how to access ZITADEL APIs](../zitadel-apis/access-zitadel-apis) for more details.
 
-**Important Note:** If the service user token must be validated using token introspection, you must include the `urn:zitadel:iam:org:project:id:{projectid}:aud` scope in your token request.
+**Important Note:** If the service account token must be validated using token introspection, you must include the `urn:zitadel:iam:org:project:id:{projectid}:aud` scope in your token request.
 If you do not include this, token introspection will fail.
 
 A successful response will include the `access_token`, `token_type`, and the time to expiry in seconds (`expires_in`):
@@ -196,7 +196,7 @@ Content-Type: application/json
 
 ### 5. Include the access token in the Authorization header
 
-When making API requests as the service user, include the generated token in the "Authorization" header with the "Bearer" prefix.
+When making API requests as the service account, include the generated token in the "Authorization" header with the "Bearer" prefix.
 
 ```bash
 curl --request POST \
@@ -208,7 +208,7 @@ curl --request POST \
 ## Accessing ZITADEL APIs
 
 You may use ZITADEL APIs to manage resources (e.g., users) or to validate tokens received by your backend service.
-Follow our guide on [how to access ZITADEL API](../zitadel-apis/access-zitadel-apis) with your service user.
+Follow our guide on [how to access ZITADEL API](../zitadel-apis/access-zitadel-apis) with your service account.
 
 ### Token introspection
 
@@ -218,7 +218,7 @@ See our [guide on token introspection with private key JWT](../token-introspecti
 
 ## Client application authentication
 
-The steps above describe service user authentication.
+The steps above describe service account authentication.
 If your application itself also needs authentication, you can use the [Client Credentials Grant](./client-credentials).
 See the ZITADEL documentation for additional details on this approach.
 
@@ -228,7 +228,7 @@ See the ZITADEL documentation for additional details on this approach.
 * **Set appropriate JWT expiration times:** Limit token validity to reduce risk in the event of a compromise.
 * **Implement proper error handling:** Handle cases where JWT verification fails or tokens are expired.
 
-By following these steps and adhering to best practices, you can securely manage service user and client application authentication within ZITADEL using private key JWTs.
+By following these steps and adhering to best practices, you can securely manage service account and client application authentication within ZITADEL using private key JWTs.
 
 ## Notes
 
