@@ -2474,7 +2474,7 @@
         "DEACTIVATE_WARN_DESCRIPTION": "You are about to deactivate an SMTP provider. Are you sure?",
         "DEACTIVATED": "SMTP config has been deactivated",
         "DELETE_TITLE": "Delete SMTP config",
-        "DELETE_DESCRIPTION": "You are about to delete a provider. Confirm this action typing the sender name",
+        "DELETE_DESCRIPTION": "You are about to delete a provider. Confirm this action by typing the sender name",
         "DELETED": "SMTP config has been deleted",
         "SENDER": "Type {{value}}, to delete this SMTP provider.",
         "TEST_TITLE": "Test your SMTP config",
