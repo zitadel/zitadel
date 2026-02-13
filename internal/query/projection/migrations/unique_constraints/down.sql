@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS eventstore.unique_constraints;

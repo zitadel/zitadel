@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS projections.current_states;
