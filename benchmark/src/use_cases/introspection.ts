@@ -42,7 +42,7 @@ export async function setup() {
   console.info(`setup: ${tokens.length} tokens generated`);
 
   const client = { ...Client() };
-  client.scope = [client.scope, ...projects.map((p) => `urn:zitadel:iam:org:project:id:${p.id}:aud`)].join(',');
+  client.scope = [client.scope, ...projects.map((p) => `urn:zitadel:iam:org:project:id:${p.id}:aud`)].join(' ');
   console.info('setup: login user with scope %s', client.scope);
 
   const userTokens = loginByUsernamePassword(Config.admin as User, client);
