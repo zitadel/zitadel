@@ -1,4 +1,4 @@
-package eventstestingimproved
+package projection
 
 import (
 	"context"
@@ -19,14 +19,11 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/embedded"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
-	// Trigger migration registration
-	_ "github.com/zitadel/zitadel/cmd/initialise"
-	_ "github.com/zitadel/zitadel/cmd/setup"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/internal/query/projection"
+	// Register migrations
+	_ "github.com/zitadel/zitadel/internal/query/projection/migrations"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -50,20 +47,16 @@ func runTests(m *testing.M) int {
 	}
 	defer stop()
 
-	// q, err := queue.NewQueueWithDB(pool.RawDB())
 	pusher := es_v3.NewEventstoreFromPool(pool)
 	es = eventstore.NewEventstore(&eventstore.Config{
-		PushTimeout: 0,
-		MaxRetries:  0,
-		Pusher:      pusher,
-		Querier:     old_es.NewPostgres(pool.InternalDB()),
-		Searcher:    pusher,
-		Queue:       nil,
+		Pusher:   pusher,
+		Querier:  old_es.NewPostgres(pool.InternalDB()),
+		Searcher: pusher,
 	})
 
-	projection.CreateRelational(ctx, pool.InternalDB(), es, projection.Config{})
+	CreateRelational(ctx, pool.InternalDB(), es, Config{})
 
-	if err := projection.Start(ctx); err != nil {
+	if err := Start(ctx); err != nil {
 		log.Printf("error starting projections: %v", err)
 		return 1
 	}
@@ -78,8 +71,6 @@ func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), er
 	}
 
 	dummyPool, err := connector.Connect(ctx, postgres.WithAfterConnectFunc(func(ctx context.Context, c *pgx.Conn) error {
-		// TODO(IAM-Marco): I am not sure whether this is needed or not. I speculate it is used for the ES table to handle
-		// the `position` column. Without it, I imagine that events might not be in the right order (because of position having low res).
 		pgxdecimal.Register(c.TypeMap())
 		return es_v3.RegisterEventstoreTypes(ctx, c)
 	}))
@@ -100,7 +91,6 @@ func TestDomainAddedEvent(t *testing.T) {
 	ctx := t.Context()
 	instanceDomainRepo := repository.InstanceDomainRepository()
 	instanceRepo := repository.InstanceRepository()
-
 	err := instanceRepo.Create(ctx, pool, &domain.Instance{
 		ID:              "123",
 		Name:            "my instance",
@@ -113,12 +103,10 @@ func TestDomainAddedEvent(t *testing.T) {
 		UpdatedAt:       time.Now(),
 	})
 	require.NoError(t, err)
-
 	tstCmd := instance.NewDomainAddedEvent(ctx, &instance.NewAggregate("123").Aggregate, "test-domain.com", false)
 	_, err = es.Push(ctx, tstCmd)
 	require.NoError(t, err)
-
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*30)
+	retryDuration, tick := WaitForAndTickWithMaxDuration(ctx, time.Second*30)
 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 		domain, err := instanceDomainRepo.Get(ctx, pool,
 			database.WithCondition(
@@ -132,4 +120,27 @@ func TestDomainAddedEvent(t *testing.T) {
 		assert.Equal(t, "test-domain.com", domain.Domain)
 		assert.Equal(t, "123", domain.InstanceID)
 	}, retryDuration, tick)
+}
+
+func WaitForAndTickWithMaxDuration(ctx context.Context, max time.Duration) (time.Duration, time.Duration) {
+	// interval which is used to retry the test
+	tick := time.Second
+	// tolerance which is used to stop the test for the timeout
+	tolerance := tick * 5
+	// default of the WaitFor is always a defined duration, shortened if the context would time out before
+	waitFor := max
+
+	if ctxDeadline, ok := ctx.Deadline(); ok {
+		// if the context has a deadline, set the WaitFor to the shorter duration
+		if until := time.Until(ctxDeadline); until < waitFor {
+			// ignore durations which are smaller than the tolerance
+			if until < tolerance {
+				waitFor = 0
+			} else {
+				// always let the test stop with tolerance before the context is in timeout
+				waitFor = until - tolerance
+			}
+		}
+	}
+	return waitFor, tick
 }
