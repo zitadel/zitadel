@@ -1581,7 +1581,7 @@
       "ADDPROVIDER": "Ajouter un fournisseur de SMS",
       "ADDPROVIDERDESCRIPTION": "Choisissez l'un des fournisseurs disponibles et saisissez les données requises.",
       "REMOVEPROVIDER": "Supprimer le fournisseur",
-      "REMOVEPROVIDER_DESC": "Vous êtes sur le point de supprimer une configuration de fournisseur. Voulez-vous continuer",
+      "REMOVEPROVIDER_DESC": "Vous êtes sur le point de supprimer un fournisseur. Voulez-vous continuer",
       "SMSPROVIDERSTATE": {
         "0": "non spécifié",
         "1": "Actif",
@@ -2242,7 +2242,7 @@
     },
     "DETAIL": {
       "TITLE": "Fournisseur d'identité",
-      "DESCRIPTION": "Mettez à jour la configuration de votre fournisseur",
+      "DESCRIPTION": "Mettez à jour les paramètres de votre fournisseur",
       "DATECREATED": "Créé",
       "DATECHANGED": "Modifié"
     },
@@ -2354,11 +2354,11 @@
     "EMPTY": "Aucun IDP disponible",
     "OIDC": {
       "GENERAL": "Informations générales",
-      "TITLE": "Configuration de l'OIDC",
+      "TITLE": "Paramètres OIDC",
       "DESCRIPTION": "Saisissez les données pour le fournisseur d'identité OIDC."
     },
     "JWT": {
-      "TITLE": "Configuration JWT",
+      "TITLE": "Paramètres JWT",
       "DESCRIPTION": "Entrez les données pour le fournisseur d'identité JWT.",
       "HEADERNAME": "Nom de l'en-tête",
       "JWTENDPOINT": "Point de terminaison JWT",
@@ -2519,7 +2519,7 @@
       },
       "DIALOG": {
         "CONFIG": {
-          "TITLE": "Modifier la configuration de l'OIDC"
+          "TITLE": "Modifier les paramètres OIDC"
         },
         "DELETE": {
           "TITLE": "Supprimer l'application",
@@ -2576,7 +2576,7 @@
       "REDIRECTNOTVALID": "Cet URI de redirection n'est pas valide.",
       "COMMAORENTERSEPERATION": "séparer par ↵",
       "TYPEREQUIRED": "Le type est obligatoire.",
-      "TITLE": "Configuration de l'OIDC",
+      "TITLE": "Paramètres OIDC",
       "CLIENTID": "ID client",
       "CLIENTSECRET": "Secret du client",
       "CLIENTSECRET_NOSECRET": "Avec le flux d'authentification que vous avez choisi, aucun secret n'est requis et n'est donc pas disponible.",
@@ -2672,8 +2672,8 @@
         "TITLE": "SAML",
         "DESCRIPTION": "Applications SAML"
       },
-      "CONFIGSECTION": "Configuration SAML",
-      "CHOOSEMETADATASOURCE": "Fournissez votre configuration SAML à l'aide de l'une des options suivantes :",
+      "CONFIGSECTION": "Paramètres SAML",
+      "CHOOSEMETADATASOURCE": "Fournissez vos paramètres SAML à l'aide de l'une des options suivantes :",
       "METADATAOPT1": "Option 1. Spécifiez l'URL où se trouve le fichier de métadonnées",
       "METADATAOPT2": "Option 2. Téléchargez un fichier contenant vos métadonnées XML",
       "METADATAOPT3": "Option 3. Créer un fichier de métadonnées minimal à la volée fournissant l'ENTITYID et l'URL ACS",

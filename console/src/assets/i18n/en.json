@@ -1585,7 +1585,7 @@
       "ADDPROVIDER": "Add SMS Provider",
       "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
       "REMOVEPROVIDER": "Remove Provider",
-      "REMOVEPROVIDER_DESC": "You are about to delete a provider configuration. Do you want to continue?",
+      "REMOVEPROVIDER_DESC": "You are about to delete a provider. Do you want to continue?",
       "SMSPROVIDERSTATE": {
         "0": "Unspecified",
         "1": "Active",
@@ -2254,7 +2254,7 @@
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
-      "DESCRIPTION": "Update your provider configuration",
+      "DESCRIPTION": "Update your provider settings",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed"
     },
@@ -2361,11 +2361,11 @@
     "EMPTY": "No IdP available",
     "OIDC": {
       "GENERAL": "General Information",
-      "TITLE": "OIDC Configuration",
+      "TITLE": "OIDC Settings",
       "DESCRIPTION": "Enter the data for the OIDC Identity Provider."
     },
     "JWT": {
-      "TITLE": "JWT Configuration",
+      "TITLE": "JWT Settings",
       "DESCRIPTION": "Enter the data for JWT Identity Provider.",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
@@ -2548,7 +2548,7 @@
       },
       "DIALOG": {
         "CONFIG": {
-          "TITLE": "Change OIDC Configuration"
+          "TITLE": "Change OIDC Settings"
         },
         "DELETE": {
           "TITLE": "Delete App",
@@ -2605,7 +2605,7 @@
       "REDIRECTNOTVALID": "This redirect URI is not valid.",
       "COMMAORENTERSEPERATION": "separate with ↵",
       "TYPEREQUIRED": "The type is required.",
-      "TITLE": "OIDC Configuration",
+      "TITLE": "OIDC Settings",
       "CLIENTID": "Client ID",
       "CLIENTSECRET": "Client Secret",
       "CLIENTSECRET_NOSECRET": "With your chosen authentication flow, no secret is required and is therefore not available.",
@@ -2701,7 +2701,7 @@
         "TITLE": "SAML",
         "DESCRIPTION": "SAML Applications"
       },
-      "CONFIGSECTION": "SAML Configuration",
+      "CONFIGSECTION": "SAML Settings",
       "CHOOSEMETADATASOURCE": "Provide your SAML settings using one of the following options:",
       "METADATAOPT1": "Option 1. Specify the url where metadata file is located",
       "METADATAOPT2": "Option 2. Upload a file containing your metadata XML",
