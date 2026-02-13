@@ -35,7 +35,7 @@ The example includes secure sign-out functionality implementing **[federated log
 
 Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to:
 
-1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects-overview)
 2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
@@ -49,7 +49,7 @@ Before running this example, you need to create and configure a PKCE application
 Once you have your [Zitadel application configured](https://zitadel.com/docs/guides/integrate/login/oidc/login-users):
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-angular).
-2. Create a `.env` file (copy from `.env.example`) and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications). Use these environment variable names exactly as shown:
+2. Create a `.env` file (copy from `.env.example`) and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications-overview). Use these environment variable names exactly as shown:
    ```
    NODE_ENV=development
    PORT=3000

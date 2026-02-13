@@ -35,7 +35,7 @@ The logout flow implements **[federated logout](https://zitadel.com/docs/guides/
 
 Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to:
 
-1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects-overview)
 2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback/zitadel` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
@@ -48,7 +48,7 @@ Before running this example, you need to create and configure a PKCE application
 Once you have your Zitadel application configured:
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-sveltekit).
-2. Create a `.env.local` file in the project root and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications). **Use these exact environment variable names:**
+2. Create a `.env.local` file in the project root and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications-overview). **Use these exact environment variable names:**
    ```
    SESSION_SECRET=your-very-secret-and-strong-session-key
    SESSION_DURATION=3600
