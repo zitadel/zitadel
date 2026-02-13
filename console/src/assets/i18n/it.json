@@ -53,9 +53,9 @@
         "METADATA": "Aggiungi attributi personalizzati all'utente come il dipartimento. Puoi utilizzare queste informazioni nelle tue azioni."
       },
       "MACHINES": {
-        "TITLE": "Utenti di servizio",
-        "DESCRIPTION": "Utenti di servizio si autenticano in modo non interattivo utilizzando un token JWT firmato con una chiave privata. Possono anche utilizzare un token di accesso personale.",
-        "METADATA": "Aggiungi attributi personalizzati all'utente come il sistema di autenticazione. Puoi utilizzare queste informazioni nelle tue azioni."
+        "TITLE": "Account di servizio",
+        "DESCRIPTION": "Gli account di servizio si autenticano in modo non interattivo utilizzando un token JWT firmato con una chiave privata. Possono anche utilizzare un token di accesso personale.",
+        "METADATA": "Aggiungi attributi personalizzati all'account come il sistema di autenticazione. Puoi utilizzare queste informazioni nelle tue azioni."
       },
       "SELF": {
         "METADATA": "Aggiungi attributi personalizzati al tuo utente come il tuo dipartimento. Puoi utilizzare queste informazioni nelle azioni della tua organizzazione."
@@ -424,7 +424,7 @@
     "ROLES": "Ruoli",
     "GRANTEDPROJECT": "Progetto delegato",
     "HUMANUSERS": "Utenti",
-    "MACHINEUSERS": "Utenti di servizio",
+    "MACHINEUSERS": "Account di servizio",
     "LOGOUT": "Esci con tutti gli utenti",
     "NEWORG": "Nuova organizzazione",
     "IAMADMIN": "Sei un amministratore d'istanza. Nota che hai autorizzazioni estese.",
@@ -989,8 +989,8 @@
       "COUNTRY": "Paese"
     },
     "MACHINE": {
-      "TITLE": "Dettagli dell'utente del servizio",
-      "USERNAME": "Nome utente",
+      "TITLE": "Dettagli dell'account di servizio",
+      "USERNAME": "Nome dell'account",
       "NAME": "Nome",
       "DESCRIPTION": "Descrizione",
       "KEYSTITLE": "Chiavi",
@@ -1151,7 +1151,7 @@
       "SELECTEDDEACTIVATED": "Utenti selezionati disattivati.",
       "SELECTEDKEYSDELETED": "Tasti selezionati cancellati.",
       "KEYADDED": "Chiave aggiunta!",
-      "MACHINEADDED": "Utente di servizio creato!",
+      "MACHINEADDED": "Account di servizio creato!",
       "DELETED": "Utente cancellato con successo!",
       "UNLOCKED": "Utente sbloccato con successo!",
       "PASSWORDLESSREGISTRATIONSENT": "Link per la registrazione inviato con successo.",

@@ -245,7 +245,7 @@ func Test_mapCommands(t *testing.T) {
 				require.NoError(t, err)
 			}
 		}
-		// is used to set the the [pushPlaceholderFmt]
+		// is used to set the [pushPlaceholderFmt]
 		NewEventstore(&database.DB{Database: new(postgres.Config)})
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {

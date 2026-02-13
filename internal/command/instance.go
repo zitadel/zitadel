@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"net/url"
 	"strings"
 	"time"
 
@@ -15,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
@@ -124,55 +122,10 @@ type InstanceSetup struct {
 	SMTPConfiguration      *SMTPConfiguration
 	OIDCSettings           *OIDCSettings
 	Quotas                 *SetQuotas
-	Features               *InstanceSetupFeatures
+	Features               *InstanceFeatures
 	Limits                 *SetLimits
 	Restrictions           *SetRestrictions
 	RolePermissionMappings []authz.RoleMapping
-}
-
-type InstanceSetupFeatures struct {
-	LoginDefaultOrg                *bool
-	UserSchema                     *bool
-	ImprovedPerformance            []feature.ImprovedPerformanceType
-	DebugOIDCParentError           *bool
-	OIDCSingleV1SessionTermination *bool
-	LoginV2                        *InstanceSetupFeatureLoginV2
-	PermissionCheckV2              *bool
-	ManagementConsoleUseV2UserApi  *bool
-	EnableRelationalTables         *bool
-}
-
-type InstanceSetupFeatureLoginV2 struct {
-	Required bool    `json:"required,omitempty"`
-	BaseURI  *string `json:"base_uri,omitempty"`
-}
-
-func (f *InstanceSetupFeatures) ToInstanceFeatures() (_ *InstanceFeatures, err error) {
-	if f == nil {
-		return nil, nil
-	}
-	var loginV2 *feature.LoginV2
-	if f.LoginV2 != nil {
-		loginV2 = &feature.LoginV2{Required: f.LoginV2.Required}
-		if f.LoginV2.BaseURI != nil {
-			loginV2.BaseURI, err = url.Parse(*f.LoginV2.BaseURI)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	return &InstanceFeatures{
-		LoginDefaultOrg:                f.LoginDefaultOrg,
-		UserSchema:                     f.UserSchema,
-		ImprovedPerformance:            f.ImprovedPerformance,
-		DebugOIDCParentError:           f.DebugOIDCParentError,
-		OIDCSingleV1SessionTermination: f.OIDCSingleV1SessionTermination,
-		LoginV2:                        loginV2,
-		PermissionCheckV2:              f.PermissionCheckV2,
-		ManagementConsoleUseV2UserApi:  f.ManagementConsoleUseV2UserApi,
-		EnableRelationalTables:         f.EnableRelationalTables,
-	}, nil
 }
 
 type SMTPConfiguration struct {
@@ -468,7 +421,7 @@ func setupQuotas(commands *Commands, validations *[]preparation.Validation, setQ
 	return nil
 }
 
-func setupFeatures(validations *[]preparation.Validation, features *InstanceSetupFeatures, instanceID string) {
+func setupFeatures(validations *[]preparation.Validation, features *InstanceFeatures, instanceID string) {
 	if features != nil {
 		*validations = append(*validations, prepareSetFeatures(instanceID, features))
 	}

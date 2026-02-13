@@ -18,7 +18,7 @@ Prerequisites:
 - prerequisites on AWS side [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/prereqs.html).
 - enabled AWS SSO [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/step1.html?icmpid=docs_sso_console)
 
-> We have to switch between ZITADEL and a AWS. If the headings begin with "ZITADEL" switch to the ZITADEL Management Console and if
+> We have to switch between ZITADEL and AWS. If the headings begin with "ZITADEL" switch to the ZITADEL Management Console and if
 > the headings start with "AWS" please switch to the AWS GUI.
 
 ## **AWS**: Change to external identity provider ZITADEL
@@ -33,7 +33,7 @@ can connect to ZITADEL as a SAML2 IDP.
    ![](../../../../public/img/saml/aws/change_idp.png)
 
 2. Download the metadata file, to provide ZITADEL with all the information it needs, and save the AWS SSO Sign-in URL,
-   which you use to login afterwards.
+   which you use to log in afterward.
 
 3. Fill out the fields as follows, to provide AWS with all the information it needs:
    ![](../../../../public/img/saml/aws/configure_idp.png)
@@ -75,5 +75,5 @@ Everything on the side of ZITADEL is done if the application is correctly create
 
 ## **AWS**: Test the connection
 
-The result, you can now login to you AWS account through your ZITADEL-login with the AWS SSO Sign-in URL, which you
+The result, you can now log in to you AWS account through your ZITADEL-login with the AWS SSO Sign-in URL, which you
 should have saved in "Change to external identity provider ZITADEL" step 2.

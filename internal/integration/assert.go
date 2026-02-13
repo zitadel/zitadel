@@ -48,7 +48,7 @@ type ResourceListDetailsMsg interface {
 // It targets API v2 messages that have the `GetDetails()` method.
 //
 // Dynamically generated values are not compared with expected.
-// Instead a sanity check is performed.
+// Instead, a sanity check is performed.
 // For the sequence a non-zero value is expected.
 // If the change date is populated, it is checked with a tolerance of 1 minute around Now.
 //
@@ -149,7 +149,7 @@ func AssertGrpcStatus(t assert.TestingT, expected codes.Code, err error) {
 //
 // As [assert.Equal] is based on reflection, comparing 2 proto messages sometimes fails,
 // due to their internal state.
-// Expected messages are usually with a vanilla state, eg only exported fields contain data.
+// Expected messages are usually with a vanilla state, e.g. only exported fields contain data.
 // Actual messages obtained from the gRPC client had unexported fields with data.
 // This makes them hard to compare.
 func EqualProto(t testing.TB, expected, actual proto.Message) bool {

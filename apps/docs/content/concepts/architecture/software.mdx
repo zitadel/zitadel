@@ -17,7 +17,7 @@ This All in One (AiO) approach makes operating Zitadel simple.
 
 ## The Architecture
 
-Zitadels software architecture is built around multiple components at different levels.
+Zitadel's software architecture is built around multiple components at different levels.
 This chapter should give you an idea of the components as well as the different layers.
 
 ![](../../../public/img/zitadel_software_architecture.png)
@@ -63,7 +63,7 @@ The Command Side has some unique requirements, these include:
 
 The command handler receives all operations who alter a resource managed by Zitadel.
 For example if a user changes their name. The API Layer will pass the instruction received through the API call to the command handler for further processing.
-The command handler is then responsible of creating the necessary commands.
+The command handler is then responsible for creating the necessary commands.
 After creating the commands the command hand them down to the command validation.
 
 ##### Command Validation
@@ -76,7 +76,7 @@ These events now are being handed down to the storage layer for storage.
 #### Events
 
 Zitadel handles events in two ways.
-Events that should be processed in near real time are processed by a in memory pub sub system.
+Events that should be processed in near real time are processed by an in memory pub sub system.
 Some events can be handled asynchronously using the spooler.
 
 ##### Pub Sub
@@ -103,7 +103,7 @@ Spoolers are especially necessary where someone can query datasets instead of si
 
 #### Projections
 
-Projections are responsible of normalizing data for the query side or for analytical purpose.
+Projections are responsible for normalizing data for the query side or for analytical purpose.
 They generally work by being invoked either through a scheduled spooler or the pub sub subscription.
 
 When they receive events they will create their normalized object and then store this into the query view and its storage layer.
@@ -122,10 +122,10 @@ It has some unique requirements, which include:
 
 ##### Query Handler
 
-The query handler receives all read relevant operations. These can either be query or simple `getById` calls.
+The query handler receives all read relevant operations. These can either be queries or simple `getById` calls.
 When receiving a query it will proceed by passing this to the repository which will call the database and return the dataset.
-If a request calls for a specific id the call will, most of the times, be revalidated against the Event Store.
-This is achieved by triggering the projection to make sure that the last sequence of a id is loaded into the query view.
+If a request calls for a specific id the call will, most of the time, be revalidated against the Event Store.
+This is achieved by triggering the projection to make sure that the last sequence of an id is loaded into the query view.
 
 > The query side has the option to dynamically check the Event Store for newer events on a certain id to make sure for consistent responses without delay.
 
