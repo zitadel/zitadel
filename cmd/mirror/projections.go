@@ -215,8 +215,7 @@ func projections(
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
-		nil,
-		nil,
+		config.Login.DefaultPaths,
 		[]denylist.AddressChecker{},
 	)
 	logging.OnError(ctx, err).Fatal("unable to start commands")
@@ -241,7 +240,7 @@ func projections(
 		commands,
 		queries,
 		es,
-		config.Login.DefaultPaths.OTPEmailPath,
+		config.Login.DefaultPaths.DefaultOTPEmailURLTemplate,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,

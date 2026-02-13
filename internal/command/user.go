@@ -279,7 +279,9 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 			userAgg,
 			fmt.Sprintf("%s@temporary.%s", id, http_util.DomainContext(ctx).RequestedDomain()),
 			existingUser.UserName,
-			domainPolicy.UserLoginMustBeDomain),
+			domainPolicy.UserLoginMustBeDomain,
+			c.loginPaths.DefaultDomainClaimedURLTemplate(ctx),
+		),
 	}, changedUserGrant, nil
 }
 
@@ -307,7 +309,9 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 		userAgg,
 		fmt.Sprintf("%s@temporary.%s", id, http_util.DomainContext(ctx).RequestedDomain()),
 		userWriteModel.UserName,
-		domainPolicy.UserLoginMustBeDomain), nil
+		domainPolicy.UserLoginMustBeDomain,
+		c.loginPaths.DefaultDomainClaimedURLTemplate(ctx),
+	), nil
 }
 
 func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {

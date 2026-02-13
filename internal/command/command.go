@@ -104,11 +104,17 @@ type Commands struct {
 	// so the query and cache overhead can be completely eliminated.
 	milestonesCompleted sync.Map
 
-	defaultEmailCodeURLTemplate   func(ctx context.Context) string
-	defaultPasswordSetURLTemplate func(ctx context.Context) string
-
+	loginPaths        LoginPaths
 	ActionsV2DenyList []denylist.AddressChecker
 	IPLookupFunction  internal_net.IPLookupFunc
+}
+
+//go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
+type LoginPaths interface {
+	DefaultEmailCodeURLTemplate(ctx context.Context) string
+	DefaultPasswordSetURLTemplate(ctx context.Context) string
+	DefaultPasskeySetURLTemplate(ctx context.Context) string
+	DefaultDomainClaimedURLTemplate(ctx context.Context) string
 }
 
 func StartCommands(
@@ -126,12 +132,9 @@ func StartCommands(
 	httpClient *http.Client,
 	permissionCheck domain.PermissionCheck,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
-	defaultAccessTokenLifetime,
-	defaultRefreshTokenLifetime,
-	defaultRefreshTokenIdleLifetime time.Duration,
+	defaultAccessTokenLifetime, defaultRefreshTokenLifetime, defaultRefreshTokenIdleLifetime time.Duration,
 	defaultSecretGenerators *SecretGenerators,
-	defaultEmailCodeURLTemplate func(ctx context.Context) string,
-	defaultPasswordSetURLTemplate func(ctx context.Context) string,
+	loginPaths LoginPaths,
 	actionsDeniedHostList []denylist.AddressChecker,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
@@ -218,12 +221,11 @@ func StartCommands(
 				WithHyphen: defaults.Multifactors.RecoveryCodes.WithHyphen,
 			},
 		},
-		GenerateDomain:                domain.NewGeneratedInstanceDomain,
-		caches:                        caches,
-		defaultEmailCodeURLTemplate:   defaultEmailCodeURLTemplate,
-		defaultPasswordSetURLTemplate: defaultPasswordSetURLTemplate,
-		ActionsV2DenyList:             actionsDeniedHostList,
-		IPLookupFunction:              net.LookupIP,
+		GenerateDomain:    domain.NewGeneratedInstanceDomain,
+		caches:            caches,
+		loginPaths:        loginPaths,
+		ActionsV2DenyList: actionsDeniedHostList,
+		IPLookupFunction:  net.LookupIP,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {

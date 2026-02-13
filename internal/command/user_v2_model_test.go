@@ -661,7 +661,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&userAgg.Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -723,7 +723,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&userAgg.Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -782,7 +782,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&userAgg.Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -850,7 +850,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&userAgg.Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,

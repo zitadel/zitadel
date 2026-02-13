@@ -44,7 +44,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		checkPermission             domain.PermissionCheck
 		defaultSecretGenerators     *SecretGenerators
-		defaultEmailCodeURLTemplate func(ctx context.Context) string
+		loginPaths                  func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx             context.Context
@@ -79,6 +79,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			fields: fields{
 				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -104,6 +105,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			fields: fields{
 				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -131,6 +133,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -163,6 +166,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -204,6 +208,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -272,6 +277,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -308,6 +314,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -373,6 +380,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -445,6 +453,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				newCode:            mockEncryptedCode("userinit", time.Hour),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -487,7 +496,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					),
 					expectPush(
 						newAddHumanEvent("", false, true, "", language.English),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -502,10 +511,10 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 						),
 					),
 				),
-				checkPermission:             newMockPermissionCheckAllowed(),
-				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				newCode:                     mockEncryptedCode("emailverify", time.Hour),
-				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				newCode:         mockEncryptedCode("emailverify", time.Hour),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -559,7 +568,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "", language.English),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -578,6 +587,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				newCode:            mockEncryptedCode("emailCode", time.Hour),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -633,7 +643,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "", language.English),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -648,11 +658,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 						),
 					),
 				),
-				checkPermission:             newMockPermissionCheckAllowed(),
-				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordHasher:          mockPasswordHasher("x"),
-				newCode:                     mockEncryptedCode("emailCode", time.Hour),
-				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				checkPermission:    newMockPermissionCheckAllowed(),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				newCode:            mockEncryptedCode("emailCode", time.Hour),
+				loginPaths:         expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -717,6 +727,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -781,6 +792,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -845,6 +857,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -899,6 +912,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -985,6 +999,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1094,6 +1109,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				userPasswordHasher:          mockPasswordHasher("x"),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phonecode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1199,6 +1215,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				userPasswordHasher:          mockPasswordHasher("x"),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phonecode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1266,6 +1283,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1375,6 +1393,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				userPasswordHasher:          mockPasswordHasher("x"),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1445,6 +1464,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1505,7 +1525,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					),
 					expectPush(
 						newRegisterHumanEvent("email@test.ch", "", false, true, "", language.English),
-						user.NewHumanEmailCodeAddedEventV2(
+						user.NewHumanEmailCodeAddedEvent(
 							context.Background(),
 							&userAgg.Aggregate,
 							&crypto.CryptoValue{
@@ -1528,10 +1548,10 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 						),
 					),
 				),
-				checkPermission:             newMockPermissionCheckAllowed(),
-				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				newCode:                     mockEncryptedCode("mailVerify", time.Hour),
-				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				newCode:         mockEncryptedCode("mailVerify", time.Hour),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1611,6 +1631,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("mailVerify", time.Hour),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1698,6 +1719,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1755,6 +1777,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1834,6 +1857,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1923,6 +1947,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2016,6 +2041,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2062,7 +2088,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 						CryptoMFA: cryptoAlg,
 					},
 				},
-				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
+				loginPaths: tt.fields.loginPaths(t),
 			}
 			err := r.AddUserHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail, tt.args.codeAlg)
 			if tt.res.err == nil {
@@ -2100,7 +2126,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		checkPermission             domain.PermissionCheck
 		defaultSecretGenerators     *SecretGenerators
-		defaultEmailCodeURLTemplate func(ctx context.Context) string
+		loginPaths                  func(*testing.T) LoginPaths
 		tarpit                      Tarpit
 	}
 	type args struct {
@@ -2138,6 +2164,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2164,6 +2191,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2186,6 +2214,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2230,6 +2259,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2258,6 +2288,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2286,6 +2317,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2335,6 +2367,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2370,6 +2403,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2407,7 +2441,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							&userAgg.Aggregate,
 							"changed@example.com",
 						),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -2422,10 +2456,10 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
-				checkPermission:             newMockPermissionCheckAllowed(),
-				newCode:                     mockEncryptedCode("emailCode", time.Hour),
-				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
-				tarpit:                      expectTarpit(0),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockEncryptedCode("emailCode", time.Hour),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2457,6 +2491,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2487,6 +2522,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2516,6 +2552,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   authz.NewMockContext("instance1", "org1", "user1"),
@@ -2554,6 +2591,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2590,6 +2628,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2622,7 +2661,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							&userAgg.Aggregate,
 							"changed@test.com",
 						),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -2637,10 +2676,10 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
-				checkPermission:             newMockPermissionCheckAllowed(),
-				newCode:                     mockEncryptedCode("emailCode", time.Hour),
-				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
-				tarpit:                      expectTarpit(0),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockEncryptedCode("emailCode", time.Hour),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2724,6 +2763,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
 				tarpit:                      expectTarpit(0),
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2800,6 +2840,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
 				tarpit:                      expectTarpit(0),
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2831,6 +2872,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2860,6 +2902,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   authz.NewMockContext("instance1", "org1", "user1"),
@@ -2898,6 +2941,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2934,6 +2978,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3014,6 +3059,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
 				tarpit:                      expectTarpit(0),
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3042,6 +3088,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3076,6 +3123,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3125,6 +3173,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3150,6 +3199,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3185,6 +3235,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				userPasswordHasher: mockPasswordHasher("x"),
 				checkPermission:    newMockPermissionCheckNotAllowed(),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3240,6 +3291,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				userPasswordHasher: mockPasswordHasher("x"),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3298,6 +3350,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3353,6 +3406,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 				tarpit:             expectTarpit(1),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3425,6 +3479,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3480,6 +3535,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3545,6 +3601,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3604,6 +3661,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3679,6 +3737,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3711,7 +3770,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:             tt.fields.checkPermission,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 				userEncryption:              tt.args.codeAlg,
-				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
+				loginPaths:                  tt.fields.loginPaths(t),
 				tarpit:                      tt.fields.tarpit.tarpit,
 			}
 			err := r.ChangeUserHuman(tt.args.ctx, tt.args.human, tt.args.codeAlg)
