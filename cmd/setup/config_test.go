@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -16,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
 func TestMustNewConfig(t *testing.T) {
@@ -48,12 +50,12 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceSetupFeatures{
+			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceFeatures{
 				LoginDefaultOrg: gu.Ptr(true),
 				UserSchema:      gu.Ptr(true),
-				LoginV2: &command.InstanceSetupFeatureLoginV2{
+				LoginV2: &feature.LoginV2{
 					Required: true,
-					BaseURI:  gu.Ptr("http://zitadel:8080"),
+					BaseURI:  &url.URL{Scheme: "http", Host: "zitadel:8080"},
 				},
 			})
 		},

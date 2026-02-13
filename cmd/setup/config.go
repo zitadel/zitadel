@@ -85,6 +85,7 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 			hook.EnumHookFunc(authz.MemberTypeString),
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
@@ -205,6 +206,7 @@ func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
