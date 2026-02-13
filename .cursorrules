@@ -2,11 +2,11 @@
 
 You are working in the ZITADEL monorepo. 
 
-**ALWAYS** start your session by reading the relevant `agents.md` file for your current context to understand the architecture and conventions.
+**ALWAYS** start your session by reading the relevant `AGENTS.md` file for your current context to understand the architecture and conventions.
 
-- **Root Context**: [agents.md](agents.md) (Architecture, Repo Map, Global Commands)
-- **Login App**: [apps/login/agents.md](apps/login/agents.md) (Next.js/React Authentication UI)
-- **Docs Site**: [apps/docs/agents.md](apps/docs/agents.md) (Fumadocs/MDX)
-- **Management Console**: [console/agents.md](console/agents.md) (Angular/RxJS)
+- **Root Context**: [AGENTS.md](AGENTS.md) (Architecture, Repo Map, Global Commands)
+- **Login App**: [apps/login/AGENTS.md](apps/login/AGENTS.md) (Next.js/React Authentication UI)
+- **Docs Site**: [apps/docs/AGENTS.md](apps/docs/AGENTS.md) (Fumadocs/MDX)
+- **Management Console**: [console/AGENTS.md](console/AGENTS.md) (Angular/RxJS)
 
 Use `pnpm nx run [PROJECT]:[TARGET]` for all build, test, and lint tasks.

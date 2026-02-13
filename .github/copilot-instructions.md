@@ -2,13 +2,13 @@
 
 You are working in the ZITADEL monorepo. This codebase uses specific conventions for its Go backend and Angular/Next.js frontends.
 
-**CRITICAL**: Before suggesting complex changes, read the `agents.md` file in the root or the active application directory for architectural context.
+**CRITICAL**: Before suggesting complex changes, read the `AGENTS.md` file in the root or the active application directory for architectural context.
 
 ## Key References
-- `agents.md`: Root architecture map and global commands.
-- `apps/login/agents.md`: Specifics for the Next.js Login UI.
-- `apps/docs/agents.md`: Specifics for the Fumadocs documentation.
-- `console/agents.md`: Specifics for the Angular Console.
+- `AGENTS.md`: Root architecture map and global commands.
+- `apps/login/AGENTS.md`: Specifics for the Next.js Login UI.
+- `apps/docs/AGENTS.md`: Specifics for the Fumadocs documentation.
+- `console/AGENTS.md`: Specifics for the Angular Console.
 
 ## Behavior
 - Use `pnpm nx` for all build and test commands.
