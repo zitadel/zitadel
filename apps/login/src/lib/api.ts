@@ -1,4 +1,6 @@
 import { newSystemToken } from "@zitadel/client/node";
+import { readFileSync } from "fs";
+import { getLoginSystemUserId } from "./deployment";
 
 export async function systemAPIToken() {
   const token = {
@@ -13,5 +15,16 @@ export async function systemAPIToken() {
     audience: token.audience,
     subject: token.userID,
     key: token.token,
+  });
+}
+
+export async function loginServiceKeyToken() {
+  const key = readFileSync(process.env.ZITADEL_LOGIN_SERVICE_KEY_FILE!, "utf-8");
+  const audience = process.env.AUDIENCE || process.env.ZITADEL_API_URL!;
+
+  return newSystemToken({
+    audience: audience,
+    subject: getLoginSystemUserId()!,
+    key: key,
   });
 }
