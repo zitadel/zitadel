@@ -17,22 +17,22 @@ export function hasSystemUserCredentials(): boolean {
 /**
  * Checks if login service key file is available for JWT authentication.
  *
- * @returns true if LOGIN_SERVICE_KEY_FILE and a user ID are present, false otherwise
+ * @returns true if ZITADEL_LOGIN_SERVICE_KEY_FILE and a user ID are present, false otherwise
  */
 export function hasLoginServiceKey(): boolean {
   return (
-    !!process.env.LOGIN_SERVICE_KEY_FILE &&
-    !!(process.env.LOGIN_SYSTEM_USER_ID || process.env.SYSTEM_USER_ID)
+    !!process.env.ZITADEL_LOGIN_SERVICE_KEY_FILE &&
+    !!(process.env.ZITADEL_LOGIN_SYSTEM_USER_ID || process.env.SYSTEM_USER_ID)
   );
 }
 
 /**
  * Gets the system user ID for login service key authentication.
  *
- * @returns LOGIN_SYSTEM_USER_ID if set, otherwise SYSTEM_USER_ID
+ * @returns ZITADEL_LOGIN_SYSTEM_USER_ID if set, otherwise SYSTEM_USER_ID
  */
 export function getLoginSystemUserId(): string | undefined {
-  return process.env.LOGIN_SYSTEM_USER_ID || process.env.SYSTEM_USER_ID;
+  return process.env.ZITADEL_LOGIN_SYSTEM_USER_ID || process.env.SYSTEM_USER_ID;
 }
 
 /**

@@ -19,7 +19,7 @@ export async function systemAPIToken() {
 }
 
 export async function loginServiceKeyToken() {
-  const key = readFileSync(process.env.LOGIN_SERVICE_KEY_FILE!, "utf-8");
+  const key = readFileSync(process.env.ZITADEL_LOGIN_SERVICE_KEY_FILE!, "utf-8");
   const audience = process.env.AUDIENCE || process.env.ZITADEL_API_URL!;
 
   return newSystemToken({
