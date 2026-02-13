@@ -1,6 +1,6 @@
 # Zitadel Management Console
 
-The Management Console is Zitadels management UI.
+The Management Console is Zitadel's management UI.
 
 It is built using [Angular](https://angular.dev/) and part of the Zitadel monorepo.
 

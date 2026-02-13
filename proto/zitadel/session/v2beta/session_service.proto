@@ -405,7 +405,7 @@ message Checks {
   ];
   optional CheckIDPIntent idp_intent = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Checks the IDP intent. Requires that the userlink is already checked and a successful idp intent.\"";
+      description: "\"Checks the IDP intent. Requires that the user-link is already checked and a successful idp intent.\"";
     }
   ];
   optional CheckTOTP totp = 5 [
