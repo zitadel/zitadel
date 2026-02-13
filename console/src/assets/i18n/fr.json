@@ -1581,7 +1581,7 @@
       "ADDPROVIDER": "Ajouter un fournisseur de SMS",
       "ADDPROVIDERDESCRIPTION": "Choisissez l'un des fournisseurs disponibles et saisissez les données requises.",
       "REMOVEPROVIDER": "Supprimer le fournisseur",
-      "REMOVEPROVIDER_DESC": "Vous êtes sur le point de supprimer un fournisseur. Voulez-vous continuer ?",
+      "REMOVEPROVIDER_DESC": "Vous êtes sur le point de supprimer un fournisseur. Voulez-vous continuer?",
       "SMSPROVIDERSTATE": {
         "0": "non spécifié",
         "1": "Actif",

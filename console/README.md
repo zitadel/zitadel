@@ -36,9 +36,9 @@ pnpm nx @zitadel/console:lint-fix
 ## Project Structure
 
 - `src/app/proto/generated/` - Generated proto files (Angular-specific format)
-- `buf.gen.yaml` - Local proto generation configuration
+- `buf.gen.yaml` - Local proto generation settings
 - `project.json` - Nx orchestration and caching for builds and tests
-- `prebuild.development.js` - Development environment configuration script
+- `prebuild.development.js` - Development environment settings script
 
 ### Dependency Chain
 
