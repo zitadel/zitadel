@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
@@ -446,6 +447,11 @@ func newProjectionsList() {
 		projections = projectionList
 		return
 	}
+	for _, toAdd := range projectionList {
+		if slices.ContainsFunc(projections, func(p projection) bool { return p.ProjectionName() == toAdd.ProjectionName() }) {
+			return
+		}
+	}
 	projections = append(projections, projectionList...)
 }
 
@@ -470,6 +476,11 @@ func newRelationalTablesList() {
 	if len(projections) == 0 {
 		projections = relTables
 		return
+	}
+	for _, toAdd := range relTables {
+		if slices.ContainsFunc(projections, func(p projection) bool { return p.ProjectionName() == toAdd.ProjectionName() }) {
+			return
+		}
 	}
 	projections = append(projections, relTables...)
 }
