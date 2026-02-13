@@ -16,17 +16,17 @@ Before you start, make sure you have everything set up correctly.
 ## Copy some information for the action
 
 1. Select the **Projects** navigation item.
-1. Select a project that has a role configured.
-1. Copy the projects **Resource Id** on the screens top right.
-1. Scroll to the **ROLES** section and note some roles key.
+2. Select a project that has a role configured.
+3. Copy the projects **Resource ID** on the screens top right.
+4. Scroll to the **ROLES** section and note some roles key.
 
 ## Create the action
 
 1. Select the **Actions** navigation item.
-1. In the **Actions <i className="las la-code"></i>** section, select the **+ New** button.
-1. Give the new action the name `addGrant`.
-1. Paste this snippet into the multiline textfield.
-1. Replace the snippets placeholders and select **Save**.
+2. In the **Actions <i className="las la-code"></i>** section, select the **+ New** button.
+3. Give the new action the name `addGrant`.
+4. Paste this snippet into the multiline text-field.
+5. Replace the snippets placeholders and select **Save**.
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/add_user_grant.js
@@ -37,10 +37,10 @@ https://github.com/zitadel/actions/blob/main/examples/add_user_grant.js
 Now, make the action hook into the [external authentication flow](/apis/actions/external-authentication).
 
 1. In the **Flows <i className="las la-exchange-alt"></i>** section, select the **+ New** button.
-1. Select the **Flow Type** _External Authentication_.
-1. Select the **Trigger Type** _Post Creation_.
-1. In the **Actions** dropdown, check _addGrant_.
-1. Select the **Save** button.
+2. Select the **Flow Type** _External Authentication_.
+3. Select the **Trigger Type** _Post Creation_.
+4. In the **Actions** dropdown, check _addGrant_.
+5. Select the **Save** button.
 
 New users automatically are assigned a role now if they register by authenticating with an external identity provider.
 
