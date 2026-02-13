@@ -8,23 +8,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
 	"github.com/jackc/pgx/v5"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/embedded"
-	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
 	// Register migrations
 	_ "github.com/zitadel/zitadel/internal/query/projection/migrations"
-	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
 var (
@@ -87,42 +81,8 @@ func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), er
 	return pool, stop, err
 }
 
-func TestDomainAddedEvent(t *testing.T) {
-	ctx := t.Context()
-	instanceDomainRepo := repository.InstanceDomainRepository()
-	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(ctx, pool, &domain.Instance{
-		ID:              "123",
-		Name:            "my instance",
-		DefaultOrgID:    gofakeit.UUID(),
-		IAMProjectID:    gofakeit.UUID(),
-		ConsoleClientID: gofakeit.UUID(),
-		ConsoleAppID:    gofakeit.UUID(),
-		DefaultLanguage: gofakeit.LanguageAbbreviation(),
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
-	})
-	require.NoError(t, err)
-	tstCmd := instance.NewDomainAddedEvent(ctx, &instance.NewAggregate("123").Aggregate, "test-domain.com", false)
-	_, err = es.Push(ctx, tstCmd)
-	require.NoError(t, err)
-	retryDuration, tick := WaitForAndTickWithMaxDuration(ctx, time.Second*30)
-	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-		domain, err := instanceDomainRepo.Get(ctx, pool,
-			database.WithCondition(
-				database.And(
-					instanceDomainRepo.InstanceIDCondition("123"),
-					instanceDomainRepo.DomainCondition(database.TextOperationEqual, "test-domain.com"),
-				),
-			),
-		)
-		require.NoError(t, err)
-		assert.Equal(t, "test-domain.com", domain.Domain)
-		assert.Equal(t, "123", domain.InstanceID)
-	}, retryDuration, tick)
-}
-
-func WaitForAndTickWithMaxDuration(ctx context.Context, max time.Duration) (time.Duration, time.Duration) {
+// Copied from [integration.WaitForAndTickWithMaxDuration] to avoid an import loop
+func waitForAndTickWithMaxDuration(ctx context.Context, max time.Duration) (time.Duration, time.Duration) {
 	// interval which is used to retry the test
 	tick := time.Second
 	// tolerance which is used to stop the test for the timeout

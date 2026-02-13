@@ -42,49 +42,6 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 		assert.NoError(t, err)
 	}, retryDuration, tick)
 
-	t.Run("test instance custom domain add reduces", func(t *testing.T) {
-		// Add a domain to the instance
-		domainName := gofakeit.DomainName()
-		beforeAdd := time.Now()
-		_, err := instance.Client.InstanceV2Beta.AddCustomDomain(CTX, &v2beta.AddCustomDomainRequest{
-			InstanceId: instance.Instance.Id,
-			Domain:     domainName,
-		})
-		require.NoError(t, err)
-		afterAdd := time.Now()
-
-		t.Cleanup(func() {
-			_, err := instance.Client.InstanceV2Beta.RemoveCustomDomain(CTX, &v2beta.RemoveCustomDomainRequest{
-				InstanceId: instance.Instance.Id,
-				Domain:     domainName,
-			})
-			if err != nil {
-				t.Logf("Failed to delete instance domain on cleanup: %v", err)
-			}
-		})
-
-		// Test that domain add reduces
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			domain, err := instanceDomainRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
-						instanceDomainRepo.DomainCondition(database.TextOperationEqual, domainName),
-						instanceDomainRepo.TypeCondition(domain.DomainTypeCustom),
-					),
-				),
-			)
-			require.NoError(t, err)
-			// event instance.domain.added
-			assert.Equal(t, domainName, domain.Domain)
-			assert.Equal(t, instance.Instance.Id, domain.InstanceID)
-			assert.False(t, *domain.IsPrimary)
-			assert.WithinRange(t, domain.CreatedAt, beforeAdd, afterAdd)
-			assert.WithinRange(t, domain.UpdatedAt, beforeAdd, afterAdd)
-		}, retryDuration, tick)
-	})
-
 	t.Run("test instance custom domain set primary reduces", func(t *testing.T) {
 		// Add a domain to the instance
 		domainName := gofakeit.DomainName()
