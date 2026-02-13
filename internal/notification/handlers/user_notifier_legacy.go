@@ -451,7 +451,7 @@ func (u *userNotifierLegacy) reduceSessionOTPEmailChallenged(event eventstore.Ev
 	if err != nil {
 		return nil, err
 	}
-	url := func(code string, origin *url.URL, user *query.NotifyUser) (string, error) {
+	link := func(code string, origin *url.URL, user *query.NotifyUser) (string, error) {
 		var buf strings.Builder
 		urlTmpl := e.URLTmpl
 		if urlTmpl == "" {
@@ -468,7 +468,7 @@ func (u *userNotifierLegacy) reduceSessionOTPEmailChallenged(event eventstore.Ev
 		e.Expiry,
 		s.UserFactor.UserID,
 		s.UserFactor.ResourceOwner,
-		url,
+		link,
 		u.commands.OTPEmailSent,
 		user.HumanOTPEmailCodeAddedType,
 		user.HumanOTPEmailCodeSentType,
