@@ -21,6 +21,7 @@ type IDPIntentWriteModel struct {
 	IDPUserID    string
 	IDPUserName  string
 	UserID       string
+	LoginHint    string
 
 	IDPAccessToken *crypto.CryptoValue
 	IDPIDToken     string
@@ -97,6 +98,7 @@ func (wm *IDPIntentWriteModel) reduceStartedEvent(e *idpintent.StartedEvent) {
 	wm.SuccessURL = e.SuccessURL
 	wm.FailureURL = e.FailureURL
 	wm.IDPID = e.IDPID
+	wm.LoginHint = e.LoginHint
 	wm.IDPArguments = e.IDPArguments
 	wm.State = domain.IDPIntentStateStarted
 }

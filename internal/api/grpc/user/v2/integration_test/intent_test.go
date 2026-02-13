@@ -1038,3 +1038,109 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 		})
 	}
 }
+
+func TestServer_StartIdentityProviderIntent_WithLoginHint(t *testing.T) {
+	oauthIdpResp := Instance.AddGenericOAuthProvider(IamCTX, integration.IDPName())
+
+	type args struct {
+		ctx context.Context
+		req *user.StartIdentityProviderIntentRequest
+	}
+	type want struct {
+		url                string
+		parametersExisting []string
+		parametersEqual    map[string]string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    want
+		wantErr bool
+	}{
+		{
+			name: "OAuth with login_hint",
+			args: args{
+				OrgCTX,
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: oauthIdpResp.Id,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+							LoginHint:  "user@example.com",
+						},
+					},
+				},
+			},
+			want: want{
+				url: "https://example.com/oauth/v2/authorize",
+				parametersEqual: map[string]string{
+					"client_id":     "clientID",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
+					"response_type": "code",
+					"scope":         "openid profile email",
+					"login_hint":    "user@example.com",
+				},
+				parametersExisting: []string{"state"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Without login_hint",
+			args: args{
+				OrgCTX,
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: oauthIdpResp.Id,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+							// No LoginHint provided
+						},
+					},
+				},
+			},
+			want: want{
+				url: "https://example.com/oauth/v2/authorize",
+				parametersEqual: map[string]string{
+					"client_id":     "clientID",
+					"prompt":        "select_account",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
+					"response_type": "code",
+					"scope":         "openid profile email",
+				},
+				parametersExisting: []string{"state"},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.StartIdentityProviderIntent(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			authUrl, err := url.Parse(got.GetAuthUrl())
+			require.NoError(t, err)
+
+			assert.Equal(t, tt.want.url, authUrl.Scheme+"://"+authUrl.Host+authUrl.Path)
+
+			for _, param := range tt.want.parametersExisting {
+				assert.True(t, authUrl.Query().Has(param), "Expected parameter %s to exist", param)
+			}
+
+			for key, expectedValue := range tt.want.parametersEqual {
+				actualValue := authUrl.Query().Get(key)
+				assert.Equal(t, expectedValue, actualValue, "Parameter %s should have value %s but got %s", key, expectedValue, actualValue)
+			}
+
+			if tt.args.req.GetContent().(*user.StartIdentityProviderIntentRequest_Urls).Urls.LoginHint == "" {
+				assert.False(t, authUrl.Query().Has("login_hint"), "login_hint should not be in URL when not provided or empty")
+			}
+		})
+	}
+}

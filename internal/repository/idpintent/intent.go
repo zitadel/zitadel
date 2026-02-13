@@ -26,6 +26,7 @@ type StartedEvent struct {
 	SuccessURL   *url.URL       `json:"successURL"`
 	FailureURL   *url.URL       `json:"failureURL"`
 	IDPID        string         `json:"idpId"`
+	LoginHint    string         `json:"loginHint"`
 	IDPArguments map[string]any `json:"idpArguments,omitempty"`
 }
 
@@ -35,6 +36,7 @@ func NewStartedEvent(
 	successURL,
 	failureURL *url.URL,
 	idpID string,
+	loginHint string,
 	idpArguments map[string]any,
 ) *StartedEvent {
 	return &StartedEvent{
@@ -46,6 +48,7 @@ func NewStartedEvent(
 		SuccessURL:   successURL,
 		FailureURL:   failureURL,
 		IDPID:        idpID,
+		LoginHint:    loginHint,
 		IDPArguments: idpArguments,
 	}
 }
