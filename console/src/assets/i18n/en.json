@@ -53,9 +53,9 @@
         "METADATA": "Add custom attributes to the user like the department. You can use this information in your actions."
       },
       "MACHINES": {
-        "TITLE": "Service Users",
-        "DESCRIPTION": "Service Users authenticate non-interactively using a JWT bearer token signed with a private key. They can also use a personal access token.",
-        "METADATA": "Add custom attributes to the user like the authenticating system. You can use this information in your actions."
+        "TITLE": "Service Accounts",
+        "DESCRIPTION": "Service Accounts authenticate non-interactively using a JWT bearer token signed with a private key. They can also use a personal access token.",
+        "METADATA": "Add custom attributes to the account like the authenticating system. You can use this information in your actions."
       },
       "SELF": {
         "METADATA": "Add custom attributes to your user like your department. You can use this information in your organizations actions."
@@ -424,7 +424,7 @@
     "ROLES": "Roles",
     "GRANTEDPROJECT": "Granted Projects",
     "HUMANUSERS": "Users",
-    "MACHINEUSERS": "Service Users",
+    "MACHINEUSERS": "Service Accounts",
     "LOGOUT": "Logout All Users",
     "NEWORG": "New Organization",
     "IAMADMIN": "You are an IAM Administrator. Note that you have extended permissions.",
@@ -991,7 +991,7 @@
       "COUNTRY": "Country"
     },
     "MACHINE": {
-      "TITLE": "Service User Details",
+      "TITLE": "Service Account Details",
       "USERNAME": "User Name",
       "NAME": "Name",
       "DESCRIPTION": "Description",
@@ -1153,7 +1153,7 @@
       "SELECTEDDEACTIVATED": "Selected users deactivated.",
       "SELECTEDKEYSDELETED": "Selected keys deleted.",
       "KEYADDED": "Key added!",
-      "MACHINEADDED": "Service User created!",
+      "MACHINEADDED": "Service Account created!",
       "DELETED": "User deleted successfully!",
       "UNLOCKED": "User unlocked successfully!",
       "PASSWORDLESSREGISTRATIONSENT": "Registration Link sent successfully.",

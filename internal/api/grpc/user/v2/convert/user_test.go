@@ -824,7 +824,7 @@ func Test_UsersToPb(t *testing.T) {
 			},
 		},
 		{
-			name: "slice with one machine user",
+			name: "slice with one service account",
 			args: args{
 				users: []*query.User{
 					{
