@@ -3,13 +3,14 @@ title: Benchmarks
 sidebar_label: Benchmarks
 ---
 
+
 import DocCardList from '@/components/docusaurus/doc-card-list';
 
 Benchmarks are crucial to understand if ZITADEL fulfills your expected workload and what resources it needs to do so.
 
 This document explains the process and goals of load-testing zitadel in a cloud environment.
 
-The results can be found on sub pages.
+The results can be found on sub-pages.
 
 ## Goals
 
@@ -54,7 +55,7 @@ The following metrics must be collected for each test iteration. The metrics are
 | ZITADEL location                      | Setup       | Region or location of the deployment of zitadel. If not further specified the hoster is Google Cloud                                                                                                                                                      | Location / Region                                                                                                                                                                                                                                    |
 | ZITADEL container specification       | Setup       | As ZITADEL is mainly run in cloud environments it should also be run as a container during the load tests. The description must at least clarify the following metrics: vCPU Memory egress bandwidth Scale                                                | **vCPU**: Amount of threads ([additional info](https://cloud.google.com/compute/docs/cpu-platforms)) **memory**: GB **egress bandwidth**:Gbps **scale**: The amount of containers running during the test. The amount must not vary during the tests |
 | ZITADEL Version                       | Setup       | The version of zitadel deployed                                                                                                                                                                                                                           | Semantic version or commit                                                                                                                                                                                                                           |
-| ZITADEL Settings                      | Setup       | Settings of zitadel which deviates from the defaults and is not secret                                                                                                                                                                                    | yaml                                                                                                                                                                                                                                                 |
+| ZITADEL Configuration                 | Setup       | Configuration of zitadel which deviates from the defaults and is not secret                                                                                                                                                                               | yaml                                                                                                                                                                                                                                                 |
 | ZITADEL feature flags                 | Setup       | Changed feature flags                                                                                                                                                                                                                                     | yaml                                                                                                                                                                                                                                                 |
 | Database                              | Setup       | Database type and version                                                                                                                                                                                                                                 | **type**: psql **version**: semantic version                                                                                                                                                                                                         |
 | Database location                     | Setup       | Region or location of the deployment of the database. If not further specified the hoster is Google Cloud SQL                                                                                                                                             | Location / Region                                                                                                                                                                                                                                    |
