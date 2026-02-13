@@ -2112,6 +2112,19 @@ message CreateUserRequest{
         example: "\"The user calls the session API in the continuous integration pipeline for acceptance tests.\"";
       }
     ];
+    // The access token type defines the type of access token that is generated for the user.
+    // By default, the access token type is an opaque Bearer token. You can change it to JWT,
+    // which will include more information about the user and their permissions in the token itself.
+    // This can be useful for machine users that need to call services that require more information about the user,
+    // without having to call the userinfo or introspection endpoint.
+    // However, revoked JWT tokens might still considered valid until they expire.
+    // A call to the userinfo or introspection endpoint to check if they are still valid.
+    AccessTokenType access_token_type = 3 [
+      (validate.rules).enum = {defined_only: true},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"ACCESS_TOKEN_TYPE_BEARER\"";
+      }
+    ];
   }
   // The unique identifier of the organization the user belongs to.
   string organization_id = 1 [
@@ -2160,8 +2173,8 @@ message CreateUserRequest{
     Human human = 4;
     // Users of type machine are users that are meant to be used by a machine.
     // In order to authenticate, [add a secret](/docs/reference/api/user/zitadel.user.v2.UserService.AddSecret), [a key](/docs/reference/api/user/zitadel.user.v2.UserService.AddKey) or [a personal access token](/docs/reference/api/user/zitadel.user.v2.UserService.AddPersonalAccessToken) to the user.
-    // Tokens generated for new users of type machine will be of an opaque Bearer type.
-    // You can change the users token type to JWT by using the management v1 service method UpdateMachine.
+    // By default, tokens generated for new users of type machine will be of an opaque Bearer type.
+    // You can change it to JWT by specifying the access token type in the machine field.
     Machine machine = 5;
   }
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
@@ -2541,6 +2554,19 @@ message UpdateUserRequest{
       (validate.rules).string = {max_len: 500},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example: "\"The user calls the session API in the continuous integration pipeline for acceptance tests.\"";
+      }
+    ];
+    // The access token type defines the type of access token that is generated for the user.
+    // By default, the access token type is an opaque Bearer token. You can change it to JWT,
+    // which will include more information about the user and their permissions in the token itself.
+    // This can be useful for machine users that need to call services that require more information about the user,
+    // without having to call the userinfo or introspection endpoint.
+    // However, revoked JWT tokens might still considered valid until they expire.
+    // A call to the userinfo or introspection endpoint to check if they are still valid.
+    optional AccessTokenType access_token_type = 3 [
+      (validate.rules).enum = {defined_only: true},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"ACCESS_TOKEN_TYPE_BEARER\"";
       }
     ];
   }

@@ -3,7 +3,7 @@ Log:
   Formatter:
     Format: text
 Hostname: localhost
-Port: 8082
+Port: 8080
 Secure: false
 LoginURLV2: "/login?authRequest="
 LogoutURLV2: "/logout?post_logout_redirect="
