@@ -111,6 +111,7 @@
                     [disablePhoneCode]="true"
                     [username]="user.preferredLoginName"
                     [canWrite]="['user.write:' + user.userId, 'user.write$'] | hasRole | async"
+                    [emailEditable]="(emailEditable$ | async)"
                     [human]="user.type.value"
                     (editType)="
                       user.state === UserState.INITIAL && $event === EditDialogType.EMAIL

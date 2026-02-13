@@ -41,6 +41,7 @@ import {
   Observable,
   ObservedValueOf,
   of,
+  from,
   shareReplay,
   Subject,
   switchMap,
@@ -100,6 +101,7 @@ export class UserDetailComponent implements OnInit {
   public currentSetting$ = signal<SidenavSetting>(GENERAL);
   public settingsList$: Observable<SidenavSetting[]>;
   public metadata$: Observable<MetadataQuery>;
+  public emailEditable$: Observable<boolean>;
   public loginPolicy$: Observable<LoginPolicy>;
   public refreshMetadata$ = new Subject<true>();
 
@@ -127,6 +129,15 @@ export class UserDetailComponent implements OnInit {
     this.user$ = this.getUser$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.settingsList$ = this.getSettingsList$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.metadata$ = this.getMetadata$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.emailEditable$ = this.getId$().pipe(
+      switchMap((id) =>
+        from(this.mgmtService.listHumanLinkedIDPs(id, 1, 0)).pipe(
+          map((resp) => (resp.resultList?.length ?? 0) === 0),
+          catchError(() => of(true)),
+        ),
+      ),
+      shareReplay({ refCount: true, bufferSize: 1 }),
+    );
 
     this.loginPolicy$ = defer(() => this.newMgmtService.getLoginPolicy()).pipe(
       catchError(() => EMPTY),
