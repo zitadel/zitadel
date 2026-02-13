@@ -53,9 +53,9 @@
         "METADATA": "Ajoutez des attributs personnalisés à l'utilisateur comme le département. Vous pouvez utiliser cette information dans vos actions."
       },
       "MACHINES": {
-        "TITLE": "Utilisateurs des services",
-        "DESCRIPTION": "Les utilisateurs des services s'authentifient de manière non interactive en utilisant un token porteur JWT signé avec une clé privée. Elles peuvent également utiliser un token d'accès personnel.",
-        "METADATA": "Ajoute des attributs personnalisés à l'utilisateur comme le système d'authentification. Vous pouvez utiliser cette information dans vos actions."
+        "TITLE": "Comptes de service",
+        "DESCRIPTION": "Les comptes de service s'authentifient de manière non interactive en utilisant un token porteur JWT signé avec une clé privée. Elles peuvent également utiliser un token d'accès personnel.",
+        "METADATA": "Ajoute des attributs personnalisés au compte comme le système d'authentification. Vous pouvez utiliser cette information dans vos actions."
       },
       "SELF": {
         "METADATA": "Ajoutez des attributs personnalisés à votre utilisateur comme votre département. Vous pouvez utiliser cette information dans les actions de votre organisation."
@@ -424,7 +424,7 @@
     "ROLES": "Rôles",
     "GRANTEDPROJECT": "Projets octroyés",
     "HUMANUSERS": "Utilisateurs",
-    "MACHINEUSERS": "Utilisateurs de services",
+    "MACHINEUSERS": "Comptes de service",
     "LOGOUT": "Déconnexion de tous les utilisateurs",
     "NEWORG": "Nouvelle organisation",
     "IAMADMIN": "Vous êtes un administrateur d'instance. Notez que vous disposez de permissions étendues.",
@@ -990,8 +990,8 @@
       "COUNTRY": "Pays"
     },
     "MACHINE": {
-      "TITLE": "Détails de l'utilisateur du service",
-      "USERNAME": "Nom de l'utilisateur",
+      "TITLE": "Détails du compte de service",
+      "USERNAME": "Nom du compte",
       "NAME": "Nom",
       "DESCRIPTION": "Description",
       "KEYSTITLE": "Clés",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "Utilisateurs sélectionnés désactivés.",
       "SELECTEDKEYSDELETED": "Clés sélectionnées supprimées.",
       "KEYADDED": "Clé ajoutée !",
-      "MACHINEADDED": "Utilisateur de service créé !",
+      "MACHINEADDED": "Compte de service créé !",
       "DELETED": "Utilisateur supprimé avec succès !",
       "UNLOCKED": "Utilisateur déverrouillé avec succès !",
       "PASSWORDLESSREGISTRATIONSENT": "Lien d'enregistrement envoyé avec succès.",

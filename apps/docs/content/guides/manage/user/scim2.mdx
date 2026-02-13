@@ -19,14 +19,14 @@ Zitadel uses provisioning domains to scope the handling of the SCIM **`externalI
 
 ### Setting a provisioning domain
 
-A provisioning domain can be assigned to a **machine user** by adding the following metadata entry:
+A provisioning domain can be assigned to a **service account** by adding the following metadata entry:
 
 - **Key:** `urn:zitadel:scim:provisioningDomain`
 - **Value:** the name of the provisioning domain
 
 ### How Zitadel stores `externalId`
 
-If a machine user has a provisioning domain set, any SCIM `externalId` provided during user provisioning or lookup is stored under:
+If a service account has a provisioning domain set, any SCIM `externalId` provided during user provisioning or lookup is stored under:
 `urn:zitadel:scim:{provisioningDomain}:externalId`
 
 If *no* provisioning domain is configured, Zitadel falls back to a simplified metadata key:

@@ -14,15 +14,15 @@ This guide provides step-by-step instructions to configure SCIM provisioning fro
 
 ## Step 1: Set Up SCIM Provisioning in ZITADEL
 
-SCIM provisioning in ZITADEL is accomplished by authenticating a Service User with appropriate permissions.
+SCIM provisioning in ZITADEL is accomplished by authenticating a Service Account with appropriate permissions.
 
-1. **Create a Service User**:
+1. **Create a Service Account**:
 
-   * Follow [this guide](https://zitadel.com/docs/guides/manage/console/users-overview) to create a Service User within your ZITADEL Organization.
+   * Follow [this guide](https://zitadel.com/docs/guides/manage/console/users-overview) to create a Service Account within your ZITADEL Organization.
 
 2. **Assign the Role**:
 
-   * Grant the Service User the **Org User Manager** role. No higher managerial role is required.
+   * Grant the Service Account the **Org User Manager** role. No higher managerial role is required.
 
 3. **Choose an Authentication Method**:
 
@@ -32,7 +32,7 @@ SCIM provisioning in ZITADEL is accomplished by authenticating a Service User wi
 
      * Client Credentials Grant
 
-4. Detailed instructions to authenticate the Service User can be found [here](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts).
+4. Detailed instructions to authenticate the Service Account can be found [here](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts).
 
 ## Step 2: Set Up SCIM in Okta
 
@@ -110,9 +110,9 @@ Review and adjust attribute mappings in Okta as needed:
 
 * [Authenticate users with SAML](https://zitadel.com/docs/guides/integrate/login/saml)
 
-* [ZITADEL: Creating Service Users](https://zitadel.com/docs/guides/manage/console/users-overview)
+* [ZITADEL: Creating Service Accounts](https://zitadel.com/docs/guides/manage/console/users-overview)
 
-* [ZITADEL: Service User Authentication](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts)
+* [ZITADEL: Service Account Authentication](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts)
 
 * [ZITADEL SCIM 2.0 API Endpoints](https://zitadel.com/docs/apis/scim2)
 

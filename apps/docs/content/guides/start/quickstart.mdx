@@ -1036,7 +1036,7 @@ You’ve successfully integrated ZITADEL into an application.
 <Callout type="warn" title="Prevent Settings Misconfiguration Lockouts">
   Login policy settings misconfigurations that occur during the testing phase can easily lead to a [lockout](/legal/policies/account-lockout-policy). To ensure you don't lose access to your instance:
 
-  1.  **Generate a backup PAT:** Create a [Service User Personal Access Token](/guides/integrate/service-accounts/personal-access-token) with the [`IAM_OWNER`](/guides/manage/console/administrators) role to revert any login UI settings misconfigurations using the API.
+  1.  **Generate a backup PAT:** Create a [Service Account Personal Access Token](/guides/integrate/service-accounts/personal-access-token) with the [`IAM_OWNER`](/guides/manage/console/administrators) role to revert any login UI misconfigurations using the API.
   2.  **Add a second Instance Administrator:** Always designate at least one [**second instance administrator**](/guides/manage/console/administrators).
 </Callout>
 
