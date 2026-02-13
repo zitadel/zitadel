@@ -2478,7 +2478,7 @@
         "DELETED": "SMTP provider has been deleted",
         "SENDER": "Type {{value}}, to delete this SMTP provider.",
         "TEST_TITLE": "Test your SMTP settings",
-        "TEST_DESCRIPTION": "Specify an email address to test your SMTP provider",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP settings",
         "TEST_EMAIL": "Email address",
         "TEST_RESULT": "Test result"
       }
