@@ -658,7 +658,7 @@ func addHumanEvent(ctx context.Context, orgID, userID string) *user.HumanAddedEv
 	}()
 }
 
-// machineEvents all events from setup to create the machine user, machinekey can't be tested here, as the public key is not provided and as such the value in the event can't be expected
+// machineEvents all events from setup to create the service account, machinekey can't be tested here, as the public key is not provided and as such the value in the event can't be expected
 func machineEvents(ctx context.Context, instanceID, orgID, userID, patID string) []eventstore.Command {
 	agg := user.NewAggregate(userID, orgID)
 	instanceAgg := instance.NewAggregate(instanceID)
