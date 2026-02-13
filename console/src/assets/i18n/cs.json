@@ -53,9 +53,9 @@
         "METADATA": "Přidejte vlastní atributy k uživateli, jako je oddělení. Tyto informace můžete využít ve vašich akcích."
       },
       "MACHINES": {
-        "TITLE": "Uživatelé služby",
-        "DESCRIPTION": "Uživatelé služby se ověřují neinteraktivně pomocí tokenu nosiče JWT podepsaného soukromým klíčem. Mohou také použít osobní přístupový token.",
-        "METADATA": "Přidejte vlastní atributy k uživateli, jako je autentizační systém. Tyto informace můžete využít ve vašich akcích."
+        "TITLE": "Servisní účty",
+        "DESCRIPTION": "Servisní účty se ověřují neinteraktivně pomocí tokenu nosiče JWT podepsaného soukromým klíčem. Mohou také použít osobní přístupový token.",
+        "METADATA": "Přidejte vlastní atributy k účtu, jako je autentizační systém. Tyto informace můžete využít ve vašich akcích."
       },
       "SELF": {
         "METADATA": "Přidejte vlastní atributy k vašemu uživateli, jako je vaše oddělení. Tyto informace můžete využít v akcích vaší organizace."
@@ -424,7 +424,7 @@
     "ROLES": "Role",
     "GRANTEDPROJECT": "Pověřené projekty",
     "HUMANUSERS": "Uživatelé",
-    "MACHINEUSERS": "Systémoví uživatelé",
+    "MACHINEUSERS": "Servisní účty",
     "LOGOUT": "Odhlásit všechny uživatele",
     "NEWORG": "Nová organizace",
     "IAMADMIN": "Jste administrátor instance. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
@@ -990,7 +990,7 @@
       "COUNTRY": "Země"
     },
     "MACHINE": {
-      "TITLE": "Detaily systémového uživatele",
+      "TITLE": "Detaily servisního účtu",
       "USERNAME": "Uživatelské jméno",
       "NAME": "Název",
       "DESCRIPTION": "Popis",

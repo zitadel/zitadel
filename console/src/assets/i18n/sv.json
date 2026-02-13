@@ -53,9 +53,9 @@
         "METADATA": "Lägg till anpassade attribut till användaren som avdelningen. Du kan använda denna information i dina åtgärder."
       },
       "MACHINES": {
-        "TITLE": "Tjänsteanvändare",
-        "DESCRIPTION": "Tjänsteanvändare autentiserar icke-interaktivt med en JWT-bärare token signerad med en privat nyckel. De kan också använda en personlig åtkomsttoken.",
-        "METADATA": "Lägg till anpassade attribut till användaren som autentiseringssystemet. Du kan använda denna information i dina åtgärder."
+        "TITLE": "Tjänstekonton",
+        "DESCRIPTION": "Tjänstekonton autentiserar icke-interaktivt med en JWT-bärare token signerad med en privat nyckel. De kan också använda en personlig åtkomsttoken.",
+        "METADATA": "Lägg till anpassade attribut till kontot som autentiseringssystemet. Du kan använda denna information i dina åtgärder."
       },
       "SELF": {
         "METADATA": "Lägg till anpassade attribut till din användare som din avdelning. Du kan använda denna information i din organisations åtgärder."
@@ -424,7 +424,7 @@
     "ROLES": "Roller",
     "GRANTEDPROJECT": "Beviljade Projekt",
     "HUMANUSERS": "Användare",
-    "MACHINEUSERS": "Tjänsteanvändare",
+    "MACHINEUSERS": "Tjänstekonton",
     "LOGOUT": "Logga ut alla användare",
     "NEWORG": "Ny Organisation",
     "IAMADMIN": "Du är en instans-administratör. Observera att du har utökade behörigheter.",
@@ -990,8 +990,8 @@
       "COUNTRY": "Land"
     },
     "MACHINE": {
-      "TITLE": "Användardetaljer för tjänst",
-      "USERNAME": "Användarnamn",
+      "TITLE": "Detaljer för tjänstekonto",
+      "USERNAME": "Kontonamn",
       "NAME": "Namn",
       "DESCRIPTION": "Beskrivning",
       "KEYSTITLE": "Nycklar",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "Valda användare deaktiverade.",
       "SELECTEDKEYSDELETED": "Valda nycklar raderade.",
       "KEYADDED": "Nyckel tillagd!",
-      "MACHINEADDED": "Serviceanvändare skapad!",
+      "MACHINEADDED": "Tjänstekonto skapat!",
       "DELETED": "Användare raderad framgångsrikt!",
       "UNLOCKED": "Användare upplåst framgångsrikt!",
       "PASSWORDLESSREGISTRATIONSENT": "Registreringslänk skickad framgångsrikt.",

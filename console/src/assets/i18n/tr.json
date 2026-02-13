@@ -53,9 +53,9 @@
         "METADATA": "Kullanıcıya departman gibi özel öznitelikler ekleyin. Bu bilgileri eylemlerinizde kullanabilirsiniz."
       },
       "MACHINES": {
-        "TITLE": "Servis Kullanıcıları",
-        "DESCRIPTION": "Servis Kullanıcıları, özel anahtar ile imzalanmış JWT bearer token kullanarak etkileşimsiz kimlik doğrulaması yapar. Ayrıca kişisel erişim belirteci de kullanabilirler.",
-        "METADATA": "Kullanıcıya kimlik doğrulayan sistem gibi özel öznitelikler ekleyin. Bu bilgileri eylemlerinizde kullanabilirsiniz."
+        "TITLE": "Hizmet Hesapları",
+        "DESCRIPTION": "Hizmet Hesapları, özel anahtar ile imzalanmış JWT bearer token kullanarak etkileşimsiz kimlik doğrulaması yapar. Ayrıca kişisel erişim belirteci de kullanabilirler.",
+        "METADATA": "Hesaba kimlik doğrulayan sistem gibi özel öznitelikler ekleyin. Bu bilgileri eylemlerinizde kullanabilirsiniz."
       },
       "SELF": {
         "METADATA": "Kullanıcınıza departmanınız gibi özel öznitelikler ekleyin. Bu bilgileri organizasyonunuzun eylemlerinde kullanabilirsiniz."
@@ -424,7 +424,7 @@
     "ROLES": "Roller",
     "GRANTEDPROJECT": "Verilen Projeler",
     "HUMANUSERS": "Kullanıcılar",
-    "MACHINEUSERS": "Servis Kullanıcıları",
+    "MACHINEUSERS": "Hizmet Hesapları",
     "LOGOUT": "Tüm Kullanıcıları Çıkış Yap",
     "NEWORG": "Yeni Organizasyon",
     "IAMADMIN": "instans Yöneticisisiniz. Genişletilmiş izinleriniz olduğunu unutmayın.",

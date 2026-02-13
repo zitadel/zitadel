@@ -243,7 +243,7 @@ func TestServer_CreateProject_Permission(t *testing.T) {
 }
 
 func getOrgProjectCreator(t *testing.T, ctx context.Context, orgId1, orgId2 string) (string, string) {
-	// create a machine user in Org 1
+	// create a service account in Org 1
 	userResp := instance.CreateUserTypeMachine(ctx, orgId1)
 
 	// assign ORG_PROJECT_CREATOR role in Org 2
@@ -996,7 +996,6 @@ func TestServer_ActivateProject(t *testing.T) {
 			name: "not existing",
 			prepare: func(request *project.ActivateProjectRequest) {
 				request.Id = "notexisting"
-				return
 			},
 			args: args{
 				ctx: iamOwnerCtx,

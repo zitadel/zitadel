@@ -53,9 +53,9 @@
         "METADATA": "Adicione atributos personalizados ao usuário, como o departamento. Você pode usar essas informações em suas ações."
       },
       "MACHINES": {
-        "TITLE": "Usuários do serviço",
-        "DESCRIPTION": "Os usuários do serviço autenticam-se de forma não interativa usando um token de portador JWT assinado com uma chave privada. Eles também podem usar um token de acesso pessoal.",
-        "METADATA": "Adicione atributos personalizados ao usuário, como o sistema de autenticação. Você pode usar essas informações em suas ações."
+        "TITLE": "Contas de serviço",
+        "DESCRIPTION": "As contas de serviço autenticam-se de forma não interativa usando um token de portador JWT assinado com uma chave privada. Elas também podem usar um token de acesso pessoal.",
+        "METADATA": "Adicione atributos personalizados à conta, como o sistema de autenticação. Você pode usar essas informações em suas ações."
       },
       "SELF": {
         "METADATA": "Adicione atributos personalizados ao seu usuário, como seu departamento. Você pode usar essas informações nas ações da sua organização."
@@ -424,7 +424,7 @@
     "ROLES": "Funções",
     "GRANTEDPROJECT": "Projetos Concedidos",
     "HUMANUSERS": "Usuários",
-    "MACHINEUSERS": "Usuários de Serviço",
+    "MACHINEUSERS": "Contas de serviço",
     "LOGOUT": "Encerrar Sessão de Todos os Usuários",
     "NEWORG": "Nova Organização",
     "IAMADMIN": "Você é um Administrador de instância. Observe que você possui permissões estendidas.",
@@ -990,8 +990,8 @@
       "COUNTRY": "País"
     },
     "MACHINE": {
-      "TITLE": "Detalhes do Usuário de Serviço",
-      "USERNAME": "Nome de Usuário",
+      "TITLE": "Detalhes da Conta de Serviço",
+      "USERNAME": "Nome da Conta",
       "NAME": "Nome",
       "DESCRIPTION": "Descrição",
       "KEYSTITLE": "Chaves",

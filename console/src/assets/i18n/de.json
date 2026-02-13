@@ -53,9 +53,9 @@
         "METADATA": "Füge dem Benutzer benutzerdefinierte Attribute hinzu, wie die Abteilung. Du kannst diese Informationen in den Aktionen nutzen."
       },
       "MACHINES": {
-        "TITLE": "Service-Benutzer",
-        "DESCRIPTION": "Service-Benutzer authentifizieren sich nicht-interaktiv mit einem JWT Bearer-Token, welches mit einem privaten Schlüssel signiert ist. Sie können auch ein persönliches Zugangstoken verwenden.",
-        "METADATA": "Füge dem Benutzer benutzerdefinierte Attribute hinzu, wie das authentifizierende System. Du kannst diese Informationen in den Aktionen nutzen."
+        "TITLE": "Servicekonten",
+        "DESCRIPTION": "Servicekonten authentifizieren sich nicht-interaktiv mit einem JWT Bearer-Token, welches mit einem privaten Schlüssel signiert ist. Sie können auch ein persönliches Zugangstoken verwenden.",
+        "METADATA": "Füge dem Konto benutzerdefinierte Attribute hinzu, wie das authentifizierende System. Du kannst diese Informationen in den Aktionen nutzen."
       },
       "SELF": {
         "METADATA": "Füge deinem Benutzer benutzerdefinierte Attribute hinzu, wie deine Abteilung. Du kannst diese Informationen in den Aktionen deiner Organisation nutzen."
@@ -424,7 +424,7 @@
     "ROLES": "Rollen",
     "GRANTEDPROJECT": "Berechtigte Projekte",
     "HUMANUSERS": "Benutzer",
-    "MACHINEUSERS": "Service-Benutzer",
+    "MACHINEUSERS": "Servicekonten",
     "LOGOUT": "Alle Benutzer abmelden",
     "NEWORG": "Neue Organisation",
     "IAMADMIN": "Du bist ein Instanz-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
@@ -990,8 +990,8 @@
       "COUNTRY": "Land"
     },
     "MACHINE": {
-      "TITLE": "Details Service-Benutzer",
-      "USERNAME": "Benutzername",
+      "TITLE": "Details Servicekonto",
+      "USERNAME": "Kontoname",
       "NAME": "Name",
       "DESCRIPTION": "Beschreibung",
       "KEYSTITLE": "Schlüssel",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "Selektierte Benutzer deaktiviert.",
       "SELECTEDKEYSDELETED": "Selektierte Schlüssel gelöscht.",
       "KEYADDED": "Schlüssel hinzugefügt!",
-      "MACHINEADDED": "Service-Benutzer erstellt!",
+      "MACHINEADDED": "Servicekonto erstellt!",
       "DELETED": "Benutzer erfolgreich gelöscht!",
       "UNLOCKED": "Benutzer erfolgreich freigeschaltet!",
       "PASSWORDLESSREGISTRATIONSENT": "Passkey Registrierungslink via E-Mail versendet.",

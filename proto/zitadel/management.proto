@@ -115,7 +115,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Users",
-            description: "ZITADEL knows two different types of users: Users (Human) and Service Users (Machine Accounts)"
+            description: "ZITADEL knows two different types of users: Users (Human) and Service Accounts"
         },
         {
             name: "User Grants",
@@ -1729,11 +1729,11 @@ service ManagementService {
         };
     }
 
-    // Update Machine User
+    // Update Service Account
     //
     // Deprecated: use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
     //
-    // Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities.
+    // Change a service account/service account. It is used for accounts with non-interactive authentication possibilities.
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/machine"
@@ -1765,11 +1765,11 @@ service ManagementService {
         };
     }
 
-    // Create Secret for Machine User
+    // Create Secret for Service Account
     //
     // Deprecated: use [user service v2 AddSecret](apis/resources/user_service_v2/user-service-add-secret.api.mdx) instead.
     //
-    // Create a new secret for a machine user/service account. It is used to authenticate the user (client credential grant).
+    // Create a new secret for a service account. It is used to authenticate the user (client credential grant).
     rpc GenerateMachineSecret(GenerateMachineSecretRequest) returns (GenerateMachineSecretResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/secret"
@@ -1801,11 +1801,11 @@ service ManagementService {
         };
     }
 
-    // Delete Secret of Machine User
+    // Delete Secret of Service Account
     //
     // Deprecated: use [user service v2 RemoveSecret](apis/resources/user_service_v2/user-service-remove-secret.api.mdx) instead.
     //
-    // Delete a secret of a machine user/service account. The user will not be able to authenticate with the secret afterward.
+    // Delete a secret of a service account. The user will not be able to authenticate with the secret afterward.
     rpc RemoveMachineSecret(RemoveMachineSecretRequest) returns (RemoveMachineSecretResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/secret"
@@ -1836,11 +1836,11 @@ service ManagementService {
         };
     }
 
-    // Get Machine user Key By ID
+    // Get Service account Key By ID
     //
     // Deprecated: use [user service v2 ListUsers](apis/resources/user_service_v2/user-service-list-users.api.mdx) instead.
     //
-    // Get a specific Key of a machine user by its id. Machine keys are used to authenticate with jwt profile authentication.
+    // Get a specific Key of a service account by its id. Machine keys are used to authenticate with jwt profile authentication.
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/keys/{key_id}"
@@ -1875,7 +1875,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 ListKeys](apis/resources/user_service_v2/user-service-list-keys.api.mdx) instead.
     //
-    // Get the list of keys of a machine user. Machine keys are used to authenticate with jwt profile authentication.
+    // Get the list of keys of a service account. Machine keys are used to authenticate with jwt profile authentication.
     rpc ListMachineKeys(ListMachineKeysRequest) returns (ListMachineKeysResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/keys/_search"
@@ -1907,7 +1907,7 @@ service ManagementService {
         };
     }
 
-    // Create Key for machine user
+    // Create Key for service account
     //
     // Deprecated: use [user service v2 AddKey](apis/resources/user_service_v2/user-service-add-key.api.mdx) instead.
     //
@@ -1946,7 +1946,7 @@ service ManagementService {
         };
     }
 
-    // Delete Key for machine user
+    // Delete Key for service account
     //
     // Deprecated: use [user service v2 RemoveKey](apis/resources/user_service_v2/user-service-remove-key.api.mdx) instead.
     //
@@ -8834,14 +8834,14 @@ message AddMachineUserRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             min_length: 1;
             max_length: 200;
-            example: "\"My Machine Account\"";
+            example: "\"My Service Account\"";
         }
     ];
     string description = 3 [
         (validate.rules).string = {max_len: 500},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             max_length: 500;
-            example: "\"First machine account used for API XY.\"";
+            example: "\"First service account used for API XY.\"";
         }
     ];
 

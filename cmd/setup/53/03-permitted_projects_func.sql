@@ -29,7 +29,7 @@ BEGIN
         RETURN;
     END IF;
 
-    -- if human/machine user
+    -- if human/service account
     SELECT * FROM eventstore.permitted_orgs(
         req_instance_id
         , auth_user_id

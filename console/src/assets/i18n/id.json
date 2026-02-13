@@ -53,8 +53,8 @@
         "METADATA": "Tambahkan atribut khusus ke pengguna seperti departemen. Anda dapat menggunakan informasi ini dalam tindakan Anda."
       },
       "MACHINES": {
-        "TITLE": "Pengguna Layanan",
-        "DESCRIPTION": "Pengguna Layanan mengautentikasi secara non-interaktif menggunakan token pembawa JWT yang ditandatangani dengan kunci pribadi. Mereka juga dapat menggunakan token akses pribadi.",
+        "TITLE": "Akun Layanan",
+        "DESCRIPTION": "Akun Layanan mengautentikasi secara non-interaktif menggunakan token pembawa JWT yang ditandatangani dengan kunci pribadi. Mereka juga dapat menggunakan token akses pribadi.",
         "METADATA": "Tambahkan atribut khusus kepada pengguna seperti sistem autentikasi. Anda dapat menggunakan informasi ini dalam tindakan Anda."
       },
       "SELF": {
@@ -424,7 +424,7 @@
     "ROLES": "Peran",
     "GRANTEDPROJECT": "Proyek yang Diberikan",
     "HUMANUSERS": "Pengguna",
-    "MACHINEUSERS": "Pengguna Layanan",
+    "MACHINEUSERS": "Akun Layanan",
     "LOGOUT": "Logout Semua Pengguna",
     "NEWORG": "Organisasi Baru",
     "IAMADMIN": "Anda adalah Administrator instance. Perhatikan bahwa Anda memiliki izin yang diperluas.",
@@ -990,7 +990,7 @@
       "COUNTRY": "Negara"
     },
     "MACHINE": {
-      "TITLE": "Detail Pengguna Layanan",
+      "TITLE": "Detail Akun Layanan",
       "USERNAME": "Nama belakang",
       "NAME": "Nama",
       "DESCRIPTION": "Keterangan",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "Pengguna terpilih dinonaktifkan.",
       "SELECTEDKEYSDELETED": "Kunci yang dipilih dihapus.",
       "KEYADDED": "Kunci ditambahkan!",
-      "MACHINEADDED": "Pengguna Layanan dibuat!",
+      "MACHINEADDED": "Akun Layanan dibuat!",
       "DELETED": "Pengguna berhasil dihapus!",
       "UNLOCKED": "Pengguna berhasil membuka kuncinya!",
       "PASSWORDLESSREGISTRATIONSENT": "Tautan Pendaftaran berhasil dikirim.",
