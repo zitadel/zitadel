@@ -14,7 +14,7 @@ Due to storage optimizations ZITADEL changes the behavior of sequences.
 This change improves command (create, update, delete) performance of ZITADEL.
 
 Sequences are no longer unique inside an instance.
-From now on sequences are upcounting per aggregate id.
+From now on sequences are counting up per aggregate id.
 For example sequences of newly created users begin at 1.
 Existing sequences remain untouched.
 
@@ -27,7 +27,7 @@ As soon as the release version is published, we will include the version here.
 
 If you use the ListEvents API to scrape events use the creation date instead of the sequence.
 If you use sequences on a list of objects it's no longer guaranteed to have unique sequences across the list.
-Therefore it's recommended to use the change data of the objects instead.
+Therefore, it's recommended to use the change data of the objects instead.
 
 ## Impact
 

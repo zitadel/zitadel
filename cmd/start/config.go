@@ -151,6 +151,7 @@ func readConfig(v *viper.Viper) (*Config, error) {
 			hooks.SliceTypeStringDecode[*command.SetQuota],
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),

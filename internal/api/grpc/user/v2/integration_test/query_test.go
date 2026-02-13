@@ -398,7 +398,7 @@ func TestServer_ListUsers(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "list user by id, no permission machine user",
+			name: "list user by id, no permission service account",
 			args: args{
 				InstancePermissionV2.WithAuthorizationToken(OrgCTX, integration.UserTypeNoPermission),
 				&user.ListUsersRequest{},
