@@ -3,33 +3,46 @@
 ## Mission & Context
 ZITADEL is an open-source Identity Management System (IAM) written in Go and Angular/React. It provides secure login, multi-tenancy, and audit trails.
 
+## Read Order
+1. Read this file first.
+2. Read the nearest scoped `AGENTS.md` for the area you edit.
+3. If multiple scopes apply, use the most specific path.
+
 ## Repository Structure Map
 - **`apps/`**: Consumer-facing web applications.
-  - **`login`**: Next.js (React) application for user authentication flows. See `apps/login/AGENTS.md`.
-  - **`docs`**: Documentation site built with Fumadocs (Next.js/MDX). See `apps/docs/AGENTS.md`.
-  - **`api`**: Nx build target that exposes the backend APIs implemented in `internal/api`; not a direct, consumer-facing app.
-- **`console/`**: The Management Console application (Angular). See `console/AGENTS.md`.
-- **`internal/`**: Core backend logic (Go). Contains the EventStore, API implementations (gRPC/REST), and business logic.
-- **`packages/`**: Shared TypeScript/JavaScript libraries used by the frontend apps.
-- **`proto/`**: Protocol Buffer definitions.
+  - **`login`**: Next.js authentication UI. See `apps/login/AGENTS.md`.
+  - **`docs`**: Fumadocs documentation app. See `apps/docs/AGENTS.md`.
+  - **`api`**: Backend Nx app target. See `apps/api/AGENTS.md`.
+- **`console/`**: Angular Management Console. See `console/AGENTS.md`.
+- **`internal/`**: Backend domain and service logic. See `internal/AGENTS.md`.
+- **`proto/`**: API definitions. See `proto/AGENTS.md`.
+- **`packages/`**: Shared TypeScript packages. See `packages/AGENTS.md`.
+- **`tests/functional-ui/`**: Cypress functional UI tests. See `tests/functional-ui/AGENTS.md`.
 
 ## Technology Stack & Conventions
 - **Orchestration**: Nx is used for build and task orchestration.
 - **Package Manager**: pnpm.
-- **Backend**: Go 1.25.
-  - **Communication**: gRPC is the primary communication protocol. REST is often available via grpc-gateway.
-  - **Pattern**: Event Sourcing is a core architectural pattern here.
+- **Backend**:
+  - **Go Version Source of Truth**: Inspect `go.mod` before Go work (`go` and optional `toolchain` directives).
+  - **Communication**: For V2 APIs, connectRPC is the primary transport. gRPC and HTTP/JSON endpoints are also supported.
+  - **Pattern**: The backend is transitioning to a relational design. Events are still persisted in a separate table for history/audit, but events are not the system of record.
 - **Frontend**:
   - **Console**: Angular + RxJS.
   - **Login/Docs**: Next.js + React.
 
-## Key Commands (AI Shortcuts)
-Run these from the root using `pnpm nx`.
+## Command Rules
+Run commands from the repository root.
 
-- **Build**: `pnpm nx run [PROJECT]:build` (e.g., `pnpm nx run @zitadel/console:build`)
-- **Test**: `pnpm nx run [PROJECT]:test`
-- **Lint**: `pnpm nx run [PROJECT]:lint`
-- **Generate Code**: `pnpm nx run [PROJECT]:generate` (Important for proto generation)
+- Use verified Nx targets only.
+- If target availability is unclear, run `pnpm nx show project <project>`.
+- Do not assume all projects have `test`, `lint`, `build`, or `generate` targets.
+- Known exception: `@zitadel/console` has no configured `test` target.
+
+## Verified Common Targets
+- `@zitadel/api`: `prod`, `build`, `generate`, `lint`, `test`, `test-unit`, `test-integration`
+- `@zitadel/login`: `dev`, `build`, `lint`, `test`, `test-unit`, `test-integration`
+- `@zitadel/docs`: `dev`, `build`, `generate`, `check-links`, `check-types`, `test`, `lint`
+- `@zitadel/console`: `dev`, `build`, `generate`, `lint`
 
 ## Documentation
 - **Human Guide**: See `CONTRIBUTING.md` for setup and contribution details.

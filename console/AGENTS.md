@@ -14,8 +14,10 @@ The **Management Console** (`console/`) is the administrative interface for ZITA
 - **Modules**: Angular Modules (NgModule) are used for grouping features.
 - **gRPC**: Heavy usage of gRPC-web or REST mappings to talk to the ZITADEL API.
 
-## Development Commands
+## Verified Nx Targets
 - **Dev Server**: `pnpm nx run @zitadel/console:dev`
 - **Build**: `pnpm nx run @zitadel/console:build`
 - **Lint**: `pnpm nx run @zitadel/console:lint`
-- **Test**: The `@zitadel/console` project currently has no `test` target configured in Nx. Tests are run via Karma; add a `test` target in the project configuration before using `nx run @zitadel/console:test`.
+- **Generate**: `pnpm nx run @zitadel/console:generate`
+- **Test**: The `@zitadel/console` project currently has no `test` target configured in Nx.
+- **Functional UI Tests**: Use `pnpm nx run @zitadel/functional-ui:test` (see `tests/functional-ui/AGENTS.md`).
