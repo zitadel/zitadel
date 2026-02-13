@@ -9,10 +9,12 @@ import (
 	"time"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
@@ -44,7 +46,7 @@ type Config struct {
 	ExternalPort    uint16
 	ExternalSecure  bool
 	Instrumentation instrumentation.Config
-	Log             *logging.Config
+	Log             *old_logging.Config
 	Metrics         *instrumentation.LegacyMetricConfig
 	EncryptionKeys  *encryption.EncryptionKeyConfig
 	DefaultInstance command.InstanceSetup
@@ -70,7 +72,7 @@ type InitProjections struct {
 	BulkLimit        uint64
 }
 
-func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
+func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
 	config := new(Config)
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
@@ -83,6 +85,7 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 			hook.EnumHookFunc(authz.MemberTypeString),
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
@@ -94,14 +97,16 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 	}
 
 	config.Instrumentation.Metric.SetLegacyConfig(config.Metrics)
-	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
+	config.Instrumentation.Log.SetLegacyConfig(config.Log)
+	shutdown, err := instrumentation.Start(cmd.Context(), config.Instrumentation)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
 	}
+	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamReady))
 
 	err = config.Log.SetLogger()
 	if err != nil {
-		err = errors.Join(err, shutdown(ctx))
+		err = errors.Join(err, shutdown(cmd.Context()))
 		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
 	}
 
@@ -180,18 +185,20 @@ type Steps struct {
 	s69CacheTablesLogged                    *CacheTablesLogged
 }
 
-func MustNewSteps(v *viper.Viper) *Steps {
+func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {
 	v.AutomaticEnv()
 	v.SetEnvPrefix("ZITADEL")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.SetConfigType("yaml")
 	err := v.ReadConfig(bytes.NewBuffer(defaultSteps))
-	logging.OnError(err).Fatal("unable to read setup steps")
+	if err != nil {
+		return nil, fmt.Errorf("unable to read default steps: %w", err)
+	}
 
 	for _, file := range stepFiles {
 		v.SetConfigFile(file)
 		err := v.MergeInConfig()
-		logging.WithFields("file", file).OnError(err).Warn("unable to read setup file")
+		logging.OnError(ctx, err).Warn("unable to read setup file", "file", file)
 	}
 
 	steps := new(Steps)
@@ -199,12 +206,15 @@ func MustNewSteps(v *viper.Viper) *Steps {
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
-	logging.OnError(err).Fatal("unable to read steps")
-	return steps
+	if err != nil {
+		return nil, fmt.Errorf("unable to read steps: %w", err)
+	}
+	return steps, nil
 }

@@ -57,7 +57,7 @@ message RSA {
       default: "RSA_BITS_2048";
     }
   ];
-  // Signing algrithm used. Default is SHA256.
+  // Signing algorithm used. Default is SHA256.
   RSAHasher hasher = 2 [
     (validate.rules).enum = {defined_only: true, not_in: [0]},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

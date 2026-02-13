@@ -168,7 +168,7 @@ func TestServer_AddOrgMember(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "iam role error",
+			name: "instance role error",
 			args: args{
 				ctx: OrgCTX,
 				req: &mgmt_pb.AddOrgMemberRequest{
@@ -249,7 +249,7 @@ func TestServer_UpdateOrgMember(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "iam role error",
+			name: "instance role error",
 			args: args{
 				ctx: OrgCTX,
 				req: &mgmt_pb.UpdateOrgMemberRequest{

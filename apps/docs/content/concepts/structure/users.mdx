@@ -6,34 +6,34 @@ sidebar_label: Users
 ## Types of users
 
 ZITADEL supports authentication and authorization for different user types.
-We can mainly differentiate between Human Users and Machine Users.
-We typically call human users simply "Users" and machine users "Service Users".
+We can mainly differentiate between Users and Service Accounts.
+Users are accounts operated/used by a human, while service accounts are those operated/used by an application/third-party software.
 
-### Human users
+### Users
 
-Human users typically logon with an interactive login.
+Users typically logon with an interactive login.
 This means that an application redirects a user to a website ("login page") where the user can provide the credentials.
 ZITADEL handles the authentication and provides the application with a token that verifies the authentication process.
 
 Read more on how to [login users with ZITADEL](/guides/integrate/login/login-users).
 
-### Service users
+### Service accounts
 
-Service users are for machine-to-machine communication and you would use those typically to access secure backend services.
-For example in ZITADEL you would require an authenticated Service User to access the Management API.
-The main difference between human and machine users is the type of credentials that can be used for authentication: Human users typically logon via an login prompt, but Machine users require a non-interactive logon process.
+Service accounts are for machine-to-machine communication, and you would use those typically to access secure backend services.
+For example in ZITADEL you would require an authenticated Service Account to access the Management API.
+The main difference between users and service accounts is the type of credentials that can be used for authentication: users typically logon via a login prompt, but service accounts require a non-interactive logon process.
 
-Learn how to [use service users](/guides/integrate/service-users/authenticate-service-users) with ZITADEL.
+Learn how to [use service accounts](/guides/integrate/service-accounts/authenticate-service-accounts) with ZITADEL.
 
-### Managers
+### Administrators
 
-Any user, human or service user, can be given a [Manager](/concepts/structure/managers) role.
+Any user or service account can be assigned an [Administrator](/concepts/structure/administrators) role.
 A user with an administrator role is not only an end-user of ZITADEL but can also manage certain aspects of ZITADEL itself.
 
 ### Federated users
 
 Federated users are identities that are managed by a third-party identity provider.
-Users can login via an external identity provider, using [identity brokering](../features/identity-brokering) ("Single-sign-on").
+Users can log in via an external identity provider, using [identity brokering](../features/identity-brokering) ("Single-sign-on").
 Federated user [accounts are linked](../features/account-linking) to internal users to be able to assign roles and keep an audit trail.
 
 ### External users
@@ -59,7 +59,7 @@ Consider this general recommendation as a starting point:
 - Create one organization ("default organization") for your own company
 - Configure projects and applications in the default organization
 - Structure users in organizations based on common domains that are self-managed (eg, company)
-- Grant your projects to the organizations, allow Managers to give granted roles to their users
+- Grant your projects to the organizations, allow Administrators to give granted roles to their users
 
 You might want to adjust this general setup based on your [scenario](/guides/solution-scenarios).
 

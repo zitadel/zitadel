@@ -21,7 +21,7 @@ You can do so by using [Console](../console/users) or [setting user metadata](/r
 
 Most of the methods below require you to login with the correct user while setting some scopes.
 Make sure you pick the right user when logging into the test application.
-Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/sdk-examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example application](/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 <Callout title="Getting a token">
 In case you want to test out different settings configure an application with code flow (PKCE).
@@ -149,7 +149,7 @@ You can use the authentication service to request and search for the user's meta
 The introspection endpoint and the token endpoint in the examples above do not require a special scope to access.
 Yet when accessing the authentication service, you need to pass the [reserved scope](/apis/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:org:project:id:zitadel:aud` along with the authentication request.
 This scope allows the user to access ZITADEL's APIs, specifically the authentication API that we need for this method.
-Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/sdk-examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example application](/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 <Callout title="Invalid audience">
 If you get the error "invalid audience (APP-Zxfako)", then you need to add the reserved scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your authentication request.
@@ -220,8 +220,8 @@ Learn everything about how to build your own registration UI [here](/guides/inte
 
 The previous methods allowed you to retrieve metadata only for the `sub` in the access token.
 In case you want to get the metadata for another user, you need to use the management service.
-The user that calls the management service must have [manager permissions](/guides/manage/console/managers).
-A user can be either a human user or a service user.
+The user that calls the management service must have [administrator permissions](/guides/manage/console/administrators).
+A user can be either a User (Human) or a Service Account.
 
 You can get [metadata of a user filtered by your query](/apis/resources/mgmt/management-service-list-user-metadata) or [get a metadata object from a user by a specific key](/apis/resources/mgmt/management-service-get-user-metadata).
 The management service allows you to set and delete metadata, see the [API documentation for users](/reference/api/user).

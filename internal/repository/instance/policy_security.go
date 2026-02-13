@@ -81,7 +81,7 @@ func SecurityPolicySetEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 	err := event.Unmarshal(securityPolicyAdded)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-soiwj", "unable to unmarshal oidc config added")
+		return nil, zerrors.ThrowInternal(err, "INST-soiwj", "unable to unmarshal oidc config added")
 	}
 
 	return securityPolicyAdded, nil

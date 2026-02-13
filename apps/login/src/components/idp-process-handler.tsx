@@ -1,6 +1,7 @@
 "use client";
 
 import { processIDPCallback } from "@/lib/server/idp-intent";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -37,6 +38,7 @@ export function IdpProcessHandler({
   const t = useTranslations("idp");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   const executedRef = useRef(false);
   const router = useRouter();
 
@@ -74,6 +76,13 @@ export function IdpProcessHandler({
           return;
         }
 
+        if (result.samlData) {
+          console.log("[IDP Process Handler] Received samlData, rendering AutoSubmitForm");
+          setSamlData(result.samlData);
+          setLoading(false);
+          return;
+        }
+
         setError(t("processing.noRedirect"));
         setLoading(false);
       })
@@ -86,6 +95,7 @@ export function IdpProcessHandler({
 
   return (
     <div className="flex min-h-screen items-center justify-center">
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       {loading && (
         <div className="flex flex-col items-center space-y-4">
           <Spinner className="h-8 w-8" />

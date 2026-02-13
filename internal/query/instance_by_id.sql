@@ -4,8 +4,8 @@ with features as (
 		coalesce(i.value, s.value)
 	) features
 	from (select $1::text instance_id) x
-	cross join projections.system_features3 s
-	full outer join projections.instance_features4 i using (key, instance_id)
+	cross join projections.system_features4 s
+	full outer join projections.instance_features5 i using (key, instance_id)
 	group by instance_id
 ), external_domains as (
 	select instance_id, array_agg(domain) as domains
@@ -63,7 +63,8 @@ select
 	f.features,
     ed.domains as external_domains,
 	td.domains as trusted_domains,
-	et.execution_targets
+	et.execution_targets,
+    r.allowed_languages
 from projections.instances i
 left join projections.security_policies2 s on i.id = s.instance_id
 left join projections.limits l on i.id = l.instance_id
@@ -71,4 +72,5 @@ left join features f on i.id = f.instance_id
 left join external_domains ed on i.id = ed.instance_id
 left join trusted_domains td on i.id = td.instance_id
 left join execution_targets et on i.id = et.instance_id
+left join projections.restrictions2 r on i.id = r.instance_id
 where i.id = $1;

@@ -4,10 +4,12 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 
 	"github.com/muhlemmer/gu"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -15,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
 func TestMustNewConfig(t *testing.T) {
@@ -47,12 +50,12 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceSetupFeatures{
+			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceFeatures{
 				LoginDefaultOrg: gu.Ptr(true),
 				UserSchema:      gu.Ptr(true),
-				LoginV2: &command.InstanceSetupFeatureLoginV2{
+				LoginV2: &feature.LoginV2{
 					Required: true,
-					BaseURI:  gu.Ptr("http://zitadel:8080"),
+					BaseURI:  &url.URL{Scheme: "http", Host: "zitadel:8080"},
 				},
 			})
 		},
@@ -238,10 +241,13 @@ Actions:
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			c := &cobra.Command{}
+			c.SetContext(t.Context())
+
 			v := viper.New()
 			v.SetConfigType("yaml")
 			require.NoError(t, v.ReadConfig(strings.NewReader(tt.args.yaml)))
-			got, _, err := NewConfig(t.Context(), v)
+			got, _, err := NewConfig(c, v)
 			require.NoError(t, err)
 			tt.want(t, got)
 		})

@@ -13,7 +13,7 @@ import AppType from "./_application-types.mdx";
 ## What is an application?
 
 Applications are the entry point to your [Project Overview](/guides/manage/console/projects-overview)
-. Users either login into one of your clients (Frontend) and interact with them directly, or use one of your APIs (Backend).
+. Users either login into one of your applications (Frontend) and interact with them directly, or use one of your APIs (Backend).
 
 All applications within a project share the same **Roles** and **Authorizations**. This means you define a role once (e.g., `admin`) on the Project level, and it applies across all your web, mobile, and API applications.
 
@@ -23,7 +23,6 @@ To access your applications, navigate to your Project in the Management Console 
   alt="Granted project"
   src="/docs/img/guides/console/applications.png"
   width="750px"
-
 />
 
 ## Create an Application
@@ -38,7 +37,7 @@ To add an application to your project, click on the **New** button and select yo
 
 ## Application Types
 
-ZITADEL offers five client types to cover different architectural patterns:
+ZITADEL offers five application types to cover different architectural patterns:
 
 <AppType components={props.components} />
 
@@ -182,7 +181,7 @@ If your application makes requests from domains other than the Redirect URI (e.g
 
 Ensure the configuration of application settings is limited to authorized users only.
 
-* Use [Administrator roles](./managers) to limit permissions for your users to make changes to your applications.
+* Use [Administrator roles](./administrators) to limit permissions for your users to make changes to your applications.
 * When [granting projects](../../../concepts/structure/granted_projects) to other organizations, the receiving organization **cannot** see or change the application configuration. They can only assign roles.
 
 ## References

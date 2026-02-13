@@ -24,7 +24,7 @@ func (i LogFormat) String() string {
 // Re-run the stringer command to generate them again.
 func _LogFormatNoOp() {
 	var x [1]struct{}
-	_ = x[LogFormatUndefined-(0)]
+	_ = x[LogFormatUnspecified-(0)]
 	_ = x[LogFormatDisabled-(1)]
 	_ = x[LogFormatText-(2)]
 	_ = x[LogFormatJSON-(3)]
@@ -32,11 +32,11 @@ func _LogFormatNoOp() {
 	_ = x[LogFormatGCPErrorReporting-(5)]
 }
 
-var _LogFormatValues = []LogFormat{LogFormatUndefined, LogFormatDisabled, LogFormatText, LogFormatJSON, LogFormatGCP, LogFormatGCPErrorReporting}
+var _LogFormatValues = []LogFormat{LogFormatUnspecified, LogFormatDisabled, LogFormatText, LogFormatJSON, LogFormatGCP, LogFormatGCPErrorReporting}
 
 var _LogFormatNameToValueMap = map[string]LogFormat{
-	_LogFormatName[0:0]:        LogFormatUndefined,
-	_LogFormatLowerName[0:0]:   LogFormatUndefined,
+	_LogFormatName[0:0]:        LogFormatUnspecified,
+	_LogFormatLowerName[0:0]:   LogFormatUnspecified,
 	_LogFormatName[0:8]:        LogFormatDisabled,
 	_LogFormatLowerName[0:8]:   LogFormatDisabled,
 	_LogFormatName[8:12]:       LogFormatText,

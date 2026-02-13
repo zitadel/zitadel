@@ -19,4 +19,5 @@ You are working in the ZITADEL monorepo. This codebase uses specific conventions
 - Before Go-related work, inspect `go.mod` for required Go version/toolchain.
 - Use verified Nx targets only; if unsure, run `pnpm nx show project <project>`.
 - For backend changes, note we are in transition: relational data is becoming the system of record, while event writes are still required for history/audit.
+- Respect terminology defined in the `Technical Glossary` section of `AGENTS.md` when generating UI text or documentation.
 - Distinguish between `apps/login` (Next.js) and `console` (Angular) when suggesting frontend code.

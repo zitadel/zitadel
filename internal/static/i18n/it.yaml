@@ -1,1421 +1,1411 @@
 Errors:
-  Internal: Si è verificato un errore interno
-  NoChangesFound: Nessun cambiamento
-  OriginNotAllowed: Origine non consentita
-  IDMissing: ID mancante
-  ResourceOwnerMissing: Resource Owner mancante
-  RemoveFailed: Non può essere cancellato
+  Internal: "Si è verificato un errore interno"
+  NoChangesFound: "Nessun cambiamento"
+  OriginNotAllowed: "Origine non consentita"
+  IDMissing: "ID mancante"
+  ResourceOwnerMissing: "Resource Owner mancante"
+  RemoveFailed: "Non può essere cancellato"
   ProjectionName:
-    Invalid: Nome della proiezione non valido
+    Invalid: "Nome della proiezione non valido"
   Assets:
-    EmptyKey: Asset key vuoto
+    EmptyKey: "Asset key vuoto"
     Store:
-      NotInitialized: Assets storage non inizializzato
-      NotConfigured: Assets storage non configurato
+      NotInitialized: "Assets storage non inizializzato"
+      NotConfigured: "Assets storage non configurato"
     Bucket:
-      Internal: Errore interno nella creazione
-      AlreadyExists: Bucket già esistente
-      CreateFailed: Bucket non creato
-      ListFailed: I Bucket non possono essere letti
-      RemoveFailed: Bucket non rimosso
-      SetPublicFailed: Impossibile impostare Bucket
+      Internal: "Errore interno nella creazione"
+      AlreadyExists: "Bucket già esistente"
+      CreateFailed: "Bucket non creato"
+      ListFailed: "I Bucket non possono essere letti"
+      RemoveFailed: "Bucket non rimosso"
+      SetPublicFailed: "Impossibile impostare Bucket"
     Object:
-      PutFailed: Oggetto non creato
-      GetFailed: Oggetto non può essere letto
-      NotFound: Oggetto non trovato
-      PresignedTokenFailed: Il token non può essere creato
-      ListFailed: La lista degli oggetti non può essere letta
-      RemoveFailed: L'oggetto non può essere rimosso
+      PutFailed: "Oggetto non creato"
+      GetFailed: "Oggetto non può essere letto"
+      NotFound: "Oggetto non trovato"
+      PresignedTokenFailed: "Il token non può essere creato"
+      ListFailed: "La lista degli oggetti non può essere letta"
+      RemoveFailed: "L'oggetto non può essere rimosso"
   Limit:
-    ExceedsDefault: Il limite supera quello predefinito
+    ExceedsDefault: "Il limite supera quello predefinito"
   Limits:
-    NotFound: Limite non trovato
-    NoneSpecified: Nessun limite specificato
+    NotFound: "Limite non trovato"
+    NoneSpecified: "Nessun limite specificato"
     Instance:
-      Blocked: L'istanza è bloccata
+      Blocked: "L'istanza è bloccata"
   Restrictions:
-    NoneSpecified: Nessuna restrizione specificata
-    DefaultLanguageMustBeAllowed: La lingua predefinita deve essere consentita
+    NoneSpecified: "Nessuna restrizione specificata"
+    DefaultLanguageMustBeAllowed: "La lingua predefinita deve essere consentita"
   Language:
-    NotParsed: Impossibile analizzare la lingua
-    NotSupported: Lingua non supportata
-    NotAllowed: Lingua non consentita
-    Undefined: Lingua non definita
-    Duplicate: Lingue duplicate
+    NotParsed: "Impossibile analizzare la lingua"
+    NotSupported: "Lingua non supportata"
+    NotAllowed: "Lingua non consentita"
+    Undefined: "Lingua non definita"
+    Duplicate: "Lingue duplicate"
   OIDCSettings:
-    NotFound: Impossibile trovare la configurazione OIDC
-    AlreadyExists: La configurazione OIDC esiste già
+    NotFound: "Impossibile trovare la configurazione OIDC"
+    AlreadyExists: "La configurazione OIDC esiste già"
   SecretGenerator:
-    AlreadyExists: Il generatore di segreti esiste già
-    TypeMissing: Manca il tipo di generatore segreto
-    NotFound: Generatore segreto non trovato
+    AlreadyExists: "Il generatore di segreti esiste già"
+    TypeMissing: "Manca il tipo di generatore segreto"
+    NotFound: "Generatore segreto non trovato"
   SMSConfig:
-    NotFound: Configurazione SMS non trovata
-    AlreadyActive: Configurazione SMS già attiva
-    AlreadyDeactivated: Configurazione SMS già disattivata
+    NotFound: "Configurazione SMS non trovata"
+    AlreadyActive: "Configurazione SMS già attiva"
+    AlreadyDeactivated: "Configurazione SMS già disattivata"
   SMTP:
-    NotEmailMessage: il messaggio non è EmailMessage
-    RequiredAttributes: oggetto, destinatari e contenuto devono essere impostati ma alcuni o tutti sono vuoti
-    CouldNotSplit: impossibile dividere l'host e la porta per la connessione a SMTP
-    CouldNotDial: impossibile contattare il server SMTP, controllare la porta, problemi con il firewall...
-    CouldNotDialTLS: Impossibile contattare con il server SMTP utilizzando TLS, controllare la porta, problemi di firewall ...
-    CouldNotCreateClient: impossibile creare il client SMTP
-    CouldNotStartTLS: impossibile avviare tls
-    CouldNotAuth: impossibile aggiungere l'autenticazione smtp, controlla se sia l'utente che la password sono corretti, se sono corretti forse il tuo provider richiede un metodo di autenticazione non supportato da Zitadel
-    CouldNotSetSender: impossibile impostare il mittente
-    CouldNotSetRecipient: impossibile impostare il destinatario
+    NotEmailMessage: "il messaggio non è EmailMessage"
+    RequiredAttributes: "oggetto, destinatari e contenuto devono essere impostati ma alcuni o tutti sono vuoti"
+    CouldNotSplit: "impossibile dividere l'host e la porta per la connessione a SMTP"
+    CouldNotDial: "impossibile contattare il server SMTP, controllare la porta, problemi con il firewall..."
+    CouldNotDialTLS: "Impossibile contattare con il server SMTP utilizzando TLS, controllare la porta, problemi di firewall ..."
+    CouldNotCreateClient: "impossibile creare il client SMTP"
+    CouldNotStartTLS: "impossibile avviare tls"
+    CouldNotAuth: "impossibile aggiungere l'autenticazione smtp, controlla se sia l'utente che la password sono corretti, se sono corretti forse il tuo provider richiede un metodo di autenticazione non supportato da Zitadel"
+    CouldNotSetSender: "impossibile impostare il mittente"
+    CouldNotSetRecipient: "impossibile impostare il destinatario"
   SMTPConfig:
-    TestPassword: Password per il test non trovata
-    NotFound: Configurazione SMTP non trovata
-    AlreadyExists: La configurazione SMTP esiste già
-    AlreadyDeactivated: Configurazione SMTP già disattivata
-    SenderAdressNotCustomDomain: L'indirizzo del mittente deve essere configurato come dominio personalizzato sull'istanza.
-    TestEmailNotFound: Indirizzo email per il test non trovato
+    TestPassword: "Password per il test non trovata"
+    NotFound: "Configurazione SMTP non trovata"
+    AlreadyExists: "La configurazione SMTP esiste già"
+    AlreadyDeactivated: "Configurazione SMTP già disattivata"
+    SenderAdressNotCustomDomain: "L'indirizzo del mittente deve essere configurato come dominio personalizzato sull'istanza."
+    TestEmailNotFound: "Indirizzo email per il test non trovato"
   Notification:
-    NoDomain: Nessun dominio trovato per il messaggio
+    NoDomain: "Nessun dominio trovato per il messaggio"
   User:
-    NotFound: L'utente non è stato trovato
-    AlreadyExists: L'utente già esistente
-    NotFoundOnOrg: L'utente non è stato trovato nell'organizzazione scelta
-    NotAllowedOrg: L'utente non è membro dell'organizzazione richiesta
-    UserIDMissing: ID utente mancante
+    NotFound: "L'utente non è stato trovato"
+    AlreadyExists: "L'utente già esistente"
+    NotFoundOnOrg: "L'utente non è stato trovato nell'organizzazione scelta"
+    NotAllowedOrg: "L'utente non è membro dell'organizzazione richiesta"
+    UserIDMissing: "ID utente mancante"
     UserIDWrong: "Utente richiesta non uguale all'utente autenticato"
-    DomainPolicyNil: Impostazione Org IAM mancante
-    EmailAsUsernameNotAllowed: L'e-mail non è consentita come nome utente
-    Invalid: I dati utente non sono validi
-    DomainNotAllowedAsUsername: Il dominio è già riservato e non può essere utilizzato
-    AlreadyInactive: Utente già inattivo
-    NotInactive: L'utente non è inattivo
-    CantDeactivateInitial: Gli utenti con lo stato iniziale possono solo essere cancellati e non disattivati
-    ShouldBeActiveOrInitial: L'utente non è attivo o inizializzato
-    AlreadyInitialised: L'utente è già inizializzato
-    NotInitialised: L'utente non è ancora inizializzato
-    NotLocked: L'utente non è bloccato
-    NoChanges: Nessun cambiamento trovato
-    InitCodeNotFound: Codice di inizializzazione non trovato
-    UsernameNotChanged: Nome utente non cambiato
-    InvalidURLTemplate: Il modello di URL non è valido
-    Locked: L'utente è bloccato
+    DomainPolicyNil: "Impostazione Org IAM mancante"
+    EmailAsUsernameNotAllowed: "L'e-mail non è consentita come nome utente"
+    Invalid: "I dati utente non sono validi"
+    DomainNotAllowedAsUsername: "Il dominio è già riservato e non può essere utilizzato"
+    AlreadyInactive: "Utente già inattivo"
+    NotInactive: "L'utente non è inattivo"
+    CantDeactivateInitial: "Gli utenti con lo stato iniziale possono solo essere cancellati e non disattivati"
+    ShouldBeActiveOrInitial: "L'utente non è attivo o inizializzato"
+    AlreadyInitialised: "L'utente è già inizializzato"
+    NotInitialised: "L'utente non è ancora inizializzato"
+    NotLocked: "L'utente non è bloccato"
+    NoChanges: "Nessun cambiamento trovato"
+    InitCodeNotFound: "Codice di inizializzazione non trovato"
+    UsernameNotChanged: "Nome utente non cambiato"
+    InvalidURLTemplate: "Il modello di URL non è valido"
+    Locked: "L'utente è bloccato"
     Profile:
-      NotFound: Profilo non trovato
-      NotChanged: Profilo non cambiato
-      Empty: Profilo è vuoto
-      FirstNameEmpty: Il nome nel profilo è vuoto
-      LastNameEmpty: Il cognome nel profilo è vuoto
-      IDMissing: Profilo ID mancante
+      NotFound: "Profilo non trovato"
+      NotChanged: "Profilo non cambiato"
+      Empty: "Profilo è vuoto"
+      FirstNameEmpty: "Il nome nel profilo è vuoto"
+      LastNameEmpty: "Il cognome nel profilo è vuoto"
+      IDMissing: "Profilo ID mancante"
     Email:
-      NotFound: Email non trovata
-      Invalid: L'e-mail non è valida
-      AlreadyVerified: L'e-mail è già verificata
-      NotChanged: Email non cambiata
-      Empty: Email è vuota
-      IDMissing: Email ID mancante
+      NotFound: "Email non trovata"
+      Invalid: "L'e-mail non è valida"
+      AlreadyVerified: "L'e-mail è già verificata"
+      NotChanged: "Email non cambiata"
+      Empty: "Email è vuota"
+      IDMissing: "Email ID mancante"
     Phone:
-      NotFound: Telefono non trovato
-      Invalid: Il telefono non è valido
-      AlreadyVerified: Telefono già verificato
-      Empty: Il telefono è vuoto
-      NotChanged: Telefono non cambiato
-      VerifyingRemovalIsNotSupported: La rimozione della verifica non è supportata
+      NotFound: "Telefono non trovato"
+      Invalid: "Il telefono non è valido"
+      AlreadyVerified: "Telefono già verificato"
+      Empty: "Il telefono è vuoto"
+      NotChanged: "Telefono non cambiato"
+      VerifyingRemovalIsNotSupported: "La rimozione della verifica non è supportata"
     Address:
-      NotFound: Indirizzo non trovato
-      NotChanged: Indirizzo non cambiato
+      NotFound: "Indirizzo non trovato"
+      NotChanged: "Indirizzo non cambiato"
     Machine:
       Key:
-        NotFound: Chiave macchina non trovato
-        AlreadyExisting: Chiave macchina già esistente
-        Invalid: La chiave pubblica non è una chiave pubblica RSA valida in formato PKIX con codifica PEM
+        NotFound: "Chiave macchina non trovato"
+        AlreadyExisting: "Chiave macchina già esistente"
+        Invalid: "La chiave pubblica non è una chiave pubblica RSA valida in formato PKIX con codifica PEM"
       Secret:
-        NotExisting: Secret non esiste
-        Invalid: Secret non è valido
-        CouldNotGenerate: Non è stato possibile generare il Secret
+        NotExisting: "Secret non esiste"
+        Invalid: "Secret non è valido"
+        CouldNotGenerate: "Non è stato possibile generare il Secret"
     PAT:
-      NotFound: Personal Access Token non trovato
-    NotHuman: L'utente deve essere personale
-    NotMachine: L'utente deve essere tecnico
-    WrongType: Non consentito per questo tipo di utente
-    NotAllowedToLink: L'utente non è autorizzato a collegarsi con un provider di accesso esterno
+      NotFound: "Personal Access Token non trovato"
+    NotHuman: "L'utente deve essere personale"
+    NotMachine: "L'utente deve essere tecnico"
+    WrongType: "Non consentito per questo tipo di utente"
+    NotAllowedToLink: "L'utente non è autorizzato a collegarsi con un provider di accesso esterno"
     Username:
-      AlreadyExists: Nome utente già preso
-      Reserved: Il nome utente è già preso
-      Empty: Il nome utente è vuoto
+      AlreadyExists: "Nome utente già preso"
+      Reserved: "Il nome utente è già preso"
+      Empty: "Il nome utente è vuoto"
     Code:
-      Empty: Il codice è vuoto
-      NotFound: Codice non trovato
-      Expired: Il codice è scaduto
-      GeneratorAlgNotSupported: L'algoritmo del generatore non è supportato
-      Invalid: Il codice non è valido
+      Empty: "Il codice è vuoto"
+      NotFound: "Codice non trovato"
+      Expired: "Il codice è scaduto"
+      GeneratorAlgNotSupported: "L'algoritmo del generatore non è supportato"
+      Invalid: "Il codice non è valido"
     Password:
-      NotFound: Password non trovato
-      Empty: La password è vuota
-      Invalid: La password non è valida
-      NotSet: L'utente non ha impostato una password
-      NotChanged: La nuova password non può essere uguale alla password attuale
-      NotSupported: Codifica hash password non supportata. Consulta https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NotFound: "Password non trovato"
+      Empty: "La password è vuota"
+      Invalid: "La password non è valida"
+      NotSet: "L'utente non ha impostato una password"
+      NotChanged: "La nuova password non può essere uguale alla password attuale"
+      NotSupported: "Codifica hash password non supportata. Consulta https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
     PasswordComplexityPolicy:
-      NotFound: Impostazioni di complessità password non trovati
-      MinLength: La password è troppo corta
-      MinLengthNotAllowed: La lunghezza minima non è consentita
-      HasLower: La password deve contenere lettere minuscole
-      HasUpper: La password deve contenere lettere maiuscole
-      HasNumber: La password deve contenere un numero
-      HasSymbol: La password deve contenere il simbolo
+      NotFound: "Impostazioni di complessità password non trovati"
+      MinLength: "La password è troppo corta"
+      MinLengthNotAllowed: "La lunghezza minima non è consentita"
+      HasLower: "La password deve contenere lettere minuscole"
+      HasUpper: "La password deve contenere lettere maiuscole"
+      HasNumber: "La password deve contenere un numero"
+      HasSymbol: "La password deve contenere il simbolo"
     ExternalIDP:
-      Invalid: IDP esterno non valido
-      IDPConfigNotExisting: IDP non valido per questa organizzazione
-      NotAllowed: IDP esterno non consentito
-      MinimumExternalIDPNeeded: Almeno un IDP deve essere aggiunto
-      AlreadyExists: IDP esterno già preso
-      NotFound: IDP esterno non trovato
-      LoginFailed: Accesso all'IDP esterno non riuscito
+      Invalid: "IDP esterno non valido"
+      IDPConfigNotExisting: "IDP non valido per questa organizzazione"
+      NotAllowed: "IDP esterno non consentito"
+      MinimumExternalIDPNeeded: "Almeno un IDP deve essere aggiunto"
+      AlreadyExists: "IDP esterno già preso"
+      NotFound: "IDP esterno non trovato"
+      LoginFailed: "Accesso all'IDP esterno non riuscito"
     MFA:
       OTP:
-        AlreadyReady: Multifattore OTP (OneTimePassword) è già impostato
-        NotExisting: Multifattore OTP (OneTimePassword) non esistente
-        NotReady: Multifattore OTP (OneTimePassword) non è pronto
-        InvalidCode: Codice non valido
+        AlreadyReady: "Multifattore OTP (OneTimePassword) è già impostato"
+        NotExisting: "Multifattore OTP (OneTimePassword) non esistente"
+        NotReady: "Multifattore OTP (OneTimePassword) non è pronto"
+        InvalidCode: "Codice non valido"
       U2F:
-        NotExisting: U2F non esistente
+        NotExisting: "U2F non esistente"
       Passwordless:
-        NotExisting: Passkey non esistente
+        NotExisting: "Passkey non esistente"
       RecoveryCodes:
-        InvalidCode: Codice di recupero non valido fornito
-        MaxCountExceeded: Numero massimo di codici di recupero superato
-        NotReady: I codici di recupero non sono pronti per l'uso
-        ConfigInvalid: La configurazione dei codici di recupero non è valida
+        InvalidCode: "Codice di recupero non valido fornito"
+        MaxCountExceeded: "Numero massimo di codici di recupero superato"
+        NotReady: "I codici di recupero non sono pronti per l'uso"
+        ConfigInvalid: "La configurazione dei codici di recupero non è valida"
     WebAuthN:
-      NotFound: WebAuthN Token non trovato
-      BeginRegisterFailed: WebAuthN inizializzazione non riuscita
-      MarshalError: Errore nel marshalling
-      ErrorOnParseCredential: Errore nell'analisi dei dati delle credenziali
-      CreateCredentialFailed: Errore nella creazione delle credenziali
-      BeginLoginFailed: WebAuthN inizializzazione login fallito
-      ValidateLoginFailed: Errore nella convalidazione delle credenziali
-      CloneWarning: Le credenziali possono essere copiate
+      NotFound: "WebAuthN Token non trovato"
+      BeginRegisterFailed: "WebAuthN inizializzazione non riuscita"
+      MarshalError: "Errore nel marshalling"
+      ErrorOnParseCredential: "Errore nell'analisi dei dati delle credenziali"
+      CreateCredentialFailed: "Errore nella creazione delle credenziali"
+      BeginLoginFailed: "WebAuthN inizializzazione login fallito"
+      ValidateLoginFailed: "Errore nella convalidazione delle credenziali"
+      CloneWarning: "Le credenziali possono essere copiate"
     RefreshToken:
-      Invalid: Refresh Token non è valido
-      NotFound: Refresh Token non trovato
+      Invalid: "Refresh Token non è valido"
+      NotFound: "Refresh Token non trovato"
   Instance:
-    NotFound: Istanza non trovata
-    AlreadyExists: L'istanza esiste già
-    NotChanged: Istanza non modificata
+    NotFound: "Istanza non trovata"
+    AlreadyExists: "L'istanza esiste già"
+    NotChanged: "Istanza non modificata"
   Org:
-    AlreadyExists: Nome o ID dell'organizzazione già utilizzato
-    Invalid: L'organizzazione non è valida
-    AlreadyDeactivated: L'organizzazione è già disattivata
-    AlreadyActive: L'organizzazione è già attiva
-    Empty: L'organizzazione è vuota
-    NotFound: Organizzazione non trovata
-    NotChanged: Organizzazione non cambiata
-    DefaultOrgNotDeletable: L'organizzazione predefinita non deve essere cancellata
-    ZitadelOrgNotDeletable: L'organizzazione con il progetto Zitadel non deve essere cancellata
-    InvalidDomain: Dominio non valido
-    DomainMissing: Dominio mancante
-    DomainNotOnOrg: Il dominio non esistente nell'organizzazione
-    DomainNotVerified: Il dominio non è verificato
-    DomainAlreadyVerified: Il dominio è già verificato
-    DomainVerificationTypeInvalid: Il tipo di verifica del dominio non è valido
-    DomainVerificationMissing: La verifica del dominio non è ancora iniziata
-    DomainVerificationFailed: Verifica del dominio fallita
-    DomainVerificationTXTNotFound: Il record TXT _zitadel-challenge non è stato trovato per il tuo dominio. Verifica di averlo aggiunto al tuo server DNS o attendi la propagazione del nuovo record
-    DomainVerificationTXTNoMatch: È stato trovato il record TXT _zitadel-challenge per il tuo dominio ma non contiene il testo del token corretto. Verifica di aver aggiunto il token corretto al tuo server DNS o attendi la propagazione del nuovo record
-    DomainVerificationHTTPNotFound: Il file della challenge non è stato trovato nell'URL previsto. Verifica di aver caricato il file nel posto giusto con permessi di lettura
-    DomainVerificationHTTPNoMatch: Il file della challenge è stato trovato nell'URL previsto ma non contiene il testo del token corretto. Controlla il suo contenuto
-    DomainVerificationTimeout: Si è verificato un timeout nella richiesta del server DNS
-    PrimaryDomainNotDeletable: Il dominio primario non deve essere cancellato
-    DomainNotFound: Dominio non trovato
-    MemberIDMissing: ID membro mancante
-    MemberNotFound: Membro non trovato
-    InvalidMember: Il membro dell'organizzazione non è valido
-    UserIDMissing: ID utente mancante
-    PolicyAlreadyExists: Impostazione già esistente
-    PolicyNotExisting: Impostazione non esistente
-    IdpInvalid: La configurazione dell'IDP non è valida
-    IdpNotExisting: La configurazione IDP non esistente
-    OIDCConfigInvalid: La configurazione OIDC IDP non è valida
-    IdpIsNotOIDC: La configurazione IDP non è di tipo oidc
+    AlreadyExists: "Nome o ID dell'organizzazione già utilizzato"
+    Invalid: "L'organizzazione non è valida"
+    AlreadyDeactivated: "L'organizzazione è già disattivata"
+    AlreadyActive: "L'organizzazione è già attiva"
+    Empty: "L'organizzazione è vuota"
+    NotFound: "Organizzazione non trovata"
+    NotChanged: "Organizzazione non cambiata"
+    DefaultOrgNotDeletable: "L'organizzazione predefinita non deve essere cancellata"
+    ZitadelOrgNotDeletable: "L'organizzazione con il progetto Zitadel non deve essere cancellata"
+    InvalidDomain: "Dominio non valido"
+    DomainMissing: "Dominio mancante"
+    DomainNotOnOrg: "Il dominio non esistente nell'organizzazione"
+    DomainNotVerified: "Il dominio non è verificato"
+    DomainAlreadyVerified: "Il dominio è già verificato"
+    DomainVerificationTypeInvalid: "Il tipo di verifica del dominio non è valido"
+    DomainVerificationMissing: "La verifica del dominio non è ancora iniziata"
+    DomainVerificationFailed: "Verifica del dominio fallita"
+    DomainVerificationTXTNotFound: "Il record TXT _zitadel-challenge non è stato trovato per il tuo dominio. Verifica di averlo aggiunto al tuo server DNS o attendi la propagazione del nuovo record"
+    DomainVerificationTXTNoMatch: "È stato trovato il record TXT _zitadel-challenge per il tuo dominio ma non contiene il testo del token corretto. Verifica di aver aggiunto il token corretto al tuo server DNS o attendi la propagazione del nuovo record"
+    DomainVerificationHTTPNotFound: "Il file della challenge non è stato trovato nell'URL previsto. Verifica di aver caricato il file nel posto giusto con permessi di lettura"
+    DomainVerificationHTTPNoMatch: "Il file della challenge è stato trovato nell'URL previsto ma non contiene il testo del token corretto. Controlla il suo contenuto"
+    DomainVerificationTimeout: "Si è verificato un timeout nella richiesta del server DNS"
+    PrimaryDomainNotDeletable: "Il dominio primario non deve essere cancellato"
+    DomainNotFound: "Dominio non trovato"
+    MemberIDMissing: "ID membro mancante"
+    MemberNotFound: "Membro non trovato"
+    InvalidMember: "Il membro dell'organizzazione non è valido"
+    UserIDMissing: "ID utente mancante"
+    PolicyAlreadyExists: "Impostazione già esistente"
+    PolicyNotExisting: "Impostazione non esistente"
+    IdpInvalid: "La configurazione dell'IDP non è valida"
+    IdpNotExisting: "La configurazione IDP non esistente"
+    OIDCConfigInvalid: "La configurazione OIDC IDP non è valida"
+    IdpIsNotOIDC: "La configurazione IDP non è di tipo oidc"
     Domain:
-      AlreadyExists: Il dominio già esistente
-      InvalidCharacter: Solo caratteri alfanumerici, . e - sono consentiti per un dominio
-      EmptyString: I caratteri non numerici e alfabetici non validi sono stati sostituiti con spazi vuoti e il dominio risultante è una stringa vuota
+      AlreadyExists: "Il dominio già esistente"
+      InvalidCharacter: "Solo caratteri alfanumerici, . e - sono consentiti per un dominio"
+      EmptyString: "I caratteri non numerici e alfabetici non validi sono stati sostituiti con spazi vuoti e il dominio risultante è una stringa vuota"
     IDP:
-      InvalidSearchQuery: Parametro di ricerca non valido
-      ClientIDMissing: ClientID mancante
-      TeamIDMissing: TeamID mancante
-      KeyIDMissing: ID chiave mancante
-      PrivateKeyMissing: Chiave privata mancante
+      InvalidSearchQuery: "Parametro di ricerca non valido"
+      ClientIDMissing: "ClientID mancante"
+      TeamIDMissing: "TeamID mancante"
+      KeyIDMissing: "ID chiave mancante"
+      PrivateKeyMissing: "Chiave privata mancante"
     LoginPolicy:
-      NotFound: Impostazioni di accesso non trovati
-      Invalid: Impostazioni di accesso non sono validi
-      RedirectURIInvalid: Default Redirect URI non valido
-      NotExisting: Impostazioni di accesso non esistenti
-      AlreadyExists: Impostazioni di accesso già esistenti
-      IdpProviderAlreadyExisting: IDP già esistente
-      IdpProviderNotExisting: IDP non esistente
-      RegistrationNotAllowed: la registrazione non è consentita.
-      UsernamePasswordNotAllowed: l'accesso con nome utente e password non è consentito.
+      NotFound: "Impostazioni di accesso non trovati"
+      Invalid: "Impostazioni di accesso non sono validi"
+      RedirectURIInvalid: "Default Redirect URI non valido"
+      NotExisting: "Impostazioni di accesso non esistenti"
+      AlreadyExists: "Impostazioni di accesso già esistenti"
+      IdpProviderAlreadyExisting: "IDP già esistente"
+      IdpProviderNotExisting: "IDP non esistente"
+      RegistrationNotAllowed: "la registrazione non è consentita."
+      UsernamePasswordNotAllowed: "l'accesso con nome utente e password non è consentito."
       MFA:
-        AlreadyExists: Multifactor già esistente
-        NotExisting: Multifattore non esistente
-        Unspecified: Multifattore non valido
+        AlreadyExists: "Multifactor già esistente"
+        NotExisting: "Multifattore non esistente"
+        Unspecified: "Multifattore non valido"
     MailTemplate:
-      NotFound: Mail template predefinito non trovato
-      NotChanged: Mail template predefinito non è stato cambiato
-      AlreadyExists: Mail template predefinito già esistente
-      Invalid: Mail template predefinito non è valido
+      NotFound: "Mail template predefinito non trovato"
+      NotChanged: "Mail template predefinito non è stato cambiato"
+      AlreadyExists: "Mail template predefinito già esistente"
+      Invalid: "Mail template predefinito non è valido"
     CustomMessageText:
-      NotFound: Testo predefinito non trovato
-      NotChanged: Il testo predefinito non è stato cambiato
-      AlreadyExists: Il testo predefinito già eistente
-      Invalid: Il testo predefinito non è valido
+      NotFound: "Testo predefinito non trovato"
+      NotChanged: "Il testo predefinito non è stato cambiato"
+      AlreadyExists: "Il testo predefinito già eistente"
+      Invalid: "Il testo predefinito non è valido"
     PasswordComplexityPolicy:
-      NotFound: Impostazioni di complessità della password non trovati
-      Empty: Mancano le impostazioni di complessità della password
-      NotExisting: Impostazioni di complessità della password non esistenti
-      AlreadyExists: Impostazioni di complessità della password sono già esistenti
+      NotFound: "Impostazioni di complessità della password non trovati"
+      Empty: "Mancano le impostazioni di complessità della password"
+      NotExisting: "Impostazioni di complessità della password non esistenti"
+      AlreadyExists: "Impostazioni di complessità della password sono già esistenti"
     PasswordLockoutPolicy:
-      NotFound: Impostazioni di blocco della password non trovati
-      Empty: Mancano le impostazioni di blocco della password
-      NotExisting: Le impostazioni di blocco della password non esistenti
-      AlreadyExists: Le impostazioni di blocco della password sono già esistenti
+      NotFound: "Impostazioni di blocco della password non trovati"
+      Empty: "Mancano le impostazioni di blocco della password"
+      NotExisting: "Le impostazioni di blocco della password non esistenti"
+      AlreadyExists: "Le impostazioni di blocco della password sono già esistenti"
     PasswordAgePolicy:
-      NotFound: Impostazioni di validità della password
-      Empty: Impostazioni di validità della password mancanti
-      NotExisting: Impostazioni di validità della password non esistenti
-      AlreadyExists: Impostazioni di validità della password sono già esistenti
-    OrgIAMPolicy:
-      Empty: Mancano le impostazioni Org IAM
-      NotExisting: Impostazioni Org IAM non esistenti
-      AlreadyExists: Impostazioni Org IAM già esistenti
+      NotFound: "Impostazioni di validità della password"
+      Empty: "Impostazioni di validità della password mancanti"
+      NotExisting: "Impostazioni di validità della password non esistenti"
+      AlreadyExists: "Impostazioni di validità della password sono già esistenti"
     NotificationPolicy:
-      NotFound: Impostazioni di notifica non trovate
-      NotChanged: Impostazioni di notifica non è stato cambiato
-      AlreadyExists: Impostazioni di notifica già esistente
+      NotFound: "Impostazioni di notifica non trovate"
+      NotChanged: "Impostazioni di notifica non è stato cambiato"
+      AlreadyExists: "Impostazioni di notifica già esistente"
     LabelPolicy:
-      NotFound: Etichettatura privata non trovata
-      NotChanged: Private Labelling non è stata cambiata
+      NotFound: "Etichettatura privata non trovata"
+      NotChanged: "Private Labelling non è stata cambiata"
   Project:
-    ProjectIDMissing: ID del progetto mancante
-    AlreadyExists: Il progetto è già stato creato nell'organizzazione
-    OrgNotExisting: L'organizzazione non esistente
-    UserNotExisting: L'utente non esistente
-    CouldNotGenerateClientSecret: Impossibile generare il segreto del cliente
-    Invalid: Il progetto non è valido
-    NotActive: Il progetto non è attivo
-    NotInactive: Il progetto non è disattivato
-    NotFound: Progetto non trovato
-    UserIDMissing: ID utente mancante
+    ProjectIDMissing: "ID del progetto mancante"
+    AlreadyExists: "Il progetto è già stato creato nell'organizzazione"
+    OrgNotExisting: "L'organizzazione non esistente"
+    UserNotExisting: "L'utente non esistente"
+    CouldNotGenerateClientSecret: "Impossibile generare il segreto del cliente"
+    Invalid: "Il progetto non è valido"
+    NotActive: "Il progetto non è attivo"
+    NotInactive: "Il progetto non è disattivato"
+    NotFound: "Progetto non trovato"
+    UserIDMissing: "ID utente mancante"
     Member:
-      NotFound: Membro del progetto non trovato
-      Invalid: Il membro del progetto non è valido
-      AlreadyExists: Il membro del progetto già esistente
-      NotExisting: Il membro del progetto non esistente
-    MinimumOneRoleNeeded: Almeno un ruolo deve essere aggiunto
+      NotFound: "Membro del progetto non trovato"
+      Invalid: "Il membro del progetto non è valido"
+      AlreadyExists: "Il membro del progetto già esistente"
+      NotExisting: "Il membro del progetto non esistente"
+    MinimumOneRoleNeeded: "Almeno un ruolo deve essere aggiunto"
     Role:
-      AlreadyExists: Ruolo è già esistente
-      Invalid: Ruolo non è valido
-      NotExisting: Ruolo non esistente
-    IDMissing: ID mancante
+      AlreadyExists: "Ruolo è già esistente"
+      Invalid: "Ruolo non è valido"
+      NotExisting: "Ruolo non esistente"
+    IDMissing: "ID mancante"
     App:
-      AlreadyExists: L'applicazione già esistente
-      NotFound: Applicazione non trovata
-      Invalid: Applicazione non valida
-      NotExisting: L'applicazione non esiste
-      NotActive: L'applicazione non è attiva
-      NotInactive: L'applicazione non è inattiva
-      OIDCConfigInvalid: La configurazione OIDC non è valida
-      APIConfigInvalid: La configurazione API non è valida
-      SAMLConfigInvalid: La configurazione SAML non è valida
-      IsNotOIDC: L'applicazione non è di tipo OIDC
-      IsNotAPI: L'applicazione non è di tipo API
-      IsNotSAML: L'applicazione non è di tipo SAML
-      SAMLMetadataMissing: Mancano i metadati SAML
-      SAMLMetadataFormat: Errore nel formato dei metadati SAML
-      SAMLEntityIDAlreadyExisting: EntityID SAML già esistente
-      OIDCAuthMethodNoSecret: Il metodo di autorizzazione OIDC scelto non richiede un segreto
-      APIAuthMethodNoSecret: Il metodo di autorizzazione API scelto non richiede un segreto
-      AuthMethodNoPrivateKeyJWT: Il metodo di autorizzazione scelto non richiede una chiave
-      ClientSecretInvalid: Il segreto del cliente non è valido
+      AlreadyExists: "L'applicazione già esistente"
+      NotFound: "Applicazione non trovata"
+      Invalid: "Applicazione non valida"
+      NotExisting: "L'applicazione non esiste"
+      NotActive: "L'applicazione non è attiva"
+      NotInactive: "L'applicazione non è inattiva"
+      OIDCConfigInvalid: "La configurazione OIDC non è valida"
+      APIConfigInvalid: "La configurazione API non è valida"
+      SAMLConfigInvalid: "La configurazione SAML non è valida"
+      IsNotOIDC: "L'applicazione non è di tipo OIDC"
+      IsNotAPI: "L'applicazione non è di tipo API"
+      IsNotSAML: "L'applicazione non è di tipo SAML"
+      SAMLMetadataMissing: "Mancano i metadati SAML"
+      SAMLMetadataFormat: "Errore nel formato dei metadati SAML"
+      SAMLEntityIDAlreadyExisting: "EntityID SAML già esistente"
+      OIDCAuthMethodNoSecret: "Il metodo di autorizzazione OIDC scelto non richiede un segreto"
+      APIAuthMethodNoSecret: "Il metodo di autorizzazione API scelto non richiede un segreto"
+      AuthMethodNoPrivateKeyJWT: "Il metodo di autorizzazione scelto non richiede una chiave"
+      ClientSecretInvalid: "Il segreto del cliente non è valido"
       Key:
-        AlreadyExisting: Chiave di applicazione già esistente
-        NotFound: Chiave di applicazione non trovata
-    RequiredFieldsMissing: Mancano alcuni campi obbligatori
+        AlreadyExisting: "Chiave di applicazione già esistente"
+        NotFound: "Chiave di applicazione non trovata"
+    RequiredFieldsMissing: "Mancano alcuni campi obbligatori"
     Grant:
-      AlreadyExists: Grant del progetto già esistente
-      NotFound: Grant non trovato
-      Invalid: Grant del progetto non è valido
-      NotExisting: Grant del progetto non esistente
-      HasNotExistingRole: Uno dei ruoli assegnati non è esistente nel progetto
-      NotActive: Grant del progetto non è attivo
-      NotInactive: Grant del progetto non è inattivo
-  IAM:
-    NotFound: IAM non trovato. Assicurati di avere il dominio corretto. Guarda su https://zitadel.com/docs/apis/introduction#domains
+      AlreadyExists: "Il permesso di progetto esiste già"
+      NotFound: "Permesso di progetto non trovato"
+      Invalid: "Il permesso di progetto non è valido"
+      NotExisting: "Il permesso di progetto non esiste"
+      HasNotExistingRole: "Uno dei ruoli assegnati nel progetto non esiste"
+      NotActive: "Il permesso di progetto non è attivo"
+      NotInactive: "Il permesso di progetto non è disattivato"
+  Instance:
+    NotFound: "Istanza non trovata. Assicurati di avere il dominio corretto. Guarda su https://zitadel.com/docs/apis/introduction#domains"
     Member:
-      RolesNotChanged: I ruoli non sono stati cambiati
-    MemberInvalid: Il membro non è valido
-    MemberAlreadyExisting: Il membro già esistente
-    MemberNotExisting: Il membro non esistente
-    IDMissing: ID mancante
-    IAMProjectIDMissing: Manca l'ID del progetto IAM
-    IamProjectAlreadySet: L'ID del progetto IAM è già stato impostato
-    IdpInvalid: La configurazione dell'IDP non è valida
-    IdpNotExisting: La configurazione IDP non esiste
-    OIDCConfigInvalid: La configurazione OIDC IDP non è valida
-    IdpIsNotOIDC: La configurazione IDP non è di tipo OIDC
-    LoginPolicyInvalid: Impostazioni di accesso non sono validi
-    LoginPolicyNotExisting: Impostazioni di accesso non esistenti
-    IdpProviderInvalid: IDP non è valido
+      RolesNotChanged: "I ruoli non sono stati cambiati"
+    MemberInvalid: "Il membro non è valido"
+    MemberAlreadyExisting: "Il membro già esistente"
+    MemberNotExisting: "Il membro non esistente"
+    IDMissing: "ID mancante"
+    IdpInvalid: "La configurazione dell'IDP non è valida"
+    IdpNotExisting: "La configurazione IDP non esiste"
+    OIDCConfigInvalid: "La configurazione OIDC IDP non è valida"
+    IdpIsNotOIDC: "La configurazione IDP non è di tipo OIDC"
+    LoginPolicyInvalid: "Impostazioni di accesso non sono validi"
+    LoginPolicyNotExisting: "Impostazioni di accesso non esistenti"
+    IdpProviderInvalid: "IDP non è valido"
     LoginPolicy:
-      NotFound: Impostazioni di accesso predefinite non trovate
-      NotChanged: Le impostazioni di accesso predefinite non sono state cambiate
-      NotExisting: Impostazioni di accesso predefinite non esistenti
-      AlreadyExists: Impostazioni di accesso predefinite già esistenti
-      RedirectURIInvalid: Default Redirect URI non valido
+      NotFound: "Impostazioni di accesso predefinite non trovate"
+      NotChanged: "Le impostazioni di accesso predefinite non sono state cambiate"
+      NotExisting: "Impostazioni di accesso predefinite non esistenti"
+      AlreadyExists: "Impostazioni di accesso predefinite già esistenti"
+      RedirectURIInvalid: "Default Redirect URI non valido"
       MFA:
-        AlreadyExists: Multifattore già esistente
-        NotExisting: Multifattore non esistente
-        Unspecified: Multifattore non valido
+        AlreadyExists: "Multifattore già esistente"
+        NotExisting: "Multifattore non esistente"
+        Unspecified: "Multifattore non valido"
       IDP:
-        AlreadyExists: IDP già esistente
-        NotExisting: IDP non esiste
-        Invalid: IDP non valido
+        AlreadyExists: "IDP già esistente"
+        NotExisting: "IDP non esiste"
+        Invalid: "IDP non valido"
       IDPConfig:
-        AlreadyExists: La configurazione del IDP già esistente
-        NotInactive: Configurazione del IDP non inattiva
-        NotActive: Configurazione del IDP non attiva
+        AlreadyExists: "La configurazione del IDP già esistente"
+        NotInactive: "Configurazione del IDP non inattiva"
+        NotActive: "Configurazione del IDP non attiva"
     LabelPolicy:
-      NotFound: Private Labelling predefinita non trovata
-      NotChanged: Private Labelling non è stata cambiata
+      NotFound: "Private Labelling predefinita non trovata"
+      NotChanged: "Private Labelling non è stata cambiata"
     MailTemplate:
-      NotFound: Mail template predefinito non trovato
-      NotChanged: Mail template predefinito non è stato cambiato
-      AlreadyExists: Mail template predefinito già esistente
-      Invalid: Mail template predefinito non è valido
+      NotFound: "Mail template predefinito non trovato"
+      NotChanged: "Mail template predefinito non è stato cambiato"
+      AlreadyExists: "Mail template predefinito già esistente"
+      Invalid: "Mail template predefinito non è valido"
     CustomMessageText:
-      NotFound: Testo del mail predefinito non trovato
-      NotChanged: Il testo predefinito del mail non è stato cambiato
-      AlreadyExists: Il testo del mail predefinito già esistente
-      Invalid: Il testo del mail predefinito non è valido
+      NotFound: "Testo del mail predefinito non trovato"
+      NotChanged: "Il testo predefinito del mail non è stato cambiato"
+      AlreadyExists: "Il testo del mail predefinito già esistente"
+      Invalid: "Il testo del mail predefinito non è valido"
     PasswordComplexityPolicy:
-      NotFound: Impostazioni di complessità della password predefinite non trovati
-      NotExisting: Impostazioni di complessità della password predefinite non esistenti
-      AlreadyExists: Impostazioni di complessità della password predefinite già esistenti
-      Empty: Le impostazioni di complessità della password predefinite non sono state trovate
-      NotChanged: Le impostazioni di complessità della password predefinite non sono state cambiate
+      NotFound: "Impostazioni di complessità della password predefinite non trovati"
+      NotExisting: "Impostazioni di complessità della password predefinite non esistenti"
+      AlreadyExists: "Impostazioni di complessità della password predefinite già esistenti"
+      Empty: "Le impostazioni di complessità della password predefinite non sono state trovate"
+      NotChanged: "Le impostazioni di complessità della password predefinite non sono state cambiate"
     PasswordAgePolicy:
-      NotFound: Le impostazioni di validità della password predefinite non trovate
-      NotExisting: Le impostazioni di validità della password predefinite non esistono
-      AlreadyExists: Le impostazioni di validità della password predefinite già esistenti
-      Empty: Le impostazioni di validità della password predefinite vuote
-      NotChanged: Le impostazioni di validità della password non sono state cambiate
+      NotFound: "Le impostazioni di validità della password predefinite non trovate"
+      NotExisting: "Le impostazioni di validità della password predefinite non esistono"
+      AlreadyExists: "Le impostazioni di validità della password predefinite già esistenti"
+      Empty: "Le impostazioni di validità della password predefinite vuote"
+      NotChanged: "Le impostazioni di validità della password non sono state cambiate"
     PasswordLockoutPolicy:
-      NotFound: Impostazioni di blocco della password predefinite non trovate
-      NotExisting: Impostazioni di blocco della password predefinite non esistenti
-      AlreadyExists: Impostazioni di blocco della password predefinite già esistenti
-      Empty: Impostazioni di blocco della password predefinite sono vuote
-      NotChanged: Le impostazioni di blocco della password predefinite non sono state cambiate
+      NotFound: "Impostazioni di blocco della password predefinite non trovate"
+      NotExisting: "Impostazioni di blocco della password predefinite non esistenti"
+      AlreadyExists: "Impostazioni di blocco della password predefinite già esistenti"
+      Empty: "Impostazioni di blocco della password predefinite sono vuote"
+      NotChanged: "Le impostazioni di blocco della password predefinite non sono state cambiate"
     DomainPolicy:
-      NotFound: Impostazioni Org IAM non trovate
-      Empty: Impostazioni Org IAM mancanti
-      NotExisting: Impostazioni Org IAM non esistenti
-      AlreadyExists: Impostazioni Org IAM già esistenti
-      NotChanged: Impostazioni Org IAM non sono state cambiate
+      NotFound: "Impostazioni di dominio dell'organizzazione non trovate"
+      Empty: "Impostazioni di dominio dell'organizzazione mancanti"
+      NotExisting: "Impostazioni di dominio dell'organizzazione non esistenti"
+      AlreadyExists: "Le impostazioni di dominio dell'organizzazione esistono già"
+      NotChanged: "Le impostazioni di dominio dell'organizzazione non sono state cambiate"
     NotificationPolicy:
-      NotFound: Impostazioni di notifica predefinite non trovate
-      NotChanged: Impostazioni di notifica predefinite non è stato cambiato
-      AlreadyExists: Impostazioni di notifica predefinite già esistente
+      NotFound: "Impostazioni di notifica predefinite non trovate"
+      NotChanged: "Impostazioni di notifica predefinite non è stato cambiato"
+      AlreadyExists: "Impostazioni di notifica predefinite già esistente"
   Policy:
-    AlreadyExists: Impostazioni già esistenti
+    AlreadyExists: "Impostazioni già esistenti"
     Label:
       Invalid:
-        PrimaryColor: Il colore primario non è un valore di colore HEX valido
-        BackgroundColor: Il colore di sfondo non è un valore di colore HEX valido
-        WarnColor: Warn color non è un valore di colore HEX valido
-        FontColor: Il colore del carattere non è un valore di colore HEX valido
-        PrimaryColorDark: Il colore primario (modo scuro) non è un valore di colore HEX valido
-        BackgroundColorDark: Il colore di sfondo (modo scuro) non è un valore di colore HEX valido
-        WarnColorDark: Warn color (dark mode) non è un valore di colore HEX valido
-        FontColorDark: Il colore del carattere (modalità scura) non è un valore di colore HEX valido
+        PrimaryColor: "Il colore primario non è un valore di colore HEX valido"
+        BackgroundColor: "Il colore di sfondo non è un valore di colore HEX valido"
+        WarnColor: "Warn color non è un valore di colore HEX valido"
+        FontColor: "Il colore del carattere non è un valore di colore HEX valido"
+        PrimaryColorDark: "Il colore primario (modo scuro) non è un valore di colore HEX valido"
+        BackgroundColorDark: "Il colore di sfondo (modo scuro) non è un valore di colore HEX valido"
+        WarnColorDark: "Warn color (dark mode) non è un valore di colore HEX valido"
+        FontColorDark: "Il colore del carattere (modalità scura) non è un valore di colore HEX valido"
   UserGrant:
-    AlreadyExists: User Grant già esistente
-    NotFound: User Grant non trovato
-    Invalid: User Grant non è valido
-    NotChanged: User Grant non è stata cambiato
-    IDMissing: ID mancante
-    NoPermissionForProject: L'utente non ha permessi su questo progetto
-    RoleKeyNotFound: Ruolo non trovato
+    AlreadyExists: "User Grant già esistente"
+    NotFound: "User Grant non trovato"
+    Invalid: "User Grant non è valido"
+    NotChanged: "User Grant non è stata cambiato"
+    IDMissing: "ID mancante"
+    NoPermissionForProject: "L'utente non ha permessi su questo progetto"
+    RoleKeyNotFound: "Ruolo non trovato"
   Member:
-    AlreadyExists: Il membro è già esistente
+    AlreadyExists: "Il membro è già esistente"
   IDPConfig:
-    AlreadyExists: La configurazione IDP con questo nome già esistente
-    NotExisting: La configurazione del IDP non esiste
+    AlreadyExists: "La configurazione IDP con questo nome già esistente"
+    NotExisting: "La configurazione del IDP non esiste"
   Changes:
-    NotFound: Nessuna storia trovata
-    AuditRetention: La storia è al di fuori della Ritenzione Audit Log
+    NotFound: "Nessuna storia trovata"
+    AuditRetention: "La storia è al di fuori della Ritenzione Audit Log"
   Token:
-    NotFound: Token non trovato
-    Invalid: Token non valido
+    NotFound: "Token non trovato"
+    Invalid: "Token non valido"
   UserSession:
-    NotFound: Sessione non trovata
+    NotFound: "Sessione non trovata"
   Key:
-    NotFound: Chiave non trovata
-    ExpireBeforeNow: La data di scadenza è passata
+    NotFound: "Chiave non trovata"
+    ExpireBeforeNow: "La data di scadenza è passata"
   Login:
     LoginPolicy:
       MFA:
-        ForceAndNotConfigured: Multifactor è configurato come richiesto, ma nessun provider è configurato. Contatta il tuo amministratore di sistema.
+        ForceAndNotConfigured: "Multifactor è configurato come richiesto, ma nessun provider è configurato. Contatta il tuo amministratore di sistema."
   Step:
     Started:
-      AlreadyExists: Il passo iniziato già esistente
+      AlreadyExists: "Il passo iniziato già esistente"
     Done:
-      AlreadyExists: Il passo fatto già esistente
+      AlreadyExists: "Il passo fatto già esistente"
   CustomText:
-    AlreadyExists: Il testo personalizzato già esistente
-    Invalid: Testo personalizzato non valido
-    NotFound: Testo personalizzato non trovato
+    AlreadyExists: "Il testo personalizzato già esistente"
+    Invalid: "Testo personalizzato non valido"
+    NotFound: "Testo personalizzato non trovato"
   TranslationFile:
-    ReadError: Errore nella lettura del file di traduzione
-    MergeError: Il file di traduzione non può essere unito alle traduzioni personalizzate
-    NotFound: Il file di traduzione non esiste
+    ReadError: "Errore nella lettura del file di traduzione"
+    MergeError: "Il file di traduzione non può essere unito alle traduzioni personalizzate"
+    NotFound: "Il file di traduzione non esiste"
   Metadata:
-    NotFound: Metadati non trovati
-    NoData: L'elenco dei metadati è vuoto
-    Invalid: I metadati non sono validi
-    KeyNotExisting: Una o più chiavi non esistono
+    NotFound: "Metadati non trovati"
+    NoData: "L'elenco dei metadati è vuoto"
+    Invalid: "I metadati non sono validi"
+    KeyNotExisting: "Una o più chiavi non esistono"
   Action:
-    Invalid: L'azione non è valida
-    NotFound: L'azione non trovata
-    NotActive: L'azione non è attiva
-    NotInactive: L'azione non è inattiva
-    MaxAllowed: Non sono permesse altre azioni attive
-    NotEnabled: La funzione "Azione" non è abilitata
+    Invalid: "L'azione non è valida"
+    NotFound: "L'azione non trovata"
+    NotActive: "L'azione non è attiva"
+    NotInactive: "L'azione non è inattiva"
+    MaxAllowed: "Non sono permesse altre azioni attive"
+    NotEnabled: "La funzione \"Azione\" non è abilitata"
   Flow:
-    FlowTypeMissing: FlowType mancante
-    Empty: Flow è già vuoto
-    WrongTriggerType: TriggerType non è valido
-    NoChanges: Nessun cambiamento
-    ActionIDsNotExist: Gli ActionID non esistono
+    FlowTypeMissing: "FlowType mancante"
+    Empty: "Flow è già vuoto"
+    WrongTriggerType: "TriggerType non è valido"
+    NoChanges: "Nessun cambiamento"
+    ActionIDsNotExist: "Gli ActionID non esistono"
   Query:
-    CloseRows: Lo statement SQL non può essere terminato
-    SQLStatement: Lo statement SQL non può essere creato
-    InvalidRequest: La richiesta non è valida
-    TooManyNestingLevels: Troppi livelli di nidificazione delle query (massimo 20)
-    LimitExceeded: Limite superato
+    CloseRows: "Lo statement SQL non può essere terminato"
+    SQLStatement: "Lo statement SQL non può essere creato"
+    InvalidRequest: "La richiesta non è valida"
+    TooManyNestingLevels: "Troppi livelli di nidificazione delle query (massimo 20)"
+    LimitExceeded: "Limite superato"
   Quota:
-    AlreadyExists: La quota esiste già per questa unità
-    NotFound: Quota non trovata per questa unità
+    AlreadyExists: "La quota esiste già per questa unità"
+    NotFound: "Quota non trovata per questa unità"
     Invalid:
-      CallURL: L'URL di chiamata per la quota non è valido
-      Percent: La percentuale contingente è inferiore all'1
-      Unimplemented: La quota non è implementata per questa unità
-      Amount: L'importo contingente è inferiore all'1
-      ResetInterval: L'intervallo di reset contingente è inferiore a un minuto
-      Noop: Una quota illimitata senza notifiche non ha alcun effetto
+      CallURL: "L'URL di chiamata per la quota non è valido"
+      Percent: "La percentuale contingente è inferiore all'1"
+      Unimplemented: "La quota non è implementata per questa unità"
+      Amount: "L'importo contingente è inferiore all'1"
+      ResetInterval: "L'intervallo di reset contingente è inferiore a un minuto"
+      Noop: "Una quota illimitata senza notifiche non ha alcun effetto"
     Access:
-      Exhausted: La quota per le richieste autenticate è esaurita
+      Exhausted: "La quota per le richieste autenticate è esaurita"
     Execution:
-      Exhausted: La quota per i secondi di azione è esaurita
+      Exhausted: "La quota per i secondi di azione è esaurita"
   LogStore:
     Access:
-      StorageFailed: Il salvataggio del registro degli accessi nel database non è riuscito
-      ScanFailed: La query delle richieste autenticate utilizzate non è riuscita
+      StorageFailed: "Il salvataggio del registro degli accessi nel database non è riuscito"
+      ScanFailed: "La query delle richieste autenticate utilizzate non è riuscita"
     Execution:
-      StorageFailed: Il salvataggio del registro delle azioni nel database non è riuscito
-      ScanFailed: La query dei secondi delle azioni utilizzate non è riuscita
+      StorageFailed: "Il salvataggio del registro delle azioni nel database non è riuscito"
+      ScanFailed: "La query dei secondi delle azioni utilizzate non è riuscita"
   Session:
-    NotExisting: La sessione non esiste
-    Terminated: La Sessione già terminata
-    Expired: La sessione è scaduta
-    PositiveLifetime: La durata della sessione non deve essere inferiore a 0
+    NotExisting: "La sessione non esiste"
+    Terminated: "La Sessione già terminata"
+    Expired: "La sessione è scaduta"
+    PositiveLifetime: "La durata della sessione non deve essere inferiore a 0"
     Token:
-      Invalid: Il token della sessione non è valido
+      Invalid: "Il token della sessione non è valido"
     WebAuthN:
-      NoChallenge: Sessione senza sfida WebAuthN
+      NoChallenge: "Sessione senza sfida WebAuthN"
   Intent:
-    IDPMissing: IDP mancante nella richiesta
-    IDPInvalid: IDP non valido per la richiesta
-    ResponseInvalid: La risposta dell'IDP non è valida
-    MissingSingleMappingAttribute: Non contiene l'attributo di mapping o ha più di un valore
-    SuccessURLMissing: URL di successo mancante nella richiesta
-    FailureURLMissing: URL di errore mancante nella richiesta
-    StateMissing: parametro di stato mancante nella richiesta
-    NotStarted: l'intento non è stato avviato o è già stato terminato
-    NotSucceeded: l'intento non è andato a buon fine
-    Expired: L'intento è scaduto
-    TokenCreationFailed: creazione del token fallita
-    InvalidToken: Il token dell'intento non è valido
-    OtherUser: Intento destinato a un altro utente
+    IDPMissing: "IDP mancante nella richiesta"
+    IDPInvalid: "IDP non valido per la richiesta"
+    ResponseInvalid: "La risposta dell'IDP non è valida"
+    MissingSingleMappingAttribute: "Non contiene l'attributo di mapping o ha più di un valore"
+    SuccessURLMissing: "URL di successo mancante nella richiesta"
+    FailureURLMissing: "URL di errore mancante nella richiesta"
+    StateMissing: "parametro di stato mancante nella richiesta"
+    NotStarted: "l'intento non è stato avviato o è già stato terminato"
+    NotSucceeded: "l'intento non è andato a buon fine"
+    Expired: "L'intento è scaduto"
+    TokenCreationFailed: "creazione del token fallita"
+    InvalidToken: "Il token dell'intento non è valido"
+    OtherUser: "Intento destinato a un altro utente"
   AuthRequest:
-    AlreadyExists: Auth Request esiste già
-    NotExisting: Auth Request non esiste
-    WrongLoginClient: Auth Request creato da un altro client di accesso
-    AlreadyHandled: Auth Request è già stata gestita
+    AlreadyExists: "Auth Request esiste già"
+    NotExisting: "Auth Request non esiste"
+    WrongLoginClient: "Auth Request creato da un altro client di accesso"
+    AlreadyHandled: "Auth Request è già stata gestita"
   OIDCSession:
-    RefreshTokenInvalid: Refresh Token non è valido
+    RefreshTokenInvalid: "Refresh Token non è valido"
     Token:
-      Invalid: Token non è valido
-      Expired: Token è scaduto
-    InvalidClient: Il token non è stato emesso per questo cliente
+      Invalid: "Token non è valido"
+      Expired: "Token è scaduto"
+    InvalidClient: "Il token non è stato emesso per questo cliente"
   SAMLRequest:
-    AlreadyExists: SAMLRequest esiste già
-    NotExisting: SAMLRequest non esiste
-    WrongLoginClient: SAMLRequest creato da un altro client di accesso
-    AlreadyHandled: SAMLRequest è già stata gestita
+    AlreadyExists: "SAMLRequest esiste già"
+    NotExisting: "SAMLRequest non esiste"
+    WrongLoginClient: "SAMLRequest creato da un altro client di accesso"
+    AlreadyHandled: "SAMLRequest è già stata gestita"
   SAMLSession:
-    InvalidClient: SAMLResponse non è stato emesso per questo client
+    InvalidClient: "SAMLResponse non è stato emesso per questo client"
   DeviceAuth:
-    NotFound: La richiesta di autorizzazione del dispositivo non esiste
-    AlreadyHandled: La richiesta di autorizzazione del dispositivo è già stata gestita
+    NotFound: "La richiesta di autorizzazione del dispositivo non esiste"
+    AlreadyHandled: "La richiesta di autorizzazione del dispositivo è già stata gestita"
   Feature:
-    NotExisting: La funzionalità non esiste
-    TypeNotSupported: Il tipo di funzionalità non è supportato
-    InvalidValue: Valore non valido per questa funzionalità
+    NotExisting: "La funzionalità non esiste"
+    TypeNotSupported: "Il tipo di funzionalità non è supportato"
+    InvalidValue: "Valore non valido per questa funzionalità"
   Target:
-    Invalid: Il target non è valido
-    NoTimeout: Il target non ha timeout
-    InvalidURL: La destinazione ha un URL non valido
-    NotFound: Obiettivo non trovato
-    InvalidExpirationDate: La data di scadenza della chiave deve essere nel futuro
-    PublicKeyExpired: La chiave pubblica dell'obiettivo è scaduta
-    PublicKeyActive: Impossibile eliminare la chiave pubblica dell'obiettivo attivo
-    InvalidPublicKey: La chiave pubblica non è valida. Deve essere una chiave pubblica RSA o ECDSA codificata PEM in formato PKCS#8
+    Invalid: "Il target non è valido"
+    NoTimeout: "Il target non ha timeout"
+    InvalidURL: "La destinazione ha un URL non valido"
+    NotFound: "Obiettivo non trovato"
+    InvalidExpirationDate: "La data di scadenza della chiave deve essere nel futuro"
+    PublicKeyExpired: "La chiave pubblica dell'obiettivo è scaduta"
+    PublicKeyActive: "Impossibile eliminare la chiave pubblica dell'obiettivo attivo"
+    InvalidPublicKey: "La chiave pubblica non è valida. Deve essere una chiave pubblica RSA o ECDSA codificata PEM in formato PKCS#8"
   Execution:
-    ConditionInvalid: La condizione di esecuzione non è valida
-    Invalid: L'esecuzione non è valida
-    NotFound: Esecuzione non trovata
-    IncludeNotFound: Includi non trovato
-    NoTargets: Nessun obiettivo definito
-    Failed: Esecuzione fallita
-    ResponseIsNotValidJSON: La risposta non è un JSON valido
-    MissingEncryptionKey: Chiave di crittografia mancante per l'esecuzione
+    ConditionInvalid: "La condizione di esecuzione non è valida"
+    Invalid: "L'esecuzione non è valida"
+    NotFound: "Esecuzione non trovata"
+    IncludeNotFound: "Includi non trovato"
+    NoTargets: "Nessun obiettivo definito"
+    Failed: "Esecuzione fallita"
+    ResponseIsNotValidJSON: "La risposta non è un JSON valido"
+    MissingEncryptionKey: "Chiave di crittografia mancante per l'esecuzione"
   UserSchema:
-    NotEnabled: La funzionalità "Schema utente" non è abilitata
+    NotEnabled: "La funzionalità \"Schema utente\" non è abilitata"
     Type:
-      Missing: Tipo di schema utente mancante
-      AlreadyExists: Il tipo di schema utente esiste già
+      Missing: "Tipo di schema utente mancante"
+      AlreadyExists: "Il tipo di schema utente esiste già"
     Authenticator:
-      Invalid: Tipo di autenticatore non valido
-    NotActive: Schema utente non attivo
-    NotInactive: Schema utente non inattivo
-    NotExists: Lo schema utente non esiste
+      Invalid: "Tipo di autenticatore non valido"
+    NotActive: "Schema utente non attivo"
+    NotInactive: "Schema utente non inattivo"
+    NotExists: "Lo schema utente non esiste"
     ID:
-      Missing: ID schema utente mancante
-    Invalid: Schema utente non valido
+      Missing: "ID schema utente mancante"
+    Invalid: "Schema utente non valido"
     Data:
-      Invalid: Dati non validi per lo schema utente
+      Invalid: "Dati non validi per lo schema utente"
   TokenExchange:
     Token:
-      Missing: Manca il gettone
-      Invalid: Il token non è valido
-      TypeMissing: Manca il tipo di token
-      TypeNotAllowed: Il tipo di token non è consentito
-      TypeNotSupported: Il tipo di token non è supportato
-      NotForAPI: Token rappresentati non consentiti per l'API
+      Missing: "Manca il gettone"
+      Invalid: "Il token non è valido"
+      TypeMissing: "Manca il tipo di token"
+      TypeNotAllowed: "Il tipo di token non è consentito"
+      TypeNotSupported: "Il tipo di token non è supportato"
+      NotForAPI: "Token rappresentati non consentiti per l'API"
     Impersonation:
-      PolicyDisabled: La rappresentazione è disabilitata nella policy di sicurezza dell'istanza
+      PolicyDisabled: "La rappresentazione è disabilitata nella policy di sicurezza dell'istanza"
   WebKey:
-    ActiveDelete: Impossibile eliminare la chiave Web attiva
-    Config: Configurazione chiave Web non valida
-    Duplicate: ID chiave Web non univoco
-    NoActive: Nessuna chiave Web attiva trovata
-    NotFound: Chiave Web non trovata
+    ActiveDelete: "Impossibile eliminare la chiave Web attiva"
+    Config: "Configurazione chiave Web non valida"
+    Duplicate: "ID chiave Web non univoco"
+    NoActive: "Nessuna chiave Web attiva trovata"
+    NotFound: "Chiave Web non trovata"
 
 AggregateTypes:
-  action: Azione
-  instance: Istanza
-  key_pair: Coppia di chiavi
-  org: Organizzazione
-  project: Progetto
-  user: Utente
-  usergrant: Sovvenzione utente
-  quota: Quota
-  feature: Funzionalità
-  target: Bersaglio
-  execution: Esecuzione
-  user_schema: Schema utente
-  auth_request: Richiesta di autenticazione
-  device_auth: Autenticazione su dispositivo
-  idpintent: IDP Intent
-  limits: Limiti
-  milestone: Milestone
-  oidc_session: OIDC Session
-  restrictions: Restrizioni
-  system: Sistema
-  session: Sessione
-  web_key: Chiave Web
-  saml_request: Richiesta SAML
-  saml_session: Sessione SAML
-
+  action: "Azione"
+  instance: "Istanza"
+  key_pair: "Coppia di chiavi"
+  org: "Organizzazione"
+  project: "Progetto"
+  user: "Utente"
+  usergrant: "Sovvenzione utente"
+  quota: "Quota"
+  feature: "Funzionalità"
+  target: "Bersaglio"
+  execution: "Esecuzione"
+  user_schema: "Schema utente"
+  auth_request: "Richiesta di autenticazione"
+  device_auth: "Autenticazione su dispositivo"
+  idpintent: "IDP Intent"
+  limits: "Limiti"
+  milestone: "Milestone"
+  oidc_session: "OIDC Session"
+  restrictions: "Restrizioni"
+  system: "Sistema"
+  session: "Sessione"
+  web_key: "Chiave Web"
+  saml_request: "Richiesta SAML"
+  saml_session: "Sessione SAML"
 EventTypes:
   execution:
-    set: Insieme di esecuzione
-    removed: Esecuzione cancellata
+    set: "Insieme di esecuzione"
+    removed: "Esecuzione cancellata"
   target:
-    added: Obiettivo creato
-    changed: Obiettivo cambiato
-    removed: Obiettivo eliminato
+    added: "Obiettivo creato"
+    changed: "Obiettivo cambiato"
+    removed: "Obiettivo eliminato"
   user:
-    added: Utente aggiunto
-    selfregistered: L'utente si è registrato
+    added: "Utente aggiunto"
+    selfregistered: "L'utente si è registrato"
     initialization:
       code:
-        added: Codice di inizializzazione generato
-        sent: Codice di inizializzazione inviato
+        added: "Codice di inizializzazione generato"
+        sent: "Codice di inizializzazione inviato"
       check:
-        succeeded: Controllo dell'inizializzazione riuscito
-        failed: Controllo dell'inizializzazione fallito
+        succeeded: "Controllo dell'inizializzazione riuscito"
+        failed: "Controllo dell'inizializzazione fallito"
     token:
-      added: Access Token creato
-      v2.added: Access Token creato
-    impersonated: Utente impersonificato
+      added: "Access Token creato"
+      v2.added: "Access Token creato"
+    impersonated: "Utente impersonificato"
     username:
-      reserved: Nome utente riservato
-      released: Nome utente rilasciato
-      changed: Nome utente cambiato
+      reserved: "Nome utente riservato"
+      released: "Nome utente rilasciato"
+      changed: "Nome utente cambiato"
     email:
-      reserved: Indirizzo e-mail riservato
-      released: Indirizzo e-mail rilasciato
-      changed: Indirizzo e-mail cambiato
-      verified: Indirizzo e-mail verificato
+      reserved: "Indirizzo e-mail riservato"
+      released: "Indirizzo e-mail rilasciato"
+      changed: "Indirizzo e-mail cambiato"
+      verified: "Indirizzo e-mail verificato"
       verification:
-        failed: Verifica dell'indirizzo e-mail non riuscita
+        failed: "Verifica dell'indirizzo e-mail non riuscita"
       code:
-        added: Codice di verifica dell'indirizzo e-mail generato
-        sent: Codice di verifica dell'indirizzo e-mail inviato
+        added: "Codice di verifica dell'indirizzo e-mail generato"
+        sent: "Codice di verifica dell'indirizzo e-mail inviato"
     machine:
-      added: Utente tecnico aggiunto
-      changed: Utente tecnico cambiato
+      added: "Utente tecnico aggiunto"
+      changed: "Utente tecnico cambiato"
       key:
-        added: Chiave aggiunta
-        removed: Chiave rimossa
+        added: "Chiave aggiunta"
+        removed: "Chiave rimossa"
       secret:
-        set: Secret set
-        updated: Hash segreto aggiornato
-        removed: Secret rimosso
+        set: "Secret set"
+        updated: "Hash segreto aggiornato"
+        removed: "Secret rimosso"
         check:
-          succeeded: Controllo della Secret riuscito
-          failed: Controllo della Secret fallito
+          succeeded: "Controllo della Secret riuscito"
+          failed: "Controllo della Secret fallito"
     human:
-      added: Persona aggiunta
-      selfregistered: Persona registrata
+      added: "Persona aggiunta"
+      selfregistered: "Persona registrata"
       avatar:
-        added: Avatar aggiunto
-        removed: Avatar rimosso
+        added: "Avatar aggiunto"
+        removed: "Avatar rimosso"
       initialization:
         code:
-          added: Codice di inizializzazione generato
-          sent: Codice di inizializzazione inviato
+          added: "Codice di inizializzazione generato"
+          sent: "Codice di inizializzazione inviato"
         check:
-          succeeded: Controllo dell'inizializzazione riuscito
-          failed: Controllo dell'inizializzazione fallito
+          succeeded: "Controllo dell'inizializzazione riuscito"
+          failed: "Controllo dell'inizializzazione fallito"
       invite:
         code:
-          added: Codice invito generato
-          sent: Codice invito inviato
+          added: "Codice invito generato"
+          sent: "Codice invito inviato"
         check:
-          succeeded: Controllo invito riuscito
-          failed: Controllo invito fallito
+          succeeded: "Controllo invito riuscito"
+          failed: "Controllo invito fallito"
       username:
-        reserved: Nome utente riservato
-        released: Nome utente rilasciato
+        reserved: "Nome utente riservato"
+        released: "Nome utente rilasciato"
       email:
-        changed: Indirizzo e-mail cambiato
-        verified: Indirizzo e-mail verificato
+        changed: "Indirizzo e-mail cambiato"
+        verified: "Indirizzo e-mail verificato"
         verification:
-          failed: Verificazione dell'indirizzo e-mail non riuscita
+          failed: "Verificazione dell'indirizzo e-mail non riuscita"
         code:
-          added: Codice di verifica generato
-          sent: Codice di verifica inviato
+          added: "Codice di verifica generato"
+          sent: "Codice di verifica inviato"
       password:
-        changed: Password cambiata
+        changed: "Password cambiata"
         code:
-          added: Codice password generato
-          sent: Codice password inviato
+          added: "Codice password generato"
+          sent: "Codice password inviato"
         check:
-          succeeded: Controllo della password riuscito
-          failed: Controllo della password fallito
+          succeeded: "Controllo della password riuscito"
+          failed: "Controllo della password fallito"
         change:
-          sent: Cambio password inviato
+          sent: "Cambio password inviato"
         hash:
-          updated: Hash della password aggiornato
+          updated: "Hash della password aggiornato"
       externallogin:
         check:
-          succeeded: Accesso esterno riuscito
+          succeeded: "Accesso esterno riuscito"
       externalidp:
-        added: IDP esterno aggiunto
-        removed: IDP esterno rimosso
+        added: "IDP esterno aggiunto"
+        removed: "IDP esterno rimosso"
         cascade:
-          removed: Cascata IDP rimossa
+          removed: "Cascata IDP rimossa"
         id:
-          migrated: L'ID utente esterno dell'IDP è stato migrato
+          migrated: "L'ID utente esterno dell'IDP è stato migrato"
       phone:
-        changed: Numero di telefono cambiato
-        verified: Numero di telefono verificato
+        changed: "Numero di telefono cambiato"
+        verified: "Numero di telefono verificato"
         verification:
-          failed: Verificazione del numero di telefono non riuscita
+          failed: "Verificazione del numero di telefono non riuscita"
         code:
-          added: Codice del numero di telefono generato
-          sent: Codice del numero di telefono inviato
-        removed: Numero di telefono rimosso
+          added: "Codice del numero di telefono generato"
+          sent: "Codice del numero di telefono inviato"
+        removed: "Numero di telefono rimosso"
       profile:
-        changed: Profilo cambiato
+        changed: "Profilo cambiato"
       address:
-        changed: Indirizzo cambiato
+        changed: "Indirizzo cambiato"
       mfa:
         otp:
-          added: OTP aggiunto
-          verified: OTP verificato
-          removed: OTP rimosso
+          added: "OTP aggiunto"
+          verified: "OTP verificato"
+          removed: "OTP rimosso"
           check:
-            succeeded: Controllo OTP riuscito
-            failed: Controllo OTP fallito
+            succeeded: "Controllo OTP riuscito"
+            failed: "Controllo OTP fallito"
           sms:
-            added: Aggiunto SMS OTP
-            removed: OTP SMS rimosso
+            added: "Aggiunta SMS OTP"
+            removed: "SMS OTP rimossa"
             code:
-              added: Aggiunto codice OTP SMS
-              sent: Codice OTP SMS inviato
+              added: "Aggiunto codice OTP SMS"
+              sent: "Codice OTP SMS inviato"
             check:
-              succeeded: Controllo OTP SMS riuscito
-              failed: Controllo OTP SMS fallito
+              succeeded: "Controllo OTP SMS riuscito"
+              failed: "Controllo OTP SMS fallito"
           email:
-            added: Aggiunto OTP e-mail
-            removed: OTP e-mail rimosso
+            added: "Aggiunto OTP e-mail"
+            removed: "OTP e-mail rimosso"
             code:
-              added: Aggiunto codice OTP e-mail
-              sent: Codice OTP e-mail inviato
+              added: "Aggiunto codice OTP e-mail"
+              sent: "Codice OTP e-mail inviato"
             check:
-              succeeded: OTP Controllo e-mail riuscito
-              failed: OTP Controllo e-mail fallito
+              succeeded: "OTP Controllo e-mail riuscito"
+              failed: "OTP Controllo e-mail fallito"
         u2f:
           token:
-            added: Aggiunto il U2F Token
-            verified: U2F Token verificato
-            removed: U2F Token rimosso
+            added: "Aggiunto il U2F Token"
+            verified: "U2F Token verificato"
+            removed: "U2F Token rimosso"
             begin:
-              login: Controllo U2F avviato
+              login: "Controllo U2F avviato"
             check:
-              succeeded: Controllo U2F riuscito
-              failed: Controllo U2F fallito
+              succeeded: "Controllo U2F riuscito"
+              failed: "Controllo U2F fallito"
             signcount:
-              changed: Il checksum del U2F Token è stato cambiato
+              changed: "Il checksum del U2F Token è stato cambiato"
         init:
-          skipped: Inizializzazione saltata
+          skipped: "Inizializzazione saltata"
       passwordless:
         token:
-          added: Aggiunto il token per l'autenticazione con passkey
-          verified: Token per l'autenticazione con passkey verificato
-          removed: Token per l'autenticazione con passkey rimosso
+          added: "Aggiunto il token per l'autenticazione con passkey"
+          verified: "Token per l'autenticazione con passkey verificato"
+          removed: "Token per l'autenticazione con passkey rimosso"
           begin:
-            login: Avviata l'autenticazione con passkey
+            login: "Avviata l'autenticazione con passkey"
           check:
-            succeeded: Controllo dell'autenticazione con passkey riuscito
-            failed: Controllo dell'autenticazione con passkey fallito
+            succeeded: "Controllo dell'autenticazione con passkey riuscito"
+            failed: "Controllo dell'autenticazione con passkey fallito"
           signcount:
-            changed: Il checksum è stato cambiato
+            changed: "Il checksum è stato cambiato"
         initialization:
           code:
-            added: Aggiunto il codice di inizializzazione
-            sent: Codice di inizializzazione inviato
-            requested: Richiesta del codice di inizializzazione
+            added: "Aggiunto il codice di inizializzazione"
+            sent: "Codice di inizializzazione inviato"
+            requested: "Richiesta del codice di inizializzazione"
             check:
-              succeeded: Codice di inizializzazione controllato con successo
-              failed: Controllo del codice di inizializzazione fallito
+              succeeded: "Codice di inizializzazione controllato con successo"
+              failed: "Controllo del codice di inizializzazione fallito"
       signed:
-        out: L'utente è uscito
+        out: "L'utente è uscito"
       refresh:
         token:
-          added: Refresh Token creato
-          renewed: Refresh Token rinnovato
-          removed: Refresh Token rimosso
-    locked: Utente bloccato
-    unlocked: Utente sbloccato
-    deactivated: Utente disattivato
-    reactivated: Utente riattivato
-    removed: Utente rimosso
+          added: "Refresh Token creato"
+          renewed: "Refresh Token rinnovato"
+          removed: "Refresh Token rimosso"
+    locked: "Utente bloccato"
+    unlocked: "Utente sbloccato"
+    deactivated: "Utente disattivato"
+    reactivated: "Utente riattivato"
+    removed: "Utente rimosso"
     password:
-      changed: Password cambiata
+      changed: "Password cambiata"
       code:
-        added: Codice password generato
-        sent: Codice password inviato
+        added: "Codice password generato"
+        sent: "Codice password inviato"
       check:
-        succeeded: Controllo della password riuscito
-        failed: Controllo della password fallito
+        succeeded: "Controllo della password riuscito"
+        failed: "Controllo della password fallito"
     phone:
-      changed: Numero di telefono cambiato
-      verified: Numero di telefono verificato
+      changed: "Numero di telefono cambiato"
+      verified: "Numero di telefono verificato"
       verification:
-        failed: Verifica del numero di telefono non riuscita
+        failed: "Verifica del numero di telefono non riuscita"
       code:
-        added: Codice del numero di telefono generato
-        sent: Codice del numero di telefono inviato
-      removed: Codice del numero di telefono rimosso
+        added: "Codice del numero di telefono generato"
+        sent: "Codice del numero di telefono inviato"
+      removed: "Codice del numero di telefono rimosso"
     profile:
-      changed: Profilo utente cambiato
+      changed: "Profilo utente cambiato"
     address:
-      changed: Indirizzo utente cambiato
+      changed: "Indirizzo utente cambiato"
     mfa:
       otp:
-        added: OTP aggiunto
-        verified: OTP verificato
-        removed: OTP rimosso
+        added: "OTP aggiunto"
+        verified: "OTP verificato"
+        removed: "OTP rimosso"
         check:
-          succeeded: Controllo OTP riuscito
-          failed: Controllo OTP fallito
+          succeeded: "Controllo OTP riuscito"
+          failed: "Controllo OTP fallito"
       init:
-        skipped: Inizializzazione OTP saltata
+        skipped: "Inizializzazione OTP saltata"
     init:
-      skipped: Inizializzazione saltata
+      skipped: "Inizializzazione saltata"
     signed:
-      out: L'utente è uscito
+      out: "L'utente è uscito"
     grant:
-      added: Autorizzazione aggiunta
-      changed: Autorizzazione cambiata
-      removed: Autorizzazione rimossa
-      deactivated: Autorizzazione disattivata
-      reactivated: Autorizzazione riattivata
-      reserved: Autorizzazione riservata
-      released: Autorizzazione rilasciata
+      added: "Autorizzazione aggiunta"
+      changed: "Autorizzazione cambiata"
+      removed: "Autorizzazione rimossa"
+      deactivated: "Autorizzazione disattivata"
+      reactivated: "Autorizzazione riattivata"
+      reserved: "Autorizzazione riservata"
+      released: "Autorizzazione rilasciata"
       cascade:
-        removed: Autorizzazione rimossa
-        changed: Autorizzazione cambiata
+        removed: "Autorizzazione rimossa"
+        changed: "Autorizzazione cambiata"
     metadata:
-      set: Set di metadati utente
-      removed: Metadati utente rimossi
-      removed.all: Tutti i metadati utente rimossi
+      set: "Set di metadati utente"
+      removed: "Metadati utente rimossi"
+      removed.all: "Tutti i metadati utente rimossi"
     domain:
-      claimed: Dominio rivendicato
-      claimed.sent: Notifica di rivendicazione del dominio inviata
+      claimed: "Dominio rivendicato"
+      claimed.sent: "Notifica di rivendicazione del dominio inviata"
     pat:
-      added: Aggiunto token di accesso personale
-      removed: Token di accesso personale rimosso
+      added: "Aggiunto token di accesso personale"
+      removed: "Token di accesso personale rimosso"
   org:
-    added: Organizzazione aggiunta
-    changed: Organizzazione cambiata
-    deactivated: Organizzazione disattivata
-    reactivated: Organizzazione riattivata
-    removed: Organizzazione rimossa
+    added: "Organizzazione aggiunta"
+    changed: "Organizzazione cambiata"
+    deactivated: "Organizzazione disattivata"
+    reactivated: "Organizzazione riattivata"
+    removed: "Organizzazione rimossa"
     domain:
-      added: Dominio aggiunto
+      added: "Dominio aggiunto"
       verification:
-        added: Aggiunta la verifica del dominio
-        failed: Verifica del dominio fallita
-      verified: Dominio verificato
-      removed: Dominio rimosso
+        added: "Aggiunta la verifica del dominio"
+        failed: "Verifica del dominio fallita"
+      verified: "Dominio verificato"
+      removed: "Dominio rimosso"
       primary:
-        set: Set di dominio primario
-      reserved: Dominio riservato
-      released: Dominio rilasciato
+        set: "Set di dominio primario"
+      reserved: "Dominio riservato"
+      released: "Dominio rilasciato"
     name:
-      reserved: Nome dell'organizzazione riservato
-      released: Nome dell'organizzazione rilasciata
+      reserved: "Nome dell'organizzazione riservato"
+      released: "Nome dell'organizzazione rilasciata"
     member:
-      added: Membro dell'organizzazione aggiunto
-      changed: Membro dell'organizzazione cambiato
-      removed: Membro dell'organizzazione rimosso
+      added: "Membro dell'organizzazione aggiunto"
+      changed: "Membro dell'organizzazione cambiato"
+      removed: "Membro dell'organizzazione rimosso"
       cascade:
-        removed: Cascata di membri dell'organizzazione rimossa
+        removed: "Cascata di membri dell'organizzazione rimossa"
     iam:
       policy:
-        added: Impostazioni IAM aggiunti
-        changed: Impostazioni IAM cambiate
-        removed: Impostazioni IAM rimosse
+        added: "Impostazioni IAM aggiunti"
+        changed: "Impostazioni IAM cambiate"
+        removed: "Impostazioni IAM rimosse"
     idp:
       config:
-        added: Configurazione IDP aggiunta
-        changed: Configurazione IDP cambiata
-        removed: Configurazione IDP rimossa
-        deactivated: Configurazione IDP disattivata
-        reactivated: Configurazione IDP riattivata
+        added: "Configurazione IDP aggiunta"
+        changed: "Configurazione IDP cambiata"
+        removed: "Configurazione IDP rimossa"
+        deactivated: "Configurazione IDP disattivata"
+        reactivated: "Configurazione IDP riattivata"
       oidc:
         config:
-          added: Aggiunta la configurazione IDP OIDC
-          changed: Configurazione IDP OIDC modificata
+          added: "Aggiunta la configurazione IDP OIDC"
+          changed: "Configurazione IDP OIDC modificata"
       saml:
         config:
-          added: Aggiunta la configurazione IDP SAML
-          changed: Configurazione IDP SAML modificata
+          added: "Aggiunta la configurazione IDP SAML"
+          changed: "Configurazione IDP SAML modificata"
       jwt:
         config:
-          added: Aggiunta la configurazione IDP JWT
-          changed: La configurazione dell'IDP JWT è stata modificata
+          added: "Aggiunta la configurazione IDP JWT"
+          changed: "La configurazione dell'IDP JWT è stata modificata"
     customtext:
-      set: Testo personalizzato salvato
-      removed: Testo personalizzato rimosso
+      set: "Testo personalizzato salvato"
+      removed: "Testo personalizzato rimosso"
       template:
-        removed: Template personalizzato rimosso
+        removed: "Template personalizzato rimosso"
     policy:
       login:
-        added: Le mpostazioni di accesso sono state aggiunte con successo.
-        changed: Impostazioni di accesso modificate
-        removed: Impostazioni di accesso rimosse
+        added: "Le mpostazioni di accesso sono state aggiunte con successo."
+        changed: "Impostazioni di accesso modificate"
+        removed: "Impostazioni di accesso rimosse"
         idpprovider:
-          added: IDP aggiunto alle impostazioni di accesso
-          removed: IDP rimosso dalle impostazioni di accesso
+          added: "IDP aggiunto alle impostazioni di accesso"
+          removed: "IDP rimosso dalle impostazioni di accesso"
           cascade:
-            removed: Cascata di provider di identità rimossa dalla policy di accesso
+            removed: "Cascata di provider di identità rimossa dalla policy di accesso"
         secondfactor:
-          added: Secondo fattore aggiunto alle impostazioni di accesso
-          removed: Secondo fattore rimosso dalle impostazioni di accesso
+          added: "Secondo fattore aggiunto alle impostazioni di accesso"
+          removed: "Secondo fattore rimosso dalle impostazioni di accesso"
         multifactor:
-          added: Aggiunto il fattore multiplo alle impostazioni di accesso
-          removed: Fattore multiplo rimosso dalle impostazioni di accesso
+          added: "Aggiunto il fattore multiplo alle impostazioni di accesso"
+          removed: "Fattore multiplo rimosso dalle impostazioni di accesso"
       password:
         complexity:
-          added: Le impostazioni di complessità delle password sono state aggiunte con successo
-          changed: Le impostazioni di complessità delle password sono state cambiate
-          removed: Le impostazioni di complessità della password sono state rimosse
+          added: "Le impostazioni di complessità delle password sono state aggiunte con successo"
+          changed: "Le impostazioni di complessità delle password sono state cambiate"
+          removed: "Le impostazioni di complessità della password sono state rimosse"
         age:
-          added: Le impostazioni di validità della password
-          changed: Le impostazioni di validità della password sono state cambiate
-          removed: Le impostazioni di validità della password sono state rimosse con successo
+          added: "Le impostazioni di validità della password"
+          changed: "Le impostazioni di validità della password sono state cambiate"
+          removed: "Le impostazioni di validità della password sono state rimosse con successo"
         lockout:
-          added: Le impostazioni di blocco della password sono state aggiunte con successo.
-          changed: Le impostazioni di blocco della password sono state cambiate
-          removed: Le impostazioni di blocco della password sono state rimosse con successo
+          added: "Le impostazioni di blocco della password sono state aggiunte con successo."
+          changed: "Le impostazioni di blocco della password sono state cambiate"
+          removed: "Le impostazioni di blocco della password sono state rimosse con successo"
       label:
-        added: Impostazioni Private Labelling aggiunte
-        changed: Impostazioni Private Labelling cambiate
-        activated: Impostazioni Private Labelling attivate
-        removed: Impostazioni Private Labelling rimosse
+        added: "Impostazioni Private Labelling aggiunte"
+        changed: "Impostazioni Private Labelling cambiate"
+        activated: "Impostazioni Private Labelling attivate"
+        removed: "Impostazioni Private Labelling rimosse"
         logo:
-          added: Logo aggiunto
-          removed: Logo rimosso
+          added: "Logo aggiunto"
+          removed: "Logo rimosso"
           dark:
-            added: Logo (modalità scura) aggiunto
-            removed: Logo (modalità scura) rimosso
+            added: "Logo (modalità scura) aggiunto"
+            removed: "Logo (modalità scura) rimosso"
         icon:
-          added: Icona aggiunta
-          removed: Icona rimossa
+          added: "Icona aggiunta"
+          removed: "Icona rimossa"
           dark:
-            added: Icona (modalità scura) aggiunta
-            removed: Icona (modalità scura) rimossa
+            added: "Icona (modalità scura) aggiunta"
+            removed: "Icona (modalità scura) rimossa"
         font:
-          added: Font aggiunto
-          removed: Font rimosso
+          added: "Font aggiunto"
+          removed: "Font rimosso"
         assets:
-          removed: Asset rimosse
+          removed: "Asset rimosse"
       privacy:
-        added: Informativa sulla privacy e termini e condizioni aggiunti
-        changed: Informativa sulla privacy e termini e condizioni cambiati
-        removed: Informativa sulla privacy e termini e condizioni rimossi
+        added: "Informativa sulla privacy e termini e condizioni aggiunti"
+        changed: "Informativa sulla privacy e termini e condizioni cambiati"
+        removed: "Informativa sulla privacy e termini e condizioni rimossi"
       domain:
-        added: Aggiunta politica di dominio
-        changed: La politica del dominio è cambiata
-        removed: Politica del dominio rimossa
+        added: "Aggiunta politica di dominio"
+        changed: "La politica del dominio è cambiata"
+        removed: "Politica del dominio rimossa"
       lockout:
-        added: Lockout policy added
-        changed: Lockout policy changed
-        removed: Lockout policy removed
+        added: "Lockout policy added"
+        changed: "Lockout policy changed"
+        removed: "Lockout policy removed"
       notification:
-        added: Impostazione di notifica creata
-        changed: Impostazione di notifica cambiata
-        removed: Impostazione di notifica rimossa
+        added: "Impostazione di notifica creata"
+        changed: "Impostazione di notifica cambiata"
+        removed: "Impostazione di notifica rimossa"
     flow:
       trigger_actions:
-        set: azioni salvate
+        set: "azioni salvate"
         cascade:
-          removed: Azioni a cascata rimosse
-        removed: Azioni rimosse
-      cleared: Il flusso è stato eliminato
+          removed: "Azioni a cascata rimosse"
+        removed: "Azioni rimosse"
+      cleared: "Il flusso è stato eliminato"
     mail:
       template:
-        added: Aggiunto modello di posta elettronica
-        changed: Il modello di posta elettronica è stato modificato
-        removed: Modello di posta elettronica rimosso
+        added: "Aggiunto modello di posta elettronica"
+        changed: "Il modello di posta elettronica è stato modificato"
+        removed: "Modello di posta elettronica rimosso"
       text:
-        added: Aggiunto il testo dell'e-mail
-        changed: Il testo dell'e-mail è stato modificato
-        removed: Testo dell'e-mail rimosso
+        added: "Aggiunto il testo dell'e-mail"
+        changed: "Il testo dell'e-mail è stato modificato"
+        removed: "Testo dell'e-mail rimosso"
     metadata:
-      removed: Metadati rimossi
-      removed.all: Tutti i metadati rimossi
-      set: Insieme di metadati
+      removed: "Metadati rimossi"
+      removed.all: "Tutti i metadati rimossi"
+      set: "Insieme di metadati"
   project:
-    added: Progetto aggiunto
-    changed: Progetto cambiato
-    deactivated: Progetto disattivato
-    reactivated: Progetto riattivato
-    removed: Progetto rimosso
+    added: "Progetto aggiunto"
+    changed: "Progetto cambiato"
+    deactivated: "Progetto disattivato"
+    reactivated: "Progetto riattivato"
+    removed: "Progetto rimosso"
     member:
-      added: Membro del progetto aggiunto
-      changed: Membro del progetto cambiato
-      removed: Membro del progetto rimosso
+      added: "Membro del progetto aggiunto"
+      changed: "Membro del progetto cambiato"
+      removed: "Membro del progetto rimosso"
       cascade:
-        removed: Cascata di membri del progetto rimossa
+        removed: "Cascata di membri del progetto rimossa"
     role:
-      added: Ruolo del progetto aggiunto
-      changed: Il ruolo del progetto è cambiato
-      removed: Ruolo del progetto rimosso
+      added: "Ruolo del progetto aggiunto"
+      changed: "Il ruolo del progetto è cambiato"
+      removed: "Ruolo del progetto rimosso"
     grant:
-      added: Grant aggiunto
-      changed: Grant cambiato
-      removed: Grant rimosso
-      deactivated: Grant disattivato
-      reactivated: Grant riattivato
+      added: "Grant aggiunto"
+      changed: "Grant cambiato"
+      removed: "Grant rimosso"
+      deactivated: "Grant disattivato"
+      reactivated: "Grant riattivato"
       cascade:
-        changed: Grant cambiato
+        changed: "Grant cambiato"
       member:
-        added: Grant Member aggiunto
-        changed: Grant Member cambiato
-        removed: Grant Member rimosso
+        added: "Grant Member aggiunto"
+        changed: "Grant Member cambiato"
+        removed: "Grant Member rimosso"
         cascade:
-          removed: Cascata di Grant Member rimossa
+          removed: "Cascata di Grant Member rimossa"
     application:
-      added: Applicazione aggiunta
-      changed: Applicazione cambiata
-      removed: Applicazione rimossa
-      deactivated: Applicazione disattivata
-      reactivated: Applicazione riattivata
+      added: "Applicazione aggiunta"
+      changed: "Applicazione cambiata"
+      removed: "Applicazione rimossa"
+      deactivated: "Applicazione disattivata"
+      reactivated: "Applicazione riattivata"
       oidc:
         secret:
           check:
-            succeeded: Validazione OIDC Client Secret riuscita
-            failed: VAidazione OIDC Client Secret fallita
+            succeeded: "Validazione OIDC Client Secret riuscita"
+            failed: "VAidazione OIDC Client Secret fallita"
         key:
-          added: Chiave di applicazione aggiunta
-          removed: Chiave di applicazione rimossa
+          added: "Chiave di applicazione aggiunta"
+          removed: "Chiave di applicazione rimossa"
       api:
         secret:
           check:
-            succeeded: Il controllo del segreto API è riuscito
-            failed: Il controllo del segreto API non è riuscito
+            succeeded: "Il controllo del segreto API è riuscito"
+            failed: "Il controllo del segreto API non è riuscito"
       config:
         saml:
-          added: Configurazione SAML aggiunta
-          changed: Configurazione SAML modificata
+          added: "Configurazione SAML aggiunta"
+          changed: "Configurazione SAML modificata"
         oidc:
-          added: Configurazione OIDC aggiunta
-          changed: Configurazione OIDC modificata
+          added: "Configurazione OIDC aggiunta"
+          changed: "Configurazione OIDC modificata"
           secret:
-            changed: Segreto OIDC cambiato
-            updated: Hash segreto OIDC aggiornato
+            changed: "Segreto OIDC cambiato"
+            updated: "Hash segreto OIDC aggiornato"
         api:
-          added: Configurazione API aggiunta
-          changed: Configurazione API modificata
+          added: "Configurazione API aggiunta"
+          changed: "Configurazione API modificata"
           secret:
-            changed: Segreto API cambiato
-            updated: Hash segreto API aggiornato
+            changed: "Segreto API cambiato"
+            updated: "Hash segreto API aggiornato"
   policy:
     password:
       complexity:
-        added: Le impostazioni di complessità delle password sono state aggiunte con successo
-        changed: Le impostazioni di complessità delle password sono state cambiate
+        added: "Le impostazioni di complessità delle password sono state aggiunte con successo"
+        changed: "Le impostazioni di complessità delle password sono state cambiate"
       age:
-        added: Le impostazioni di validità della password sono state aggiunte con successo.
-        changed: Le impostazioni di validità della password sono state cambiate
+        added: "Le impostazioni di validità della password sono state aggiunte con successo."
+        changed: "Le impostazioni di validità della password sono state cambiate"
       lockout:
-        added: Le impostazioni di blocco della password sono state aggiunte.
-        changed: Le impostazioni di blocco della password sono state cambiate.
+        added: "Le impostazioni di blocco della password sono state aggiunte."
+        changed: "Le impostazioni di blocco della password sono state cambiate."
   iam:
     setup:
-      started: Avviato il setup di Zitadel
-      done: setup di Zitadel fatto
+      started: "Avviato il setup di Zitadel"
+      done: "setup di Zitadel fatto"
     global:
       org:
-        set: Organizzazione glabale di Zitadel salvata
+        set: "Organizzazione glabale di Zitadel salvata"
     project:
       iam:
-        set: progetto Zitadel salvato
+        set: "progetto Zitadel salvato"
     member:
-      added: Zitadel membro aggiunto
-      changed: Zitadel membro cambiato
-      removed: Zitadel membro rimosso
+      added: "Zitadel membro aggiunto"
+      changed: "Zitadel membro cambiato"
+      removed: "Zitadel membro rimosso"
       cascade:
-        removed: Membro Zitadel rimosso a cascata
+        removed: "Membro Zitadel rimosso a cascata"
     idp:
       config:
-        added: Configurazione IDP aggiunta
-        changed: Configurazione IDP cambiata
-        removed: Configurazione IDP rimossa
-        deactivated: Configurazione IDP disattivata
-        reactivated: Configurazione IDP riattivata
+        added: "Configurazione IDP aggiunta"
+        changed: "Configurazione IDP cambiata"
+        removed: "Configurazione IDP rimossa"
+        deactivated: "Configurazione IDP disattivata"
+        reactivated: "Configurazione IDP riattivata"
       oidc:
         config:
-          added: Aggiunta la configurazione IDP OIDC
-          changed: Configurazione IDP OIDC modificata
+          added: "Aggiunta la configurazione IDP OIDC"
+          changed: "Configurazione IDP OIDC modificata"
       saml:
         config:
-          added: Aggiunta la configurazione IDP SAML
-          changed: La configurazione dell'IDP SAML è stata modificata
+          added: "Aggiunta la configurazione IDP SAML"
+          changed: "La configurazione dell'IDP SAML è stata modificata"
       jwt:
         config:
-          added: Aggiunta la configurazione JWT al provider di identità
-          changed: Configurazione JWT dal provider di identità rimossa
+          added: "Aggiunta la configurazione JWT al provider di identità"
+          changed: "Configurazione JWT dal provider di identità rimossa"
     customtext:
-      set: Il testo è stato impostato
-      removed: Il testo è stato rimosso
+      set: "Il testo è stato impostato"
+      removed: "Il testo è stato rimosso"
     policy:
       login:
-        added: Le impostazioni di accesso predefinite sono state aggiunte.
-        changed: Le impostazioni di accesso predefinite sono state cambiate.
+        added: "Le impostazioni di accesso predefinite sono state aggiunte."
+        changed: "Le impostazioni di accesso predefinite sono state cambiate."
         idpprovider:
-          added: IDP aggiunto alle impostazioni di accesso predefinite
-          removed: IDP rimosso dalle impostazioni di accesso predefinite
+          added: "IDP aggiunto alle impostazioni di accesso predefinite"
+          removed: "IDP rimosso dalle impostazioni di accesso predefinite"
       label:
-        added: Le impostazioni Private Labelling sono state aggiunte.
-        changed: Le impostazioni Private Labelling sono state cambiate.
-        activated: Private Labelling attivato
+        added: "Le impostazioni Private Labelling sono state aggiunte."
+        changed: "Le impostazioni Private Labelling sono state cambiate."
+        activated: "Private Labelling attivato"
         logo:
-          added: Logo aggiunto
-          removed: Logo rimosso
+          added: "Logo aggiunto"
+          removed: "Logo rimosso"
           dark:
-            added: Logo (modalità scura) aggiunto
-            removed: Logo (modalità scura) rimosso
+            added: "Logo (modalità scura) aggiunto"
+            removed: "Logo (modalità scura) rimosso"
         icon:
-          added: Icona aggiunta
-          removed: Icona rimossa
+          added: "Icona aggiunta"
+          removed: "Icona rimossa"
           dark:
-            added: Icona (modalità scura) aggiunta
-            removed: Icona (modalità scura) rimossa
+            added: "Icona (modalità scura) aggiunta"
+            removed: "Icona (modalità scura) rimossa"
         font:
-          added: Font aggiunto
-          removed: Font rimosso
+          added: "Font aggiunto"
+          removed: "Font rimosso"
         assets:
-          removed: Asset rimosse
+          removed: "Asset rimosse"
     default:
       language:
-        set: lingua predefinita impostata
+        set: "lingua predefinita impostata"
     oidc:
       settings:
-        added: Configurazione OIDC aggiunta
-        changed: Configurazione OIDC cambiata
-        removed: Configurazione OIDC rimossa
+        added: "Configurazione OIDC aggiunta"
+        changed: "Configurazione OIDC cambiata"
+        removed: "Configurazione OIDC rimossa"
     secret:
       generator:
-        added: Generatore di segreti aggiunto
-        changed: Generatore di segreti cambiato
-        removed: Generatore di segreti cambiato
+        added: "Generatore di segreti aggiunto"
+        changed: "Generatore di segreti cambiato"
+        removed: "Generatore di segreti cambiato"
     smtp:
       config:
-        added: SMTP configuration added
-        changed: SMTP configuration changed
-        activated: Configurazione SMTP attivata
-        deactivated: Configurazione SMTP disattivata
-        removed: Configurazione SMTP rimossa
+        added: "SMTP configuration added"
+        changed: "SMTP configuration changed"
+        activated: "Configurazione SMTP attivata"
+        deactivated: "Configurazione SMTP disattivata"
+        removed: "Configurazione SMTP rimossa"
         password:
-          changed: SMTP configuration secret changed
+          changed: "SMTP configuration secret changed"
     sms:
       config:
         twilio:
-          added: Aggiunto il fornitore di SMS Twilio
-          changed: Twilio SMS Provider cambiato
+          added: "Aggiunto il fornitore di SMS Twilio"
+          changed: "Twilio SMS Provider cambiato"
           token:
-            changed: Twilio SMS Provider token cambiato
-          removed: Provider SMS Twilio rimosso
-          activated: Provider SMS Twilio attivato
-          deactivated: Provider SMS Twilio disattivato
+            changed: "Twilio SMS Provider token cambiato"
+          removed: "Provider SMS Twilio rimosso"
+          activated: "Provider SMS Twilio attivato"
+          deactivated: "Provider SMS Twilio disattivato"
   key_pair:
-    added: Keypair aggiunto
+    added: "Keypair aggiunto"
     certificate:
-      added: Certificato aggiunto
+      added: "Certificato aggiunto"
   action:
-    added: Azione aggiunta
-    changed: Azione cambiata
-    deactivated: Azione disattivata
-    reactivated: Azione riattivata
-    removed: Azione rimossa
+    added: "Azione aggiunta"
+    changed: "Azione cambiata"
+    deactivated: "Azione disattivata"
+    reactivated: "Azione riattivata"
+    removed: "Azione rimossa"
   instance:
-    added: Istanza aggiunta
-    changed: L'istanza è cambiata
+    added: "Istanza aggiunta"
+    changed: "L'istanza è cambiata"
     customtext:
-      removed: Testo personalizzato rimosso
-      set: Set di testo personalizzato
+      removed: "Testo personalizzato rimosso"
+      set: "Set di testo personalizzato"
       template:
-        removed: Modello di testo personalizzato rimosso
+        removed: "Modello di testo personalizzato rimosso"
     default:
       language:
-        set: Lingua predefinita impostata
+        set: "Lingua predefinita impostata"
       org:
-        set: Insieme di organizzazioni predefinito
+        set: "Insieme di organizzazioni predefinito"
     domain:
-      added: Dominio aggiunto
+      added: "Dominio aggiunto"
       primary:
-        set: Insieme di domini primari
-      removed: Dominio rimosso
+        set: "Insieme di domini primari"
+      removed: "Dominio rimosso"
     iam:
       console:
-        set: Set di applicazioni per la console di gestione Zitadel
+        set: "Set di applicazioni per la console di gestione Zitadel"
       project:
-        set: Set progetto Zitadel
+        set: "Set progetto Zitadel"
     mail:
       template:
-        added: Aggiunto modello di posta elettronica
-        changed: Il modello di posta elettronica è stato modificato
+        added: "Aggiunto modello di posta elettronica"
+        changed: "Il modello di posta elettronica è stato modificato"
       text:
-        added: Aggiunto il testo dell'e-mail
-        changed: Il testo dell'e-mail è stato modificato
+        added: "Aggiunto il testo dell'e-mail"
+        changed: "Il testo dell'e-mail è stato modificato"
     member:
-      added: Membro dell'istanza aggiunto
-      changed: Il membro dell'istanza è cambiato
-      removed: Membro dell'istanza rimosso
+      added: "Membro dell'istanza aggiunto"
+      changed: "Il membro dell'istanza è cambiato"
+      removed: "Membro dell'istanza rimosso"
       cascade:
-        removed: Cascata di membri dell'istanza rimossa
+        removed: "Cascata di membri dell'istanza rimossa"
     notification:
       provider:
         debug:
-          fileadded: Aggiunto provider di notifiche di debug dei file
-          filechanged: Il provider delle notifiche di debug dei file è stato modificato
-          fileremoved: Provider di notifiche di debug del file rimosso
-          logadded: Aggiunto provider di notifiche di debug del registro
-          logchanged: Il provider delle notifiche di debug del registro è stato modificato
-          logremoved: Provider di notifiche di debug del registro rimosso
+          fileadded: "Aggiunto provider di notifiche di debug dei file"
+          filechanged: "Il provider delle notifiche di debug dei file è stato modificato"
+          fileremoved: "Provider di notifiche di debug del file rimosso"
+          logadded: "Aggiunto provider di notifiche di debug del registro"
+          logchanged: "Il provider delle notifiche di debug del registro è stato modificato"
+          logremoved: "Provider di notifiche di debug del registro rimosso"
     oidc:
       settings:
-        added: Aggiunte impostazioni OIDC
-        changed: Le impostazioni OIDC sono state modificate
+        added: "Aggiunte impostazioni OIDC"
+        changed: "Le impostazioni OIDC sono state modificate"
     policy:
       domain:
-        added: Aggiunta politica di dominio
-        changed: Domain policy changed
+        added: "Aggiunta politica di dominio"
+        changed: "Domain policy changed"
       label:
-        activated: Criterio etichetta attivato
-        added: Aggiunta la politica sull'etichetta
+        activated: "Criterio etichetta attivato"
+        added: "Aggiunta la politica sull'etichetta"
         assets:
-          removed: Risorsa dalla norma sull'etichetta rimossa
-        changed: La politica sull'etichetta è cambiata
+          removed: "Risorsa dalla norma sull'etichetta rimossa"
+        changed: "La politica sull'etichetta è cambiata"
         font:
-          added: Carattere aggiunto ai criteri di etichetta
-          removed: Carattere rimosso dai criteri di etichetta
+          added: "Carattere aggiunto ai criteri di etichetta"
+          removed: "Carattere rimosso dai criteri di etichetta"
         icon:
-          added: Icona aggiunta al criterio dell'etichetta
-          removed: Icona rimossa dal criterio di etichetta
+          added: "Icona aggiunta al criterio dell'etichetta"
+          removed: "Icona rimossa dal criterio di etichetta"
           dark:
-            added: Icona aggiunta al criterio dell'etichetta oscura
-            removed: Icona rimossa dal criterio dell'etichetta oscura
+            added: "Icona aggiunta al criterio dell'etichetta oscura"
+            removed: "Icona rimossa dal criterio dell'etichetta oscura"
         logo:
-          added: Logo aggiunto alla politica sull'etichetta
-          removed: Logo rimosso dalla politica sull'etichetta
+          added: "Logo aggiunto alla politica sull'etichetta"
+          removed: "Logo rimosso dalla politica sull'etichetta"
           dark:
-            added: Logo aggiunto alla politica delle etichette scure
-            removed: Logo rimosso dalla politica delle etichette scure
+            added: "Logo aggiunto alla politica delle etichette scure"
+            removed: "Logo rimosso dalla politica delle etichette scure"
       lockout:
-        added: Aggiunta politica di blocco
-        changed: La politica di blocco è cambiata
+        added: "Aggiunta politica di blocco"
+        changed: "La politica di blocco è cambiata"
       login:
-        added: Criteri di accesso aggiunti
-        changed: La politica di accesso è cambiata
+        added: "Criteri di accesso aggiunti"
+        changed: "La politica di accesso è cambiata"
         idpprovider:
-          added: Provider di identità aggiunto alla policy di accesso
+          added: "Provider di identità aggiunto alla policy di accesso"
           cascade:
-            removed: Cascata di provider di identità rimossa dalla policy di accesso
-          removed: Provider di identità rimosso dalla policy di accesso
+            removed: "Cascata di provider di identità rimossa dalla policy di accesso"
+          removed: "Provider di identità rimosso dalla policy di accesso"
         multifactor:
-          added: Multifattore aggiunto alla policy di accesso
-          removed: Multifattore rimosso dalla policy di accesso
+          added: "Multifattore aggiunto alla policy di accesso"
+          removed: "Multifattore rimosso dalla policy di accesso"
         secondfactor:
-          added: Secondo fattore aggiunto alla politica di accesso
-          removed: Secondo fattore rimosso dalla politica di accesso
+          added: "Secondo fattore aggiunto alla politica di accesso"
+          removed: "Secondo fattore rimosso dalla politica di accesso"
       password:
         age:
-          added: Aggiunta politica sull'età della password
-          changed: La politica di validità della password è cambiata
+          added: "Aggiunta politica sull'età della password"
+          changed: "La politica di validità della password è cambiata"
         complexity:
-          added: Aggiunta policy sulla complessità della password
-          changed: Criterio di complessità della password rimosso
+          added: "Aggiunta policy sulla complessità della password"
+          changed: "Criterio di complessità della password rimosso"
       privacy:
-        added: Aggiunta informativa sulla privacy
-        changed: L'informativa sulla privacy è cambiata
+        added: "Aggiunta informativa sulla privacy"
+        changed: "L'informativa sulla privacy è cambiata"
       security:
-        set: Insieme di politiche di sicurezza
-
-    removed: Istanza rimossa
+        set: "Insieme di politiche di sicurezza"
+    removed: "Istanza rimossa"
     secret:
       generator:
-        added: Aggiunto generatore segreto
-        changed: Il generatore segreto è cambiato
-        removed: Generatore segreto rimosso
+        added: "Aggiunto generatore segreto"
+        changed: "Il generatore segreto è cambiato"
+        removed: "Generatore segreto rimosso"
     sms:
       configtwilio:
-        activated: Configurazione SMS Twilio attivata
-        added: Aggiunta la configurazione SMS di Twilio
-        changed: La configurazione SMS di Twilio è stata modificata
-        deactivated: Configurazione SMS Twilio disattivata
-        removed: Configurazione SMS di Twilio rimossa
+        activated: "Configurazione SMS Twilio attivata"
+        added: "Aggiunta la configurazione SMS di Twilio"
+        changed: "La configurazione SMS di Twilio è stata modificata"
+        deactivated: "Configurazione SMS Twilio disattivata"
+        removed: "Configurazione SMS di Twilio rimossa"
         token:
-          changed: La configurazione del token di Twilio SMS è stata modificata
+          changed: "La configurazione del token di Twilio SMS è stata modificata"
     smtp:
       config:
-        added: Aggiunta configurazione SMTP
-        changed: La configurazione SMTP è stata modificata
-        activated: Configurazione SMTP attivata
-        deactivated: Configurazione SMTP disattivata
+        added: "Aggiunta configurazione SMTP"
+        changed: "La configurazione SMTP è stata modificata"
+        activated: "Configurazione SMTP attivata"
+        deactivated: "Configurazione SMTP disattivata"
         password:
-          changed: La password della configurazione SMTP è cambiata
-        removed: Configurazione SMTP rimossa
+          changed: "La password della configurazione SMTP è cambiata"
+        removed: "Configurazione SMTP rimossa"
   user_schema:
-    created: Schema utente creato
-    updated: Schema utente aggiornato
-    deactivated: Schema utente disattivato
-    reactivated: Schema utente riattivato
-    deleted: Schema utente eliminato
+    created: "Schema utente creato"
+    updated: "Schema utente aggiornato"
+    deactivated: "Schema utente disattivato"
+    reactivated: "Schema utente riattivato"
+    deleted: "Schema utente eliminato"
     user:
-      created: Utente creato
-      updated: Utente aggiornato
-      deleted: Utente eliminato
+      created: "Utente creato"
+      updated: "Utente aggiornato"
+      deleted: "Utente eliminato"
       email:
-        updated: Indirizzo email modificato
-        verified: Indirizzo email verificato
+        updated: "Indirizzo email modificato"
+        verified: "Indirizzo email verificato"
         verification:
-          failed: Verifica indirizzo email non riuscita
+          failed: "Verifica indirizzo email non riuscita"
         code:
-          added: Codice di verifica indirizzo email generato
-          sent: Codice di verifica indirizzo email inviato
+          added: "Codice di verifica indirizzo email generato"
+          sent: "Codice di verifica indirizzo email inviato"
       phone:
-        updated: Numero di telefono modificato
-        verified: Numero di telefono verificato
+        updated: "Numero di telefono modificato"
+        verified: "Numero di telefono verificato"
         verification:
-          failed: Verifica numero di telefono non riuscita
+          failed: "Verifica numero di telefono non riuscita"
         code:
-          added: Codice di verifica numero di telefono generato
-          sent: Codice di verifica numero di telefono inviato
+          added: "Codice di verifica numero di telefono generato"
+          sent: "Codice di verifica numero di telefono inviato"
   web_key:
-    added: Web Key aggiunto
-    activated: Web Key attivato
-    deactivated: Web Key disattivato
-    removed: Web Key rimosso
-
+    added: "Web Key aggiunto"
+    activated: "Web Key attivato"
+    deactivated: "Web Key disattivato"
+    removed: "Web Key rimosso"
 Application:
   OIDC:
-    UnsupportedVersion: La tua versione di OIDC non è supportata
+    UnsupportedVersion: "La tua versione di OIDC non è supportata"
     V1:
-      NotCompliant: La tua configurazione non è conforme e differisce dallo standard OIDC 1.0.
-      NoRedirectUris: Deve essere registrato almeno un URI di reindirizzamento.
-      NotAllCombinationsAreAllowed: La configurazione è conforme, ma non tutte le combinazioni possibili sono permesse.
+      NotCompliant: "La tua configurazione non è conforme e differisce dallo standard OIDC 1.0."
+      NoRedirectUris: "Deve essere registrato almeno un URI di reindirizzamento."
+      NotAllCombinationsAreAllowed: "La configurazione è conforme, ma non tutte le combinazioni possibili sono permesse."
       Code:
         RedirectUris:
-          HttpOnlyForWeb: Grant Type Implicit consente reindirizzamenti http solo per AppType Web
-          CustomOnlyForNative: Grant Type permette solo URI di reindirizzamento personalizzati per AppType native (ad esempio appname:// )
+          HttpOnlyForWeb: "Grant Type Implicit consente reindirizzamenti http solo per AppType Web"
+          CustomOnlyForNative: "Grant Type permette solo URI di reindirizzamento personalizzati per AppType native (ad esempio appname:// )"
       Implicit:
         RedirectUris:
-          CustomNotAllowed: Grant Type non permette URI di reindirizzamento personalizzati
-          HttpNotAllowed: Grant Type implicito non permette URI di reindirizzamento http
-          HttpLocalhostOnlyForNative: http://localhost redirect uri è consentito solo per le applicazioni native.
+          CustomNotAllowed: "Grant Type non permette URI di reindirizzamento personalizzati"
+          HttpNotAllowed: "Grant Type implicito non permette URI di reindirizzamento http"
+          HttpLocalhostOnlyForNative: "http://localhost redirect uri è consentito solo per le applicazioni native."
       Native:
         AuthMethodType:
-          NotNone: Le applicazioni native dovrebbero avere authmethodtype none.
+          NotNone: "Le applicazioni native dovrebbero avere authmethodtype none."
         RedirectUris:
-          MustBeHttpLocalhost: Gli URI di reindirizzamento devono iniziare con il proprio protocollo, http://127.0.0.1, http://[::1] o http://localhost.
+          MustBeHttpLocalhost: "Gli URI di reindirizzamento devono iniziare con il proprio protocollo, http://127.0.0.1, http://[::1] o http://localhost."
       UserAgent:
         AuthMethodType:
-          NotNone: L'app agente utente dovrebbe avere authmethodtype none.
+          NotNone: "L'app agente utente dovrebbe avere authmethodtype none."
       GrantType:
         Refresh:
-          NoAuthCode: Refresh Token consentito solo in combinazione con Authorization Code.
-
+          NoAuthCode: "Refresh Token consentito solo in combinazione con Authorization Code."
 Action:
   Flow:
     Type:
-      Unspecified: Non specificato
-      ExternalAuthentication: Autenticazione esterna
-      CustomiseToken: Completare Token
-      InternalAuthentication: Autenticazione interna
-      CustomizeSAMLResponse: Completare SAMLResponse
+      Unspecified: "Non specificato"
+      ExternalAuthentication: "Autenticazione esterna"
+      CustomiseToken: "Completare Token"
+      InternalAuthentication: "Autenticazione interna"
+      CustomizeSAMLResponse: "Completare SAMLResponse"
   TriggerType:
-    Unspecified: Non specificato
-    PostAuthentication: Post-autenticazione
-    PreCreation: Pre-creazione
-    PostCreation: Creazione successiva
-    PreUserinfoCreation: Pre userinfo creazione
-    PreAccessTokenCreation: Pre access token creazione
-    PreSAMLResponseCreation: Pre SAMLResponse creazione
+    Unspecified: "Non specificato"
+    PostAuthentication: "Post-autenticazione"
+    PreCreation: "Pre-creazione"
+    PostCreation: "Creazione successiva"
+    PreUserinfoCreation: "Pre userinfo creazione"
+    PreAccessTokenCreation: "Pre access token creazione"
+    PreSAMLResponseCreation: "Pre SAMLResponse creazione"

@@ -3,6 +3,7 @@ package notification
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/zitadel/logging"
 
@@ -35,7 +36,8 @@ func Register(
 	commands *command.Commands,
 	queries *query.Queries,
 	es *eventstore.Eventstore,
-	otpEmailTmpl, fileSystemPath string,
+	otpEmailTmpl func(origin *url.URL) string,
+	fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
 	queue *queue.Queue,
 ) {
@@ -57,12 +59,12 @@ func Register(
 		queue,
 		backChannelLogoutWorkerConfig.MaxAttempts,
 	))
-	queue.AddWorkers(handlers.NewBackChannelLogoutWorker(commands, q, es, queue, c, backChannelLogoutWorkerConfig, id.SonyFlakeGenerator()))
+	queue.AddWorkers(ctx, handlers.NewBackChannelLogoutWorker(commands, q, es, queue, c, backChannelLogoutWorkerConfig, id.SonyFlakeGenerator()))
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}
 	if !notificationWorkerConfig.LegacyEnabled {
-		queue.AddWorkers(handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c))
+		queue.AddWorkers(ctx, handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c))
 	}
 }
 
