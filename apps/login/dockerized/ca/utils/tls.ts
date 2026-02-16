@@ -16,7 +16,21 @@ export function generateCertificates({
   ips = ["127.0.0.1"],
   days = 1,
 } = {}) {
-  function createCert({ subject, issuer, publicKey, signingKey, extensions, serial = "01" }) {
+  function createCert({
+    subject,
+    issuer,
+    publicKey,
+    signingKey,
+    extensions,
+    serial = "01",
+  }: {
+    subject: forge.pki.CertificateField[];
+    issuer: forge.pki.CertificateField[];
+    publicKey: forge.pki.rsa.PublicKey;
+    signingKey: forge.pki.rsa.PrivateKey;
+    extensions?: forge.pki.CertificateField[];
+    serial?: string;
+  }) {
     const cert = forge.pki.createCertificate();
     cert.publicKey = publicKey;
     cert.serialNumber = serial;
