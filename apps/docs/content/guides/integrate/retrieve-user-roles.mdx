@@ -212,10 +212,10 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
 
 ### Retrieve roles using the auth API
 
-Now we will use the auth API to retrieve roles from a logged in user using the user’s token
+Now we will use the auth API to retrieve roles from a logged-in user using the user’s token
 The base URL is: **https://`${CUSTOM_DOMAIN}`/auth/v1**
 
-Let’s start with a user who has multiple roles in different organizations in a multi-tenanted setup. You can use the logged-in user’s token or the service account’s token to retrieve the roles assigned to this user using the [APIs listed under user authorizations/grants in the auth API](/docs/apis/resources/auth/user-authorizations-grants).
+Let’s start with a user who has multiple roles in different organizations in a multi-tenanted setup. You can use the logged-in user’s token or the service account’s token to retrieve the roles assigned to this user using the [APIs listed under user authorizations/grants in the auth API](/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations).
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
 #### **1. [List my project roles](/reference/api/auth/zitadel.auth.v1.AuthService.ListMyProjectPermissions)**
