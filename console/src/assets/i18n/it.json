@@ -2823,7 +2823,7 @@
       "BULK_DELETE_TITLE": "Elimina assegnazioni ruoli",
       "BULK_DELETE_DESCRIPTION": "Stai per eliminare diverse assegnazioni ruoli. Vuoi continuare?"
     }
-    },
+  },
   "CHANGES": {
     "LISTTITLE": "Ultimi cambiamenti",
     "BOTTOM": "Hai raggiunto la fine della lista.",
