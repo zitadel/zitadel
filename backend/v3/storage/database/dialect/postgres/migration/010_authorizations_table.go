@@ -12,5 +12,5 @@ var (
 )
 
 func init() {
-	RegisterSQLMigration(10, up010AuthorizationsTable, down010AuthorizationsTable)
+	registerSQLMigration(10, up010AuthorizationsTable, down010AuthorizationsTable)
 }

@@ -12,5 +12,5 @@ var (
 )
 
 func init() {
-	RegisterSQLMigration(4, up004CorrectSetUpdatedAt, down004CorrectSetUpdatedAt)
+	registerSQLMigration(4, up004CorrectSetUpdatedAt, down004CorrectSetUpdatedAt)
 }
