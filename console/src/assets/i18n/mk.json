@@ -724,7 +724,7 @@
       "ME": "Go To own profile",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
       "USERS": "<strong>G</strong>o to <strong>U</strong>sers",
-      "USERGRANTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments",
+      "ROLEASSIGNMENTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments",
       "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows",
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Лозинка и Безбедност",
       "KEYS": "Клучеви",
       "PAT": "Токени за Личен Пристап",
-      "USERGRANTS": "Доделување улоги",
+      "ROLEASSIGNMENTS": "Доделување улоги",
       "MEMBERSHIPS": "Улоги на администратор",
       "METADATA": "Метаподатоци"
     },

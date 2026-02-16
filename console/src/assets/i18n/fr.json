@@ -724,7 +724,7 @@
       "ME": "Aller à son propre profil",
       "PROJECTS": "Aller à Projets",
       "USERS": "Aller à Utilisateurs",
-      "USERGRANTS": "Aller à Attributions de rôles",
+      "ROLEASSIGNMENTS": "Aller à Attributions de rôles",
       "ACTIONS": "Aller à Actions et Flux",
       "DOMAINS": "Aller à Domaines"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Mot de passe et sécurité",
       "KEYS": "Clés",
       "PAT": "Jetons d'accès personnels",
-      "USERGRANTS": "Attributions de rôles",
+      "ROLEASSIGNMENTS": "Attributions de rôles",
       "MEMBERSHIPS": "Rôles d'administrateur",
       "METADATA": "Métadonnées"
     },

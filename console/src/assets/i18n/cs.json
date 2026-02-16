@@ -724,7 +724,7 @@
       "ME": "Přejít na vlastní profil",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects - Projekty",
       "USERS": "<strong>G</strong>o to <strong>U</strong>sers - Uživatelé",
-      "USERGRANTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments - Přiřazení rolí",
+      "ROLEASSIGNMENTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments - Přiřazení rolí",
       "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows - Akce a postupy",
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains - Domény"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Heslo a zabezpečení",
       "KEYS": "Klíče",
       "PAT": "Osobní přístupové tokeny",
-      "USERGRANTS": "Přiřazení rolí",
+      "ROLEASSIGNMENTS": "Přiřazení rolí",
       "MEMBERSHIPS": "Role správce",
       "METADATA": "Metadata"
     },

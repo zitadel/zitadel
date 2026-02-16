@@ -724,7 +724,7 @@
       "ME": "前往个人资料",
       "PROJECTS": "前往项目",
       "USERS": "前往用户",
-      "USERGRANTS": "前往授权",
+      "ROLEASSIGNMENTS": "前往授权",
       "ACTIONS": "前往认证流程",
       "DOMAINS": "前往域名"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "密码和安全",
       "KEYS": "秘钥",
       "PAT": "个人访问令牌",
-      "USERGRANTS": "授权",
+      "ROLEASSIGNMENTS": "授权",
       "MEMBERSHIPS": "管理员角色",
       "METADATA": "元数据"
     },

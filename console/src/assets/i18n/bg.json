@@ -723,7 +723,7 @@
       "ME": "Отидете на собствен профил",
       "PROJECTS": "<strong>Ж</strong>o към <strong>П</strong>проекти",
       "USERS": "<strong>Ж</strong>o към <strong>U</strong>sers",
-      "USERGRANTS": "<strong>Ж</strong>o към <strong>Р</strong>олеви назначения",
+      "ROLEASSIGNMENTS": "<strong>Ж</strong>o към <strong>Р</strong>олеви назначения",
       "ACTIONS": "<strong>Ж</strong>o към Действия и <strong>Е</strong>ниски нива",
       "DOMAINS": "<strong>Ж</strong>o към <strong>д</strong>omains"
     }
@@ -764,7 +764,7 @@
       "SECURITY": "Парола и сигурност",
       "KEYS": "Ключове",
       "PAT": "Лични токени за достъп",
-      "USERGRANTS": "Ролеви назначения",
+      "ROLEASSIGNMENTS": "Ролеви назначения",
       "MEMBERSHIPS": "Роли на администратор",
       "METADATA": "Метаданни"
     },

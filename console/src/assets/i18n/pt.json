@@ -724,7 +724,7 @@
       "ME": "Ir para meu perfil",
       "PROJECTS": "<strong>I</strong>r para <strong>P</strong>rojetos",
       "USERS": "<strong>I</strong>r para <strong>U</strong>suários",
-      "USERGRANTS": "<strong>I</strong>r para <strong>A</strong>utorizações",
+      "ROLEASSIGNMENTS": "<strong>I</strong>r para <strong>A</strong>utorizações",
       "ACTIONS": "<strong>I</strong>r para <strong>A</strong>ções e <strong>F</strong>luxos",
       "DOMAINS": "<strong>I</strong>r para <strong>D</strong>omínios"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Senha e Segurança",
       "KEYS": "Chaves",
       "PAT": "Tokens de Acesso Pessoal",
-      "USERGRANTS": "Autorizações",
+      "ROLEASSIGNMENTS": "Autorizações",
       "MEMBERSHIPS": "Funções de Administrador",
       "METADATA": "Metadados"
     },

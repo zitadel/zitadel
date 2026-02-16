@@ -724,7 +724,7 @@
       "ME": "Kendi profiline git",
       "PROJECTS": "<strong>P</strong>rojelere git",
       "USERS": "<strong>K</strong>ullanıcılara git",
-      "USERGRANTS": "<strong>Y</strong>etkilendirmelere git",
+      "ROLEASSIGNMENTS": "<strong>Y</strong>etkilendirmelere git",
       "ACTIONS": "<strong>E</strong>ylemler ve <strong>A</strong>kışlara git",
       "DOMAINS": "<strong>A</strong>lan <strong>A</strong>dlarına git"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Şifre ve Güvenlik",
       "KEYS": "Anahtarlar",
       "PAT": "Kişisel Erişim Token'ları",
-      "USERGRANTS": "Yetkilendirmeler",
+      "ROLEASSIGNMENTS": "Yetkilendirmeler",
       "MEMBERSHIPS": "Yönetici Rolleri",
       "METADATA": "Meta Veri"
     },

@@ -724,7 +724,7 @@
       "ME": "Gå till egen profil",
       "PROJECTS": "<strong>G</strong>å till <strong>P</strong>rojekt",
       "USERS": "<strong>G</strong>å till <strong>A</strong>nvändare",
-      "USERGRANTS": "<strong>G</strong>å till <strong>A</strong>uktorisationer",
+      "ROLEASSIGNMENTS": "<strong>G</strong>å till <strong>A</strong>uktorisationer",
       "ACTIONS": "<strong>G</strong>å till Åtgärder och <strong>F</strong>löden",
       "DOMAINS": "<strong>G</strong>å till <strong>D</strong>omäner"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Lösenord och Säkerhet",
       "KEYS": "Nycklar",
       "PAT": "Personliga Åtkomsttoken",
-      "USERGRANTS": "Auktorisationer",
+      "ROLEASSIGNMENTS": "Auktorisationer",
       "MEMBERSHIPS": "Administratörsroller",
       "METADATA": "Metadata"
     },

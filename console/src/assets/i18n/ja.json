@@ -724,7 +724,7 @@
       "ME": "自分のプロフィールに移動する",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
       "USERS": "<strong>G</strong>o to <strong>U</strong>sers",
-      "USERGRANTS": "<strong>G</strong>o to <strong>A</strong>ロール割り当て",
+      "ROLEASSIGNMENTS": "<strong>G</strong>o to <strong>A</strong>ロール割り当て",
       "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows",
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "パスワードとセキュリティ",
       "KEYS": "キー",
       "PAT": "個人用アクセス トークン",
-      "USERGRANTS": "ロール割り当て",
+      "ROLEASSIGNMENTS": "ロール割り当て",
       "MEMBERSHIPS": "管理者ロール",
       "METADATA": "メタデータ"
     },

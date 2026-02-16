@@ -725,7 +725,7 @@
       "ME": "Go To own profile",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
       "USERS": "<strong>G</strong>o to <strong>U</strong>sers",
-      "USERGRANTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments",
+      "ROLEASSIGNMENTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments",
       "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows",
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
     }
@@ -766,7 +766,7 @@
       "SECURITY": "Password and Security",
       "KEYS": "Keys",
       "PAT": "Personal Access Tokens",
-      "USERGRANTS": "Role Assignments",
+      "ROLEASSIGNMENTS": "Role Assignments",
       "MEMBERSHIPS": "Administrator Roles",
       "METADATA": "Metadata"
     },

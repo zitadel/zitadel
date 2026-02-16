@@ -724,7 +724,7 @@
       "ME": "Menj a saját profilodra",
       "PROJECTS": "<strong>M</strong>enj a <strong>P</strong>rojektekhez",
       "USERS": "<strong>M</strong>enj a <strong>F</strong>elhasználókhoz",
-      "USERGRANTS": "<strong>M</strong>enj a <strong>S</strong>zerepkör hozzárendelésekhez",
+      "ROLEASSIGNMENTS": "<strong>M</strong>enj a <strong>S</strong>zerepkör hozzárendelésekhez",
       "ACTIONS": "<strong>M</strong>enj az Akciókhoz és a <strong>F</strong>olyamatokhoz",
       "DOMAINS": "<strong>M</strong>enj a <strong>D</strong>oménekhez"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Jelszó és Biztonság",
       "KEYS": "Kulcsok",
       "PAT": "Személyes Hozzáférési Tokenek",
-      "USERGRANTS": "Szerepkör hozzárendelések",
+      "ROLEASSIGNMENTS": "Szerepkör hozzárendelések",
       "MEMBERSHIPS": "Adminisztrátor Szerepkörök",
       "METADATA": "Metaadatok"
     },

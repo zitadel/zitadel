@@ -725,7 +725,7 @@
       "ME": "Перейти до власного профілю",
       "PROJECTS": "<strong>П</strong>ерейти до <strong>П</strong>роектів",
       "USERS": "<strong>П</strong>ерейти до <strong>К</strong>ористувачів",
-      "USERGRANTS": "<strong>П</strong>ерейти до <strong>А</strong>вторизацій",
+      "ROLEASSIGNMENTS": "<strong>П</strong>ерейти до <strong>А</strong>вторизацій",
       "ACTIONS": "<strong>П</strong>ерейти до Дій та <strong>П</strong>отоків",
       "DOMAINS": "<strong>П</strong>ерейти до <strong>Д</strong>оменів"
     }
@@ -766,7 +766,7 @@
       "SECURITY": "Пароль та безпека",
       "KEYS": "Ключі",
       "PAT": "Персональні токени доступу",
-      "USERGRANTS": "Авторизації",
+      "ROLEASSIGNMENTS": "Авторизації",
       "MEMBERSHIPS": "Ролі адміністратора",
       "METADATA": "Метадані"
     },

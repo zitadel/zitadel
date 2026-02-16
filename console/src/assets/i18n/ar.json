@@ -717,7 +717,7 @@
       "ME": "الذهاب إلى الملف الشخصي",
       "PROJECTS": "<strong>الذهاب</strong> إلى <strong>المشاريع</strong>",
       "USERS": "<strong>الذهاب</strong> إلى <strong>المستخدمين</strong>",
-      "USERGRANTS": "<strong>الذهاب</strong> إلى <strong>تعيينات الأدوار</strong>",
+      "ROLEASSIGNMENTS": "<strong>الذهاب</strong> إلى <strong>تعيينات الأدوار</strong>",
       "ACTIONS": "<strong>الذهاب</strong> إلى الإجراءات و <strong>التدفقات</strong>",
       "DOMAINS": "<strong>الذهاب</strong> إلى <strong>النطاقات</strong>"
     }
@@ -758,7 +758,7 @@
       "SECURITY": "كلمة المرور والأمان",
       "KEYS": "المفاتيح",
       "PAT": "رموز الوصول الشخصية",
-      "USERGRANTS": "تعيينات الأدوار",
+      "ROLEASSIGNMENTS": "تعيينات الأدوار",
       "MEMBERSHIPS": "أدوار مسؤولي النظام",
       "METADATA": "البيانات الوصفية"
     },

@@ -49,7 +49,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Applications",
-            description: "Applications are the entry point to your project. Users either login into one of your applications and interact with them directly or use one of your APIs. All applications share the roles and authorizations of their project."
+            description: "Applications are the entry point to your project. Users either login into one of your applications and interact with them directly or use one of your APIs. All applications share the roles and role assignments of their project."
         },
         {
             name: "Authentication Methods"
@@ -105,7 +105,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Project Grants",
-            description: "A project that is granted to another organization, so the other organization has access to it and can manage the user authorizations, is called a project grant."
+            description: "A project that is granted to another organization, so the other organization has access to it and can manage the user role assignments, is called a project grant."
         },
         {
             name: "Project Roles"
@@ -4218,7 +4218,7 @@ service ManagementService {
     //
     // Deprecated: use [CreateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-project-service-create-project-grant.api.mdx) instead.
     //
-    // Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
+    // Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the role assignments for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc AddProjectGrant(AddProjectGrantRequest) returns (AddProjectGrantResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants"
@@ -4247,7 +4247,7 @@ service ManagementService {
     //
     // Deprecated: use [UpdateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-project-service-update-project-grant.api.mdx) instead.
     //
-    // Change the roles of the project that is granted to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
+    // Change the roles of the project that is granted to another organization. The project grant will allow the granted organization to access the project and manage the role assignments for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc UpdateProjectGrant(UpdateProjectGrantRequest) returns (UpdateProjectGrantResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/grants/{grant_id}"

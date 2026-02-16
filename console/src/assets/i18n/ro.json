@@ -722,7 +722,7 @@
       "ME": "Du-te la propriul profil",
       "PROJECTS": "<strong>Du-te</strong> la <strong>P</strong>roiecte",
       "USERS": "<strong>Du-te</strong> la <strong>U</strong>tilizatori",
-      "USERGRANTS": "<strong>Du-te</strong> la <strong>A</strong>utorizații",
+      "ROLEASSIGNMENTS": "<strong>Du-te</strong> la <strong>A</strong>utorizații",
       "ACTIONS": "<strong>Du-te</strong> la Acțiuni și <strong>F</strong>luxuri",
       "DOMAINS": "<strong>Du-te</strong> la <strong>D</strong>omenii"
     }
@@ -763,7 +763,7 @@
       "SECURITY": "Parolă și securitate",
       "KEYS": "Chei",
       "PAT": "Tokenuri de acces personal",
-      "USERGRANTS": "Autorizații",
+      "ROLEASSIGNMENTS": "Autorizații",
       "MEMBERSHIPS": "Roluri de administrator",
       "METADATA": "Metadata"
     },

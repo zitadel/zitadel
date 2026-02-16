@@ -723,7 +723,7 @@
       "ME": "Idź do Własnego Profilu",
       "PROJECTS": "Idź do <strong>P</strong>rojektów",
       "USERS": "Idź do <strong>U</strong>żytkowników",
-      "USERGRANTS": "Idź do <strong>A</strong>utoryzacji",
+      "ROLEASSIGNMENTS": "Idź do <strong>A</strong>utoryzacji",
       "ACTIONS": "Idź do Działań i Przepływów",
       "DOMAINS": "Idź do <strong>D</strong>omen"
     }
@@ -764,7 +764,7 @@
       "SECURITY": "Hasło i Bezpieczeństwo",
       "KEYS": "Klucze",
       "PAT": "Tokeny Dostępu Osobistego",
-      "USERGRANTS": "Autoryzacje",
+      "ROLEASSIGNMENTS": "Autoryzacje",
       "MEMBERSHIPS": "Role administratora",
       "METADATA": "Metadane"
     },

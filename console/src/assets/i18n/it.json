@@ -723,7 +723,7 @@
       "ME": "Vai al profilo",
       "PROJECTS": "Vai ai progetti",
       "USERS": "Vai ai utenti",
-      "USERGRANTS": "Vai ai Assegnazioni Ruoli",
+      "ROLEASSIGNMENTS": "Vai ai Assegnazioni Ruoli",
       "ACTIONS": "Vai ai azioni e processi",
       "DOMAINS": "Vai ai domini"
     }
@@ -764,7 +764,7 @@
       "SECURITY": "Password e sicurezza",
       "KEYS": "Chiavi",
       "PAT": "Personal Access Tokens",
-      "USERGRANTS": "Assegnazioni Ruoli",
+      "ROLEASSIGNMENTS": "Assegnazioni Ruoli",
       "MEMBERSHIPS": "Ruoli di amministratore",
       "METADATA": "Metadati"
     },

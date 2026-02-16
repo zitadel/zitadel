@@ -724,7 +724,7 @@
       "ME": "Ga naar eigen profiel",
       "PROJECTS": "<strong>G</strong>a naar <strong>P</strong>rojecten",
       "USERS": "<strong>G</strong>a naar <strong>U</strong>sers",
-      "USERGRANTS": "<strong>G</strong>a naar <strong>A</strong>uthorizations",
+      "ROLEASSIGNMENTS": "<strong>G</strong>a naar <strong>A</strong>uthorizations",
       "ACTIONS": "<strong>G</strong>a naar Acties en <strong>F</strong>lows",
       "DOMAINS": "<strong>G</strong>a naar <strong>D</strong>omeinen"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Wachtwoord en beveiliging",
       "KEYS": "Sleutels",
       "PAT": "Persoonlijke toegangstokens",
-      "USERGRANTS": "Machtigingen",
+      "ROLEASSIGNMENTS": "Machtigingen",
       "MEMBERSHIPS": "Beheerdersrollen",
       "METADATA": "Metadata"
     },

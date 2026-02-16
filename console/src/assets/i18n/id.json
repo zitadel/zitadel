@@ -724,7 +724,7 @@
       "ME": "Buka profil sendiri",
       "PROJECTS": "<strong>Buka</strong>ke <strong>P</strong>proyek",
       "USERS": "<strong>G</strong>ke <strong>U</strong>ser",
-      "USERGRANTS": "<strong>Ke</strong> <strong>P</strong>enugasan Peran",
+      "ROLEASSIGNMENTS": "<strong>Ke</strong> <strong>P</strong>enugasan Peran",
       "ACTIONS": "<strong>G</strong>ke Tindakan dan <strong>F</strong>terendah",
       "DOMAINS": "<strong>Pergi</strong>ke <strong>D</strong>omain"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Kata Sandi dan Keamanan",
       "KEYS": "Kunci",
       "PAT": "Token Akses Pribadi",
-      "USERGRANTS": "Penugasan Peran",
+      "ROLEASSIGNMENTS": "Penugasan Peran",
       "MEMBERSHIPS": "Peran Administrator",
       "METADATA": "Metadata"
     },

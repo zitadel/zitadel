@@ -724,7 +724,7 @@
       "ME": "내 프로필로 이동",
       "PROJECTS": "프로젝트로 이동 (<strong>GP</strong>)",
       "USERS": "사용자로 이동 (<strong>GU</strong>)",
-      "USERGRANTS": "역할 할당으로 이동 (<strong>GA</strong>)",
+      "ROLEASSIGNMENTS": "역할 할당으로 이동 (<strong>GA</strong>)",
       "ACTIONS": "액션 플로우로 이동 (<strong>GF</strong>)",
       "DOMAINS": "도메인으로 이동 (<strong>GD</strong>)"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "비밀번호 및 보안",
       "KEYS": "키",
       "PAT": "개인 접근 토큰",
-      "USERGRANTS": "역할 할당",
+      "ROLEASSIGNMENTS": "역할 할당",
       "MEMBERSHIPS": "관리자 역할",
       "METADATA": "메타데이터"
     },

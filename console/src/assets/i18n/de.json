@@ -724,7 +724,7 @@
       "ME": "Zum eigenen Profil",
       "PROJECTS": "Zu den <strong>P</strong>rojekten",
       "USERS": "Zu den Benutzern",
-      "USERGRANTS": "Zu den <strong>R</strong>ollen-Zuweisungen",
+      "ROLEASSIGNMENTS": "Zu den <strong>R</strong>ollen-Zuweisungen",
       "ACTIONS": "Zu den Aktionen und Flows",
       "DOMAINS": "Zu den <strong>D</strong>omains"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Passwort und Sicherheit",
       "KEYS": "Schlüssel",
       "PAT": "Personal Access Tokens",
-      "USERGRANTS": "Rollen-Zuweisungen",
+      "ROLEASSIGNMENTS": "Rollen-Zuweisungen",
       "MEMBERSHIPS": "Administrator-Rollen",
       "METADATA": "Metadaten"
     },
