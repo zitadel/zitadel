@@ -60,6 +60,7 @@ describe("Custom CA Certificate Integration", () => {
   let network: StartedNetwork;
   let mockServer: StartedTestContainer;
   let mockServerBundle: string;
+  let loginImage: GenericContainer;
 
   beforeAll(async () => {
     if (fs.existsSync(OUTPUT_DIR)) {
@@ -90,6 +91,8 @@ describe("Custom CA Certificate Integration", () => {
       .withExposedPorts(443)
       .withWaitStrategy(Wait.forLogMessage("Mock TLS server listening"))
       .start();
+
+    loginImage = await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build();
   });
 
   afterAll(async () => {
@@ -106,9 +109,7 @@ describe("Custom CA Certificate Integration", () => {
         fs.unlinkSync(path.join(OUTPUT_DIR, "requests.json"));
       }
 
-      const image = await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build();
-
-      container = await image
+      container = await loginImage
         .withNetwork(network)
         .withExposedPorts(3000)
         .withEnvironment({
@@ -189,9 +190,7 @@ describe("Custom CA Certificate Integration", () => {
     beforeAll(async () => {
       requestsBefore = readCapturedRequests().length;
 
-      const image = await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build();
-
-      container = await image
+      container = await loginImage
         .withNetwork(network)
         .withExposedPorts(3000)
         .withEnvironment({
