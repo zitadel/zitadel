@@ -12,7 +12,7 @@ Prerequisites:
 - Existing ZITADEL instance, organization, and project. Follow our [get started](/guides/start/quickstart) guide to get started. If not present follow [this guide](/guides/start/quickstart)
 - Existing Cloudflare account and [team domain](https://developers.cloudflare.com/cloudflare-one/glossary/#team-domain)
 
-## Create the client in ZITADEL
+## Create the application in ZITADEL
 
 <CreateApp components={props.components}  appType="web" authType="code" appName="Cloudflare" redirectURI="https://<your-team-name>.cloudflareaccess.com/cdn-cgi/access/callback"/>
 
@@ -23,7 +23,7 @@ Make sure to enable "User Info inside ID Token" on your application settings.
 ![](../../../../public/img/guides/integrate/services/user-info-inside-id-token.png)
 
 <Callout>
-Cloudflare will return an error "User email was not returned. API permissions are likely incorrect". Enable to send the user information inside the token on your client settings.
+Cloudflare will return an error "User email was not returned. API permissions are likely incorrect". Enable to send the user information inside the token on your application settings.
 </Callout>
 
 ## Configure Cloudflare Zero Trust Authentication

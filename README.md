@@ -46,7 +46,7 @@ We provide you with a wide range of out-of-the-box features to accelerate your p
 :white_check_mark: SAML2  
 :white_check_mark: LDAP  
 :white_check_mark: Passkeys / FIDO2  
-:white_check_mark: OTP  
+:white_check_mark: OTP
 :white_check_mark: SCIM 2.0 Server
 and an unlimited audit trail is there for you, ready to use.
 
@@ -117,14 +117,14 @@ Authentication
 - Single Sign On (SSO)
 - [Passkeys support (FIDO2 / WebAuthN)](https://zitadel.com/docs/concepts/features/passkeys)
 - Username / Password
-- Multifactor authentication with OTP, U2F, Email OTP, SMS OTP
+- Multifactor authentication with OTP, U2F, OTP Email, OTP SMS
 - [LDAP](https://zitadel.com/docs/guides/integrate/identity-providers/ldap)
 - [External enterprise identity providers and social logins](https://zitadel.com/docs/guides/integrate/identity-providers/introduction)
 - [Device authorization](https://zitadel.com/docs/guides/solution-scenarios/device-authorization)
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints)
 - [Custom sessions](https://zitadel.com/docs/guides/integrate/login-ui/username-password) if you need to go beyond OIDC or SAML 
-- [Machine-to-machine](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
+- [Machine-to-machine](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
 - [Token exchange and impersonation](https://zitadel.com/docs/guides/integrate/token-exchange)
 - [Beta: Hosted Login V2](https://zitadel.com/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta) our new Login version 2.0
 
@@ -187,7 +187,7 @@ Use our Login widget to allow easy and secure access to your applications and en
 
 ### Management Console
 
-Use [Console](https://zitadel.com/docs/guides/manage/console/console-overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
+Use [Console](https://zitadel.com/docs/guides/manage/console/console-overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to set up organizations, projects and applications.
 
 [![Console Showcase](https://user-images.githubusercontent.com/1366906/223663344-67038d5f-4415-4285-ab20-9a4d397e2138.gif)](http://www.youtube.com/watch?v=RPpHktAcCtk "Console Showcase")
 

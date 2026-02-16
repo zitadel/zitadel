@@ -68,7 +68,7 @@ In the Branding settings, you can upload you Logo for the login interface, set y
 
 Make sure you click the "Apply configuration" button after you finish your configuration. This will ensure your design is visible for your customers.
 
-Branding settings applied on you instance act as a default for all your organizations. If you need custom branding on a organization take a look at our guide under [organization setting](./organizations#organization-settings).
+Branding settings applied on you instance act as a default for all your organizations. If you need custom branding on a organization take a look at our guide under [organization setting](./organizations-overview#organization-settings).
 
 ## Notification settings
 
@@ -154,7 +154,7 @@ The Login Policy defines how the login process should look like and which authen
 ### Default Redirect URI
 
 The Default Redirect URI will be used, if a user calls the login page directly.
-More specifically, typically a client will initiate login with an auth request.
+More specifically, typically an application will initiate login with an auth request.
 The auth request contains a client-id and a redirect uri, that must match the configuration in ZITADEL.
 If there is no [auth request](https://zitadel.com/playgrounds/oidc), users will be redirected to the Default Redirect URI, which is by default `https://${CUSTOM_DOMAIN}/ui/console/`
 
@@ -189,8 +189,8 @@ Second factors (2FA):
 
 - Time-based One Time Password (TOTP), Authenticator Apps like Google/Microsoft Authenticator, Authy, etc.
 - Universal Second Factor (U2F), e.g FaceID, WindowsHello, Fingerprint, Hardware tokens like Yubikey
-- One Time Password with Email (Email OTP)
-- One Time Password with SMS (SMS OTP)
+- One Time Password with Email (OTP Email)
+- One Time Password with SMS (OTP SMS)
 
 Force a user to register and use a multifactor authentication, by checking the option "Force MFA".
 Ensure that you have added the MFA methods you want to allow.
@@ -266,7 +266,7 @@ If an account is locked, the administrator has to unlock it in the ZITADEL Manag
 
 ### Add organization domain as suffix to loginnames
 
-If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.
+If you enable this setting, all loginnames will be suffixed with the organization domain. If this setting is disabled, you have to ensure that usernames are unique over all organizations.
 
 ### Validate Org domains
 

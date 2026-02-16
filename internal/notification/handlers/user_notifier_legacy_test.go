@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"fmt"
+	"net/url"
 	"testing"
 	"time"
 
@@ -1506,7 +1507,7 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 }
 
 func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
-	expectMailSubject := "Verify One-Time Password"
+	expectMailSubject := "Verify OTP"
 	tests := []struct {
 		name string
 		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, wantLegacy)
@@ -1783,7 +1784,7 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 				testCode := ""
 				expiry := 0 * time.Hour
-				expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
+				expectContent := fmt.Sprintf(`%[1]s is your OTP for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, eventOriginDomain, expiry)
 				w.messageSMS = &wantLegacySMS{
 					sms: &messages.SMS{
@@ -1823,7 +1824,7 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 				testCode := ""
 				expiry := 0 * time.Hour
-				expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
+				expectContent := fmt.Sprintf(`%[1]s is your OTP for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, instancePrimaryDomain, expiry)
 				w.messageSMS = &wantLegacySMS{
 					sms: &messages.SMS{
@@ -1868,7 +1869,7 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 				testCode := ""
 				expiry := 0 * time.Hour
-				expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
+				expectContent := fmt.Sprintf(`%[1]s is your OTP for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, instancePrimaryDomain, expiry)
 				w.messageSMS = &wantLegacySMS{
 					sms: &messages.SMS{
@@ -1972,7 +1973,9 @@ func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			smtpAlg,
 			f.SMSTokenCrypto,
 		),
-		otpEmailTmpl: defaultOTPEmailTemplate,
+		otpEmailTmpl: func(origin *url.URL) string {
+			return origin.String() + defaultOTPEmailTemplate
+		},
 		channels: &notificationChannels{
 			Chain: *senders.ChainChannels(channel),
 			EmailConfig: &email.Config{

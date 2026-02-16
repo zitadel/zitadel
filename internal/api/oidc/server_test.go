@@ -106,6 +106,8 @@ func TestServer_createDiscoveryConfig(t *testing.T) {
 				RequireRequestURIRegistration:                      false,
 				OPPolicyURI:                                        "",
 				OPTermsOfServiceURI:                                "",
+				BackChannelLogoutSupported:                         true,
+				BackChannelLogoutSessionSupported:                  true,
 			},
 		},
 	}
