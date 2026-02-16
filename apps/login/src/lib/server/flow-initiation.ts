@@ -20,12 +20,32 @@ import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
-import { DEFAULT_CSP } from "../../../constants/csp";
+import { buildCSP } from "../csp";
 import escapeHtml from "escape-html";
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
+
+function setCSPHeaders(
+  response: NextResponse,
+  serviceConfig: ServiceConfig,
+  securitySettings: { embeddedIframe?: { enabled?: boolean; allowedOrigins: string[] } } | null,
+): void {
+  const iframeOrigins =
+    securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
+      ? securitySettings.embeddedIframe.allowedOrigins
+      : undefined;
+
+  response.headers.set(
+    "Content-Security-Policy",
+    buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }),
+  );
+
+  if (!iframeOrigins) {
+    response.headers.set("X-Frame-Options", "deny");
+  }
+}
 
 const gotoAccounts = ({
   request,
@@ -240,15 +260,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest });
 
       const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
-
-      if (securitySettings?.embeddedIframe?.enabled) {
-        securitySettings.embeddedIframe.allowedOrigins;
-        noSessionResponse.headers.set(
-          "Content-Security-Policy",
-          `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
-        );
-        noSessionResponse.headers.delete("X-Frame-Options");
-      }
+      setCSPHeaders(noSessionResponse, serviceConfig, securitySettings);
 
       if (!selectedSession || !selectedSession.id) {
         return noSessionResponse;
@@ -277,15 +289,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       });
 
       const callbackResponse = NextResponse.redirect(callbackUrl);
-
-      if (securitySettings?.embeddedIframe?.enabled) {
-        securitySettings.embeddedIframe.allowedOrigins;
-        callbackResponse.headers.set(
-          "Content-Security-Policy",
-          `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
-        );
-        callbackResponse.headers.delete("X-Frame-Options");
-      }
+      setCSPHeaders(callbackResponse, serviceConfig, securitySettings);
 
       return callbackResponse;
     } else {
