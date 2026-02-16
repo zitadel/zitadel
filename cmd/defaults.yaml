@@ -406,7 +406,7 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
-  # Organization cache, gettable by primary domain or ID.
+  # Organization cache, gettable by Organization Domain or ID.
   Organization:
     Connector: ""
     MaxAge: 1h
@@ -974,7 +974,7 @@ DefaultInstance:
     # If DefaultInstance.Org.Machine.Machine is defined, a service account is created with the IAM_OWNER role.
     Human:
       # In case that UserLoginMustBeDomain is false (default) and if you don't overwrite the username with an email,
-      # it will be suffixed by the org domain (org-name + domain from config).
+      # it will be suffixed by the Organization Domain (org-name + domain from config).
       # for example zitadel-admin in org `My Org` on domain.tld -> zitadel-admin@my-org.domain.tld
       UserName: zitadel-admin # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_USERNAME
       FirstName: ZITADEL # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_FIRSTNAME
