@@ -2793,7 +2793,7 @@
     "ADD_BTN": "Nowe",
     "PROJECT": {
       "TITLE": "Przypisania roli",
-      "DESCRIPTION": "Zdefiniuj przypisania ról dla określonego projektu. Pamiętaj, że możesz wyświetlić tylko wpisy projektów i użytkowników, do których masz uprawnienia.",
+      "DESCRIPTION": "Zdefiniuj przypisania ról dla określonego projektu. Pamiętaj, że możesz wyświetlić tylko wpisy projektów i użytkowników, do których masz uprawnienia."
     },
     "USER": {
       "TITLE": "Utwórz przypisania roli",
