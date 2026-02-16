@@ -18,8 +18,8 @@ Follow the links below to assign roles to your users.
 
 - [Add application roles via the ZITADEL Management Console](/guides/manage/console/roles)
 - [Add administrator roles via the ZITADEL Management Console](/guides/manage/console/administrators)
-- [Add application roles via the Project Service API](/docs/reference/api/project/zitadel.project.v2.ProjectService.AddProjectRole)
-- [Add administrator roles to users via the Internal Permission Service API](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator)
+- [Add application roles via the Project Service API](/reference/api/project/zitadel.project.v2.ProjectService.AddProjectRole)
+- [Add administrator roles to users via the Internal Permission Service API](/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator)
 
 ## Retrieve roles
 
@@ -215,7 +215,7 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
 Now we will use the auth API to retrieve roles from a logged-in user using the user’s token
 The base URL is: **https://`${CUSTOM_DOMAIN}`/auth/v1**
 
-Let’s start with a user who has multiple roles in different organizations in a multi-tenanted setup. You can use the logged-in user’s token or the service account’s token to retrieve the roles assigned to this user using the [APIs listed under user authorizations/grants in the auth API](/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations).
+Let’s start with a user who has multiple roles in different organizations in a multi-tenanted setup. You can use the logged-in user’s token or the service account’s token to retrieve the roles assigned to this user using the [APIs listed under user authorizations/grants in the auth API](/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations).
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
 #### **1. [List my project roles](/reference/api/auth/zitadel.auth.v1.AuthService.ListMyProjectPermissions)**
