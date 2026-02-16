@@ -26,10 +26,7 @@ import (
 func TestIntrospection_RoleAddedAfterLogin(t *testing.T) {
 	// PROJECT A WILL GRANT ROLES
 	projectA := Instance.CreateProject(CTX, t, "", "project-a", false, false)
-
 	const roleKey = "role_a"
-	projectRolesClaimName := fmt.Sprintf(oidc_api.ClaimProjectRolesFormat, projectA.GetId())
-
 	Instance.AddProjectRole(CTX, t, projectA.GetId(), roleKey, roleKey, "")
 
 	// PROJECT B WILL RECEIVE THE GRANTS
@@ -51,8 +48,14 @@ func TestIntrospection_RoleAddedAfterLogin(t *testing.T) {
 	require.NoError(t, err)
 
 	// LOGIN WITH USER
-	authRequestID := createAuthRequest(t, Instance, app.GetClientId(), redirectURI,
-		oidc.ScopeOpenID, oidc.ScopeProfile, oidc_api.ScopeProjectsRoles)
+	scopes := []string{
+		oidc.ScopeOpenID,
+		oidc.ScopeProfile,
+		oidc_api.ScopeProjectsRoles,
+		oidc_api.ScopeProjectRolePrefix + roleKey,
+		fmt.Sprintf("urn:zitadel:iam:org:project:id:%s:aud", projectA.GetId()),
+	}
+	authRequestID := createAuthRequest(t, Instance, app.GetClientId(), redirectURI, scopes...)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -74,6 +77,7 @@ func TestIntrospection_RoleAddedAfterLogin(t *testing.T) {
 	introspectionBeforeB, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServerB, tokens.AccessToken)
 	require.NoError(t, err)
 	assert.True(t, introspectionBeforeB.Active)
+	projectRolesClaimName := fmt.Sprintf(oidc_api.ClaimProjectRolesFormat, projectA.GetId())
 	if roles, ok := introspectionBeforeB.Claims[projectRolesClaimName]; ok {
 		if rolesMap, ok := roles.(map[string]interface{}); ok {
 			assert.Contains(t, rolesMap, roleKey, "role should not be present before granting")
@@ -92,8 +96,7 @@ func TestIntrospection_RoleAddedAfterLogin(t *testing.T) {
 
 	// TODO remove the second login. It should work without logging in again
 	// LOGIN WITH USER
-	authRequestID = createAuthRequest(t, Instance, app.GetClientId(), redirectURI,
-		oidc.ScopeOpenID, oidc.ScopeProfile, oidc_api.ScopeProjectsRoles)
+	authRequestID = createAuthRequest(t, Instance, app.GetClientId(), redirectURI, scopes...)
 	sessionID, sessionToken, startTime, changeTime = Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err = Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
