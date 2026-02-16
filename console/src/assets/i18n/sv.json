@@ -702,7 +702,7 @@
     "USERNAME": "Användarnamn",
     "ORGNAME": "Organisationsnamn",
     "ORGID": "Organisations ID",
-    "PRIMARYDOMAIN": "Primär domän",
+    "PRIMARYDOMAIN": "Organisationsdomän",
     "PROJECTNAME": "Projektnamn",
     "RESOURCEOWNER": "Resursägare",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Ladda ner fil",
       "SELECTORGTOOLTIP": "Välj denna organisation.",
-      "PRIMARYDOMAIN": "Primär domän",
+      "PRIMARYDOMAIN": "Organisationsdomän",
       "STATE": "Status",
       "USEPASSWORD": "Ange initialt lösenord",
       "USEPASSWORDDESC": "Användaren behöver inte ange lösenordet under initialiseringen."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Lägg till domän",
-      "TITLE": "Verifierade domäner",
+      "TITLE": "Organisationsdomän",
       "DESCRIPTION": "Konfigurera dina organisationsdomäner. Denna domän kan användas för domänupptäckt och användarnamnssuffix.",
-      "SETPRIMARY": "Ange som primär",
+      "SETPRIMARY": "Organisationsdomän",
       "DELETE": {
         "TITLE": "Radera domän",
         "DESCRIPTION": "Du är på väg att radera en av dina domäner."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administratör tillagd.",
       "MEMBERREMOVED": "Administratör borttagen.",
       "MEMBERCHANGED": "Administratör ändrad.",
-      "SETPRIMARY": "Primär domän inställd.",
+      "SETPRIMARY": "Organisationsdomän",
       "DELETED": "Organisation raderad framgångsrikt",
       "DEFAULTORGNOTFOUND": "Standardorganisationen hittades inte",
       "ORG_WAS_DELETED": "Organisationen har raderats."
@@ -1503,7 +1503,7 @@
       "NOTIFICATIONS_DESC": "SMTP- och SMS-inställningar",
       "MESSAGETEXTS": "Meddelandetexter",
       "IDP": "Identitetsleverantörer",
-      "VERIFIED_DOMAINS": "Verifierade domäner",
+      "VERIFIED_DOMAINS": "Organisationsdomän",
       "DOMAIN": "Domäninställningar",
       "LOGINTEXTS": "Inloggningsgränssnittstexter",
       "BRANDING": "Varumärke",

@@ -701,7 +701,7 @@
     "USERNAME": "Nazwa Użytkownika",
     "ORGNAME": "Nazwa Organizacji",
     "ORGID": "ID Organizacji",
-    "PRIMARYDOMAIN": "Domena podstawowa",
+    "PRIMARYDOMAIN": "Domena organizacji",
     "PROJECTNAME": "Nazwa Projektu",
     "RESOURCEOWNER": "Właściciel Zasobu",
     "METHODS": {
@@ -1419,7 +1419,7 @@
       },
       "DOWNLOAD_FILE": "Pobierz plik",
       "SELECTORGTOOLTIP": "Wybierz tę organizację.",
-      "PRIMARYDOMAIN": "Domena główna",
+      "PRIMARYDOMAIN": "Domena organizacji",
       "STATE": "Stan",
       "USEPASSWORD": "Ustaw hasło początkowe",
       "USEPASSWORDDESC": "Użytkownik nie musi ustawiać hasła podczas inicjalizacji."
@@ -1430,9 +1430,9 @@
     },
     "DOMAINS": {
       "NEW": "Dodaj domenę",
-      "TITLE": "Zweryfikowane domeny",
+      "TITLE": "Domena organizacji",
       "DESCRIPTION": "Skonfiguruj swoje domeny. Ta domena może być używana do logowania się z Twoimi użytkownikami.",
-      "SETPRIMARY": "Ustaw jako główną",
+      "SETPRIMARY": "Domena organizacji",
       "DELETE": {
         "TITLE": "Usuń domenę",
         "DESCRIPTION": "Zamierzasz usunąć jedną z twoich domen. Zauważ, że twoi użytkownicy już nie będą mogli używać tej domeny do logowania się."
@@ -1460,7 +1460,7 @@
       "MEMBERADDED": "Dodano administratora.",
       "MEMBERREMOVED": "Usunięto administratora.",
       "MEMBERCHANGED": "Zmieniono administratora.",
-      "SETPRIMARY": "Ustawiono domenę podstawową.",
+      "SETPRIMARY": "Domena organizacji",
       "DELETED": "Organizacja została usunięta pomyślnie",
       "DEFAULTORGNOTFOUND": "Nie znaleziono organizacji domyślnej",
       "ORG_WAS_DELETED": "Organizacja została usunięta."
@@ -1498,7 +1498,7 @@
       "NOTIFICATIONS_DESC": "Ustawienia SMTP i SMS",
       "MESSAGETEXTS": "Teksty wiadomości",
       "IDP": "Dostawcy tożsamości",
-      "VERIFIED_DOMAINS": "Zweryfikowane domeny",
+      "VERIFIED_DOMAINS": "Domena organizacji",
       "DOMAIN": "Ustawienia domeny",
       "LOGINTEXTS": "Teksty interfejsu logowania",
       "BRANDING": "Marka",

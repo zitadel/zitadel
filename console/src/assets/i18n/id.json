@@ -702,7 +702,7 @@
     "USERNAME": "Nama belakang",
     "ORGNAME": "Nama Organisasi",
     "ORGID": "ID Organisasi",
-    "PRIMARYDOMAIN": "Domain Utama",
+    "PRIMARYDOMAIN": "Domain Organisasi",
     "PROJECTNAME": "Nama Proyek",
     "RESOURCEOWNER": "Pemilik Sumber Daya",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Unduh Berkas",
       "SELECTORGTOOLTIP": "Pilih organisasi ini.",
-      "PRIMARYDOMAIN": "Domain Utama",
+      "PRIMARYDOMAIN": "Domain Organisasi",
       "STATE": "Negara",
       "USEPASSWORD": "Tetapkan Kata Sandi Awal",
       "USEPASSWORDDESC": "Pengguna tidak perlu mengatur kata sandi selama inisialisasi."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Tambahkan Domain",
-      "TITLE": "Domain terverifikasi",
+      "TITLE": "Domain Organisasi",
       "DESCRIPTION": "Konfigurasikan domain organisasi Anda. Domain ini dapat digunakan untuk penemuan domain dan akhiran nama pengguna.",
-      "SETPRIMARY": "Tetapkan sebagai Utama",
+      "SETPRIMARY": "Domain Organisasi",
       "DELETE": {
         "TITLE": "Hapus Domain",
         "DESCRIPTION": "Anda akan menghapus salah satu domain Anda."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administrator menambahkan.",
       "MEMBERREMOVED": "Administrator dihapus.",
       "MEMBERCHANGED": "Administrator berubah.",
-      "SETPRIMARY": "Kumpulan domain primer.",
+      "SETPRIMARY": "Domain Organisasi",
       "DELETED": "Organisasi berhasil dihapus",
       "DEFAULTORGNOTFOUND": "Organisasi default tidak ditemukan",
       "ORG_WAS_DELETED": "Organisasi telah dihapus."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "Pengaturan SMTP dan SMS",
       "MESSAGETEXTS": "Teks Pesan",
       "IDP": "Penyedia Identitas",
-      "VERIFIED_DOMAINS": "Domain terverifikasi",
+      "VERIFIED_DOMAINS": "Domain Organisasi",
       "DOMAIN": "Pengaturan domain",
       "LOGINTEXTS": "Teks Antarmuka Masuk",
       "BRANDING": "merek",

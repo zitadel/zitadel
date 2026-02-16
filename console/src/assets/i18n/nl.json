@@ -702,7 +702,7 @@
     "USERNAME": "Gebruikersnaam",
     "ORGNAME": "Organisatienaam",
     "ORGID": "Organisatie ID",
-    "PRIMARYDOMAIN": "Primair domein",
+    "PRIMARYDOMAIN": "Organisatie Domein",
     "PROJECTNAME": "Projectnaam",
     "RESOURCEOWNER": "Eigenaar van de bron",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Download bestand",
       "SELECTORGTOOLTIP": "Selecteer deze organisatie.",
-      "PRIMARYDOMAIN": "Primaire Domein",
+      "PRIMARYDOMAIN": "Organisatie Domein",
       "STATE": "Status",
       "USEPASSWORD": "Stel Initieel Wachtwoord in",
       "USEPASSWORDDESC": "De gebruiker hoeft het wachtwoord niet in te stellen tijdens de initialisatie."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Domein toevoegen",
-      "TITLE": "Geverifieerde domeinen",
+      "TITLE": "Organisatie Domein",
       "DESCRIPTION": "Configureer uw organisatiedomeinen. Dit domein kan worden gebruikt voor domeinontdekking en gebruikersnaamsuffixering.",
-      "SETPRIMARY": "Stel in als Primair",
+      "SETPRIMARY": "Organisatie Domein",
       "DELETE": {
         "TITLE": "Verwijder Domein",
         "DESCRIPTION": "U staat op het punt een van uw domeinen te verwijderen."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Beheerder toegevoegd.",
       "MEMBERREMOVED": "Beheerder verwijderd.",
       "MEMBERCHANGED": "Beheerder gewijzigd.",
-      "SETPRIMARY": "Primaire domein ingesteld.",
+      "SETPRIMARY": "Organisatie Domein",
       "DELETED": "Organisatie succesvol verwijderd",
       "DEFAULTORGNOTFOUND": "De standaardorganisatie is niet gevonden",
       "ORG_WAS_DELETED": "Organisatie is verwijderd."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP en SMS Instellingen",
       "MESSAGETEXTS": "Bericht Teksten",
       "IDP": "Identiteitsproviders",
-      "VERIFIED_DOMAINS": "Geverifieerde domeinen",
+      "VERIFIED_DOMAINS": "Organisatie Domein",
       "DOMAIN": "Domein instellingen",
       "LOGINTEXTS": "Login Interface Teksten",
       "BRANDING": "Branding",

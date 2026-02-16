@@ -702,7 +702,7 @@
     "USERNAME": "Uživatelské jméno",
     "ORGNAME": "Název organizace",
     "ORGID": "ID organizace",
-    "PRIMARYDOMAIN": "Primární doména",
+    "PRIMARYDOMAIN": "Doména organizace",
     "PROJECTNAME": "Název projektu",
     "RESOURCEOWNER": "Vlastník zdroje",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Stáhnout soubor",
       "SELECTORGTOOLTIP": "Vybrat tuto organizaci.",
-      "PRIMARYDOMAIN": "Primární doména",
+      "PRIMARYDOMAIN": "Doména organizace",
       "STATE": "Stav",
       "USEPASSWORD": "Nastavit počáteční heslo",
       "USEPASSWORDDESC": "Uživatel nemusí během inicializace nastavovat heslo."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Přidat doménu",
-      "TITLE": "Ověřené domény",
+      "TITLE": "Doména organizace",
       "DESCRIPTION": "Konfigurujte domény vaší organizace. Tato doména může být použita pro zjišťování domény a připojení uživatelských jmen.",
-      "SETPRIMARY": "Nastavit jako primární",
+      "SETPRIMARY": "Doména organizace",
       "DELETE": {
         "TITLE": "Smazat doménu",
         "DESCRIPTION": "Chystáte se smazat jednu z vašich domén."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Správce přidán.",
       "MEMBERREMOVED": "Správce odstraněn.",
       "MEMBERCHANGED": "Správce změněn.",
-      "SETPRIMARY": "Nastavena primární doména.",
+      "SETPRIMARY": "Doména organizace",
       "DELETED": "Organizace úspěšně smazána",
       "DEFAULTORGNOTFOUND": "Výchozí organizace nebyla nalezena",
       "ORG_WAS_DELETED": "Organizace byla smazána."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "Nastavení SMTP a SMS",
       "MESSAGETEXTS": "Texty zpráv",
       "IDP": "Poskytovatelé identity",
-      "VERIFIED_DOMAINS": "Ověřené domény",
+      "VERIFIED_DOMAINS": "Doména organizace",
       "DOMAIN": "Nastavení domény",
       "LOGINTEXTS": "Texty přihlašovací stránky",
       "BRANDING": "Branding",

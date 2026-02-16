@@ -223,7 +223,7 @@ Errors:
     DomainVerificationHTTPNotFound: "在预期的 URL 中找不到包含质询的文件。检查您是否已将文件上传到正确的位置并具有读取权限"
     DomainVerificationHTTPNoMatch: "已在预期 URL 中找到包含质询的文件，但它不包含正确的标记文本。检查其内容"
     DomainVerificationTimeout: "查询 DNS 服务器超时"
-    PrimaryDomainNotDeletable: "不得删除主域名"
+    PrimaryDomainNotDeletable: "不得删除组织域名"
     DomainNotFound: "未找到域名"
     MemberIDMissing: "成员 ID 丢失"
     MemberNotFound: "未找到组织成员"
@@ -898,7 +898,7 @@ EventTypes:
       verified: "验证域名"
       removed: "删除域名"
       primary:
-        set: "设置主域名"
+        set: "已设置组织域名"
       reserved: "保留域名"
       released: "释放域名"
     name:

@@ -700,7 +700,7 @@
     "ORGNAME": "Organization Name",
     "ORGID": "Organization ID",
     "STATE": "State",
-    "PRIMARYDOMAIN": "Primary Domain",
+    "PRIMARYDOMAIN": "Organization Domain",
     "DISPLAYNAME": "User Display Name",
     "EMAIL": "Email",
     "USERNAME": "User Name",
@@ -1415,13 +1415,13 @@
         "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your domain this step has to be completed!",
         "VERIFICATION_VALIDATION_DESC": "Do not delete the verification code, as Zitadel will re-check the ownership of your domain from time to time.",
         "VERIFICATION_NEWTOKEN_TITLE": "Request New Token",
-        "VERIFICATION_VALIDATION_ONGOING": "The {{ value }} method has been selected to verify your domain. Click on the button to trigger a verification check or reset the verification process.",
+        "VERIFICATION_VALIDATION_ONGOING": "The {{ value }} method has been selected to verify your Organization Domain. Click on the button to trigger a verification check or reset the verification process.",
         "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
         "RESETMETHOD": "Reset verification method"
       },
       "DOWNLOAD_FILE": "Download File",
       "SELECTORGTOOLTIP": "Select this organization.",
-      "PRIMARYDOMAIN": "Primary Domain",
+      "PRIMARYDOMAIN": "Organization Domain",
       "STATE": "State",
       "USEPASSWORD": "Set Initial Password",
       "USEPASSWORDDESC": "The user does not have to set the password during initialization."
@@ -1432,9 +1432,9 @@
     },
     "DOMAINS": {
       "NEW": "Add Domain",
-      "TITLE": "Verified domains",
+      "TITLE": "Organization Domains",
       "DESCRIPTION": "Configure your organization domains. This domain can be used for domain discovery and username suffixing.",
-      "SETPRIMARY": "Set as Primary",
+      "SETPRIMARY": "Set as Organization Domain",
       "DELETE": {
         "TITLE": "Delete Domain",
         "DESCRIPTION": "You are about to delete one of your domains."
@@ -1462,7 +1462,7 @@
       "MEMBERADDED": "Administrator added.",
       "MEMBERREMOVED": "Administrator removed.",
       "MEMBERCHANGED": "Administrator changed.",
-      "SETPRIMARY": "Primary domain set.",
+      "SETPRIMARY": "Organization Domain set.",
       "DELETED": "Organization deleted successfully",
       "DEFAULTORGNOTFOUND": "The default organization was not found",
       "ORG_WAS_DELETED": "Organization has been deleted."
@@ -1500,7 +1500,7 @@
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
-      "VERIFIED_DOMAINS": "Verified domains",
+      "VERIFIED_DOMAINS": "Organization Domains",
       "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",

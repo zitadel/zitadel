@@ -702,7 +702,7 @@
     "USERNAME": "Nome de Usuário",
     "ORGNAME": "Nome da Organização",
     "ORGID": "ID da Organização",
-    "PRIMARYDOMAIN": "Domínio primário",
+    "PRIMARYDOMAIN": "Domínio da Organização",
     "PROJECTNAME": "Nome do Projeto",
     "RESOURCEOWNER": "Proprietário do Recurso",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Baixar Arquivo",
       "SELECTORGTOOLTIP": "Selecionar esta organização.",
-      "PRIMARYDOMAIN": "Domínio Principal",
+      "PRIMARYDOMAIN": "Domínio da Organização",
       "STATE": "Estado",
       "USEPASSWORD": "Definir Senha Inicial",
       "USEPASSWORDDESC": "O usuário não precisa definir a senha durante a inicialização."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Adicionar Domínio",
-      "TITLE": "Domínios verificados",
+      "TITLE": "Domínio da Organização",
       "DESCRIPTION": "Configure seus domínios. Este domínio pode ser usado para o login dos seus usuários.",
-      "SETPRIMARY": "Definir como Principal",
+      "SETPRIMARY": "Domínio da Organização",
       "DELETE": {
         "TITLE": "Excluir Domínio",
         "DESCRIPTION": "Você está prestes a excluir um dos seus domínios. Observe que seus usuários não poderão mais usar este domínio para fazer login."
@@ -1462,7 +1462,7 @@
       "MEMBERADDED": "Administrador adicionado.",
       "MEMBERREMOVED": "Administrador removido.",
       "MEMBERCHANGED": "Administrador alterado.",
-      "SETPRIMARY": "Domínio principal definido.",
+      "SETPRIMARY": "Domínio da Organização",
       "DELETED": "Organização excluída com sucesso",
       "DEFAULTORGNOTFOUND": "A organização padrão não foi encontrada",
       "ORG_WAS_DELETED": "Organização foi excluída."
@@ -1500,7 +1500,7 @@
       "NOTIFICATIONS_DESC": "Configurações de SMTP e SMS",
       "MESSAGETEXTS": "Textos de Mensagem",
       "IDP": "Provedores de Identidade",
-      "VERIFIED_DOMAINS": "Domínios verificados",
+      "VERIFIED_DOMAINS": "Domínio da Organização",
       "DOMAIN": "Configurações de Domínio",
       "LOGINTEXTS": "Textos da Interface de Login",
       "BRANDING": "Marca",
