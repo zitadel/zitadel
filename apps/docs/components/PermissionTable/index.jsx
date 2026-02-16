@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import yaml from 'js-yaml';
 import { Check, X } from 'lucide-react';
-import { cn } from '@/utils/cn'; // Assuming utils/cn exists or I'll use clsx/tailwind-merge directly if not sure
+import { cn } from '@/utils/cn'; // Assuming utils/cn exists, or I'll use clsx/tailwind-merge directly if not sure
 
-// Fallback utility if generic cn doesn't exist, checking imports first is safer but I'll inline a simple merge if needed
+// Fallback utility if generic cn doesn't exist, checking imports first is safer, but I'll inline a simple merge if needed
 // Checking package.json I saw clsx and tailwind-merge are dependencies.
 
 function classNames(...classes) {

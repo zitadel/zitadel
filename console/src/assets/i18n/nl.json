@@ -53,9 +53,9 @@
         "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals de afdeling. Je kunt deze informatie gebruiken in je acties."
       },
       "MACHINES": {
-        "TITLE": "Servicegebruikers",
-        "DESCRIPTION": "Servicegebruikers authenticeren niet-interactief met behulp van een JWT-bearertoken ondertekend met een privésleutel. Ze kunnen ook een persoonlijk toegangstoken gebruiken.",
-        "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals het authenticatiesysteem. Je kunt deze informatie gebruiken in je acties."
+        "TITLE": "Serviceaccounts",
+        "DESCRIPTION": "Serviceaccounts authenticeren niet-interactief met behulp van een JWT-bearertoken ondertekend met een privésleutel. Ze kunnen ook een persoonlijk toegangstoken gebruiken.",
+        "METADATA": "Voeg aangepaste attributen toe aan het account zoals het authenticatiesysteem. Je kunt deze informatie gebruiken in je acties."
       },
       "SELF": {
         "METADATA": "Voeg aangepaste attributen toe aan je gebruiker zoals je afdeling. Je kunt deze informatie gebruiken in de acties van je organisatie."
@@ -424,7 +424,7 @@
     "ROLES": "Rollen",
     "GRANTEDPROJECT": "Verleende projecten",
     "HUMANUSERS": "Gebruikers",
-    "MACHINEUSERS": "Servicegebruikers",
+    "MACHINEUSERS": "Serviceaccounts",
     "LOGOUT": "Alle gebruikers uitloggen",
     "NEWORG": "Nieuwe organisatie",
     "IAMADMIN": "U bent een instantie-beheerder. Let op: u heeft uitgebreide rechten.",
@@ -990,8 +990,8 @@
       "COUNTRY": "Land"
     },
     "MACHINE": {
-      "TITLE": "Details Servicegebruiker",
-      "USERNAME": "Gebruikersnaam",
+      "TITLE": "Details Serviceaccount",
+      "USERNAME": "Accountnaam",
       "NAME": "Naam",
       "DESCRIPTION": "Beschrijving",
       "KEYSTITLE": "Sleutels",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "Geselecteerde gebruikers gedeactiveerd.",
       "SELECTEDKEYSDELETED": "Geselecteerde sleutels verwijderd.",
       "KEYADDED": "Sleutel toegevoegd!",
-      "MACHINEADDED": "Servicegebruiker aangemaakt!",
+      "MACHINEADDED": "Serviceaccount aangemaakt!",
       "DELETED": "Gebruiker succesvol verwijderd!",
       "UNLOCKED": "Gebruiker succesvol ontgrendeld!",
       "PASSWORDLESSREGISTRATIONSENT": "Registratielink succesvol verzonden.",

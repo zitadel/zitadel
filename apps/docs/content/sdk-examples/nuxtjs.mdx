@@ -31,9 +31,9 @@ The example implements secure [session management](https://authjs.dev/concepts/s
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/console-overview). Follow the PKCE application setup guide to:
 
-1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects-overview)
 2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/api/auth/callback/zitadel` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000`)
@@ -46,7 +46,7 @@ Before running this example, you need to create and configure a PKCE application
 Once you have your Zitadel application configured:
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-nuxtjs).
-2. Create a `.env` file and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications). **Use these exact environment variable names:**
+2. Create a `.env` file and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications-overview). **Use these exact environment variable names:**
 ```
    PORT=3000
    SESSION_DURATION=3600
@@ -59,7 +59,7 @@ Once you have your Zitadel application configured:
    AUTH_ORIGIN=http://localhost:3000
 ```
 Replace these values with:
-   - Your actual Zitadel instance URL (the **Issuer** from your [Zitadel instance settings](https://zitadel.com/docs/guides/manage/console/overview))
+   - Your actual Zitadel instance URL (the **Issuer** from your [Zitadel instance settings](https://zitadel.com/docs/guides/manage/console/console-overview))
    - The **Client ID** you copied when creating the application
    - A randomly generated **NUXT_AUTH_SECRET** for session encryption (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
    - The **callback URI** you configured in the PKCE setup (must match exactly)
