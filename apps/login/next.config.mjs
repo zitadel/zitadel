@@ -36,6 +36,10 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: process.env.NEXT_OUTPUT_MODE || undefined,
   reactStrictMode: true,
+  webpack: (config) => {
+    config.optimization.minimize = false;
+    return config;
+  },
   experimental: {
     // Add React 19 compatibility optimizations
     optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],

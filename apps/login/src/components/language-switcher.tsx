@@ -9,6 +9,7 @@ import clsx from "clsx";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 // Helper function to get language switcher roundness from theme
 function getLanguageSwitcherRoundness(): string {
@@ -34,6 +35,7 @@ export function LanguageSwitcher() {
   const handleChange = async (language: Lang) => {
     setSelected(language);
     const newLocale = language.code;
+    trackEvent(MixpanelEvents.language_selected, { language: newLocale, previous_language: currentLocale });
 
     await setLanguageCookie(newLocale);
 

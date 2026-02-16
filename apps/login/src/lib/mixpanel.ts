@@ -100,6 +100,9 @@ export const MixpanelEvents = {
   mfa_setup_method_selected: "mfa_setup_method_selected",
   mfa_setup_skipped: "mfa_setup_skipped",
 
+  // Language
+  language_selected: "language_selected",
+
   // Page view
   page_view: "page_view",
 } as const;
@@ -111,8 +114,10 @@ export function trackEvent(
   event: MixpanelEvent,
   properties?: Record<string, string | number | boolean>,
 ) {
+  const props = { source: "login", ...properties };
+  console.log(`[Mixpanel] Tracking event: ${event}`, props);
   if (!initialized) return;
-  mixpanel.track(event, properties);
+  mixpanel.track(event, props);
 }
 
 export function trackPageView(pathname: string) {
