@@ -23,7 +23,7 @@ This example uses **[@auth/qwik](https://www.npmjs.com/package/@auth/qwik)**, a 
 
 This [Qwik](https://qwik.dev) application showcases a complete authentication implementation using [Zitadel](https://qwik.dev) application showcases a complete authentication implementation using [Zitadel](https://zitadel.com/docs) with the [Authorization Code Flow with PKCE](https://qwik.dev). The example includes secure sign-in functionality that redirects users to Zitadel's hosted login page, handles the OAuth callback to exchange authorization codes for [access tokens](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint), and manages sessions with [JWT tokens](https://qwik.dev) application showcases a complete authentication implementation using [Zitadel](https://zitadel.com/docs) with the [Authorization Code Flow with PKCE](https://oauth.net/2/pkce/). The example includes secure sign-in functionality that redirects users to Zitadel's hosted login page, handles the OAuth callback to exchange authorization codes for [access tokens](https://zitadel.com/docs/apis/openidoauth/endpoints#token-endpoint), and manages sessions with [JWT tokens](https://zitadel.com/docs/apis/openidoauth/endpoints#token-jwt-response) stored in encrypted server-side cookies.
 
-Route protection is implemented using [Qwik City's](https://qwik.dev/docs/qwikcity) `onRequest` handler, which performs server-side authentication checks before rendering protected pages. Unauthenticated users attempting to access secured routes are automatically redirected to the login page with a callback URL to return them to their intended destination after successful authentication. The application displays comprehensive user profile information including standard [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) like name and email, as well as Zitadel-specific claims such as [organization membership](https://zitadel.com/docs/guides/manage/console/organizations) and [project roles](https://zitadel.com/docs/guides/manage/console/projects).
+Route protection is implemented using [Qwik City's](https://qwik.dev/docs/qwikcity) `onRequest` handler, which performs server-side authentication checks before rendering protected pages. Unauthenticated users attempting to access secured routes are automatically redirected to the login page with a callback URL to return them to their intended destination after successful authentication. The application displays comprehensive user profile information including standard [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) like name and email, as well as Zitadel-specific claims such as [organization membership](https://zitadel.com/docs/guides/manage/console/organizations-overview) and [project roles](https://zitadel.com/docs/guides/manage/console/projects-overview).
 
 Sign-out functionality implements **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** through Zitadel's end-session endpoint, ensuring that users are logged out from both the application and Zitadel's single sign-on session. The logout process includes [CSRF protection](https://zitadel.com/docs/guides/integrate/login/oidc/logout#csrf-protection) using state parameters validated through secure cookies, followed by proper cleanup of session data and redirection back to the application.
 
@@ -33,22 +33,22 @@ Sign-out functionality implements **[federated logout](https://zitadel.com/docs/
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/console-overview). Follow the PKCE application setup guide to:
 
-1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects-overview)
 2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback/zitadel` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/api/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps
 
-> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/console-overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
 
 ### Run the example
 
-Once you have your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications) configured:
+Once you have your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications-overview) configured:
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-qwik).
-2. Create a `.env.local` file and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications):
+2. Create a `.env.local` file and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications-overview):
    ```
    VITE_PORT=3000
    VITE_SESSION_SECRET=your-very-secret-and-strong-session-key
