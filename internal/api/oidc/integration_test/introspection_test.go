@@ -111,26 +111,6 @@ func TestIntrospection_RoleAddedAfterLogin(t *testing.T) {
 	// wait a bit to ensure the grant is processed
 	time.Sleep(1 * time.Second)
 
-	// TODO remove the second login. It should work without logging in again
-	// LOGIN WITH USER
-	authRequestID = createAuthRequest(t, Instance, app.GetClientId(), redirectURI, scopes...)
-	sessionID, sessionToken, startTime, changeTime = Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
-	linkResp, err = Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
-		AuthRequestId: authRequestID,
-		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
-			Session: &oidc_pb.Session{
-				SessionId:    sessionID,
-				SessionToken: sessionToken,
-			},
-		},
-	})
-	require.NoError(t, err)
-	code = assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err = exchangeTokens(t, Instance, app.GetClientId(), code, redirectURI)
-	require.NoError(t, err)
-	assertTokens(t, tokens, false)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
-
 	// INTROSPECT TOKEN AND VERIFY ROLE IS PRESENT
 	introspectionAfter, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, tokens.AccessToken)
 	require.NoError(t, err)
