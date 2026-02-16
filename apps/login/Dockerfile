@@ -10,7 +10,10 @@ COPY --chown=nextjs:nodejs .next/standalone ./
 USER nextjs
 ENV HOSTNAME="::" \
     PORT="3000" \
-    NODE_ENV="production"
+    NODE_ENV="production" \
+    NODE_OPTIONS="--use-openssl-ca" \
+    SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt" \
+    SSL_CERT_DIR="/etc/ssl/certs"
 
 # TODO: Check healthy, not ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
