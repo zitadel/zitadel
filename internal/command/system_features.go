@@ -11,11 +11,9 @@ import (
 
 type SystemFeatures struct {
 	LoginDefaultOrg                *bool
-	TokenExchange                  *bool
 	UserSchema                     *bool
 	ImprovedPerformance            []feature.ImprovedPerformanceType
 	OIDCSingleV1SessionTermination *bool
-	EnableBackChannelLogout        *bool
 	LoginV2                        *feature.LoginV2
 	PermissionCheckV2              *bool
 	EnableRelationalTables         *bool
@@ -24,11 +22,9 @@ type SystemFeatures struct {
 func (m *SystemFeatures) isEmpty() bool {
 	return m == nil || (m.LoginDefaultOrg == nil &&
 		m.UserSchema == nil &&
-		m.TokenExchange == nil &&
 		// nil check to allow unset improvements
 		m.ImprovedPerformance == nil &&
 		m.OIDCSingleV1SessionTermination == nil &&
-		m.EnableBackChannelLogout == nil &&
 		m.LoginV2 == nil &&
 		m.PermissionCheckV2 == nil &&
 		m.EnableRelationalTables == nil)

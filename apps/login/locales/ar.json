@@ -47,6 +47,7 @@
       "userNotFound": "المستخدم غير موجود في النظام",
       "couldNotCreateSession": "تعذر إنشاء جلسة للمستخدم",
       "initialUserNotSupported": "المستخدم الأولي غير مدعوم",
+      "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
       "usernamePasswordNotAllowed": "اسم المستخدم وكلمة المرور غير مسموح بهما! اتصل بالمسؤول لمزيد من المعلومات.",
       "passkeysNotAllowed": "مفاتيح المرور غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
       "couldNotFindIdentityProvider": "تعذر العثور على مزود الهوية.",

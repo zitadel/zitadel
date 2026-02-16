@@ -1,0 +1,313 @@
+---
+title: Configuration
+sidebar_label: Configuration
+---
+
+
+
+This guide covers the major configuration options for the Zitadel Helm chart. For a complete list of options, see the [values.yaml](https://github.com/zitadel/zitadel-charts/blob/main/charts/zitadel/values.yaml) in the chart repository.
+
+## Global Settings
+
+Global settings affect multiple components of the deployment.
+
+### Replica Count
+
+Set the number of Zitadel replicas:
+
+```yaml
+replicaCount: 2
+```
+
+### Container Images
+
+#### Zitadel Image
+
+Configure the Zitadel container image:
+
+```yaml
+image:
+  repository: ghcr.io/zitadel/zitadel
+  tag: "v4.9.1"
+  pullPolicy: IfNotPresent
+```
+
+#### Login Image
+
+Configure the Login container image:
+
+```yaml
+login:
+  image:
+    repository: ghcr.io/zitadel/login
+    tag: "v4.9.1"
+    pullPolicy: IfNotPresent
+```
+
+### Pod Security Context
+
+Configure security settings for the pods. These settings apply globally to all pods in the deployment:
+
+```yaml
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  readOnlyRootFilesystem: true
+  privileged: false
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+```
+
+## Zitadel Settings
+
+### ExternalDomain
+
+The domain where Zitadel is accessible. This is used for generating URLs, cookies, and OIDC endpoints.
+
+```yaml
+zitadel:
+  configmapConfig:
+    ExternalDomain: "zitadel.example.com"
+    ExternalPort: 443
+    ExternalSecure: true
+```
+
+| Setting          | Description                                  |
+|------------------|----------------------------------------------|
+| `ExternalDomain` | The public domain name (no protocol or port) |
+| `ExternalPort`   | The public port (443 for HTTPS, 80 for HTTP) |
+| `ExternalSecure` | Whether the external connection uses HTTPS   |
+
+### TLS
+
+TLS is terminated at the ingress controller. The Zitadel containers do not handle TLS termination:
+
+```yaml
+zitadel:
+  configmapConfig:
+    TLS:
+      Enabled: false
+```
+
+### FirstInstance / Bootstrapping
+
+Configure the initial Zitadel instance created during setup.
+
+```yaml
+zitadel:
+  configmapConfig:
+    FirstInstance:
+      Org:
+        Human:
+          UserName: "admin"
+          Password: "SecurePassword123!"
+          FirstName: "Zitadel"
+          LastName: "Admin"
+          Email: "admin@zitadel.example.com"
+          PasswordChangeRequired: false
+```
+
+#### Service Account for System API
+
+For programmatic access, configure a system user with RSA keys:
+
+```yaml
+zitadel:
+  configmapConfig:
+    SystemAPIUsers:
+      systemuser:
+        KeyData: |
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...
+          -----END PUBLIC KEY-----
+```
+
+Generate the RSA private key:
+
+```bash
+openssl genrsa -out system-user-private.pem 2048
+```
+
+Extract the public key:
+
+```bash
+openssl rsa -in system-user-private.pem -pubout -out system-user-public.pem
+```
+
+## Secrets
+
+### Referenced Secrets
+
+Reference Kubernetes Secrets for sensitive values:
+
+```yaml
+zitadel:
+  masterkeySecretName: zitadel-masterkey
+  configSecretName: zitadel-config-secret
+```
+
+Create the masterkey secret:
+
+```bash
+kubectl create secret generic zitadel-masterkey \
+  --from-literal=masterkey="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
+```
+
+Create a config secret for sensitive values. Save this as `zitadel-config-secret.yaml`:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: zitadel-config-secret
+type: Opaque
+stringData:
+  config.yaml: |
+    Database:
+      Postgres:
+        User:
+          Password: "secure-app-password"
+        Admin:
+          Password: "secure-admin-password"
+```
+
+Apply the secret:
+
+```bash
+kubectl apply --filename zitadel-config-secret.yaml
+```
+
+Reference it in your values:
+
+```yaml
+zitadel:
+  configSecretName: zitadel-config-secret
+  configSecretKey: config.yaml
+```
+
+## Scaling and Availability
+
+Zitadel is designed to run as a stateless application, which makes horizontal scaling straightforward. For production deployments, you should run multiple replicas to ensure availability during node failures, deployments, and other disruptions.
+
+### Replica Count
+
+Running at least two replicas ensures that your Zitadel deployment remains available if one pod fails or is evicted. For larger deployments with higher traffic, you may want to run more replicas.
+
+```yaml
+replicaCount: 2
+```
+
+### Autoscaling
+
+The chart supports the [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) (HPA) to automatically scale the number of Zitadel replicas based on resource utilization. When autoscaling is enabled, the HPA overrides the `replicaCount` value.
+
+Enable autoscaling with CPU-based scaling:
+
+```yaml
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPU: 80
+```
+
+You can also scale based on memory utilization:
+
+```yaml
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetMemory: 80
+```
+
+For more advanced scaling, you can use custom metrics exposed by Zitadel. This requires a metrics server such as [Prometheus](https://prometheus.io/) and a metrics adapter such as [prometheus-adapter](https://github.com/kubernetes-sigs/prometheus-adapter) running in your cluster.
+
+The following example scales when the average number of goroutines per pod exceeds 150. The `go_goroutines` metric is a good proxy for concurrent load. You should observe your application's baseline to find a suitable value for your workload.
+
+```yaml
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: "go_goroutines"
+      target:
+        type: AverageValue
+        averageValue: "150"
+```
+
+You can also configure the [scaling behavior](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior) to control how quickly the HPA scales up or down:
+
+```yaml
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPU: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+```
+
+### Pod Disruption Budget
+
+A [Pod Disruption Budget](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) ensures that a minimum number of pods remain available during voluntary disruptions such as node drains, cluster upgrades, or deployment rollouts. Without a PDB, Kubernetes may evict all your pods simultaneously during maintenance.
+
+```yaml
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+```
+
+With `minAvailable: 1`, Kubernetes guarantees that at least one Zitadel pod is always running. If you have more replicas, you can increase this value accordingly.
+
+### Pod Anti-Affinity
+
+Pod anti-affinity rules tell Kubernetes to schedule Zitadel pods on different nodes. This prevents a single node failure from taking down all your Zitadel replicas.
+
+```yaml
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - zitadel
+          topologyKey: kubernetes.io/hostname
+```
+
+The `preferredDuringSchedulingIgnoredDuringExecution` rule is a soft preference. Kubernetes will try to spread pods across nodes, but will still schedule pods on the same node if no other nodes are available. For stricter requirements, you can use `requiredDuringSchedulingIgnoredDuringExecution` instead.
+
+## Next Steps
+
+- [Configuring the Ingress](./ingress) — Set up ingress for Zitadel and Login containers
+- [Configuring the Database](./database) — Connect to PostgreSQL
+- [Configuring Observability](./observability) — Collect traces, metrics, and logs
+- [Operations](./operations) — Learn about upgrades and scaling
+- [Uninstalling](./uninstalling) — Remove Zitadel from your cluster

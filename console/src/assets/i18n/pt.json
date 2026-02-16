@@ -46,16 +46,16 @@
     },
     "USERS": {
       "TITLE": "Usuários",
-      "DESCRIPTION": "Um usuário é um humano ou uma máquina que pode acessar seus aplicativos.",
+      "DESCRIPTION": "Um usuário é um humano ou uma conta de serviço que pode acessar seus aplicativos.",
       "HUMANS": {
         "TITLE": "Usuários",
         "DESCRIPTION": "Os usuários são autenticados interativamente em uma sessão do navegador com um prompt de login.",
         "METADATA": "Adicione atributos personalizados ao usuário, como o departamento. Você pode usar essas informações em suas ações."
       },
       "MACHINES": {
-        "TITLE": "Usuários do serviço",
-        "DESCRIPTION": "Os usuários do serviço autenticam-se de forma não interativa usando um token de portador JWT assinado com uma chave privada. Eles também podem usar um token de acesso pessoal.",
-        "METADATA": "Adicione atributos personalizados ao usuário, como o sistema de autenticação. Você pode usar essas informações em suas ações."
+        "TITLE": "Contas de serviço",
+        "DESCRIPTION": "As contas de serviço autenticam-se de forma não interativa usando um token de portador JWT assinado com uma chave privada. Elas também podem usar um token de acesso pessoal.",
+        "METADATA": "Adicione atributos personalizados à conta, como o sistema de autenticação. Você pode usar essas informações em suas ações."
       },
       "SELF": {
         "METADATA": "Adicione atributos personalizados ao seu usuário, como seu departamento. Você pode usar essas informações nas ações da sua organização."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Chaves Web Ativas e Futuras",
           "DESCRIPTION": "Suas chaves web ativas e futuras. Ativar uma nova chave desativará a atual.",
-          "NOTE": "Nota: O endpoint JWKs OIDC retorna uma resposta que pode ser armazenada em cache (padrão: 5 min). Evite ativar uma chave muito cedo, pois ela pode ainda não estar disponível no cache e para os clientes.",
+          "NOTE": "Nota: O endpoint JWKs OIDC retorna uma resposta que pode ser armazenada em cache (padrão: 5 min). Evite ativar uma chave muito cedo, pois ela pode ainda não estar disponível no cache e para os aplicativos.",
           "ACTIVATE": "Ativar próxima Chave Web",
           "ACTIVE": "Atualmente ativa",
           "NEXT": "Próxima na fila",
@@ -223,8 +223,8 @@
           "PR": "Quando um usuário reseta sua senha, ele receberá um e-mail com um link para definir uma nova senha.",
           "VE": "Quando um usuário muda seu endereço de e-mail, ele receberá um e-mail com um link para verificar o novo endereço.",
           "VP": "Quando um usuário muda seu número de telefone, ele receberá um SMS com um código para verificar o novo número.",
-          "VEO": "Quando um usuário adiciona um método de Senha Única via e-mail, ele precisa ativá-lo inserindo um código enviado para seu endereço de e-mail.",
-          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone.",
+          "VEO": "Quando um usuário adiciona um método OTP via e-mail, ele precisa ativá-lo inserindo um código enviado para seu endereço de e-mail.",
+          "VSO": "Quando um usuário adiciona um método OTP via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone.",
           "IU": "Quando um código de convite de usuário é criado, eles receberão um e-mail com um link para configurar seu método de autenticação."
         }
       },
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formulário de Login",
           "DESCRIPTION": "Personalize o formulário de login.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Usuário e Senha permitidos",
-            "DESCRIPTION": "Permite que seus usuários façam login com seu nome de usuário e senha. Se isto for desativado, seus usuários só poderão fazer login usando autenticação sem senha ou com um provedor de identidade externo."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Autenticação local permitida",
+            "DESCRIPTION": "Permita que os seus utilizadores iniciem sessão com o seu nome de utilizador e palavra-passe ou autenticação por passkey. Se isto for desativado, os seus utilizadores apenas poderão iniciar sessão utilizando um fornecedor de identidade externo."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Registro de Usuário permitido",
@@ -420,14 +420,14 @@
     "ORGANIZATION": "Organização",
     "PROJECT": "Projetos",
     "PROJECTOVERVIEW": "Visão Geral",
-    "PROJECTGRANTS": "Autorizações",
+    "PROJECTGRANTS": "Concessões de projeto",
     "ROLES": "Funções",
     "GRANTEDPROJECT": "Projetos Concedidos",
     "HUMANUSERS": "Usuários",
-    "MACHINEUSERS": "Usuários de Serviço",
+    "MACHINEUSERS": "Contas de serviço",
     "LOGOUT": "Encerrar Sessão de Todos os Usuários",
     "NEWORG": "Nova Organização",
-    "IAMADMIN": "Você é um Administrador IAM. Observe que você possui permissões estendidas.",
+    "IAMADMIN": "Você é um Administrador de instância. Observe que você possui permissões estendidas.",
     "SHOWORGS": "Mostrar Todas as Organizações",
     "GRANTS": "Autorizações",
     "ACTIONS": "Ações",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Tem permissão para criar e gerenciar usuários",
     "IAM_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais de todas as organizações",
     "IAM_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais de todas as organizações",
-    "IAM_LOGIN_CLIENT": "Tem permissão para gerenciar clientes de login",
+    "IAM_LOGIN_CLIENT": "Tem permissão para gerenciar aplicativos de login",
     "ORG_OWNER": "Tem permissão sobre toda a organização",
     "ORG_USER_MANAGER": "Tem permissão para criar e gerenciar usuários da organização",
     "ORG_OWNER_VIEWER": "Tem permissão para revisar toda a organização",
@@ -766,7 +766,7 @@
       "KEYS": "Chaves",
       "PAT": "Tokens de Acesso Pessoal",
       "USERGRANTS": "Autorizações",
-      "MEMBERSHIPS": "Associações",
+      "MEMBERSHIPS": "Funções de Administrador",
       "METADATA": "Metadados"
     },
     "TITLE": "Informações Pessoais",
@@ -851,7 +851,7 @@
       "U2F_NAME": "Nome do Autenticador",
       "TYPE": {
         "0": "Nenhum MFA definido",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Impressão digital, Chaves de Segurança, Face ID e outros"
       },
       "STATE": {
@@ -884,7 +884,7 @@
       "DESCRIPTION": "Adicione um segundo fator para garantir a segurança ideal da sua conta.",
       "MANAGE_DESCRIPTION": "Gerencie os métodos de segundo fator dos seus usuários.",
       "ADD": "Adicionar Fator",
-      "OTP": "Aplicativo de Autenticação para TOTP (One-Time Password)",
+      "OTP": "Aplicativo de Autenticação para TOTP",
       "OTP_DIALOG_TITLE": "Adicionar OTP",
       "OTP_DIALOG_DESCRIPTION": "Digitalize o código QR com um aplicativo autenticador e insira o código abaixo para verificar e ativar o método OTP.",
       "U2F": "Impressão digital, Chaves de Segurança, Face ID e outros",
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "Fator adicionado com sucesso!",
       "U2F_ERROR": "Ocorreu um erro durante a configuração!",
       "U2F_NAME": "Nome do Autenticador",
-      "OTPSMS": "OTP (senha de uso único) com SMS",
-      "OTPEMAIL": "OTP (senha de uso único) com e-mail",
-      "SETUPOTPSMSDESCRIPTION": "Deseja configurar este número de telefone como segundo fator OTP (senha de uso único)?",
+      "OTPSMS": "OTP com SMS",
+      "OTPEMAIL": "OTP com e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Deseja configurar este número de telefone como segundo fator OTP?",
       "OTPSMSSUCCESS": "Fator OTP configurado com sucesso.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Seu telefone deve ser verificado para usar este método.",
       "OTPEMAILSUCCESS": "Fator OTP configurado com sucesso.",
       "TYPE": {
         "0": "Nenhum MFA definido",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Impressão digital, Chaves de Segurança, Face ID e outros"
       },
       "STATE": {
@@ -990,8 +990,8 @@
       "COUNTRY": "País"
     },
     "MACHINE": {
-      "TITLE": "Detalhes do Usuário de Serviço",
-      "USERNAME": "Nome de Usuário",
+      "TITLE": "Detalhes da Conta de Serviço",
+      "USERNAME": "Nome da Conta",
       "NAME": "Nome",
       "DESCRIPTION": "Descrição",
       "KEYSTITLE": "Chaves",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Funções de administrador do Zitadel",
-      "DESCRIPTION": "Essas são todas as permissões de membros do usuário. Você também pode modificá-las nas páginas de detalhes da organização, projeto ou IAM.",
+      "DESCRIPTION": "Essas são todas as funções de administrador do usuário. Você também pode modificá-las nas páginas de detalhes da organização, projeto ou instância.",
       "ORGCONTEXT": "Você vê todas as organizações e projetos relacionados à organização atualmente selecionada.",
       "USERCONTEXT": "Você vê todas as organizações e projetos para os quais está autorizado. Incluindo outras organizações.",
       "CREATIONDATE": "Data de Criação",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Remover",
       "TYPE": "Tipo",
       "ORGID": "ID da Organização",
-      "UPDATED": "A permissão de membro foi atualizada.",
+      "UPDATED": "A função de administrador foi atualizada.",
       "NOPERMISSIONTOEDIT": "Você não possui as permissões necessárias para editar funções!",
       "TYPES": {
         "UNKNOWN": "Desconhecido",
@@ -1267,12 +1267,12 @@
       "DESCRIPTION": "Gerencie as políticas globais e configurações de acesso à gerência."
     },
     "EVENTSTORE": {
-      "TITLE": "Administração de armazenamento IAM",
+      "TITLE": "Administração de armazenamento Instância",
       "DESCRIPTION": "Gerencie as visualizações do Zitadel e eventos falhados."
     },
     "MEMBER": {
-      "TITLE": "Gerentes",
-      "DESCRIPTION": "Esses gerentes têm permissão para fazer alterações na sua instância."
+      "TITLE": "Administradores",
+      "DESCRIPTION": "Esses administradores têm permissão para fazer alterações na sua instância."
     },
     "PAGES": {
       "STATE": "Status",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Gerente removido.",
-      "MEMBERSADDED": "Gerentes adicionados.",
-      "MEMBERADDED": "Gerente adicionado.",
-      "MEMBERCHANGED": "Gerente alterado.",
+      "MEMBERREMOVED": "Administrador removido.",
+      "MEMBERSADDED": "Administradores adicionados.",
+      "MEMBERADDED": "Administrador adicionado.",
+      "MEMBERCHANGED": "Administrador alterado.",
       "ROLEREMOVED": "Função removida.",
       "ROLECHANGED": "Função alterada.",
       "REACTIVATED": "Reativado",
@@ -1450,8 +1450,8 @@
       "3": "Removida"
     },
     "MEMBER": {
-      "TITLE": "Gerentes da Organização",
-      "DESCRIPTION": "Defina os usuários que podem alterar as preferências da sua organização."
+      "TITLE": "Administradores da Organização",
+      "DESCRIPTION": "Defina os administradores que podem alterar as preferências da sua organização."
     },
     "TOAST": {
       "UPDATED": "Organização atualizada com sucesso.",
@@ -1459,9 +1459,9 @@
       "REACTIVATED": "Organização reativada.",
       "DOMAINADDED": "Domínio adicionado.",
       "DOMAINREMOVED": "Domínio removido.",
-      "MEMBERADDED": "Gerente adicionado.",
-      "MEMBERREMOVED": "Gerente removido.",
-      "MEMBERCHANGED": "Gerente alterado.",
+      "MEMBERADDED": "Administrador adicionado.",
+      "MEMBERREMOVED": "Administrador removido.",
+      "MEMBERCHANGED": "Administrador alterado.",
       "SETPRIMARY": "Domínio principal definido.",
       "DELETED": "Organização excluída com sucesso",
       "DEFAULTORGNOTFOUND": "A organização padrão não foi encontrada",
@@ -1595,7 +1595,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Número do remetente",
         "VERIFYSERVICESID": "SID do serviço de verificação",
-        "VERIFYSERVICESID_DESCRIPTION": "Configurar um SID do serviço de verificação permite usar o serviço Twilio Verify em vez do serviço de mensagens para a verificação de números de telefone e SMS OTP.",
+        "VERIFYSERVICESID_DESCRIPTION": "Configurar um SID do serviço de verificação permite usar o serviço Twilio Verify em vez do serviço de mensagens para a verificação de números de telefone e OTP SMS.",
         "ADDED": "Twilio adicionado com sucesso.",
         "UPDATED": "Twilio atualizado com sucesso.",
         "REMOVED": "Twilio removido",
@@ -1613,8 +1613,8 @@
         "4": "Redefinição de senha",
         "5": "Inicialização passkey",
         "6": "Segredo do aplicativo",
-        "7": "Senha única (OTP) - SMS",
-        "8": "Senha única (OTP) - e-mail"
+        "7": "OTP - SMS",
+        "8": "OTP - e-mail"
       },
       "EXPIRY": "Expiração (em minutos)",
       "INCLUDEDIGITS": "Incluir números",
@@ -1636,8 +1636,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Organização Padrão de Login",
       "LOGINDEFAULTORG_DESCRIPTION": "A interface de login utilizará as configurações da organização padrão (e não da instância) se nenhum contexto de organização estiver definido",
-      "OIDCTOKENEXCHANGE": "Troca de Token OIDC",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Habilita o tipo de concessão experimental urn:ietf:params:oauth:grant-type:token-exchange para o endpoint de token OIDC. A troca de token pode ser usada para solicitar tokens com escopo menor ou personificar outros usuários. Consulte a política de segurança para permitir a personificação em uma instância.",
       "USERSCHEMA": "Esquema de Usuário",
       "USERSCHEMAS_DESCRIPTION": "Esquemas de Usuário permitem gerenciar esquemas de dados do usuário. Se o sinalizador estiver ativado, você poderá usar a nova API e seus recursos.",
       "ACTIONS": "Ações",
@@ -1646,8 +1644,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se a bandeira estiver habilitada, você poderá encerrar uma sessão única da interface do usuário de login fornecendo um id_token com uma reivindicação `sid como id_token_hint no ponto final de end_session. Observe que atualmente todas as sessões do mesmo agente de usuário (navegador) são encerradas na interface do usuário de login. As sessões gerenciadas por meio da API de sessão já permitem o encerramento de sessões individuais.",
       "DEBUGOIDCPARENTERROR": "Erro de Depuração do Pai OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se a bandeira estiver ativada, o erro do pai OIDC será registrado no console.",
-      "ENABLEBACKCHANNELLOGOUT": "Ativar Logout de Backchannel",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Back-Channel implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os clientes sobre a terminação da sessão no Provedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificação de Permissão V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Se a bandeira estiver ativada, você poderá usar a nova API e seus recursos.",
       "STATES": {
@@ -1878,8 +1874,8 @@
         "changedate": "Data de alteração",
         "username": "Nome de usuário",
         "tempUsername": "Nome de usuário temporário",
-        "otp": "Senha de uso único",
-        "verifyUrl": "URL para verificar a senha de uso único",
+        "otp": "OTP",
+        "verifyUrl": "URL para verificar o OTP",
         "expiry": "Data de expiração",
         "applicationName": "Nome do aplicativo"
       },
@@ -1946,14 +1942,14 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Membros",
+      "TITLE": "Administradores",
       "USERNAME": "Nome de Usuário",
       "DISPLAYNAME": "Nome de Exibição",
       "LOGINNAME": "Nome de Login",
       "EMAIL": "E-mail",
       "ROLES": "Funções",
-      "ADD": "Adicionar Membro",
-      "ADDDESCRIPTION": "Insira os nomes dos usuários a serem adicionados."
+      "ADD": "Adicionar Administrador",
+      "ADDDESCRIPTION": "Insira os nomes dos administradores a serem adicionados."
     },
     "TABLE": {
       "TOTAL": "Total de Entradas",
@@ -2043,9 +2039,9 @@
       "NAME": "Novo Nome"
     },
     "MEMBER": {
-      "TITLE": "Gerentes",
-      "TITLEDESC": "Os gerentes podem fazer alterações neste projeto com base em sua função.",
-      "DESCRIPTION": "Esses gerentes podem ter permissão para editar o seu projeto.",
+      "TITLE": "Administradores",
+      "TITLEDESC": "Os administradores podem fazer alterações neste projeto com base em sua função.",
+      "DESCRIPTION": "Esses administradores podem ter permissão para editar o seu projeto.",
       "USERNAME": "Nome de Usuário",
       "DISPLAYNAME": "Nome de Exibição",
       "LOGINNAME": "Nome de Login",
@@ -2059,7 +2055,7 @@
       "DESCRIPTION": "Permite que outra organização use o seu projeto.",
       "EDITTITLE": "Editar funções",
       "CREATE": {
-        "TITLE": "Criar Concessão de Organização",
+        "TITLE": "Criar Concessão de projecto",
         "SEL_USERS": "Selecione os usuários aos quais deseja conceder acesso",
         "SEL_PROJECT": "Buscar um projeto",
         "SEL_ROLES": "Selecione as funções que deseja adicionar à concessão",
@@ -2071,13 +2067,13 @@
         "ORG_DESCRIPTION_DESC": "Altere o contexto no cabeçalho acima para conceder um usuário para outra organização.",
         "SEL_ORG_FORMFIELD": "Domínio Completo",
         "SEL_ORG_BUTTON": "Buscar Organização",
-        "FOR_ORG": "A concessão é criada para:"
+        "FOR_ORG": "A concessão do projeto será criada para:"
       },
       "DETAIL": {
         "TITLE": "Concessão de Projeto",
-        "DESC": "Você pode selecionar quais funções podem ser usadas pela organização especificada e eleger gerentes",
-        "MEMBERTITLE": "Gerentes",
-        "MEMBERDESC": "Estes são os gerentes da organização concedida. Adicione usuários aqui que devem ter acesso para editar os dados do projeto.",
+        "DESC": "Você pode selecionar quais funções podem ser usadas pela organização especificada e eleger administradores",
+        "MEMBERTITLE": "Administradores",
+        "MEMBERDESC": "Estes são os administradores da organização concedida. Adicione usuários aqui que devem ter acesso para editar os dados do projeto.",
         "PROJECTNAME": "Nome do Projeto",
         "GRANTEDORG": "Organização Concedida",
         "RESOURCEOWNER": "Proprietário do Recurso"
@@ -2090,7 +2086,7 @@
       "ALL": "Todos",
       "SHOWDETAIL": "Mostrar Detalhes",
       "USER": "Usuário",
-      "MEMBERS": "Gerentes",
+      "MEMBERS": "Administradores",
       "ORG": "Organização",
       "PROJECTNAME": "Nome do Projeto",
       "GRANTEDORG": "Organização Concedida",
@@ -2108,9 +2104,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Concessão de projeto criada.",
         "PROJECTGRANTADDED": "Concessão de projeto criada.",
         "PROJECTGRANTCHANGED": "Concessão de projeto alterada.",
-        "PROJECTGRANTMEMBERADDED": "Gerente da concessão adicionado.",
-        "PROJECTGRANTMEMBERCHANGED": "Gerente da concessão alterado.",
-        "PROJECTGRANTMEMBERREMOVED": "Gerente da concessão removido.",
+        "PROJECTGRANTMEMBERADDED": "Administrador da concessão adicionado.",
+        "PROJECTGRANTMEMBERCHANGED": "Administrador da concessão alterado.",
+        "PROJECTGRANTMEMBERREMOVED": "Administrador da concessão removido.",
         "PROJECTGRANTUPDATED": "Concessão de Projeto atualizada"
       },
       "DIALOG": {
@@ -2173,10 +2169,10 @@
       "EMPTY": "Nenhum projeto encontrado"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Gerente removido.",
-      "MEMBERSADDED": "Gerentes adicionados.",
-      "MEMBERADDED": "Gerente adicionado.",
-      "MEMBERCHANGED": "Gerente alterado.",
+      "MEMBERREMOVED": "Administrador removido.",
+      "MEMBERSADDED": "Administradores adicionados.",
+      "MEMBERADDED": "Administrador adicionado.",
+      "MEMBERCHANGED": "Administrador alterado.",
       "ROLESCREATED": "Funções criadas.",
       "ROLEREMOVED": "Função removida.",
       "ROLECHANGED": "Função alterada.",
@@ -2184,7 +2180,7 @@
       "DEACTIVATED": "Desativado.",
       "CREATED": "Projeto criado.",
       "UPDATED": "Projeto alterado.",
-      "GRANTUPDATED": "Concessão alterada.",
+      "GRANTUPDATED": "Concessão de projeto alterada.",
       "DELETED": "Projeto excluído."
     }
   },
@@ -2406,10 +2402,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Desconhecido",
-      "1": "Senha de uso único para o aplicativo autenticador (TOTP)",
+      "1": "OTP para o aplicativo autenticador",
       "2": "Impressão digital, Chaves de Segurança, Face ID e outros",
-      "3": "Senha de uso único para e-mail (Email OTP)",
-      "4": "Senha de uso único para SMS (SMS OTP)",
+      "3": "OTP Email",
+      "4": "OTP SMS",
       "5": "Códigos de recuperação"
     }
   },
@@ -2630,8 +2626,8 @@
       "IDTOKENROLEASSERTION": "Funções do usuário no ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Se selecionado, as funções solicitadas do usuário autenticado serão adicionadas ao ID token.",
       "IDTOKENUSERINFOASSERTION": "Informações do usuário no ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite que os clientes obtenham claims de perfil, e-mail, telefone e endereço do ID token.",
-      "CLOCKSKEW": "Permite que os clientes lidem com a discrepância de tempo do OP e do cliente. A duração (0-5s) será adicionada ao claim exp e subtraída de iat, auth_time e nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite que os aplicativos obtenham claims de perfil, e-mail, telefone e endereço do ID token.",
+      "CLOCKSKEW": "Permite que os aplicativos lidem com a discrepância de tempo do OP e do aplicativo. A duração (0-5s) será adicionada ao claim exp e subtraída de iat, auth_time e nbf.",
       "RECOMMENDED": "recomendado",
       "NOTRECOMMENDED": "não recomendado",
       "SELECTION": {
@@ -2649,7 +2645,8 @@
             "DESCRIPTION": "Aplicativos de página única (SPA) e, em geral, todos os frameworks JS executados em navegadores"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2765,10 +2762,10 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "Adicionar um Gerente",
+    "ADD": "Adicionar um Administrador",
     "CREATIONTYPE": "Tipo de Criação",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instância",
       "2": "Organização",
       "0": "Projeto Próprio",
       "1": "Projeto Concedido",
@@ -2777,8 +2774,8 @@
     "EDITROLE": "Editar funções",
     "EDITFOR": "Editar as funções para o usuário: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Remover Gerente",
-      "DELETE_DESCRIPTION": "Você está prestes a remover um gerente. Tem certeza?"
+      "DELETE_TITLE": "Remover Administrador",
+      "DELETE_DESCRIPTION": "Você está prestes a remover um administrador. Tem certeza?"
     },
     "SHOWDETAILS": "Clique para mostrar detalhes."
   },
@@ -2813,7 +2810,7 @@
       "UPDATED": "Autorização atualizada.",
       "REMOVED": "Autorização removida",
       "BULKREMOVED": "Autorizações removidas.",
-      "CANTSHOWINFO": "Você não pode visitar o perfil deste usuário porque não é membro da organização à qual esse usuário pertence"
+      "CANTSHOWINFO": "Não é possível visitar o perfil deste utilizador, pois não é administrador da organização à qual este utilizador pertence."
     },
     "DIALOG": {
       "DELETE_TITLE": "Excluir autorização",

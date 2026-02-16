@@ -64,7 +64,12 @@ jobs:
       - name: Lint, Test and Build
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx affected  --nxBail --targets lint test build --exclude @zitadel/docs
+#          NX_NATIVE_LOGGING: "nx::native::cache,nx::native::db"
+          NX_DAEMON: "false"
+          NX_DISABLE_DB: "true"
+        run: pnpm nx affected --nxBail --targets lint test build --exclude @zitadel/docs
+      - name: Check for uncommitted changes (Codegen mismatch)
+        run: git diff --exit-code
       - name: Suggest Pipeline Fix By Nx Cloud AI
         if: failure() || cancelled()
         env:

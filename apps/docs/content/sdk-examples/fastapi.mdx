@@ -1,0 +1,82 @@
+---
+title: FastAPI
+sidebar_label: FastAPI
+framework_url: https://fastapi.tiangolo.com
+auth_library: "Authlib"
+auth_library_url: https://authlib.org
+example_repo: https://github.com/zitadel/example-auth-fastapi
+auth_flow: pkce
+status: stable
+---
+
+## Overview
+
+[FastAPI](https://fastapi.tiangolo.com) is a modern, fast (high-performance) web framework for building APIs with Python based on standard Python type hints. This example demonstrates how to integrate **[Zitadel](https://zitadel.com/docs)** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain sessions across your application.
+
+#### Auth library
+
+This example uses **[Authlib](https://authlib.org)**, the standard authentication library for Python web frameworks. Authlib implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) flow, manages [PKCE](https://oauth.net/2/pkce/), performs secure token exchange, and provides session management helpers. The integration uses Authlib's Starlette client which seamlessly handles OAuth 2.0 flows within FastAPI applications built on [Starlette](https://www.starlette.io).
+
+---
+
+## What this example demonstrates
+
+This example shows a complete authentication implementation using [FastAPI](https://fastapi.tiangolo.com) with [Zitadel](https://zitadel.com/docs). Users start on a public landing page, click a login button to authenticate with Zitadel using the secure [PKCE flow](https://oauth.net/2/pkce/), and are redirected to a protected profile page displaying their [user information](https://zitadel.com/docs/apis/openidoauth/claims) after successful authentication.
+
+The application implements server-side session management with Starlette's session middleware, storing authentication state securely in encrypted cookies. Protected routes use the `require_auth` dependency to automatically redirect unauthenticated users to the sign-in flow, ensuring only authenticated users can access sensitive areas. The profile page displays comprehensive user information including [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) and [session metadata](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint).
+
+The application demonstrates proper **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** by terminating sessions both locally and with Zitadel's [end-session endpoint](https://zitadel.com/docs/guides/integrate/login/oidc/logout), complete with CSRF protection using state parameters. Additionally, it includes automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/endpoints) using [refresh tokens](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) to maintain long-lived sessions without requiring users to re-authenticate. The example uses [Zitadel-specific scopes](https://zitadel.com/docs/apis/openidoauth/scopes) like `urn:zitadel:iam:user:metadata` and `urn:zitadel:iam:org:projects:roles` to access extended user attributes and role information for implementing [role-based access control (RBAC)](https://zitadel.com/docs/guides/manage/console/roles).
+
+---
+
+## Getting started
+
+### Prerequisites
+
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/console-overview). Follow the PKCE application setup guide to:
+
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects-overview)
+2. Configure it to use the PKCE authentication method
+3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
+4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
+5. Copy your **Client ID** for use in the next steps
+6. Optionally enable [refresh tokens](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) in Token Settings for long-lived sessions
+
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/console-overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+
+### Run the example
+
+Once you have your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications-overview) configured:
+
+1. Clone the [repository](https://github.com/zitadel/example-auth-fastapi).
+2. Create a `.env` file (copy from `.env.example`) and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications-overview). **Use these exact environment variable names:**
+   ```
+   PY_ENV=development
+   PORT=3000
+   SESSION_SECRET=your-very-secret-and-strong-session-key
+   ZITADEL_DOMAIN=https://your-zitadel-domain
+   ZITADEL_CLIENT_ID=your-zitadel-application-client-id
+   ZITADEL_CLIENT_SECRET=your-randomly-generated-client-secret
+   ZITADEL_CALLBACK_URL=http://localhost:3000/auth/callback
+   ZITADEL_POST_LOGIN_URL=/profile
+   ZITADEL_POST_LOGOUT_URL=http://localhost:3000/auth/logout/callback
+   ```
+   Replace these values with:
+	- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/default-settings) for `ZITADEL_DOMAIN` (the issuer)
+	- The **Client ID** you copied when creating the application for `ZITADEL_CLIENT_ID`
+	- The **redirect URI** you configured in the PKCE setup for `ZITADEL_CALLBACK_URL` (must match exactly)
+	- The **post-logout redirect URI** for `ZITADEL_POST_LOGOUT_URL`
+	- A strong random string for `SESSION_SECRET` (generate using: `python -c "import secrets; print(secrets.token_hex(32))"`)
+	- A randomly generated string for `ZITADEL_CLIENT_SECRET` (generate using: `python -c "import secrets; print(secrets.token_hex(32))"`)
+3. Install dependencies using [Poetry](https://python-poetry.org) with `poetry install` and start the development server with `poetry run python run.py` to verify the authentication flow end-to-end.
+
+---
+
+## Learn more and resources
+
+* [PKCE concept](https://oauth.net/2/pkce/)
+* [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
+* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/login-users)
+* [FastAPI documentation](https://fastapi.tiangolo.com)
+* [Authlib documentation](https://authlib.org)
+* [Example repository](https://github.com/zitadel/example-auth-fastapi)

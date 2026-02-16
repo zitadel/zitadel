@@ -19,7 +19,7 @@ func TestErrorMethod(t *testing.T) {
 
 func TestZitadelError_Is(t *testing.T) {
 	parent := errors.New("parent error")
-	target := newZitadelError(KindAborted, parent, "id", "message")
+	target := CreateZitadelError(KindAborted, parent, "id", "message", 0)
 	tests := []struct {
 		name string // description of this test case
 		err  error
@@ -32,27 +32,27 @@ func TestZitadelError_Is(t *testing.T) {
 		},
 		{
 			name: "different kind",
-			err:  newZitadelError(KindNotFound, parent, "id", "message"),
+			err:  CreateZitadelError(KindNotFound, parent, "id", "message", 0),
 			want: false,
 		},
 		{
 			name: "different id",
-			err:  newZitadelError(KindAborted, parent, "otherID", "message"),
+			err:  CreateZitadelError(KindAborted, parent, "otherID", "message", 0),
 			want: false,
 		},
 		{
 			name: "different message",
-			err:  newZitadelError(KindAborted, parent, "id", "other message"),
+			err:  CreateZitadelError(KindAborted, parent, "id", "other message", 0),
 			want: false,
 		},
 		{
 			name: "different parent",
-			err:  newZitadelError(KindAborted, errors.New("other parent"), "id", "message"),
+			err:  CreateZitadelError(KindAborted, errors.New("other parent"), "id", "message", 0),
 			want: false,
 		},
 		{
 			name: "same error",
-			err:  newZitadelError(KindAborted, parent, "id", "message"),
+			err:  CreateZitadelError(KindAborted, parent, "id", "message", 0),
 			want: true,
 		},
 	}
