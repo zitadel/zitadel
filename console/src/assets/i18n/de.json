@@ -2813,7 +2813,7 @@
     "TOAST": {
       "UPDATED": "Rollen-Zuweisung geändert.",
       "REMOVED": "Rollen-Zuweisung entfernt.",
-      "BULKREMOVED": "Rollen-Zuweisung entfernt.",
+      "BULKREMOVED": "Rollen-Zuweisungen entfernt.",
       "CANTSHOWINFO": "Sie können das Profil dieses Benutzers nicht besuchen, da Sie kein Administrator der Organisation sind, zu der dieser Benutzer gehört"
     },
     "DIALOG": {

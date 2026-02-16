@@ -84,7 +84,7 @@ export class KeyboardShortcutsService implements OnDestroy {
             this.router.navigate(USERS.link);
           }
         }
-        if (firstKey.code === 'KeyG' && secondKey.code === 'KeyA') {
+        if (firstKey.code === 'KeyG' && secondKey.code === 'KeyR') {
           if (this.hasPermission(ROLEASSIGNMENTS)) {
             this.router.navigate(ROLEASSIGNMENTS.link);
           }
