@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
       "MAXLENGTHERROR": "必须少于{{value}}个字符"
     },
-    "ID": "ID",
+    "ID": "用户ID",
     "EMAIL": "电子邮件",
     "PHONE": "手机号码",
     "PHONEEMPTY": "未定义手机号码",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "名称",
-      "ID": "ID",
+      "ID": "组织ID",
       "CREATIONDATE": "创建于",
       "DATECHANGED": "修改于",
       "FILTER": "筛选",
@@ -2017,7 +2017,8 @@
           "DESCRIPTION": "您真的要删除您的项目吗？",
           "TYPENAME": "键入项目的名称以将其永久删除。"
         }
-      }
+      },
+      "ID": "项目ID"
     },
     "SETTINGS": {
       "TITLE": "设置",
@@ -2304,7 +2305,7 @@
     "ADD": "添加身份提供者",
     "TYPE": "类型",
     "OWNER": "所有者",
-    "ID": "ID",
+    "ID": "身份提供商ID",
     "NAME": "名称",
     "AUTHORIZATIONENDPOINT": "授权端点",
     "TOKENENDPOINT": "令牌端点",
@@ -2528,7 +2529,7 @@
     "TOKEN": "令牌设置",
     "PAGES": {
       "TITLE": "应用",
-      "ID": "ID",
+      "ID": "应用ID",
       "DESCRIPTION": "在这里您可以编辑您的应用程序数据及其配置。",
       "CREATE": "OIDC 应用",
       "CREATE_SELECT_PROJECT": "首先选择你的项目",
@@ -2872,5 +2873,6 @@
       "TITLE": "当前用户事件",
       "DESCRIPTION": "在这里您可以看到用户变更的最新事件。"
     }
-  }
+  },
+  "INSTANCEID": "实例ID"
 }

@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Deve ter pelo menos {{value}} caracteres.",
       "MAXLENGTHERROR": "Deve ter menos de {{value}} caracteres"
     },
-    "ID": "ID",
+    "ID": "ID do utilizador",
     "EMAIL": "E-mail",
     "PHONE": "Número de Telefone",
     "PHONEEMPTY": "Nenhum número de telefone definido",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nome",
-      "ID": "ID",
+      "ID": "ID da organização",
       "CREATIONDATE": "Data de Criação",
       "DATECHANGED": "Alterado",
       "FILTER": "Filtro",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "Tem certeza de que deseja excluir o seu projeto?",
           "TYPENAME": "Digite o nome do projeto para excluí-lo permanentemente."
         }
-      }
+      },
+      "ID": "ID do projeto"
     },
     "SETTINGS": {
       "TITLE": "Configurações",
@@ -2290,7 +2291,7 @@
     "ADD": "Adicionar Provedor de Identidade",
     "TYPE": "Tipo",
     "OWNER": "Proprietário",
-    "ID": "ID",
+    "ID": "ID do provedor de identidade",
     "NAME": "Nome",
     "AUTHORIZATIONENDPOINT": "Ponto de Autorização",
     "TOKENENDPOINT": "Ponto de Token",
@@ -2491,7 +2492,7 @@
     "TOKEN": "Configurações de Token",
     "PAGES": {
       "TITLE": "Aplicativo",
-      "ID": "ID",
+      "ID": "ID da aplicação",
       "DESCRIPTION": "Aqui você pode editar os dados do seu aplicativo e sua configuração.",
       "CREATE": "Criar aplicativo",
       "CREATE_SELECT_PROJECT": "Selecione o seu projeto primeiro",
@@ -2835,5 +2836,6 @@
       "TITLE": "Atividade",
       "DESCRIPTION": "Aqui você pode ver os eventos mais recentes que geraram uma alteração no usuário."
     }
-  }
+  },
+  "INSTANCEID": "ID da instância"
 }

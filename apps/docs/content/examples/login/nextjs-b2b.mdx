@@ -38,14 +38,14 @@ Let's call this one `portal-web`.
 Select `Web`, continue, `CODE`, then enter `http://localhost:3000/api/auth/callback/zitadel` for the redirect, and `http://localhost:3000` for the post redirect. Then press on `create`.
 Because the requests from your Next.js application to ZITADEL are made on the server side, you can safely select `CODE`. You will get a secret at the end of the stepper. With NextAuth your secret never gets exposed on the browser since it is kept in your Next.js server.
 
-Copy the "Resource ID" of the project `Portal` as you will need this in your environment configuration file later.
+Copy the "Project ID" of the project `Portal` as you will need this in your environment configuration file later.
 
 Click on the application `portal-web`.
 On the application detail page click on the section under redirect settings and enable `Development Mode`. This will allow you application to work on `localhost:3000`.
 To read the user data and roles from ID Token, go to the section Token Settings and make sure both checkboxes, `User roles inside ID Token` and `User Info inside ID Token` are enabled.
 Make sure to save your changes.
 
-Copy the "Resource ID" of the application `portal-web` as you will need this in your environment configuration file later.
+Copy the "Project ID" of the application `portal-web` as you will need this in your environment configuration file later.
 
 ### Roles
 
@@ -98,9 +98,9 @@ Replace the values as follows
 
 `ZITADEL_API`: URL of the Management API. Typically, the same as `ZITADEL_ISSUER`.
 
-`ORG_ID`: We will create an organization during later steps. You can find `${YOUR_ORG_ID}` by selecting the `Demo-Vendor` organization in Console. `${YOUR_ORG_ID}` is displayed on top of the organization detail page as "Resource ID".
+`ORG_ID`: We will create an organization during later steps. You can find `${YOUR_ORG_ID}` by selecting the `Demo-Vendor` organization in Console. `${YOUR_ORG_ID}` is displayed on top of the organization detail page as "Project ID".
 
-`PROJECT_ID`: You can find `${PROJECT_ID}` by clicking on "Projects" in the navigation and select the Project `Portal`. `${PROJECT_ID}` is displayed on the top as "Resource ID".
+`PROJECT_ID`: You can find `${PROJECT_ID}` by clicking on "Projects" in the navigation and select the Project `Portal`. `${PROJECT_ID}` is displayed on the top as "Project ID".
 
 `ZITADEL_CLIENT_ID`: Having the project `Portal` selected, click on the Application `portal-web`. `${CLIENT_ID}` is displayed as a field in the OIDC configuration, labeled "Client ID" and has the format `12345678@portal`.
 

@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Doit comporter au moins {{value}} caractères.",
       "MAXLENGTHERROR": "Doit contenir moins de {{value}} caractères"
     },
-    "ID": "ID",
+    "ID": "ID de l'utilisateur",
     "EMAIL": "E-mail",
     "PHONE": "Numéro de téléphone",
     "PHONEEMPTY": "Pas de numéro de téléphone défini",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nom",
-      "ID": "ID",
+      "ID": "ID de l'organisation",
       "CREATIONDATE": "Date de création",
       "DATECHANGED": "Modifié",
       "FILTER": "Filtre",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "Voulez-vous vraiment supprimer votre projet ?",
           "TYPENAME": "Tapez le nom du projet pour le supprimer définitivement."
         }
-      }
+      },
+      "ID": "ID du projet"
     },
     "SETTINGS": {
       "TITLE": "Paramètres",
@@ -2091,7 +2092,7 @@
       "GRANTEDORGDOMAIN": "Domaine",
       "RESOURCEOWNER": "Propriétaire de la ressource",
       "GRANTEDORGNAME": "Nom de l'organisation",
-      "GRANTID": "Id de l'octroi",
+      "GRANTID": "ID de l'octroi",
       "CREATIONDATE": "Date de création",
       "CHANGEDATE": "Dernière modification",
       "DATES": "Dates",
@@ -2293,7 +2294,7 @@
     "ADD": "Ajouter un fournisseur d'identité",
     "TYPE": "Type",
     "OWNER": "Propriétaire",
-    "ID": "ID",
+    "ID": "ID du fournisseur d'identité",
     "NAME": "Nom",
     "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
     "TOKENENDPOINT": "Token Endpoint",
@@ -2496,7 +2497,7 @@
     "TOKEN": "Paramètres du jeton",
     "PAGES": {
       "TITLE": "Application",
-      "ID": "ID",
+      "ID": "ID de l'application",
       "DESCRIPTION": "Ici vous pouvez modifier les données de votre application et sa configuration.",
       "CREATE": "Créer une application",
       "CREATE_SELECT_PROJECT": "Sélectionnez d'abord votre projet",
@@ -2840,5 +2841,6 @@
       "TITLE": "Activité",
       "DESCRIPTION": "Vous pouvez voir ici les derniers événements qui ont généré un changement d'utilisateur."
     }
-  }
+  },
+  "INSTANCEID": "ID de l'instance"
 }

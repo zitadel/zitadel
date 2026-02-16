@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
       "MAXLENGTHERROR": "Muss weniger als {{value}} Zeichen umfassen."
     },
-    "ID": "ID",
+    "ID": "Benutzer-ID",
     "EMAIL": "E-Mail",
     "PHONE": "Telefonnummer",
     "PHONEEMPTY": "Keine Telefonnummer hinterlegt",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Name",
-      "ID": "ID",
+      "ID": "Organisations-ID",
       "CREATIONDATE": "Erstelldatum",
       "DATECHANGED": "Geändert",
       "FILTER": "Filter",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "Willst Du das Projekt wirklich löschen?",
           "TYPENAME": "Wiederholen Sie den Namen des Projektes um es zu löschen."
         }
-      }
+      },
+      "ID": "Projekt-ID"
     },
     "SETTINGS": {
       "TITLE": "Einstellungen",
@@ -2091,7 +2092,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Besitzer",
       "GRANTEDORGNAME": "Name der Organisation",
-      "GRANTID": "Grant Id",
+      "GRANTID": "Grant ID",
       "CREATIONDATE": "Erstelldatum",
       "CHANGEDATE": "Letzte Änderung",
       "DATES": "Datum",
@@ -2289,7 +2290,7 @@
     "UPDATECLIENTSECRET": "Client Secret updaten",
     "TYPE": "Typ",
     "OWNER": "Besitzer",
-    "ID": "ID",
+    "ID": "Identitätsanbieter-ID",
     "AVAILABILITY": "Verfügbarkeit",
     "AVAILABLE": "verfügbar",
     "AVAILABLEBUTINACTIVE": "verfügbar aber inaktiv",
@@ -2495,7 +2496,7 @@
     "TOKEN": "Token Einstellungen",
     "PAGES": {
       "TITLE": "Anwendung",
-      "ID": "ID",
+      "ID": "Anwendungs-ID",
       "DESCRIPTION": "Hier kannst Du Deine Applikationen bearbeiten und deren Konfiguration anpassen.",
       "CREATE": "Applikation erstellen",
       "CREATE_SELECT_PROJECT": "Wähle zuerst dein Projekt aus",
@@ -2839,5 +2840,6 @@
       "TITLE": "Aktivität",
       "DESCRIPTION": "Hier siehst Du die letzten Vorkommnisse, die den Benutzer betreffen."
     }
-  }
+  },
+  "INSTANCEID": "Instanz-ID"
 }
