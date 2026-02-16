@@ -2847,7 +2847,7 @@
       "CANTSHOWINFO": "You cannot visit this user's profile as you are not an administrator of the organization where this user belongs to"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Delete Role assignment",
+      "DELETE_TITLE": "Delete role assignment",
       "DELETE_DESCRIPTION": "You are about to delete a role assignment. Do you want to continue?",
       "BULK_DELETE_TITLE": "Delete role assignments",
       "BULK_DELETE_DESCRIPTION": "You are about to delete multiple role assignments. Do you want to continue?"
