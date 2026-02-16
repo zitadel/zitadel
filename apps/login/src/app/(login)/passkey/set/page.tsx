@@ -109,6 +109,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             requestId={requestId}
             code={code}
             codeId={codeId}
+            loginName={loginName ?? session?.factors?.user?.loginName ?? user?.preferredLoginName}
           />
         )}
       </div>

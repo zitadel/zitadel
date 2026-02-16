@@ -413,7 +413,7 @@ func successfulIntentHandler(cmd *command.Commands, createIntent func(ctx contex
 }
 
 func createIntent(ctx context.Context, cmd *command.Commands, instanceID, idpID string) (string, error) {
-	writeModel, _, err := cmd.CreateIntent(ctx, "", idpID, "https://example.com/success", "https://example.com/failure", instanceID, nil)
+	writeModel, _, err := cmd.CreateIntent(ctx, "", idpID, "https://example.com/success", "https://example.com/failure", instanceID, "", nil)
 	if err != nil {
 		return "", err
 	}

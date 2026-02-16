@@ -17,7 +17,7 @@ At the end of the guide you should have an API with a protected endpoint.
 ## Prerequisites
 
 This will handle the OAuth 2.0 introspection request including authentication using JWT with Private Key using our [Go SDK](https://github.com/zitadel/zitadel-go).
-All that is required, is to create your API, create a private key and a personal access token for a service user.
+All that is required, is to create your API, create a private key and a personal access token for a service account.
 
 ### Set up application and obtain keys
 
@@ -54,15 +54,15 @@ And make sure to download it, as you won't be able to retrieve it again.
 
 Now we need to create a *Personal Access Token* to authenticate the application requests.
 
-On the user view, switch to *Service Users* and create a new one.
+On the user view, switch to *Service Accounts* and create a new one.
 
 ![](../../../public/img/go/api-service_user_panel.png)
 
-Give the service user a name and a user name. Select `Bearer` as *Access Token Type*.
+Give the service account a name and a username. Select `Bearer` as *Access Token Type*.
 
 ![](../../../public/img/go/api-create_service_user.png)
 
-### Create service user and personal access token (PAT)
+### Create service account and personal access token (PAT)
 
 Once done, from the left panel of the user management, click on Personal Access Token and create a new one.
 
@@ -91,7 +91,7 @@ Create a new go file with the content below. This will create an API with three 
 
 If authorization is required, the token must not be expired and the API has to be part of the audience (either client_id or project_id).
 
-For tests we will use a Personal Access Token.
+For tests, we will use a Personal Access Token.
 
 ```go reference
 https://github.com/zitadel/zitadel-go/blob/next/example/api/http/main.go

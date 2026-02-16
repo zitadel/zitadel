@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -142,5 +143,41 @@ func TestCommands_asyncPush(t *testing.T) {
 			}
 			require.NoError(t, err)
 		})
+	}
+}
+
+func expectLoginPathsNoCall(t *testing.T) LoginPaths {
+	return NewMockLoginPaths(gomock.NewController(t))
+}
+
+func expectLoginPathsDefaultEmailCodeURLTemplate(tmpl string) func(t *testing.T) LoginPaths {
+	return func(t *testing.T) LoginPaths {
+		m := NewMockLoginPaths(gomock.NewController(t))
+		m.EXPECT().DefaultEmailCodeURLTemplate(gomock.Any()).Return(tmpl)
+		return m
+	}
+}
+
+func expectLoginPathsDefaultDomainClaimedURLTemplate(tmpl string) func(t *testing.T) LoginPaths {
+	return func(t *testing.T) LoginPaths {
+		m := NewMockLoginPaths(gomock.NewController(t))
+		m.EXPECT().DefaultDomainClaimedURLTemplate(gomock.Any()).Return(tmpl)
+		return m
+	}
+}
+
+func expectLoginPathsDefaultPasswordSetURLTemplate(tmpl string) func(t *testing.T) LoginPaths {
+	return func(t *testing.T) LoginPaths {
+		m := NewMockLoginPaths(gomock.NewController(t))
+		m.EXPECT().DefaultPasswordSetURLTemplate(gomock.Any()).Return(tmpl)
+		return m
+	}
+}
+
+func expectLoginPathsDefaultPasskeySetURLTemplate(tmpl string) func(t *testing.T) LoginPaths {
+	return func(t *testing.T) LoginPaths {
+		m := NewMockLoginPaths(gomock.NewController(t))
+		m.EXPECT().DefaultPasskeySetURLTemplate(gomock.Any()).Return(tmpl)
+		return m
 	}
 }
