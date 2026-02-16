@@ -11,6 +11,7 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs = {
   userCode: string;
@@ -34,9 +35,11 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
 
   async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
     setLoading(true);
+    trackEvent(MixpanelEvents.device_code_submitted);
 
     const response = await getDeviceAuthorizationRequest(value.userCode)
       .catch(() => {
+        trackEvent(MixpanelEvents.device_code_failure);
         setError("Could not continue the request");
         return;
       })
@@ -45,10 +48,12 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
       });
 
     if (!response || !response.deviceAuthorizationRequest?.id) {
+      trackEvent(MixpanelEvents.device_code_failure);
       setError("Could not continue the request");
       return;
     }
 
+    trackEvent(MixpanelEvents.device_code_success);
     return router.push(
       `/device/consent?` +
         new URLSearchParams({

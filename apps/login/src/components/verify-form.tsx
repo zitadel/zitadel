@@ -14,6 +14,7 @@ import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs = {
   code: string;
@@ -49,6 +50,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   async function resendCode() {
     setError("");
     setLoading(true);
+    trackEvent(MixpanelEvents.verify_code_resent);
 
     // do not send code for dummy userid that is set to prevent user enumeration
     if (userId === UNKNOWN_USER_ID) {
@@ -83,6 +85,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
     async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
       setError("");
       setLoading(true);
+      trackEvent(MixpanelEvents.verify_code_submitted);
 
       try {
         const response = await sendVerification({
@@ -94,8 +97,15 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
           requestId: requestId,
         });
 
+        if (response && "error" in response && response.error) {
+          trackEvent(MixpanelEvents.verify_failure);
+        } else {
+          trackEvent(MixpanelEvents.verify_success);
+        }
+
         handleServerActionResponse(response, router, setSamlData, setError);
       } catch {
+        trackEvent(MixpanelEvents.verify_failure);
         setError(t("errors.couldNotVerifyUser"));
       } finally {
         setLoading(false);

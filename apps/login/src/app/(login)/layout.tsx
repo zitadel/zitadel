@@ -2,6 +2,7 @@ import "@/styles/globals.scss";
 
 import { BackgroundWrapper } from "@/components/background-wrapper";
 import { LanguageProvider } from "@/components/language-provider";
+import { MixpanelProvider } from "@/components/mixpanel-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/skeleton";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               }
             >
               <LanguageProvider>
+                <MixpanelProvider>
                 <BackgroundWrapper
                   className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
                 >
@@ -57,6 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     </div>
                   </div>
                 </BackgroundWrapper>
+                </MixpanelProvider>
               </LanguageProvider>
             </Suspense>
           </Tooltip.Provider>

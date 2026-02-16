@@ -14,6 +14,7 @@ import { Avatar } from "./avatar";
 import { Translated } from "./translated";
 import { handleServerActionResponse } from "@/lib/client";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 export function isSessionValid(session: Partial<Session>): {
   valid: boolean;
@@ -66,6 +67,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
       <Tooltip.Trigger asChild>
         <button
           onClick={async () => {
+            trackEvent(MixpanelEvents.session_selected);
             if (valid && session?.factors?.user) {
               const sessionPayload: ContinueWithSessionCommand = session;
               if (requestId) {

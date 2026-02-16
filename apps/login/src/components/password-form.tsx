@@ -16,6 +16,7 @@ import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { handleServerActionResponse } from "@/lib/client";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs = {
   password: string;
@@ -47,6 +48,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
   async function submitPassword(values: Inputs) {
     setError("");
     setLoading(true);
+    trackEvent(MixpanelEvents.password_submitted);
 
     try {
       const response = await sendPassword({
@@ -59,8 +61,15 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
         requestId,
       });
 
+      if (response && "error" in response && response.error) {
+        trackEvent(MixpanelEvents.login_failure);
+      } else {
+        trackEvent(MixpanelEvents.login_success);
+      }
+
       handleServerActionResponse(response, router, setSamlData, setError);
     } catch {
+      trackEvent(MixpanelEvents.login_failure);
       setError(t("verify.errors.couldNotVerifyPassword"));
     } finally {
       setLoading(false);
@@ -71,6 +80,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
     setError("");
     setInfo("");
     setLoading(true);
+    trackEvent(MixpanelEvents.password_reset_requested);
 
     const response = await resetPassword({
       loginName,

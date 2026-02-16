@@ -3,4 +3,4 @@ const ZITADEL_DOMAIN = process.env.ZITADEL_API_URL
   : '*.zitadel.cloud';
 
 export const DEFAULT_CSP =
-  `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self'; child-src; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; img-src 'self' https://${ZITADEL_DOMAIN};`;
+  `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.mxpnl.com; connect-src 'self' https://api-js.mixpanel.com; child-src; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; img-src 'self' https://${ZITADEL_DOMAIN};`;

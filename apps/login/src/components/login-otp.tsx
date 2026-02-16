@@ -17,6 +17,7 @@ import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -121,6 +122,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
 
   async function submitCode(values: Inputs, organization?: string) {
     setLoading(true);
+    trackEvent(MixpanelEvents.otp_code_submitted, { method });
 
     let body: any = {
       code: values.code,
@@ -161,6 +163,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
       requestId,
     })
       .catch(() => {
+        trackEvent(MixpanelEvents.otp_failure, { method });
         setError("Could not verify OTP code");
         return;
       })
@@ -169,6 +172,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
       });
 
     if (response && "error" in response && response.error) {
+      trackEvent(MixpanelEvents.otp_failure, { method });
       setError(response.error);
       return;
     }
@@ -179,6 +183,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
   function setCodeAndContinue(values: Inputs) {
     return submitCode(values, organization).then(async (response) => {
       if (response && "sessionId" in response) {
+        trackEvent(MixpanelEvents.otp_success, { method });
         setLoading(true);
         // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
         await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -224,6 +229,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                 type="button"
                 className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
                 onClick={async () => {
+                  trackEvent(MixpanelEvents.otp_code_resent, { method });
                   setLoading(true);
                   const response = await updateSessionForOTPChallenge();
                   if (response?.error) {

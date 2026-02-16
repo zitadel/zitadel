@@ -10,6 +10,7 @@ import { useState } from "react";
 import { handleServerActionResponse } from "@/lib/client";
 import { AutoSubmitForm } from "./auto-submit-form";
 import { Alert } from "./alert";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Props = {
   userId: string;
@@ -65,17 +66,18 @@ export function ChooseSecondFactorToSetup({
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <div className="grid w-full grid-cols-1 gap-5 pt-4">
         {loginSettings.secondFactors.map((factor) => {
+          const trackSetupSelection = () => trackEvent(MixpanelEvents.mfa_setup_method_selected, { factor: String(factor) });
           switch (factor) {
             case SecondFactorType.OTP:
-              return TOTP(userMethods.includes(AuthenticationMethodType.TOTP), "/otp/time-based/set?" + params);
+              return <div onClick={trackSetupSelection} key={factor}>{TOTP(userMethods.includes(AuthenticationMethodType.TOTP), "/otp/time-based/set?" + params)}</div>;
             case SecondFactorType.U2F:
-              return U2F(userMethods.includes(AuthenticationMethodType.U2F), "/u2f/set?" + params);
+              return <div onClick={trackSetupSelection} key={factor}>{U2F(userMethods.includes(AuthenticationMethodType.U2F), "/u2f/set?" + params)}</div>;
             case SecondFactorType.OTP_EMAIL:
               return (
-                emailVerified && EMAIL(userMethods.includes(AuthenticationMethodType.OTP_EMAIL), "/otp/email/set?" + params)
+                emailVerified && <div onClick={trackSetupSelection} key={factor}>{EMAIL(userMethods.includes(AuthenticationMethodType.OTP_EMAIL), "/otp/email/set?" + params)}</div>
               );
             case SecondFactorType.OTP_SMS:
-              return phoneVerified && SMS(userMethods.includes(AuthenticationMethodType.OTP_SMS), "/otp/sms/set?" + params);
+              return phoneVerified && <div onClick={trackSetupSelection} key={factor}>{SMS(userMethods.includes(AuthenticationMethodType.OTP_SMS), "/otp/sms/set?" + params)}</div>;
             default:
               return null;
           }

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "./alert";
 import { Spinner } from "./spinner";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Props = {
   provider: string;
@@ -51,6 +52,7 @@ export function IdpProcessHandler({
     executedRef.current = true;
 
     console.log("[IDP Process Handler] Starting IDP callback processing from client");
+    trackEvent(MixpanelEvents.idp_callback_started, { provider });
 
     processIDPCallback({
       provider,
@@ -65,6 +67,7 @@ export function IdpProcessHandler({
       .then((result) => {
         if (result.error) {
           console.error("[IDP Process Handler] Error:", result.error);
+          trackEvent(MixpanelEvents.idp_callback_failure, { provider, error: result.error });
           setError(result.error);
           setLoading(false);
           return;
@@ -72,12 +75,14 @@ export function IdpProcessHandler({
 
         if (result.redirect) {
           console.log("[IDP Process Handler] Redirecting to:", result.redirect);
+          trackEvent(MixpanelEvents.idp_callback_success, { provider });
           router.push(result.redirect);
           return;
         }
 
         if (result.samlData) {
           console.log("[IDP Process Handler] Received samlData, rendering AutoSubmitForm");
+          trackEvent(MixpanelEvents.idp_callback_success, { provider });
           setSamlData(result.samlData);
           setLoading(false);
           return;
@@ -88,6 +93,7 @@ export function IdpProcessHandler({
       })
       .catch((err) => {
         console.error("[IDP Process Handler] Unexpected error:", err);
+        trackEvent(MixpanelEvents.idp_callback_failure, { provider, error: err instanceof Error ? err.message : "unexpected_error" });
         setError(err instanceof Error ? err.message : t("processing.unexpectedError"));
         setLoading(false);
       });

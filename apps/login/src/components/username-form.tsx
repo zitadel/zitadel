@@ -14,6 +14,7 @@ import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { useTranslations } from "next-intl";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs = {
   loginName: string;
@@ -57,6 +58,7 @@ export function UsernameForm({
 
   async function submitLoginName(values: Inputs, organization?: string) {
     setLoading(true);
+    trackEvent(MixpanelEvents.username_submitted);
 
     try {
       const res = await sendLoginname({

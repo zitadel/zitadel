@@ -18,6 +18,7 @@ import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { handleServerActionResponse } from "@/lib/client";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs =
   | {
@@ -89,6 +90,7 @@ export function SetPasswordForm({
 
   async function submitPassword(values: Inputs) {
     setLoading(true);
+    trackEvent(MixpanelEvents.password_set_submitted);
 
     let payload: { userId: string; password: string; code?: string; organization?: string } = {
       userId: userId,
@@ -111,14 +113,18 @@ export function SetPasswordForm({
       });
 
     if (changeResponse && "error" in changeResponse) {
+      trackEvent(MixpanelEvents.password_set_failure);
       setError(changeResponse.error);
       return;
     }
 
     if (!changeResponse) {
+      trackEvent(MixpanelEvents.password_set_failure);
       setError(t("set.errors.couldNotSetPassword"));
       return;
     }
+
+    trackEvent(MixpanelEvents.password_set_success);
 
     const params = new URLSearchParams({});
 

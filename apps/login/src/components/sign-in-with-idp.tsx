@@ -14,6 +14,7 @@ import { SignInWithGitlab } from "./idps/sign-in-with-gitlab";
 import { SignInWithGoogle } from "./idps/sign-in-with-google";
 import { Translated } from "./translated";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
@@ -55,7 +56,7 @@ export function SignInWithIdp({
 
     const Component = components[type];
     return Component ? (
-      <form action={action} className="flex" key={`idp-${index}`}>
+      <form action={action} className="flex" key={`idp-${index}`} onSubmit={() => trackEvent(MixpanelEvents.idp_button_clicked, { idp_name: name, idp_type: String(type) })}>
         <input type="hidden" name="id" value={id} />
         <input type="hidden" name="provider" value={idpTypeToSlug(type)} />
         <input type="hidden" name="requestId" value={requestId} />

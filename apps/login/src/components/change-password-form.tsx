@@ -18,6 +18,7 @@ import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { handleServerActionResponse } from "@/lib/client";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs =
   | {
@@ -53,6 +54,7 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
 
   async function submitChange(values: Inputs) {
     setLoading(true);
+    trackEvent(MixpanelEvents.password_change_submitted);
 
     const changeResponse = await checkSessionAndSetPassword({
       sessionId,
@@ -64,16 +66,20 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
     });
 
     if (changeResponse && "error" in changeResponse && changeResponse.error) {
+      trackEvent(MixpanelEvents.password_change_failure);
       setError(typeof changeResponse.error === "string" ? changeResponse.error : t("change.errors.unknownError"));
       setLoading(false);
       return;
     }
 
     if (!changeResponse) {
+      trackEvent(MixpanelEvents.password_change_failure);
       setError(t("change.errors.couldNotChangePassword"));
       setLoading(false);
       return;
     }
+
+    trackEvent(MixpanelEvents.password_change_success);
 
     await new Promise((resolve) => setTimeout(resolve, 1000)); // wait for a second, to prevent eventual consistency issues
 

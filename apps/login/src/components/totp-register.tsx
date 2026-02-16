@@ -16,6 +16,7 @@ import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs = {
   code: string;
@@ -48,8 +49,10 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
 
   async function continueWithCode(values: Inputs) {
     setLoading(true);
+    trackEvent(MixpanelEvents.totp_setup_code_submitted);
     return verifyTOTP(values.code, loginName, organization)
       .then(async () => {
+        trackEvent(MixpanelEvents.totp_setup_success);
         // if attribute is set, validate MFA after it is setup, otherwise proceed as usual (when mfa is enforced to login)
         if (checkAfter) {
           const params = new URLSearchParams({});
@@ -91,6 +94,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
         }
       })
       .catch((e) => {
+        trackEvent(MixpanelEvents.totp_setup_failure);
         setError(e.message);
         return;
       })

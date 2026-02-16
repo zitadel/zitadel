@@ -11,6 +11,7 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs = {
   loginName: string;
@@ -38,6 +39,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
   async function submitUsernamePassword(values: Inputs) {
     setError("");
     setLoading(true);
+    trackEvent(MixpanelEvents.ldap_login_submitted);
 
     const response = await createNewSessionForLDAP({
       idpId: idpId,
@@ -46,6 +48,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
       link: link,
     })
       .catch(() => {
+        trackEvent(MixpanelEvents.ldap_login_failure);
         setError("Could not start LDAP flow");
         return;
       })
@@ -54,11 +57,13 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
       });
 
     if (response && "error" in response && response.error) {
+      trackEvent(MixpanelEvents.ldap_login_failure);
       setError(response.error);
       return;
     }
 
     if (response && "redirect" in response && response.redirect) {
+      trackEvent(MixpanelEvents.ldap_login_success);
       return router.push(response.redirect);
     }
   }

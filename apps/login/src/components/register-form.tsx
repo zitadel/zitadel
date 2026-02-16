@@ -17,6 +17,7 @@ import { PrivacyPolicyCheckboxes } from "./privacy-policy-checkboxes";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs =
   | {
@@ -67,6 +68,7 @@ export function RegisterForm({
 
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
+    trackEvent(MixpanelEvents.register_submitted);
     try {
       const response = await registerUser({
         email: values.email,
@@ -76,10 +78,17 @@ export function RegisterForm({
         requestId: requestId,
       });
 
+      if (response && "error" in response && response.error) {
+        trackEvent(MixpanelEvents.register_failure);
+      } else {
+        trackEvent(MixpanelEvents.register_success);
+      }
+
       handleServerActionResponse(response, router, setSamlData, setError);
 
       return response;
     } catch {
+      trackEvent(MixpanelEvents.register_failure);
       setError(t("errors.couldNotRegisterUser"));
     } finally {
       setLoading(false);
@@ -87,6 +96,7 @@ export function RegisterForm({
   }
 
   async function submitAndContinue(value: Inputs, withPassword: boolean = false) {
+    trackEvent(MixpanelEvents.register_method_selected, { method: withPassword ? "password" : "passkey" });
     const registerParams: any = value;
 
     if (organization) {

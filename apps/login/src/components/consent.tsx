@@ -9,6 +9,7 @@ import { Alert } from "./alert";
 import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 export function ConsentScreen({
   scope,
@@ -28,6 +29,7 @@ export function ConsentScreen({
 
   async function denyDeviceAuth() {
     setLoading(true);
+    trackEvent(MixpanelEvents.device_consent_denied);
     const response = await completeDeviceAuthorization(
       deviceAuthorizationRequestId,
     )
@@ -100,7 +102,7 @@ export function ConsentScreen({
         </Button>
         <span className="flex-grow"></span>
 
-        <Link href={nextUrl}>
+        <Link href={nextUrl} onClick={() => trackEvent(MixpanelEvents.device_consent_approved)}>
           <Button
             data-testid="submit-button"
             type="submit"

@@ -13,6 +13,7 @@ import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Props = {
   loginName?: string;
@@ -59,6 +60,7 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
   async function submitRegisterAndContinue(): Promise<boolean | void | null> {
     setError("");
     setLoading(true);
+    trackEvent(MixpanelEvents.u2f_register_started);
     const response = await addU2F({
       sessionId,
     })
@@ -125,9 +127,12 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
       const submitResponse = await submitVerify(u2fId, "", data, sessionId);
 
       if (!submitResponse) {
+        trackEvent(MixpanelEvents.u2f_register_failure);
         setError("An error on verifying passkey");
         return;
       }
+
+      trackEvent(MixpanelEvents.u2f_register_success);
 
       if (checkAfter) {
         const paramsToContinue = new URLSearchParams({});

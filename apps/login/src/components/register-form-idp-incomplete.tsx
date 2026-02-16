@@ -13,6 +13,7 @@ import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs =
   | {
@@ -67,6 +68,7 @@ export function RegisterFormIDPIncomplete({
 
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
+    trackEvent(MixpanelEvents.idp_register_submitted);
     try {
       const response = await registerUserAndLinkToIDP({
         idpId: idpId,

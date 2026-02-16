@@ -16,6 +16,7 @@ import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs =
   | {
@@ -60,6 +61,7 @@ export function SetRegisterPasswordForm({
 
   async function submitRegister(values: Inputs) {
     setLoading(true);
+    trackEvent(MixpanelEvents.register_password_submitted);
     try {
       const response = await registerUser({
         email: email,

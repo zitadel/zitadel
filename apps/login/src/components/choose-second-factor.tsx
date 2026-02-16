@@ -2,6 +2,7 @@
 
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { EMAIL, SMS, TOTP, U2F } from "./auth-methods";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Props = {
   loginName?: string;
@@ -37,7 +38,7 @@ export function ChooseSecondFactor({
     <div className="grid w-full grid-cols-1 gap-5 pt-4">
       {userMethods.map((method, i) => {
         return (
-          <div key={"method-" + i}>
+          <div key={"method-" + i} onClick={() => trackEvent(MixpanelEvents.mfa_method_selected, { method: String(method) })}>
             {method === AuthenticationMethodType.TOTP &&
               TOTP(false, "/otp/time-based?" + params)}
             {method === AuthenticationMethodType.U2F &&

@@ -16,6 +16,7 @@ import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -41,6 +42,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
     if (!initialized.current) {
       initialized.current = true;
       setLoading(true);
+      trackEvent(MixpanelEvents.passkey_login_started);
       updateOrCreateSessionForChallenge()
         .then((response) => {
           const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
@@ -121,6 +123,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       });
 
       const handled = handleServerActionResponse(response, router, setSamlData, setError);
+      trackEvent(MixpanelEvents.passkey_login_success);
 
       if (!handled) {
         if (!response) {
@@ -130,6 +133,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         }
       }
     } catch {
+      trackEvent(MixpanelEvents.passkey_login_failure);
       setError(t("verify.errors.couldNotVerifyPasskey"));
     } finally {
       setLoading(false);
