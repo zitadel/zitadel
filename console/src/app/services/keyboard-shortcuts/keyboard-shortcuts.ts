@@ -48,7 +48,7 @@ export const USERS: KeyboardShortcut = {
 export const ROLEASSIGNMENTS: KeyboardShortcut = {
   i18nKey: 'KEYBOARDSHORTCUTS.SHORTCUTS.ROLEASSIGNMENTS',
   link: ['/grants'],
-  keyboardKeys: ['g', 'a'],
+  keyboardKeys: ['g', 'r'],
   permissions: ['usergrant.read'],
 };
 

@@ -724,7 +724,7 @@
       "ME": "내 프로필로 이동",
       "PROJECTS": "프로젝트로 이동 (<strong>GP</strong>)",
       "USERS": "사용자로 이동 (<strong>GU</strong>)",
-      "ROLEASSIGNMENTS": "역할 할당으로 이동 (<strong>GA</strong>)",
+      "ROLEASSIGNMENTS": "역할 할당으로 이동 (<strong>GR</strong>)",
       "ACTIONS": "액션 플로우로 이동 (<strong>GF</strong>)",
       "DOMAINS": "도메인으로 이동 (<strong>GD</strong>)"
     }
