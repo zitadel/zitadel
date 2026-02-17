@@ -82,9 +82,21 @@ type MaskConfig struct {
 	Value string
 }
 
+// replacer returns a function that replaces the value of any attribute whose key matches
+// one of the configured keys with the configured value.
+// If a group key matches, all attribute values in that group are replaced.
+// Attribute structure is preserved, e.g. "password" is replaced with "masked" but still appears as "password" in the logs.
 func (c MaskConfig) replacer() replacer {
-	return func(_ []string, a slog.Attr) slog.Attr {
-		if slices.Contains(c.Keys, a.Key) {
+	slices.Sort(c.Keys)
+	return func(groups []string, a slog.Attr) slog.Attr {
+		// mask all entries in a matching group, e.g. "data.*"
+		for _, g := range groups {
+			if _, found := slices.BinarySearch(c.Keys, g); found {
+				a.Value = slog.StringValue(c.Value)
+				return a
+			}
+		}
+		if _, found := slices.BinarySearch(c.Keys, a.Key); found {
 			a.Value = slog.StringValue(c.Value)
 		}
 		return a
