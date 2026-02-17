@@ -41,7 +41,7 @@
       },
       "GRANTED": {
         "TITLE": "Toegekende Projecten",
-        "DESCRIPTION": "Dit zijn projecten waarvan u eigenaar bent. U kunt hun instellingen, roltoewijzingen en toepassingen beheren."
+        "DESCRIPTION": "Dit zijn de projecten die andere organisaties aan u hebben toegewezen. Met toegewezen projecten kunt u uw gebruikers toegang geven tot applicaties van andere organisaties."
       }
     },
     "USERS": {

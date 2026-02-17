@@ -2818,11 +2818,11 @@
     "DESC": "Bunlar, kuruluşunuzdaki tüm rol atamalarıdır.",
     "DELETE": "Rol atamasını sil",
     "EMPTY": "Rol ataması bulunamadı",
-    "ADD": "Rol ataması oluşturr",
+    "ADD": "Rol ataması oluştur",
     "ADD_BTN": "Yeni",
     "PROJECT": {
       "TITLE": "Rol ataması",
-      "DESCRIPTION": "Belirtilen proje için rol atamalarını tanımlayın. Yalnızca izinlerinizin olduğu projelerin ve kullanıcıların girişlerini görebileceğinizi unutmayı."
+      "DESCRIPTION": "Belirtilen proje için rol atamalarını tanımlayın. Yalnızca izinlerinizin olduğu projelerin ve kullanıcıların girişlerini görebileceğinizi unutmayın."
     },
     "USER": {
       "TITLE": "Rol ataması",

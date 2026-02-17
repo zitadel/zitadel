@@ -2835,7 +2835,7 @@
     "TOAST": {
       "UPDATED": "Atribuire rol actualizată",
       "REMOVED": "Atribuire rol eliminată",
-      "BULKREMOVED": "Atribuiri rol eliminate eliminate.",
+      "BULKREMOVED": "Atribuiri rol eliminate",
       "CANTSHOWINFO": "Nu puteți vizita profilul acestui utilizator, deoarece nu sunteți administrator al organizației căreia îi aparține acest utilizator"
     },
     "DIALOG": {
