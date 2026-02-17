@@ -17,6 +17,7 @@ import { Human } from '@zitadel/proto/zitadel/user_pb';
 export class ContactComponent {
   @Input() disablePhoneCode: boolean = false;
   @Input() canWrite: boolean | null = false;
+  @Input() emailEditable: boolean = true;
   @Input({ required: true }) human!: HumanUser | Human;
   @Input() username: string = '';
   @Output() editType: EventEmitter<EditDialogType> = new EventEmitter<EditDialogType>();
