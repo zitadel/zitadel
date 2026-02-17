@@ -203,10 +203,7 @@ func (a authorization) setRoles(ctx context.Context, client database.QueryExecut
 
 	// set the roles
 	builder.WriteString(updateAuthorizationRoleStmt)
-	err := database.Changes(changes).Write(builder)
-	if err != nil {
-		return 0, err
-	}
+	database.Changes(changes).Write(builder)
 	builder.WriteString(updateAuthorizationRoleStmtWhere)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
