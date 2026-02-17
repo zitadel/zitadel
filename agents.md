@@ -4,7 +4,7 @@
 
 ZITADEL follows a strict hierarchical containment model. When generating code, logic, or translations, adhere to this structure:
 
-- **System (Installation):** The entire ZITADEL deployment. Global settings are applied through runtime settings files or environment variables. See `cmd/defaults.yaml`.
+- **System (Installation):** The entire ZITADEL deployment. Global settings are applied through runtime configuration files or environment variables. See `cmd/defaults.yaml`.
 - **Instance (The "Identity System"):** 
   - **Definition:** A logical partition/virtual tenant. It is a "System inside a System."
   - **Isolation:** Data and settings are strictly isolated between instances.
