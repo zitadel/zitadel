@@ -708,10 +708,17 @@ Login:
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_LOGIN_CACHE_SHAREDMAXAGE
   DefaultPaths:
-    BasePath: "/ui/v2/login"
-    PasswordSetPath: "/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
-    EmailCodePath: "/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
-    OTPEmailPath: "/otp/verify?code={{.Code}}&userID={{.UserID}}&sessionId={{.SessionID}}"
+    BasePath: "/ui/v2/login/"
+    # PasswordSetPath is used to create the link for setting a password during user registration or password reset
+    PasswordSetPath: "password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}" # ZITADEL_LOGIN_DEFAULTPATHS_PASSWORDSETPATH
+    # EmailCodePath is used to create the link for verifying the user's email address
+    EmailCodePath: "verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    # OTPEmailPath is used to create the link for verifying the user's OTP during login
+    OTPEmailPath: "otp/email?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}"
+    # PasskeySetPath is used to create the link for adding a passkey to the user's account though the login UI
+    PasskeySetPath: "passkey/set?codeId={{.CodeID}}&code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    # DomainClaimedPath is used to create the link to the login UI after an organization has claimed a domain and the user's loginname was updated
+    DomainClaimedPath: "loginname?loginName={{.TempUsername}}&organization={{.OrgID}}"
 
 Console:
   ShortCache:
@@ -845,7 +852,7 @@ SystemDefaults:
     #   - "scrypt"
     #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
   SecretHasher:
-    # Set hasher configuration for machine users, API and OIDC client secrets.
+    # Set hasher configuration for service accounts, API and OIDC client secrets.
     Hasher:
       # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
       # Depending on the algorithm, different configuration options take effect.
@@ -964,7 +971,7 @@ DefaultInstance:
   Org:
     Name: ZITADEL # ZITADEL_DEFAULTINSTANCE_ORG_NAME
     # In the DefaultInstance.Org.Human section, the initial organization's admin user with the role IAM_OWNER is defined.
-    # If DefaultInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role.
+    # If DefaultInstance.Org.Machine.Machine is defined, a service account is created with the IAM_OWNER role.
     Human:
       # In case that UserLoginMustBeDomain is false (default) and if you don't overwrite the username with an email,
       # it will be suffixed by the org domain (org-name + domain from config).
@@ -984,7 +991,7 @@ DefaultInstance:
         Verified: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PHONE_VERIFIED
       Password: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PASSWORD
     # In the DefaultInstance.Org.Machine section, the initial organization's admin user with the role IAM_OWNER is defined.
-    # If DefaultInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role.
+    # If DefaultInstance.Org.Machine.Machine is defined, a service account is created with the IAM_OWNER role.
     Machine:
       Machine:
         Username: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_MACHINE_USERNAME

@@ -53,7 +53,7 @@ Before you run the tests you need an initialized user. The tests don't implement
   setup: creates human users  
   test: creates new sessions with user id check
 * `make oidc_session`  
-  setup: creates a machine user to create the auth request and session.  
+  setup: creates a service account to create the auth request and session.  
   test: creates an auth request, a session and links the session to the auth request. Implementation of [this flow](https://zitadel.com/docs/guides/integrate/login-ui/oidc-standard).
 * `make otp_session`  
   setup: creates 1 human user for each VU and adds OTP Email to it  
@@ -62,10 +62,10 @@ Before you run the tests you need an initialized user. The tests don't implement
   setup: creates 1 human user for each VU and adds OTP Email to it  
   test: creates a session based on the login name of the user and checks for the password on a second step
 * `make machine_jwt_profile_grant`  
-  setup: generates private/public key, creates machine users, adds a key  
+  setup: generates private/public key, creates service accounts, adds a key  
   test: creates a token and calls user info 
 * `make machine_jwt_profile_grant_single_user`  
-  setup: generates private/public key, creates machine user, adds a key  
+  setup: generates private/public key, creates service account, adds a key  
   test: creates a token and calls user info in parallel for the same user
 * `make users_by_metadata_key`  
   setup: creates for half of the VUS a human user and a machine for the other half, adds 3 metadata to each user

@@ -53,9 +53,9 @@
         "METADATA": "Lägg till anpassade attribut till användaren som avdelningen. Du kan använda denna information i dina åtgärder."
       },
       "MACHINES": {
-        "TITLE": "Tjänsteanvändare",
-        "DESCRIPTION": "Tjänsteanvändare autentiserar icke-interaktivt med en JWT-bärare token signerad med en privat nyckel. De kan också använda en personlig åtkomsttoken.",
-        "METADATA": "Lägg till anpassade attribut till användaren som autentiseringssystemet. Du kan använda denna information i dina åtgärder."
+        "TITLE": "Tjänstekonton",
+        "DESCRIPTION": "Tjänstekonton autentiserar icke-interaktivt med en JWT-bärare token signerad med en privat nyckel. De kan också använda en personlig åtkomsttoken.",
+        "METADATA": "Lägg till anpassade attribut till kontot som autentiseringssystemet. Du kan använda denna information i dina åtgärder."
       },
       "SELF": {
         "METADATA": "Lägg till anpassade attribut till din användare som din avdelning. Du kan använda denna information i din organisations åtgärder."
@@ -424,10 +424,10 @@
     "ROLES": "Roller",
     "GRANTEDPROJECT": "Beviljade Projekt",
     "HUMANUSERS": "Användare",
-    "MACHINEUSERS": "Tjänsteanvändare",
+    "MACHINEUSERS": "Tjänstekonton",
     "LOGOUT": "Logga ut alla användare",
     "NEWORG": "Ny Organisation",
-    "IAMADMIN": "Du är en IAM-administratör. Observera att du har utökade behörigheter.",
+    "IAMADMIN": "Du är en instans-administratör. Observera att du har utökade behörigheter.",
     "SHOWORGS": "Visa Alla Organisationer",
     "GRANTS": "Behörigheter",
     "ACTIONS": "Åtgärder",
@@ -766,7 +766,7 @@
       "KEYS": "Nycklar",
       "PAT": "Personliga Åtkomsttoken",
       "USERGRANTS": "Auktorisationer",
-      "MEMBERSHIPS": "Medlemskap",
+      "MEMBERSHIPS": "Administratörsroller",
       "METADATA": "Metadata"
     },
     "TITLE": "Personlig Information",
@@ -990,8 +990,8 @@
       "COUNTRY": "Land"
     },
     "MACHINE": {
-      "TITLE": "Användardetaljer för tjänst",
-      "USERNAME": "Användarnamn",
+      "TITLE": "Detaljer för tjänstekonto",
+      "USERNAME": "Kontonamn",
       "NAME": "Namn",
       "DESCRIPTION": "Beskrivning",
       "KEYSTITLE": "Nycklar",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "Valda användare deaktiverade.",
       "SELECTEDKEYSDELETED": "Valda nycklar raderade.",
       "KEYADDED": "Nyckel tillagd!",
-      "MACHINEADDED": "Serviceanvändare skapad!",
+      "MACHINEADDED": "Tjänstekonto skapat!",
       "DELETED": "Användare raderad framgångsrikt!",
       "UNLOCKED": "Användare upplåst framgångsrikt!",
       "PASSWORDLESSREGISTRATIONSENT": "Registreringslänk skickad framgångsrikt.",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel-administratörsroller",
-      "DESCRIPTION": "Detta är alla medlemsbeviljanden för användaren. Du kan också ändra dem på organisations-, projekt- eller IAM-detaljsidor.",
+      "DESCRIPTION": "Detta är alla administratörsroller för användaren. Du kan också ändra dem på organisations-, projekt- eller instans-detaljsidor.",
       "ORGCONTEXT": "Du ser alla organisationer och projekt som är relaterade till den för närvarande valda organisationen.",
       "USERCONTEXT": "Du ser alla organisationer och projekt som du är auktoriserad till. Inklusive andra organisationer.",
       "CREATIONDATE": "Skapelsedatum",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Ta bort",
       "TYPE": "Typ",
       "ORGID": "Organisations-ID",
-      "UPDATED": "Medlemskapet uppdaterades.",
+      "UPDATED": "Administratörsrollen uppdaterades.",
       "NOPERMISSIONTOEDIT": "Du saknar de nödvändiga behörigheterna för att redigera roller!",
       "TYPES": {
         "UNKNOWN": "Okänd",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Hantera dina globala policyer och åtkomstinställningar."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Lagringsadministration",
+      "TITLE": "Instans Lagringsadministration",
       "DESCRIPTION": "Hantera dina Zitadel-vyer och misslyckade händelser."
     },
     "MEMBER": {
@@ -1458,9 +1458,9 @@
       "REACTIVATED": "Organisation återaktiverad.",
       "DOMAINADDED": "Domän tillagd.",
       "DOMAINREMOVED": "Domän borttagen.",
-      "MEMBERADDED": "administratör tillagd.",
-      "MEMBERREMOVED": "administratör borttagen.",
-      "MEMBERCHANGED": "administratör ändrad.",
+      "MEMBERADDED": "Administratör tillagd.",
+      "MEMBERREMOVED": "Administratör borttagen.",
+      "MEMBERCHANGED": "Administratör ändrad.",
       "SETPRIMARY": "Primär domän inställd.",
       "DELETED": "Organisation raderad framgångsrikt",
       "DEFAULTORGNOTFOUND": "Standardorganisationen hittades inte",
@@ -1934,7 +1934,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "Organisation",
-    "DESCRIPTION": "Här kan du redigera konfigurationen av din organisation och hantera medlemmarna.",
+    "DESCRIPTION": "Här kan du redigera konfigurationen av din organisation och hantera administratörerna.",
     "DETAIL": {
       "TITLE": "Detalj",
       "NAME": "Namn",
@@ -1946,13 +1946,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Medlemmar",
+      "TITLE": "Administratörer",
       "USERNAME": "Användarnamn",
       "DISPLAYNAME": "Visningsnamn",
       "LOGINNAME": "Inloggningsnamn",
       "EMAIL": "E-post",
       "ROLES": "Roller",
-      "ADD": "Lägg till medlem",
+      "ADD": "Lägg till administratör",
       "ADDDESCRIPTION": "Ange namnen på de användare som ska läggas till."
     },
     "TABLE": {
@@ -2043,8 +2043,8 @@
       "NAME": "Nytt Namn"
     },
     "MEMBER": {
-      "TITLE": "administratörer",
-      "TITLEDESC": "administratörer kan göra ändringar i detta projekt baserat på deras roll.",
+      "TITLE": "Administratörer",
+      "TITLEDESC": "Administratörer kan göra ändringar i detta projekt baserat på deras roll.",
       "DESCRIPTION": "Dessa administratörer kan kanske redigera ditt projekt.",
       "USERNAME": "Användarnamn",
       "DISPLAYNAME": "Visningsnamn",
@@ -2074,7 +2074,7 @@
       "DETAIL": {
         "TITLE": "Projektbeviljande",
         "DESC": "Du kan välja vilka roller som kan användas av den specificerade organisationen och välja administratörer",
-        "MEMBERTITLE": "administratörer",
+        "MEMBERTITLE": "Administratörer",
         "MEMBERDESC": "Dessa är administratörerna för den beviljade organisationen. Lägg till användare här som ska få tillgång att redigera projektets data.",
         "PROJECTNAME": "Projektnamn",
         "GRANTEDORG": "Beviljad Organisation",
@@ -2088,7 +2088,7 @@
       "ALL": "Alla",
       "SHOWDETAIL": "Visa Detaljer",
       "USER": "Användare",
-      "MEMBERS": "administratörer",
+      "MEMBERS": "Administratörer",
       "ORG": "Organisation",
       "PROJECTNAME": "Projektnamn",
       "GRANTEDORG": "Beviljad Organisation",
@@ -2171,10 +2171,10 @@
       "EMPTY": "Inget projekt hittades"
     },
     "TOAST": {
-      "MEMBERREMOVED": "administratör borttagen.",
-      "MEMBERSADDED": "administratörer tillagda.",
-      "MEMBERADDED": "administratör tillagd.",
-      "MEMBERCHANGED": "administratör ändrad.",
+      "MEMBERREMOVED": "Administratör borttagen.",
+      "MEMBERSADDED": "Administratörer tillagda.",
+      "MEMBERADDED": "Administratör tillagd.",
+      "MEMBERCHANGED": "Administratör ändrad.",
       "ROLESCREATED": "Roller skapade.",
       "ROLEREMOVED": "Roll borttagen.",
       "ROLECHANGED": "Roll ändrad.",
@@ -2798,7 +2798,7 @@
     "ADD": "Lägg till en administratör",
     "CREATIONTYPE": "Skapandetyp",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instans",
       "2": "Organisation",
       "0": "Eget Projekt",
       "1": "Beviljat Projekt",
@@ -2843,7 +2843,7 @@
       "UPDATED": "Auktorisering uppdaterad.",
       "REMOVED": "Auktorisering borttagen",
       "BULKREMOVED": "Auktoriseringar borttagna.",
-      "CANTSHOWINFO": "Du kan inte besöka denna användares profil eftersom du inte är medlem i organisationen där denna användare tillhör"
+      "CANTSHOWINFO": "Du kan inte besöka denna användares profil eftersom du inte är administratör i organisationen där denna användare tillhör"
     },
     "DIALOG": {
       "DELETE_TITLE": "Radera auktorisering",

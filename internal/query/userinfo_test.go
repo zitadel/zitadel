@@ -395,7 +395,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 					Human:              nil,
 					Machine: &Machine{
 						Name:        "tests",
-						Description: "My test service user",
+						Description: "My test service account",
 					},
 				},
 				Org: &UserInfoOrg{

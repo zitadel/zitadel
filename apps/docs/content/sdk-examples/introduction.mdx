@@ -34,12 +34,12 @@ To further streamline your setup, simply visit the management console in Zitadel
 
 ![](../../public/img/sdk-examples/console.png)
 
-To begin configuring login for any of these samples, start [here](https://zitadel.com/signin).
+To begin configuring login for any of these samples, start [here](/guides/manage/console/console-overview).
 
 ## OIDC Libraries
 
 OIDC is a standard for authentication and most languages and frameworks do provide a OIDC library which can be easily integrated to your application.
-If we do not provide an specific example, SDK or guide, we strongly recommend using existing authentication libraries for your
+If we do not provide a specific example, SDK or guide, we strongly recommend using existing authentication libraries for your
 language or framework instead of building your own.
 Certified libraries have undergone rigorous testing and validation to ensure high security and reliability.
 There are many recommended libraries available, this saves time and ensures that users' data is well-protected.
@@ -52,9 +52,9 @@ You might want to check out the following links to find a good library:
 
 ## Other example applications
 
-- [B2B customer portal](https://github.com/zitadel/zitadel-nextjs-b2b): Showcase the use of personal access tokens in a B2B environment. Uses NextJS Framework.
+- [B2B customer portal](https://github.com/zitadel/zitadel-nextjs-b2b): Showcase the use of personal access tokens in a B2B environment. Uses Next.js Framework.
 - [Frontend with backend API](https://github.com/zitadel/example-quote-generator-app): A simple web application using a React front-end and a Python back-end API, both secured using Zitadel
-- [Introspection](https://github.com/zitadel/examples-api-access-and-token-introspection): Python examples for securing an API and invoking it as a service user
+- [Introspection](https://github.com/zitadel/examples-api-access-and-token-introspection): Python examples for securing an API and invoking it as a service account
 - [Fine-grained authorization](https://github.com/zitadel/example-fine-grained-authorization): Leverage actions, custom metadata, and claims for attribute-based access control
 
 Search for the "example" tag in our repository to [explore all examples](https://github.com/search?q=topic%3Aexamples+org%3Azitadel&type=repositories).
@@ -72,7 +72,7 @@ the [buf plugin registry](https://buf.build/plugins) for more ideas.
 
 ### Example with Ruby
 
-With gRPC we usually need to generate the client stub and the messages/types. This is why we need two plugins.
+With gRPC, we usually need to generate the client stub and the messages/types. This is why we need two plugins.
 The plugin `grpc/ruby` generates the client stub and the plugin `protocolbuffers/ruby` takes care of the messages/types.
 
 ```yaml

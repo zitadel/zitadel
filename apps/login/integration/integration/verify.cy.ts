@@ -90,6 +90,7 @@ describe("verify email", () => {
     // TODO: Avoid uncaught exception in application
     cy.once("uncaught:exception", () => false);
     cy.visit("/verify?userId=221394658884845598&code=abc");
+    cy.get("[data-testid=submit-button]").click();
     cy.contains("Could not verify email");
   });
 });

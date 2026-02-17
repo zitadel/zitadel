@@ -12,11 +12,11 @@ Domain discovery is typically used in [B2B](./b2b) or [SaaS](./saas) scenarios w
 ![](../../../public/img/guides/solution-scenarios/domain-discovery.png)
 
 In the example there is a service provider with a ZITADEL instance running on a [Custom Domain](/guides/manage/cloud/instances#add-custom-domain) on `login.mycompany.com`.
-By default all users login on the organization **CIAM** with their preferred social login provider.
+By default, all users login on the organization **CIAM** with their preferred social login provider.
 
-Users of the two business customers **Alpha** and **Beta** should login according to their organization login and access policy settings.
-In case of Alpha users will login via an external identity provider (eg, [Entra ID](/guides/integrate/identity-providers/azure-ad-oidc)).
-Beta users must only login with username/password and MFA instead.
+Users of the two business customers **Alpha** and **Beta** should log in, according to their organization login and access policy settings.
+In the case of Alpha, users will log in via an external identity provider (eg, [Entra ID](/guides/integrate/identity-providers/azure-ad-oidc)).
+Beta users must only log in with username/password and MFA instead.
 
 For this scenario you need to route the user `alice@alpha.com` to the **Alpha Organization** and `bob@beta.com` to the **Beta Organization** respectively.
 
@@ -78,13 +78,13 @@ In case multiple providers are configured, then the user will be prompted to sel
 
 Users of **Beta** must create an account and login with password and 2FA.
 
-In the organization settings under Login Behavior and Access make sure the following settings are applied:
+In the organization settings under `Login Behavior and Access`, make sure the following settings are applied:
 
 - **Username Password allowed**: Enabled
-- **Register allowed**: Disabled - you may want [Managers](/concepts/structure/managers) to setup accounts.
+- **Register allowed**: Disabled - you may want [Administrators](/concepts/structure/administrators) to set up accounts.
 - **External IDP allowed**: Disabled
 
-Make sure to [Force MFA](/guides/manage/console/default-settings#multifactor-mfa) so that users must setup a second factor for authentication.
+Make sure to [Force MFA](/guides/manage/console/default-settings#multifactor-mfa) so that users must set up a second factor for authentication.
 
 ### Verify domains
 
@@ -108,7 +108,7 @@ The user journeys for the different users would look as follows:
 
 Chuck
 
-1. Select Google button
+1. Select the Google button
 1. Redirect to Google IDP
 1. Chuck logs in with Google credentials
 1. Redirected back to your application

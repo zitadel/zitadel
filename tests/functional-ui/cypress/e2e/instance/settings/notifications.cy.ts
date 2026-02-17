@@ -36,19 +36,19 @@ describe('instance notifications', () => {
       cy.get<SMTPProvider>('@provider').then((provider) => {
         cy.visit(smtpPath);
         cy.get(`a:contains('Mailgun')`).click();
-        cy.get('[formcontrolname="description"]').should('be.enabled').clear().type(provider.description);
-        cy.get('[formcontrolname="hostAndPort"]').should('have.value', 'smtp.mailgun.org:587');
-        cy.get('[formcontrolname="user"]').should('be.enabled').clear().type('user@example.com');
-        cy.get('[formcontrolname="password"]').should('be.enabled').clear().type('password');
+        cy.get('input[name="description"]').should('be.enabled').clear().type(provider.description);
+        cy.get('input[name="hostAndPort"]').should('have.value', 'smtp.mailgun.org:465');
+        cy.get('input[name="smtp-user"]').should('be.enabled').clear().type('user@example.com');
+        cy.get('input[name="smtp-password"]').should('be.enabled').clear().type('password');
         cy.get('[data-e2e="continue-to-2nd-form"]').should('be.enabled').click();
-        cy.get('[formcontrolname="senderAddress"]').should('be.enabled').clear().type('sender1@example.com');
-        cy.get('[formcontrolname="senderName"]').should('be.enabled').clear().type('Test1');
-        cy.get('[formcontrolname="replyToAddress"]').should('be.enabled').clear().type('replyto1@example.com');
+        cy.get('input[name="senderAddress"]').should('be.enabled').clear().type('sender1@example.com');
+        cy.get('input[name="senderName"]').should('be.enabled').clear().type('Test1');
+        cy.get('input[name="senderReplyToAddress"]').should('be.enabled').clear().type('replyto1@example.com');
         cy.get('[data-e2e="continue-button"]').should('be.enabled').click();
         cy.get('[data-e2e="create-button"]').should('be.enabled').click();
         cy.shouldConfirmSuccess();
         cy.get('[data-e2e="close-button"]').should('be.enabled').click();
-        cy.get(provider.rowSelector).contains('smtp.mailgun.org:587');
+        cy.get(provider.rowSelector).contains('smtp.mailgun.org:465');
         cy.get(provider.rowSelector).contains('sender1@example.com');
       });
     });
@@ -57,14 +57,14 @@ describe('instance notifications', () => {
       cy.get<SMTPProvider>('@provider').then((provider) => {
         cy.visit(smtpPath);
         cy.get(`a:contains('Mailgun')`).click();
-        cy.get('[formcontrolname="description"]').should('be.enabled').clear().type(provider.description);
-        cy.get('[formcontrolname="hostAndPort"]').should('have.value', 'smtp.mailgun.org:587');
-        cy.get('[formcontrolname="user"]').should('be.enabled').clear().type('user@example.com');
-        cy.get('[formcontrolname="password"]').should('be.enabled').clear().type('password');
+        cy.get('input[name="description"]').should('be.enabled').clear().type(provider.description);
+        cy.get('input[name="hostAndPort"]').should('have.value', 'smtp.mailgun.org:465');
+        cy.get('input[name="smtp-user"]').should('be.enabled').clear().type('user@example.com');
+        cy.get('input[name="smtp-password"]').should('be.enabled').clear().type('password');
         cy.get('[data-e2e="continue-to-2nd-form"]').should('be.enabled').click();
-        cy.get('[formcontrolname="senderAddress"]').should('be.enabled').clear().type('sender1@example.com');
-        cy.get('[formcontrolname="senderName"]').should('be.enabled').clear().type('Test1');
-        cy.get('[formcontrolname="replyToAddress"]').should('be.enabled').clear().type('replyto1@example.com');
+        cy.get('input[name="senderAddress"]').should('be.enabled').clear().type('sender1@example.com');
+        cy.get('input[name="senderName"]').should('be.enabled').clear().type('Test1');
+        cy.get('input[name="senderReplyToAddress"]').should('be.enabled').clear().type('replyto1@example.com');
         cy.get('[data-e2e="continue-button"]').should('be.enabled').click();
         cy.get('[data-e2e="create-button"]').click();
         cy.shouldConfirmSuccess();
@@ -72,7 +72,7 @@ describe('instance notifications', () => {
         cy.shouldConfirmSuccess();
         cy.get('[data-e2e="close-button"]').click();
         cy.get(provider.rowSelector).find('[data-e2e="active-provider"]');
-        cy.get(provider.rowSelector).contains('smtp.mailgun.org:587');
+        cy.get(provider.rowSelector).contains('smtp.mailgun.org:465');
         cy.get(provider.rowSelector).contains('sender1@example.com');
       });
     });
@@ -91,8 +91,8 @@ describe('instance notifications', () => {
         cy.get<SMTPProvider>('@provider').then(({ rowSelector }) => {
           cy.get(rowSelector).click();
           cy.get('[data-e2e="continue-to-2nd-form"]').click();
-          cy.get('[formcontrolname="senderAddress"]').should('be.enabled').clear().type('senderchange1@example.com');
-          cy.get('[formcontrolname="senderName"]').clear().type('Change1');
+          cy.get('input[name="senderAddress"]').should('be.enabled').clear().type('senderchange1@example.com');
+          cy.get('input[name="senderName"]').clear().type('Change1');
           cy.get('[data-e2e="continue-button"]').click();
           cy.get('[data-e2e="create-button"]').click();
           cy.shouldConfirmSuccess();

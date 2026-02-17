@@ -131,7 +131,9 @@ export type UpdateSessionCommand = {
   requestId?: string;
 };
 
-export async function sendPassword(command: UpdateSessionCommand): Promise<{ error: string } | { redirect: string }> {
+export async function sendPassword(
+  command: UpdateSessionCommand,
+): Promise<{ error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
   const t = await getTranslations("password");
@@ -374,10 +376,12 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
     return mfaFactorCheck;
   }
 
+  let result: Awaited<ReturnType<typeof completeFlowOrGetUrl>>;
+
   if (command.requestId && session.id) {
-    // OIDC/SAML flow - use completeFlowOrGetUrl for proper handling
+    // OIDC/SAML flow
     logger.info("Password auth: OIDC/SAML flow with requestId:", { requestId: command.requestId, sessionId: session.id });
-    const result = await completeFlowOrGetUrl(
+    result = await completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: command.requestId,
@@ -385,15 +389,19 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
       },
       loginSettingsByUser?.defaultRedirectUri,
     );
-    logger.info("Password auth: OIDC/SAML flow result:", { result });
+  } else {
+    // Regular flow (no requestId)
+    logger.info("Password auth: Regular flow with loginName:", { loginName: session.factors.user.loginName });
+    result = await completeFlowOrGetUrl(
+      {
+        loginName: session.factors.user.loginName,
+        organization: session.factors?.user?.organizationId,
+      },
+      loginSettingsByUser?.defaultRedirectUri,
+    );
+  }
 
-    // Safety net - ensure we always return a valid object
-    if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
-      logger.error("Password auth: Invalid result from completeFlowOrGetUrl (OIDC/SAML):", { result });
-      recordAuthFailure("password", "navigation_failed", command.organization);
-      return { error: "Authentication completed but navigation failed" };
-    }
-
+  if (result && typeof result === "object") {
     if ("redirect" in result) {
       recordAuthSuccess("password", command.organization);
     } else if ("error" in result) {
@@ -402,29 +410,8 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
     return result;
   }
 
-  // Regular flow (no requestId) - return URL for client-side navigation
-
-  const result = await completeFlowOrGetUrl(
-    {
-      loginName: session.factors.user.loginName,
-      organization: session.factors?.user?.organizationId,
-    },
-    loginSettingsByUser?.defaultRedirectUri,
-  );
-
-  // Safety net - ensure we always return a valid object
-  if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
-    logger.error("Password auth: Invalid result from completeFlowOrGetUrl:", { result });
-    recordAuthFailure("password", "navigation_failed", command.organization);
-    return { error: "Authentication completed but navigation failed" };
-  }
-
-  if ("redirect" in result) {
-    recordAuthSuccess("password", command.organization);
-  } else if ("error" in result) {
-    recordAuthFailure("password", "flow_error", command.organization);
-  }
-  return result;
+  recordAuthFailure("password", "navigation_failed", command.organization);
+  return { error: "Authentication completed but navigation failed" };
 }
 
 // this function lets users with code set a password or users with valid User Verification Check

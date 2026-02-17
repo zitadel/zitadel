@@ -33,7 +33,7 @@ import {
 import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
-import { setSAMLFormCookie } from "./saml";
+
 import { createServiceForHost } from "./service";
 
 const useCache = process.env.DEBUG !== "true";
@@ -775,7 +775,7 @@ export async function startIdentityProviderFlow({
 }: WithServiceConfig<{
   idpId: string;
   urls: RedirectURLsJson;
-}>): Promise<string | null> {
+}>): Promise<{ url: string; fields?: Record<string, string> } | null> {
   // Use empty publicHost to avoid issues with redirect URIs pointing to the login UI instead of the zitadel API
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, {
     ...serviceConfig,
@@ -792,30 +792,11 @@ export async function startIdentityProviderFlow({
     })
     .then(async (resp) => {
       if (resp.nextStep.case === "authUrl" && resp.nextStep.value) {
-        return resp.nextStep.value;
+        return { url: resp.nextStep.value };
       } else if (resp.nextStep.case === "formData" && resp.nextStep.value) {
         const formData: FormData = resp.nextStep.value;
-        const redirectUrl = "/saml-post";
 
-        try {
-          const stringifiedFields = JSON.stringify(formData.fields);
-
-          // Check cookie size limits (typical limit is 4KB)
-          if (stringifiedFields.length > 4000) {
-            console.warn(
-              `SAML form cookie value is large (${stringifiedFields.length} characters), may exceed browser limits`,
-            );
-          }
-
-          const dataId = await setSAMLFormCookie(stringifiedFields);
-          const params = new URLSearchParams({ url: formData.url, id: dataId });
-
-          return `${redirectUrl}?${params.toString()}`;
-        } catch (stringifyError) {
-          throw new Error(
-            `Failed to serialize SAML form data: ${stringifyError instanceof Error ? stringifyError.message : String(stringifyError)}`,
-          );
-        }
+        return { url: formData.url, fields: formData.fields };
       } else {
         return null;
       }

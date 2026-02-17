@@ -182,13 +182,13 @@ CLIENT_ID = "197....@projectname"
 CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 ```
 
-### ZITADEL configuration to create a service user
+### ZITADEL configuration to create a service account
 
 ![](../../../public/img/python-flask/3.png)
 
-1. Create a service user and a Personal Access Token (PAT) for that user by following [this guide](/guides/integrate/service-accounts/personal-access-token#create-a-service-user-with-a-pat).
+1. Create a service account and a Personal Access Token (PAT) for that user by following [this guide](/guides/integrate/service-accounts/personal-access-token#create-a-service-account-with-a-pat).
 2. To enable authorization, follow [this guide](/guides/manage/console/roles) to create a role `read:messages` on your project.
-3. Next, create an authorization for the service user you created by adding the role `read:messages` to the user. Follow this [guide](/guides/manage/console/roles#authorizations) for more information on creating an authorization.
+3. Next, create an authorization for the service account you created by adding the role `read:messages` to the user. Follow this [guide](/guides/manage/console/roles#authorizations) for more information on creating an authorization.
 
 ### Run the API
 
@@ -222,7 +222,7 @@ curl --request GET \
 
 You should get a response with Status Code 401 and an error message.
 
-Now let's add an authorization header to your request. Save the personal access token for your service user to a variable by running the following command. Replace the value with the PAT you obtained earlier.
+Now let's add an authorization header to your request. Save the personal access token for your service account to a variable by running the following command. Replace the value with the PAT you obtained earlier.
 
 `PAT=nr9vnUTkQkn4rxWk...`
 
@@ -252,4 +252,4 @@ You should get a response with Status Code 200 and the following message.
 
 `{"message":"Private, scoped route - You need to be authenticated and have the role read:messages to see this."}`
 
-You can remove the role from the service user in ZITADEL and try again. You should then get a Status Code 403, Forbidden error.
+You can remove the role from the service account in ZITADEL and try again. You should then get a Status Code 403, Forbidden error.

@@ -18,8 +18,7 @@ export interface AuthFlowParams {
 }
 
 async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConfig; ids: string[] }): Promise<Session[]> {
-  const response = await listSessions({ serviceConfig, ids: ids.filter((id: string | undefined) => !!id),
-  });
+  const response = await listSessions({ serviceConfig, ids: ids.filter((id: string | undefined) => !!id) });
 
   return response?.sessions ?? [];
 }
@@ -30,7 +29,9 @@ async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConf
  * This is the shared logic for flow completion
  * Returns either an error or a redirect URL for client-side navigation
  */
-export async function completeAuthFlow(command: AuthFlowParams): Promise<{ error: string } | { redirect: string }> {
+export async function completeAuthFlow(
+  command: AuthFlowParams,
+): Promise<{ error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   const { sessionId, requestId } = command;
 
   const _headers = await headers();
@@ -46,7 +47,9 @@ export async function completeAuthFlow(command: AuthFlowParams): Promise<{ error
 
   if (requestId.startsWith("oidc_")) {
     // Complete OIDC flow
-    const result = await loginWithOIDCAndSession({ serviceConfig, authRequest: requestId.replace("oidc_", ""),
+    const result = await loginWithOIDCAndSession({
+      serviceConfig,
+      authRequest: requestId.replace("oidc_", ""),
       sessionId,
       sessions,
       sessionCookies,
@@ -61,14 +64,20 @@ export async function completeAuthFlow(command: AuthFlowParams): Promise<{ error
     return result;
   } else if (requestId.startsWith("saml_")) {
     // Complete SAML flow
-    const result = await loginWithSAMLAndSession({ serviceConfig, samlRequest: requestId.replace("saml_", ""),
+    const result = await loginWithSAMLAndSession({
+      serviceConfig,
+      samlRequest: requestId.replace("saml_", ""),
       sessionId,
       sessions,
       sessionCookies,
     });
 
     // Safety net - ensure we always return a valid object
-    if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
+    if (
+      !result ||
+      typeof result !== "object" ||
+      (!("redirect" in result) && !("error" in result) && !("samlData" in result))
+    ) {
       logger.error("Auth flow: Invalid result from loginWithSAMLAndSession:", { result });
       return { error: "Authentication completed but navigation failed" };
     }

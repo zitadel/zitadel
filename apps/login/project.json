@@ -33,6 +33,7 @@
         "!{projectRoot}/.local.env",
         "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/dockerized/**/*",
         "!{projectRoot}/cypress.config.ts"
       ],
       "outputs": [
@@ -52,6 +53,7 @@
         "!{projectRoot}/.local.env",
         "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/dockerized/**/*",
         "!{projectRoot}/cypress.config.ts"
       ],
       "outputs": [
@@ -81,11 +83,11 @@
       ]
     },
     "test": {
-      "description": "Runs all tests (unit, integration, and OpenTelemetry)",
+      "description": "Runs all tests (unit, integration, and dockerized)",
       "dependsOn": [
         "test-unit",
         "test-integration",
-        "test-otel"
+        "test-dockerized"
       ]
     },
     "test-unit": {
@@ -94,8 +96,8 @@
         "^build"
       ]
     },
-    "test-otel": {
-      "description": "Runs OpenTelemetry integration tests with Docker Compose",
+    "test-dockerized": {
+      "description": "Runs dockerized integration tests (OpenTelemetry and custom CA certificate tests)",
       "dependsOn": [
         "build",
         "test-integration"
@@ -105,12 +107,13 @@
       "inputs": [
         "default",
         "!{projectRoot}/integration/**/*",
-        "!{projectRoot}/acceptance/**/*"
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/dockerized/**/output/**/*"
       ],
       "options": {
         "cwd": "{projectRoot}",
         "commands": [
-          "pnpm vitest --run --config vitest.config.otel.mts"
+          "pnpm vitest --run --config vitest.config.dockerized.mts"
         ]
       }
     },

@@ -10,12 +10,12 @@ This guide shows you the different concepts and use cases of the logout process 
 ### Single Sign On (SSO) vs Single Logout (SLO)
 
 Single Sign On (SSO) allows a user to login once without the need for authentication across multiple applications.
-Single Logout (SLO) is the counterpart to SSO. With SLO a user can logout and terminate sessions across many applications, without actively logging out from them.
+Single Logout (SLO) is the counterpart to SSO. With SLO a user can log out and terminate sessions across many applications, without actively logging out from them.
 
 The purpose of a logout is to terminate a user session.
 Depending on how the session handling is implemented, there are different mechanisms that can be used.
 There are two possibilities where sessions are stored:
-- The User Agent (e.g the Browser or Mobile App) stores the session information (e.g. in a cookie)
+- The User Agent (e.g. the Browser or Mobile App) stores the session information (e.g. in a cookie)
 - A Server stores the session information (e.g. in a database or api)
 
 ### OpenID Connect Logout
@@ -27,14 +27,14 @@ OpenID Connect defines three logout mechanisms to address the different architec
 
 #### Session Management
 
-Session Management in OpenID Connect defines a mechanism for a client (Relying Party, RP) to monitor the state of the user session from a identity provider (OP, e.g ZITADEL).
+Session Management in OpenID Connect defines a mechanism for a client (Relying Party, RP) to monitor the state of the user session from an identity provider (OP, e.g. ZITADEL).
 When a user logs out of the provider, the user's session is terminated and the client can in turn reflect that in its behavior.
 
 #### RP initiated Logout
 
-With the RP initiated flow all logout processes are triggered by a request from the client (e.g your application) through a well defined standard API by redirecting the user-agent to the [end_session_endpoint](/apis/openidoauth/endpoints#end-session-endpoint).
+With the RP initiated flow all logout processes are triggered by a request from the client (e.g. your application) through a well-defined standard API by redirecting the user-agent to the [end_session_endpoint](/apis/openidoauth/endpoints#end-session-endpoint).
 If you have specified some post_logout_redirect_uris on your client you have to send either the id_token_hint or the client_id as param in your request.
-So ZITADEL is able to read the configured redirect uris.
+So ZITADEL is able to read the configured redirect URIs.
 
 ```
 GET ${CUSTOM_DOMAIN}/oidc/v1/end_session
@@ -55,7 +55,7 @@ This is not yet implemented in ZITADEL
 #### Back-Channel Logout
 
 The back-channel logout is a mechanism on the server-side and the user agent does not have to do anything.
-The user will logout from all clients even in the case the user agent was closed.
+The user will log out from all clients even in the case the user agent was closed.
 
 <Callout>
 This is not yet implemented in ZITADEL
