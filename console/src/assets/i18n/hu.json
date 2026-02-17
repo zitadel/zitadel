@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Adminisztrátor hozzáadva.",
       "MEMBERREMOVED": "Adminisztrátor eltávolítva.",
       "MEMBERCHANGED": "Adminisztrátor megváltozott.",
-      "SETPRIMARY": "Szervezet domainje",
+      "SETPRIMARY": "A szervezet domainje sikeresen be lett állítva.",
       "DELETED": "A szervezet sikeresen törölve.",
       "DEFAULTORGNOTFOUND": "Az alapértelmezett szervezet nem található.",
       "ORG_WAS_DELETED": "A szervezet törölve lett."

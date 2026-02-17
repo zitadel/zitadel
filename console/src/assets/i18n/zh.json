@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "管理员已添加。",
       "MEMBERREMOVED": "管理员已删除。",
       "MEMBERCHANGED": "管理员以改变。",
-      "SETPRIMARY": "组织域名",
+      "SETPRIMARY": "组织域名已成功设置。",
       "DELETED": "成功删除的组织",
       "DEFAULTORGNOTFOUND": "未找到默认组织",
       "ORG_WAS_DELETED": "组织被删除"

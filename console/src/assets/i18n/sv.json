@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administratör tillagd.",
       "MEMBERREMOVED": "Administratör borttagen.",
       "MEMBERCHANGED": "Administratör ändrad.",
-      "SETPRIMARY": "Organisationsdomän",
+      "SETPRIMARY": "Organisationsdomänen har ställts in.",
       "DELETED": "Organisation raderad framgångsrikt",
       "DEFAULTORGNOTFOUND": "Standardorganisationen hittades inte",
       "ORG_WAS_DELETED": "Organisationen har raderats."

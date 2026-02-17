@@ -1462,7 +1462,7 @@
       "MEMBERADDED": "Administrator added.",
       "MEMBERREMOVED": "Administrator removed.",
       "MEMBERCHANGED": "Administrator changed.",
-      "SETPRIMARY": "Organization Domain set.",
+      "SETPRIMARY": "Organization domain set successfully.",
       "DELETED": "Organization deleted successfully",
       "DEFAULTORGNOTFOUND": "The default organization was not found",
       "ORG_WAS_DELETED": "Organization has been deleted."

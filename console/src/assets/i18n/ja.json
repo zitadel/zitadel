@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "管理者が追加されました。",
       "MEMBERREMOVED": "管理者が削除されました。",
       "MEMBERCHANGED": "管理者が変更されました。",
-      "SETPRIMARY": "組織ドメイン",
+      "SETPRIMARY": "組織ドメインが正常に設定されました。",
       "DELETED": "組織が正常に削除されました。",
       "DEFAULTORGNOTFOUND": "デフォルトの組織が見つかりませんでした",
       "ORG_WAS_DELETED": "組織が削除されました。"

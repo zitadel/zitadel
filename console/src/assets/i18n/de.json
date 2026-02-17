@@ -702,7 +702,7 @@
     "USERNAME": "Nutzername",
     "ORGNAME": "Organisationsname",
     "ORGID": "Organisations ID",
-    "PRIMARYDOMAIN": "Domain der Organisation",
+    "PRIMARYDOMAIN": "Organisationsdomäne",
     "PROJECTNAME": "Projektname",
     "RESOURCEOWNER": "Ressourcenbesitzer",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Datei herunterladen",
       "SELECTORGTOOLTIP": "Diese Organisation auswählen",
-      "PRIMARYDOMAIN": "Domain der Organisation",
+      "PRIMARYDOMAIN": "Organisationsdomäne",
       "STATE": "Status",
       "USEPASSWORD": "Initiales Passwort setzen",
       "USEPASSWORDDESC": "Der Nutzer muss das Passwort bei der Initialisierung nicht setzen."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
-      "TITLE": "Domain der Organisation",
+      "TITLE": "Organisationsdomäne",
       "DESCRIPTION": "Konfiguriere die Domains, die für Domain Discovery und als Suffix für die Benutzer verwendet werden können.",
-      "SETPRIMARY": "Domain der Organisation",
+      "SETPRIMARY": "Organisationsdomäne",
       "DELETE": {
         "TITLE": "Domain löschen?",
         "DESCRIPTION": "Du bist im Begriff, eine Domain aus deiner Organisation zu löschen."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administrator hinzugefügt.",
       "MEMBERREMOVED": "Administrator entfernt.",
       "MEMBERCHANGED": "Administrator geändert.",
-      "SETPRIMARY": "Domain der Organisation",
+      "SETPRIMARY": "Organisationsdomäne wurde erfolgreich festgelegt.",
       "DELETED": "Organisation erfolgreich gelöscht",
       "DEFAULTORGNOTFOUND": "Die Standardorganisation wurde nicht gefunden",
       "ORG_WAS_DELETED": "Organisation wurde gelöscht."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP und SMS Einstellungen",
       "MESSAGETEXTS": "Benachrichtigungstexte",
       "IDP": "Identitätsanbieter",
-      "VERIFIED_DOMAINS": "Domain der Organisation",
+      "VERIFIED_DOMAINS": "Organisationsdomäne",
       "DOMAIN": "Domain Einstellungen",
       "LOGINTEXTS": "Login Interface Texte",
       "BRANDING": "Branding",
@@ -2156,7 +2156,7 @@
       "DELETE": "Projekt löschen",
       "ORGNAME": "Name der Organisation",
       "ORGID": "Organisations ID",
-      "ORGDOMAIN": "Domain der Organisation",
+      "ORGDOMAIN": "Organisationsdomäne",
       "STATE": "Status",
       "TYPE": "Typ",
       "CREATIONDATE": "Erstelldatum",

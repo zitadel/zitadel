@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Yönetici eklendi.",
       "MEMBERREMOVED": "Yönetici kaldırıldı.",
       "MEMBERCHANGED": "Yönetici değiştirildi.",
-      "SETPRIMARY": "Organizasyon Domain'i",
+      "SETPRIMARY": "Organizasyon domain'i başarıyla ayarlandı.",
       "DELETED": "Organizasyon başarıyla silindi",
       "DEFAULTORGNOTFOUND": "Varsayılan organizasyon bulunamadı",
       "ORG_WAS_DELETED": "Organizasyon silindi."

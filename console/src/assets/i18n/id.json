@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administrator menambahkan.",
       "MEMBERREMOVED": "Administrator dihapus.",
       "MEMBERCHANGED": "Administrator berubah.",
-      "SETPRIMARY": "Domain Organisasi",
+      "SETPRIMARY": "Domain organisasi berhasil ditetapkan.",
       "DELETED": "Organisasi berhasil dihapus",
       "DEFAULTORGNOTFOUND": "Organisasi default tidak ditemukan",
       "ORG_WAS_DELETED": "Organisasi telah dihapus."

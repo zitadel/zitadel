@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Správce přidán.",
       "MEMBERREMOVED": "Správce odstraněn.",
       "MEMBERCHANGED": "Správce změněn.",
-      "SETPRIMARY": "Doména organizace",
+      "SETPRIMARY": "Doména organizace byla úspěšně nastavena.",
       "DELETED": "Organizace úspěšně smazána",
       "DEFAULTORGNOTFOUND": "Výchozí organizace nebyla nalezena",
       "ORG_WAS_DELETED": "Organizace byla smazána."

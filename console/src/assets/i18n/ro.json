@@ -1459,7 +1459,7 @@
       "MEMBERADDED": "Administrator adăugat.",
       "MEMBERREMOVED": "Administrator eliminat.",
       "MEMBERCHANGED": "Administrator modificat.",
-      "SETPRIMARY": "Domeniu organizație",
+      "SETPRIMARY": "Domeniul organizației a fost setat cu succes.",
       "DELETED": "Organizația a fost ștearsă cu succes",
       "DEFAULTORGNOTFOUND": "Organizația implicită nu a fost găsită",
       "ORG_WAS_DELETED": "Organizația a fost ștearsă."

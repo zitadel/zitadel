@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Beheerder toegevoegd.",
       "MEMBERREMOVED": "Beheerder verwijderd.",
       "MEMBERCHANGED": "Beheerder gewijzigd.",
-      "SETPRIMARY": "Organisatie Domein",
+      "SETPRIMARY": "Organisatiedomein is succesvol ingesteld.",
       "DELETED": "Organisatie succesvol verwijderd",
       "DEFAULTORGNOTFOUND": "De standaardorganisatie is niet gevonden",
       "ORG_WAS_DELETED": "Organisatie is verwijderd."

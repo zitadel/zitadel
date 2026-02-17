@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administrateur ajouté.",
       "MEMBERREMOVED": "Administrateur supprimé.",
       "MEMBERCHANGED": "Administrateur modifié.",
-      "SETPRIMARY": "Domaine de l'organisation",
+      "SETPRIMARY": "Le domaine de l'organisation a été défini avec succès.",
       "DELETED": "Organisation supprimée avec succès",
       "DEFAULTORGNOTFOUND": "L'organisation par défaut est introuvable",
       "ORG_WAS_DELETED": "L'organisation a été supprimée"
