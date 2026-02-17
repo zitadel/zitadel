@@ -30,7 +30,7 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 function setCSPHeaders(
   response: NextResponse,
   serviceConfig: ServiceConfig,
-  securitySettings: { embeddedIframe?: { enabled?: boolean; allowedOrigins: string[] } } | null,
+  securitySettings: { embeddedIframe?: { enabled?: boolean; allowedOrigins: string[] } } | null | undefined,
 ): void {
   const iframeOrigins =
     securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
