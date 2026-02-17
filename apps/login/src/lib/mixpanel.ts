@@ -44,6 +44,7 @@ export function initMixpanel() {
     ip: false,
     persistence: "localStorage",
     opt_out_tracking_by_default: true,
+    api_host: "https://api-eu.mixpanel.com",
   });
 
   initialized = true;
