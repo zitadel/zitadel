@@ -2820,7 +2820,7 @@
     },
     "CREATE": {
       "TITLE": "Een roltoewijzing maken",
-      "DESCRIPTION": "Zoek naar de organisatie, het project en de roltoewijzing rollen."
+      "DESCRIPTION": "Zoek naar de organisatie, het project en de bijbehorende rollen."
     },
     "EDIT": {
       "TITLE": "Roltoewijzing wijzigen"

@@ -63,7 +63,7 @@
     },
     "ROLE_ASSIGNMENTS": {
       "TITLE": "Role Assignments",
-      "DESCRIPTION": "Role assignments define the access rights of a user to a project. You can grant a user access to a project and define the users roles within that project."
+      "DESCRIPTION": "Role assignments define the access rights of a user to a project. You can grant a user access to a project and define the user's roles within that project."
     },
     "ACTIONS": {
       "TITLE": "Actions",

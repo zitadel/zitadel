@@ -49,7 +49,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Applications",
-            description: "Applications are the entry point to your project. Users either log in into one of your applications and interact with them directly or use one of your APIs. All applications share the roles and role assignments of their project."
+            description: "Applications are the entry point to your project. Users either log into one of your applications and interact with them directly or use one of your APIs. All applications share the roles and role assignments of their project."
         },
         {
             name: "Authentication Methods"
