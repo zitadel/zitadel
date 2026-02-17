@@ -123,12 +123,12 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				expectPushFailed(io.ErrClosedPipe,
 					feature_v2.NewSetEvent(
 						ctx, aggregate,
-						feature_v2.InstanceConsoleUseV2UserApi, true,
+						feature_v2.InstanceManagementConsoleUseV2UserApi, true,
 					),
 				),
 			),
 			args: args{ctx, &InstanceFeatures{
-				ConsoleUseV2UserApi: gu.Ptr(true),
+				ManagementConsoleUseV2UserApi: gu.Ptr(true),
 			}},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -332,13 +332,6 @@ func TestInstanceFeatures_isEmpty(t *testing.T) {
 			name: "UserSchema set",
 			features: &InstanceFeatures{
 				UserSchema: gu.Ptr(true),
-			},
-			want: false,
-		},
-		{
-			name: "TokenExchange set",
-			features: &InstanceFeatures{
-				TokenExchange: gu.Ptr(true),
 			},
 			want: false,
 		},

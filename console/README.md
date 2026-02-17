@@ -1,6 +1,6 @@
-# Zitadel Console
+# Zitadel Management Console
 
-The Console is Zitadels management UI.
+The Management Console is Zitadel's management UI.
 
 It is built using [Angular](https://angular.dev/) and part of the Zitadel monorepo.
 
@@ -42,14 +42,14 @@ pnpm nx @zitadel/console:lint-fix
 
 ### Dependency Chain
 
-The Console app has the following build dependencies managed by Nx:
+The Management Console app has the following build dependencies managed by Nx:
 
 1. `@zitadel/proto:generate` - Generates the protobuf stubs
 2. `@zitadel/client:build` - Builds the TypeScript gRPC client library
-3. `@zitadel/console:generate` - Generates Console-specific protobuf stubs
-4. `@zitadel/console:build` - Creates a production build from Console
+3. `@zitadel/console:generate` - Generates Management Console-specific protobuf stubs
+4. `@zitadel/console:build` - Creates a production build from Management Console
 
-This ensures that the Console always has access to the latest client library and protobuf definitions.
+This ensures that the Management Console always has access to the latest client library and protobuf definitions.
 
 
 ### Proto Generation Details
@@ -57,8 +57,8 @@ This ensures that the Console always has access to the latest client library and
 1. **`@zitadel/proto` generation**: Modern ES modules with `@bufbuild/protobuf` for v2 APIs
 2. **Local `buf.gen.yaml` generation**: Traditional protobuf JavaScript classes for v1 APIs
 
-The Console app calls Zitadel v1 and v2 APIs.
-As long as the Console still calls v1 APIs, it needs to import client stubs from separate sources:
+The Management Console app calls Zitadel v1 and v2 APIs.
+As long as the Management Console still calls v1 APIs, it needs to import client stubs from separate sources:
 - [Source outputs from direct buf generation for v1 APIs](#v1-stubs)
 - [@zitadel/client for v2 APIs](#v2-stubs)
 
@@ -68,7 +68,7 @@ As long as the Console still calls v1 APIs, it needs to import client stubs from
 - Generates traditional Google protobuf JavaScript classes extending `jspb.Message`
 - Uses plugins: `protocolbuffers/js`, `grpc/web`, `grpc-ecosystem/openapiv2`
 - Output: `src/app/proto/generated/`
-- Used for: Most existing Console functionality
+- Used for: Most existing Management Console functionality
 
 ### <a name="v2-stubs"></a>Modern v2 API (ES Modules)
 
@@ -80,13 +80,13 @@ As long as the Console still calls v1 APIs, it needs to import client stubs from
 
 ### Dependency Management
 
-The Console's `project.json` ensures proper execution order:
+The Management Console's `project.json` ensures proper execution order:
 
 1. `@zitadel/proto:generate` runs first (modern ES modules)
-2. Console's local generation runs second (traditional protobuf)
+2. Management Console's local generation runs second (traditional protobuf)
 3. Build/lint/start tasks depend on both generations being complete
 
-This approach allows the Console app to use both v1 and v2 APIs while maintaining proper build dependencies.
+This approach allows the Management Console app to use both v1 and v2 APIs while maintaining proper build dependencies.
 
 ## Legacy Information
 

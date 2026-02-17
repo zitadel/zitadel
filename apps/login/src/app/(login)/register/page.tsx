@@ -3,7 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterForm } from "@/components/register-form";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import {
   getActiveIdentityProviders,
   getBrandingSettings,
@@ -13,7 +13,6 @@ import {
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -29,39 +28,27 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   let { firstname, lastname, email, organization, requestId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
     if (org) {
       organization = org.id;
     }
   }
 
-  const legal = await getLegalAndSupportSettings({
-    serviceUrl,
-    organization,
+  const legal = await getLegalAndSupportSettings({ serviceConfig, organization,
   });
-  const passwordComplexitySettings = await getPasswordComplexitySettings({
-    serviceUrl,
-    organization,
+  const passwordComplexitySettings = await getPasswordComplexitySettings({ serviceConfig, organization,
   });
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
+  const loginSettings = await getLoginSettings({ serviceConfig, organization,
   });
 
-  const identityProviders = await getActiveIdentityProviders({
-    serviceUrl,
-    orgId: organization,
+  const identityProviders = await getActiveIdentityProviders({ serviceConfig, orgId: organization,
   }).then((resp) => {
     return resp.identityProviders.filter((idp) => {
       return idp.options?.isAutoCreation || idp.options?.isCreationAllowed; // check if IDP allows to create account automatically or manual creation is allowed
@@ -105,7 +92,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {legal &&
           passwordComplexitySettings &&
           organization &&
-          (loginSettings.allowUsernamePassword || loginSettings.passkeysType == PasskeysType.ALLOWED) && (
+          loginSettings.allowLocalAuthentication && (
             <RegisterForm
               idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
               legal={legal}

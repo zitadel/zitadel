@@ -551,15 +551,16 @@ func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func buildLogoutURL(origin, logoutURLV2 string, redirectURI string, extraParams map[string]string) string {
+func buildLogoutURL(origin, logoutURLV2, redirectURI string, extraParams map[string]string) *url.URL {
 	u, _ := url.Parse(origin + logoutURLV2 + redirectURI)
 	q := u.Query()
 	for k, v := range extraParams {
 		q.Set(k, v)
 	}
+	q.Set("logout_token", "signed-logout-token") // placeholder
 	u.RawQuery = q.Encode()
 	// Append the redirect URI as a URL-escaped string
-	return u.String()
+	return u
 }
 
 func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
@@ -567,7 +568,7 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 		name          string
 		clientID      string
 		authRequestID func(t testing.TB, instance *integration.Instance, clientID, redirectURI string, scope ...string) string
-		logoutURL     string
+		logoutURL     *url.URL
 	}{
 		{
 			name: "login header",
@@ -614,7 +615,18 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 
 			postLogoutRedirect, err := rp.EndSession(CTX, provider, "", logoutRedirectURI, "state", "hint", oidc.ParseLocales([]string{"it-IT", "en-US"}))
 			require.NoError(t, err)
-			assert.Equal(t, tt.logoutURL, postLogoutRedirect.String())
+
+			requiredQueries := tt.logoutURL.Query()
+			for key, value := range requiredQueries {
+				if key == "logout_token" {
+					assert.NotEmpty(t, value[0], "logout_token must be present")
+					continue
+				}
+				assert.Equal(t, value[0], postLogoutRedirect.Query().Get(key))
+			}
+			requiredURLWithoutQueries := *tt.logoutURL
+			requiredURLWithoutQueries.RawQuery = ""
+			assert.Equal(t, requiredURLWithoutQueries.String(), postLogoutRedirect.Scheme+"://"+postLogoutRedirect.Host+postLogoutRedirect.Path)
 
 			// userinfo must not fail until login UI terminated session
 			_, err = rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)

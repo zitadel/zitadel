@@ -11,6 +11,7 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
@@ -19,7 +20,6 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
@@ -71,6 +71,7 @@ func CreateServer(
 			grpc_middleware.ChainUnaryServer(
 				middleware.CallDurationHandler(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
+				middleware.LogHandler(grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
 				middleware.InstanceInterceptor(queries, externalDomain, translator, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
 				middleware.AccessStorageInterceptor(accessSvc),
@@ -79,7 +80,7 @@ func CreateServer(
 				middleware.AuthorizationInterceptor(verifier, systemAuthz, authConfig),
 				middleware.TranslationHandler(),
 				middleware.QuotaExhaustedInterceptor(accessSvc, system_pb.SystemService_ServiceDesc.ServiceName),
-				middleware.ExecutionHandler(targetEncAlg),
+				middleware.ExecutionHandler(targetEncAlg, queries.GetActiveSigningWebKey),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
 				middleware.ActivityInterceptor(),

@@ -1,7 +1,7 @@
 package database
 
 // Order represents a SQL condition.
-// Its written after the ORDER BY keyword in a SQL statement.
+// It's written after the ORDER BY keyword in a SQL statement.
 type Order interface {
 	Write(builder *StatementBuilder)
 }

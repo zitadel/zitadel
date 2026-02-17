@@ -16,8 +16,8 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/key"
@@ -61,23 +61,44 @@ func New() *cobra.Command {
 		Long: `sets up data to start ZITADEL.
 Requirements:
 - postgreSQL`,
-		Run: func(cmd *cobra.Command, args []string) {
-			err := tls.ModeFromFlag(cmd)
-			logging.OnError(err).Fatal("invalid tlsMode")
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).Error("zitadel setup command failed")
+			}()
+
+			err = tls.ModeFromFlag(cmd)
+			if err != nil {
+				return fmt.Errorf("invalid tlsMode: %w", err)
+			}
 
 			err = BindInitProjections(cmd)
-			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
+			if err != nil {
+				return fmt.Errorf("unable to bind \"init-projections\" flag: %w", err)
+			}
 
 			err = bindForMirror(cmd)
-			logging.OnError(err).Fatal("unable to bind \"for-mirror\" flag")
+			if err != nil {
+				return fmt.Errorf("unable to bind \"for-mirror\" flag: %w", err)
+			}
 
-			config := MustNewConfig(viper.GetViper())
-			steps := MustNewSteps(viper.New())
+			config, shutdown, err := NewConfig(cmd, viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+
+			steps, err := NewSteps(cmd.Context(), viper.New())
+			if err != nil {
+				return err
+			}
 
 			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Panic("No master key provided")
-
-			Setup(cmd.Context(), config, steps, masterKey)
+			if err != nil {
+				return fmt.Errorf("no master key provided: %w", err)
+			}
+			return Setup(cmd.Context(), config, steps, masterKey)
 		},
 	}
 
@@ -104,9 +125,8 @@ func bindForMirror(cmd *cobra.Command) error {
 	return viper.BindPFlag("ForMirror", cmd.Flags().Lookup("for-mirror"))
 }
 
-func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) {
-	logging.Info("setup started")
-
+func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) (err error) {
+	logging.Info(ctx, "setup started")
 	var setupErr error
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 
@@ -114,15 +134,14 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		stop()
 
 		if setupErr == nil {
-			logging.Info("setup completed")
+			logging.Info(ctx, "setup completed")
 			return
 		}
 
-		if setupErr != nil && !errors.Is(setupErr, context.Canceled) {
+		if !errors.Is(setupErr, context.Canceled) {
 			// If Setup failed for some other reason than the context being cancelled,
 			// then this could be a fatal error we should not retry
-			logging.WithFields("error", setupErr).Fatal("setup failed, skipping cleanup")
-			return
+			logging.OnError(ctx, setupErr).Fatal("setup failed, skipping cleanup")
 		}
 
 		// if we're in the middle of long-running setup, run cleanup before exiting
@@ -132,12 +151,13 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		cleanupCtx, cleanupCancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
 		defer cleanupCancel()
 
-		Cleanup(cleanupCtx, config)
+		err = Cleanup(cleanupCtx, config)
+		logging.OnError(ctx, err).Error("setup cleanup failed")
 	}()
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 	dbClient, err := database.Connect(config.Database, false)
-	logging.OnError(err).Fatal("unable to connect to database")
+	logging.OnError(ctx, err).Fatal("unable to connect to database")
 
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	esV3 := new_es.NewEventstore(dbClient)
@@ -145,7 +165,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	config.Eventstore.Searcher = esV3
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 
-	logging.OnError(err).Fatal("unable to start eventstore")
+	logging.OnError(ctx, err).Fatal("unable to start eventstore")
 	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(dbClient, &es_v4_pg.Config{
 		MaxRetries: config.Eventstore.MaxRetries,
 	}))
@@ -166,6 +186,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.FirstInstance.externalDomain = config.ExternalDomain
 	steps.FirstInstance.externalSecure = config.ExternalSecure
 	steps.FirstInstance.externalPort = config.ExternalPort
+	steps.FirstInstance.defaultPaths = config.Login.DefaultPaths
 
 	steps.s5LastFailed = &LastFailed{dbClient: dbClient.DB}
 	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient.DB}
@@ -224,9 +245,14 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s64ChangePushPosition = &ChangePushPosition{dbClient: dbClient}
 	steps.s65FixUserMetadata5Index = &FixUserMetadata5Index{dbClient: dbClient}
 	steps.s66SessionRecoveryCodeCheckedAt = &SessionRecoveryCodeCheckedAt{dbClient: dbClient}
+	steps.s67SyncMemberRoleFields = &SyncMemberRoleFields{dbClient: dbClient}
+	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
+	steps.s69CacheTablesLogged = &CacheTablesLogged{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
-	logging.OnError(err).Fatal("unable to start projections")
+	if err != nil {
+		return fmt.Errorf("unable to create projections: %w", err)
+	}
 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
@@ -277,6 +303,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s63AlterResourceCounts,
 		steps.s64ChangePushPosition,
 		steps.s65FixUserMetadata5Index,
+		steps.s67SyncMemberRoleFields,
+		steps.s69CacheTablesLogged,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -340,6 +368,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s48Apps7SAMLConfigsLoginVersion,
 		steps.s59SetupWebkeys, // this step needs commands.
 		steps.s66SessionRecoveryCodeCheckedAt,
+		steps.s68TargetAddPayloadTypeColumn,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -354,6 +383,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			return
 		}
 	}
+	return nil
 }
 
 func executeMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) error {
@@ -374,8 +404,8 @@ func executeMigration(ctx context.Context, eventstoreClient *eventstore.Eventsto
 			"hint", pgErr.Hint,
 		)
 	}
-	logging.WithFields(logFields...).WithError(err).Error(errorMsg)
-	return fmt.Errorf("%s: %w", errorMsg, err)
+	logging.WithError(ctx, err).Error(errorMsg, logFields...)
+	return err
 }
 
 // readStmt reads a single file from the embedded FS,
@@ -426,10 +456,10 @@ func startCommandsQueries(
 	*auth_view.View,
 ) {
 	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
-	logging.OnError(err).Fatal("unable to start key storage")
+	logging.OnError(ctx, err).Fatal("unable to start key storage")
 
 	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
-	logging.OnError(err).Fatal("unable to ensure encryption keys")
+	logging.OnError(ctx, err).Fatal("unable to ensure encryption keys")
 
 	err = projection.Create(
 		ctx,
@@ -444,13 +474,13 @@ func startCommandsQueries(
 		keys.SAML,
 		config.SystemAPIUsers,
 	)
-	logging.OnError(err).Fatal("unable to start projections")
+	logging.OnError(ctx, err).Fatal("unable to start projections")
 
 	staticStorage, err := config.AssetStorage.NewStorage(dbClient.DB)
-	logging.OnError(err).Fatal("unable to start asset storage")
+	logging.OnError(ctx, err).Fatal("unable to start asset storage")
 
 	adminView, err := admin_view.StartView(dbClient)
-	logging.OnError(err).Fatal("unable to start admin view")
+	logging.OnError(ctx, err).Fatal("unable to start admin view")
 	admin_handler.Register(ctx,
 		admin_handler.Config{
 			Client:                dbClient,
@@ -465,7 +495,7 @@ func startCommandsQueries(
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 
 	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)
-	logging.OnError(err).Fatal("unable to start caches")
+	logging.OnError(ctx, err).Fatal("unable to start caches")
 
 	queries, err := query.StartQueries(
 		ctx,
@@ -494,10 +524,10 @@ func startCommandsQueries(
 		nil, // not needed for projections
 		false,
 	)
-	logging.OnError(err).Fatal("unable to start queries")
+	logging.OnError(ctx, err).Fatal("unable to start queries")
 
 	authView, err := auth_view.StartView(dbClient, keys.OIDC, queries, eventstoreClient)
-	logging.OnError(err).Fatal("unable to start admin view")
+	logging.OnError(ctx, err).Fatal("unable to start auth view")
 	auth_handler.Register(ctx,
 		auth_handler.Config{
 			Client:                dbClient,
@@ -510,7 +540,7 @@ func startCommandsQueries(
 	)
 
 	authZRepo, err := authz.Start(queries, eventstoreClient, dbClient, keys.OIDC, config.ExternalSecure)
-	logging.OnError(err).Fatal("unable to start authz repo")
+	logging.OnError(ctx, err).Fatal("unable to start authz repo")
 	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 		return internal_authz.CheckPermission(ctx, authZRepo, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
@@ -544,16 +574,14 @@ func startCommandsQueries(
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
-
-		nil,
-		nil,
+		config.Login.DefaultPaths,
 	)
-	logging.OnError(err).Fatal("unable to start commands")
+	logging.OnError(ctx, err).Fatal("unable to start commands")
 
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
-	logging.OnError(err).Fatal("unable to init queue")
+	logging.OnError(ctx, err).Fatal("unable to init queue")
 
 	notify_handler.Register(
 		ctx,
@@ -562,6 +590,7 @@ func startCommandsQueries(
 		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
 		config.Notifications,
+		config.OIDC.BackChannelLogoutConfig(),
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -569,13 +598,11 @@ func startCommandsQueries(
 		commands,
 		queries,
 		eventstoreClient,
-		config.Login.DefaultPaths.OTPEmailPath,
+		config.Login.DefaultPaths.DefaultOTPEmailURLTemplate,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
-		keys.OIDC,
-		config.OIDC.DefaultBackChannelLogoutLifetime,
 		q,
 	)
 
@@ -588,28 +615,28 @@ func initProjections(
 ) error {
 	for _, p := range projection.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
-			logging.WithFields("name", p.String()).OnError(err).Error("projection migration failed")
+			logging.WithError(ctx, err).Error("projection migration failed", "name", p.String())
 			return err
 		}
 	}
 
 	for _, p := range admin_handler.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
-			logging.WithFields("name", p.String()).OnError(err).Error("admin schema migration failed")
+			logging.WithError(ctx, err).Error("admin schema migration failed", "name", p.String())
 			return err
 		}
 	}
 
 	for _, p := range auth_handler.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
-			logging.WithFields("name", p.String()).OnError(err).Error("auth schema migration failed")
+			logging.WithError(ctx, err).Error("auth schema migration failed", "name", p.String())
 			return err
 		}
 	}
 
 	for _, p := range notify_handler.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
-			logging.WithFields("name", p.String()).OnError(err).Error("notification migration failed")
+			logging.WithError(ctx, err).Error("notification migration failed", "name", p.String())
 			return err
 		}
 	}

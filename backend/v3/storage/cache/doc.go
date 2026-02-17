@@ -1,2 +1,2 @@
-// this package is copy pasted from the internal/cache package
+// Package cache is copied and pasted from the internal/cache package.
 package cache

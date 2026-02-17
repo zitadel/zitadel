@@ -49,7 +49,7 @@ message Target {
     RESTAsync rest_async = 7;
   }
 
-  // Timeout defines the duration until ZITADEL cancels the execution.
+  // Timeout defines the duration until Zitadel cancels the execution.
   // If the target doesn't respond before this timeout expires, the the connection is closed and the action fails. Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called. In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
   google.protobuf.Duration timeout = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -66,12 +66,26 @@ message Target {
 
   // The current signing key used to sign the request sent to the target.
   // The key can be used to verify the integrity and authenticity of the request
-  // on the receiver side. The key should be treated as a secret and only known to ZITADEL and the receiver.
+  // on the receiver side. The key should be treated as a secret and only known to Zitadel and the receiver.
   // The signature is included in the request header `X-ZITADEL-Signature`
   // and calculated over the raw body of the request using HMAC with SHA256.
   string signing_key = 10 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"98KmsU67\""
+    }
+  ];
+
+  // Payload type defines how the payload is formatted and secured.
+  // The default is `PAYLOAD_TYPE_JSON`, which sends the payload as JSON in the body of the request.
+  // For integrity and authenticity a signature is included in the header `X-ZITADEL-Signature`.
+  // You can also choose to send the payload as a JWT (`PAYLOAD_TYPE_JWT`), which sends
+  // the payload as a signed JWT in the body of the request. This allows the receiver to verify
+  // the authenticity and integrity of the payload using the signing key (published on the JWKS URL).
+  // If you need encryption as well, you can choose `PAYLOAD_TYPE_JWE`, which sends the payload
+  // as an encrypted JWT in the body of the request. You can provide your own public key for encryption.
+  PayloadType payload_type = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"PAYLOAD_TYPE_JSON\""
     }
   ];
 }
@@ -87,3 +101,77 @@ message RESTCall {
 }
 
 message RESTAsync {}
+
+enum PayloadType {
+  PAYLOAD_TYPE_UNSPECIFIED = 0;
+  // PAYLOAD_TYPE_JSON will send the payload as JSON in the body of the request.
+  // For integrity and authenticity a signature is included in the header `X-ZITADEL-Signature`.
+  // This is the current default, for backwards compatibility reasons.
+  PAYLOAD_TYPE_JSON = 1;
+  // PAYLOAD_TYPE_JWT will send the payload as JSON Web Token (JWT) in the body of the request.
+  // This allows the receiver to verify the authenticity and integrity of the payload
+  // using the signing key (published on the JWKS URL).
+  PAYLOAD_TYPE_JWT = 2;
+  // PAYLOAD_TYPE_JWE will send the payload as Encrypted JWT (JWE) in the body of the request.
+  // This allows additional security, e.g when passing sensitive information.
+  // You can provide your own public key for encryption.
+  PAYLOAD_TYPE_JWE = 3;
+}
+
+message PublicKey {
+  // KeyID is the unique identifier of the public key.
+  // It's also used as the `kid` field in the JWE header when the payload type is set to `PAYLOAD_TYPE_JWE`.
+  string key_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629032906489576\"";
+    }
+  ];
+
+  // Active indicates whether the public key is active and used for payload encryption.
+  // Only one public key can be active at a time.
+  bool active = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+    }
+  ];
+
+  // The public key in PEM format.
+  bytes public_key = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"-----BEGIN PUBLIC KEY-----...\"";
+    }
+  ];
+
+  // Fingerprint is the fingerprint of the public key. It's prefixed with the hashing algorithm used
+  // and base64 encoded without padding, e.g. `SHA256:STqK+Sd4qgdu+UjiwI8NBjOD6P7UqQ42EZYIdySEyTw`.
+  // The fingerprint can be used to easily compare the public key with other sources.
+  string fingerprint = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"SHA256:STqK+Sd4qgdu+UjiwI8NBjOD6P7UqQ42EZYIdySEyTw\"";
+    }
+  ];
+
+  // ExpirationDate is the timestamp when the public key automatically expires and
+  // no longer will be used for payload encryption, even when active.
+  // Be sure to upload and activate a new public key before the expiration date
+  // to avoid failed executions.
+  google.protobuf.Timestamp expiration_date = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+
+  // CreationDate is the timestamp when the the public key was uploaded.
+  google.protobuf.Timestamp creation_date = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+
+  // ChangeDate is the timestamp when the public key was last changed, e.g. activated or deactivated.
+  google.protobuf.Timestamp change_date = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}

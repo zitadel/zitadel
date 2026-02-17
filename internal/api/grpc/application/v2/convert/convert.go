@@ -28,6 +28,7 @@ func AppToPb(queryApp *query.App) *application.Application {
 		State:         appStateToPb(queryApp.State),
 		Name:          queryApp.Name,
 		Configuration: appConfigToPb(queryApp),
+		ProjectId:     queryApp.ProjectID,
 	}
 }
 
@@ -153,6 +154,10 @@ func applicationFilterToQuery(applicationFilter *application.ApplicationSearchFi
 		return query.NewAppStateSearchQuery(domain.AppState(q.StateFilter))
 	case *application.ApplicationSearchFilter_TypeFilter:
 		return applicationTypeFilterToQuery(q.TypeFilter)
+	case *application.ApplicationSearchFilter_ClientIdFilter:
+		return query.NewAppClientIDSearchQuery(strings.TrimSpace(q.ClientIdFilter.GetClientId()))
+	case *application.ApplicationSearchFilter_EntityIdFilter:
+		return query.NewAppSAMLEntityIDSearchQuery(strings.TrimSpace(q.EntityIdFilter.GetEntityId()))
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-z2mAGy", "List.Query.Invalid")
 	}

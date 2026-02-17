@@ -22,20 +22,33 @@
               "base": "dist/console"
             },
             "index": "src/index.html",
-            "polyfills": ["zone.js"],
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
               "src/assets",
               "src/manifest.webmanifest",
-              { "glob": "**/*", "input": "../docs/static/img/tech", "output": "assets/docs/img/tech" }
+              {
+                "glob": "**/*",
+                "input": "../apps/docs/public/img/tech",
+                "output": "assets/docs/img/tech"
+              }
             ],
-            "styles": ["src/styles.scss"],
-            "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "scripts": [
+              "./node_modules/tinycolor2/dist/tinycolor-min.js"
+            ],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["import", "mixed-decls"]
+                "silenceDeprecations": [
+                  "import",
+                  "mixed-decls"
+                ]
               },
               "includePaths": [
                 "node_modules",
@@ -120,7 +133,9 @@
                 "i18n-iso-countries/langs/hu.json",
                 "i18n-iso-countries/langs/ko.json",
                 "i18n-iso-countries/langs/ro.json",
-                "i18n-iso-countries/langs/tr.json"
+                "i18n-iso-countries/langs/tr.json",
+                "i18n-iso-countries/langs/uk.json",
+                "i18n-iso-countries/langs/ar.json"
               ]
             }
           },
@@ -143,18 +158,29 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "polyfills": ["zone.js", "zone.js/testing"],
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/styles.scss"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.scss"
+            ],
             "scripts": []
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
           }
         }
       }
@@ -162,7 +188,9 @@
   },
   "cli": {
     "analytics": false,
-    "schematicCollections": ["@angular-eslint/schematics"],
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ],
     "packageManager": "pnpm"
   },
   "schematics": {

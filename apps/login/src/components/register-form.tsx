@@ -1,6 +1,7 @@
 "use client";
 
 import { registerUser } from "@/lib/server/register";
+import { handleServerActionResponse } from "@/lib/client";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
@@ -15,6 +16,7 @@ import { TextInput } from "./input";
 import { PrivacyPolicyCheckboxes } from "./privacy-policy-checkboxes";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs =
   | {
@@ -46,7 +48,7 @@ export function RegisterForm({
   idpCount = 0,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       email: email ?? "",
       firstName: firstname ?? "",
@@ -59,36 +61,29 @@ export function RegisterForm({
   const [loading, setLoading] = useState<boolean>(false);
   const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
   const [error, setError] = useState<string>("");
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
 
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
-    const response = await registerUser({
-      email: values.email,
-      firstName: values.firstname,
-      lastName: values.lastname,
-      organization: organization,
-      requestId: requestId,
-    })
-      .catch(() => {
-        setError(t("errors.couldNotRegisterUser"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const response = await registerUser({
+        email: values.email,
+        firstName: values.firstname,
+        lastName: values.lastname,
+        organization: organization,
+        requestId: requestId,
       });
 
-    if (response && "error" in response && response.error) {
-      setError(response.error);
-      return;
-    }
+      handleServerActionResponse(response, router, setSamlData, setError);
 
-    if (response && "redirect" in response && response.redirect) {
-      return router.push(response.redirect);
+      return response;
+    } catch {
+      setError(t("errors.couldNotRegisterUser"));
+    } finally {
+      setLoading(false);
     }
-
-    return response;
   }
 
   async function submitAndContinue(value: Inputs, withPassword: boolean = false) {
@@ -119,93 +114,96 @@ export function RegisterForm({
   const canSubmit = formState.isValid && (!isLegalAcceptanceRequired || tosAndPolicyAccepted);
 
   return (
-    <form className="w-full">
-      <div className="mb-4 grid grid-cols-2 gap-4">
-        <div className="">
-          <TextInput
-            type="firstname"
-            autoComplete="firstname"
-            required
-            {...register("firstname", { required: t("required.firstname") })}
-            label={t("labels.firstname")}
-            error={errors.firstname?.message as string}
-            data-testid="firstname-text-input"
-          />
-        </div>
-        <div className="">
-          <TextInput
-            type="lastname"
-            autoComplete="lastname"
-            required
-            {...register("lastname", { required: t("required.lastname") })}
-            label={t("labels.lastname")}
-            error={errors.lastname?.message as string}
-            data-testid="lastname-text-input"
-          />
-        </div>
-        <div className="col-span-2">
-          <TextInput
-            type="email"
-            autoComplete="email"
-            required
-            {...register("email", { required: t("required.email") })}
-            label={t("labels.email")}
-            error={errors.email?.message as string}
-            data-testid="email-text-input"
-          />
-        </div>
-      </div>
-      {(legal?.tosLink || legal?.privacyPolicyLink) && (
-        <PrivacyPolicyCheckboxes legal={legal} onChange={setTosAndPolicyAccepted} />
-      )}
-      {/* show chooser if both methods are allowed */}
-      {loginSettings && loginSettings.allowUsernamePassword && loginSettings.passkeysType == PasskeysType.ALLOWED && (
-        <>
-          <p className="ztdl-p mb-6 mt-4 block text-left">
-            <Translated i18nKey="selectMethod" namespace="register" />
-          </p>
-
-          <div className="pb-4">
-            <AuthenticationMethodRadio selected={selected} selectionChanged={setSelected} />
+    <>
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
+      <form className="w-full">
+        <div className="mb-4 grid grid-cols-2 gap-4">
+          <div className="">
+            <TextInput
+              type="firstname"
+              autoComplete="firstname"
+              required
+              {...register("firstname", { required: t("required.firstname") })}
+              label={t("labels.firstname")}
+              error={errors.firstname?.message as string}
+              data-testid="firstname-text-input"
+            />
           </div>
-        </>
-      )}
-      {!loginSettings?.allowUsernamePassword &&
-        loginSettings?.passkeysType !== PasskeysType.ALLOWED &&
-        (!loginSettings?.allowExternalIdp || !idpCount) && (
+          <div className="">
+            <TextInput
+              type="lastname"
+              autoComplete="lastname"
+              required
+              {...register("lastname", { required: t("required.lastname") })}
+              label={t("labels.lastname")}
+              error={errors.lastname?.message as string}
+              data-testid="lastname-text-input"
+            />
+          </div>
+          <div className="col-span-2">
+            <TextInput
+              type="email"
+              autoComplete="email"
+              required
+              {...register("email", { required: t("required.email") })}
+              label={t("labels.email")}
+              error={errors.email?.message as string}
+              data-testid="email-text-input"
+            />
+          </div>
+        </div>
+        {(legal?.tosLink || legal?.privacyPolicyLink) && (
+          <PrivacyPolicyCheckboxes legal={legal} onChange={setTosAndPolicyAccepted} />
+        )}
+        {/* show chooser if both methods are allowed */}
+        {loginSettings && loginSettings.allowLocalAuthentication && loginSettings.passkeysType == PasskeysType.ALLOWED && (
+          <>
+            <p className="ztdl-p mb-6 mt-4 block text-left">
+              <Translated i18nKey="selectMethod" namespace="register" />
+            </p>
+
+            <div className="pb-4">
+              <AuthenticationMethodRadio selected={selected} selectionChanged={setSelected} />
+            </div>
+          </>
+        )}
+        {!loginSettings?.allowLocalAuthentication &&
+          loginSettings?.passkeysType !== PasskeysType.ALLOWED &&
+          (!loginSettings?.allowExternalIdp || !idpCount) && (
+            <div className="py-4">
+              <Alert type={AlertType.INFO}>
+                <Translated i18nKey="noMethodAvailableWarning" namespace="register" />
+              </Alert>
+            </div>
+          )}
+
+        {error && (
           <div className="py-4">
-            <Alert type={AlertType.INFO}>
-              <Translated i18nKey="noMethodAvailableWarning" namespace="register" />
-            </Alert>
+            <Alert>{error}</Alert>
           </div>
         )}
 
-      {error && (
-        <div className="py-4">
-          <Alert>{error}</Alert>
+        <div className="mt-8 flex w-full flex-row items-center justify-between">
+          <BackButton data-testid="back-button" />
+          <Button
+            type="submit"
+            variant={ButtonVariants.Primary}
+            disabled={loading || !canSubmit}
+            onClick={handleSubmit((values) => {
+              const usePasswordToContinue: boolean =
+                loginSettings?.allowLocalAuthentication && loginSettings?.passkeysType == PasskeysType.ALLOWED
+                  ? !(selected === methods[0]) // choose selection if both available
+                  : !!loginSettings?.allowLocalAuthentication; // if password is chosen
+              // set password as default if only password is allowed
+              return submitAndContinue(values, usePasswordToContinue);
+            })}
+            data-testid="submit-button"
+          >
+            {loading && <Spinner className="mr-2 h-5 w-5" />}
+            <Translated i18nKey="submit" namespace="register" />
+          </Button>
         </div>
-      )}
-
-      <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <BackButton data-testid="back-button" />
-        <Button
-          type="submit"
-          variant={ButtonVariants.Primary}
-          disabled={loading || !canSubmit}
-          onClick={handleSubmit((values) => {
-            const usePasswordToContinue: boolean =
-              loginSettings?.allowUsernamePassword && loginSettings?.passkeysType == PasskeysType.ALLOWED
-                ? !(selected === methods[0]) // choose selection if both available
-                : !!loginSettings?.allowUsernamePassword; // if password is chosen
-            // set password as default if only password is allowed
-            return submitAndContinue(values, usePasswordToContinue);
-          })}
-          data-testid="submit-button"
-        >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}
-          <Translated i18nKey="submit" namespace="register" />
-        </Button>
-      </div>
-    </form>
+      </form>
+    </>
   );
 }

@@ -3,12 +3,14 @@ package mirror
 import (
 	"bytes"
 	_ "embed"
+	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/key"
 )
 
@@ -34,28 +36,50 @@ Order of execution:
 3. mirror event store tables
 4. recompute projections
 5. verify`,
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			err := viper.MergeConfig(bytes.NewBuffer(defaultConfig))
-			logging.OnError(err).Fatal("unable to read default config")
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).Error("zitadel mirror (sub)command failed")
+			}()
 
+			err = viper.MergeConfig(bytes.NewBuffer(defaultConfig))
+			if err != nil {
+				return fmt.Errorf("unable to read default config: %w", err)
+			}
 			for _, file := range *configFiles {
 				viper.SetConfigFile(file)
 				err := viper.MergeInConfig()
-				logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
+				logging.OnError(cmd.Context(), err).Error("unable to read config file")
 			}
+			return nil
 		},
-		Run: func(cmd *cobra.Command, args []string) {
-			config := mustNewMigrationConfig(viper.GetViper())
-			projectionConfig := mustNewProjectionsConfig(viper.GetViper())
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).Error("zitadel mirror command failed")
+			}()
+
+			config, shutdown, err := newMigrationConfig(cmd, viper.GetViper())
+			if err != nil {
+				return fmt.Errorf("unable to create migration config: %w", err)
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+
+			projectionConfig, _, err := newProjectionsConfig(cmd, viper.GetViper())
+			if err != nil {
+				return fmt.Errorf("unable to create projections config: %w", err)
+			}
 
 			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Fatal("unable to read master key")
+			if err != nil {
+				return fmt.Errorf("unable to read master key: %w", err)
+			}
 
 			copySystem(cmd.Context(), config)
 			copyAuth(cmd.Context(), config)
 			copyEventstore(cmd.Context(), config)
-
 			projections(cmd.Context(), projectionConfig, masterKey)
+			return nil
 		},
 	}
 

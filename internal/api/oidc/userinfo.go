@@ -30,7 +30,7 @@ import (
 func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 	token, err := s.verifyAccessToken(ctx, r.Data.AccessToken)
@@ -185,7 +185,7 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 			if !userInfoAssertion {
 				continue
 			}
-			// TODO: handle address for human users as soon as implemented
+			// TODO: handle address for Users (Humans) as soon as implemented
 		case ScopeUserMetaData:
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
@@ -461,7 +461,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		UserGrants:   qu.UserGrants,
 	}
 
-	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm)
+	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm, s.query.GetActiveSigningWebKey)
 	if err != nil {
 		return err
 	}

@@ -28,10 +28,10 @@
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MFA.TABLETYPE' | translate }}</th>
         <td mat-cell *cnslCellDef="let mfa; dataSource: dataSource" [ngSwitch]="mfa.type.case">
-          <span *ngSwitchCase="'otp'">TOTP (Time-based One-Time Password)</span>
+          <span *ngSwitchCase="'otp'">TOTP</span>
           <span *ngSwitchCase="'u2f'">U2F (Universal 2nd Factor)</span>
-          <span *ngSwitchCase="'otpSms'">One-Time Password SMS</span>
-          <span *ngSwitchCase="'otpEmail'">One-Time Password Email</span>
+          <span *ngSwitchCase="'otpSms'">OTP SMS</span>
+          <span *ngSwitchCase="'otpEmail'">OTP Email</span>
         </td>
       </ng-container>
 

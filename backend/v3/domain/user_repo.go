@@ -83,8 +83,8 @@ type userColumns interface {
 //go:generate mockgen -typed -package domainmock -destination ./mock/human_user.mock.go . HumanUserRepository
 
 type HumanUserRepository interface {
-	// Update updates the human user
-	// It ensures that updates are only applied to human users
+	// Update updates the user
+	// It ensures that updates are only applied to user
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	humanConditions
 	humanChanges
@@ -156,12 +156,12 @@ type humanEmailChanges interface {
 	// 	* [VerificationTypeUpdate] to update email verification, a verification must exist (e.g. resend code)
 	// 	* [VerificationTypeSkipped] to skip email verification, existing verification is removed (e.g. admin set email)
 	SetEmail(verification VerificationType) database.Change
-	// CheckEmailOTP sets the email OTP based on the check
+	// CheckEmailOTP sets the OTP Email based on the check
 	//  * [CheckTypeInit] to initialize a new check, previous check is overwritten
 	//  * [CheckTypeFailed] increments failed attempts
 	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
 	CheckEmailOTP(check CheckType) database.Change
-	// EnableEmailOTPAt enables the email OTP
+	// EnableEmailOTPAt enables the OTP Email
 	// If enabledAt is zero, it will be set to NOW()
 	EnableEmailOTPAt(enabledAt time.Time) database.Change
 	// EnableEmailOTP sets the enabled at time to NOW()
@@ -179,12 +179,12 @@ type humanPhoneChanges interface {
 	SetPhone(verification VerificationType) database.Change
 	// RemovePhone removes the phone number
 	RemovePhone() database.Change
-	// CheckSMSOTP sets the SMS OTP based on the check
+	// CheckSMSOTP sets the OTP SMS based on the check
 	//  * [CheckTypeInit] to initialize a new check, previous check is overwritten
 	//  * [CheckTypeFailed] increments failed attempts
 	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
 	CheckSMSOTP(check CheckType) database.Change
-	// EnableSMSOTPAt enables the SMS OTP
+	// EnableSMSOTPAt enables the OTP SMS
 	// If enabledAt is zero, it will be set to NOW()
 	EnableSMSOTPAt(enabledAt time.Time) database.Change
 	// EnableSMSOTP sets the enabled at time to NOW()
@@ -234,8 +234,8 @@ type humanColumns interface {
 //go:generate mockgen -typed -package domainmock -destination ./mock/machine_user.mock.go . MachineUserRepository
 
 type MachineUserRepository interface {
-	// Update updates the machine user
-	// It ensures that updates are only applied to machine users
+	// Update updates the service account
+	// It ensures that updates are only applied to service accounts
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	machineConditions
 	machineChanges
@@ -258,14 +258,14 @@ type machineChanges interface {
 	// SetAccessTokenType sets the personal access token type field
 	SetAccessTokenType(tokenType PersonalAccessTokenType) database.Change
 
-	// AddKey adds a key for the machine user
+	// AddKey adds a key for the service account
 	AddKey(key *MachineKey) database.Change
-	// RemoveKey removes a key for the machine user
+	// RemoveKey removes a key for the service account
 	RemoveKey(id string) database.Change
 
-	// AddPersonalAccessToken adds a personal access token for the machine user
+	// AddPersonalAccessToken adds a personal access token for the service account
 	AddPersonalAccessToken(pat *PersonalAccessToken) database.Change
-	// RemovePersonalAccessToken removes a personal access token for the machine user
+	// RemovePersonalAccessToken removes a personal access token for the service account
 	RemovePersonalAccessToken(id string) database.Change
 }
 
@@ -277,6 +277,7 @@ type humanPasskeyConditions interface {
 	PasskeyIDCondition(passkeyID string) database.Condition
 	PasskeyKeyIDCondition(keyID string) database.Condition
 	PasskeyChallengeCondition(challenge string) database.Condition
+	PasskeyTypeCondition(passkeyType PasskeyType) database.Condition
 }
 
 type humanPasskeyChanges interface {

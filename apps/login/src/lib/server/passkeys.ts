@@ -19,12 +19,13 @@ import {
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getTranslations } from "next-intl/server";
-import { getMostRecentSessionCookie, getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
-import { getServiceUrlFromHeaders } from "../service-url";
+import { getSessionCookieById } from "../cookies";
+import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkUserVerification } from "../verify-helper";
-import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "./cookie";
-import { getOriginalHost } from "./host";
+import { getPublicHost } from "./host";
+import { updateOrCreateSession } from "./session";
 import { completeFlowOrGetUrl } from "../client";
+import { createSessionAndUpdateCookie } from "./cookie";
 
 type VerifyPasskeyCommand = {
   passkeyId: string;
@@ -63,8 +64,8 @@ export async function registerPasskeyLink(
   }
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = await getOriginalHost();
+  const { serviceConfig } = getServiceConfig(_headers);
+  const host = getPublicHost(_headers);
 
   let session: GetSessionResponse | undefined;
   let createdSession: Session | undefined;
@@ -74,11 +75,12 @@ export async function registerPasskeyLink(
   if (command.sessionId) {
     // Session-based flow (existing logic)
     const sessionCookie = await getSessionCookieById({ sessionId: command.sessionId });
-    session = await getSession({
-      serviceUrl,
-      sessionId: sessionCookie.id,
-      sessionToken: sessionCookie.token,
-    });
+
+    if (!sessionCookie) {
+      return { error: "Could not get session cookie" };
+    }
+
+    session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
 
     if (!session?.session?.factors?.user?.id) {
       return { error: "Could not determine user from session" };
@@ -89,10 +91,7 @@ export async function registerPasskeyLink(
     const sessionValid = isSessionValid(session.session);
 
     if (!sessionValid.valid) {
-      const authmethods = await listAuthenticationMethodTypes({
-        serviceUrl,
-        userId: currentUserId,
-      });
+      const authmethods = await listAuthenticationMethodTypes({ serviceConfig, userId: currentUserId });
 
       // if the user has no authmethods set, we need to check if the user was verified
       if (authmethods.authMethodTypes.length !== 0) {
@@ -117,10 +116,7 @@ export async function registerPasskeyLink(
         code: command.code,
       };
     } else {
-      const codeResponse = await createPasskeyRegistrationLink({
-        serviceUrl,
-        userId: currentUserId,
-      });
+      const codeResponse = await createPasskeyRegistrationLink({ serviceConfig, userId: currentUserId });
 
       if (!codeResponse?.code?.code) {
         return { error: "Could not create registration link" };
@@ -136,10 +132,7 @@ export async function registerPasskeyLink(
     };
 
     // Check if user exists
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId: currentUserId,
-    });
+    const userResponse = await getUserByID({ serviceConfig, userId: currentUserId });
 
     if (!userResponse || !userResponse.user) {
       return { error: "User not found" };
@@ -155,10 +148,11 @@ export async function registerPasskeyLink(
       },
     });
 
-    createdSession = await createSessionAndUpdateCookie({
+    const result = await createSessionAndUpdateCookie({
       checks,
       requestId: undefined, // No requestId in passkey registration context, TODO: consider if needed
     });
+    createdSession = result.session;
 
     if (!createdSession) {
       return { error: "Could not create session" };
@@ -179,17 +173,12 @@ export async function registerPasskeyLink(
     throw new Error("Could not determine user");
   }
 
-  return registerPasskey({
-    serviceUrl,
-    userId: currentUserId,
-    code: registerCode,
-    domain: hostname,
-  });
+  return registerPasskey({ serviceConfig, userId: currentUserId, code: registerCode, domain: hostname });
 }
 
 export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   if (!command.sessionId && !command.userId) {
     throw new Error("Either sessionId or userId must be provided");
@@ -207,6 +196,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     }${os.name}${os.name ? ", " : ""}${browser.name}`;
   }
 
+  let loginName: string | undefined;
   let currentUserId: string;
 
   if (command.sessionId) {
@@ -214,11 +204,12 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     const sessionCookie = await getSessionCookieById({
       sessionId: command.sessionId,
     });
-    const session = await getSession({
-      serviceUrl,
-      sessionId: sessionCookie.id,
-      sessionToken: sessionCookie.token,
-    });
+
+    if (!sessionCookie) {
+      throw new Error("Could not get session cookie");
+    }
+
+    const session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
     const userId = session?.session?.factors?.user?.id;
 
     if (!userId) {
@@ -226,23 +217,23 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     }
 
     currentUserId = userId;
+    loginName = session?.session?.factors?.user?.loginName;
   } else {
     // UserId-based flow
     currentUserId = command.userId!;
 
     // Verify user exists
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId: currentUserId,
-    });
+    const userResponse = await getUserByID({ serviceConfig, userId: currentUserId });
 
     if (!userResponse || !userResponse.user) {
       throw new Error("User not found");
     }
+
+    loginName = userResponse.user.preferredLoginName;
   }
 
-  return zitadelVerifyPasskeyRegistration({
-    serviceUrl,
+  const response = await zitadelVerifyPasskeyRegistration({
+    serviceConfig,
     request: create(VerifyPasskeyRegistrationRequestSchema, {
       passkeyId: command.passkeyId,
       publicKeyCredential: command.publicKeyCredential,
@@ -250,6 +241,8 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
       userId: currentUserId,
     }),
   });
+
+  return { ...response, loginName };
 }
 
 type SendPasskeyCommand = {
@@ -266,62 +259,41 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   const t = await getTranslations("passkey");
 
-  const recentSession = sessionId
-    ? await getSessionCookieById({ sessionId })
-    : loginName
-      ? await getSessionCookieByLoginName({ loginName, organization })
-      : await getMostRecentSessionCookie();
-
-  if (!recentSession) {
-    return {
-      error: t("verify.errors.couldNotFindSession"),
-    };
-  }
-
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
+  const result = await updateOrCreateSession({
+    loginName,
+    sessionId,
     organization,
-  });
-
-  let lifetime = command.lifetime; // Use provided lifetime first
-
-  if (!lifetime) {
-    lifetime = checks?.webAuthN
-      ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
-      : checks?.otpEmail || checks?.otpSms
-        ? loginSettings?.secondFactorCheckLifetime
-        : undefined;
-  }
-
-  if (!lifetime || !lifetime.seconds) {
-    console.warn("No passkey lifetime provided, defaulting to 24 hours");
-
-    lifetime = {
-      seconds: BigInt(60 * 60 * 24), // default to 24 hours
-      nanos: 0,
-    } as Duration;
-  }
-
-  const session = await setSessionAndUpdateCookie({
-    recentCookie: recentSession,
     checks,
     requestId,
-    lifetime,
+    lifetime: command.lifetime,
   });
 
-  if (!session || !session?.factors?.user?.id) {
-    return { error: t("verify.errors.couldNotUpdateSession") };
+  if (result.error) {
+    // try to interpret validation errors as translation keys if possible, or fallback to generic
+    // For now returning the error string directly as key or default
+    return { error: result.error };
+  }
+
+  // transformation to partial session for compatibility
+  const session = {
+    id: result.sessionId,
+    factors: result.factors,
+    // @ts-ignore
+    challenges: result.challenges,
+  };
+
+  const _headers = await headers();
+  const { serviceConfig } = getServiceConfig(_headers);
+  const loginSettings = await getLoginSettings({ serviceConfig, organization });
+
+  const userId = session?.factors?.user?.id;
+  if (!userId) {
+    return { error: t("verify.errors.couldNotFindSession") };
   }
 
   let userResponse;
   try {
-    userResponse = await getUserByID({
-      serviceUrl,
-      userId: session?.factors?.user?.id,
-    });
+    userResponse = await getUserByID({ serviceConfig, userId });
   } catch (error) {
     console.error("Error fetching user by ID:", error);
     return { error: t("verify.errors.couldNotGetUser") };
@@ -333,7 +305,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-  const emailVerificationCheck = checkEmailVerification(session, humanUser, organization, requestId);
+  const emailVerificationCheck = checkEmailVerification(session as any, humanUser, organization, requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
@@ -360,11 +332,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   }
 
   // Check if we got a valid redirect result
-  if (redirectResult && typeof redirectResult === "object" && "redirect" in redirectResult && redirectResult.redirect) {
-    return redirectResult;
-  }
-
-  if (redirectResult && typeof redirectResult === "object" && "error" in redirectResult) {
+  if (redirectResult && typeof redirectResult === "object") {
     return redirectResult;
   }
 

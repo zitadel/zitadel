@@ -1,27 +1,16 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { ViewportScroller } from '@angular/common';
-import {
-  Component,
-  DestroyRef,
-  effect,
-  HostBinding,
-  HostListener,
-  Inject,
-  OnDestroy,
-  ViewChild,
-  DOCUMENT,
-} from '@angular/core';
+import { Component, DestroyRef, HostBinding, HostListener, Inject, ViewChild, DOCUMENT } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
-import { filter, map, startWith } from 'rxjs/operators';
+import { filter, map, startWith, switchMap } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
-import { Org } from './proto/generated/zitadel/org_pb';
 import { PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
@@ -55,14 +44,11 @@ export class AppComponent {
   @HostListener('window:scroll', ['$event']) onScroll(event: Event): void {
     this.yoffset = this.viewPortScroller.getScrollPosition()[1];
   }
-  public orgs$: Observable<Org.AsObject[]> = of([]);
   public showAccount: boolean = false;
   public isDarkTheme: Observable<boolean> = of(true);
 
   public showProjectSection: boolean = false;
   public activeOrganizationQuery = this.newOrganizationService.activeOrganizationQuery();
-
-  private listMyZitadelPermissionsQuery = this.newAuthService.listMyZitadelPermissionsQuery();
 
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
@@ -216,9 +202,8 @@ export class AppComponent {
 
     this.getProjectCount();
 
-    effect(() => {
-      const orgId = this.newOrganizationService.orgId();
-      if (orgId) {
+    this.authService.activeOrgChanged.pipe(takeUntilDestroyed()).subscribe((org) => {
+      if (org?.id) {
         this.getProjectCount();
       }
     });
@@ -227,30 +212,28 @@ export class AppComponent {
       .pipe(
         map((params) => params.get('org')),
         filter(Boolean),
-        takeUntilDestroyed(this.destroyRef),
+        takeUntilDestroyed(),
       )
-      .subscribe((orgId) => this.newOrganizationService.setOrgId(orgId));
+      .subscribe((orgId) => this.authService.getActiveOrg(orgId));
 
-    effect(() => {
-      const permissions = this.listMyZitadelPermissionsQuery.data();
-      const error = this.listMyZitadelPermissionsQuery.error();
-
-      if (!permissions && !error) {
-        // not loaded yet
-        return;
-      }
-
-      // if we have an error this is gonna be false anyway as permissions will be undefined
-      if (permissions?.includes('org.read')) {
-        return;
-      }
-
-      if (error) {
-        console.error(error);
-      }
-
-      this.router.navigate(['/users/me']).then();
-    });
+    this.authenticationService.authenticationChanged
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.authService.getActiveOrg()),
+        takeUntilDestroyed(),
+      )
+      .subscribe({
+        next: async (org) => {
+          if (!org) {
+            return this.router.navigate(['/users/me']);
+          }
+          return true;
+        },
+        error: async (err) => {
+          console.error(err);
+          return this.router.navigate(['/users/me']);
+        },
+      });
 
     this.isDarkTheme = this.themeService.isDarkTheme;
     this.isDarkTheme.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((dark) => {
@@ -263,8 +246,6 @@ export class AppComponent {
       this.document.documentElement.lang = language.lang;
     });
   }
-
-  // TODO implement Console storage
 
   //   private startIntroWorkflow(): void {
   //     setTimeout(() => {
@@ -317,8 +298,8 @@ export class AppComponent {
   private getProjectCount(): void {
     this.authService.isAllowed(['project.read']).subscribe((allowed) => {
       if (allowed) {
-        this.mgmtService.listProjects(0, 0);
-        this.mgmtService.listGrantedProjects(0, 0);
+        this.mgmtService.listProjects(0, 0).then();
+        this.mgmtService.listGrantedProjects(0, 0).then();
       }
     });
   }

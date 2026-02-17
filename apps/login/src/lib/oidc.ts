@@ -1,41 +1,33 @@
 import { Cookie } from "@/lib/cookies";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
-import { createCallback, getLoginSettings } from "@/lib/zitadel";
+import { createCallback, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { isSessionValid } from "./session";
 
 type LoginWithOIDCAndSession = {
-  serviceUrl: string;
+  serviceConfig: ServiceConfig;
   authRequest: string;
   sessionId: string;
   sessions: Session[];
   sessionCookies: Cookie[];
 };
 export async function loginWithOIDCAndSession({
-  serviceUrl,
+  serviceConfig,
   authRequest,
   sessionId,
   sessions,
   sessionCookies,
 }: LoginWithOIDCAndSession): Promise<{ error: string } | { redirect: string }> {
-  console.log(`Login with session: ${sessionId} and authRequest: ${authRequest}`);
-
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
-    console.log(`Found session ${selectedSession.id}`);
-
-    const isValid = await isSessionValid({
-      serviceUrl,
-      session: selectedSession,
-    });
+    const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
 
     console.log("Session is valid:", isValid);
 
     if (!isValid && selectedSession.factors?.user) {
-      console.log("Session is not valid, need to re-authenticate user");
       // if the session is not valid anymore, we need to redirect the user to re-authenticate /
       // TODO: handle IDP intent direcly if available
       const command: SendLoginnameCommand = {
@@ -47,7 +39,6 @@ export async function loginWithOIDCAndSession({
       const res = await sendLoginname(command);
 
       if (res && "redirect" in res && res?.redirect) {
-        console.log("Redirecting to re-authenticate:", res.redirect);
         return { redirect: res.redirect };
       }
     }
@@ -62,7 +53,7 @@ export async function loginWithOIDCAndSession({
 
       try {
         const { callbackUrl } = await createCallback({
-          serviceUrl,
+          serviceConfig,
           req: create(CreateCallbackRequestSchema, {
             authRequestId: authRequest,
             callbackKind: {
@@ -72,7 +63,6 @@ export async function loginWithOIDCAndSession({
           }),
         });
         if (callbackUrl) {
-          console.log("Redirecting to callback URL:", callbackUrl);
           return { redirect: callbackUrl };
         } else {
           return { error: "An error occurred!" };
@@ -82,7 +72,7 @@ export async function loginWithOIDCAndSession({
         console.error(error);
         if (error && typeof error === "object" && "code" in error && error?.code === 9) {
           const loginSettings = await getLoginSettings({
-            serviceUrl,
+            serviceConfig,
             organization: selectedSession.factors?.user?.organizationId,
           });
 
@@ -99,7 +89,6 @@ export async function loginWithOIDCAndSession({
           if (selectedSession.factors?.user?.organizationId) {
             params.append("organization", selectedSession.factors?.user?.organizationId);
           }
-          console.log("Redirecting to signed-in page:", signedinUrl + "?" + params.toString());
           return { redirect: signedinUrl + "?" + params.toString() };
         } else {
           return { error: "Unknown error occurred" };

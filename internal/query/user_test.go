@@ -11,7 +11,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -19,129 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
-
-func TestUser_usersCheckPermission(t *testing.T) {
-	type want struct {
-		users []*User
-	}
-	tests := []struct {
-		name        string
-		want        want
-		users       *Users
-		permissions []string
-	}{
-		{
-			"permissions for all users",
-			want{
-				users: []*User{
-					{ID: "first"}, {ID: "second"}, {ID: "third"},
-				},
-			},
-			&Users{
-				Users: []*User{
-					{ID: "first"}, {ID: "second"}, {ID: "third"},
-				},
-			},
-			[]string{"first", "second", "third"},
-		},
-		{
-			"permissions for one user, first",
-			want{
-				users: []*User{
-					{ID: "first"},
-				},
-			},
-			&Users{
-				Users: []*User{
-					{ID: "first"}, {ID: "second"}, {ID: "third"},
-				},
-			},
-			[]string{"first"},
-		},
-		{
-			"permissions for one user, second",
-			want{
-				users: []*User{
-					{ID: "second"},
-				},
-			},
-			&Users{
-				Users: []*User{
-					{ID: "first"}, {ID: "second"}, {ID: "third"},
-				},
-			},
-			[]string{"second"},
-		},
-		{
-			"permissions for one user, third",
-			want{
-				users: []*User{
-					{ID: "third"},
-				},
-			},
-			&Users{
-				Users: []*User{
-					{ID: "first"}, {ID: "second"}, {ID: "third"},
-				},
-			},
-			[]string{"third"},
-		},
-		{
-			"permissions for two users, first",
-			want{
-				users: []*User{
-					{ID: "first"}, {ID: "third"},
-				},
-			},
-			&Users{
-				Users: []*User{
-					{ID: "first"}, {ID: "second"}, {ID: "third"},
-				},
-			},
-			[]string{"first", "third"},
-		},
-		{
-			"permissions for two users, second",
-			want{
-				users: []*User{
-					{ID: "second"}, {ID: "third"},
-				},
-			},
-			&Users{
-				Users: []*User{
-					{ID: "first"}, {ID: "second"}, {ID: "third"},
-				},
-			},
-			[]string{"second", "third"},
-		},
-		{
-			"no permissions",
-			want{
-				users: []*User{},
-			},
-			&Users{
-				Users: []*User{
-					{ID: "first"}, {ID: "second"}, {ID: "third"},
-				},
-			},
-			[]string{},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			checkPermission := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-				for _, perm := range tt.permissions {
-					if resourceID == perm {
-						return nil
-					}
-				}
-				return errors.New("failed")
-			}
-			usersCheckPermission(context.Background(), tt.users, checkPermission)
-			require.Equal(t, tt.want.users, tt.users.Users)
-		})
-	}
-}
 
 func TestUser_userCheckPermission(t *testing.T) {
 	type args struct {
@@ -349,7 +225,7 @@ var (
 		"username",
 		"login_names",
 		"preferred_login_name",
-		// human
+		// User (human)
 		"user_id",
 		"first_name",
 		"last_name",
@@ -358,7 +234,7 @@ var (
 		"preferred_language",
 		"gender",
 		"avatar_key",
-		// machine
+		// service account
 		"user_id",
 		"last_email",
 		"verified_email",
@@ -417,7 +293,7 @@ var (
 		"username",
 		"login_names",
 		"preferred_login_name",
-		// human
+		// User (human)
 		"user_id",
 		"first_name",
 		"last_name",
@@ -433,7 +309,7 @@ var (
 		"password_change_required",
 		"password_changed",
 		"mfa_init_skipped",
-		// machine
+		// service account
 		"user_id",
 		"name",
 		"description",
@@ -841,7 +717,7 @@ func Test_UserPrepares(t *testing.T) {
 						"username",
 						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
-						// human
+						// User (human)
 						"id",
 						"first_name",
 						"last_name",
@@ -904,7 +780,7 @@ func Test_UserPrepares(t *testing.T) {
 						"username",
 						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
-						// human
+						// User (human)
 						"id",
 						"first_name",
 						"last_name",
@@ -991,7 +867,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (human)
 							"id",
 							"first_name",
 							"last_name",
@@ -1007,7 +883,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							testNow,
 							testNow,
-							// machine
+							// service account
 							nil,
 							nil,
 							nil,
@@ -1076,7 +952,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (human)
 							"id",
 							"first_name",
 							"last_name",
@@ -1092,7 +968,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							testNow,
 							testNow,
-							// machine
+							// service account
 							nil,
 							nil,
 							nil,
@@ -1166,7 +1042,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (human)
 							"id",
 							"first_name",
 							"last_name",
@@ -1182,7 +1058,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							testNow,
 							testNow,
-							// machine
+							// service account
 							nil,
 							nil,
 							nil,
@@ -1201,7 +1077,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (human)
 							nil,
 							nil,
 							nil,
@@ -1217,7 +1093,7 @@ func Test_UserPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							// machine
+							// service account
 							"id",
 							"name",
 							"description",

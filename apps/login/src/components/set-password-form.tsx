@@ -1,16 +1,7 @@
 "use client";
 
-import {
-  lowerCaseValidator,
-  numberValidator,
-  symbolValidator,
-  upperCaseValidator,
-} from "@/helpers/validators";
-import {
-  changePassword,
-  resetPassword,
-  sendPassword,
-} from "@/lib/server/password";
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
+import { changePassword, resetPassword, sendPassword } from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
@@ -25,6 +16,8 @@ import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { handleServerActionResponse } from "@/lib/client";
+import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs =
   | {
@@ -40,6 +33,7 @@ type Props = {
   loginName: string;
   userId: string;
   organization?: string;
+  defaultOrganization?: string;
   requestId?: string;
   codeRequired: boolean;
 };
@@ -47,6 +41,7 @@ type Props = {
 export function SetPasswordForm({
   passwordComplexitySettings,
   organization,
+  defaultOrganization,
   requestId,
   loginName,
   userId,
@@ -54,7 +49,7 @@ export function SetPasswordForm({
   codeRequired,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       code: code ?? "",
     },
@@ -64,6 +59,7 @@ export function SetPasswordForm({
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
 
@@ -74,6 +70,7 @@ export function SetPasswordForm({
     const response = await resetPassword({
       loginName,
       organization,
+      defaultOrganization,
       requestId,
     })
       .catch(() => {
@@ -84,7 +81,7 @@ export function SetPasswordForm({
         setLoading(false);
       });
 
-    if (response && "error" in response) {
+    if (response && "error" in response && typeof response.error === "string") {
       setError(response.error);
       return;
     }
@@ -92,9 +89,11 @@ export function SetPasswordForm({
 
   async function submitPassword(values: Inputs) {
     setLoading(true);
-    let payload: { userId: string; password: string; code?: string } = {
+
+    let payload: { userId: string; password: string; code?: string; organization?: string } = {
       userId: userId,
       password: values.password,
+      organization,
     };
 
     // this is not required for initial password setup
@@ -148,22 +147,7 @@ export function SetPasswordForm({
         setLoading(false);
       });
 
-    if (
-      passwordResponse &&
-      "error" in passwordResponse &&
-      passwordResponse.error
-    ) {
-      setError(passwordResponse.error);
-      return;
-    }
-
-    if (
-      passwordResponse &&
-      "redirect" in passwordResponse &&
-      passwordResponse.redirect
-    ) {
-      return router.push(passwordResponse.redirect);
-    }
+    handleServerActionResponse(passwordResponse as any, router, setSamlData, setError);
 
     return;
   }
@@ -173,9 +157,7 @@ export function SetPasswordForm({
   const watchPassword = watch("password", "");
   const watchConfirmPassword = watch("confirmPassword", "");
 
-  const hasMinLength =
-    passwordComplexitySettings &&
-    watchPassword?.length >= passwordComplexitySettings.minLength;
+  const hasMinLength = passwordComplexitySettings && watchPassword?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(watchPassword);
   const hasNumber = numberValidator(watchPassword);
   const hasUppercase = upperCaseValidator(watchPassword);
@@ -190,7 +172,9 @@ export function SetPasswordForm({
     hasMinLength;
 
   return (
-    <form className="w-full">
+    <>
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
+      <form className="w-full">
       <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
         {codeRequired && (
           <Alert type={AlertType.INFO}>
@@ -271,19 +255,14 @@ export function SetPasswordForm({
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
-          disabled={
-            loading ||
-            !policyIsValid ||
-            !formState.isValid ||
-            watchPassword !== watchConfirmPassword
-          }
+          disabled={loading || !policyIsValid || !formState.isValid || watchPassword !== watchConfirmPassword}
           onClick={handleSubmit(submitPassword)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="set.submit" namespace="password" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="password" />
         </Button>
       </div>
-    </form>
+      </form>
+    </>
   );
 }

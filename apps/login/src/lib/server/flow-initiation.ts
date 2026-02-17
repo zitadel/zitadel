@@ -1,3 +1,5 @@
+import { idpTypeToSlug } from "@/lib/idp";
+import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
 import { findValidSession } from "@/lib/session";
 import {
@@ -8,10 +10,9 @@ import {
   getOrgsByDomain,
   getSAMLRequest,
   getSecuritySettings,
+  ServiceConfig,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
-import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
-import { idpTypeToSlug } from "@/lib/idp";
 import { create } from "@zitadel/client";
 import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
@@ -20,6 +21,7 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../../../constants/csp";
+import escapeHtml from "escape-html";
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;
@@ -47,7 +49,7 @@ const gotoAccounts = ({
 };
 
 export interface FlowInitiationParams {
-  serviceUrl: string;
+  serviceConfig: ServiceConfig;
   requestId: string;
   sessions: Session[];
   sessionCookies: any[];
@@ -58,12 +60,9 @@ export interface FlowInitiationParams {
  * Handle OIDC flow initiation
  */
 export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
-  const { serviceUrl, requestId, sessions, sessionCookies, request } = params;
+  const { serviceConfig, requestId, sessions, sessionCookies, request } = params;
 
-  const { authRequest } = await getAuthRequest({
-    serviceUrl,
-    authRequestId: requestId.replace("oidc_", ""),
-  });
+  const { authRequest } = await getAuthRequest({ serviceConfig, authRequestId: requestId.replace("oidc_", "") });
 
   let organization = "";
   let suffix = "";
@@ -85,10 +84,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
         console.log("Extracted org domain:", orgDomain);
         if (orgDomain) {
-          const orgs = await getOrgsByDomain({
-            serviceUrl,
-            domain: orgDomain,
-          });
+          const orgs = await getOrgsByDomain({ serviceConfig, domain: orgDomain });
 
           if (orgs.result && orgs.result.length === 1) {
             organization = orgs.result[0].id ?? "";
@@ -103,7 +99,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       idpId = matched?.[1] ?? "";
 
       const identityProviders = await getActiveIdentityProviders({
-        serviceUrl,
+        serviceConfig,
         orgId: organization ? organization : undefined,
       }).then((resp) => {
         return resp.identityProviders;
@@ -112,7 +108,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       const idp = identityProviders.find((idp) => idp.id === idpId);
 
       if (idp) {
-        const origin = request.nextUrl.origin;
         const identityProviderType = identityProviders[0].type;
 
         if (identityProviderType === IdentityProviderType.LDAP) {
@@ -137,19 +132,44 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           params.set("organization", organization);
         }
 
-        let url: string | null = await startIdentityProviderFlow({
-          serviceUrl,
+        const response = await startIdentityProviderFlow({
+          serviceConfig,
           idpId,
           urls: {
-            successUrl: `${origin}/idp/${provider}/process?` + new URLSearchParams(params),
-            failureUrl: `${origin}/idp/${provider}/failure?` + new URLSearchParams(params),
+            successUrl: constructUrl(request, `/idp/${provider}/process?${params.toString()}`).toString(),
+            failureUrl: constructUrl(request, `/idp/${provider}/failure?${params.toString()}`).toString(),
           },
         });
 
-        if (!url) {
+        if (!response || !response.url) {
           return NextResponse.json({ error: "Could not start IDP flow" }, { status: 500 });
         }
 
+        if (response.fields) {
+          const hiddenInputs = Object.entries(response.fields)
+            .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
+            .join("\n");
+
+          const html = `
+            <html>
+              <body onload="document.forms[0].submit()">
+                <form action="${escapeHtml(response.url)}" method="post">
+                  ${hiddenInputs}
+                  <noscript>
+                    <button type="submit">Continue</button>
+                  </noscript>
+                </form>
+              </body>
+            </html>
+          `;
+
+
+          return new NextResponse(html, {
+            headers: { "Content-Type": "text/html" },
+          });
+        }
+
+        let url = response.url;
         if (url.startsWith("/")) {
           url = constructUrl(request, url).toString();
         }
@@ -215,15 +235,9 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       }
       return NextResponse.redirect(loginNameUrl);
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
-      const securitySettings = await getSecuritySettings({
-        serviceUrl,
-      });
+      const securitySettings = await getSecuritySettings({ serviceConfig });
 
-      const selectedSession = await findValidSession({
-        serviceUrl,
-        sessions,
-        authRequest,
-      });
+      const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest });
 
       const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
 
@@ -252,7 +266,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       };
 
       const { callbackUrl } = await createCallback({
-        serviceUrl,
+        serviceConfig,
         req: create(CreateCallbackRequestSchema, {
           authRequestId: requestId.replace("oidc_", ""),
           callbackKind: {
@@ -275,11 +289,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
       return callbackResponse;
     } else {
-      let selectedSession = await findValidSession({
-        serviceUrl,
-        sessions,
-        authRequest,
-      });
+      let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest });
 
       if (!selectedSession || !selectedSession.id) {
         return gotoAccounts({
@@ -306,7 +316,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
       try {
         const { callbackUrl } = await createCallback({
-          serviceUrl,
+          serviceConfig,
           req: create(CreateCallbackRequestSchema, {
             authRequestId: requestId.replace("oidc_", ""),
             callbackKind: {
@@ -359,12 +369,9 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
  * Handle SAML flow initiation
  */
 export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
-  const { serviceUrl, requestId, sessions, sessionCookies, request } = params;
+  const { serviceConfig, requestId, sessions, sessionCookies, request } = params;
 
-  const { samlRequest } = await getSAMLRequest({
-    serviceUrl,
-    samlRequestId: requestId.replace("saml_", ""),
-  });
+  const { samlRequest } = await getSAMLRequest({ serviceConfig, samlRequestId: requestId.replace("saml_", "") });
 
   if (!samlRequest) {
     return NextResponse.json({ error: "No samlRequest found" }, { status: 400 });
@@ -378,11 +385,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
   }
 
   // Try to find a valid session
-  let selectedSession = await findValidSession({
-    serviceUrl,
-    sessions,
-    samlRequest,
-  });
+  let selectedSession = await findValidSession({ serviceConfig, sessions, samlRequest });
 
   // Early return: No valid session found - show account selection
   if (!selectedSession || !selectedSession.id) {
@@ -411,7 +414,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
 
   try {
     const { url, binding } = await createResponse({
-      serviceUrl,
+      serviceConfig,
       req: create(CreateResponseRequestSchema, {
         samlRequestId: requestId.replace("saml_", ""),
         responseKind: {
@@ -427,9 +430,9 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
       const html = `
         <html>
           <body onload="document.forms[0].submit()">
-            <form action="${url}" method="post">
-              <input type="hidden" name="RelayState" value="${binding.value.relayState}" />
-              <input type="hidden" name="SAMLResponse" value="${binding.value.samlResponse}" />
+            <form action="${escapeHtml(url)}" method="post">
+              <input type="hidden" name="RelayState" value="${escapeHtml(binding.value.relayState)}" />
+              <input type="hidden" name="SAMLResponse" value="${escapeHtml(binding.value.samlResponse)}" />
               <noscript>
                 <button type="submit">Continue</button>
               </noscript>

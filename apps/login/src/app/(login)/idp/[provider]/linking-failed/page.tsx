@@ -1,6 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings } from "@/lib/zitadel";
 import { headers } from "next/headers";
 
@@ -15,21 +15,18 @@ export default async function LinkingFailedPage(props: {
   const { organization, error } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col space-y-4">
         <h1>
-          <Translated i18nKey="linkingFailed.title" namespace="idp" />
+          <Translated i18nKey="title" namespace="idp" />
         </h1>
-        <p className="ztdl-p">
-          <Translated i18nKey="linkingFailed.description" namespace="idp" />
+        <p className="ztdl-p text-center">
+          <Translated i18nKey="errors.linkingFailed" namespace="idp" />
         </p>
         {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       </div>
