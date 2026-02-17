@@ -451,7 +451,7 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
  */
 async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
   const { options, intent, serviceConfig, buildRedirectParams, t } = ctx;
-  const { addHumanUser } = intent;
+  const { addHumanUser, idpInformation } = intent;
   const { organization, provider } = ctx.params;
 
   if (options?.isAutoCreation && addHumanUser) {
@@ -465,6 +465,28 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
       console.error("[IDP Process] Could not determine organization for auto-creation (no default org available)");
       const params = buildRedirectParams();
       return { redirect: `/idp/${provider}/failure?${params}&error=no_organization_context` };
+    }
+
+    // Check if required profile fields are present
+    if (!addHumanUser.profile?.givenName || !addHumanUser.profile?.familyName) {
+      console.log(
+        "[IDP Process] Missing required profile fields (givenName or familyName), redirecting to complete registration",
+      );
+
+      const params = buildRedirectParams(
+        {
+          organization: orgToRegisterOn,
+          idpId: idpInformation!.idpId,
+          idpUserId: idpInformation!.userId || "",
+          idpUserName: idpInformation!.userName || "",
+          // User data for pre-filling form
+          givenName: addHumanUser.profile?.givenName || "",
+          familyName: addHumanUser.profile?.familyName || "",
+          email: addHumanUser.email?.email || "",
+        },
+        true,
+      );
+      return { redirect: `/idp/${provider}/complete-registration?${params}` };
     }
 
     const organizationSchema = create(OrganizationSchema, {
