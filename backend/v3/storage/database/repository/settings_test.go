@@ -5,147 +5,154 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/backend/v3/domain"
+	domain "github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 )
 
+var now = time.Now().Round(time.Millisecond)
+
 func TestGetLoginSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.LoginSettingsRepository()
+	repo := repository.LoginSettings()
 
-	settings := []*domain.LoginSettings{
+	settings := []*domain.LoginSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LoginSettingsAttributes: domain.LoginSettingsAttributes{
-				AllowUserNamePassword:      gu.Ptr(true),
-				AllowRegister:              gu.Ptr(true),
-				AllowExternalIDP:           gu.Ptr(true),
-				ForceMFA:                   gu.Ptr(true),
-				ForceMFALocalOnly:          gu.Ptr(true),
-				HidePasswordReset:          gu.Ptr(true),
-				IgnoreUnknownUsernames:     gu.Ptr(true),
-				AllowDomainDiscovery:       gu.Ptr(true),
-				DisableLoginWithEmail:      gu.Ptr(true),
-				DisableLoginWithPhone:      gu.Ptr(true),
-				PasswordlessType:           gu.Ptr(domain.PasswordlessTypeAllowed),
-				DefaultRedirectURI:         gu.Ptr("uri"),
-				PasswordCheckLifetime:      gu.Ptr(time.Hour),
-				ExternalLoginCheckLifetime: gu.Ptr(time.Hour),
-				MFAInitSkipLifetime:        gu.Ptr(time.Hour),
-				SecondFactorCheckLifetime:  gu.Ptr(time.Hour),
-				MultiFactorCheckLifetime:   gu.Ptr(time.Hour),
-			},
+			AllowUsernamePassword:       true,
+			AllowRegister:               true,
+			AllowExternalIDP:            true,
+			ForceMultiFactor:            true,
+			ForceMultiFactorLocalOnly:   true,
+			HidePasswordReset:           true,
+			IgnoreUnknownUsernames:      true,
+			AllowDomainDiscovery:        true,
+			DisableLoginWithEmail:       true,
+			DisableLoginWithPhone:       true,
+			PasswordlessType:            domain.PasswordlessTypeAllowed,
+			DefaultRedirectURI:          "uri",
+			PasswordCheckLifetime:       time.Hour,
+			ExternalLoginCheckLifetime:  time.Hour,
+			MultiFactorInitSkipLifetime: time.Hour,
+			SecondFactorCheckLifetime:   time.Hour,
+			MultiFactorCheckLifetime:    time.Hour,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LoginSettingsAttributes: domain.LoginSettingsAttributes{
-				AllowUserNamePassword:      gu.Ptr(false),
-				AllowRegister:              gu.Ptr(false),
-				AllowExternalIDP:           gu.Ptr(false),
-				ForceMFA:                   gu.Ptr(false),
-				ForceMFALocalOnly:          gu.Ptr(false),
-				HidePasswordReset:          gu.Ptr(false),
-				IgnoreUnknownUsernames:     gu.Ptr(false),
-				AllowDomainDiscovery:       gu.Ptr(false),
-				DisableLoginWithEmail:      gu.Ptr(false),
-				DisableLoginWithPhone:      gu.Ptr(false),
-				PasswordlessType:           gu.Ptr(domain.PasswordlessTypeNotAllowed),
-				DefaultRedirectURI:         gu.Ptr("uri2"),
-				PasswordCheckLifetime:      gu.Ptr(time.Minute),
-				ExternalLoginCheckLifetime: gu.Ptr(time.Minute),
-				MFAInitSkipLifetime:        gu.Ptr(time.Minute),
-				SecondFactorCheckLifetime:  gu.Ptr(time.Minute),
-				MultiFactorCheckLifetime:   gu.Ptr(time.Minute),
-			},
+			AllowUsernamePassword:       false,
+			AllowRegister:               false,
+			AllowExternalIDP:            false,
+			ForceMultiFactor:            false,
+			ForceMultiFactorLocalOnly:   false,
+			HidePasswordReset:           false,
+			IgnoreUnknownUsernames:      false,
+			AllowDomainDiscovery:        false,
+			DisableLoginWithEmail:       false,
+			DisableLoginWithPhone:       false,
+			PasswordlessType:            domain.PasswordlessTypeNotAllowed,
+			DefaultRedirectURI:          "uri2",
+			PasswordCheckLifetime:       time.Minute,
+			ExternalLoginCheckLifetime:  time.Minute,
+			MultiFactorInitSkipLifetime: time.Minute,
+			SecondFactorCheckLifetime:   time.Minute,
+			MultiFactorCheckLifetime:    time.Minute,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
-				OrganizationID: gu.Ptr(firstOrgID),
+				OrganizationID: &firstOrgID,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LoginSettingsAttributes: domain.LoginSettingsAttributes{
-				AllowUserNamePassword:      gu.Ptr(true),
-				AllowRegister:              gu.Ptr(true),
-				AllowExternalIDP:           gu.Ptr(true),
-				ForceMFA:                   gu.Ptr(true),
-				ForceMFALocalOnly:          gu.Ptr(true),
-				HidePasswordReset:          gu.Ptr(true),
-				IgnoreUnknownUsernames:     gu.Ptr(true),
-				AllowDomainDiscovery:       gu.Ptr(true),
-				DisableLoginWithEmail:      gu.Ptr(true),
-				DisableLoginWithPhone:      gu.Ptr(true),
-				PasswordlessType:           gu.Ptr(domain.PasswordlessTypeAllowed),
-				DefaultRedirectURI:         gu.Ptr("uri"),
-				PasswordCheckLifetime:      gu.Ptr(time.Hour),
-				ExternalLoginCheckLifetime: gu.Ptr(time.Hour),
-				MFAInitSkipLifetime:        gu.Ptr(time.Hour),
-				SecondFactorCheckLifetime:  gu.Ptr(time.Hour),
-				MultiFactorCheckLifetime:   gu.Ptr(time.Hour),
-			},
+			AllowUsernamePassword:       true,
+			AllowRegister:               true,
+			AllowExternalIDP:            true,
+			ForceMultiFactor:            true,
+			ForceMultiFactorLocalOnly:   true,
+			HidePasswordReset:           true,
+			IgnoreUnknownUsernames:      true,
+			AllowDomainDiscovery:        true,
+			DisableLoginWithEmail:       true,
+			DisableLoginWithPhone:       true,
+			PasswordlessType:            domain.PasswordlessTypeAllowed,
+			DefaultRedirectURI:          "uri",
+			PasswordCheckLifetime:       time.Hour,
+			ExternalLoginCheckLifetime:  time.Hour,
+			MultiFactorInitSkipLifetime: time.Hour,
+			SecondFactorCheckLifetime:   time.Hour,
+			MultiFactorCheckLifetime:    time.Hour,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
-				OrganizationID: gu.Ptr(secondOrgID),
+				OrganizationID: &secondOrgID,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LoginSettingsAttributes: domain.LoginSettingsAttributes{
-				AllowUserNamePassword:      gu.Ptr(false),
-				AllowRegister:              gu.Ptr(false),
-				AllowExternalIDP:           gu.Ptr(false),
-				ForceMFA:                   gu.Ptr(false),
-				ForceMFALocalOnly:          gu.Ptr(false),
-				HidePasswordReset:          gu.Ptr(false),
-				IgnoreUnknownUsernames:     gu.Ptr(false),
-				AllowDomainDiscovery:       gu.Ptr(false),
-				DisableLoginWithEmail:      gu.Ptr(false),
-				DisableLoginWithPhone:      gu.Ptr(false),
-				PasswordlessType:           gu.Ptr(domain.PasswordlessTypeNotAllowed),
-				DefaultRedirectURI:         gu.Ptr("uri2"),
-				PasswordCheckLifetime:      gu.Ptr(time.Minute),
-				ExternalLoginCheckLifetime: gu.Ptr(time.Minute),
-				MFAInitSkipLifetime:        gu.Ptr(time.Minute),
-				SecondFactorCheckLifetime:  gu.Ptr(time.Minute),
-				MultiFactorCheckLifetime:   gu.Ptr(time.Minute),
-			},
+			AllowUsernamePassword:       false,
+			AllowRegister:               false,
+			AllowExternalIDP:            false,
+			ForceMultiFactor:            false,
+			ForceMultiFactorLocalOnly:   false,
+			HidePasswordReset:           false,
+			IgnoreUnknownUsernames:      false,
+			AllowDomainDiscovery:        false,
+			DisableLoginWithEmail:       false,
+			DisableLoginWithPhone:       false,
+			PasswordlessType:            domain.PasswordlessTypeNotAllowed,
+			DefaultRedirectURI:          "uri2",
+			PasswordCheckLifetime:       time.Minute,
+			ExternalLoginCheckLifetime:  time.Minute,
+			MultiFactorInitSkipLifetime: time.Minute,
+			SecondFactorCheckLifetime:   time.Minute,
+			MultiFactorCheckLifetime:    time.Minute,
 		},
 	}
 
-	for _, setting := range settings {
+	for i, setting := range settings {
 		err := repo.Set(t.Context(), tx, setting)
-		require.NoError(t, err)
+		require.NoError(t, err, "failed to create %d. setting", i)
 	}
 
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.LoginSettings
+		want      *domain.LoginSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
-			condition: repo.IDCondition(settings[0].ID),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			condition: repo.OrganizationIDCondition(settings[0].OrganizationID),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "not found",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
 			wantErr:   database.NewNoRowFoundError(nil),
 		},
 		{
@@ -155,12 +162,12 @@ func TestGetLoginSettings(t *testing.T) {
 		},
 		{
 			name:      "ok, instance",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(nil)),
 			want:      settings[0],
 		},
 		{
 			name:      "ok, organization",
-			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			condition: database.And(repo.InstanceIDCondition(secondInstanceID), repo.OrganizationIDCondition(&secondOrgID)),
 			want:      settings[3],
 		},
 	}
@@ -181,108 +188,112 @@ func TestListLoginSettings(t *testing.T) {
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.LoginSettingsRepository()
+	repo := repository.LoginSettings()
 
-	settings := []*domain.LoginSettings{
+	settings := []*domain.LoginSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LoginSettingsAttributes: domain.LoginSettingsAttributes{
-				AllowUserNamePassword:      gu.Ptr(true),
-				AllowRegister:              gu.Ptr(true),
-				AllowExternalIDP:           gu.Ptr(true),
-				ForceMFA:                   gu.Ptr(true),
-				ForceMFALocalOnly:          gu.Ptr(true),
-				HidePasswordReset:          gu.Ptr(true),
-				IgnoreUnknownUsernames:     gu.Ptr(true),
-				AllowDomainDiscovery:       gu.Ptr(true),
-				DisableLoginWithEmail:      gu.Ptr(true),
-				DisableLoginWithPhone:      gu.Ptr(true),
-				PasswordlessType:           gu.Ptr(domain.PasswordlessTypeAllowed),
-				DefaultRedirectURI:         gu.Ptr("uri"),
-				PasswordCheckLifetime:      gu.Ptr(time.Hour),
-				ExternalLoginCheckLifetime: gu.Ptr(time.Hour),
-				MFAInitSkipLifetime:        gu.Ptr(time.Hour),
-				SecondFactorCheckLifetime:  gu.Ptr(time.Hour),
-				MultiFactorCheckLifetime:   gu.Ptr(time.Hour),
-			},
+			AllowUsernamePassword:       true,
+			AllowRegister:               true,
+			AllowExternalIDP:            true,
+			ForceMultiFactor:            true,
+			ForceMultiFactorLocalOnly:   true,
+			HidePasswordReset:           true,
+			IgnoreUnknownUsernames:      true,
+			AllowDomainDiscovery:        true,
+			DisableLoginWithEmail:       true,
+			DisableLoginWithPhone:       true,
+			PasswordlessType:            domain.PasswordlessTypeAllowed,
+			DefaultRedirectURI:          "uri",
+			PasswordCheckLifetime:       time.Hour,
+			ExternalLoginCheckLifetime:  time.Hour,
+			MultiFactorInitSkipLifetime: time.Hour,
+			SecondFactorCheckLifetime:   time.Hour,
+			MultiFactorCheckLifetime:    time.Hour,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LoginSettingsAttributes: domain.LoginSettingsAttributes{
-				AllowUserNamePassword:      gu.Ptr(false),
-				AllowRegister:              gu.Ptr(false),
-				AllowExternalIDP:           gu.Ptr(false),
-				ForceMFA:                   gu.Ptr(false),
-				ForceMFALocalOnly:          gu.Ptr(false),
-				HidePasswordReset:          gu.Ptr(false),
-				IgnoreUnknownUsernames:     gu.Ptr(false),
-				AllowDomainDiscovery:       gu.Ptr(false),
-				DisableLoginWithEmail:      gu.Ptr(false),
-				DisableLoginWithPhone:      gu.Ptr(false),
-				PasswordlessType:           gu.Ptr(domain.PasswordlessTypeNotAllowed),
-				DefaultRedirectURI:         gu.Ptr("uri2"),
-				PasswordCheckLifetime:      gu.Ptr(time.Minute),
-				ExternalLoginCheckLifetime: gu.Ptr(time.Minute),
-				MFAInitSkipLifetime:        gu.Ptr(time.Minute),
-				SecondFactorCheckLifetime:  gu.Ptr(time.Minute),
-				MultiFactorCheckLifetime:   gu.Ptr(time.Minute),
-			},
+			AllowUsernamePassword:       false,
+			AllowRegister:               false,
+			AllowExternalIDP:            false,
+			ForceMultiFactor:            false,
+			ForceMultiFactorLocalOnly:   false,
+			HidePasswordReset:           false,
+			IgnoreUnknownUsernames:      false,
+			AllowDomainDiscovery:        false,
+			DisableLoginWithEmail:       false,
+			DisableLoginWithPhone:       false,
+			PasswordlessType:            domain.PasswordlessTypeNotAllowed,
+			DefaultRedirectURI:          "uri2",
+			PasswordCheckLifetime:       time.Minute,
+			ExternalLoginCheckLifetime:  time.Minute,
+			MultiFactorInitSkipLifetime: time.Minute,
+			SecondFactorCheckLifetime:   time.Minute,
+			MultiFactorCheckLifetime:    time.Minute,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LoginSettingsAttributes: domain.LoginSettingsAttributes{
-				AllowUserNamePassword:      gu.Ptr(true),
-				AllowRegister:              gu.Ptr(true),
-				AllowExternalIDP:           gu.Ptr(true),
-				ForceMFA:                   gu.Ptr(true),
-				ForceMFALocalOnly:          gu.Ptr(true),
-				HidePasswordReset:          gu.Ptr(true),
-				IgnoreUnknownUsernames:     gu.Ptr(true),
-				AllowDomainDiscovery:       gu.Ptr(true),
-				DisableLoginWithEmail:      gu.Ptr(true),
-				DisableLoginWithPhone:      gu.Ptr(true),
-				PasswordlessType:           gu.Ptr(domain.PasswordlessTypeAllowed),
-				DefaultRedirectURI:         gu.Ptr("uri"),
-				PasswordCheckLifetime:      gu.Ptr(time.Hour),
-				ExternalLoginCheckLifetime: gu.Ptr(time.Hour),
-				MFAInitSkipLifetime:        gu.Ptr(time.Hour),
-				SecondFactorCheckLifetime:  gu.Ptr(time.Hour),
-				MultiFactorCheckLifetime:   gu.Ptr(time.Hour),
-			},
+			AllowUsernamePassword:       true,
+			AllowRegister:               true,
+			AllowExternalIDP:            true,
+			ForceMultiFactor:            true,
+			ForceMultiFactorLocalOnly:   true,
+			HidePasswordReset:           true,
+			IgnoreUnknownUsernames:      true,
+			AllowDomainDiscovery:        true,
+			DisableLoginWithEmail:       true,
+			DisableLoginWithPhone:       true,
+			PasswordlessType:            domain.PasswordlessTypeAllowed,
+			DefaultRedirectURI:          "uri",
+			PasswordCheckLifetime:       time.Hour,
+			ExternalLoginCheckLifetime:  time.Hour,
+			MultiFactorInitSkipLifetime: time.Hour,
+			SecondFactorCheckLifetime:   time.Hour,
+			MultiFactorCheckLifetime:    time.Hour,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LoginSettingsAttributes: domain.LoginSettingsAttributes{
-				AllowUserNamePassword:      gu.Ptr(false),
-				AllowRegister:              gu.Ptr(false),
-				AllowExternalIDP:           gu.Ptr(false),
-				ForceMFA:                   gu.Ptr(false),
-				ForceMFALocalOnly:          gu.Ptr(false),
-				HidePasswordReset:          gu.Ptr(false),
-				IgnoreUnknownUsernames:     gu.Ptr(false),
-				AllowDomainDiscovery:       gu.Ptr(false),
-				DisableLoginWithEmail:      gu.Ptr(false),
-				DisableLoginWithPhone:      gu.Ptr(false),
-				PasswordlessType:           gu.Ptr(domain.PasswordlessTypeNotAllowed),
-				DefaultRedirectURI:         gu.Ptr("uri2"),
-				PasswordCheckLifetime:      gu.Ptr(time.Minute),
-				ExternalLoginCheckLifetime: gu.Ptr(time.Minute),
-				MFAInitSkipLifetime:        gu.Ptr(time.Minute),
-				SecondFactorCheckLifetime:  gu.Ptr(time.Minute),
-				MultiFactorCheckLifetime:   gu.Ptr(time.Minute),
-			},
+			AllowUsernamePassword:       false,
+			AllowRegister:               false,
+			AllowExternalIDP:            false,
+			ForceMultiFactor:            false,
+			ForceMultiFactorLocalOnly:   false,
+			HidePasswordReset:           false,
+			IgnoreUnknownUsernames:      false,
+			AllowDomainDiscovery:        false,
+			DisableLoginWithEmail:       false,
+			DisableLoginWithPhone:       false,
+			PasswordlessType:            domain.PasswordlessTypeNotAllowed,
+			DefaultRedirectURI:          "uri2",
+			PasswordCheckLifetime:       time.Minute,
+			ExternalLoginCheckLifetime:  time.Minute,
+			MultiFactorInitSkipLifetime: time.Minute,
+			SecondFactorCheckLifetime:   time.Minute,
+			MultiFactorCheckLifetime:    time.Minute,
 		},
 	}
 
@@ -294,23 +305,23 @@ func TestListLoginSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.LoginSettings
+		want      []*domain.LoginSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
 			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "no results, ok",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.LoginSettings{},
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
+			want:      []*domain.LoginSetting{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.LoginSettings{settings[2], settings[0]},
+			want:      []*domain.LoginSetting{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -318,7 +329,7 @@ func TestListLoginSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.LoginSettings{settings[0]},
+			want: []*domain.LoginSetting{settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -326,7 +337,7 @@ func TestListLoginSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.LoginSettings{settings[2]},
+			want: []*domain.LoginSetting{settings[2]},
 		},
 	}
 
@@ -344,36 +355,37 @@ func TestListLoginSettings(t *testing.T) {
 
 func TestSetLoginSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.LoginSettingsRepository()
+	repo := repository.LoginSettings()
 
-	existingSettings := &domain.LoginSettings{
-		Settings: domain.Settings{
+	existingSettings := &domain.LoginSetting{
+		Setting: domain.Setting{
 			InstanceID:     instanceID,
 			OrganizationID: gu.Ptr(orgID),
+			ID:             gofakeit.UUID(),
+			CreatedAt:      now,
+			UpdatedAt:      now,
 		},
-		LoginSettingsAttributes: domain.LoginSettingsAttributes{
-			AllowUserNamePassword:      gu.Ptr(false),
-			AllowRegister:              gu.Ptr(false),
-			AllowExternalIDP:           gu.Ptr(false),
-			ForceMFA:                   gu.Ptr(false),
-			ForceMFALocalOnly:          gu.Ptr(false),
-			HidePasswordReset:          gu.Ptr(false),
-			IgnoreUnknownUsernames:     gu.Ptr(false),
-			AllowDomainDiscovery:       gu.Ptr(false),
-			DisableLoginWithEmail:      gu.Ptr(false),
-			DisableLoginWithPhone:      gu.Ptr(false),
-			PasswordlessType:           gu.Ptr(domain.PasswordlessTypeNotAllowed),
-			DefaultRedirectURI:         gu.Ptr("uri2"),
-			PasswordCheckLifetime:      gu.Ptr(time.Minute),
-			ExternalLoginCheckLifetime: gu.Ptr(time.Minute),
-			MFAInitSkipLifetime:        gu.Ptr(time.Minute),
-			SecondFactorCheckLifetime:  gu.Ptr(time.Minute),
-			MultiFactorCheckLifetime:   gu.Ptr(time.Minute),
-		},
+		AllowUsernamePassword:       false,
+		AllowRegister:               false,
+		AllowExternalIDP:            false,
+		ForceMultiFactor:            false,
+		ForceMultiFactorLocalOnly:   false,
+		HidePasswordReset:           false,
+		IgnoreUnknownUsernames:      false,
+		AllowDomainDiscovery:        false,
+		DisableLoginWithEmail:       false,
+		DisableLoginWithPhone:       false,
+		PasswordlessType:            domain.PasswordlessTypeNotAllowed,
+		DefaultRedirectURI:          "uri2",
+		PasswordCheckLifetime:       time.Minute,
+		ExternalLoginCheckLifetime:  time.Minute,
+		MultiFactorInitSkipLifetime: time.Minute,
+		SecondFactorCheckLifetime:   time.Minute,
+		MultiFactorCheckLifetime:    time.Minute,
 	}
 
 	err := repo.Set(t.Context(), tx, existingSettings)
@@ -381,133 +393,132 @@ func TestSetLoginSettings(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings *domain.LoginSettings
+		settings *domain.LoginSetting
 		wantErr  error
 	}{
 		{
 			name: "create instance",
-			settings: &domain.LoginSettings{
-				Settings: domain.Settings{
+			settings: &domain.LoginSetting{
+				Setting: domain.Setting{
 					InstanceID:     instanceID,
 					OrganizationID: nil,
+					ID:             gofakeit.UUID(),
+					CreatedAt:      now,
+					UpdatedAt:      now,
 				},
-				LoginSettingsAttributes: domain.LoginSettingsAttributes{
-					AllowUserNamePassword:      gu.Ptr(true),
-					AllowRegister:              gu.Ptr(true),
-					AllowExternalIDP:           gu.Ptr(true),
-					ForceMFA:                   gu.Ptr(true),
-					ForceMFALocalOnly:          gu.Ptr(true),
-					HidePasswordReset:          gu.Ptr(true),
-					IgnoreUnknownUsernames:     gu.Ptr(true),
-					AllowDomainDiscovery:       gu.Ptr(true),
-					DisableLoginWithEmail:      gu.Ptr(true),
-					DisableLoginWithPhone:      gu.Ptr(true),
-					PasswordlessType:           gu.Ptr(domain.PasswordlessTypeAllowed),
-					DefaultRedirectURI:         gu.Ptr("uri"),
-					PasswordCheckLifetime:      gu.Ptr(time.Hour),
-					ExternalLoginCheckLifetime: gu.Ptr(time.Hour),
-					MFAInitSkipLifetime:        gu.Ptr(time.Hour),
-					SecondFactorCheckLifetime:  gu.Ptr(time.Hour),
-					MultiFactorCheckLifetime:   gu.Ptr(time.Hour),
-				},
+				AllowUsernamePassword:       true,
+				AllowRegister:               true,
+				AllowExternalIDP:            true,
+				ForceMultiFactor:            true,
+				ForceMultiFactorLocalOnly:   true,
+				HidePasswordReset:           true,
+				IgnoreUnknownUsernames:      true,
+				AllowDomainDiscovery:        true,
+				DisableLoginWithEmail:       true,
+				DisableLoginWithPhone:       true,
+				PasswordlessType:            domain.PasswordlessTypeAllowed,
+				DefaultRedirectURI:          "uri",
+				PasswordCheckLifetime:       time.Hour,
+				ExternalLoginCheckLifetime:  time.Hour,
+				MultiFactorInitSkipLifetime: time.Hour,
+				SecondFactorCheckLifetime:   time.Hour,
+				MultiFactorCheckLifetime:    time.Hour,
 			},
 		},
 		{
 			name: "update organization",
-			settings: &domain.LoginSettings{
-				Settings: domain.Settings{
+			settings: &domain.LoginSetting{
+				Setting: domain.Setting{
 					InstanceID:     instanceID,
 					OrganizationID: gu.Ptr(orgID),
+					ID:             gofakeit.UUID(),
+					CreatedAt:      now,
+					UpdatedAt:      now,
 				},
-				LoginSettingsAttributes: domain.LoginSettingsAttributes{
-					AllowUserNamePassword:      gu.Ptr(true),
-					AllowRegister:              gu.Ptr(true),
-					AllowExternalIDP:           gu.Ptr(true),
-					ForceMFA:                   gu.Ptr(true),
-					ForceMFALocalOnly:          gu.Ptr(true),
-					HidePasswordReset:          gu.Ptr(true),
-					IgnoreUnknownUsernames:     gu.Ptr(true),
-					AllowDomainDiscovery:       gu.Ptr(true),
-					DisableLoginWithEmail:      gu.Ptr(true),
-					DisableLoginWithPhone:      gu.Ptr(true),
-					PasswordlessType:           gu.Ptr(domain.PasswordlessTypeAllowed),
-					DefaultRedirectURI:         gu.Ptr("uri"),
-					PasswordCheckLifetime:      gu.Ptr(time.Hour),
-					ExternalLoginCheckLifetime: gu.Ptr(time.Hour),
-					MFAInitSkipLifetime:        gu.Ptr(time.Hour),
-					SecondFactorCheckLifetime:  gu.Ptr(time.Hour),
-					MultiFactorCheckLifetime:   gu.Ptr(time.Hour),
-				},
+				AllowUsernamePassword:       true,
+				AllowRegister:               true,
+				AllowExternalIDP:            true,
+				ForceMultiFactor:            true,
+				ForceMultiFactorLocalOnly:   true,
+				HidePasswordReset:           true,
+				IgnoreUnknownUsernames:      true,
+				AllowDomainDiscovery:        true,
+				DisableLoginWithEmail:       true,
+				DisableLoginWithPhone:       true,
+				PasswordlessType:            domain.PasswordlessTypeAllowed,
+				DefaultRedirectURI:          "uri",
+				PasswordCheckLifetime:       time.Hour,
+				ExternalLoginCheckLifetime:  time.Hour,
+				MultiFactorInitSkipLifetime: time.Hour,
+				SecondFactorCheckLifetime:   time.Hour,
+				MultiFactorCheckLifetime:    time.Hour,
 			},
 		},
 		{
 			name: "non-existing instance",
-			settings: &domain.LoginSettings{
-				Settings: domain.Settings{
+			settings: &domain.LoginSetting{
+				Setting: domain.Setting{
 					InstanceID:     "foo",
 					OrganizationID: nil,
+					ID:             gofakeit.UUID(),
+					CreatedAt:      now,
+					UpdatedAt:      now,
 				},
-				LoginSettingsAttributes: domain.LoginSettingsAttributes{
-					AllowUserNamePassword:      gu.Ptr(true),
-					AllowRegister:              gu.Ptr(true),
-					AllowExternalIDP:           gu.Ptr(true),
-					ForceMFA:                   gu.Ptr(true),
-					ForceMFALocalOnly:          gu.Ptr(true),
-					HidePasswordReset:          gu.Ptr(true),
-					IgnoreUnknownUsernames:     gu.Ptr(true),
-					AllowDomainDiscovery:       gu.Ptr(true),
-					DisableLoginWithEmail:      gu.Ptr(true),
-					DisableLoginWithPhone:      gu.Ptr(true),
-					PasswordlessType:           gu.Ptr(domain.PasswordlessTypeAllowed),
-					DefaultRedirectURI:         gu.Ptr("uri"),
-					PasswordCheckLifetime:      gu.Ptr(time.Hour),
-					ExternalLoginCheckLifetime: gu.Ptr(time.Hour),
-					MFAInitSkipLifetime:        gu.Ptr(time.Hour),
-					SecondFactorCheckLifetime:  gu.Ptr(time.Hour),
-					MultiFactorCheckLifetime:   gu.Ptr(time.Hour),
-				},
+				AllowUsernamePassword:       true,
+				AllowRegister:               true,
+				AllowExternalIDP:            true,
+				ForceMultiFactor:            true,
+				ForceMultiFactorLocalOnly:   true,
+				HidePasswordReset:           true,
+				IgnoreUnknownUsernames:      true,
+				AllowDomainDiscovery:        true,
+				DisableLoginWithEmail:       true,
+				DisableLoginWithPhone:       true,
+				PasswordlessType:            domain.PasswordlessTypeAllowed,
+				DefaultRedirectURI:          "uri",
+				PasswordCheckLifetime:       time.Hour,
+				ExternalLoginCheckLifetime:  time.Hour,
+				MultiFactorInitSkipLifetime: time.Hour,
+				SecondFactorCheckLifetime:   time.Hour,
+				MultiFactorCheckLifetime:    time.Hour,
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
 		{
 			name: "non-existing org",
-			settings: &domain.LoginSettings{
-				Settings: domain.Settings{
+			settings: &domain.LoginSetting{
+				Setting: domain.Setting{
 					InstanceID:     instanceID,
 					OrganizationID: gu.Ptr("foo"),
+					ID:             gofakeit.UUID(),
+					CreatedAt:      now,
+					UpdatedAt:      now,
 				},
-				LoginSettingsAttributes: domain.LoginSettingsAttributes{
-					AllowUserNamePassword:      gu.Ptr(true),
-					AllowRegister:              gu.Ptr(true),
-					AllowExternalIDP:           gu.Ptr(true),
-					ForceMFA:                   gu.Ptr(true),
-					ForceMFALocalOnly:          gu.Ptr(true),
-					HidePasswordReset:          gu.Ptr(true),
-					IgnoreUnknownUsernames:     gu.Ptr(true),
-					AllowDomainDiscovery:       gu.Ptr(true),
-					DisableLoginWithEmail:      gu.Ptr(true),
-					DisableLoginWithPhone:      gu.Ptr(true),
-					PasswordlessType:           gu.Ptr(domain.PasswordlessTypeAllowed),
-					DefaultRedirectURI:         gu.Ptr("uri"),
-					PasswordCheckLifetime:      gu.Ptr(time.Hour),
-					ExternalLoginCheckLifetime: gu.Ptr(time.Hour),
-					MFAInitSkipLifetime:        gu.Ptr(time.Hour),
-					SecondFactorCheckLifetime:  gu.Ptr(time.Hour),
-					MultiFactorCheckLifetime:   gu.Ptr(time.Hour),
-				},
+				AllowUsernamePassword:       true,
+				AllowRegister:               true,
+				AllowExternalIDP:            true,
+				ForceMultiFactor:            true,
+				ForceMultiFactorLocalOnly:   true,
+				HidePasswordReset:           true,
+				IgnoreUnknownUsernames:      true,
+				AllowDomainDiscovery:        true,
+				DisableLoginWithEmail:       true,
+				DisableLoginWithPhone:       true,
+				PasswordlessType:            domain.PasswordlessTypeAllowed,
+				DefaultRedirectURI:          "uri",
+				PasswordCheckLifetime:       time.Hour,
+				ExternalLoginCheckLifetime:  time.Hour,
+				MultiFactorInitSkipLifetime: time.Hour,
+				SecondFactorCheckLifetime:   time.Hour,
+				MultiFactorCheckLifetime:    time.Hour,
 			},
 			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  database.ErrInvalidChangeTarget,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
+			t.Cleanup(rollback)
 			err := repo.Set(t.Context(), savepoint, tt.settings)
 			require.ErrorIs(t, err, tt.wantErr)
 		})
@@ -516,64 +527,66 @@ func TestSetLoginSettings(t *testing.T) {
 
 func TestDeleteLoginSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.LoginSettingsRepository()
+	repo := repository.LoginSettings()
 
-	existingInstanceSettings := &domain.LoginSettings{
-		Settings: domain.Settings{
+	existingInstanceSettings := &domain.LoginSetting{
+		Setting: domain.Setting{
 			InstanceID:     instanceID,
 			OrganizationID: nil,
+			ID:             gofakeit.UUID(),
+			CreatedAt:      now,
+			UpdatedAt:      now,
 		},
-		LoginSettingsAttributes: domain.LoginSettingsAttributes{
-			AllowUserNamePassword:      gu.Ptr(false),
-			AllowRegister:              gu.Ptr(false),
-			AllowExternalIDP:           gu.Ptr(false),
-			ForceMFA:                   gu.Ptr(false),
-			ForceMFALocalOnly:          gu.Ptr(false),
-			HidePasswordReset:          gu.Ptr(false),
-			IgnoreUnknownUsernames:     gu.Ptr(false),
-			AllowDomainDiscovery:       gu.Ptr(false),
-			DisableLoginWithEmail:      gu.Ptr(false),
-			DisableLoginWithPhone:      gu.Ptr(false),
-			PasswordlessType:           gu.Ptr(domain.PasswordlessTypeNotAllowed),
-			DefaultRedirectURI:         gu.Ptr("uri"),
-			PasswordCheckLifetime:      gu.Ptr(time.Minute),
-			ExternalLoginCheckLifetime: gu.Ptr(time.Minute),
-			MFAInitSkipLifetime:        gu.Ptr(time.Minute),
-			SecondFactorCheckLifetime:  gu.Ptr(time.Minute),
-			MultiFactorCheckLifetime:   gu.Ptr(time.Minute),
-		},
+		AllowUsernamePassword:       false,
+		AllowRegister:               false,
+		AllowExternalIDP:            false,
+		ForceMultiFactor:            false,
+		ForceMultiFactorLocalOnly:   false,
+		HidePasswordReset:           false,
+		IgnoreUnknownUsernames:      false,
+		AllowDomainDiscovery:        false,
+		DisableLoginWithEmail:       false,
+		DisableLoginWithPhone:       false,
+		PasswordlessType:            domain.PasswordlessTypeNotAllowed,
+		DefaultRedirectURI:          "uri",
+		PasswordCheckLifetime:       time.Minute,
+		ExternalLoginCheckLifetime:  time.Minute,
+		MultiFactorInitSkipLifetime: time.Minute,
+		SecondFactorCheckLifetime:   time.Minute,
+		MultiFactorCheckLifetime:    time.Minute,
 	}
 	err := repo.Set(t.Context(), tx, existingInstanceSettings)
 	require.NoError(t, err)
 
-	existingOrganizationSettings := &domain.LoginSettings{
-		Settings: domain.Settings{
+	existingOrganizationSettings := &domain.LoginSetting{
+		Setting: domain.Setting{
 			InstanceID:     instanceID,
 			OrganizationID: gu.Ptr(orgID),
+			ID:             gofakeit.UUID(),
+			CreatedAt:      now,
+			UpdatedAt:      now,
 		},
-		LoginSettingsAttributes: domain.LoginSettingsAttributes{
-			AllowUserNamePassword:      gu.Ptr(false),
-			AllowRegister:              gu.Ptr(false),
-			AllowExternalIDP:           gu.Ptr(false),
-			ForceMFA:                   gu.Ptr(false),
-			ForceMFALocalOnly:          gu.Ptr(false),
-			HidePasswordReset:          gu.Ptr(false),
-			IgnoreUnknownUsernames:     gu.Ptr(false),
-			AllowDomainDiscovery:       gu.Ptr(false),
-			DisableLoginWithEmail:      gu.Ptr(false),
-			DisableLoginWithPhone:      gu.Ptr(false),
-			PasswordlessType:           gu.Ptr(domain.PasswordlessTypeNotAllowed),
-			DefaultRedirectURI:         gu.Ptr("uri"),
-			PasswordCheckLifetime:      gu.Ptr(time.Minute),
-			ExternalLoginCheckLifetime: gu.Ptr(time.Minute),
-			MFAInitSkipLifetime:        gu.Ptr(time.Minute),
-			SecondFactorCheckLifetime:  gu.Ptr(time.Minute),
-			MultiFactorCheckLifetime:   gu.Ptr(time.Minute),
-		},
+		AllowUsernamePassword:       false,
+		AllowRegister:               false,
+		AllowExternalIDP:            false,
+		ForceMultiFactor:            false,
+		ForceMultiFactorLocalOnly:   false,
+		HidePasswordReset:           false,
+		IgnoreUnknownUsernames:      false,
+		AllowDomainDiscovery:        false,
+		DisableLoginWithEmail:       false,
+		DisableLoginWithPhone:       false,
+		PasswordlessType:            domain.PasswordlessTypeNotAllowed,
+		DefaultRedirectURI:          "uri",
+		PasswordCheckLifetime:       time.Minute,
+		ExternalLoginCheckLifetime:  time.Minute,
+		MultiFactorInitSkipLifetime: time.Minute,
+		SecondFactorCheckLifetime:   time.Minute,
+		MultiFactorCheckLifetime:    time.Minute,
 	}
 	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
 	require.NoError(t, err)
@@ -586,9 +599,9 @@ func TestDeleteLoginSettings(t *testing.T) {
 	}{
 		{
 			name:             "incomplete condition",
-			condition:        repo.InstanceIDCondition(instanceID),
+			condition:        repo.OrganizationIDCondition(gu.Ptr(orgID)),
 			wantRowsAffected: 0,
-			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:          database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:             "not found",
@@ -628,114 +641,118 @@ func TestDeleteLoginSettings(t *testing.T) {
 
 func TestGetBrandingSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.BrandingSettingsRepository()
+	repo := repository.BrandingSettings()
 
-	settings := []*domain.BrandingSettings{
+	settings := []*domain.BrandingSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				PrimaryColorLight:    gu.Ptr("color"),
-				BackgroundColorLight: gu.Ptr("color"),
-				WarnColorLight:       gu.Ptr("color"),
-				FontColorLight:       gu.Ptr("color"),
-				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				PrimaryColorDark:     gu.Ptr("color"),
-				BackgroundColorDark:  gu.Ptr("color"),
-				WarnColorDark:        gu.Ptr("color"),
-				FontColorDark:        gu.Ptr("color"),
-				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				HideLoginNameSuffix:  gu.Ptr(true),
-				ErrorMsgPopup:        gu.Ptr(true),
-				DisableWatermark:     gu.Ptr(true),
-				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-				FontURL:              &url.URL{Scheme: "https", Host: "host"},
-			},
+			PrimaryColorLight:    "color",
+			BackgroundColorLight: "color",
+			WarnColorLight:       "color",
+			FontColorLight:       "color",
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     "color",
+			BackgroundColorDark:  "color",
+			WarnColorDark:        "color",
+			FontColorDark:        "color",
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  true,
+			ErrorMessagePopup:    true,
+			DisableWatermark:     true,
+			ThemeMode:            domain.BrandingPolicyThemeAuto,
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				PrimaryColorLight:    gu.Ptr("color"),
-				BackgroundColorLight: gu.Ptr("color"),
-				WarnColorLight:       gu.Ptr("color"),
-				FontColorLight:       gu.Ptr("color"),
-				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				PrimaryColorDark:     gu.Ptr("color"),
-				BackgroundColorDark:  gu.Ptr("color"),
-				WarnColorDark:        gu.Ptr("color"),
-				FontColorDark:        gu.Ptr("color"),
-				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				HideLoginNameSuffix:  gu.Ptr(true),
-				ErrorMsgPopup:        gu.Ptr(true),
-				DisableWatermark:     gu.Ptr(true),
-				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-				FontURL:              &url.URL{Scheme: "https", Host: "host"},
-			},
+			PrimaryColorLight:    "color",
+			BackgroundColorLight: "color",
+			WarnColorLight:       "color",
+			FontColorLight:       "color",
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     "color",
+			BackgroundColorDark:  "color",
+			WarnColorDark:        "color",
+			FontColorDark:        "color",
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  true,
+			ErrorMessagePopup:    true,
+			DisableWatermark:     true,
+			ThemeMode:            domain.BrandingPolicyThemeAuto,
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				PrimaryColorLight:    gu.Ptr("color"),
-				BackgroundColorLight: gu.Ptr("color"),
-				WarnColorLight:       gu.Ptr("color"),
-				FontColorLight:       gu.Ptr("color"),
-				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				PrimaryColorDark:     gu.Ptr("color"),
-				BackgroundColorDark:  gu.Ptr("color"),
-				WarnColorDark:        gu.Ptr("color"),
-				FontColorDark:        gu.Ptr("color"),
-				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				HideLoginNameSuffix:  gu.Ptr(true),
-				ErrorMsgPopup:        gu.Ptr(true),
-				DisableWatermark:     gu.Ptr(true),
-				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-				FontURL:              &url.URL{Scheme: "https", Host: "host"},
-			},
+			PrimaryColorLight:    "color",
+			BackgroundColorLight: "color",
+			WarnColorLight:       "color",
+			FontColorLight:       "color",
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     "color",
+			BackgroundColorDark:  "color",
+			WarnColorDark:        "color",
+			FontColorDark:        "color",
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  true,
+			ErrorMessagePopup:    true,
+			DisableWatermark:     true,
+			ThemeMode:            domain.BrandingPolicyThemeAuto,
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				PrimaryColorLight:    gu.Ptr("color"),
-				BackgroundColorLight: gu.Ptr("color"),
-				WarnColorLight:       gu.Ptr("color"),
-				FontColorLight:       gu.Ptr("color"),
-				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				PrimaryColorDark:     gu.Ptr("color"),
-				BackgroundColorDark:  gu.Ptr("color"),
-				WarnColorDark:        gu.Ptr("color"),
-				FontColorDark:        gu.Ptr("color"),
-				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				HideLoginNameSuffix:  gu.Ptr(true),
-				ErrorMsgPopup:        gu.Ptr(true),
-				DisableWatermark:     gu.Ptr(true),
-				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-				FontURL:              &url.URL{Scheme: "https", Host: "host"},
-			},
+			PrimaryColorLight:    "color",
+			BackgroundColorLight: "color",
+			WarnColorLight:       "color",
+			FontColorLight:       "color",
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     "color",
+			BackgroundColorDark:  "color",
+			WarnColorDark:        "color",
+			FontColorDark:        "color",
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  true,
+			ErrorMessagePopup:    true,
+			DisableWatermark:     true,
+			ThemeMode:            domain.BrandingPolicyThemeAuto,
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
 		},
 	}
 
@@ -743,12 +760,12 @@ func TestGetBrandingSettings(t *testing.T) {
 		err := repo.Set(t.Context(), tx, setting)
 		require.NoError(t, err)
 	}
-	_, err := repo.Activate(t.Context(), tx, repo.UniqueCondition(settings[0].InstanceID, settings[0].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview))
+	_, err := repo.ActivateAt(t.Context(), tx, repo.UniqueCondition(settings[0].InstanceID, settings[0].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview), now)
 	require.NoError(t, err)
 	activeInstanceSetting := *settings[0]
 	activeInstanceSetting.State = domain.SettingStateActive
 
-	_, err = repo.Activate(t.Context(), tx, repo.UniqueCondition(settings[3].InstanceID, settings[3].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview))
+	_, err = repo.ActivateAt(t.Context(), tx, repo.UniqueCondition(settings[3].InstanceID, settings[3].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview), now)
 	require.NoError(t, err)
 	activeOrganizationSetting := *settings[3]
 	activeOrganizationSetting.State = domain.SettingStateActive
@@ -756,17 +773,17 @@ func TestGetBrandingSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.BrandingSettings
+		want      *domain.BrandingSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
-			condition: repo.IDCondition(settings[0].ID),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			condition: repo.OrganizationIDCondition(&firstOrgID),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "not found",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
 			wantErr:   database.NewNoRowFoundError(nil),
 		},
 		{
@@ -777,7 +794,8 @@ func TestGetBrandingSettings(t *testing.T) {
 		{
 			name: "ok, instance",
 			condition: database.And(
-				repo.PrimaryKeyCondition(settings[0].InstanceID, settings[0].ID),
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(nil),
 				repo.StateCondition(domain.SettingStatePreview),
 			),
 			want: settings[0],
@@ -785,7 +803,8 @@ func TestGetBrandingSettings(t *testing.T) {
 		{
 			name: "ok, instance, active",
 			condition: database.And(
-				repo.PrimaryKeyCondition(activeInstanceSetting.InstanceID, activeInstanceSetting.ID),
+				repo.InstanceIDCondition(activeInstanceSetting.InstanceID),
+				repo.OrganizationIDCondition(nil),
 				repo.StateCondition(domain.SettingStateActive),
 			),
 			want: &activeInstanceSetting,
@@ -793,15 +812,17 @@ func TestGetBrandingSettings(t *testing.T) {
 		{
 			name: "ok, organization",
 			condition: database.And(
-				repo.PrimaryKeyCondition(settings[3].InstanceID, settings[3].ID),
+				repo.InstanceIDCondition(settings[3].InstanceID),
+				repo.OrganizationIDCondition(settings[3].OrganizationID),
 				repo.StateCondition(domain.SettingStatePreview),
 			),
 			want: settings[3],
 		},
 		{
-			name: "ok, organization",
+			name: "ok, organization, active",
 			condition: database.And(
-				repo.PrimaryKeyCondition(activeOrganizationSetting.InstanceID, activeOrganizationSetting.ID),
+				repo.InstanceIDCondition(activeOrganizationSetting.InstanceID),
+				repo.OrganizationIDCondition(activeOrganizationSetting.OrganizationID),
 				repo.StateCondition(domain.SettingStateActive),
 			),
 			want: &activeOrganizationSetting,
@@ -818,114 +839,118 @@ func TestGetBrandingSettings(t *testing.T) {
 
 func TestListBrandingSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.BrandingSettingsRepository()
+	repo := repository.BrandingSettings()
 
-	settings := []*domain.BrandingSettings{
+	settings := []*domain.BrandingSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				PrimaryColorLight:    gu.Ptr("color"),
-				BackgroundColorLight: gu.Ptr("color"),
-				WarnColorLight:       gu.Ptr("color"),
-				FontColorLight:       gu.Ptr("color"),
-				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				PrimaryColorDark:     gu.Ptr("color"),
-				BackgroundColorDark:  gu.Ptr("color"),
-				WarnColorDark:        gu.Ptr("color"),
-				FontColorDark:        gu.Ptr("color"),
-				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				HideLoginNameSuffix:  gu.Ptr(true),
-				ErrorMsgPopup:        gu.Ptr(true),
-				DisableWatermark:     gu.Ptr(true),
-				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-				FontURL:              &url.URL{Scheme: "https", Host: "host"},
-			},
+			PrimaryColorLight:    "color",
+			BackgroundColorLight: "color",
+			WarnColorLight:       "color",
+			FontColorLight:       "color",
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     "color",
+			BackgroundColorDark:  "color",
+			WarnColorDark:        "color",
+			FontColorDark:        "color",
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  true,
+			ErrorMessagePopup:    true,
+			DisableWatermark:     true,
+			ThemeMode:            domain.BrandingPolicyThemeAuto,
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				PrimaryColorLight:    gu.Ptr("color"),
-				BackgroundColorLight: gu.Ptr("color"),
-				WarnColorLight:       gu.Ptr("color"),
-				FontColorLight:       gu.Ptr("color"),
-				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				PrimaryColorDark:     gu.Ptr("color"),
-				BackgroundColorDark:  gu.Ptr("color"),
-				WarnColorDark:        gu.Ptr("color"),
-				FontColorDark:        gu.Ptr("color"),
-				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				HideLoginNameSuffix:  gu.Ptr(true),
-				ErrorMsgPopup:        gu.Ptr(true),
-				DisableWatermark:     gu.Ptr(true),
-				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-				FontURL:              &url.URL{Scheme: "https", Host: "host"},
-			},
+			PrimaryColorLight:    "color",
+			BackgroundColorLight: "color",
+			WarnColorLight:       "color",
+			FontColorLight:       "color",
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     "color",
+			BackgroundColorDark:  "color",
+			WarnColorDark:        "color",
+			FontColorDark:        "color",
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  true,
+			ErrorMessagePopup:    true,
+			DisableWatermark:     true,
+			ThemeMode:            domain.BrandingPolicyThemeAuto,
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				PrimaryColorLight:    gu.Ptr("color"),
-				BackgroundColorLight: gu.Ptr("color"),
-				WarnColorLight:       gu.Ptr("color"),
-				FontColorLight:       gu.Ptr("color"),
-				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				PrimaryColorDark:     gu.Ptr("color"),
-				BackgroundColorDark:  gu.Ptr("color"),
-				WarnColorDark:        gu.Ptr("color"),
-				FontColorDark:        gu.Ptr("color"),
-				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				HideLoginNameSuffix:  gu.Ptr(true),
-				ErrorMsgPopup:        gu.Ptr(true),
-				DisableWatermark:     gu.Ptr(true),
-				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-				FontURL:              &url.URL{Scheme: "https", Host: "host"},
-			},
+			PrimaryColorLight:    "color",
+			BackgroundColorLight: "color",
+			WarnColorLight:       "color",
+			FontColorLight:       "color",
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     "color",
+			BackgroundColorDark:  "color",
+			WarnColorDark:        "color",
+			FontColorDark:        "color",
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  true,
+			ErrorMessagePopup:    true,
+			DisableWatermark:     true,
+			ThemeMode:            domain.BrandingPolicyThemeAuto,
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				PrimaryColorLight:    gu.Ptr("color"),
-				BackgroundColorLight: gu.Ptr("color"),
-				WarnColorLight:       gu.Ptr("color"),
-				FontColorLight:       gu.Ptr("color"),
-				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-				PrimaryColorDark:     gu.Ptr("color"),
-				BackgroundColorDark:  gu.Ptr("color"),
-				WarnColorDark:        gu.Ptr("color"),
-				FontColorDark:        gu.Ptr("color"),
-				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-				HideLoginNameSuffix:  gu.Ptr(true),
-				ErrorMsgPopup:        gu.Ptr(true),
-				DisableWatermark:     gu.Ptr(true),
-				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-				FontURL:              &url.URL{Scheme: "https", Host: "host"},
-			},
+			PrimaryColorLight:    "color",
+			BackgroundColorLight: "color",
+			WarnColorLight:       "color",
+			FontColorLight:       "color",
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     "color",
+			BackgroundColorDark:  "color",
+			WarnColorDark:        "color",
+			FontColorDark:        "color",
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  true,
+			ErrorMessagePopup:    true,
+			DisableWatermark:     true,
+			ThemeMode:            domain.BrandingPolicyThemeAuto,
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
 		},
 	}
 
@@ -933,12 +958,12 @@ func TestListBrandingSettings(t *testing.T) {
 		err := repo.Set(t.Context(), tx, setting)
 		require.NoError(t, err)
 	}
-	_, err := repo.Activate(t.Context(), tx, repo.UniqueCondition(settings[0].InstanceID, settings[0].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview))
+	_, err := repo.ActivateAt(t.Context(), tx, repo.UniqueCondition(settings[0].InstanceID, settings[0].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview), now)
 	require.NoError(t, err)
 	activeInstanceSetting := *settings[0]
 	activeInstanceSetting.State = domain.SettingStateActive
 
-	_, err = repo.Activate(t.Context(), tx, repo.UniqueCondition(settings[2].InstanceID, settings[2].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview))
+	_, err = repo.ActivateAt(t.Context(), tx, repo.UniqueCondition(settings[2].InstanceID, settings[2].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview), now)
 	require.NoError(t, err)
 	activeOrganizationSetting := *settings[2]
 	activeOrganizationSetting.State = domain.SettingStateActive
@@ -946,23 +971,23 @@ func TestListBrandingSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.BrandingSettings
+		want      []*domain.BrandingSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
 			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "no results, ok",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.BrandingSettings{},
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
+			want:      []*domain.BrandingSetting{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.BrandingSettings{&activeOrganizationSetting, settings[2], &activeInstanceSetting, settings[0]},
+			want:      []*domain.BrandingSetting{&activeOrganizationSetting, settings[2], &activeInstanceSetting, settings[0]},
 		},
 		{
 			name: "all from instance, preview",
@@ -970,7 +995,7 @@ func TestListBrandingSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.StateCondition(domain.SettingStatePreview),
 			),
-			want: []*domain.BrandingSettings{settings[2], settings[0]},
+			want: []*domain.BrandingSetting{settings[2], settings[0]},
 		},
 		{
 			name: "all from instance, active",
@@ -978,7 +1003,7 @@ func TestListBrandingSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.StateCondition(domain.SettingStateActive),
 			),
-			want: []*domain.BrandingSettings{&activeOrganizationSetting, &activeInstanceSetting},
+			want: []*domain.BrandingSetting{&activeOrganizationSetting, &activeInstanceSetting},
 		},
 		{
 			name: "only from instance",
@@ -986,7 +1011,7 @@ func TestListBrandingSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.BrandingSettings{&activeInstanceSetting, settings[0]},
+			want: []*domain.BrandingSetting{&activeInstanceSetting, settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -994,7 +1019,7 @@ func TestListBrandingSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.BrandingSettings{&activeOrganizationSetting, settings[2]},
+			want: []*domain.BrandingSetting{&activeOrganizationSetting, settings[2]},
 		},
 	}
 
@@ -1018,36 +1043,37 @@ func TestListBrandingSettings(t *testing.T) {
 
 func TestSetBrandingSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.BrandingSettingsRepository()
+	repo := repository.BrandingSettings()
 
-	existingSettings := &domain.BrandingSettings{
-		Settings: domain.Settings{
+	existingSettings := &domain.BrandingSetting{
+		Setting: domain.Setting{
 			InstanceID:     instanceID,
 			OrganizationID: gu.Ptr(orgID),
+			ID:             gofakeit.UUID(),
+			CreatedAt:      now,
+			UpdatedAt:      now,
 		},
-		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-			PrimaryColorLight:    gu.Ptr("color"),
-			BackgroundColorLight: gu.Ptr("color"),
-			WarnColorLight:       gu.Ptr("color"),
-			FontColorLight:       gu.Ptr("color"),
-			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			PrimaryColorDark:     gu.Ptr("color"),
-			BackgroundColorDark:  gu.Ptr("color"),
-			WarnColorDark:        gu.Ptr("color"),
-			FontColorDark:        gu.Ptr("color"),
-			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			HideLoginNameSuffix:  gu.Ptr(true),
-			ErrorMsgPopup:        gu.Ptr(true),
-			DisableWatermark:     gu.Ptr(true),
-			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-			FontURL:              &url.URL{Scheme: "https", Host: "host"},
-		},
+		PrimaryColorLight:    "color",
+		BackgroundColorLight: "color",
+		WarnColorLight:       "color",
+		FontColorLight:       "color",
+		LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+		IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+		PrimaryColorDark:     "color",
+		BackgroundColorDark:  "color",
+		WarnColorDark:        "color",
+		FontColorDark:        "color",
+		LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+		IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+		HideLoginNameSuffix:  true,
+		ErrorMessagePopup:    true,
+		DisableWatermark:     true,
+		ThemeMode:            domain.BrandingPolicyThemeAuto,
+		FontURL:              &url.URL{Scheme: "https", Host: "host"},
 	}
 
 	err := repo.Set(t.Context(), tx, existingSettings)
@@ -1055,127 +1081,126 @@ func TestSetBrandingSettings(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings *domain.BrandingSettings
+		settings *domain.BrandingSetting
 		wantErr  error
 	}{
 		{
 			name: "create instance",
-			settings: &domain.BrandingSettings{
-				Settings: domain.Settings{
+			settings: &domain.BrandingSetting{
+				Setting: domain.Setting{
 					InstanceID:     instanceID,
 					OrganizationID: nil,
+					ID:             gofakeit.UUID(),
+					CreatedAt:      now,
+					UpdatedAt:      now,
 				},
-				BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-					PrimaryColorLight:    gu.Ptr("color"),
-					BackgroundColorLight: gu.Ptr("color"),
-					WarnColorLight:       gu.Ptr("color"),
-					FontColorLight:       gu.Ptr("color"),
-					LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-					IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-					PrimaryColorDark:     gu.Ptr("color"),
-					BackgroundColorDark:  gu.Ptr("color"),
-					WarnColorDark:        gu.Ptr("color"),
-					FontColorDark:        gu.Ptr("color"),
-					LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-					IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-					HideLoginNameSuffix:  gu.Ptr(true),
-					ErrorMsgPopup:        gu.Ptr(true),
-					DisableWatermark:     gu.Ptr(true),
-					ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-					FontURL:              &url.URL{Scheme: "https", Host: "host"},
-				},
+				PrimaryColorLight:    "color",
+				BackgroundColorLight: "color",
+				WarnColorLight:       "color",
+				FontColorLight:       "color",
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     "color",
+				BackgroundColorDark:  "color",
+				WarnColorDark:        "color",
+				FontColorDark:        "color",
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  true,
+				ErrorMessagePopup:    true,
+				DisableWatermark:     true,
+				ThemeMode:            domain.BrandingPolicyThemeAuto,
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
 			},
 		},
 		{
 			name: "update organization",
-			settings: &domain.BrandingSettings{
-				Settings: domain.Settings{
+			settings: &domain.BrandingSetting{
+				Setting: domain.Setting{
 					InstanceID:     instanceID,
 					OrganizationID: gu.Ptr(orgID),
+					ID:             gofakeit.UUID(),
+					CreatedAt:      now,
+					UpdatedAt:      now,
 				},
-				BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-					PrimaryColorLight:    gu.Ptr("color"),
-					BackgroundColorLight: gu.Ptr("color"),
-					WarnColorLight:       gu.Ptr("color"),
-					FontColorLight:       gu.Ptr("color"),
-					LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-					IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-					PrimaryColorDark:     gu.Ptr("color"),
-					BackgroundColorDark:  gu.Ptr("color"),
-					WarnColorDark:        gu.Ptr("color"),
-					FontColorDark:        gu.Ptr("color"),
-					LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-					IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-					HideLoginNameSuffix:  gu.Ptr(true),
-					ErrorMsgPopup:        gu.Ptr(true),
-					DisableWatermark:     gu.Ptr(true),
-					ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-					FontURL:              &url.URL{Scheme: "https", Host: "host"},
-				},
+				PrimaryColorLight:    "color",
+				BackgroundColorLight: "color",
+				WarnColorLight:       "color",
+				FontColorLight:       "color",
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     "color",
+				BackgroundColorDark:  "color",
+				WarnColorDark:        "color",
+				FontColorDark:        "color",
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  true,
+				ErrorMessagePopup:    true,
+				DisableWatermark:     true,
+				ThemeMode:            domain.BrandingPolicyThemeAuto,
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
 			},
 		},
 		{
 			name: "non-existing instance",
-			settings: &domain.BrandingSettings{
-				Settings: domain.Settings{
+			settings: &domain.BrandingSetting{
+				Setting: domain.Setting{
 					InstanceID:     "foo",
 					OrganizationID: nil,
+					ID:             gofakeit.UUID(),
+					CreatedAt:      now,
+					UpdatedAt:      now,
 				},
-				BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-					PrimaryColorLight:    gu.Ptr("color"),
-					BackgroundColorLight: gu.Ptr("color"),
-					WarnColorLight:       gu.Ptr("color"),
-					FontColorLight:       gu.Ptr("color"),
-					LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-					IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-					PrimaryColorDark:     gu.Ptr("color"),
-					BackgroundColorDark:  gu.Ptr("color"),
-					WarnColorDark:        gu.Ptr("color"),
-					FontColorDark:        gu.Ptr("color"),
-					LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-					IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-					HideLoginNameSuffix:  gu.Ptr(true),
-					ErrorMsgPopup:        gu.Ptr(true),
-					DisableWatermark:     gu.Ptr(true),
-					ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-					FontURL:              &url.URL{Scheme: "https", Host: "host"},
-				},
+				PrimaryColorLight:    "color",
+				BackgroundColorLight: "color",
+				WarnColorLight:       "color",
+				FontColorLight:       "color",
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     "color",
+				BackgroundColorDark:  "color",
+				WarnColorDark:        "color",
+				FontColorDark:        "color",
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  true,
+				ErrorMessagePopup:    true,
+				DisableWatermark:     true,
+				ThemeMode:            domain.BrandingPolicyThemeAuto,
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
 		{
 			name: "non-existing org",
-			settings: &domain.BrandingSettings{
-				Settings: domain.Settings{
+			settings: &domain.BrandingSetting{
+				Setting: domain.Setting{
 					InstanceID:     instanceID,
 					OrganizationID: gu.Ptr("foo"),
+					ID:             gofakeit.UUID(),
+					CreatedAt:      now,
+					UpdatedAt:      now,
 				},
-				BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-					PrimaryColorLight:    gu.Ptr("color"),
-					BackgroundColorLight: gu.Ptr("color"),
-					WarnColorLight:       gu.Ptr("color"),
-					FontColorLight:       gu.Ptr("color"),
-					LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-					IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-					PrimaryColorDark:     gu.Ptr("color"),
-					BackgroundColorDark:  gu.Ptr("color"),
-					WarnColorDark:        gu.Ptr("color"),
-					FontColorDark:        gu.Ptr("color"),
-					LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-					IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-					HideLoginNameSuffix:  gu.Ptr(true),
-					ErrorMsgPopup:        gu.Ptr(true),
-					DisableWatermark:     gu.Ptr(true),
-					ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-					FontURL:              &url.URL{Scheme: "https", Host: "host"},
-				},
+				PrimaryColorLight:    "color",
+				BackgroundColorLight: "color",
+				WarnColorLight:       "color",
+				FontColorLight:       "color",
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     "color",
+				BackgroundColorDark:  "color",
+				WarnColorDark:        "color",
+				FontColorDark:        "color",
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  true,
+				ErrorMessagePopup:    true,
+				DisableWatermark:     true,
+				ThemeMode:            domain.BrandingPolicyThemeAuto,
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
 			},
 			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  database.ErrInvalidChangeTarget,
 		},
 	}
 	for _, tt := range tests {
@@ -1190,65 +1215,67 @@ func TestSetBrandingSettings(t *testing.T) {
 
 func TestActivateBrandingSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.BrandingSettingsRepository()
+	repo := repository.BrandingSettings()
 
-	existingInstanceSettings := &domain.BrandingSettings{
-		Settings: domain.Settings{
+	existingInstanceSettings := &domain.BrandingSetting{
+		Setting: domain.Setting{
 			InstanceID:     instanceID,
 			OrganizationID: nil,
+			ID:             gofakeit.UUID(),
+			CreatedAt:      now,
+			UpdatedAt:      now,
 		},
-		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-			PrimaryColorLight:    gu.Ptr("color"),
-			BackgroundColorLight: gu.Ptr("color"),
-			WarnColorLight:       gu.Ptr("color"),
-			FontColorLight:       gu.Ptr("color"),
-			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			PrimaryColorDark:     gu.Ptr("color"),
-			BackgroundColorDark:  gu.Ptr("color"),
-			WarnColorDark:        gu.Ptr("color"),
-			FontColorDark:        gu.Ptr("color"),
-			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			HideLoginNameSuffix:  gu.Ptr(true),
-			ErrorMsgPopup:        gu.Ptr(true),
-			DisableWatermark:     gu.Ptr(true),
-			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-			FontURL:              &url.URL{Scheme: "https", Host: "host"},
-		},
+		PrimaryColorLight:    "color",
+		BackgroundColorLight: "color",
+		WarnColorLight:       "color",
+		FontColorLight:       "color",
+		LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+		IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+		PrimaryColorDark:     "color",
+		BackgroundColorDark:  "color",
+		WarnColorDark:        "color",
+		FontColorDark:        "color",
+		LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+		IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+		HideLoginNameSuffix:  true,
+		ErrorMessagePopup:    true,
+		DisableWatermark:     true,
+		ThemeMode:            domain.BrandingPolicyThemeAuto,
+		FontURL:              &url.URL{Scheme: "https", Host: "host"},
 	}
 
 	err := repo.Set(t.Context(), tx, existingInstanceSettings)
 	require.NoError(t, err)
 
-	existingOrganizationSettings := &domain.BrandingSettings{
-		Settings: domain.Settings{
+	existingOrganizationSettings := &domain.BrandingSetting{
+		Setting: domain.Setting{
 			InstanceID:     instanceID,
 			OrganizationID: gu.Ptr(orgID),
+			ID:             gofakeit.UUID(),
+			CreatedAt:      now,
+			UpdatedAt:      now,
 		},
-		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-			PrimaryColorLight:    gu.Ptr("color"),
-			BackgroundColorLight: gu.Ptr("color"),
-			WarnColorLight:       gu.Ptr("color"),
-			FontColorLight:       gu.Ptr("color"),
-			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			PrimaryColorDark:     gu.Ptr("color"),
-			BackgroundColorDark:  gu.Ptr("color"),
-			WarnColorDark:        gu.Ptr("color"),
-			FontColorDark:        gu.Ptr("color"),
-			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			HideLoginNameSuffix:  gu.Ptr(true),
-			ErrorMsgPopup:        gu.Ptr(true),
-			DisableWatermark:     gu.Ptr(true),
-			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-			FontURL:              &url.URL{Scheme: "https", Host: "host"},
-		},
+		PrimaryColorLight:    "color",
+		BackgroundColorLight: "color",
+		WarnColorLight:       "color",
+		FontColorLight:       "color",
+		LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+		IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+		PrimaryColorDark:     "color",
+		BackgroundColorDark:  "color",
+		WarnColorDark:        "color",
+		FontColorDark:        "color",
+		LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+		IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+		HideLoginNameSuffix:  true,
+		ErrorMessagePopup:    true,
+		DisableWatermark:     true,
+		ThemeMode:            domain.BrandingPolicyThemeAuto,
+		FontURL:              &url.URL{Scheme: "https", Host: "host"},
 	}
 
 	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
@@ -1313,168 +1340,39 @@ func TestActivateBrandingSettings(t *testing.T) {
 	}
 }
 
-func TestActivateAtBrandingSettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.BrandingSettingsRepository()
-
-	existingInstanceSettings := &domain.BrandingSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: nil,
-		},
-		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-			PrimaryColorLight:    gu.Ptr("color"),
-			BackgroundColorLight: gu.Ptr("color"),
-			WarnColorLight:       gu.Ptr("color"),
-			FontColorLight:       gu.Ptr("color"),
-			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			PrimaryColorDark:     gu.Ptr("color"),
-			BackgroundColorDark:  gu.Ptr("color"),
-			WarnColorDark:        gu.Ptr("color"),
-			FontColorDark:        gu.Ptr("color"),
-			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			HideLoginNameSuffix:  gu.Ptr(true),
-			ErrorMsgPopup:        gu.Ptr(true),
-			DisableWatermark:     gu.Ptr(true),
-			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-			FontURL:              &url.URL{Scheme: "https", Host: "host"},
-		},
-	}
-
-	err := repo.Set(t.Context(), tx, existingInstanceSettings)
-	require.NoError(t, err)
-
-	existingOrganizationSettings := &domain.BrandingSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-			PrimaryColorLight:    gu.Ptr("color"),
-			BackgroundColorLight: gu.Ptr("color"),
-			WarnColorLight:       gu.Ptr("color"),
-			FontColorLight:       gu.Ptr("color"),
-			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			PrimaryColorDark:     gu.Ptr("color"),
-			BackgroundColorDark:  gu.Ptr("color"),
-			WarnColorDark:        gu.Ptr("color"),
-			FontColorDark:        gu.Ptr("color"),
-			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			HideLoginNameSuffix:  gu.Ptr(true),
-			ErrorMsgPopup:        gu.Ptr(true),
-			DisableWatermark:     gu.Ptr(true),
-			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-			FontURL:              &url.URL{Scheme: "https", Host: "host"},
-		},
-	}
-
-	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name             string
-		wantRowsAffected int64
-		condition        database.Condition
-		updatedAt        time.Time
-		wantErr          error
-	}{
-		{
-			name: "activate instance",
-			condition: repo.UniqueCondition(
-				existingInstanceSettings.InstanceID,
-				nil,
-				domain.SettingTypeBranding,
-				domain.SettingStatePreview,
-			),
-			updatedAt:        time.Now(),
-			wantRowsAffected: 1,
-		},
-		{
-			name: "activate organization",
-			condition: repo.UniqueCondition(
-				existingOrganizationSettings.InstanceID,
-				existingOrganizationSettings.OrganizationID,
-				domain.SettingTypeBranding,
-				domain.SettingStatePreview,
-			),
-			updatedAt:        time.Now(),
-			wantRowsAffected: 1,
-		},
-		{
-			name: "non-existing instance",
-			condition: repo.UniqueCondition(
-				"foo",
-				nil,
-				domain.SettingTypeBranding,
-				domain.SettingStatePreview,
-			),
-			updatedAt:        time.Now(),
-			wantRowsAffected: 0,
-		},
-
-		{
-			name: "non-existing organization",
-			condition: repo.UniqueCondition(
-				existingOrganizationSettings.InstanceID,
-				gu.Ptr("foo"),
-				domain.SettingTypeBranding,
-				domain.SettingStatePreview,
-			),
-			updatedAt:        time.Now(),
-			wantRowsAffected: 0,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			rowsAffected, err := repo.ActivateAt(t.Context(), savepoint, tt.condition, tt.updatedAt)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
-		})
-	}
-}
-
 func TestDeleteBrandingSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.BrandingSettingsRepository()
+	repo := repository.BrandingSettings()
 
-	existingInstanceSettings := &domain.BrandingSettings{
-		Settings: domain.Settings{
+	existingInstanceSettings := &domain.BrandingSetting{
+		Setting: domain.Setting{
 			InstanceID:     instanceID,
 			OrganizationID: nil,
+			ID:             gofakeit.UUID(),
+			CreatedAt:      now,
+			UpdatedAt:      now,
 		},
-		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-			PrimaryColorLight:    gu.Ptr("color"),
-			BackgroundColorLight: gu.Ptr("color"),
-			WarnColorLight:       gu.Ptr("color"),
-			FontColorLight:       gu.Ptr("color"),
-			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			PrimaryColorDark:     gu.Ptr("color"),
-			BackgroundColorDark:  gu.Ptr("color"),
-			WarnColorDark:        gu.Ptr("color"),
-			FontColorDark:        gu.Ptr("color"),
-			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			HideLoginNameSuffix:  gu.Ptr(true),
-			ErrorMsgPopup:        gu.Ptr(true),
-			DisableWatermark:     gu.Ptr(true),
-			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-			FontURL:              &url.URL{Scheme: "https", Host: "host"},
-		},
+		PrimaryColorLight:    "color",
+		BackgroundColorLight: "color",
+		WarnColorLight:       "color",
+		FontColorLight:       "color",
+		LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+		IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+		PrimaryColorDark:     "color",
+		BackgroundColorDark:  "color",
+		WarnColorDark:        "color",
+		FontColorDark:        "color",
+		LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+		IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+		HideLoginNameSuffix:  true,
+		ErrorMessagePopup:    true,
+		DisableWatermark:     true,
+		ThemeMode:            domain.BrandingPolicyThemeAuto,
+		FontURL:              &url.URL{Scheme: "https", Host: "host"},
 	}
 	err := repo.Set(t.Context(), tx, existingInstanceSettings)
 	require.NoError(t, err)
@@ -1488,33 +1386,32 @@ func TestDeleteBrandingSettings(t *testing.T) {
 		),
 	)
 	require.NoError(t, err)
-	activeInstanceSetting := *existingInstanceSettings
-	activeInstanceSetting.State = domain.SettingStateActive
 
-	existingOrganizationSettings := &domain.BrandingSettings{
-		Settings: domain.Settings{
+	existingOrganizationSettings := &domain.BrandingSetting{
+		Setting: domain.Setting{
 			InstanceID:     instanceID,
 			OrganizationID: gu.Ptr(orgID),
+			ID:             gofakeit.UUID(),
+			CreatedAt:      now,
+			UpdatedAt:      now,
 		},
-		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-			PrimaryColorLight:    gu.Ptr("color"),
-			BackgroundColorLight: gu.Ptr("color"),
-			WarnColorLight:       gu.Ptr("color"),
-			FontColorLight:       gu.Ptr("color"),
-			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
-			PrimaryColorDark:     gu.Ptr("color"),
-			BackgroundColorDark:  gu.Ptr("color"),
-			WarnColorDark:        gu.Ptr("color"),
-			FontColorDark:        gu.Ptr("color"),
-			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
-			HideLoginNameSuffix:  gu.Ptr(true),
-			ErrorMsgPopup:        gu.Ptr(true),
-			DisableWatermark:     gu.Ptr(true),
-			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
-			FontURL:              &url.URL{Scheme: "https", Host: "host"},
-		},
+		PrimaryColorLight:    "color",
+		BackgroundColorLight: "color",
+		WarnColorLight:       "color",
+		FontColorLight:       "color",
+		LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+		IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+		PrimaryColorDark:     "color",
+		BackgroundColorDark:  "color",
+		WarnColorDark:        "color",
+		FontColorDark:        "color",
+		LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+		IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+		HideLoginNameSuffix:  true,
+		ErrorMessagePopup:    true,
+		DisableWatermark:     true,
+		ThemeMode:            domain.BrandingPolicyThemeAuto,
+		FontURL:              &url.URL{Scheme: "https", Host: "host"},
 	}
 	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
 	require.NoError(t, err)
@@ -1528,8 +1425,6 @@ func TestDeleteBrandingSettings(t *testing.T) {
 		),
 	)
 	require.NoError(t, err)
-	activeOrganizationSetting := *existingOrganizationSettings
-	activeOrganizationSetting.State = domain.SettingStateActive
 
 	tests := []struct {
 		name             string
@@ -1539,9 +1434,9 @@ func TestDeleteBrandingSettings(t *testing.T) {
 	}{
 		{
 			name:             "incomplete condition",
-			condition:        repo.InstanceIDCondition(instanceID),
+			condition:        repo.OrganizationIDCondition(&orgID),
 			wantRowsAffected: 0,
-			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:          database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:             "not found",
@@ -1596,66 +1491,70 @@ func TestDeleteBrandingSettings(t *testing.T) {
 
 func TestGetPasswordComplexitySettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.PasswordComplexitySettingsRepository()
+	repo := repository.PasswordComplexitySettings()
 
-	settings := []*domain.PasswordComplexitySettings{
+	settings := []*domain.PasswordComplexitySetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-				MinLength:    gu.Ptr(uint64(8)),
-				HasLowercase: gu.Ptr(true),
-				HasUppercase: gu.Ptr(true),
-				HasNumber:    gu.Ptr(true),
-				HasSymbol:    gu.Ptr(true),
-			},
+			MinLength:    uint64(8),
+			HasLowercase: true,
+			HasUppercase: true,
+			HasNumber:    true,
+			HasSymbol:    true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-				MinLength:    gu.Ptr(uint64(10)),
-				HasLowercase: gu.Ptr(true),
-				HasUppercase: gu.Ptr(true),
-				HasNumber:    gu.Ptr(true),
-				HasSymbol:    gu.Ptr(true),
-			},
+			MinLength:    uint64(10),
+			HasLowercase: true,
+			HasUppercase: true,
+			HasNumber:    true,
+			HasSymbol:    true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-				MinLength:    gu.Ptr(uint64(12)),
-				HasLowercase: gu.Ptr(true),
-				HasUppercase: gu.Ptr(true),
-				HasNumber:    gu.Ptr(true),
-				HasSymbol:    gu.Ptr(true),
-			},
+			MinLength:    uint64(12),
+			HasLowercase: true,
+			HasUppercase: true,
+			HasNumber:    true,
+			HasSymbol:    true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-				MinLength:    gu.Ptr(uint64(14)),
-				HasLowercase: gu.Ptr(true),
-				HasUppercase: gu.Ptr(true),
-				HasNumber:    gu.Ptr(true),
-				HasSymbol:    gu.Ptr(true),
-			},
+			MinLength:    uint64(14),
+			HasLowercase: true,
+			HasUppercase: true,
+			HasNumber:    true,
+			HasSymbol:    true,
 		},
 	}
 
@@ -1667,17 +1566,17 @@ func TestGetPasswordComplexitySettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.PasswordComplexitySettings
+		want      *domain.PasswordComplexitySetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
-			condition: repo.IDCondition(settings[0].ID),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			condition: repo.OrganizationIDCondition(settings[0].OrganizationID),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "not found",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
 			wantErr:   database.NewNoRowFoundError(nil),
 		},
 		{
@@ -1687,12 +1586,12 @@ func TestGetPasswordComplexitySettings(t *testing.T) {
 		},
 		{
 			name:      "ok, instance",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[0].InstanceID), repo.OrganizationIDCondition(settings[0].OrganizationID)),
 			want:      settings[0],
 		},
 		{
 			name:      "ok, organization",
-			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[3].InstanceID), repo.OrganizationIDCondition(settings[3].OrganizationID)),
 			want:      settings[3],
 		},
 	}
@@ -1707,66 +1606,70 @@ func TestGetPasswordComplexitySettings(t *testing.T) {
 
 func TestListPasswordComplexitySettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.PasswordComplexitySettingsRepository()
+	repo := repository.PasswordComplexitySettings()
 
-	settings := []*domain.PasswordComplexitySettings{
+	settings := []*domain.PasswordComplexitySetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-				MinLength:    gu.Ptr(uint64(8)),
-				HasLowercase: gu.Ptr(true),
-				HasUppercase: gu.Ptr(true),
-				HasNumber:    gu.Ptr(true),
-				HasSymbol:    gu.Ptr(true),
-			},
+			MinLength:    uint64(8),
+			HasLowercase: true,
+			HasUppercase: true,
+			HasNumber:    true,
+			HasSymbol:    true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-				MinLength:    gu.Ptr(uint64(10)),
-				HasLowercase: gu.Ptr(true),
-				HasUppercase: gu.Ptr(true),
-				HasNumber:    gu.Ptr(true),
-				HasSymbol:    gu.Ptr(true),
-			},
+			MinLength:    uint64(10),
+			HasLowercase: true,
+			HasUppercase: true,
+			HasNumber:    true,
+			HasSymbol:    true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-				MinLength:    gu.Ptr(uint64(10)),
-				HasLowercase: gu.Ptr(true),
-				HasUppercase: gu.Ptr(true),
-				HasNumber:    gu.Ptr(true),
-				HasSymbol:    gu.Ptr(true),
-			},
+			MinLength:    uint64(10),
+			HasLowercase: true,
+			HasUppercase: true,
+			HasNumber:    true,
+			HasSymbol:    true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-				MinLength:    gu.Ptr(uint64(12)),
-				HasLowercase: gu.Ptr(true),
-				HasUppercase: gu.Ptr(true),
-				HasNumber:    gu.Ptr(true),
-				HasSymbol:    gu.Ptr(true),
-			},
+			MinLength:    uint64(12),
+			HasLowercase: true,
+			HasUppercase: true,
+			HasNumber:    true,
+			HasSymbol:    true,
 		},
 	}
 
@@ -1778,23 +1681,23 @@ func TestListPasswordComplexitySettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.PasswordComplexitySettings
+		want      []*domain.PasswordComplexitySetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
 			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "no results, ok",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.PasswordComplexitySettings{},
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
+			want:      []*domain.PasswordComplexitySetting{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.PasswordComplexitySettings{settings[2], settings[0]},
+			want:      []*domain.PasswordComplexitySetting{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -1802,7 +1705,7 @@ func TestListPasswordComplexitySettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.PasswordComplexitySettings{settings[0]},
+			want: []*domain.PasswordComplexitySetting{settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -1810,7 +1713,7 @@ func TestListPasswordComplexitySettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.PasswordComplexitySettings{settings[2]},
+			want: []*domain.PasswordComplexitySetting{settings[2]},
 		},
 	}
 
@@ -1826,256 +1729,60 @@ func TestListPasswordComplexitySettings(t *testing.T) {
 	}
 }
 
-func TestSetPasswordComplexitySettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.PasswordComplexitySettingsRepository()
-
-	existingSettings := &domain.PasswordComplexitySettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-			MinLength:    gu.Ptr(uint64(8)),
-			HasLowercase: gu.Ptr(true),
-			HasUppercase: gu.Ptr(true),
-			HasNumber:    gu.Ptr(true),
-			HasSymbol:    gu.Ptr(true),
-		},
-	}
-
-	err := repo.Set(t.Context(), tx, existingSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name     string
-		settings *domain.PasswordComplexitySettings
-		wantErr  error
-	}{
-		{
-			name: "create instance",
-			settings: &domain.PasswordComplexitySettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: nil,
-				},
-				PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-					MinLength:    gu.Ptr(uint64(8)),
-					HasLowercase: gu.Ptr(true),
-					HasUppercase: gu.Ptr(true),
-					HasNumber:    gu.Ptr(true),
-					HasSymbol:    gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "update organization",
-			settings: &domain.PasswordComplexitySettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr(orgID),
-				},
-				PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-					MinLength:    gu.Ptr(uint64(10)),
-					HasLowercase: gu.Ptr(true),
-					HasUppercase: gu.Ptr(true),
-					HasNumber:    gu.Ptr(true),
-					HasSymbol:    gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "non-existing instance",
-			settings: &domain.PasswordComplexitySettings{
-				Settings: domain.Settings{
-					InstanceID:     "foo",
-					OrganizationID: nil,
-				},
-				PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-					MinLength:    gu.Ptr(uint64(8)),
-					HasLowercase: gu.Ptr(true),
-					HasUppercase: gu.Ptr(true),
-					HasNumber:    gu.Ptr(true),
-					HasSymbol:    gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name: "non-existing org",
-			settings: &domain.PasswordComplexitySettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr("foo"),
-				},
-				PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-					MinLength:    gu.Ptr(uint64(8)),
-					HasLowercase: gu.Ptr(true),
-					HasUppercase: gu.Ptr(true),
-					HasNumber:    gu.Ptr(true),
-					HasSymbol:    gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  database.ErrInvalidChangeTarget,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			err := repo.Set(t.Context(), savepoint, tt.settings)
-			require.ErrorIs(t, err, tt.wantErr)
-		})
-	}
-}
-
-func TestDeletePasswordComplexitySettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.PasswordComplexitySettingsRepository()
-
-	existingInstanceSettings := &domain.PasswordComplexitySettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: nil,
-		},
-		PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-			MinLength:    gu.Ptr(uint64(8)),
-			HasLowercase: gu.Ptr(true),
-			HasUppercase: gu.Ptr(true),
-			HasNumber:    gu.Ptr(true),
-			HasSymbol:    gu.Ptr(true),
-		},
-	}
-	err := repo.Set(t.Context(), tx, existingInstanceSettings)
-	require.NoError(t, err)
-
-	existingOrganizationSettings := &domain.PasswordComplexitySettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
-			MinLength:    gu.Ptr(uint64(8)),
-			HasLowercase: gu.Ptr(true),
-			HasUppercase: gu.Ptr(true),
-			HasNumber:    gu.Ptr(true),
-			HasSymbol:    gu.Ptr(true),
-		},
-	}
-	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name             string
-		condition        database.Condition
-		wantRowsAffected int64
-		wantErr          error
-	}{
-		{
-			name:             "incomplete condition",
-			condition:        repo.InstanceIDCondition(instanceID),
-			wantRowsAffected: 0,
-			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
-		},
-		{
-			name:             "not found",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypePasswordComplexity, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete instance",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete instance twice",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete organization",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete organization twice",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
-		})
-	}
-}
-
 func TestGetPasswordExpirySettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.PasswordExpirySettingsRepository()
+	repo := repository.PasswordExpirySettings()
 
-	settings := []*domain.PasswordExpirySettings{
+	settings := []*domain.PasswordExpirySetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-				ExpireWarnDays: gu.Ptr(uint64(10)),
-				MaxAgeDays:     gu.Ptr(uint64(30)),
-			},
+			ExpireWarnDays: uint64(10),
+			MaxAgeDays:     uint64(30),
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-				ExpireWarnDays: gu.Ptr(uint64(11)),
-				MaxAgeDays:     gu.Ptr(uint64(31)),
-			},
+			ExpireWarnDays: uint64(11),
+			MaxAgeDays:     uint64(31),
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-				ExpireWarnDays: gu.Ptr(uint64(12)),
-				MaxAgeDays:     gu.Ptr(uint64(32)),
-			},
+			ExpireWarnDays: uint64(12),
+			MaxAgeDays:     uint64(32),
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-				ExpireWarnDays: gu.Ptr(uint64(13)),
-				MaxAgeDays:     gu.Ptr(uint64(33)),
-			},
+			ExpireWarnDays: uint64(13),
+			MaxAgeDays:     uint64(33),
 		},
 	}
 
@@ -2087,17 +1794,17 @@ func TestGetPasswordExpirySettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.PasswordExpirySettings
+		want      *domain.PasswordExpirySetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
-			condition: repo.IDCondition(settings[0].ID),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			condition: repo.OrganizationIDCondition(settings[0].OrganizationID),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "not found",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
 			wantErr:   database.NewNoRowFoundError(nil),
 		},
 		{
@@ -2107,12 +1814,12 @@ func TestGetPasswordExpirySettings(t *testing.T) {
 		},
 		{
 			name:      "ok, instance",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[0].InstanceID), repo.OrganizationIDCondition(settings[0].OrganizationID)),
 			want:      settings[0],
 		},
 		{
 			name:      "ok, organization",
-			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[3].InstanceID), repo.OrganizationIDCondition(settings[3].OrganizationID)),
 			want:      settings[3],
 		},
 	}
@@ -2127,54 +1834,58 @@ func TestGetPasswordExpirySettings(t *testing.T) {
 
 func TestListPasswordExpirySettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.PasswordExpirySettingsRepository()
+	repo := repository.PasswordExpirySettings()
 
-	settings := []*domain.PasswordExpirySettings{
+	settings := []*domain.PasswordExpirySetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-				ExpireWarnDays: gu.Ptr(uint64(10)),
-				MaxAgeDays:     gu.Ptr(uint64(30)),
-			},
+			ExpireWarnDays: uint64(10),
+			MaxAgeDays:     uint64(30),
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-				ExpireWarnDays: gu.Ptr(uint64(11)),
-				MaxAgeDays:     gu.Ptr(uint64(31)),
-			},
+			ExpireWarnDays: uint64(11),
+			MaxAgeDays:     uint64(31),
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-				ExpireWarnDays: gu.Ptr(uint64(12)),
-				MaxAgeDays:     gu.Ptr(uint64(32)),
-			},
+			ExpireWarnDays: uint64(12),
+			MaxAgeDays:     uint64(32),
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-				ExpireWarnDays: gu.Ptr(uint64(13)),
-				MaxAgeDays:     gu.Ptr(uint64(33)),
-			},
+			ExpireWarnDays: uint64(13),
+			MaxAgeDays:     uint64(33),
 		},
 	}
 
@@ -2186,23 +1897,23 @@ func TestListPasswordExpirySettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.PasswordExpirySettings
+		want      []*domain.PasswordExpirySetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
 			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "no results, ok",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.PasswordExpirySettings{},
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
+			want:      []*domain.PasswordExpirySetting{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.PasswordExpirySettings{settings[2], settings[0]},
+			want:      []*domain.PasswordExpirySetting{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -2210,7 +1921,7 @@ func TestListPasswordExpirySettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.PasswordExpirySettings{settings[0]},
+			want: []*domain.PasswordExpirySetting{settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -2218,7 +1929,7 @@ func TestListPasswordExpirySettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.PasswordExpirySettings{settings[2]},
+			want: []*domain.PasswordExpirySetting{settings[2]},
 		},
 	}
 
@@ -2234,239 +1945,64 @@ func TestListPasswordExpirySettings(t *testing.T) {
 	}
 }
 
-func TestSetPasswordExpirySettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.PasswordExpirySettingsRepository()
-
-	existingSettings := &domain.PasswordExpirySettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-			ExpireWarnDays: gu.Ptr(uint64(10)),
-			MaxAgeDays:     gu.Ptr(uint64(30)),
-		},
-	}
-
-	err := repo.Set(t.Context(), tx, existingSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name     string
-		settings *domain.PasswordExpirySettings
-		wantErr  error
-	}{
-		{
-			name: "create instance",
-			settings: &domain.PasswordExpirySettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: nil,
-				},
-				PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-					ExpireWarnDays: gu.Ptr(uint64(10)),
-					MaxAgeDays:     gu.Ptr(uint64(30)),
-				},
-			},
-		},
-		{
-			name: "update organization",
-			settings: &domain.PasswordExpirySettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr(orgID),
-				},
-				PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-					ExpireWarnDays: gu.Ptr(uint64(10)),
-					MaxAgeDays:     gu.Ptr(uint64(30)),
-				},
-			},
-		},
-		{
-			name: "non-existing instance",
-			settings: &domain.PasswordExpirySettings{
-				Settings: domain.Settings{
-					InstanceID:     "foo",
-					OrganizationID: nil,
-				},
-				PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-					ExpireWarnDays: gu.Ptr(uint64(10)),
-					MaxAgeDays:     gu.Ptr(uint64(30)),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name: "non-existing org",
-			settings: &domain.PasswordExpirySettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr("foo"),
-				},
-				PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-					ExpireWarnDays: gu.Ptr(uint64(10)),
-					MaxAgeDays:     gu.Ptr(uint64(30)),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  database.ErrInvalidChangeTarget,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			err := repo.Set(t.Context(), savepoint, tt.settings)
-			require.ErrorIs(t, err, tt.wantErr)
-		})
-	}
-}
-
-func TestDeletePasswordExpirySettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.PasswordExpirySettingsRepository()
-
-	existingInstanceSettings := &domain.PasswordExpirySettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: nil,
-		},
-		PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-			ExpireWarnDays: gu.Ptr(uint64(10)),
-			MaxAgeDays:     gu.Ptr(uint64(30)),
-		},
-	}
-	err := repo.Set(t.Context(), tx, existingInstanceSettings)
-	require.NoError(t, err)
-
-	existingOrganizationSettings := &domain.PasswordExpirySettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
-			ExpireWarnDays: gu.Ptr(uint64(10)),
-			MaxAgeDays:     gu.Ptr(uint64(30)),
-		},
-	}
-	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name             string
-		condition        database.Condition
-		wantRowsAffected int64
-		wantErr          error
-	}{
-		{
-			name:             "incomplete condition",
-			condition:        repo.InstanceIDCondition(instanceID),
-			wantRowsAffected: 0,
-			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
-		},
-		{
-			name:             "not found",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypePasswordExpiry, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete instance",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete instance twice",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete organization",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete organization twice",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
-		})
-	}
-}
-
 func TestGetLockoutSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.LockoutSettingsRepository()
+	repo := repository.LockoutSettings()
 
-	settings := []*domain.LockoutSettings{
+	settings := []*domain.LockoutSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-				MaxPasswordAttempts: gu.Ptr(uint64(3)),
-				MaxOTPAttempts:      gu.Ptr(uint64(3)),
-				ShowLockOutFailures: gu.Ptr(true),
-			},
+			MaxPasswordAttempts: uint64(3),
+			MaxOTPAttempts:      uint64(3),
+			ShowLockOutFailures: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-				MaxPasswordAttempts: gu.Ptr(uint64(4)),
-				MaxOTPAttempts:      gu.Ptr(uint64(4)),
-				ShowLockOutFailures: gu.Ptr(true),
-			},
+			MaxPasswordAttempts: uint64(4),
+			MaxOTPAttempts:      uint64(4),
+			ShowLockOutFailures: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-				MaxPasswordAttempts: gu.Ptr(uint64(5)),
-				MaxOTPAttempts:      gu.Ptr(uint64(5)),
-				ShowLockOutFailures: gu.Ptr(false),
-			},
+			MaxPasswordAttempts: uint64(5),
+			MaxOTPAttempts:      uint64(5),
+			ShowLockOutFailures: false,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-				MaxPasswordAttempts: gu.Ptr(uint64(6)),
-				MaxOTPAttempts:      gu.Ptr(uint64(6)),
-				ShowLockOutFailures: gu.Ptr(true),
-			},
+			MaxPasswordAttempts: uint64(6),
+			MaxOTPAttempts:      uint64(6),
+			ShowLockOutFailures: true,
 		},
 	}
 
@@ -2478,17 +2014,17 @@ func TestGetLockoutSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.LockoutSettings
+		want      *domain.LockoutSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
-			condition: repo.IDCondition(settings[0].ID),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			condition: repo.OrganizationIDCondition(settings[0].OrganizationID),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "not found",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
 			wantErr:   database.NewNoRowFoundError(nil),
 		},
 		{
@@ -2498,12 +2034,12 @@ func TestGetLockoutSettings(t *testing.T) {
 		},
 		{
 			name:      "ok, instance",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[0].InstanceID), repo.OrganizationIDCondition(settings[0].OrganizationID)),
 			want:      settings[0],
 		},
 		{
 			name:      "ok, organization",
-			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[3].InstanceID), repo.OrganizationIDCondition(settings[3].OrganizationID)),
 			want:      settings[3],
 		},
 	}
@@ -2518,58 +2054,62 @@ func TestGetLockoutSettings(t *testing.T) {
 
 func TestListLockoutSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.LockoutSettingsRepository()
+	repo := repository.LockoutSettings()
 
-	settings := []*domain.LockoutSettings{
+	settings := []*domain.LockoutSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-				MaxPasswordAttempts: gu.Ptr(uint64(3)),
-				MaxOTPAttempts:      gu.Ptr(uint64(3)),
-				ShowLockOutFailures: gu.Ptr(true),
-			},
+			MaxPasswordAttempts: uint64(3),
+			MaxOTPAttempts:      uint64(3),
+			ShowLockOutFailures: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-				MaxPasswordAttempts: gu.Ptr(uint64(4)),
-				MaxOTPAttempts:      gu.Ptr(uint64(4)),
-				ShowLockOutFailures: gu.Ptr(false),
-			},
+			MaxPasswordAttempts: uint64(4),
+			MaxOTPAttempts:      uint64(4),
+			ShowLockOutFailures: false,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-				MaxPasswordAttempts: gu.Ptr(uint64(5)),
-				MaxOTPAttempts:      gu.Ptr(uint64(5)),
-				ShowLockOutFailures: gu.Ptr(true),
-			},
+			MaxPasswordAttempts: uint64(5),
+			MaxOTPAttempts:      uint64(5),
+			ShowLockOutFailures: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-				MaxPasswordAttempts: gu.Ptr(uint64(6)),
-				MaxOTPAttempts:      gu.Ptr(uint64(6)),
-				ShowLockOutFailures: gu.Ptr(true),
-			},
+			MaxPasswordAttempts: uint64(6),
+			MaxOTPAttempts:      uint64(6),
+			ShowLockOutFailures: true,
 		},
 	}
 
@@ -2581,23 +2121,23 @@ func TestListLockoutSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.LockoutSettings
+		want      []*domain.LockoutSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
 			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "no results, ok",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.LockoutSettings{},
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
+			want:      []*domain.LockoutSetting{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.LockoutSettings{settings[2], settings[0]},
+			want:      []*domain.LockoutSetting{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -2605,7 +2145,7 @@ func TestListLockoutSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.LockoutSettings{settings[0]},
+			want: []*domain.LockoutSetting{settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -2613,7 +2153,7 @@ func TestListLockoutSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.LockoutSettings{settings[2]},
+			want: []*domain.LockoutSetting{settings[2]},
 		},
 	}
 
@@ -2629,246 +2169,64 @@ func TestListLockoutSettings(t *testing.T) {
 	}
 }
 
-func TestSetLockoutSettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.LockoutSettingsRepository()
-
-	existingSettings := &domain.LockoutSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-			MaxPasswordAttempts: gu.Ptr(uint64(3)),
-			MaxOTPAttempts:      gu.Ptr(uint64(3)),
-			ShowLockOutFailures: gu.Ptr(true),
-		},
-	}
-
-	err := repo.Set(t.Context(), tx, existingSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name     string
-		settings *domain.LockoutSettings
-		wantErr  error
-	}{
-		{
-			name: "create instance",
-			settings: &domain.LockoutSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: nil,
-				},
-				LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-					MaxPasswordAttempts: gu.Ptr(uint64(4)),
-					MaxOTPAttempts:      gu.Ptr(uint64(4)),
-					ShowLockOutFailures: gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "update organization",
-			settings: &domain.LockoutSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr(orgID),
-				},
-				LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-					MaxPasswordAttempts: gu.Ptr(uint64(5)),
-					MaxOTPAttempts:      gu.Ptr(uint64(5)),
-					ShowLockOutFailures: gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "non-existing instance",
-			settings: &domain.LockoutSettings{
-				Settings: domain.Settings{
-					InstanceID:     "foo",
-					OrganizationID: nil,
-				},
-				LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-					MaxPasswordAttempts: gu.Ptr(uint64(3)),
-					MaxOTPAttempts:      gu.Ptr(uint64(3)),
-					ShowLockOutFailures: gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name: "non-existing org",
-			settings: &domain.LockoutSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr("foo"),
-				},
-				LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-					MaxPasswordAttempts: gu.Ptr(uint64(3)),
-					MaxOTPAttempts:      gu.Ptr(uint64(3)),
-					ShowLockOutFailures: gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  database.ErrInvalidChangeTarget,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			err := repo.Set(t.Context(), savepoint, tt.settings)
-			require.ErrorIs(t, err, tt.wantErr)
-		})
-	}
-}
-
-func TestDeleteLockoutSettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.LockoutSettingsRepository()
-
-	existingInstanceSettings := &domain.LockoutSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: nil,
-		},
-		LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-			MaxPasswordAttempts: gu.Ptr(uint64(3)),
-			MaxOTPAttempts:      gu.Ptr(uint64(3)),
-			ShowLockOutFailures: gu.Ptr(true),
-		},
-	}
-	err := repo.Set(t.Context(), tx, existingInstanceSettings)
-	require.NoError(t, err)
-
-	existingOrganizationSettings := &domain.LockoutSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-			MaxPasswordAttempts: gu.Ptr(uint64(4)),
-			MaxOTPAttempts:      gu.Ptr(uint64(4)),
-			ShowLockOutFailures: gu.Ptr(true),
-		},
-	}
-	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name             string
-		condition        database.Condition
-		wantRowsAffected int64
-		wantErr          error
-	}{
-		{
-			name:             "incomplete condition",
-			condition:        repo.InstanceIDCondition(instanceID),
-			wantRowsAffected: 0,
-			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
-		},
-		{
-			name:             "not found",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeLockout, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete instance",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLockout, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete instance twice",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLockout, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete organization",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLockout, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete organization twice",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLockout, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
-		})
-	}
-}
-
 func TestGetSecuritySettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.SecuritySettingsRepository()
+	repo := repository.SecuritySettings()
 
-	settings := []*domain.SecuritySettings{
+	settings := []*domain.SecuritySetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-				EnableIframeEmbedding: gu.Ptr(true),
-				AllowedOrigins:        []string{"origin1", "origin2"},
-				EnableImpersonation:   gu.Ptr(true),
-			},
+			EnableIframeEmbedding: true,
+			AllowedOrigins:        []string{"origin1", "origin2"},
+			EnableImpersonation:   true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-				EnableIframeEmbedding: gu.Ptr(true),
-				AllowedOrigins:        []string{"origin3", "origin4"},
-				EnableImpersonation:   gu.Ptr(false),
-			},
+			EnableIframeEmbedding: true,
+			AllowedOrigins:        []string{"origin3", "origin4"},
+			EnableImpersonation:   false,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-				EnableIframeEmbedding: gu.Ptr(true),
-				AllowedOrigins:        []string{"origin5", "origin6"},
-				EnableImpersonation:   gu.Ptr(true),
-			},
+			EnableIframeEmbedding: true,
+			AllowedOrigins:        []string{"origin5", "origin6"},
+			EnableImpersonation:   true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-				EnableIframeEmbedding: gu.Ptr(false),
-				AllowedOrigins:        []string{"origin7", "origin8"},
-				EnableImpersonation:   gu.Ptr(true),
-			},
+			EnableIframeEmbedding: false,
+			AllowedOrigins:        []string{"origin7", "origin8"},
+			EnableImpersonation:   true,
 		},
 	}
 
@@ -2880,17 +2238,17 @@ func TestGetSecuritySettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.SecuritySettings
+		want      *domain.SecuritySetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
-			condition: repo.IDCondition(settings[0].ID),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			condition: repo.OrganizationIDCondition(settings[0].OrganizationID),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "not found",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
 			wantErr:   database.NewNoRowFoundError(nil),
 		},
 		{
@@ -2900,12 +2258,12 @@ func TestGetSecuritySettings(t *testing.T) {
 		},
 		{
 			name:      "ok, instance",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[0].InstanceID), repo.OrganizationIDCondition(settings[0].OrganizationID)),
 			want:      settings[0],
 		},
 		{
 			name:      "ok, organization",
-			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[3].InstanceID), repo.OrganizationIDCondition(settings[3].OrganizationID)),
 			want:      settings[3],
 		},
 	}
@@ -2920,58 +2278,62 @@ func TestGetSecuritySettings(t *testing.T) {
 
 func TestListSecuritySettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.SecuritySettingsRepository()
+	repo := repository.SecuritySettings()
 
-	settings := []*domain.SecuritySettings{
+	settings := []*domain.SecuritySetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-				EnableIframeEmbedding: gu.Ptr(true),
-				AllowedOrigins:        []string{"origin1", "origin2"},
-				EnableImpersonation:   gu.Ptr(true),
-			},
+			EnableIframeEmbedding: true,
+			AllowedOrigins:        []string{"origin1", "origin2"},
+			EnableImpersonation:   true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-				EnableIframeEmbedding: gu.Ptr(true),
-				AllowedOrigins:        []string{"origin3", "origin4"},
-				EnableImpersonation:   gu.Ptr(false),
-			},
+			EnableIframeEmbedding: true,
+			AllowedOrigins:        []string{"origin3", "origin4"},
+			EnableImpersonation:   false,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-				EnableIframeEmbedding: gu.Ptr(true),
-				AllowedOrigins:        []string{"origin5", "origin6"},
-				EnableImpersonation:   gu.Ptr(true),
-			},
+			EnableIframeEmbedding: true,
+			AllowedOrigins:        []string{"origin5", "origin6"},
+			EnableImpersonation:   true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-				EnableIframeEmbedding: gu.Ptr(false),
-				AllowedOrigins:        []string{"origin7", "origin8"},
-				EnableImpersonation:   gu.Ptr(true),
-			},
+			EnableIframeEmbedding: false,
+			AllowedOrigins:        []string{"origin7", "origin8"},
+			EnableImpersonation:   true,
 		},
 	}
 
@@ -2983,23 +2345,23 @@ func TestListSecuritySettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.SecuritySettings
+		want      []*domain.SecuritySetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
 			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "no results, ok",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.SecuritySettings{},
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
+			want:      []*domain.SecuritySetting{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.SecuritySettings{settings[2], settings[0]},
+			want:      []*domain.SecuritySetting{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -3007,7 +2369,7 @@ func TestListSecuritySettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.SecuritySettings{settings[0]},
+			want: []*domain.SecuritySetting{settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -3015,7 +2377,7 @@ func TestListSecuritySettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.SecuritySettings{settings[2]},
+			want: []*domain.SecuritySetting{settings[2]},
 		},
 	}
 
@@ -3031,246 +2393,64 @@ func TestListSecuritySettings(t *testing.T) {
 	}
 }
 
-func TestSetSecuritySettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.SecuritySettingsRepository()
-
-	existingSettings := &domain.SecuritySettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-			EnableIframeEmbedding: gu.Ptr(true),
-			AllowedOrigins:        []string{"origin1", "origin2"},
-			EnableImpersonation:   gu.Ptr(true),
-		},
-	}
-
-	err := repo.Set(t.Context(), tx, existingSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name     string
-		settings *domain.SecuritySettings
-		wantErr  error
-	}{
-		{
-			name: "create instance",
-			settings: &domain.SecuritySettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: nil,
-				},
-				SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-					EnableIframeEmbedding: gu.Ptr(true),
-					AllowedOrigins:        []string{"origin1", "origin2"},
-					EnableImpersonation:   gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "update organization",
-			settings: &domain.SecuritySettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr(orgID),
-				},
-				SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-					EnableIframeEmbedding: gu.Ptr(true),
-					AllowedOrigins:        []string{"origin1", "origin2"},
-					EnableImpersonation:   gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "non-existing instance",
-			settings: &domain.SecuritySettings{
-				Settings: domain.Settings{
-					InstanceID:     "foo",
-					OrganizationID: nil,
-				},
-				SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-					EnableIframeEmbedding: gu.Ptr(true),
-					AllowedOrigins:        []string{"origin1", "origin2"},
-					EnableImpersonation:   gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name: "non-existing org",
-			settings: &domain.SecuritySettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr("foo"),
-				},
-				SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-					EnableIframeEmbedding: gu.Ptr(true),
-					AllowedOrigins:        []string{"origin1", "origin2"},
-					EnableImpersonation:   gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  database.ErrInvalidChangeTarget,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			err := repo.Set(t.Context(), savepoint, tt.settings)
-			require.ErrorIs(t, err, tt.wantErr)
-		})
-	}
-}
-
-func TestDeleteSecuritySettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.SecuritySettingsRepository()
-
-	existingInstanceSettings := &domain.SecuritySettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: nil,
-		},
-		SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-			EnableIframeEmbedding: gu.Ptr(true),
-			AllowedOrigins:        []string{"origin1", "origin2"},
-			EnableImpersonation:   gu.Ptr(true),
-		},
-	}
-	err := repo.Set(t.Context(), tx, existingInstanceSettings)
-	require.NoError(t, err)
-
-	existingOrganizationSettings := &domain.SecuritySettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
-			EnableIframeEmbedding: gu.Ptr(true),
-			AllowedOrigins:        []string{"origin3", "origin4"},
-			EnableImpersonation:   gu.Ptr(true),
-		},
-	}
-	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name             string
-		condition        database.Condition
-		wantRowsAffected int64
-		wantErr          error
-	}{
-		{
-			name:             "incomplete condition",
-			condition:        repo.InstanceIDCondition(instanceID),
-			wantRowsAffected: 0,
-			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
-		},
-		{
-			name:             "not found",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeSecurity, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete instance",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeSecurity, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete instance twice",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeSecurity, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete organization",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeSecurity, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete organization twice",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeSecurity, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
-		})
-	}
-}
-
 func TestGetDomainSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.DomainSettingsRepository()
+	repo := repository.DomainSettings()
 
-	settings := []*domain.DomainSettings{
+	settings := []*domain.DomainSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			DomainSettingsAttributes: domain.DomainSettingsAttributes{
-				LoginNameIncludesDomain:                gu.Ptr(true),
-				RequireOrgDomainVerification:           gu.Ptr(true),
-				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-			},
+			LoginNameIncludesDomain:                true,
+			RequireOrgDomainVerification:           true,
+			SMTPSenderAddressMatchesInstanceDomain: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			DomainSettingsAttributes: domain.DomainSettingsAttributes{
-				LoginNameIncludesDomain:                gu.Ptr(false),
-				RequireOrgDomainVerification:           gu.Ptr(true),
-				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-			},
+			LoginNameIncludesDomain:                false,
+			RequireOrgDomainVerification:           true,
+			SMTPSenderAddressMatchesInstanceDomain: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			DomainSettingsAttributes: domain.DomainSettingsAttributes{
-				LoginNameIncludesDomain:                gu.Ptr(true),
-				RequireOrgDomainVerification:           gu.Ptr(false),
-				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-			},
+			LoginNameIncludesDomain:                true,
+			RequireOrgDomainVerification:           false,
+			SMTPSenderAddressMatchesInstanceDomain: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			DomainSettingsAttributes: domain.DomainSettingsAttributes{
-				LoginNameIncludesDomain:                gu.Ptr(true),
-				RequireOrgDomainVerification:           gu.Ptr(true),
-				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(false),
-			},
+			LoginNameIncludesDomain:                true,
+			RequireOrgDomainVerification:           true,
+			SMTPSenderAddressMatchesInstanceDomain: false,
 		},
 	}
 
@@ -3282,17 +2462,17 @@ func TestGetDomainSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.DomainSettings
+		want      *domain.DomainSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
-			condition: repo.IDCondition(settings[0].ID),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			condition: repo.OrganizationIDCondition(settings[0].OrganizationID),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "not found",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
 			wantErr:   database.NewNoRowFoundError(nil),
 		},
 		{
@@ -3302,12 +2482,12 @@ func TestGetDomainSettings(t *testing.T) {
 		},
 		{
 			name:      "ok, instance",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[0].InstanceID), repo.OrganizationIDCondition(settings[0].OrganizationID)),
 			want:      settings[0],
 		},
 		{
 			name:      "ok, organization",
-			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[3].InstanceID), repo.OrganizationIDCondition(settings[3].OrganizationID)),
 			want:      settings[3],
 		},
 	}
@@ -3322,58 +2502,62 @@ func TestGetDomainSettings(t *testing.T) {
 
 func TestListDomainSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.DomainSettingsRepository()
+	repo := repository.DomainSettings()
 
-	settings := []*domain.DomainSettings{
+	settings := []*domain.DomainSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			DomainSettingsAttributes: domain.DomainSettingsAttributes{
-				LoginNameIncludesDomain:                gu.Ptr(true),
-				RequireOrgDomainVerification:           gu.Ptr(true),
-				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-			},
+			LoginNameIncludesDomain:                true,
+			RequireOrgDomainVerification:           true,
+			SMTPSenderAddressMatchesInstanceDomain: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			DomainSettingsAttributes: domain.DomainSettingsAttributes{
-				LoginNameIncludesDomain:                gu.Ptr(false),
-				RequireOrgDomainVerification:           gu.Ptr(true),
-				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-			},
+			LoginNameIncludesDomain:                false,
+			RequireOrgDomainVerification:           true,
+			SMTPSenderAddressMatchesInstanceDomain: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			DomainSettingsAttributes: domain.DomainSettingsAttributes{
-				LoginNameIncludesDomain:                gu.Ptr(true),
-				RequireOrgDomainVerification:           gu.Ptr(false),
-				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-			},
+			LoginNameIncludesDomain:                true,
+			RequireOrgDomainVerification:           false,
+			SMTPSenderAddressMatchesInstanceDomain: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			DomainSettingsAttributes: domain.DomainSettingsAttributes{
-				LoginNameIncludesDomain:                gu.Ptr(true),
-				RequireOrgDomainVerification:           gu.Ptr(true),
-				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(false),
-			},
+			LoginNameIncludesDomain:                true,
+			RequireOrgDomainVerification:           true,
+			SMTPSenderAddressMatchesInstanceDomain: false,
 		},
 	}
 
@@ -3385,23 +2569,23 @@ func TestListDomainSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.DomainSettings
+		want      []*domain.DomainSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
 			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "no results, ok",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.DomainSettings{},
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
+			want:      []*domain.DomainSetting{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.DomainSettings{settings[2], settings[0]},
+			want:      []*domain.DomainSetting{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -3409,7 +2593,7 @@ func TestListDomainSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.DomainSettings{settings[0]},
+			want: []*domain.DomainSetting{settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -3417,7 +2601,7 @@ func TestListDomainSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.DomainSettings{settings[2]},
+			want: []*domain.DomainSetting{settings[2]},
 		},
 	}
 
@@ -3433,238 +2617,56 @@ func TestListDomainSettings(t *testing.T) {
 	}
 }
 
-func TestSetDomainSettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.DomainSettingsRepository()
-
-	existingSettings := &domain.DomainSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		DomainSettingsAttributes: domain.DomainSettingsAttributes{
-			LoginNameIncludesDomain:                gu.Ptr(true),
-			RequireOrgDomainVerification:           gu.Ptr(true),
-			SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-		},
-	}
-
-	err := repo.Set(t.Context(), tx, existingSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name     string
-		settings *domain.DomainSettings
-		wantErr  error
-	}{
-		{
-			name: "create instance",
-			settings: &domain.DomainSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: nil,
-				},
-				DomainSettingsAttributes: domain.DomainSettingsAttributes{
-					LoginNameIncludesDomain:                gu.Ptr(true),
-					RequireOrgDomainVerification:           gu.Ptr(true),
-					SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "update organization",
-			settings: &domain.DomainSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr(orgID),
-				},
-				DomainSettingsAttributes: domain.DomainSettingsAttributes{
-					LoginNameIncludesDomain:                gu.Ptr(true),
-					RequireOrgDomainVerification:           gu.Ptr(true),
-					SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "non-existing instance",
-			settings: &domain.DomainSettings{
-				Settings: domain.Settings{
-					InstanceID:     "foo",
-					OrganizationID: nil,
-				},
-				DomainSettingsAttributes: domain.DomainSettingsAttributes{
-					LoginNameIncludesDomain:                gu.Ptr(true),
-					RequireOrgDomainVerification:           gu.Ptr(true),
-					SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name: "non-existing org",
-			settings: &domain.DomainSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr("foo"),
-				},
-				DomainSettingsAttributes: domain.DomainSettingsAttributes{
-					LoginNameIncludesDomain:                gu.Ptr(true),
-					RequireOrgDomainVerification:           gu.Ptr(true),
-					SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  database.ErrInvalidChangeTarget,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			err := repo.Set(t.Context(), savepoint, tt.settings)
-			require.ErrorIs(t, err, tt.wantErr)
-		})
-	}
-}
-
-func TestDeleteDomainSettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.DomainSettingsRepository()
-
-	existingInstanceSettings := &domain.DomainSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: nil,
-		},
-		DomainSettingsAttributes: domain.DomainSettingsAttributes{
-			LoginNameIncludesDomain:                gu.Ptr(true),
-			RequireOrgDomainVerification:           gu.Ptr(true),
-			SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-		},
-	}
-	err := repo.Set(t.Context(), tx, existingInstanceSettings)
-	require.NoError(t, err)
-
-	existingOrganizationSettings := &domain.DomainSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		DomainSettingsAttributes: domain.DomainSettingsAttributes{
-			LoginNameIncludesDomain:                gu.Ptr(true),
-			RequireOrgDomainVerification:           gu.Ptr(false),
-			SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
-		},
-	}
-	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name             string
-		condition        database.Condition
-		wantRowsAffected int64
-		wantErr          error
-	}{
-		{
-			name:             "incomplete condition",
-			condition:        repo.InstanceIDCondition(instanceID),
-			wantRowsAffected: 0,
-			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
-		},
-		{
-			name:             "not found",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeDomain, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete instance",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeDomain, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete instance twice",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeDomain, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete organization",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeDomain, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete organization twice",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeDomain, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
-		})
-	}
-}
-
 func TestGetOrganizationSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.OrganizationSettingsRepository()
+	repo := repository.OrganizationSettings()
 
-	settings := []*domain.OrganizationSettings{
+	settings := []*domain.OrganizationSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-				OrganizationScopedUsernames: gu.Ptr(true),
-			},
+			OrganizationScopedUsernames: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-				OrganizationScopedUsernames: gu.Ptr(true),
-			},
+			OrganizationScopedUsernames: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-				OrganizationScopedUsernames: gu.Ptr(true),
-			},
+			OrganizationScopedUsernames: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-				OrganizationScopedUsernames: gu.Ptr(true),
-			},
+			OrganizationScopedUsernames: true,
 		},
 	}
 
@@ -3676,17 +2678,17 @@ func TestGetOrganizationSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.OrganizationSettings
+		want      *domain.OrganizationSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
-			condition: repo.IDCondition(settings[0].ID),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			condition: repo.OrganizationIDCondition(settings[0].OrganizationID),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "not found",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
 			wantErr:   database.NewNoRowFoundError(nil),
 		},
 		{
@@ -3696,12 +2698,12 @@ func TestGetOrganizationSettings(t *testing.T) {
 		},
 		{
 			name:      "ok, instance",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[0].InstanceID), repo.OrganizationIDCondition(settings[0].OrganizationID)),
 			want:      settings[0],
 		},
 		{
 			name:      "ok, organization",
-			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[3].InstanceID), repo.OrganizationIDCondition(settings[3].OrganizationID)),
 			want:      settings[3],
 		},
 	}
@@ -3716,50 +2718,54 @@ func TestGetOrganizationSettings(t *testing.T) {
 
 func TestListOrganizationSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.OrganizationSettingsRepository()
+	repo := repository.OrganizationSettings()
 
-	settings := []*domain.OrganizationSettings{
+	settings := []*domain.OrganizationSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-				OrganizationScopedUsernames: gu.Ptr(true),
-			},
+			OrganizationScopedUsernames: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-				OrganizationScopedUsernames: gu.Ptr(true),
-			},
+			OrganizationScopedUsernames: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-				OrganizationScopedUsernames: gu.Ptr(true),
-			},
+			OrganizationScopedUsernames: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-				OrganizationScopedUsernames: gu.Ptr(true),
-			},
+			OrganizationScopedUsernames: true,
 		},
 	}
 
@@ -3771,23 +2777,23 @@ func TestListOrganizationSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.OrganizationSettings
+		want      []*domain.OrganizationSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
 			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "no results, ok",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.OrganizationSettings{},
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
+			want:      []*domain.OrganizationSetting{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.OrganizationSettings{settings[2], settings[0]},
+			want:      []*domain.OrganizationSetting{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -3795,7 +2801,7 @@ func TestListOrganizationSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.OrganizationSettings{settings[0]},
+			want: []*domain.OrganizationSetting{settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -3803,7 +2809,7 @@ func TestListOrganizationSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.OrganizationSettings{settings[2]},
+			want: []*domain.OrganizationSetting{settings[2]},
 		},
 	}
 
@@ -3819,224 +2825,56 @@ func TestListOrganizationSettings(t *testing.T) {
 	}
 }
 
-func TestSetOrganizationSettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.OrganizationSettingsRepository()
-
-	existingSettings := &domain.OrganizationSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-			OrganizationScopedUsernames: gu.Ptr(true),
-		},
-	}
-
-	err := repo.Set(t.Context(), tx, existingSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name     string
-		settings *domain.OrganizationSettings
-		wantErr  error
-	}{
-		{
-			name: "create instance",
-			settings: &domain.OrganizationSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: nil,
-				},
-				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-					OrganizationScopedUsernames: gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "update organization",
-			settings: &domain.OrganizationSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr(orgID),
-				},
-				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-					OrganizationScopedUsernames: gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "non-existing instance",
-			settings: &domain.OrganizationSettings{
-				Settings: domain.Settings{
-					InstanceID:     "foo",
-					OrganizationID: nil,
-				},
-				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-					OrganizationScopedUsernames: gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name: "non-existing org",
-			settings: &domain.OrganizationSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr("foo"),
-				},
-				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-					OrganizationScopedUsernames: gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  database.ErrInvalidChangeTarget,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			err := repo.Set(t.Context(), savepoint, tt.settings)
-			require.ErrorIs(t, err, tt.wantErr)
-		})
-	}
-}
-
-func TestDeleteOrganizationSettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.OrganizationSettingsRepository()
-
-	existingInstanceSettings := &domain.OrganizationSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: nil,
-		},
-		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-			OrganizationScopedUsernames: gu.Ptr(true),
-		},
-	}
-	err := repo.Set(t.Context(), tx, existingInstanceSettings)
-	require.NoError(t, err)
-
-	existingOrganizationSettings := &domain.OrganizationSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
-			OrganizationScopedUsernames: gu.Ptr(true),
-		},
-	}
-	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name             string
-		condition        database.Condition
-		wantRowsAffected int64
-		wantErr          error
-	}{
-		{
-			name:             "incomplete condition",
-			condition:        repo.InstanceIDCondition(instanceID),
-			wantRowsAffected: 0,
-			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
-		},
-		{
-			name:             "not found",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeOrganization, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete instance",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeOrganization, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete instance twice",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeOrganization, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete organization",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeOrganization, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete organization twice",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeOrganization, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
-		})
-	}
-}
-
 func TestGetNotificationSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.NotificationSettingsRepository()
+	repo := repository.NotificationSettings()
 
-	settings := []*domain.NotificationSettings{
+	settings := []*domain.NotificationSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-				PasswordChange: gu.Ptr(true),
-			},
+			PasswordChange: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-				PasswordChange: gu.Ptr(true),
-			},
+			PasswordChange: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-				PasswordChange: gu.Ptr(true),
-			},
+			PasswordChange: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-				PasswordChange: gu.Ptr(true),
-			},
+			PasswordChange: true,
 		},
 	}
 
@@ -4048,17 +2886,17 @@ func TestGetNotificationSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.NotificationSettings
+		want      *domain.NotificationSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
-			condition: repo.IDCondition(settings[0].ID),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			condition: repo.OrganizationIDCondition(settings[0].OrganizationID),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "not found",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
 			wantErr:   database.NewNoRowFoundError(nil),
 		},
 		{
@@ -4068,12 +2906,12 @@ func TestGetNotificationSettings(t *testing.T) {
 		},
 		{
 			name:      "ok, instance",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[0].InstanceID), repo.OrganizationIDCondition(settings[0].OrganizationID)),
 			want:      settings[0],
 		},
 		{
 			name:      "ok, organization",
-			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[3].InstanceID), repo.OrganizationIDCondition(settings[3].OrganizationID)),
 			want:      settings[3],
 		},
 	}
@@ -4088,50 +2926,54 @@ func TestGetNotificationSettings(t *testing.T) {
 
 func TestListNotificationSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.NotificationSettingsRepository()
+	repo := repository.NotificationSettings()
 
-	settings := []*domain.NotificationSettings{
+	settings := []*domain.NotificationSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-				PasswordChange: gu.Ptr(true),
-			},
+			PasswordChange: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-				PasswordChange: gu.Ptr(true),
-			},
+			PasswordChange: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-				PasswordChange: gu.Ptr(true),
-			},
+			PasswordChange: true,
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-				PasswordChange: gu.Ptr(true),
-			},
+			PasswordChange: true,
 		},
 	}
 
@@ -4143,23 +2985,23 @@ func TestListNotificationSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.NotificationSettings
+		want      []*domain.NotificationSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
 			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "no results, ok",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.NotificationSettings{},
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
+			want:      []*domain.NotificationSetting{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.NotificationSettings{settings[2], settings[0]},
+			want:      []*domain.NotificationSetting{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -4167,7 +3009,7 @@ func TestListNotificationSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.NotificationSettings{settings[0]},
+			want: []*domain.NotificationSetting{settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -4175,7 +3017,7 @@ func TestListNotificationSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.NotificationSettings{settings[2]},
+			want: []*domain.NotificationSetting{settings[2]},
 		},
 	}
 
@@ -4191,248 +3033,80 @@ func TestListNotificationSettings(t *testing.T) {
 	}
 }
 
-func TestSetNotificationSettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.NotificationSettingsRepository()
-
-	existingSettings := &domain.NotificationSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-			PasswordChange: gu.Ptr(true),
-		},
-	}
-
-	err := repo.Set(t.Context(), tx, existingSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name     string
-		settings *domain.NotificationSettings
-		wantErr  error
-	}{
-		{
-			name: "create instance",
-			settings: &domain.NotificationSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: nil,
-				},
-				NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-					PasswordChange: gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "update organization",
-			settings: &domain.NotificationSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr(orgID),
-				},
-				NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-					PasswordChange: gu.Ptr(true),
-				},
-			},
-		},
-		{
-			name: "non-existing instance",
-			settings: &domain.NotificationSettings{
-				Settings: domain.Settings{
-					InstanceID:     "foo",
-					OrganizationID: nil,
-				},
-				NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-					PasswordChange: gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name: "non-existing org",
-			settings: &domain.NotificationSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr("foo"),
-				},
-				NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-					PasswordChange: gu.Ptr(true),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  database.ErrInvalidChangeTarget,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			err := repo.Set(t.Context(), savepoint, tt.settings)
-			require.ErrorIs(t, err, tt.wantErr)
-		})
-	}
-}
-
-func TestDeleteNotificationSettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.NotificationSettingsRepository()
-
-	existingInstanceSettings := &domain.NotificationSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: nil,
-		},
-		NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-			PasswordChange: gu.Ptr(true),
-		},
-	}
-	err := repo.Set(t.Context(), tx, existingInstanceSettings)
-	require.NoError(t, err)
-
-	existingOrganizationSettings := &domain.NotificationSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
-			PasswordChange: gu.Ptr(true),
-		},
-	}
-	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name             string
-		condition        database.Condition
-		wantRowsAffected int64
-		wantErr          error
-	}{
-		{
-			name:             "incomplete condition",
-			condition:        repo.InstanceIDCondition(instanceID),
-			wantRowsAffected: 0,
-			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
-		},
-		{
-			name:             "not found",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeNotification, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete instance",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeNotification, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete instance twice",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeNotification, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete organization",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeNotification, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete organization twice",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeNotification, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
-		})
-	}
-}
-
 func TestGetLegalAndSupportSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.LegalAndSupportSettingsRepository()
+	repo := repository.LegalAndSupportSettings()
 
-	settings := []*domain.LegalAndSupportSettings{
+	settings := []*domain.LegalAndSupportSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
-			},
+			TOSLink:           "https://host",
+			PrivacyPolicyLink: "https://host",
+			HelpLink:          "https://host",
+			SupportEmail:      "email",
+			DocsLink:          "https://host",
+			CustomLink:        "https://host",
+			CustomLinkText:    "linktext",
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
-			},
+			TOSLink:           "https://host",
+			PrivacyPolicyLink: "https://host",
+			HelpLink:          "https://host",
+			SupportEmail:      "email",
+			DocsLink:          "https://host",
+			CustomLink:        "https://host",
+			CustomLinkText:    "linktext",
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
-			},
+			TOSLink:           "https://host",
+			PrivacyPolicyLink: "https://host",
+			HelpLink:          "https://host",
+			SupportEmail:      "email",
+			DocsLink:          "https://host",
+			CustomLink:        "https://host",
+			CustomLinkText:    "linktext",
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
-			},
+			TOSLink:           "https://host",
+			PrivacyPolicyLink: "https://host",
+			HelpLink:          "https://host",
+			SupportEmail:      "email",
+			DocsLink:          "https://host",
+			CustomLink:        "https://host",
+			CustomLinkText:    "linktext",
 		},
 	}
 
@@ -4444,17 +3118,17 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.LegalAndSupportSettings
+		want      *domain.LegalAndSupportSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
-			condition: repo.IDCondition(settings[0].ID),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			condition: repo.OrganizationIDCondition(settings[0].OrganizationID),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "not found",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
 			wantErr:   database.NewNoRowFoundError(nil),
 		},
 		{
@@ -4464,12 +3138,12 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 		},
 		{
 			name:      "ok, instance",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[0].InstanceID), repo.OrganizationIDCondition(settings[0].OrganizationID)),
 			want:      settings[0],
 		},
 		{
 			name:      "ok, organization",
-			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[3].InstanceID), repo.OrganizationIDCondition(settings[3].OrganizationID)),
 			want:      settings[3],
 		},
 	}
@@ -4484,74 +3158,78 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 
 func TestListLegalAndSupportSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.LegalAndSupportSettingsRepository()
+	repo := repository.LegalAndSupportSettings()
 
-	settings := []*domain.LegalAndSupportSettings{
+	settings := []*domain.LegalAndSupportSetting{
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
-			},
+			TOSLink:           "https://host",
+			PrivacyPolicyLink: "https://host",
+			HelpLink:          "https://host",
+			SupportEmail:      "email",
+			DocsLink:          "https://host",
+			CustomLink:        "https://host",
+			CustomLinkText:    "linktext",
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
-			},
+			TOSLink:           "https://host",
+			PrivacyPolicyLink: "https://host",
+			HelpLink:          "https://host",
+			SupportEmail:      "email",
+			DocsLink:          "https://host",
+			CustomLink:        "https://host",
+			CustomLinkText:    "linktext",
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
-			},
+			TOSLink:           "https://host",
+			PrivacyPolicyLink: "https://host",
+			HelpLink:          "https://host",
+			SupportEmail:      "email",
+			DocsLink:          "https://host",
+			CustomLink:        "https://host",
+			CustomLinkText:    "linktext",
 		},
 		{
-			Settings: domain.Settings{
+			Setting: domain.Setting{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
+				ID:             gofakeit.UUID(),
+				CreatedAt:      now,
+				UpdatedAt:      now,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
-			},
+			TOSLink:           "https://host",
+			PrivacyPolicyLink: "https://host",
+			HelpLink:          "https://host",
+			SupportEmail:      "email",
+			DocsLink:          "https://host",
+			CustomLink:        "https://host",
+			CustomLinkText:    "linktext",
 		},
 	}
 
@@ -4563,23 +3241,23 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.LegalAndSupportSettings
+		want      []*domain.LegalAndSupportSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
 			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "no results, ok",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.LegalAndSupportSettings{},
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
+			want:      []*domain.LegalAndSupportSetting{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.LegalAndSupportSettings{settings[2], settings[0]},
+			want:      []*domain.LegalAndSupportSetting{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -4587,7 +3265,7 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.LegalAndSupportSettings{settings[0]},
+			want: []*domain.LegalAndSupportSetting{settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -4595,7 +3273,7 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.LegalAndSupportSettings{settings[2]},
+			want: []*domain.LegalAndSupportSetting{settings[2]},
 		},
 	}
 
@@ -4611,231 +3289,17 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 	}
 }
 
-func TestSetLegalAndSupportSettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.LegalAndSupportSettingsRepository()
-
-	existingSettings := &domain.LegalAndSupportSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-			TOSLink:           gu.Ptr("https://host"),
-			PrivacyPolicyLink: gu.Ptr("https://host"),
-			HelpLink:          gu.Ptr("https://host"),
-			SupportEmail:      gu.Ptr("email"),
-			DocsLink:          gu.Ptr("https://host"),
-			CustomLink:        gu.Ptr("https://host"),
-			CustomLinkText:    gu.Ptr("linktext"),
-		},
-	}
-
-	err := repo.Set(t.Context(), tx, existingSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name     string
-		settings *domain.LegalAndSupportSettings
-		wantErr  error
-	}{
-		{
-			name: "create instance",
-			settings: &domain.LegalAndSupportSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: nil,
-				},
-				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr("https://host"),
-					PrivacyPolicyLink: gu.Ptr("https://host"),
-					HelpLink:          gu.Ptr("https://host"),
-					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr("https://host"),
-					CustomLink:        gu.Ptr("https://host"),
-					CustomLinkText:    gu.Ptr("linktext"),
-				},
-			},
-		},
-		{
-			name: "update organization",
-			settings: &domain.LegalAndSupportSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr(orgID),
-				},
-				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr("https://host"),
-					PrivacyPolicyLink: gu.Ptr("https://host"),
-					HelpLink:          gu.Ptr("https://host"),
-					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr("https://host"),
-					CustomLink:        gu.Ptr("https://host"),
-					CustomLinkText:    gu.Ptr("linktext"),
-				},
-			},
-		},
-		{
-			name: "non-existing instance",
-			settings: &domain.LegalAndSupportSettings{
-				Settings: domain.Settings{
-					InstanceID:     "foo",
-					OrganizationID: nil,
-				},
-				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr("https://host"),
-					PrivacyPolicyLink: gu.Ptr("https://host"),
-					HelpLink:          gu.Ptr("https://host"),
-					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr("https://host"),
-					CustomLink:        gu.Ptr("https://host"),
-					CustomLinkText:    gu.Ptr("linktext"),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name: "non-existing org",
-			settings: &domain.LegalAndSupportSettings{
-				Settings: domain.Settings{
-					InstanceID:     instanceID,
-					OrganizationID: gu.Ptr("foo"),
-				},
-				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr("https://host"),
-					PrivacyPolicyLink: gu.Ptr("https://host"),
-					HelpLink:          gu.Ptr("https://host"),
-					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr("https://host"),
-					CustomLink:        gu.Ptr("https://host"),
-					CustomLinkText:    gu.Ptr("linktext"),
-				},
-			},
-			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  database.ErrInvalidChangeTarget,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			err := repo.Set(t.Context(), savepoint, tt.settings)
-			require.ErrorIs(t, err, tt.wantErr)
-		})
-	}
-}
-
-func TestDeleteLegalAndSupportSettings(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-
-	instanceID := createInstance(t, tx)
-	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.LegalAndSupportSettingsRepository()
-
-	existingInstanceSettings := &domain.LegalAndSupportSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: nil,
-		},
-		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-			TOSLink:           gu.Ptr("https://host"),
-			PrivacyPolicyLink: gu.Ptr("https://host"),
-			HelpLink:          gu.Ptr("https://host"),
-			SupportEmail:      gu.Ptr("email"),
-			DocsLink:          gu.Ptr("https://host"),
-			CustomLink:        gu.Ptr("https://host"),
-			CustomLinkText:    gu.Ptr("linktext"),
-		},
-	}
-	err := repo.Set(t.Context(), tx, existingInstanceSettings)
-	require.NoError(t, err)
-
-	existingOrganizationSettings := &domain.LegalAndSupportSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: gu.Ptr(orgID),
-		},
-		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-			TOSLink:           gu.Ptr("https://host"),
-			PrivacyPolicyLink: gu.Ptr("https://host"),
-			HelpLink:          gu.Ptr("https://host"),
-			SupportEmail:      gu.Ptr("email"),
-			DocsLink:          gu.Ptr("https://host"),
-			CustomLink:        gu.Ptr("https://host"),
-			CustomLinkText:    gu.Ptr("linktext"),
-		},
-	}
-	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name             string
-		condition        database.Condition
-		wantRowsAffected int64
-		wantErr          error
-	}{
-		{
-			name:             "incomplete condition",
-			condition:        repo.InstanceIDCondition(instanceID),
-			wantRowsAffected: 0,
-			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
-		},
-		{
-			name:             "not found",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete instance",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete instance twice",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-		{
-			name:             "delete organization",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
-			wantRowsAffected: 1,
-		},
-		{
-			name:             "delete organization twice",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
-			wantRowsAffected: 0,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
-		})
-	}
-}
-
 func TestGetSecretGeneratorSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.SecretGeneratorSettingsRepository()
+	repo := repository.SecretGeneratorSettings()
 
-	settings := []*domain.SecretGeneratorSettings{
+	settings := []*domain.SecretGeneratorSetting{
 		createSecretGeneratorSettings(firstInstanceID, nil),
 		createSecretGeneratorSettings(secondInstanceID, nil),
 		createSecretGeneratorSettings(firstInstanceID, gu.Ptr(firstOrgID)),
@@ -4850,17 +3314,17 @@ func TestGetSecretGeneratorSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.SecretGeneratorSettings
+		want      *domain.SecretGeneratorSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
-			condition: repo.IDCondition(settings[0].ID),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			condition: repo.OrganizationIDCondition(settings[0].OrganizationID),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "not found",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
 			wantErr:   database.NewNoRowFoundError(nil),
 		},
 		{
@@ -4870,12 +3334,12 @@ func TestGetSecretGeneratorSettings(t *testing.T) {
 		},
 		{
 			name:      "ok, instance",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[0].InstanceID), repo.OrganizationIDCondition(settings[0].OrganizationID)),
 			want:      settings[0],
 		},
 		{
 			name:      "ok, organization",
-			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			condition: database.And(repo.InstanceIDCondition(settings[3].InstanceID), repo.OrganizationIDCondition(settings[3].OrganizationID)),
 			want:      settings[3],
 		},
 	}
@@ -4890,15 +3354,15 @@ func TestGetSecretGeneratorSettings(t *testing.T) {
 
 func TestListSecretGeneratorSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	firstInstanceID := createInstance(t, tx)
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.SecretGeneratorSettingsRepository()
+	repo := repository.SecretGeneratorSettings()
 
-	settings := []*domain.SecretGeneratorSettings{
+	settings := []*domain.SecretGeneratorSetting{
 		createSecretGeneratorSettings(firstInstanceID, nil),
 		createSecretGeneratorSettings(secondInstanceID, nil),
 		createSecretGeneratorSettings(firstInstanceID, gu.Ptr(firstOrgID)),
@@ -4913,23 +3377,23 @@ func TestListSecretGeneratorSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.SecretGeneratorSettings
+		want      []*domain.SecretGeneratorSetting
 		wantErr   error
 	}{
 		{
 			name:      "incomplete condition",
 			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
-			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:   database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:      "no results, ok",
-			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.SecretGeneratorSettings{},
+			condition: database.And(repo.InstanceIDCondition(firstInstanceID), repo.OrganizationIDCondition(gu.Ptr("nix"))),
+			want:      []*domain.SecretGeneratorSetting{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.SecretGeneratorSettings{settings[2], settings[0]},
+			want:      []*domain.SecretGeneratorSetting{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -4937,7 +3401,7 @@ func TestListSecretGeneratorSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.SecretGeneratorSettings{settings[0]},
+			want: []*domain.SecretGeneratorSetting{settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -4945,7 +3409,7 @@ func TestListSecretGeneratorSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.SecretGeneratorSettings{settings[2]},
+			want: []*domain.SecretGeneratorSetting{settings[2]},
 		},
 	}
 
@@ -4963,11 +3427,11 @@ func TestListSecretGeneratorSettings(t *testing.T) {
 
 func TestSetSecretGeneratorSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.SecretGeneratorSettingsRepository()
+	repo := repository.SecretGeneratorSettings()
 
 	existingSettings := createSecretGeneratorSettings(instanceID, gu.Ptr(orgID))
 
@@ -4976,7 +3440,7 @@ func TestSetSecretGeneratorSettings(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings *domain.SecretGeneratorSettings
+		settings *domain.SecretGeneratorSetting
 		wantErr  error
 	}{
 		{
@@ -4997,11 +3461,6 @@ func TestSetSecretGeneratorSettings(t *testing.T) {
 			settings: createSecretGeneratorSettings(instanceID, gu.Ptr("foo")),
 			wantErr:  new(database.ForeignKeyError),
 		},
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  database.ErrInvalidChangeTarget,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -5015,11 +3474,11 @@ func TestSetSecretGeneratorSettings(t *testing.T) {
 
 func TestDeleteSecretGeneratorSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
-	defer rollback()
+	t.Cleanup(rollback)
 
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.SecretGeneratorSettingsRepository()
+	repo := repository.SecretGeneratorSettings()
 
 	existingInstanceSettings := createSecretGeneratorSettings(instanceID, nil)
 	err := repo.Set(t.Context(), tx, existingInstanceSettings)
@@ -5037,9 +3496,9 @@ func TestDeleteSecretGeneratorSettings(t *testing.T) {
 	}{
 		{
 			name:             "incomplete condition",
-			condition:        repo.InstanceIDCondition(instanceID),
+			condition:        repo.OrganizationIDCondition(gu.Ptr(orgID)),
 			wantRowsAffected: 0,
-			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+			wantErr:          database.NewMissingConditionError(repo.InstanceIDColumn()),
 		},
 		{
 			name:             "not found",
@@ -5079,11 +3538,11 @@ func TestDeleteSecretGeneratorSettings(t *testing.T) {
 
 func createDefaultSecretGeneratorAttrs() domain.SecretGeneratorAttrs {
 	return domain.SecretGeneratorAttrs{
-		Length:              gu.Ptr(uint(32)),
-		IncludeUpperLetters: gu.Ptr(true),
-		IncludeLowerLetters: gu.Ptr(true),
-		IncludeDigits:       gu.Ptr(true),
-		IncludeSymbols:      gu.Ptr(false),
+		Length:              uint(32),
+		IncludeUpperLetters: true,
+		IncludeLowerLetters: true,
+		IncludeDigits:       true,
+		IncludeSymbols:      false,
 	}
 }
 
@@ -5091,24 +3550,24 @@ func createDefaultSecretGeneratorAttrsWithExpiry(expiry time.Duration) domain.Se
 	return domain.SecretGeneratorAttrsWithExpiry{
 		Expiry: gu.Ptr(expiry),
 		SecretGeneratorAttrs: domain.SecretGeneratorAttrs{
-			Length:              gu.Ptr(uint(32)),
-			IncludeUpperLetters: gu.Ptr(true),
-			IncludeLowerLetters: gu.Ptr(true),
-			IncludeDigits:       gu.Ptr(true),
-			IncludeSymbols:      gu.Ptr(false),
+			Length:              uint(32),
+			IncludeUpperLetters: true,
+			IncludeLowerLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      false,
 		},
 	}
 }
 
-func createDefaultSecretGeneratorSettingsAttributes() domain.SecretGeneratorSettingsAttributes {
+func createDefaultSecretGeneratorSettingsAttributes() domain.SecretGeneratorSetting {
 	attrs := createDefaultSecretGeneratorAttrs()
 	oneDay := 24 * time.Hour
 	thirtyMinutes := 30 * time.Minute
 	tenMinutes := 10 * time.Minute
 
-	return domain.SecretGeneratorSettingsAttributes{
+	return domain.SecretGeneratorSetting{
 		ClientSecret: &domain.ClientSecretAttributes{
-			SecretGeneratorAttrs: attrs,
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(tenMinutes),
 		},
 		InitializeUserCode: &domain.InitializeUserCodeAttributes{
 			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(oneDay),
@@ -5137,12 +3596,14 @@ func createDefaultSecretGeneratorSettingsAttributes() domain.SecretGeneratorSett
 	}
 }
 
-func createSecretGeneratorSettings(instanceID string, organizationID *string) *domain.SecretGeneratorSettings {
-	return &domain.SecretGeneratorSettings{
-		Settings: domain.Settings{
-			InstanceID:     instanceID,
-			OrganizationID: organizationID,
-		},
-		SecretGeneratorSettingsAttributes: createDefaultSecretGeneratorSettingsAttributes(),
+func createSecretGeneratorSettings(instanceID string, organizationID *string) *domain.SecretGeneratorSetting {
+	setting := createDefaultSecretGeneratorSettingsAttributes()
+	setting.Setting = domain.Setting{
+		InstanceID:     instanceID,
+		OrganizationID: organizationID,
+		ID:             gofakeit.UUID(),
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}
+	return &setting
 }

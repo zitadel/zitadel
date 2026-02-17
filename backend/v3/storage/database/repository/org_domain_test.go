@@ -928,8 +928,7 @@ func TestOrganizationDomainChanges(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var builder database.StatementBuilder
-			err := test.change.Write(&builder)
-			require.NoError(t, err)
+			test.change.Write(&builder)
 			assert.Equal(t, test.expected, builder.String())
 		})
 	}

@@ -123,9 +123,7 @@ func (p projectGrant) Update(ctx context.Context, client database.QueryExecutor,
 
 	// now we add the logic to do the required changes based on the given project grant
 	builder.WriteString(updateProjectGrantRoleStmt)
-	if err := database.Changes(changes).Write(builder); err != nil {
-		return 0, err
-	}
+	database.Changes(changes).Write(builder)
 	builder.WriteString(updateProjectGrantRoleStmtWhere)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)

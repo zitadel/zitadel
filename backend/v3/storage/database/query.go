@@ -17,6 +17,23 @@ func WithCondition(condition Condition) QueryOption {
 	}
 }
 
+// EnsureCondition sets the condition for the query.
+// If there is no condition, it sets the given condition.
+// If the condition is already set, the condition is set if the column is not already restricted by the existing condition,
+// otherwise it is left unchanged.
+func EnsureConditionOnColumn(column Column, condition Condition) QueryOption {
+	return func(opts *QueryOpts) {
+		if opts.Condition == nil {
+			opts.Condition = condition
+			return
+		}
+		if opts.Condition.IsRestrictingColumn(column) {
+			return
+		}
+		opts.Condition = And(opts.Condition, condition)
+	}
+}
+
 // WithOrderBy sets the columns to order the results by.
 func WithOrderBy(ordering OrderDirection, orderBy ...Column) QueryOption {
 	return func(opts *QueryOpts) {
