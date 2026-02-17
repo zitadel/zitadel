@@ -45,10 +45,10 @@ export const USERS: KeyboardShortcut = {
   permissions: ['user.read'],
 };
 
-export const USERGRANTS: KeyboardShortcut = {
-  i18nKey: 'KEYBOARDSHORTCUTS.SHORTCUTS.USERGRANTS',
+export const ROLEASSIGNMENTS: KeyboardShortcut = {
+  i18nKey: 'KEYBOARDSHORTCUTS.SHORTCUTS.ROLEASSIGNMENTS',
   link: ['/grants'],
-  keyboardKeys: ['g', 'a'],
+  keyboardKeys: ['g', 'r'],
   permissions: ['usergrant.read'],
 };
 
@@ -73,7 +73,7 @@ export const ORGSETTINGS: KeyboardShortcut = {
   permissions: ['org.read'],
 };
 
-export const SIDEWIDESHORTCUTS = [ME, HOME, INSTANCE, ORG, PROJECTS, USERS, USERGRANTS, ACTIONS, DOMAINS, ORGSETTINGS];
+export const SIDEWIDESHORTCUTS = [ME, HOME, INSTANCE, ORG, PROJECTS, USERS, ROLEASSIGNMENTS, ACTIONS, DOMAINS, ORGSETTINGS];
 
 export const ORGSWITCHER: KeyboardShortcut = {
   i18nKey: 'KEYBOARDSHORTCUTS.SHORTCUTS.ORGSWITCHER',
