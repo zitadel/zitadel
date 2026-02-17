@@ -2496,7 +2496,7 @@
     "TOKEN": "Token Einstellungen",
     "PAGES": {
       "TITLE": "Anwendung",
-      "ID": "Anwendungs-ID",
+      "ID": "Applikations-ID",
       "DESCRIPTION": "Hier kannst Du Deine Applikationen bearbeiten und deren Konfiguration anpassen.",
       "CREATE": "Applikation erstellen",
       "CREATE_SELECT_PROJECT": "Wähle zuerst dein Projekt aus",
