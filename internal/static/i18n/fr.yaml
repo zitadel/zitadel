@@ -892,7 +892,7 @@ EventTypes:
       verified: "Domaine vérifié"
       removed: "Domaine supprimé"
       primary:
-        set: "Domaine de l'organisation défini"
+        set: "Domaine de l'organisation modifié"
       reserved: "Domaine réservé"
       released: "Domaine libéré"
     name:

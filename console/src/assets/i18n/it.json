@@ -1431,7 +1431,7 @@
     },
     "DOMAINS": {
       "NEW": "Aggiungi dominio",
-      "TITLE": "Dominio",
+      "TITLE": "Dominio dell'Organizzazione",
       "DESCRIPTION": "Configura i tuoi domini. Questo dominio può essere utilizzato per accedere con i tuoi utenti.",
       "SETPRIMARY": "Impostato come Dominio dell'Organizzazione",
       "DELETE": {
