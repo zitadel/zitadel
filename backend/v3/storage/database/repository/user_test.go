@@ -371,7 +371,7 @@ func Test_user_List(t *testing.T) {
 		Machine: &domain.MachineUser{
 			Name:            "My Machine",
 			Description:     "This is my machine user",
-			Secret:          []byte("asdf"),
+			Secret:          "asdf",
 			AccessTokenType: domain.AccessTokenTypeJWT,
 			PATs: []*domain.PersonalAccessToken{
 				{
@@ -418,7 +418,7 @@ func Test_user_List(t *testing.T) {
 		Machine: &domain.MachineUser{
 			Name:            "My Machine 2",
 			Description:     "This is my machine user 2",
-			Secret:          []byte("asdf"),
+			Secret:          "asdf",
 			AccessTokenType: domain.AccessTokenTypeJWT,
 			PATs: []*domain.PersonalAccessToken{
 				{
@@ -3370,7 +3370,7 @@ func Test_user_Update(t *testing.T) {
 				user: func() *domain.User {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(machineCondition))
 					require.NoError(t, err)
-					u.Machine.Secret = []byte("new-secret")
+					u.Machine.Secret = "new-secret"
 					return u
 				}(),
 			},

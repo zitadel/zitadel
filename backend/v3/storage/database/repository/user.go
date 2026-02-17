@@ -73,7 +73,7 @@ var queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, 
 	`, jsonb_agg(DISTINCT jsonb_build_object('instanceId', user_metadata.instance_id, 'key', user_metadata.key, 'value', encode(user_metadata.value, 'base64'), 'createdAt', user_metadata.created_at, 'updatedAt', user_metadata.updated_at)) FILTER (WHERE user_metadata.user_id IS NOT NULL) AS metadata` +
 	// machine
 	`, CASE WHEN users.type = 'machine' THEN jsonb_build_object('name', users.name` +
-	`, 'description', users.description, 'secret', encode(users.secret, 'base64')` +
+	`, 'description', users.description, 'secret', users.secret` +
 	`, 'accessTokenType', users.access_token_type` +
 	`, 'keys', jsonb_agg(DISTINCT jsonb_build_object('id', machine_keys.id, 'publicKey', encode(machine_keys.public_key, 'base64'), 'createdAt', machine_keys.created_at, 'expiresAt', machine_keys.expires_at, 'type', machine_keys.type)) FILTER (WHERE machine_keys.user_id IS NOT NULL)` +
 	`, 'pats', jsonb_agg(DISTINCT jsonb_build_object('id', user_personal_access_tokens.id, 'createdAt', user_personal_access_tokens.created_at, 'expiresAt', user_personal_access_tokens.expires_at, 'scopes', user_personal_access_tokens.scopes)) FILTER (WHERE user_personal_access_tokens.user_id IS NOT NULL)` +

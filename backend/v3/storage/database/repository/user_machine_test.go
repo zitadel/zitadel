@@ -77,7 +77,6 @@ func Test_machineUser_create(t *testing.T) {
 		func() test {
 			username := gofakeit.Username()
 			id := gofakeit.UUID()
-			secret := []byte("secret")
 			return test{
 				name: "with secret",
 				args: args{
@@ -91,7 +90,7 @@ func Test_machineUser_create(t *testing.T) {
 						Machine: &domain.MachineUser{
 							Name:        "machine",
 							Description: "description",
-							Secret:      secret,
+							Secret:      "secret",
 						},
 					},
 				},
@@ -107,7 +106,7 @@ func Test_machineUser_create(t *testing.T) {
 						Machine: &domain.MachineUser{
 							Name:        "machine",
 							Description: "description",
-							Secret:      secret,
+							Secret:      "secret",
 						},
 					},
 				},
@@ -304,7 +303,7 @@ func Test_machineUser_create(t *testing.T) {
 							Description:     "description",
 							PATs:            pats,
 							Keys:            keys,
-							Secret:          []byte("secret"),
+							Secret:          "secret",
 							AccessTokenType: domain.AccessTokenTypeJWT,
 						},
 					},
@@ -339,7 +338,7 @@ func Test_machineUser_create(t *testing.T) {
 							Description:     "description",
 							PATs:            pats,
 							Keys:            keys,
-							Secret:          []byte("secret"),
+							Secret:          "secret",
 							AccessTokenType: domain.AccessTokenTypeJWT,
 						},
 					},

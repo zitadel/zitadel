@@ -23,7 +23,7 @@ type User struct {
 type MachineUser struct {
 	Name            string          `json:"name,omitempty" db:"name"`
 	Description     string          `json:"description,omitempty" db:"description"`
-	Secret          []byte          `json:"secret,omitempty" db:"secret"`
+	Secret          string          `json:"secret,omitempty" db:"secret"`
 	AccessTokenType AccessTokenType `json:"accessTokenType,omitempty" db:"access_token_type"`
 
 	PATs []*PersonalAccessToken `json:"pats,omitempty" db:"pats"`

@@ -71,7 +71,7 @@ CREATE TABLE zitadel.users(
     
     , name                                  TEXT        CHECK ((type = 'human' AND name IS NULL)                                  OR (type = 'machine'))
     , description                           TEXT        CHECK ((type = 'human' AND description IS NULL)                           OR (type = 'machine'))
-    , secret                                BYTEA       CHECK ((type = 'human' AND secret IS NULL)                                OR (type = 'machine'))
+    , secret                                TEXT        CHECK ((type = 'human' AND secret IS NULL)                                OR (type = 'machine'))
     , access_token_type                     SMALLINT    CHECK ((type = 'human' AND access_token_type IS NULL)                     OR (type = 'machine'))
 );
 
