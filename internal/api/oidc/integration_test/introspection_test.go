@@ -11,10 +11,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rs"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
-	"github.com/zitadel/zitadel/internal/integration"
 	"google.golang.org/grpc/metadata"
 
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
@@ -156,17 +156,16 @@ func TestIntrospection_RoleAddedAfterLogin(t *testing.T) {
 			scopes := []string{
 				oidc.ScopeOpenID,
 				oidc.ScopeProfile,
-				"urn:zitadel:iam:org:project:roles",
-				oidc_api.ScopeProjectRolePrefix + testCase.Role,
+				oidc_api.ScopeProjectsRoles,
 				fmt.Sprintf("urn:zitadel:iam:org:project:id:%s:aud", testCase.RoleGrantingProjectId),
 			}
 			accessToken := login(t, app.GetClientId(), scopes)
 
 			// introspect token and verify role is not present
+			projectRolesClaimName := fmt.Sprintf(oidc_api.ClaimProjectRolesFormat, testCase.RoleGrantingProjectId)
 			introspectionBefore, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), testCase.IntrospectionServer, accessToken)
 			require.NoError(tt, err)
 			assert.True(tt, introspectionBefore.Active)
-			projectRolesClaimName := fmt.Sprintf(oidc_api.ClaimProjectRolesFormat, testCase.RoleGrantingProjectId)
 			if roles, ok := introspectionBefore.Claims[projectRolesClaimName]; ok {
 				if rolesMap, ok := roles.(map[string]interface{}); ok {
 					assert.Contains(tt, rolesMap, testCase.Role, "role should not be present before granting")
