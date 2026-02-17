@@ -36,7 +36,7 @@ pnpm nx @zitadel/console:lint-fix
 ## Project Structure
 
 - `src/app/proto/generated/` - Generated proto files (Angular-specific format)
-- `buf.gen.yaml` - Local proto generation settings
+- `buf.gen.yaml` - Local proto generation configuration
 - `project.json` - Nx orchestration and caching for builds and tests
 - `prebuild.development.js` - Development environment settings script
 
@@ -64,7 +64,7 @@ As long as the Management Console still calls v1 APIs, it needs to import client
 
 ### <a name="v1-stubs"></a>Legacy v1 API (Traditional Protobuf)
 
-- Uses local `buf.gen.yaml` settings
+- Uses local `buf.gen.yaml` configuration
 - Generates traditional Google protobuf JavaScript classes extending `jspb.Message`
 - Uses plugins: `protocolbuffers/js`, `grpc/web`, `grpc-ecosystem/openapiv2`
 - Output: `src/app/proto/generated/`
