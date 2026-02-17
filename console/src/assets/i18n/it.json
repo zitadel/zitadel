@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Scaricare il file",
       "SELECTORGTOOLTIP": "Seleziona questa organizzazione.",
-      "PRIMARYDOMAIN": "Domini dell'Organizzazione",
+      "PRIMARYDOMAIN": "Dominio dell'Organizzazione",
       "STATE": "Stato",
       "USEPASSWORD": "Imposta la password iniziale",
       "USEPASSWORDDESC": "L'utente non deve impostare la password durante l'inizializzazione."
