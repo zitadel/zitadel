@@ -22,12 +22,15 @@ ZITADEL is an open-source Identity Management System (IAM) written in Go and Ang
 ## Technology Stack & Conventions
 - **Orchestration**: Nx is used for build and task orchestration.
 - **Package Manager**: pnpm.
+- **Development Environment**: `.devcontainer/` available for consistent development setup with Docker.
 - **Backend**:
   - **Go Version Source of Truth**: Inspect `go.mod` before Go work (`go` and optional `toolchain` directives).
   - **Communication**: For V2 APIs, connectRPC is the primary transport. gRPC and HTTP/JSON endpoints are also supported.
-  - **Pattern**: The backend is transitioning to a relational design. Events are still persisted in a separate table for history/audit, but events are not the system of record.
+  - **Architecture Pattern**: The backend is transitioning to a relational design where relational data is the system of record. Events are still persisted in a separate eventstore table for history/audit trails, but they are no longer the single source of truth. This transition is ongoing.
+    - **V2 Pattern** (`internal/`): Current architecture with eventstore integration and command/query patterns.
+    - **V3 Pattern** (`backend/v3/`): New hexagonal architecture with improved separation of concerns. See `backend/v3/doc.go`.
 - **Frontend**:
-  - **Console**: Angular + RxJS.
+  - **Console**: Angular + RxJS + Angular Material.
   - **Login/Docs**: Next.js + React.
 
 ## ZITADEL Domain & Multi-Tenancy Logic
