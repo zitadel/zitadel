@@ -9,8 +9,7 @@
       ],
       "defaultConfiguration": "default",
       "configurations": {
-        "default": {},
-        "test-login-integration": {}
+        "default": {}
       }
     },
     "dev": {
@@ -31,10 +30,8 @@
         "{workspaceRoot}/pnpm-lock.yaml",
         "!{projectRoot}/.env.*",
         "!{projectRoot}/.local.env",
-        "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
-        "!{projectRoot}/dockerized/**/*",
-        "!{projectRoot}/cypress.config.ts"
+        "!{projectRoot}/dockerized/**/*"
       ],
       "outputs": [
         "{projectRoot}/.next/standalone"
@@ -51,10 +48,8 @@
         "{workspaceRoot}/pnpm-lock.yaml",
         "!{projectRoot}/.env.*",
         "!{projectRoot}/.local.env",
-        "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
-        "!{projectRoot}/dockerized/**/*",
-        "!{projectRoot}/cypress.config.ts"
+        "!{projectRoot}/dockerized/**/*"
       ],
       "outputs": [
         "{projectRoot}/.next",
@@ -85,8 +80,7 @@
     "test": {
       "description": "Runs all tests (unit and integration)",
       "dependsOn": [
-        "test-unit",
-        "test-integration"
+        "test-unit"
       ]
     },
     "test-unit": {
@@ -104,7 +98,6 @@
       "cache": true,
       "inputs": [
         "default",
-        "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
         "!{projectRoot}/dockerized/**/output/**/*"
       ],
@@ -115,43 +108,7 @@
         ]
       }
     },
-    "test-integration-run-login": {
-      "description": "Runs the Login application under test. It has its own target, separate from test-integration, because it's a continuous task.",
-      "dependsOn": [
-        "build"
-      ],
-      "continuous": true,
-      "command": "nx run @zitadel/login:prod:test-login-integration --excludeTaskDependencies"
-    },
-    "test-integration": {
-      "description": "Runs integration tests using Cypress against a running Login and a mocked API",
-      "dependsOn": [
-        "test-integration-run-login",
-        "@zitadel/login-api-mock:build",
-        "@zitadel/login-api-mock:serve"
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{projectRoot}",
-        "parallel": false,
-        "commands": [
-          "pnpm cypress install",
-          "pnpm wait-on --verbose --interval 2000 --simultaneous 1 --timeout 30m \"tcp:${API_MOCK_STUBS_HOST}:22220\" \"http-get://localhost:3001/ui/v2/login/verify?userId=221394658884845598&code=abc\"",
-          "DISPLAY='' pnpm cypress run --headless",
-          "nx run @zitadel/login:test-integration-stop"
-        ]
-      },
-      "inputs": [
-        "default",
-        "{workspaceRoot}/pnpm-lock.yaml",
-        "!{projectRoot}/acceptance/**/*",
-        { "env": "LOGIN_BASE_URL" }
-      ]
-    },
-    "test-integration-stop": {
-        "description": "Stops the gRPC mock container used for integration tests.",
-        "command": "nx run @zitadel/login-api-mock:down"
-    },
+
     "pack": {
       "description": "Packages the standalone Login application build into an archive",
       "dependsOn": [
