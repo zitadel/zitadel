@@ -30,8 +30,8 @@ func TestAddOrganizationDomain(t *testing.T) {
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
@@ -230,8 +230,8 @@ func TestGetOrganizationDomain(t *testing.T) {
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
 
@@ -402,8 +402,8 @@ func TestListOrganizationDomains(t *testing.T) {
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
 
@@ -557,8 +557,8 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
 
@@ -718,8 +718,8 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
 
@@ -928,7 +928,8 @@ func TestOrganizationDomainChanges(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var builder database.StatementBuilder
-			test.change.Write(&builder)
+			err := test.change.Write(&builder)
+			require.NoError(t, err)
 			assert.Equal(t, test.expected, builder.String())
 		})
 	}

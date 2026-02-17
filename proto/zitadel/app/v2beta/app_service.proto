@@ -22,7 +22,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Application Service";
     version: "2.0-beta";
-    description: "This API is intended to manage apps (SAML, OIDC, etc..) in a ZITADEL instance. This service is in beta state. It can AND will continue breaking until a stable version is released.";
+    description: "This API is intended to manage apps (SAML, OIDC, etc..) in a Zitadel instance. This service is in beta state. It can AND will continue breaking until a stable version is released.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -45,7 +45,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -58,8 +58,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -112,7 +112,7 @@ service AppService {
 
     // Create Application
     //
-    // Deprecated: use [application service v2 CreateApplication](apis/resources/application_service_v2/application-service-create-application.api.mdx) instead.
+    // Deprecated: use [application service v2 CreateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead.
     //
     // Create an application. The application can be OIDC, API or SAML type, based on the input.
     //
@@ -143,7 +143,7 @@ service AppService {
 
     // Update Application
     //
-    // Deprecated: use [application service v2 UpdateApplication](apis/resources/application_service_v2/zitadel-app-v-2-application-service-update-application.api.mdx) instead.
+    // Deprecated: use [application service v2 UpdateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead.
     //
     // Changes the configuration of an OIDC, API or SAML type application, as well as
     // the application name, based on the input provided.
@@ -175,7 +175,7 @@ service AppService {
 
     // Get Application
     //
-    // Deprecated: use [application service v2 GetApplication](apis/resources/application_service_v2/application-service-get-application.api.mdx) instead.
+    // Deprecated: use [application service v2 GetApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.GetApplication) instead.
     //
     // Retrieves the application matching the provided ID.
     //
@@ -205,7 +205,7 @@ service AppService {
 
     // Delete Application
     //
-    // Deprecated: use [application service v2 DeleteApplication](apis/resources/application_service_v2/application-service-delete-application.api.mdx) instead.
+    // Deprecated: use [application service v2 DeleteApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplication) instead.
     //
     // Deletes the application belonging to the input project and matching the provided
     // application ID.
@@ -236,7 +236,7 @@ service AppService {
 
     // Deactivate Application
     //
-    // Deprecated: use [application service v2 DeactivateApplication](apis/resources/application_service_v2/application-service-deactivate-application.api.mdx) instead.
+    // Deprecated: use [application service v2 DeactivateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeactivateApplication) instead.
     //
     // Deactivates the application belonging to the input project and matching the provided
     // application ID.
@@ -268,7 +268,7 @@ service AppService {
 
     // Reactivate Application
     //
-    // Deprecated: use [application service v2 ReactivateApplication](apis/resources/application_service_v2/application-service-reactivate-application.api.mdx) instead.
+    // Deprecated: use [application service v2 ReactivateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.ReactivateApplication) instead.
     //
     // Reactivates the application belonging to the input project and matching the provided
     // application ID.
@@ -301,7 +301,7 @@ service AppService {
 
     // Regenerate Client Secret
     //
-    // Deprecated: use [application service v2 GenerateClientSecret](apis/resources/application_service_v2/application-service-generate-client-secret.api.mdx) instead.
+    // Deprecated: use [application service v2 GenerateClientSecret](/docs/reference/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret) instead.
     //
     // Regenerates the client secret of an API or OIDC application that belongs to the input project.
     // 
@@ -332,7 +332,7 @@ service AppService {
 
     // List Applications
     //
-    // Deprecated: use [application service v2 ListApplications](apis/resources/application_service_v2/application-service-list-applications.api.mdx) instead.
+    // Deprecated: use [application service v2 ListApplications](/docs/reference/api/application/zitadel.application.v2.ApplicationService.ListApplications) instead.
     //
     // Returns a list of applications matching the input parameters that belong to the provided
     // project.
@@ -368,7 +368,7 @@ service AppService {
 
     // Create Application Key 
     //
-    // Deprecated: use [application service v2 CreateApplicationKey](apis/resources/application_service_v2/application-service-create-application-key.api.mdx) instead.
+    // Deprecated: use [application service v2 CreateApplicationKey](/docs/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplicationKey) instead.
     //
     // Create a new application key, which is used to authorize an API application.
     //
@@ -402,7 +402,7 @@ service AppService {
 
     // Delete Application Key 
     //
-    // Deprecated: use [application service v2 DeleteApplicationKey](apis/resources/application_service_v2/application-service-delete-application-key.api.mdx) instead.
+    // Deprecated: use [application service v2 DeleteApplicationKey](/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplicationKey) instead.
     //
     // Deletes an application key matching the provided ID.
     //
@@ -436,7 +436,7 @@ service AppService {
 
     // Get Application Key
     //
-    // Deprecated: use [application service v2 GetApplicationKey](apis/resources/application_service_v2/application-service-get-application-key.api.mdx) instead.
+    // Deprecated: use [application service v2 GetApplicationKey](/docs/reference/api/application/zitadel.application.v2.ApplicationService.GetApplicationKey) instead.
     //
     // Retrieves the application key matching the provided ID.
     //
@@ -468,7 +468,7 @@ service AppService {
 
     // List Application Keys
     //
-    // Deprecated: use [application service v2 ListApplicationKeys](apis/resources/application_service_v2/application-service-list-application-keys.api.mdx) instead.
+    // Deprecated: use [application service v2 ListApplicationKeys](/docs/reference/api/application/zitadel.application.v2.ApplicationService.ListApplicationKeys) instead.
     //
     // Returns a list of application keys matching the input parameters.
     //
@@ -568,7 +568,7 @@ message CreateOIDCApplicationRequest {
         }
     ];
 
-    // ZITADEL will redirect to this link after a successful logout
+    // Zitadel will redirect to this link after a successful logout
     repeated string post_logout_redirect_uris = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"http://localhost:4200/signedout\"]";

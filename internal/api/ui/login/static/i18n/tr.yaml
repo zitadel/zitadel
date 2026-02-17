@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Faktör Doğrulama
   DescriptionPhone: 2-faktörünüzü oluşturun. Doğrulamak için telefon numaranızı girin.
   DescriptionCode: 2-faktörünüzü oluşturun. Telefon numaranızı doğrulamak için aldığınız kodu girin.
+  CountryCodeLabel: Ülke
   PhoneLabel: Telefon
   CodeLabel: Kod
   EditButtonText: Düzenle
@@ -267,6 +268,8 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Cinsiyet
   Female: Kadın
   Male: Erkek
@@ -312,6 +315,8 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Şartlar ve koşullar
   TosConfirm: Kabul ediyorum
   TosLinkText: Kullanım Şartları
@@ -391,6 +396,8 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Cihaz Yetkilendirme
   UserCode:
@@ -442,8 +449,8 @@ Errors:
       NotFound: Profil bulunamadı
       NotChanged: Profil değişmedi
       Empty: Profil boş
-      FirstNameEmpty: Profildeki ad boş
-      LastNameEmpty: Profildeki soyadı boş
+      FirstNameEmpty: Profildeki ad alanı boş
+      LastNameEmpty: Profildeki soyad alanı boş
       IDMissing: Profil ID'si eksik
     Email:
       NotFound: E-posta bulunamadı

@@ -15,8 +15,6 @@ import { getMembershipColor } from 'src/app/utils/color';
 
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { MembershipsDataSource } from './memberships-datasource';
-import { NewOrganizationService } from '../../services/new-organization.service';
-import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
 
 @Component({
   selector: 'cnsl-memberships-table',
@@ -50,7 +48,6 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private router: Router,
     private workflowService: OverlayWorkflowService,
-    private readonly newOrganizationService: NewOrganizationService,
   ) {
     this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe((_) => {
       this.changedSelection.emit(this.selection.selected);
@@ -118,43 +115,45 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
   }
 
   public async goto(membership: Membership.AsObject) {
-    const orgId = this.newOrganizationService.orgId();
+    const org = await this.authService.getActiveOrg();
 
-    if (membership.orgId && !membership.projectId && !membership.projectGrantId) {
-      // only shown on auth user, or if currentOrg === resourceOwner
-      try {
-        const membershipOrg = await this.newOrganizationService.setOrgId(membership.orgId);
-        await this.router.navigate(['/org/members']);
-        this.startOrgContextWorkflow(membershipOrg, orgId);
-      } catch (error) {
-        this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
+    if (org) {
+      if (membership.orgId && !membership.projectId && !membership.projectGrantId) {
+        // only shown on auth user, or if currentOrg === resourceOwner
+        try {
+          const membershipOrg = await this.authService.getActiveOrg(membership.orgId);
+          await this.router.navigate(['/org/members']);
+          this.startOrgContextWorkflow(membershipOrg?.id, org.id);
+        } catch (error) {
+          this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
+        }
+      } else if (membership.projectGrantId && membership.details?.resourceOwner) {
+        // only shown on auth user
+        try {
+          const membershipOrg = await this.authService.getActiveOrg(membership.details?.resourceOwner);
+          await this.router.navigate(['/granted-projects', membership.projectId, 'grants', membership.projectGrantId]);
+          this.startOrgContextWorkflow(membershipOrg?.id, org.id);
+        } catch (error) {
+          this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
+        }
+      } else if (membership.projectId && membership.details?.resourceOwner) {
+        // only shown on auth user, or if currentOrg === resourceOwner
+        try {
+          const membershipOrg = await this.authService.getActiveOrg(membership.details?.resourceOwner);
+          await this.router.navigate(['/projects', membership.projectId, 'members']);
+          this.startOrgContextWorkflow(membershipOrg?.id, org.id);
+        } catch (error) {
+          this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
+        }
+      } else if (membership.iam) {
+        // only shown on auth user
+        await this.router.navigate(['/instance/members']);
       }
-    } else if (membership.projectGrantId && membership.details?.resourceOwner) {
-      // only shown on auth user
-      try {
-        const membershipOrg = await this.newOrganizationService.setOrgId(membership.details?.resourceOwner);
-        await this.router.navigate(['/granted-projects', membership.projectId, 'grants', membership.projectGrantId]);
-        this.startOrgContextWorkflow(membershipOrg, orgId);
-      } catch (error) {
-        this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
-      }
-    } else if (membership.projectId && membership.details?.resourceOwner) {
-      // only shown on auth user, or if currentOrg === resourceOwner
-      try {
-        const membershipOrg = await this.newOrganizationService.setOrgId(membership.details?.resourceOwner);
-        await this.router.navigate(['/projects', membership.projectId, 'members']);
-        this.startOrgContextWorkflow(membershipOrg, orgId);
-      } catch (error) {
-        this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
-      }
-    } else if (membership.iam) {
-      // only shown on auth user
-      await this.router.navigate(['/instance/members']);
     }
   }
 
-  private startOrgContextWorkflow(membershipOrg: Organization, currentOrgId?: string | null): void {
-    if (!currentOrgId || (membershipOrg.id && currentOrgId && currentOrgId !== membershipOrg.id)) {
+  private startOrgContextWorkflow(membershipOrgId?: string, currentOrgId?: string | null): void {
+    if (!currentOrgId || (membershipOrgId && currentOrgId && currentOrgId !== membershipOrgId)) {
       setTimeout(() => {
         this.workflowService.startWorkflow(OrgContextChangedWorkflowOverlays, null);
       }, 1000);

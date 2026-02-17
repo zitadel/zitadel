@@ -8,13 +8,16 @@ import (
 	"strings"
 
 	"connectrpc.com/grpcreflect"
+	"connectrpc.com/otelconnect"
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/zitadel/logging"
+	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -25,7 +28,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
@@ -54,6 +56,7 @@ type API struct {
 
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
 	translator                *i18n.Translator
+	connectOTELInterceptor    *otelconnect.Interceptor
 }
 
 func (a *API) ListGrpcServices() []string {
@@ -107,6 +110,7 @@ func New(
 	accessInterceptor *http_mw.AccessInterceptor,
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
+	trustRemoteSpans bool,
 ) (_ *API, err error) {
 	api := &API{
 		port:                      port,
@@ -126,6 +130,19 @@ func New(
 
 	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService(), targetEncryptionAlgorithm, api.translator)
 	api.grpcGateway, err = server.CreateGateway(ctx, port, hostHeaders, accessInterceptor, tlsConfig)
+	if err != nil {
+		return nil, err
+	}
+	otelOpts := []otelconnect.Option{
+		otelconnect.WithTracerProvider(otel.GetTracerProvider()),
+		otelconnect.WithMeterProvider(otel.GetMeterProvider()),
+		otelconnect.WithPropagator(otel.GetTextMapPropagator()),
+		otelconnect.WithoutServerPeerAttributes(),
+	}
+	if trustRemoteSpans {
+		otelOpts = append(otelOpts, otelconnect.WithTrustRemote())
+	}
+	api.connectOTELInterceptor, err = otelconnect.NewInterceptor(otelOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +208,9 @@ func (a *API) RegisterService(ctx context.Context, srv server.Server) error {
 func (a *API) registerConnectServer(service server.ConnectServer) {
 	prefix, handler := service.RegisterConnectServer(
 		connect_middleware.CallDurationHandler(),
+		a.connectOTELInterceptor,
 		connect_middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
+		connect_middleware.LogHandler(grpc_api.Probes...),
 		connect_middleware.NoCacheInterceptor(),
 		connect_middleware.InstanceInterceptor(a.queries, a.externalDomain, a.translator, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName, instance_pb.InstanceService_ServiceDesc.ServiceName),
 		connect_middleware.AccessStorageInterceptor(a.accessInterceptor.AccessService()),
@@ -200,7 +219,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.AuthorizationInterceptor(a.verifier, a.systemAuthZ, a.authConfig),
 		connect_middleware.TranslationHandler(),
 		connect_middleware.QuotaExhaustedInterceptor(a.accessInterceptor.AccessService(), system_pb.SystemService_ServiceDesc.ServiceName),
-		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm),
+		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm, a.queries.GetActiveSigningWebKey),
 		connect_middleware.ValidationHandler(),
 		connect_middleware.ServiceHandler(),
 		connect_middleware.ActivityInterceptor(),
@@ -220,16 +239,16 @@ func (a *API) HandleFunc(path string, f http.HandlerFunc) {
 	a.router.HandleFunc(path, f)
 }
 
-// RegisterHandlerOnPrefix registers a http handler on a path prefix
-// the prefix will not be passed to the actual handler
+// RegisterHandlerOnPrefix registers an http handler on a path prefix.
+// The prefix will not be passed to the actual handler.
 func (a *API) RegisterHandlerOnPrefix(prefix string, handler http.Handler) {
 	prefix = strings.TrimSuffix(prefix, "/")
 	subRouter := a.router.PathPrefix(prefix).Name(prefix).Subrouter()
 	subRouter.PathPrefix("").Handler(http.StripPrefix(prefix, handler))
 }
 
-// RegisterHandlerPrefixes registers a http handler on a multiple path prefixes
-// the prefix will remain when calling the actual handler
+// RegisterHandlerPrefixes registers an http handler on multiple path prefixes.
+// The prefix will remain when calling the actual handler.
 func (a *API) RegisterHandlerPrefixes(handler http.Handler, prefixes ...string) {
 	for _, prefix := range prefixes {
 		prefix = strings.TrimSuffix(prefix, "/")

@@ -10,14 +10,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v3/pkg/crypto"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	"github.com/zitadel/zitadel/internal/command"
@@ -33,6 +35,7 @@ const (
 	LoginPostLogoutRedirectParam = "post_logout_redirect"
 	LoginLogoutHintParam         = "logout_hint"
 	LoginUILocalesParam          = "ui_locales"
+	LoginLogoutTokenParam        = "logout_token"
 	LoginPath                    = "/login"
 	LogoutPath                   = "/logout"
 	LogoutDonePath               = "/logout/done"
@@ -41,7 +44,7 @@ const (
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 
@@ -164,7 +167,7 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 
@@ -203,7 +206,7 @@ func (o *OPStorage) decryptGrant(grant string) (string, error) {
 func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 
@@ -246,7 +249,7 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 func (o *OPStorage) terminateSession(ctx context.Context, userID string) (sessions []command.HumanSignOutSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
@@ -273,7 +276,7 @@ func (o *OPStorage) terminateSession(ctx context.Context, userID string) (sessio
 func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionRequest *op.EndSessionRequest) (redirectURI string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 
@@ -298,7 +301,11 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 		} else {
 			logoutURI = logoutURI.JoinPath(LogoutPath)
 		}
-		return buildLoginV2LogoutURL(logoutURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales), nil
+		signer, _, err := sign.GetSignerOnce(o.query.GetActiveSigningWebKey)(ctx)
+		if err != nil {
+			return "", err
+		}
+		return buildLoginV2LogoutURL(logoutURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales, signer)
 	}
 
 	// V1:
@@ -375,7 +382,13 @@ func (o *OPStorage) federatedLogout(ctx context.Context, sessionID string, postL
 	return login.ExternalLogoutPath(sessionID)
 }
 
-func buildLoginV2LogoutURL(logoutURI *url.URL, redirectURI, logoutHint string, uiLocales []language.Tag) string {
+type logoutTokenPayload struct {
+	PostLogoutRedirectURI string       `json:"post_logout_redirect_uri,omitempty"`
+	LogoutHint            string       `json:"logout_hint,omitempty"`
+	UILocales             oidc.Locales `json:"ui_locales,omitempty"`
+}
+
+func buildLoginV2LogoutURL(logoutURI *url.URL, redirectURI, logoutHint string, uiLocales oidc.Locales, signer jose.Signer) (string, error) {
 	if strings.HasSuffix(logoutURI.Path, "/") && len(logoutURI.Path) > 1 {
 		logoutURI.Path = strings.TrimSuffix(logoutURI.Path, "/")
 	}
@@ -386,14 +399,19 @@ func buildLoginV2LogoutURL(logoutURI *url.URL, redirectURI, logoutHint string, u
 		q.Set(LoginLogoutHintParam, logoutHint)
 	}
 	if len(uiLocales) > 0 {
-		locales := make([]string, len(uiLocales))
-		for i, locale := range uiLocales {
-			locales[i] = locale.String()
-		}
-		q.Set(LoginUILocalesParam, strings.Join(locales, " "))
+		q.Set(LoginUILocalesParam, uiLocales.String())
 	}
+	logoutToken, err := crypto.Sign(&logoutTokenPayload{
+		PostLogoutRedirectURI: redirectURI,
+		LogoutHint:            logoutHint,
+		UILocales:             uiLocales,
+	}, signer)
+	if err != nil {
+		return "", err
+	}
+	q.Set(LoginLogoutTokenParam, logoutToken)
 	logoutURI.RawQuery = q.Encode()
-	return logoutURI.String()
+	return logoutURI.String(), nil
 }
 
 // v2PostLogoutRedirectURI will take care that the post_logout_redirect_uri is correctly set for v2 logins.
@@ -487,7 +505,7 @@ func (o *OPStorage) revokeTokenV1(ctx context.Context, token, userID, clientID s
 func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, token string) (userID string, tokenID string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 

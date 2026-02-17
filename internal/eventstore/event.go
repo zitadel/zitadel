@@ -2,7 +2,10 @@ package eventstore
 
 import (
 	"encoding/json"
+	"log/slog"
+	"maps"
 	"reflect"
+	"slices"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -21,10 +24,10 @@ type action interface {
 	Revision() uint16
 }
 
-// Command is the intend to store an event into the eventstore
+// Command is the intent to store an event into the eventstore
 type Command interface {
 	action
-	// Payload returns the payload of the event. It represent the changed fields by the event
+	// Payload returns the payload of the event. It represents the changed fields by the event
 	// valid types are:
 	// * nil: no payload
 	// * struct: which can be marshalled to json
@@ -108,4 +111,59 @@ func isEventTypes(command Command, types ...EventType) bool {
 		}
 	}
 	return false
+}
+
+type logValue struct {
+	event Event
+}
+
+func eventToLogValue(event Event) slog.LogValuer {
+	return &logValue{
+		event: event,
+	}
+}
+
+func (lv *logValue) LogValue() slog.Value {
+	attributes := make([]slog.Attr, 0, 12)
+	aggregate := lv.event.Aggregate()
+	attributes = append(attributes,
+		slog.String("aggregate_id", aggregate.ID),
+		slog.String("aggregate_type", string(aggregate.Type)),
+		slog.String("resource_owner", aggregate.ResourceOwner),
+		slog.String("instance_id", aggregate.InstanceID),
+		slog.String("version", string(aggregate.Version)),
+		slog.String("creator", lv.event.Creator()),
+		slog.String("event_type", string(lv.event.Type())),
+		slog.Uint64("revision", uint64(lv.event.Revision())),
+		slog.Uint64("sequence", lv.event.Sequence()),
+		slog.Time("created_at", lv.event.CreatedAt()),
+		slog.String("position", lv.event.Position().String()),
+	)
+
+	var m map[string]any
+	err := lv.event.Unmarshal(&m)
+	if err != nil {
+		attributes = append(attributes,
+			slog.String("msg", "failed to unmarshal event for logging"),
+			slog.String("err", err.Error()),
+		)
+		return slog.GroupValue(attributes...)
+	}
+	attributes = append(attributes,
+		slog.Any("data", mapToLogValue(m)),
+	)
+	return slog.GroupValue(attributes...)
+}
+
+// mapToLogValue converts a map[string]any to a [slog.Value], handling nested maps recursively.
+func mapToLogValue(m map[string]any) slog.Value {
+	attributes := make([]slog.Attr, 0, len(m))
+	for _, key := range slices.Sorted(maps.Keys(m)) {
+		value := m[key]
+		if nestedMap, ok := value.(map[string]any); ok {
+			value = mapToLogValue(nestedMap)
+		}
+		attributes = append(attributes, slog.Any(key, value))
+	}
+	return slog.GroupValue(attributes...)
 }

@@ -32,7 +32,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         title: "Management API";
         version: "1.0";
-        description: "The management API is as the name states the interface where systems can mutate IAM objects like organizations, projects, clients, users and so on if they have the necessary access rights.";
+        description: "The management API is as the name states the interface where systems can mutate instance objects like organizations, projects, applications, users and so on if they have the necessary access rights.";
         contact:{
             name: "ZITADEL"
             url: "https://zitadel.com"
@@ -49,7 +49,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Applications",
-            description: "Applications are the entry point to your project. Users either login into one of your clients and interact with them directly or use one of your APIs. All applications share the roles and authorizations of their project."
+            description: "Applications are the entry point to your project. Users either log into one of your applications and interact with them directly or use one of your APIs. All applications share the roles and role assignments of their project."
         },
         {
             name: "Authentication Methods"
@@ -105,7 +105,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Project Grants",
-            description: "A project that is granted to another organization, so the other organization has access to it and can manage the user authorizations, is called a project grant."
+            description: "A project that is granted to another organization, so the other organization has access to it and can manage the user role assignments, is called a project grant."
         },
         {
             name: "Project Roles"
@@ -115,7 +115,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Users",
-            description: "ZITADEL knows two different types of users: Users (Human) and Service Users (Machine Accounts)"
+            description: "ZITADEL knows two different types of users: Users (Human) and Service Accounts"
         },
         {
             name: "User Grants",
@@ -129,7 +129,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "User Metadata",
-            description: "Metadata is a key/value list to enrich the user object with any data needed. The data is not interpreted by ZITADEL itself."
+            description: "Metadata is a key/value list to enrich the user object with any data needed. The data is not interpreted by Zitadel itself."
         },
         {
             name: "ZITADEL Administrators"
@@ -146,7 +146,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     consumes: "application/grpc-web+proto";
     produces: "application/grpc-web+proto";
 
-    host: "$CUSTOM-DOMAIN";
+    host: "$CUSTOM_DOMAIN";
     base_path: "/management/v1";
 
     external_docs: {
@@ -166,8 +166,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             value: {
                 type: TYPE_OAUTH2;
                 flow: FLOW_ACCESS_CODE;
-                authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-                token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+                authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+                token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
                 scopes: {
                     scope: {
                         key: "openid";
@@ -193,7 +193,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     extensions: {
         key: "x-zitadel-orgid";
         value: {
-            string_value: "$YOUR-ORGANIZATION";
+            string_value: "$YOUR_ORGANIZATION";
         }
     }
 };
@@ -206,7 +206,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Healthz";
-            description: "The health endpoint allows an external system to probe if ZITADEL management API is alive"
+            description: "The health endpoint allows an external system to probe if Zitadel management API is alive"
             tags: "General";
             responses: {
                 key: "200"
@@ -224,7 +224,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "ZITADEL documentation";
-            description: "This endpoint returns some general needed (OIDC) information about ZITADEL like the issuer or discovery endpoint."
+            description: "This endpoint returns some general needed (OIDC) information about Zitadel like the issuer or discovery endpoint."
             tags: "General";
             responses: {
                 key: "200"
@@ -246,7 +246,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Instance information";
-            description: "Some needed settings made in ZITADEL like the global organization id or ZITADEL project ID "
+            description: "Some needed settings made in Zitadel like the global organization id or Zitadel project ID "
             tags: "General";
             responses: {
                 key: "200"
@@ -284,7 +284,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 ListUsers with InUserIDQuery](apis/resources/user_service_v2/user-service-list-users.api.mdx) instead.
     //
-    // Returns the full user object (human or machine) including the profile, email, etc.
+    // Returns the full user or Service Account including the profile, email, etc.
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -444,7 +444,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) instead.
     //
-    // Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
+    // Create a new user. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human"
@@ -473,7 +473,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 UpdateHumanUser](apis/resources/user_service_v2/user-service-update-human-user.api.mdx) instead.
     //
-    // Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
+    // Create/import a new user. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human/_import"
@@ -1454,7 +1454,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 RemoveTOTP](apis/resources/user_service_v2/user-service-remove-totp.api.mdx) instead.
     //
-    // Remove the configured One-Time Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.
+    // Remove the configured OTP as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.
     rpc RemoveHumanAuthFactorOTP(RemoveHumanAuthFactorOTPRequest) returns (RemoveHumanAuthFactorOTPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp"
@@ -1524,7 +1524,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 RemoveOTPSMS](apis/resources/user_service_v2/user-service-remove-otpsms.api.mdx) instead.
     //
-    // Remove the configured One-Time Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
+    // Remove the configured OTP SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
     rpc RemoveHumanAuthFactorOTPSMS(RemoveHumanAuthFactorOTPSMSRequest) returns (RemoveHumanAuthFactorOTPSMSResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_sms"
@@ -1559,7 +1559,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 RemoveOTPEmail](apis/resources/user_service_v2/user-service-remove-otp-email.api.mdx) instead.
     //
-    // Remove the configured One-Time Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
+    // Remove the configured OTP Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
     rpc RemoveHumanAuthFactorOTPEmail(RemoveHumanAuthFactorOTPEmailRequest) returns (RemoveHumanAuthFactorOTPEmailResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_email"
@@ -1590,11 +1590,11 @@ service ManagementService {
         };
     }
 
-    // Search Passwordless/Passkey authentication
+    // Search Passkey authentication
     //
     // Deprecated: use [user service v2 ListPasskeys](apis/resources/user_service_v2/user-service-list-passkeys.api.mdx) instead.
     //
-    // Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token.
+    // Get a list of configured passkey authentication methods from the user. Passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token.
     rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_search"
@@ -1625,11 +1625,11 @@ service ManagementService {
         };
     }
 
-    // Add Passwordless/Passkey Registration Link
+    // Add Passkey Registration Link
     //
     // Deprecated: use [user service v2 RegisterPasskey](apis/resources/user_service_v2/user-service-register-passkey.api.mdx) instead.
     //
-    // Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
+    // Adds a new passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
     rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_link"
@@ -1659,11 +1659,11 @@ service ManagementService {
         };
     }
 
-    // Send Passwordless/Passkey Registration Link
+    // Send Passkey Registration Link
     //
     // Deprecated: use [user service v2 RegisterPasskey](apis/resources/user_service_v2/user-service-register-passkey.api.mdx) instead.
     //
-    // Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
+    // Adds a new passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
     rpc SendPasswordlessRegistration(SendPasswordlessRegistrationRequest) returns (SendPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_send_link"
@@ -1694,11 +1694,11 @@ service ManagementService {
         };
     }
 
-    // Delete Passwordless/Passkey
+    // Delete Passkey
     //
     // Deprecated: use [user service v2 RemovePasskey](apis/resources/user_service_v2/user-service-remove-passkey.api.mdx) instead.
     //
-    // Remove a configured passwordless/passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.).
+    // Remove a configured passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.).
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/passwordless/{token_id}"
@@ -1729,11 +1729,11 @@ service ManagementService {
         };
     }
 
-    // Update Machine User
+    // Update Service Account
     //
     // Deprecated: use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
     //
-    // Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities.
+    // Change a service account/service account. It is used for accounts with non-interactive authentication possibilities.
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/machine"
@@ -1765,11 +1765,11 @@ service ManagementService {
         };
     }
 
-    // Create Secret for Machine User
+    // Create Secret for Service Account
     //
     // Deprecated: use [user service v2 AddSecret](apis/resources/user_service_v2/user-service-add-secret.api.mdx) instead.
     //
-    // Create a new secret for a machine user/service account. It is used to authenticate the user (client credential grant).
+    // Create a new secret for a service account. It is used to authenticate the user (client credential grant).
     rpc GenerateMachineSecret(GenerateMachineSecretRequest) returns (GenerateMachineSecretResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/secret"
@@ -1801,11 +1801,11 @@ service ManagementService {
         };
     }
 
-    // Delete Secret of Machine User
+    // Delete Secret of Service Account
     //
     // Deprecated: use [user service v2 RemoveSecret](apis/resources/user_service_v2/user-service-remove-secret.api.mdx) instead.
     //
-    // Delete a secret of a machine user/service account. The user will not be able to authenticate with the secret afterward.
+    // Delete a secret of a service account. The user will not be able to authenticate with the secret afterward.
     rpc RemoveMachineSecret(RemoveMachineSecretRequest) returns (RemoveMachineSecretResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/secret"
@@ -1836,11 +1836,11 @@ service ManagementService {
         };
     }
 
-    // Get Machine user Key By ID
+    // Get Service account Key By ID
     //
     // Deprecated: use [user service v2 ListUsers](apis/resources/user_service_v2/user-service-list-users.api.mdx) instead.
     //
-    // Get a specific Key of a machine user by its id. Machine keys are used to authenticate with jwt profile authentication.
+    // Get a specific Key of a service account by its id. Machine keys are used to authenticate with jwt profile authentication.
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/keys/{key_id}"
@@ -1875,7 +1875,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 ListKeys](apis/resources/user_service_v2/user-service-list-keys.api.mdx) instead.
     //
-    // Get the list of keys of a machine user. Machine keys are used to authenticate with jwt profile authentication.
+    // Get the list of keys of a service account. Machine keys are used to authenticate with jwt profile authentication.
     rpc ListMachineKeys(ListMachineKeysRequest) returns (ListMachineKeysResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/keys/_search"
@@ -1907,7 +1907,7 @@ service ManagementService {
         };
     }
 
-    // Create Key for machine user
+    // Create Key for service account
     //
     // Deprecated: use [user service v2 AddKey](apis/resources/user_service_v2/user-service-add-key.api.mdx) instead.
     //
@@ -1946,7 +1946,7 @@ service ManagementService {
         };
     }
 
-    // Delete Key for machine user
+    // Delete Key for service account
     //
     // Deprecated: use [user service v2 RemoveKey](apis/resources/user_service_v2/user-service-remove-key.api.mdx) instead.
     //
@@ -2183,11 +2183,11 @@ service ManagementService {
         };
     }
 
-    // List ZITADEL Permissions
+    // List Zitadel Permissions
     //
     // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-list-administrators.api.mdx) instead.
     //
-    // Show all the permissions the user has in ZITADEL (ZITADEL Manager).
+    // Show all the permissions the user has in Zitadel (ZITADEL Manager).
     rpc ListUserMemberships(ListUserMembershipsRequest) returns (ListUserMembershipsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/memberships/_search"
@@ -2238,7 +2238,7 @@ service ManagementService {
 
     // Get Organization By Domain
     //
-    // Deprecated: use [organization v2 service ListOrganizations](apis/resources/org_service_v2/organization-service-list-organizations.api.mdx) instead.
+    // Deprecated: use [organization v2 service ListOrganizations](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-list-organizations.api.mdx) instead.
     //
     // Search an organization by the domain, overall organizations. The domain must match exactly.
     rpc GetOrgByDomainGlobal(GetOrgByDomainGlobalRequest) returns (GetOrgByDomainGlobalResponse) {
@@ -2283,9 +2283,9 @@ service ManagementService {
 
     // Create Organization
     //
-    // Deprecated: use [organization service v2 CreateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-create-organization.api.mdx) instead
+    // Deprecated: use [organization service v2 CreateOrganization](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-add-organization.api.mdx) instead
     //
-    // Create a new organization. Based on the given name a domain will be generated to be able to identify users within an organization.
+    // Create a new organization. Based on the provided name a domain will be generated to be able to identify users within an organization.
     rpc AddOrg(AddOrgRequest) returns (AddOrgResponse) {
         option (google.api.http) = {
             post: "/orgs"
@@ -2312,7 +2312,7 @@ service ManagementService {
 
     // Update Organization
     //
-    // Deprecated: use [organization service v2 UpdateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-update-organization.api.mdx) instead.
+    // Deprecated: use [organization service v2 UpdateOrganization](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-update-organization.api.mdx) instead.
     //
     // Change the name of the organization.
     rpc UpdateOrg(UpdateOrgRequest) returns (UpdateOrgResponse) {
@@ -2341,7 +2341,7 @@ service ManagementService {
 
     // Deactivate Organization
     //
-    // Deprecated: use [organization service v2 DeactivateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-deactivate-organization.api.mdx) instead.
+    // Deprecated: use [organization service v2 DeactivateOrganization](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-deactivate-organization.api.mdx) instead.
     //
     // Sets the state of my organization to deactivated. Users of this organization will not be able to log in.
     rpc DeactivateOrg(DeactivateOrgRequest) returns (DeactivateOrgResponse) {
@@ -2370,7 +2370,7 @@ service ManagementService {
 
     // Reactivate Organization
     //
-    // Deprecated: use [organization service v2 ActivateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-activate-organization.api.mdx) instead.
+    // Deprecated: use [organization service v2 ActivateOrganization](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-activate-organization.api.mdx) instead.
     //
     // Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again.
     rpc ReactivateOrg(ReactivateOrgRequest) returns (ReactivateOrgResponse) {
@@ -2399,7 +2399,7 @@ service ManagementService {
 
     // Delete Organization
     //
-    // Deprecated: use [organization service v2 DeleteOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization.api.mdx) instead.
+    // Deprecated: use [organization service v2 DeleteOrganization](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-delete-organization.api.mdx) instead.
     //
     // Deletes my organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in.
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
@@ -2427,7 +2427,7 @@ service ManagementService {
 
     // Set Organization Metadata
     //
-    // Deprecated: use [organization service v2 SetOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-set-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 SetOrganizationMetadata](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-set-organization-metadata.api.mdx) instead.
     //
     // This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
     rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
@@ -2457,7 +2457,7 @@ service ManagementService {
 
     // Bulk Set Organization Metadata
     //
-    // Deprecated: use [organization service v2 SetOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-set-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 SetOrganizationMetadata](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-set-organization-metadata.api.mdx) instead.
     //
     // This endpoint sets a list of metadata to the organization. Make sure the values are base64 encoded.
     rpc BulkSetOrgMetadata(BulkSetOrgMetadataRequest) returns (BulkSetOrgMetadataResponse) {
@@ -2487,7 +2487,7 @@ service ManagementService {
 
     // Search Organization Metadata
     //
-    // Deprecated: use [organization service v2 ListOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-list-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 ListOrganizationMetadata](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-list-organization-metadata.api.mdx) instead.
     //
     // Get the metadata of an organization filtered by your query.
     rpc ListOrgMetadata(ListOrgMetadataRequest) returns (ListOrgMetadataResponse) {
@@ -2517,7 +2517,7 @@ service ManagementService {
 
     // Get Organization Metadata By Key
     //
-    // Deprecated: use [organization service v2 ListOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-list-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 ListOrganizationMetadata](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-list-organization-metadata.api.mdx) instead.
     //
     // Get a metadata object from an organization by a specific key.
     rpc GetOrgMetadata(GetOrgMetadataRequest) returns (GetOrgMetadataResponse) {
@@ -2546,7 +2546,7 @@ service ManagementService {
 
     // Delete Organization Metadata By Key
     //
-    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-delete-organization-metadata.api.mdx) instead.
     //
     // Remove a metadata object from an organization with a specific key.
     rpc RemoveOrgMetadata(RemoveOrgMetadataRequest) returns (RemoveOrgMetadataResponse) {
@@ -2575,7 +2575,7 @@ service ManagementService {
 
     // Bulk Delete Metadata
     //
-    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-delete-organization-metadata.api.mdx) instead.
     //
     // Remove a list of metadata objects from an organization with a list of keys.
     rpc BulkRemoveOrgMetadata(BulkRemoveOrgMetadataRequest) returns (BulkRemoveOrgMetadataResponse) {
@@ -2605,7 +2605,7 @@ service ManagementService {
 
     // Add Domain
     //
-    // Deprecated: use [organization service v2 AddOrganizationDomain](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-add-organization-domain.api.mdx) instead.
+    // Deprecated: use [organization service v2 AddOrganizationDomain](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-add-organization-domain.api.mdx) instead.
     //
     // Add a new domain to an organization. The domains are used to identify to which organization a user belongs.
     rpc AddOrgDomain(AddOrgDomainRequest) returns (AddOrgDomainResponse) {
@@ -2634,7 +2634,7 @@ service ManagementService {
 
     // Search Domains
     //
-    // Deprecated: use [organization service v2 ListOrganizationDomains](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-list-organization-domains.api.mdx) instead.
+    // Deprecated: use [organization service v2 ListOrganizationDomains](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-list-organization-domains.api.mdx) instead.
     //
     // Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs.
     rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
@@ -2663,7 +2663,7 @@ service ManagementService {
 
     // Remove Domain
     //
-    // Deprecated: use [organization service v2 DeleteOrganizationDomain](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization-domain.api.mdx) instead.
+    // Deprecated: use [organization service v2 DeleteOrganizationDomain](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-delete-organization-domain.api.mdx) instead.
     //
     // Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead.
     rpc RemoveOrgDomain(RemoveOrgDomainRequest) returns (RemoveOrgDomainResponse) {
@@ -2691,7 +2691,7 @@ service ManagementService {
 
     // Generate Domain Verification
     //
-    // Deprecated: use [organization service v2 GenerateOrganizationDomainValidation](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-generate-organization-domain-validation.api.mdx) instead.
+    // Deprecated: use [organization service v2 GenerateOrganizationDomainValidation](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-generate-organization-domain-validation.api.mdx) instead.
     //
     // Generate a new file to be able to verify your domain with DNS or HTTP challenge.
     rpc GenerateOrgDomainValidation(GenerateOrgDomainValidationRequest) returns (GenerateOrgDomainValidationResponse) {
@@ -2720,9 +2720,9 @@ service ManagementService {
 
     // Verify Domain
     //
-    // Deprecated: use [organization service v2 VerifyOrganizationDomain](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-verify-organization-domain.api.mdx) instead.
+    // Deprecated: use [organization service v2 VerifyOrganizationDomain](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-verify-organization-domain.api.mdx) instead.
     //
-    // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique.
+    // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). Zitadel will check it and set the domain as verified if it was successful. A verify domain has to be unique.
     rpc ValidateOrgDomain(ValidateOrgDomainRequest) returns (ValidateOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_validate"
@@ -2785,7 +2785,7 @@ service ManagementService {
             tags: "Members";
             tags: "ZITADEL Administrators";
             summary: "List Organization Member Roles";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the organization level."
+            description: "Members are users with permission to administrate Zitadel on different levels. This request returns all roles possible for a Zitadel member on the organization level."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2801,7 +2801,7 @@ service ManagementService {
     //
     // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-list-administrators.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the organization level, matching the search queries. The search queries will be AND linked.
+    // Members are users with permission to administrate Zitadel on different levels. This request returns all users with memberships on the organization level, matching the search queries. The search queries will be AND linked.
     rpc ListOrgMembers(ListOrgMembersRequest) returns (ListOrgMembersResponse) {
         option (google.api.http) = {
             post: "/orgs/me/members/_search"
@@ -2832,7 +2832,7 @@ service ManagementService {
     //
     // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-create-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the organization level with one or multiple roles.
+    // Members are users with permission to administrate Zitadel on different levels. This request adds a new user to the members list on the organization level with one or multiple roles.
     rpc AddOrgMember(AddOrgMemberRequest) returns (AddOrgMemberResponse) {
         option (google.api.http) = {
             post: "/orgs/me/members"
@@ -2863,7 +2863,7 @@ service ManagementService {
     //
     // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-update-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
+    // Members are users with permission to administrate Zitadel on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateOrgMember(UpdateOrgMemberRequest) returns (UpdateOrgMemberResponse) {
         option (google.api.http) = {
             put: "/orgs/me/members/{user_id}"
@@ -2894,7 +2894,7 @@ service ManagementService {
     //
     // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-delete-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (iam, project).
+    // Members are users with permission to administrate Zitadel on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (iam, project).
     rpc RemoveOrgMember(RemoveOrgMemberRequest) returns (RemoveOrgMemberResponse) {
         option (google.api.http) = {
             delete: "/orgs/me/members/{user_id}"
@@ -3362,7 +3362,7 @@ service ManagementService {
     //
     // Deprecated: use [project v2 service RemoveProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-project-service-remove-project-role.api.mdx) instead.
     //
-    // Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants.
+    // Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants (role assignments).
     rpc RemoveProjectRole(RemoveProjectRoleRequest) returns (RemoveProjectRoleResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/roles/{role_key=**}"
@@ -3401,7 +3401,7 @@ service ManagementService {
             tags: "Members";
             tags: "ZITADEL Administrators";
             summary: "List Project Member Roles";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the project level."
+            description: "Members are users with permission to administrate Zitadel on different levels. This request returns all roles possible for a Zitadel member on the project level."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3417,7 +3417,7 @@ service ManagementService {
     //
     // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-list-administrators.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project level, matching the search queries. The search queries will be AND linked.
+    // Members are users with permission to administrate Zitadel on different levels. This request returns all users with memberships on the project level, matching the search queries. The search queries will be AND linked.
     rpc ListProjectMembers(ListProjectMembersRequest) returns (ListProjectMembersResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/members/_search"
@@ -3449,7 +3449,7 @@ service ManagementService {
     //
     // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-create-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the project level with one or multiple roles.
+    // Members are users with permission to administrate Zitadel on different levels. This request adds a new user to the members list on the project level with one or multiple roles.
     rpc AddProjectMember(AddProjectMemberRequest) returns (AddProjectMemberResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/members"
@@ -3481,7 +3481,7 @@ service ManagementService {
     //
     // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-update-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
+    // Members are users with permission to administrate Zitadel on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateProjectMember(UpdateProjectMemberRequest) returns (UpdateProjectMemberResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/members/{user_id}"
@@ -3513,7 +3513,7 @@ service ManagementService {
     //
     // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-delete-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an project level. The user can still have roles on another level (iam, organization).
+    // Members are users with permission to administrate Zitadel on different levels. This request removes a user from the members list on an project level. The user can still have roles on another level (iam, organization).
     rpc RemoveProjectMember(RemoveProjectMemberRequest) returns (RemoveProjectMemberResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/members/{user_id}"
@@ -4218,7 +4218,7 @@ service ManagementService {
     //
     // Deprecated: use [CreateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-project-service-create-project-grant.api.mdx) instead.
     //
-    // Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
+    // Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the role assignments for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc AddProjectGrant(AddProjectGrantRequest) returns (AddProjectGrantResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants"
@@ -4247,7 +4247,7 @@ service ManagementService {
     //
     // Deprecated: use [UpdateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-project-service-update-project-grant.api.mdx) instead.
     //
-    // Change the roles of the project that is granted to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
+    // Change the roles of the project that is granted to another organization. The project grant will allow the granted organization to access the project and manage the role assignments for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc UpdateProjectGrant(UpdateProjectGrantRequest) returns (UpdateProjectGrantResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/grants/{grant_id}"
@@ -4334,7 +4334,7 @@ service ManagementService {
     //
     // Deprecated: use [DeleteProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-project-service-delete-project-grant.api.mdx) instead.
     //
-    // Remove a project grant. All user grants for this project grant will also be removed. A user will not have access to the project afterward (if permissions are checked).
+    // Remove a project grant. All user grants (role assignments) for this project grant will also be removed. A user will not have access to the project afterward (if permissions are checked).
     rpc RemoveProjectGrant(RemoveProjectGrantRequest) returns (RemoveProjectGrantResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/grants/{grant_id}"
@@ -4372,7 +4372,7 @@ service ManagementService {
             tags: "Members";
             tags: "ZITADEL Administrators";
             summary: "List Project Grant Member Roles";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the project grant level."
+            description: "Members are users with permission to administrate Zitadel on different levels. This request returns all roles possible for a Zitadel member on the project grant level."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4388,7 +4388,7 @@ service ManagementService {
     //
     // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-list-administrators.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked.
+    // Members are users with permission to administrate Zitadel on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked.
     rpc ListProjectGrantMembers(ListProjectGrantMembersRequest) returns (ListProjectGrantMembersResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/members/_search"
@@ -4419,7 +4419,7 @@ service ManagementService {
     //
     // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-create-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked.
+    // Members are users with permission to administrate Zitadel on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked.
     rpc AddProjectGrantMember(AddProjectGrantMemberRequest) returns (AddProjectGrantMemberResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/members"
@@ -4450,7 +4450,7 @@ service ManagementService {
     //
     // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-update-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
+    // Members are users with permission to administrate Zitadel on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateProjectGrantMember(UpdateProjectGrantMemberRequest) returns (UpdateProjectGrantMemberResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/grants/{grant_id}/members/{user_id}"
@@ -4481,7 +4481,7 @@ service ManagementService {
     //
     // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-delete-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on a project grant level. The user can still have roles on another level (iam, organization, project).
+    // Members are users with permission to administrate Zitadel on different levels. This request removes a user from the members list on a project grant level. The user can still have roles on another level (iam, organization, project).
     rpc RemoveProjectGrantMember(RemoveProjectGrantMemberRequest) returns (RemoveProjectGrantMemberResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/grants/{grant_id}/members/{user_id}"
@@ -4512,6 +4512,8 @@ service ManagementService {
     // Deprecated: [List authorizations](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-list-authorizations.api.mdx) and filter by its ID.
     //
     // Returns a user grant per ID. A user grant is a role a user has for a specific project and organization.
+    //
+    // Note: User grant refers to role assignments.
     rpc GetUserGrantByID(GetUserGrantByIDRequest) returns (GetUserGrantByIDResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/grants/{grant_id}"
@@ -4539,7 +4541,9 @@ service ManagementService {
     //
     // Deprecated: [List authorizations](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-list-authorizations.api.mdx) and pass the user ID filter to search for a users grants on owned or granted projects.
     //
-    // Returns a list of user grants that match the search queries. User grants are the roles users have for a specific project and organization.
+    // Returns a list of user grants that match the search queries. User grants/role assignments are the roles users have for a specific project and organization.
+    //
+    // Note: User grant refers to role assignments.
     rpc ListUserGrants(ListUserGrantRequest) returns (ListUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/grants/_search"
@@ -4570,6 +4574,8 @@ service ManagementService {
     // Deprecated: [Add an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-create-authorization.api.mdx) to grant a user access to an owned or granted project.
     //
     // Add a user grant for a specific user. User grants are the roles users have for a specific project and organization.
+    //
+    // Note: User grant refers to role assignments.
     rpc AddUserGrant(AddUserGrantRequest) returns (AddUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants"
@@ -4599,6 +4605,8 @@ service ManagementService {
     // Deprecated: [Update an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-update-authorization.api.mdx) to update a user's roles on an owned or granted project.
     //
     // Update the roles of a user grant. User grants are the roles users have for a specific project and organization.
+    //
+    // Note: User grant refers to role assignments.
     rpc UpdateUserGrant(UpdateUserGrantRequest) returns (UpdateUserGrantResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/grants/{grant_id}"
@@ -4628,6 +4636,8 @@ service ManagementService {
     // Deprecated: [Deactivate an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-deactivate-authorization.api.mdx) to disable a user's access to an owned or granted project.
     //
     // Deactivate the user grant. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated.
+    //
+    // Note: User grant refers to role assignments.
     rpc DeactivateUserGrant(DeactivateUserGrantRequest) returns (DeactivateUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants/{grant_id}/_deactivate"
@@ -4657,6 +4667,8 @@ service ManagementService {
     // Deprecated: [Activate an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-activate-authorization.api.mdx) to enable a user's access to an owned or granted project.
     //
     // Reactivate a deactivated user grant. The user will be able to use the granted project again. An error will be returned if the user grant is not deactivated.
+    //
+    // Note: User grant refers to role assignments.
     rpc ReactivateUserGrant(ReactivateUserGrantRequest) returns (ReactivateUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants/{grant_id}/_reactivate"
@@ -4686,6 +4698,8 @@ service ManagementService {
     // Deprecated: [Delete an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-delete-authorization.api.mdx) to remove a users access to an owned or granted project.
     //
     // Removes the user grant from the user. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
+    //
+    // Note: User grant refers to role assignments.
     rpc RemoveUserGrant(RemoveUserGrantRequest) returns (RemoveUserGrantResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/grants/{grant_id}"
@@ -4713,7 +4727,9 @@ service ManagementService {
     //
     // Deprecated: [Delete authorizations one after the other](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-delete-authorization.api.mdx) to remove access for multiple users on multiple owned or granted projects.
     //
-    // Remove a list of user grants. The users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
+    // Remove a list of user grants (role assignments). The users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
+    //
+    // Note: User grant refers to role assignments.
     rpc BulkRemoveUserGrant(BulkRemoveUserGrantRequest) returns (BulkRemoveUserGrantResponse) {
         option (google.api.http) = {
             delete: "/user_grants/_bulk"
@@ -4778,7 +4794,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Domain Settings";
             summary: "Get Domain Policy";
-            description: "Returns the domain policy (this policy is managed by the IAM administrator)";
+            description: "Returns the domain policy (this policy is managed by the instance administrator)";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5803,7 +5819,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Private Labeling/Branding Settings";
-            description: "Returns the currently active private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the currently active private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5828,7 +5844,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Preview Private Labeling/Branding Settings";
-            description: "Returns the preview private labeling/branding configured on the organization. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the preview private labeling/branding configured on the organization. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5853,7 +5869,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Default Private Labeling/Branding Settings";
-            description: "Returns the default private labeling/branding configured on the instance. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the default private labeling/branding configured on the instance. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5879,7 +5895,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Create Labeling/Branding Settings";
-            description: "Create the private labeling/branding configured on the organization. Make sure to activate it so it will be shown to the users. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Create the private labeling/branding configured on the organization. Make sure to activate it so it will be shown to the users. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5905,7 +5921,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Update Labeling/Branding Settings";
-            description: "Update the preview private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Update the preview private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5932,7 +5948,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Activate Labeling/Branding Settings";
-            description: "Activates the preview private labeling/branding configured on the organization. It will be shown to the users afterward. The settings will trigger if the organization has been identified (organization scope, user). Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Activates the preview private labeling/branding configured on the organization. It will be shown to the users afterward. The settings will trigger if the organization has been identified (organization scope, user). Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6324,7 +6340,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Verify Email Message Text";
-            description: "Get the default text of the verify-email message/email that is set on the instance or as translation files in ZITADEL itself. The email is sent when a user adds a new non-verified email address."
+            description: "Get the default text of the verify-email message/email that is set on the instance or as translation files in Zitadel itself. The email is sent when a user adds a new non-verified email address."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6421,7 +6437,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Verify Phone Message Text";
-            description: "Get the default text of the verify-phone message that is set on the instance or as translation files in ZITADEL itself. The message is sent when a user adds a new non-verified phone number and a notification provider is configured."
+            description: "Get the default text of the verify-phone message that is set on the instance or as translation files in Zitadel itself. The message is sent when a user adds a new non-verified phone number and a notification provider is configured."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6493,8 +6509,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Custom Verify SMS OTP Message Text";
-            description: "Get the custom text of the verify SMS OTP message that is set on the organization. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Custom Verify OTP SMS Message Text";
+            description: "Get the custom text of the verify OTP SMS message that is set on the organization. The message is sent when an OTP SMS should be verified and a notification provider is configured."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6517,8 +6533,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Default Verify SMS OTP Message Text";
-            description: "Get the default text of the verify SMS OTP message that is set on the instance or as translation files in ZITADEL itself. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Default Verify OTP SMS Message Text";
+            description: "Get the default text of the verify OTP SMS message that is set on the instance or as translation files in Zitadel itself. The message is sent when an OTP SMS should be verified and a notification provider is configured."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6542,8 +6558,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Set Custom Verify SMS OTP Reset Message Text";
-            description: "Set the custom text of the verify SMS OTP message for the organization. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            summary: "Set Custom Verify OTP SMS Reset Message Text";
+            description: "Set the custom text of the verify OTP SMS message for the organization. The message is sent when an OTP SMS should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6566,8 +6582,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Reset Custom Verify SMS OTP Message Text to Default";
-            description: "Removes the custom text of the verify SMS OTP message from the organization and therefore the default texts will trigger for the users afterward."
+            summary: "Reset Custom Verify OTP SMS Message Text to Default";
+            description: "Removes the custom text of the verify OTP SMS message from the organization and therefore the default texts will trigger for the users afterward."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6590,8 +6606,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Custom Verify Email OTP Message Text";
-            description: "Get the custom text of the verify Email OTP message that is set on the organization. The message is sent when an Email One-time password should be verified and a notification provider is configured."
+            summary: "Get Custom Verify OTP Email Message Text";
+            description: "Get the custom text of the verify OTP Email message that is set on the organization. The message is sent when an OTP Email Email should be verified and a notification provider is configured."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6614,8 +6630,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Default Verify Email OTP Message Text";
-            description: "Get the default text of the verify Email OTP message that is set on the instance or as translation files in ZITADEL itself. The message is sent when an Email One-time password should be verified and a notification provider is configured."
+            summary: "Get Default Verify OTP Email Message Text";
+            description: "Get the default text of the verify OTP Email message that is set on the instance or as translation files in Zitadel itself. The message is sent when an OTP Email Email should be verified and a notification provider is configured."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6639,8 +6655,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Set Custom Verify Email OTP Reset Message Text";
-            description: "Set the custom text of the verify Email OTP message for the organization. The message is sent when an Email One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            summary: "Set Custom Verify OTP Email Reset Message Text";
+            description: "Set the custom text of the verify OTP Email message for the organization. The message is sent when an OTP Email Email should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6663,8 +6679,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Reset Custom Verify Email OTP Message Text to Default";
-            description: "Removes the custom text of the verify Email OTP message from the organization and therefore the default texts will trigger for the users afterward."
+            summary: "Reset Custom Verify OTP Email Message Text to Default";
+            description: "Removes the custom text of the verify OTP Email message from the organization and therefore the default texts will trigger for the users afterward."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6712,7 +6728,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Domain Claimed Message Text";
-            description: "Get the default text of the domain claimed message/email that is set on the instance or as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an organization claims a domain and a user of this domain exists in another organization."
+            description: "Get the default text of the domain claimed message/email that is set on the instance or as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an organization claims a domain and a user of this domain exists in another organization."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6881,7 +6897,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Custom Password Change Message Text";
+            summary: "Get Custom Password Changed Message Text";
             description: "Get the custom text of the password-changed message/email that is configured on the organization. The message is sent when the password of a user has been changed."
             parameters: {
                 headers: {
@@ -6905,8 +6921,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Default Password Change Message Text";
-            description: "Get the default text of the password-changed message/email that is configured on the instance or as translation files in ZITADEL itself. The message is sent when the password of a user has been changed."
+            summary: "Get Default Password Changed Message Text";
+            description: "Get the default text of the password-changed message/email that is configured on the instance or as translation files in Zitadel itself. The message is sent when the password of a user has been changed."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -7003,7 +7019,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Invite User Message Text";
-            description: "Get the default text of the invite user message/email that is configured on the instance or as translation files in ZITADEL itself. The message is sent when an invite code email is requested."
+            description: "Get the default text of the invite user message/email that is configured on the instance or as translation files in Zitadel itself. The message is sent when an invite code email is requested."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -7100,7 +7116,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Login Texts";
             summary: "Get Default Login Text";
-            description: "Get the default texts for the login and register UI of ZITADEL, which are configured on the instance or as translation files in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured. Or if the organization context is not given."
+            description: "Get the default texts for the login and register UI of ZITADEL, which are configured on the instance or as translation files in Zitadel itself. The text will be shown to the users of all organizations, that do not have a custom text configured. Or if the organization context is not given."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -7125,7 +7141,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Login Texts";
             summary: "Set Default Login Text";
-            description: "Set the custom texts for the login and register UI of ZITADEL for the organization."
+            description: "Set the custom texts for the login and register UI of Zitadel for the organization."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -7149,7 +7165,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Login Texts";
             summary: "Reset Custom Login Text to Default";
-            description: "Removes the custom texts for the login and register UI from the organization and therefore the configuration of the instance or the translation files in ZITADEL itself will trigger."
+            description: "Removes the custom texts for the login and register UI from the organization and therefore the configuration of the instance or the translation files in Zitadel itself will trigger."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -7251,7 +7267,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Deprecated: Add JWT Identity Provider (IDP)";
-            description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token.";
+            description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where Zitadel can get the existing JWT token.";
             deprecated: true;
             parameters: {
                 headers: {
@@ -8235,7 +8251,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Actions";
             summary: "Create Action";
-            description: "Create a new ZITADEL action. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
+            description: "Create a new Zitadel action. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -8260,7 +8276,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Actions";
             summary: "Update Action";
-            description: "Update an existing ZITADEL action. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
+            description: "Update an existing Zitadel action. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -8579,7 +8595,7 @@ message AddHumanUserRequest {
         zitadel.user.v1.Gender gender = 6;
     }
     message Email {
-        string email = 1 [(validate.rules).string.email = true];
+        string email = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
         bool is_email_verified = 2;
     }
     message Phone {
@@ -8660,7 +8676,7 @@ message ImportHumanUserRequest {
             }
         };
         string email = 1 [
-            (validate.rules).string.email = true,
+            (validate.rules).string = {min_len: 1, max_len: 200},
             (google.api.field_behavior) = REQUIRED,
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 example: "\"minnie@mouse.com\"";
@@ -8730,9 +8746,33 @@ message ImportHumanUserRequest {
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 max_length: 200,
                 example: "\"minnie.mouse@gmail.com\"";
-                description: "A display name ZITADEL can show on the linked provider."
+                description: "A display name Zitadel can show on the linked provider."
             }
         ];
+    }
+    message RecoveryCode {
+        oneof code_type {
+            string raw = 1 [
+                (validate.rules).string = {min_len: 1, max_len: 200},
+                (google.api.field_behavior) = REQUIRED,
+                (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                    example: "\"a435b-34kns\"";
+                    description: "\"Encoded hash of a recovery code in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets\"";
+                    min_length: 1,
+                    max_length: 200;
+                }
+            ];
+            string hash = 2 [
+                (validate.rules).string = {min_len: 1, max_len: 200},
+                (google.api.field_behavior) = REQUIRED,
+                (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                    example: "\"$2a$12$lJ08fqVr8bFJilRVnDT9QeULI7YW.nT3iwUv6dyg0aCrfm3UY8XR2\"";
+                    description: "\"Encoded hash of a recovery code in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets\"";
+                    min_length: 1,
+                    max_length: 200;
+                }
+            ];
+        }
     }
 
     string user_name = 1 [
@@ -8773,6 +8813,11 @@ message ImportHumanUserRequest {
             description: "To link your user directly with an external identity provider (Identity brokering)"
         }
     ];
+    repeated RecoveryCode recovery_codes = 11 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Import your existing recovery codes. You can import the raw code or the hashed code. The raw code will be hashed on import, the hashed code will be stored as is and need to be in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets";
+        }
+    ];
 }
 
 message ImportHumanUserResponse {
@@ -8805,14 +8850,14 @@ message AddMachineUserRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             min_length: 1;
             max_length: 200;
-            example: "\"My Machine Account\"";
+            example: "\"My Service Account\"";
         }
     ];
     string description = 3 [
         (validate.rules).string = {max_len: 500},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             max_length: 500;
-            example: "\"First machine account used for API XY.\"";
+            example: "\"First service account used for API XY.\"";
         }
     ];
 
@@ -9110,7 +9155,7 @@ message UpdateHumanEmailRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
     string email = 2 [
-        (validate.rules).string.email = true,
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"gigi@zitadel.com\"";
         }
@@ -9125,7 +9170,7 @@ message UpdateHumanEmailResponse {
 message ResendHumanInitializationRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string email = 2 [
-        (validate.rules).string = {ignore_empty: true, email: true},
+        (validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"updated-email@test.com\"";
             description: "Send a new email address if the one set on the user is wrong or has a typo."
@@ -9866,7 +9911,7 @@ message AddProjectRequest {
     ];
     bool project_role_check = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Deny authentication if the user has no authorization assigned to this project. Authorizations to the project without assigned a specific role to the user are allowed.";
+            description: "Deny authentication if the user has no roles assigned to this project. Access to the project without a specific role assigned to the user is allowed.";
         }
     ];
     bool has_project_check = 4 [
@@ -9911,12 +9956,12 @@ message UpdateProjectRequest {
     ];
     bool project_role_check = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "When enabled ZITADEL will check if a user has a role of this project assigned when login into an application of this project.";
+            description: "When enabled Zitadel will check if a user has a role of this project assigned when login into an application of this project.";
         }
     ];
     bool has_project_check = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "When enabled ZITADEL will check if the organization of the user, that is trying to log in, has a grant to this project.";
+            description: "When enabled Zitadel will check if the organization of the user, that is trying to log in, has a grant to this project.";
         }
     ];
     zitadel.project.v1.PrivateLabelingSetting private_labeling_setting = 6 [
@@ -9978,7 +10023,7 @@ message AddProjectRoleRequest {
             min_length: 1;
             max_length: 200;
             example: "\"ADMIN\"";
-            description: "The key is the only relevant attribute for ZITADEL regarding the authorization checks."
+            description: "The key is the only relevant attribute for Zitadel regarding the authorization checks."
         }
     ];
     string display_name = 3 [
@@ -10033,7 +10078,7 @@ message UpdateProjectRoleRequest {
             min_length: 1;
             max_length: 200;
             example: "\"ADMIN\"";
-            description: "The key is the only relevant attribute for ZITADEL regarding the authorization checks."
+            description: "The key is the only relevant attribute for Zitadel regarding the authorization checks."
         }
     ];
     string display_name = 3 [
@@ -11279,7 +11324,7 @@ message GetDefaultPasswordAgePolicyResponse {
 message AddCustomPasswordAgePolicyRequest {
     // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
-    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
+    // Amount of days after which the user should be notified of the upcoming expiry. Zitadel will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
@@ -11290,7 +11335,7 @@ message AddCustomPasswordAgePolicyResponse {
 message UpdateCustomPasswordAgePolicyRequest {
     // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
-    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
+    // Amount of days after which the user should be notified of the upcoming expiry. Zitadel will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
@@ -11406,19 +11451,19 @@ message AddCustomPrivacyPolicyRequest {
     ];
     string docs_link = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to documentation to be shown in the console.";
+            description: "Link to documentation to be shown in the management console.";
             example: "\"https://zitadel.com/docs\"";
         }
     ];
     string custom_link = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to an external resource that will be available to users in the console.";
+            description: "Link to an external resource that will be available to users in the management console.";
             example: "\"https://external.link\"";
         }
     ];
     string custom_link_text = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "The button text that would be shown in console pointing to custom link.";
+            description: "The button text that would be shown in the management console pointing to custom link.";
             example: "\"External\"";
         }
     ];
@@ -11456,19 +11501,19 @@ message UpdateCustomPrivacyPolicyRequest {
     ];
     string docs_link = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to documentation to be shown in the console.";
+            description: "Link to documentation to be shown in the management console.";
             example: "\"https://zitadel.com/docs\"";
         }
     ];
     string custom_link = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to an external resource that will be available to users in the console.";
+            description: "Link to an external resource that will be available to users in the management console.";
             example: "\"https://external.link\"";
         }
     ];
     string custom_link_text = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "The button text that would be shown in console pointing to custom link.";
+            description: "The button text that would be shown in management console pointing to custom link.";
             example: "\"External\"";
         }
     ];
@@ -12180,7 +12225,7 @@ message SetCustomVerifySMSOTPMessageTextRequest {
     string text = 2 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please visit {{ .VerifyURL }} or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
+            example: "\"Please visit {{ .VerifyURL }} or copy the OTP {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
             max_length: 800;
         }
     ];
@@ -12224,21 +12269,21 @@ message SetCustomVerifyEmailOTPMessageTextRequest {
     string title = 2 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ZITADEL - One-time Password\""
+            example: "\"ZITADEL - OTP\""
             max_length: 500;
         }
     ];
     string pre_header = 3 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify One-time Password \""
+            example: "\"Verify OTP \""
             max_length: 500;
         }
     ];
     string subject = 4 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify One-time Password\""
+            example: "\"Verify OTP\""
             max_length: 500;
         }
     ];
@@ -12252,7 +12297,7 @@ message SetCustomVerifyEmailOTPMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please use the \\\"Authenticate\\\" button or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
+            example: "\"Please use the \\\"Authenticate\\\" button or copy the OTP {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
             max_length: 10000;
         }
     ];
@@ -12678,7 +12723,7 @@ message AddOrgOIDCIDPRequest {
     repeated string scopes = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "the scopes requested by ZITADEL during the request on the identity provider";
+            description: "the scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     zitadel.idp.v1.OIDCMappingField display_name_mapping = 7 [
@@ -12856,7 +12901,7 @@ message UpdateOrgIDPOIDCConfigRequest {
     repeated string scopes = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "the scopes requested by ZITADEL during the request on the identity provider";
+            description: "the scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     zitadel.idp.v1.OIDCMappingField display_name_mapping = 6 [
@@ -12983,28 +13028,28 @@ message AddGenericOAuthProviderRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/o/oauth2/v2/auth\"";
-            description: "The endpoint where ZITADEL send the user to authenticate";
+            description: "The endpoint where Zitadel send the user to authenticate";
         }
     ];
     string token_endpoint = 5 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://oauth2.googleapis.com/token\"";
-            description: "The endpoint where ZITADEL can get the token";
+            description: "The endpoint where Zitadel can get the token";
         }
     ];
     string user_endpoint = 6 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://openidconnect.googleapis.com/v1/userinfo\"";
-            description: "The endpoint where ZITADEL can get the user information";
+            description: "The endpoint where Zitadel can get the user information";
         }
     ];
     repeated string scopes = 7 [
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request on the identity provider";
+            description: "The scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     // identifying attribute of the user in the response of the user_endpoint
@@ -13052,28 +13097,28 @@ message UpdateGenericOAuthProviderRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/o/oauth2/v2/auth\"";
-            description: "The endpoint where ZITADEL send the user to authenticate";
+            description: "The endpoint where Zitadel send the user to authenticate";
         }
     ];
     string token_endpoint = 6 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://oauth2.googleapis.com/token\"";
-            description: "The endpoint where ZITADEL can get the token";
+            description: "The endpoint where Zitadel can get the token";
         }
     ];
     string user_endpoint = 7 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://openidconnect.googleapis.com/v1/userinfo\"";
-            description: "The endpoint where ZITADEL can get the user information";
+            description: "The endpoint where Zitadel can get the user information";
         }
     ];
     repeated string scopes = 8 [
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request on the identity provider";
+            description: "The scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     // identifying attribute of the user in the response of the user_endpoint
@@ -13125,7 +13170,7 @@ message AddGenericOIDCProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "the scopes requested by ZITADEL during the request on the identity provider";
+            description: "the scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
@@ -13178,7 +13223,7 @@ message UpdateGenericOIDCProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "the scopes requested by ZITADEL during the request on the identity provider";
+            description: "the scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     zitadel.idp.v1.Options provider_options = 7;
@@ -13275,14 +13320,14 @@ message AddAzureADProviderRequest {
     ];
     bool email_verified = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Azure AD doesn't send if the email has been verified. Enable this if the user email should always be added verified in ZITADEL (no verification emails will be sent)";
+            description: "Azure AD doesn't send if the email has been verified. Enable this if the user email should always be added verified in Zitadel (no verification emails will be sent)";
         }
     ];
     repeated string scopes = 6 [
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\", \"User.Read\"]";
-            description: "the scopes requested by ZITADEL during the request to Azure AD";
+            description: "the scopes requested by Zitadel during the request to Azure AD";
         }
     ];
     zitadel.idp.v1.Options provider_options = 7;
@@ -13324,14 +13369,14 @@ message UpdateAzureADProviderRequest {
     ];
     bool email_verified = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Azure AD doesn't send if the email has been verified. Enable this if the user email should always be added verified in ZITADEL (no verification emails will be sent)";
+            description: "Azure AD doesn't send if the email has been verified. Enable this if the user email should always be added verified in Zitadel (no verification emails will be sent)";
         }
     ];
     repeated string scopes = 7 [
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\", \"User.Read\"]";
-            description: "the scopes requested by ZITADEL during the request to Azure AD";
+            description: "the scopes requested by Zitadel during the request to Azure AD";
         }
     ];
     zitadel.idp.v1.Options provider_options = 8;
@@ -13368,7 +13413,7 @@ message AddGitHubProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitHub";
+            description: "The scopes requested by Zitadel during the request to GitHub";
         }
     ];
     zitadel.idp.v1.Options provider_options = 5;
@@ -13406,7 +13451,7 @@ message UpdateGitHubProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitHub";
+            description: "The scopes requested by Zitadel during the request to GitHub";
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
@@ -13444,7 +13489,7 @@ message AddGitHubEnterpriseServerProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitHub";
+            description: "The scopes requested by Zitadel during the request to GitHub";
         }
     ];
     zitadel.idp.v1.Options provider_options = 8;
@@ -13485,7 +13530,7 @@ message UpdateGitHubEnterpriseServerProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitHub";
+            description: "The scopes requested by Zitadel during the request to GitHub";
         }
     ];
     zitadel.idp.v1.Options provider_options = 9;
@@ -13522,7 +13567,7 @@ message AddGitLabProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitLab";
+            description: "The scopes requested by Zitadel during the request to GitLab";
         }
     ];
     zitadel.idp.v1.Options provider_options = 5;
@@ -13561,7 +13606,7 @@ message UpdateGitLabProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitLab";
+            description: "The scopes requested by Zitadel during the request to GitLab";
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
@@ -13597,7 +13642,7 @@ message AddGitLabSelfHostedProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitLab";
+            description: "The scopes requested by Zitadel during the request to GitLab";
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
@@ -13636,7 +13681,7 @@ message UpdateGitLabSelfHostedProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitLab";
+            description: "The scopes requested by Zitadel during the request to GitLab";
         }
     ];
     zitadel.idp.v1.Options provider_options = 7;
@@ -13673,7 +13718,7 @@ message AddGoogleProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to Google";
+            description: "The scopes requested by Zitadel during the request to Google";
         }
     ];
     zitadel.idp.v1.Options provider_options = 5;
@@ -13711,7 +13756,7 @@ message UpdateGoogleProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to Google";
+            description: "The scopes requested by Zitadel during the request to Google";
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
@@ -13791,7 +13836,7 @@ message AddSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 8;
-    // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
+    // Optionally enable federated logout. If enabled, Zitadel will send a logout request to the identity provider,
     // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
     optional bool federated_logout_enabled = 9;
     // Specify a Signature Algorithm that should be used to sign SAML requests and responses.
@@ -13831,7 +13876,7 @@ message UpdateSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 9;
-    // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
+    // Optionally enable federated logout. If enabled, Zitadel will send a logout request to the identity provider,
     // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
     optional bool federated_logout_enabled = 10;
     // Specify a Signature Algorithm that should be used to sign SAML requests and responses.
@@ -13906,7 +13951,7 @@ message AddAppleProviderRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             max_items: 20,
             example: "[\"name\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to Apple";
+            description: "The scopes requested by Zitadel during the request to Apple";
         }
     ];
     zitadel.idp.v1.Options provider_options = 7;
@@ -13969,7 +14014,7 @@ message UpdateAppleProviderRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             max_items: 20,
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to Apple";
+            description: "The scopes requested by Zitadel during the request to Apple";
         }
     ];
     zitadel.idp.v1.Options provider_options = 8;

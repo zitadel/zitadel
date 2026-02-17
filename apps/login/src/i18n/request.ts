@@ -1,5 +1,5 @@
 import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { getHostedLoginTranslation } from "@/lib/zitadel";
 import { JsonObject } from "@zitadel/client";
 import deepmerge from "deepmerge";
@@ -13,7 +13,7 @@ export default getRequestConfig(async () => {
   let locale: string = fallback;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const languageHeader = await (await headers()).get(LANGUAGE_HEADER_NAME);
   if (languageHeader) {
@@ -34,9 +34,7 @@ export default getRequestConfig(async () => {
 
   let translations: JsonObject | {} = {};
   try {
-    const i18nJSON = await getHostedLoginTranslation({
-      serviceUrl,
-      locale,
+    const i18nJSON = await getHostedLoginTranslation({ serviceConfig, locale,
       organization: i18nOrganization,
     });
 

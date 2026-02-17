@@ -1,0 +1,107 @@
+---
+title: Caching
+sidebar_label: Caching
+---
+
+
+
+This guide explains how to connect Zitadel caches to Redis or Valkey on Kubernetes.
+
+<Callout type="info">
+Caching is an experimental beta feature. See the [Caches](/self-hosting/manage/cache) page for behavior, objects, and tuning guidance.
+</Callout>
+
+Zitadel supports Redis or any Redis-compatible store (for example, Valkey) in standalone mode. Sentinel and Redis Cluster are not supported because the cache connector expects a single endpoint and does not implement cluster routing or sentinel failover logic.
+
+<Callout type="note">
+Zitadel supports server-auth TLS (`EnableTLS: true`) but does not support client certificates/mTLS for cache connections.
+</Callout>
+
+Each cache uses its own Redis database index. Set `DBOffset` so Zitadel-owned indexes do not overlap with other applications. Zitadel issues `FLUSHDB` on its cache databases, so sharing an index with other apps is unsafe.
+
+## Connect without authentication (development only)
+
+```yaml
+zitadel:
+  configmapConfig:
+    Caches:
+      Connectors:
+        Redis:
+          Enabled: true
+          Addr: "redis-master.caching.svc.cluster.local:6379"
+          DBOffset: 10
+      Instance:
+        Connector: "redis"
+        MaxAge: 1h
+        LastUseAge: 10m
+      Organization:
+        Connector: "redis"
+        MaxAge: 1h
+        LastUseAge: 10m
+```
+
+Use this only on isolated clusters where the Redis endpoint does not require authentication.
+
+## Connect with password from a Kubernetes Secret
+
+Keep credentials in a secret while the rest of the cache configuration stays in values:
+
+```yaml
+zitadel:
+  configSecretName: zitadel-cache-credentials
+  configmapConfig:
+    Caches:
+      Connectors:
+        Redis:
+          Enabled: true
+          Addr: "redis.database.svc.cluster.local:6379"
+          DBOffset: 10
+      Instance:
+        Connector: "redis"
+        MaxAge: 1h
+        LastUseAge: 10m
+      Organization:
+        Connector: "redis"
+        MaxAge: 1h
+        LastUseAge: 10m
+```
+
+Create the secret with your Redis ACL user and password:
+
+```bash
+kubectl create secret generic zitadel-cache-credentials \
+  --from-literal=config.yaml="
+Caches:
+  Connectors:
+    Redis:
+      Username: cache-user        # Omit for default user
+      Password: your-redis-password
+"
+```
+
+## Connect with TLS (Redis or Valkey)
+
+Enable TLS when your endpoint requires encryption. This uses server-auth TLS with the container's trust store.
+
+```yaml
+zitadel:
+  configSecretName: zitadel-cache-credentials
+  configmapConfig:
+    Caches:
+      Connectors:
+        Redis:
+          Enabled: true
+          Addr: "redis.example.com:6380"
+          EnableTLS: true
+          DBOffset: 10
+      Instance:
+        Connector: "redis"
+        MaxAge: 1h
+        LastUseAge: 10m
+      Organization:
+        Connector: "redis"
+        MaxAge: 1h
+        LastUseAge: 10m
+```
+
+Reuse the secret from the previous section for credentials if needed. Custom certificate authorities must be added to the container's trust bundle (for example, by mounting a CA file into the pod); client certificate authentication is not supported.

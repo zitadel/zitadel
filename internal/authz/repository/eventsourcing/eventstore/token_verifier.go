@@ -98,7 +98,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 		return "", "", "", "", "", zerrors.ThrowUnauthenticated(nil, "APP-Reb32", "invalid token")
 	}
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
-		return repo.verifyAccessTokenV2(ctx, tokenID, verifierClientID, projectID)
+		return repo.verifyAccessTokenV2(ctx, tokenID, subject, verifierClientID, projectID)
 	}
 	if sessionID, ok := strings.CutPrefix(tokenID, authz.SessionTokenPrefix); ok {
 		userID, clientID, resourceOwner, err = repo.verifySessionToken(ctx, sessionID, tokenString)
@@ -132,7 +132,7 @@ func (repo *TokenVerifierRepo) verifyAccessTokenV1(ctx context.Context, tokenID,
 	return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, nil
 }
 
-func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, verifierClientID, projectID string) (userID, agentID, clientID, prefLang, resourceOwner string, err error) {
+func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, subject, verifierClientID, projectID string) (userID, agentID, clientID, prefLang, resourceOwner string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -145,6 +145,11 @@ func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, v
 	}
 	if err = verifyAudience(activeToken.Audience, verifierClientID, projectID); err != nil {
 		return "", "", "", "", "", err
+	}
+	// If the subject doesn't match the userID from the database, the token probably got tampered with or truncated.
+	// See https://github.com/zitadel/zitadel/security/advisories/GHSA-6mq3-xmgp-pjm5
+	if activeToken.UserID != subject {
+		return "", "", "", "", "", zerrors.ThrowUnauthenticated(nil, "APP-3f4fs", "invalid token")
 	}
 	if err = repo.checkAuthentication(ctx, activeToken.AuthMethods, activeToken.UserID); err != nil {
 		return "", "", "", "", "", err
@@ -186,7 +191,7 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if err != nil {
 		return err
 	}
-	// machine users do not have interactive logins, so we don't check for MFA requirements
+	// service accounts do not have interactive logins, so we don't check for MFA requirements
 	if requirements.UserType == domain.UserTypeMachine {
 		return nil
 	}
@@ -250,6 +255,9 @@ func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType 
 	}
 	if !session.OTPEmailFactor.OTPCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeOTPEmail)
+	}
+	if !session.RecoveryCodeFactor.RecoveryCodeCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeRecoveryCode)
 	}
 	return types
 }

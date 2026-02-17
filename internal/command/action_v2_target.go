@@ -22,6 +22,7 @@ type AddTarget struct {
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
+	PayloadType      target_domain.PayloadType
 
 	SigningKey string
 }
@@ -77,6 +78,7 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 		add.Timeout,
 		add.InterruptOnError,
 		code.Crypted,
+		add.PayloadType,
 	))
 	if err != nil {
 		return time.Time{}, err
@@ -95,6 +97,7 @@ type ChangeTarget struct {
 	Endpoint         *string
 	Timeout          *time.Duration
 	InterruptOnError *bool
+	PayloadType      target_domain.PayloadType
 
 	ExpirationSigningKey bool
 	SigningKey           *string
@@ -153,6 +156,7 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 		change.Timeout,
 		change.InterruptOnError,
 		changedSigningKey,
+		change.PayloadType,
 	)
 	if changedEvent == nil {
 		return existing.WriteModel.ChangeDate, nil

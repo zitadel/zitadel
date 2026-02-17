@@ -28,12 +28,12 @@ func _NumberOperationNoOp() {
 	_ = x[NumberOperationEqual-(1)]
 	_ = x[NumberOperationNotEqual-(2)]
 	_ = x[NumberOperationLessThan-(3)]
-	_ = x[NumberOperationAtLeast-(4)]
+	_ = x[NumberOperationLessThanOrEqual-(4)]
 	_ = x[NumberOperationGreaterThan-(5)]
-	_ = x[NumberOperationAtMost-(6)]
+	_ = x[NumberOperationGreaterThanOrEqual-(6)]
 }
 
-var _NumberOperationValues = []NumberOperation{NumberOperationEqual, NumberOperationNotEqual, NumberOperationLessThan, NumberOperationAtLeast, NumberOperationGreaterThan, NumberOperationAtMost}
+var _NumberOperationValues = []NumberOperation{NumberOperationEqual, NumberOperationNotEqual, NumberOperationLessThan, NumberOperationLessThanOrEqual, NumberOperationGreaterThan, NumberOperationGreaterThanOrEqual}
 
 var _NumberOperationNameToValueMap = map[string]NumberOperation{
 	_NumberOperationName[0:1]:      NumberOperationEqual,
@@ -42,12 +42,12 @@ var _NumberOperationNameToValueMap = map[string]NumberOperation{
 	_NumberOperationLowerName[1:3]: NumberOperationNotEqual,
 	_NumberOperationName[3:4]:      NumberOperationLessThan,
 	_NumberOperationLowerName[3:4]: NumberOperationLessThan,
-	_NumberOperationName[4:6]:      NumberOperationAtLeast,
-	_NumberOperationLowerName[4:6]: NumberOperationAtLeast,
+	_NumberOperationName[4:6]:      NumberOperationLessThanOrEqual,
+	_NumberOperationLowerName[4:6]: NumberOperationLessThanOrEqual,
 	_NumberOperationName[6:7]:      NumberOperationGreaterThan,
 	_NumberOperationLowerName[6:7]: NumberOperationGreaterThan,
-	_NumberOperationName[7:9]:      NumberOperationAtMost,
-	_NumberOperationLowerName[7:9]: NumberOperationAtMost,
+	_NumberOperationName[7:9]:      NumberOperationGreaterThanOrEqual,
+	_NumberOperationLowerName[7:9]: NumberOperationGreaterThanOrEqual,
 }
 
 var _NumberOperationNames = []string{
@@ -94,11 +94,11 @@ func (i NumberOperation) IsANumberOperation() bool {
 	return false
 }
 
-const _TextOperationName = "=<>LIKELIKELIKELIKELIKELIKE"
+const _TextOperationName = "=<>LIKELIKELIKELIKELIKELIKE=<>"
 
-var _TextOperationIndex = [...]uint8{0, 1, 3, 7, 11, 15, 19, 23, 27}
+var _TextOperationIndex = [...]uint8{0, 1, 3, 7, 11, 15, 19, 23, 27, 28, 30}
 
-const _TextOperationLowerName = "=<>likelikelikelikelikelike"
+const _TextOperationLowerName = "=<>likelikelikelikelikelike=<>"
 
 func (i TextOperation) String() string {
 	i -= 1
@@ -120,9 +120,11 @@ func _TextOperationNoOp() {
 	_ = x[TextOperationContainsIgnoreCase-(6)]
 	_ = x[TextOperationEndsWithIgnoreCase-(7)]
 	_ = x[TextOperationStartsWithIgnoreCase-(8)]
+	_ = x[TextOperationEqualIgnoreCase-(9)]
+	_ = x[TextOperationNotEqualIgnoreCase-(10)]
 }
 
-var _TextOperationValues = []TextOperation{TextOperationEqual, TextOperationNotEqual, TextOperationStartsWith, TextOperationContains, TextOperationEndsWith, TextOperationContainsIgnoreCase, TextOperationEndsWithIgnoreCase, TextOperationStartsWithIgnoreCase}
+var _TextOperationValues = []TextOperation{TextOperationEqual, TextOperationNotEqual, TextOperationStartsWith, TextOperationContains, TextOperationEndsWith, TextOperationContainsIgnoreCase, TextOperationEndsWithIgnoreCase, TextOperationStartsWithIgnoreCase, TextOperationEqualIgnoreCase, TextOperationNotEqualIgnoreCase}
 
 var _TextOperationNameToValueMap = map[string]TextOperation{
 	_TextOperationName[0:1]:        TextOperationEqual,
@@ -141,6 +143,10 @@ var _TextOperationNameToValueMap = map[string]TextOperation{
 	_TextOperationLowerName[19:23]: TextOperationEndsWithIgnoreCase,
 	_TextOperationName[23:27]:      TextOperationStartsWithIgnoreCase,
 	_TextOperationLowerName[23:27]: TextOperationStartsWithIgnoreCase,
+	_TextOperationName[27:28]:      TextOperationEqualIgnoreCase,
+	_TextOperationLowerName[27:28]: TextOperationEqualIgnoreCase,
+	_TextOperationName[28:30]:      TextOperationNotEqualIgnoreCase,
+	_TextOperationLowerName[28:30]: TextOperationNotEqualIgnoreCase,
 }
 
 var _TextOperationNames = []string{
@@ -152,6 +158,8 @@ var _TextOperationNames = []string{
 	_TextOperationName[15:19],
 	_TextOperationName[19:23],
 	_TextOperationName[23:27],
+	_TextOperationName[27:28],
+	_TextOperationName[28:30],
 }
 
 // TextOperationString retrieves an enum value from the enum constants string name.

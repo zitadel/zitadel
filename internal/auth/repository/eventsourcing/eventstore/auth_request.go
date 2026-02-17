@@ -166,6 +166,11 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err := setOrgID(ctx, repo.OrgViewProvider, request); err != nil {
 		return nil, err
 	}
+	if request.UserID != "" && request.UserOrgID == "" {
+		if err := repo.selectUser(ctx, request, request.UserID); err != nil {
+			return nil, err
+		}
+	}
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.WithFields("login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Info("login hint invalid")
@@ -350,7 +355,14 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, authReqID, userID, 
 			return zerrors.ThrowNotFound(nil, "AUTH-2d3f4", "Errors.UserSession.NotFound")
 		}
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID, false)
+	if err := repo.selectUser(ctx, request, userID); err != nil {
+		return err
+	}
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
+func (repo *AuthRequestRepo) selectUser(ctx context.Context, request *domain.AuthRequest, userID string) error {
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, userID, false)
 	if err != nil {
 		return err
 	}
@@ -362,7 +374,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, authReqID, userID, 
 		username = user.PreferredLoginName
 	}
 	request.SetUserInfo(user.ID, username, user.PreferredLoginName, user.DisplayName, user.AvatarKey, user.ResourceOwner)
-	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+	return nil
 }
 
 func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, authReqID, userID, resourceOwner, password, userAgentID string, info *domain.BrowserInfo) (err error) {
@@ -458,6 +470,16 @@ func (repo *AuthRequestRepo) VerifyMFAOTPEmail(ctx context.Context, userID, reso
 		return err
 	}
 	return repo.Command.HumanCheckOTPEmail(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
+}
+
+func (repo *AuthRequestRepo) VerifyMFARecoveryCode(ctx context.Context, userID, resourceOwner, code, authRequestID, userAgentID string, info *domain.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
+	if err != nil {
+		return err
+	}
+	return repo.Command.HumanCheckRecoveryCode(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
 }
 
 func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {
@@ -647,7 +669,7 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 	if request.UserID != userID {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
 	}
-	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, false)
+	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, request.UserID, false)
 	if err != nil {
 		return request, err
 	}
@@ -798,7 +820,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
-	// if there's an active (human) user, let's use it
+	// if there's an active User (Human), let's use it
 	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).IsEnabled() {
 		request.SetUserInfo(user.ID, loginNameInput, preferredLoginName, "", "", user.ResourceOwner)
 		return nil
@@ -833,7 +855,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if err != nil {
 		return err
 	}
-	// let's check if it was a machine user
+	// let's check if it was a service account
 	if !user.MachineView.IsZero() {
 		return zerrors.ThrowPreconditionFailed(nil, "AUTH-DGV4g", "Errors.User.NotHuman")
 	}
@@ -1032,7 +1054,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 	if len(links.Links) != 1 {
 		return zerrors.ThrowNotFound(nil, "AUTH-Sf8sd", "Errors.ExternalIDP.NotFound")
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, links.Links[0].UserID, false)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, links.Links[0].UserID, false)
 	if err != nil {
 		return err
 	}
@@ -1062,7 +1084,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 			return steps, err
 		}
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
 	if err != nil {
 		return nil, err
 	}
@@ -1124,7 +1146,10 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return append(steps, step), nil
 	}
 
-	expired := passwordAgeChangeRequired(request.PasswordAgePolicy, user.PasswordChanged)
+	var expired bool
+	if isInternalLogin && user.PasswordSet {
+		expired = passwordAgeChangeRequired(request.PasswordAgePolicy, user.PasswordChanged)
+	}
 	if expired || user.PasswordChangeRequired {
 		steps = append(steps, &domain.ChangePasswordStep{Expired: expired})
 	}
@@ -1141,7 +1166,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return steps, nil
 	}
 
-	if request.LinkingUsers != nil && len(request.LinkingUsers) != 0 {
+	if len(request.LinkingUsers) != 0 {
 		return append(steps, &domain.LinkUsersStep{}), nil
 	}
 	//PLANNED: consent step
@@ -1198,7 +1223,7 @@ func (repo *AuthRequestRepo) nextStepsUser(ctx context.Context, request *domain.
 	defer func() { span.EndWithError(err) }()
 
 	steps := make([]domain.NextStep, 0)
-	if request.LinkingUsers != nil && len(request.LinkingUsers) > 0 {
+	if len(request.LinkingUsers) > 0 {
 		steps = append(steps, new(domain.ExternalNotFoundOptionStep))
 		return steps, nil
 	}
@@ -1641,6 +1666,8 @@ var (
 		user_repo.UserIDPLoginCheckSucceededType,
 		user_repo.HumanMFAOTPCheckSucceededType,
 		user_repo.HumanMFAOTPCheckFailedType,
+		user_repo.HumanRecoveryCodeCheckSucceededType,
+		user_repo.HumanRecoveryCodeCheckFailedType,
 		user_repo.HumanSignedOutType,
 		user_repo.HumanPasswordlessTokenCheckSucceededType,
 		user_repo.HumanPasswordlessTokenCheckFailedType,
@@ -1690,6 +1717,8 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			user_repo.UserIDPLoginCheckSucceededType,
 			user_repo.HumanMFAOTPCheckSucceededType,
 			user_repo.HumanMFAOTPCheckFailedType,
+			user_repo.HumanRecoveryCodeCheckSucceededType,
+			user_repo.HumanRecoveryCodeCheckFailedType,
 			user_repo.HumanSignedOutType,
 			user_repo.HumanPasswordlessTokenCheckSucceededType,
 			user_repo.HumanPasswordlessTokenCheckFailedType,
@@ -1710,8 +1739,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	return user_view_model.UserSessionToModel(&sessionCopy), nil
 }
 
-func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string, ignoreUnknownUsernames bool) (user *user_model.UserView, err error) {
-	// PLANNED: Check LockoutPolicy
+func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries orgViewProvider, userID string, ignoreUnknownUsernames bool) (user *user_model.UserView, err error) {
 	user, err = userByID(ctx, userViewProvider, userEventProvider, userID)
 	if err != nil {
 		if ignoreUnknownUsernames && zerrors.IsNotFound(err) {

@@ -1,19 +1,20 @@
 "use server";
 
-import { setSessionAndUpdateCookie } from "@/lib/server/cookie";
+import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   deleteSession,
   getLoginSettings,
   getSecuritySettings,
   humanMFAInitSkipped,
   listAuthenticationMethodTypes,
+  listUsers,
 } from "@/lib/zitadel";
-import { Duration } from "@zitadel/client";
+import { create, Duration } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { headers } from "next/headers";
+import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import {
   getMostRecentSessionCookie,
@@ -21,8 +22,8 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
-import { getServiceUrlFromHeaders } from "../service-url";
-import { getOriginalHost } from "./host";
+import { getServiceConfig } from "../service-url";
+import { getPublicHost } from "./host";
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,
@@ -36,16 +37,13 @@ export async function skipMFAAndContinueWithNextUrl({
   sessionId?: string;
   requestId?: string;
   organization?: string;
-}): Promise<{ redirect: string } | { error: string }> {
+}): Promise<{ redirect: string } | { error: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: organization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: organization });
 
-  await humanMFAInitSkipped({ serviceUrl, userId });
+  await humanMFAInitSkipped({ serviceConfig, userId });
 
   if (requestId && sessionId) {
     return completeFlowOrGetUrl(
@@ -73,14 +71,11 @@ export type ContinueWithSessionCommand = Session & { requestId?: string };
 
 export async function continueWithSession({ requestId, ...session }: ContinueWithSessionCommand) {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const t = await getTranslations("error");
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: session.factors?.user?.organizationId,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: session.factors?.user?.organizationId });
 
   if (requestId && session.id && session.factors?.user) {
     return completeFlowOrGetUrl(
@@ -115,44 +110,69 @@ export type UpdateSessionCommand = {
   lifetime?: Duration;
 };
 
-export async function updateSession(options: UpdateSessionCommand) {
-  let { loginName, sessionId, organization, checks, requestId, challenges } = options;
-  const recentSession = sessionId
+export async function updateOrCreateSession(options: UpdateSessionCommand) {
+  let { loginName, sessionId, organization, checks, requestId, challenges, lifetime } = options;
+
+  const _headers = await headers();
+  const { serviceConfig } = getServiceConfig(_headers);
+  const host = getPublicHost(_headers);
+
+  const t = await getTranslations("verify.errors");
+
+  if (!host) {
+    return { error: "Could not get host" }; // Technical error, maybe leave or translate if key exists
+  }
+
+  if (challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
+    const [hostname] = host.split(":");
+
+    challenges.webAuthN.domain = hostname;
+  }
+
+  let recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
       ? await getSessionCookieByLoginName({ loginName, organization })
       : await getMostRecentSessionCookie();
 
   if (!recentSession) {
-    return {
-      error: "Could not find session",
-    };
+    if (!loginName) {
+      return { error: t("couldNotFindSession") };
+    }
+
+    const checks = create(ChecksSchema, {
+      user: { search: { case: "loginName", value: loginName } },
+    });
+
+    const result = await createSessionAndUpdateCookie({
+      checks,
+      challenges,
+      requestId,
+    }).catch((error) => {
+      console.error("Could not create session", error);
+      return undefined;
+    });
+
+    if (result && "sessionCookie" in result) {
+      recentSession = result.sessionCookie;
+    }
+
+    if (!recentSession) {
+      return {
+        error: t("couldNotFindSession"),
+      };
+    }
   }
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = await getOriginalHost();
+  const loginSettings = await getLoginSettings({ serviceConfig, organization });
 
-  if (!host) {
-    return { error: "Could not get host" };
+  if (!lifetime) {
+    lifetime = checks?.webAuthN
+      ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
+      : checks?.otpEmail || checks?.otpSms
+        ? loginSettings?.secondFactorCheckLifetime
+        : undefined;
   }
-
-  if (host && challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
-    const [hostname] = host.split(":");
-
-    challenges.webAuthN.domain = hostname;
-  }
-
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
-  });
-
-  let lifetime = checks?.webAuthN
-    ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
-    : checks?.otpEmail || checks?.otpSms
-      ? loginSettings?.secondFactorCheckLifetime
-      : undefined;
 
   if (!lifetime || !lifetime.seconds) {
     console.warn("No lifetime provided for session, defaulting to 24 hours");
@@ -162,25 +182,57 @@ export async function updateSession(options: UpdateSessionCommand) {
     } as Duration;
   }
 
-  const session = await setSessionAndUpdateCookie({
-    recentCookie: recentSession,
-    checks,
-    challenges,
-    requestId,
-    lifetime,
-  });
+  let session;
+  try {
+    session = await setSessionAndUpdateCookie({
+      recentCookie: recentSession,
+      checks,
+      challenges,
+      requestId,
+      lifetime,
+    });
+  } catch (error) {
+    const loginNameForCreation = options.loginName || recentSession?.loginName;
+    const orgForCreation = options.organization || recentSession?.organization;
 
-  if (!session) {
-    return { error: "Could not update session" };
+    if (!loginNameForCreation) {
+      throw error;
+    }
+
+    const users = await listUsers({
+      serviceConfig,
+      loginName: loginNameForCreation,
+      organizationId: orgForCreation,
+    });
+
+    if (users.details?.totalResult === BigInt(1) && users.result[0].userId) {
+      const user = users.result[0];
+      const newChecks = create(ChecksSchema, {
+        ...(checks || {}),
+        user: { search: { case: "userId", value: user.userId } } as any,
+      });
+
+      const result = await createSessionAndUpdateCookie({
+        checks: newChecks,
+        requestId,
+        lifetime,
+        challenges,
+      });
+      // @ts-ignore
+      session = { ...result.session, challenges: result.challenges };
+    } else {
+      throw error;
+    }
+  }
+
+  if (!session || ("error" in session && session.error)) {
+    return { error: t("couldNotUpdateSession") };
   }
 
   // if password, check if user has MFA methods
   let authMethods;
   if (checks && checks.password && session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes({
-      serviceUrl,
-      userId: session.factors.user.id,
-    });
+    const response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
     if (response.authMethodTypes && response.authMethodTypes.length) {
       authMethods = response.authMethodTypes;
     }
@@ -189,6 +241,7 @@ export async function updateSession(options: UpdateSessionCommand) {
   return {
     sessionId: session.id,
     factors: session.factors,
+    // @ts-ignore
     challenges: session.challenges,
     authMethods,
   };
@@ -200,19 +253,23 @@ type ClearSessionOptions = {
 
 export async function clearSession(options: ClearSessionOptions) {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const { sessionId } = options;
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
+  if (!sessionCookie) {
+    return;
+  }
+
   const deleteResponse = await deleteSession({
-    serviceUrl,
+    serviceConfig,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
 
-  const securitySettings = await getSecuritySettings({ serviceUrl });
+  const securitySettings = await getSecuritySettings({ serviceConfig });
   const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
   if (!deleteResponse) {

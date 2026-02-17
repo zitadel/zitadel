@@ -4,15 +4,17 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log/slog"
 	"math/rand"
 	"slices"
 	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/rs/xid"
 	"github.com/shopspring/decimal"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -80,11 +82,12 @@ var _ migration.Migration = (*Handler)(nil)
 // Execute implements migration.Migration.
 func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) error {
 	start := time.Now()
-	logging.WithFields("projection", h.ProjectionName()).Info("projection starts prefilling")
+	ctx = logging.With(ctx, "projection", h.ProjectionName())
+	logging.Info(ctx, "projection starts prefilling")
 	logTicker := time.NewTicker(30 * time.Second)
 	go func() {
 		for range logTicker.C {
-			logging.WithFields("projection", h.ProjectionName()).Info("projection is prefilling")
+			logging.Info(ctx, "projection is prefilling")
 		}
 	}()
 
@@ -123,7 +126,7 @@ func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) er
 	wg.Wait()
 
 	logTicker.Stop()
-	logging.WithFields("projection", h.ProjectionName(), "took", time.Since(start)).Info("projections ended prefilling")
+	logging.Info(ctx, "projections ended prefilling", "took", time.Since(start))
 	return nil
 }
 
@@ -170,7 +173,7 @@ func NewHandler(
 		aggregates[reducer.Aggregate] = eventTypes
 	}
 
-	metrics := NewProjectionMetrics()
+	metrics := NewProjectionMetrics(ctx)
 
 	handler := &Handler{
 		projection:             projection,
@@ -203,6 +206,7 @@ func NewHandler(
 }
 
 func (h *Handler) Start(ctx context.Context) {
+	ctx = logging.NewCtx(ctx, logging.StreamEventHandler, slog.String("projection", h.ProjectionName()))
 	go h.schedule(ctx)
 	if h.triggerWithoutEvents != nil {
 		return
@@ -267,10 +271,12 @@ func (h *Handler) schedule(ctx context.Context) {
 			t.Stop()
 			return
 		case <-t.C:
+			jobCtx := logging.With(ctx, "job_id", xid.New(), "invoker", "schedule")
 			instances, err := h.queryInstances()
-			h.log().OnError(err).Debug("unable to query instances")
-
-			h.triggerInstances(call.WithTimestamp(ctx), instances)
+			if err != nil {
+				logging.Debug(jobCtx, "unable to query instances", "err", err)
+			}
+			h.triggerInstances(call.WithTimestamp(jobCtx), instances)
 			t.Reset(h.requeueEvery)
 		}
 	}
@@ -286,12 +292,12 @@ func (h *Handler) triggerInstances(ctx context.Context, instances []string, trig
 		if err == nil {
 			continue
 		}
-		h.log().WithField("instance", instance).WithError(err).Debug("trigger failed")
+		logging.Debug(instanceCtx, "trigger failed", "err", err)
 		time.Sleep(h.retryFailedAfter)
 		// retry if trigger failed
 		for ; err != nil; _, err = h.Trigger(instanceCtx, triggerOpts...) {
 			time.Sleep(h.retryFailedAfter)
-			h.log().WithField("instance", instance).WithError(err).Debug("trigger failed")
+			logging.Debug(instanceCtx, "trigger failed", "err", err)
 		}
 	}
 }
@@ -302,28 +308,29 @@ func randomizeStart(min, maxSeconds float64) time.Duration {
 }
 
 func (h *Handler) subscribe(ctx context.Context) {
+	defer logging.Info(ctx, "handler has shutdown")
 	queue := make(chan eventstore.Event, 100)
 	subscription := eventstore.SubscribeEventTypes(queue, h.eventTypes)
 	for {
 		select {
 		case <-ctx.Done():
 			subscription.Unsubscribe()
-			h.log().Debug("shutdown")
 			return
 		case event := <-queue:
 			events := checkAdditionalEvents(queue, event)
 			solvedInstances := make([]string, 0, len(events))
 			queueCtx := call.WithTimestamp(ctx)
+			queueCtx = logging.With(queueCtx, "job_id", xid.New(), "invoker", "subscribe")
 			for _, e := range events {
 				if slices.Contains(solvedInstances, e.Aggregate().InstanceID) {
 					continue
 				}
 				queueCtx = authz.WithInstanceID(queueCtx, e.Aggregate().InstanceID)
-				_, err := h.Trigger(queueCtx)
-				h.log().OnError(err).Debug("trigger of queued event failed")
-				if err == nil {
-					solvedInstances = append(solvedInstances, e.Aggregate().InstanceID)
+				if _, err := h.Trigger(queueCtx); err != nil {
+					logging.Warn(queueCtx, "trigger of queued event failed", "err", err)
+					continue
 				}
+				solvedInstances = append(solvedInstances, e.Aggregate().InstanceID)
 			}
 		}
 	}
@@ -468,8 +475,7 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 			wg.Done()
 		}
 		wg.Wait()
-		h.log().OnError(err).Info("process events failed")
-		h.log().WithField("iteration", i).Debug("trigger iteration")
+		logging.Debug(ctx, "trigger iteration", "iteration", i)
 		if !additionalIteration || err != nil {
 			return call.ResetTimestamp(ctx), err
 		}
@@ -506,7 +512,7 @@ func (h *Handler) lockInstance(ctx context.Context, config *triggerConfig) func(
 	}
 
 	// in case we want to wait for a running trigger / lock (e.g. query),
-	// we try to lock as long as the context is not cancelled
+	// we try to lock as long as the context is not canceled
 	select {
 	case instanceLock.(chan bool) <- true:
 		return func() {
@@ -523,7 +529,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		if errors.As(err, &pgErr) {
 			// error returned if the row is currently locked by another connection
 			if pgErr.Code == "55P03" {
-				h.log().Debug("state already locked")
+				logging.WithError(ctx, err).Info("another handler is already updating this projection")
 				err = nil
 				additionalIteration = false
 			}
@@ -549,7 +555,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	defer func() {
 		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
-			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
+			logging.OnError(ctx, rollbackErr).Error("unable to rollback tx")
 			return
 		}
 		commitErr := tx.Commit()
@@ -569,7 +575,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return false, err
 	}
 	if !hasLocked {
-		h.log().Debug("skip execution, projection already locked")
+		logging.Info(ctx, "another handler is already updating this projection")
 		return false, nil
 	}
 
@@ -611,12 +617,12 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	}()
 
 	if len(statements) == 0 {
-		err = h.setState(tx, currentState)
+		err = h.setState(ctx, tx, currentState)
 		return additionalIteration, err
 	}
 
 	lastProcessedIndex, err := h.executeStatements(ctx, tx, statements)
-	h.log().OnError(err).WithField("lastProcessedIndex", lastProcessedIndex).Debug("execution of statements failed")
+	logging.OnError(ctx, err).Debug("execution of statements failed", "lastProcessedIndex", lastProcessedIndex)
 	if lastProcessedIndex < 0 {
 		return false, err
 	}
@@ -628,7 +634,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	currentState.sequence = statements[lastProcessedIndex].Sequence
 	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
 
-	setStateErr := h.setState(tx, currentState)
+	setStateErr := h.setState(ctx, tx, currentState)
 	if setStateErr != nil {
 		err = setStateErr
 	}
@@ -647,12 +653,12 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 
 	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil {
-		h.log().WithError(err).Debug("filter eventstore failed")
+		logging.WithError(ctx, err).Debug("filter eventstore failed")
 		return nil, false, err
 	}
 	eventAmount := len(events)
 
-	statements, err := h.eventsToStatements(tx, events, currentState)
+	statements, err := h.eventsToStatements(ctx, tx, events, currentState)
 	if err != nil || len(statements) == 0 {
 		return nil, false, err
 	}
@@ -716,17 +722,17 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 
 	_, err = tx.ExecContext(ctx, "SAVEPOINT exec_stmt")
 	if err != nil {
-		h.log().WithError(err).Debug("create savepoint failed")
+		logging.WithError(ctx, err).Debug("create savepoint failed")
 		return err
 	}
 
 	if err = statement.Execute(ctx, tx, h.projection.Name()); err != nil {
-		h.log().WithError(err).Error("statement execution failed")
+		logging.WithError(ctx, err).Error("statement execution failed")
 
 		_, rollbackErr := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT exec_stmt")
-		h.log().OnError(rollbackErr).Error("rollback to savepoint failed")
+		logging.OnError(ctx, rollbackErr).Debug("rollback to savepoint failed")
 
-		shouldContinue := h.handleFailedStmt(tx, failureFromStatement(statement, err))
+		shouldContinue := h.handleFailedStmt(ctx, tx, failureFromStatement(statement, err))
 		if shouldContinue {
 			return nil
 		}

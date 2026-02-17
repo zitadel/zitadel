@@ -30,7 +30,7 @@ import (
 func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 	token, err := s.verifyAccessToken(ctx, r.Data.AccessToken)
@@ -185,11 +185,15 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 			if !userInfoAssertion {
 				continue
 			}
-			// TODO: handle address for human users as soon as implemented
+			// TODO: handle address for Users (Humans) as soon as implemented
 		case ScopeUserMetaData:
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
 			setUserInfoOrgClaims(user, out)
+		case ScopeCustomUserGroups:
+			setUserInfoCustomUserGroups(user.UserGroups, out)
+		case ScopeUserGroups:
+			setUserInfoUserGroups(user.UserGroups, out)
 		default:
 			if claim, ok := strings.CutPrefix(s, domain.OrgDomainPrimaryScope); ok {
 				out.AppendClaims(domain.OrgDomainPrimaryClaim, claim)
@@ -285,6 +289,24 @@ func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
 		}
 	}
+}
+
+func setUserInfoCustomUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserInfo) {
+	if len(userGroups) == 0 {
+		return
+	}
+	out.AppendClaims(ClaimCustomUserGroups, userGroups)
+}
+
+func setUserInfoUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserInfo) {
+	if len(userGroups) == 0 {
+		return
+	}
+	groups := make([]string, len(userGroups))
+	for i, userGroup := range userGroups {
+		groups[i] = userGroup.Name
+	}
+	out.AppendClaims(ClaimUserGroups, groups)
 }
 
 //nolint:gocognit
@@ -439,7 +461,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		UserGrants:   qu.UserGrants,
 	}
 
-	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm)
+	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm, s.query.GetActiveSigningWebKey)
 	if err != nil {
 		return err
 	}
