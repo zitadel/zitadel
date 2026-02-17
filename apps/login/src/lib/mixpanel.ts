@@ -4,6 +4,9 @@ let initialized = false;
 let trackingEnabled = false;
 
 function getConsentCookie(): Record<string, any> | null {
+  // Note - this relies on the cookie used by vanilla-cookie-consent, which is handled in the portal. Third parties
+  // Implementing this will need to either use a cookie following the same format as vanilla-cookie-consent or
+  // implement their own consent management and adjust this function accordingly.
   if (typeof document === "undefined") return null;
   const match = document.cookie.match(/(?:^|;\s*)cc_cookie=([^;]*)/);
   if (!match) return null;
@@ -128,7 +131,7 @@ export const MixpanelEvents = {
   device_consent_denied: "device_consent_denied",
 
   // Session
-  session_selected: "session_selected",
+  account_selected: "account_selected",
   session_cleared: "session_cleared",
 
   // MFA

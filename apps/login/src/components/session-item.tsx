@@ -67,7 +67,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
       <Tooltip.Trigger asChild>
         <button
           onClick={async () => {
-            trackEvent(MixpanelEvents.session_selected);
+            trackEvent(MixpanelEvents.account_selected);
             if (valid && session?.factors?.user) {
               const sessionPayload: ContinueWithSessionCommand = session;
               if (requestId) {
