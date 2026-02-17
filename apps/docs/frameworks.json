@@ -135,59 +135,5 @@
 		"description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
 		"imgSrcDark": "/docs/img/tech/vue.svg",
 		"docsLink": "/docs/guides/start/quickstart?framework=vue"
-	},
-	{
-		"title": "Dart",
-		"imgSrcDark": "/docs/img/tech/dart.svg",
-		"docsLink": "https://github.com/smartive/zitadel-dart",
-		"external": true,
-		"client": true,
-		"sdk": true
-	},
-	{
-		"title": "Elixir",
-		"imgSrcDark": "/docs/img/tech/elixir.svg",
-		"docsLink": "https://github.com/maennchen/zitadel_api",
-		"external": true
-	},
-	{
-		"title": "NextAuth",
-		"imgSrcDark": "/docs/img/tech/nextjs.svg",
-		"imgSrcLight": "/docs/img/tech/nextjslight.svg",
-		"docsLink": "https://next-auth.js.org/providers/zitadel",
-		"external": true
-	},
-	{
-		"title": ".Net SDK",
-		"imgSrcDark": "/docs/img/tech/dotnet.svg",
-		"docsLink": "https://github.com/smartive/zitadel-net",
-		"external": true,
-		"client": true
-	},
-	{
-		"title": "Passport.js",
-		"imgSrcDark": "/docs/img/tech/passportjs.svg",
-		"docsLink": "https://github.com/buehler/node-passport-zitadel",
-		"external": true
-	},
-	{
-		"title": "Rust",
-		"imgSrcLight": "/docs/img/tech/rust.svg",
-		"imgSrcDark": "/docs/img/tech/rustlight.svg",
-		"docsLink": "https://github.com/smartive/zitadel-rust",
-		"client": true,
-		"external": true
-	},
-	{
-		"title": "Pylon",
-		"imgSrcDark": "/docs/img/tech/pylon.svg",
-		"docsLink": "https://github.com/getcronit/pylon",
-		"external": true
-	},
-		{
-		"title": "Vanilla-JS",
-		"imgSrcDark": "/docs/img/tech/javascript.svg",
-		"docsLink": "https://github.com/zitadel/zitadel-vanilla-js",
-		"external": true
 	}
 ]
