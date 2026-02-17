@@ -2283,7 +2283,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             tags: "Domain Settings";
-            summary: "Get Org IAM Policy";
+            summary: "Get Org Instance Policy";
             description: "Use Get Domain Settings instead"
             deprecated: true;
         };
@@ -2302,7 +2302,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             tags: "Domain Settings";
-            summary: "Update Org IAM Policy";
+            summary: "Update Org Instance Policy";
             description: "Use Update Domain Settings instead";
             deprecated: true;
         };
@@ -2320,7 +2320,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             tags: "Domain Settings";
-            summary: "Get Org IAM Policy";
+            summary: "Get Org Instance Policy";
             description: "Use GetDomain Settings for Organization instead";
             deprecated: true;
         };
@@ -2339,7 +2339,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             tags: "Domain Settings";
-            summary: "Add Custom Org IAM Policy";
+            summary: "Add Custom Org Instance Policy";
             description: "Use Get Domain Settings for Organization instead"
             deprecated: true;
         };
@@ -2358,7 +2358,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             tags: "Domain Settings";
-            summary: "Update Custom Org IAM Policy";
+            summary: "Update Custom Org Instance Policy";
             description: "Use Get Domain Settings for Organization instead"
             deprecated: true;
         };

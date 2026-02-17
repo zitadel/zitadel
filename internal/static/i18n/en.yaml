@@ -911,9 +911,9 @@ EventTypes:
         removed: "Organization member cascade removed"
     iam:
       policy:
-        added: "System policy added"
-        changed: "System policy changed"
-        removed: "System policy removed"
+        added: "Organization policy added"
+        changed: "Organization policy changed"
+        removed: "Organization policy removed"
     idp:
       config:
         added: "IDP configuration added"

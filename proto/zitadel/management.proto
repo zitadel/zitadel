@@ -4751,7 +4751,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             tags: "Domain Settings";
-            summary: "Get Org IAM Policy";
+            summary: "Get Org Instance Policy";
             description: "Use Get Domain Settings instead"
             deprecated: true;
             parameters: {

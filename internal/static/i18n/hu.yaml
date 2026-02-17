@@ -409,11 +409,11 @@ Errors:
       Empty: "Az alapértelmezett jelszó kizárás szabályzat üres"
       NotChanged: "Az alapértelmezett jelszó kizárás szabályzat nem lett megváltoztatva"
     DomainPolicy:
-      NotFound: "Org IAM Policy nem található"
-      Empty: "Org IAM Policy üres"
-      NotExisting: "Org IAM Policy nem létezik"
-      AlreadyExists: "Org IAM Policy már létezik"
-      NotChanged: "Org IAM Policy nem lett módosítva"
+      NotFound: "Org Instance Policy nem található"
+      Empty: "Org Instance Policy üres"
+      NotExisting: "Org Instance Policy nem létezik"
+      AlreadyExists: "Org Instance Policy már létezik"
+      NotChanged: "Org Instance Policy nem lett módosítva"
     NotificationPolicy:
       NotFound: "Default Notification Policy nem található"
       NotChanged: "Default Notification Policy nem lett módosítva"

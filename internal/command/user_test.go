@@ -183,7 +183,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 			},
 		},
 		{
-			name: "org iam policy not found, precondition error",
+			name: "org instance policy not found, precondition error",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1202,7 +1202,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 			},
 		},
 		{
-			name: "org iam policy not found, precondition error",
+			name: "org instance policy not found, precondition error",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(

@@ -139,7 +139,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 			},
 		},
 		{
-			name: "org iam policy not existing, not found error",
+			name: "org instance policy not existing, not found error",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -346,7 +346,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-55M9f", "Errors.Org.NotFound"),
 		},
 		{
-			name: "org iam policy not existing, not found error",
+			name: "org instance policy not existing, not found error",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
