@@ -701,7 +701,7 @@
     "USERNAME": "User Name",
     "ORGNAME": "Nome organizzazione",
     "ORGID": "ID organizzazione",
-    "PRIMARYDOMAIN": "Dominio",
+    "PRIMARYDOMAIN": "Dominio dell'organizzazione",
     "PROJECTNAME": "Nome del progetto",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
