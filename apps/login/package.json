@@ -72,7 +72,7 @@
     "dotenv-cli": "^8.0.0",
     "env-cmd": "^10.1.0",
     "esbuild": "^0.27.3",
-    "eslint": "^8.57.1",
+    "eslint": "^9.26.0",
     "eslint-config-next": "15.5.9",
     "eslint-config-prettier": "^9.1.2",
     "gaxios": "^7.1.3",
