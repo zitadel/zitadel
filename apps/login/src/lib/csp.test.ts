@@ -22,6 +22,12 @@ describe("buildCSP", () => {
     expect(csp).toMatch(/font-src 'self'(?:;| |$)/);
   });
 
+  test("keeps frame-ancestors as 'none' when iframeOrigins is empty", () => {
+    const csp = buildCSP({ iframeOrigins: [] });
+
+    expect(csp).toContain("frame-ancestors 'none'");
+  });
+
   test("overrides frame-ancestors when iframeOrigins are provided", () => {
     const csp = buildCSP({
       iframeOrigins: ["https://app.example.com", "https://other.example.com"],

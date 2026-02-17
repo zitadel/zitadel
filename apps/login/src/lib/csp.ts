@@ -8,7 +8,6 @@ const BASE_DIRECTIVES: Record<string, string[]> = {
   "img-src": ["'self'"],
   "frame-ancestors": ["'none'"],
   "object-src": ["'none'"],
-  "child-src": [],
 };
 
 export interface CSPOptions {

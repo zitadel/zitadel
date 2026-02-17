@@ -19,6 +19,7 @@ import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitad
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
 import { buildCSP } from "../csp";
 import escapeHtml from "escape-html";
@@ -30,7 +31,7 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 function setCSPHeaders(
   response: NextResponse,
   serviceConfig: ServiceConfig,
-  securitySettings: { embeddedIframe?: { enabled?: boolean; allowedOrigins: string[] } } | null | undefined,
+  securitySettings: SecuritySettings | undefined,
 ): void {
   const iframeOrigins =
     securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
