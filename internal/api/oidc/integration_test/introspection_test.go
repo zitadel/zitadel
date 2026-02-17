@@ -22,6 +22,9 @@ import (
 
 // This is a regression test for https://github.com/zitadel/zitadel/issues/11177
 func TestIntrospection_RoleAddedAfterLogin(t *testing.T) {
+	//-------------------------
+	// HELPER FUNCTIONS
+	//-------------------------
 	createIntrospectionApi := func(tt *testing.T, projectId string) rs.ResourceServer {
 		api, err := Instance.CreateAPIClientJWT(CTX, projectId)
 		require.NoError(tt, err)
@@ -74,6 +77,9 @@ func TestIntrospection_RoleAddedAfterLogin(t *testing.T) {
 		return tokens.AccessToken
 	}
 
+	//-------------------------
+	// TEST CASES
+	//-------------------------
 	type TestCase struct {
 		Name                  string
 		RoleGrantedProjectId  string
@@ -138,6 +144,9 @@ func TestIntrospection_RoleAddedAfterLogin(t *testing.T) {
 		}(),
 	}
 
+	//-------------------------
+	// TEST
+	//-------------------------
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(tt *testing.T) {
 			// create app to log in with
