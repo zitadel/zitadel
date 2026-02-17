@@ -506,8 +506,28 @@ export async function checkSessionAndSetPassword({
       recentCookie: sessionCookie,
       checks,
       lifetime,
+      requestId: sessionCookie.requestId,
     });
-  } catch {
+  } catch (error: any) {
+    if ("failedAttempts" in error && error.failedAttempts) {
+      if (loginSettings?.ignoreUnknownUsernames) {
+        return { error: t("errors.failedToAuthenticateNoLimit") };
+      }
+      const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: sessionCookie.organization });
+
+      const hasLimit =
+        lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
+      const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
+      const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
+
+      return {
+        error: t(messageKey, {
+          failedAttempts: error.failedAttempts,
+          maxPasswordAttempts: hasLimit ? (lockoutSettings?.maxPasswordAttempts).toString() : "?",
+          lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
+        }),
+      };
+    }
     if (loginSettings?.ignoreUnknownUsernames) {
       return { error: t("change.errors.couldNotVerifyPassword") };
     }

@@ -69,6 +69,7 @@ describe("checkSessionAndSetPassword", () => {
   let mockGetSession: any;
   let mockListAuthenticationMethodTypes: any;
   let mockGetLoginSettings: any;
+  let mockGetLockoutSettings: any;
   let mockSetPassword: any;
   let mockSetSessionAndUpdateCookie: any;
 
@@ -78,7 +79,8 @@ describe("checkSessionAndSetPassword", () => {
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("../service-url");
     const { getSessionCookieById } = await import("../cookies");
-    const { getSession, listAuthenticationMethodTypes, getLoginSettings, setPassword } = await import("../zitadel");
+    const { getSession, listAuthenticationMethodTypes, getLoginSettings, getLockoutSettings, setPassword } =
+      await import("../zitadel");
     const { setSessionAndUpdateCookie } = await import("./cookie");
 
     mockHeaders = vi.mocked(headers);
@@ -87,6 +89,7 @@ describe("checkSessionAndSetPassword", () => {
     mockGetSession = vi.mocked(getSession);
     mockListAuthenticationMethodTypes = vi.mocked(listAuthenticationMethodTypes);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
+    mockGetLockoutSettings = vi.mocked(getLockoutSettings);
     mockSetPassword = vi.mocked(setPassword);
     mockSetSessionAndUpdateCookie = vi.mocked(setSessionAndUpdateCookie);
 
@@ -164,6 +167,61 @@ describe("checkSessionAndSetPassword", () => {
     });
 
     expect(result).toEqual({ error: "change.errors.couldNotVerifyPassword" });
+    expect(mockSetPassword).not.toHaveBeenCalled();
+  });
+
+  test("should pass requestId from session cookie to setSessionAndUpdateCookie", async () => {
+    mockGetSessionCookieById.mockResolvedValue({
+      id: "session123",
+      token: "token123",
+      organization: "org123",
+      requestId: "oidc-request-456",
+    });
+
+    await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "oldpassword",
+      password: "newpassword",
+    });
+
+    expect(mockSetSessionAndUpdateCookie).toHaveBeenCalledWith(
+      expect.objectContaining({
+        requestId: "oidc-request-456",
+      }),
+    );
+  });
+
+  test("should return lockout error with attempt counts when failedAttempts error is thrown", async () => {
+    mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 3 });
+    mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(5) });
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "wrongpassword",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticate" });
+    expect(mockGetLockoutSettings).toHaveBeenCalled();
+    expect(mockSetPassword).not.toHaveBeenCalled();
+  });
+
+  test("should return generic error for failedAttempts when ignoreUnknownUsernames is true", async () => {
+    mockGetLoginSettings.mockResolvedValue({
+      forceMfa: false,
+      passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
+      ignoreUnknownUsernames: true,
+    });
+    mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 3 });
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "wrongpassword",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
+    expect(mockGetLockoutSettings).not.toHaveBeenCalled();
     expect(mockSetPassword).not.toHaveBeenCalled();
   });
 
