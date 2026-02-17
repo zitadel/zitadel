@@ -3,17 +3,17 @@ title: Prevent users from accessing ZITADEL Management Console
 sidebar_label: Limit access to management console
 ---
 
-ZITADEL includes a management console that allows Managers to configure all resources. All uses, including end-users, by default, view and manage their profile information.
+ZITADEL includes a management console that allows Administrators to configure all resources. All uses, including end-users, by default, view and manage their profile information.
 In some use cases you want to prevent users from accessing the management console, this could be:
 - User management is integrated into your own app
 - Users login via SSO and should not be able to change their data in the Management Console
-- Only managers should be able to access Management Console to manage their users
+- Only administrators should be able to access Management Console to manage their users
 
 At the moment it is not possible to simply disable the Management Console, but with the configuration described in this guide, you can prevent users from accessing the Console.
 
 ## Self-hosted
 
-If you are running ZITADEL self-hosted, we recommend restricting the access to ZITADEL Management Console via WAF/reverse-proxy for Non-Manager users
+If you are running ZITADEL self-hosted, we recommend restricting the access to ZITADEL Management Console via WAF/reverse-proxy for Non-Administrator users
 
 ## ZITADEL Cloud (and self-hosted)
 
@@ -33,7 +33,7 @@ By default, this setting is disabled, so all users can access the project.
 
 ![](../../../public/img/guides/solution-scenarios/console-check-project-auth.png)
 
-Start by granting the organization of your managers, that should be able to access the Management Console, the [default project](/guides/manage/console/projects-overview#the-default-project):
+Start by granting the organization of your administrators that should be able to access the Management Console, the [default project](/guides/manage/console/projects-overview#the-default-project):
 
 1. Click on the default-project > Grants > New +
    ![](../../../public/img/guides/solution-scenarios/console-zitadel-project-grants.png)
@@ -49,9 +49,9 @@ To avoid accidental lock-out, the [default project](/guides/manage/console/proje
 
 You need to use the [update project API call](/reference/api/management/zitadel.management.v1.ManagementService.UpdateProject) to set the configuration on the project.
 
-First, you need a user with manager permissions to change the project settings in that organization.
-This means either you add the manager to the organization or you use a manager on the instance level with "IAM-OWNER" permissions.
-After that create a Personal Access Token (PAT) for the manager.
+First, you need a user with administrator permissions to change the project settings in that organization.
+This means either you add the manager to the organization or you use an administrator on the instance level with "IAM-OWNER" permissions.
+After that create a Personal Access Token (PAT) for the administrator.
 
 More detailed information about creating a PAT and administrator roles you can find [here](/guides/integrate/service-accounts/personal-access-token)
 
@@ -72,7 +72,7 @@ curl -L -X PUT "https://${CUSTOM_DOMAIN}/management/v1/projects/${PROJECT_ID}" \
 
 Where
 - `${CUSTOM_DOMAIN}` is your Custom Domain, f.e. mydemo.zitadel.cloud
-- `${PAT}` is your service user's personal access token
+- `${PAT}` is your service account's personal access token
 - `${PROJECT_ID}` is the default-project's ID that can be found in Management Console see screenshot above
 
 You should now be able to log in with users of the organization that have the grant (in this example users of the organization "Customer-A").

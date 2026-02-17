@@ -16,7 +16,7 @@ B2B can be a simple scenario where an organization only shares one of its projec
 ## Sample scenario
 
 Octagon is a fictitious company which is used throughout this guide to explain the details and key concepts of such a B2B scenario.
-Octagon tries to solve multiple tasks in the banking field. Its portfolio includes several applications for their employees, customers, and partners. Some of which are web-based, some of which are used by machine users only.
+Octagon tries to solve multiple tasks in the banking field. Its portfolio includes several applications for their employees, customers, and partners. Some of which are web-based, some of which are used by service accounts only.
 
 ### Portal Application
 
@@ -71,7 +71,7 @@ In this scenario, Dimitri and Michael share the same organization Pentagon, wher
 
 > Note: Roles are meant for internal business logic and therefore need to be validated separately, none of the users described are allowed to create user grants, at least if they do not own a ZITADEL administrator role.
 
-If you made a dashboard where some users are able to create user grants, the Management API to do such operations should be triggered with the personal access token of the users, not with a token of a machine user, to create a meaningful audit log.
+If you made a dashboard where some users are able to create user grants, the Management API to do such operations should be triggered with the personal access token of the users, not with a token of a service account, to create a meaningful audit log.
 If you had such a use case, ZITADEL administrator roles must be assigned to those users.
 
 ### Noteworthy

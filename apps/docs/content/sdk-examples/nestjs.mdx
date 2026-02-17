@@ -21,7 +21,7 @@ This example uses **[@auth/core](https://www.npmjs.com/package/@auth/core)**, th
 
 ## What this example demonstrates
 
-This example implements a complete authentication flow using [PKCE](https://oauth.net/2/pkce/) with [Zitadel](https://oauth.net/2/pkce/) with [Zitadel](https://zitadel.com/docs) as the identity provider. Users begin on a public landing page and click a login button to authenticate through Zitadel's authorization server. After successful authentication, they're redirected to a protected profile page displaying their user information retrieved from the [ID token](https://oauth.net/2/pkce/) with [Zitadel](https://zitadel.com/docs) as the identity provider. Users begin on a public landing page and click a login button to authenticate through Zitadel's authorization server. After successful authentication, they're redirected to a protected profile page displaying their user information retrieved from the [ID token](https://zitadel.com/docs/apis/openidoauth/claims) and [access token](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint).
+This example implements a complete authentication flow using [PKCE](https://oauth.net/2/pkce/) with [Zitadel](https://zitadel.com/docs) as the identity provider. Users begin on a public landing page and click a login button to authenticate through Zitadel's authorization server. After successful authentication, they're redirected to a protected profile page displaying their user information retrieved from the [ID token](https://oauth.net/2/pkce/) with [Zitadel](https://zitadel.com/docs) as the identity provider. Users begin on a public landing page and click a login button to authenticate through Zitadel's authorization server. After successful authentication, they're redirected to a protected profile page displaying their user information retrieved from the [ID token](https://zitadel.com/docs/apis/openidoauth/claims) and [access token](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint).
 
 The application leverages [NestJS controllers](https://docs.nestjs.com/controllers) to handle authentication routes and [@mridang/nestjs-auth guards](https://docs.nestjs.com/controllers) to handle authentication routes and [@mridang/nestjs-auth guards](https://www.npmjs.com/package/@mridang/nestjs-auth) to protect routes requiring authentication. [Session management](https://docs.nestjs.com/controllers) to handle authentication routes and [@mridang/nestjs-auth guards](https://www.npmjs.com/package/@mridang/nestjs-auth) to protect routes requiring authentication. [Session management](https://zitadel.com/docs/guides/integrate/login/oidc/login-users) is handled through encrypted [JWT-based sessions](https://docs.nestjs.com/controllers) to handle authentication routes and [@mridang/nestjs-auth guards](https://www.npmjs.com/package/@mridang/nestjs-auth) to protect routes requiring authentication. [Session management](https://zitadel.com/docs/guides/integrate/login/oidc/login-users) is handled through encrypted [JWT-based sessions](https://authjs.dev/concepts/session-strategies#jwt-session) stored in secure, HTTP-only cookies. The example includes automatic [token refresh](https://docs.nestjs.com/controllers) to handle authentication routes and [@mridang/nestjs-auth guards](https://www.npmjs.com/package/@mridang/nestjs-auth) to protect routes requiring authentication. [Session management](https://zitadel.com/docs/guides/integrate/login/oidc/login-users) is handled through encrypted [JWT-based sessions](https://authjs.dev/concepts/session-strategies#jwt-session) stored in secure, HTTP-only cookies. The example includes automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) functionality using [refresh tokens](https://oauth.net/2/pkce/), ensuring users maintain their sessions without interruption when access tokens expire.
 
@@ -35,22 +35,22 @@ All protected routes are secured using the [@mridang/nestjs-auth global guard](h
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/console-overview). Follow the PKCE application setup guide to:
 
-1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects-overview)
 2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback/zitadel` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps
 
-> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/console-overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
 
 ### Run the example
 
 Once you have your Zitadel application configured:
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-nestjs).
-2. Create a `.env` file in the project root and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications). **Use the exact environment variable names from the repository:**
+2. Create a `.env` file in the project root and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications-overview). **Use the exact environment variable names from the repository:**
    ```
    NODE_ENV=development
    PORT=3000

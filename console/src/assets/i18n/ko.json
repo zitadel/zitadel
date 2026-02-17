@@ -53,8 +53,8 @@
         "METADATA": "부서와 같은 사용자 정의 속성을 사용자에게 추가하세요. 이 정보를 작업에 사용할 수 있습니다."
       },
       "MACHINES": {
-        "TITLE": "서비스 사용자",
-        "DESCRIPTION": "서비스 사용자는 개인 키로 서명된 JWT bearer 토큰을 사용하여 비대화형 인증을 수행합니다. 또한 개인 액세스 토큰을 사용할 수 있습니다.",
+        "TITLE": "서비스 계정",
+        "DESCRIPTION": "서비스 계정은 개인 키로 서명된 JWT bearer 토큰을 사용하여 비대화형 인증을 수행합니다. 또한 개인 액세스 토큰을 사용할 수 있습니다.",
         "METADATA": "인증 시스템과 같은 사용자 정의 속성을 사용자에게 추가하세요. 이 정보를 작업에 사용할 수 있습니다."
       },
       "SELF": {
@@ -424,10 +424,10 @@
     "ROLES": "역할",
     "GRANTEDPROJECT": "부여된 프로젝트",
     "HUMANUSERS": "사용자",
-    "MACHINEUSERS": "서비스 사용자",
+    "MACHINEUSERS": "서비스 계정",
     "LOGOUT": "모든 사용자 로그아웃",
     "NEWORG": "새 조직",
-    "IAMADMIN": "IAM 관리자입니다. 확장된 권한이 부여되었습니다.",
+    "IAMADMIN": "인스턴스 관리자입니다. 확장된 권한이 부여되었습니다.",
     "SHOWORGS": "모든 조직 보기",
     "GRANTS": "권한",
     "ACTIONS": "작업",
@@ -766,7 +766,7 @@
       "KEYS": "키",
       "PAT": "개인 접근 토큰",
       "USERGRANTS": "권한 부여",
-      "MEMBERSHIPS": "멤버십",
+      "MEMBERSHIPS": "관리자 역할",
       "METADATA": "메타데이터"
     },
     "TITLE": "개인 정보",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel 관리자 역할",
-      "DESCRIPTION": "이 사용자의 모든 멤버 권한입니다. 조직, 프로젝트 또는 IAM 세부 페이지에서 수정할 수도 있습니다.",
+      "DESCRIPTION": "이 사용자의 모든 관리자 역할입니다. 조직, 프로젝트 또는 인스턴스 세부 페이지에서 수정할 수도 있습니다.",
       "ORGCONTEXT": "현재 선택된 조직과 관련된 모든 조직과 프로젝트를 볼 수 있습니다.",
       "USERCONTEXT": "사용 권한이 있는 모든 조직과 프로젝트를 볼 수 있습니다. 다른 조직도 포함됩니다.",
       "CREATIONDATE": "생성 날짜",
@@ -1170,7 +1170,7 @@
       "REMOVE": "제거",
       "TYPE": "유형",
       "ORGID": "조직 ID",
-      "UPDATED": "멤버십이 업데이트되었습니다.",
+      "UPDATED": "관리자 역할이 업데이트되었습니다.",
       "NOPERMISSIONTOEDIT": "역할을 편집할 권한이 없습니다!",
       "TYPES": {
         "UNKNOWN": "알 수 없음",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "전역 정책 및 관리 액세스 설정을 관리합니다."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM 스토리지 관리",
+      "TITLE": "인스턴스 스토리지 관리",
       "DESCRIPTION": "Zitadel 뷰 및 실패한 이벤트를 관리합니다."
     },
     "MEMBER": {
@@ -1942,13 +1942,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "멤버",
+      "TITLE": "관리자",
       "USERNAME": "사용자 이름",
       "DISPLAYNAME": "표시 이름",
       "LOGINNAME": "로그인 이름",
       "EMAIL": "이메일",
       "ROLES": "역할",
-      "ADD": "멤버 추가",
+      "ADD": "관리자 추가",
       "ADDDESCRIPTION": "추가할 사용자 이름을 입력하세요."
     },
     "TABLE": {
@@ -2788,10 +2788,10 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "매니저 추가",
+    "ADD": "관리자 추가",
     "CREATIONTYPE": "생성 유형",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "인스턴스",
       "2": "조직",
       "0": "소유 프로젝트",
       "1": "부여된 프로젝트",
@@ -2800,8 +2800,8 @@
     "EDITROLE": "역할 편집",
     "EDITFOR": "사용자의 역할 편집: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "매니저 제거",
-      "DELETE_DESCRIPTION": "매니저를 제거하려고 합니다. 계속하시겠습니까?"
+      "DELETE_TITLE": "관리자 제거",
+      "DELETE_DESCRIPTION": "관리자를 제거하려고 합니다. 계속하시겠습니까?"
     },
     "SHOWDETAILS": "세부 정보 보려면 클릭하세요."
   },
@@ -2836,7 +2836,7 @@
       "UPDATED": "권한이 업데이트되었습니다.",
       "REMOVED": "권한이 제거되었습니다.",
       "BULKREMOVED": "권한이 삭제되었습니다.",
-      "CANTSHOWINFO": "이 사용자가 속한 조직의 구성원이 아니기 때문에 사용자의 프로필을 볼 수 없습니다."
+      "CANTSHOWINFO": "이 사용자가 속한 조직의 관리자가 아니기 때문에 사용자의 프로필을 볼 수 없습니다."
     },
     "DIALOG": {
       "DELETE_TITLE": "권한 삭제",

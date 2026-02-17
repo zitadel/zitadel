@@ -3153,5 +3153,65 @@
     "source": "/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-list-web-keys",
     "destination": "/reference/api/webkey/zitadel.webkey.v2.WebKeyService.ListWebKeys",
     "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/actions",
+    "destination": "/guides/manage/console/actions-overview",
+    "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/applications",
+    "destination": "/guides/manage/console/applications-overview",
+    "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/organizations",
+    "destination": "/guides/manage/console/organizations-overview",
+    "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/projects",
+    "destination": "/guides/manage/console/projects-overview",
+    "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/users",
+    "destination": "/guides/manage/console/users-overview",
+    "permanent": true
+  },
+  {
+    "source": "/apis/actions/introduction",
+    "destination": "/guides/manage/console/actions-overview",
+    "permanent": true
+  },
+  {
+    "source": "/concepts/structure/applications",
+    "destination": "/guides/manage/console/applications-overview",
+    "permanent": true
+  },
+  {
+    "source": "/concepts/structure/organizations",
+    "destination": "/guides/manage/console/organizations-overview",
+    "permanent": true
+  },
+  {
+    "source": "/concepts/structure/projects",
+    "destination": "/guides/manage/console/projects-overview",
+    "permanent": true
+  },
+  {
+    "source": "/concepts/structure/users",
+    "destination": "/guides/manage/console/users-overview",
+    "permanent": true
+  },
+  {
+    "source": "/concepts/features/console",
+    "destination": "/guides/manage/console/console-overview",
+    "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/overview",
+    "destination": "/guides/manage/console/console-overview",
+    "permanent": true
   }
 ]

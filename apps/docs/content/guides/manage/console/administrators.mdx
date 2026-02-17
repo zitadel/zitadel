@@ -1,0 +1,65 @@
+---
+title: ZITADEL Administrators
+sidebar_label: Administrators
+---
+
+import AdministratorDescription from "../../../concepts/structure/_administrator_description.mdx";
+import AddAdministrator from "./_add_administrator.mdx";
+import PermissionTable from '@/components/PermissionTable';
+import permissionData from "../../../../../../cmd/defaults.yaml";
+
+<AdministratorDescription components={props.components}  name="AdministratorDescription" />
+
+To configure administrators in ZITADEL, go to the resource where you like to add it (e.g., Instance, Organization, Project, GrantedProject).
+In the right part of the management console you can find **ADMINISTRATORS** in the details part. Here you have a list of the current administrators and can add a new one.
+
+<img alt="Administrators" src="/docs/img/guides/console/administrators.png" width="200px" />
+
+<AddAdministrator components={props.components}  name="AddAdministrator" />
+
+## Roles
+
+| Name                          | Role                          | Description                                                                                                  |
+|-------------------------------|-------------------------------|--------------------------------------------------------------------------------------------------------------|
+| Instance Owner                | IAM_OWNER                     | Manage the Instance, manage all organizations with their content                                             |
+| Instance Owner Viewer         | IAM_OWNER_VIEWER              | View the Instance and view all organizations with their content                                              |
+| Instance Org Manager          | IAM_ORG_MANAGER               | Manage all organizations including their policies, projects and users                                        |
+| Instance User Manager         | IAM_USER_MANAGER              | Manage all users and their authorizations over all organizations                                             |
+| Instance Admin Impersonator   | IAM_ADMIN_IMPERSONATOR        | Allow impersonation of admin and end users from all organizations                                            |
+| Instance Impersonator         | IAM_END_USER_IMPERSONATOR     | Allow impersonation of end users from all organizations                                                      |
+| Instance Login Client         | IAM_LOGIN_CLIENT              | Get all permissions needed to implement your own Login UI.                                                   |
+| Org Owner                     | ORG_OWNER                     | Manage everything within an organization                                                                     |
+| Org Owner Viewer              | ORG_OWNER_VIEWER              | View everything within an organization                                                                       |
+| Org User Manager              | ORG_USER_MANAGER              | Manage users and their authorizations within an organization                                                 |
+| Org User Permission Editor    | ORG_USER_PERMISSION_EDITOR    | Manage user grants and view everything needed for this                                                       |
+| Org Project Permission Editor | ORG_PROJECT_PERMISSION_EDITOR | Grant Projects to other organizations and view everything needed for this                                    |
+| Org Project Creator           | ORG_PROJECT_CREATOR           | This role is used for users in the global organization. They are allowed to create projects and manage them. |
+| Org Admin Impersonator        | ORG_ADMIN_IMPERSONATOR        | Allow impersonation of admin and end users from the organization                                             |
+| Org Impersonator              | ORG_END_USER_IMPERSONATOR     | Allow impersonation of end users from the organization                                                       |
+| Project Owner                 | PROJECT_OWNER                 | Manage everything within a project. This includes to grant users for the project.                            |
+| Project Owner Viewer          | PROJECT_OWNER_VIEWER          | View everything within a project.                                                                            |
+| Project Owner Global          | PROJECT_OWNER_GLOBAL          | Same as PROJECT_OWNER, but in the global organization.                                                       |
+| Project Owner Viewer Global   | PROJECT_OWNER_VIEWER_GLOBAL   | Same as PROJECT_OWNER_VIEWER, but in the global organization.                                                |
+| Project Grant Owner           | PROJECT_GRANT_OWNER           | Same as PROJECT_OWNER but for a granted project.                                                             |
+
+## Configure roles
+
+If you run a self-hosted ZITADEL instance, you can define your custom roles by overwriting the defaults.yaml
+In the InternalAuthZ section you will find all the roles and which permissions they have.
+
+Example:
+
+```bash
+InternalAuthZ:
+  RolePermissionMappings:
+    - Role: "IAM_OWNER"
+      Permissions:
+        - "iam.read"
+        - "iam.write"
+```
+
+# Administrator Permission Matrix
+
+This table is generated dynamically from our configuration file.
+
+<PermissionTable data={permissionData} />

@@ -10,29 +10,29 @@ Benchmark results of v4 release of Zitadel.
 
 ## Performance test results
 
-| Metric                                | Value |
-|:--------------------------------------|:------|
-| Baseline                              | none  |
-| Purpose                               | Test current performance |
-| Test start                            | 14:56 UTC |
-| Test duration                         | 30min |
-| Executed test                         | otp_session |
-| k6 version                            | v1.0.0-rc1 |
-| VUs                                   | 600 |
-| Client location                       | US1 |
-| ZITADEL location                      | US1 |
-| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7 |
-| ZITADEL Version                       | v4.0.0-rc2 |
+| Metric                                | Value                                                                                                                                                                                                                                                  |
+|:--------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Baseline                              | none                                                                                                                                                                                                                                                   |
+| Purpose                               | Test current performance                                                                                                                                                                                                                               |
+| Test start                            | 14:56 UTC                                                                                                                                                                                                                                              |
+| Test duration                         | 30min                                                                                                                                                                                                                                                  |
+| Executed test                         | otp_session                                                                                                                                                                                                                                            |
+| k6 version                            | v1.0.0-rc1                                                                                                                                                                                                                                             |
+| VUs                                   | 600                                                                                                                                                                                                                                                    |
+| Client location                       | US1                                                                                                                                                                                                                                                    |
+| ZITADEL location                      | US1                                                                                                                                                                                                                                                    |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7                                                                                                                                                                       |
+| ZITADEL Version                       | v4.0.0-rc2                                                                                                                                                                                                                                             |
 | ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
-| Database                              | type: psql<br />version: v17.4 |
-| Database location                     | US1 |
-| Database specification                | vCPU: 8<br/> memory: 32Gib |
-| ZITADEL metrics during test           |  |
-| Observed errors                       | database usage was 80% |
-| Top 3 most expensive database queries | 1: query events by instance id, aggregate types, event types, position<br/>2: lock projection<br/>3: write events<br/> |
-| k6 Iterations per second              | 60 |
-| k6 output                             | [output](#k6-output) |
-| flowchart outcome                     |  |
+| Database                              | type: psql<br />version: v17.4                                                                                                                                                                                                                         |
+| Database location                     | US1                                                                                                                                                                                                                                                    |
+| Database specification                | vCPU: 8<br/> memory: 32Gib                                                                                                                                                                                                                             |
+| ZITADEL metrics during test           |                                                                                                                                                                                                                                                        |
+| Observed errors                       | database usage was 80%                                                                                                                                                                                                                                 |
+| Top 3 most expensive database queries | 1: query events by instance id, aggregate types, event types, position<br/>2: lock projection<br/>3: write events<br/>                                                                                                                                 |
+| k6 Iterations per second              | 60                                                                                                                                                                                                                                                     |
+| k6 output                             | [output](#k6-output)                                                                                                                                                                                                                                   |
+| flowchart outcome                     |                                                                                                                                                                                                                                                        |
 
 ## Endpoint latencies
 
