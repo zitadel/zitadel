@@ -49,7 +49,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Applications",
-            description: "Applications are the entry point to your project. Users either login into one of your applications and interact with them directly or use one of your APIs. All applications share the roles and role assignments of their project."
+            description: "Applications are the entry point to your project. Users either log in into one of your applications and interact with them directly or use one of your APIs. All applications share the roles and role assignments of their project."
         },
         {
             name: "Authentication Methods"
@@ -9911,7 +9911,7 @@ message AddProjectRequest {
     ];
     bool project_role_check = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Deny authentication if the user has no authorization assigned to this project. Authorizations to the project without assigned a specific role to the user are allowed.";
+            description: "Deny authentication if the user has no roles assigned to this project. Access to the project without a specific role assigned to the user is allowed.";
         }
     ];
     bool has_project_check = 4 [
