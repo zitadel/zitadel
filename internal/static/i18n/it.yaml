@@ -1224,7 +1224,7 @@ EventTypes:
     domain:
       added: "Dominio aggiunto"
       primary:
-        set: "Insieme di domini primari"
+        set: "Dominio dell'organizzazione cambiato"
       removed: "Dominio rimosso"
     iam:
       console:
