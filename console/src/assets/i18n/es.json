@@ -53,9 +53,9 @@
         "METADATA": "Añade atributos personalizados al usuario como el departamento. Puedes usar esta información en tus acciones."
       },
       "MACHINES": {
-        "TITLE": "Usuarios del servicio",
-        "DESCRIPTION": "Los Usuarios del servicio se autentican de manera no interactiva usando un token portador JWT firmado con una clave privada. También pueden usar un token de acceso personal.",
-        "METADATA": "Añade atributos personalizados al usuario como el sistema autenticador. Puedes usar esta información en tus acciones."
+        "TITLE": "Cuentas de servicio",
+        "DESCRIPTION": "Las cuentas de servicio se autentican de manera no interactiva usando un token portador JWT firmado con una clave privada. También pueden usar un token de acceso personal.",
+        "METADATA": "Añade atributos personalizados a la cuenta como el sistema autenticador. Puedes usar esta información en tus acciones."
       },
       "SELF": {
         "METADATA": "Añade atributos personalizados a tu usuario como tu departamento. Puedes usar esta información en las acciones de tu organización."
@@ -424,10 +424,10 @@
     "ROLES": "Roles",
     "GRANTEDPROJECT": "Proyecto concedido",
     "HUMANUSERS": "Usuarios",
-    "MACHINEUSERS": "Usuarios del servicio",
+    "MACHINEUSERS": "Cuentas de servicio",
     "LOGOUT": "Cerrar sesión para todos los usuarios",
     "NEWORG": "Nueva organización",
-    "IAMADMIN": "Eres un administrador IAM. Ten en cuenta que tienes permisos ampliados.",
+    "IAMADMIN": "Eres un administrador instancia. Ten en cuenta que tienes permisos ampliados.",
     "SHOWORGS": "Mostrar todas las organizaciones",
     "GRANTS": "Autorizaciones",
     "ACTIONS": "Acciones",
@@ -766,7 +766,7 @@
       "KEYS": "Claves",
       "PAT": "Tokens de acceso personal",
       "USERGRANTS": "Autorizaciones",
-      "MEMBERSHIPS": "Membresías",
+      "MEMBERSHIPS": "Roles de administrador",
       "METADATA": "Metadatos"
     },
     "TITLE": "Información personal",
@@ -990,8 +990,8 @@
       "COUNTRY": "País"
     },
     "MACHINE": {
-      "TITLE": "Detalles del usuario del servicio",
-      "USERNAME": "Nombre de usuario",
+      "TITLE": "Detalles de la cuenta de servicio",
+      "USERNAME": "Nombre de la cuenta",
       "NAME": "Nombre",
       "DESCRIPTION": "Descripción",
       "KEYSTITLE": "Claves",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "Se desactivaron los usuarios seleccionados.",
       "SELECTEDKEYSDELETED": "Se borraron las claves seleccionadas.",
       "KEYADDED": "¡Clave añadida!",
-      "MACHINEADDED": "¡Creado servicio de usuario!",
+      "MACHINEADDED": "¡Cuenta de servicio creada!",
       "DELETED": "¡El usuario se borró con éxito!",
       "UNLOCKED": "¡El usuario se desbloqueó con éxito!",
       "PASSWORDLESSREGISTRATIONSENT": "Enviado con éxito un enlace de registro.",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Roles del administrador de Zitadel",
-      "DESCRIPTION": "Estas son todas las concesiones de membresía del usuario. Puedes modificarlas también en las páginas de organización, proyecto o detalles IAM.",
+      "DESCRIPTION": "Estos son todos los roles de administrador del usuario. Puedes modificarlas también en las páginas de organización, proyecto o detalles instancia.",
       "ORGCONTEXT": "Puedes ver todas las organizaciones y proyectos que están relacionados con la organización seleccionada actualmente.",
       "USERCONTEXT": "Puedes ver todas las organizaciones y proyectos para los que estás autorizado. Incluyendo otras organizaciones.",
       "CREATIONDATE": "Fecha de creación",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Eliminar",
       "TYPE": "Tipo",
       "ORGID": "ID de organización",
-      "UPDATED": "La membresía fue actualizada.",
+      "UPDATED": "El rol de administrador fue actualizado.",
       "NOPERMISSIONTOEDIT": "¡No dispones de los permisos requeridos para editar roles!",
       "TYPES": {
         "UNKNOWN": "Desconocido",
@@ -1267,12 +1267,12 @@
       "DESCRIPTION": "Gestiona tus políticas globales y tus ajustes de gestión de accesos."
     },
     "EVENTSTORE": {
-      "TITLE": "Administración del almacenamiento IAM",
+      "TITLE": "Administración del almacenamiento Instancia",
       "DESCRIPTION": "Gestionar tus vistas de Zitadel y tus eventos fallidos."
     },
     "MEMBER": {
-      "TITLE": "Mánagers",
-      "DESCRIPTION": "Estos mánagers están autorizados para hacer cambios en tu instancia."
+      "TITLE": "Administradores",
+      "DESCRIPTION": "Estos administradores están autorizados para hacer cambios en tu instancia."
     },
     "PAGES": {
       "STATE": "Estado",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Mánager eliminado.",
-      "MEMBERSADDED": "Mánagers añadidos.",
-      "MEMBERADDED": "Mánager añadido.",
-      "MEMBERCHANGED": "Mánager modificado.",
+      "MEMBERREMOVED": "Administrador eliminado.",
+      "MEMBERSADDED": "Administradores añadidos.",
+      "MEMBERADDED": "Administrador añadido.",
+      "MEMBERCHANGED": "Administrador modificado.",
       "ROLEREMOVED": "Rol eliminado.",
       "ROLECHANGED": "Rol cambiado.",
       "REACTIVATED": "Reactivado",
@@ -1450,7 +1450,7 @@
       "2": "Desactivada"
     },
     "MEMBER": {
-      "TITLE": "Mánagers de la organización",
+      "TITLE": "Administradores de la organización",
       "DESCRIPTION": "Indica qué usuarios podrán cambiar las preferencias de tu organización."
     },
     "TOAST": {
@@ -1459,9 +1459,9 @@
       "REACTIVATED": "Organización reactivada.",
       "DOMAINADDED": "Dominio añadido.",
       "DOMAINREMOVED": "Dominio eliminado.",
-      "MEMBERADDED": "Mánager añadido.",
-      "MEMBERREMOVED": "Mánager eliminado.",
-      "MEMBERCHANGED": "Mánager modificado.",
+      "MEMBERADDED": "Administrador añadido.",
+      "MEMBERREMOVED": "Administrador eliminado.",
+      "MEMBERCHANGED": "Administrador modificado.",
       "SETPRIMARY": "Dominio primario establecido.",
       "DELETED": "Organización borrada con éxito",
       "DEFAULTORGNOTFOUND": "No se encontró la organización por defecto",
@@ -1943,13 +1943,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Miembros",
+      "TITLE": "Administradores",
       "USERNAME": "Nombre de usuario",
       "DISPLAYNAME": "Nombre mostrado",
       "LOGINNAME": "Nombre de inicio de sesión",
       "EMAIL": "Email",
       "ROLES": "Roles",
-      "ADD": "Añadir miembro",
+      "ADD": "Añadir administrador",
       "ADDDESCRIPTION": "Introducir los nombres de los usuarios a añadir."
     },
     "TABLE": {
@@ -2040,9 +2040,9 @@
       "NAME": "Nuevo nombre"
     },
     "MEMBER": {
-      "TITLE": "Mánagers",
-      "TITLEDESC": "Los mánagers pueden hacer cambios en este proyecto basándose en su rol.",
-      "DESCRIPTION": "Estos mánagers pueden editar tu proyecto.",
+      "TITLE": "Administradores",
+      "TITLEDESC": "Los administradores pueden hacer cambios en este proyecto basándose en su rol.",
+      "DESCRIPTION": "Estos administradores pueden editar tu proyecto.",
       "USERNAME": "Nombre de usuario",
       "DISPLAYNAME": "Nombre mostrado",
       "LOGINNAME": "Nombre de inicio de sesión",
@@ -2070,9 +2070,9 @@
       },
       "DETAIL": {
         "TITLE": "Concesión de proyecto",
-        "DESC": "Puedes seleccionar qué roles pueden usarse por la organización especificada y elegir mánagers",
-        "MEMBERTITLE": "Mánagers",
-        "MEMBERDESC": "Estos son los mánagers de la organización concesionaria. Añade aquí los usuarios que deberían obtener acceso para editar los datos del proyecto.",
+        "DESC": "Puedes seleccionar qué roles pueden usarse por la organización especificada y elegir administradores",
+        "MEMBERTITLE": "Administradores",
+        "MEMBERDESC": "Estos son los administradores de la organización concesionaria. Añade aquí los usuarios que deberían obtener acceso para editar los datos del proyecto.",
         "PROJECTNAME": "Nombre del proyecto",
         "GRANTEDORG": "Organización concesionaria",
         "RESOURCEOWNER": "Propietario del recurso"
@@ -2085,7 +2085,7 @@
       "ALL": "Todos",
       "SHOWDETAIL": "Mostrar detalles",
       "USER": "Usuario",
-      "MEMBERS": "Mánagers",
+      "MEMBERS": "Administradores",
       "ORG": "Organización",
       "PROJECTNAME": "Nombre del proyecto",
       "GRANTEDORG": "Organización concesionaria",
@@ -2103,9 +2103,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Concesión de proyecto creada.",
         "PROJECTGRANTADDED": "Concesión de proyecto añadida.",
         "PROJECTGRANTCHANGED": "Concesión de proyecto modificada.",
-        "PROJECTGRANTMEMBERADDED": "Gestor de concesiones añadido.",
-        "PROJECTGRANTMEMBERCHANGED": "Gestor de concesiones modificado.",
-        "PROJECTGRANTMEMBERREMOVED": "Gestor de concesiones eliminado.",
+        "PROJECTGRANTMEMBERADDED": "Administrador de concesiones añadido.",
+        "PROJECTGRANTMEMBERCHANGED": "Administrador de concesiones modificado.",
+        "PROJECTGRANTMEMBERREMOVED": "Administrador de concesiones eliminado.",
         "PROJECTGRANTUPDATED": "Concesión de proyecto actualizada"
       },
       "DIALOG": {
@@ -2168,10 +2168,10 @@
       "EMPTY": "No se encontraron proyectos"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Mánager eliminado.",
-      "MEMBERSADDED": "Mánagers añadidos.",
-      "MEMBERADDED": "Mánager añadido.",
-      "MEMBERCHANGED": "Mánager modificado.",
+      "MEMBERREMOVED": "Administrador eliminado.",
+      "MEMBERSADDED": "Administradores añadidos.",
+      "MEMBERADDED": "Administrador añadido.",
+      "MEMBERCHANGED": "Administrador modificado.",
       "ROLESCREATED": "Roles creados.",
       "ROLEREMOVED": "Rol eliminado.",
       "ROLECHANGED": "Rol modificado.",
@@ -2763,10 +2763,10 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "Añadir un Mánager",
+    "ADD": "Añadir un Administrador",
     "CREATIONTYPE": "Tipo de creación",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instancia",
       "2": "Organización",
       "0": "Proyecto propio",
       "1": "Proyecto con acceso concedido",
@@ -2775,8 +2775,8 @@
     "EDITROLE": "Editar roles",
     "EDITFOR": "Editar los roles para el usuario: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Eliminar Mánager",
-      "DELETE_DESCRIPTION": "Estás a punto de eliminar un mánager. ¿Estás seguro?"
+      "DELETE_TITLE": "Eliminar Administrador",
+      "DELETE_DESCRIPTION": "Estás a punto de eliminar un administrador. ¿Estás seguro?"
     },
     "SHOWDETAILS": "Mostrar detalles"
   },
@@ -2811,7 +2811,7 @@
       "UPDATED": "Autorización actualizada.",
       "REMOVED": "Autorización eliminada",
       "BULKREMOVED": "Autorizaciones eliminadas.",
-      "CANTSHOWINFO": "No puedes visitar el perfil de este usuario porque no eres miembro de la organización a la que pertenece este usuario."
+      "CANTSHOWINFO": "No puedes visitar el perfil de este usuario porque no eres administrador de la organización a la que pertenece este usuario."
     },
     "DIALOG": {
       "DELETE_TITLE": "Borrar autorización",

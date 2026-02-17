@@ -409,7 +409,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam OrgDomainPolicyAddedEventType",
+			name: "Instance OrgDomainPolicyAddedEventType",
 			args: args{
 				event: getEvent(
 					testEvent(
@@ -440,7 +440,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam OrgDomainPolicyChangedEventType",
+			name: "Instance OrgDomainPolicyChangedEventType",
 			args: args{
 				event: getEvent(
 					testEvent(
@@ -470,7 +470,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam OrgDomainPolicyChangedEventType no change",
+			name: "Instance OrgDomainPolicyChangedEventType no change",
 			args: args{
 				event: getEvent(
 					testEvent(

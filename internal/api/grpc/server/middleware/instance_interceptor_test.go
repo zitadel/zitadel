@@ -281,6 +281,10 @@ func (m *mockInstance) DefaultLanguage() language.Tag {
 	return language.English
 }
 
+func (m *mockInstance) AllowedLanguages() []language.Tag {
+	return []language.Tag{language.English}
+}
+
 func (m *mockInstance) DefaultOrganisationID() string {
 	return "orgID"
 }

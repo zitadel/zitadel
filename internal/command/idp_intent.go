@@ -27,7 +27,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, successURL, failureURL string, idpArguments map[string]any) preparation.Validation {
+func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, successURL, failureURL string, loginHint string, idpArguments map[string]any) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if idpID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.IDPMissing")
@@ -55,6 +55,7 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, s
 					successURL,
 					failureURL,
 					idpID,
+					loginHint,
 					idpArguments,
 				),
 			}, nil
@@ -62,7 +63,7 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, s
 	}
 }
 
-func (c *Commands) CreateIntent(ctx context.Context, intentID, idpID, successURL, failureURL, resourceOwner string, idpArguments map[string]any) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
+func (c *Commands) CreateIntent(ctx context.Context, intentID, idpID, successURL, failureURL, resourceOwner, loginHint string, idpArguments map[string]any) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
 	if intentID == "" {
 		var err error
 		intentID, err = c.idGenerator.Next()
@@ -73,7 +74,7 @@ func (c *Commands) CreateIntent(ctx context.Context, intentID, idpID, successURL
 	writeModel := NewIDPIntentWriteModel(intentID, resourceOwner, c.maxIdPIntentLifetime)
 
 	//nolint: staticcheck
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL, idpArguments))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL, loginHint, idpArguments))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -135,7 +136,7 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 	return intent, nil
 }
 
-func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, samlRootURL string) (state string, session idp.Session, err error) {
+func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, samlRootURL string, loginHint string) (state string, session idp.Session, err error) {
 	state, err = c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
@@ -144,7 +145,11 @@ func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, sam
 	if err != nil {
 		return "", nil, err
 	}
-	session, err = provider.BeginAuth(ctx, state)
+	var params []idp.Parameter
+	if loginHint != "" {
+		params = append(params, idp.LoginHintParam(loginHint))
+	}
+	session, err = provider.BeginAuth(ctx, state, params...)
 	return state, session, err
 }
 

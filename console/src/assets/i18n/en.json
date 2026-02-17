@@ -53,9 +53,9 @@
         "METADATA": "Add custom attributes to the user like the department. You can use this information in your actions."
       },
       "MACHINES": {
-        "TITLE": "Service Users",
-        "DESCRIPTION": "Service Users authenticate non-interactively using a JWT bearer token signed with a private key. They can also use a personal access token.",
-        "METADATA": "Add custom attributes to the user like the authenticating system. You can use this information in your actions."
+        "TITLE": "Service Accounts",
+        "DESCRIPTION": "Service Accounts authenticate non-interactively using a JWT bearer token signed with a private key. They can also use a personal access token.",
+        "METADATA": "Add custom attributes to the account like the authenticating system. You can use this information in your actions."
       },
       "SELF": {
         "METADATA": "Add custom attributes to your user like your department. You can use this information in your organizations actions."
@@ -424,7 +424,7 @@
     "ROLES": "Roles",
     "GRANTEDPROJECT": "Granted Projects",
     "HUMANUSERS": "Users",
-    "MACHINEUSERS": "Service Users",
+    "MACHINEUSERS": "Service Accounts",
     "LOGOUT": "Logout All Users",
     "NEWORG": "New Organization",
     "IAMADMIN": "You are an IAM Administrator. Note that you have extended permissions.",
@@ -767,7 +767,7 @@
       "KEYS": "Keys",
       "PAT": "Personal Access Tokens",
       "USERGRANTS": "Authorizations",
-      "MEMBERSHIPS": "Memberships",
+      "MEMBERSHIPS": "Administrator Roles",
       "METADATA": "Metadata"
     },
     "TITLE": "Personal Information",
@@ -991,7 +991,7 @@
       "COUNTRY": "Country"
     },
     "MACHINE": {
-      "TITLE": "Service User Details",
+      "TITLE": "Service Account Details",
       "USERNAME": "User Name",
       "NAME": "Name",
       "DESCRIPTION": "Description",
@@ -1153,7 +1153,7 @@
       "SELECTEDDEACTIVATED": "Selected users deactivated.",
       "SELECTEDKEYSDELETED": "Selected keys deleted.",
       "KEYADDED": "Key added!",
-      "MACHINEADDED": "Service User created!",
+      "MACHINEADDED": "Service Account created!",
       "DELETED": "User deleted successfully!",
       "UNLOCKED": "User unlocked successfully!",
       "PASSWORDLESSREGISTRATIONSENT": "Registration Link sent successfully.",
@@ -1162,7 +1162,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel Administrator Roles",
-      "DESCRIPTION": "These are all member grants of the user. You can modify them also on organization, project, or IAM detail pages.",
+      "DESCRIPTION": "These are all administrator roles of the user. You can modify them also on organization, project, or IAM detail pages.",
       "ORGCONTEXT": "You see all organizations and projects that are related to the currently selected organization.",
       "USERCONTEXT": "You see all organizations and projects to which you are authorized. Including other organizations.",
       "CREATIONDATE": "Creation Date",
@@ -1171,7 +1171,7 @@
       "REMOVE": "Remove",
       "TYPE": "Type",
       "ORGID": "Organization ID",
-      "UPDATED": "The membership was updated.",
+      "UPDATED": "The administrator role was updated.",
       "NOPERMISSIONTOEDIT": "You are missing the required permissions to edit roles!",
       "TYPES": {
         "UNKNOWN": "Unknown",
@@ -1272,8 +1272,8 @@
       "DESCRIPTION": "Manage your Zitadel views and failed events."
     },
     "MEMBER": {
-      "TITLE": "Managers",
-      "DESCRIPTION": "These Managers are allowed to make changes in your instance."
+      "TITLE": "Administrators",
+      "DESCRIPTION": "These administrators are allowed to make changes in your instance."
     },
     "PAGES": {
       "STATE": "Status",
@@ -1362,10 +1362,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERSADDED": "Managers added.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERCHANGED": "Manager changed.",
+      "MEMBERREMOVED": "Administrator removed.",
+      "MEMBERSADDED": "Administrators added.",
+      "MEMBERADDED": "Administrator added.",
+      "MEMBERCHANGED": "Administrator changed.",
       "ROLEREMOVED": "Role removed.",
       "ROLECHANGED": "Role changed.",
       "REACTIVATED": "Reactivated",
@@ -1450,7 +1450,7 @@
       "2": "Deactivated"
     },
     "MEMBER": {
-      "TITLE": "Organization Managers",
+      "TITLE": "Organization Administrators",
       "DESCRIPTION": "Define the users who can change your organizations preferences."
     },
     "TOAST": {
@@ -1459,9 +1459,9 @@
       "REACTIVATED": "Organization reactivated.",
       "DOMAINADDED": "Added domain.",
       "DOMAINREMOVED": "Removed domain.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERCHANGED": "Manager changed.",
+      "MEMBERADDED": "Administrator added.",
+      "MEMBERREMOVED": "Administrator removed.",
+      "MEMBERCHANGED": "Administrator changed.",
       "SETPRIMARY": "Primary domain set.",
       "DELETED": "Organization deleted successfully",
       "DEFAULTORGNOTFOUND": "The default organization was not found",
@@ -1946,13 +1946,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Members",
+      "TITLE": "Administrators",
       "USERNAME": "User Name",
       "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Login Name",
       "EMAIL": "E-mail",
       "ROLES": "Roles",
-      "ADD": "Add Member",
+      "ADD": "Add an Administrator",
       "ADDDESCRIPTION": "Enter the names of the users to be added."
     },
     "TABLE": {
@@ -2043,9 +2043,9 @@
       "NAME": "New Name"
     },
     "MEMBER": {
-      "TITLE": "Managers",
-      "TITLEDESC": "Managers can make changes to this project based on their role.",
-      "DESCRIPTION": "These managers may be able to edit your project.",
+      "TITLE": "Administrators",
+      "TITLEDESC": "Administrators can make changes to this project based on their role.",
+      "DESCRIPTION": "These administrators may be able to edit your project.",
       "USERNAME": "User Name",
       "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Loginname",
@@ -2073,9 +2073,9 @@
       },
       "DETAIL": {
         "TITLE": "Project Grant",
-        "DESC": "You can select which roles can be used by the specified organization, and elect managers",
-        "MEMBERTITLE": "Managers",
-        "MEMBERDESC": "These are the managers of the granted organization. Add users here who should gain access to edit the data of the project.",
+        "DESC": "You can select which roles can be used by the specified organization, and elect administrators",
+        "MEMBERTITLE": "Administrators",
+        "MEMBERDESC": "These are the administrators of the granted organization. Add users here who should gain access to edit the data of the project.",
         "PROJECTNAME": "Project Name",
         "GRANTEDORG": "Granted Organization",
         "RESOURCEOWNER": "Resource Owner"
@@ -2088,7 +2088,7 @@
       "ALL": "All",
       "SHOWDETAIL": "Show Details",
       "USER": "User",
-      "MEMBERS": "Managers",
+      "MEMBERS": "Administrators",
       "ORG": "Organization",
       "PROJECTNAME": "Project Name",
       "GRANTEDORG": "Granted Organization",
@@ -2106,9 +2106,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Project Grant created.",
         "PROJECTGRANTADDED": "Project Grant created.",
         "PROJECTGRANTCHANGED": "Project Grant changed.",
-        "PROJECTGRANTMEMBERADDED": "Grant manager added.",
-        "PROJECTGRANTMEMBERCHANGED": "Grant manager changed.",
-        "PROJECTGRANTMEMBERREMOVED": "Grant manager removed.",
+        "PROJECTGRANTMEMBERADDED": "Grant administrator added.",
+        "PROJECTGRANTMEMBERCHANGED": "Grant administrator changed.",
+        "PROJECTGRANTMEMBERREMOVED": "Grant administrator removed.",
         "PROJECTGRANTUPDATED": "Project Grant updated"
       },
       "DIALOG": {
@@ -2171,10 +2171,10 @@
       "EMPTY": "No project found"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERSADDED": "Managers added.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERCHANGED": "Manager changed.",
+      "MEMBERREMOVED": "Administrator removed.",
+      "MEMBERSADDED": "Administrators added.",
+      "MEMBERADDED": "Administrator added.",
+      "MEMBERCHANGED": "Administrator changed.",
       "ROLESCREATED": "Roles created.",
       "ROLEREMOVED": "Role removed.",
       "ROLECHANGED": "Role changed.",
@@ -2796,7 +2796,7 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "Add a Manager",
+    "ADD": "Add an Administrator",
     "CREATIONTYPE": "Creation Type",
     "CREATIONTYPES": {
       "3": "IAM",
@@ -2808,8 +2808,8 @@
     "EDITROLE": "Edit roles",
     "EDITFOR": "Edit the roles for the user: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Remove Manager",
-      "DELETE_DESCRIPTION": "You are about to remove a manager. Are you sure?"
+      "DELETE_TITLE": "Remove Administrator",
+      "DELETE_DESCRIPTION": "You are about to remove an administrator. Are you sure?"
     },
     "SHOWDETAILS": "Click to show details."
   },
@@ -2844,7 +2844,7 @@
       "UPDATED": "Authorization updated.",
       "REMOVED": "Authorization removed",
       "BULKREMOVED": "Authorizations removed.",
-      "CANTSHOWINFO": "You cannot visit this user's profile as you are not a member of the organization where this user belongs to"
+      "CANTSHOWINFO": "You cannot visit this user's profile as you are not an administrator of the organization where this user belongs to"
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete authorization",

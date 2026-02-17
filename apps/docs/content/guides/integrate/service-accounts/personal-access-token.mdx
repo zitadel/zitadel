@@ -1,18 +1,18 @@
 ---
-title: Configure personal access token authentication for service users
+title: Configure personal access token authentication for service accounts
 sidebar_label: Personal access token authentication
 ---
 
-A Personal Access Token (PAT) is a ready to use token which can be used as _Authorization_ header.
-At the moment ZITADEL only allows PATs for machine accounts (service users).
+A Personal Access Token (PAT) is a ready-to-use token that can be used as an _Authorization_ header.
+At the moment ZITADEL only allows PATs for service accounts.
 
-It is an alternative to the [private key JWT](./private-key-jwt) and [client credentials](./client-credentials). Read more about the different [authentication methods for service users](./authenticate-service-accounts).
+It is an alternative to the [private key JWT](./private-key-jwt) and [client credentials](./client-credentials). Read more about the different [authentication methods for service accounts](./authenticate-service-accounts).
 
-## Create a Service User with a PAT
+## Create a Service Account with a PAT
 
-1. Navigate to Service Users
+1. Navigate to Service Accounts
 2. Click on **New**
-3. Enter a user name and a display name
+3. Enter a username and a display name
 4. Click on the Personal Access Token menu point in the detail of your user
 5. Click on **New**
 6. You can either set an expiration date or leave it empty if you don't want it to expire
@@ -22,30 +22,30 @@ It is an alternative to the [private key JWT](./private-key-jwt) and [client cre
 
 ## Grant role for ZITADEL
 
-To be able to access the ZITADEL APIs your service user needs permissions to ZITADEL.
+To be able to access the ZITADEL APIs, your service account needs permissions to ZITADEL.
 
 1. Go to the detail page of your organization
 2. Click in the top right corner the "+" button
-3. Search for your service user
-4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](/guides/manage/console/managers))
+3. Search for your service account
+4. Give the user the role you need — for example, we choose Org Owner (More about [ZITADEL Permissions](/guides/manage/console/administrators))
 
 ![](../../../../public/img/guides/console-service-user-org-owner.gif)
 
 ## Accessing ZITADEL APIs
 
 You might want to access ZITADEL APIs to manage resources, such as users, or to validate tokens sent to your backend service.
-Follow our guides on [how to access ZITADEL API](../zitadel-apis/access-zitadel-apis) to use the ZITADEL APIs with your service user.
+Follow our guides on [how to access ZITADEL API](../zitadel-apis/access-zitadel-apis) to use the ZITADEL APIs with your service account.
 
 ### Token introspection
 
 Your API endpoint might receive tokens from users and need to validate the token with ZITADEL.
-In this case your API needs to authenticate with ZITADEL and then do a token introspection.
+In this case your API needs to authenticate with ZITADEL and then do token introspection.
 Follow our [guide on token introspection with private key JWT](../token-introspection/private-key-jwt) to learn more.
 
 ## Call ZITADEL API with PAT
 
-Because the PAT is a ready to use token, you can add it as Authorization Header and send it in your requests to the ZITADEL API.
-In this example we read the organization of the service user.
+Because the PAT is a ready-to-use token, you can add it as an Authorization Header and send it in your requests to the ZITADEL API.
+In this example we read the organization of the service account.
 
 ```bash
 curl --request GET \
@@ -55,7 +55,7 @@ curl --request GET \
 
 ## Client application authentication
 
-The above steps demonstrate service user authentication.
+The above steps demonstrate service account authentication.
 If your application also needs to authenticate itself, you can utilize [Client Credentials Grant](./client-credentials).
 Refer to ZITADEL documentation for details on this alternative method.
 
@@ -65,4 +65,4 @@ Refer to ZITADEL documentation for details on this alternative method.
 * **Set appropriate JWT expiration times:** Limit the validity period of tokens to minimize the impact of potential compromise.
 * **Implement proper error handling:** Handle situations where JWT verification fails or tokens are expired.
 
-By following these steps and adhering to security best practices, you can effectively secure service user and client application communication within ZITADEL using private key JWT authentication.
+By following these steps and adhering to security best practices, you can effectively secure service account and client application communication within ZITADEL using private key JWT authentication.

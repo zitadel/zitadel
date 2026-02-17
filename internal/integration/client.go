@@ -329,7 +329,7 @@ func (i *Instance) CreateUserTypeMachine(ctx context.Context, orgId string) *use
 			},
 		},
 	})
-	logging.OnError(err).Panic("create machine user")
+	logging.OnError(err).Panic("create service account")
 	i.TriggerUserByID(ctx, resp.GetId())
 	return resp
 }

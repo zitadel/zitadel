@@ -17,7 +17,7 @@ Users or service accounts can be assigned roles. You can do this via the ZITADEL
 Follow the links below to assign roles to your users.
 
 - [Add application roles via the ZITADEL Management Console](/guides/manage/console/roles)
-- [Add administrator roles via the ZITADEL Management Console](/guides/manage/console/managers)
+- [Add administrator roles via the ZITADEL Management Console](/guides/manage/console/administrators)
 - [Add application roles via the ZITADEL Management API](/reference/api/project)
 - [Add administrator roles to users via the ZITADEL Management API](/reference/api/management)
 
@@ -34,7 +34,7 @@ How to generate a token:
 - [Generate tokens for users](/guides/integrate/login/oidc/login-users)
 - [Generate tokens for service accounts](/guides/integrate/service-accounts/authenticate-service-accounts)
 
-In order to access role information via the token you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL management console before requesting the token.
+In order to access role information via the token, you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL management console before requesting the token.
 
 ### Determine the audience
 
@@ -215,7 +215,7 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
 Now we will use the auth API to retrieve roles from a logged in user using the user’s token
 The base URL is: **https://`${CUSTOM_DOMAIN}`/auth/v1**
 
-Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/reference/api/authorization).
+Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the service account’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/reference/api/authorization).
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
@@ -404,7 +404,7 @@ In [APIs listed under user grants in the management API](/reference/api/manageme
 
 #### **1. [Search user grants](/reference/api/management/zitadel.management.v1.ManagementService.ListUserGrants)​**
 
-Returns a list of user roles that match the search queries. A user with manager permissions will call this API and will also have to reside in the same organization as the user.
+Returns a list of user roles that match the search queries. A user with administrator permissions will call this API and will also have to reside in the same organization as the user.
 
 **URL: https://`${CUSTOM_DOMAIN}`/management/v1/users/grants/_search**
 

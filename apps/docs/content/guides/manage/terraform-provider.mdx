@@ -14,7 +14,7 @@ It can be used to create, update, and delete ZITADEL resources, as well as to ma
 Make sure you create the following resources in ZITADEL and have [Terraform installed](https://learn.hashicorp.com/tutorials/terraform/install-cli):
 
 - [A ZITADEL Instance](../start/quickstart)
-- [A service user](/guides/integrate/service-accounts/authenticate-service-accounts) with [enough authorization](/guides/manage/console/managers) to manage the desired resources
+- [A service account](/guides/integrate/service-accounts/authenticate-service-accounts) with [enough authorization](/guides/manage/console/administrators) to manage the desired resources
 
 ## Manage ZITADEL resources through terraform
 
@@ -23,7 +23,7 @@ The full documentation and examples are available on the [Terraform registry](ht
 To provide a small guide to where to start:
 
 1. Create a folder where all the terraform files reside.
-2. Configure the provider to use the right domain, port and token, with for example a `main.tf`file [as shown in the example](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs).
+2. Configure the provider to use the right domain, port and token, with, for example, a `main.tf`file [as shown in the example](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs).
 3. Add a `zitadel_org` resource to the `main.tf` file, to create and manage a new organization in the instance, [as shown in the example](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs/resources/org).
 4. Add any resources to the organization in the `main.tf` file, [as an example a user](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs/resources/human_user).
 5. (Optional) Use Terraform in the directory with the command `terraform plan`, to see which resources would be created and how.
