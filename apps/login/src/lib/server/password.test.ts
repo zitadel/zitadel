@@ -149,6 +149,24 @@ describe("checkSessionAndSetPassword", () => {
     expect(mockSetPassword).not.toHaveBeenCalled();
   });
 
+  test("should return generic error when current password is incorrect and ignoreUnknownUsernames is true", async () => {
+    mockGetLoginSettings.mockResolvedValue({
+      forceMfa: false,
+      passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
+      ignoreUnknownUsernames: true,
+    });
+    mockSetSessionAndUpdateCookie.mockRejectedValue(new Error("invalid password"));
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "wrongpassword",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "change.errors.couldNotVerifyPassword" });
+    expect(mockSetPassword).not.toHaveBeenCalled();
+  });
+
   test("should return error when session cookie not found", async () => {
     mockGetSessionCookieById.mockResolvedValue(null);
 

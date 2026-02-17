@@ -508,6 +508,9 @@ export async function checkSessionAndSetPassword({
       lifetime,
     });
   } catch {
+    if (loginSettings?.ignoreUnknownUsernames) {
+      return { error: t("change.errors.couldNotVerifyPassword") };
+    }
     return { error: t("change.errors.currentPasswordInvalid") };
   }
 
