@@ -859,11 +859,13 @@ service AuthService {
         };
     }
 
-    // List My Authorizations / User Grants
+    // List My Authorizations / Role Assignments
     //
     // Deprecated: [List authorizations](/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations) and pass the user ID filter with your users ID to search for your authorizations on granted and owned projects.
     //
-    // Returns a list of the authorizations/user grants the authenticated user has. User grants consist of an organization, a project and 1-n roles.
+    // Returns a list of the authorizations/role assignments the authenticated user has. Role assignments consist of an organization, a project and 1-n roles.
+    //
+    // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
     rpc ListMyUserGrants(ListMyUserGrantsRequest) returns (ListMyUserGrantsResponse) {
         option (google.api.http) = {
             post: "/usergrants/me/_search"
@@ -892,7 +894,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authorizations/Grants"
             summary: "List My Organizations";
-            description: "Returns a list of the organizations where the authenticated user has any authorizations/user grants. The request is made in the context of the requested project. This request can be used in multi-tenancy applications to show the user a tenant switcher."
+            description: "Returns a list of the organizations where the authenticated user has any authorizations/role assignments. The request is made in the context of the requested project. This request can be used in multi-tenancy applications to show the user a tenant switcher."
         };
     }
 
@@ -1515,6 +1517,7 @@ message ListMyUserGrantsResponse {
     repeated UserGrant result = 2;
 }
 
+// Note: User grant refers to role assignments.
 message UserGrant {
     string org_id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1575,7 +1578,7 @@ message UserGrant {
     ];
     zitadel.user.v1.UserGrantState state = 13 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "current state of the user grant";
+            description: "current state of the user grant (role assignment)";
         }
     ];
 }

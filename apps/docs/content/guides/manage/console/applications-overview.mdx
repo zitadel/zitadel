@@ -15,7 +15,7 @@ import AppType from "./_application-types.mdx";
 Applications are the entry point to your [Project Overview](/guides/manage/console/projects-overview)
 . Users either login into one of your applications (Frontend) and interact with them directly, or use one of your APIs (Backend).
 
-All applications within a project share the same **Roles** and **Authorizations**. This means you define a role once (e.g., `admin`) on the Project level, and it applies across all your web, mobile, and API applications.
+All applications within a project share the same **Roles** and **Role Assignments**. This means you define a role once (e.g., `admin`) on the Project level, and it applies across all your web, mobile, and API applications.
 
 To access your applications, navigate to your Project in the Management Console and select your application.
 
@@ -117,13 +117,13 @@ When disabled, ZITADEL enforces strict security and only allows `https`.
 **Glob Patterns:**
 Development mode allows the use of glob patterns in Redirect URIs for flexibility:
 
-| Special Terms | Meaning |
-| :--- | :--- |
-| `*` | Matches any sequence of **non-path-separators**. |
-| `/**/` | Matches zero or more directories. |
-| `?` | Matches any single non-path-separator character. |
-| `[class]` | Matches any single character against a class of characters (e.g., `[a-z]`). |
-| `{alt1,...}` | Matches a sequence if one of the comma-separated alternatives matches. |
+| Special Terms | Meaning                                                                     |
+|:--------------|:----------------------------------------------------------------------------|
+| `*`           | Matches any sequence of **non-path-separators**.                            |
+| `/**/`        | Matches zero or more directories.                                           |
+| `?`           | Matches any single non-path-separator character.                            |
+| `[class]`     | Matches any single character against a class of characters (e.g., `[a-z]`). |
+| `{alt1,...}`  | Matches a sequence if one of the comma-separated alternatives matches.      |
 
 <Callout type="note">
 Double stars (`**`) should appear surrounded by path separators (e.g., `/**/`). A pattern like `path/to/**.txt` is invalid; use `path/to/**/*.txt`.
