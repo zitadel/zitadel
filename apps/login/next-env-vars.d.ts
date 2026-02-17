@@ -2,12 +2,12 @@ declare namespace NodeJS {
   interface ProcessEnv {
     // Allow any environment variable that matches the pattern
     [key: `${string}_AUDIENCE`]: string; // The system api url
-    [key: `${string}_SYSTEM_USER_ID`]: string; // The service user id
-    [key: `${string}_SYSTEM_USER_PRIVATE_KEY`]: string; // The service user private key
+    [key: `${string}_SYSTEM_USER_ID`]: string; // The service account id
+    [key: `${string}_SYSTEM_USER_PRIVATE_KEY`]: string; // The service account private key
 
     AUDIENCE: string; // The fallback system api url
-    SYSTEM_USER_ID: string; // The fallback service user id
-    SYSTEM_USER_PRIVATE_KEY: string; // The fallback service user private key
+    SYSTEM_USER_ID: string; // The fallback service account id
+    SYSTEM_USER_PRIVATE_KEY: string; // The fallback service account private key
 
     /**
      * The Zitadel API url
@@ -15,7 +15,7 @@ declare namespace NodeJS {
     ZITADEL_API_URL: string;
 
     /**
-     * The service user token
+     * The service account token
      * If ZITADEL_SERVICE_USER_TOKEN is set, its value is used.
      * If ZITADEL_SERVICE_USER_TOKEN is not set but ZITADEL_SERVICE_USER_TOKEN_FILE is set, the application blocks until the file is created.
      * As soon as the file exists, its content is read and ZITADEL_SERVICE_USER_TOKEN is set.
@@ -44,5 +44,13 @@ declare namespace NodeJS {
      * Optional: The application name shown in the login and invite emails
      */
     NEXT_PUBLIC_APPLICATION_NAME?: string;
+
+    /**
+     * Optional: Enable automatic code submission on page load.
+     * Set to "true" to auto-submit verification codes (e.g. email verification, Email OTP).
+     * Default behavior (undefined) requires users to click a Submit button,
+     * which is safer for environments with enterprise email link scanners.
+     */
+    NEXT_PUBLIC_AUTO_SUBMIT_CODE?: string;
   }
 }

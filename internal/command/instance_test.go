@@ -3,15 +3,12 @@ package command
 import (
 	"context"
 	"encoding/json"
-	"net/url"
 	"slices"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
@@ -21,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -658,7 +654,7 @@ func addHumanEvent(ctx context.Context, orgID, userID string) *user.HumanAddedEv
 	}()
 }
 
-// machineEvents all events from setup to create the machine user, machinekey can't be tested here, as the public key is not provided and as such the value in the event can't be expected
+// machineEvents all events from setup to create the service account, machinekey can't be tested here, as the public key is not provided and as such the value in the event can't be expected
 func machineEvents(ctx context.Context, instanceID, orgID, userID, patID string) []eventstore.Command {
 	agg := user.NewAggregate(userID, orgID)
 	instanceAgg := instance.NewAggregate(instanceID)
@@ -1766,121 +1762,6 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.want, got)
 			}
-		})
-	}
-}
-
-func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
-	t.Parallel()
-
-	type fields struct {
-		LoginDefaultOrg                *bool
-		UserSchema                     *bool
-		ImprovedPerformance            []feature.ImprovedPerformanceType
-		DebugOIDCParentError           *bool
-		OIDCSingleV1SessionTermination *bool
-		LoginV2                        *InstanceSetupFeatureLoginV2
-		PermissionCheckV2              *bool
-		ManagementConsoleUseV2UserApi  *bool
-		EnableRelationalTables         *bool
-	}
-
-	correctlyParsedURI, err := url.Parse("https://example.com")
-	require.NoError(t, err)
-
-	tt := []struct {
-		name    string
-		fields  fields
-		want    *InstanceFeatures
-		wantErr bool
-	}{
-		{
-			name:   "nil features returns nil",
-			fields: fields{},
-			want:   &InstanceFeatures{},
-		},
-		{
-			name: "all fields no login v2",
-			fields: fields{
-				LoginDefaultOrg:                gu.Ptr(true),
-				UserSchema:                     gu.Ptr(false),
-				ImprovedPerformance:            []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
-				DebugOIDCParentError:           gu.Ptr(true),
-				OIDCSingleV1SessionTermination: gu.Ptr(false),
-				PermissionCheckV2:              gu.Ptr(true),
-				ManagementConsoleUseV2UserApi:  gu.Ptr(false),
-				EnableRelationalTables:         gu.Ptr(true),
-			},
-			want: &InstanceFeatures{
-				LoginDefaultOrg:                gu.Ptr(true),
-				UserSchema:                     gu.Ptr(false),
-				ImprovedPerformance:            []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
-				DebugOIDCParentError:           gu.Ptr(true),
-				OIDCSingleV1SessionTermination: gu.Ptr(false),
-				LoginV2:                        nil,
-				PermissionCheckV2:              gu.Ptr(true),
-				ManagementConsoleUseV2UserApi:  gu.Ptr(false),
-				EnableRelationalTables:         gu.Ptr(true),
-			},
-		},
-		{
-			name: "with login v2 no base uri",
-			fields: fields{
-				LoginV2: &InstanceSetupFeatureLoginV2{
-					Required: true,
-				},
-			},
-			want: &InstanceFeatures{
-				LoginV2: &feature.LoginV2{
-					Required: true,
-				},
-			},
-		},
-		{
-			name: "with login v2 valid base uri",
-			fields: fields{
-				LoginV2: &InstanceSetupFeatureLoginV2{
-					Required: true,
-					BaseURI:  gu.Ptr("https://example.com"),
-				},
-			},
-			want: &InstanceFeatures{
-				LoginV2: &feature.LoginV2{
-					Required: true,
-					BaseURI:  correctlyParsedURI,
-				},
-			},
-		},
-		{
-			name: "with login v2 invalid base uri",
-			fields: fields{
-				LoginV2: &InstanceSetupFeatureLoginV2{
-					Required: true,
-					BaseURI:  gu.Ptr("://invalid"),
-				},
-			},
-			wantErr: true,
-		},
-	}
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
-			f := &InstanceSetupFeatures{
-				LoginDefaultOrg:                tc.fields.LoginDefaultOrg,
-				UserSchema:                     tc.fields.UserSchema,
-				ImprovedPerformance:            tc.fields.ImprovedPerformance,
-				DebugOIDCParentError:           tc.fields.DebugOIDCParentError,
-				OIDCSingleV1SessionTermination: tc.fields.OIDCSingleV1SessionTermination,
-				LoginV2:                        tc.fields.LoginV2,
-				PermissionCheckV2:              tc.fields.PermissionCheckV2,
-				ManagementConsoleUseV2UserApi:  tc.fields.ManagementConsoleUseV2UserApi,
-				EnableRelationalTables:         tc.fields.EnableRelationalTables,
-			}
-			got, err := f.ToInstanceFeatures()
-
-			require.Equal(t, tc.wantErr, err != nil)
-			assert.Equal(t, tc.want, got)
 		})
 	}
 }

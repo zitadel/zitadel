@@ -3,7 +3,7 @@ title: Identity Brokering
 sidebar_label: Identity Brokering
 ---
 
-Link social logins and external identity providers with your identity management platform allowing users to login with their preferred identity provider.
+Link social logins and external identity providers with your identity management platform allowing users to log in with their preferred identity provider.
 
 Establish a trusted connection between your central identity provider (IdP) and third party identity providers.
 
@@ -26,7 +26,7 @@ A service provider that specializes in brokering access control between multiple
 Federated identity management is an arrangement that is made between two or more such identity brokers across organizations.
 
 For example, if Google is configured as an identity provider in your organization, the user will get the option to use his Google Account on the Login Screen of ZITADEL.
-Because Google is registered as a trusted identity provider, the user will be able to login in with the Google account after the user is linked with an existing ZITADEL account (if the user is already registered) or a new one with the claims provided by Google.
+Because Google is registered as a trusted identity provider, the user will be able to log in with the Google account after the user is linked with an existing ZITADEL account (if the user is already registered) or a new one with the claims provided by Google.
 
 ![](../../../public/img/concepts/features/identity-brokering.png)
 
@@ -41,9 +41,9 @@ The schema is a very simplified version, but shows the essential steps for ident
 ## Is single-sign-on (SSO) the same as identity brokering?
 
 Sometimes single-sign-on (SSO) and login with third party identity providers is used interchangeably.
-Typically SSO describes an authentication scheme that allows users to log in once at a central identity provider and access service providers (client applications) without to login again.
+Typically, SSO describes an authentication scheme that allows users to log in once at a central identity provider and access service providers (client applications) without having to login again.
 
-Identity brokering describes an authentication scheme where users can login with external identity providers that have a established trust with an identity provider which facilitates the authentication for the requested applications.
+Identity brokering describes an authentication scheme where users can log in with external identity providers that have an established trust with an identity provider which facilitates the authentication for the requested applications.
 
 The connection between the two lies in how SSO can be implemented as part of an identity brokering solution.
 In such cases, the identity broker uses SSO to enable seamless access across multiple systems, handling the complexities of different authentication protocols and standards behind the scenes.
@@ -52,12 +52,12 @@ This allows users to log in once and gain access to multiple systems that the br
 ## Multitenancy and identity brokering
 
 In a multi-tenancy application, you want to be able to configure an external identity provider per tenant.
-For example some organizations might use their EntraID, some other want to login with their OKTA, or Google Workspace.
+For example some organizations might use their EntraID, some other want to log in with their OKTA, or Google Workspace.
 
 Using an identity provider with strong multitenancy capabilities such as ZITADEL, you can configure a different set of external identity providers per organization.
 
 [Domain discovery](/guides/solution-scenarios/domain-discovery) ensures that users are redirected to their external identity provider based on their email-address or username.
-[Managers](../structure/managers) can configure organization domains that are used for domain-based redirection to an external IdP.
+[Administrators](../structure/administrators) can configure organization domains that are used for domain-based redirection to an external IdP.
 
 ![](../../../public/img/concepts/features/domain-discovery.png)
 

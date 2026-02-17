@@ -98,11 +98,18 @@ type Commands struct {
 	caches *Caches
 	// Store instance IDs where all milestones are reached (except InstanceDeleted).
 	// These instance's milestones never need to be invalidated,
-	// so the query and cache overhead can completely eliminated.
+	// so the query and cache overhead can be completely eliminated.
 	milestonesCompleted sync.Map
 
-	defaultEmailCodeURLTemplate   func(ctx context.Context) string
-	defaultPasswordSetURLTemplate func(ctx context.Context) string
+	loginPaths LoginPaths
+}
+
+//go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
+type LoginPaths interface {
+	DefaultEmailCodeURLTemplate(ctx context.Context) string
+	DefaultPasswordSetURLTemplate(ctx context.Context) string
+	DefaultPasskeySetURLTemplate(ctx context.Context) string
+	DefaultDomainClaimedURLTemplate(ctx context.Context) string
 }
 
 func StartCommands(
@@ -120,12 +127,9 @@ func StartCommands(
 	httpClient *http.Client,
 	permissionCheck domain.PermissionCheck,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
-	defaultAccessTokenLifetime,
-	defaultRefreshTokenLifetime,
-	defaultRefreshTokenIdleLifetime time.Duration,
+	defaultAccessTokenLifetime, defaultRefreshTokenLifetime, defaultRefreshTokenIdleLifetime time.Duration,
 	defaultSecretGenerators *SecretGenerators,
-	defaultEmailCodeURLTemplate func(ctx context.Context) string,
-	defaultPasswordSetURLTemplate func(ctx context.Context) string,
+	loginPaths LoginPaths,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -211,10 +215,9 @@ func StartCommands(
 				WithHyphen: defaults.Multifactors.RecoveryCodes.WithHyphen,
 			},
 		},
-		GenerateDomain:                domain.NewGeneratedInstanceDomain,
-		caches:                        caches,
-		defaultEmailCodeURLTemplate:   defaultEmailCodeURLTemplate,
-		defaultPasswordSetURLTemplate: defaultPasswordSetURLTemplate,
+		GenerateDomain: domain.NewGeneratedInstanceDomain,
+		caches:         caches,
+		loginPaths:     loginPaths,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {

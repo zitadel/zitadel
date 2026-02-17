@@ -2,15 +2,12 @@
 package integration
 
 import (
-	"bytes"
 	"context"
 	"crypto/rsa"
 	"crypto/x509"
 	_ "embed"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -39,7 +36,7 @@ const (
 
 // UserType provides constants that give
 // a short explanation with the purpose
-// a service user.
+// a service account.
 // This allows to pre-create users with
 // different permissions and reuse them.
 type UserType int
@@ -193,14 +190,6 @@ func (i *Instance) setupInstance(ctx context.Context, token string) {
 // Host returns the primary Domain of the instance with the port.
 func (i *Instance) Host() string {
 	return fmt.Sprintf("%s:%d", i.Domain, i.Config.Port)
-}
-
-func loadInstanceOwnerPAT() string {
-	data, err := os.ReadFile(filepath.Join(tmpDir, adminPATFile))
-	if err != nil {
-		panic(err)
-	}
-	return string(bytes.TrimSpace(data))
 }
 
 func (i *Instance) createMachineUserInstanceOwner(ctx context.Context, token string) {
