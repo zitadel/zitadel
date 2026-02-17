@@ -1105,6 +1105,12 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 									KeyID:      "id",
 									Crypted:    []byte("accessToken"),
 								},
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("refreshToken"),
+								},
 								"idToken",
 								time.Time{},
 							)
@@ -1119,7 +1125,8 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 				idpSession: &openid.Session{
 					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 						Token: &oauth2.Token{
-							AccessToken: "accessToken",
+							AccessToken:  "accessToken",
+							RefreshToken: "refreshToken",
 						},
 						IDToken: "idToken",
 					},
@@ -1501,9 +1508,10 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 		encryptionAlg crypto.EncryptionAlgorithm
 	}
 	type res struct {
-		accessToken *crypto.CryptoValue
-		idToken     string
-		err         error
+		accessToken  *crypto.CryptoValue
+		refreshToken *crypto.CryptoValue
+		idToken      string
+		err          error
 	}
 	tests := []struct {
 		name string
@@ -1517,9 +1525,10 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 				crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			res{
-				accessToken: nil,
-				idToken:     "",
-				err:         nil,
+				accessToken:  nil,
+				refreshToken: nil,
+				idToken:      "",
+				err:          nil,
 			},
 		},
 		{
@@ -1539,9 +1548,10 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 				}(),
 			},
 			res{
-				accessToken: nil,
-				idToken:     "",
-				err:         zerrors.ThrowInternal(nil, "id", "encryption failed"),
+				accessToken:  nil,
+				refreshToken: nil,
+				idToken:      "",
+				err:          zerrors.ThrowInternal(nil, "id", "encryption failed"),
 			},
 		},
 		{
@@ -1550,7 +1560,8 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 				&oauth.Session{
 					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 						Token: &oauth2.Token{
-							AccessToken: "accessToken",
+							AccessToken:  "accessToken",
+							RefreshToken: "refreshToken",
 						},
 					},
 				},
@@ -1563,6 +1574,12 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 					KeyID:      "id",
 					Crypted:    []byte("accessToken"),
 				},
+				refreshToken: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("refreshToken"),
+				},
 				idToken: "",
 				err:     nil,
 			},
@@ -1573,7 +1590,8 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 				&openid.Session{
 					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 						Token: &oauth2.Token{
-							AccessToken: "accessToken",
+							AccessToken:  "accessToken",
+							RefreshToken: "refreshToken",
 						},
 						IDToken: "idToken",
 					},
@@ -1586,6 +1604,12 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 					Algorithm:  "enc",
 					KeyID:      "id",
 					Crypted:    []byte("accessToken"),
+				},
+				refreshToken: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("refreshToken"),
 				},
 				idToken: "idToken",
 				err:     nil,
@@ -1602,9 +1626,10 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 				crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			res{
-				accessToken: nil,
-				idToken:     "idToken",
-				err:         nil,
+				accessToken:  nil,
+				refreshToken: nil,
+				idToken:      "idToken",
+				err:          nil,
 			},
 		},
 		{
@@ -1628,8 +1653,9 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 					KeyID:      "id",
 					Crypted:    []byte("accessToken"),
 				},
-				idToken: "",
-				err:     nil,
+				refreshToken: nil,
+				idToken:      "",
+				err:          nil,
 			},
 		},
 		{
@@ -1639,7 +1665,8 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 					OAuthSession: &oauth.Session{
 						Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 							Token: &oauth2.Token{
-								AccessToken: "accessToken",
+								AccessToken:  "accessToken",
+								RefreshToken: "refreshToken",
 							},
 							IDToken: "idToken",
 						},
@@ -1654,6 +1681,12 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 					KeyID:      "id",
 					Crypted:    []byte("accessToken"),
 				},
+				refreshToken: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("refreshToken"),
+				},
 				idToken: "idToken",
 				err:     nil,
 			},
@@ -1661,9 +1694,10 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotAccessToken, gotIDToken, err := tokensForSucceededIDPIntent(tt.args.session, tt.args.encryptionAlg)
+			gotAccessToken, refreshToken, gotIDToken, err := tokensForSucceededIDPIntent(tt.args.session, tt.args.encryptionAlg)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.accessToken, gotAccessToken)
+			assert.Equal(t, tt.res.refreshToken, refreshToken)
 			assert.Equal(t, tt.res.idToken, gotIDToken)
 		})
 	}
