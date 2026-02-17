@@ -59,8 +59,10 @@ Instrumentation:
       # Keys are unqualified attribute names and apply to all attributes with the specified name,
       # regardless of their position in the attribute hierarchy.
       # Eg. "some_key" matches "some_key" and "parent.some_key" etc.
-      # When the key matches a group of attributes, all attribute values in the group are masked
-      # and the structure of the group is preserved.
+      # When the key matches a group of attributes (e.g. slog.Group), all attribute values in the
+      # group are masked and the structure of the group is preserved.
+      # When the key matches a non-group attribute whose value is a nested object/array
+      # (e.g. added via slog.Any), the entire value is replaced with Value and its structure is not preserved.
       Keys: # ZITADEL_INSTRUMENTATION_LOG_MASK_KEYS (comma separated list)
         # - "first_name"
         # - "last_name"
