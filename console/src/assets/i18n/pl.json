@@ -53,9 +53,9 @@
         "METADATA": "Dodaj niestandardowe atrybuty do użytkownika, takie jak dział. Możesz użyć tych informacji w swoich działaniach."
       },
       "MACHINES": {
-        "TITLE": "Użytkownicy serwisu",
-        "DESCRIPTION": "Użytkownicy usługi uwierzytelniają się w sposób nieinteraktywny przy użyciu tokena okaziciela JWT podpisanego kluczem prywatnym. Mogą także skorzystać z osobistego tokena dostępu.",
-        "METADATA": "Dodaj niestandardowe atrybuty do użytkownika, takie jak system uwierzytelniający. Możesz użyć tych informacji w swoich działaniach."
+        "TITLE": "Konta serwisu",
+        "DESCRIPTION": "Konta serwisu uwierzytelniają się w sposób nieinteraktywny przy użyciu tokena okaziciela JWT podpisanego kluczem prywatnym. Mogą także skorzystać z osobistego tokena dostępu.",
+        "METADATA": "Dodaj niestandardowe atrybuty do konta, takie jak system uwierzytelniający. Możesz użyć tych informacji w swoich działaniach."
       },
       "SELF": {
         "METADATA": "Dodaj niestandardowe atrybuty do siebie, takie jak twój dział. Możesz użyć tych informacji w działaniach swojej organizacji."
@@ -424,7 +424,7 @@
     "ROLES": "Role",
     "GRANTEDPROJECT": "Uprawnione projekty",
     "HUMANUSERS": "Użytkownicy",
-    "MACHINEUSERS": "Użytkownicy usług",
+    "MACHINEUSERS": "Konta serwisu",
     "LOGOUT": "Wyloguj Wszystkich Użytkowników",
     "NEWORG": "Nowa Organizacja",
     "IAMADMIN": "Jesteś administratorem instancja. Zauważ, że masz rozszerzone uprawnienia.",

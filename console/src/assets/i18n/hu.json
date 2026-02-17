@@ -53,9 +53,9 @@
         "METADATA": "Adj hozzá egyéni attribútumokat a felhasználóhoz, mint például az osztály. Ezt az információt felhasználhatod a műveleteid során."
       },
       "MACHINES": {
-        "TITLE": "Szolgáltatásfelhasználók",
-        "DESCRIPTION": "A szolgáltatásfelhasználók nem interaktívan hitelesítik magukat egy privát kulccsal aláírt JWT hordozó tokennel. Személyes hozzáférési tokent is használhatnak.",
-        "METADATA": "Adj hozzá egyéni attribútumokat a felhasználóhoz, mint például a hitelesítő rendszer. Ezt az információt felhasználhatod a műveleteid során."
+        "TITLE": "Szolgáltatásfiók",
+        "DESCRIPTION": "A szolgáltatásfiókok nem interaktívan hitelesítik magukat egy privát kulccsal aláírt JWT hordozó tokennel. Személyes hozzáférési tokent is használhatnak.",
+        "METADATA": "Adj hozzá egyéni attribútumokat a fiókhoz, mint például a hitelesítő rendszer. Ezt az információt felhasználhatod a műveleteid során."
       },
       "SELF": {
         "METADATA": "Adj hozzá egyéni attribútumokat a felhasználódhoz, mint például az osztályod. Ezt az információt felhasználhatod a szervezeted műveleteiben."
@@ -424,7 +424,7 @@
     "ROLES": "Szerepkörök",
     "GRANTEDPROJECT": "Megadott Projektek",
     "HUMANUSERS": "Felhasználók",
-    "MACHINEUSERS": "Szolgáltatási Felhasználók",
+    "MACHINEUSERS": "Szolgáltatásfiók",
     "LOGOUT": "Minden Felhasználó Kijelentkezése",
     "NEWORG": "Új Szervezet",
     "IAMADMIN": "Te egy példány Adminisztrátor vagy. Ne felejtsd el, hogy kibővített jogosultságokkal rendelkezel.",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "A kiválasztott felhasználók deaktiválva.",
       "SELECTEDKEYSDELETED": "A kiválasztott kulcsok törölve.",
       "KEYADDED": "Kulcs hozzáadva!",
-      "MACHINEADDED": "Service User létrehozva!",
+      "MACHINEADDED": "Szolgáltatásfiók létrehozva!",
       "DELETED": "A felhasználó sikeresen törölve!",
       "UNLOCKED": "A felhasználó sikeresen feloldva!",
       "PASSWORDLESSREGISTRATIONSENT": "A Passkey regisztrációs link sikeresen elküldve.",

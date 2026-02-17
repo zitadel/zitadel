@@ -6,7 +6,7 @@ sidebar_label: Technical Advisories
 Technical advisories are notices that report major issues with ZITADEL Self-Hosted or the ZITADEL Cloud platform that could potentially impact security or stability in production environments.
 These advisories may include details about the nature of the issue, its potential impact, and recommended mitigation actions.
 
-Users are strongly encouraged to evaluate these advisories and consider the recommended mitigation actions independently from their version upgrade schedule.
+Users are strongly encouraged to evaluate these advisories and consider the recommended mitigation actions independently of their version upgrade schedule.
 We understand that these advisories may include breaking changes, and we aim to provide clear guidance on how to address these changes.
 
 <table>
@@ -64,7 +64,7 @@ We understand that these advisories may include breaking changes, and we aim to 
       keep the library up-to-date, the management console UI will loose its dynamic theming
       capability. If you need users to have your branding settings (background-,
       button-, link and text coloring) you should implement your own user
-      facing UI yourself and not use ZITADELs management console UI.
+      facing UI yourself and not use ZITADEL's management console UI.
       ZITADEL hosted Login-UI is not affected by this change.
     </td>
     <td>2.40.0</td>
@@ -96,7 +96,7 @@ We understand that these advisories may include breaking changes, and we aim to 
       Due to storage optimizations ZITADEL changes the behavior of sequences.
       This change improves command (create, update, delete) performance of ZITADEL.
       Sequences are no longer unique inside an instance.
-      From now on sequences are upcounting per aggregate id.
+      From now on sequences are incrementing per aggregate id.
       For example sequences of newly created users begin at 1.
       Existing sequences remain untouched.
     </td>
@@ -113,7 +113,7 @@ We understand that these advisories may include breaking changes, and we aim to 
       Migrating to versions &gt;= 2.39 from &lt; 2.39 will cause down time during setup starts and the new version is started.
       This is caused by storage optimizations which replace the `eventstore.events` database table with the new `eventstore.events2` table.
       All existing events are migrated during the execution of the `zitadel setup` command.
-      New events will be inserted into the new `eventstore.events2` table. The old table `evetstore.events` is renamed to `eventstore.events_old` and will be dropped in a future release of ZITADEL.
+      New events will be inserted into the new `eventstore.events2` table. The old table `eventstore.events` is renamed to `eventstore.events_old` and will be dropped in a future release of ZITADEL.
     </td>
     <td>2.39.0</td>
     <td>Calendar week 41/42 2023</td>
@@ -256,7 +256,7 @@ We understand that these advisories may include breaking changes, and we aim to 
 
 If you want to stay up to date on our technical advisories, we recommend subscribing to our [Technical Advisory mailing list](https://share-eu1.hsforms.com/1NAOUyAMmRzSnB7uP665xHA2dljbt) or visiting our [website](https://zitadel.com/technical-advisory).
 
-As ZITADEL Cloud customer, you can also login to the <a href="https://zitadel.com/admin">ZITADEL Customer Portal</a> and enable the Technical Advisory <a href="https://zitadel.com/admin/settings">Notifications</a> in your settings.
+As ZITADEL Cloud customer, you can also log in to the <a href="https://zitadel.com/admin">ZITADEL Customer Portal</a> and enable the Technical Advisory <a href="https://zitadel.com/admin/settings">Notifications</a> in your settings.
 
 ## Categories
 

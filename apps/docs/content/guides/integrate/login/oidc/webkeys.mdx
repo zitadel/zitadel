@@ -26,7 +26,7 @@ ZITADEL implements the [RFC7517 - JSON Web Key (JWK)](https://www.rfc-editor.org
 Web keys in ZITADEL support a number of [JSON Web Algorithms (JWA)](https://www.rfc-editor.org/rfc/rfc7518) for digital signatures:
 
 | Identifier | Description                     |
-| ---------- | ------------------------------- |
+|------------|---------------------------------|
 | RS256      | RSASSA-PKCS1-v1_5 using SHA-256 |
 | RS384      | RSASSA-PKCS1-v1_5 using SHA-384 |
 | RS512      | RSASSA-PKCS1-v1_5 using SHA-512 |
@@ -73,7 +73,7 @@ Since the decision in the proposal isn't published yet,
 there is a big change some OIDC client libraries don't have proper support for EdDSA / ed25519.
 
 The ZITADEL back-end is written in Go. The Go developers have denied ed448 curve implementations to be included.
-Therefore ZITADEL only uses ed25519 with a SHA512.
+Therefore, ZITADEL only uses ed25519 with a SHA512.
 The same counts for [zitadel/oidc](https://github.com/zitadel/oidc) Go library.
 
 ## Web Key management
@@ -127,7 +127,7 @@ The RSA generator config takes two enum values.
   - `RSA_HASHER_SHA384` results in the RS384 algorithm header.
   - `RSA_HASHER_SHA512` results in the RS512 algorithm header.
 
-For example, to create a RSA web key with the size of 3072 bits and the SHA512 algorithm (RS512):
+For example, to create an RSA web key with the size of 3072 bits and the SHA512 algorithm (RS512):
 
 ```bash
 curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
@@ -175,7 +175,7 @@ Note that the `alg` header for ed25519 is `EdDSA` and refers to both ed25519 and
 Both curves specify different hashers.
 Clients which support both curves must inspect `crv` header value to assert the difference.
 
-For example, to create a ed25519 web key:
+For example, to create an ed25519 web key:
 
 ```bash
 curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
@@ -188,7 +188,7 @@ curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
 ```
 
 [^2]: The ZITADEL back-end is written in Go. The Go developers have denied ed448 curve implementations to be included.
-  Therefore ZITADEL won't support this either.
+  Therefore, ZITADEL won't support this either.
 
 ### Activation
 
@@ -198,7 +198,7 @@ There can be only one active key on an instance.
 Activating a key implies deactivation of the previously active key.
 
 Public keys on the [JWKS](#json-web-key-set) endpoint may be [cached](#caching).
-Therefore it is advised to delay activation after generating a key,
+Therefore, it is advised to delay activation after generating a key,
 at least for the duration of the max-age setting plus any time it might take for client applications to refresh.
 
 ### Deletion
@@ -207,8 +207,8 @@ Non-active keys may be [deleted](/apis/resources/webkey_service_v2/zitadel-webke
 Deletion also means tokens signed with this key become invalid.
 Active keys can't be deleted.
 As each public key is available on the [JWKS](#json-web-key-set) endpoint,
-it is important to cleanup old web keys that are no longer needed.
-Otherwise the endpoint's response size will only grow over time, which might lead to performance issues.
+it is important to clean up old web keys that are no longer needed.
+Otherwise, the endpoint's response size will only grow over time, which might lead to performance issues.
 
 Once a key was activated and deactivated (by activation of the next key) deletion should wait:
 
@@ -224,16 +224,16 @@ This strategy aims to fulfill the following requirements:
 1. Web keys are rotated monthly.
 2. Applications have enough time to see the next activated web key on the [JWKS](#json-web-key-set) endpoint.
 3. Web keys are kept long enough to cover the access and ID token validity of 24 hours.
-4. Web keys are kept long enough to to allow usage of the `id_token_hint` for at least 3 months.
+4. Web keys are kept long enough to allow usage of the `id_token_hint` for at least 3 months.
   Users that haven't logged in / refreshed tokens with the client application for that period,
   will need to re-enter their username.
 
-When the instance was created, resp. the feature was rolled out, the instance got two keys with the first one activated. When this feature becomes generally available, instance creation will setup the first two keys in the same way. So the initial state always looks like this:
+When the instance was created, resp. the feature was rolled out, the instance got two keys with the first one activated. When this feature becomes generally available, instance creation will set up the first two keys in the same way. So the initial state always looks like this:
 
-| id  | created    | changed    | state           |
-| --- | ---------- | ---------- | --------------- |
-| 1   | 2025-01-01 | 2025-01-01 | `STATE_ACTIVE`  |
-| 2   | 2025-01-01 | 2025-01-01 | `STATE_INITIAL` |
+| id | created    | changed    | state           |
+|----|------------|------------|-----------------|
+| 1  | 2025-01-01 | 2025-01-01 | `STATE_ACTIVE`  |
+| 2  | 2025-01-01 | 2025-01-01 | `STATE_INITIAL` |
 
 For the sake of this example we will use simplified IDs and restrict timestamps to dates.
 
@@ -253,24 +253,24 @@ curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
 
 Key ID 2 became active, Key ID 1 became inactive and a new key with ID 3 was created:
 
-| id  | created    | changed    | state            |
-| --- | ---------- | ---------- | ---------------- |
-| 1   | 2025-01-01 | 2025-02-01 | `STATE_INACTIVE` |
-| 2   | 2025-01-01 | 2025-02-01 | `STATE_ACTIVE`   |
-| 3   | 2025-02-01 | 2025-02-01 | `STATE_INITIAL`  |
+| id | created    | changed    | state            |
+|----|------------|------------|------------------|
+| 1  | 2025-01-01 | 2025-02-01 | `STATE_INACTIVE` |
+| 2  | 2025-01-01 | 2025-02-01 | `STATE_ACTIVE`   |
+| 3  | 2025-02-01 | 2025-02-01 | `STATE_INITIAL`  |
 
 No keys are deleted yet.
 We continue like this monthly.
 At one point (on 2025-05-01) we will have a web key with `STATE_INACTIVE` with a changed date of 3 months ago:
 
-| id  | created    | changed    | state            |
-| --- | ---------- | ---------- | ---------------- |
-| 1   | 2025-01-01 | 2025-02-01 | `STATE_INACTIVE` |
-| 2   | 2025-01-01 | 2025-03-01 | `STATE_INACTIVE` |
-| 3   | 2025-02-01 | 2025-04-01 | `STATE_INACTIVE` |
-| 4   | 2025-03-01 | 2025-05-01 | `STATE_INACTIVE` |
-| 5   | 2025-04-01 | 2025-05-01 | `STATE_ACTIVE`   |
-| 6   | 2025-05-01 | 2025-05-01 | `STATE_INITIAL`  |
+| id | created    | changed    | state            |
+|----|------------|------------|------------------|
+| 1  | 2025-01-01 | 2025-02-01 | `STATE_INACTIVE` |
+| 2  | 2025-01-01 | 2025-03-01 | `STATE_INACTIVE` |
+| 3  | 2025-02-01 | 2025-04-01 | `STATE_INACTIVE` |
+| 4  | 2025-03-01 | 2025-05-01 | `STATE_INACTIVE` |
+| 5  | 2025-04-01 | 2025-05-01 | `STATE_ACTIVE`   |
+| 6  | 2025-05-01 | 2025-05-01 | `STATE_INITIAL`  |
 
 In addition to the activate and create calls we made on this iteration,
 we can now safely delete the oldest key, as both requirement 3 and 4 are now fulfilled:
@@ -283,15 +283,15 @@ curl -L -X DELETE 'https://${CUSTOM_DOMAIN}/v2/web_keys/1' \
 
 The final state:
 
-| id  | created    | changed    | state            |
-| --- | ---------- | ---------- | ---------------- |
-| 2   | 2025-01-01 | 2025-03-01 | `STATE_INACTIVE` |
-| 3   | 2025-02-01 | 2025-04-01 | `STATE_INACTIVE` |
-| 4   | 2025-03-01 | 2025-05-01 | `STATE_INACTIVE` |
-| 5   | 2025-04-01 | 2025-05-01 | `STATE_ACTIVE`   |
-| 6   | 2025-05-01 | 2025-05-01 | `STATE_INITIAL`  |
+| id | created    | changed    | state            |
+|----|------------|------------|------------------|
+| 2  | 2025-01-01 | 2025-03-01 | `STATE_INACTIVE` |
+| 3  | 2025-02-01 | 2025-04-01 | `STATE_INACTIVE` |
+| 4  | 2025-03-01 | 2025-05-01 | `STATE_INACTIVE` |
+| 5  | 2025-04-01 | 2025-05-01 | `STATE_ACTIVE`   |
+| 6  | 2025-05-01 | 2025-05-01 | `STATE_INITIAL`  |
 
-Next month, Key ID 6 will be activated, an new key added and Key ID 2 can be deleted.
+Next month, Key ID 6 will be activated, a new key added and Key ID 2 can be deleted.
 
 ## JSON web key set
 
@@ -340,7 +340,7 @@ The legacy keys will disappear once they expire.
 As web keys can be created and distributed ahead of time, it is safe for JWKS responses to be cached at intermediate proxies.
 Once the `web_key` feature is enabled, ZITADEL will send a `Cache-Control` header which allows caching.
 
-By default and in ZITADEL Cloud we allow 5 minutes of caching:
+By default, and in ZITADEL, Cloud we allow 5 minutes of caching:
 
 ```
 Cache-Control: max-age=300, must-revalidate

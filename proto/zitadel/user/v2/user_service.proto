@@ -1504,7 +1504,7 @@ service UserService {
 
   // Remove a Users Secret
   //
-  // Remove the current client ID and client secret from a machine user.
+  // Remove the current client ID and client secret from a service account.
   //
   // Required permission:
   //   - user.write
@@ -1620,7 +1620,7 @@ service UserService {
       responses: {
         key: "200";
         value: {
-          description: "A list of all machine user keys matching the query";
+          description: "A list of all service account keys matching the query";
         };
       };
       responses: {
