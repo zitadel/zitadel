@@ -1,6 +1,12 @@
 "use client";
 
-import { initMixpanel, trackPageView } from "@/lib/mixpanel";
+import {
+  initMixpanel,
+  trackPageView,
+  hasMixpanelConsent,
+  optInTracking,
+  optOutTracking,
+} from "@/lib/mixpanel";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
@@ -13,6 +19,20 @@ export function MixpanelProvider({ children }: { children: React.ReactNode }) {
       initMixpanel();
       initializedRef.current = true;
     }
+
+    const handleConsentChange = () => {
+      if (hasMixpanelConsent()) {
+        optInTracking();
+      } else {
+        optOutTracking();
+      }
+    };
+
+    window.addEventListener("cc:onChange:mixpanel", handleConsentChange);
+
+    return () => {
+      window.removeEventListener("cc:onChange:mixpanel", handleConsentChange);
+    };
   }, []);
 
   useEffect(() => {

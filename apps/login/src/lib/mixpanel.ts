@@ -1,6 +1,36 @@
 import mixpanel from "mixpanel-browser";
 
 let initialized = false;
+let trackingEnabled = false;
+
+function getConsentCookie(): Record<string, any> | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/(?:^|;\s*)cc_cookie=([^;]*)/);
+  if (!match) return null;
+  try {
+    return JSON.parse(decodeURIComponent(match[1]));
+  } catch {
+    return null;
+  }
+}
+
+export function hasMixpanelConsent(): boolean {
+  const cookie = getConsentCookie();
+  if (!cookie?.services?.analytics) return false;
+  return cookie.services.analytics.indexOf("mixpanel") !== -1;
+}
+
+export function optInTracking() {
+  if (!initialized) return;
+  trackingEnabled = true;
+  mixpanel.opt_in_tracking();
+}
+
+export function optOutTracking() {
+  if (!initialized) return;
+  trackingEnabled = false;
+  mixpanel.opt_out_tracking();
+}
 
 export function initMixpanel() {
   if (typeof window === "undefined") return;
@@ -13,9 +43,14 @@ export function initMixpanel() {
     track_pageview: false,
     ip: false,
     persistence: "localStorage",
+    opt_out_tracking_by_default: true,
   });
 
   initialized = true;
+
+  if (hasMixpanelConsent()) {
+    optInTracking();
+  }
 }
 
 export const MixpanelEvents = {
@@ -116,7 +151,7 @@ export function trackEvent(
 ) {
   const props = { source: "login", ...properties };
   console.log(`[Mixpanel] Tracking event: ${event}`, props);
-  if (!initialized) return;
+  if (!initialized || !trackingEnabled) return;
   mixpanel.track(event, props);
 }
 
