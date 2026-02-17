@@ -7,5 +7,6 @@ export default defineConfig({
     include: ["dockerized/**/*.test.ts"],
     testTimeout: 180000,
     hookTimeout: 180000,
+    fileParallelism: false,
   },
 });
