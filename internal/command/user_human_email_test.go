@@ -20,6 +20,7 @@ import (
 func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
+		loginPaths func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx             context.Context
@@ -41,6 +42,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 			name: "invalid email, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -61,6 +63,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -104,6 +107,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -140,6 +144,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -185,6 +190,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -234,6 +240,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -283,6 +290,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -341,9 +349,75 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 							},
 							time.Hour*1,
 							"",
+							false,
+							"",
 						),
 					),
 				),
+				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate(""),
+			},
+			args: args{
+				ctx: context.Background(),
+				email: &domain.Email{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					EmailAddress: "email-changed@test.ch",
+				},
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
+			},
+			res: res{
+				want: &domain.Email{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					EmailAddress: "email-changed@test.ch",
+				},
+			},
+		},
+		{
+			name: "email changed with code, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanEmailChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"email-changed@test.ch",
+						),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+							"http://example.com/{{.user}}/email/{{.code}}",
+							false,
+							"",
+						),
+					),
+				),
+				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -371,6 +445,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
+				loginPaths: tt.fields.loginPaths(t),
 			}
 			got, err := r.ChangeHumanEmail(tt.args.ctx, tt.args.email, tt.args.secretGenerator)
 			if tt.res.err == nil {
@@ -389,6 +464,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 	type fields struct {
 		eventstore         func(*testing.T) *eventstore.Eventstore
+		loginPaths         func(*testing.T) LoginPaths
 		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
@@ -414,6 +490,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 			name: "userid missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -428,6 +505,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 			name: "code missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -444,6 +522,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -476,6 +555,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -517,6 +597,8 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 								},
 								time.Hour*1,
 								"",
+								false,
+								"",
 							),
 						),
 					),
@@ -526,6 +608,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:             context.Background(),
@@ -568,6 +651,8 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 								},
 								time.Hour*1,
 								"",
+								false,
+								"",
 							),
 						),
 					),
@@ -577,6 +662,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:             context.Background(),
@@ -621,6 +707,8 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 								},
 								time.Hour*1,
 								"",
+								false,
+								"",
 							),
 						),
 					),
@@ -649,6 +737,84 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 					),
 				),
 				userPasswordHasher: mockPasswordHasher("x"),
+				loginPaths:         expectLoginPathsNoCall,
+			},
+			args: args{
+				ctx:                 context.Background(),
+				userID:              "user1",
+				code:                "a",
+				resourceOwner:       "org1",
+				optionalPassword:    "password",
+				optionalUserAgentID: "userAgentID",
+				secretGenerator:     GetMockSecretGenerator(t),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "valid code (with password and user agent), url template, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+								"http://example.com/{{.user}}/email/{{.code}}",
+								false,
+								"",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password",
+							false,
+							"userAgentID",
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:                 context.Background(),
@@ -671,6 +837,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 			r := &Commands{
 				eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
+				loginPaths:         tt.fields.loginPaths(t),
 			}
 			got, err := r.VerifyHumanEmail(
 				tt.args.ctx,
@@ -697,6 +864,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
+		loginPaths func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx             context.Context
@@ -719,6 +887,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 			name: "userid missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -734,6 +903,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -772,6 +942,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -808,6 +979,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -860,9 +1032,12 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 							},
 							time.Hour*1,
 							"",
+							false,
+							"",
 						),
 					),
 				),
+				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate(""),
 			},
 			args: args{
 				ctx:             context.Background(),
@@ -917,10 +1092,75 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 								Crypted:    []byte("a"),
 							},
 							time.Hour*1,
+							"",
+							false,
 							"authRequestID",
 						),
 					),
 				),
+				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate(""),
+			},
+			args: args{
+				ctx:             context.Background(),
+				userID:          "user1",
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
+				authRequestID:   "authRequestID",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "new code with authRequestID, url template, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"email2@test.ch",
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+							"http://example.com/{{.user}}/email/{{.code}}",
+							false,
+							"authRequestID",
+						),
+					),
+				),
+				loginPaths: expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx:             context.Background(),
@@ -940,6 +1180,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
+				loginPaths: tt.fields.loginPaths(t),
 			}
 			got, err := r.CreateHumanEmailVerificationCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.secretGenerator, tt.args.authRequestID)
 			if tt.res.err == nil {

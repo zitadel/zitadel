@@ -26,9 +26,10 @@ type Props = {
   code?: string;
   isInvite: boolean;
   requestId?: string;
+  submit: boolean;
 };
 
-export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite }: Props) {
+export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite, submit }: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -104,11 +105,11 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   );
 
   useEffect(() => {
-    if (code && code !== processedCode.current) {
+    if (submit && code && code !== processedCode.current) {
       processedCode.current = code;
       fcn({ code });
     }
-  }, [code, fcn]);
+  }, [submit, code, fcn]);
 
   return (
     <>

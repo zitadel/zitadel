@@ -18,7 +18,7 @@ All that is required, is a service account with an Org Owner (or another role, d
 However, we recommend you read the guide on [how to access ZITADEL API](/guides/integrate/zitadel-apis/access-zitadel-apis) and the associated guides for a basic knowledge of :
 
  - [Recommended Authorization Flows](/guides/integrate/login/oidc/oauth-recommended-flows)
- - [Service Users](/guides/integrate/service-accounts/authenticate-service-accounts)
+ - [Service Accounts](/guides/integrate/service-accounts/authenticate-service-accounts)
 
 > Be sure to have a valid key JSON and that its service account is either ORG_OWNER or at least ORG_OWNER_VIEWER before you continue with this guide.
 
@@ -107,7 +107,7 @@ To use the auth API you will not need a specific role, because only an authentic
 
 For accessing the admin or management API the user will need some specific roles.
 If you encountered an error (e.g. `code = PermissionDenied desc = No matching permissions found`),
-ensure your service user has the required permissions by assigning the `ORG_OWNER` or `ORG_OWNER_VIEWER` role
+ensure your service account has the required permissions by assigning the `ORG_OWNER` or `ORG_OWNER_VIEWER` role
 and check the mentioned [guides](#prerequisites) at the beginning.
 
 If you've run into any other problem, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/zitadel/zitadel/issues) or in the [SDK](https://github.com/zitadel/zitadel-go/issues).

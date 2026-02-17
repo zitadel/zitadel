@@ -37,7 +37,7 @@ Overall, ZITADEL's hosted login page simplifies the authentication process for d
 
 Different login name formats can be used on ZITADEL's hosted login page to select a user.
 Login methods can be a user's username, containing the username and an [organization domain](/guides/manage/console/organizations-overview#usernames-and-domains), their email addresses, or their phone numbers.
-By default, all of these login methods are allowed and can be adjusted by [Managers](/concepts/structure/managers) to meet their requirements.
+By default, all of these login methods are allowed and can be adjusted by [Administrators](/concepts/structure/administrators) to meet their requirements.
 
 ### Support for multiple authentication methods
 
@@ -62,9 +62,9 @@ ZITADEL simplifies multi-tenancy authentication by securely managing authenticat
 
 Key features include:
 
-1. **Secure Tenant Isolation**: Ensures robust security measures to prevent unauthorized access between tenants, maintaining data privacy and compliance. [Managers](/concepts/structure/managers) for an organization have only access to data and configuration within their Organization.
+1. **Secure Tenant Isolation**: Ensures robust security measures to prevent unauthorized access between tenants, maintaining data privacy and compliance. [Administrators](/concepts/structure/administrators) for an organization have only access to data and configuration within their Organization.
 2. **Custom Authentication Configurations**: Allows tailored [authentication settings](/guides/manage/console/default-settings#login-behavior-and-access), [branding](/guides/manage/customize/branding), and policies for each tenant.
-3. **Centralized Management**: Provides [centralized administration](/guides/manage/console/managers) for efficient management across all tenants.
+3. **Centralized Management**: Provides [centralized administration](/guides/manage/console/administrators) for efficient management across all tenants.
 4. **Scalability and Flexibility**: Scales seamlessly to accommodate growing organizations of all sizes.
 5. **Domain Discovery**: Starting on a central login page, route users to their tenant based on their email address or other user attributes. Authentication settings will be applied automatically based on the organization's policies, this includes routing users seamlessly to third party identity providers like [Entra ID](/guides/integrate/identity-providers/azure-ad-oidc).
 
@@ -178,9 +178,9 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
 
         The simplest way to deploy the new login for yourself is by using the [Deploy with Vercel button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) to deploy the login directly to your Vercel.
 
-        1. [Create a service user](/guides/integrate/service-accounts/personal-access-token#create-a-service-user-with-a-pat) with a PAT in your instance
+        1. [Create a service account](/guides/integrate/service-accounts/personal-access-token#create-a-service-account-with-a-pat) with a PAT in your instance
         2. Give the user IAM_LOGIN_CLIENT Permissions in the default settings (CUSTOM_DOMAIN/ui/console/instance?id=organizations)
-        Note: [Zitadel Manager Guide](/guides/manage/console/managers)
+        Note: [Zitadel Administrator Guide](/guides/manage/console/administrators)
         3. Deploy login to Vercel: You can do so by directly clicking the [“Deploy” button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) in our [repository](https://github.com/zitadel/zitadel)
         4. If you have used the deploy button in the steps before, you will automatically be asked for this step. Enter the environment variables in Vercel
            - PAT

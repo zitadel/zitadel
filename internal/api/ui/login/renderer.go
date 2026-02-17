@@ -433,11 +433,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, transl
 }
 
 func (l *Login) getTranslator(ctx context.Context, authReq *domain.AuthRequest) *i18n.Translator {
-	restrictions, err := l.query.GetInstanceRestrictions(ctx)
-	if err != nil {
-		logging.OnError(err).Warn("cannot load instance restrictions to retrieve allowed languages for creating the translator")
-	}
-	translator := l.renderer.NewTranslator(ctx, restrictions.AllowedLanguages)
+	translator := l.renderer.NewTranslator(ctx, authz.GetInstance(ctx).AllowedLanguages())
 	if authReq != nil {
 		l.addLoginTranslations(translator, authReq.DefaultTranslations)
 		l.addLoginTranslations(translator, authReq.OrgTranslations)

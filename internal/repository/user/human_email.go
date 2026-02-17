@@ -147,16 +147,6 @@ func NewHumanEmailCodeAddedEvent(
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-	authRequestID string,
-) *HumanEmailCodeAddedEvent {
-	return NewHumanEmailCodeAddedEventV2(ctx, aggregate, code, expiry, "", false, authRequestID)
-}
-
-func NewHumanEmailCodeAddedEventV2(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	code *crypto.CryptoValue,
-	expiry time.Duration,
 	urlTemplate string,
 	codeReturned bool,
 	authRequestID string,

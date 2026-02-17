@@ -3358,7 +3358,7 @@ func TestServer_CreateUser(t *testing.T) {
 			},
 		},
 		{
-			name: "machine user",
+			name: "service account",
 			testCase: func(runId string) testCase {
 				username := fmt.Sprintf("donald.duck+%s", runId)
 				return testCase{
@@ -3577,7 +3577,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 			}
 		},
 	}, {
-		name: "machine username given",
+		name: "service accountname given",
 		testCase: func(runId string) testCase {
 			username := fmt.Sprintf("donald.duck+%s", runId)
 			return testCase{
@@ -3599,7 +3599,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 			}
 		},
 	}, {
-		name: "machine username default to generated id",
+		name: "service accountname default to generated id",
 		testCase: func(runId string) testCase {
 			return testCase{
 				args: args{
@@ -3619,7 +3619,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 			}
 		},
 	}, {
-		name: "machine username default to given id",
+		name: "service accountname default to given id",
 		testCase: func(runId string) testCase {
 			return testCase{
 				args: args{
@@ -3795,7 +3795,7 @@ func TestServer_CreateUser_Permission(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "machine user, error",
+			name: "service account, error",
 			args: args{
 				UserCTX,
 				&user.CreateUserRequest{
@@ -4150,7 +4150,7 @@ func TestServer_UpdateUserTypeMachine(t *testing.T) {
 			},
 		},
 		{
-			name: "update machine user with human fields, error",
+			name: "update service account with human fields, error",
 			testCase: func(runId, userId string) testCase {
 				return testCase{
 					args: args{
@@ -4280,7 +4280,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 			}
 		},
 	}, {
-		name: "machine username",
+		name: "service accountname",
 		testCase: func(runId string) testCase {
 			username := fmt.Sprintf("donald.duck+%s", runId)
 			return testCase{
@@ -4493,7 +4493,7 @@ func TestServer_UpdateUser_Permission(t *testing.T) {
 			},
 		},
 		{
-			name: "machine user, error",
+			name: "service account, error",
 			testCase: func() testCase {
 				return testCase{
 					args: args{

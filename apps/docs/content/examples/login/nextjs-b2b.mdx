@@ -29,55 +29,55 @@ Enter the name `Demo-Vendor`, and click "Create". Then click on that organizatio
 
 ### Portal Web Application
 
-To setup this sample you have to create a project and an application in the vendor organization (`Demo-Vendor`) first.
+To set up this sample you have to create a project and an application in the vendor organization (`Demo-Vendor`) first.
 
 Open the Management Console (`https://$CUSTOM_DOMAIN.zitadel.cloud/ui/console/projects`) and create a new project. Let's call it `Portal`.
 
 Then on the project detail page click on new application and enter a name for this app.
 Let's call this one `portal-web`.
 Select `Web`, continue, `CODE`, then enter `http://localhost:3000/api/auth/callback/zitadel` for the redirect, and `http://localhost:3000` for the post redirect. Then press on `create`.
-Because the requests from your NextJS application to ZITADEL are made on the server side, you can safely select `CODE`. You will get a secret at the end of the stepper. With NextAuth your secret never gets exposed on the browser since it is kept in your NextJS server.
+Because the requests from your Next.js application to ZITADEL are made on the server side, you can safely select `CODE`. You will get a secret at the end of the stepper. With NextAuth your secret never gets exposed on the browser since it is kept in your Next.js server.
 
-Copy the "Resource Id" of the project `Portal` as you will need this in your environment configuration file later.
+Copy the "Resource ID" of the project `Portal` as you will need this in your environment configuration file later.
 
 Click on the application `portal-web`.
 On the application detail page click on the section under redirect settings and enable `Development Mode`. This will allow you application to work on `localhost:3000`.
 To read the user data and roles from ID Token, go to the section Token Settings and make sure both checkboxes, `User roles inside ID Token` and `User Info inside ID Token` are enabled.
 Make sure to save your changes.
 
-Copy the "Resource Id" of the application `portal-web` as you will need this in your environment configuration file later.
+Copy the "Resource ID" of the application `portal-web` as you will need this in your environment configuration file later.
 
 ### Roles
 
-To setup the needed roles for your project, navigate to your `Portal` project, and add the following roles
+To set up the needed roles for your project, navigate to your `Portal` project, and add the following roles
 
 | Key    | Display Name  | Group | Description                                                            |
-| :----- | :------------ | :---- | ---------------------------------------------------------------------- |
+|:-------|:--------------|:------|------------------------------------------------------------------------|
 | admin  | Administrator |       | The administrator, allowed to read granted projects and to user grants |
 | reader | Reader        |       | A user who is allowed to read his organizations granted projects only  |
 
 Now in the `General` section of the Portal project, make sure to enable `Assert Roles on Authentication`.
 This makes sure that roles, which is used by the application to enable UI components, are set in your OIDC ID Token.
 
-### Service User
+### Service Account
 
-To make the application work you need a service user which loads granted-projects and user-grants for you.
-In the B2B-Demo organization, navigate to `Users` in navigation of Management Console, click on `Service Users` and create a new user.
+To make the application work you need a service account which loads granted-projects and user-grants for you.
+In the B2B-Demo organization, navigate to `Users` in navigation of Management Console, click on `Service Accounts` and create a new user.
 Let's set its username to `nextjs` and its name to `NextJS`. Then press `create`.
 
 On the detail page of that user, navigate to "Personal Access Tokens" and add a new entry, set an optional expiration date.
 
 Copy the generated Token as you will need this in your environment configuration file later.
 
-Go back to the `Portal` project and add the Service User as Manager (top right).
+Go back to the `Portal` project and add the Service Account as Manager (top right).
 Make sure to select `Project Owner Viewer` as the management role.
 
-To show granted projects, go to the `Demo-Vendor` organization and add the Service User as `Org Project Permission Editor` Manager.
+To show granted projects, go to the `Demo-Vendor` organization and add the Service Account as `Org Project Permission Editor` Manager.
 
 ## Configuration
 
 Now clone this project and navigate to its root folder.
-Create a file `.env.local` and copy paste the following:
+Create a file `.env.local` and copy and paste the following:
 
 ```text
 NEXTAUTH_URL=http://localhost:3000
@@ -96,15 +96,15 @@ Replace the values as follows
 
 `NEXT_PUBLIC_ZITADEL_ISSUER`: The url to your zitadel instance. When using zitadel.cloud for this demo you can find the domain of your ZITADEL instance in the customer portal. You can also find this information by going to your application `portal-web` and click 'URLs' in the navigation. The variable is prefixed with `NEXT_PUBLIC_` such that it can be accessed from the application.
 
-`ZITADEL_API`: URL of the Management API. Typically the same as `ZITADEL_ISSUER`.
+`ZITADEL_API`: URL of the Management API. Typically, the same as `ZITADEL_ISSUER`.
 
-`ORG_ID`: We will create an organization during later steps. You can find `${YOUR_ORG_ID}` by selecting the `Demo-Vendor` organization in Console. `${YOUR_ORG_ID}` is displayed on top of the organization detail page as "Resource Id".
+`ORG_ID`: We will create an organization during later steps. You can find `${YOUR_ORG_ID}` by selecting the `Demo-Vendor` organization in Console. `${YOUR_ORG_ID}` is displayed on top of the organization detail page as "Resource ID".
 
-`PROJECT_ID`: You can find `${PROJECT_ID}` by clicking on "Projects" in the navigation and select the Project `Portal`. `${PROJECT_ID}` is displayed on the top as "Resource Id".
+`PROJECT_ID`: You can find `${PROJECT_ID}` by clicking on "Projects" in the navigation and select the Project `Portal`. `${PROJECT_ID}` is displayed on the top as "Resource ID".
 
-`ZITADEL_CLIENT_ID`: Having the project `Portal` selected, click on the Application `portal-web`. `${CLIENT_ID}` is displayed as a field in the OIDC configuration, labelled "Client ID" and has the format `12345678@portal`.
+`ZITADEL_CLIENT_ID`: Having the project `Portal` selected, click on the Application `portal-web`. `${CLIENT_ID}` is displayed as a field in the OIDC configuration, labeled "Client ID" and has the format `12345678@portal`.
 
-`SERVICE_ACCOUNT_ACCESS_TOKEN`: Set up a service user, add a Personal Access Token and copy the secret here (see below).
+`SERVICE_ACCOUNT_ACCESS_TOKEN`: Set up a service account, add a Personal Access Token and copy the secret here (see below).
 
 ## Install and Run
 
@@ -141,7 +141,7 @@ Let's call the first user `Alice Admin`. Create a second user called `Eric Emplo
 ### Administrator Role
 
 We want to enable Alice to assign roles to users in her organization in a self-service manner.
-To make this happen, we need to assign Alice an [Administrator Role](/concepts/structure/managers) within the Organization `Demo-Customer`.
+To make this happen, we need to assign Alice an [Administrator Role](/concepts/structure/administrators) within the Organization `Demo-Customer`.
 
 Still in the organization `Demo-Customer`, navigate to Organization. Click on the plus on the top right and give `Alice Admin` the Administrator Role `Org Owner`.
 
@@ -165,7 +165,7 @@ Give `Alice Admin` the roles `reader` and `admin`.
 
 ### Login
 
-You should be able to login to the Demo Application with `Alice Admin` and see all granted projects.
+You should be able to log in to the Demo Application with `Alice Admin` and see all granted projects.
 
 You can log out and log in with `Eric Employee` and you should only have access to the granted projects, but not to the Authorizations tab.
 

@@ -3,6 +3,7 @@ package setup
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
@@ -58,8 +59,7 @@ func (mig *externalConfigChange) Execute(ctx context.Context, _ eventstore.Event
 		0,
 		0,
 		nil,
-		nil,
-		nil,
+		&login.DefaultPaths{},
 	)
 
 	if err != nil {

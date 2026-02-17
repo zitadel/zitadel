@@ -169,9 +169,7 @@ func (u user) Update(ctx context.Context, client database.QueryExecutor, conditi
 	}
 
 	builder.WriteString("UPDATE zitadel.users SET ")
-	if err := database.Changes(changes).Write(builder); err != nil {
-		return 0, err
-	}
+	database.Changes(changes).Write(builder)
 	builder.WriteString(" FROM existing_user")
 	writeCondition(builder, database.And(
 		database.NewColumnCondition(u.IDColumn(), existingUser.IDColumn()),
