@@ -49,6 +49,7 @@ Instrumentation:
     # Streams enable logging for specific parts of the application.
     Streams: # ZITADEL_INSTRUMENTATION_LOG_STREAMS (comma separated list)
       - runtime # General runtime logs, such as startup and shutdown messages.
+      - ready # Logs related to readiness and health checks. (zitadel ready command)
       - request # Logs for incoming API and HTTP requests.
       - event_handler # Logs for event handling in projections.
       - queue # Logs for the job queue processing.
