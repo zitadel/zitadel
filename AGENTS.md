@@ -80,12 +80,14 @@ If a translation is requested for a language not listed above, follow these prio
 4. **Strict Ban:** NEVER use words that mean "an illustration", "a case", "a sample", or "an example."
 
 ## Command Rules
-Run commands from the repository root.
+Run commands from the repository root using Nx targets.
 
+- **Always use `pnpm nx run <project>:<target>`** — never `cd` into a package and run `pnpm <script>` directly. Running package scripts directly bypasses Nx's dependency graph: generated outputs (e.g. protobuf stubs, built packages) that a target depends on will be missing and cause import resolution errors.
 - Use verified Nx targets only.
 - If target availability is unclear, run `pnpm nx show project <project>`.
 - Do not assume all projects have `test`, `lint`, `build`, or `generate` targets.
 - Known exception: `@zitadel/console` has no configured `test` target.
+- **Debugging**: If a target produces an unexpected result and you suspect a stale cache, append `--skip-nx-cache` to force a fresh run: `pnpm nx run <project>:<target> --skip-nx-cache`.
 
 ## Verified Common Targets
 - `@zitadel/api`: `prod`, `build`, `generate`, `lint`, `test`, `test-unit`, `test-integration`
