@@ -2,9 +2,8 @@
 title: Database
 ---
 
-import Postgres from './_postgres.mdx'
-
 # Database Configuration
+
 <Callout type="info">
 Even if you provision the PostgreSQL user and database manually, you must still run `zitadel init schema`
 to bootstrap the required schemas and tables before running `start-from-setup` or `zitadel start`.
@@ -13,7 +12,99 @@ See the [Managed PostgreSQL / No Admin Access](#managed-postgresql--no-admin-acc
 
 The command is `zitadel init schema` (alias: `zitadel init zitadel` for backwards compatibility).
 </Callout>
-<Postgres components={props.components} />
+
+## ZITADEL with Postgres
+
+PostgreSQL is the default database for ZITADEL due to its reliability, robustness, and adherence to SQL standards. It is well-suited for handling the complex data requirements of an identity management system.
+
+If you are using Zitadel v2 and want to use a PostgreSQL database, you can [overwrite the default configuration](/self-hosting/manage/configure/configure).
+
+Currently, versions 14 to 18 are supported.
+
+Postgres can be configured as follows:
+```yaml
+Database:
+  postgres:
+    Host: localhost
+    Port: 5432
+    Database: zitadel
+    AwaitInitialConn: 5m
+    MaxOpenConns: 15
+    MaxIdleConns: 10
+    MaxConnLifetime: 1h
+    MaxConnIdleTime: 5m
+    Options:
+    User:
+      Username: zitadel
+      Password: zitadel
+      SSL:
+        Mode: disable
+        RootCert:
+        Cert:
+        Key:
+    Admin:
+      Username: postgres
+      Password: postgres
+      SSL:
+        Mode: disable
+        RootCert:
+        Cert:
+        Key:
+```
+
+### Managed PostgreSQL / No Admin Access
+
+If you don't have a PostgreSQL superuser available (e.g. managed services like RDS, Cloud SQL, or Azure Database),
+you can pre-provision the user and database yourself and skip the admin-credential requirement.
+
+The `init` command has two distinct responsibilities:
+
+1. **Instance provisioning** — `CREATE ROLE`, `CREATE DATABASE`, `GRANT` → requires a superuser/admin.
+2. **Schema bootstrapping** — creates schemas (`eventstore`, `projections`, `system`) and tables → requires only database owner privileges.
+
+If you handle step 1 manually, you still **must** run step 2. Use the dedicated sub-command `zitadel init schema`, which performs only schema bootstrapping using the service user credentials — no admin privileges needed.
+
+**Step 1 — Provision user and database (run as superuser)**
+
+:::caution
+Replace `<strong-password>` with a strong, unique password and store it in a secret manager. Do not use trivial passwords in production.
+:::
+
+```sql
+CREATE ROLE zitadel LOGIN PASSWORD '<strong-password>';
+CREATE DATABASE zitadel WITH OWNER zitadel;
+GRANT CONNECT, CREATE ON DATABASE zitadel TO zitadel;
+```
+
+Adjust `pg_hba.conf` if needed to allow the zitadel user to connect.
+
+**Step 2 — Bootstrap schemas and tables (run as the service user)**
+
+Set only the service user credentials — no `Admin.*` variables are needed for this command.
+
+For managed/remote PostgreSQL, set `SSL_MODE` to `require` or `verify-full` to encrypt the connection. `disable` is only appropriate for local development.
+
+```bash
+ZITADEL_DATABASE_POSTGRES_HOST=<your-host> \
+  ZITADEL_DATABASE_POSTGRES_PORT=5432 \
+  ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel \
+  ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel \
+  ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=<strong-password> \
+  ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=require \
+  zitadel init schema
+```
+
+**Step 3 — Run setup and start**
+
+:::caution
+`--tlsMode disabled` is for local testing only. For any internet-facing or production deployment, configure TLS to prevent credentials and tokens from being transmitted in cleartext. See the [TLS configuration guide](/self-hosting/manage/tls_modes).
+:::
+
+```bash
+zitadel start-from-setup --masterkey "<32-character-key>"
+```
+
+See the [phases guide](/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime) for details on separating init, setup, and runtime for production deployments.
 
 ## Zitadel Credentials
 
