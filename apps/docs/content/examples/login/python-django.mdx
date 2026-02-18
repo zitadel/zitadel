@@ -42,7 +42,7 @@ If none of the roles is provided as a user, the user in Django will not be creat
 
 ![Project roles in management console](../../../public/img/django/project-roles.png)
 
-Finally, we can assign the roles to users in the project's authorizations tab.
+Finally, we can assign the roles to users in the project's `Role Assignments` tab.
 
 ![Project authorizations in management console](../../../public/img/django/project-authorizations.png)
 
@@ -198,7 +198,7 @@ Never store and commit secrets in the ".env" or settings.py file
 
 ### Authentication and authorization
 
-To check the authentication and authorization the views in the polls application are extended with decorators:
+To check the authentication and authorization, the views in the polls application are extended with decorators:
 
 ```python reference
 https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/views.py
