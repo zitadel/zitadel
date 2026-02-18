@@ -1,12 +1,16 @@
 ---
-title: ZITADEL with Django Python
-sidebar_label: Django
+title: Secure Django (Python) API Application with ZITADEL
+description: Learn how to secure your Django (Python) API with ZITADEL.
+sidebar_label: Django API
 ---
 
 import AppJWT from '../imports/_app_jwt.mdx';
 import ServiceAccountJWT from '../imports/_serviceaccount_jwt.mdx';
 import ServiceAccountRole from '../imports/_serviceaccount_role.mdx';
 import SetupPython from '../imports/_setup_python.mdx';
+import { GithubCodeBlock } from '@/components/github-code-block';
+
+# Django API
 
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your Django Python application.
 It explains how to check the token validity in the API and how to check for permissions.
@@ -14,7 +18,7 @@ It explains how to check the token validity in the API and how to check for perm
 By the end of this guide, your application will have three different endpoint which are public, private(valid token) and private-scoped(valid token with specific role).
 
 <Callout>
-This documentation references our [example](https://github.com/zitadel/example-django-python-oauth) on GitHub.
+This documentation references our [example](https://github.com/zitadel/example-python-django-oauth) on GitHub.
 </Callout>
 
 ## ZITADEL setup
@@ -61,9 +65,7 @@ For this example we need the following dependencies:
 
 For the dependencies we need a requirements.txt-file with the following content:
 
-```python reference
-https://github.com/zitadel/example-python-django-oauth/blob/main/requirements.txt
-```
+<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/requirements.txt"></GithubCodeBlock>
 
 Then install all dependencies with:
 ```bash
@@ -81,9 +83,7 @@ django-admin startproject myapi .
 
 There is info needed for the introspection calls, which we put into the settings.py:
 
-```python reference
-https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/settings.py#L125-L133
-```
+<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/settings.py#L125-L133"></GithubCodeBlock>
 
 and create a ".env"-file in the root folder with the configuration as an example:
 ```bash
@@ -105,25 +105,16 @@ API_PRIVATE_KEY_FILE_PATH = '/tmp/example/250719519163548112.json'
 To validate the tokens, we need a validator which can be called in the event of API-calls.
 
 validator.py:
-
-```python reference
-https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/validator.py
-```
+<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/validator.py"></GithubCodeBlock>
 
 ### Requests and URLs
 
 We define 3 different endpoints which differ in terms of requirements.
 views.py:
-
-```python reference
-https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/views.py
-```
+<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/views.py"></GithubCodeBlock>
 
 To handle endpoints the urls have to be added to the urls.py:
-
-```python reference
-https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/urls.py
-```
+<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/urls.py"></GithubCodeBlock>
 
 ### DB
 
