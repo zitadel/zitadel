@@ -108,14 +108,17 @@
       "description": "Установите пароль для вашего аккаунта",
       "submit": "Продолжить",
       "labels": {
+        "currentPassword": "Текущий пароль",
         "newPassword": "Новый пароль",
         "confirmPassword": "Подтвердите пароль"
       },
       "required": {
+        "currentPassword": "Вы должны указать текущий пароль!",
         "newPassword": "Вы должны указать новый пароль!",
         "confirmPassword": "Это поле обязательно для заполнения"
       },
       "errors": {
+        "currentPasswordInvalid": "Текущий пароль неверен.",
         "couldNotChangePassword": "Не удалось изменить пароль",
         "couldNotVerifyPassword": "Не удалось проверить пароль",
         "unknownError": "Неизвестная ошибка"
