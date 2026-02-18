@@ -1433,7 +1433,7 @@
       "NEW": "Domain hinzufügen",
       "TITLE": "Organisationsdomäne",
       "DESCRIPTION": "Konfiguriere die Domains, die für Domain Discovery und als Suffix für die Benutzer verwendet werden können.",
-      "SETPRIMARY": "Organisationsdomäne",
+      "SETPRIMARY": "Als Organisationsdomäne festlegen",
       "DELETE": {
         "TITLE": "Domain löschen?",
         "DESCRIPTION": "Du bist im Begriff, eine Domain aus deiner Organisation zu löschen."
