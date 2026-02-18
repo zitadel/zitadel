@@ -86,15 +86,15 @@ For managed/remote PostgreSQL, set `SSL_MODE` to `require` or `verify-full` to e
 
 ```bash
 ZITADEL_DATABASE_POSTGRES_HOST=<your-host> \
-  ZITADEL_DATABASE_POSTGRES_PORT=5432 \
-  ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel \
-  ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel \
-  ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=<strong-password> \
-  ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=require \
-  zitadel init schema
+    ZITADEL_DATABASE_POSTGRES_PORT=5432 \
+    ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel \
+    ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel \
+    ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=<strong-password> \
+    ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=require \
+    zitadel init schema
 ```
 
-**Step 3 — Run setup and start**
+**Run setup and start**
 
 :::caution
 `--tlsMode disabled` is for local testing only. For any internet-facing or production deployment, configure TLS to prevent credentials and tokens from being transmitted in cleartext. See the [TLS configuration guide](/self-hosting/manage/tls_modes).
