@@ -19,7 +19,7 @@ This documentation references our [example](https://github.com/zitadel/example-d
 
 ## ZITADEL setup
 
-Before we can start building our application, we have to do a few configuration steps in ZITADEL Management Console.
+Before we can start building our application, we have to do a few setup steps in ZITADEL Management Console.
 
 ### Create application
 
@@ -55,7 +55,7 @@ And the following from the Service Account:
 
 For this example we need the following dependencies:
 - `django`: to create an API with django
-- `python-dotenv`: to use environment variables in the configuration
+- `python-dotenv`: to use environment variables in the settings
 - `authlib`: client-side OAuth functionality
 - `requests`: HTTP requests for the introspection
 
@@ -85,7 +85,7 @@ There is info needed for the introspection calls, which we put into the settings
 https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/settings.py#L125-L133
 ```
 
-and create a ".env"-file in the root folder with the configuration as an example:
+and create a ".env"-file in the root folder with the settings as an example:
 ```bash
 ZITADEL_INTROSPECTION_URL = 'URL to the introspection endpoint to verify the provided token'
 ZITADEL_DOMAIN = 'Domain used as audience in the token verification'
