@@ -702,7 +702,7 @@
     "USERNAME": "Nom de l'utilisateur",
     "ORGNAME": "Nom de l'organisation",
     "ORGID": "ID de l'organisation",
-    "PRIMARYDOMAIN": "Domaine principal",
+    "PRIMARYDOMAIN": "Domaine de l'organisation",
     "PROJECTNAME": "Nom du projet",
     "RESOURCEOWNER": "Propriétaire des ressources",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Télécharger le fichier",
       "SELECTORGTOOLTIP": "Sélectionnez cette organisation.",
-      "PRIMARYDOMAIN": "Domaine primaire",
+      "PRIMARYDOMAIN": "Domaine de l'organisation",
       "STATE": "État",
       "USEPASSWORD": "Définir le mot de passe initial",
       "USEPASSWORDDESC": "L'utilisateur n'a pas à définir le mot de passe lors de l'initialisation."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Ajouter un domaine",
-      "TITLE": "Domaines vérifiés",
+      "TITLE": "Domaine de l'organisation",
       "DESCRIPTION": "Configurez vos domaines. Ce domaine peut être utilisé pour se connecter avec vos utilisateurs.",
-      "SETPRIMARY": "Définir comme primaire",
+      "SETPRIMARY": "Domaine de l'organisation",
       "DELETE": {
         "TITLE": "Supprimer un domaine",
         "DESCRIPTION": "Vous êtes sur le point de supprimer l'un de vos domaines. Notez que vos utilisateurs ne peuvent plus utiliser ce domaine pour leur connexion."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administrateur ajouté.",
       "MEMBERREMOVED": "Administrateur supprimé.",
       "MEMBERCHANGED": "Administrateur modifié.",
-      "SETPRIMARY": "Domaine primaire défini.",
+      "SETPRIMARY": "Le domaine de l'organisation a été défini avec succès.",
       "DELETED": "Organisation supprimée avec succès",
       "DEFAULTORGNOTFOUND": "L'organisation par défaut est introuvable",
       "ORG_WAS_DELETED": "L'organisation a été supprimée"
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "Paramètres SMTP et SMS",
       "MESSAGETEXTS": "Textes des messages",
       "IDP": "Fournisseurs d'identité",
-      "VERIFIED_DOMAINS": "Domaines vérifiés",
+      "VERIFIED_DOMAINS": "Domaine de l'organisation",
       "DOMAIN": "Paramètres du domaine",
       "LOGINTEXTS": "Textes de l'interface de connexion",
       "BRANDING": "Image de marque",

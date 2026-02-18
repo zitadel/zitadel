@@ -701,7 +701,7 @@
     "USERNAME": "User Name",
     "ORGNAME": "Nome organizzazione",
     "ORGID": "ID organizzazione",
-    "PRIMARYDOMAIN": "Dominio primario",
+    "PRIMARYDOMAIN": "Dominio dell'organizzazione",
     "PROJECTNAME": "Nome del progetto",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Scaricare il file",
       "SELECTORGTOOLTIP": "Seleziona questa organizzazione.",
-      "PRIMARYDOMAIN": "Dominio primario",
+      "PRIMARYDOMAIN": "Dominio dell'Organizzazione",
       "STATE": "Stato",
       "USEPASSWORD": "Imposta la password iniziale",
       "USEPASSWORDDESC": "L'utente non deve impostare la password durante l'inizializzazione."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Aggiungi dominio",
-      "TITLE": "Domini verificati",
+      "TITLE": "Dominio dell'Organizzazione",
       "DESCRIPTION": "Configura i tuoi domini. Questo dominio può essere utilizzato per accedere con i tuoi utenti.",
-      "SETPRIMARY": "Impostato come primario",
+      "SETPRIMARY": "Impostato come Dominio dell'Organizzazione",
       "DELETE": {
         "TITLE": "Cancellare il dominio",
         "DESCRIPTION": "Stai per eliminare uno dei tuoi domini. Nota che i tuoi utenti non possono più usare questo dominio per il loro login."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Amministratore aggiunto con successo",
       "MEMBERREMOVED": "Amministratore rimosso con successo",
       "MEMBERCHANGED": "Amministratore cambiato con successo",
-      "SETPRIMARY": "Dominio primario cambiato con successo",
+      "SETPRIMARY": "Il dominio dell'organizzazione è stato impostato correttamente.",
       "DELETED": "Organizzazione eliminata con successo",
       "DEFAULTORGNOTFOUND": "Impossibile trovare l'organizzazione predefinita",
       "ORG_WAS_DELETED": "Organizzazione è stata eliminata"
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Fornitori di identità",
-      "VERIFIED_DOMAINS": "Domini verificati",
+      "VERIFIED_DOMAINS": "Domini dell'Organizzazione",
       "DOMAIN": "Impostazioni del dominio",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",

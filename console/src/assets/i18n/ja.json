@@ -702,7 +702,7 @@
     "USERNAME": "ユーザー名",
     "ORGNAME": "組織名",
     "ORGID": "組織ID",
-    "PRIMARYDOMAIN": "プライマリドメイン",
+    "PRIMARYDOMAIN": "組織ドメイン",
     "PROJECTNAME": "プロジェクト名",
     "RESOURCEOWNER": "リソース所有者",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "ファイルをダウンロード",
       "SELECTORGTOOLTIP": "この組織を選択",
-      "PRIMARYDOMAIN": "プライマリドメイン",
+      "PRIMARYDOMAIN": "組織ドメイン",
       "STATE": "ステート",
       "USEPASSWORD": "初期パスワードを設定する",
       "USEPASSWORDDESC": "ユーザーは、初期セットアップ中にパスワードを設定する必要はありません。"
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "ドメインを追加する",
-      "TITLE": "検証済みドメイン",
+      "TITLE": "組織ドメイン",
       "DESCRIPTION": "ドメインを設定します。このドメインは、ユーザーのログインで使用できます。",
-      "SETPRIMARY": "プライマリとして設定する",
+      "SETPRIMARY": "組織ドメイン",
       "DELETE": {
         "TITLE": "ドメインの削除",
         "DESCRIPTION": "ドメインの1つを削除しようとしています。ユーザーはログインにこのドメインを使用できなくなることに注意してください。"
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "管理者が追加されました。",
       "MEMBERREMOVED": "管理者が削除されました。",
       "MEMBERCHANGED": "管理者が変更されました。",
-      "SETPRIMARY": "プライマリドメインが設定されました。",
+      "SETPRIMARY": "組織ドメインが正常に設定されました。",
       "DELETED": "組織が正常に削除されました。",
       "DEFAULTORGNOTFOUND": "デフォルトの組織が見つかりませんでした",
       "ORG_WAS_DELETED": "組織が削除されました。"
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTPおよびSMS設定",
       "MESSAGETEXTS": "メッセージテキスト",
       "IDP": "IDプロバイダー",
-      "VERIFIED_DOMAINS": "検証済みドメイン",
+      "VERIFIED_DOMAINS": "組織ドメイン",
       "DOMAIN": "ドメイン設定",
       "LOGINTEXTS": "ログイン画面のテキスト",
       "BRANDING": "ブランディング",

@@ -699,7 +699,7 @@
     "ORGNAME": "Organizasyon Adı",
     "ORGID": "Organizasyon ID",
     "STATE": "Durum",
-    "PRIMARYDOMAIN": "Birincil Alan Adı",
+    "PRIMARYDOMAIN": "Organizasyon Domain'i",
     "DISPLAYNAME": "Kullanıcı Görünen Adı",
     "EMAIL": "E-posta",
     "USERNAME": "Kullanıcı Adı",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Dosyayı İndir",
       "SELECTORGTOOLTIP": "Bu organizasyonu seç.",
-      "PRIMARYDOMAIN": "Birincil Domain",
+      "PRIMARYDOMAIN": "Organizasyon Domain'i",
       "STATE": "Durum",
       "USEPASSWORD": "İlk Şifreyi Ayarla",
       "USEPASSWORDDESC": "Kullanıcının başlatma sırasında şifre ayarlaması gerekmez."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Domain Ekle",
-      "TITLE": "Doğrulanmış domain'ler",
+      "TITLE": "Organizasyon Domain'i",
       "DESCRIPTION": "Organizasyon domain'lerinizi yapılandırın. Bu domain, domain keşfi ve kullanıcı adı soneki için kullanılabilir.",
-      "SETPRIMARY": "Birincil Olarak Ayarla",
+      "SETPRIMARY": "Organizasyon Domain'i",
       "DELETE": {
         "TITLE": "Domain'i Sil",
         "DESCRIPTION": "Domain'lerinizden birini silmek üzeresiniz."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Yönetici eklendi.",
       "MEMBERREMOVED": "Yönetici kaldırıldı.",
       "MEMBERCHANGED": "Yönetici değiştirildi.",
-      "SETPRIMARY": "Birincil domain ayarlandı.",
+      "SETPRIMARY": "Organizasyon domain'i başarıyla ayarlandı.",
       "DELETED": "Organizasyon başarıyla silindi",
       "DEFAULTORGNOTFOUND": "Varsayılan organizasyon bulunamadı",
       "ORG_WAS_DELETED": "Organizasyon silindi."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP ve SMS Ayarları",
       "MESSAGETEXTS": "Mesaj Metinleri",
       "IDP": "Kimlik Sağlayıcıları",
-      "VERIFIED_DOMAINS": "Doğrulanmış domain'ler",
+      "VERIFIED_DOMAINS": "Organizasyon Domain'i",
       "DOMAIN": "Domain ayarları",
       "LOGINTEXTS": "Giriş Arayüzü Metinleri",
       "BRANDING": "Marka",
