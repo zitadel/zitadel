@@ -2,7 +2,7 @@ Login:
   Title: Bentornato!
   Description: Inserisci i tuoi dati di accesso.
   TitleLinking: Accesso per il collegamento degli utenti
-  DescriptionLinking: Inserisci i tuoi dati di accesso per collegare il tuo utente esterno con un utente ZITADEL.
+  DescriptionLinking: Inserisci i tuoi dati di accesso per collegare il tuo utente esterno con un utente Zitadel.
   LoginNameLabel: Nome di accesso
   UsernamePlaceHolder: nome utente
   LoginnamePlaceHolder: nomeutente@dominio
@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: Seleziona l'account
-  Description: Usa il tuo account ZITADEL
+  Description: Usa il tuo account Zitadel
   TitleLinking: Seleziona l'account per il collegamento dell'utente
   DescriptionLinking: Seleziona il tuo account da collegare al tuo utente esterno.
   OtherUser: Altro utente
@@ -269,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -315,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -395,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 
 DeviceAuth:
   Title: Autorizzazione del dispositivo

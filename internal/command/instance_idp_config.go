@@ -90,7 +90,7 @@ func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.ID
 	instanceAgg := InstanceAggregateFromWriteModel(&existingIDP.WriteModel)
 	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, instanceAgg, config.IDPConfigID, config.Name, config.StylingType, config.AutoRegister)
 	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-3k0fs", "Errors.IAM.IDPConfig.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-3k0fs", "Errors.Instance.IDPConfig.NotChanged")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
@@ -109,7 +109,7 @@ func (c *Commands) DeactivateDefaultIDPConfig(ctx context.Context, idpID string)
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-2n0fs", "Errors.IAM.IDPConfig.NotActive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-2n0fs", "Errors.Instance.IDPConfig.NotActive")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingIDP.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewIDPConfigDeactivatedEvent(ctx, instanceAgg, idpID))
@@ -129,7 +129,7 @@ func (c *Commands) ReactivateDefaultIDPConfig(ctx context.Context, idpID string)
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateInactive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-5Mo0d", "Errors.IAM.IDPConfig.NotInactive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-5Mo0d", "Errors.Instance.IDPConfig.NotInactive")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingIDP.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewIDPConfigReactivatedEvent(ctx, instanceAgg, idpID))

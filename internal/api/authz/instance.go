@@ -6,18 +6,23 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 )
 
-var emptyInstance = &instance{}
+var (
+	emptyInstance          = &instance{}
+	_             Instance = (*instance)(nil)
+)
 
 type Instance interface {
 	InstanceID() string
 	ProjectID() string
-	ConsoleClientID() string
-	ConsoleApplicationID() string
+	ManagementConsoleClientID() string
+	ManagementConsoleApplicationID() string
 	DefaultLanguage() language.Tag
+	AllowedLanguages() []language.Tag
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
 	EnableImpersonation() bool
@@ -42,6 +47,7 @@ type instance struct {
 	clientID         string
 	orgID            string
 	defaultLanguage  language.Tag
+	allowedLanguages []language.Tag
 	features         feature.Features
 	executionTargets target.Router
 }
@@ -62,16 +68,20 @@ func (i *instance) ProjectID() string {
 	return i.projectID
 }
 
-func (i *instance) ConsoleClientID() string {
+func (i *instance) ManagementConsoleClientID() string {
 	return i.clientID
 }
 
-func (i *instance) ConsoleApplicationID() string {
+func (i *instance) ManagementConsoleApplicationID() string {
 	return i.appID
 }
 
 func (i *instance) DefaultLanguage() language.Tag {
 	return i.defaultLanguage
+}
+
+func (i *instance) AllowedLanguages() []language.Tag {
+	return i.allowedLanguages
 }
 
 func (i *instance) DefaultOrganisationID() string {
@@ -107,11 +117,12 @@ func GetFeatures(ctx context.Context) feature.Features {
 }
 
 func WithInstance(ctx context.Context, instance Instance) context.Context {
+	ctx = instrumentation.SetInstance(ctx, instance)
 	return context.WithValue(ctx, instanceKey, instance)
 }
 
 func WithInstanceID(ctx context.Context, id string) context.Context {
-	return context.WithValue(ctx, instanceKey, &instance{id: id})
+	return WithInstance(ctx, &instance{id: id})
 }
 
 func WithDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) context.Context {
@@ -124,7 +135,7 @@ func WithDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) cont
 	return context.WithValue(ctx, instanceKey, i)
 }
 
-func WithConsole(ctx context.Context, projectID, appID string) context.Context {
+func WithManagementConsole(ctx context.Context, projectID, appID string) context.Context {
 	i, ok := ctx.Value(instanceKey).(*instance)
 	if !ok {
 		i = new(instance)
@@ -135,7 +146,7 @@ func WithConsole(ctx context.Context, projectID, appID string) context.Context {
 	return context.WithValue(ctx, instanceKey, i)
 }
 
-func WithConsoleClientID(ctx context.Context, clientID string) context.Context {
+func WithManagementConsoleClientID(ctx context.Context, clientID string) context.Context {
 	i, ok := ctx.Value(instanceKey).(*instance)
 	if !ok {
 		i = new(instance)

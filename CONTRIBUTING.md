@@ -1,13 +1,13 @@
 # Contributing to Zitadel
 
-Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (API), Next.js/React (Login), Angular (Console), and Docusaurus (Docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
+Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (API), Next.js/React (Login), Angular (Console), and Fumadocs (Docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
 
 ## Quick Start
 
 1. Clone the repository: `git clone https://github.com/zitadel/zitadel` or [open it in a local Dev Container](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel) or [create a GitHub Codespace](https://codespaces.new/zitadel/zitadel)
 2. If you cloned the repository to your local machine, install the required development dependencies
    - [Node.js v22.x](https://nodejs.org/en/download/) - Required for UI development and to run development commands `pnpm nx ...`
-   - [Go 1.24.x](https://go.dev/doc/install) - Required for API development
+   - [Go](https://go.dev/doc/install) - Required for API development. Use the version declared in `go.mod`.
    - [Docker](https://docs.docker.com/engine/install/) - Required for supporting services like the development database and for tests.
    - [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies) - Required for Browser UI tests
    <details>
@@ -25,7 +25,7 @@ Zitadel is an open-source identity and access management platform built with a m
 5. Generate code `pnpm nx run-many --target generate`
 6. Optionally, install the following VSCode plugins:
    - [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go) - For API development. Use golangci-lint v2 as linter.
-   - [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Console development
+   - [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Management Console development
    - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
    - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
    - [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner tooling
@@ -34,7 +34,7 @@ Jump to the dedicated sections for developing a specific project:
 
 - [Contributing to the API](#contribute-to-api)
 - [Contributing to the Login](#contribute-to-login)
-- [Contributing to the Console](#contribute-to-console)
+- [Contributing to the Management Console](#contribute-to-management-console)
 - [Contributing to the Docs](#contribute-to-docs)
 - [Contributing translations](#contribute-translations)
 
@@ -52,7 +52,7 @@ You can build and start any project with Nx commands.
 | **Test - Unit**               | `pnpm nx run PROJECT:test-unit`             | Run unit tests               |                                                                                                                                                                                                  |
 | **Test - Integration**        | `pnpm nx run PROJECT:test-integration`      | Run integration tests        | Learn mnore about how to [debug API integration tests](#run-api-integration-tests)                                                                                                               |
 | **Test - Integration Stop**   | `pnpm nx run PROJECT:test-integration-stop` | Stop integration containers  |                                                                                                                                                                                                  |
-| **Test - Functional UI**      | `pnpm nx run @zitadel/functional-ui:test`   | Run functional UI tests      | Learn more about how to [develop the Console and opening the interactive Test Suite](#pass-console-quality-checks)                                                                               |
+| **Test - Functional UI**      | `pnpm nx run @zitadel/functional-ui:test`   | Run functional UI tests      | Learn more about how to [develop the Management Console and opening the interactive Test Suite](#pass-management-console-quality-checks)                                                                               |
 | **Test - Functional UI Stop** | `pnpm nx run @zitadel/functional-ui:stop`   | Run functional UI containers |                                                                                                                                                                                                  |
 | **Test**                      | `pnpm nx run PROJECT:test`                  | Run all tests                |                                                                                                                                                                                                  |
 | **Lint**                      | `pnpm nx run PROJECT:lint`                  | Check code style             |                                                                                                                                                                                                  |
@@ -127,9 +127,9 @@ The code consists of the following parts:
 | ------------------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
 | API implementation | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to API](#contribute-to-api)             |
 | API definitions    | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#contribute-to-api)             |
-| Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-to-frontend)   |
+| Management Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-to-frontend)   |
 | Login              | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#contribute-to-frontend)   |
-| Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#contribute-to-frontend)   |
+| Docs               | Project documentation made with Fumadocs           | [Fumadocs](https://fumadocs.dev/)                                                                         | [./apps/docs](./apps/docs)                          | [Contribute to Frontend](#contribute-to-frontend)   |
 | translations       | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#contribute-translations) |
 
 Please follow the guides to validate and test the code before you contribute.
@@ -229,7 +229,7 @@ To start developing, make sure you followed the [quick start](#quick-start) step
 
 ### Develop the API
 
-Optionally build the Console
+Optionally build the Management Console
 
 ```bash
 pnpm nx run @zitadel/api:build-console
@@ -272,7 +272,7 @@ For example, in VSCode, you can use a `launch.json` configuration like this.
    }
 ```
 
-If you have built the Console and started the Login, visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+If you have built the Management Console and started the Login, visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
 Call the API using the generated [](./admin.pat) with [grpcurl](https://github.com/fullstorydev/grpcurl) or [grpcui](https://github.com/fullstorydev/grpcui), for example:
 
@@ -348,7 +348,7 @@ pnpm nx run @zitadel/devcontainer:compose down db-api-integration cache-api-inte
 
 ### Run Functional UI Tests
 
-To test the whole system, including the Console UI and the Login UI, run the Functional UI tests.
+To test the whole system, including the Management Console UI and the Login UI, run the Functional UI tests.
 
 ```bash
 # If you made changes in the tests/functional-ui directory, make sure you reformat the files
@@ -368,7 +368,7 @@ Choose your contribution area:
 
 - **[Login App](#contribute-to-login)** (Next.js/React) - Modern authentication flows
 - **[Console](#contribute-to-console)** (Angular) - Admin dashboard and user management
-- **[Docs](#contribute-to-docs)** (Docusaurus) - Project documentation
+- **[Docs](#contribute-to-docs)** (Fumadocs) - Project documentation
 - **[Client Packages](#client-packages)** - Shared libraries for API communication
 
 ### Project Dependencies
@@ -423,7 +423,7 @@ If you don't want to build and run a local API, you can just run the Login devel
 
 ```env
 ZITADEL_API_URL=https://[your-cloud-instance-domain]
-ZITADEL_SERVICE_USER_TOKEN=[personal access token for an IAM Login Client]
+ZITADEL_SERVICE_USER_TOKEN=[personal access token for an instance Login Client]
 ```
 
 3. Start the development server.
@@ -461,13 +461,13 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 - Build and deploy with Docker: `pnpm nx run @zitadel/login:build && docker build -t my-zitadel-login apps/login`
 - Build and deploy with NodeJS: `pnpm nx run @zitadel/login:prod`
 
-### Contribute to Console
+### Contribute to the Management Console
 
-To learn more about the Console, go to the Consoles [README.md](./console/README.md).
+To learn more about the Management Console, go to the Management Consoles [README.md](./console/README.md).
 
 To start developing, make sure you followed the [quick start](#quick-start) steps.
 
-#### Develop the Console against a local API
+#### Develop the Management Console against a local API
 
 Run the local development database.
 
@@ -489,7 +489,7 @@ pnpm nx run @zitadel/login:prod
 
 Allow the API [to redirect to your dev server](#configure-console-dev-server-redirects).
 
-In another terminal, start the Console development server
+In another terminal, start the Management Console development server
 
 ```bash
 pnpm nx run @zitadel/console:dev
@@ -501,7 +501,7 @@ Make some changes to the source code and see how the browser is automatically up
 
 #### Develop against a Cloud instance
 
-If you don't want to build and run a local API, you can just run the console development server and point it to a cloud instance.
+If you don't want to build and run a local API, you can just run the management console development server and point it to a cloud instance.
 
 Save the following file to console/.env.local
 
@@ -519,9 +519,9 @@ Allow the API [to redirect to your dev server](#configure-console-dev-server-red
 
 Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
-#### Configure Console Dev Server Redirects
+#### Configure the Management Console Dev Server Redirects
 
-To allow Console access via http://localhost:4200, you have to configure the Zitadel API.
+To allow the Management Console access via http://localhost:4200, you have to configure the Zitadel API.
 
 1. Navigate to http://localhost:8080/ui/console/projects.
 2. Select the _ZITADEL_ project.
@@ -531,16 +531,16 @@ To allow Console access via http://localhost:4200, you have to configure the Zit
 6. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
 7. Select the _Save_ button
 
-#### Pass Console Quality Checks
+#### Pass the Management Console Quality Checks
 
 Run the quality checks for the code you changed.
 
 ```bash
-# Run console-related linting builds and unit tests
+# Run the management console-related linting builds and unit tests
 pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test
 ```
 
-Run functional UI tests against a locally built API and a dev server Console.
+Run functional UI tests against a locally built API and a dev server Management Console.
 
 Allow the API [to redirect to your dev server](#configure-console-dev-server-redirects).
 Alternatively, create the file `tests/functional-ui/.env.open.local` with the following content:
@@ -550,7 +550,7 @@ CYPRESS_BASE_URL=http://localhost:8080/ui/console
 ```
 
 ```bash
-# Run the API and the Console dev server
+# Run the API and the Management Console dev server
 # Beware this doesn't work from within a dev container.
 pnpm nx run @zitadel/functional-ui:open
 ```
@@ -582,62 +582,9 @@ pnpm nx run @zitadel/client:build  # Build after changes
 
 ### Contribute to Docs
 
-Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Nx** for development and build processes.
+Project documentation is located under [./apps/docs](./apps/docs).
+Please refer to the [Docs README](./apps/docs/README.md) for detailed instructions on how to contribute to the documentation.
 
-To start developing, make sure you followed the [quick start](#quick-start) steps.
-
-#### Local Development
-
-```bash
-# Start development server (recommended)
-pnpm nx run @zitadel/docs:dev
-
-# Or start production server
-pnpm nx run @zitadel/docs:prod
-```
-
-The Docs build process automatically:
-
-1. Downloads required protoc plugins
-2. Generates gRPC documentation from proto files
-3. Generates API documentation from OpenAPI specs
-4. Copies configuration files
-5. Builds the Docusaurus site
-
-#### Local testing
-
-The documentation server will be available at http://localhost:3000 with live reload for fast development feedback.
-
-#### Style guide
-
-- **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
-- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "\_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
-- **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as separate file and make use of embedded files to import it into other docs pages.
-- **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
-
-Following the [Google style guide](https://developers.google.com/style) is highly recommended. Its clear and concise guidelines ensure consistency and effective communication within the wider developer community.
-
-The style guide covers a lot of material, so their [highlights](https://developers.google.com/style/highlights) page provides an overview of its most important points. Some of the points stated in the highlights that we care about most are given below:
-
-- Be conversational and friendly without being frivolous.
-- Use sentence case for document titles and section headings.
-- Use active voice: make clear who's performing the action.
-- Use descriptive link text.
-
-#### Docs pull request
-
-When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
-Scope can be left empty (omit the brackets) or refer to the top navigation sections.
-
-#### Pass Quality Checks
-
-Verify the Docs build correctly.
-
-```bash
-pnpm nx run @zitadel/docs:build
-```
-
-Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
 ## Contribute Translations
 
@@ -657,7 +604,7 @@ You also have to add some changes to the following files:
 - [Register Local File](./console/src/app/app.module.ts) - Import and register the Angular locale, register `i18n-iso-countries` locale
 - [Exclude from Angular prebundle](./console/angular.json) - Add `i18n-iso-countries/langs/<locale>.json` to `prebundle.exclude`
 - [Add Supported Language](./console/src/app/utils/language.ts)
-- [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
+- [Customized Text Docs](./apps/docs/docs/guides/manage/customize/texts.md)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
 
 ### Login v2 (Next.js)
@@ -737,8 +684,8 @@ The category shows which part of Zitadel is affected.
 - **category: backend**: The backend includes the APIs, event store, command and query side. This is developed in golang.
 - **category: ci**: ci is all about continuous integration and pipelines.
 - **category: design**: All about the ux/ui of Zitadel
-- **category: docs**: Adjustments or new documentations, this can be found in the docs folder.
-- **category: frontend**: The frontend concerns on the one hand the Zitadel management Console (Angular) and on the other hand the Login (gohtml)
+- **category: docs**: Adjustments or new documentations, this can be found in the apps/docs folder.
+- **category: frontend**: The frontend concerns on the one hand the Zitadel Management Console (Angular) and on the other hand the Login (gohtml)
 - **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
 - **category: translation**: Everything concerning translations or new languages
 

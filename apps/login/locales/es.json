@@ -47,7 +47,7 @@
       "userNotFound": "Usuario no encontrado en el sistema",
       "couldNotCreateSession": "No se pudo crear la sesión para el usuario",
       "initialUserNotSupported": "Usuario inicial no admitido",
-      "usernamePasswordNotAllowed": "El inicio de sesión con usuario y contraseña no está permitido. Contacte con su administrador para más información.",
+      "localAuthenticationNotAllowed": "¡La autenticación local no está permitida! Contacte con su administrador para más información.",
       "passkeysNotAllowed": "Las passkeys no están permitidas. Contacte con su administrador para más información.",
       "couldNotFindIdentityProvider": "No se pudo encontrar el proveedor de identidad.",
       "userNotActive": "El usuario no está activo. Contacte con su administrador para más información."
@@ -108,14 +108,17 @@
       "description": "Establece la contraseña para tu cuenta",
       "submit": "Continuar",
       "labels": {
+        "currentPassword": "Contraseña actual",
         "newPassword": "Nueva contraseña",
         "confirmPassword": "Confirmar contraseña"
       },
       "required": {
+        "currentPassword": "¡Debes proporcionar tu contraseña actual!",
         "newPassword": "¡Debes proporcionar una nueva contraseña!",
         "confirmPassword": "Este campo es obligatorio"
       },
       "errors": {
+        "currentPasswordInvalid": "La contraseña actual es incorrecta.",
         "couldNotChangePassword": "No se pudo cambiar la contraseña",
         "couldNotVerifyPassword": "No se pudo verificar la contraseña",
         "unknownError": "Error desconocido"
@@ -315,7 +318,7 @@
       "description": "No se proporcionaron datos suficientes para el registro."
     },
     "title": "Registrarse",
-    "description": "Crea tu cuenta ZITADEL.",
+    "description": "Crea tu cuenta Zitadel.",
     "noMethodAvailableWarning": "No hay métodos de autenticación disponibles. Por favor, contacta a tu administrador.",
     "selectMethod": "Selecciona el método con el que deseas autenticarte",
     "agreeTo": "Para registrarte debes aceptar los términos y condiciones",

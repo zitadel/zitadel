@@ -3,15 +3,12 @@ package command
 import (
 	"context"
 	"encoding/json"
-	"net/url"
 	"slices"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
@@ -21,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -34,17 +30,17 @@ import (
 
 func instanceSetupZitadelIDs() ZitadelConfig {
 	return ZitadelConfig{
-		instanceID:   "INSTANCE",
-		orgID:        "ORG",
-		projectID:    "PROJECT",
-		consoleAppID: "console-id",
-		authAppID:    "auth-id",
-		mgmtAppID:    "mgmt-id",
-		adminAppID:   "admin-id",
+		instanceID:             "INSTANCE",
+		orgID:                  "ORG",
+		projectID:              "PROJECT",
+		managementConsoleAppID: "console-id",
+		authAppID:              "auth-id",
+		mgmtAppID:              "mgmt-id",
+		adminAppID:             "admin-id",
 	}
 }
 
-func projectAddedEvents(ctx context.Context, instanceID, orgID, id, owner string, externalSecure bool) []eventstore.Command {
+func projectAddedEvents(ctx context.Context, instanceID, orgID, id string, externalSecure bool) []eventstore.Command {
 	events := []eventstore.Command{
 		project.NewProjectAddedEvent(ctx,
 			&project.NewAggregate(id, orgID).Aggregate,
@@ -63,14 +59,14 @@ func projectAddedEvents(ctx context.Context, instanceID, orgID, id, owner string
 	events = append(events, apiAppEvents(ctx, orgID, id, "admin-id", "Admin-API")...)
 	events = append(events, apiAppEvents(ctx, orgID, id, "auth-id", "Auth-API")...)
 
-	consoleAppID := "console-id"
-	consoleClientID := "clientID"
-	events = append(events, oidcAppEvents(ctx, orgID, id, consoleAppID, "Console", consoleClientID, externalSecure)...)
+	managementConsoleAppID := "console-id"
+	managementConsoleClientID := "clientID"
+	events = append(events, oidcAppEvents(ctx, orgID, id, managementConsoleAppID, "Management Console", managementConsoleClientID, externalSecure)...)
 	events = append(events,
-		instance.NewIAMConsoleSetEvent(ctx,
+		instance.NewIAMManagementConsoleSetEvent(ctx,
 			&instance.NewAggregate(instanceID).Aggregate,
-			&consoleClientID,
-			&consoleAppID,
+			&managementConsoleClientID,
+			&managementConsoleAppID,
 		),
 	)
 	return events
@@ -170,23 +166,20 @@ func orgEvents(ctx context.Context, instanceID, orgID, name, projectID, defaultD
 		instance.NewDefaultOrgSetEventEvent(ctx, &instanceAgg.Aggregate, orgID),
 	}
 
-	owner := ""
 	if machine {
 		machineID := "USER-MACHINE"
 		events = append(events, machineEvents(ctx, instanceID, orgID, machineID, "PAT")...)
-		owner = machineID
 	}
 	if human {
 		userID := "USER"
 		events = append(events, humanEvents(ctx, instanceID, orgID, userID)...)
-		owner = userID
 	}
 	if loginClient {
 		userID := "USER-LOGIN-CLIENT"
 		events = append(events, loginClientEvents(ctx, instanceID, orgID, userID, "LOGIN-CLIENT-PAT")...)
 	}
 
-	events = append(events, projectAddedEvents(ctx, instanceID, orgID, projectID, owner, externalSecure)...)
+	events = append(events, projectAddedEvents(ctx, instanceID, orgID, projectID, externalSecure)...)
 	return events
 }
 
@@ -194,7 +187,7 @@ func orgIDs() []string {
 	return slices.Concat([]string{"USER-MACHINE", "PAT", "USER", "USER-LOGIN-CLIENT", "LOGIN-CLIENT-PAT"}, projectClientIDs())
 }
 
-func instancePoliciesFilters(instanceID string) []expect {
+func instancePoliciesFilters(_ string) []expect {
 	return []expect{
 		expectFilter(),
 		expectFilter(),
@@ -661,7 +654,7 @@ func addHumanEvent(ctx context.Context, orgID, userID string) *user.HumanAddedEv
 	}()
 }
 
-// machineEvents all events from setup to create the machine user, machinekey can't be tested here, as the public key is not provided and as such the value in the event can't be expected
+// machineEvents all events from setup to create the service account, machinekey can't be tested here, as the public key is not provided and as such the value in the event can't be expected
 func machineEvents(ctx context.Context, instanceID, orgID, userID, patID string) []eventstore.Command {
 	agg := user.NewAggregate(userID, orgID)
 	instanceAgg := instance.NewAggregate(instanceID)
@@ -774,7 +767,6 @@ func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 									"INSTANCE",
 									"ORG",
 									"PROJECT",
-									"owner",
 									false,
 								)...,
 							),
@@ -1180,13 +1172,13 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 					},
 				},
 				ids: ZitadelConfig{
-					instanceID:   "INSTANCE",
-					orgID:        "ORG",
-					projectID:    "PROJECT",
-					consoleAppID: "console-id",
-					authAppID:    "auth-id",
-					mgmtAppID:    "mgmt-id",
-					adminAppID:   "admin-id",
+					instanceID:             "INSTANCE",
+					orgID:                  "ORG",
+					projectID:              "PROJECT",
+					managementConsoleAppID: "console-id",
+					authAppID:              "auth-id",
+					mgmtAppID:              "mgmt-id",
+					adminAppID:             "admin-id",
 				},
 			},
 			res: res{
@@ -1770,129 +1762,6 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.want, got)
 			}
-		})
-	}
-}
-
-func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
-	t.Parallel()
-
-	type fields struct {
-		LoginDefaultOrg                *bool
-		UserSchema                     *bool
-		TokenExchange                  *bool
-		ImprovedPerformance            []feature.ImprovedPerformanceType
-		DebugOIDCParentError           *bool
-		OIDCSingleV1SessionTermination *bool
-		EnableBackChannelLogout        *bool
-		LoginV2                        *InstanceSetupFeatureLoginV2
-		PermissionCheckV2              *bool
-		ConsoleUseV2UserApi            *bool
-		EnableRelationalTables         *bool
-	}
-
-	correctlyParsedURI, err := url.Parse("https://example.com")
-	require.NoError(t, err)
-
-	tt := []struct {
-		name    string
-		fields  fields
-		want    *InstanceFeatures
-		wantErr bool
-	}{
-		{
-			name:   "nil features returns nil",
-			fields: fields{},
-			want:   &InstanceFeatures{},
-		},
-		{
-			name: "all fields no login v2",
-			fields: fields{
-				LoginDefaultOrg:                gu.Ptr(true),
-				UserSchema:                     gu.Ptr(false),
-				TokenExchange:                  gu.Ptr(true),
-				ImprovedPerformance:            []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
-				DebugOIDCParentError:           gu.Ptr(true),
-				OIDCSingleV1SessionTermination: gu.Ptr(false),
-				EnableBackChannelLogout:        gu.Ptr(true),
-				PermissionCheckV2:              gu.Ptr(true),
-				ConsoleUseV2UserApi:            gu.Ptr(false),
-				EnableRelationalTables:         gu.Ptr(true),
-			},
-			want: &InstanceFeatures{
-				LoginDefaultOrg:                gu.Ptr(true),
-				UserSchema:                     gu.Ptr(false),
-				TokenExchange:                  gu.Ptr(true),
-				ImprovedPerformance:            []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
-				DebugOIDCParentError:           gu.Ptr(true),
-				OIDCSingleV1SessionTermination: gu.Ptr(false),
-				EnableBackChannelLogout:        gu.Ptr(true),
-				LoginV2:                        nil,
-				PermissionCheckV2:              gu.Ptr(true),
-				ConsoleUseV2UserApi:            gu.Ptr(false),
-				EnableRelationalTables:         gu.Ptr(true),
-			},
-		},
-		{
-			name: "with login v2 no base uri",
-			fields: fields{
-				LoginV2: &InstanceSetupFeatureLoginV2{
-					Required: true,
-				},
-			},
-			want: &InstanceFeatures{
-				LoginV2: &feature.LoginV2{
-					Required: true,
-				},
-			},
-		},
-		{
-			name: "with login v2 valid base uri",
-			fields: fields{
-				LoginV2: &InstanceSetupFeatureLoginV2{
-					Required: true,
-					BaseURI:  gu.Ptr("https://example.com"),
-				},
-			},
-			want: &InstanceFeatures{
-				LoginV2: &feature.LoginV2{
-					Required: true,
-					BaseURI:  correctlyParsedURI,
-				},
-			},
-		},
-		{
-			name: "with login v2 invalid base uri",
-			fields: fields{
-				LoginV2: &InstanceSetupFeatureLoginV2{
-					Required: true,
-					BaseURI:  gu.Ptr("://invalid"),
-				},
-			},
-			wantErr: true,
-		},
-	}
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
-			f := &InstanceSetupFeatures{
-				LoginDefaultOrg:                tc.fields.LoginDefaultOrg,
-				UserSchema:                     tc.fields.UserSchema,
-				TokenExchange:                  tc.fields.TokenExchange,
-				ImprovedPerformance:            tc.fields.ImprovedPerformance,
-				DebugOIDCParentError:           tc.fields.DebugOIDCParentError,
-				OIDCSingleV1SessionTermination: tc.fields.OIDCSingleV1SessionTermination,
-				EnableBackChannelLogout:        tc.fields.EnableBackChannelLogout,
-				LoginV2:                        tc.fields.LoginV2,
-				PermissionCheckV2:              tc.fields.PermissionCheckV2,
-				ConsoleUseV2UserApi:            tc.fields.ConsoleUseV2UserApi,
-				EnableRelationalTables:         tc.fields.EnableRelationalTables,
-			}
-			got, err := f.ToInstanceFeatures()
-
-			require.Equal(t, tc.wantErr, err != nil)
-			assert.Equal(t, tc.want, got)
 		})
 	}
 }

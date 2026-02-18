@@ -50,7 +50,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Branding",
-            description: "Defines the look of the login UI, E-Mails, and ZITADEL Console. For adding assets like logo, icon and font, have a look at the assets API."
+            description: "Defines the look of the login UI, E-Mails, and Zitadel Management Console. For adding assets like logo, icon and font, have a look at the assets API."
         },
         {
             name: "Domain Settings"
@@ -210,7 +210,7 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Healthz";
-            description: "The health endpoint allows an external system to probe if ZITADEL system API is alive. Response as soon as ZITADEL is running."
+            description: "The health endpoint allows an external system to probe if Zitadel system API is alive. Response as soon as Zitadel is running."
             tags: "General";
             responses: {
                 key: "200";
@@ -315,7 +315,7 @@ service AdminService {
     //
     // Deprecated: use [instance service v2 GetInstance](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-get-instance.api.mdx) instead.
     //
-    // Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running.
+    // Returns a list of domains that are configured for this Zitadel instance. These domains are the URLs where Zitadel is running.
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
         option (google.api.http) = {
             post: "/domains/_search";
@@ -335,7 +335,7 @@ service AdminService {
     //
     // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-list-trusted-domains.api.mdx) instead.
     //
-    // Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
+    // Returns a list of domains that are configured for this Zitadel instance. These domains are trusted to be used as public hosts.
     rpc ListInstanceTrustedDomains(ListInstanceTrustedDomainsRequest) returns (ListInstanceTrustedDomainsResponse) {
         option (google.api.http) = {
             post: "/trusted_domains/_search";
@@ -355,7 +355,7 @@ service AdminService {
     //
     // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-add-trusted-domain.api.mdx) instead.
     //
-    // Add a domain to the list configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
+    // Add a domain to the list configured for this Zitadel instance. These domains are trusted to be used as public hosts.
     rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             post: "/trusted_domains";
@@ -376,7 +376,7 @@ service AdminService {
     //
     // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-remove-trusted-domain.api.mdx) instead.
     //
-    // Removes a domain from the list configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
+    // Removes a domain from the list configured for this Zitadel instance. These domains are trusted to be used as public hosts.
     rpc RemoveInstanceTrustedDomain(RemoveInstanceTrustedDomainRequest) returns (RemoveInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             delete: "/trusted_domains/{domain}";
@@ -1087,7 +1087,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Add OIDC Settings";
-            description: "Create new OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and clients."
+            description: "Create new OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and applications."
         };
     }
 
@@ -1104,7 +1104,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Add OIDC Settings";
-            description: "Update existing OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and clients."
+            description: "Update existing OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and applications."
         };
     }
 
@@ -1152,7 +1152,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Get Security Settings";
-            description: "Returns the security settings of the ZITADEL instance."
+            description: "Returns the security settings of the Zitadel instance."
         };
     }
 
@@ -1169,7 +1169,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Set Security Settings";
-            description: "Set the security settings of the ZITADEL instance."
+            description: "Set the security settings of the Zitadel instance."
         };
     }
 
@@ -1244,7 +1244,7 @@ service AdminService {
             tags: "Organizations";
             tags: "Settings";
             summary: "Set Default Organization";
-            description: "Sets the default organization of the ZITADEL instance. If no specific organization is given on the register form, a user will be registered to the default organization."
+            description: "Sets the default organization of the Zitadel instance. If no specific organization is given on the register form, a user will be registered to the default organization."
         };
     }
 
@@ -1252,7 +1252,7 @@ service AdminService {
     //
     // Deprecated: use [organization service v2 ListOrganizations](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-list-organizations.api.mdx) instead.
     //
-    // Get the default organization of the ZITADEL instance. If no specific organization is given on the register form, a user will be registered to the default organization.
+    // Get the default organization of the Zitadel instance. If no specific organization is given on the register form, a user will be registered to the default organization.
     rpc GetDefaultOrg(GetDefaultOrgRequest) returns (GetDefaultOrgResponse) {
         option (google.api.http) = {
             get: "/orgs/default";
@@ -1498,7 +1498,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Deprecated: Add JWT Identity Provider (IDP)";
-            description: "Create a new identity provider configuration to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token.";
+            description: "Create a new identity provider configuration to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where Zitadel can get the existing JWT token.";
             deprecated: true;
             responses: {
                 key: "200";
@@ -2395,7 +2395,7 @@ service AdminService {
             tags: "Settings";
             tags: "Domain Settings";
             summary: "Get Domain Settings";
-            description: "Returns the domain settings configured as default on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation.."
+            description: "Returns the domain settings configured as default on the instance. Domain settings specify how Zitadel should handle domains, in regards to usernames, emails and validation.."
             responses: {
                 key: "200";
                 value: {
@@ -2419,7 +2419,7 @@ service AdminService {
             tags: "Settings";
             tags: "Domain Settings";
             summary: "Update Domain Settings";
-            description: "Update the domain settings configured as default on the instance. Domain settings specify how ZITADEL should handle domains, usernames, emails and validation. It affects all organizations that do not have overwritten settings."
+            description: "Update the domain settings configured as default on the instance. Domain settings specify how Zitadel should handle domains, usernames, emails and validation. It affects all organizations that do not have overwritten settings."
             responses: {
                 key: "200";
                 value: {
@@ -2443,7 +2443,7 @@ service AdminService {
             tags: "Domain Settings";
             tags: "Organizations";
             summary: "Get Domain Settings for Organization";
-            description: "Get the domain settings configured on a specific organization. If the organization doesn't have a custom setting, the default will be returned. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
+            description: "Get the domain settings configured on a specific organization. If the organization doesn't have a custom setting, the default will be returned. Domain settings specify how Zitadel should handle domains, in regards to usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
@@ -2468,7 +2468,7 @@ service AdminService {
             tags: "Domain Settings";
             tags: "Organizations";
             summary: "Set a Domain Settings for an Organization";
-            description: "Create the domain settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
+            description: "Create the domain settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how Zitadel should handle domains, in regards to usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
@@ -2493,7 +2493,7 @@ service AdminService {
             tags: "Domain Settings";
             tags: "Organizations";
             summary: "Update Domain Settings for Organization";
-            description: "Update the domain settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
+            description: "Update the domain settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how Zitadel should handle domains, in regards to usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
@@ -2517,7 +2517,7 @@ service AdminService {
             tags: "Domain Settings";
             tags: "Organizations";
             summary: "Reset Domain Settings of Organization";
-            description: "Resets the domain settings configured on a specific organization to the settings configured on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
+            description: "Resets the domain settings configured on a specific organization to the settings configured on the instance. Domain settings specify how Zitadel should handle domains, in regards to usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
@@ -2540,7 +2540,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Private Labeling/Branding Settings";
-            description: "Returns the currently active private labeling/branding configured on the instance level. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the currently active private labeling/branding configured on the instance level. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             responses: {
                 key: "200";
                 value: {
@@ -2563,7 +2563,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Preview Private Labeling/Branding Settings";
-            description: "Returns the preview private labeling/branding configured on the instance level. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the preview private labeling/branding configured on the instance level. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             responses: {
                 key: "200";
                 value: {
@@ -2587,7 +2587,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Update Labeling/Branding Settings";
-            description: "Update the preview private labeling/branding configured on the instance level. It affects all organizations, that don't overwrite the settings. The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Update the preview private labeling/branding configured on the instance level. It affects all organizations, that don't overwrite the settings. The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             responses: {
                 key: "200";
                 value: {
@@ -2611,7 +2611,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Activate Labeling/Branding Settings";
-            description: "Activates the preview private labeling/branding configured on the instance level. It will be shown to the users afterward. It affects all organizations, that don't overwrite the settings. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Activates the preview private labeling/branding configured on the instance level. It will be shown to the users afterward. It affects all organizations, that don't overwrite the settings. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
         };
     }
 
@@ -3320,7 +3320,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Init Message Text";
-            description: "Get the default text of the initialize-user message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user is created and has either no password or a non-verified email address."
+            description: "Get the default text of the initialize-user message/email that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user is created and has either no password or a non-verified email address."
         };
     }
 
@@ -3369,7 +3369,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Init Message Text to Default";
-            description: "Removes the custom text of the initialize-user message/email that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom text of the initialize-user message/email that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3388,7 +3388,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Password Reset Message Text";
-            description: "Get the default text of the password reset message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user triggers the password forgot-request."
+            description: "Get the default text of the password reset message/email that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user triggers the password forgot-request."
         };
     }
 
@@ -3437,7 +3437,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Password Reset Message Text to Default";
-            description: "Removes the custom text of the password reset user message/email that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom text of the password reset user message/email that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3453,7 +3453,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Verify Email Message Text";
-            description: "Get the default text of the verify-email message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user adds a new non-verified email address."
+            description: "Get the default text of the verify-email message/email that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user adds a new non-verified email address."
         };
     }
 
@@ -3502,7 +3502,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Verify Email Message Text to Default";
-            description: "Removes the custom text of the email verify message/email that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom text of the email verify message/email that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3518,7 +3518,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Verify Phone Message Text";
-            description: "Get the default text of the verify-phone message that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user adds a new non-verified phone number and a notification provider is configured."
+            description: "Get the default text of the verify-phone message that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user adds a new non-verified phone number and a notification provider is configured."
         };
     }
 
@@ -3567,7 +3567,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Verify Phone Message Text to Default";
-            description: "Removes the custom text of the verify-phone message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom text of the verify-phone message that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3583,8 +3583,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Default Verify SMS OTP Message Text";
-            description: "Get the default text of the verify SMS OTP message that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Default Verify OTP SMS Message Text";
+            description: "Get the default text of the verify OTP SMS message that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured."
         };
     }
 
@@ -3599,8 +3599,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Custom Verify SMS OTP Message Text";
-            description: "Get the custom text of the verify SMS OTP message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Custom Verify OTP SMS Message Text";
+            description: "Get the custom text of the verify OTP SMS message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured."
         };
     }
 
@@ -3616,8 +3616,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Set Default Verify SMS OTP Reset Message Text";
-            description: "Set the custom text of the verify SMS OTP user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            summary: "Set Default Verify OTP SMS Reset Message Text";
+            description: "Set the custom text of the verify OTP SMS user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
     }
 
@@ -3632,8 +3632,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Reset Custom Verify SMS OTP Message Text to Default";
-            description: "Removes the custom text of the verify SMS OTP message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            summary: "Reset Custom Verify OTP SMS Message Text to Default";
+            description: "Removes the custom text of the verify OTP SMS message that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3649,8 +3649,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Default Verify SMS OTP Message Text";
-            description: "Get the default text of the verify Email OTP message that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Default Verify OTP SMS Message Text";
+            description: "Get the default text of the verify OTP Email message that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured."
         };
     }
 
@@ -3665,8 +3665,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Custom Verify SMS OTP Message Text";
-            description: "Get the custom text of the Email OTP message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            summary: "Get Custom Verify OTP SMS Message Text";
+            description: "Get the custom text of the OTP Email message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured."
         };
     }
 
@@ -3682,8 +3682,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Set Default Verify SMS OTP Reset Message Text";
-            description: "Set the custom text of the Email OTP user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            summary: "Set Default Verify OTP SMS Reset Message Text";
+            description: "Set the custom text of the OTP Email user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an OTP SMS should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
     }
 
@@ -3698,8 +3698,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Reset Custom Verify SMS OTP Message Text to Default";
-            description: "Removes the custom text of the Email OTP message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            summary: "Reset Custom Verify OTP SMS Message Text to Default";
+            description: "Removes the custom text of the OTP Email message that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3715,7 +3715,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Domain Claimed Message Text";
-            description: "Get the default text of the domain claimed message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an organization claims a domain and a user of this domain exists in another organization."
+            description: "Get the default text of the domain claimed message/email that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an organization claims a domain and a user of this domain exists in another organization."
         };
     }
 
@@ -3764,7 +3764,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Domain Claimed Message Text to Default";
-            description: "Removes the custom text of the domain claimed message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom text of the domain claimed message that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3780,7 +3780,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Passwordless Registration Message Text";
-            description: "Get the default text of the domain claimed message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user requests passwordless/passkey registration as email, to be able to configure on another device."
+            description: "Get the default text of the domain claimed message/email that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user requests passwordless/passkey registration as email, to be able to configure on another device."
         };
     }
 
@@ -3829,7 +3829,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Passwordless Registration Message Text to Default";
-            description: "Removes the custom text of the passwordless/passkey registration message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom text of the passwordless/passkey registration message that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3845,7 +3845,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Password Changed Message Text";
-            description: "Get the default text of the password-changed message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when the password of a user has been changed."
+            description: "Get the default text of the password-changed message/email that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when the password of a user has been changed."
         };
     }
 
@@ -3894,7 +3894,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Password Changed Message Text to Default";
-            description: "Removes the custom text of the password-changed message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom text of the password-changed message that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3910,7 +3910,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Invite User Message Text";
-            description: "Get the default text of the invite user message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an invite code email is requested."
+            description: "Get the default text of the invite user message/email that is stored as translation files in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an invite code email is requested."
         };
     }
 
@@ -3959,7 +3959,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Invite User Message Text to Default";
-            description: "Removes the custom text of the invite user message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom text of the invite user message that is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3975,7 +3975,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Login Texts";
             summary: "Get Default Login Text";
-            description: "Get the default texts for the login and register UI of ZITADEL, which are stored as translation files in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
+            description: "Get the default texts for the login and register UI of ZITADEL, which are stored as translation files in Zitadel itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -4024,7 +4024,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Login Texts";
             summary: "Reset Custom Login Text to Default";
-            description: "Removes the custom texts for the login and register UI of ZITADEL, which is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom texts for the login and register UI of ZITADEL, which is overwritten on the instance and triggers the text from the translation files stored in Zitadel itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -4040,22 +4040,22 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "List IAM Member Roles";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the instance level."
+            summary: "List instance Member Roles";
+            description: "Members are users with permission to administrate Zitadel on different levels. This request returns all roles possible for a Zitadel member on the instance level."
             responses: {
                 key: "200";
                 value: {
-                    description: "roles on the IAM of the user";
+                    description: "roles on the instance of the user";
                 };
             };
         };
     }
 
-    // List IAM Members
+    // List instance Members
     //
     // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-list-administrators.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the instance level, matching the search queries. The search queries will be AND linked.
+    // Members are users with permission to administrate Zitadel on different levels. This request returns all users with memberships on the instance level, matching the search queries. The search queries will be AND linked.
     rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
         option (google.api.http) = {
             post: "/members/_search";
@@ -4073,17 +4073,17 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "members of the IAM";
+                    description: "members of the instance";
                 };
             };
         };
     }
 
-    // Add IAM Member
+    // Add instance Member
     //
     // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-create-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list with one or multiple roles.
+    // Members are users with permission to administrate Zitadel on different levels. This request adds a new user to the members list with one or multiple roles.
     rpc AddIAMMember(AddIAMMemberRequest) returns (AddIAMMemberResponse) {
         option (google.api.http) = {
             post: "/members";
@@ -4101,7 +4101,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "Member added to the IAM";
+                    description: "Member added to the instance";
                 };
             };
             responses: {
@@ -4118,11 +4118,11 @@ service AdminService {
         };
     }
 
-    // Update IAM Member
+    // Update instance Member
     //
     // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-update-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
+    // Members are users with permission to administrate Zitadel on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateIAMMember(UpdateIAMMemberRequest) returns (UpdateIAMMemberResponse) {
         option (google.api.http) = {
             put: "/members/{user_id}";
@@ -4140,7 +4140,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "Member of the IAM updated";
+                    description: "Member of the instance updated";
                 };
             };
             responses: {
@@ -4161,7 +4161,7 @@ service AdminService {
     //
     // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-delete-administrator.api.mdx) instead.
     //
-    // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (organization, project).
+    // Members are users with permission to administrate Zitadel on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (organization, project).
     rpc RemoveIAMMember(RemoveIAMMemberRequest) returns (RemoveIAMMemberResponse) {
         option (google.api.http) = {
             delete: "/members/{user_id}";
@@ -4178,7 +4178,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "Member of the IAM removed";
+                    description: "Member of the instance removed";
                 };
             };
             responses: {
@@ -4944,6 +4944,7 @@ message AddEmailProviderSMTPRequest {
             example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
         }
     ];
+    // Deprecated: use [Auth] oneof instead.
     string password = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"this-is-my-password\"";
@@ -4965,6 +4966,78 @@ message AddEmailProviderSMTPRequest {
             max_length: 200;
         }
     ];
+    oneof Auth {
+        SMTPNoAuth none = 9;
+        SMTPPlainAuth plain = 10;
+        SMTPXOAuth2Auth xoauth2 = 11;
+    }
+}
+
+// SMTPNoAuth can be used when no authentication is required for the SMTP connection.
+message SMTPNoAuth {}
+
+// SMTPPlainAuth adds plain authentication to the smtp connection. The username of the parent configuration is used in
+// combination with the password in this message.
+message SMTPPlainAuth {
+    string password = 1 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"this-is-my-client-secret\"";
+        }
+    ];
+}
+
+// SMTPXOAuth2Auth adds XOAut2 authentication to the smtp connection. The username of the parent configuration is used
+// in combination with the other parameters of this message.
+message SMTPXOAuth2Auth {
+    // token_endpoint is the endpoint from which a token will be requested according to the oauth2 specification.
+    string token_endpoint = 1 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"http://auth.example.com/token\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+    // scopes is a list of scopes which should be requested from the authorization service. To authorize a token to
+    // use the smtp functionality, the server requires a specific scope. These scopes can be found in the documentation
+    // of the provider.
+    repeated string scopes = 2 [
+        (google.api.field_behavior) = REQUIRED,
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://mail.example.com\"]";
+        }
+    ];
+    // OAuth2Type is a oneof used to switch between the different types of oauth2 authorization flows.
+    oneof OAuth2Type {
+        ClientCredentials client_credentials = 3;
+    }
+
+    // ClientCredentials authenticates the SMTP client using Oauth 2.0 Client Credentials grant.
+    // https://datatracker.ietf.org/doc/html/rfc6749#section-4.4
+    message ClientCredentials {
+        string client_id = 1 [
+            (validate.rules).string = {min_len: 0, max_len: 200},
+            (google.api.field_behavior) = REQUIRED,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+                min_length: 0;
+                max_length: 200;
+            }
+        ];
+        string client_secret = 2 [
+            (validate.rules).string = {min_len: 0, max_len: 200},
+            (google.api.field_behavior) = REQUIRED,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"this-is-my-client-secret\"";
+                min_length: 0;
+                max_length: 200;
+            }
+        ];
+    }
 }
 
 message AddEmailProviderSMTPResponse {
@@ -5029,6 +5102,11 @@ message UpdateEmailProviderSMTPRequest {
         }
     ];
     string id = 9 [(validate.rules).string = {min_len: 1, max_len: 100}];
+    oneof Auth {
+        SMTPNoAuth none = 10;
+        SMTPPlainAuth plain = 11;
+        SMTPXOAuth2Auth xoauth2 = 12;
+    }
 }
 
 message UpdateEmailProviderSMTPResponse {
@@ -5221,6 +5299,11 @@ message TestEmailProviderSMTPRequest {
             example: "\"267191369515139464\"";
         }
     ];
+    oneof Auth {
+        SMTPNoAuth none = 9;
+        SMTPPlainAuth plain = 10;
+        SMTPXOAuth2Auth xoauth2 = 11;
+    }
 }
 
 // This is an empty response
@@ -5496,7 +5579,7 @@ message GetSecurityPolicyResponse{
 message SetSecurityPolicyRequest{
     // states if iframe embedding is enabled or disabled
     bool enable_iframe_embedding = 1;
-    // origins allowed loading ZITADEL in an iframe if enable_iframe_embedding is true
+    // origins allowed loading Zitadel in an iframe if enable_iframe_embedding is true
     repeated string allowed_origins = 2;
     // allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
     bool enable_impersonation = 3;
@@ -5645,7 +5728,7 @@ message SetUpOrgRequest {
             string display_name = 4 [
                 (validate.rules).string = {max_len: 200},
                 (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                    description: "a user can set the display name if nothing is set ZITADEL computes \"first_name last_name\"";
+                    description: "a user can set the display name if nothing is set Zitadel computes \"first_name last_name\"";
                     max_length: 200;
                     example: "\"Gigi Giraffe\"";
                 }
@@ -5841,7 +5924,7 @@ message AddOIDCIDPRequest {
     repeated string scopes = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "the scopes requested by ZITADEL during the request on the identity provider";
+            description: "the scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     zitadel.idp.v1.OIDCMappingField display_name_mapping = 7 [
@@ -6075,7 +6158,7 @@ message UpdateIDPOIDCConfigRequest {
     repeated string scopes = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "the scopes requested by ZITADEL during the request on the identity provider";
+            description: "the scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     zitadel.idp.v1.OIDCMappingField display_name_mapping = 6 [
@@ -6204,28 +6287,28 @@ message AddGenericOAuthProviderRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/o/oauth2/v2/auth\"";
-            description: "The endpoint where ZITADEL send the user to authenticate";
+            description: "The endpoint where Zitadel send the user to authenticate";
         }
     ];
     string token_endpoint = 5 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://oauth2.googleapis.com/token\"";
-            description: "The endpoint where ZITADEL can get the token";
+            description: "The endpoint where Zitadel can get the token";
         }
     ];
     string user_endpoint = 6 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://openidconnect.googleapis.com/v1/userinfo\"";
-            description: "The endpoint where ZITADEL can get the user information";
+            description: "The endpoint where Zitadel can get the user information";
         }
     ];
     repeated string scopes = 7 [
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request on the identity provider";
+            description: "The scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     // identifying attribute of the user in the response of the user_endpoint
@@ -6273,28 +6356,28 @@ message UpdateGenericOAuthProviderRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/o/oauth2/v2/auth\"";
-            description: "The endpoint where ZITADEL send the user to authenticate";
+            description: "The endpoint where Zitadel send the user to authenticate";
         }
     ];
     string token_endpoint = 6 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://oauth2.googleapis.com/token\"";
-            description: "The endpoint where ZITADEL can get the token";
+            description: "The endpoint where Zitadel can get the token";
         }
     ];
     string user_endpoint = 7 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://openidconnect.googleapis.com/v1/userinfo\"";
-            description: "The endpoint where ZITADEL can get the user information";
+            description: "The endpoint where Zitadel can get the user information";
         }
     ];
     repeated string scopes = 8 [
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request on the identity provider";
+            description: "The scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     // identifying attribute of the user in the response of the user_endpoint
@@ -6346,7 +6429,7 @@ message AddGenericOIDCProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "the scopes requested by ZITADEL during the request on the identity provider";
+            description: "the scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
@@ -6399,7 +6482,7 @@ message UpdateGenericOIDCProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "the scopes requested by ZITADEL during the request on the identity provider";
+            description: "the scopes requested by Zitadel during the request on the identity provider";
         }
     ];
     zitadel.idp.v1.Options provider_options = 7;
@@ -6496,14 +6579,14 @@ message AddAzureADProviderRequest {
     ];
     bool email_verified = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Azure AD doesn't send if the email has been verified. Enable this if the user email should always be added verified in ZITADEL (no verification emails will be sent)";
+            description: "Azure AD doesn't send if the email has been verified. Enable this if the user email should always be added verified in Zitadel (no verification emails will be sent)";
         }
     ];
     repeated string scopes = 6 [
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\", \"User.Read\"]";
-            description: "the scopes requested by ZITADEL during the request to Azure AD";
+            description: "the scopes requested by Zitadel during the request to Azure AD";
         }
     ];
     zitadel.idp.v1.Options provider_options = 7;
@@ -6545,14 +6628,14 @@ message UpdateAzureADProviderRequest {
     ];
     bool email_verified = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Azure AD doesn't send if the email has been verified. Enable this if the user email should always be added verified in ZITADEL (no verification emails will be sent)";
+            description: "Azure AD doesn't send if the email has been verified. Enable this if the user email should always be added verified in Zitadel (no verification emails will be sent)";
         }
     ];
     repeated string scopes = 7 [
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\", \"User.Read\"]";
-            description: "the scopes requested by ZITADEL during the request to Azure AD";
+            description: "the scopes requested by Zitadel during the request to Azure AD";
         }
     ];
     zitadel.idp.v1.Options provider_options = 8;
@@ -6589,7 +6672,7 @@ message AddGitHubProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitHub";
+            description: "The scopes requested by Zitadel during the request to GitHub";
         }
     ];
     zitadel.idp.v1.Options provider_options = 5;
@@ -6627,7 +6710,7 @@ message UpdateGitHubProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitHub";
+            description: "The scopes requested by Zitadel during the request to GitHub";
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
@@ -6665,7 +6748,7 @@ message AddGitHubEnterpriseServerProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitHub";
+            description: "The scopes requested by Zitadel during the request to GitHub";
         }
     ];
     zitadel.idp.v1.Options provider_options = 8;
@@ -6706,7 +6789,7 @@ message UpdateGitHubEnterpriseServerProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitHub";
+            description: "The scopes requested by Zitadel during the request to GitHub";
         }
     ];
     zitadel.idp.v1.Options provider_options = 9;
@@ -6743,7 +6826,7 @@ message AddGitLabProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitLab";
+            description: "The scopes requested by Zitadel during the request to GitLab";
         }
     ];
     zitadel.idp.v1.Options provider_options = 5;
@@ -6782,7 +6865,7 @@ message UpdateGitLabProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitLab";
+            description: "The scopes requested by Zitadel during the request to GitLab";
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
@@ -6818,7 +6901,7 @@ message AddGitLabSelfHostedProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitLab";
+            description: "The scopes requested by Zitadel during the request to GitLab";
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
@@ -6857,7 +6940,7 @@ message UpdateGitLabSelfHostedProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to GitLab";
+            description: "The scopes requested by Zitadel during the request to GitLab";
         }
     ];
     zitadel.idp.v1.Options provider_options = 7;
@@ -6894,7 +6977,7 @@ message AddGoogleProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to Google";
+            description: "The scopes requested by Zitadel during the request to Google";
         }
     ];
     zitadel.idp.v1.Options provider_options = 5;
@@ -6932,7 +7015,7 @@ message UpdateGoogleProviderRequest {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to Google";
+            description: "The scopes requested by Zitadel during the request to Google";
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
@@ -7041,7 +7124,7 @@ message AddAppleProviderRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             max_items: 20,
             example: "[\"name\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to Apple";
+            description: "The scopes requested by Zitadel during the request to Apple";
         }
     ];
     zitadel.idp.v1.Options provider_options = 7;
@@ -7104,7 +7187,7 @@ message UpdateAppleProviderRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             max_items: 20,
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "The scopes requested by ZITADEL during the request to Apple";
+            description: "The scopes requested by Zitadel during the request to Apple";
         }
     ];
     zitadel.idp.v1.Options provider_options = 8;
@@ -7140,7 +7223,7 @@ message AddSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 8;
-    // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
+    // Optionally enable federated logout. If enabled, Zitadel will send a logout request to the identity provider,
     // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
     optional bool federated_logout_enabled = 9;
     // Specify a Signature Algorithm that should be used to sign SAML requests and responses.
@@ -7180,7 +7263,7 @@ message UpdateSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 9;
-    // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
+    // Optionally enable federated logout. If enabled, Zitadel will send a logout request to the identity provider,
     // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
     optional bool federated_logout_enabled = 10;
     // Specify a Signature Algorithm that should be used to sign SAML requests and responses.
@@ -7377,7 +7460,7 @@ message AddCustomDomainPolicyRequest {
     ]; // the username has to end with the domain of its organization (uniqueness is organization based)
     bool validate_org_domains = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if organization domains should be validated org count as validated automatically"
+            description: "defines if Organization Domains should be validated org count as validated automatically"
         }
     ];
     bool smtp_sender_address_matches_instance_domain = 4 [
@@ -7413,7 +7496,7 @@ message UpdateCustomDomainPolicyRequest {
     ];
     bool validate_org_domains = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if organization domains should be validated org count as validated automatically"
+            description: "defines if Organization Domains should be validated org count as validated automatically"
         }
     ];
     bool smtp_sender_address_matches_instance_domain = 4 [
@@ -7840,7 +7923,7 @@ message GetPasswordAgePolicyResponse {
 message UpdatePasswordAgePolicyRequest {
     // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
-    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
+    // Amount of days after which the user should be notified of the upcoming expiry. Zitadel will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
@@ -7912,13 +7995,13 @@ message UpdatePrivacyPolicyRequest {
     ];
     string custom_link = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to an external resource that will be available to users in the console.";
+            description: "Link to an external resource that will be available to users in the management console.";
             example: "\"https://external.link\"";
         }
     ];
     string custom_link_text = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "The button text that would be shown in console pointing to custom link.";
+            description: "The button text that would be shown in the management console pointing to custom link.";
             example: "\"External\"";
         }
     ];
@@ -8318,7 +8401,7 @@ message SetDefaultVerifySMSOTPMessageTextRequest {
     string text = 2 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please visit {{ .VerifyURL }} or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
+            example: "\"Please visit {{ .VerifyURL }} or copy the OTP {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
             max_length: 800;
         }
     ];
@@ -8363,21 +8446,21 @@ message SetDefaultVerifyEmailOTPMessageTextRequest {
     string title = 2 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ZITADEL - One-time Password\""
+            example: "\"ZITADEL - OTP\""
             max_length: 500;
         }
     ];
     string pre_header = 3 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify One-time Password \""
+            example: "\"Verify OTP\""
             max_length: 500;
         }
     ];
     string subject = 4 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify One-time Password\""
+            example: "\"Verify OTP\""
             max_length: 500;
         }
     ];
@@ -8391,7 +8474,7 @@ message SetDefaultVerifyEmailOTPMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please use the \\\"Authenticate\\\" button or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
+            example: "\"Please use the \\\"Authenticate\\\" button or copy the OTP {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
             max_length: 10000;
         }
     ];
@@ -9368,7 +9451,7 @@ message ListMilestonesResponse {
 message SetRestrictionsRequest {
     optional bool disallow_public_org_registration = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
+            description: "defines if Zitadel should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
         }
     ];
     optional SelectLanguages allowed_languages = 2 [
@@ -9397,7 +9480,7 @@ message GetRestrictionsResponse {
     zitadel.v1.ObjectDetails details = 1;
     bool disallow_public_org_registration = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
+            description: "defines if Zitadel should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
         }
     ];
     repeated string allowed_languages = 3 [

@@ -1611,7 +1611,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			name: "human added with initial mail",
 			fields: fields{
 				eventstore: expectEventstore(
-					expectFilter(), // add human exists check
+					expectFilter(), // add User (Human) exists check
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(

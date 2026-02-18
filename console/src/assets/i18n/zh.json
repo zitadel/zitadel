@@ -1,15 +1,15 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "元数据",
     "HOME": {
-      "TITLE": "开始使用ZITADEL",
+      "TITLE": "开始使用Zitadel",
       "NEXT": {
         "TITLE": "你的下一步",
         "DESCRIPTION": "完成以下步骤来保护你的应用程序。",
         "CREATE_PROJECT": {
           "TITLE": "创建项目",
-          "DESCRIPTION": "添加一个项目并定义其角色和权限。"
+          "DESCRIPTION": "添加项目并定义角色及角色分配。"
         }
       },
       "MORE_SHORTCUTS": {
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "文档",
-          "DESCRIPTION": "探索ZITADEL的知识库，熟悉核心概念和思想。学习ZITADEL的工作原理和如何使用它。"
+          "DESCRIPTION": "探索Zitadel的知识库，熟悉核心概念和思想。学习Zitadel的工作原理和如何使用它。"
         },
         "EXAMPLES": {
           "TITLE": "示例和软件开发工具包",
-          "DESCRIPTION": "浏览我们的示例和SDK，以你喜欢的编程语言和工具一起使用ZITADEL。"
+          "DESCRIPTION": "浏览我们的示例和SDK，以你喜欢的编程语言和工具一起使用Zitadel。"
         }
       }
     },
@@ -37,7 +37,7 @@
       "DESCRIPTION": "一个项目托管一个或多个应用，你可以用它们来验证你的用户。例如，你可能有一个包含3个应用的项目；一个用于你的Web前端，一个用于你的移动应用，一个用于你的后端。你还可以通过项目对用户进行授权。为了允许其他组织的用户登录到你的应用，给予他们访问你的项目的权限。<br/><br/>如果你找不到一个项目，请联系项目所有者或拥有相应权利的人以获得访问权限。",
       "OWNED": {
         "TITLE": "所拥有的项目",
-        "DESCRIPTION": "这些是你拥有的项目。你可以管理这些项目的设置、权限和应用。"
+        "DESCRIPTION": "这些是您拥有的项目。您可以管理其设置、角色分配和应用程序。"
       },
       "GRANTED": {
         "TITLE": "授予的项目",
@@ -46,28 +46,28 @@
     },
     "USERS": {
       "TITLE": "用户",
-      "DESCRIPTION": "用户是可以访问你的应用的人或机器。",
+      "DESCRIPTION": "用户是可以访问你的应用的人或服务账户。",
       "HUMANS": {
         "TITLE": "用户",
         "DESCRIPTION": "用户在浏览器会话中通过登录提示进行交互身份验证。",
         "METADATA": "为用户添加自定义属性，如部门。你可以在你的行动中使用这些信息。"
       },
       "MACHINES": {
-        "TITLE": "服务用户",
-        "DESCRIPTION": "服务用户使用使用私钥签名的 JWT 不记名令牌进行非交互式身份验证。他们还可以使用个人访问令牌。",
+        "TITLE": "服务账户",
+        "DESCRIPTION": "服务账户使用使用私钥签名的 JWT 不记名令牌进行非交互式身份验证。他们还可以使用个人访问令牌。",
         "METADATA": "为用户添加自定义属性，如认证系统。你可以在你的行动中使用这些信息。"
       },
       "SELF": {
         "METADATA": "为你自己添加自定义属性，如你的部门。你可以在你的组织的行动中使用这些信息。"
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "授权",
-      "DESCRIPTION": "授权定义了用户对项目的访问权限。您可以授予用户访问项目的权限并在该项目内定义用户的角色。"
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "角色分配",
+      "DESCRIPTION": "角色分配定义用户对项目的访问权限。您可以授予用户访问项目的权限，并定义他们在项目中的角色。"
     },
     "ACTIONS": {
       "TITLE": "操作",
-      "DESCRIPTION": "在用户在ZITADEL进行认证时发生的事件上运行自定义代码。自动化您的流程，丰富您用户的元数据和令牌或通知外部系统。",
+      "DESCRIPTION": "在用户在Zitadel进行认证时发生的事件上运行自定义代码。自动化您的流程，丰富您用户的元数据和令牌或通知外部系统。",
       "SCRIPTS": {
         "TITLE": "脚本",
         "DESCRIPTION": "编写一次JavaScript代码，并在多个流程中触发它。"
@@ -97,23 +97,23 @@
         "NEXT": "下一步？",
         "SAML": {
           "TITLE": "配置你的SAML身份提供者",
-          "DESCRIPTION": "ZITADEL已配置。现在需要配置你的SAML身份提供者。大多数提供者允许你直接上传整个ZITADEL元数据XML。其他提供者可能仅要求你提供一些特定的URL，例如实体ID（元数据URL）、断言消费服务（ACS）URL或单点登出URL。"
+          "DESCRIPTION": "Zitadel已配置。现在需要配置你的SAML身份提供者。大多数提供者允许你直接上传整个Zitadel元数据XML。其他提供者可能仅要求你提供一些特定的URL，例如实体ID（元数据URL）、断言消费服务（ACS）URL或单点登出URL。"
         },
         "CALLBACK": {
           "TITLE": "配置你的{{ provider }}身份提供者",
-          "DESCRIPTION": "在你能配置ZITADEL之前，将这个URL传递给你的身份提供者，以便在认证后启用浏览器重定向回到ZITADEL。"
+          "DESCRIPTION": "在你能配置Zitadel之前，将这个URL传递给你的身份提供者，以便在认证后启用浏览器重定向回到Zitadel。"
         },
         "JWT": {
           "TITLE": "将JWT用作联合身份",
-          "DESCRIPTION": "JWT身份提供者使你能够将现有的JWT令牌用作联合身份。如果你已经有一个JWT发行者，这个功能非常有用。使用JWT IdP，你可以利用这些JWT即时创建和更新ZITADEL中的用户。"
+          "DESCRIPTION": "JWT身份提供者使你能够将现有的JWT令牌用作联合身份。如果你已经有一个JWT发行者，这个功能非常有用。使用JWT IdP，你可以利用这些JWT即时创建和更新Zitadel中的用户。"
         },
         "LDAP": {
-          "TITLE": "配置ZITADEL以连接到你的LDAP身份提供者",
-          "DESCRIPTION": "提供你的LDAP服务器的连接细节，并配置你的LDAP属性到ZITADEL属性的映射。"
+          "TITLE": "配置Zitadel以连接到你的LDAP身份提供者",
+          "DESCRIPTION": "提供你的LDAP服务器的连接细节，并配置你的LDAP属性到Zitadel属性的映射。"
         },
         "AUTOFILL": {
           "TITLE": "自动填充用户数据",
-          "DESCRIPTION": "使用一个操作来改善用户体验。你可以使用身份提供者的值预填充ZITADEL的注册表单。"
+          "DESCRIPTION": "使用一个操作来改善用户体验。你可以使用身份提供者的值预填充Zitadel的注册表单。"
         },
         "ACTIVATE": {
           "TITLE": "激活IdP",
@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "外部链接",
-        "DESCRIPTION": "引导您的用户访问登录页面上显示的自定义外部资源。用户需要先接受服务条款和隐私政策，然后才能注册。更改文档的链接或设置空字符串以在控制台中隐藏文档按钮。在控制台中添加自定义外部链接和该链接的自定义文本，或将它们设置为空以隐藏该按钮。"
+        "DESCRIPTION": "引导您的用户访问登录页面上显示的自定义外部资源。用户需要先接受服务条款和隐私政策，然后才能注册。更改文档的链接或设置空字符串以在管理控制台中隐藏文档按钮。在管理控制台中添加自定义外部链接和该链接的自定义文本，或将它们设置为空以隐藏该按钮。"
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP设置",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS设置",
-        "DESCRIPTION": "为了解锁ZITADEL的所有功能，配置Twilio向您的用户发送SMS消息。"
+        "DESCRIPTION": "为了解锁Zitadel的所有功能，配置Twilio向您的用户发送SMS消息。"
       },
       "IAM_EVENTS": {
         "TITLE": "事件",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "失败的事件",
-        "DESCRIPTION": "此页面显示您实例中的所有失败事件。如果ZITADEL的行为不符合您的预期，请始终首先检查此列表。"
+        "DESCRIPTION": "此页面显示您实例中的所有失败事件。如果Zitadel的行为不符合您的预期，请始终首先检查此列表。"
       },
       "IAM_VIEWS": {
         "TITLE": "视图",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "安全设置",
-        "DESCRIPTION": "启用可能会影响安全性的ZITADEL功能。在更改这些设置之前，您确实需要知道自己在做什么。"
+        "DESCRIPTION": "启用可能会影响安全性的Zitadel功能。在更改这些设置之前，您确实需要知道自己在做什么。"
       },
       "OIDC": {
         "TITLE": "OpenID Connect设置",
@@ -187,11 +187,11 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "管理您的 OIDC Web 密钥，以安全地签署和验证您的 ZITADEL 实例的令牌。",
+        "DESCRIPTION": "管理您的 OIDC Web 密钥，以安全地签署和验证您的 Zitadel 实例的令牌。",
         "TABLE": {
           "TITLE": "活动和未来的 Web 密钥",
           "DESCRIPTION": "您的当前活动和即将启用的 Web 密钥。激活新密钥将会停用当前密钥。",
-          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认 5 分钟）。请避免过早激活密钥，否则它可能尚未在缓存或客户端中可用。",
+          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认 5 分钟）。请避免过早激活密钥，否则它可能尚未在缓存或应用中可用。",
           "ACTIVATE": "激活下一个 Web 密钥",
           "ACTIVE": "当前活动",
           "NEXT": "队列中的下一个",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "创建新的 Web 密钥",
-          "DESCRIPTION": "创建新的 Web 密钥会将其添加到您的列表。ZITADEL 默认使用 RSA2048 密钥和 SHA256 哈希算法。",
+          "DESCRIPTION": "创建新的 Web 密钥会将其添加到您的列表。Zitadel 默认使用 RSA2048 密钥和 SHA256 哈希算法。",
           "KEY_TYPE": "密钥类型",
           "BITS": "位数",
           "HASHER": "哈希算法",
@@ -223,8 +223,8 @@
           "PR": "当用户重置其密码时，他们将收到一封带有设置新密码链接的电子邮件。",
           "VE": "当用户更改其电子邮件地址时，他们将收到一封带有验证新地址链接的电子邮件。",
           "VP": "当用户更改其电话号码时，他们将收到一条带有验证新号码的代码的短信。",
-          "VEO": "当用户通过电子邮件方式添加一次性密码时，他们需要通过输入发送到其电子邮件地址的代码来激活它。",
-          "VSO": "当用户通过短信方式添加一次性密码时，他们需要通过输入发送到其电话号码的代码来激活它。",
+          "VEO": "当用户通过电子邮件方式添加 OTP 时，他们需要通过输入发送到其电子邮件地址的代码来激活它。",
+          "VSO": "当用户通过短信方式添加 OTP 时，他们需要通过输入发送到其电话号码的代码来激活它。",
           "IU": "当创建用户邀请代码时，他们将收到一封包含设置其身份验证方法的链接的电子邮件。"
         }
       },
@@ -234,7 +234,7 @@
       },
       "DOMAINS": {
         "TITLE": "域设置",
-        "DESCRIPTION": "定义您的域上的限制并配置您的登录名模式。ZITADEL在用户输入其登录名时立即选择用户的组织。因此，登录名需要跨所有组织唯一。如果您有在多个域中拥有账户的用户，您可以通过在登录名后加上组织域来确保唯一性。",
+        "DESCRIPTION": "定义您的域上的限制并配置您的登录名模式。Zitadel在用户输入其登录名时立即选择用户的组织。因此，登录名需要跨所有组织唯一。如果您有在多个域中拥有账户的用户，您可以通过在登录名后加上组织域来确保唯一性。",
         "REQUIRE_VERIFICATION": {
           "TITLE": "需要验证自定义域",
           "DESCRIPTION": "如果启用此功能，组织域必须在它们可以用于域发现或用户名后缀之前进行验证。"
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "登录表单",
           "DESCRIPTION": "自定义登录表单。",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "允许用户名和密码",
-            "DESCRIPTION": "允许用户使用他们的用户名和密码登录。如果此功能被禁用，你的用户只能使用Passkey认证或外部身份提供者登录。"
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "允许本地身份验证",
+            "DESCRIPTION": "允许您的用户使用其用户名和密码或通行密钥身份验证登录。如果停用此选项，您的用户只能使用外部身份提供商登录。"
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "允许用户注册",
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "允许外部登录",
-            "DESCRIPTION": "允许用户使用外部身份提供者登录，而不是使用ZITADEL用户登录。"
+            "DESCRIPTION": "允许用户使用外部身份提供者登录，而不是使用Zitadel用户登录。"
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "隐藏密码重置",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "开始使用 ZITADEL",
-    "DISCLAIMER": "ZITADEL 对您的数据进行保密和安全处理。",
+    "WELCOME": "开始使用 Zitadel",
+    "DISCLAIMER": "Zitadel 对您的数据进行保密和安全处理。",
     "DISCLAIMERLINK": "更多的信息",
     "DOCUMENTATION": {
-      "DESCRIPTION": "快速开始使用 ZITADEL。"
+      "DESCRIPTION": "快速开始使用 Zitadel。"
     },
     "GETSTARTED": {
-      "DESCRIPTION": "快速开始使用 ZITADEL。"
+      "DESCRIPTION": "快速开始使用 Zitadel。"
     },
     "QUICKSTARTS": {
       "LABEL": "第一步",
-      "DESCRIPTION": "快速开始使用 ZITADEL。"
+      "DESCRIPTION": "快速开始使用 Zitadel。"
     },
     "SHORTCUTS": {
       "SHORTCUTS": "快捷方式",
@@ -366,7 +366,7 @@
     "COMPLETED": "已完成",
     "DISMISS": "隐藏",
     "CARD": {
-      "TITLE": "让你的ZITADEL运转起来",
+      "TITLE": "让你的Zitadel运转起来",
       "DESCRIPTION": "这份清单有助于设置你的实例，并指导你完成最重要的步骤"
     },
     "MILESTONES": {
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "创建你的第一个项目",
-        "description": "添加你的第一个项目并定义其角色和授权。",
+        "description": "添加项目并定义角色及角色分配。",
         "action": "创建项目"
       },
       "APPLICATION_CREATED": {
@@ -392,7 +392,7 @@
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "登录你的应用程序",
-        "description": "将你的应用程序与 ZITADEL 集成以进行身份验证，并通过使用管理员用户登录来测试它。",
+        "description": "将你的应用程序与 Zitadel 集成以进行身份验证，并通过使用管理员用户登录来测试它。",
         "action": "登录"
       },
       "user.human.added": {
@@ -420,16 +420,16 @@
     "ORGANIZATION": "组织",
     "PROJECT": "项目",
     "PROJECTOVERVIEW": "概览",
-    "PROJECTGRANTS": "授予",
+    "PROJECTGRANTS": "项目授权",
     "ROLES": "角色",
     "GRANTEDPROJECT": "已授予的项目",
     "HUMANUSERS": "用户",
-    "MACHINEUSERS": "服务用户",
+    "MACHINEUSERS": "服务账户",
     "LOGOUT": "退出所有账户",
     "NEWORG": "创建组织",
-    "IAMADMIN": "您是 IAM 管理员。请注意您具有扩展权限。",
+    "IAMADMIN": "您是实例管理员。请注意您具有扩展权限。",
     "SHOWORGS": "查看所有组织",
-    "GRANTS": "授权",
+    "GRANTS": "角色分配",
     "ACTIONS": "认证流程",
     "PRIVACY": "隐私",
     "TOS": "服务条款",
@@ -438,8 +438,8 @@
     "CUSTOMERPORTAL": "客户门户网站"
   },
   "QUICKSTART": {
-    "TITLE": "将 ZITADEL 集成到您的应用程序中",
-    "DESCRIPTION": "将 ZITADEL 集成到您的应用程序中，或使用我们的示例，几分钟内即可开始使用。",
+    "TITLE": "将 Zitadel 集成到您的应用程序中",
+    "DESCRIPTION": "将 Zitadel 集成到您的应用程序中，或使用我们的示例，几分钟内即可开始使用。",
     "BTN_START": "创建应用程序",
     "BTN_LEARNMORE": "了解更多",
     "CREATEPROJECTFORAPP": "创建项目 {{value}}",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "默认情况下启用开发模式。您可以稍后更新生产值。",
     "GUIDE": "指南",
     "BROWSEEXAMPLES": "浏览示例",
-    "DUPLICATEAPPRENAME": "具有相同 neme 的应用程序已经存在。请选择不同的名称。",
+    "DUPLICATEAPPRENAME": "具有相同名称的应用程序已经存在。请选择不同的名称。",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "变革框架",
@@ -656,12 +656,12 @@
     "IAM_USER_MANAGER": "有权创建和管理用户",
     "IAM_ADMIN_IMPERSONATOR": "有权模拟所有组织的管理员和最终用户",
     "IAM_END_USER_IMPERSONATOR": "有权模拟所有组织的最终用户",
-    "IAM_LOGIN_CLIENT": "具有管理登录客户端的权限",
+    "IAM_LOGIN_CLIENT": "具有管理登录应用程序的权限",
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
     "ORG_SETTINGS_MANAGER": "有权管理组织的设置",
-    "ORG_USER_PERMISSION_EDITOR": "有权管理用户授权",
+    "ORG_USER_PERMISSION_EDITOR": "具有管理角色分配的权限",
     "ORG_PROJECT_PERMISSION_EDITOR": "有权管理项目授权",
     "ORG_PROJECT_CREATOR": "有权创建自己的项目和基础设置",
     "ORG_ADMIN_IMPERSONATOR": "有权模拟组织的管理员和最终用户",
@@ -702,7 +702,7 @@
     "USERNAME": "用户名",
     "ORGNAME": "组织名称",
     "ORGID": "组织ID",
-    "PRIMARYDOMAIN": "主域",
+    "PRIMARYDOMAIN": "组织域名",
     "PROJECTNAME": "项目名称",
     "RESOURCEOWNER": "资源所有者",
     "METHODS": {
@@ -724,7 +724,7 @@
       "ME": "前往个人资料",
       "PROJECTS": "前往项目",
       "USERS": "前往用户",
-      "USERGRANTS": "前往授权",
+      "ROLEASSIGNMENTS": "角色分配",
       "ACTIONS": "前往认证流程",
       "DOMAINS": "前往域名"
     }
@@ -744,7 +744,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "您的实例已被阻止。",
-      "DESCRIPTION": "请联系您的 ZITADEL 实例管理员以更新订阅。"
+      "DESCRIPTION": "请联系您的 Zitadel 实例管理员以更新订阅。"
     },
     "INVALID_FORMAT": "格式是无效的。",
     "NOTANEMAIL": "给定的值不是合法电子邮件地址。",
@@ -765,8 +765,8 @@
       "SECURITY": "密码和安全",
       "KEYS": "秘钥",
       "PAT": "个人访问令牌",
-      "USERGRANTS": "授权",
-      "MEMBERSHIPS": "成员身份",
+      "ROLEASSIGNMENTS": "角色分配",
+      "MEMBERSHIPS": "管理员角色",
       "METADATA": "元数据"
     },
     "TITLE": "个人信息",
@@ -841,7 +841,7 @@
       "NAME": "名称",
       "EMPTY": "没有可用的设备",
       "TITLE": "Passkey 认证",
-      "DESCRIPTION": "添加基于 WebAuthn 的身份验证方法以使用 Passkey 登录 ZITADEL。",
+      "DESCRIPTION": "添加基于 WebAuthn 的身份验证方法以使用 Passkey 登录 Zitadel。",
       "MANAGE_DESCRIPTION": "管理用户的第二因素认证方式。",
       "U2F": "添加方法",
       "U2F_DIALOG_TITLE": "身份验证器",
@@ -851,7 +851,7 @@
       "U2F_NAME": "身份验证器名称",
       "TYPE": {
         "0": "未定义 MFA",
-        "1": "一次性密码 (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "身份验证因子添加成功！",
       "U2F_ERROR": "安装过程中发生错误！",
       "U2F_NAME": "身份验证器名称",
-      "OTPSMS": "带短信的 OTP（一次性密码）",
-      "OTPEMAIL": "带电子邮件的 OTP（一次性密码）",
-      "SETUPOTPSMSDESCRIPTION": "您想将此电话号码设置为 OTP（一次性密码）第二因素吗？",
+      "OTPSMS": "带短信的 OTP",
+      "OTPEMAIL": "带电子邮件的 OTP",
+      "SETUPOTPSMSDESCRIPTION": "您想将此电话号码设置为 OTP 第二因素吗？",
       "OTPSMSSUCCESS": "OTP 因子设置成功。",
       "OTPSMSPHONEMUSTBEVERIFIED": "您的手机必须经过验证才能使用此方法。",
       "OTPEMAILSUCCESS": "OTP 因子设置成功。",
       "TYPE": {
         "0": "未定义 MFA",
-        "1": "一次性密码 (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -990,7 +990,7 @@
       "COUNTRY": "国家"
     },
     "MACHINE": {
-      "TITLE": "服务用户详情",
+      "TITLE": "服务账户详情",
       "USERNAME": "用户名",
       "NAME": "名称",
       "DESCRIPTION": "描述",
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "验证码"
     },
     "GRANTS": {
-      "TITLE": "用户授权",
+      "TITLE": "角色分配",
       "DESCRIPTION": "授予此用户对某些项目的访问权限",
       "CREATE": {
-        "TITLE": "创建用户授权",
+        "TITLE": "创建角色分配",
         "DESCRIPTION": "搜索组织、项目和相应的项目角色。"
       },
       "PROJECTNAME": "项目名称",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "选中的用户已被停用。",
       "SELECTEDKEYSDELETED": "选中的 Keys 已被删除。",
       "KEYADDED": "Key 已添加！",
-      "MACHINEADDED": "服务用户已创建成功!",
+      "MACHINEADDED": "服务账户已创建成功!",
       "DELETED": "用户删除成功!",
       "UNLOCKED": "用户解锁成功!",
       "PASSWORDLESSREGISTRATIONSENT": "注册链接发送成功。",
@@ -1160,8 +1160,8 @@
       "SECRETREMOVED": "秘密被成功删除!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL 管理员角色",
-      "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或 IAM 详细信息页面上修改它们。",
+      "TITLE": "Zitadel 管理员角色",
+      "DESCRIPTION": "这些都是用户管理员角色。您还可以在组织、项目或实例详细信息页面上修改它们。",
       "ORGCONTEXT": "您会看到与当前所选组织相关的所有组织和项目。",
       "USERCONTEXT": "您会看到您被授权的所有组织和项目。包括其他组织。",
       "CREATIONDATE": "创建于",
@@ -1170,7 +1170,7 @@
       "REMOVE": "删除",
       "TYPE": "类型",
       "ORGID": "组织 ID",
-      "UPDATED": "成员授权已更新。",
+      "UPDATED": "管理员角色已更新。",
       "NOPERMISSIONTOEDIT": "您缺少编辑角色所需的权限！",
       "TYPES": {
         "UNKNOWN": "未知",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "允许失败",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "警告",
-      "DESCRIPTION": "如果您禁用此设置，可能会导致您的组织中的用户无法登录。此外，您将无法再访问控制台以禁用该操作。我们建议您在单独的组织中创建管理员用户，或在开发环境或开发组织中先测试脚本。"
+      "DESCRIPTION": "如果您禁用此设置，可能会导致您的组织中的用户无法登录。此外，您将无法再访问管理控制台以禁用该操作。我们建议您在单独的组织中创建管理员用户，或在开发环境或开发组织中先测试脚本。"
     },
     "SCRIPT": "脚本",
     "FLOWTYPE": "流程类型",
@@ -1267,12 +1267,12 @@
       "DESCRIPTION": "管理您的全局策略和管理访问设置。"
     },
     "EVENTSTORE": {
-      "TITLE": "IAM 存储管理",
-      "DESCRIPTION": "管理您的 ZITADEL 视图和失败的事件。"
+      "TITLE": "实例存储管理",
+      "DESCRIPTION": "管理您的 Zitadel 视图和失败的事件。"
     },
     "MEMBER": {
-      "TITLE": "管理者",
-      "DESCRIPTION": "这些管理者可以在您的实例中进行更改。"
+      "TITLE": "管理员",
+      "DESCRIPTION": "这些管理员可以在您的实例中进行更改。"
     },
     "PAGES": {
       "STATE": "状态",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "管理者已删除。",
-      "MEMBERSADDED": "已添加多个管理者。",
-      "MEMBERADDED": "管理者已添加。",
-      "MEMBERCHANGED": "管理者已改变。",
+      "MEMBERREMOVED": "管理员已删除。",
+      "MEMBERSADDED": "已添加多个管理员。",
+      "MEMBERADDED": "管理员已添加。",
+      "MEMBERCHANGED": "管理员已改变。",
       "ROLEREMOVED": "角色已删除。",
       "ROLECHANGED": "角色已更改。",
       "REACTIVATED": "重新激活",
@@ -1412,7 +1412,7 @@
         "VERIFICATION_HTTP_URL_LABEL": "预期网址：",
         "VERIFICATION_HTTP_FILE_LABEL": "验证文件：",
         "VERIFICATION_SKIP": "您现在可以跳过验证并继续创建您的组织，但为了使用您的域，必须完成此步骤！",
-        "VERIFICATION_VALIDATION_DESC": "不要删除验证码，因为 ZITADEL 会不时重新检查您的域名所有权。",
+        "VERIFICATION_VALIDATION_DESC": "不要删除验证码，因为 Zitadel 会不时重新检查您的域名所有权。",
         "VERIFICATION_NEWTOKEN_TITLE": "请求新令牌",
         "VERIFICATION_VALIDATION_ONGOING": "已选择 {{ value }} 方法来验证您的域。单击该按钮可触发验证检查或重置验证过程。",
         "VERIFICATION_SUCCESSFUL": "域名验证成功！",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "下载文件",
       "SELECTORGTOOLTIP": "选择此组织。",
-      "PRIMARYDOMAIN": "主域名",
+      "PRIMARYDOMAIN": "组织域名",
       "STATE": "状态",
       "USEPASSWORD": "设置初始密码",
       "USEPASSWORDDESC": "用户初始化时无需设置密码。"
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "添加域名",
-      "TITLE": "已验证的域名",
+      "TITLE": "组织域名",
       "DESCRIPTION": "配置您的域名。此域名可用于您的用户登录。",
-      "SETPRIMARY": "设置为主域名",
+      "SETPRIMARY": "组织域名",
       "DELETE": {
         "TITLE": "删除域名",
         "DESCRIPTION": "您即将删除您的一个域名。请注意，您的用户不能再使用此域进行登录。"
@@ -1449,7 +1449,7 @@
       "2": "停用"
     },
     "MEMBER": {
-      "TITLE": "组织管理者",
+      "TITLE": "组织管理员",
       "DESCRIPTION": "定义可以更改组织首选项的用户。"
     },
     "TOAST": {
@@ -1458,10 +1458,10 @@
       "REACTIVATED": "组织重新启用。",
       "DOMAINADDED": "域名已添加。",
       "DOMAINREMOVED": "域名已删除。",
-      "MEMBERADDED": "管理者已添加。",
-      "MEMBERREMOVED": "管理者已删除。",
-      "MEMBERCHANGED": "管理者以改变。",
-      "SETPRIMARY": "已设为主域名。",
+      "MEMBERADDED": "管理员已添加。",
+      "MEMBERREMOVED": "管理员已删除。",
+      "MEMBERCHANGED": "管理员以改变。",
+      "SETPRIMARY": "组织域名已成功设置。",
       "DELETED": "成功删除的组织",
       "DEFAULTORGNOTFOUND": "未找到默认组织",
       "ORG_WAS_DELETED": "组织被删除"
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP 和 SMS 设置",
       "MESSAGETEXTS": "消息文本",
       "IDP": "身份提供者",
-      "VERIFIED_DOMAINS": "已验证的域名",
+      "VERIFIED_DOMAINS": "组织域名",
       "DOMAIN": "域名设置",
       "LOGINTEXTS": "登录界面文本",
       "BRANDING": "品牌标识",
@@ -1558,7 +1558,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1613,9 +1614,9 @@
         "3": "电话号码验证",
         "4": "重置密码",
         "5": "Passkey 初始化",
-        "6": "App 验证",
-        "7": "一次性密码 (OTP) - SMS",
-        "8": "一次性密码 (OTP) - 电子邮件"
+        "6": "应用密钥",
+        "7": "OTP - SMS",
+        "8": "OTP - 电子邮件"
       },
       "EXPIRY": "过期时间 (以分钟为单位)",
       "INCLUDEDIGITS": "包含数字",
@@ -1637,8 +1638,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "登录默认组织",
       "LOGINDEFAULTORG_DESCRIPTION": "如果没有设置组织上下文，登录界面将使用默认组织的设置（而不是实例的设置）",
-      "OIDCTOKENEXCHANGE": "OIDC 令牌交换",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "启用 OIDC 令牌端点的实验性 urn:ietf:params:oauth:grant-type:token-exchange 授权类型。令牌交换可用于请求具有较少范围的令牌或模拟其他用户。请参阅安全策略以允许在实例上模拟。",
       "USERSCHEMA": "用户架构",
       "USERSCHEMA_DESCRIPTION": "用户架构允许管理用户的数据架构。如果启用此标志，您将可以使用新的 API 及其功能。",
       "ACTIONS": "操作",
@@ -1647,8 +1646,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
       "DEBUGOIDCPARENTERROR": "调试 OIDC 父错误",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "如果启用该标志，OIDC 父错误将记录在控制台中。",
-      "ENABLEBACKCHANNELLOGOUT": "启用 Backchannel 注销",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知客户端在 OpenID 提供商处终止会话。",
       "PERMISSIONCHECKV2": "权限检查 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
       "STATES": {
@@ -1662,8 +1659,8 @@
         "DISABLED": "“已禁用” 是继承的"
       },
       "RESET": "全部设置为继承",
-      "CONSOLEUSEV2USERAPI": "在控制台中使用V2 API创建用户。",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。",
+      "CONSOLEUSEV2USERAPI": "在管理控制台中使用V2 API创建用户。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，管理控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。",
       "LOGINV2": "登录 V2",
       "LOGINV2_DESCRIPTION": "启用此选项将激活基于 TypeScript 的新登录界面，具有更高的安全性、性能和可定制性。",
       "LOGINV2_BASEURI": "基础 URI",
@@ -1710,7 +1707,7 @@
       "RELEASE": "Release",
       "DROPFONT": "将字体文件放入这里",
       "RELEASEFONT": "Release",
-      "USEOFLOGO": "您的徽标将用于登录和电子邮件，而图标用于较小的 UI 元素，例如控制台中的组织切换器",
+      "USEOFLOGO": "您的徽标将用于登录和电子邮件，而图标用于较小的 UI 元素，例如管理控制台中的组织切换器",
       "MAXSIZE": "图片最大支持 524kB",
       "EMAILNOSVG": "电子邮件不支持 SVG 文件格式。因此建议以 PNG 或其他支持的格式上传您的 Logo。",
       "MAXSIZEEXCEEDED": "文件大小超过了 524kB。",
@@ -1726,7 +1723,7 @@
       },
       "PREVIEW": {
         "TITLE": "登录",
-        "SECOND": "使用您的 ZITADEL 帐户登录。",
+        "SECOND": "使用您的 Zitadel 帐户登录。",
         "ERROR": "找不到用户！",
         "PRIMARYBUTTON": "下一步",
         "SECONDARYBUTTON": "注册"
@@ -1766,9 +1763,9 @@
       "POLICYLINK": "链接到隐私政策",
       "HELPLINK": "链接到帮助",
       "SUPPORTEMAIL": "支持邮箱",
-      "DOCSLINK": "文档链接（Console）",
-      "CUSTOMLINK": "自定义链接（Console）",
-      "CUSTOMLINKTEXT": "自定义链接文本（Console）",
+      "DOCSLINK": "文档链接（管理控制台）",
+      "CUSTOMLINK": "自定义链接（管理控制台）",
+      "CUSTOMLINKTEXT": "自定义链接文本（管理控制台）",
       "SAVED": "保存成功！",
       "RESET_TITLE": "恢复默认值",
       "RESET_DESCRIPTION": "您即将恢复 TOS 和隐私政策的默认链接。你真的要继续吗？"
@@ -1809,7 +1806,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1854,8 +1852,8 @@
         "INIT": "初始化",
         "VE": "验证电子邮箱",
         "VP": "验证手机号码",
-        "VSO": "验证短信一次性密码",
-        "VEO": "验证电子邮件一次性密码",
+        "VSO": "验证短信 OTP",
+        "VEO": "验证电子邮件 OTP",
         "PR": "重置密码",
         "DC": "域名声明",
         "PL": "Passkey",
@@ -1878,8 +1876,8 @@
         "changedate": "修改于",
         "username": "用户名",
         "tempUsername": "临时用户名",
-        "otp": "一次性密码",
-        "verifyUrl": "验证一次性密码的URL",
+        "otp": "OTP",
+        "verifyUrl": "验证 OTP 的 URL",
         "expiry": "过期时间",
         "applicationName": "应用程序名称"
       },
@@ -1921,7 +1919,7 @@
       "DEFAULTREDIRECTURI_DESC": "定义如果在没有应用程序上下文的情况下开始登录（例如来自邮件），用户将被重定向到哪里。",
       "ERRORMSGPOPUP": "在对话框中显示错误",
       "DISABLEWATERMARK": "隐藏水印",
-      "DISABLEWATERMARK_DESC": "登录界面隐藏 Powered by ZITADEL 水印"
+      "DISABLEWATERMARK_DESC": "登录界面隐藏 Powered by Zitadel 水印"
     },
     "RESET": "重置为实例默认值",
     "CREATECUSTOM": "创建自定义策略",
@@ -1935,7 +1933,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "组织",
-    "DESCRIPTION": "您可以在此处编辑组织的配置并管理成员。",
+    "DESCRIPTION": "您可以在此处编辑组织的配置并管理管理员。",
     "DETAIL": {
       "TITLE": "详情",
       "NAME": "名称",
@@ -1947,13 +1945,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "成员",
+      "TITLE": "管理员",
       "USERNAME": "用户名",
       "DISPLAYNAME": "展示名称",
       "LOGINNAME": "登录名称",
       "EMAIL": "电子邮件",
       "ROLES": "角色",
-      "ADD": "添加成员",
+      "ADD": "添加管理员",
       "ADDDESCRIPTION": "输入要添加的用户的名称。"
     },
     "TABLE": {
@@ -1975,7 +1973,7 @@
       "CREATE_DESC": "插入您的项目名称。",
       "ROLE": "角色",
       "NOITEMS": "没有项目",
-      "ZITADELPROJECT": "这属于 ZITADEL 项目。注意：如果您修改了设置，ZITADEL 可能无法正常运行。",
+      "ZITADELPROJECT": "这属于 Zitadel 项目。注意：如果您修改了设置，Zitadel 可能无法正常运行。",
       "TYPE": {
         "OWNED": "拥有的项目",
         "OWNED_SINGULAR": "拥有项目",
@@ -2044,9 +2042,9 @@
       "NAME": "新名称"
     },
     "MEMBER": {
-      "TITLE": "管理者",
-      "TITLEDESC": "管理者可以根据他们的角色对此项目进行更改。",
-      "DESCRIPTION": "这些管理者可能能够编辑您的项目。",
+      "TITLE": "管理员",
+      "TITLEDESC": "管理员可以根据他们的角色对此项目进行更改。",
+      "DESCRIPTION": "这些管理员可能能够编辑您的项目。",
       "USERNAME": "用户名",
       "DISPLAYNAME": "展示名称",
       "LOGINNAME": "登录名称",
@@ -2060,7 +2058,7 @@
       "DESCRIPTION": "允许其他组织使用您的项目。",
       "EDITTITLE": "编辑角色",
       "CREATE": {
-        "TITLE": "创建组织授权",
+        "TITLE": "创建项目授权",
         "SEL_USERS": "选择您要授予访问权限的用户",
         "SEL_PROJECT": "搜索项目",
         "SEL_ROLES": "选择要添加到授权中的角色",
@@ -2070,13 +2068,13 @@
         "ORG_DESCRIPTION": "您即将授予组织 {{name}} 的用户。",
         "ORG_DESCRIPTION_DESC": "切换上面标题中的上下文以授予另一个组织的用户。",
         "SEL_ORG_FORMFIELD": "组织",
-        "FOR_ORG": "授予组织:"
+        "FOR_ORG": "项目授权将为以下对象创建:"
       },
       "DETAIL": {
         "TITLE": "项目授权",
-        "DESC": "您可以选择指定组织可以使用哪些角色，并选择管理者",
-        "MEMBERTITLE": "管理者",
-        "MEMBERDESC": "这些是被授予组织的管理者。在此处添加应有权编辑项目数据的用户。",
+        "DESC": "您可以选择指定组织可以使用哪些角色，并选择管理员",
+        "MEMBERTITLE": "管理员",
+        "MEMBERDESC": "这些是被授予组织的管理员。在此处添加应有权编辑项目数据的用户。",
         "PROJECTNAME": "项目名称",
         "GRANTEDORG": "授予组织",
         "RESOURCEOWNER": "资源所有者"
@@ -2089,7 +2087,7 @@
       "ALL": "所有",
       "SHOWDETAIL": "显示详细资料",
       "USER": "用户",
-      "MEMBERS": "管理者",
+      "MEMBERS": "管理员",
       "ORG": "组织",
       "PROJECTNAME": "项目名称",
       "GRANTEDORG": "授予组织",
@@ -2107,9 +2105,9 @@
         "PROJECTGRANTUSERGRANTADDED": "项目授权已创建。",
         "PROJECTGRANTADDED": "项目授权已创建。",
         "PROJECTGRANTCHANGED": "项目授权已更改",
-        "PROJECTGRANTMEMBERADDED": "授权管理者已添加",
-        "PROJECTGRANTMEMBERCHANGED": "授权管理者已更改。",
-        "PROJECTGRANTMEMBERREMOVED": "授权管理者已删除。",
+        "PROJECTGRANTMEMBERADDED": "授权管理员已添加",
+        "PROJECTGRANTMEMBERCHANGED": "授权管理员已更改。",
+        "PROJECTGRANTMEMBERREMOVED": "授权管理员已删除。",
         "PROJECTGRANTUPDATED": "项目授权已更新。"
       },
       "DIALOG": {
@@ -2145,7 +2143,7 @@
       "ASSERTION": "身份验证时附加角色信息",
       "ASSERTION_DESCRIPTION": "角色信息将包含在用户信息中，具体取决于令牌类型和应用程序设置。",
       "CHECK": "身份验证时检查用户授权",
-      "CHECK_DESCRIPTION": "如果设置，则只有在为其帐户分配了任何角色时才允许用户进行身份验证。",
+      "CHECK_DESCRIPTION": "若用户未被分配到该项目中的任何角色，则拒绝认证。允许向项目分配角色权限，但无需为用户指定具体角色。",
       "DIALOG": {
         "DELETE_TITLE": "删除角色",
         "DELETE_DESCRIPTION": "您即将删除项目角色。你确定吗？"
@@ -2172,10 +2170,10 @@
       "EMPTY": "未找到项目"
     },
     "TOAST": {
-      "MEMBERREMOVED": "管理者已删除。",
-      "MEMBERSADDED": "管理者已添加。",
-      "MEMBERADDED": "管理者已添加。",
-      "MEMBERCHANGED": "管理者已更改。",
+      "MEMBERREMOVED": "管理员已删除。",
+      "MEMBERSADDED": "管理员已添加。",
+      "MEMBERADDED": "管理员已添加。",
+      "MEMBERCHANGED": "管理员已更改。",
       "ROLESCREATED": "角色已创建。",
       "ROLEREMOVED": "角色已删除。",
       "ROLECHANGED": "角色已更改。",
@@ -2183,7 +2181,7 @@
       "DEACTIVATED": "已停用。",
       "CREATED": "项目已创建。",
       "UPDATED": "项目已修改。",
-      "GRANTUPDATED": "授权已更新。",
+      "GRANTUPDATED": "项目授权已更改。",
       "DELETED": "项目已删除"
     }
   },
@@ -2363,7 +2361,7 @@
     "DELETE_SELECTION_TITLE": "删除 IDP",
     "DELETE_SELECTION_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
     "FEDERATEDLOGOUTENABLED": "已启用联合注销",
-    "FEDERATEDLOGOUTENABLED_DESC": "如果启用，用户在 ZITADEL 中终止会话时，也会从 IdP 注销。",
+    "FEDERATEDLOGOUTENABLED_DESC": "如果启用，用户在 Zitadel 中终止会话时，也会从 IdP 注销。",
     "EMPTY": "没有可用的 IDP",
     "OIDC": {
       "GENERAL": "通用信息",
@@ -2437,10 +2435,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "未知",
-      "1": "身份验证应用程序的一次性密码（TOTP）",
+      "1": "身份验证应用程序的 OTP（TOTP）",
       "2": "Passkey",
-      "3": "电子邮件一次性密码（email OTP）",
-      "4": "短信一次性密码（SMS OTP）",
+      "3": "电子邮件 OTP (OTP email)",
+      "4": "短信 OTP (OTP SMS)",
       "5": "恢复码"
     }
   },
@@ -2464,7 +2462,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP 提供商",
-      "DESCRIPTION": "这些是您的 ZITADEL 实例的 SMTP 提供商。激活您想要用来向用户发送通知的通知。",
+      "DESCRIPTION": "这些是您的 Zitadel 实例的 SMTP 提供商。激活您想要用来向用户发送通知的通知。",
       "EMPTY": "没有可用的 SMTP 提供商",
       "ACTIVATED": "活性",
       "ACTIVATE": "激活提供商",
@@ -2542,7 +2540,7 @@
       "DATECHANGED": "修改于",
       "URLS": "URLs",
       "DELETE": "删除应用",
-      "JUMPTOPROJECT": "要配置角色、授权等，请导航到项目。",
+      "JUMPTOPROJECT": "要配置角色、角色分配等设置，请导航至项目页面。",
       "DETAIL": {
         "TITLE": "详情",
         "STATE": {
@@ -2665,8 +2663,8 @@
       "IDTOKENROLEASSERTION": "在 ID Token 中包含用户角色",
       "IDTOKENROLEASSERTION_DESCRIPTION": "如果勾选，则已验证用户的请求角色将添加到 ID Token 中。",
       "IDTOKENUSERINFOASSERTION": "在 ID Token 中包含用户信息",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "使客户端能够从 ID Token 中读取个人资料、电子邮件、电话和地址声明。",
-      "CLOCKSKEW": "使客户端能够处理 OP 和客户端的时钟偏差。持续时间（0-5 秒）将添加到 exp 声明中，并从 iats、auth_time 和 nbf 中减去。",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "使应用程序能够从 ID Token 中读取个人资料、电子邮件、电话和地址声明。",
+      "CLOCKSKEW": "使应用程序能够处理 OP 和应用程序的时钟偏差。持续时间（0-5 秒）将添加到 exp 声明中，并从 iats、auth_time 和 nbf 中减去。",
       "RECOMMENDED": "推荐的",
       "NOTRECOMMENDED": "不推荐的",
       "SELECTION": {
@@ -2684,7 +2682,8 @@
             "DESCRIPTION": "单页应用程序 (SPA) 以及通常在浏览器中执行的所有 JS 框架"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "反向通道注销URI"
     },
     "API": {
       "INFO": {
@@ -2796,13 +2795,14 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "添加管理者",
+    "ADD": "添加管理员",
     "CREATIONTYPE": "创建类型",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "实例",
       "2": "Organization",
       "0": "Owned Project",
       "1": "Granted Project",
@@ -2811,49 +2811,49 @@
     "EDITROLE": "编辑角色",
     "EDITFOR": "编辑用户：{{value}} 的角色",
     "DIALOG": {
-      "DELETE_TITLE": "删除管理者",
-      "DELETE_DESCRIPTION": "您即将删除管理者。你确定吗？"
+      "DELETE_TITLE": "删除管理员",
+      "DELETE_DESCRIPTION": "您即将删除管理员。你确定吗？"
     },
     "SHOWDETAILS": "点击显示详情。"
   },
   "ROLESLABEL": "角色",
   "GRANTS": {
-    "TITLE": "授权",
-    "DESC": "这里列出的是当前组织已授权的用户列表",
-    "DELETE": "删除授权",
-    "EMPTY": "没有用户授权数据",
-    "ADD": "创建用户授权",
+    "TITLE": "角色分配",
+    "DESC": "这些是您组织中的所有角色分配。",
+    "DELETE": "删除角色分配",
+    "EMPTY": "未找到角色分配",
+    "ADD": "创建角色分配",
     "ADD_BTN": "创建",
     "PROJECT": {
-      "TITLE": "授权",
-      "DESCRIPTION": "为指定项目定义授权。请注意：您只能查看您拥有权限的项目和用户的条目。"
+      "TITLE": "角色分配",
+      "DESCRIPTION": "为指定项目定义角色分配。请注意，您仅能查看具有权限的项目和用户条目。"
     },
     "USER": {
-      "TITLE": "授权",
-      "DESCRIPTION": "为指定用户定义授权。请注意，您只能查看您拥有权限的项目和用户的条目。"
+      "TITLE": "角色分配",
+      "DESCRIPTION": "为指定用户定义角色分配。请注意，您仅能查看具有权限的项目和用户条目。"
     },
     "CREATE": {
-      "TITLE": "创建授权",
+      "TITLE": "创建角色分配",
       "DESCRIPTION": "搜索组织、项目和相应的角色。"
     },
     "EDIT": {
-      "TITLE": "更改授权"
+      "TITLE": "更改角色分配"
     },
     "DETAIL": {
-      "TITLE": "授权详情",
-      "DESCRIPTION": "在这里您可以看到授权的所有详细信息。"
+      "TITLE": "角色分配的详细信息",
+      "DESCRIPTION": "此处可查看角色分配的所有详细信息"
     },
     "TOAST": {
-      "UPDATED": "授权已更新。",
-      "REMOVED": "已移除授权。",
-      "BULKREMOVED": "已移除授权。",
-      "CANTSHOWINFO": "您无法访问该用户的个人资料，因为您不是该用户所属组织的成员"
+      "UPDATED": "角色分配已更新",
+      "REMOVED": "角色分配已被移除",
+      "BULKREMOVED": "角色分配已被移除",
+      "CANTSHOWINFO": "您无法访问该用户的个人资料，因为您不是该用户所属组织的管理员"
     },
     "DIALOG": {
-      "DELETE_TITLE": "删除授权",
-      "DELETE_DESCRIPTION": "您即将删除授权。你想继续吗？",
-      "BULK_DELETE_TITLE": "删除授权",
-      "BULK_DELETE_DESCRIPTION": "您将要删除多个授权。你想继续吗？"
+      "DELETE_TITLE": "删除角色分配",
+      "DELETE_DESCRIPTION": "您即将移除一个角色分配。继续？",
+      "BULK_DELETE_TITLE": "删除角色分配",
+      "BULK_DELETE_DESCRIPTION": "您即将移除多个角色分配。继续？"
     }
   },
   "CHANGES": {

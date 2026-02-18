@@ -29,7 +29,7 @@ message Session {
   Factors factors = 5;
 
   // Metadata contains custom key value pairs set by the user.
-  // The metadata is not interpreted by ZITADEL and can be used to store any information
+  // The metadata is not interpreted by Zitadel and can be used to store any information
   // relevant to the session.
   map<string, bytes> metadata = 6;
 
@@ -95,12 +95,12 @@ message WebAuthNFactor {
 }
 
 message TOTPFactor {
-  // The timestamp when the Time-based One-Time Password was last verified.
+  // The timestamp when the TOTP was last verified.
   google.protobuf.Timestamp verified_at = 1;
 }
 
 message OTPFactor {
-  // The timestamp when the One-Time Password was last verified either by SMS or Email.
+  // The timestamp when the OTP was last verified either by SMS or Email.
   google.protobuf.Timestamp verified_at = 1;
 }
 

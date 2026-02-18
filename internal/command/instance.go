@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"net/url"
 	"strings"
 	"time"
 
@@ -15,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
@@ -31,11 +29,11 @@ import (
 )
 
 const (
-	zitadelProjectName = "ZITADEL"
-	mgmtAppName        = "Management-API"
-	adminAppName       = "Admin-API"
-	authAppName        = "Auth-API"
-	consoleAppName     = "Console"
+	zitadelProjectName       = "ZITADEL"
+	mgmtAppName              = "Management-API"
+	adminAppName             = "Admin-API"
+	authAppName              = "Auth-API"
+	managementConsoleAppName = "Management Console"
 )
 
 type InstanceSetup struct {
@@ -124,59 +122,10 @@ type InstanceSetup struct {
 	SMTPConfiguration      *SMTPConfiguration
 	OIDCSettings           *OIDCSettings
 	Quotas                 *SetQuotas
-	Features               *InstanceSetupFeatures
+	Features               *InstanceFeatures
 	Limits                 *SetLimits
 	Restrictions           *SetRestrictions
 	RolePermissionMappings []authz.RoleMapping
-}
-
-type InstanceSetupFeatures struct {
-	LoginDefaultOrg                *bool
-	UserSchema                     *bool
-	TokenExchange                  *bool
-	ImprovedPerformance            []feature.ImprovedPerformanceType
-	DebugOIDCParentError           *bool
-	OIDCSingleV1SessionTermination *bool
-	EnableBackChannelLogout        *bool
-	LoginV2                        *InstanceSetupFeatureLoginV2
-	PermissionCheckV2              *bool
-	ConsoleUseV2UserApi            *bool
-	EnableRelationalTables         *bool
-}
-
-type InstanceSetupFeatureLoginV2 struct {
-	Required bool    `json:"required,omitempty"`
-	BaseURI  *string `json:"base_uri,omitempty"`
-}
-
-func (f *InstanceSetupFeatures) ToInstanceFeatures() (_ *InstanceFeatures, err error) {
-	if f == nil {
-		return nil, nil
-	}
-	var loginV2 *feature.LoginV2
-	if f.LoginV2 != nil {
-		loginV2 = &feature.LoginV2{Required: f.LoginV2.Required}
-		if f.LoginV2.BaseURI != nil {
-			loginV2.BaseURI, err = url.Parse(*f.LoginV2.BaseURI)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	return &InstanceFeatures{
-		LoginDefaultOrg:                f.LoginDefaultOrg,
-		UserSchema:                     f.UserSchema,
-		TokenExchange:                  f.TokenExchange,
-		ImprovedPerformance:            f.ImprovedPerformance,
-		DebugOIDCParentError:           f.DebugOIDCParentError,
-		OIDCSingleV1SessionTermination: f.OIDCSingleV1SessionTermination,
-		EnableBackChannelLogout:        f.EnableBackChannelLogout,
-		LoginV2:                        loginV2,
-		PermissionCheckV2:              f.PermissionCheckV2,
-		ConsoleUseV2UserApi:            f.ConsoleUseV2UserApi,
-		EnableRelationalTables:         f.EnableRelationalTables,
-	}, nil
 }
 
 type SMTPConfiguration struct {
@@ -214,15 +163,15 @@ type SecretGenerators struct {
 }
 
 type ZitadelConfig struct {
-	instanceID     string
-	orgID          string
-	projectID      string
-	mgmtAppID      string
-	adminAppID     string
-	authAppID      string
-	consoleAppID   string
-	limitsID       string
-	restrictionsID string
+	instanceID             string
+	orgID                  string
+	projectID              string
+	mgmtAppID              string
+	adminAppID             string
+	authAppID              string
+	managementConsoleAppID string
+	limitsID               string
+	restrictionsID         string
 }
 
 func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
@@ -256,7 +205,7 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 		return err
 	}
 
-	s.zitadel.consoleAppID, err = idGenerator.Next()
+	s.zitadel.managementConsoleAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
@@ -272,7 +221,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	if err := setup.generateIDs(c.idGenerator); err != nil {
 		return "", "", nil, "", nil, err
 	}
-	ctx = contextWithInstanceSetupInfo(ctx, setup.zitadel.instanceID, setup.zitadel.projectID, setup.zitadel.consoleAppID, c.externalDomain, setup.DefaultLanguage)
+	ctx = contextWithInstanceSetupInfo(ctx, setup.zitadel.instanceID, setup.zitadel.projectID, setup.zitadel.managementConsoleAppID, c.externalDomain, setup.DefaultLanguage)
 
 	validations, pat, machineKey, loginClientPat, err := setUpInstance(ctx, c, setup)
 	if err != nil {
@@ -310,9 +259,9 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	return setup.zitadel.instanceID, token, machineKey, loginClientToken, details, nil
 }
 
-func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, consoleAppID, externalDomain string, defaultLanguage language.Tag) context.Context {
+func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, managementConsoleAppID, externalDomain string, defaultLanguage language.Tag) context.Context {
 	return authz.WithDefaultLanguage(
-		authz.WithConsole(
+		authz.WithManagementConsole(
 			authz.SetCtxData(
 				http.WithRequestedHost(
 					authz.WithInstanceID(
@@ -323,7 +272,7 @@ func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, co
 				authz.CtxData{ResourceOwner: instanceID},
 			),
 			projectID,
-			consoleAppID,
+			managementConsoleAppID,
 		),
 		defaultLanguage,
 	)
@@ -472,7 +421,7 @@ func setupQuotas(commands *Commands, validations *[]preparation.Validation, setQ
 	return nil
 }
 
-func setupFeatures(validations *[]preparation.Validation, features *InstanceSetupFeatures, instanceID string) {
+func setupFeatures(validations *[]preparation.Validation, features *InstanceFeatures, instanceID string) {
 	if features != nil {
 		*validations = append(*validations, prepareSetFeatures(instanceID, features))
 	}
@@ -520,6 +469,14 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 	if smtpConfig == nil {
 		return
 	}
+	var username string
+	var pwd []byte
+	if smtpConfig.SMTP.PlainAuth != nil {
+		username = smtpConfig.SMTP.PlainAuth.User
+		if smtpConfig.SMTP.PlainAuth != nil {
+			pwd = []byte(smtpConfig.SMTP.PlainAuth.Password)
+		}
+	}
 	*validations = append(*validations,
 		commands.prepareAddAndActivateSMTPConfig(
 			instanceAgg,
@@ -528,8 +485,8 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 			smtpConfig.FromName,
 			smtpConfig.ReplyToAddress,
 			smtpConfig.SMTP.Host,
-			smtpConfig.SMTP.User,
-			[]byte(smtpConfig.SMTP.Password),
+			username,
+			pwd,
 			smtpConfig.Tls,
 		),
 	)
@@ -560,8 +517,8 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 	cnsl := &addOIDCApp{
 		AddApp: AddApp{
 			Aggregate: *projectAgg,
-			ID:        ids.consoleAppID,
-			Name:      consoleAppName,
+			ID:        ids.managementConsoleAppID,
+			Name:      managementConsoleAppName,
 		},
 		Version:                  domain.OIDCVersionV1,
 		RedirectUris:             []string{},
@@ -616,7 +573,7 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 		),
 
 		commands.AddOIDCAppCommand(cnsl),
-		SetIAMConsoleID(instanceAgg, &cnsl.ClientID, &ids.consoleAppID),
+		SetIAMConsoleID(instanceAgg, &cnsl.ClientID, &ids.managementConsoleAppID),
 	)
 }
 
@@ -811,7 +768,7 @@ func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string
 		if len(instanceValidations.Validations) == 0 {
 			continue
 		}
-		ctx := authz.WithConsole(authz.WithInstanceID(ctx, instanceID), instanceValidations.ProjectID, instanceValidations.ConsoleAppID)
+		ctx := authz.WithManagementConsole(authz.WithInstanceID(ctx, instanceID), instanceValidations.ProjectID, instanceValidations.ManagementConsoleAppID)
 		cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, instanceValidations.Validations...)
 		if err != nil {
 			return err
@@ -862,12 +819,12 @@ func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validati
 	}
 }
 
-// SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
+// SetIAMConsoleID defines the command to set the clientID of the Management Console App onto the instance
 func SetIAMConsoleID(a *instance.Aggregate, clientID, appID *string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
-				instance.NewIAMConsoleSetEvent(ctx, &a.Aggregate, clientID, appID),
+				instance.NewIAMManagementConsoleSetEvent(ctx, &a.Aggregate, clientID, appID),
 			}, nil
 		}, nil
 	}

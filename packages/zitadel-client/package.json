@@ -1,5 +1,4 @@
 {
-  "packageManager": "pnpm@10.13.1",
   "name": "@zitadel/client",
   "license": "MIT",
   "publishConfig": {
@@ -72,7 +71,7 @@
     "clean": "rm -rf node_modules dist"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.10.2",
+    "@bufbuild/protobuf": "^2.11.0",
     "@connectrpc/connect": "^2.1.1",
     "@connectrpc/connect-node": "^2.1.1",
     "@connectrpc/connect-web": "^2.1.1",
@@ -80,13 +79,13 @@
     "jose": "^5.10.0"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.62.1",
+    "@bufbuild/buf": "^1.64.0",
     "@bufbuild/protocompile": "^0.0.1",
-    "@types/node": "^24.10.4",
-    "@typescript-eslint/eslint-plugin": "^8.52.0",
-    "@typescript-eslint/parser": "^8.52.0",
+    "@types/node": "^24.10.9",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
     "eslint": "^8.57.1",
-    "knip": "^5.80.0",
+    "knip": "^5.82.1",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^2.1.9"

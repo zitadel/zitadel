@@ -51,12 +51,12 @@ type clientCredentialsClient struct {
 }
 
 // AccessTokenType returns the AccessTokenType for the token to be created because of the client credentials request
-// machine users currently only have opaque tokens ([op.AccessTokenTypeBearer])
+// service accounts currently only have opaque tokens ([op.AccessTokenTypeBearer])
 func (c *clientCredentialsClient) AccessTokenType() op.AccessTokenType {
 	return accessTokenTypeToOIDC(c.tokenType)
 }
 
-// GetID returns the client_id (username of the machine user) for the token to be created because of the client credentials request
+// GetID returns the client_id (username of the service account) for the token to be created because of the client credentials request
 func (c *clientCredentialsClient) GetID() string {
 	return c.clientID
 }
@@ -71,12 +71,12 @@ func (c *clientCredentialsClient) PostLogoutRedirectURIs() []string {
 	return nil
 }
 
-// ApplicationType returns [op.ApplicationTypeWeb] as the machine users is a confidential client
+// ApplicationType returns [op.ApplicationTypeWeb] as the service accounts is a confidential client
 func (c *clientCredentialsClient) ApplicationType() op.ApplicationType {
 	return op.ApplicationTypeWeb
 }
 
-// AuthMethod returns the allowed auth method type for machine user.
+// AuthMethod returns the allowed auth method type for service account.
 // It returns Basic Auth
 func (c *clientCredentialsClient) AuthMethod() oidc.AuthMethod {
 	return oidc.AuthMethodBasic
@@ -87,7 +87,7 @@ func (c *clientCredentialsClient) ResponseTypes() []oidc.ResponseType {
 	return nil
 }
 
-// GrantTypes returns the grant types supported by the machine users, which is currently only client credentials ([oidc.GrantTypeClientCredentials])
+// GrantTypes returns the grant types supported by the service accounts, which is currently only client credentials ([oidc.GrantTypeClientCredentials])
 func (c *clientCredentialsClient) GrantTypes() []oidc.GrantType {
 	return []oidc.GrantType{
 		oidc.GrantTypeClientCredentials,
@@ -132,7 +132,7 @@ func (c *clientCredentialsClient) IDTokenUserinfoClaimsAssertion() bool {
 
 // ClockSkew enable handling clock skew of the token validation. The duration (0-5s) will be added to exp claim and subtracted from iats,
 // auth_time and nbf of the token to be created because of the client credentials request.
-// It returns 0 as clock skew is not implemented on machine users.
+// It returns 0 as clock skew is not implemented on service accounts.
 func (c *clientCredentialsClient) ClockSkew() time.Duration {
 	return 0
 }

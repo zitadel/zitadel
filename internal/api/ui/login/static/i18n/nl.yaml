@@ -269,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -315,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -395,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:

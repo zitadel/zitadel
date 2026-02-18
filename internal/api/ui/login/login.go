@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 
@@ -56,39 +57,125 @@ type Config struct {
 }
 
 type DefaultPaths struct {
-	BasePath        string
-	PasswordSetPath string
-	EmailCodePath   string
-	OTPEmailPath    string
+	BasePath          *url.URL
+	PasswordSetPath   *url.URL
+	EmailCodePath     *url.URL
+	OTPEmailPath      *url.URL
+	PasskeySetPath    *url.URL
+	DomainClaimedPath *url.URL
 }
 
-func (c *Config) defaultBaseURL(ctx context.Context) string {
+func (c *DefaultPaths) defaultBaseURL(ctx context.Context) *url.URL {
 	loginV2 := authz.GetInstance(ctx).Features().LoginV2
-	if loginV2.Required {
-		// use the origin as default
-		baseURI := http_utils.DomainContext(ctx).Origin()
-		// use custom base URI if defined
-		if loginV2.BaseURI != nil && loginV2.BaseURI.String() != "" {
-			baseURI = loginV2.BaseURI.String()
-		}
-		return baseURI + c.DefaultPaths.BasePath
+	// In case login v1 is still active, we don't want to return a base URL, as the templates will not be used
+	if !loginV2.Required {
+		return nil
 	}
-	return ""
+	origin := http_utils.DomainContext(ctx).OriginURL()
+	if loginV2.BaseURI == nil || loginV2.BaseURI.String() == "" {
+		// In case the login v2 is enabled without a custom BaseURI,
+		// we use the request origin plus the default base path as the base URL for the templates.
+		if c.BasePath == nil {
+			return origin
+		}
+		return origin.ResolveReference(c.BasePath)
+	}
+	// In case a custom BaseURI is set for login v2, we use it as the base URL for the templates.
+	if loginV2.BaseURI.IsAbs() {
+		return loginV2.BaseURI
+	}
+	// If the custom BaseURI is a relative URL, we join the request origin with the custom BaseURI to form the base URL for the templates.
+	return origin.ResolveReference(loginV2.BaseURI)
 }
 
-func (c *Config) DefaultEmailCodeURLTemplate(ctx context.Context) string {
-	basePath := c.defaultBaseURL(ctx)
-	if basePath == "" {
+// mergeURLs will merge two URLs, where the path is joined and query parameters are combined.
+// It uses (*url.URL).JoinPath on the base URL and the second URL's Path field to build the resulting path,
+// and then merges the query parameters from both URLs using [mergeQueries], preserving existing values and placeholders.
+// Fragments are not modified or combined by this function.
+// For example, merging "https://example.com/base" with a URL whose path is "/path/to/resource" will result in "https://example.com/base/path/to/resource".
+func mergeURLs(base, path *url.URL) string {
+	if base == nil && path == nil {
 		return ""
 	}
-	return basePath + c.DefaultPaths.EmailCodePath
+	if base == nil {
+		return path.String()
+	}
+	if path == nil {
+		return base.String()
+	}
+	u := base.JoinPath(path.Path)
+	u.RawQuery = mergeQueries(u.Query(), path.Query())
+	return u.String()
 }
-func (c *Config) DefaultPasswordSetURLTemplate(ctx context.Context) string {
+
+// mergeQueries will merge two sets of query parameters, preserving existing values and placeholders.
+// It takes two url.Values, where the first one is considered the base and the second one is merged into it.
+// The resulting query string will contain all unique key-value pairs from both sets of query parameters.
+// If a value contains placeholders in the format "{{placeholder}}", they are preserved in the final query string without being URL-encoded.
+func mergeQueries(base, path url.Values) string {
+	placeholders := map[string]string{}
+	for _, value := range base {
+		for _, v := range value {
+			if strings.Contains(v, "{{") && strings.Contains(v, "}}") {
+				placeholders[url.QueryEscape(v)] = v
+			}
+		}
+	}
+	for key, value := range path {
+		baseValues, ok := base[key]
+		for _, v := range value {
+			if !ok || !slices.Contains(baseValues, v) {
+				base.Add(key, v)
+			}
+			if strings.Contains(v, "{{") && strings.Contains(v, "}}") {
+				placeholders[url.QueryEscape(v)] = v
+			}
+		}
+	}
+	raw := base.Encode()
+	for esc, orig := range placeholders {
+		raw = strings.ReplaceAll(raw, esc, orig)
+	}
+	return raw
+}
+
+func (c *DefaultPaths) DefaultEmailCodeURLTemplate(ctx context.Context) string {
 	basePath := c.defaultBaseURL(ctx)
-	if basePath == "" {
+	if basePath == nil {
 		return ""
 	}
-	return c.defaultBaseURL(ctx) + c.DefaultPaths.PasswordSetPath
+	return mergeURLs(basePath, c.EmailCodePath)
+}
+
+func (c *DefaultPaths) DefaultPasswordSetURLTemplate(ctx context.Context) string {
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == nil {
+		return ""
+	}
+	return mergeURLs(basePath, c.PasswordSetPath)
+}
+
+func (c *DefaultPaths) DefaultPasskeySetURLTemplate(ctx context.Context) string {
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == nil {
+		return ""
+	}
+	return mergeURLs(basePath, c.PasskeySetPath)
+}
+
+func (c *DefaultPaths) DefaultDomainClaimedURLTemplate(ctx context.Context) string {
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == nil {
+		return ""
+	}
+	return mergeURLs(basePath, c.DomainClaimedPath)
+}
+
+func (c *DefaultPaths) DefaultOTPEmailURLTemplate(origin *url.URL) string {
+	if c.BasePath == nil {
+		return mergeURLs(origin, c.OTPEmailPath)
+	}
+	return mergeURLs(origin.ResolveReference(c.BasePath), c.OTPEmailPath)
 }
 
 const (

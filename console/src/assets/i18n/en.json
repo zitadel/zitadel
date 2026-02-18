@@ -1,15 +1,15 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Metadata",
     "HOME": {
-      "TITLE": "Get started with ZITADEL",
+      "TITLE": "Get started with Zitadel",
       "NEXT": {
         "TITLE": "Your next steps",
         "DESCRIPTION": "Complete the following steps to secure your application.",
         "CREATE_PROJECT": {
           "TITLE": "Create a project",
-          "DESCRIPTION": "Add a project and define its roles and authorizations."
+          "DESCRIPTION": "Add a project and define its roles and role assignments."
         }
       },
       "MORE_SHORTCUTS": {
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "Documentation",
-          "DESCRIPTION": "Explore ZITADELs knowledge base to familiarize yourself with core concepts and ideas. Learn how ZITADEL works and how to use it."
+          "DESCRIPTION": "Explore Zitadels knowledge base to familiarize yourself with core concepts and ideas. Learn how Zitadel works and how to use it."
         },
         "EXAMPLES": {
           "TITLE": "Examples and Software Development Kits",
-          "DESCRIPTION": "Browse our examples and SDKs to use ZITADEL together with your favorite programming languages and tools."
+          "DESCRIPTION": "Browse our examples and SDKs to use Zitadel together with your favorite programming languages and tools."
         }
       }
     },
@@ -34,10 +34,10 @@
     },
     "PROJECTS": {
       "TITLE": "Projects",
-      "DESCRIPTION": "A project hosts one or more applications that you can use to authenticate your users. For example, you might have a single project with 3 applications: one each for your web frontend, your mobile app, and your backend services. Also you can authorize your users with projects. To allow users from other organizations to log in to your applications, grant them access to your project.<br/><br/>If you can't find a project, contact the project's owner or someone with the corresponding rights to gain access.",
+      "DESCRIPTION": "A project hosts one or more applications that you can use to authenticate your users. For example, you might have a single project with 3 applications: one each for your web frontend, your mobile application, and your backend services. Also you can authorize your users with projects. To allow users from other organizations to log in to your applications, grant them access to your project.<br/><br/>If you can't find a project, contact the project's owner or someone with the corresponding rights to gain access.",
       "OWNED": {
         "TITLE": "Owned Projects",
-        "DESCRIPTION": "These are the projects you own. You can manage these project settings, authorizations and applications."
+        "DESCRIPTION": "These are the projects you own. You can manage these project settings, role assignments, and applications."
       },
       "GRANTED": {
         "TITLE": "Granted Projects",
@@ -46,28 +46,28 @@
     },
     "USERS": {
       "TITLE": "Users",
-      "DESCRIPTION": "A user is a human or a machine that can access your applications.",
+      "DESCRIPTION": "A user is a human or a service account that can access your applications.",
       "HUMANS": {
         "TITLE": "Users",
         "DESCRIPTION": "Users authenticate interactively in a browser session with a login prompt.",
         "METADATA": "Add custom attributes to the user like the department. You can use this information in your actions."
       },
       "MACHINES": {
-        "TITLE": "Service Users",
-        "DESCRIPTION": "Service Users authenticate non-interactively using a JWT bearer token signed with a private key. They can also use a personal access token.",
-        "METADATA": "Add custom attributes to the user like the authenticating system. You can use this information in your actions."
+        "TITLE": "Service Accounts",
+        "DESCRIPTION": "Service Accounts authenticate non-interactively using a JWT bearer token signed with a private key. They can also use a personal access token.",
+        "METADATA": "Add custom attributes to the account like the authenticating system. You can use this information in your actions."
       },
       "SELF": {
         "METADATA": "Add custom attributes to your user like your department. You can use this information in your organizations actions."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Authorizations",
-      "DESCRIPTION": "Authorizations define the access rights of a user to a project. You can grant a user access to a project and define the users roles within that project."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Role Assignments",
+      "DESCRIPTION": "Role assignments define the access rights of a user to a project. You can grant a user access to a project and define the user's roles within that project."
     },
     "ACTIONS": {
       "TITLE": "Actions",
-      "DESCRIPTION": "Run custom code on events that happen as your users authenticate at ZITADEL. Automate your processes, enrich your users metadata and their tokens or notify external systems.",
+      "DESCRIPTION": "Run custom code on events that happen as your users authenticate at Zitadel. Automate your processes, enrich your users metadata and their tokens or notify external systems.",
       "SCRIPTS": {
         "TITLE": "Scripts",
         "DESCRIPTION": "Write your JavaScript code once and trigger it in multiple flows."
@@ -97,23 +97,23 @@
         "NEXT": "What now?",
         "SAML": {
           "TITLE": "Configure your SAML Identity Provider",
-          "DESCRIPTION": "ZITADEL is configured. Now your SAML Identity Provider needs some configuration. Most providers allow you to just upload the whole ZITADEL metadata XML. Other providers ask you to provide some distinct URLs only, like for example the entity ID (metadata URL), the Assertion Consumer Service (ACS) URL or the Single Logout URL."
+          "DESCRIPTION": "Zitadel is configured. Now your SAML Identity Provider needs some setup. Most providers allow you to just upload the whole Zitadel metadata XML. Other providers ask you to provide some distinct URLs only, like for example the entity ID (metadata URL), the Assertion Consumer Service (ACS) URL or the Single Logout URL."
         },
         "CALLBACK": {
           "TITLE": "Configure your {{ provider }} Identity Provider",
-          "DESCRIPTION": "Before you can configure ZITADEL, pass this URL to your Identity Provider to enable the browser redirection back to ZITADEL after authentication."
+          "DESCRIPTION": "Before you can configure Zitadel, pass this URL to your Identity Provider to enable the browser redirection back to Zitadel after authentication."
         },
         "JWT": {
           "TITLE": "Use JWTs as federated Identities",
-          "DESCRIPTION": "The JWT Identity Provider enables you to use your existing JWT tokens as federated identities. This feature is handy if you already have an issuer for JWTs. With a JWT IdP, you can use these JWTs to create and update users in ZITADEL on-the-fly."
+          "DESCRIPTION": "The JWT Identity Provider enables you to use your existing JWT tokens as federated identities. This feature is handy if you already have an issuer for JWTs. With a JWT IdP, you can use these JWTs to create and update users in Zitadel on-the-fly."
         },
         "LDAP": {
-          "TITLE": "Configure ZITADEL to connect to your LDAP Identity Provider",
-          "DESCRIPTION": "Provide the connection details to your LDAP server and configure the mapping of your LDAP attributes to ZITADEL attributes."
+          "TITLE": "Configure Zitadel to connect to your LDAP Identity Provider",
+          "DESCRIPTION": "Provide the connection details to your LDAP server and configure the mapping of your LDAP attributes to Zitadel attributes."
         },
         "AUTOFILL": {
           "TITLE": "Autofill user data",
-          "DESCRIPTION": "Use an action to improve your users experience. You can pre-fill ZITADELs registration form with values from the identity provider."
+          "DESCRIPTION": "Use an action to improve your users experience. You can pre-fill Zitadels registration form with values from the identity provider."
         },
         "ACTIVATE": {
           "TITLE": "Activate the IdP",
@@ -126,11 +126,11 @@
       },
       "BRANDING": {
         "TITLE": "Branding",
-        "DESCRIPTION": "Customize the look and feel of your login form. Remember to apply your configuration when you are done."
+        "DESCRIPTION": "Customize the look and feel of your login form. Remember to apply your settings when you are done."
       },
       "PRIVACY_POLICY": {
         "TITLE": "External Links",
-        "DESCRIPTION": "Guide your users to custom external resources shown on the login page. Users need to accept the Terms of Service and Privacy Policy before they can sign up. Change the link to your documentation or set an empty string to hide the documentation button from the console. Add a custom external link and a custom text for that link in the console, or set them empty to hide that button."
+        "DESCRIPTION": "Guide your users to custom external resources shown on the login page. Users need to accept the Terms of Service and Privacy Policy before they can sign up. Change the link to your documentation or set an empty string to hide the documentation button from the management console. Add a custom external link and a custom text for that link in the management console, or set them empty to hide that button."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP Settings",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS Settings",
-        "DESCRIPTION": "To unlock all ZITADEL features, configure Twilio to send SMS messages to your users."
+        "DESCRIPTION": "To unlock all Zitadel features, configure Twilio to send SMS messages to your users."
       },
       "IAM_EVENTS": {
         "TITLE": "Events",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "Failed Events",
-        "DESCRIPTION": "This page shows all failed events in your instance. If ZITADEL doesn't behave as you expect, always check this this list first."
+        "DESCRIPTION": "This page shows all failed events in your instance. If Zitadel doesn't behave as you expect, always check this this list first."
       },
       "IAM_VIEWS": {
         "TITLE": "Views",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "Security Settings",
-        "DESCRIPTION": "Enable ZITADEL features that can have security impacts. You really should know what you are doing before you change these settings."
+        "DESCRIPTION": "Enable Zitadel features that can have security impacts. You really should know what you are doing before you change these settings."
       },
       "OIDC": {
         "TITLE": "OpenID Connect Settings",
@@ -187,11 +187,11 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "Manage your OIDC Web Keys to securely sign and validate tokens for your ZITADEL instance.",
+        "DESCRIPTION": "Manage your OIDC Web Keys to securely sign and validate tokens for your Zitadel instance.",
         "TABLE": {
           "TITLE": "Active and Future Web Keys",
           "DESCRIPTION": "Your active and upcoming web keys. Activating a new key will deactivate the current one.",
-          "NOTE": "Note: The JWKs OIDC endpoint returns a cacheable response (default 5 min). Avoid activating a key too soon, as it may not be available to caches and clients yet.",
+          "NOTE": "Note: The JWKs OIDC endpoint returns a cacheable response (default 5 min). Avoid activating a key too soon, as it may not be available to caches and applications yet.",
           "ACTIVATE": "Activate next Web Key",
           "ACTIVE": "Currently active",
           "NEXT": "Next in queue",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "Create new Web Key",
-          "DESCRIPTION": "Creating a new web key adds it to your list. ZITADEL uses RSA2048 keys with a SHA256 hasher by default.",
+          "DESCRIPTION": "Creating a new web key adds it to your list. Zitadel uses RSA2048 keys with a SHA256 hasher by default.",
           "KEY_TYPE": "Key Type",
           "BITS": "Bits",
           "HASHER": "Hasher",
@@ -223,8 +223,8 @@
           "PR": "When a user resets their password, they will receive an email with a link to set a new password.",
           "VE": "When a user changes their email address, they will receive an email with a link to verify the new address.",
           "VP": "When a user changes their phone number, they will receive an SMS with a code to verify the new number.",
-          "VEO": "When a user adds a One-Time Password via email method, they need to activate it by entering a code sent to their email address.",
-          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number.",
+          "VEO": "When a user adds an OTP via email method, they need to activate it by entering a code sent to their email address.",
+          "VSO": "When a user adds an OTP via SMS method, they need to activate it by entering a code sent to their phone number.",
           "IU": "When a user invite code is created, they will receive an email with a link to set their authentication method."
         }
       },
@@ -237,15 +237,15 @@
         "DESCRIPTION": "Define restrictions on your domains and configure your login name patterns.",
         "REQUIRE_VERIFICATION": {
           "TITLE": "Require custom domains to be be verified",
-          "DESCRIPTION": "If this is activated, organization domains have to be verified before they can be used for domain discovery or username suffixing."
+          "DESCRIPTION": "If this is activated, Organization Domains have to be verified before they can be used for domain discovery or username suffixing."
         },
         "LOGIN_NAME_PATTERN": {
           "TITLE": "Login Name Pattern",
-          "DESCRIPTION": "Control the pattern of your users login names. ZITADEL selects your users organization as soon as they enter their login name. Therefore the loginnames need to be unique across all organizations. If you have users that have an account in multiple domains, you can ensure uniqueness by suffixing your login names with the organization domain."
+          "DESCRIPTION": "Control the pattern of your users login names. Zitadel selects your users organization as soon as they enter their login name. Therefore the loginnames need to be unique across all organizations. If you have users that have an account in multiple domains, you can ensure uniqueness by suffixing your login names with the Organization Domain."
         },
         "DOMAIN_VERIFICATION": {
           "TITLE": "Domain Verification",
-          "DESCRIPTION": "Only allow your organization to use the domains they actually control. If activated, organization domains are periodically verified by DNS or HTTP challenge before they can be used. This is a security feature to prevent domain hijacking."
+          "DESCRIPTION": "Only allow your organization to use the domains they actually control. If activated, Organization Domains are periodically verified by DNS or HTTP challenge before they can be used. This is a security feature to prevent domain hijacking."
         },
         "SMTP_SENDER_ADDRESS": {
           "TITLE": "SMTP Sender Address",
@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Login Form",
           "DESCRIPTION": "Customize the login form.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Username and Password allowed",
-            "DESCRIPTION": "Allow your users to log in with their username and password. If this is deactivated, your users can only log in using passkey authentication or with an external identity provider."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Local authentication allowed",
+            "DESCRIPTION": "Allow your users to log in with their username and password or passkey authentication. If this is deactivated, your users can only log in using an external identity provider."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "User Registration allowed",
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "External Login allowed",
-            "DESCRIPTION": "Allow your users to log in with an external identity provider instead of using the ZITADEL user to log in."
+            "DESCRIPTION": "Allow your users to log in with an external identity provider instead of using the Zitadel user to log in."
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "Password Reset hidden",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "Get started with ZITADEL",
-    "DISCLAIMER": "ZITADEL treats your data confidentially and securely.",
+    "WELCOME": "Get started with Zitadel",
+    "DISCLAIMER": "Zitadel treats your data confidentially and securely.",
     "DISCLAIMERLINK": "Further information",
     "DOCUMENTATION": {
-      "DESCRIPTION": "Get started with ZITADEL quickly."
+      "DESCRIPTION": "Get started with Zitadel quickly."
     },
     "GETSTARTED": {
-      "DESCRIPTION": "Get started with ZITADEL quickly."
+      "DESCRIPTION": "Get started with Zitadel quickly."
     },
     "QUICKSTARTS": {
       "LABEL": "First Steps",
-      "DESCRIPTION": "Get started with ZITADEL quickly."
+      "DESCRIPTION": "Get started with Zitadel quickly."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Shortcuts",
@@ -366,7 +366,7 @@
     "COMPLETED": "completed",
     "DISMISS": "No thanks, I'm a pro.",
     "CARD": {
-      "TITLE": "Get your ZITADEL running",
+      "TITLE": "Get your Zitadel running",
       "DESCRIPTION": "This checklist helps to setup your instance and guides your through the most essential steps"
     },
     "MILESTONES": {
@@ -382,17 +382,17 @@
       },
       "PROJECT_CREATED": {
         "title": "Create a project",
-        "description": "Add a project and define its roles and authorizations.",
+        "description": "Add a project and define its roles and role assignments.",
         "action": "Create project"
       },
       "APPLICATION_CREATED": {
-        "title": "Register your app",
+        "title": "Register your application",
         "description": "Register your web, native, api or saml application and setup an authentication flow.",
-        "action": "Register app"
+        "action": "Register application"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Log in to your app",
-        "description": "Integrate your application with ZITADEL for authentication and test it by logging in with your admin user.",
+        "title": "Log in to your application",
+        "description": "Integrate your application with Zitadel for authentication and test it by logging in with your admin user.",
         "action": "Log in"
       },
       "user.human.added": {
@@ -401,9 +401,9 @@
         "action": "Add user"
       },
       "user.grant.added": {
-        "title": "Grant users",
+        "title": "Assign roles to users",
         "description": "Allow users to access your application and setup their role.",
-        "action": "Grant user"
+        "action": "Assign roles to users"
       }
     }
   },
@@ -420,16 +420,16 @@
     "ORGANIZATION": "Organization",
     "PROJECT": "Projects",
     "PROJECTOVERVIEW": "Overview",
-    "PROJECTGRANTS": "Grants",
+    "PROJECTGRANTS": "Project Grants",
     "ROLES": "Roles",
     "GRANTEDPROJECT": "Granted Projects",
     "HUMANUSERS": "Users",
-    "MACHINEUSERS": "Service Users",
+    "MACHINEUSERS": "Service Accounts",
     "LOGOUT": "Logout All Users",
     "NEWORG": "New Organization",
     "IAMADMIN": "You are an IAM Administrator. Note that you have extended permissions.",
     "SHOWORGS": "Show All Organizations",
-    "GRANTS": "Authorizations",
+    "GRANTS": "Role Assignments",
     "ACTIONS": "Actions",
     "TARGETS": "Targets",
     "PRIVACY": "Privacy",
@@ -439,8 +439,8 @@
     "CUSTOMERPORTAL": "Customer Portal"
   },
   "QUICKSTART": {
-    "TITLE": "Integrate ZITADEL into your application",
-    "DESCRIPTION": "Integrate ZITADEL into your application or use one of our samples to get started in minutes.",
+    "TITLE": "Integrate Zitadel into your application",
+    "DESCRIPTION": "Integrate Zitadel into your application or use one of our samples to get started in minutes.",
     "BTN_START": "Create Application",
     "BTN_LEARNMORE": "Learn More",
     "CREATEPROJECTFORAPP": "Create Project {{value}}",
@@ -448,13 +448,13 @@
     "FRAMEWORK": "Framework",
     "FRAMEWORK_OTHER": "Other (OIDC, SAML, API)",
     "ALMOSTDONE": "You're almost done.",
-    "REVIEWCONFIGURATION": "Review Configuration",
-    "REVIEWCONFIGURATION_DESCRIPTION": "We've created a basic configuration for {{value}} applications. You can adapt this configuration to your needs after creation.",
+    "REVIEWCONFIGURATION": "Review Settings",
+    "REVIEWCONFIGURATION_DESCRIPTION": "We've created a basic setup for {{value}} applications. You can adapt these settings to your needs after creation.",
     "REDIRECTS": "Configure redirects",
     "DEVMODEWARN": "Dev Mode is enabled by default. You can update values for production later.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Browse Examples and SDKs",
-    "DUPLICATEAPPRENAME": "An app with the same name exists already. Please choose a different name.",
+    "DUPLICATEAPPRENAME": "An application with the same name exists already. Please choose a different name.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Change Framework",
@@ -657,12 +657,12 @@
     "IAM_USER_MANAGER": "Has permission to create and manage users",
     "IAM_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from all organizations",
     "IAM_END_USER_IMPERSONATOR": "Has permission to impersonate end users from all organizations",
-    "IAM_LOGIN_CLIENT": "Has permission to manage login clients",
+    "IAM_LOGIN_CLIENT": "Has permission to manage login applications",
     "ORG_OWNER": "Has permission over the whole organization",
     "ORG_USER_MANAGER": "Has permission to create and manage users of the organization",
     "ORG_OWNER_VIEWER": "Has permission to review the whole organization",
     "ORG_SETTINGS_MANAGER": "Has permission to manage organization settings",
-    "ORG_USER_PERMISSION_EDITOR": "Has permission to manage user grants",
+    "ORG_USER_PERMISSION_EDITOR": "Has permission to manage role assignments",
     "ORG_PROJECT_PERMISSION_EDITOR": "Has permission to manage project grants",
     "ORG_PROJECT_CREATOR": "Has permission to create his own projects and underlying settings",
     "ORG_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from the organization",
@@ -677,7 +677,7 @@
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
-      "TEXT": "All organization settings and tables in console are based on a selected organization. Click this button to switch organization or create a new one."
+      "TEXT": "All organization settings and tables in the Management Console are based on a selected organization. Click this button to switch organization or create a new one."
     },
     "INSTANCE": {
       "TEXT": "Click here to get to the default settings. Note that you have only access to this button if you have enhanced permissions."
@@ -700,7 +700,7 @@
     "ORGNAME": "Organization Name",
     "ORGID": "Organization ID",
     "STATE": "State",
-    "PRIMARYDOMAIN": "Primary Domain",
+    "PRIMARYDOMAIN": "Organization Domain",
     "DISPLAYNAME": "User Display Name",
     "EMAIL": "Email",
     "USERNAME": "User Name",
@@ -725,7 +725,7 @@
       "ME": "Go To own profile",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
       "USERS": "<strong>G</strong>o to <strong>U</strong>sers",
-      "USERGRANTS": "<strong>G</strong>o to <strong>A</strong>uthorizations",
+      "ROLEASSIGNMENTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments",
       "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows",
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
     }
@@ -745,7 +745,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "Your instance is blocked.",
-      "DESCRIPTION": "Ask your ZITADEL instance administrator to update the subscription."
+      "DESCRIPTION": "Ask your Zitadel instance administrator to update the subscription."
     },
     "INVALID_FORMAT": "The formatting is invalid.",
     "NOTANEMAIL": "The given value is not an e-mail address.",
@@ -766,8 +766,8 @@
       "SECURITY": "Password and Security",
       "KEYS": "Keys",
       "PAT": "Personal Access Tokens",
-      "USERGRANTS": "Authorizations",
-      "MEMBERSHIPS": "Memberships",
+      "ROLEASSIGNMENTS": "Role Assignments",
+      "MEMBERSHIPS": "Administrator Roles",
       "METADATA": "Metadata"
     },
     "TITLE": "Personal Information",
@@ -842,7 +842,7 @@
       "NAME": "Name",
       "EMPTY": "No device set",
       "TITLE": "Passkey Authentication",
-      "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL with a passkey.",
+      "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto Zitadel with a passkey.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "U2F": "Add method",
       "U2F_DIALOG_TITLE": "Verify authenticator",
@@ -852,7 +852,7 @@
       "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -885,24 +885,24 @@
       "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "ADD": "Add Factor",
-      "OTP": "Authenticator App for TOTP (Time-based One-Time Password)",
+      "OTP": "Authenticator Application for TOTP",
       "OTP_DIALOG_TITLE": "Add OTP",
-      "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
+      "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator application and enter the code below to verify and activate the TOTP method.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verify Factor",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
       "U2F_SUCCESS": "Factor added successfully!",
       "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
-      "OTPSMS": "OTP (One-Time Password) with SMS",
-      "OTPEMAIL": "OTP (One-Time Password) with Email",
-      "SETUPOTPSMSDESCRIPTION": "Do you want to setup this phonenumber as OTP (One-Time password) second factor?",
+      "OTPSMS": "OTP with SMS",
+      "OTPEMAIL": "OTP with Email",
+      "SETUPOTPSMSDESCRIPTION": "Do you want to setup this phonenumber as OTP second factor?",
       "OTPSMSSUCCESS": "OTP factor set up with success.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Your phone must be verified in order to use this method.",
       "OTPEMAILSUCCESS": "OTP factor set up with success.",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -991,7 +991,7 @@
       "COUNTRY": "Country"
     },
     "MACHINE": {
-      "TITLE": "Service User Details",
+      "TITLE": "Service Account Details",
       "USERNAME": "User Name",
       "NAME": "Name",
       "DESCRIPTION": "Description",
@@ -1082,10 +1082,10 @@
       "ENTERCODE_DESC": "Verify Code"
     },
     "GRANTS": {
-      "TITLE": "User Grants",
+      "TITLE": "Role Assignments",
       "DESCRIPTION": "Grant this user access to certain projects",
       "CREATE": {
-        "TITLE": "Create User Grant",
+        "TITLE": "Create Role Assignment",
         "DESCRIPTION": "Search for the organization, the project and the corresponding project roles."
       },
       "PROJECTNAME": "Project Name",
@@ -1120,8 +1120,8 @@
       "ADDITIONAL-EXTERNAL": "Loginname (external organization)"
     },
     "TARGET": {
-      "SELF": "If you want to grant a user of an other organization",
-      "EXTERNAL": "To grant a user of your organization",
+      "SELF": "If you want to assign a role to a user from another organization",
+      "EXTERNAL": "To assign a role to a user from your organization",
       "CLICKHERE": "click here"
     },
     "SIGNEDOUT": "You are signed out. Click the button \"Sign In\" to sign in again.",
@@ -1153,7 +1153,7 @@
       "SELECTEDDEACTIVATED": "Selected users deactivated.",
       "SELECTEDKEYSDELETED": "Selected keys deleted.",
       "KEYADDED": "Key added!",
-      "MACHINEADDED": "Service User created!",
+      "MACHINEADDED": "Service Account created!",
       "DELETED": "User deleted successfully!",
       "UNLOCKED": "User unlocked successfully!",
       "PASSWORDLESSREGISTRATIONSENT": "Registration Link sent successfully.",
@@ -1161,8 +1161,8 @@
       "SECRETREMOVED": "Secret removed successfully!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL Administrator Roles",
-      "DESCRIPTION": "These are all member grants of the user. You can modify them also on organization, project, or IAM detail pages.",
+      "TITLE": "Zitadel Administrator Roles",
+      "DESCRIPTION": "These are all administrator roles of the user. You can modify them also on organization, project, or IAM detail pages.",
       "ORGCONTEXT": "You see all organizations and projects that are related to the currently selected organization.",
       "USERCONTEXT": "You see all organizations and projects to which you are authorized. Including other organizations.",
       "CREATIONDATE": "Creation Date",
@@ -1171,7 +1171,7 @@
       "REMOVE": "Remove",
       "TYPE": "Type",
       "ORGID": "Organization ID",
-      "UPDATED": "The membership was updated.",
+      "UPDATED": "The administrator role was updated.",
       "NOPERMISSIONTOEDIT": "You are missing the required permissions to edit roles!",
       "TYPES": {
         "UNKNOWN": "Unknown",
@@ -1227,7 +1227,7 @@
     "ALLOWEDTOFAIL": "Allowed To Fail",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Warning",
-      "DESCRIPTION": "If you disable this setting, it may cause users in your organization to be unable to sign in. Additionally, you will no longer be able to access the console to disable the action. We recommend creating an administrator user in a separate organization or testing scripts first in a development environment or a development organization."
+      "DESCRIPTION": "If you disable this setting, it may cause users in your organization to be unable to sign in. Additionally, you will no longer be able to access the management console to disable the action. We recommend creating an administrator user in a separate organization or testing scripts first in a development environment or a development organization."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Type",
@@ -1269,11 +1269,11 @@
     },
     "EVENTSTORE": {
       "TITLE": "IAM Storage Administration",
-      "DESCRIPTION": "Manage your ZITADEL views and failed events."
+      "DESCRIPTION": "Manage your Zitadel views and failed events."
     },
     "MEMBER": {
-      "TITLE": "Managers",
-      "DESCRIPTION": "These Managers are allowed to make changes in your instance."
+      "TITLE": "Administrators",
+      "DESCRIPTION": "These administrators are allowed to make changes in your instance."
     },
     "PAGES": {
       "STATE": "Status",
@@ -1362,10 +1362,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERSADDED": "Managers added.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERCHANGED": "Manager changed.",
+      "MEMBERREMOVED": "Administrator removed.",
+      "MEMBERSADDED": "Administrators added.",
+      "MEMBERADDED": "Administrator added.",
+      "MEMBERCHANGED": "Administrator changed.",
       "ROLEREMOVED": "Role removed.",
       "ROLECHANGED": "Role changed.",
       "REACTIVATED": "Reactivated",
@@ -1413,15 +1413,15 @@
         "VERIFICATION_HTTP_URL_LABEL": "Expected URL:",
         "VERIFICATION_HTTP_FILE_LABEL": "Verification file:",
         "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your domain this step has to be completed!",
-        "VERIFICATION_VALIDATION_DESC": "Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time.",
+        "VERIFICATION_VALIDATION_DESC": "Do not delete the verification code, as Zitadel will re-check the ownership of your domain from time to time.",
         "VERIFICATION_NEWTOKEN_TITLE": "Request New Token",
-        "VERIFICATION_VALIDATION_ONGOING": "The {{ value }} method has been selected to verify your domain. Click on the button to trigger a verification check or reset the verification process.",
+        "VERIFICATION_VALIDATION_ONGOING": "The {{ value }} method has been selected to verify your Organization Domain. Click on the button to trigger a verification check or reset the verification process.",
         "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
         "RESETMETHOD": "Reset verification method"
       },
       "DOWNLOAD_FILE": "Download File",
       "SELECTORGTOOLTIP": "Select this organization.",
-      "PRIMARYDOMAIN": "Primary Domain",
+      "PRIMARYDOMAIN": "Organization Domain",
       "STATE": "State",
       "USEPASSWORD": "Set Initial Password",
       "USEPASSWORDDESC": "The user does not have to set the password during initialization."
@@ -1432,9 +1432,9 @@
     },
     "DOMAINS": {
       "NEW": "Add Domain",
-      "TITLE": "Verified domains",
-      "DESCRIPTION": "Configure your organization domains. This domain can be used for domain discovery and username suffixing.",
-      "SETPRIMARY": "Set as Primary",
+      "TITLE": "Organization Domains",
+      "DESCRIPTION": "Configure your Organization Domains. This domain can be used for domain discovery and username suffixing.",
+      "SETPRIMARY": "Set as Organization Domain",
       "DELETE": {
         "TITLE": "Delete Domain",
         "DESCRIPTION": "You are about to delete one of your domains."
@@ -1450,7 +1450,7 @@
       "2": "Deactivated"
     },
     "MEMBER": {
-      "TITLE": "Organization Managers",
+      "TITLE": "Organization Administrators",
       "DESCRIPTION": "Define the users who can change your organizations preferences."
     },
     "TOAST": {
@@ -1459,10 +1459,10 @@
       "REACTIVATED": "Organization reactivated.",
       "DOMAINADDED": "Added domain.",
       "DOMAINREMOVED": "Removed domain.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERCHANGED": "Manager changed.",
-      "SETPRIMARY": "Primary domain set.",
+      "MEMBERADDED": "Administrator added.",
+      "MEMBERREMOVED": "Administrator removed.",
+      "MEMBERCHANGED": "Administrator changed.",
+      "SETPRIMARY": "Organization Domain set successfully.",
       "DELETED": "Organization deleted successfully",
       "DEFAULTORGNOTFOUND": "The default organization was not found",
       "ORG_WAS_DELETED": "Organization has been deleted."
@@ -1500,7 +1500,7 @@
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
-      "VERIFIED_DOMAINS": "Verified domains",
+      "VERIFIED_DOMAINS": "Organization Domains",
       "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
@@ -1559,7 +1559,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1584,7 +1585,7 @@
       "ADDPROVIDER": "Add SMS Provider",
       "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
       "REMOVEPROVIDER": "Remove Provider",
-      "REMOVEPROVIDER_DESC": "You are about to delete a provider configuration. Do you want to continue?",
+      "REMOVEPROVIDER_DESC": "You are about to delete a provider. Do you want to continue?",
       "SMSPROVIDERSTATE": {
         "0": "Unspecified",
         "1": "Active",
@@ -1614,9 +1615,9 @@
         "3": "Phone verification",
         "4": "Password Reset",
         "5": "Passkey Initialization",
-        "6": "App Secret",
-        "7": "One Time Password (OTP) - SMS",
-        "8": "One Time Password (OTP) - Email"
+        "6": "Application Secret",
+        "7": "OTP - SMS",
+        "8": "OTP - Email"
       },
       "EXPIRY": "Expiration (in minutes)",
       "INCLUDEDIGITS": "Include Numbers",
@@ -1638,8 +1639,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Login Default Org",
       "LOGINDEFAULTORG_DESCRIPTION": "The login UI will use the settings of the default org (and not from the instance) if no organization context is set",
-      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Enable the experimental urn:ietf:params:oauth:grant-type:token-exchange grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.",
       "USERSCHEMA": "User Schema",
       "USERSCHEMA_DESCRIPTION": "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features.",
       "ACTIONS": "Actions",
@@ -1648,8 +1647,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
-      "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
       "PERMISSIONCHECKV2": "Permission Check V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
       "STATES": {
@@ -1663,8 +1660,8 @@
         "DISABLED": "\"Disabled\" is inherited"
       },
       "RESET": "Set all to inherit",
-      "CONSOLEUSEV2USERAPI": "Use V2 Api in Console for User creation",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
+      "CONSOLEUSEV2USERAPI": "Use V2 Api in the Management Console for User creation",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the Management Console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Enabling this activates the new TypeScript-based login UI with improved security, performance, and customization.",
       "LOGINV2_BASEURI": "Base URI",
@@ -1674,7 +1671,7 @@
     "DIALOG": {
       "RESET": {
         "DEFAULTTITLE": "Reset Setting",
-        "DEFAULTDESCRIPTION": "You are about to reset your settings to the default configuration of your instance. Are you sure you want to continue?",
+        "DEFAULTDESCRIPTION": "You are about to reset your settings to the default settings of your instance. Are you sure you want to continue?",
         "LOGINPOLICY_DESCRIPTION": "Warning: If your continue, Identity Provider settings will be reset to the instance setting too."
       }
     }
@@ -1698,7 +1695,7 @@
       "DESCRIPTION": "Give the login your personalized style and modify its behavior.",
       "PREVIEW_DESCRIPTION": "Changes of the policy will automatically deployed to preview environment.",
       "BTN": "Select File",
-      "ACTIVATEPREVIEW": "Apply configuration",
+      "ACTIVATEPREVIEW": "Apply settings",
       "DARK": "Dark Mode",
       "LIGHT": "Light Mode",
       "CHANGEVIEW": "Change View",
@@ -1711,7 +1708,7 @@
       "RELEASE": "Release",
       "DROPFONT": "Drop font file here",
       "RELEASEFONT": "Release",
-      "USEOFLOGO": "Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organization switcher in console",
+      "USEOFLOGO": "Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organization switcher in management console",
       "MAXSIZE": "The maximum size is limited to 524kB",
       "EMAILNOSVG": "The SVG file format is not supported in emails. Therefore upload your logo in PNG or other supported format.",
       "MAXSIZEEXCEEDED": "Maximum size of 524kB exceeded.",
@@ -1723,11 +1720,11 @@
       "FONTCOLOR": "Font color",
       "VIEWS": {
         "PREVIEW": "Preview",
-        "CURRENT": "Current Configuration"
+        "CURRENT": "Current Settings"
       },
       "PREVIEW": {
         "TITLE": "Login",
-        "SECOND": "login with your ZITADEL-Account.",
+        "SECOND": "login with your Zitadel-Account.",
         "ERROR": "User could not be found!",
         "PRIMARYBUTTON": "next",
         "SECONDARYBUTTON": "register"
@@ -1750,7 +1747,7 @@
       "TITLE": "Branding",
       "BTN": "Select File",
       "DESCRIPTION": "Customize the appearance of the Login",
-      "ACTIVATEPREVIEW": "Activate Configuration"
+      "ACTIVATEPREVIEW": "Activate Settings"
     },
     "LOGIN_POLICY": {
       "TITLE": "Login Settings",
@@ -1767,9 +1764,9 @@
       "POLICYLINK": "Link to Privacy Policy",
       "HELPLINK": "Link to Help",
       "SUPPORTEMAIL": "Support Email",
-      "DOCSLINK": "Docs Link (Console)",
-      "CUSTOMLINK": "Custom Link (Console)",
-      "CUSTOMLINKTEXT": "Custom Link Text (Console)",
+      "DOCSLINK": "Docs Link (Management Console)",
+      "CUSTOMLINK": "Custom Link (Management Console)",
+      "CUSTOMLINKTEXT": "Custom Link Text (Management Console)",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"
@@ -1779,7 +1776,7 @@
       "DESCRIPTION": "Define your texts for the login interfaces. If texts are empty, the default Value shown as the placeholder will be used.",
       "DESCRIPTION_SHORT": "Define your texts for the login interfaces.",
       "NEWERVERSIONEXISTS": "Newer Version exists",
-      "CURRENTDATE": "Current configuration",
+      "CURRENTDATE": "Current settings",
       "CHANGEDATE": "Newer Version from",
       "KEYNAME": "Login Screen / Interface",
       "RESET_TITLE": "Restore Default Values",
@@ -1810,7 +1807,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1855,8 +1853,8 @@
         "INIT": "Initialization",
         "VE": "Verify Email",
         "VP": "Verify Phone",
-        "VSO": "Verify SMS OTP",
-        "VEO": "Verify Email OTP",
+        "VSO": "Verify OTP SMS",
+        "VEO": "Verify OTP Email",
         "PR": "Password Reset",
         "DC": "Domain Claim",
         "PL": "Passkey",
@@ -1879,8 +1877,8 @@
         "changedate": "Change date",
         "username": "Username",
         "tempUsername": "Temp username",
-        "otp": "One-time password",
-        "verifyUrl": "Verify One-time password URL",
+        "otp": "OTP",
+        "verifyUrl": "Verify OTP URL",
         "expiry": "Expiry",
         "applicationName": "Application name"
       },
@@ -1903,9 +1901,9 @@
       "MAXOTPATTEMPTS": "OTP maximum attempts",
       "EXPIREWARNDAYS": "Expiration Warning after days",
       "MAXAGEDAYS": "Maximum validity in days",
-      "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
-      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
-      "VALIDATEORGDOMAINS": "Organization domain verification required (DNS or HTTP challenge)",
+      "USERLOGINMUSTBEDOMAIN": "Add Organization Domain as suffix to loginnames",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the Organization Domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
+      "VALIDATEORGDOMAINS": "Organization Domain verification required (DNS or HTTP challenge)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
@@ -1917,12 +1915,12 @@
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
       "HIDELOGINNAMESUFFIX_DESC": "Hides the login name suffix in the login interface",
       "IGNOREUNKNOWNUSERNAMES_DESC": "If the option is selected, the password screen will be displayed in the login process even if the user was not found. The error on the password check will not disclose if the username or password was wrong.",
-      "ALLOWDOMAINDISCOVERY_DESC": "If the option is selected, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the organization domains and will redirect to the registration of that organisation on success.",
+      "ALLOWDOMAINDISCOVERY_DESC": "If the option is selected, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the Organization Domains and will redirect to the registration of that organisation on success.",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",
       "DISABLEWATERMARK": "Hide Watermark",
-      "DISABLEWATERMARK_DESC": "Hide Powered by ZITADEL watermark in the login interface"
+      "DISABLEWATERMARK_DESC": "Hide Powered by Zitadel watermark in the login interface"
     },
     "RESET": "Reset to Instance default",
     "CREATECUSTOM": "Create Custom Policy",
@@ -1936,7 +1934,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "Organization",
-    "DESCRIPTION": "Here you can edit the configuration of your organization and manage the members.",
+    "DESCRIPTION": "Here you can edit the settings of your organization and manage the members.",
     "DETAIL": {
       "TITLE": "Detail",
       "NAME": "Name",
@@ -1948,13 +1946,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Members",
+      "TITLE": "Administrators",
       "USERNAME": "User Name",
       "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Login Name",
       "EMAIL": "E-mail",
       "ROLES": "Roles",
-      "ADD": "Add Member",
+      "ADD": "Add an Administrator",
       "ADDDESCRIPTION": "Enter the names of the users to be added."
     },
     "TABLE": {
@@ -1976,7 +1974,7 @@
       "CREATE_DESC": "Insert your project's name.",
       "ROLE": "Role",
       "NOITEMS": "No projects",
-      "ZITADELPROJECT": "This belongs to the ZITADEL project. Beware: If you make changes ZITADEL may not behave as intended.",
+      "ZITADELPROJECT": "This belongs to the Zitadel project. Beware: If you make changes Zitadel may not behave as intended.",
       "TYPE": {
         "OWNED": "Owned Projects",
         "OWNED_SINGULAR": "Owned Project",
@@ -2045,9 +2043,9 @@
       "NAME": "New Name"
     },
     "MEMBER": {
-      "TITLE": "Managers",
-      "TITLEDESC": "Managers can make changes to this project based on their role.",
-      "DESCRIPTION": "These managers may be able to edit your project.",
+      "TITLE": "Administrators",
+      "TITLEDESC": "Administrators can make changes to this project based on their role.",
+      "DESCRIPTION": "These administrators may be able to edit your project.",
       "USERNAME": "User Name",
       "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Loginname",
@@ -2061,23 +2059,23 @@
       "DESCRIPTION": "Allow another organization to use your project.",
       "EDITTITLE": "Edit roles",
       "CREATE": {
-        "TITLE": "Create Organization Grant",
+        "TITLE": "Create Project Grant",
         "SEL_USERS": "Select the users you wish to grant access",
         "SEL_PROJECT": "Search for a project",
-        "SEL_ROLES": "Select the roles you want to be added to the grant",
+        "SEL_ROLES": "Select the roles you want to be added to the project grant",
         "SEL_USER": "Select users",
         "SEL_ORG": "Search an organization",
         "SEL_ORG_DESC": "Search the organization to grant.",
         "ORG_DESCRIPTION": "You are about to grant a user for the organization {{name}}.",
         "ORG_DESCRIPTION_DESC": "Switch the context in the header above to grant a user for another organization.",
         "SEL_ORG_FORMFIELD": "Organization",
-        "FOR_ORG": "The grant is created for:"
+        "FOR_ORG": "The project grant is created for:"
       },
       "DETAIL": {
         "TITLE": "Project Grant",
-        "DESC": "You can select which roles can be used by the specified organization, and elect managers",
-        "MEMBERTITLE": "Managers",
-        "MEMBERDESC": "These are the managers of the granted organization. Add users here who should gain access to edit the data of the project.",
+        "DESC": "You can select which roles can be used by the specified organization, and elect administrators",
+        "MEMBERTITLE": "Administrators",
+        "MEMBERDESC": "These are the administrators of the granted organization. Add users here who should gain access to edit the data of the project.",
         "PROJECTNAME": "Project Name",
         "GRANTEDORG": "Granted Organization",
         "RESOURCEOWNER": "Resource Owner"
@@ -2090,7 +2088,7 @@
       "ALL": "All",
       "SHOWDETAIL": "Show Details",
       "USER": "User",
-      "MEMBERS": "Managers",
+      "MEMBERS": "Administrators",
       "ORG": "Organization",
       "PROJECTNAME": "Project Name",
       "GRANTEDORG": "Granted Organization",
@@ -2105,16 +2103,16 @@
       "NOROLES": "No roles",
       "TYPE": "Type",
       "TOAST": {
-        "PROJECTGRANTUSERGRANTADDED": "Project grant created.",
-        "PROJECTGRANTADDED": "Project grant created.",
-        "PROJECTGRANTCHANGED": "Project grant changed.",
-        "PROJECTGRANTMEMBERADDED": "Grant manager added.",
-        "PROJECTGRANTMEMBERCHANGED": "Grant manager changed.",
-        "PROJECTGRANTMEMBERREMOVED": "Grant manager removed.",
+        "PROJECTGRANTUSERGRANTADDED": "Project Grant created.",
+        "PROJECTGRANTADDED": "Project Grant created.",
+        "PROJECTGRANTCHANGED": "Project Grant changed.",
+        "PROJECTGRANTMEMBERADDED": "Grant administrator added.",
+        "PROJECTGRANTMEMBERCHANGED": "Grant administrator changed.",
+        "PROJECTGRANTMEMBERREMOVED": "Grant administrator removed.",
         "PROJECTGRANTUPDATED": "Project Grant updated"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Delete project grant",
+        "DELETE_TITLE": "Delete Project Grant",
         "DELETE_DESCRIPTION": "You are about to delete a project grant. Are you sure?"
       },
       "ROLES": "Project Roles"
@@ -2129,7 +2127,7 @@
       "ADDNEWLINE": "Add additional role",
       "KEY": "Key",
       "TITLE": "Roles",
-      "DESCRIPTION": "Define some roles which can be used to create project-grants.",
+      "DESCRIPTION": "Define some roles which can be used to create project grants.",
       "NAME": "Name",
       "DISPLAY_NAME": "Display Name",
       "GROUP": "Group",
@@ -2144,9 +2142,9 @@
       "SELECTGROUPTOOLTIP": "Select all Roles of the group {{group}}.",
       "OPTIONS": "Options",
       "ASSERTION": "Return user roles during authentication",
-      "ASSERTION_DESCRIPTION": "When a user authenticates, their role information is provided to your application. For OpenID Connect, the roles can be requested from the UserInfo endpoint or sent in the ID or Access Token, based on your application's configuration.",
+      "ASSERTION_DESCRIPTION": "When a user authenticates, their role information is provided to your application. For OpenID Connect, the roles can be requested from the UserInfo endpoint or sent in the ID or Access Token, based on your application's settings.",
       "CHECK": "Only authorized users can authenticate",
-      "CHECK_DESCRIPTION": "Deny authentication if the user has no authorization assigned to this project. Authorizations to the project without assigned a specific role to the user are allowed.",
+      "CHECK_DESCRIPTION": "Deny authentication if the user has no roles assigned to this project. Access to the project without a specific role assigned to the user is allowed.",
       "DIALOG": {
         "DELETE_TITLE": "Delete role",
         "DELETE_DESCRIPTION": "You are about to delete a project role. Are you sure?"
@@ -2173,10 +2171,10 @@
       "EMPTY": "No project found"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERSADDED": "Managers added.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERCHANGED": "Manager changed.",
+      "MEMBERREMOVED": "Administrator removed.",
+      "MEMBERSADDED": "Administrators added.",
+      "MEMBERADDED": "Administrator added.",
+      "MEMBERCHANGED": "Administrator changed.",
       "ROLESCREATED": "Roles created.",
       "ROLEREMOVED": "Role removed.",
       "ROLECHANGED": "Role changed.",
@@ -2184,7 +2182,7 @@
       "DEACTIVATED": "Deactivated.",
       "CREATED": "Project created.",
       "UPDATED": "Project changed.",
-      "GRANTUPDATED": "Grant changed.",
+      "GRANTUPDATED": "Project Grant changed.",
       "DELETED": "Project deleted."
     }
   },
@@ -2256,7 +2254,7 @@
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
-      "DESCRIPTION": "Update your provider configuration",
+      "DESCRIPTION": "Update your provider settings",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed"
     },
@@ -2313,7 +2311,7 @@
     "AVAILABLEBUTINACTIVE": "available but inactive",
     "SETAVAILABLE": "set as available",
     "SETUNAVAILABLE": "set as not available",
-    "CONFIG": "Configuration",
+    "CONFIG": "Settings",
     "STATE": "Status",
     "ISSUER": "Issuer",
     "SCOPESLIST": "Scopes List",
@@ -2359,15 +2357,15 @@
     "DELETE_SELECTION_TITLE": "Delete IdP",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "FEDERATEDLOGOUTENABLED": "Federated Logout Enabled",
-    "FEDERATEDLOGOUTENABLED_DESC": "If enabled, the user will be logged out from the IdP as well if the user terminates the session in ZITADEL.",
+    "FEDERATEDLOGOUTENABLED_DESC": "If enabled, the user will be logged out from the IdP as well if the user terminates the session in Zitadel.",
     "EMPTY": "No IdP available",
     "OIDC": {
       "GENERAL": "General Information",
-      "TITLE": "OIDC Configuration",
+      "TITLE": "OIDC Settings",
       "DESCRIPTION": "Enter the data for the OIDC Identity Provider."
     },
     "JWT": {
-      "TITLE": "JWT Configuration",
+      "TITLE": "JWT Settings",
       "DESCRIPTION": "Enter the data for JWT Identity Provider.",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
@@ -2434,10 +2432,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "One Time Password by Authenticator App (TOTP)",
+      "1": "TOTP (Authenticator App)",
       "2": "Passkey",
-      "3": "One Time Password by Email (Email OTP)",
-      "4": "One Time Password by SMS (SMS OTP)",
+      "3": "OTP by Email (OTP Email)",
+      "4": "OTP by SMS (OTP SMS)",
       "5": "Recovery Codes"
     }
   },
@@ -2461,7 +2459,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP Provider",
-      "DESCRIPTION": "These are the SMTP providers for your ZITADEL instance. Activate the one you want to use to send notifications to your users.",
+      "DESCRIPTION": "These are the SMTP providers for your Zitadel instance. Activate the one you want to use to send notifications to your users.",
       "EMPTY": "No SMTP Provider available",
       "ACTIVATED": "Activated",
       "ACTIVATE": "Activate provider",
@@ -2469,18 +2467,18 @@
       "TEST": "Test your provider",
       "TYPE": "Type",
       "DIALOG": {
-        "ACTIVATED": "SMTP config has been activated",
-        "ACTIVATE_WARN_TITLE": "Activate SMTP config",
-        "ACTIVATE_WARN_DESCRIPTION": "You are about to activate an SMTP configuration. First we'll deactivate the current active provider and then activate this configuration. Are you sure?",
-        "DEACTIVATE_WARN_TITLE": "Deactivate SMTP config",
-        "DEACTIVATE_WARN_DESCRIPTION": "You are about to deactivate an SMTP configuration. Are you sure?",
-        "DEACTIVATED": "SMTP config has been deactivated",
-        "DELETE_TITLE": "Delete SMTP config",
-        "DELETE_DESCRIPTION": "You are about to delete a configuration. Confirm this action typing the sender name",
-        "DELETED": "SMTP config has been deleted",
-        "SENDER": "Type {{value}}, to delete this SMTP configuration.",
-        "TEST_TITLE": "Test your SMTP config",
-        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "ACTIVATED": "SMTP provider has been activated",
+        "ACTIVATE_WARN_TITLE": "Activate SMTP settings",
+        "ACTIVATE_WARN_DESCRIPTION": "You are about to activate an SMTP provider. First we'll deactivate the current active provider and then activate this one. Are you sure?",
+        "DEACTIVATE_WARN_TITLE": "Deactivate SMTP settings",
+        "DEACTIVATE_WARN_DESCRIPTION": "You are about to deactivate an SMTP provider. Are you sure?",
+        "DEACTIVATED": "SMTP provider has been deactivated",
+        "DELETE_TITLE": "Delete SMTP provider",
+        "DELETE_DESCRIPTION": "You are about to delete a provider. Confirm this action by typing the sender name",
+        "DELETED": "SMTP provider has been deleted",
+        "SENDER": "Type {{value}}, to delete this SMTP provider.",
+        "TEST_TITLE": "Test your SMTP settings",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP settings",
         "TEST_EMAIL": "Email address",
         "TEST_RESULT": "Test result"
       }
@@ -2497,11 +2495,11 @@
         "NEXT_STEPS": "Next Steps",
         "ACTIVATE": {
           "TITLE": "Activate your SMTP Provider",
-          "DESCRIPTION": "ZITADEL cannot use this SMTP Provider to send notifications until you activate it. If you activate this provider any other provider that was active will now be deactivated."
+          "DESCRIPTION": "Zitadel cannot use this SMTP Provider to send notifications until you activate it. If you activate this provider any other provider that was active will now be deactivated."
         },
         "DEACTIVATE": {
           "TITLE": "Deactivate your SMTP Provider",
-          "DESCRIPTION": "If you deactivate this SMTP Provider, ZITADEL cannot use it to send notifications until you activate it again."
+          "DESCRIPTION": "If you deactivate this SMTP Provider, Zitadel cannot use it to send notifications until you activate it again."
         },
         "SAVE_SETTINGS": "Save your settings",
         "TEST": {
@@ -2523,23 +2521,23 @@
     "LIST": "Applications",
     "COMPLIANCE": "OIDC Compliance",
     "URLS": "URLs",
-    "CONFIGURATION": "Configuration",
+    "CONFIGURATION": "Settings",
     "TOKEN": "Token Settings",
     "PAGES": {
       "TITLE": "Application",
       "ID": "ID",
-      "DESCRIPTION": "Here you can edit your application data and it's configuration.",
+      "DESCRIPTION": "Here you can edit your application data and its settings.",
       "CREATE": "Create application",
       "CREATE_SELECT_PROJECT": "Select your project first",
       "CREATE_NEW_PROJECT": "or enter the name for your new project",
       "CREATE_DESC_TITLE": "Enter Your Application Details Step by Step",
-      "CREATE_DESC_SUB": "A recommended configuration will be automatically generated.",
+      "CREATE_DESC_SUB": "A recommended setup will be automatically generated.",
       "STATE": "Status",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed",
       "URLS": "URLs",
       "DELETE": "Delete App",
-      "JUMPTOPROJECT": "To configure roles, authorizations and more, navigate to the project.",
+      "JUMPTOPROJECT": "To configure roles, role assignments and more, navigate to the project.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {
@@ -2550,7 +2548,7 @@
       },
       "DIALOG": {
         "CONFIG": {
-          "TITLE": "Change OIDC Configuration"
+          "TITLE": "Change OIDC Settings"
         },
         "DELETE": {
           "TITLE": "Delete App",
@@ -2607,7 +2605,7 @@
       "REDIRECTNOTVALID": "This redirect URI is not valid.",
       "COMMAORENTERSEPERATION": "separate with ↵",
       "TYPEREQUIRED": "The type is required.",
-      "TITLE": "OIDC Configuration",
+      "TITLE": "OIDC Settings",
       "CLIENTID": "Client ID",
       "CLIENTSECRET": "Client Secret",
       "CLIENTSECRET_NOSECRET": "With your chosen authentication flow, no secret is required and is therefore not available.",
@@ -2656,14 +2654,14 @@
       "TOKENTYPE1": "JWT",
       "UNSECUREREDIRECT": "I sure hope you know what you are doing.",
       "OVERVIEWSECTION": "Overview",
-      "OVERVIEWTITLE": "You are now done. Review your configuration.",
+      "OVERVIEWTITLE": "You are now done. Review your settings.",
       "ACCESSTOKENROLEASSERTION": "Add user roles to the access token",
       "ACCESSTOKENROLEASSERTION_DESCRIPTION": "If selected, the requested roles of the authenticated user are added to the access token.",
       "IDTOKENROLEASSERTION": "User roles inside ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "When this option is enabled, the authenticated user's assigned roles will be added directly to their ID token. Ensure to enable the Project setting 'Assign user roles during authentication' or request via custom scope.",
       "IDTOKENUSERINFOASSERTION": "Include user's profile info in the ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Enables clients to retrieve profile, email, phone and address claims from ID token.",
-      "CLOCKSKEW": "Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Enables applications to retrieve profile, email, phone and address claims from ID token.",
+      "CLOCKSKEW": "Enables applications to handle clock skew of OP and application. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
       "RECOMMENDED": "recommended",
       "NOTRECOMMENDED": "not recommended",
       "SELECTION": {
@@ -2681,7 +2679,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) and in general all JS frameworks executed in browsers"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
@@ -2702,8 +2701,8 @@
         "TITLE": "SAML",
         "DESCRIPTION": "SAML Applications"
       },
-      "CONFIGSECTION": "SAML Configuration",
-      "CHOOSEMETADATASOURCE": "Provide your SAML configuration using one of the following options:",
+      "CONFIGSECTION": "SAML Settings",
+      "CHOOSEMETADATASOURCE": "Provide your SAML settings using one of the following options:",
       "METADATAOPT1": "Option 1. Specify the url where metadata file is located",
       "METADATAOPT2": "Option 2. Upload a file containing your metadata XML",
       "METADATAOPT3": "Option 3. Create a minimal metadata file on the fly providing ENTITYID and ACS URL",
@@ -2793,10 +2792,11 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "Add a Manager",
+    "ADD": "Add an Administrator",
     "CREATIONTYPE": "Creation Type",
     "CREATIONTYPES": {
       "3": "IAM",
@@ -2808,49 +2808,49 @@
     "EDITROLE": "Edit roles",
     "EDITFOR": "Edit the roles for the user: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Remove Manager",
-      "DELETE_DESCRIPTION": "You are about to remove a manager. Are you sure?"
+      "DELETE_TITLE": "Remove Administrator",
+      "DELETE_DESCRIPTION": "You are about to remove an administrator. Are you sure?"
     },
     "SHOWDETAILS": "Click to show details."
   },
   "ROLESLABEL": "Roles",
   "GRANTS": {
-    "TITLE": "Authorizations",
-    "DESC": "These are all authorizations on your organization.",
-    "DELETE": "Delete Authorization",
-    "EMPTY": "No authorization found",
-    "ADD": "Create Authorization",
+    "TITLE": "Role Assignments",
+    "DESC": "These are all the role assignments on your organization.",
+    "DELETE": "Delete Role Assignment",
+    "EMPTY": "No role assignment found",
+    "ADD": "Create Role Assignment",
     "ADD_BTN": "New",
     "PROJECT": {
-      "TITLE": "Authorization",
-      "DESCRIPTION": "Define authorizations for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
+      "TITLE": "Role Assignment",
+      "DESCRIPTION": "Define role assignments for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
     },
     "USER": {
-      "TITLE": "Authorization",
-      "DESCRIPTION": "Define authorizations for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
+      "TITLE": "Role Assignment",
+      "DESCRIPTION": "Define role assignments for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
     },
     "CREATE": {
-      "TITLE": "Create authorization",
+      "TITLE": "Create role assignment",
       "DESCRIPTION": "Search for the organization, the project, and the corresponding roles."
     },
     "EDIT": {
-      "TITLE": "Change authorization"
+      "TITLE": "Change role assignment"
     },
     "DETAIL": {
-      "TITLE": "Authorization Detail",
-      "DESCRIPTION": "Here you can see all the details of the authorization."
+      "TITLE": "Role assignment detail",
+      "DESCRIPTION": "Here you can see all the details of the role assignment."
     },
     "TOAST": {
-      "UPDATED": "Authorization updated.",
-      "REMOVED": "Authorization removed",
-      "BULKREMOVED": "Authorizations removed.",
-      "CANTSHOWINFO": "You cannot visit this user's profile as you are not a member of the organization where this user belongs to"
+      "UPDATED": "Role assignment updated.",
+      "REMOVED": "Role assignment removed",
+      "BULKREMOVED": "Role assignments removed.",
+      "CANTSHOWINFO": "You cannot visit this user's profile as you are not an administrator of the organization where this user belongs to"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Delete authorization",
-      "DELETE_DESCRIPTION": "You are about to delete an authorization. Do you want to continue?",
-      "BULK_DELETE_TITLE": "Delete authorizations",
-      "BULK_DELETE_DESCRIPTION": "You are about to delete multiple authorizations. Do you want to continue?"
+      "DELETE_TITLE": "Delete role assignment",
+      "DELETE_DESCRIPTION": "You are about to delete a role assignment. Do you want to continue?",
+      "BULK_DELETE_TITLE": "Delete role assignments",
+      "BULK_DELETE_DESCRIPTION": "You are about to delete multiple role assignments. Do you want to continue?"
     }
   },
   "CHANGES": {
