@@ -1582,7 +1582,7 @@
       "ADDPROVIDER": "Añadir proveedor SMS",
       "ADDPROVIDERDESCRIPTION": "Elige uno de los siguientes proveedores e introduce los datos requeridos.",
       "REMOVEPROVIDER": "Eliminar proveedor",
-      "REMOVEPROVIDER_DESC": "Estás a punto de borrar la configuración de un proveedor. ¿Quieres continuar?",
+      "REMOVEPROVIDER_DESC": "Estás a punto de borrar un proveedor. ¿Quieres continuar?",
       "SMSPROVIDERSTATE": {
         "0": "No especificado",
         "1": "Activo",
@@ -2243,7 +2243,7 @@
     },
     "DETAIL": {
       "TITLE": "Proveedor de identidad (IDP)",
-      "DESCRIPTION": "Actualiza la configuración de tu proveedor",
+      "DESCRIPTION": "Actualiza los ajustes de tu proveedor",
       "DATECREATED": "Creado",
       "DATECHANGED": "Cambiado"
     },
@@ -2350,11 +2350,11 @@
     "EMPTY": "No hay IDP disponible",
     "OIDC": {
       "GENERAL": "Información general",
-      "TITLE": "Configuración OIDC",
+      "TITLE": "Ajustes OIDC",
       "DESCRIPTION": "Introduce los datos del proveedor de identidad OIDC."
     },
     "JWT": {
-      "TITLE": "Configuración JWT",
+      "TITLE": "Ajustes JWT",
       "DESCRIPTION": "Introduce los datos para el proveedor de identidad JWT.",
       "HEADERNAME": "Nombre de cabecera",
       "JWTENDPOINT": "JWT Endpoint",
@@ -2515,7 +2515,7 @@
       },
       "DIALOG": {
         "CONFIG": {
-          "TITLE": "Cambiar configuración OIDC"
+          "TITLE": "Cambiar ajustes OIDC"
         },
         "DELETE": {
           "TITLE": "Borrar App",
@@ -2572,7 +2572,7 @@
       "REDIRECTNOTVALID": "Esta URI de redirección no es válida.",
       "COMMAORENTERSEPERATION": "separado con ↵",
       "TYPEREQUIRED": "Se requiere el tipo.",
-      "TITLE": "Configuración OIDC",
+      "TITLE": "Ajustes OIDC",
       "CLIENTID": "ID de cliente",
       "CLIENTSECRET": "Secreto de cliente",
       "CLIENTSECRET_NOSECRET": "Con tu flujo de autenticación elegido, no se requiere ningún secreto y por tanto no está disponible.",
@@ -2668,8 +2668,8 @@
         "TITLE": "SAML",
         "DESCRIPTION": "Aplicaciones SAML"
       },
-      "CONFIGSECTION": "Configuración SAML",
-      "CHOOSEMETADATASOURCE": "Proporciona tu configuración SAML usando una de las siguientes opciones:",
+      "CONFIGSECTION": "Ajustes SAML",
+      "CHOOSEMETADATASOURCE": "Proporciona tus ajustes SAML usando una de las siguientes opciones:",
       "METADATAOPT1": "Opción 1. Especifica la URL donde se encuentra el fichero de metadatos",
       "METADATAOPT2": "Opción 2. Sube un fichero que contenga tus metadatos XML",
       "METADATAOPT3": "Opción 3. Crea, al vuelo, un fichero de metadatos mínimo proporcionando el ENTITYID y la ACS URL",

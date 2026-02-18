@@ -97,7 +97,7 @@
         "NEXT": "What now?",
         "SAML": {
           "TITLE": "Configure your SAML Identity Provider",
-          "DESCRIPTION": "Zitadel is configured. Now your SAML Identity Provider needs some configuration. Most providers allow you to just upload the whole Zitadel metadata XML. Other providers ask you to provide some distinct URLs only, like for example the entity ID (metadata URL), the Assertion Consumer Service (ACS) URL or the Single Logout URL."
+          "DESCRIPTION": "Zitadel is configured. Now your SAML Identity Provider needs some setup. Most providers allow you to just upload the whole Zitadel metadata XML. Other providers ask you to provide some distinct URLs only, like for example the entity ID (metadata URL), the Assertion Consumer Service (ACS) URL or the Single Logout URL."
         },
         "CALLBACK": {
           "TITLE": "Configure your {{ provider }} Identity Provider",
@@ -126,7 +126,7 @@
       },
       "BRANDING": {
         "TITLE": "Branding",
-        "DESCRIPTION": "Customize the look and feel of your login form. Remember to apply your configuration when you are done."
+        "DESCRIPTION": "Customize the look and feel of your login form. Remember to apply your settings when you are done."
       },
       "PRIVACY_POLICY": {
         "TITLE": "External Links",
@@ -448,8 +448,8 @@
     "FRAMEWORK": "Framework",
     "FRAMEWORK_OTHER": "Other (OIDC, SAML, API)",
     "ALMOSTDONE": "You're almost done.",
-    "REVIEWCONFIGURATION": "Review Configuration",
-    "REVIEWCONFIGURATION_DESCRIPTION": "We've created a basic configuration for {{value}} applications. You can adapt this configuration to your needs after creation.",
+    "REVIEWCONFIGURATION": "Review Settings",
+    "REVIEWCONFIGURATION_DESCRIPTION": "We've created a basic setup for {{value}} applications. You can adapt these settings to your needs after creation.",
     "REDIRECTS": "Configure redirects",
     "DEVMODEWARN": "Dev Mode is enabled by default. You can update values for production later.",
     "GUIDE": "Guide",
@@ -1585,7 +1585,7 @@
       "ADDPROVIDER": "Add SMS Provider",
       "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
       "REMOVEPROVIDER": "Remove Provider",
-      "REMOVEPROVIDER_DESC": "You are about to delete a provider configuration. Do you want to continue?",
+      "REMOVEPROVIDER_DESC": "You are about to delete a provider. Do you want to continue?",
       "SMSPROVIDERSTATE": {
         "0": "Unspecified",
         "1": "Active",
@@ -1671,7 +1671,7 @@
     "DIALOG": {
       "RESET": {
         "DEFAULTTITLE": "Reset Setting",
-        "DEFAULTDESCRIPTION": "You are about to reset your settings to the default configuration of your instance. Are you sure you want to continue?",
+        "DEFAULTDESCRIPTION": "You are about to reset your settings to the default settings of your instance. Are you sure you want to continue?",
         "LOGINPOLICY_DESCRIPTION": "Warning: If your continue, Identity Provider settings will be reset to the instance setting too."
       }
     }
@@ -1695,7 +1695,7 @@
       "DESCRIPTION": "Give the login your personalized style and modify its behavior.",
       "PREVIEW_DESCRIPTION": "Changes of the policy will automatically deployed to preview environment.",
       "BTN": "Select File",
-      "ACTIVATEPREVIEW": "Apply configuration",
+      "ACTIVATEPREVIEW": "Apply settings",
       "DARK": "Dark Mode",
       "LIGHT": "Light Mode",
       "CHANGEVIEW": "Change View",
@@ -1720,7 +1720,7 @@
       "FONTCOLOR": "Font color",
       "VIEWS": {
         "PREVIEW": "Preview",
-        "CURRENT": "Current Configuration"
+        "CURRENT": "Current Settings"
       },
       "PREVIEW": {
         "TITLE": "Login",
@@ -1747,7 +1747,7 @@
       "TITLE": "Branding",
       "BTN": "Select File",
       "DESCRIPTION": "Customize the appearance of the Login",
-      "ACTIVATEPREVIEW": "Activate Configuration"
+      "ACTIVATEPREVIEW": "Activate Settings"
     },
     "LOGIN_POLICY": {
       "TITLE": "Login Settings",
@@ -1776,7 +1776,7 @@
       "DESCRIPTION": "Define your texts for the login interfaces. If texts are empty, the default Value shown as the placeholder will be used.",
       "DESCRIPTION_SHORT": "Define your texts for the login interfaces.",
       "NEWERVERSIONEXISTS": "Newer Version exists",
-      "CURRENTDATE": "Current configuration",
+      "CURRENTDATE": "Current settings",
       "CHANGEDATE": "Newer Version from",
       "KEYNAME": "Login Screen / Interface",
       "RESET_TITLE": "Restore Default Values",
@@ -1934,7 +1934,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "Organization",
-    "DESCRIPTION": "Here you can edit the configuration of your organization and manage the members.",
+    "DESCRIPTION": "Here you can edit the settings of your organization and manage the members.",
     "DETAIL": {
       "TITLE": "Detail",
       "NAME": "Name",
@@ -2142,7 +2142,7 @@
       "SELECTGROUPTOOLTIP": "Select all Roles of the group {{group}}.",
       "OPTIONS": "Options",
       "ASSERTION": "Return user roles during authentication",
-      "ASSERTION_DESCRIPTION": "When a user authenticates, their role information is provided to your application. For OpenID Connect, the roles can be requested from the UserInfo endpoint or sent in the ID or Access Token, based on your application's configuration.",
+      "ASSERTION_DESCRIPTION": "When a user authenticates, their role information is provided to your application. For OpenID Connect, the roles can be requested from the UserInfo endpoint or sent in the ID or Access Token, based on your application's settings.",
       "CHECK": "Only authorized users can authenticate",
       "CHECK_DESCRIPTION": "Deny authentication if the user has no roles assigned to this project. Access to the project without a specific role assigned to the user is allowed.",
       "DIALOG": {
@@ -2254,7 +2254,7 @@
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
-      "DESCRIPTION": "Update your provider configuration",
+      "DESCRIPTION": "Update your provider settings",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed"
     },
@@ -2311,7 +2311,7 @@
     "AVAILABLEBUTINACTIVE": "available but inactive",
     "SETAVAILABLE": "set as available",
     "SETUNAVAILABLE": "set as not available",
-    "CONFIG": "Configuration",
+    "CONFIG": "Settings",
     "STATE": "Status",
     "ISSUER": "Issuer",
     "SCOPESLIST": "Scopes List",
@@ -2361,11 +2361,11 @@
     "EMPTY": "No IdP available",
     "OIDC": {
       "GENERAL": "General Information",
-      "TITLE": "OIDC Configuration",
+      "TITLE": "OIDC Settings",
       "DESCRIPTION": "Enter the data for the OIDC Identity Provider."
     },
     "JWT": {
-      "TITLE": "JWT Configuration",
+      "TITLE": "JWT Settings",
       "DESCRIPTION": "Enter the data for JWT Identity Provider.",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
@@ -2467,18 +2467,18 @@
       "TEST": "Test your provider",
       "TYPE": "Type",
       "DIALOG": {
-        "ACTIVATED": "SMTP config has been activated",
-        "ACTIVATE_WARN_TITLE": "Activate SMTP config",
-        "ACTIVATE_WARN_DESCRIPTION": "You are about to activate an SMTP configuration. First we'll deactivate the current active provider and then activate this configuration. Are you sure?",
-        "DEACTIVATE_WARN_TITLE": "Deactivate SMTP config",
-        "DEACTIVATE_WARN_DESCRIPTION": "You are about to deactivate an SMTP configuration. Are you sure?",
-        "DEACTIVATED": "SMTP config has been deactivated",
-        "DELETE_TITLE": "Delete SMTP config",
-        "DELETE_DESCRIPTION": "You are about to delete a configuration. Confirm this action typing the sender name",
-        "DELETED": "SMTP config has been deleted",
-        "SENDER": "Type {{value}}, to delete this SMTP configuration.",
-        "TEST_TITLE": "Test your SMTP config",
-        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "ACTIVATED": "SMTP provider has been activated",
+        "ACTIVATE_WARN_TITLE": "Activate SMTP settings",
+        "ACTIVATE_WARN_DESCRIPTION": "You are about to activate an SMTP provider. First we'll deactivate the current active provider and then activate this one. Are you sure?",
+        "DEACTIVATE_WARN_TITLE": "Deactivate SMTP settings",
+        "DEACTIVATE_WARN_DESCRIPTION": "You are about to deactivate an SMTP provider. Are you sure?",
+        "DEACTIVATED": "SMTP provider has been deactivated",
+        "DELETE_TITLE": "Delete SMTP provider",
+        "DELETE_DESCRIPTION": "You are about to delete a provider. Confirm this action by typing the sender name",
+        "DELETED": "SMTP provider has been deleted",
+        "SENDER": "Type {{value}}, to delete this SMTP provider.",
+        "TEST_TITLE": "Test your SMTP settings",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP settings",
         "TEST_EMAIL": "Email address",
         "TEST_RESULT": "Test result"
       }
@@ -2521,17 +2521,17 @@
     "LIST": "Applications",
     "COMPLIANCE": "OIDC Compliance",
     "URLS": "URLs",
-    "CONFIGURATION": "Configuration",
+    "CONFIGURATION": "Settings",
     "TOKEN": "Token Settings",
     "PAGES": {
       "TITLE": "Application",
       "ID": "ID",
-      "DESCRIPTION": "Here you can edit your application data and it's configuration.",
+      "DESCRIPTION": "Here you can edit your application data and its settings.",
       "CREATE": "Create application",
       "CREATE_SELECT_PROJECT": "Select your project first",
       "CREATE_NEW_PROJECT": "or enter the name for your new project",
       "CREATE_DESC_TITLE": "Enter Your Application Details Step by Step",
-      "CREATE_DESC_SUB": "A recommended configuration will be automatically generated.",
+      "CREATE_DESC_SUB": "A recommended setup will be automatically generated.",
       "STATE": "Status",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed",
@@ -2548,7 +2548,7 @@
       },
       "DIALOG": {
         "CONFIG": {
-          "TITLE": "Change OIDC Configuration"
+          "TITLE": "Change OIDC Settings"
         },
         "DELETE": {
           "TITLE": "Delete App",
@@ -2605,7 +2605,7 @@
       "REDIRECTNOTVALID": "This redirect URI is not valid.",
       "COMMAORENTERSEPERATION": "separate with ↵",
       "TYPEREQUIRED": "The type is required.",
-      "TITLE": "OIDC Configuration",
+      "TITLE": "OIDC Settings",
       "CLIENTID": "Client ID",
       "CLIENTSECRET": "Client Secret",
       "CLIENTSECRET_NOSECRET": "With your chosen authentication flow, no secret is required and is therefore not available.",
@@ -2654,7 +2654,7 @@
       "TOKENTYPE1": "JWT",
       "UNSECUREREDIRECT": "I sure hope you know what you are doing.",
       "OVERVIEWSECTION": "Overview",
-      "OVERVIEWTITLE": "You are now done. Review your configuration.",
+      "OVERVIEWTITLE": "You are now done. Review your settings.",
       "ACCESSTOKENROLEASSERTION": "Add user roles to the access token",
       "ACCESSTOKENROLEASSERTION_DESCRIPTION": "If selected, the requested roles of the authenticated user are added to the access token.",
       "IDTOKENROLEASSERTION": "User roles inside ID Token",
@@ -2701,8 +2701,8 @@
         "TITLE": "SAML",
         "DESCRIPTION": "SAML Applications"
       },
-      "CONFIGSECTION": "SAML Configuration",
-      "CHOOSEMETADATASOURCE": "Provide your SAML configuration using one of the following options:",
+      "CONFIGSECTION": "SAML Settings",
+      "CHOOSEMETADATASOURCE": "Provide your SAML settings using one of the following options:",
       "METADATAOPT1": "Option 1. Specify the url where metadata file is located",
       "METADATAOPT2": "Option 2. Upload a file containing your metadata XML",
       "METADATAOPT3": "Option 3. Create a minimal metadata file on the fly providing ENTITYID and ACS URL",
