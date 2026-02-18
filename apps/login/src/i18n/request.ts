@@ -1,6 +1,6 @@
 import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
-import { getHostedLoginTranslation, getSupportedLanguages } from "@/lib/zitadel";
+import { getHostedLoginTranslation, getAllowedLanguages } from "@/lib/zitadel";
 import { JsonObject } from "@zitadel/client";
 import deepmerge from "deepmerge";
 import { getRequestConfig } from "next-intl/server";
@@ -13,14 +13,14 @@ export default getRequestConfig(async () => {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  let supportedLanguages = LANGS.map((l) => l.code);
+  let allowedLanguages = LANGS.map((l) => l.code);
   let defaultLanguage = fallback;
 
   try {
-    const settings = await getSupportedLanguages({ serviceConfig });
-    if (settings.supportedLanguages?.length) {
+    const settings = await getAllowedLanguages({ serviceConfig });
+    if (settings.allowedLanguages?.length) {
       const localLanguageCodes = LANGS.map((l) => l.code);
-      supportedLanguages = settings.supportedLanguages.filter((l) => localLanguageCodes.includes(l));
+      allowedLanguages = settings.allowedLanguages.filter((l) => localLanguageCodes.includes(l));
     }
     if (settings.defaultLanguage) {
       defaultLanguage = settings.defaultLanguage;
@@ -35,14 +35,14 @@ export default getRequestConfig(async () => {
   if (languageHeader) {
     // splits "en-US,en;q=0.9" to ["en", "US"] or ["en"]
     const headerLocale = languageHeader.split(",")[0].split("-")[0];
-    if (supportedLanguages.includes(headerLocale)) {
+    if (allowedLanguages.includes(headerLocale)) {
       locale = headerLocale;
     }
   }
 
   const languageCookie = cookiesList?.get(LANGUAGE_COOKIE_NAME);
   if (languageCookie && languageCookie.value) {
-    if (supportedLanguages.includes(languageCookie.value)) {
+    if (allowedLanguages.includes(languageCookie.value)) {
       locale = languageCookie.value;
     } else {
       // If the cookie tells a language that is other than the supported ones, fall back to the default.

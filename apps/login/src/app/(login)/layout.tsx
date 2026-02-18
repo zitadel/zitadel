@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { getServiceConfig } from "@/lib/service-url";
-import { getSupportedLanguages } from "@/lib/zitadel";
+import { getAllowedLanguages } from "@/lib/zitadel";
 import { LANGS, getLanguage } from "@/lib/i18n";
 
 const lato = Lato({
@@ -32,9 +32,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   let languages = LANGS;
   try {
-    const settings = await getSupportedLanguages({ serviceConfig });
-    if (settings.supportedLanguages?.length) {
-      languages = settings.supportedLanguages
+    const settings = await getAllowedLanguages({ serviceConfig });
+    if (settings.allowedLanguages?.length) {
+      languages = settings.allowedLanguages
         .filter((code) => LANGS.find((l) => l.code === code))
         .map((code) => getLanguage(code));
     }

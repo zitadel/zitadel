@@ -159,12 +159,12 @@ export async function registerTOTP({ serviceConfig, userId }: WithServiceConfig<
   return userService.registerTOTP({ userId }, {});
 }
 
-export async function getSupportedLanguages({ serviceConfig }: WithServiceConfig) {
+export async function getAllowedLanguages({ serviceConfig }: WithServiceConfig) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
   const callback = settingsService.getGeneralSettings({}, {}).then((resp) => {
     return {
-      supportedLanguages: resp.supportedLanguages,
+      allowedLanguages: resp.allowedLanguages,
       defaultLanguage: resp.defaultLanguage,
     };
   });
