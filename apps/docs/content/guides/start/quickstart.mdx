@@ -21,7 +21,7 @@ Set up your ZITADEL account and organization to begin managing identities for yo
 
 You first need access to the ZITADEL Cloud Customer Portal.
 This is the administrative hub for managing your billing, teams, and instances.
-1. **Sign Up**: Go to [zitadel.com](http://zitadel.com) and select Sign Up.
+1. **Sign Up**: Go to [zitadel.com](https://zitadel.com) and select Sign Up.
 2. **Onboarding**: Follow the prompts to verify your email and set up your Portal Team.
   - Tip: We recommend using Passkeys for a secure, passwordless login experience.
 3. **Access**: Once authenticated, you will be redirected to the Customer Portal dashboard.
@@ -53,7 +53,7 @@ Follow these steps to deploy your first instance:
 ### 4. Create your Project and Application
 
 In ZITADEL, [**Applications**](/guides/manage/console/applications-overview) are grouped into [**Projects**](/guides/manage/console/projects-overview).
-This allows multiple applications (like a React frontend and a Go backend) to share the same roles and authorizations.
+This allows multiple applications (like a React frontend and a Go backend) to share the same roles and role assignments.
 
 #### Launch the Management Console
 
@@ -1036,7 +1036,7 @@ You’ve successfully integrated ZITADEL into an application.
 <Callout type="warn" title="Prevent Misconfiguration Lockouts">
   Login policy misconfigurations that occur during the testing phase can easily lead to a [lockout](/legal/policies/account-lockout-policy). To ensure you don't lose access to your instance:
 
-  1.  **Generate a backup PAT:** Create a [Service User Personal Access Token](/guides/integrate/service-accounts/personal-access-token) with the [`IAM_OWNER`](/guides/manage/console/administrators) role to revert any login UI misconfigurations using the API.
+  1.  **Generate a backup PAT:** Create a [Service Account Personal Access Token](/guides/integrate/service-accounts/personal-access-token) with the [`IAM_OWNER`](/guides/manage/console/administrators) role to revert any login UI misconfigurations using the API.
   2.  **Add a second Instance Administrator:** Always designate at least one [**second instance administrator**](/guides/manage/console/administrators).
 </Callout>
 

@@ -28,7 +28,7 @@ Service accounts represent machines, backend services, or IoT devices requiring 
 * **Authentication:** Authenticates via **JWT Profile** or **Personal Access Tokens (PAT)**. Both methods support expiration settings.
 * **Usage:** Primarily used to gain access to the ZITADEL Management API or to secure backend-to-backend communication.
 
-To see how service users are utilized in practice, check out our [NextJS B2B Demo application](https://github.com/zitadel/zitadel-nextjs-b2b).
+To see how service accounts are utilized in practice, check out our [NextJS B2B Demo application](https://github.com/zitadel/zitadel-nextjs-b2b).
 
 ### Federated Users
 Federated users are identities managed by a third-party Identity Provider (IdP) such as Google, Azure AD, or GitHub.
@@ -93,11 +93,11 @@ Metadata can be requested via the Auth and Management APIs, the Userinfo endpoin
   alt="ID Token settings"
 />
 
-### Authorizations
-User authorizations (roles) are displayed on user profile pages.
+### Role Assignments
+The roles assigned to a user are displayed on user profile pages.
 
 To access these roles in your application:
-* **Userinfo Endpoint:** Check the **Assert roles on authentication** box in your [Project Settings](./roles#authorizations).
+* **Userinfo Endpoint:** Check the **Assert roles on authentication** box in your [Project Settings](./roles#role-assignments).
 * **ID Token:** Toggle **User roles inside ID Token** in your [Application Settings](./applications-overview).
 
 ## References

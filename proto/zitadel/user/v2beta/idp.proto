@@ -49,6 +49,14 @@ message RedirectURLs {
       example: "\"https://custom.com/login/idp/fail\"";
     }
   ];
+  string login_hint = 3 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "login_hint hints to the login page which user wants to log in."
+      max_length: 200;
+      example: "\"someone@example.com\"";
+    }
+  ];
 }
 
 message IDPIntent {

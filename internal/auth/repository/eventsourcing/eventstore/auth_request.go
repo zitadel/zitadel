@@ -855,7 +855,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if err != nil {
 		return err
 	}
-	// let's check if it was a machine user
+	// let's check if it was a service account
 	if !user.MachineView.IsZero() {
 		return zerrors.ThrowPreconditionFailed(nil, "AUTH-DGV4g", "Errors.User.NotHuman")
 	}
