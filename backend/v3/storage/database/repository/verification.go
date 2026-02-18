@@ -49,7 +49,7 @@ func (v verification) init(init *domain.VerificationTypeInit, existingTableName 
 func (v verification) update(update *domain.VerificationTypeUpdate, existingTableName string, instanceID, verificationID database.Column) database.CTEChange {
 	changes := make(database.Changes, 0, 3)
 	if update.Code != nil {
-		changes = append(changes, database.NewChange(v.codeColumn(), *update.Code))
+		changes = append(changes, database.NewChange(v.codeColumn(), update.Code))
 	}
 	if update.Expiry != nil {
 		changes = append(changes, database.NewChange(v.expiryColumn(), *update.Expiry))
