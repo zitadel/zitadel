@@ -41,6 +41,10 @@ const nextConfig = {
     optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
     useCache: true,
   },
+  // Packages that must not be bundled by webpack and should remain as external
+  // requires at runtime. These packages use native modules or have bundling
+  // incompatibilities. Keep this list in sync with package.json dependencies
+  // when adding new OpenTelemetry or logging packages.
   serverExternalPackages: [
     'winston',
     '@opentelemetry/api',
