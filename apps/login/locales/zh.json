@@ -108,14 +108,17 @@
       "description": "为您的账户设置密码",
       "submit": "继续",
       "labels": {
+        "currentPassword": "当前密码",
         "newPassword": "新密码",
         "confirmPassword": "确认密码"
       },
       "required": {
+        "currentPassword": "必须提供当前密码！",
         "newPassword": "必须提供新密码！",
         "confirmPassword": "此字段为必填项"
       },
       "errors": {
+        "currentPasswordInvalid": "当前密码不正确。",
         "couldNotChangePassword": "无法更改密码",
         "couldNotVerifyPassword": "无法验证密码",
         "unknownError": "未知错误"

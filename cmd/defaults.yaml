@@ -1326,7 +1326,7 @@ DefaultInstance:
     # - en
     # - de
   Quotas:
-    # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
+    # Items take a slice of quota settings, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported
 
     # "requests.all.authenticated"
