@@ -108,14 +108,17 @@
       "description": "Hesabınız için şifre belirleyin",
       "submit": "Devam",
       "labels": {
+        "currentPassword": "Mevcut Şifre",
         "newPassword": "Yeni Şifre",
         "confirmPassword": "Şifreyi Onayla"
       },
       "required": {
+        "currentPassword": "Mevcut şifrenizi girmelisiniz!",
         "newPassword": "Yeni bir şifre sağlamalısınız!",
         "confirmPassword": "Bu alan zorunludur"
       },
       "errors": {
+        "currentPasswordInvalid": "Mevcut şifre yanlış.",
         "couldNotChangePassword": "Şifre değiştirilemedi",
         "couldNotVerifyPassword": "Şifre doğrulanamadı",
         "unknownError": "Bilinmeyen hata"
