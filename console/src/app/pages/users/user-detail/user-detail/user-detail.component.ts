@@ -55,7 +55,7 @@ import { Metadata } from '@zitadel/proto/zitadel/metadata_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
-const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
+const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.ROLEASSIGNMENTS' };
 const METADATA: SidenavSetting = { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA' };
 const IDP: SidenavSetting = { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' };
 const SECURITY: SidenavSetting = { id: 'security', i18nKey: 'USER.SETTINGS.SECURITY' };
