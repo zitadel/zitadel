@@ -68,7 +68,6 @@
     "@zitadel/proto": "workspace:*",
     "autoprefixer": "^10.4.23",
     "concurrently": "^9.2.1",
-
     "dotenv-cli": "^8.0.0",
     "env-cmd": "^10.1.0",
     "esbuild": "^0.27.3",
