@@ -29,7 +29,7 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { unstable_cacheLife as cacheLife } from "next/cache";
+import { cacheLife } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
 
