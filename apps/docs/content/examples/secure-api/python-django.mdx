@@ -4,8 +4,8 @@ sidebar_label: Django (API)
 ---
 
 import AppJWT from '../imports/_app_jwt.mdx';
-import ServiceuserJWT from '../imports/_serviceuser_jwt.mdx';
-import ServiceuserRole from '../imports/_serviceuser_role.mdx';
+import ServiceAccountJWT from '../imports/_serviceaccount_jwt.mdx';
+import ServiceAccountRole from '../imports/_serviceaccount_role.mdx';
 import SetupPython from '../imports/_setup_python.mdx';
 import { GithubCodeBlock } from '@/components/github-code-block';
 
@@ -26,13 +26,13 @@ Before we can start building our application, we have to do a few configuration 
 
 <AppJWT components={props.components} />
 
-### Create Serviceuser
+### Create Service Account
 
-<ServiceuserJWT components={props.components} />
+<ServiceAccountJWT components={props.components} />
 
-### Give Serviceuser an authorization
+### Give Service Account an authorization
 
-<ServiceuserRole components={props.components} />
+<ServiceAccountRole components={props.components} />
 
 ### Prerequisites
 
@@ -43,8 +43,8 @@ At the end you should have the following for the API:
 - `.json`-key-file for the API, from the application
 - ID of the project
 
-And the following from the Serviceuser:
-- `.json`-key-file from the serviceuser
+And the following from the Service Account:
+- `.json`-key-file from the service account
 
 ## Setup new Django application
 

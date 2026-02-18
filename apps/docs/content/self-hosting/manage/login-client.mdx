@@ -14,7 +14,7 @@ In that case, you can create a new PAT for the login client manually.
 
 In the following URLs, replace the base URL and the user ID according to your environment.
 
-1. Create a new machine user, for example at http://localhost:8080/ui/console/users/create-machine
+1. Create a new service account, for example at http://localhost:8080/ui/console/users/create-machine
 2. Create a PAT, for example at http://localhost:8080/ui/console/users/332169800719532035?new=true&id=pat
 3. Save the PAT to a file, for example `/path/on/your/host/login-client.pat`
 4. Make sure the user has the `Instance Login Client` role (internally called `IAM_LOGIN_CLIENT`), for example at http://localhost:8080/ui/console/instance/members
@@ -34,7 +34,7 @@ docker run -p 3000:3000 -v /path/on/your/host/login-client.pat:/path/in/containe
 <Callout type="warn">
 Before doing this, make sure you have a working PAT for an instance Owner user.
 In case something goes wrong and you lock yourself out from the login screen, you can revert the changes.
-Create a machine user PAT like you created the [login client PAT above](#create-login-client), but give the user the instance Owner role (internally called `IAM_OWNER`).
+Create a service account PAT like you created the [login client PAT above](#create-login-client), but give the user the instance Owner role (internally called `IAM_OWNER`).
 </Callout>
 
 Enable the `Login V2` feature flag, for example at the bottom of http://localhost:8080/ui/console/instance?id=features.

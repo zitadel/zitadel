@@ -598,7 +598,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               "guides/integrate/identity-providers/azure-ad-oidc",
               "guides/integrate/identity-providers/azure-ad-saml",
               "guides/integrate/identity-providers/okta-oidc",
-              "guides/integrate/identity-providers/okta-saml",
+              "guides/integrate/identity-providers/okta_saml",
               "guides/integrate/identity-providers/keycloak",
               "guides/integrate/identity-providers/onelogin-saml",
               "guides/integrate/identity-providers/pingfederate-saml",

@@ -23,7 +23,7 @@ Its set of features will increase with time and its progress will be tracked [he
 The new Login app consists of a confidential (backend) part and a browser (client side) part.
 In addition to that, the OIDC specification builds upon a proxy which is set up in the Next.js middleware. It rewrites requests of the paths `/.well-known/:path*`, `/oauth/:path*`, `/oidc/:path*` to ZITADEL.
 
-The backend side of the application is authorized using a machine user's personal access token.
+The backend side of the application is authorized using a service account's personal access token.
 This token is used to fetch policies and settings from your instances or organization which define how users are authenticated and how the Login app is displayed.
 
 The frontend side of the application communicates to the backend side by using a cookie which is set by the server.
@@ -137,7 +137,7 @@ You can review an example implementation of a middleware [here](https://github.c
   <img src="https://vercel.com/button" alt="Deploy with Vercel" style={{pointerEvents: "none", display: "block"}}/>
 </a>
 
-To deploy your own version on Vercel, navigate to your instance and create a service user.
+To deploy your own version on Vercel, navigate to your instance and create a service account.
 Create a personal access token (PAT) for the user and copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to Default settings and make sure it gets `IAM_LOGIN_CLIENT` permissions.
 Finally set your instance url as `ZITADEL_API_URL`. Make sure to set it without trailing slash.
 Also ensure your login domain is registered on your instance by adding it as a [Trusted Domain](/apis/resources/admin/admin-service-add-instance-trusted-domain).

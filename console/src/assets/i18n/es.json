@@ -9,7 +9,7 @@
         "DESCRIPTION": "Completa los siguientes pasos para asegurar tu aplicación.",
         "CREATE_PROJECT": {
           "TITLE": "Crear un proyecto",
-          "DESCRIPTION": "Agrega un proyecto y define sus roles y autorizaciones."
+          "DESCRIPTION": "Agrega un proyecto y define sus roles y asignaciones de roles."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Un proyecto alberga una o más aplicaciones, que puedes usar para autenticar a tus usuarios. Por ejemplo, podrías tener un solo proyecto con 3 aplicaciones: una para tu frontend web, otra para tu aplicación móvil y otra para tus servicios backend. También puedes autorizar a tus usuarios con proyectos. Para permitir que usuarios de otras organizaciones se registren en tus aplicaciones, otórgales acceso a tu proyecto.<br/><br/>Si no encuentras un proyecto, contacta al dueño del proyecto o alguien con los derechos correspondientes para obtener acceso.",
       "OWNED": {
         "TITLE": "Proyectos Propios",
-        "DESCRIPTION": "Estos son los proyectos que posees. Puedes gestionar los ajustes de estos proyectos, autorizaciones y aplicaciones."
+        "DESCRIPTION": "Estos son los proyectos que posees. Puedes gestionar los ajustes de estos proyectos, asignaciones de roles y aplicaciones."
       },
       "GRANTED": {
         "TITLE": "Proyectos Concedidos",
@@ -53,17 +53,17 @@
         "METADATA": "Añade atributos personalizados al usuario como el departamento. Puedes usar esta información en tus acciones."
       },
       "MACHINES": {
-        "TITLE": "Usuarios del servicio",
-        "DESCRIPTION": "Los Usuarios del servicio se autentican de manera no interactiva usando un token portador JWT firmado con una clave privada. También pueden usar un token de acceso personal.",
-        "METADATA": "Añade atributos personalizados al usuario como el sistema autenticador. Puedes usar esta información en tus acciones."
+        "TITLE": "Cuentas de servicio",
+        "DESCRIPTION": "Las cuentas de servicio se autentican de manera no interactiva usando un token portador JWT firmado con una clave privada. También pueden usar un token de acceso personal.",
+        "METADATA": "Añade atributos personalizados a la cuenta como el sistema autenticador. Puedes usar esta información en tus acciones."
       },
       "SELF": {
         "METADATA": "Añade atributos personalizados a tu usuario como tu departamento. Puedes usar esta información en las acciones de tu organización."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Autorizaciones",
-      "DESCRIPTION": "Las autorizaciones definen los derechos de acceso de un usuario a un proyecto. Puedes otorgar acceso a un usuario a un proyecto y definir los roles del usuario dentro de ese proyecto."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Asignaciones de roles",
+      "DESCRIPTION": "Las asignaciones de roles definen los derechos de acceso de un usuario a un proyecto. Puedes otorgar acceso a un usuario a un proyecto y definir los roles del usuario dentro de ese proyecto."
     },
     "ACTIONS": {
       "TITLE": "Acciones",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Crea tu primer proyecto",
-        "description": "Añade tu primer proyecto y define sus roles y autorizaciones.",
+        "description": "Añade tu primer proyecto y define sus roles y asignaciones de roles.",
         "action": "Crear proyecto"
       },
       "APPLICATION_CREATED": {
@@ -401,9 +401,9 @@
         "action": "Añadir usuario"
       },
       "user.grant.added": {
-        "title": "Concede permisos",
-        "description": "Permite a tus usuarios acceder a tu aplicación y configura sus roles.",
-        "action": "Conceder permisos"
+        "title": "Asignar roles a usuarios",
+        "description": "Permite a tus usuarios acceder a tu aplicación y configurar sus roles.",
+        "action": "Asignar roles a usuarios"
       }
     }
   },
@@ -424,12 +424,12 @@
     "ROLES": "Roles",
     "GRANTEDPROJECT": "Proyecto concedido",
     "HUMANUSERS": "Usuarios",
-    "MACHINEUSERS": "Usuarios del servicio",
+    "MACHINEUSERS": "Cuentas de servicio",
     "LOGOUT": "Cerrar sesión para todos los usuarios",
     "NEWORG": "Nueva organización",
     "IAMADMIN": "Eres un administrador instancia. Ten en cuenta que tienes permisos ampliados.",
     "SHOWORGS": "Mostrar todas las organizaciones",
-    "GRANTS": "Autorizaciones",
+    "GRANTS": "Asignaciones de roles",
     "ACTIONS": "Acciones",
     "PRIVACY": "Privacidad",
     "TOS": "Términos de Servicio",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios de la organización",
     "ORG_OWNER_VIEWER": "TIene permiso para revisar toda la organización",
     "ORG_SETTINGS_MANAGER": "Tiene permiso para gestionar las configuraciones de la organización",
-    "ORG_USER_PERMISSION_EDITOR": "Tiene permiso para gestionar concesiones de usuario",
+    "ORG_USER_PERMISSION_EDITOR": "Tiene permiso para gestionar asignaciones de roles",
     "ORG_PROJECT_PERMISSION_EDITOR": "Tiene permiso para gestionar concesiones de proyecto",
     "ORG_PROJECT_CREATOR": "Tiene permiso para crear sus propios proyectos y ajustes subyacentes",
     "ORG_ADMIN_IMPERSONATOR": "Tiene permiso para hacerse pasar por administradores y usuarios finales de la organización",
@@ -724,7 +724,7 @@
       "ME": "Ir a tu propio perfil",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
       "USERS": "<strong>G</strong>o to <strong>U</strong>sers",
-      "USERGRANTS": "<strong>G</strong>o to <strong>A</strong>uthorizations",
+      "ROLEASSIGNMENTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments",
       "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows",
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Contraseñas y seguridad",
       "KEYS": "Claves",
       "PAT": "Tokens de acceso personal",
-      "USERGRANTS": "Autorizaciones",
+      "ROLEASSIGNMENTS": "Asignaciones de roles",
       "MEMBERSHIPS": "Roles de administrador",
       "METADATA": "Metadatos"
     },
@@ -990,8 +990,8 @@
       "COUNTRY": "País"
     },
     "MACHINE": {
-      "TITLE": "Detalles del usuario del servicio",
-      "USERNAME": "Nombre de usuario",
+      "TITLE": "Detalles de la cuenta de servicio",
+      "USERNAME": "Nombre de la cuenta",
       "NAME": "Nombre",
       "DESCRIPTION": "Descripción",
       "KEYSTITLE": "Claves",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "Se desactivaron los usuarios seleccionados.",
       "SELECTEDKEYSDELETED": "Se borraron las claves seleccionadas.",
       "KEYADDED": "¡Clave añadida!",
-      "MACHINEADDED": "¡Creado servicio de usuario!",
+      "MACHINEADDED": "¡Cuenta de servicio creada!",
       "DELETED": "¡El usuario se borró con éxito!",
       "UNLOCKED": "¡El usuario se desbloqueó con éxito!",
       "PASSWORDLESSREGISTRATIONSENT": "Enviado con éxito un enlace de registro.",
@@ -2504,7 +2504,7 @@
       "DATECHANGED": "Cambiada",
       "URLS": "URLs",
       "DELETE": "Borrar App",
-      "JUMPTOPROJECT": "Para configurar roles, autorizaciones y más, navegue hasta el proyecto.",
+      "JUMPTOPROJECT": "Para configurar roles, asignaciones de roles y más, navegue hasta el proyecto.",
       "DETAIL": {
         "TITLE": "Detalle",
         "STATE": {
@@ -2782,42 +2782,42 @@
   },
   "ROLESLABEL": "Roles",
   "GRANTS": {
-    "TITLE": "Autorizaciones",
-    "DESC": "Estas son todas las autorizaciones de tu organización.",
-    "DELETE": "Borrar autorización",
-    "EMPTY": "No se encontraron autorizaciones",
-    "ADD": "Crear autorización",
+    "TITLE": "Asignaciones de roles",
+    "DESC": "Estas son todas las asignaciones de roles de tu organización.",
+    "DELETE": "Borrar asignación de rol",
+    "EMPTY": "No se encontraron asignaciones de roles",
+    "ADD": "Crear asignación de rol",
     "ADD_BTN": "Nueva",
     "PROJECT": {
-      "TITLE": "Autorización",
-      "DESCRIPTION": "Define las autorizaciones para el proyecto especificado. Ten en cuenta que solo puedes ver entradas de los proyectos y usuarios para los que tienes permisos."
+      "TITLE": "Asignación de rol",
+      "DESCRIPTION": "Define las asignaciones de roles para el proyecto especificado. Ten en cuenta que solo puedes ver entradas de los proyectos y usuarios para los que tienes permisos."
     },
     "USER": {
-      "TITLE": "Autorización",
-      "DESCRIPTION": "Define las autorizaciones para el usuario especificado. Ten en cuenta que solo puedes ver entradas de los proyectos y usuarios para los que tienes permisos."
+      "TITLE": "Asignación de rol",
+      "DESCRIPTION": "Define las asignaciones de roles para el usuario especificado. Ten en cuenta que solo puedes ver entradas de los proyectos y usuarios para los que tienes permisos."
     },
     "CREATE": {
-      "TITLE": "Crear autorización",
+      "TITLE": "Crear asignación de rol",
       "DESCRIPTION": "Buscar la organización, el proyecto, y los roles correspondientes."
     },
     "EDIT": {
-      "TITLE": "Cambiar autorización"
+      "TITLE": "Cambiar asignación de rol"
     },
     "DETAIL": {
-      "TITLE": "Detalles de autorización",
-      "DESCRIPTION": "Aquí puedes ver todos los detalles de la autorización."
+      "TITLE": "Detalles de asignación de rol",
+      "DESCRIPTION": "Aquí puedes ver todos los detalles de la asignación de rol."
     },
     "TOAST": {
-      "UPDATED": "Autorización actualizada.",
-      "REMOVED": "Autorización eliminada",
-      "BULKREMOVED": "Autorizaciones eliminadas.",
+      "UPDATED": "Asignación de rol actualizada.",
+      "REMOVED": "Asignación de rol eliminada",
+      "BULKREMOVED": "Asignaciones de roles eliminadas.",
       "CANTSHOWINFO": "No puedes visitar el perfil de este usuario porque no eres administrador de la organización a la que pertenece este usuario."
     },
     "DIALOG": {
-      "DELETE_TITLE": "Borrar autorización",
-      "DELETE_DESCRIPTION": "Estás a punto de borrar una autorización. ¿Quieres continuar?",
-      "BULK_DELETE_TITLE": "Borrar autorizaciones",
-      "BULK_DELETE_DESCRIPTION": "Estás a punto de borrar múltiples autorizaciones. ¿Quieres continuar?"
+      "DELETE_TITLE": "Borrar asignación de rol",
+      "DELETE_DESCRIPTION": "Estás a punto de borrar una asignación de rol. ¿Quieres continuar?",
+      "BULK_DELETE_TITLE": "Borrar asignaciones de roles",
+      "BULK_DELETE_DESCRIPTION": "Estás a punto de borrar múltiples asignaciones de roles. ¿Quieres continuar?"
     }
   },
   "CHANGES": {

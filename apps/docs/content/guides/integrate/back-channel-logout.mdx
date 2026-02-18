@@ -52,7 +52,7 @@ provides the possibility to match the exact SSO session, which was terminated.
 ### Client
 
 To enable the back-channel logout on an application, they simply need to register a `backchannel_logout_uri` as part of their
-configuration, e.g. [creating an OIDC application](https://zitadel.com/docs/reference/api/management/management-service-add-oidc-app).
+configuration, e.g. [creating an OIDC application](/guides/manage/console/applications-overview).
 
 As soon as the URI is set, every new authorization request will register a back-channel notification to be sent once
 the session is terminated by a user sign out.

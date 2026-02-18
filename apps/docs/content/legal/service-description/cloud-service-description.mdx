@@ -43,7 +43,7 @@ You can freely choose the infrastructure and location to host ZITADEL.
 ### Responsibilities
 
 Your obligations while operating and using ZITADEL are detailed in our [terms of service](/legal/terms-of-service#your-obligations) given the provisions in our [acceptable use policy](/legal/policies/acceptable-use-policy).
-When using ZITADEL Cloud, we may processing data on behalf according to the [data processing agreement](/legal/data-processing-agreement).
+When using ZITADEL Cloud, we may process data on behalf according to the [data processing agreement](/legal/data-processing-agreement).
 
 In a self-hosted setup, you will be responsible for the cost, operations, and availability of your infrastructure.
 For DDoS, bot, and threat detection and protection we rely on external services in ZITADEL Cloud.
@@ -54,20 +54,20 @@ The SMTP service and SMS service are limited in use.
 You should configure your own service providers for production use cases.
 In a self-hosted setup, you will be responsible for SMTP / SMS services, domains and certificates.
 
-| Responsibility | ZITADEL Cloud | Self-Hosted |
-| --- | --- | --- |
-| Data / Information | Customer | Customer |
-| User Access | Customer | Customer |
-| SMTP Service | Customer (trial: ZITADEL) | Customer |
-| SMS Service | Customer (trial: ZITADEL) | Customer |
-| Custom Domain / TLS | Customer (trial: ZITADEL) | Customer |
-| DDoS & Bot protection | ZITADEL | Customer |
-| WAF / Threat detection | ZITADEL | Customer |
-| [Backup](#backup) | ZITADEL | Customer |
-| Networking | ZITADEL | Customer |
-| Compute / Scaling | ZITADEL | Customer |
-| Database | ZITADEL | Customer |
-| Application | ZITADEL | ZITADEL |
+| Responsibility         | ZITADEL Cloud             | Self-Hosted |
+|------------------------|---------------------------|-------------|
+| Data / Information     | Customer                  | Customer    |
+| User Access            | Customer                  | Customer    |
+| SMTP Service           | Customer (trial: ZITADEL) | Customer    |
+| SMS Service            | Customer (trial: ZITADEL) | Customer    |
+| Custom Domain / TLS    | Customer (trial: ZITADEL) | Customer    |
+| DDoS & Bot protection  | ZITADEL                   | Customer    |
+| WAF / Threat detection | ZITADEL                   | Customer    |
+| [Backup](#backup)      | ZITADEL                   | Customer    |
+| Networking             | ZITADEL                   | Customer    |
+| Compute / Scaling      | ZITADEL                   | Customer    |
+| Database               | ZITADEL                   | Customer    |
+| Application            | ZITADEL                   | ZITADEL     |
 
 ## Data location
 
@@ -81,5 +81,5 @@ Our backup strategy executes daily full backups and differential backups on much
 In a disaster recovery scenario, our goal is to guarantee a recovery point objective (RPO) of 1h, and a higher but similar recovery time objective (RTO).
 Under normal operations, RPO and RTO goals are below 1 minute.
 
-If you you have different requirements we provide you with a flexible approach to backup, restore, and transfer data (f.e. to a self-hosted setup) through our APIs.
+If you have different requirements we provide you with a flexible approach to back up, restore, and transfer data (f.e. to a self-hosted setup) through our APIs.
 Please consult the [migration guides](/guides/migrate/introduction) for more information.

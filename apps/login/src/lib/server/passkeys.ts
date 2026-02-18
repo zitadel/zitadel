@@ -196,6 +196,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     }${os.name}${os.name ? ", " : ""}${browser.name}`;
   }
 
+  let loginName: string | undefined;
   let currentUserId: string;
 
   if (command.sessionId) {
@@ -216,6 +217,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     }
 
     currentUserId = userId;
+    loginName = session?.session?.factors?.user?.loginName;
   } else {
     // UserId-based flow
     currentUserId = command.userId!;
@@ -226,9 +228,11 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     if (!userResponse || !userResponse.user) {
       throw new Error("User not found");
     }
+
+    loginName = userResponse.user.preferredLoginName;
   }
 
-  return zitadelVerifyPasskeyRegistration({
+  const response = await zitadelVerifyPasskeyRegistration({
     serviceConfig,
     request: create(VerifyPasskeyRegistrationRequestSchema, {
       passkeyId: command.passkeyId,
@@ -237,6 +241,8 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
       userId: currentUserId,
     }),
   });
+
+  return { ...response, loginName };
 }
 
 type SendPasskeyCommand = {
