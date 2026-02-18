@@ -15,7 +15,7 @@ You can either create your own application or directly run the example by provid
 
 ## Set up application
 
-Before we begin developing our API, we need to perform a few configuration steps in the ZITADEL Console.
+Before we begin developing our API, we need to perform a few setup steps in the ZITADEL Console.
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select the **API** application type and continue.
 
@@ -47,7 +47,7 @@ So in your application, create a `support/zitadel` package and in there the `Cus
 https://github.com/zitadel/zitadel-java/blob/main/api/src/main/java/demo/app/support/zitadel/CustomAuthorityOpaqueTokenIntrospector.java
 ```
 
-### Application server configuration
+### Application server settings
 
 As we have now our support class, we can now create and configure the application server itself.
 
@@ -59,7 +59,7 @@ It will also use the just created CustomAuthorityOpaqueTokenIntrospector for the
 https://github.com/zitadel/zitadel-java/blob/main/api/src/main/java/demo/app/config/WebSecurityConfig.java
 ```
 
-For the authorization (and the server in general) to work, the application needs some configuration, so please provide the following to your `application.yml` (resources folder):
+For the authorization (and the server in general) to work, the application needs some settings, so please provide the following to your `application.yml` (resources folder):
 
 ```yaml reference
 https://github.com/zitadel/zitadel-java/blob/main/api/src/main/resources/application.yml
