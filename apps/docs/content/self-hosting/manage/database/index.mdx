@@ -57,14 +57,14 @@ Database:
 If you don't have a PostgreSQL superuser available (e.g. managed services like RDS, Cloud SQL, or Azure Database),
 you can pre-provision the user and database yourself and skip the admin-credential requirement.
 
-The `init` command has two distinct responsibilities:
+The `init` command performs two steps that require different privileges:
 
-1. **Instance provisioning** — `CREATE ROLE`, `CREATE DATABASE`, `GRANT` → requires a superuser/admin.
-2. **Schema bootstrapping** — creates schemas (`eventstore`, `projections`, `system`) and tables → requires only database owner privileges.
+- **Provisioning step** — `CREATE ROLE`, `CREATE DATABASE`, `GRANT` → requires a superuser/admin.
+- **Schema bootstrapping step** — creates schemas (`eventstore`, `projections`, `system`) and tables → requires only database owner privileges.
 
-If you handle step 1 manually, you still **must** run step 2. Use the dedicated sub-command `zitadel init schema`, which performs only schema bootstrapping using the service user credentials — no admin privileges needed.
+If you handle the provisioning step manually, you still **must** run the schema bootstrapping step. Use the dedicated sub-command `zitadel init schema`, which performs only schema bootstrapping using the service user credentials — no admin privileges needed.
 
-**Step 1 — Provision user and database (run as superuser)**
+**Provisioning step — Provision user and database (run as superuser)**
 
 :::caution
 Replace `<strong-password>` with a strong, unique password and store it in a secret manager. Do not use trivial passwords in production.
@@ -78,7 +78,7 @@ GRANT CONNECT, CREATE ON DATABASE zitadel TO zitadel;
 
 Adjust `pg_hba.conf` if needed to allow the zitadel user to connect.
 
-**Step 2 — Bootstrap schemas and tables (run as the service user)**
+**Schema bootstrapping step — Bootstrap schemas and tables (run as the service user)**
 
 Set only the service user credentials — no `Admin.*` variables are needed for this command.
 

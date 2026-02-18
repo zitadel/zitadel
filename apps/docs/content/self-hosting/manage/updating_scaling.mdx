@@ -53,26 +53,26 @@ The command `zitadel init` ensures the database connection is ready to use for t
 It just needs to be executed once over ZITADELs full life cycle,
 when you install ZITADEL from scratch.
 
-`zitadel init` performs two distinct tiers of work:
+`zitadel init` performs two steps that require different privileges:
 
-**Tier 1 — Instance provisioning** (requires a PostgreSQL superuser via `Database.postgres.Admin.Username`):
+**Provisioning step** (requires a PostgreSQL superuser via `Database.postgres.Admin.Username`):
 - If it doesn't exist already, it creates the unprivileged user configured in `Database.postgres.User.Username`.
   Subsequent phases connect to the database with this user's credentials only.
 - If it doesn't exist already, it creates a database with the configured database name.
 - If not already done, it grants the necessary permissions to the unprivileged user.
 
-**Tier 2 — Schema bootstrapping** (requires database owner privileges, uses the service user):
+**Schema bootstrapping step** (requires database owner privileges, uses the service user):
 - If they don't exist already, it creates all schemas (`eventstore`, `projections`, `system`) and base tables.
 
 :::note Manual provisioning
-If you manage Tier 1 yourself (e.g. on a managed PostgreSQL service where you don't have superuser access),
-you can skip Tier 1 entirely by running only the schema bootstrapping step:
+If you handle the provisioning step yourself (e.g. on a managed PostgreSQL service where you don't have superuser access),
+you can skip it entirely by running only the schema bootstrapping step:
 
 ```bash
 zitadel init schema
 ```
 
-This sub-command connects using the service user credentials and only performs Tier 2.
+This sub-command connects using the service user credentials and only performs schema bootstrapping.
 No `Admin.*` credentials are required.
 See the [database documentation](/self-hosting/manage/database) for full details.
 :::
