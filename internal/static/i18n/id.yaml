@@ -222,7 +222,7 @@ Errors:
     DomainVerificationHTTPNotFound: "File yang berisi tantangan tidak ditemukan di URL yang diharapkan."
     DomainVerificationHTTPNoMatch: "File yang berisi tantangan telah ditemukan di URL yang diharapkan tetapi tidak berisi teks token yang tepat."
     DomainVerificationTimeout: "Ada waktu tunggu untuk menanyakan server DNS"
-    PrimaryDomainNotDeletable: "Domain primer tidak boleh dihapus"
+    PrimaryDomainNotDeletable: "Domain organisasi tidak boleh dihapus"
     DomainNotFound: "Domain tidak ditemukan"
     MemberIDMissing: "ID anggota hilang"
     MemberNotFound: "Anggota organisasi tidak ditemukan"
@@ -891,7 +891,7 @@ EventTypes:
       verified: "Domain terverifikasi"
       removed: "Domain dihapus"
       primary:
-        set: "Kumpulan domain primer"
+        set: "Domain organisasi ditetapkan"
       reserved: "Domain sudah dipesan"
       released: "Domain dirilis"
     name:
