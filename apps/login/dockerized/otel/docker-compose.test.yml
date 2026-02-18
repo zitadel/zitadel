@@ -42,6 +42,7 @@ services:
       - OTEL_SERVICE_NAME=zitadel-login-test
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      # Intentional test headers used to verify OTLP header propagation in integration tests
       - OTEL_EXPORTER_OTLP_HEADERS=x-test-header=test-value-123,x-another-header=another-value
       - OTEL_LOG_LEVEL=info
       - OTEL_METRICS_EXPORTER=otlp,prometheus
