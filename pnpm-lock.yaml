@@ -12,6 +12,9 @@ importers:
 
   .:
     devDependencies:
+      '@bufbuild/buf':
+        specifier: ^1.65.0
+        version: 1.65.0
       '@changesets/cli':
         specifier: ^2.29.8
         version: 2.29.8(@types/node@25.2.3)
@@ -106,9 +109,6 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      '@bufbuild/buf':
-        specifier: ^1.65.0
-        version: 1.65.0
       '@eslint/eslintrc':
         specifier: ^3.3.3
         version: 3.3.3
@@ -251,9 +251,6 @@ importers:
       '@babel/eslint-parser':
         specifier: ^7.28.6
         version: 7.28.6(@babel/core@7.28.4)(eslint@8.57.1)
-      '@bufbuild/buf':
-        specifier: ^1.64.0
-        version: 1.64.0
       '@faker-js/faker':
         specifier: ^9.9.0
         version: 9.9.0
@@ -558,9 +555,6 @@ importers:
       '@angular/language-service':
         specifier: ^20.3.16
         version: 20.3.16
-      '@bufbuild/buf':
-        specifier: ^1.64.0
-        version: 1.64.0
       '@types/file-saver':
         specifier: ^2.0.7
         version: 2.0.7
@@ -658,12 +652,9 @@ importers:
         specifier: ^5.10.0
         version: 5.10.0
     devDependencies:
-      '@bufbuild/buf':
-        specifier: ^1.64.0
-        version: 1.64.0
       '@bufbuild/protocompile':
         specifier: ^0.0.1
-        version: 0.0.1(@bufbuild/buf@1.64.0)
+        version: 0.0.1(@bufbuild/buf@1.65.0)
       '@types/node':
         specifier: ^24.10.9
         version: 24.10.9
@@ -1237,22 +1228,10 @@ packages:
   '@balena/dockerignore@1.0.2':
     resolution: {integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==}
 
-  '@bufbuild/buf-darwin-arm64@1.64.0':
-    resolution: {integrity: sha512-wv4WJ/ho9Jt4b/3SuwrzCa7r68yvOSMhnpztPivu75CMF+btZijWYjc/Wt6JkOYbGmsXAlSzyANXZaQM9KCm8g==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [darwin]
-
   '@bufbuild/buf-darwin-arm64@1.65.0':
     resolution: {integrity: sha512-2U8CHjW1ysINYKwIPcc4WAiQPxe91RIjNtjpg+RC9rP0aZ7TpGm5MTMY5l3sN4drtmKdb9rBs3bMQsMNhSc90A==}
     engines: {node: '>=12'}
     cpu: [arm64]
-    os: [darwin]
-
-  '@bufbuild/buf-darwin-x64@1.64.0':
-    resolution: {integrity: sha512-2idJ/x94DzsYbiuLticvevXNiTXeCv/WjO7NYcwo8WXOIBHdGKK6nfoEAa4DMSo2qv/u3O2Q9sublQ+LYmITkw==}
-    engines: {node: '>=12'}
-    cpu: [x64]
     os: [darwin]
 
   '@bufbuild/buf-darwin-x64@1.65.0':
@@ -1261,22 +1240,10 @@ packages:
     cpu: [x64]
     os: [darwin]
 
-  '@bufbuild/buf-linux-aarch64@1.64.0':
-    resolution: {integrity: sha512-954Tg1LKjPHNOuOBJH57SDnvHYBFf3NSWccu8bqBcXcRpdebnRiNCDWPGDhXqXXPfLnAbTYMyOdh+D4KsYsygw==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [linux]
-
   '@bufbuild/buf-linux-aarch64@1.65.0':
     resolution: {integrity: sha512-gzqvY4PLRQ7g0+RlE9g+OL/6yPd5szG7e3Wd5bgjJzfKaQerNiQWaGyPLdcRsIM/WxJhT5e5lG8OrrWHwgQ9Ig==}
     engines: {node: '>=12'}
     cpu: [arm64]
-    os: [linux]
-
-  '@bufbuild/buf-linux-armv7@1.64.0':
-    resolution: {integrity: sha512-RDPQK+qMXuA2TV8jvzrGUFR1m+cJ32crxPHXgqmHSd+/LneUdNB/U0euhm94rNP8Xr3EbcMTBQ0kwajF4ZeeKg==}
-    engines: {node: '>=12'}
-    cpu: [arm]
     os: [linux]
 
   '@bufbuild/buf-linux-armv7@1.65.0':
@@ -1285,23 +1252,11 @@ packages:
     cpu: [arm]
     os: [linux]
 
-  '@bufbuild/buf-linux-x64@1.64.0':
-    resolution: {integrity: sha512-PONSa1DorjkMASu9EYtd6ckgMQC5MSHi9aY5CqWwV5hl262A43k2qt3EbYCClyGdNjC+Vu8Av9Blfd91Yg5kRw==}
-    engines: {node: '>=12'}
-    cpu: [x64]
-    os: [linux]
-
   '@bufbuild/buf-linux-x64@1.65.0':
     resolution: {integrity: sha512-0j06h1uKCXlOtrlNcTBkURazT+AwMNvuVxgJsYeUDnSliN05QS7LnBzPOwKg76ariSqlLo+QXk9eNtdhgVjYOg==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [linux]
-
-  '@bufbuild/buf-win32-arm64@1.64.0':
-    resolution: {integrity: sha512-nBEr7udVctBq0TIoCWkoI1BCcwDynKW9u1bX27/0QUnIySm9bgS5AeMyhuWsXKka+kHjR/fMf3tHlP2a5o85ag==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [win32]
 
   '@bufbuild/buf-win32-arm64@1.65.0':
     resolution: {integrity: sha512-KBFsQ3iEityUuLTUCoXAO6ZTGUXWljSjK4upqofsYCb4OJeSeVguD7b09efkQt9ymKsXBt5wQicsRdkMJy/VEA==}
@@ -1309,22 +1264,11 @@ packages:
     cpu: [arm64]
     os: [win32]
 
-  '@bufbuild/buf-win32-x64@1.64.0':
-    resolution: {integrity: sha512-5dwpWxLRCLKQ3xsrmRs8lGO2lL6mVCKRlgvGDj5PCMy9+BmqmwHtPAYMj+nUtqQqUNnax4oADeIfliMmeUXd7g==}
-    engines: {node: '>=12'}
-    cpu: [x64]
-    os: [win32]
-
   '@bufbuild/buf-win32-x64@1.65.0':
     resolution: {integrity: sha512-vJYzHjncSLdy4sPDW8kLqUldHh6Vucg6KabAflm7CDj29lU/HydV8T+nOVsXkoRMUf4+H/qy8WjnSMEtRkaogA==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [win32]
-
-  '@bufbuild/buf@1.64.0':
-    resolution: {integrity: sha512-MC9Zj+pUQsKLEQrsBPmV3CuECYUSD2n82WUcLMu6f49LwSMtKg887B5vPADsf2yMM+6N1LjYHHLb3fN4R1ZGyg==}
-    engines: {node: '>=12'}
-    hasBin: true
 
   '@bufbuild/buf@1.65.0':
     resolution: {integrity: sha512-IQmIBB2CGbJAwx1NkuAWMuj4QGPnZ8mujbf4ckx9t6KI9EzfUzql1OyKi9qPrxlLAciI+kBIyPDQ2MIvXTxWUg==}
@@ -12822,57 +12766,26 @@ snapshots:
 
   '@balena/dockerignore@1.0.2': {}
 
-  '@bufbuild/buf-darwin-arm64@1.64.0':
-    optional: true
-
   '@bufbuild/buf-darwin-arm64@1.65.0':
-    optional: true
-
-  '@bufbuild/buf-darwin-x64@1.64.0':
     optional: true
 
   '@bufbuild/buf-darwin-x64@1.65.0':
     optional: true
 
-  '@bufbuild/buf-linux-aarch64@1.64.0':
-    optional: true
-
   '@bufbuild/buf-linux-aarch64@1.65.0':
-    optional: true
-
-  '@bufbuild/buf-linux-armv7@1.64.0':
     optional: true
 
   '@bufbuild/buf-linux-armv7@1.65.0':
     optional: true
 
-  '@bufbuild/buf-linux-x64@1.64.0':
-    optional: true
-
   '@bufbuild/buf-linux-x64@1.65.0':
-    optional: true
-
-  '@bufbuild/buf-win32-arm64@1.64.0':
     optional: true
 
   '@bufbuild/buf-win32-arm64@1.65.0':
     optional: true
 
-  '@bufbuild/buf-win32-x64@1.64.0':
-    optional: true
-
   '@bufbuild/buf-win32-x64@1.65.0':
     optional: true
-
-  '@bufbuild/buf@1.64.0':
-    optionalDependencies:
-      '@bufbuild/buf-darwin-arm64': 1.64.0
-      '@bufbuild/buf-darwin-x64': 1.64.0
-      '@bufbuild/buf-linux-aarch64': 1.64.0
-      '@bufbuild/buf-linux-armv7': 1.64.0
-      '@bufbuild/buf-linux-x64': 1.64.0
-      '@bufbuild/buf-win32-arm64': 1.64.0
-      '@bufbuild/buf-win32-x64': 1.64.0
 
   '@bufbuild/buf@1.65.0':
     optionalDependencies:
@@ -12894,9 +12807,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@bufbuild/protocompile@0.0.1(@bufbuild/buf@1.64.0)':
+  '@bufbuild/protocompile@0.0.1(@bufbuild/buf@1.65.0)':
     dependencies:
-      '@bufbuild/buf': 1.64.0
+      '@bufbuild/buf': 1.65.0
       '@bufbuild/protobuf': 2.11.0
       fflate: 0.8.2
 

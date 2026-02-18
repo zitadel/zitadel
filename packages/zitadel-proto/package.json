@@ -76,7 +76,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "generate": "buf generate ../../proto",
+    "generate": "pnpm exec buf generate ../../proto",
     "clean": "rm -rf zitadel node_modules google protoc-gen-openapiv2 validate cjs types es"
   },
   "dependencies": {
