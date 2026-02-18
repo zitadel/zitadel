@@ -298,6 +298,11 @@ export const guidesSidebar: readonly SidebarItem[] = [
             type: "category",
             label: "Frontend & Mobile (OIDC/PKCE)",
             items: [
+              {
+                type: "link",
+                label: "Angular",
+                href: "/docs/sdk-examples/oidc-libraries"
+              },
               "sdk-examples/go",
               {
                 type: "link",
@@ -318,6 +323,11 @@ export const guidesSidebar: readonly SidebarItem[] = [
                 type: "link",
                 label: "Vue",
                 href: "https://github.com/zitadel/zitadel-vue",
+              },
+              {
+                type: "link",
+                label: "Other",
+                href: "/docs/sdk-examples/oidc-libraries"
               },
             ],
           },

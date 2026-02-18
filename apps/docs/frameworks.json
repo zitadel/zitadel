@@ -53,8 +53,7 @@
 	{
 		"title": "Go",
 		"imgSrcDark": "/docs/img/tech/golang.svg",
-		"docsLink": "/docs/guides/start/quickstart?framework=go",
-		"sdk": true
+		"docsLink": "/docs/guides/start/quickstart?framework=go"
 	},
 	{
 		"id": "hono",
@@ -129,5 +128,102 @@
 		"description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
 		"imgSrcDark": "/docs/img/tech/vue.svg",
 		"docsLink": "/docs/guides/start/quickstart?framework=vue"
+	},
+	{
+		"id": "java",
+		"title": "Java",
+		"description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
+		"imgSrcDark": "/docs/img/tech/vue.svg",
+		"docsLink": "/docs/guides/start/quickstart?framework=vue"
+	},
+	{
+		"id": "client-dart",
+		"title": "Dart / Flutter",
+		"imgSrcDark": "/docs/img/tech/dart.svg",
+		"docsLink": "https://github.com/smartive/zitadel-dart",
+		"client": true,
+		"external": true
+	},
+	{
+		"title": "Elixir",
+		"imgSrcDark": "/docs/img/tech/elixir.svg",
+		"docsLink": "https://github.com/maennchen/zitadel_api",
+		"client": true,
+		"external": true
+	},
+	{
+		"id": "sdk-go",
+		"title": "Go",
+		"imgSrcDark": "/docs/img/tech/golang.svg",
+		"docsLink": "/docs/sdk-examples/go",
+		"client": true,
+		"sdk": true
+	},
+	{
+		"id": "client-java",
+		"title": "Java",
+		"imgSrcDark": "/docs/img/tech/java.svg",
+		"docsLink": "/docs/sdk-examples/client-libraries/java",
+		"client": true
+	},
+	{
+		"title": ".Net",
+		"imgSrcDark": "/docs/img/tech/dotnet.svg",
+		"docsLink": "https://github.com/smartive/zitadel-net",
+		"external": true,
+		"client": true
+	},
+	{
+		"id": "client-node",
+		"title": "Node.js",
+		"imgSrcDark": "/docs/img/tech/nodejs.svg",
+		"docsLink": "/docs/sdk-examples/client-libraries/node",
+		"client": true
+	},
+	{
+		"id": "client-php",
+		"title": "PHP",
+		"imgSrcDark": "/docs/img/tech/php.svg",
+		"docsLink": "/docs/sdk-examples/client-libraries/php",
+		"client": true
+	},
+	{
+		"id": "client-python",
+		"title": "Python",
+		"imgSrcDark": "/docs/img/tech/python.svg",
+		"docsLink": "/docs/sdk-examples/client-libraries/python",
+		"client": true
+	},
+	{
+		"id": "sdk-react",
+		"title": "React",
+		"imgSrcDark": "/docs/img/tech/react.svg",
+		"docsLink": "https://github.com/zitadel/zitadel-react",
+		"sdk": true,
+		"external": true
+	},
+	{
+		"id": "client-ruby",
+		"title": "Ruby",
+		"imgSrcDark": "/docs/img/tech/ruby.svg",
+		"docsLink": "/docs/sdk-examples/client-libraries/ruby",
+		"client": true
+	},
+	{
+		"title": "Rust",
+		"imgSrcLight": "/docs/img/tech/rust.svg",
+		"imgSrcDark": "/docs/img/tech/rustlight.svg",
+		"docsLink": "https://github.com/smartive/zitadel-rust",
+		"client": true,
+		"sdk": true,
+		"external": true
+	},
+	{
+		"id": "sdk-vue",
+		"title": "Vue",
+		"imgSrcDark": "/docs/img/tech/vue.svg",
+		"docsLink": "https://github.com/zitadel/zitadel-vue",
+		"sdk": true,
+		"external": true
 	}
 ]

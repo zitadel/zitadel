@@ -4,6 +4,7 @@ sidebar_label: Introduction
 ---
 
 import { Frameworks } from "@/components/frameworks";
+import OIDCLibrariesTable from './_oidc-libraries-table.mdx'
 
 You can integrate Zitadel quickly into your application and be up and running within minutes.
 To achieve your goals as fast as possible, we provide you with SDKs, Example Repositories and Guides.
@@ -18,23 +19,18 @@ If you encounter issues with a community-contributed example, please contact the
 We provide this list for informational purposes and to foster community engagement, but we do not assume responsibility for these external implementations.
 </Callout>
 
-## Clients
+## Management Clients
+
+Automate and manage your ZITADEL instance programmatically. These clients are built for Machine-to-Machine (M2M) communication, allowing your backend services to perform administrative tasks without human intervention.
 
 <Frameworks filter={(framework) => framework.client === true } />
 
-## SDKs
+## ZITADEL SDKs
+
+ZITADEL SDKs are purpose-built to provide a deep, idiomatic integration into your specific framework.
+While standard OIDC libraries handle basic authentication, Zitadel SDKs act as a powerful abstraction layer, streamlining complex identity tasks and providing direct access to the ZITADEL core platform.
 
 <Frameworks filter={(framework) => framework.sdk === true } />
-
-## Resources
-
-<Frameworks filter={(framework) => framework.client === false || framework.client == null} />
-
-To further streamline your setup, simply visit the management console in Zitadel where you can select one of the languages or frameworks. This will allow you to instantly set up the configuration for that specific sample in Zitadel, ensuring you have everything you need to get started right away.
-
-![](../../public/img/sdk-examples/console.png)
-
-To begin configuring login for any of these samples, start [here](/guides/manage/console/console-overview).
 
 ## OIDC Libraries
 
@@ -44,13 +40,10 @@ language or framework instead of building your own.
 Certified libraries have undergone rigorous testing and validation to ensure high security and reliability.
 There are many recommended libraries available, this saves time and ensures that users' data is well-protected.
 
-You might want to check out the following links to find a good library:
 
-- [awesome-auth](https://github.com/casbin/awesome-auth)
-- [OpenID General References](https://openid.net/developers/libraries/)
-- [OpenID certified developer tools](https://openid.net/certified-open-id-developer-tools/)
+<OIDCLibrariesTable />
 
-## Other example applications
+## Example Applications
 
 - [B2B customer portal](https://github.com/zitadel/zitadel-nextjs-b2b): Showcase the use of personal access tokens in a B2B environment. Uses Next.js Framework.
 - [Frontend with backend API](https://github.com/zitadel/example-quote-generator-app): A simple web application using a React front-end and a Python back-end API, both secured using Zitadel
