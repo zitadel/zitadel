@@ -2,6 +2,7 @@ import { Client, create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { otelGrpcInterceptor } from "./grpc/interceptors/otel";
+import { createLogger } from "./logger";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { OrganizationSchema, TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest, OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
@@ -35,6 +36,8 @@ import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
 
 import { createServiceForHost } from "./service";
+
+const logger = createLogger("zitadel");
 
 const useCache = process.env.DEBUG !== "true";
 
@@ -1265,7 +1268,7 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
                 req.header.delete(key);
               }
             } else {
-              console.warn(`Skipping malformed header: ${header}`);
+              logger.warn("Skipping malformed header", { header });
             }
           });
         }
