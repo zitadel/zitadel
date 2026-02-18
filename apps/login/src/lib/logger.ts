@@ -39,7 +39,7 @@ const prodFormat = winston.format.combine(
  * In development, outputs colorized human-readable format.
  */
 export const logger = winston.createLogger({
-  level: process.env.OTEL_LOG_LEVEL || process.env.LOG_LEVEL || (isProduction ? "info" : "debug"),
+  level: process.env.OTEL_LOG_LEVEL || process.env.LOG_LEVEL || "info",
   format: isProduction ? prodFormat : devFormat,
   defaultMeta: {
     service: process.env.OTEL_SERVICE_NAME || "zitadel-login",
