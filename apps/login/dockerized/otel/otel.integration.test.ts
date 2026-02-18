@@ -53,8 +53,8 @@ async function waitForService(url: string, maxAttempts = 30, delayMs = 2000): Pr
       console.log(`[waitForService] ${url} returned ${response.status} (attempt ${i + 1})`);
     } catch (error) {
       console.log(`[waitForService] ${url} failed: ${error instanceof Error ? error.message : error} (attempt ${i + 1})`);
-      await new Promise((r) => setTimeout(r, delayMs));
     }
+    await new Promise((r) => setTimeout(r, delayMs));
   }
   console.log(`[waitForService] ${url} timed out after ${maxAttempts} attempts`);
   return false;
