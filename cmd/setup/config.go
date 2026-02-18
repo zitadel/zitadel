@@ -3,7 +3,6 @@ package setup
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -11,7 +10,6 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
@@ -46,8 +44,6 @@ type Config struct {
 	ExternalPort    uint16
 	ExternalSecure  bool
 	Instrumentation instrumentation.Config
-	Log             *old_logging.Config
-	Metrics         *instrumentation.LegacyMetricConfig
 	EncryptionKeys  *encryption.EncryptionKeyConfig
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
@@ -96,20 +92,11 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 		return nil, nil, fmt.Errorf("unable to read default config: %w", err)
 	}
 
-	config.Instrumentation.Metric.SetLegacyConfig(config.Metrics)
-	config.Instrumentation.Log.SetLegacyConfig(config.Log)
 	shutdown, err := instrumentation.Start(cmd.Context(), config.Instrumentation)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
 	}
 	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamReady))
-
-	err = config.Log.SetLogger()
-	if err != nil {
-		err = errors.Join(err, shutdown(cmd.Context()))
-		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
-	}
-
 	id.Configure(config.Machine)
 
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.

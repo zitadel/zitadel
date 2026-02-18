@@ -5,49 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 	"github.com/zitadel/sloggcp"
 )
-
-func TestLogConfig_SetLegacyConfig(t *testing.T) {
-	tests := []struct {
-		name string // description of this test case
-		lc   *old_logging.Config
-		c    *LogConfig
-		want *LogConfig
-	}{
-		{
-			name: "nil legacy config does not change log config",
-			lc:   nil,
-			c:    &LogConfig{Level: slog.LevelInfo},
-			want: &LogConfig{Level: slog.LevelInfo},
-		},
-		{
-			name: "legacy config sets log level when format is disabled",
-			lc:   &old_logging.Config{Level: "debug"},
-			c:    &LogConfig{Level: slog.LevelInfo},
-			want: &LogConfig{Level: slog.LevelDebug},
-		},
-		{
-			name: "legacy config does not change log config when format is not disabled",
-			lc:   &old_logging.Config{Level: "debug"},
-			c:    &LogConfig{Level: slog.LevelInfo, Format: LogFormatJSON},
-			want: &LogConfig{Level: slog.LevelInfo, Format: LogFormatJSON},
-		},
-		{
-			name: "invalid legacy log level defaults to info",
-			lc:   &old_logging.Config{Level: "invalid"},
-			c:    &LogConfig{Level: slog.LevelDebug},
-			want: &LogConfig{Level: slog.LevelInfo},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.c.SetLegacyConfig(tt.lc)
-			assert.Equal(t, tt.want, tt.c)
-		})
-	}
-}
 
 func TestLogConfig_replacer(t *testing.T) {
 	type args struct {
@@ -161,6 +120,112 @@ func TestLogConfig_replacer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.c.replacer()(tt.args.groups, tt.args.a)
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_setLegacyLogger(t *testing.T) {
+	tests := []struct {
+		name    string
+		cfg     LogConfig
+		wantErr bool
+	}{
+		{
+			name:    "empty config",
+			cfg:     LogConfig{},
+			wantErr: false,
+		},
+		{
+			name: "disabled log format",
+			cfg: LogConfig{
+				Format: LogFormatDisabled,
+			},
+			wantErr: false,
+		},
+		{
+			name: "unsupported log format",
+			cfg: LogConfig{
+				Format: LogFormat(999), // invalid format
+			},
+			wantErr: false,
+		},
+		{
+			name: "text log format",
+			cfg: LogConfig{
+				Format: LogFormatText,
+			},
+			wantErr: false,
+		},
+		{
+			name: "json log format",
+			cfg: LogConfig{
+				Format: LogFormatJSON,
+			},
+			wantErr: false,
+		},
+		{
+			name: "gcp log format",
+			cfg: LogConfig{
+				Format: LogFormatGCP,
+			},
+			wantErr: false,
+		},
+		{
+			name: "gcp error reporting log format",
+			cfg: LogConfig{
+				Format: LogFormatGCPErrorReporting,
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid log level",
+			cfg: LogConfig{
+				Format: LogFormatText,
+				Level:  999, // invalid level
+			},
+			wantErr: true,
+		},
+		{
+			name: "level debug",
+			cfg: LogConfig{
+				Format: LogFormatText,
+				Level:  slog.LevelDebug,
+			},
+			wantErr: false,
+		},
+		{
+			name: "level info",
+			cfg: LogConfig{
+				Format: LogFormatText,
+				Level:  slog.LevelInfo,
+			},
+			wantErr: false,
+		},
+		{
+			name: "level warn",
+			cfg: LogConfig{
+				Format: LogFormatText,
+				Level:  slog.LevelWarn,
+			},
+			wantErr: false,
+		},
+		{
+			name: "level error",
+			cfg: LogConfig{
+				Format: LogFormatText,
+				Level:  slog.LevelError,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotErr := setLegacyLogger(tt.cfg)
+			if tt.wantErr {
+				assert.Error(t, gotErr)
+				return
+			}
+			assert.NoError(t, gotErr)
 		})
 	}
 }
