@@ -13,6 +13,38 @@
 #   Same reason — this script must work without Go present.
 set -euo pipefail
 
+# ── VERSIONS & CHECKSUMS ────────────────────────────────────────────────────
+# To upgrade: update VERSION and the SHA256_<os>_<arch> vars below.
+# Note: macOS ships a universal binary, so darwin_amd64 and darwin_arm64 share
+#       the same tarball and checksum.
+
+CONNECT_OPENAPI_VERSION="0.25.2"
+# checksums from upstream checksums.txt
+CONNECT_OPENAPI_SHA256_linux_amd64="90821ab96f16747dc5a4ab93900a6bc6b968d63f47553a08274dc594301bced3"
+CONNECT_OPENAPI_SHA256_linux_arm64="9726418d7af55f87e3bbb2a4fa6233016b200caf5a285ce1c6e6428ef225536d"
+CONNECT_OPENAPI_SHA256_darwin_amd64="a6bc3d87b4caaa7048d22fe0f45e3b5e778b4b209f84a836b3335fb2fd14b588"
+CONNECT_OPENAPI_SHA256_darwin_arm64="a6bc3d87b4caaa7048d22fe0f45e3b5e778b4b209f84a836b3335fb2fd14b588"
+
+# ── HELPERS ──────────────────────────────────────────────────────────────────
+
+verify_sha256() {
+  local file="$1" expected="$2"
+  local actual
+  if command -v sha256sum &>/dev/null; then
+    actual=$(sha256sum "$file" | cut -d' ' -f1)
+  else
+    actual=$(shasum -a 256 "$file" | cut -d' ' -f1)
+  fi
+  if [ "$actual" != "$expected" ]; then
+    echo "ERROR: SHA256 mismatch for $(basename "$file")" >&2
+    echo "  expected: $expected" >&2
+    echo "  actual:   $actual" >&2
+    exit 1
+  fi
+}
+
+# ── PLATFORM DETECTION ───────────────────────────────────────────────────────
+
 _uname_os=$(uname -s | tr '[:upper:]' '[:lower:]')
 _uname_arch=$(uname -m)
 case "$_uname_os" in
@@ -32,17 +64,20 @@ mkdir -p "$BIN_DIR"
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/zitadel-docs-proto-plugins.XXXXXX")
 trap 'rm -rf "$TMP"' EXIT
 
-# ----- protoc-gen-connect-openapi v0.25.2 (sudorandom/protoc-gen-connect-openapi) -----
-# Note: macOS ships a universal binary ("darwin_all") for both amd64 and arm64.
+# ── INSTALL ───────────────────────────────────────────────────────────────────
+
+# ----- protoc-gen-connect-openapi (sudorandom/protoc-gen-connect-openapi) -----
+# macOS ships a single universal ("all") tarball for both amd64 and arm64.
 case "$GOOS" in
   linux)  OAI_ARCH="$GOARCH" ;;
-  darwin) OAI_ARCH="all"      ;;
+  darwin) OAI_ARCH="all"     ;;
 esac
-
-echo "Downloading protoc-gen-connect-openapi v0.25.2 (${GOOS}/${OAI_ARCH})..."
+sha256_var="CONNECT_OPENAPI_SHA256_${GOOS}_${GOARCH}"
+echo "Downloading protoc-gen-connect-openapi v${CONNECT_OPENAPI_VERSION} (${GOOS}/${OAI_ARCH})..."
 curl -fsSL \
-  "https://github.com/sudorandom/protoc-gen-connect-openapi/releases/download/v0.25.2/protoc-gen-connect-openapi_0.25.2_${GOOS}_${OAI_ARCH}.tar.gz" \
+  "https://github.com/sudorandom/protoc-gen-connect-openapi/releases/download/v${CONNECT_OPENAPI_VERSION}/protoc-gen-connect-openapi_${CONNECT_OPENAPI_VERSION}_${GOOS}_${OAI_ARCH}.tar.gz" \
   -o "${TMP}/oai.tar.gz"
+verify_sha256 "${TMP}/oai.tar.gz" "${!sha256_var}"
 tar -xzf "${TMP}/oai.tar.gz" -C "${TMP}" protoc-gen-connect-openapi
 install -m 755 "${TMP}/protoc-gen-connect-openapi" "${BIN_DIR}/protoc-gen-connect-openapi"
 
