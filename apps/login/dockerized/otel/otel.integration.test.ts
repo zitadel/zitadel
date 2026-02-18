@@ -856,127 +856,340 @@ describe("OpenTelemetry Disabled", () => {
 });
 
 describe("Log Level Configuration", () => {
-  describe("LOG_LEVEL=debug", () => {
-    let network: StartedNetwork;
-    let mockZitadel: StartedTestContainer;
-    let loginApp: StartedTestContainer;
-    let appUrl: string;
+  describe("OTEL Disabled", () => {
+    describe("LOG_LEVEL=debug", () => {
+      let network: StartedNetwork;
+      let mockZitadel: StartedTestContainer;
+      let loginApp: StartedTestContainer;
+      let appUrl: string;
 
-    beforeAll(async () => {
-      network = await new Network().start();
+      beforeAll(async () => {
+        network = await new Network().start();
 
-      mockZitadel = await new GenericContainer("node:20-alpine")
-        .withNetwork(network)
-        .withNetworkAliases("mock-zitadel")
-        .withCopyFilesToContainer([
-          { source: path.join(TEST_DIR, "mock-zitadel-server.js"), target: "/app/server.js" },
-        ])
-        .withEnvironment({
-          PORT: "8080",
-        })
-        .withCommand(["node", "/app/server.js"])
-        .withExposedPorts(8080, 7432)
-        .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
-        .start();
+        mockZitadel = await new GenericContainer("node:20-alpine")
+          .withNetwork(network)
+          .withNetworkAliases("mock-zitadel")
+          .withCopyFilesToContainer([
+            { source: path.join(TEST_DIR, "mock-zitadel-server.js"), target: "/app/server.js" },
+          ])
+          .withEnvironment({
+            PORT: "8080",
+          })
+          .withCommand(["node", "/app/server.js"])
+          .withExposedPorts(8080, 7432)
+          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+          .start();
 
-      loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
-        .withNetwork(network)
-        .withExposedPorts(3000)
-        .withEnvironment({
-          ZITADEL_API_URL: "http://mock-zitadel:8080",
-          ZITADEL_SERVICE_USER_TOKEN: "test-token",
-          OTEL_SDK_DISABLED: "true",
-          LOG_LEVEL: "debug",
-        })
-        .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
-        .start();
+        loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
+          .withNetwork(network)
+          .withExposedPorts(3000)
+          .withEnvironment({
+            ZITADEL_API_URL: "http://mock-zitadel:8080",
+            ZITADEL_SERVICE_USER_TOKEN: "test-token",
+            OTEL_SDK_DISABLED: "true",
+            LOG_LEVEL: "debug",
+          })
+          .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
+          .start();
 
-      appUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(3000)}`;
-      console.log(`[LOG_LEVEL=debug] APP_URL: ${appUrl}`);
+        appUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(3000)}`;
+        console.log(`[OTEL_DISABLED + LOG_LEVEL=debug] APP_URL: ${appUrl}`);
 
-      await fetch(`${appUrl}/ui/v2/login/healthy`);
-      await fetch(`${appUrl}/ui/v2/login/otel-test`);
-      await new Promise((r) => setTimeout(r, 1000));
-    }, DOCKER_TIMEOUT);
+        await fetch(`${appUrl}/ui/v2/login/healthy`);
+        await fetch(`${appUrl}/ui/v2/login/otel-test`);
+        await new Promise((r) => setTimeout(r, 1000));
+      }, DOCKER_TIMEOUT);
 
-    afterAll(async () => {
-      await loginApp?.stop();
-      await mockZitadel?.stop();
-      await network?.stop();
-    }, DOCKER_TIMEOUT);
+      afterAll(async () => {
+        await loginApp?.stop();
+        await mockZitadel?.stop();
+        await network?.stop();
+      }, DOCKER_TIMEOUT);
 
-    it("starts successfully with LOG_LEVEL=debug", async () => {
-      const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
-      expect(response.ok).toBe(true);
-    }, TEST_TIMEOUT);
+      it("starts successfully", async () => {
+        const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
+        expect(response.ok).toBe(true);
+      }, TEST_TIMEOUT);
 
-    it("includes info level logs", async () => {
-      const logOutput = await getContainerLogs(loginApp);
-      expect(logOutput).toContain('"level":"info"');
-    }, TEST_TIMEOUT);
+      it("includes info level logs in console", async () => {
+        const logOutput = await getContainerLogs(loginApp);
+        expect(logOutput).toContain('"level":"info"');
+      }, TEST_TIMEOUT);
+    });
+
+    describe("LOG_LEVEL=warn", () => {
+      let network: StartedNetwork;
+      let mockZitadel: StartedTestContainer;
+      let loginApp: StartedTestContainer;
+      let appUrl: string;
+
+      beforeAll(async () => {
+        network = await new Network().start();
+
+        mockZitadel = await new GenericContainer("node:20-alpine")
+          .withNetwork(network)
+          .withNetworkAliases("mock-zitadel")
+          .withCopyFilesToContainer([
+            { source: path.join(TEST_DIR, "mock-zitadel-server.js"), target: "/app/server.js" },
+          ])
+          .withEnvironment({
+            PORT: "8080",
+          })
+          .withCommand(["node", "/app/server.js"])
+          .withExposedPorts(8080, 7432)
+          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+          .start();
+
+        loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
+          .withNetwork(network)
+          .withExposedPorts(3000)
+          .withEnvironment({
+            ZITADEL_API_URL: "http://mock-zitadel:8080",
+            ZITADEL_SERVICE_USER_TOKEN: "test-token",
+            OTEL_SDK_DISABLED: "true",
+            LOG_LEVEL: "warn",
+          })
+          .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
+          .start();
+
+        appUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(3000)}`;
+        console.log(`[OTEL_DISABLED + LOG_LEVEL=warn] APP_URL: ${appUrl}`);
+
+        await fetch(`${appUrl}/ui/v2/login/healthy`);
+        await new Promise((r) => setTimeout(r, 1000));
+      }, DOCKER_TIMEOUT);
+
+      afterAll(async () => {
+        await loginApp?.stop();
+        await mockZitadel?.stop();
+        await network?.stop();
+      }, DOCKER_TIMEOUT);
+
+      it("starts successfully", async () => {
+        const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
+        expect(response.ok).toBe(true);
+      }, TEST_TIMEOUT);
+
+      it("does not include info level logs in console", async () => {
+        const logOutput = await getContainerLogs(loginApp);
+        expect(logOutput).not.toContain('"level":"info"');
+      }, TEST_TIMEOUT);
+
+      it("does not include debug level logs in console", async () => {
+        const logOutput = await getContainerLogs(loginApp);
+        expect(logOutput).not.toContain('"level":"debug"');
+      }, TEST_TIMEOUT);
+    });
   });
 
-  describe("LOG_LEVEL=warn", () => {
-    let network: StartedNetwork;
-    let mockZitadel: StartedTestContainer;
-    let loginApp: StartedTestContainer;
-    let appUrl: string;
+  describe("OTEL Enabled", () => {
+    const OTEL_LOG_OUTPUT_DIR = path.join(OUTPUT_DIR, "loglevel");
 
-    beforeAll(async () => {
-      network = await new Network().start();
+    describe("LOG_LEVEL=debug", () => {
+      let network: StartedNetwork;
+      let otelCollector: StartedTestContainer;
+      let mockZitadel: StartedTestContainer;
+      let loginApp: StartedTestContainer;
+      let appUrl: string;
+      let logOutputDir: string;
 
-      mockZitadel = await new GenericContainer("node:20-alpine")
-        .withNetwork(network)
-        .withNetworkAliases("mock-zitadel")
-        .withCopyFilesToContainer([
-          { source: path.join(TEST_DIR, "mock-zitadel-server.js"), target: "/app/server.js" },
-        ])
-        .withEnvironment({
-          PORT: "8080",
-        })
-        .withCommand(["node", "/app/server.js"])
-        .withExposedPorts(8080, 7432)
-        .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
-        .start();
+      beforeAll(async () => {
+        logOutputDir = path.join(OTEL_LOG_OUTPUT_DIR, "debug");
+        if (fs.existsSync(logOutputDir)) {
+          fs.rmSync(logOutputDir, { recursive: true });
+        }
+        fs.mkdirSync(logOutputDir, { recursive: true });
+        fs.writeFileSync(path.join(logOutputDir, "logs.json"), "");
 
-      loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
-        .withNetwork(network)
-        .withExposedPorts(3000)
-        .withEnvironment({
-          ZITADEL_API_URL: "http://mock-zitadel:8080",
-          ZITADEL_SERVICE_USER_TOKEN: "test-token",
-          OTEL_SDK_DISABLED: "true",
-          LOG_LEVEL: "warn",
-        })
-        .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
-        .start();
+        network = await new Network().start();
 
-      appUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(3000)}`;
-      console.log(`[LOG_LEVEL=warn] APP_URL: ${appUrl}`);
+        otelCollector = await new GenericContainer("otel/opentelemetry-collector-contrib:0.145.0")
+          .withNetwork(network)
+          .withNetworkAliases("otel-collector")
+          .withUser("0:0")
+          .withCommand(["--config=/etc/otel-collector-config.yaml"])
+          .withCopyFilesToContainer([
+            { source: path.join(TEST_DIR, "otel-collector-config.yaml"), target: "/etc/otel-collector-config.yaml" },
+          ])
+          .withBindMounts([{ source: logOutputDir, target: "/tmp/otel" }])
+          .withExposedPorts(4318, 13133)
+          .withWaitStrategy(Wait.forHttp("/", 13133))
+          .start();
 
-      await fetch(`${appUrl}/ui/v2/login/healthy`);
-      await new Promise((r) => setTimeout(r, 1000));
-    }, DOCKER_TIMEOUT);
+        mockZitadel = await new GenericContainer("node:20-alpine")
+          .withNetwork(network)
+          .withNetworkAliases("mock-zitadel")
+          .withCopyFilesToContainer([
+            { source: path.join(TEST_DIR, "mock-zitadel-server.js"), target: "/app/server.js" },
+          ])
+          .withEnvironment({
+            PORT: "8080",
+          })
+          .withCommand(["node", "/app/server.js"])
+          .withExposedPorts(8080, 7432)
+          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+          .start();
 
-    afterAll(async () => {
-      await loginApp?.stop();
-      await mockZitadel?.stop();
-      await network?.stop();
-    }, DOCKER_TIMEOUT);
+        loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
+          .withNetwork(network)
+          .withExposedPorts(3000)
+          .withEnvironment({
+            ZITADEL_API_URL: "http://mock-zitadel:8080",
+            ZITADEL_SERVICE_USER_TOKEN: "test-token",
+            OTEL_SERVICE_NAME: "zitadel-login-loglevel-debug",
+            OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318",
+            OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf",
+            OTEL_LOG_LEVEL: "debug",
+            OTEL_LOGS_EXPORTER: "otlp",
+            OTEL_BSP_SCHEDULE_DELAY: "1000",
+          })
+          .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
+          .start();
 
-    it("starts successfully with LOG_LEVEL=warn", async () => {
-      const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
-      expect(response.ok).toBe(true);
-    }, TEST_TIMEOUT);
+        appUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(3000)}`;
+        console.log(`[OTEL_ENABLED + LOG_LEVEL=debug] APP_URL: ${appUrl}`);
 
-    it("does not include info level logs", async () => {
-      const logOutput = await getContainerLogs(loginApp);
-      expect(logOutput).not.toContain('"level":"info"');
-    }, TEST_TIMEOUT);
+        await fetch(`${appUrl}/ui/v2/login/healthy`);
+        await fetch(`${appUrl}/ui/v2/login/otel-test`);
+        await new Promise((r) => setTimeout(r, 3000));
 
-    it("does not include debug level logs", async () => {
-      const logOutput = await getContainerLogs(loginApp);
-      expect(logOutput).not.toContain('"level":"debug"');
-    }, TEST_TIMEOUT);
+        await waitForFile(path.join(logOutputDir, "logs.json"), 30, 1000);
+      }, DOCKER_TIMEOUT);
+
+      afterAll(async () => {
+        await loginApp?.stop();
+        await mockZitadel?.stop();
+        await otelCollector?.stop();
+        await network?.stop();
+      }, DOCKER_TIMEOUT);
+
+      it("starts successfully", async () => {
+        const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
+        expect(response.ok).toBe(true);
+      }, TEST_TIMEOUT);
+
+      it("exports logs to OTLP collector", () => {
+        const logs = fs.readFileSync(path.join(logOutputDir, "logs.json"), "utf-8");
+        expect(logs.length).toBeGreaterThan(0);
+      }, TEST_TIMEOUT);
+
+      it("includes info level logs in OTLP export", () => {
+        const logs = fs.readFileSync(path.join(logOutputDir, "logs.json"), "utf-8");
+        expect(logs).toContain('"severityText":"info"');
+      }, TEST_TIMEOUT);
+
+      it("includes info level logs in console", async () => {
+        const logOutput = await getContainerLogs(loginApp);
+        expect(logOutput).toContain('"level":"info"');
+      }, TEST_TIMEOUT);
+    });
+
+    describe("LOG_LEVEL=warn", () => {
+      let network: StartedNetwork;
+      let otelCollector: StartedTestContainer;
+      let mockZitadel: StartedTestContainer;
+      let loginApp: StartedTestContainer;
+      let appUrl: string;
+      let logOutputDir: string;
+
+      beforeAll(async () => {
+        logOutputDir = path.join(OTEL_LOG_OUTPUT_DIR, "warn");
+        if (fs.existsSync(logOutputDir)) {
+          fs.rmSync(logOutputDir, { recursive: true });
+        }
+        fs.mkdirSync(logOutputDir, { recursive: true });
+        fs.writeFileSync(path.join(logOutputDir, "logs.json"), "");
+
+        network = await new Network().start();
+
+        otelCollector = await new GenericContainer("otel/opentelemetry-collector-contrib:0.145.0")
+          .withNetwork(network)
+          .withNetworkAliases("otel-collector")
+          .withUser("0:0")
+          .withCommand(["--config=/etc/otel-collector-config.yaml"])
+          .withCopyFilesToContainer([
+            { source: path.join(TEST_DIR, "otel-collector-config.yaml"), target: "/etc/otel-collector-config.yaml" },
+          ])
+          .withBindMounts([{ source: logOutputDir, target: "/tmp/otel" }])
+          .withExposedPorts(4318, 13133)
+          .withWaitStrategy(Wait.forHttp("/", 13133))
+          .start();
+
+        mockZitadel = await new GenericContainer("node:20-alpine")
+          .withNetwork(network)
+          .withNetworkAliases("mock-zitadel")
+          .withCopyFilesToContainer([
+            { source: path.join(TEST_DIR, "mock-zitadel-server.js"), target: "/app/server.js" },
+          ])
+          .withEnvironment({
+            PORT: "8080",
+          })
+          .withCommand(["node", "/app/server.js"])
+          .withExposedPorts(8080, 7432)
+          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+          .start();
+
+        loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
+          .withNetwork(network)
+          .withExposedPorts(3000)
+          .withEnvironment({
+            ZITADEL_API_URL: "http://mock-zitadel:8080",
+            ZITADEL_SERVICE_USER_TOKEN: "test-token",
+            OTEL_SERVICE_NAME: "zitadel-login-loglevel-warn",
+            OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318",
+            OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf",
+            OTEL_LOG_LEVEL: "warn",
+            OTEL_LOGS_EXPORTER: "otlp",
+            OTEL_BSP_SCHEDULE_DELAY: "1000",
+          })
+          .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
+          .start();
+
+        appUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(3000)}`;
+        console.log(`[OTEL_ENABLED + LOG_LEVEL=warn] APP_URL: ${appUrl}`);
+
+        await fetch(`${appUrl}/ui/v2/login/healthy`);
+        await fetch(`${appUrl}/ui/v2/login/otel-test`);
+        await new Promise((r) => setTimeout(r, 3000));
+      }, DOCKER_TIMEOUT);
+
+      afterAll(async () => {
+        await loginApp?.stop();
+        await mockZitadel?.stop();
+        await otelCollector?.stop();
+        await network?.stop();
+      }, DOCKER_TIMEOUT);
+
+      it("starts successfully", async () => {
+        const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
+        expect(response.ok).toBe(true);
+      }, TEST_TIMEOUT);
+
+      it("does not include info level logs in console", async () => {
+        const logOutput = await getContainerLogs(loginApp);
+        expect(logOutput).not.toContain('"level":"info"');
+      }, TEST_TIMEOUT);
+
+      it("does not include debug level logs in console", async () => {
+        const logOutput = await getContainerLogs(loginApp);
+        expect(logOutput).not.toContain('"level":"debug"');
+      }, TEST_TIMEOUT);
+
+      it("does not export info level logs to OTLP", () => {
+        const logsPath = path.join(logOutputDir, "logs.json");
+        if (fs.existsSync(logsPath)) {
+          const logs = fs.readFileSync(logsPath, "utf-8");
+          expect(logs).not.toContain('"severityText":"info"');
+        }
+      }, TEST_TIMEOUT);
+
+      it("does not export debug level logs to OTLP", () => {
+        const logsPath = path.join(logOutputDir, "logs.json");
+        if (fs.existsSync(logsPath)) {
+          const logs = fs.readFileSync(logsPath, "utf-8");
+          expect(logs).not.toContain('"severityText":"debug"');
+        }
+      }, TEST_TIMEOUT);
+    });
   });
 });
