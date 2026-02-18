@@ -10,7 +10,6 @@ const COMPOSE_FILE = path.join(TEST_DIR, "docker-compose.test.yml");
 const DOCKER_TIMEOUT = 180000;
 const TEST_TIMEOUT = 30000;
 
-// Dynamic port discovery - populated in beforeAll
 let APP_URL = "";
 let PROMETHEUS_URL = "";
 let COLLECTOR_HEALTH_URL = "";
@@ -25,7 +24,6 @@ function getHostPort(service: string, containerPort: number): number {
     cwd: TEST_DIR,
     encoding: "utf-8",
   }).trim();
-  // Output format: 0.0.0.0:12345 or [::]:12345
   const match = output.match(/:(\d+)$/);
   if (!match) {
     throw new Error(`Failed to parse port from: ${output}`);
@@ -153,17 +151,14 @@ describe("OpenTelemetry Integration", () => {
     try {
       execSync(`docker compose -f ${COMPOSE_FILE} down -v`, { stdio: "pipe", cwd: TEST_DIR });
     } catch {
-      // Container cleanup may fail if not running
     }
 
-    // Clean output directory to ensure fresh data
     if (fs.existsSync(OUTPUT_DIR)) {
       fs.rmSync(OUTPUT_DIR, { recursive: true });
     }
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
     execSync(`docker compose -f ${COMPOSE_FILE} up -d --build`, { stdio: "inherit", cwd: TEST_DIR });
 
-    // Discover dynamically assigned ports
     const appPort = getHostPort("login-app", 3000);
     const prometheusPort = getHostPort("login-app", 9464);
     const collectorHealthPort = getHostPort("otel-collector", 13133);
@@ -179,7 +174,6 @@ describe("OpenTelemetry Integration", () => {
     console.log(`[PORTS] COLLECTOR_HEALTH_URL: ${COLLECTOR_HEALTH_URL}`);
     console.log(`[PORTS] MOCK_ZITADEL_URL: ${MOCK_ZITADEL_URL}`);
 
-    // Debug: show container status and logs
     try {
       const psOutput = execSync(`docker compose -f ${COMPOSE_FILE} ps -a`, { cwd: TEST_DIR, encoding: "utf-8" });
       console.log("[DEBUG] Container status:\n", psOutput);
@@ -203,7 +197,6 @@ describe("OpenTelemetry Integration", () => {
     await fetch(`${APP_URL}/ui/v2/login/healthy`);
     await fetch(`${APP_URL}/ui/v2/login/this-does-not-exist-404`);
 
-    // Wait for telemetry files to be written (includes batch processor flush and Docker volume sync)
     const tracesReady = await waitForFile(path.join(OUTPUT_DIR, "traces.json"));
     if (!tracesReady) throw new Error("Traces file not found");
     const logsReady = await waitForFile(path.join(OUTPUT_DIR, "logs.json"));
@@ -216,7 +209,6 @@ describe("OpenTelemetry Integration", () => {
     try {
       execSync(`docker compose -f ${COMPOSE_FILE} down -v`, { stdio: "pipe", cwd: TEST_DIR });
     } catch {
-      // Container cleanup may fail if already stopped
     }
   }, DOCKER_TIMEOUT);
 
@@ -329,7 +321,6 @@ describe("OpenTelemetry Integration", () => {
           .flatMap((rs: { scopeSpans: Array<{ scope: { name: string }; spans: unknown[] }> }) => rs.scopeSpans)
           .filter((ss: { scope: { name: string } }) => ss.scope.name === "@opentelemetry/instrumentation-http")
           .flatMap((ss: { spans: unknown[] }) => ss.spans);
-        // Verify no HTTP instrumentation spans contain /healthy
         const healthySpans = httpSpans.filter(
           (s: { attributes?: Array<{ key: string; value: { stringValue?: string } }> }) =>
             s.attributes?.some(
@@ -810,7 +801,6 @@ describe("OpenTelemetry Disabled", () => {
         cwd: TEST_DIR,
       });
     } catch {
-      // Cleanup may fail if not running
     }
 
     execSync(`docker compose -f ${DISABLED_COMPOSE_FILE} up -d --build`, {
@@ -833,7 +823,6 @@ describe("OpenTelemetry Disabled", () => {
         cwd: TEST_DIR,
       });
     } catch {
-      // Cleanup may fail
     }
   }, DOCKER_TIMEOUT);
 
