@@ -63,18 +63,20 @@
     "generate-proto-docs": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm generate:proto-docs",
+        "command": "bash -c 'PATH=\"${PWD}/../../.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" pnpm generate:proto-docs'",
         "cwd": "apps/docs"
       },
       "dependsOn": [
-        "fetch-remote-content"
+        "fetch-remote-content",
+        "@zitadel/api:generate-install"
       ],
       "outputs": [
         "{projectRoot}/openapi"
       ],
       "cache": true,
       "inputs": [
-        "default",
+        "{projectRoot}/scripts/generate-proto-docs.mjs",
+        "{projectRoot}/buf.gen.yaml",
         "{workspaceRoot}/proto/**/*",
         {
           "dependentTasksOutputFiles": "apps/docs/content/versions.json"

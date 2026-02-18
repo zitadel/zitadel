@@ -17,6 +17,12 @@
     },
     "generate": {
       "description": "Generates code from protobuf definitions for API v1 endpoints",
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash -c 'PATH=\"${PWD}/../.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" pnpm exec buf generate ../proto --include-imports --include-wkt'",
+        "cwd": "console"
+      },
+      "dependsOn": ["@zitadel/api:generate-install"],
       "inputs": [
         "{workspaceRoot}/proto/**/*",
         "{projectRoot}/buf.gen.yaml",

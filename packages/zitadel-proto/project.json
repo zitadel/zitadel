@@ -3,7 +3,8 @@
   "targets": {
     "generate": {
       "inputs": [
-        "default",
+        "{projectRoot}/buf.gen.yaml",
+        "{projectRoot}/package.json",
         "{workspaceRoot}/pnpm-lock.yaml",
         "{workspaceRoot}/proto/**/*"
       ],
