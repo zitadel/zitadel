@@ -39,7 +39,6 @@ services:
     environment:
       - HOSTNAME=0.0.0.0
       - PORT=3000
-      - OTEL_SDK_DISABLED=false
       - OTEL_SERVICE_NAME=zitadel-login-test
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
