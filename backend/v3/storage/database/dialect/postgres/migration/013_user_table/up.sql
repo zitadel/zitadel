@@ -40,13 +40,13 @@ CREATE TABLE zitadel.users(
 
     , password_hash                         TEXT        CHECK ((type = 'machine' AND password_hash IS NULL)                         OR (type = 'human'))
     , password_change_required              BOOLEAN     CHECK ((type = 'machine' AND password_change_required IS NULL)              OR (type = 'human'))
-    , password_changed_at                  TIMESTAMPTZ CHECK ((type = 'machine' AND password_changed_at IS NULL)                  OR (type = 'human'))
+    , password_changed_at                   TIMESTAMPTZ CHECK ((type = 'machine' AND password_changed_at IS NULL)                   OR (type = 'human'))
     , password_verification_id              TEXT        CHECK ((type = 'machine' AND password_verification_id IS NULL)              OR (type = 'human')) -- used for reset password flow
     , password_last_successful_check        TIMESTAMPTZ CHECK ((type = 'machine' AND password_last_successful_check IS NULL)        OR (type = 'human'))
     , password_failed_attempts              SMALLINT    CHECK ((type = 'machine' AND password_failed_attempts IS NULL)              OR (type = 'human') AND (password_failed_attempts >= 0))
 
     , email                                 TEXT        CHECK ((type = 'machine' AND email IS NULL)                                 OR (type = 'human'))
-    , unverified_email                       TEXT       CHECK ((type = 'machine' AND unverified_email IS NULL)                      OR (type = 'human')) -- after successful verification this column is not cleared.
+    , unverified_email                      TEXT        CHECK ((type = 'machine' AND unverified_email IS NULL)                      OR (type = 'human')) -- after successful verification this column is not cleared.
     , email_verified_at                     TIMESTAMPTZ CHECK ((type = 'machine' AND email_verified_at IS NULL)                     OR (type = 'human'))
     , email_verification_id                 TEXT        CHECK ((type = 'machine' AND email_verification_id IS NULL)                 OR (type = 'human' AND (email IS DISTINCT FROM unverified_email OR email_verification_id IS NULL)))
     , email_otp_enabled_at                  TIMESTAMPTZ CHECK ((type = 'machine' AND email_otp_enabled_at IS NULL)                  OR (type = 'human'))
@@ -64,6 +64,7 @@ CREATE TABLE zitadel.users(
     , totp_secret                           BYTEA       CHECK ((type = 'machine' AND totp_secret IS NULL)                           OR (type = 'human'))
     , totp_verified_at                      TIMESTAMPTZ CHECK ((type = 'machine' AND totp_verified_at IS NULL)                      OR (type = 'human'))
     , totp_last_successful_check            TIMESTAMPTZ CHECK ((type = 'machine' AND totp_last_successful_check IS NULL)            OR (type = 'human'))
+    , totp_failed_attempts                  SMALLINT    CHECK ((type = 'machine' AND totp_failed_attempts IS NULL)                  OR (type = 'human'))
 
     -- foreign keys for verifications are created in the verification migration
 
@@ -84,7 +85,7 @@ ALTER TABLE zitadel.authorizations ADD CONSTRAINT fk_authorization_user FOREIGN 
 CREATE UNIQUE INDEX ON zitadel.users(instance_id, organization_id, username) WHERE username_org_unique IS TRUE; --TODO(adlerhurst): does that work if a username is already present on a user without org unique?
 CREATE UNIQUE INDEX ON zitadel.users(instance_id, username) WHERE username_org_unique IS FALSE;
 CREATE INDEX idx_user_username ON zitadel.users (username);
-CREATE INDEX idx_user_username_insensitive ON zitadel.users (lower(username));
+CREATE INDEX idx_user_username_lower ON zitadel.users (lower(username));
 CREATE INDEX idx_machine_name ON zitadel.users (name);
 CREATE INDEX idx_human_email ON zitadel.users (email);
 CREATE INDEX idx_human_email_lower ON zitadel.users (lower(email));

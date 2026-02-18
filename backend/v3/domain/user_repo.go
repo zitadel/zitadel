@@ -7,6 +7,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/user.mock.go . UserRepository
@@ -198,6 +199,7 @@ type humanEmailChanges interface {
 	DisableEmailOTP() database.Change
 	// SetLastSuccessfulEmailOTPCheck sets the last successful email OTP check time
 	// If checkedAt is zero, it will be set to NOW()
+	// It resets the failed attempts
 	SetLastSuccessfulEmailOTPCheck(checkedAt time.Time) database.Change
 	// IncrementEmailOTPFailedAttempts increments the email OTP failed attempts
 	IncrementEmailOTPFailedAttempts() database.Change
@@ -228,6 +230,7 @@ type humanPhoneChanges interface {
 	DisableSMSOTP() database.Change
 	// SetLastSuccessfulSMSOTPCheck sets the last successful SMS OTP check time
 	// If checkedAt is zero, it will be set to NOW()
+	// It resets the failed attempts
 	SetLastSuccessfulSMSOTPCheck(checkedAt time.Time) database.Change
 	// IncrementSMSOTPFailedAttempts increments the SMS OTP failed attempts
 	IncrementSMSOTPFailedAttempts() database.Change
@@ -237,7 +240,7 @@ type humanPhoneChanges interface {
 
 type humanTOTPChanges interface {
 	// SetTOTP changes the TOTP secret and verification timestamp
-	SetTOTPSecret(secret []byte) database.Change
+	SetTOTPSecret(secret *crypto.CryptoValue) database.Change
 	// SetTOTPVerifiedAt sets the TOTP verified at time
 	// If verifiedAt is zero, it will be set to NOW()
 	SetTOTPVerifiedAt(verifiedAt time.Time) database.Change
@@ -245,7 +248,12 @@ type humanTOTPChanges interface {
 	RemoveTOTP() database.Change
 	// SetLastSuccessfulTOTPCheck sets the last successful TOTP check time
 	// If checkedAt is zero, it will be set to NOW()
+	// It resets the failed attempts
 	SetLastSuccessfulTOTPCheck(checkedAt time.Time) database.Change
+	// IncrementTOTPFailedAttempts increments the TOTP failed attempts
+	IncrementTOTPFailedAttempts() database.Change
+	// ResetTOTPFailedAttempts resets the TOTP failed attempts
+	ResetTOTPFailedAttempts() database.Change
 }
 
 type identityProviderLinkChanges interface {

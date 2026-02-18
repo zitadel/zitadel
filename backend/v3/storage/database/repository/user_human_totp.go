@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 // -------------------------------------------------------------
@@ -11,7 +12,7 @@ import (
 // -------------------------------------------------------------
 
 // SetTOTPSecret implements [domain.HumanUserRepository.SetTOTPSecret].
-func (u userHuman) SetTOTPSecret(secret []byte) database.Change {
+func (u userHuman) SetTOTPSecret(secret *crypto.CryptoValue) database.Change {
 	return database.NewChange(u.totpSecretColumn(), secret)
 }
 
@@ -35,9 +36,25 @@ func (u userHuman) RemoveTOTP() database.Change {
 // SetLastSuccessfulTOTPCheck implements [domain.HumanUserRepository.SetLastSuccessfulTOTPCheck].
 func (u userHuman) SetLastSuccessfulTOTPCheck(checkedAt time.Time) database.Change {
 	if checkedAt.IsZero() {
-		return database.NewChange(u.lastSuccessfulTOTPCheckColumn(), database.NowInstruction)
+		return database.NewChanges(
+			database.NewChange(u.lastSuccessfulTOTPCheckColumn(), database.NowInstruction),
+			u.ResetTOTPFailedAttempts(),
+		)
 	}
-	return database.NewChange(u.lastSuccessfulTOTPCheckColumn(), checkedAt)
+	return database.NewChanges(
+		database.NewChange(u.lastSuccessfulTOTPCheckColumn(), checkedAt),
+		u.ResetTOTPFailedAttempts(),
+	)
+}
+
+// IncrementTOTPFailedAttempts implements [domain.HumanUserRepository.IncrementTOTPFailedAttempts].
+func (u userHuman) IncrementTOTPFailedAttempts() database.Change {
+	return database.NewIncrementColumnChange(u.totpFailedAttemptsColumn(), database.Coalesce(u.totpFailedAttemptsColumn(), 0))
+}
+
+// ResetTOTPFailedAttempts implements [domain.HumanUserRepository.ResetTOTPFailedAttempts].
+func (u userHuman) ResetTOTPFailedAttempts() database.Change {
+	return database.NewChange(u.totpFailedAttemptsColumn(), 0)
 }
 
 // -------------------------------------------------------------
@@ -58,4 +75,8 @@ func (u userHuman) totpVerifiedAtColumn() database.Column {
 
 func (u userHuman) lastSuccessfulTOTPCheckColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "totp_last_successful_check")
+}
+
+func (u userHuman) totpFailedAttemptsColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "totp_failed_attempts")
 }

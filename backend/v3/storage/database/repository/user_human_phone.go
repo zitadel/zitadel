@@ -75,9 +75,15 @@ func (u userHuman) DisableSMSOTP() database.Change {
 
 func (u userHuman) SetLastSuccessfulSMSOTPCheck(checkedAt time.Time) database.Change {
 	if checkedAt.IsZero() {
-		return database.NewChange(u.lastSuccessfulSMSOTPCheckColumn(), database.NowInstruction)
+		return database.NewChanges(
+			database.NewChange(u.lastSuccessfulSMSOTPCheckColumn(), database.NowInstruction),
+			u.ResetSMSOTPFailedAttempts(),
+		)
 	}
-	return database.NewChange(u.lastSuccessfulSMSOTPCheckColumn(), checkedAt)
+	return database.NewChanges(
+		database.NewChange(u.lastSuccessfulSMSOTPCheckColumn(), checkedAt),
+		u.ResetSMSOTPFailedAttempts(),
+	)
 }
 
 // IncrementSMSOTPFailedAttempts implements [domain.HumanUserRepository.IncrementSMSOTPFailedAttempts].

@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 type User struct {
@@ -120,8 +122,8 @@ type HumanPhone struct {
 }
 
 type HumanTOTP struct {
-	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"-"`
-	Secret     []byte    `json:"secret,omitempty" db:"-"`
+	VerifiedAt time.Time           `json:"verifiedAt,omitzero" db:"-"`
+	Secret     *crypto.CryptoValue `json:"secret,omitempty" db:"-"`
 	// LastSuccessfullyCheckedAt is the time when the TOTP was last successfully checked
 	LastSuccessfullyCheckedAt *time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"-"`
 

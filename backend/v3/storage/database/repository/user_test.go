@@ -196,7 +196,12 @@ func Test_user_List(t *testing.T) {
 			},
 			TOTP: &domain.HumanTOTP{
 				VerifiedAt: now,
-				Secret:     []byte("secret"),
+				Secret: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "aes-256",
+					KeyID:      "id",
+					Crypted:    []byte("secret"),
+				},
 			},
 			IdentityProviderLinks: []*domain.IdentityProviderLink{
 				{
@@ -313,7 +318,12 @@ func Test_user_List(t *testing.T) {
 			},
 			TOTP: &domain.HumanTOTP{
 				VerifiedAt: now,
-				Secret:     []byte("secret"),
+				Secret: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "aes-256",
+					KeyID:      "id",
+					Crypted:    []byte("secret"),
+				},
 			},
 			IdentityProviderLinks: []*domain.IdentityProviderLink{
 				{
@@ -2958,7 +2968,12 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.SetTOTPSecret([]byte("new-secret")),
+					humanRepo.SetTOTPSecret(&crypto.CryptoValue{
+						CryptoType: crypto.TypeEncryption,
+						Algorithm:  "aes-256",
+						KeyID:      "id",
+						Crypted:    []byte("new-secret"),
+					}),
 				},
 			},
 			want: want{
@@ -2966,7 +2981,12 @@ func Test_user_Update(t *testing.T) {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
 					u.Human.TOTP = &domain.HumanTOTP{
-						Secret: []byte("new-secret"),
+						Secret: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "aes-256",
+							KeyID:      "id",
+							Crypted:    []byte("new-secret"),
+						},
 					}
 					return u
 				}(),
@@ -2976,7 +2996,12 @@ func Test_user_Update(t *testing.T) {
 			name: "set human totp verified at",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetTOTPSecret([]byte("secret")),
+					humanRepo.SetTOTPSecret(&crypto.CryptoValue{
+						CryptoType: crypto.TypeEncryption,
+						Algorithm:  "aes-256",
+						KeyID:      "id",
+						Crypted:    []byte("secret"),
+					}),
 				)
 				return err
 			},
@@ -2991,7 +3016,12 @@ func Test_user_Update(t *testing.T) {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
 					u.Human.TOTP = &domain.HumanTOTP{
-						Secret:     []byte("secret"),
+						Secret: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "aes-256",
+							KeyID:      "id",
+							Crypted:    []byte("secret"),
+						},
 						VerifiedAt: now,
 					}
 					return u
@@ -3002,7 +3032,12 @@ func Test_user_Update(t *testing.T) {
 			name: "set human remove totp",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetTOTPSecret([]byte("secret")),
+					humanRepo.SetTOTPSecret(&crypto.CryptoValue{
+						CryptoType: crypto.TypeEncryption,
+						Algorithm:  "aes-256",
+						KeyID:      "id",
+						Crypted:    []byte("secret"),
+					}),
 					humanRepo.SetTOTPVerifiedAt(now),
 				)
 				return err
@@ -3026,7 +3061,12 @@ func Test_user_Update(t *testing.T) {
 			name: "set human last successful totp check",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.SetTOTPSecret([]byte("secret")),
+					humanRepo.SetTOTPSecret(&crypto.CryptoValue{
+						CryptoType: crypto.TypeEncryption,
+						Algorithm:  "aes-256",
+						KeyID:      "id",
+						Crypted:    []byte("secret"),
+					}),
 					humanRepo.SetTOTPVerifiedAt(now),
 				)
 				return err
@@ -3042,7 +3082,12 @@ func Test_user_Update(t *testing.T) {
 					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
 					require.NoError(t, err)
 					u.Human.TOTP = &domain.HumanTOTP{
-						Secret:                    []byte("secret"),
+						Secret: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "aes-256",
+							KeyID:      "id",
+							Crypted:    []byte("secret"),
+						},
 						VerifiedAt:                now,
 						LastSuccessfullyCheckedAt: &now,
 					}

@@ -510,7 +510,12 @@ func Test_humanUser_create(t *testing.T) {
 							},
 							TOTP: &domain.HumanTOTP{
 								VerifiedAt: createdAt,
-								Secret:     []byte("secret"),
+								Secret: &crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "aes-256",
+									KeyID:      "id",
+									Crypted:    []byte("secret"),
+								},
 							},
 						},
 					},
@@ -538,7 +543,12 @@ func Test_humanUser_create(t *testing.T) {
 							},
 							TOTP: &domain.HumanTOTP{
 								VerifiedAt: createdAt,
-								Secret:     []byte("secret"),
+								Secret: &crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "aes-256",
+									KeyID:      "id",
+									Crypted:    []byte("secret"),
+								},
 							},
 						},
 					},

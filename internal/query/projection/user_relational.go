@@ -402,6 +402,14 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 			}
 		}
 
+		password := domain.HumanPassword{
+			IsChangeRequired: e.ChangeRequired,
+		}
+		if hash := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash); hash != "" {
+			password.Hash = hash
+			password.ChangedAt = e.CreatedAt()
+		}
+
 		return userRepo.Create(ctx, v3Tx, &domain.User{
 			InstanceID:     e.Aggregate().InstanceID,
 			OrganizationID: e.Aggregate().ResourceOwner,
@@ -410,6 +418,8 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 			State:          domain.UserStateActive,
 			CreatedAt:      e.CreatedAt(),
 			UpdatedAt:      e.CreatedAt(),
+			// TODO check when to set username unique
+			// IsUsernameOrgUnique: ,
 			Human: &domain.HumanUser{
 				FirstName:         e.FirstName,
 				LastName:          e.LastName,
@@ -420,12 +430,8 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 				Email: domain.HumanEmail{
 					UnverifiedAddress: string(e.EmailAddress),
 				},
-				Phone: phone,
-				Password: domain.HumanPassword{
-					IsChangeRequired: e.ChangeRequired,
-					ChangedAt:        e.CreatedAt(),
-					Hash:             crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash),
-				},
+				Phone:    phone,
+				Password: password,
 			},
 		})
 	}), nil
@@ -453,6 +459,14 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 			}
 		}
 
+		password := domain.HumanPassword{
+			IsChangeRequired: e.ChangeRequired,
+		}
+		if hash := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash); hash != "" {
+			password.Hash = hash
+			password.ChangedAt = e.CreatedAt()
+		}
+
 		return userRepo.Create(ctx, v3Tx, &domain.User{
 			InstanceID:     e.Aggregate().InstanceID,
 			OrganizationID: e.Aggregate().ResourceOwner,
@@ -461,6 +475,8 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 			State:          domain.UserStateActive,
 			CreatedAt:      e.CreatedAt(),
 			UpdatedAt:      e.CreatedAt(),
+			// TODO check when to set username unique
+			// IsUsernameOrgUnique: ,
 			Human: &domain.HumanUser{
 				FirstName:         e.FirstName,
 				LastName:          e.LastName,
@@ -471,12 +487,8 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 				Email: domain.HumanEmail{
 					UnverifiedAddress: string(e.EmailAddress),
 				},
-				Phone: phone,
-				Password: domain.HumanPassword{
-					IsChangeRequired: e.ChangeRequired,
-					ChangedAt:        e.CreatedAt(),
-					Hash:             crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash),
-				},
+				Phone:    phone,
+				Password: password,
 			},
 		})
 	}), nil
@@ -1731,11 +1743,7 @@ func (p *userRelationalProjection) reduceTOTPAdded(event eventstore.Event) (*han
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			// repo.SetTOTP(&domain.VerificationTypeInit{
-			// 	CreatedAt: e.CreatedAt(),
-			// 	Code:      e.Secret,
-			// 	Value:     gu.Ptr(string(e.Secret.Crypted)),
-			// }),
+			repo.SetTOTPSecret(e.Secret),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1755,9 +1763,7 @@ func (p *userRelationalProjection) reduceTOTPVerified(event eventstore.Event) (*
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			// repo.SetTOTP(&domain.VerificationTypeVerified{
-			// 	VerifiedAt: e.CreatedAt(),
-			// }),
+			repo.SetTOTPVerifiedAt(e.CreatedAt()),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1817,9 +1823,7 @@ func (p *userRelationalProjection) reduceTOTPCheckFailed(event eventstore.Event)
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			// repo.CheckTOTP(&domain.CheckTypeFailed{
-			// 	FailedAt: e.CreatedAt(),
-			// }),
+			repo.IncrementTOTPFailedAttempts(),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err

@@ -60,9 +60,15 @@ func (u userHuman) DisableEmailOTP() database.Change {
 
 func (u userHuman) SetLastSuccessfulEmailOTPCheck(checkedAt time.Time) database.Change {
 	if checkedAt.IsZero() {
-		return database.NewChange(u.lastSuccessfulEmailOTPCheckColumn(), database.NowInstruction)
+		return database.NewChanges(
+			database.NewChange(u.lastSuccessfulEmailOTPCheckColumn(), database.NowInstruction),
+			u.ResetEmailOTPFailedAttempts(),
+		)
 	}
-	return database.NewChange(u.lastSuccessfulEmailOTPCheckColumn(), checkedAt)
+	return database.NewChanges(
+		database.NewChange(u.lastSuccessfulEmailOTPCheckColumn(), checkedAt),
+		u.ResetEmailOTPFailedAttempts(),
+	)
 }
 
 func (u userHuman) IncrementEmailOTPFailedAttempts() database.Change {
