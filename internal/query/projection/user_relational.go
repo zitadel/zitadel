@@ -178,7 +178,15 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceHumanPasswordChanged,
 				},
 				{
+					Event:  user.UserV1PasswordChangedType,
+					Reduce: p.reduceHumanPasswordChanged,
+				},
+				{
 					Event:  user.HumanPasswordCodeAddedType,
+					Reduce: p.reduceHumanPasswordCodeAdded,
+				},
+				{
+					Event:  user.UserV1PasswordCodeAddedType,
 					Reduce: p.reduceHumanPasswordCodeAdded,
 				},
 				{
@@ -186,7 +194,15 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceHumanPasswordCheckSucceeded,
 				},
 				{
+					Event:  user.UserV1PasswordCheckSucceededType,
+					Reduce: p.reduceHumanPasswordCheckSucceeded,
+				},
+				{
 					Event:  user.HumanPasswordCheckFailedType,
+					Reduce: p.reduceHumanPasswordCheckFailed,
+				},
+				{
+					Event:  user.UserV1PasswordCheckFailedType,
 					Reduce: p.reduceHumanPasswordCheckFailed,
 				},
 				{
@@ -329,7 +345,15 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceTOTPAdded,
 				},
 				{
+					Event:  user.UserV1MFAOTPAddedType,
+					Reduce: p.reduceTOTPAdded,
+				},
+				{
 					Event:  user.HumanMFAOTPVerifiedType,
+					Reduce: p.reduceTOTPVerified,
+				},
+				{
+					Event:  user.UserV1MFAOTPVerifiedType,
 					Reduce: p.reduceTOTPVerified,
 				},
 				{
@@ -337,11 +361,23 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceTOTPRemoved,
 				},
 				{
+					Event:  user.UserV1MFAOTPRemovedType,
+					Reduce: p.reduceTOTPRemoved,
+				},
+				{
 					Event:  user.HumanMFAOTPCheckSucceededType,
 					Reduce: p.reduceTOTPCheckSucceeded,
 				},
 				{
+					Event:  user.UserV1MFAOTPCheckSucceededType,
+					Reduce: p.reduceTOTPCheckSucceeded,
+				},
+				{
 					Event:  user.HumanMFAOTPCheckFailedType,
+					Reduce: p.reduceTOTPCheckFailed,
+				},
+				{
+					Event:  user.UserV1MFAOTPCheckFailedType,
 					Reduce: p.reduceTOTPCheckFailed,
 				},
 				{
@@ -1596,6 +1632,35 @@ func (p *userRelationalProjection) reducePasskeyInitCodeRequested(event eventsto
 		return err
 	}), nil
 }
+
+// func (p *userRelationalProjection) reducePasskeyCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+// 	var e user.HumanWebAuthNCheckSucceededEvent
+// 	switch typed := event.(type) {
+// 	case *user.HumanPasswordlessCheckSucceededEvent:
+// 		e = typed.HumanWebAuthNCheckSucceededEvent
+// 	case *user.HumanU2FCheckSucceededEvent:
+// 		e = typed.HumanWebAuthNCheckSucceededEvent
+// 	default:
+// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type for passkey %s", event.Type())
+// 	}
+
+// 	return handler.NewStatement(&e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+// 		tx, ok := ex.(*sql.Tx)
+// 		if !ok {
+// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+// 		}
+// 		repo := repository.HumanUserRepository()
+// 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+// 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 			repo.UpdatePasskey(
+// 				repo.PasskeyConditions().IDCondition(e.WebAuthNTokenID),
+// 				repo.SetLastSuccessfulPasskeyCheck(e.CreatedAt()),
+// 			),
+// 			repo.SetUpdatedAt(e.CreatedAt()),
+// 		)
+// 		return err
+// 	}), nil
+// }
 
 func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanMFAInitSkippedEvent](event)
