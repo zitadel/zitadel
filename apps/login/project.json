@@ -78,7 +78,7 @@
       ]
     },
     "test": {
-      "description": "Runs all tests (unit and integration)",
+      "description": "Runs all tests (unit only)",
       "dependsOn": [
         "test-unit"
       ]
