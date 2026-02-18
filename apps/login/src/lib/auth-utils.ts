@@ -8,7 +8,8 @@ import { LANGS } from "@/lib/i18n";
  * Check if a language code is valid (supported by the login UI)
  */
 export function isValidLanguage(code: string): boolean {
-  return LANGS.some((lang) => lang.code === code);
+  const normalized = code.trim().toLowerCase();
+  return LANGS.some((lang) => lang.code === normalized);
 }
 
 /**
@@ -19,11 +20,19 @@ export function getValidLocaleFromUILocales(uiLocales: string[] | undefined): st
   if (!uiLocales || uiLocales.length === 0) {
     return null;
   }
-  
+
   for (const locale of uiLocales) {
+    // Check if locale is valid
+    if (isValidLanguage(locale)) {
+      return locale;
+    }
     // uiLocales may contain language tags like "en-US" or "de-CH"
     // Extract the language code (part before the hyphen)
-    const languageCode = locale.split("-")[0].toLowerCase();
+    // Note this will strip any regional specifyer
+    // e.g. de-CH and de-AT both becomes just de
+    // zh-Hans-CN (Simplified) and zh-Hant-TW (Traditional) both become zh
+    // As of time of writing, this is expected behaviour, since there is only one translation for all languages
+    const languageCode = locale.split("-")[0];
     if (isValidLanguage(languageCode)) {
       return languageCode;
     }
