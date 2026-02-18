@@ -13,11 +13,18 @@ const PORT = process.env.PORT || 8080;
 const OUTPUT_DIR = process.env.OUTPUT_DIR || "/tmp/otel";
 const HEADERS_FILE = path.join(OUTPUT_DIR, "captured-headers.json");
 
-// Safely stringify JSON to reduce XSS risk when reflecting user input
+/**
+ * Safely stringify a value to JSON with XSS-preventing character escapes.
+ *
+ * Escapes `<`, `>`, `&`, and `/` to their Unicode equivalents to prevent
+ * script injection when the output is reflected in HTTP responses or
+ * embedded in HTML contexts.
+ *
+ * @param {unknown} value - The value to stringify
+ * @returns {string} JSON string with dangerous characters escaped
+ */
 function safeJsonStringify(value) {
-  const json = JSON.stringify(value, null, 2);
-  // Escape characters that could lead to script execution if misinterpreted as HTML/JS
-  return json
+  return JSON.stringify(value, null, 2)
     .replace(/</g, "\\u003c")
     .replace(/>/g, "\\u003e")
     .replace(/&/g, "\\u0026")
