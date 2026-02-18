@@ -10,7 +10,7 @@ BIN_DIR="${PWD}/.artifacts/bin/${GOOS}/${GOARCH}"
 
 mkdir -p "$BIN_DIR"
 
-TMP=$(mktemp -d)
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/zitadel-binary-plugins.XXXXXX")
 trap 'rm -rf "$TMP"' EXIT
 
 # ----- protoc-gen-grpc-web v1.5.0 (grpc/grpc-web) -----
