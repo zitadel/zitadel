@@ -1,5 +1,6 @@
 {
   "name": "@zitadel/docs",
+  "packageManager": "pnpm@10.28.2",
   "private": true,
   "type": "module",
   "scripts": {
