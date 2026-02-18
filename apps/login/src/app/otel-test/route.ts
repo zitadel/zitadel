@@ -22,10 +22,7 @@ export async function GET() {
   const span = tracer.startSpan("test-span");
 
   try {
-    logger.debug("OTEL_TEST_DEBUG: Debug level message");
-    logger.info("OTEL_TEST_INFO: Info level message");
-    logger.warn("OTEL_TEST_WARN: Warn level message");
-    logger.error("OTEL_TEST_ERROR: Error level message");
+    logger.info("OTEL test endpoint called", { test: true });
 
     const meter = metrics.getMeter("otel-test");
     const counter = meter.createCounter("otel_test_requests_total", {
