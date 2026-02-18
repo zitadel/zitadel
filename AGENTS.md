@@ -90,6 +90,16 @@ Run commands from the repository root.
 - `@zitadel/docs`: `dev`, `build`, `generate`, `check-links`, `check-types`, `test`, `lint`
 - `@zitadel/console`: `dev`, `build`, `generate`, `lint`
 
+## PR Title Convention
+
+PR titles are validated by the Semantic PR app. Format:
+
+`<type>(<scope>): <short summary>`
+
+**Types**: must come from the list in [`.github/semantic.yml`](.github/semantic.yml) under `types:` — e.g. `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+
+**Scopes**: optional, but if used must come from the list in [`.github/semantic.yml`](.github/semantic.yml) under `scopes:`. When in doubt, omit the scope — do not invent values not on that list.
+
 ## Documentation
 - **Human Guide**: See `CONTRIBUTING.md` for setup and contribution details.
 - **API Design**: See `API_DESIGN.md` for API specific guidelines.
