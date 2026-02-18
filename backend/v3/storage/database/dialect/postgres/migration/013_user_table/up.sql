@@ -25,7 +25,7 @@ CREATE TABLE zitadel.users(
     , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 
     , PRIMARY KEY (instance_id, id)
-    , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations(instance_id, id)
+    , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations(instance_id, id) ON DELETE CASCADE
 
     -- human
 

@@ -25,8 +25,6 @@ func Test_user_Get(t *testing.T) {
 	t.Cleanup(rollback)
 
 	userRepo := repository.UserRepository()
-	// humanRepo := repository.HumanUserRepository()
-	// machineRepo := repository.MachineUserRepository()
 
 	instanceID := createInstance(t, tx)
 
@@ -142,8 +140,6 @@ func Test_user_List(t *testing.T) {
 	t.Cleanup(rollback)
 
 	userRepo := repository.UserRepository()
-	// humanRepo := repository.HumanUserRepository()
-	// machineRepo := repository.MachineUserRepository()
 
 	instanceID := createInstance(t, tx)
 
@@ -526,7 +522,6 @@ func Test_user_ListConditions(t *testing.T) {
 
 	userRepo := repository.UserRepository()
 	humanRepo := repository.HumanUserRepository()
-	// machineRepo := repository.MachineUserRepository()
 
 	instanceID1 := createInstance(t, tx)
 	instance1OrgID1 := createOrganization(t, tx, instanceID1)
