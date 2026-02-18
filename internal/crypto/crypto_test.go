@@ -69,10 +69,15 @@ func TestCrypt(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"encrypt",
-			args{[]byte("test"), &mockEncCrypto{}},
-			&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("test")},
-			false,
+			name:    "encrypt ok",
+			args:    args{[]byte("test"), &mockEncCrypto{}},
+			want:    &CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("test")},
+			wantErr: false,
+		},
+		{
+			name:    "encryption algorithm nil should return error",
+			args:    args{[]byte("test"), nil},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -101,10 +106,15 @@ func TestEncrypt(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"ok",
-			args{[]byte("test"), &mockEncCrypto{}},
-			&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("test")},
-			false,
+			name:    "ok",
+			args:    args{[]byte("test"), &mockEncCrypto{}},
+			want:    &CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("test")},
+			wantErr: false,
+		},
+		{
+			name:    "encryption algorithm nil should return error",
+			args:    args{[]byte("test"), nil},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -133,16 +143,25 @@ func TestDecrypt(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"ok",
-			args{&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("test")}, &mockEncCrypto{}},
-			[]byte("test"),
-			false,
+			name:    "ok",
+			args:    args{&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("test")}, &mockEncCrypto{}},
+			want:    []byte("test"),
+			wantErr: false,
 		},
 		{
-			"wrong id",
-			args{&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID2", Crypted: []byte("test")}, &mockEncCrypto{}},
-			nil,
-			true,
+			name:    "wrong id",
+			args:    args{&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID2", Crypted: []byte("test")}, &mockEncCrypto{}},
+			wantErr: true,
+		},
+		{
+			name:    "when encryption algorithm is nil should return error",
+			args:    args{&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID2", Crypted: []byte("test")}, nil},
+			wantErr: true,
+		},
+		{
+			name:    "when crypto value is nil should return error",
+			args:    args{nil, &mockEncCrypto{}},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -171,16 +190,26 @@ func TestDecryptString(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"ok",
-			args{&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("test")}, &mockEncCrypto{}},
-			"test",
-			false,
+			name:    "ok",
+			args:    args{&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("test")}, &mockEncCrypto{}},
+			want:    "test",
+			wantErr: false,
 		},
 		{
-			"wrong id",
-			args{&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID2", Crypted: []byte("test")}, &mockEncCrypto{}},
-			"",
-			true,
+			name:    "wrong id",
+			args:    args{&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID2", Crypted: []byte("test")}, &mockEncCrypto{}},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "when encryption algorithm is nil should return error",
+			args:    args{&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID2", Crypted: []byte("test")}, nil},
+			wantErr: true,
+		},
+		{
+			name:    "when crypto value is nil should return error",
+			args:    args{nil, &mockEncCrypto{}},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
