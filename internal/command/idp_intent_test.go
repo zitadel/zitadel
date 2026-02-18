@@ -1585,6 +1585,30 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 			},
 		},
 		{
+			"oauth tokens - no refresh token",
+			args{
+				&oauth.Session{
+					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+						Token: &oauth2.Token{
+							AccessToken: "accessToken",
+						},
+					},
+				},
+				crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res{
+				accessToken: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("accessToken"),
+				},
+				refreshToken: nil,
+				idToken:      "",
+				err:          nil,
+			},
+		},
+		{
 			"oidc tokens",
 			args{
 				&openid.Session{
