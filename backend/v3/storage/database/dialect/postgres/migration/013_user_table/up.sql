@@ -30,7 +30,7 @@ CREATE TABLE zitadel.users(
     -- human
 
     , first_name                            TEXT        CHECK ((type = 'machine' AND first_name IS NULL)                            OR (type = 'human' AND first_name <> ''))
-    , last_name                             TEXT        CHECK ((type = 'machine' AND last_name IS NULL)                             OR (type = 'human' AND last_name <> ''))))
+    , last_name                             TEXT        CHECK ((type = 'machine' AND last_name IS NULL)                             OR (type = 'human' AND last_name <> ''))
     , nickname                              TEXT        CHECK ((type = 'machine' AND nickname IS NULL)                              OR (type = 'human'))
     , display_name                          TEXT        CHECK ((type = 'machine' AND display_name IS NULL)                          OR (type = 'human'))
     , preferred_language                    TEXT        CHECK ((type = 'machine' AND preferred_language IS NULL)                    OR (type = 'human'))
