@@ -37,20 +37,46 @@ Database:
         Key:
 ```
 
-The admin user is only needed for the installation step but can also be avoided
-by preparing the necessary requirements:
+### Managed PostgreSQL / No Admin Access
 
-* the zitadel user
-* the zitadel database
-* granting required permissions to the zitadel user
+If you don't have a PostgreSQL superuser available (e.g. managed services like RDS, Cloud SQL, or Azure Database),
+you can pre-provision the user and database yourself and skip the admin-credential requirement.
+
+The `init` command has two distinct responsibilities:
+
+1. **Instance provisioning** — `CREATE ROLE`, `CREATE DATABASE`, `GRANT` → requires a superuser/admin.
+2. **Schema bootstrapping** — creates schemas (`eventstore`, `projections`, `system`) and tables → requires only database owner privileges.
+
+If you handle step 1 manually, you still **must** run step 2. Use the dedicated sub-command `zitadel init schema`, which performs only schema bootstrapping using the service user credentials — no admin privileges needed.
+
+**Step 1 — Provision user and database (run as superuser)**
 
 ```sql
-CREATE ROLE zitadel LOGIN;
-CREATE DATABASE zitadel;
+CREATE ROLE zitadel LOGIN PASSWORD 'zitadel';
+CREATE DATABASE zitadel WITH OWNER zitadel;
 GRANT CONNECT, CREATE ON DATABASE zitadel TO zitadel;
 ```
 
-Don't forget to adjust `pg_hba.conf` and set a password for the zitadel user.
+Adjust `pg_hba.conf` if needed to allow the zitadel user to connect.
 
-With the setup done, follow the [phases guide](/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime)
-to run the init and then setup phase to get all necessary tables and data set up.
+**Step 2 — Bootstrap schemas and tables (run as the service user)**
+
+Set only the service user credentials — no `Admin.*` variables are needed for this command:
+
+```bash
+ZITADEL_DATABASE_POSTGRES_HOST=localhost \
+  ZITADEL_DATABASE_POSTGRES_PORT=5432 \
+  ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel \
+  ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel \
+  ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel \
+  ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable \
+  zitadel init schema
+```
+
+**Step 3 — Run setup and start**
+
+```bash
+zitadel start-from-setup --masterkey "<32-character-key>" --tlsMode disabled
+```
+
+See the [phases guide](/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime) for details on separating init, setup, and runtime for production deployments.

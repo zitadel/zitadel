@@ -5,7 +5,14 @@ title: Database
 import Postgres from './_postgres.mdx'
 
 # Database Configuration
+<Callout type="info">
+Even if you provision the PostgreSQL user and database manually, you must still run `zitadel init schema`
+to bootstrap the required schemas and tables before running `start-from-setup` or `zitadel start`.
+Skipping this step causes `relation "eventstore.events" does not exist` errors.
+See the [Managed PostgreSQL / No Admin Access](#managed-postgresql--no-admin-access) section below for the exact steps.
 
+The command is `zitadel init schema` (alias: `zitadel init zitadel` for backwards compatibility).
+</Callout>
 <Postgres components={props.components} />
 
 ## Zitadel Credentials

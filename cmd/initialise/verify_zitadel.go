@@ -17,12 +17,20 @@ import (
 
 func newZitadel() *cobra.Command {
 	return &cobra.Command{
-		Use:   "zitadel",
-		Short: "initialize ZITADEL internals",
-		Long: `initialize ZITADEL internals.
+		Use:     "schema",
+		Aliases: []string{"zitadel"},
+		Short:   "bootstrap the ZITADEL database schema",
+		Long: `Bootstrap the ZITADEL database schema.
+
+Creates all required schemas (eventstore, projections, system) and base tables
+using the service user credentials. No admin/superuser privileges are required.
+
+Use this command when you have provisioned the database user and database
+yourself (e.g. on a managed PostgreSQL service) and want to skip the
+admin-credential requirement of the full 'zitadel init' command.
 
 Prerequisites:
-- postgreSQL with user and database
+- PostgreSQL user exists and has ownership of the target database
 `,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
