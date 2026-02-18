@@ -28,11 +28,11 @@ services:
       - HOSTNAME=0.0.0.0
       - PORT=3000
       - OTEL_SDK_DISABLED=true
+      - LOG_LEVEL=warn
       - ZITADEL_API_URL=http://mock-zitadel:8080
       - ZITADEL_SERVICE_USER_TOKEN=test-token
     ports:
       - "3000"
-      - "9464"
     depends_on:
       mock-zitadel:
         condition: service_healthy

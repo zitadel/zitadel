@@ -33,7 +33,7 @@ services:
   login-app:
     image: node:20-alpine
     working_dir: /app
-    command: ["node", "apps/login/server.js"]
+    command: ["node", "zitadel/apps/login/server.js"]
     volumes:
       - ../../.next/standalone:/app:ro
     environment:

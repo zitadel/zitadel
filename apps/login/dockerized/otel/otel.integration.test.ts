@@ -43,7 +43,10 @@ function getHostPort(service: string, containerPort: number): number {
 async function waitForService(url: string, maxAttempts = 30, delayMs = 2000): Promise<boolean> {
   for (let i = 0; i < maxAttempts; i++) {
     try {
-      const response = await fetch(url);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (response.ok) {
         console.log(`[waitForService] ${url} is ready (attempt ${i + 1})`);
         return true;
@@ -197,9 +200,11 @@ describe("OpenTelemetry Integration", () => {
     await fetch(`${APP_URL}/ui/v2/login/healthy`);
     await fetch(`${APP_URL}/ui/v2/login/this-does-not-exist-404`);
 
-    const tracesReady = await waitForFile(path.join(OUTPUT_DIR, "traces.json"));
+    await new Promise((r) => setTimeout(r, 3000));
+
+    const tracesReady = await waitForFile(path.join(OUTPUT_DIR, "traces.json"), 60, 1000);
     if (!tracesReady) throw new Error("Traces file not found");
-    const logsReady = await waitForFile(path.join(OUTPUT_DIR, "logs.json"));
+    const logsReady = await waitForFile(path.join(OUTPUT_DIR, "logs.json"), 60, 1000);
     if (!logsReady) throw new Error("Logs file not found");
     const metricsReady = await waitForFile(path.join(OUTPUT_DIR, "metrics.json"), 60, 1000);
     if (!metricsReady) throw new Error("Metrics file not found");
@@ -666,7 +671,7 @@ describe("OpenTelemetry Integration", () => {
 
     describe("Log Content", () => {
       it("contains OTEL test log message", () => {
-        expect(readLogs()).toContain("OTEL test endpoint called");
+        expect(readLogs()).toContain("OTEL_TEST_INFO");
       }, TEST_TIMEOUT);
 
       it("contains test completed log message", () => {
@@ -680,6 +685,18 @@ describe("OpenTelemetry Integration", () => {
 
       it("contains severity number 9 for INFO", () => {
         expect(readLogs()).toContain('"severityNumber":9');
+      }, TEST_TIMEOUT);
+
+      it("does not contain debug messages when OTEL_LOG_LEVEL=info", () => {
+        expect(readLogs()).not.toContain("OTEL_TEST_DEBUG");
+      }, TEST_TIMEOUT);
+
+      it("contains warn messages", () => {
+        expect(readLogs()).toContain("OTEL_TEST_WARN");
+      }, TEST_TIMEOUT);
+
+      it("contains error messages", () => {
+        expect(readLogs()).toContain("OTEL_TEST_ERROR");
       }, TEST_TIMEOUT);
     });
 
@@ -726,8 +743,8 @@ describe("OpenTelemetry Integration", () => {
         expect(readLogs()).toContain('"timestamp"');
       }, TEST_TIMEOUT);
 
-      it("includes custom test attribute", () => {
-        expect(readLogs()).toContain('"test"');
+      it("includes otel-test context", () => {
+        expect(readLogs()).toContain('"otel-test"');
       }, TEST_TIMEOUT);
 
       it("includes duration attribute", () => {
@@ -769,6 +786,164 @@ describe("OpenTelemetry Integration", () => {
       }, TEST_TIMEOUT);
     });
   });
+});
+
+describe("Log Level: debug", () => {
+  const DEBUG_COMPOSE_FILE = path.join(TEST_DIR, "docker-compose.loglevel-debug.yml");
+  let debugAppUrl = "";
+
+  function getDebugHostPort(service: string, containerPort: number): number {
+    const output = execSync(
+      `docker compose -f ${DEBUG_COMPOSE_FILE} port ${service} ${containerPort}`,
+      { cwd: TEST_DIR, encoding: "utf-8" },
+    ).trim();
+    const match = output.match(/:(\d+)$/);
+    if (!match) {
+      throw new Error(`Failed to parse port from: ${output}`);
+    }
+    return parseInt(match[1], 10);
+  }
+
+  function getDebugContainerLogs(): string {
+    return execSync(`docker compose -f ${DEBUG_COMPOSE_FILE} logs login-app`, {
+      cwd: TEST_DIR,
+      encoding: "utf-8",
+    });
+  }
+
+  beforeAll(async () => {
+    try {
+      execSync(`docker compose -f ${DEBUG_COMPOSE_FILE} down -v`, {
+        stdio: "pipe",
+        cwd: TEST_DIR,
+      });
+    } catch {
+    }
+
+    execSync(`docker compose -f ${DEBUG_COMPOSE_FILE} up -d --build`, {
+      stdio: "inherit",
+      cwd: TEST_DIR,
+    });
+
+    const appPort = getDebugHostPort("login-app", 3000);
+    debugAppUrl = `http://localhost:${appPort}`;
+    console.log(`[LOG_LEVEL=debug] APP_URL: ${debugAppUrl}`);
+
+    const ready = await waitForService(`${debugAppUrl}/ui/v2/login/healthy`, 60);
+    if (!ready) throw new Error("Login app (LOG_LEVEL=debug) failed to start");
+
+    await fetch(`${debugAppUrl}/ui/v2/login/otel-test`);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }, DOCKER_TIMEOUT);
+
+  afterAll(() => {
+    try {
+      execSync(`docker compose -f ${DEBUG_COMPOSE_FILE} down -v`, {
+        stdio: "pipe",
+        cwd: TEST_DIR,
+      });
+    } catch {
+    }
+  }, DOCKER_TIMEOUT);
+
+  it("outputs debug level messages", () => {
+    const logs = getDebugContainerLogs();
+    expect(logs).toContain("OTEL_TEST_DEBUG");
+  }, TEST_TIMEOUT);
+
+  it("outputs info level messages", () => {
+    const logs = getDebugContainerLogs();
+    expect(logs).toContain("OTEL_TEST_INFO");
+  }, TEST_TIMEOUT);
+
+  it("outputs warn level messages", () => {
+    const logs = getDebugContainerLogs();
+    expect(logs).toContain("OTEL_TEST_WARN");
+  }, TEST_TIMEOUT);
+
+  it("outputs error level messages", () => {
+    const logs = getDebugContainerLogs();
+    expect(logs).toContain("OTEL_TEST_ERROR");
+  }, TEST_TIMEOUT);
+});
+
+describe("Log Level: warn", () => {
+  const WARN_COMPOSE_FILE = path.join(TEST_DIR, "docker-compose.loglevel-warn.yml");
+  let warnAppUrl = "";
+
+  function getWarnHostPort(service: string, containerPort: number): number {
+    const output = execSync(
+      `docker compose -f ${WARN_COMPOSE_FILE} port ${service} ${containerPort}`,
+      { cwd: TEST_DIR, encoding: "utf-8" },
+    ).trim();
+    const match = output.match(/:(\d+)$/);
+    if (!match) {
+      throw new Error(`Failed to parse port from: ${output}`);
+    }
+    return parseInt(match[1], 10);
+  }
+
+  function getWarnContainerLogs(): string {
+    return execSync(`docker compose -f ${WARN_COMPOSE_FILE} logs login-app`, {
+      cwd: TEST_DIR,
+      encoding: "utf-8",
+    });
+  }
+
+  beforeAll(async () => {
+    try {
+      execSync(`docker compose -f ${WARN_COMPOSE_FILE} down -v`, {
+        stdio: "pipe",
+        cwd: TEST_DIR,
+      });
+    } catch {
+    }
+
+    execSync(`docker compose -f ${WARN_COMPOSE_FILE} up -d --build`, {
+      stdio: "inherit",
+      cwd: TEST_DIR,
+    });
+
+    const appPort = getWarnHostPort("login-app", 3000);
+    warnAppUrl = `http://localhost:${appPort}`;
+    console.log(`[LOG_LEVEL=warn] APP_URL: ${warnAppUrl}`);
+
+    const ready = await waitForService(`${warnAppUrl}/ui/v2/login/healthy`, 60);
+    if (!ready) throw new Error("Login app (LOG_LEVEL=warn) failed to start");
+
+    await fetch(`${warnAppUrl}/ui/v2/login/otel-test`);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }, DOCKER_TIMEOUT);
+
+  afterAll(() => {
+    try {
+      execSync(`docker compose -f ${WARN_COMPOSE_FILE} down -v`, {
+        stdio: "pipe",
+        cwd: TEST_DIR,
+      });
+    } catch {
+    }
+  }, DOCKER_TIMEOUT);
+
+  it("does not output debug level messages", () => {
+    const logs = getWarnContainerLogs();
+    expect(logs).not.toContain("OTEL_TEST_DEBUG");
+  }, TEST_TIMEOUT);
+
+  it("does not output info level messages", () => {
+    const logs = getWarnContainerLogs();
+    expect(logs).not.toContain("OTEL_TEST_INFO");
+  }, TEST_TIMEOUT);
+
+  it("outputs warn level messages", () => {
+    const logs = getWarnContainerLogs();
+    expect(logs).toContain("OTEL_TEST_WARN");
+  }, TEST_TIMEOUT);
+
+  it("outputs error level messages", () => {
+    const logs = getWarnContainerLogs();
+    expect(logs).toContain("OTEL_TEST_ERROR");
+  }, TEST_TIMEOUT);
 });
 
 describe("OpenTelemetry Disabled", () => {
