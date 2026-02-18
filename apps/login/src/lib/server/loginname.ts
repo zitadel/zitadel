@@ -253,11 +253,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         return preventUserEnumeration(command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
-      if (user.preferredLoginName !== concatLoginname || humanUser?.phone?.phone !== command.loginName) {
+      if (user.preferredLoginName !== concatLoginname && humanUser?.phone?.phone !== command.loginName) {
         return preventUserEnumeration(command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
-      if (user.preferredLoginName !== concatLoginname || humanUser?.email?.email !== command.loginName) {
+      if (user.preferredLoginName !== concatLoginname && humanUser?.email?.email !== command.loginName) {
         return preventUserEnumeration(command.organization);
       }
     }
