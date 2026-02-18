@@ -263,9 +263,7 @@
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-authoption",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadel",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/sudorandom/protoc-gen-connect-openapi@v0.19.1",
-                    "bash ./apps/api/scripts/install-binary-plugins.sh"
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadel"
                 ]
             },
             "cache": true,
@@ -277,8 +275,7 @@
                     "runtime": "go env GOARCH"
                 },
                 "{workspaceRoot}/internal/protoc/protoc-gen-authoption/**/*",
-                "{workspaceRoot}/internal/protoc/protoc-gen-zitadel/**/*",
-                "{workspaceRoot}/apps/api/scripts/install-binary-plugins.sh"
+                "{workspaceRoot}/internal/protoc/protoc-gen-zitadel/**/*"
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/bin/*/*/enumer",
@@ -293,10 +290,7 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-validate",
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-connect-go",
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-authoption",
-                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-zitadel",
-                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-connect-openapi",
-                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-grpc-web",
-                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-js"
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-zitadel"
             ]
         },
         "generate-stubs": {

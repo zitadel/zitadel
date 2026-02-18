@@ -695,9 +695,6 @@ importers:
         specifier: ^2.11.0
         version: 2.11.0
     devDependencies:
-      '@bufbuild/buf':
-        specifier: ^1.64.0
-        version: 1.64.0
       '@bufbuild/protoc-gen-es':
         specifier: ^2.11.0
         version: 2.11.0(@bufbuild/protobuf@2.11.0)

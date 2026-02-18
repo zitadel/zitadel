@@ -63,12 +63,12 @@
     "generate-proto-docs": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "bash -c 'PATH=\"${PWD}/../../.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" pnpm generate:proto-docs'",
+        "command": "bash -c 'GOOS=$(uname -s | tr \"[:upper:]\" \"[:lower:]\"); GOARCH=$(uname -m); GOARCH=${GOARCH/x86_64/amd64}; GOARCH=${GOARCH/aarch64/arm64}; PATH=\"${PWD}/../../.artifacts/bin/${GOOS}/${GOARCH}:$PATH\" pnpm generate:proto-docs'",
         "cwd": "apps/docs"
       },
       "dependsOn": [
         "fetch-remote-content",
-        "@zitadel/api:generate-install"
+        "install-proto-plugins"
       ],
       "outputs": [
         "{projectRoot}/openapi"
@@ -81,6 +81,21 @@
         {
           "dependentTasksOutputFiles": "apps/docs/content/versions.json"
         }
+      ]
+    },
+    "install-proto-plugins": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash ./apps/docs/scripts/install-proto-plugins.sh"
+      },
+      "cache": true,
+      "inputs": [
+        { "runtime": "uname -s" },
+        { "runtime": "uname -m" },
+        "{projectRoot}/scripts/install-proto-plugins.sh"
+      ],
+      "outputs": [
+        "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-connect-openapi"
       ]
     },
     "generate-api-reference": {
