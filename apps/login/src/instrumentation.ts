@@ -4,7 +4,7 @@ import type { LoggerProvider } from "@opentelemetry/api-logs";
  * @module instrumentation
  *
  * OpenTelemetry instrumentation for Next.js applications using NodeSDK.
- * Disabled by default - only enabled when OTEL_EXPORTER_OTLP_ENDPOINT is set.
+ * Set OTEL_SDK_DISABLED=true to disable instrumentation entirely.
  *
  * Configuration via standard OTEL environment variables:
  *
@@ -30,9 +30,6 @@ let _loggerProvider: LoggerProvider | null = null;
 
 export async function register(): Promise<void> {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
-
-  // Skip OTEL initialization if no endpoint is configured
-  if (!process.env.OTEL_EXPORTER_OTLP_ENDPOINT) return;
 
   const [
     { NodeSDK },
