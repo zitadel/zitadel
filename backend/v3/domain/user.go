@@ -17,7 +17,7 @@ type User struct {
 
 	Machine  *MachineUser `json:"machine,omitempty" db:"-"`
 	Human    *HumanUser   `json:"human,omitempty" db:"-"`
-	Metadata []*Metadata  `json:"metadata,omitempty" db:"-"`
+	Metadata []*Metadata  `json:"metadata,omitempty" db:"metadata"`
 }
 
 type MachineUser struct {
