@@ -129,6 +129,7 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
           <TextInput
             type="password"
             autoComplete="current-password"
+            autoFocus
             required
             {...register("currentPassword", {
               required: t("change.required.currentPassword"),
@@ -142,7 +143,6 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
           <TextInput
             type="password"
             autoComplete="new-password"
-            autoFocus
             required
             {...register("password", {
               required: t("change.required.newPassword"),
