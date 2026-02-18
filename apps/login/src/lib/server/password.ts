@@ -90,7 +90,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
       return { error: t("errors.couldNotSendResetLink") };
     }
   } else if (userLoginSettings?.disableLoginWithEmail) {
-    if (user.preferredLoginName !== command.loginName || humanUser?.phone?.phone !== command.loginName) {
+    if (user.preferredLoginName !== command.loginName && humanUser?.phone?.phone !== command.loginName) {
       if (userLoginSettings?.ignoreUnknownUsernames) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         return {};
@@ -98,7 +98,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
       return { error: t("errors.couldNotSendResetLink") };
     }
   } else if (userLoginSettings?.disableLoginWithPhone) {
-    if (user.preferredLoginName !== command.loginName || humanUser?.email?.email !== command.loginName) {
+    if (user.preferredLoginName !== command.loginName && humanUser?.email?.email !== command.loginName) {
       if (userLoginSettings?.ignoreUnknownUsernames) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         return {};
@@ -221,14 +221,14 @@ export async function sendPassword(
           return { error: t("errors.couldNotVerifyPassword") };
         }
       } else if (userLoginSettings?.disableLoginWithEmail) {
-        if (user.preferredLoginName !== command.loginName || humanUser?.phone?.phone !== command.loginName) {
+        if (user.preferredLoginName !== command.loginName && humanUser?.phone?.phone !== command.loginName) {
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
           return { error: t("errors.couldNotVerifyPassword") };
         }
       } else if (userLoginSettings?.disableLoginWithPhone) {
-        if (user.preferredLoginName !== command.loginName || humanUser?.email?.email !== command.loginName) {
+        if (user.preferredLoginName !== command.loginName && humanUser?.email?.email !== command.loginName) {
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
