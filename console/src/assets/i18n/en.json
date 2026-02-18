@@ -9,7 +9,7 @@
         "DESCRIPTION": "Complete the following steps to secure your application.",
         "CREATE_PROJECT": {
           "TITLE": "Create a project",
-          "DESCRIPTION": "Add a project and define its roles and authorizations."
+          "DESCRIPTION": "Add a project and define its roles and role assignments."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "A project hosts one or more applications that you can use to authenticate your users. For example, you might have a single project with 3 applications: one each for your web frontend, your mobile application, and your backend services. Also you can authorize your users with projects. To allow users from other organizations to log in to your applications, grant them access to your project.<br/><br/>If you can't find a project, contact the project's owner or someone with the corresponding rights to gain access.",
       "OWNED": {
         "TITLE": "Owned Projects",
-        "DESCRIPTION": "These are the projects you own. You can manage these project settings, authorizations and applications."
+        "DESCRIPTION": "These are the projects you own. You can manage these project settings, role assignments, and applications."
       },
       "GRANTED": {
         "TITLE": "Granted Projects",
@@ -61,9 +61,9 @@
         "METADATA": "Add custom attributes to your user like your department. You can use this information in your organizations actions."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Authorizations",
-      "DESCRIPTION": "Authorizations define the access rights of a user to a project. You can grant a user access to a project and define the users roles within that project."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Role Assignments",
+      "DESCRIPTION": "Role assignments define the access rights of a user to a project. You can grant a user access to a project and define the user's roles within that project."
     },
     "ACTIONS": {
       "TITLE": "Actions",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Create a project",
-        "description": "Add a project and define its roles and authorizations.",
+        "description": "Add a project and define its roles and role assignments.",
         "action": "Create project"
       },
       "APPLICATION_CREATED": {
@@ -401,9 +401,9 @@
         "action": "Add user"
       },
       "user.grant.added": {
-        "title": "Grant users",
+        "title": "Assign roles to users",
         "description": "Allow users to access your application and setup their role.",
-        "action": "Grant user"
+        "action": "Assign roles to users"
       }
     }
   },
@@ -429,7 +429,7 @@
     "NEWORG": "New Organization",
     "IAMADMIN": "You are an IAM Administrator. Note that you have extended permissions.",
     "SHOWORGS": "Show All Organizations",
-    "GRANTS": "Authorizations",
+    "GRANTS": "Role Assignments",
     "ACTIONS": "Actions",
     "TARGETS": "Targets",
     "PRIVACY": "Privacy",
@@ -662,7 +662,7 @@
     "ORG_USER_MANAGER": "Has permission to create and manage users of the organization",
     "ORG_OWNER_VIEWER": "Has permission to review the whole organization",
     "ORG_SETTINGS_MANAGER": "Has permission to manage organization settings",
-    "ORG_USER_PERMISSION_EDITOR": "Has permission to manage user grants",
+    "ORG_USER_PERMISSION_EDITOR": "Has permission to manage role assignments",
     "ORG_PROJECT_PERMISSION_EDITOR": "Has permission to manage project grants",
     "ORG_PROJECT_CREATOR": "Has permission to create his own projects and underlying settings",
     "ORG_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from the organization",
@@ -725,7 +725,7 @@
       "ME": "Go To own profile",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
       "USERS": "<strong>G</strong>o to <strong>U</strong>sers",
-      "USERGRANTS": "<strong>G</strong>o to <strong>A</strong>uthorizations",
+      "ROLEASSIGNMENTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments",
       "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows",
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
     }
@@ -767,7 +767,7 @@
       "SECURITY": "Password and Security",
       "KEYS": "Keys",
       "PAT": "Personal Access Tokens",
-      "USERGRANTS": "Authorizations",
+      "ROLEASSIGNMENTS": "Role Assignments",
       "MEMBERSHIPS": "Administrator Roles",
       "METADATA": "Metadata"
     },
@@ -1083,10 +1083,10 @@
       "ENTERCODE_DESC": "Verify Code"
     },
     "GRANTS": {
-      "TITLE": "User Grants",
+      "TITLE": "Role Assignments",
       "DESCRIPTION": "Grant this user access to certain projects",
       "CREATE": {
-        "TITLE": "Create User Grant",
+        "TITLE": "Create Role Assignment",
         "DESCRIPTION": "Search for the organization, the project and the corresponding project roles."
       },
       "PROJECTNAME": "Project Name",
@@ -1121,8 +1121,8 @@
       "ADDITIONAL-EXTERNAL": "Loginname (external organization)"
     },
     "TARGET": {
-      "SELF": "If you want to grant a user of an other organization",
-      "EXTERNAL": "To grant a user of your organization",
+      "SELF": "If you want to assign a role to a user from another organization",
+      "EXTERNAL": "To assign a role to a user from your organization",
       "CLICKHERE": "click here"
     },
     "SIGNEDOUT": "You are signed out. Click the button \"Sign In\" to sign in again.",
@@ -2146,7 +2146,7 @@
       "ASSERTION": "Return user roles during authentication",
       "ASSERTION_DESCRIPTION": "When a user authenticates, their role information is provided to your application. For OpenID Connect, the roles can be requested from the UserInfo endpoint or sent in the ID or Access Token, based on your application's configuration.",
       "CHECK": "Only authorized users can authenticate",
-      "CHECK_DESCRIPTION": "Deny authentication if the user has no authorization assigned to this project. Authorizations to the project without assigned a specific role to the user are allowed.",
+      "CHECK_DESCRIPTION": "Deny authentication if the user has no roles assigned to this project. Access to the project without a specific role assigned to the user is allowed.",
       "DIALOG": {
         "DELETE_TITLE": "Delete role",
         "DELETE_DESCRIPTION": "You are about to delete a project role. Are you sure?"
@@ -2539,7 +2539,7 @@
       "DATECHANGED": "Changed",
       "URLS": "URLs",
       "DELETE": "Delete App",
-      "JUMPTOPROJECT": "To configure roles, authorizations and more, navigate to the project.",
+      "JUMPTOPROJECT": "To configure roles, role assignments and more, navigate to the project.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {
@@ -2817,42 +2817,42 @@
   },
   "ROLESLABEL": "Roles",
   "GRANTS": {
-    "TITLE": "Authorizations",
-    "DESC": "These are all authorizations on your organization.",
-    "DELETE": "Delete Authorization",
-    "EMPTY": "No authorization found",
-    "ADD": "Create Authorization",
+    "TITLE": "Role Assignments",
+    "DESC": "These are all the role assignments on your organization.",
+    "DELETE": "Delete Role Assignment",
+    "EMPTY": "No role assignment found",
+    "ADD": "Create Role Assignment",
     "ADD_BTN": "New",
     "PROJECT": {
-      "TITLE": "Authorization",
-      "DESCRIPTION": "Define authorizations for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
+      "TITLE": "Role Assignment",
+      "DESCRIPTION": "Define role assignments for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
     },
     "USER": {
-      "TITLE": "Authorization",
-      "DESCRIPTION": "Define authorizations for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
+      "TITLE": "Role Assignment",
+      "DESCRIPTION": "Define role assignments for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
     },
     "CREATE": {
-      "TITLE": "Create authorization",
+      "TITLE": "Create role assignment",
       "DESCRIPTION": "Search for the organization, the project, and the corresponding roles."
     },
     "EDIT": {
-      "TITLE": "Change authorization"
+      "TITLE": "Change role assignment"
     },
     "DETAIL": {
-      "TITLE": "Authorization Detail",
-      "DESCRIPTION": "Here you can see all the details of the authorization."
+      "TITLE": "Role assignment detail",
+      "DESCRIPTION": "Here you can see all the details of the role assignment."
     },
     "TOAST": {
-      "UPDATED": "Authorization updated.",
-      "REMOVED": "Authorization removed",
-      "BULKREMOVED": "Authorizations removed.",
+      "UPDATED": "Role assignment updated.",
+      "REMOVED": "Role assignment removed",
+      "BULKREMOVED": "Role assignments removed.",
       "CANTSHOWINFO": "You cannot visit this user's profile as you are not an administrator of the organization where this user belongs to"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Delete authorization",
-      "DELETE_DESCRIPTION": "You are about to delete an authorization. Do you want to continue?",
-      "BULK_DELETE_TITLE": "Delete authorizations",
-      "BULK_DELETE_DESCRIPTION": "You are about to delete multiple authorizations. Do you want to continue?"
+      "DELETE_TITLE": "Delete role assignment",
+      "DELETE_DESCRIPTION": "You are about to delete a role assignment. Do you want to continue?",
+      "BULK_DELETE_TITLE": "Delete role assignments",
+      "BULK_DELETE_DESCRIPTION": "You are about to delete multiple role assignments. Do you want to continue?"
     }
   },
   "CHANGES": {

@@ -102,7 +102,7 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
 	}
-	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamReady))
+	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 
 	err = config.Log.SetLogger()
 	if err != nil {
