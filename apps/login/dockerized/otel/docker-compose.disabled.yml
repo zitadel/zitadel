@@ -4,7 +4,7 @@ services:
     command: ["node", "/app/mock-zitadel-server.js"]
     working_dir: /app
     volumes:
-      - ../otel/mock-zitadel-server.js:/app/mock-zitadel-server.js:ro
+      - ./mock-zitadel-server.js:/app/mock-zitadel-server.js:ro
       - ./output:/tmp/otel
     environment:
       - PORT=8080
@@ -24,7 +24,6 @@ services:
     command: ["node", "apps/login/server.js"]
     volumes:
       - ../../.next/standalone:/app:ro
-      - ./output:/tmp/logs
     environment:
       - HOSTNAME=0.0.0.0
       - PORT=3000
@@ -33,6 +32,7 @@ services:
       - ZITADEL_SERVICE_USER_TOKEN=test-token
     ports:
       - "3000"
+      - "9464"
     depends_on:
       mock-zitadel:
         condition: service_healthy

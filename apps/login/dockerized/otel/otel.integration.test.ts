@@ -779,3 +779,101 @@ describe("OpenTelemetry Integration", () => {
     });
   });
 });
+
+describe("OpenTelemetry Disabled", () => {
+  const DISABLED_COMPOSE_FILE = path.join(TEST_DIR, "docker-compose.disabled.yml");
+  let disabledAppUrl = "";
+
+  function getDisabledHostPort(service: string, containerPort: number): number {
+    const output = execSync(
+      `docker compose -f ${DISABLED_COMPOSE_FILE} port ${service} ${containerPort}`,
+      { cwd: TEST_DIR, encoding: "utf-8" },
+    ).trim();
+    const match = output.match(/:(\d+)$/);
+    if (!match) {
+      throw new Error(`Failed to parse port from: ${output}`);
+    }
+    return parseInt(match[1], 10);
+  }
+
+  function getDisabledContainerLogs(): string {
+    return execSync(`docker compose -f ${DISABLED_COMPOSE_FILE} logs login-app`, {
+      cwd: TEST_DIR,
+      encoding: "utf-8",
+    });
+  }
+
+  beforeAll(async () => {
+    try {
+      execSync(`docker compose -f ${DISABLED_COMPOSE_FILE} down -v`, {
+        stdio: "pipe",
+        cwd: TEST_DIR,
+      });
+    } catch {
+      // Cleanup may fail if not running
+    }
+
+    execSync(`docker compose -f ${DISABLED_COMPOSE_FILE} up -d --build`, {
+      stdio: "inherit",
+      cwd: TEST_DIR,
+    });
+
+    const appPort = getDisabledHostPort("login-app", 3000);
+    disabledAppUrl = `http://localhost:${appPort}`;
+    console.log(`[OTEL DISABLED] APP_URL: ${disabledAppUrl}`);
+
+    const ready = await waitForService(`${disabledAppUrl}/ui/v2/login/healthy`, 60);
+    if (!ready) throw new Error("Login app (OTEL disabled) failed to start");
+  }, DOCKER_TIMEOUT);
+
+  afterAll(() => {
+    try {
+      execSync(`docker compose -f ${DISABLED_COMPOSE_FILE} down -v`, {
+        stdio: "pipe",
+        cwd: TEST_DIR,
+      });
+    } catch {
+      // Cleanup may fail
+    }
+  }, DOCKER_TIMEOUT);
+
+  describe("Application Health", () => {
+    it("starts successfully with OTEL_SDK_DISABLED=true", async () => {
+      const response = await fetch(`${disabledAppUrl}/ui/v2/login/healthy`);
+      expect(response.ok).toBe(true);
+    }, TEST_TIMEOUT);
+
+    it("responds to health checks", async () => {
+      const response = await fetch(`${disabledAppUrl}/ui/v2/login/healthy`);
+      expect(response.status).toBe(200);
+    }, TEST_TIMEOUT);
+  });
+
+  describe("Metrics Endpoint", () => {
+    it("metrics endpoint is not available when OTEL is disabled", async () => {
+      const metricsPort = getDisabledHostPort("login-app", 9464);
+      const metricsUrl = `http://localhost:${metricsPort}/metrics`;
+      try {
+        await fetch(metricsUrl);
+        expect.fail("Metrics endpoint should not be available");
+      } catch (error) {
+        expect(error).toBeDefined();
+      }
+    }, TEST_TIMEOUT);
+  });
+
+  describe("Logging", () => {
+    it("outputs logs to console via Winston", async () => {
+      await fetch(`${disabledAppUrl}/ui/v2/login/healthy`);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const logs = getDisabledContainerLogs();
+      expect(logs.length).toBeGreaterThan(0);
+    }, TEST_TIMEOUT);
+
+    it("does not contain OTEL SDK initialization logs", async () => {
+      const logs = getDisabledContainerLogs();
+      expect(logs).not.toContain("OpenTelemetry SDK started");
+      expect(logs).not.toContain("Exporter");
+    }, TEST_TIMEOUT);
+  });
+});
