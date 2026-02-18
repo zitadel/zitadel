@@ -2867,7 +2867,7 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.IncrementPhoneOTPFailedAttempts(),
+					humanRepo.IncrementSMSOTPFailedAttempts(),
 				},
 			},
 			want: want{
@@ -2900,14 +2900,14 @@ func Test_user_Update(t *testing.T) {
 					return err
 				}
 				_, err = userRepo.Update(t.Context(), tx, humanCondition,
-					humanRepo.IncrementPhoneOTPFailedAttempts(),
+					humanRepo.IncrementSMSOTPFailedAttempts(),
 				)
 				return err
 			},
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.ResetPhoneOTPFailedAttempts(),
+					humanRepo.ResetSMSOTPFailedAttempts(),
 				},
 			},
 			want: want{
