@@ -1,72 +1,50 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { execSync } from "child_process";
+import { GenericContainer, type StartedTestContainer, Network, Wait } from "testcontainers";
+import type { StartedNetwork } from "testcontainers";
 import * as fs from "fs";
 import * as path from "path";
 
 const TEST_DIR = path.dirname(new URL(import.meta.url).pathname);
 const OUTPUT_DIR = path.join(TEST_DIR, "output");
-const COMPOSE_FILE = path.join(TEST_DIR, "docker-compose.test.yml");
+const LOGIN_APP_DIR = path.join(TEST_DIR, "../..");
 
 const DOCKER_TIMEOUT = 180000;
 const TEST_TIMEOUT = 30000;
 
-let APP_URL = "";
-let PROMETHEUS_URL = "";
-let COLLECTOR_HEALTH_URL = "";
-let MOCK_ZITADEL_URL = "";
+const LOGIN_IMAGE_TAG = "zitadel-login-otel-test:latest";
 
-/**
- * Gets the dynamically assigned host port for a service/container port.
- * Uses `docker compose port` to discover the actual bound port.
- */
-function getHostPort(service: string, containerPort: number): number {
-  const output = execSync(`docker compose -f ${COMPOSE_FILE} port ${service} ${containerPort}`, {
-    cwd: TEST_DIR,
-    encoding: "utf-8",
-  }).trim();
-  const match = output.match(/:(\d+)$/);
-  if (!match) {
-    throw new Error(`Failed to parse port from: ${output}`);
+function readTraces(): string {
+  try {
+    return fs.readFileSync(path.join(OUTPUT_DIR, "traces.json"), "utf-8");
+  } catch {
+    return "";
   }
-  return parseInt(match[1], 10);
 }
 
-/**
- * Polls a health endpoint until it returns HTTP 200.
- * Used to wait for Docker services to become ready.
- *
- * @param url - The health check URL to poll
- * @param maxAttempts - Maximum number of polling attempts (default: 30)
- * @param delayMs - Delay between attempts in milliseconds (default: 2000)
- * @returns true if service became healthy, false if max attempts exceeded
- */
-async function waitForService(url: string, maxAttempts = 30, delayMs = 2000): Promise<boolean> {
-  for (let i = 0; i < maxAttempts; i++) {
-    try {
-      const response = await fetch(url);
-      if (response.ok) {
-        console.log(`[waitForService] ${url} is ready (attempt ${i + 1})`);
-        return true;
-      }
-      console.log(`[waitForService] ${url} returned ${response.status} (attempt ${i + 1})`);
-    } catch (error) {
-      console.log(`[waitForService] ${url} failed: ${error instanceof Error ? error.message : error} (attempt ${i + 1})`);
-    }
-    await new Promise((r) => setTimeout(r, delayMs));
+function readMetrics(): string {
+  try {
+    return fs.readFileSync(path.join(OUTPUT_DIR, "metrics.json"), "utf-8");
+  } catch {
+    return "";
   }
-  console.log(`[waitForService] ${url} timed out after ${maxAttempts} attempts`);
-  return false;
 }
 
-/**
- * Polls for a file to exist and contain data.
- * Used to wait for OTLP collector to write exported telemetry.
- *
- * @param filePath - Absolute path to the file
- * @param maxAttempts - Maximum number of polling attempts (default: 30)
- * @param delayMs - Delay between attempts in milliseconds (default: 1000)
- * @returns true if file exists with content, false if max attempts exceeded
- */
+function readLogs(): string {
+  try {
+    return fs.readFileSync(path.join(OUTPUT_DIR, "logs.json"), "utf-8");
+  } catch {
+    return "";
+  }
+}
+
+function readCapturedHeaders(): Array<{ traceparent: string | null; url: string; method: string }> {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(OUTPUT_DIR, "captured-headers.json"), "utf-8"));
+  } catch {
+    return [];
+  }
+}
+
 async function waitForFile(filePath: string, maxAttempts = 30, delayMs = 1000): Promise<boolean> {
   for (let i = 0; i < maxAttempts; i++) {
     try {
@@ -87,129 +65,126 @@ async function waitForFile(filePath: string, maxAttempts = 30, delayMs = 1000): 
   return false;
 }
 
-/**
- * Reads the traces.json file exported by the OTLP collector.
- * Contains all trace spans in OTLP JSON format.
- */
-function readTraces(): string {
-  try {
-    return fs.readFileSync(path.join(OUTPUT_DIR, "traces.json"), "utf-8");
-  } catch {
-    return "";
-  }
-}
-
-/**
- * Reads the metrics.json file exported by the OTLP collector.
- * Contains all metrics in OTLP JSON format.
- */
-function readMetrics(): string {
-  try {
-    return fs.readFileSync(path.join(OUTPUT_DIR, "metrics.json"), "utf-8");
-  } catch {
-    return "";
-  }
-}
-
-/**
- * Reads the logs.json file exported by the OTLP collector.
- * Contains all log records in OTLP JSON format.
- */
-function readLogs(): string {
-  try {
-    return fs.readFileSync(path.join(OUTPUT_DIR, "logs.json"), "utf-8");
-  } catch {
-    return "";
-  }
-}
-
-/**
- * Fetches metrics from the Prometheus scraping endpoint.
- * Returns metrics in Prometheus text exposition format.
- */
-async function fetchPrometheusMetrics(): Promise<string> {
-  const response = await fetch(PROMETHEUS_URL);
-  return response.text();
-}
-
-/**
- * Retrieves HTTP headers captured by the mock Zitadel server.
- * Used to verify trace context propagation to backend gRPC calls.
- */
-async function fetchCapturedHeaders(): Promise<Array<{ traceparent: string | null; url: string; method: string }>> {
-  const filePath = path.join(OUTPUT_DIR, "captured-headers.json");
-  try {
-    return JSON.parse(fs.readFileSync(filePath, "utf-8"));
-  } catch {
-    const response = await fetch(`${MOCK_ZITADEL_URL}/captured-headers`);
-    return response.json();
-  }
+async function getContainerLogs(container: StartedTestContainer, timeoutMs = 2000): Promise<string> {
+  const stream = await container.logs();
+  return new Promise((resolve) => {
+    let output = "";
+    const timeout = setTimeout(() => {
+      stream.destroy();
+      resolve(output);
+    }, timeoutMs);
+    stream.on("data", (chunk: Buffer) => {
+      output += chunk.toString();
+    });
+    stream.on("end", () => {
+      clearTimeout(timeout);
+      resolve(output);
+    });
+    stream.on("error", () => {
+      clearTimeout(timeout);
+      resolve(output);
+    });
+  });
 }
 
 describe("OpenTelemetry Integration", () => {
-  beforeAll(async () => {
-    try {
-      execSync(`docker compose -f ${COMPOSE_FILE} down -v`, { stdio: "pipe", cwd: TEST_DIR });
-    } catch {
-    }
+  let network: StartedNetwork;
+  let otelCollector: StartedTestContainer;
+  let mockZitadel: StartedTestContainer;
+  let loginApp: StartedTestContainer;
+  let appUrl: string;
+  let prometheusUrl: string;
 
+  beforeAll(async () => {
     if (fs.existsSync(OUTPUT_DIR)) {
       fs.rmSync(OUTPUT_DIR, { recursive: true });
     }
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-    execSync(`docker compose -f ${COMPOSE_FILE} up -d --build`, { stdio: "inherit", cwd: TEST_DIR });
 
-    const appPort = getHostPort("login-app", 3000);
-    const prometheusPort = getHostPort("login-app", 9464);
-    const collectorHealthPort = getHostPort("otel-collector", 13133);
-    const mockZitadelHealthPort = getHostPort("mock-zitadel", 7432);
+    fs.writeFileSync(path.join(OUTPUT_DIR, "traces.json"), "");
+    fs.writeFileSync(path.join(OUTPUT_DIR, "logs.json"), "");
+    fs.writeFileSync(path.join(OUTPUT_DIR, "metrics.json"), "");
 
-    APP_URL = `http://localhost:${appPort}`;
-    PROMETHEUS_URL = `http://localhost:${prometheusPort}/metrics`;
-    COLLECTOR_HEALTH_URL = `http://localhost:${collectorHealthPort}`;
-    MOCK_ZITADEL_URL = `http://localhost:${mockZitadelHealthPort}`;
+    network = await new Network().start();
 
-    console.log(`[PORTS] APP_URL: ${APP_URL}`);
-    console.log(`[PORTS] PROMETHEUS_URL: ${PROMETHEUS_URL}`);
-    console.log(`[PORTS] COLLECTOR_HEALTH_URL: ${COLLECTOR_HEALTH_URL}`);
-    console.log(`[PORTS] MOCK_ZITADEL_URL: ${MOCK_ZITADEL_URL}`);
+    otelCollector = await new GenericContainer("otel/opentelemetry-collector-contrib:0.145.0")
+      .withNetwork(network)
+      .withNetworkAliases("otel-collector")
+      .withUser("0:0")
+      .withCommand(["--config=/etc/otel-collector-config.yaml"])
+      .withCopyFilesToContainer([
+        { source: path.join(TEST_DIR, "otel-collector-config.yaml"), target: "/etc/otel-collector-config.yaml" },
+      ])
+      .withBindMounts([{ source: OUTPUT_DIR, target: "/tmp/otel" }])
+      .withExposedPorts(4318, 8888, 13133)
+      .withWaitStrategy(Wait.forHttp("/", 13133))
+      .start();
 
-    try {
-      const psOutput = execSync(`docker compose -f ${COMPOSE_FILE} ps -a`, { cwd: TEST_DIR, encoding: "utf-8" });
-      console.log("[DEBUG] Container status:\n", psOutput);
-      const logsOutput = execSync(`docker compose -f ${COMPOSE_FILE} logs otel-collector`, { cwd: TEST_DIR, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
-      console.log("[DEBUG] Collector logs:\n", logsOutput);
-    } catch (e) {
-      console.log("[DEBUG] Failed to get container info:", e instanceof Error ? e.message : e);
-    }
+    mockZitadel = await new GenericContainer("node:20-alpine")
+      .withNetwork(network)
+      .withNetworkAliases("mock-zitadel")
+      .withCopyFilesToContainer([
+        { source: path.join(TEST_DIR, "mock-zitadel-server.js"), target: "/app/server.js" },
+      ])
+      .withBindMounts([{ source: OUTPUT_DIR, target: "/tmp/otel" }])
+      .withEnvironment({
+        PORT: "8080",
+        OUTPUT_DIR: "/tmp/otel",
+      })
+      .withCommand(["node", "/app/server.js"])
+      .withExposedPorts(8080, 7432)
+      .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+      .start();
 
-    const collectorReady = await waitForService(COLLECTOR_HEALTH_URL);
-    if (!collectorReady) throw new Error("OTEL collector failed to start");
+    await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
 
-    const mockReady = await waitForService(`${MOCK_ZITADEL_URL}/health`);
-    if (!mockReady) throw new Error("Mock Zitadel failed to start");
+    loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
+      .withNetwork(network)
+      .withExposedPorts(3000, 9464)
+      .withEnvironment({
+        ZITADEL_API_URL: "http://mock-zitadel:8080",
+        ZITADEL_SERVICE_USER_TOKEN: "test-token-for-otel-integration-tests",
+        OTEL_SERVICE_NAME: "zitadel-login-test",
+        OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318",
+        OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf",
+        OTEL_EXPORTER_OTLP_HEADERS: "x-test-header=test-value-123,x-another-header=another-value",
+        OTEL_LOG_LEVEL: "info",
+        OTEL_METRICS_EXPORTER: "otlp,prometheus",
+        OTEL_LOGS_EXPORTER: "otlp",
+        OTEL_EXPORTER_PROMETHEUS_PORT: "9464",
+        OTEL_BSP_SCHEDULE_DELAY: "1000",
+        OTEL_METRIC_EXPORT_INTERVAL: "5000",
+        DEBUG: "true",
+      })
+      .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
+      .start();
 
-    const appReady = await waitForService(`${APP_URL}/ui/v2/login/healthy`, 60);
-    if (!appReady) throw new Error("Login app failed to start");
+    appUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(3000)}`;
+    prometheusUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(9464)}/metrics`;
 
-    await fetch(`${APP_URL}/ui/v2/login/otel-test`);
-    await fetch(`${APP_URL}/ui/v2/login/loginname`, { redirect: "manual" });
-    await fetch(`${APP_URL}/ui/v2/login/healthy`);
-    await fetch(`${APP_URL}/ui/v2/login/this-does-not-exist-404`);
+    console.log(`[PORTS] APP_URL: ${appUrl}`);
+    console.log(`[PORTS] PROMETHEUS_URL: ${prometheusUrl}`);
 
-    const tracesReady = await waitForFile(path.join(OUTPUT_DIR, "traces.json"));
+    await fetch(`${appUrl}/ui/v2/login/otel-test`);
+    await fetch(`${appUrl}/ui/v2/login/loginname`, { redirect: "manual" });
+    await fetch(`${appUrl}/ui/v2/login/healthy`);
+    await fetch(`${appUrl}/ui/v2/login/this-does-not-exist-404`);
+
+    await new Promise((r) => setTimeout(r, 3000));
+
+    const tracesReady = await waitForFile(path.join(OUTPUT_DIR, "traces.json"), 60, 1000);
     if (!tracesReady) throw new Error("Traces file not found");
-    const logsReady = await waitForFile(path.join(OUTPUT_DIR, "logs.json"));
+    const logsReady = await waitForFile(path.join(OUTPUT_DIR, "logs.json"), 60, 1000);
     if (!logsReady) throw new Error("Logs file not found");
     const metricsReady = await waitForFile(path.join(OUTPUT_DIR, "metrics.json"), 60, 1000);
     if (!metricsReady) throw new Error("Metrics file not found");
   }, DOCKER_TIMEOUT);
 
   afterAll(async () => {
-    try {
-      execSync(`docker compose -f ${COMPOSE_FILE} down -v`, { stdio: "pipe", cwd: TEST_DIR });
-    } catch {
-    }
+    await loginApp?.stop();
+    await mockZitadel?.stop();
+    await otelCollector?.stop();
+    await network?.stop();
   }, DOCKER_TIMEOUT);
 
   describe("Traces", () => {
@@ -405,32 +380,32 @@ describe("OpenTelemetry Integration", () => {
     });
 
     describe("Trace Propagation", () => {
-      it("propagates traceparent to gRPC", async () => {
-        const requests = await fetchCapturedHeaders();
+      it("propagates traceparent to gRPC", () => {
+        const requests = readCapturedHeaders();
         const grpcCalls = requests.filter((r) => r.method === "POST" && r.traceparent !== null);
         expect(grpcCalls.length).toBeGreaterThan(0);
       }, TEST_TIMEOUT);
 
-      it("uses W3C traceparent format", async () => {
-        const requests = await fetchCapturedHeaders();
+      it("uses W3C traceparent format", () => {
+        const requests = readCapturedHeaders();
         const grpcCalls = requests.filter((r) => r.traceparent !== null);
         grpcCalls.forEach((r) => expect(r.traceparent).toMatch(/^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$/));
       }, TEST_TIMEOUT);
 
-      it("uses traceparent version 00", async () => {
-        const requests = await fetchCapturedHeaders();
+      it("uses traceparent version 00", () => {
+        const requests = readCapturedHeaders();
         const grpcCalls = requests.filter((r) => r.traceparent !== null);
         grpcCalls.forEach((r) => expect(r.traceparent).toMatch(/^00-/));
       }, TEST_TIMEOUT);
 
-      it("sets sampled flag to 01", async () => {
-        const requests = await fetchCapturedHeaders();
+      it("sets sampled flag to 01", () => {
+        const requests = readCapturedHeaders();
         const grpcCalls = requests.filter((r) => r.traceparent !== null);
         grpcCalls.forEach((r) => expect(r.traceparent).toMatch(/-01$/));
       }, TEST_TIMEOUT);
 
-      it("maintains trace ID consistency", async () => {
-        const requests = await fetchCapturedHeaders();
+      it("maintains trace ID consistency", () => {
+        const requests = readCapturedHeaders();
         const grpcCalls = requests.filter((r) => r.method === "POST" && r.traceparent !== null);
         const traceIds = grpcCalls.map((r) => r.traceparent!.split("-")[1]);
         const uniqueIds = new Set(traceIds);
@@ -490,123 +465,148 @@ describe("OpenTelemetry Integration", () => {
 
     describe("Prometheus Endpoint", () => {
       it("returns HTTP 200", async () => {
-        const response = await fetch(PROMETHEUS_URL);
+        const response = await fetch(prometheusUrl);
         expect(response.status).toBe(200);
       }, TEST_TIMEOUT);
 
       it("returns text/plain content type", async () => {
-        const response = await fetch(PROMETHEUS_URL);
+        const response = await fetch(prometheusUrl);
         expect(response.headers.get("content-type")).toContain("text/plain");
       }, TEST_TIMEOUT);
     });
 
     describe("Runtime Metrics", () => {
       it("exposes nodejs_eventloop_utilization", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("nodejs_eventloop_utilization");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("nodejs_eventloop_utilization");
       }, TEST_TIMEOUT);
 
       it("exposes nodejs_eventloop_delay", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("nodejs_eventloop_delay");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("nodejs_eventloop_delay");
       }, TEST_TIMEOUT);
 
       it("exposes v8js_memory_heap_used", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("v8js_memory_heap_used");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("v8js_memory_heap_used");
       }, TEST_TIMEOUT);
 
       it("exposes v8js_memory_heap_limit", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("v8js_memory_heap_limit");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("v8js_memory_heap_limit");
       }, TEST_TIMEOUT);
 
       it("exposes v8js_gc_duration", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("v8js_gc_duration");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("v8js_gc_duration");
       }, TEST_TIMEOUT);
     });
 
     describe("HTTP Metrics", () => {
       it("exposes http_server_duration", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("http_server_duration");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("http_server_duration");
       }, TEST_TIMEOUT);
 
       it("exposes http_server_duration_sum", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("http_server_duration_sum");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("http_server_duration_sum");
       }, TEST_TIMEOUT);
 
       it("exposes http_server_duration_count", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("http_server_duration_count");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("http_server_duration_count");
       }, TEST_TIMEOUT);
 
       it("exposes http_server_duration_bucket", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("http_server_duration_bucket");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("http_server_duration_bucket");
       }, TEST_TIMEOUT);
 
       it("records status code 200", async () => {
-        expect(await fetchPrometheusMetrics()).toContain('http_status_code="200"');
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain('http_status_code="200"');
       }, TEST_TIMEOUT);
 
       it("records status code 404", async () => {
-        expect(await fetchPrometheusMetrics()).toContain('http_status_code="404"');
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain('http_status_code="404"');
       }, TEST_TIMEOUT);
 
       it("records HTTP GET method", async () => {
-        expect(await fetchPrometheusMetrics()).toContain('http_method="GET"');
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain('http_method="GET"');
       }, TEST_TIMEOUT);
     });
 
     describe("Application Metrics", () => {
       it("exposes http_server_requests_total", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("http_server_requests_total");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("http_server_requests_total");
       }, TEST_TIMEOUT);
 
       it("exposes http_server_active_requests", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("http_server_active_requests");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("http_server_active_requests");
       }, TEST_TIMEOUT);
 
       it("exposes login_auth_attempts_total", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("login_auth_attempts_total");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("login_auth_attempts_total");
       }, TEST_TIMEOUT);
 
       it("exposes login_auth_successes_total", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("login_auth_successes_total");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("login_auth_successes_total");
       }, TEST_TIMEOUT);
 
       it("exposes login_session_creation_duration", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("login_session_creation_duration");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("login_session_creation_duration");
       }, TEST_TIMEOUT);
 
       it("exposes http_server_response_status_total", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("http_server_response_status_total");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("http_server_response_status_total");
       }, TEST_TIMEOUT);
 
       it("exposes http_server_request_duration_seconds", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("http_server_request_duration_seconds");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("http_server_request_duration_seconds");
       }, TEST_TIMEOUT);
     });
 
     describe("Custom Test Metrics", () => {
       it("exposes otel_test_requests_total", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("otel_test_requests_total");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("otel_test_requests_total");
       }, TEST_TIMEOUT);
 
       it("exposes otel_test_duration_seconds", async () => {
-        expect(await fetchPrometheusMetrics()).toContain("otel_test_duration_seconds");
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain("otel_test_duration_seconds");
       }, TEST_TIMEOUT);
     });
 
     describe("Metric Labels", () => {
       it("includes method label on auth metrics", async () => {
-        expect(await fetchPrometheusMetrics()).toContain('method="test"');
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain('method="test"');
       }, TEST_TIMEOUT);
 
       it("includes organization label on auth metrics", async () => {
-        expect(await fetchPrometheusMetrics()).toContain('organization="test-org"');
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain('organization="test-org"');
       }, TEST_TIMEOUT);
 
       it("includes route label on request metrics", async () => {
-        expect(await fetchPrometheusMetrics()).toContain('route="/otel-test"');
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain('route="/otel-test"');
       }, TEST_TIMEOUT);
 
       it("includes success label on session metrics", async () => {
-        expect(await fetchPrometheusMetrics()).toContain('success="true"');
+        const response = await fetch(prometheusUrl);
+        expect(await response.text()).toContain('success="true"');
       }, TEST_TIMEOUT);
     });
 
@@ -772,76 +772,64 @@ describe("OpenTelemetry Integration", () => {
 });
 
 describe("OpenTelemetry Disabled", () => {
-  const DISABLED_COMPOSE_FILE = path.join(TEST_DIR, "docker-compose.disabled.yml");
-  let disabledAppUrl = "";
-
-  function getDisabledHostPort(service: string, containerPort: number): number {
-    const output = execSync(
-      `docker compose -f ${DISABLED_COMPOSE_FILE} port ${service} ${containerPort}`,
-      { cwd: TEST_DIR, encoding: "utf-8" },
-    ).trim();
-    const match = output.match(/:(\d+)$/);
-    if (!match) {
-      throw new Error(`Failed to parse port from: ${output}`);
-    }
-    return parseInt(match[1], 10);
-  }
-
-  function getDisabledContainerLogs(): string {
-    return execSync(`docker compose -f ${DISABLED_COMPOSE_FILE} logs login-app`, {
-      cwd: TEST_DIR,
-      encoding: "utf-8",
-    });
-  }
+  let network: StartedNetwork;
+  let mockZitadel: StartedTestContainer;
+  let loginApp: StartedTestContainer;
+  let appUrl: string;
 
   beforeAll(async () => {
-    try {
-      execSync(`docker compose -f ${DISABLED_COMPOSE_FILE} down -v`, {
-        stdio: "pipe",
-        cwd: TEST_DIR,
-      });
-    } catch {
-    }
+    network = await new Network().start();
 
-    execSync(`docker compose -f ${DISABLED_COMPOSE_FILE} up -d --build`, {
-      stdio: "inherit",
-      cwd: TEST_DIR,
-    });
+    mockZitadel = await new GenericContainer("node:20-alpine")
+      .withNetwork(network)
+      .withNetworkAliases("mock-zitadel")
+      .withCopyFilesToContainer([
+        { source: path.join(TEST_DIR, "mock-zitadel-server.js"), target: "/app/server.js" },
+      ])
+      .withEnvironment({
+        PORT: "8080",
+      })
+      .withCommand(["node", "/app/server.js"])
+      .withExposedPorts(8080, 7432)
+      .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+      .start();
 
-    const appPort = getDisabledHostPort("login-app", 3000);
-    disabledAppUrl = `http://localhost:${appPort}`;
-    console.log(`[OTEL DISABLED] APP_URL: ${disabledAppUrl}`);
+    loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
+      .withNetwork(network)
+      .withExposedPorts(3000, 9464)
+      .withEnvironment({
+        ZITADEL_API_URL: "http://mock-zitadel:8080",
+        ZITADEL_SERVICE_USER_TOKEN: "test-token",
+        OTEL_SDK_DISABLED: "true",
+      })
+      .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
+      .start();
 
-    const ready = await waitForService(`${disabledAppUrl}/ui/v2/login/healthy`, 60);
-    if (!ready) throw new Error("Login app (OTEL disabled) failed to start");
+    appUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(3000)}`;
+    console.log(`[OTEL DISABLED] APP_URL: ${appUrl}`);
   }, DOCKER_TIMEOUT);
 
-  afterAll(() => {
-    try {
-      execSync(`docker compose -f ${DISABLED_COMPOSE_FILE} down -v`, {
-        stdio: "pipe",
-        cwd: TEST_DIR,
-      });
-    } catch {
-    }
+  afterAll(async () => {
+    await loginApp?.stop();
+    await mockZitadel?.stop();
+    await network?.stop();
   }, DOCKER_TIMEOUT);
 
   describe("Application Health", () => {
     it("starts successfully with OTEL_SDK_DISABLED=true", async () => {
-      const response = await fetch(`${disabledAppUrl}/ui/v2/login/healthy`);
+      const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
       expect(response.ok).toBe(true);
     }, TEST_TIMEOUT);
 
     it("responds to health checks", async () => {
-      const response = await fetch(`${disabledAppUrl}/ui/v2/login/healthy`);
+      const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
       expect(response.status).toBe(200);
     }, TEST_TIMEOUT);
   });
 
   describe("Metrics Endpoint", () => {
     it("metrics endpoint is not available when OTEL is disabled", async () => {
-      const metricsPort = getDisabledHostPort("login-app", 9464);
-      const metricsUrl = `http://localhost:${metricsPort}/metrics`;
+      const metricsUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(9464)}/metrics`;
       try {
         await fetch(metricsUrl);
         expect.fail("Metrics endpoint should not be available");
@@ -853,16 +841,142 @@ describe("OpenTelemetry Disabled", () => {
 
   describe("Logging", () => {
     it("outputs logs to console via Winston", async () => {
-      await fetch(`${disabledAppUrl}/ui/v2/login/healthy`);
+      await fetch(`${appUrl}/ui/v2/login/healthy`);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const logs = getDisabledContainerLogs();
-      expect(logs.length).toBeGreaterThan(0);
+      const logOutput = await getContainerLogs(loginApp);
+      expect(logOutput.length).toBeGreaterThan(0);
     }, TEST_TIMEOUT);
 
     it("does not contain OTEL SDK initialization logs", async () => {
-      const logs = getDisabledContainerLogs();
-      expect(logs).not.toContain("OpenTelemetry SDK started");
-      expect(logs).not.toContain("Exporter");
+      const logOutput = await getContainerLogs(loginApp);
+      expect(logOutput).not.toContain("OpenTelemetry SDK started");
+      expect(logOutput).not.toContain("Exporter");
+    }, TEST_TIMEOUT);
+  });
+});
+
+describe("Log Level Configuration", () => {
+  describe("LOG_LEVEL=debug", () => {
+    let network: StartedNetwork;
+    let mockZitadel: StartedTestContainer;
+    let loginApp: StartedTestContainer;
+    let appUrl: string;
+
+    beforeAll(async () => {
+      network = await new Network().start();
+
+      mockZitadel = await new GenericContainer("node:20-alpine")
+        .withNetwork(network)
+        .withNetworkAliases("mock-zitadel")
+        .withCopyFilesToContainer([
+          { source: path.join(TEST_DIR, "mock-zitadel-server.js"), target: "/app/server.js" },
+        ])
+        .withEnvironment({
+          PORT: "8080",
+        })
+        .withCommand(["node", "/app/server.js"])
+        .withExposedPorts(8080, 7432)
+        .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+        .start();
+
+      loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
+        .withNetwork(network)
+        .withExposedPorts(3000)
+        .withEnvironment({
+          ZITADEL_API_URL: "http://mock-zitadel:8080",
+          ZITADEL_SERVICE_USER_TOKEN: "test-token",
+          OTEL_SDK_DISABLED: "true",
+          LOG_LEVEL: "debug",
+        })
+        .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
+        .start();
+
+      appUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(3000)}`;
+      console.log(`[LOG_LEVEL=debug] APP_URL: ${appUrl}`);
+
+      await fetch(`${appUrl}/ui/v2/login/healthy`);
+      await fetch(`${appUrl}/ui/v2/login/otel-test`);
+      await new Promise((r) => setTimeout(r, 1000));
+    }, DOCKER_TIMEOUT);
+
+    afterAll(async () => {
+      await loginApp?.stop();
+      await mockZitadel?.stop();
+      await network?.stop();
+    }, DOCKER_TIMEOUT);
+
+    it("starts successfully with LOG_LEVEL=debug", async () => {
+      const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
+      expect(response.ok).toBe(true);
+    }, TEST_TIMEOUT);
+
+    it("includes info level logs", async () => {
+      const logOutput = await getContainerLogs(loginApp);
+      expect(logOutput).toContain('"level":"info"');
+    }, TEST_TIMEOUT);
+  });
+
+  describe("LOG_LEVEL=warn", () => {
+    let network: StartedNetwork;
+    let mockZitadel: StartedTestContainer;
+    let loginApp: StartedTestContainer;
+    let appUrl: string;
+
+    beforeAll(async () => {
+      network = await new Network().start();
+
+      mockZitadel = await new GenericContainer("node:20-alpine")
+        .withNetwork(network)
+        .withNetworkAliases("mock-zitadel")
+        .withCopyFilesToContainer([
+          { source: path.join(TEST_DIR, "mock-zitadel-server.js"), target: "/app/server.js" },
+        ])
+        .withEnvironment({
+          PORT: "8080",
+        })
+        .withCommand(["node", "/app/server.js"])
+        .withExposedPorts(8080, 7432)
+        .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+        .start();
+
+      loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
+        .withNetwork(network)
+        .withExposedPorts(3000)
+        .withEnvironment({
+          ZITADEL_API_URL: "http://mock-zitadel:8080",
+          ZITADEL_SERVICE_USER_TOKEN: "test-token",
+          OTEL_SDK_DISABLED: "true",
+          LOG_LEVEL: "warn",
+        })
+        .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
+        .start();
+
+      appUrl = `http://${loginApp.getHost()}:${loginApp.getMappedPort(3000)}`;
+      console.log(`[LOG_LEVEL=warn] APP_URL: ${appUrl}`);
+
+      await fetch(`${appUrl}/ui/v2/login/healthy`);
+      await new Promise((r) => setTimeout(r, 1000));
+    }, DOCKER_TIMEOUT);
+
+    afterAll(async () => {
+      await loginApp?.stop();
+      await mockZitadel?.stop();
+      await network?.stop();
+    }, DOCKER_TIMEOUT);
+
+    it("starts successfully with LOG_LEVEL=warn", async () => {
+      const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
+      expect(response.ok).toBe(true);
+    }, TEST_TIMEOUT);
+
+    it("does not include info level logs", async () => {
+      const logOutput = await getContainerLogs(loginApp);
+      expect(logOutput).not.toContain('"level":"info"');
+    }, TEST_TIMEOUT);
+
+    it("does not include debug level logs", async () => {
+      const logOutput = await getContainerLogs(loginApp);
+      expect(logOutput).not.toContain('"level":"debug"');
     }, TEST_TIMEOUT);
   });
 });
