@@ -58,7 +58,7 @@ Depending on your authentication method you'll need additional headers and param
 Send your `client_id` and `client_secret` as Basic Auth Header. Note that OAuth2 requires client_id and client_secret to be form url encoded.
 So check [Client Secret Basic Auth Method](/apis/openidoauth/authn-methods#client-secret-basic) on how to build it correctly.
 
-```curl
+```bash
 curl --request POST \
 --url ${CUSTOM_DOMAIN}/oauth/v2/token \
 --header 'Authorization: Basic ${basic}' \
