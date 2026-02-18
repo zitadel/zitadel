@@ -153,6 +153,24 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 		}
 	}
 
+	if user.Human.Invite != nil {
+		if user.Human.Invite.PendingVerification != nil {
+			verification := &domain.VerificationTypeInit{
+				CreatedAt: user.CreatedAt,
+				Code:      user.Human.Invite.PendingVerification.Code,
+			}
+			if user.Human.Invite.PendingVerification.ID != "" {
+				verification.ID = &user.Human.Invite.PendingVerification.ID
+			}
+			if user.Human.Invite.PendingVerification.ExpiresAt != nil && !user.Human.Invite.PendingVerification.ExpiresAt.IsZero() {
+				verification.Expiry = gu.Ptr(time.Since(*user.Human.Invite.PendingVerification.ExpiresAt))
+			}
+			ctes["invite_verification"] = u.SetInviteVerification(verification).(database.CTEChange)
+		} else if !user.Human.Invite.AcceptedAt.IsZero() {
+			columnValues["invite_accepted_at"] = createdAt
+		}
+	}
+
 	for i, passkey := range user.Human.Passkeys {
 		ctes[fmt.Sprintf("passkey_%d", i)] = u.AddPasskey(passkey).(database.CTEChange)
 	}

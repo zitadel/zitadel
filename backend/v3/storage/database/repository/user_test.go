@@ -3169,6 +3169,7 @@ func Test_user_Update(t *testing.T) {
 							humanRepo.IdentityProviderLinkConditions().ProviderIDCondition("provider-id"),
 						),
 						humanRepo.SetIdentityProviderLinkUsername("updated-username"),
+						humanRepo.SetIdentityProviderLinkProvidedID("new-id"),
 					),
 				},
 			},
@@ -3179,7 +3180,7 @@ func Test_user_Update(t *testing.T) {
 					u.Human.IdentityProviderLinks = []*domain.IdentityProviderLink{
 						{
 							ProviderID:       "provider-id",
-							ProvidedUserID:   "provided-user-id",
+							ProvidedUserID:   "new-id",
 							ProvidedUsername: "updated-username",
 							CreatedAt:        now,
 							UpdatedAt:        now,
@@ -3300,7 +3301,13 @@ func Test_user_Update(t *testing.T) {
 						database.And(
 							humanRepo.PasskeyConditions().IDCondition("passkey-id"),
 						),
+						humanRepo.SetPasskeyAttestationType("new-attestation-type"),
+						humanRepo.SetPasskeyAuthenticatorAttestationGUID([]byte("new-aaguid")),
+						humanRepo.SetPasskeyKeyID([]byte("new-key-id")),
 						humanRepo.SetPasskeyName("updated-name"),
+						humanRepo.SetPasskeyPublicKey([]byte("new-public-key")),
+						humanRepo.SetPasskeySignCount(123),
+						humanRepo.SetPasskeyUpdatedAt(now.Add(500*time.Millisecond)),
 					),
 				},
 			},
@@ -3311,17 +3318,18 @@ func Test_user_Update(t *testing.T) {
 					u.Human.Passkeys = []*domain.Passkey{
 						{
 							ID:                           "passkey-id",
-							PublicKey:                    []byte("public-key"),
+							PublicKey:                    []byte("new-public-key"),
 							Type:                         domain.PasskeyTypePasswordless,
 							CreatedAt:                    now,
-							UpdatedAt:                    now,
+							UpdatedAt:                    now.Add(500 * time.Millisecond),
 							VerifiedAt:                   now,
-							KeyID:                        []byte("keyID"),
+							KeyID:                        []byte("new-key-id"),
 							Name:                         "updated-name",
-							AttestationType:              "attestation-type",
-							AuthenticatorAttestationGUID: []byte("aa guid"),
+							AttestationType:              "new-attestation-type",
+							AuthenticatorAttestationGUID: []byte("new-aaguid"),
 							Challenge:                    []byte("challenge"),
 							RelyingPartyID:               "rp id",
+							SignCount:                    123,
 						},
 					}
 					return u
@@ -3511,7 +3519,7 @@ func Test_user_Update(t *testing.T) {
 		{
 			name: "set machine remove personal access token",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
-				rowCount, err := userRepo.Update(t.Context(), tx, machineCondition,
+				rowCount, err := machineRepo.Update(t.Context(), tx, machineCondition,
 					machineRepo.AddPersonalAccessToken(&domain.PersonalAccessToken{
 						ID:        "pat-to-remove",
 						Scopes:    []string{"openid", "profile"},
