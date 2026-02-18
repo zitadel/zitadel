@@ -50,7 +50,7 @@ We provide you with a wide range of out-of-the-box features to accelerate your p
 :white_check_mark: SCIM 2.0 Server
 and an unlimited audit trail is there for you, ready to use.
 
-With ZITADEL, you are assured of a robust and customizable turnkey solution for all your authentication and authorization needs.
+With ZITADEL, you are assured of a robust and customizable turnkey solution for all your authentication and authorization needses.
 
 ---
 
