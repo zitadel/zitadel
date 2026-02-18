@@ -24,7 +24,13 @@
       <span class="smaller cnsl-secondary-text">{{ user.preferredLoginName }}</span>
     </div>
     <span class="fill-space"></span>
-    <button class="search-user-dl-btn" matTooltip="{{ 'ACTIONS.REMOVE' | translate }}" mat-icon-button color="warn" (click)="remove(user)">
+    <button
+      class="search-user-dl-btn"
+      matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+      mat-icon-button
+      color="warn"
+      (click)="remove(user)"
+    >
       <i class="las la-minus-circle"></i>
     </button>
   </div>
