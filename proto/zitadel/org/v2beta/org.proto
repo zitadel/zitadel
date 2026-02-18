@@ -24,7 +24,7 @@ message Organization {
     }
   ];
 
-  //  The timestamp of the verification of the organization domain.
+  //  The timestamp of the verification of the Organization Domain.
   google.protobuf.Timestamp changed_date = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
