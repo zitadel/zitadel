@@ -38,7 +38,7 @@ Database:
       Username: zitadel
       Password: zitadel
       SSL:
-        Mode: disable
+        Mode: disable  # Use 'require' or 'verify-full' for production
         RootCert:
         Cert:
         Key:
@@ -46,7 +46,7 @@ Database:
       Username: postgres
       Password: postgres
       SSL:
-        Mode: disable
+        Mode: disable  # Use 'require' or 'verify-full' for production
         RootCert:
         Cert:
         Key:
@@ -73,6 +73,8 @@ Replace `<strong-password>` with a strong, unique password and store it in a sec
 ```sql
 CREATE ROLE zitadel LOGIN PASSWORD '<strong-password>';
 CREATE DATABASE zitadel WITH OWNER zitadel;
+-- The GRANT below is redundant when zitadel is the database owner,
+-- but is included for clarity. Owners implicitly hold all privileges.
 GRANT CONNECT, CREATE ON DATABASE zitadel TO zitadel;
 ```
 
@@ -96,8 +98,8 @@ ZITADEL_DATABASE_POSTGRES_HOST=<your-host> \
 
 **Run setup and start**
 
-:::caution
-`--tlsMode disabled` is for local testing only. For any internet-facing or production deployment, configure TLS to prevent credentials and tokens from being transmitted in cleartext. See the [TLS configuration guide](/self-hosting/manage/tls_modes).
+:::note
+For production deployments, configure TLS to encrypt authentication traffic. See the [TLS configuration guide](/self-hosting/manage/tls_modes) for the available modes.
 :::
 
 ```bash

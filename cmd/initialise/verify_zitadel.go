@@ -15,7 +15,7 @@ import (
 	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
-func newZitadel() *cobra.Command {
+func newSchema() *cobra.Command {
 	return &cobra.Command{
 		Use:     "schema",
 		Aliases: []string{"zitadel"},
@@ -34,7 +34,7 @@ Prerequisites:
 `,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).Error("zitadel verify zitadel command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel init schema command failed")
 			}()
 			config, shutdown, err := NewConfig(cmd, viper.GetViper())
 			if err != nil {

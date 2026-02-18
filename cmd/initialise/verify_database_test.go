@@ -71,6 +71,19 @@ func Test_verifyDB(t *testing.T) {
 			targetErr: nil,
 		},
 		{
+			name: "catalog check fails",
+			args: args{
+				db: prepareDB(t,
+					expectQuery("SELECT current_database()", nil, []string{"current_database"}, [][]driver.Value{
+						{"postgres"},
+					}),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = $1)", sql.ErrConnDone, []string{"exists"}, [][]driver.Value{}, "zitadel"),
+				),
+				database: "zitadel",
+			},
+			targetErr: sql.ErrConnDone,
+		},
+		{
 			name: "same database as admin connection, skip creation",
 			args: args{
 				db: prepareDB(t,
