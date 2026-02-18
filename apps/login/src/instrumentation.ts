@@ -76,6 +76,7 @@ export async function register(): Promise<void> {
 
   _loggerProvider = logs.getLoggerProvider();
 
+  // Use console during shutdown as the logger may be unavailable
   const shutdown = () => sdk.shutdown().catch(console.error);
   process.once("SIGTERM", shutdown);
   process.once("SIGINT", shutdown);
