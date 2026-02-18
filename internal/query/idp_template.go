@@ -74,6 +74,8 @@ type OIDCIDPTemplate struct {
 	Scopes           database.TextArray[string]
 	IsIDTokenMapping bool
 	UsePKCE          bool
+	IconURL          string
+	BackgroundColor  string
 }
 
 type JWTIDPTemplate struct {
@@ -322,6 +324,14 @@ var (
 	}
 	OIDCUsePKCECol = Column{
 		name:  projection.OIDCUsePKCECol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCIconURLCol = Column{
+		name:  projection.OIDCIconURLCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCBackgroundColorCol = Column{
+		name:  projection.OIDCBackgroundColorCol,
 		table: oidcIdpTemplateTable,
 	}
 )
@@ -907,6 +917,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
 			OIDCUsePKCECol.identifier(),
+			OIDCIconURLCol.identifier(),
+			OIDCBackgroundColorCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -1028,6 +1040,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			oidcScopes := database.TextArray[string]{}
 			oidcIDTokenMapping := sql.NullBool{}
 			oidcUserPKCE := sql.NullBool{}
+			oidcIconURL := sql.NullString{}
+			oidcBackgroundColor := sql.NullString{}
 
 			jwtID := sql.NullString{}
 			jwtIssuer := sql.NullString{}
@@ -1147,6 +1161,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&oidcScopes,
 				&oidcIDTokenMapping,
 				&oidcUserPKCE,
+				&oidcIconURL,
+				&oidcBackgroundColor,
 				// jwt
 				&jwtID,
 				&jwtIssuer,
@@ -1264,6 +1280,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					Scopes:           oidcScopes,
 					IsIDTokenMapping: oidcIDTokenMapping.Bool,
 					UsePKCE:          oidcUserPKCE.Bool,
+					IconURL:          oidcIconURL.String,
+					BackgroundColor:  oidcBackgroundColor.String,
 				}
 			}
 			if jwtID.Valid {
@@ -1423,6 +1441,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
 			OIDCUsePKCECol.identifier(),
+			OIDCIconURLCol.identifier(),
+			OIDCBackgroundColorCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -1549,6 +1569,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				oidcScopes := database.TextArray[string]{}
 				oidcIDTokenMapping := sql.NullBool{}
 				oidcUserPKCE := sql.NullBool{}
+				oidcIconURL := sql.NullString{}
+				oidcBackgroundColor := sql.NullString{}
 
 				jwtID := sql.NullString{}
 				jwtIssuer := sql.NullString{}
@@ -1668,6 +1690,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&oidcScopes,
 					&oidcIDTokenMapping,
 					&oidcUserPKCE,
+					&oidcIconURL,
+					&oidcBackgroundColor,
 					// jwt
 					&jwtID,
 					&jwtIssuer,
@@ -1784,6 +1808,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 						Scopes:           oidcScopes,
 						IsIDTokenMapping: oidcIDTokenMapping.Bool,
 						UsePKCE:          oidcUserPKCE.Bool,
+						IconURL:          oidcIconURL.String,
+						BackgroundColor:  oidcBackgroundColor.String,
 					}
 				}
 				if jwtID.Valid {

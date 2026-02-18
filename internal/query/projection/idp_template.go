@@ -80,6 +80,8 @@ const (
 	OIDCScopesCol         = "scopes"
 	OIDCIDTokenMappingCol = "id_token_mapping"
 	OIDCUsePKCECol        = "use_pkce"
+	OIDCIconURLCol        = "icon_url"
+	OIDCBackgroundColorCol = "background_color"
 
 	JWTIDCol           = "idp_id"
 	JWTInstanceIDCol   = "instance_id"
@@ -236,6 +238,8 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(OIDCScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(OIDCIDTokenMappingCol, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(OIDCUsePKCECol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(OIDCIconURLCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(OIDCBackgroundColorCol, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(OIDCInstanceIDCol, OIDCIDCol),
 			IDPTemplateOIDCSuffix,
@@ -823,6 +827,8 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OIDCIDTokenMappingCol, idpEvent.IsIDTokenMapping),
 				handler.NewCol(OIDCUsePKCECol, idpEvent.UsePKCE),
+				handler.NewCol(OIDCIconURLCol, idpEvent.IconURL),
+				handler.NewCol(OIDCBackgroundColorCol, idpEvent.BackgroundColor),
 			},
 			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
@@ -2291,6 +2297,12 @@ func reduceOIDCIDPChangedColumns(idpEvent idp.OIDCIDPChangedEvent) []handler.Col
 	}
 	if idpEvent.UsePKCE != nil {
 		oidcCols = append(oidcCols, handler.NewCol(OIDCUsePKCECol, *idpEvent.UsePKCE))
+	}
+	if idpEvent.IconURL != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCIconURLCol, *idpEvent.IconURL))
+	}
+	if idpEvent.BackgroundColor != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCBackgroundColorCol, *idpEvent.BackgroundColor))
 	}
 	return oidcCols
 }

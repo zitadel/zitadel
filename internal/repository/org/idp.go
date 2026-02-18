@@ -140,6 +140,7 @@ func NewOIDCIDPAddedEvent(
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
 	isIDTokenMapping, usePKCE bool,
+	iconURL, backgroundColor string,
 	options idp.Options,
 ) *OIDCIDPAddedEvent {
 
@@ -158,6 +159,8 @@ func NewOIDCIDPAddedEvent(
 			scopes,
 			isIDTokenMapping,
 			usePKCE,
+			iconURL,
+			backgroundColor,
 			options,
 		),
 	}

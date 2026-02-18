@@ -13177,6 +13177,10 @@ message AddGenericOIDCProviderRequest {
     bool is_id_token_mapping = 7;
     // Enable the use of Proof Key for Code Exchange (PKCE) for the OIDC flow.
     bool use_pkce = 8;
+    // Optional URL to an icon for the provider button on the login screen.
+    string icon_url = 9;
+    // Optional background color for the provider button (e.g. hex color \"#1976d2\").
+    string background_color = 10;
 }
 
 message AddGenericOIDCProviderResponse {
@@ -13230,6 +13234,10 @@ message UpdateGenericOIDCProviderRequest {
     bool is_id_token_mapping = 8;
     // Enable the use of Proof Key for Code Exchange (PKCE) for the OIDC flow.
     bool use_pkce = 9;
+    // Optional URL to an icon for the provider button on the login screen.
+    string icon_url = 10;
+    // Optional background color for the provider button (e.g. hex color \"#1976d2\").
+    string background_color = 11;
 }
 
 message UpdateGenericOIDCProviderResponse {

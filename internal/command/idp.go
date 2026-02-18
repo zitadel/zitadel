@@ -32,6 +32,8 @@ type GenericOIDCProvider struct {
 	Scopes           []string
 	IsIDTokenMapping bool
 	UsePKCE          bool
+	IconURL          string
+	BackgroundColor  string
 	IDPOptions       idp.Options
 }
 

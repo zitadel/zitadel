@@ -25,9 +25,12 @@ var (
 		` projections.idp_templates6.is_auto_creation,` +
 		` projections.idp_templates6.is_auto_update,` +
 		` projections.idp_templates6.auto_linking,` +
+		` projections.idp_templates6_oidc.icon_url,` +
+		` projections.idp_templates6_oidc.background_color,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_login_policy_links5` +
 		` LEFT JOIN projections.idp_templates6 ON projections.idp_login_policy_links5.idp_id = projections.idp_templates6.id AND projections.idp_login_policy_links5.instance_id = projections.idp_templates6.instance_id` +
+		` LEFT JOIN projections.idp_templates6_oidc ON projections.idp_templates6.id = projections.idp_templates6_oidc.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_oidc.instance_id` +
 		` RIGHT JOIN (SELECT login_policy_owner.aggregate_id, login_policy_owner.instance_id, login_policy_owner.owner_removed FROM projections.login_policies5 AS login_policy_owner` +
 		` WHERE (login_policy_owner.instance_id = $1 AND (login_policy_owner.aggregate_id = $2 OR login_policy_owner.aggregate_id = $3)) ORDER BY login_policy_owner.is_default LIMIT 1) AS login_policy_owner` +
 		` ON login_policy_owner.aggregate_id = projections.idp_login_policy_links5.resource_owner AND login_policy_owner.instance_id = projections.idp_login_policy_links5.instance_id`)
@@ -41,6 +44,8 @@ var (
 		"is_auto_creation",
 		"is_auto_update",
 		"auto_linking",
+		"icon_url",
+		"background_color",
 		"count",
 	}
 )
@@ -76,6 +81,9 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 							true,
 							true,
 							domain.AutoLinkingOptionUsername,
+							nil,
+							nil,
+							uint64(1),
 						},
 					},
 				),
@@ -118,7 +126,10 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 							false,
 							false,
 							false,
-							0,
+							nil,
+							nil,
+							nil,
+							1,
 						},
 					},
 				),

@@ -218,6 +218,8 @@ type OIDCIDPWriteModel struct {
 	Scopes           []string
 	IsIDTokenMapping bool
 	UsePKCE          bool
+	IconURL          string
+	BackgroundColor  string
 	idp.Options
 
 	State domain.IDPState
@@ -259,6 +261,8 @@ func (wm *OIDCIDPWriteModel) reduceAddedEvent(e *idp.OIDCIDPAddedEvent) {
 	wm.Scopes = e.Scopes
 	wm.IsIDTokenMapping = e.IsIDTokenMapping
 	wm.UsePKCE = e.UsePKCE
+	wm.IconURL = e.IconURL
+	wm.BackgroundColor = e.BackgroundColor
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -285,6 +289,12 @@ func (wm *OIDCIDPWriteModel) reduceChangedEvent(e *idp.OIDCIDPChangedEvent) {
 	if e.UsePKCE != nil {
 		wm.UsePKCE = *e.UsePKCE
 	}
+	if e.IconURL != nil {
+		wm.IconURL = *e.IconURL
+	}
+	if e.BackgroundColor != nil {
+		wm.BackgroundColor = *e.BackgroundColor
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -296,6 +306,7 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	idTokenMapping, usePKCE bool,
+	iconURL, backgroundColor string,
 	options idp.Options,
 ) ([]idp.OIDCIDPChanges, error) {
 	changes := make([]idp.OIDCIDPChanges, 0)
@@ -325,6 +336,12 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	}
 	if wm.UsePKCE != usePKCE {
 		changes = append(changes, idp.ChangeOIDCUsePKCE(usePKCE))
+	}
+	if wm.IconURL != iconURL {
+		changes = append(changes, idp.ChangeOIDCIconURL(iconURL))
+	}
+	if wm.BackgroundColor != backgroundColor {
+		changes = append(changes, idp.ChangeOIDCBackgroundColor(backgroundColor))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {

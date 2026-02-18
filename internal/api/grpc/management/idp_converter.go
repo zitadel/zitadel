@@ -238,6 +238,8 @@ func addGenericOIDCProviderToCommand(req *mgmt_pb.AddGenericOIDCProviderRequest)
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
 		UsePKCE:          req.UsePkce,
+		IconURL:          req.IconUrl,
+		BackgroundColor:  req.BackgroundColor,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -251,6 +253,8 @@ func updateGenericOIDCProviderToCommand(req *mgmt_pb.UpdateGenericOIDCProviderRe
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
 		UsePKCE:          req.UsePkce,
+		IconURL:          req.IconUrl,
+		BackgroundColor:  req.BackgroundColor,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }

@@ -763,6 +763,8 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, writeMo
 					provider.Scopes,
 					provider.IsIDTokenMapping,
 					provider.UsePKCE,
+					provider.IconURL,
+					provider.BackgroundColor,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -808,6 +810,8 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, writ
 				provider.Scopes,
 				provider.IsIDTokenMapping,
 				provider.UsePKCE,
+				provider.IconURL,
+				provider.BackgroundColor,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {

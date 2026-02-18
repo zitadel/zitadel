@@ -518,6 +518,8 @@ func oidcConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OIDCI
 			Scopes:           template.Scopes,
 			IsIdTokenMapping: template.IsIDTokenMapping,
 			UsePkce:          template.UsePKCE,
+			IconUrl:          template.IconURL,
+			BackgroundColor:  template.BackgroundColor,
 		},
 	}
 }

@@ -10,7 +10,7 @@ export const SignInWithGeneric = forwardRef<
   const {
     children,
     name = "",
-    className = "h-[50px] pl-20",
+    className = "h-[50px]",
     ...restProps
   } = props;
   return (

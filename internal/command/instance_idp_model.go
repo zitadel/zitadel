@@ -177,6 +177,7 @@ func (wm *InstanceOIDCIDPWriteModel) NewChangedEvent(
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	idTokenMapping, usePKCE bool,
+	iconURL, backgroundColor string,
 	options idp.Options,
 ) (*instance.OIDCIDPChangedEvent, error) {
 
@@ -189,6 +190,8 @@ func (wm *InstanceOIDCIDPWriteModel) NewChangedEvent(
 		scopes,
 		idTokenMapping,
 		usePKCE,
+		iconURL,
+		backgroundColor,
 		options,
 	)
 	if err != nil || len(changes) == 0 {
