@@ -2117,8 +2117,8 @@ message CreateUserRequest{
     // which will include more information about the user and their permissions in the token itself.
     // This can be useful for machine users that need to call services that require more information about the user,
     // without having to call the userinfo or introspection endpoint.
-    // However, revoked JWT tokens might still considered valid until they expire.
-    // A call to the userinfo or introspection endpoint to check if they are still valid.
+    // However, revoked JWTs may still be considered valid until they expire.
+    // Always call the userinfo or introspection endpoint to verify that a JWT is still valid.
     AccessTokenType access_token_type = 3 [
       (validate.rules).enum = {defined_only: true},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -2561,8 +2561,8 @@ message UpdateUserRequest{
     // which will include more information about the user and their permissions in the token itself.
     // This can be useful for machine users that need to call services that require more information about the user,
     // without having to call the userinfo or introspection endpoint.
-    // However, revoked JWT tokens might still considered valid until they expire.
-    // A call to the userinfo or introspection endpoint to check if they are still valid.
+    // However, revoked JWT tokens might still be considered valid until they expire.
+    // Therefore, you must call the userinfo or introspection endpoint to check whether they are still valid.
     optional AccessTokenType access_token_type = 3 [
       (validate.rules).enum = {defined_only: true},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
