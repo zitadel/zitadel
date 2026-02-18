@@ -70,7 +70,7 @@ func (u userHuman) passwordChangeRequiredColumn() database.Column {
 }
 
 func (u userHuman) passwordVerifiedAtColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "password_verified_at")
+	return database.NewColumn(u.unqualifiedTableName(), "password_changed_at")
 }
 
 func (u userHuman) passwordVerificationIDColumn() database.Column {

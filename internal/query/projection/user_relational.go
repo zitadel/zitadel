@@ -234,19 +234,6 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				},
 
 				{
-					Event: user.HumanRefreshTokenAddedType,
-					// TODO: needed?
-				},
-				{
-					Event: user.HumanRefreshTokenRenewedType,
-					// TODO: needed?
-				},
-				{
-					Event: user.HumanRefreshTokenRemovedType,
-					// TODO: needed?
-				},
-
-				{
 					Event:  user.PersonalAccessTokenAddedType,
 					Reduce: p.reducePersonalAccessTokenAdded,
 				},
@@ -366,10 +353,6 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOTPSMSDisabled,
 				},
 				{
-					Event:  user.HumanOTPSMSCodeAddedType,
-					Reduce: p.reduceOTPSMSCodeAdded,
-				},
-				{
 					Event:  user.HumanOTPSMSCheckSucceededType,
 					Reduce: p.reduceOTPSMSCheckSucceeded,
 				},
@@ -386,10 +369,6 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOTPEmailDisabled,
 				},
 				{
-					Event:  user.HumanOTPEmailCodeAddedType,
-					Reduce: p.reduceOTPEmailCodeAdded,
-				},
-				{
 					Event:  user.HumanOTPEmailCheckSucceededType,
 					Reduce: p.reduceOTPEmailCheckSucceeded,
 				},
@@ -403,9 +382,9 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 }
 
 func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-HbYn4", "reduce.wrong.event.type %s", user.HumanAddedType)
+	e, err := assertEvent[*user.HumanAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -453,9 +432,9 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 }
 
 func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanRegisteredEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xhD3q", "reduce.wrong.event.type %s", user.HumanRegisteredType)
+	e, err := assertEvent[*user.HumanRegisteredEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -504,9 +483,9 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 }
 
 func (p *userRelationalProjection) reduceUserLocked(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserLockedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-eUn8f", "reduce.wrong.event.type %s", user.UserLockedType)
+	e, err := assertEvent[*user.UserLockedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -527,9 +506,9 @@ func (p *userRelationalProjection) reduceUserLocked(event eventstore.Event) (*ha
 }
 
 func (p *userRelationalProjection) reduceUserUnlocked(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserUnlockedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JIyRl", "reduce.wrong.event.type %s", user.UserUnlockedType)
+	e, err := assertEvent[*user.UserUnlockedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -550,9 +529,9 @@ func (p *userRelationalProjection) reduceUserUnlocked(event eventstore.Event) (*
 }
 
 func (p *userRelationalProjection) reduceUserDeactivated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserDeactivatedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-6BNjj", "reduce.wrong.event.type %s", user.UserDeactivatedType)
+	e, err := assertEvent[*user.UserDeactivatedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -573,9 +552,9 @@ func (p *userRelationalProjection) reduceUserDeactivated(event eventstore.Event)
 }
 
 func (p *userRelationalProjection) reduceUserReactivated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserReactivatedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-IoF6j", "reduce.wrong.event.type %s", user.UserReactivatedType)
+	e, err := assertEvent[*user.UserReactivatedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -596,9 +575,9 @@ func (p *userRelationalProjection) reduceUserReactivated(event eventstore.Event)
 }
 
 func (p *userRelationalProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-BQB2t", "reduce.wrong.event.type %s", user.UserRemovedType)
+	e, err := assertEvent[*user.UserRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -617,9 +596,9 @@ func (p *userRelationalProjection) reduceUserRemoved(event eventstore.Event) (*h
 }
 
 func (p *userRelationalProjection) reduceUsernameChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UsernameChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-QNKyV", "reduce.wrong.event.type %s", user.UserUserNameChangedType)
+	e, err := assertEvent[*user.UsernameChangedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -640,9 +619,9 @@ func (p *userRelationalProjection) reduceUsernameChanged(event eventstore.Event)
 }
 
 func (p *userRelationalProjection) reduceDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.DomainClaimedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASwf3", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
+	e, err := assertEvent[*user.DomainClaimedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -663,9 +642,9 @@ func (p *userRelationalProjection) reduceDomainClaimed(event eventstore.Event) (
 }
 
 func (p *userRelationalProjection) reduceHumanProfileChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanProfileChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-769v4", "reduce.wrong.event.type %s", user.HumanProfileChangedType)
+	e, err := assertEvent[*user.HumanProfileChangedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	repo := repository.UserRepository().Human()
@@ -711,9 +690,9 @@ func (p *userRelationalProjection) reduceHumanProfileChanged(event eventstore.Ev
 }
 
 func (p *userRelationalProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPhoneChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xOGIA", "reduce.wrong.event.type %s", user.HumanPhoneChangedType)
+	e, err := assertEvent[*user.HumanPhoneChangedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -735,9 +714,9 @@ func (p *userRelationalProjection) reduceHumanPhoneChanged(event eventstore.Even
 }
 
 func (p *userRelationalProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPhoneRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JI4S1", "reduce.wrong.event.type %s", user.HumanPhoneRemovedType)
+	e, err := assertEvent[*user.HumanPhoneRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -757,9 +736,9 @@ func (p *userRelationalProjection) reduceHumanPhoneRemoved(event eventstore.Even
 }
 
 func (p *userRelationalProjection) reduceHumanPhoneVerified(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPhoneVerifiedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-LBnqG", "reduce.wrong.event.type %s", user.HumanPhoneVerifiedType)
+	e, err := assertEvent[*user.HumanPhoneVerifiedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -781,9 +760,14 @@ func (p *userRelationalProjection) reduceHumanPhoneVerified(event eventstore.Eve
 }
 
 func (p *userRelationalProjection) reduceHumanPhoneCodeAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPhoneCodeAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanPhoneCodeAddedType)
+	e, err := assertEvent[*user.HumanPhoneCodeAddedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	var expiry *time.Duration
+	if e.Expiry > 0 {
+		expiry = &e.Expiry
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -797,7 +781,7 @@ func (p *userRelationalProjection) reduceHumanPhoneCodeAdded(event eventstore.Ev
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetPhoneVerification(&domain.VerificationTypeUpdate{
 				Code:   e.Code,
-				Expiry: &e.Expiry,
+				Expiry: expiry,
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
@@ -806,9 +790,9 @@ func (p *userRelationalProjection) reduceHumanPhoneCodeAdded(event eventstore.Ev
 }
 
 func (p *userRelationalProjection) reduceHumanPhoneVerificationFailed(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPhoneVerificationFailedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanPhoneVerificationFailedType)
+	e, err := assertEvent[*user.HumanPhoneVerificationFailedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -829,9 +813,9 @@ func (p *userRelationalProjection) reduceHumanPhoneVerificationFailed(event even
 }
 
 func (p *userRelationalProjection) reduceHumanEmailChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanEmailChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-KwiHa", "reduce.wrong.event.type %s", user.HumanEmailChangedType)
+	e, err := assertEvent[*user.HumanEmailChangedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -854,9 +838,9 @@ func (p *userRelationalProjection) reduceHumanEmailChanged(event eventstore.Even
 }
 
 func (p *userRelationalProjection) reduceHumanEmailVerified(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanEmailVerifiedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanEmailVerifiedType)
+	e, err := assertEvent[*user.HumanEmailVerifiedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -877,9 +861,9 @@ func (p *userRelationalProjection) reduceHumanEmailVerified(event eventstore.Eve
 }
 
 func (p *userRelationalProjection) reduceHumanEmailCodeAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanEmailCodeAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanEmailCodeAddedType)
+	e, err := assertEvent[*user.HumanEmailCodeAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -907,9 +891,9 @@ func (p *userRelationalProjection) reduceHumanEmailCodeAdded(event eventstore.Ev
 }
 
 func (p *userRelationalProjection) reduceHumanEmailVerificationFailed(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanEmailVerificationFailedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanEmailVerificationFailedType)
+	e, err := assertEvent[*user.HumanEmailVerificationFailedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -930,9 +914,9 @@ func (p *userRelationalProjection) reduceHumanEmailVerificationFailed(event even
 }
 
 func (p *userRelationalProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanAvatarAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-eDEdt", "reduce.wrong.event.type %s", user.HumanAvatarAddedType)
+	e, err := assertEvent[*user.HumanAvatarAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -952,9 +936,9 @@ func (p *userRelationalProjection) reduceHumanAvatarAdded(event eventstore.Event
 }
 
 func (p *userRelationalProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanAvatarRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-KhETX", "reduce.wrong.event.type %s", user.HumanAvatarRemovedType)
+	e, err := assertEvent[*user.HumanAvatarRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -974,9 +958,9 @@ func (p *userRelationalProjection) reduceHumanAvatarRemoved(event eventstore.Eve
 }
 
 func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPasswordChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jqXUY", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
+	e, err := assertEvent[*user.HumanPasswordChangedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -997,9 +981,9 @@ func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.E
 }
 
 func (p *userRelationalProjection) reduceHumanPasswordCodeAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPasswordCodeAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordCodeAddedType)
+	e, err := assertEvent[*user.HumanPasswordCodeAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1026,9 +1010,9 @@ func (p *userRelationalProjection) reduceHumanPasswordCodeAdded(event eventstore
 }
 
 func (p *userRelationalProjection) reduceHumanPasswordCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPasswordCheckSucceededEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordCheckSucceededType)
+	e, err := assertEvent[*user.HumanPasswordCheckSucceededEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1046,9 +1030,9 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckSucceeded(event event
 }
 
 func (p *userRelationalProjection) reduceHumanPasswordCheckFailed(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPasswordCheckFailedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordCheckFailedType)
+	e, err := assertEvent[*user.HumanPasswordCheckFailedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1066,9 +1050,9 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckFailed(event eventsto
 }
 
 func (p *userRelationalProjection) reduceHumanPasswordHashUpdated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPasswordHashUpdatedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordHashUpdatedType)
+	e, err := assertEvent[*user.HumanPasswordHashUpdatedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1086,9 +1070,9 @@ func (p *userRelationalProjection) reduceHumanPasswordHashUpdated(event eventsto
 }
 
 func (p *userRelationalProjection) reduceMachineSecretSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.MachineSecretSetEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x0p1n1i", "reduce.wrong.event.type %s", user.MachineSecretSetType)
+	e, err := assertEvent[*user.MachineSecretSetEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1109,9 +1093,9 @@ func (p *userRelationalProjection) reduceMachineSecretSet(event eventstore.Event
 }
 
 func (p *userRelationalProjection) reduceMachineSecretHashUpdated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.MachineSecretHashUpdatedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Wieng4u", "reduce.wrong.event.type %s", user.MachineSecretHashUpdatedType)
+	e, err := assertEvent[*user.MachineSecretHashUpdatedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1130,9 +1114,9 @@ func (p *userRelationalProjection) reduceMachineSecretHashUpdated(event eventsto
 }
 
 func (p *userRelationalProjection) reduceMachineSecretRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.MachineSecretRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x0p6n1i", "reduce.wrong.event.type %s", user.MachineSecretRemovedType)
+	e, err := assertEvent[*user.MachineSecretRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -1152,9 +1136,9 @@ func (p *userRelationalProjection) reduceMachineSecretRemoved(event eventstore.E
 }
 
 func (p *userRelationalProjection) reduceMachineKeyAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.MachineKeyAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.MachineKeyAddedEventType)
+	e, err := assertEvent[*user.MachineKeyAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1178,9 +1162,9 @@ func (p *userRelationalProjection) reduceMachineKeyAdded(event eventstore.Event)
 }
 
 func (p *userRelationalProjection) reduceMachineKeyRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.MachineKeyRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.MachineKeyRemovedEventType)
+	e, err := assertEvent[*user.MachineKeyRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1198,9 +1182,9 @@ func (p *userRelationalProjection) reduceMachineKeyRemoved(event eventstore.Even
 }
 
 func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.MachineAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-q7ier", "reduce.wrong.event.type %s", user.MachineAddedEventType)
+	e, err := assertEvent[*user.MachineAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -1231,9 +1215,9 @@ func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*
 }
 
 func (p *userRelationalProjection) reduceMachineChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.MachineChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.MachineChangedEventType)
+	e, err := assertEvent[*user.MachineChangedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	repo := repository.MachineUserRepository()
 
@@ -1267,9 +1251,9 @@ func (p *userRelationalProjection) reduceMachineChanged(event eventstore.Event) 
 }
 
 func (p *userRelationalProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.PersonalAccessTokenAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
+	e, err := assertEvent[*user.PersonalAccessTokenAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1291,9 +1275,9 @@ func (p *userRelationalProjection) reducePersonalAccessTokenAdded(event eventsto
 }
 
 func (p *userRelationalProjection) reducePersonalAccessTokenRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.PersonalAccessTokenRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.PersonalAccessTokenRemovedType)
+	e, err := assertEvent[*user.PersonalAccessTokenRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1310,9 +1294,9 @@ func (p *userRelationalProjection) reducePersonalAccessTokenRemoved(event events
 }
 
 func (p *userRelationalProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.MetadataSetEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xOO4e", "reduce.wrong.event.type %s", user.MetadataSetType)
+	e, err := assertEvent[*user.MetadataSetEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1334,9 +1318,9 @@ func (p *userRelationalProjection) reduceMetadataSet(event eventstore.Event) (*h
 }
 
 func (p *userRelationalProjection) reduceMetadataRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.MetadataRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xOO4e", "reduce.wrong.event.type %s", user.MetadataRemovedType)
+	e, err := assertEvent[*user.MetadataRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1353,9 +1337,9 @@ func (p *userRelationalProjection) reduceMetadataRemoved(event eventstore.Event)
 }
 
 func (p *userRelationalProjection) reduceMetadataRemovedAll(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.MetadataRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xOO4e", "reduce.wrong.event.type %s", user.MetadataRemovedType)
+	e, err := assertEvent[*user.MetadataRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1506,9 +1490,9 @@ func (p *userRelationalProjection) reducePasskeyRemoved(event eventstore.Event) 
 }
 
 func (p *userRelationalProjection) reducePasskeyInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPasswordlessInitCodeAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeAddedType)
+	e, err := assertEvent[*user.HumanPasswordlessInitCodeAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1531,9 +1515,9 @@ func (p *userRelationalProjection) reducePasskeyInitCodeAdded(event eventstore.E
 }
 
 func (p *userRelationalProjection) reducePasskeyInitCodeCheckFailed(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPasswordlessInitCodeCheckFailedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeCheckFailedType)
+	e, err := assertEvent[*user.HumanPasswordlessInitCodeCheckFailedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1554,9 +1538,9 @@ func (p *userRelationalProjection) reducePasskeyInitCodeCheckFailed(event events
 }
 
 func (p *userRelationalProjection) reducePasskeyInitCodeCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPasswordlessInitCodeCheckSucceededEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeCheckSucceededType)
+	e, err := assertEvent[*user.HumanPasswordlessInitCodeCheckSucceededEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1577,9 +1561,9 @@ func (p *userRelationalProjection) reducePasskeyInitCodeCheckSucceeded(event eve
 }
 
 func (p *userRelationalProjection) reducePasskeyInitCodeRequested(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanPasswordlessInitCodeRequestedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeRequestedType)
+	e, err := assertEvent[*user.HumanPasswordlessInitCodeRequestedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1601,34 +1585,10 @@ func (p *userRelationalProjection) reducePasskeyInitCodeRequested(event eventsto
 	}), nil
 }
 
-// func (p *userRelationalProjection) reduceUnsetMFAInitSkipped(e eventstore.Event) (*handler.Statement, error) {
-// 	switch e.(type) {
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ojrf6", "reduce.wrong.event.type %s", e.Type())
-// 	case *user.HumanOTPVerifiedEvent,
-// 		*user.HumanOTPSMSAddedEvent,
-// 		*user.HumanOTPEmailAddedEvent,
-// 		*user.HumanU2FVerifiedEvent,
-// 		*user.HumanPasswordlessVerifiedEvent:
-// 	}
-
-// 	return handler.NewUpdateStatement(
-// 		e,
-// 		[]handler.Column{
-// 			handler.NewCol(HumanMFAInitSkipped, sql.NullTime{}),
-// 		},
-// 		[]handler.Condition{
-// 			handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
-// 			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
-// 		},
-// 		handler.WithTableSuffix(UserHumanSuffix),
-// 	), nil
-// }
-
 func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanMFAInitSkippedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAInitSkippedType)
+	e, err := assertEvent[*user.HumanMFAInitSkippedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1647,9 +1607,9 @@ func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) 
 }
 
 func (p *userRelationalProjection) reduceIDPLinkAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserIDPLinkAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.UserIDPLinkAddedType)
+	e, err := assertEvent[*user.UserIDPLinkAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1673,9 +1633,9 @@ func (p *userRelationalProjection) reduceIDPLinkAdded(event eventstore.Event) (*
 }
 
 func (p *userRelationalProjection) reduceIDPLinkCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserIDPLinkCascadeRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.UserIDPLinkCascadeRemovedType)
+	e, err := assertEvent[*user.UserIDPLinkCascadeRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1693,9 +1653,9 @@ func (p *userRelationalProjection) reduceIDPLinkCascadeRemoved(event eventstore.
 }
 
 func (p *userRelationalProjection) reduceIDPLinkRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserIDPLinkRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.UserIDPLinkRemovedType)
+	e, err := assertEvent[*user.UserIDPLinkRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1713,9 +1673,9 @@ func (p *userRelationalProjection) reduceIDPLinkRemoved(event eventstore.Event) 
 }
 
 func (p *userRelationalProjection) reduceIDPLinkUserIDMigrated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserIDPExternalIDMigratedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.UserIDPExternalIDMigratedType)
+	e, err := assertEvent[*user.UserIDPExternalIDMigratedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1726,8 +1686,8 @@ func (p *userRelationalProjection) reduceIDPLinkUserIDMigrated(event eventstore.
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.UpdateIdentityProviderLink(
-				nil, // TODO(adlerhurst): set correct condition
-				repo.SetIdentityProviderLinkProvidedID(e.IDPConfigID, e.PreviousID, e.NewID),
+				database.And(repo.IdentityProviderLinkConditions().ProviderIDCondition(e.IDPConfigID), repo.IdentityProviderLinkConditions().ProvidedUserIDCondition(e.PreviousID)),
+				repo.SetIdentityProviderLinkProvidedID(e.NewID),
 			),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
@@ -1736,9 +1696,9 @@ func (p *userRelationalProjection) reduceIDPLinkUserIDMigrated(event eventstore.
 }
 
 func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserIDPExternalUsernameEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.UserIDPExternalUsernameChangedType)
+	e, err := assertEvent[*user.UserIDPExternalUsernameEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1749,10 +1709,7 @@ func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.UpdateIdentityProviderLink(
-				database.And(
-					// repo.LinkedIdentityProviderIDCondition(e.IDPConfigID),
-					nil, // TODO(adlerhurst): add e.ExternalUserID as condition
-				),
+				database.And(repo.IdentityProviderLinkConditions().ProviderIDCondition(e.IDPConfigID), repo.IdentityProviderLinkConditions().ProvidedUserIDCondition(e.ExternalUserID)),
 				repo.SetIdentityProviderLinkUsername(e.ExternalUsername),
 			),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1762,9 +1719,9 @@ func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore
 }
 
 func (p *userRelationalProjection) reduceTOTPAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPAddedType)
+	e, err := assertEvent[*user.HumanOTPAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1786,9 +1743,9 @@ func (p *userRelationalProjection) reduceTOTPAdded(event eventstore.Event) (*han
 }
 
 func (p *userRelationalProjection) reduceTOTPVerified(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPVerifiedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPVerifiedType)
+	e, err := assertEvent[*user.HumanOTPVerifiedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1808,9 +1765,9 @@ func (p *userRelationalProjection) reduceTOTPVerified(event eventstore.Event) (*
 }
 
 func (p *userRelationalProjection) reduceTOTPRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPRemovedType)
+	e, err := assertEvent[*user.HumanOTPRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1828,9 +1785,9 @@ func (p *userRelationalProjection) reduceTOTPRemoved(event eventstore.Event) (*h
 }
 
 func (p *userRelationalProjection) reduceTOTPCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPCheckSucceededEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPCheckSucceededType)
+	e, err := assertEvent[*user.HumanOTPCheckSucceededEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1840,9 +1797,7 @@ func (p *userRelationalProjection) reduceTOTPCheckSucceeded(event eventstore.Eve
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			// repo.CheckTOTP(&domain.CheckTypeSucceeded{
-			// 	SucceededAt: e.CreatedAt(),
-			// }),
+			repo.SetLastSuccessfulTOTPCheck(e.CreatedAt()),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1850,9 +1805,9 @@ func (p *userRelationalProjection) reduceTOTPCheckSucceeded(event eventstore.Eve
 }
 
 func (p *userRelationalProjection) reduceTOTPCheckFailed(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPCheckFailedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPCheckFailedType)
+	e, err := assertEvent[*user.HumanOTPCheckFailedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1872,9 +1827,9 @@ func (p *userRelationalProjection) reduceTOTPCheckFailed(event eventstore.Event)
 }
 
 func (p *userRelationalProjection) reduceOTPSMSEnabled(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPSMSAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPSMSAddedType)
+	e, err := assertEvent[*user.HumanOTPSMSAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1893,9 +1848,9 @@ func (p *userRelationalProjection) reduceOTPSMSEnabled(event eventstore.Event) (
 }
 
 func (p *userRelationalProjection) reduceOTPSMSDisabled(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPSMSRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPSMSRemovedType)
+	e, err := assertEvent[*user.HumanOTPSMSRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1913,34 +1868,10 @@ func (p *userRelationalProjection) reduceOTPSMSDisabled(event eventstore.Event) 
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceOTPSMSCodeAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPSMSCodeAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPSMSCodeAddedType)
-	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
-		}
-		repo := repository.HumanUserRepository()
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			// repo.CheckSMSOTP(&domain.CheckTypeInit{
-			// 	Code:      e.Code,
-			// 	CreatedAt: e.CreatedAt(),
-			// 	Expiry:    &e.Expiry,
-			// }),
-			repo.SetUpdatedAt(e.CreatedAt()),
-		)
-		return err
-	}), nil
-}
-
 func (p *userRelationalProjection) reduceOTPSMSCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPSMSCheckSucceededEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPSMSCheckSucceededType)
+	e, err := assertEvent[*user.HumanOTPSMSCheckSucceededEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1950,9 +1881,7 @@ func (p *userRelationalProjection) reduceOTPSMSCheckSucceeded(event eventstore.E
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			// repo.CheckSMSOTP(&domain.CheckTypeSucceeded{
-			// 	SucceededAt: e.CreatedAt(),
-			// }),
+			repo.SetLastSuccessfulSMSOTPCheck(e.CreatedAt()),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1960,9 +1889,9 @@ func (p *userRelationalProjection) reduceOTPSMSCheckSucceeded(event eventstore.E
 }
 
 func (p *userRelationalProjection) reduceOTPSMSCheckFailed(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPSMSCheckFailedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPSMSCheckFailedType)
+	e, err := assertEvent[*user.HumanOTPSMSCheckFailedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1972,9 +1901,7 @@ func (p *userRelationalProjection) reduceOTPSMSCheckFailed(event eventstore.Even
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			// repo.CheckSMSOTP(&domain.CheckTypeFailed{
-			// 	FailedAt: e.CreatedAt(),
-			// }),
+			repo.IncrementSMSOTPFailedAttempts(),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1982,9 +1909,9 @@ func (p *userRelationalProjection) reduceOTPSMSCheckFailed(event eventstore.Even
 }
 
 func (p *userRelationalProjection) reduceOTPEmailEnabled(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPEmailAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPEmailAddedType)
+	e, err := assertEvent[*user.HumanOTPEmailAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -2002,9 +1929,9 @@ func (p *userRelationalProjection) reduceOTPEmailEnabled(event eventstore.Event)
 }
 
 func (p *userRelationalProjection) reduceOTPEmailDisabled(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPEmailRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPEmailRemovedType)
+	e, err := assertEvent[*user.HumanOTPEmailRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -2021,34 +1948,10 @@ func (p *userRelationalProjection) reduceOTPEmailDisabled(event eventstore.Event
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPEmailCodeAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPEmailCodeAddedType)
-	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
-		}
-		repo := repository.HumanUserRepository()
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			// repo.CheckEmailOTP(&domain.CheckTypeInit{
-			// 	Code:      e.Code,
-			// 	CreatedAt: e.CreatedAt(),
-			// 	Expiry:    &e.Expiry,
-			// }),
-			repo.SetUpdatedAt(e.CreatedAt()),
-		)
-		return err
-	}), nil
-}
-
 func (p *userRelationalProjection) reduceOTPEmailCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPEmailCheckSucceededEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPEmailCheckSucceededType)
+	e, err := assertEvent[*user.HumanOTPEmailCheckSucceededEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -2058,9 +1961,7 @@ func (p *userRelationalProjection) reduceOTPEmailCheckSucceeded(event eventstore
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			// repo.CheckEmailOTP(&domain.CheckTypeSucceeded{
-			// 	SucceededAt: e.CreatedAt(),
-			// }),
+			repo.SetLastSuccessfulEmailOTPCheck(e.CreatedAt()),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2068,9 +1969,9 @@ func (p *userRelationalProjection) reduceOTPEmailCheckSucceeded(event eventstore
 }
 
 func (p *userRelationalProjection) reduceOTPEmailCheckFailed(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPEmailCheckFailedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPEmailCheckFailedType)
+	e, err := assertEvent[*user.HumanOTPEmailCheckFailedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -2080,9 +1981,7 @@ func (p *userRelationalProjection) reduceOTPEmailCheckFailed(event eventstore.Ev
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			// repo.CheckEmailOTP(&domain.CheckTypeFailed{
-			// 	FailedAt: e.CreatedAt(),
-			// }),
+			repo.IncrementEmailOTPFailedAttempts(),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err

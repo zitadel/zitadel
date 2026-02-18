@@ -29,8 +29,8 @@ CREATE TABLE zitadel.users(
 
     -- human
 
-    , first_name                            TEXT        CHECK ((type = 'machine' AND first_name IS NULL)                            OR (type = 'human'))
-    , last_name                             TEXT        CHECK ((type = 'machine' AND last_name IS NULL)                             OR (type = 'human'))
+    , first_name                            TEXT        CHECK ((type = 'machine' AND first_name IS NULL)                            OR (type = 'human' AND first_name <> ''))
+    , last_name                             TEXT        CHECK ((type = 'machine' AND last_name IS NULL)                             OR (type = 'human' AND last_name <> ''))))
     , nickname                              TEXT        CHECK ((type = 'machine' AND nickname IS NULL)                              OR (type = 'human'))
     , display_name                          TEXT        CHECK ((type = 'machine' AND display_name IS NULL)                          OR (type = 'human'))
     , preferred_language                    TEXT        CHECK ((type = 'machine' AND preferred_language IS NULL)                    OR (type = 'human'))
@@ -40,7 +40,7 @@ CREATE TABLE zitadel.users(
 
     , password_hash                         TEXT        CHECK ((type = 'machine' AND password_hash IS NULL)                         OR (type = 'human'))
     , password_change_required              BOOLEAN     CHECK ((type = 'machine' AND password_change_required IS NULL)              OR (type = 'human'))
-    , password_verified_at                  TIMESTAMPTZ CHECK ((type = 'machine' AND password_verified_at IS NULL)                  OR (type = 'human'))
+    , password_changed_at                  TIMESTAMPTZ CHECK ((type = 'machine' AND password_changed_at IS NULL)                  OR (type = 'human'))
     , password_verification_id              TEXT        CHECK ((type = 'machine' AND password_verification_id IS NULL)              OR (type = 'human')) -- used for reset password flow
     , password_last_successful_check        TIMESTAMPTZ CHECK ((type = 'machine' AND password_last_successful_check IS NULL)        OR (type = 'human'))
     , password_failed_attempts              SMALLINT    CHECK ((type = 'machine' AND password_failed_attempts IS NULL)              OR (type = 'human') AND (password_failed_attempts >= 0))
@@ -201,8 +201,6 @@ CREATE INDEX idx_user_passkeys_challenge ON zitadel.user_passkeys (sha256(challe
 CREATE INDEX idx_user_passkeys_key_id ON zitadel.user_passkeys (key_id);
 CREATE INDEX idx_user_passkeys_type ON zitadel.user_passkeys (type);
 
--- CREATE INDEX idx_user_metadata_key ON zitadel.user_metadata (key);
--- CREATE INDEX idx_user_metadata_value ON zitadel.user_metadata (sha256(value));
 -- ----------------------------------------------------------------
 -- identity provider links
 -- ----------------------------------------------------------------
@@ -212,7 +210,7 @@ CREATE TABLE zitadel.user_identity_provider_links(
     , identity_provider_id TEXT NOT NULL
     , user_id TEXT NOT NULL
     
-    , provided_user_id TEXT NOT NULL
+    , provided_user_id TEXT NOT NULL CHECK(provided_user_id <> '')  
     , provided_username TEXT NOT NULL
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()

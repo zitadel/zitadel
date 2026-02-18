@@ -107,8 +107,8 @@ func (u userIdentityProviderLink) SetIdentityProviderLinkUsername(username strin
 }
 
 // SetIdentityProviderLinkProvidedID implements [domain.HumanUserRepository.SetIdentityProviderLinkProvidedID].
-func (u userIdentityProviderLink) SetIdentityProviderLinkProvidedID(providerID string, currentProvidedUserID string, newProvidedUserID string) database.Change {
-	return database.NewChange(u.providedUserIDColumn(), newProvidedUserID)
+func (u userIdentityProviderLink) SetIdentityProviderLinkProvidedID(providedUserID string) database.Change {
+	return database.NewChange(u.providedUserIDColumn(), providedUserID)
 }
 
 // -------------------------------------------------------------

@@ -80,11 +80,13 @@ func (u userHuman) SetLastSuccessfulSMSOTPCheck(checkedAt time.Time) database.Ch
 	return database.NewChange(u.lastSuccessfulSMSOTPCheckColumn(), checkedAt)
 }
 
-func (u userHuman) IncrementPhoneOTPFailedAttempts() database.Change {
+// IncrementSMSOTPFailedAttempts implements [domain.HumanUserRepository.IncrementSMSOTPFailedAttempts].
+func (u userHuman) IncrementSMSOTPFailedAttempts() database.Change {
 	return database.NewIncrementColumnChange(u.failedSMSOTPAttemptsColumn(), database.Coalesce(u.failedSMSOTPAttemptsColumn(), 0))
 }
 
-func (u userHuman) ResetPhoneOTPFailedAttempts() database.Change {
+// ResetSMSOTPFailedAttempts implements [domain.HumanUserRepository.ResetSMSOTPFailedAttempts].
+func (u userHuman) ResetSMSOTPFailedAttempts() database.Change {
 	return database.NewChange(u.failedSMSOTPAttemptsColumn(), 0)
 }
 

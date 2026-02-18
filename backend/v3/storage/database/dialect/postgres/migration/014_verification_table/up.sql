@@ -47,3 +47,9 @@ CREATE TRIGGER user_verification_integrity_trigger
 AFTER UPDATE ON zitadel.users
 FOR EACH ROW
 EXECUTE FUNCTION zitadel.ensure_user_verification_integrity();
+
+CREATE TRIGGER trigger_set_updated_at
+BEFORE UPDATE ON zitadel.verifications
+FOR EACH ROW
+WHEN (NEW.updated_at IS NULL)
+EXECUTE FUNCTION zitadel.set_updated_at();

@@ -250,7 +250,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 			},
 			update:       []database.Change{},
@@ -264,7 +264,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 			},
 			update: []database.Change{
@@ -279,7 +279,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -321,7 +321,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -342,7 +342,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -377,7 +377,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -424,7 +424,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -469,7 +469,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -498,7 +498,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -525,7 +525,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -552,7 +552,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -581,7 +581,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -608,7 +608,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -635,7 +635,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -662,7 +662,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -689,7 +689,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)
@@ -740,7 +740,7 @@ func TestSession_Update(t *testing.T) {
 					InstanceID: instanceId,
 					ID:         gofakeit.Name(),
 					Lifetime:   time.Hour * 24,
-					CreatorID:  userID,
+					CreatorID:  gofakeit.Name(),
 				}
 				err := sessionRepo.Create(t.Context(), tx, session)
 				require.NoError(t, err)

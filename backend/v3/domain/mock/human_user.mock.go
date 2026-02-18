@@ -960,40 +960,40 @@ func (c *MockHumanUserRepositoryIncrementPasswordFailedAttemptsCall) DoAndReturn
 	return c
 }
 
-// IncrementPhoneOTPFailedAttempts mocks base method.
-func (m *MockHumanUserRepository) IncrementPhoneOTPFailedAttempts() database.Change {
+// IncrementSMSOTPFailedAttempts mocks base method.
+func (m *MockHumanUserRepository) IncrementSMSOTPFailedAttempts() database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IncrementPhoneOTPFailedAttempts")
+	ret := m.ctrl.Call(m, "IncrementSMSOTPFailedAttempts")
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
-// IncrementPhoneOTPFailedAttempts indicates an expected call of IncrementPhoneOTPFailedAttempts.
-func (mr *MockHumanUserRepositoryMockRecorder) IncrementPhoneOTPFailedAttempts() *MockHumanUserRepositoryIncrementPhoneOTPFailedAttemptsCall {
+// IncrementSMSOTPFailedAttempts indicates an expected call of IncrementSMSOTPFailedAttempts.
+func (mr *MockHumanUserRepositoryMockRecorder) IncrementSMSOTPFailedAttempts() *MockHumanUserRepositoryIncrementSMSOTPFailedAttemptsCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncrementPhoneOTPFailedAttempts", reflect.TypeOf((*MockHumanUserRepository)(nil).IncrementPhoneOTPFailedAttempts))
-	return &MockHumanUserRepositoryIncrementPhoneOTPFailedAttemptsCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncrementSMSOTPFailedAttempts", reflect.TypeOf((*MockHumanUserRepository)(nil).IncrementSMSOTPFailedAttempts))
+	return &MockHumanUserRepositoryIncrementSMSOTPFailedAttemptsCall{Call: call}
 }
 
-// MockHumanUserRepositoryIncrementPhoneOTPFailedAttemptsCall wrap *gomock.Call
-type MockHumanUserRepositoryIncrementPhoneOTPFailedAttemptsCall struct {
+// MockHumanUserRepositoryIncrementSMSOTPFailedAttemptsCall wrap *gomock.Call
+type MockHumanUserRepositoryIncrementSMSOTPFailedAttemptsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockHumanUserRepositoryIncrementPhoneOTPFailedAttemptsCall) Return(arg0 database.Change) *MockHumanUserRepositoryIncrementPhoneOTPFailedAttemptsCall {
+func (c *MockHumanUserRepositoryIncrementSMSOTPFailedAttemptsCall) Return(arg0 database.Change) *MockHumanUserRepositoryIncrementSMSOTPFailedAttemptsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockHumanUserRepositoryIncrementPhoneOTPFailedAttemptsCall) Do(f func() database.Change) *MockHumanUserRepositoryIncrementPhoneOTPFailedAttemptsCall {
+func (c *MockHumanUserRepositoryIncrementSMSOTPFailedAttemptsCall) Do(f func() database.Change) *MockHumanUserRepositoryIncrementSMSOTPFailedAttemptsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockHumanUserRepositoryIncrementPhoneOTPFailedAttemptsCall) DoAndReturn(f func() database.Change) *MockHumanUserRepositoryIncrementPhoneOTPFailedAttemptsCall {
+func (c *MockHumanUserRepositoryIncrementSMSOTPFailedAttemptsCall) DoAndReturn(f func() database.Change) *MockHumanUserRepositoryIncrementSMSOTPFailedAttemptsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1796,40 +1796,40 @@ func (c *MockHumanUserRepositoryResetPasswordFailedAttemptsCall) DoAndReturn(f f
 	return c
 }
 
-// ResetPhoneOTPFailedAttempts mocks base method.
-func (m *MockHumanUserRepository) ResetPhoneOTPFailedAttempts() database.Change {
+// ResetSMSOTPFailedAttempts mocks base method.
+func (m *MockHumanUserRepository) ResetSMSOTPFailedAttempts() database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ResetPhoneOTPFailedAttempts")
+	ret := m.ctrl.Call(m, "ResetSMSOTPFailedAttempts")
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
-// ResetPhoneOTPFailedAttempts indicates an expected call of ResetPhoneOTPFailedAttempts.
-func (mr *MockHumanUserRepositoryMockRecorder) ResetPhoneOTPFailedAttempts() *MockHumanUserRepositoryResetPhoneOTPFailedAttemptsCall {
+// ResetSMSOTPFailedAttempts indicates an expected call of ResetSMSOTPFailedAttempts.
+func (mr *MockHumanUserRepositoryMockRecorder) ResetSMSOTPFailedAttempts() *MockHumanUserRepositoryResetSMSOTPFailedAttemptsCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetPhoneOTPFailedAttempts", reflect.TypeOf((*MockHumanUserRepository)(nil).ResetPhoneOTPFailedAttempts))
-	return &MockHumanUserRepositoryResetPhoneOTPFailedAttemptsCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetSMSOTPFailedAttempts", reflect.TypeOf((*MockHumanUserRepository)(nil).ResetSMSOTPFailedAttempts))
+	return &MockHumanUserRepositoryResetSMSOTPFailedAttemptsCall{Call: call}
 }
 
-// MockHumanUserRepositoryResetPhoneOTPFailedAttemptsCall wrap *gomock.Call
-type MockHumanUserRepositoryResetPhoneOTPFailedAttemptsCall struct {
+// MockHumanUserRepositoryResetSMSOTPFailedAttemptsCall wrap *gomock.Call
+type MockHumanUserRepositoryResetSMSOTPFailedAttemptsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockHumanUserRepositoryResetPhoneOTPFailedAttemptsCall) Return(arg0 database.Change) *MockHumanUserRepositoryResetPhoneOTPFailedAttemptsCall {
+func (c *MockHumanUserRepositoryResetSMSOTPFailedAttemptsCall) Return(arg0 database.Change) *MockHumanUserRepositoryResetSMSOTPFailedAttemptsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockHumanUserRepositoryResetPhoneOTPFailedAttemptsCall) Do(f func() database.Change) *MockHumanUserRepositoryResetPhoneOTPFailedAttemptsCall {
+func (c *MockHumanUserRepositoryResetSMSOTPFailedAttemptsCall) Do(f func() database.Change) *MockHumanUserRepositoryResetSMSOTPFailedAttemptsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockHumanUserRepositoryResetPhoneOTPFailedAttemptsCall) DoAndReturn(f func() database.Change) *MockHumanUserRepositoryResetPhoneOTPFailedAttemptsCall {
+func (c *MockHumanUserRepositoryResetSMSOTPFailedAttemptsCall) DoAndReturn(f func() database.Change) *MockHumanUserRepositoryResetSMSOTPFailedAttemptsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -2063,17 +2063,17 @@ func (c *MockHumanUserRepositorySetGenderCall) DoAndReturn(f func(domain.HumanGe
 }
 
 // SetIdentityProviderLinkProvidedID mocks base method.
-func (m *MockHumanUserRepository) SetIdentityProviderLinkProvidedID(providerID, currentProvidedUserID, newProvidedUserID string) database.Change {
+func (m *MockHumanUserRepository) SetIdentityProviderLinkProvidedID(providedUserID string) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetIdentityProviderLinkProvidedID", providerID, currentProvidedUserID, newProvidedUserID)
+	ret := m.ctrl.Call(m, "SetIdentityProviderLinkProvidedID", providedUserID)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetIdentityProviderLinkProvidedID indicates an expected call of SetIdentityProviderLinkProvidedID.
-func (mr *MockHumanUserRepositoryMockRecorder) SetIdentityProviderLinkProvidedID(providerID, currentProvidedUserID, newProvidedUserID any) *MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall {
+func (mr *MockHumanUserRepositoryMockRecorder) SetIdentityProviderLinkProvidedID(providedUserID any) *MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetIdentityProviderLinkProvidedID", reflect.TypeOf((*MockHumanUserRepository)(nil).SetIdentityProviderLinkProvidedID), providerID, currentProvidedUserID, newProvidedUserID)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetIdentityProviderLinkProvidedID", reflect.TypeOf((*MockHumanUserRepository)(nil).SetIdentityProviderLinkProvidedID), providedUserID)
 	return &MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall{Call: call}
 }
 
@@ -2089,13 +2089,13 @@ func (c *MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall) Return(ar
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall) Do(f func(string, string, string) database.Change) *MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall {
+func (c *MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall) Do(f func(string) database.Change) *MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall) DoAndReturn(f func(string, string, string) database.Change) *MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall {
+func (c *MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall) DoAndReturn(f func(string) database.Change) *MockHumanUserRepositorySetIdentityProviderLinkProvidedIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

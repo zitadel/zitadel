@@ -94,9 +94,9 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 		}
 	} else if user.Human.Password.Hash != "" {
 		columnValues["password_hash"] = user.Human.Password.Hash
-		columnValues["password_verified_at"] = createdAt
+		columnValues["password_changed_at"] = createdAt
 		if !user.Human.Password.ChangedAt.IsZero() {
-			columnValues["password_verified_at"] = user.Human.Password.ChangedAt
+			columnValues["password_changed_at"] = user.Human.Password.ChangedAt
 		}
 	}
 

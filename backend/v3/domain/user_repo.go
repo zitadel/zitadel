@@ -229,10 +229,10 @@ type humanPhoneChanges interface {
 	// SetLastSuccessfulSMSOTPCheck sets the last successful SMS OTP check time
 	// If checkedAt is zero, it will be set to NOW()
 	SetLastSuccessfulSMSOTPCheck(checkedAt time.Time) database.Change
-	// IncrementPhoneOTPFailedAttempts increments the phone OTP failed attempts
-	IncrementPhoneOTPFailedAttempts() database.Change
-	// ResetPhoneOTPFailedAttempts resets the phone OTP failed attempts
-	ResetPhoneOTPFailedAttempts() database.Change
+	// IncrementSMSOTPFailedAttempts increments the SMS OTP failed attempts
+	IncrementSMSOTPFailedAttempts() database.Change
+	// ResetSMSOTPFailedAttempts resets the SMS OTP failed attempts
+	ResetSMSOTPFailedAttempts() database.Change
 }
 
 type humanTOTPChanges interface {
@@ -258,7 +258,7 @@ type identityProviderLinkChanges interface {
 	// SetIdentityProviderLinkUsername sets the username for an identity provider link
 	SetIdentityProviderLinkUsername(username string) database.Change
 	// SetIdentityProviderLinkProvidedID sets the provided user ID for an identity provider link
-	SetIdentityProviderLinkProvidedID(providerID, currentProvidedUserID, newProvidedUserID string) database.Change
+	SetIdentityProviderLinkProvidedID(providedUserID string) database.Change
 }
 
 type HumanIdentityProviderLinkConditions interface {
