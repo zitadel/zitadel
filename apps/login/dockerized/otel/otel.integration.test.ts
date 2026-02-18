@@ -203,11 +203,7 @@ describe("OpenTelemetry Integration", () => {
     await fetch(`${APP_URL}/ui/v2/login/healthy`);
     await fetch(`${APP_URL}/ui/v2/login/this-does-not-exist-404`);
 
-    // Wait for batch processors to flush, collector to write files,
-    // and Docker volume sync (can be slow on macOS)
-    await new Promise((r) => setTimeout(r, 15000));
-
-    // Wait for telemetry files to be written
+    // Wait for telemetry files to be written (includes batch processor flush and Docker volume sync)
     const tracesReady = await waitForFile(path.join(OUTPUT_DIR, "traces.json"));
     if (!tracesReady) throw new Error("Traces file not found");
     const logsReady = await waitForFile(path.join(OUTPUT_DIR, "logs.json"));
