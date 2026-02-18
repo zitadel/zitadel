@@ -2,8 +2,6 @@ import { idpTypeToSlug } from "@/lib/idp";
 import { createLogger } from "@/lib/logger";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
-
-const logger = createLogger("flow-initiation");
 import { findValidSession } from "@/lib/session";
 import {
   createCallback,
@@ -25,6 +23,8 @@ import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_s
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../../../constants/csp";
 import escapeHtml from "escape-html";
+
+const logger = createLogger("flow-initiation");
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;

@@ -13,6 +13,9 @@ import {
   setLanguageCookie,
 } from "./cookies";
 
+import { cookies } from "next/headers";
+import { timestampDate, timestampFromMs } from "@zitadel/client";
+
 // Mock logger - use vi.hoisted to ensure it's defined before vi.mock runs
 const mockLogger = vi.hoisted(() => ({
   debug: vi.fn(),
@@ -34,9 +37,6 @@ vi.mock("@zitadel/client", () => ({
   timestampDate: vi.fn((ts: any) => new Date(Number(ts.seconds) * 1000)),
   timestampFromMs: vi.fn((ms: number) => ({ seconds: BigInt(Math.floor(ms / 1000)) }) as any),
 }));
-
-import { cookies } from "next/headers";
-import { timestampDate, timestampFromMs } from "@zitadel/client";
 
 describe("cookies", () => {
   let mockCookies: any;

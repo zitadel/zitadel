@@ -12,8 +12,6 @@ import {
   verifyTOTPRegistration,
   sendEmailCode as zitadelSendEmailCode,
 } from "@/lib/zitadel";
-
-const logger = createLogger("verify");
 import crypto from "crypto";
 
 import { create } from "@zitadel/client";
@@ -29,6 +27,8 @@ import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHostWithProtocol } from "./host";
 import { getTranslations } from "next-intl/server";
+
+const logger = createLogger("verify");
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
   const _headers = await headers();

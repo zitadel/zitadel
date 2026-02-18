@@ -10,8 +10,6 @@ import {
   registerPasskey,
   verifyPasskeyRegistration as zitadelVerifyPasskeyRegistration,
 } from "@/lib/zitadel";
-
-const logger = createLogger("passkeys");
 import { create, Duration, Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema, GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -29,6 +27,8 @@ import { getPublicHost } from "./host";
 import { updateOrCreateSession } from "./session";
 import { completeFlowOrGetUrl } from "../client";
 import { createSessionAndUpdateCookie } from "./cookie";
+
+const logger = createLogger("passkeys");
 
 type VerifyPasskeyCommand = {
   passkeyId: string;

@@ -1,8 +1,9 @@
 module.exports = {
   parser: "@typescript-eslint/parser",
   extends: ["next", "prettier"],
-  plugins: ["@typescript-eslint"],
+  plugins: ["@typescript-eslint", "import"],
   rules: {
+    "import/first": "error",
     "@next/next/no-html-link-for-pages": "off",
     "@next/next/no-img-element": "off",
     "react/no-unescaped-entities": "off",
