@@ -9,7 +9,7 @@ import (
 )
 
 // -------------------------------------------------------------
-// conditions
+// changes
 // -------------------------------------------------------------
 
 func (u userHuman) SetPassword(password string) database.Change {
@@ -44,9 +44,15 @@ func (u userHuman) SetPasswordChangeRequired(required bool) database.Change {
 
 func (u userHuman) SetLastSuccessfulPasswordCheck(checkedAt time.Time) database.Change {
 	if checkedAt.IsZero() {
-		return database.NewChange(u.lastSuccessfulPasswordCheckColumn(), database.NowInstruction)
+		return database.NewChanges(
+			database.NewChange(u.lastSuccessfulPasswordCheckColumn(), database.NowInstruction),
+			u.ResetPasswordFailedAttempts(),
+		)
 	}
-	return database.NewChange(u.lastSuccessfulPasswordCheckColumn(), checkedAt)
+	return database.NewChanges(
+		database.NewChange(u.lastSuccessfulPasswordCheckColumn(), checkedAt),
+		u.ResetPasswordFailedAttempts(),
+	)
 }
 
 func (u userHuman) IncrementPasswordFailedAttempts() database.Change {

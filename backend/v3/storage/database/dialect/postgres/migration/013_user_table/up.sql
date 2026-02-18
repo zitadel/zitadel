@@ -66,6 +66,10 @@ CREATE TABLE zitadel.users(
     , totp_last_successful_check            TIMESTAMPTZ CHECK ((type = 'machine' AND totp_last_successful_check IS NULL)            OR (type = 'human'))
     , totp_failed_attempts                  SMALLINT    CHECK ((type = 'machine' AND totp_failed_attempts IS NULL)                  OR (type = 'human'))
 
+    , invite_verification_id                TEXT        CHECK ((type = 'machine' AND invite_verification_id IS NULL)                OR (type = 'human'))
+    , invite_accepted_at                    TIMESTAMPTZ CHECK ((type = 'machine' AND invite_accepted_at IS NULL)                    OR (type = 'human'))
+    , invite_failed_attempts                SMALLINT    CHECK ((type = 'machine' AND invite_failed_attempts IS NULL)                OR (type = 'human'))
+
     -- foreign keys for verifications are created in the verification migration
 
     -- machine
@@ -177,7 +181,7 @@ CREATE TYPE zitadel.passkey_type AS ENUM (
 CREATE TABLE zitadel.user_passkeys(
     instance_id TEXT NOT NULL
     , token_id TEXT NOT NULL
-    , key_id TEXT NOT NULL
+    , key_id BYTEA NOT NULL
 
     , user_id TEXT NOT NULL
 

@@ -51,6 +51,8 @@ type HumanUser struct {
 
 	IdentityProviderLinks []*IdentityProviderLink `json:"identityProviderLinks,omitempty" db:"-"`
 
+	Invite *HumanInvite `json:"invite,omitempty" db:"-"`
+
 	// Verifications are used if the Login does something on behalf of the user that requires verification
 	// e.g. starting passkey registration
 	Verifications []*Verification `json:"verifications,omitempty" db:"-"`
@@ -176,7 +178,7 @@ const (
 
 type Passkey struct {
 	ID                           string      `json:"id" db:"-"`
-	KeyID                        string      `json:"keyId" db:"-"`
+	KeyID                        []byte      `json:"keyId" db:"-"`
 	Name                         string      `json:"name" db:"-"`
 	SignCount                    uint32      `json:"signCount" db:"-"`
 	PublicKey                    []byte      `json:"publicKey" db:"-"`
@@ -225,3 +227,12 @@ const (
 	UserTypeHuman
 	UserTypeMachine
 )
+
+type HumanInvite struct {
+	AcceptedAt time.Time `json:"acceptedAt,omitzero" db:"-"`
+	// PendingVerification is the verification data for UnverifiedAddress
+	// If nil, no email change is in progress
+	PendingVerification *Verification `json:"pendingVerification,omitempty" db:"-"`
+	// FailedAttempts is the number of consecutive failed invite attempts
+	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"-"`
+}

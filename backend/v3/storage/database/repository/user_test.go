@@ -181,7 +181,7 @@ func Test_user_List(t *testing.T) {
 					UpdatedAt:                    now,
 					VerifiedAt:                   now,
 					Challenge:                    []byte("challenge2"),
-					KeyID:                        "key-id2",
+					KeyID:                        []byte("key-id2"),
 					Name:                         "u2f",
 					Type:                         domain.PasskeyTypeU2F,
 					PublicKey:                    []byte("public key"),
@@ -294,7 +294,7 @@ func Test_user_List(t *testing.T) {
 					UpdatedAt:                    now,
 					VerifiedAt:                   now,
 					Challenge:                    []byte("challenge2"),
-					KeyID:                        "key-id3",
+					KeyID:                        []byte("key-id3"),
 					Name:                         "u2f",
 					Type:                         domain.PasskeyTypeU2F,
 					PublicKey:                    []byte("public key"),
@@ -1166,7 +1166,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-1",
 							Challenge:                    []byte("challenge1"),
-							KeyID:                        "key-id",
+							KeyID:                        []byte("key-id"),
 							Name:                         "passwordless",
 							Type:                         domain.PasskeyTypePasswordless,
 							PublicKey:                    []byte("public key"),
@@ -1179,7 +1179,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-2",
 							Challenge:                    []byte("challenge2"),
-							KeyID:                        "key-id2",
+							KeyID:                        []byte("key-id2"),
 							Name:                         "u2f",
 							Type:                         domain.PasskeyTypeU2F,
 							PublicKey:                    []byte("public key"),
@@ -1195,7 +1195,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-3",
 							Challenge:                    []byte("challenge1"),
-							KeyID:                        "key-id",
+							KeyID:                        []byte("key-id"),
 							Name:                         "passwordless",
 							Type:                         domain.PasskeyTypePasswordless,
 							PublicKey:                    []byte("public key"),
@@ -1226,7 +1226,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-1",
 							Challenge:                    []byte("challenge1"),
-							KeyID:                        "key-id",
+							KeyID:                        []byte("key-id"),
 							Name:                         "passwordless",
 							Type:                         domain.PasskeyTypePasswordless,
 							PublicKey:                    []byte("public key"),
@@ -1239,7 +1239,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-2",
 							Challenge:                    []byte("challenge2"),
-							KeyID:                        "key-id2",
+							KeyID:                        []byte("key-id2"),
 							Name:                         "u2f",
 							Type:                         domain.PasskeyTypeU2F,
 							PublicKey:                    []byte("public key"),
@@ -1255,7 +1255,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-3",
 							Challenge:                    []byte("challenge3"),
-							KeyID:                        "key-id",
+							KeyID:                        []byte("key-id"),
 							Name:                         "passwordless",
 							Type:                         domain.PasskeyTypePasswordless,
 							PublicKey:                    []byte("public key"),
@@ -1286,7 +1286,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-1",
 							Challenge:                    []byte("challenge1"),
-							KeyID:                        "key-id",
+							KeyID:                        []byte("key-id"),
 							Name:                         "passwordless",
 							Type:                         domain.PasskeyTypePasswordless,
 							PublicKey:                    []byte("public key"),
@@ -1299,7 +1299,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-2",
 							Challenge:                    []byte("challenge2"),
-							KeyID:                        "key-id2",
+							KeyID:                        []byte("key-id2"),
 							Name:                         "u2f",
 							Type:                         domain.PasskeyTypeU2F,
 							PublicKey:                    []byte("public key"),
@@ -1315,7 +1315,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-3",
 							Challenge:                    []byte("challenge3"),
-							KeyID:                        "key-id",
+							KeyID:                        []byte("key-id"),
 							Name:                         "passwordless",
 							Type:                         domain.PasskeyTypePasswordless,
 							PublicKey:                    []byte("public key"),
@@ -1346,7 +1346,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-1",
 							Challenge:                    []byte("challenge1"),
-							KeyID:                        "key-id",
+							KeyID:                        []byte("key-id"),
 							Name:                         "passwordless",
 							Type:                         domain.PasskeyTypePasswordless,
 							PublicKey:                    []byte("public key"),
@@ -1359,7 +1359,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-2",
 							Challenge:                    []byte("challenge2"),
-							KeyID:                        "key-id2",
+							KeyID:                        []byte("key-id2"),
 							Name:                         "u2f",
 							Type:                         domain.PasskeyTypeU2F,
 							PublicKey:                    []byte("public key"),
@@ -1375,7 +1375,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-3",
 							Challenge:                    []byte("challenge3"),
-							KeyID:                        "key-id",
+							KeyID:                        []byte("key-id"),
 							Name:                         "passwordless",
 							Type:                         domain.PasskeyTypePasswordless,
 							PublicKey:                    []byte("public key"),
@@ -1406,7 +1406,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-1",
 							Challenge:                    []byte("challenge1"),
-							KeyID:                        "key-id",
+							KeyID:                        []byte("key-id"),
 							Name:                         "passwordless",
 							Type:                         domain.PasskeyTypePasswordless,
 							PublicKey:                    []byte("public key"),
@@ -1419,7 +1419,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-2",
 							Challenge:                    []byte("challenge2"),
-							KeyID:                        "key-id2",
+							KeyID:                        []byte("key-id2"),
 							Name:                         "u2f",
 							Type:                         domain.PasskeyTypeU2F,
 							PublicKey:                    []byte("public key"),
@@ -1435,7 +1435,7 @@ func Test_user_ListConditions(t *testing.T) {
 						&domain.Passkey{
 							ID:                           "passkey-3",
 							Challenge:                    []byte("challenge3"),
-							KeyID:                        "key-id",
+							KeyID:                        []byte("key-id"),
 							Name:                         "passwordless",
 							Type:                         domain.PasskeyTypePasswordless,
 							PublicKey:                    []byte("public key"),
@@ -3241,7 +3241,7 @@ func Test_user_Update(t *testing.T) {
 						CreatedAt:                    now,
 						UpdatedAt:                    now,
 						VerifiedAt:                   now,
-						KeyID:                        "keyID",
+						KeyID:                        []byte("keyID"),
 						Name:                         "name",
 						AttestationType:              "attestation-type",
 						AuthenticatorAttestationGUID: []byte("aa guid"),
@@ -3261,7 +3261,7 @@ func Test_user_Update(t *testing.T) {
 						CreatedAt:                    now,
 						UpdatedAt:                    now,
 						VerifiedAt:                   now,
-						KeyID:                        "keyID",
+						KeyID:                        []byte("keyID"),
 						Name:                         "name",
 						AttestationType:              "attestation-type",
 						AuthenticatorAttestationGUID: []byte("aa guid"),
@@ -3283,7 +3283,7 @@ func Test_user_Update(t *testing.T) {
 						CreatedAt:                    now,
 						UpdatedAt:                    now,
 						VerifiedAt:                   now,
-						KeyID:                        "keyID",
+						KeyID:                        []byte("keyID"),
 						Name:                         "name",
 						AttestationType:              "attestation-type",
 						AuthenticatorAttestationGUID: []byte("aa guid"),
@@ -3316,7 +3316,7 @@ func Test_user_Update(t *testing.T) {
 							CreatedAt:                    now,
 							UpdatedAt:                    now,
 							VerifiedAt:                   now,
-							KeyID:                        "keyID",
+							KeyID:                        []byte("keyID"),
 							Name:                         "updated-name",
 							AttestationType:              "attestation-type",
 							AuthenticatorAttestationGUID: []byte("aa guid"),
@@ -3339,7 +3339,7 @@ func Test_user_Update(t *testing.T) {
 						CreatedAt:                    now,
 						UpdatedAt:                    now,
 						VerifiedAt:                   now,
-						KeyID:                        "keyID",
+						KeyID:                        []byte("keyID"),
 						Name:                         "name",
 						AttestationType:              "attestation-type",
 						AuthenticatorAttestationGUID: []byte("aa guid"),
@@ -3530,6 +3530,172 @@ func Test_user_Update(t *testing.T) {
 			},
 			want: want{
 				user: machine,
+			},
+		},
+		{
+			name: "init invite verification",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetInviteVerification(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Expiry:    gu.Ptr(10 * time.Minute),
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "aes-256",
+							KeyID:      "key-id",
+							Crypted:    []byte("invite code"),
+						},
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Invite = &domain.HumanInvite{
+						PendingVerification: &domain.Verification{
+							CreatedAt: now,
+							UpdatedAt: now,
+							Code: &crypto.CryptoValue{
+								CryptoType: crypto.TypeHash,
+								Algorithm:  "aes-256",
+								KeyID:      "key-id",
+								Crypted:    []byte("invite code"),
+							},
+							ExpiresAt: gu.Ptr(now.Add(10 * time.Minute)),
+						},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "invite verification succeeded",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetInviteVerification(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Expiry:    gu.Ptr(10 * time.Minute),
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "aes-256",
+							KeyID:      "key-id",
+							Crypted:    []byte("invite code"),
+						},
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetInviteVerification(&domain.VerificationTypeSucceeded{
+						VerifiedAt: now,
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Invite = &domain.HumanInvite{
+						PendingVerification: nil,
+						AcceptedAt:          now,
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "invite verification updated",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetInviteVerification(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Expiry:    gu.Ptr(10 * time.Minute),
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "aes-256",
+							KeyID:      "key-id",
+							Crypted:    []byte("invite code"),
+						},
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetInviteVerification(&domain.VerificationTypeUpdate{
+						Expiry: gu.Ptr(1 * time.Hour),
+					}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Invite = &domain.HumanInvite{
+						PendingVerification: &domain.Verification{
+							CreatedAt: now,
+							UpdatedAt: now,
+							Code: &crypto.CryptoValue{
+								CryptoType: crypto.TypeHash,
+								Algorithm:  "aes-256",
+								KeyID:      "key-id",
+								Crypted:    []byte("invite code"),
+							},
+							ExpiresAt: gu.Ptr(now.Add(1 * time.Hour)),
+						},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "invite verification failed",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := userRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.SetInviteVerification(&domain.VerificationTypeInit{
+						CreatedAt: now,
+						Expiry:    gu.Ptr(10 * time.Minute),
+						Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "aes-256",
+							KeyID:      "key-id",
+							Crypted:    []byte("invite code"),
+						},
+					}),
+				)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetInviteVerification(&domain.VerificationTypeFailed{}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.Invite = &domain.HumanInvite{
+						FailedAttempts: 1,
+						PendingVerification: &domain.Verification{
+							CreatedAt: now,
+							UpdatedAt: now,
+							Code: &crypto.CryptoValue{
+								CryptoType: crypto.TypeHash,
+								Algorithm:  "aes-256",
+								KeyID:      "key-id",
+								Crypted:    []byte("invite code"),
+							},
+							ExpiresAt: gu.Ptr(now.Add(1 * time.Hour)),
+						},
+					}
+					return u
+				}(),
 			},
 		},
 	}

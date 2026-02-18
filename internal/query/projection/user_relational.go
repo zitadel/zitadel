@@ -412,6 +412,18 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanOTPEmailCheckFailedType,
 					Reduce: p.reduceOTPEmailCheckFailed,
 				},
+				{
+					Event:  user.HumanInviteCodeAddedType,
+					Reduce: p.reduceInviteCodeAdded,
+				},
+				{
+					Event:  user.HumanInviteCheckSucceededType,
+					Reduce: p.reduceInviteCheckSucceeded,
+				},
+				{
+					Event:  user.HumanInviteCheckFailedType,
+					Reduce: p.reduceInviteCheckFailed,
+				},
 			},
 		},
 	}
@@ -2051,6 +2063,82 @@ func (p *userRelationalProjection) reduceOTPEmailCheckFailed(event eventstore.Ev
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.IncrementEmailOTPFailedAttempts(),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceInviteCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*user.HumanInviteCodeAddedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+
+		var expiry *time.Duration
+		if e.Expiry > 0 {
+			expiry = &e.Expiry
+		}
+
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetInviteVerification(&domain.VerificationTypeInit{
+				CreatedAt: e.CreatedAt(),
+				Code:      e.Code,
+				Expiry:    expiry,
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceInviteCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*user.HumanInviteCheckSucceededEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetInviteVerification(&domain.VerificationTypeSucceeded{
+				VerifiedAt: e.CreatedAt(),
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceInviteCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*user.HumanInviteCheckFailedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetInviteVerification(&domain.VerificationTypeFailed{
+				FailedAt: e.CreatedAt(),
+			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err

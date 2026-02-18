@@ -155,6 +155,7 @@ type humanChanges interface {
 	humanTOTPChanges
 	identityProviderLinkChanges
 	humanPasskeyChanges
+	inviteChanges
 }
 
 type humanPasswordChanges interface {
@@ -267,6 +268,15 @@ type identityProviderLinkChanges interface {
 	SetIdentityProviderLinkUsername(username string) database.Change
 	// SetIdentityProviderLinkProvidedID sets the provided user ID for an identity provider link
 	SetIdentityProviderLinkProvidedID(providedUserID string) database.Change
+}
+
+type inviteChanges interface {
+	// SetInviteVerification sets the invite verification based on the verification type:
+	//  * [VerificationTypeInit]: to initialize invite verification, a verification will be created. The current accepted at time remains unchanged
+	//  * [VerificationTypeSucceeded]: to mark the invite as accepted and remove the verification. The current accepted at time remains unchanged use [inviteChanges.AcceptInvite] to set the accepted at time.
+	//  * [VerificationTypeUpdate]: to update the existing invite verification. If a new code is requested, use [VerificationTypeInit].
+	//  * [VerificationTypeFailed]: to increment the failed attempts of the verification.
+	SetInviteVerification(verification VerificationType) database.Change
 }
 
 type HumanIdentityProviderLinkConditions interface {

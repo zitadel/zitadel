@@ -328,7 +328,7 @@ func Test_humanUser_create(t *testing.T) {
 			passkeys := []*domain.Passkey{
 				{
 					ID:                           gofakeit.UUID(),
-					KeyID:                        gofakeit.UUID(),
+					KeyID:                        []byte(gofakeit.UUID()),
 					Type:                         domain.PasskeyTypePasswordless,
 					Name:                         "passwordless",
 					PublicKey:                    []byte("public key"),
@@ -342,7 +342,7 @@ func Test_humanUser_create(t *testing.T) {
 				},
 				{
 					ID:                           gofakeit.UUID(),
-					KeyID:                        gofakeit.UUID(),
+					KeyID:                        []byte(gofakeit.UUID()),
 					Type:                         domain.PasskeyTypeU2F,
 					Name:                         "u2f",
 					PublicKey:                    []byte("public key"),
