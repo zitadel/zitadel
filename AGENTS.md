@@ -93,6 +93,16 @@ Run commands from the repository root.
 ## Proto Plugin Binaries
 All proto plugins are installed to `.artifacts/bin/<GOOS>/<GOARCH>/` and Nx-cached. `generate` targets wire up the correct install dependency and prepend `.artifacts/bin/` to `$PATH` — no manual install step is needed.
 
+## PR Title Convention
+
+PR titles are validated by the Semantic PR app. Format:
+
+`<type>(<scope>): <short summary>`
+
+**Types**: must come from the list in [`.github/semantic.yml`](.github/semantic.yml) under `types:` — e.g. `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+
+**Scopes**: optional, but if used must come from the list in [`.github/semantic.yml`](.github/semantic.yml) under `scopes:`. When in doubt, omit the scope — do not invent values not on that list.
+
 ## Documentation
 - **Human Guide**: See `CONTRIBUTING.md` for setup and contribution details.
 - **API Design**: See `API_DESIGN.md` for API specific guidelines.

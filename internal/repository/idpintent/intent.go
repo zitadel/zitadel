@@ -82,9 +82,10 @@ type SucceededEvent struct {
 	IDPUserName string `json:"idpUserName,omitempty"`
 	UserID      string `json:"userId,omitempty"`
 
-	IDPAccessToken *crypto.CryptoValue `json:"idpAccessToken,omitempty"`
-	IDPIDToken     string              `json:"idpIdToken,omitempty"`
-	ExpiresAt      time.Time           `json:"expiresAt,omitempty"`
+	IDPAccessToken  *crypto.CryptoValue `json:"idpAccessToken,omitempty"`
+	IDPRefreshToken *crypto.CryptoValue `json:"idpRefreshToken,omitempty"`
+	IDPIDToken      string              `json:"idpIdToken,omitempty"`
+	ExpiresAt       time.Time           `json:"expiresAt,omitempty"`
 }
 
 func NewSucceededEvent(
@@ -95,6 +96,7 @@ func NewSucceededEvent(
 	idpUserName,
 	userID string,
 	idpAccessToken *crypto.CryptoValue,
+	idpRefreshToken *crypto.CryptoValue,
 	idpIDToken string,
 	expiresAt time.Time,
 ) *SucceededEvent {
@@ -104,13 +106,14 @@ func NewSucceededEvent(
 			aggregate,
 			SucceededEventType,
 		),
-		IDPUser:        idpUser,
-		IDPUserID:      idpUserID,
-		IDPUserName:    idpUserName,
-		UserID:         userID,
-		IDPAccessToken: idpAccessToken,
-		IDPIDToken:     idpIDToken,
-		ExpiresAt:      expiresAt,
+		IDPUser:         idpUser,
+		IDPUserID:       idpUserID,
+		IDPUserName:     idpUserName,
+		UserID:          userID,
+		IDPAccessToken:  idpAccessToken,
+		IDPRefreshToken: idpRefreshToken,
+		IDPIDToken:      idpIDToken,
+		ExpiresAt:       expiresAt,
 	}
 }
 

@@ -174,15 +174,13 @@ Make sure you use [semantic release messages format](https://github.com/angular/
 
 #### Type
 
-Must be one of the following:
-
-- **feat**: New Feature
-- **fix**: Bug Fix
-- **docs**: Documentation
+Allowed values are listed in [`.github/semantic.yml`](.github/semantic.yml) under `types:`.
 
 #### Scope
 
-This is optional to indicate which component is affected. If in doubt, leave blank (`<type>: <short summary>`)
+This is optional to indicate which component is affected.
+Allowed values are listed in [`.github/semantic.yml`](.github/semantic.yml) under `scopes:`.
+When in doubt, omit the scope — `<type>: <short summary>` is always valid.
 
 #### Short summary
 
