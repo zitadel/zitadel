@@ -62,7 +62,7 @@
     "eslint": "^10.0.0",
     "eslint-config-next": "16.1.6",
     "eslint-plugin-mdx": "^3.6.2",
-    "glob": "^13.0.5",
+    "glob": "^12.0.0",
     "globals": "^17.3.0",
     "next-validate-link": "^1.6.4",
     "postcss": "^8.5.6",
