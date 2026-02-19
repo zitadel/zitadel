@@ -116,14 +116,17 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 		columnValues["email_verification_id"] = func(builder *database.StatementBuilder) {
 			builder.WriteString(`(SELECT id FROM email_verification)`)
 		}
-		columnValues["unverified_email"] = user.Human.Email.UnverifiedAddress
-	} else if user.Human.Email.Address != "" {
+	}
+	if user.Human.Email.Address != "" {
 		columnValues["email"] = user.Human.Email.Address
-		columnValues["unverified_email"] = user.Human.Email.UnverifiedAddress
+		columnValues["unverified_email"] = user.Human.Email.Address
 		columnValues["email_verified_at"] = createdAt
 		if !user.Human.Email.VerifiedAt.IsZero() {
 			columnValues["email_verified_at"] = user.Human.Email.VerifiedAt
 		}
+	}
+	if user.Human.Email.UnverifiedAddress != "" {
+		columnValues["unverified_email"] = user.Human.Email.UnverifiedAddress
 	}
 	if user.Human.Phone != nil {
 		if user.Human.Phone.PendingVerification != nil {
@@ -142,14 +145,17 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 			columnValues["phone_verification_id"] = func(builder *database.StatementBuilder) {
 				builder.WriteString(`(SELECT id FROM phone_verification)`)
 			}
-			columnValues["unverified_phone"] = user.Human.Phone.UnverifiedNumber
-		} else if user.Human.Phone.Number != "" {
+		}
+		if user.Human.Phone.Number != "" {
 			columnValues["phone"] = user.Human.Phone.Number
-			columnValues["unverified_phone"] = user.Human.Phone.UnverifiedNumber
+			columnValues["unverified_phone"] = user.Human.Phone.Number
 			columnValues["phone_verified_at"] = createdAt
 			if !user.Human.Phone.VerifiedAt.IsZero() {
 				columnValues["phone_verified_at"] = user.Human.Phone.VerifiedAt
 			}
+		}
+		if user.Human.Phone.UnverifiedNumber != "" {
+			columnValues["unverified_phone"] = user.Human.Phone.UnverifiedNumber
 		}
 	}
 
@@ -166,7 +172,8 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 				verification.Expiry = gu.Ptr(time.Since(*user.Human.Invite.PendingVerification.ExpiresAt))
 			}
 			ctes["invite_verification"] = u.SetInviteVerification(verification).(database.CTEChange)
-		} else if !user.Human.Invite.AcceptedAt.IsZero() {
+		}
+		if !user.Human.Invite.AcceptedAt.IsZero() {
 			columnValues["invite_accepted_at"] = createdAt
 		}
 	}

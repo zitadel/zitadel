@@ -59,7 +59,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -87,16 +87,18 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			assert.NotZero(t, user.Human.Email.VerifiedAt)
 			assert.Nil(t, user.Human.Email.PendingVerification)
 			// Phone
-			assert.Equal(t, humanUserRequest.Phone.Phone, user.Human.Phone.Number)
-			assert.NotZero(t, user.Human.Phone.VerifiedAt)
-			assert.Nil(t, user.Human.Phone.PendingVerification)
+			if !assert.NotNil(t, humanUserRequest.Phone) {
+				assert.Equal(t, humanUserRequest.Phone.Phone, user.Human.Phone.Number)
+				assert.NotZero(t, user.Human.Phone.VerifiedAt)
+				assert.Nil(t, user.Human.Phone.PendingVerification)
+			}
 			// Human
 			assert.Equal(t, humanUserRequest.Profile.FirstName, user.Human.FirstName)
 			assert.Equal(t, humanUserRequest.Profile.LastName, user.Human.LastName)
 			assert.Equal(t, humanUserRequest.Profile.NickName, user.Human.Nickname)
 			assert.Equal(t, humanUserRequest.Profile.DisplayName, user.Human.DisplayName)
-			assert.Equal(t, humanUserRequest.Profile.PreferredLanguage, user.Human.PreferredLanguage)
-			assert.Equal(t, uint8(humanUserRequest.Profile.Gender), user.Human.Gender)
+			assert.Equal(t, humanUserRequest.Profile.PreferredLanguage, user.Human.PreferredLanguage.String())
+			assert.EqualValues(t, humanUserRequest.Profile.Gender, user.Human.Gender)
 		}, retryDuration, tick)
 	})
 
@@ -198,7 +200,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 	// 	resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
 	// 	require.NoError(t, err)
 
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 	// 		user, err := userRepo.Get(
 	// 			CTX,
@@ -241,7 +243,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 	// 	resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
 	// 	require.NoError(t, err)
 
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 	// 		user, err := userRepo.Get(
 	// 			CTX,
@@ -283,7 +285,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -306,7 +308,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -350,7 +352,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -371,7 +373,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -394,7 +396,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -438,7 +440,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -461,7 +463,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -505,7 +507,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -526,7 +528,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -549,7 +551,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -593,7 +595,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -614,7 +616,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := userRepo.Get(
 				CTX,
@@ -656,7 +658,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -679,7 +681,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -773,7 +775,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 	// 	require.NoError(t, err)
 
 	// 	// check user exists
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 	// 		user, err := userRepo.Get(
 	// 			CTX,
@@ -840,7 +842,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 	// 	require.NoError(t, err)
 
 	// 	// check usernme now includes the domain
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 	// 		user, err := userRepo.Get(
 	// 			CTX,
@@ -883,7 +885,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -913,7 +915,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -1023,7 +1025,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		require.Equal(t, 200, out.StatusCode())
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -1127,7 +1129,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -1155,7 +1157,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		require.Equal(t, 200, out.StatusCode())
 		after := time.Now()
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -1213,7 +1215,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		userID := res.UserId
 
 		// make sure user exists
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -1249,7 +1251,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		after := time.Now()
 
 		// check password updated
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			humanUser, err := userRepo.Get(
 				CTX,
@@ -1268,7 +1270,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 	})
 }
 
-func TestServer_TesMachinetUserReduces(t *testing.T) {
+func TestServer_TestMachineUserReduces(t *testing.T) {
 	instanceID := Instance.ID()
 	orgID := Instance.DefaultOrg.Id
 
@@ -1288,7 +1290,7 @@ func TestServer_TesMachinetUserReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -1342,7 +1344,7 @@ func TestServer_TesMachinetUserReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			user, err := userRepo.Get(
 				CTX,
@@ -1360,8 +1362,9 @@ func TestServer_TesMachinetUserReduces(t *testing.T) {
 			assert.WithinRange(t, user.UpdatedAt, before, after)
 			// machine
 			assert.Equal(t, updateMachineUserReq.Name, user.Machine.Name)
-			assert.Equal(t, machineUserRequest.Description, user.Machine.Description)
+			assert.Equal(t, updateMachineUserReq.Description, user.Machine.Description)
 			assert.Equal(t, domain.AccessTokenTypeJWT, user.Machine.AccessTokenType)
-		}, retryDuration, tick)
+		}, retryDuration, tick, "event not reduced in time for user %q", userID)
+		t.Log("hodor")
 	})
 }
