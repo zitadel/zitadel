@@ -171,6 +171,24 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: user.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  user.UserDeactivatedType,
+					Reduce: p.reduceUserDeactivated,
+				},
+			},
+		},
+		{
+			Aggregate: user.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserRemoved,
+				},
+			},
+		},
 	}
 }
 
@@ -462,6 +480,34 @@ func (p *sessionProjection) reducePasswordChanged(event eventstore.Event) (*hand
 			handler.NewCond(SessionColumnUserID, e.Aggregate().ID),
 			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewLessThanCond(SessionColumnPasswordCheckedAt, e.CreationDate()),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceUserDeactivated(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*user.UserDeactivatedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(SessionColumnUserID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*user.UserRemovedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(SessionColumnUserID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
