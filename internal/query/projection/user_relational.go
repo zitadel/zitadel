@@ -1471,7 +1471,7 @@ func (p *userRelationalProjection) reducePasskeyVerified(event eventstore.Event)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		// TODO: remaining fields to be updated?
+
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
@@ -1644,35 +1644,6 @@ func (p *userRelationalProjection) reducePasskeyInitCodeRequested(event eventsto
 		return err
 	}), nil
 }
-
-// func (p *userRelationalProjection) reducePasskeyCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
-// 	var e user.HumanWebAuthNCheckSucceededEvent
-// 	switch typed := event.(type) {
-// 	case *user.HumanPasswordlessCheckSucceededEvent:
-// 		e = typed.HumanWebAuthNCheckSucceededEvent
-// 	case *user.HumanU2FCheckSucceededEvent:
-// 		e = typed.HumanWebAuthNCheckSucceededEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type for passkey %s", event.Type())
-// 	}
-
-// 	return handler.NewStatement(&e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-// 		tx, ok := ex.(*sql.Tx)
-// 		if !ok {
-// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
-// 		}
-// 		repo := repository.HumanUserRepository()
-// 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-// 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-// 			repo.UpdatePasskey(
-// 				repo.PasskeyConditions().IDCondition(e.WebAuthNTokenID),
-// 				repo.SetLastSuccessfulPasskeyCheck(e.CreatedAt()),
-// 			),
-// 			repo.SetUpdatedAt(e.CreatedAt()),
-// 		)
-// 		return err
-// 	}), nil
-// }
 
 func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanMFAInitSkippedEvent](event)
