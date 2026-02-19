@@ -56,7 +56,6 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.6",
-    "@bufbuild/buf": "^1.64.0",
     "@faker-js/faker": "^9.9.0",
     "@opentelemetry/sdk-trace-base": "^2.5.0",
     "@opentelemetry/sdk-trace-node": "^2.5.0",
