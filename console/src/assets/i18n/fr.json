@@ -9,7 +9,7 @@
         "DESCRIPTION": "Complétez les étapes suivantes pour sécuriser votre application.",
         "CREATE_PROJECT": {
           "TITLE": "Créer un projet",
-          "DESCRIPTION": "Ajoutez un projet et définissez ses rôles et autorisations."
+          "DESCRIPTION": "Ajoutez un projet et définissez ses rôles et attributions de rôles."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Un projet héberge une ou plusieurs applications, que vous pouvez utiliser pour authentifier vos utilisateurs. Par exemple, vous pourriez avoir un seul projet avec 3 applications : une pour votre frontend web, une pour votre application mobile et une pour votre backend. Vous pouvez également autoriser vos utilisateurs avec des projets. Pour permettre aux utilisateurs d'autres organisations de se connecter à vos applications, accordez-leur l'accès à votre projet.<br/><br/>Si vous ne trouvez pas un projet, contactez le propriétaire du projet ou quelqu'un avec les droits correspondants pour obtenir l'accès.",
       "OWNED": {
         "TITLE": "Projets Possédés",
-        "DESCRIPTION": "Ce sont les projets que vous possédez. Vous pouvez gérer les paramètres de ces projets, les autorisations et les applications."
+        "DESCRIPTION": "Ce sont les projets que vous possédez. Vous pouvez gérer les paramètres de ces projets, les attributions de rôles et les applications."
       },
       "GRANTED": {
         "TITLE": "Projets Octroyés",
@@ -61,9 +61,9 @@
         "METADATA": "Ajoutez des attributs personnalisés à votre utilisateur comme votre département. Vous pouvez utiliser cette information dans les actions de votre organisation."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Autorisations",
-      "DESCRIPTION": "Les autorisations définissent les droits d'accès d'un utilisateur à un projet. Vous pouvez octroyer à un utilisateur l'accès à un projet et définir les rôles de l'utilisateur au sein de ce projet."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Attributions de rôles",
+      "DESCRIPTION": "Les attributions de rôles définissent les droits d'accès d'un utilisateur à un projet. Vous pouvez octroyer à un utilisateur l'accès à un projet et définir les rôles de l'utilisateur au sein de ce projet."
     },
     "ACTIONS": {
       "TITLE": "Actions",
@@ -126,7 +126,7 @@
       },
       "BRANDING": {
         "TITLE": "Branding",
-        "DESCRIPTION": "Personnalisez l'apparence de votre formulaire de connexion. N'oubliez pas d'appliquer votre configuration lorsque vous avez terminé."
+        "DESCRIPTION": "Personnalisez l'apparence de votre formulaire de connexion. N'oubliez pas d'appliquer vos paramètres lorsque vous avez terminé."
       },
       "PRIVACY_POLICY": {
         "TITLE": "Liens Externes",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Créez un projet",
-        "description": "Ajoutez un projet et définissez ses rôles et autorisations.",
+        "description": "Ajoutez un projet et définissez ses rôles et attributions de rôles.",
         "action": "Créez un projet"
       },
       "APPLICATION_CREATED": {
@@ -401,9 +401,9 @@
         "action": "Ajoutez un utilisateur"
       },
       "user.grant.added": {
-        "title": "Octroyer des droits",
-        "description": "Autorisez les utilisateurs à accéder à votre application et définissez leur rôle.",
-        "action": "Accordez des droits à un utilisateur"
+        "title": "Attribuer des rôles aux utilisateurs",
+        "description": "Autorisez les utilisateurs à accéder à votre application et attribuez-leur des rôles.",
+        "action": "Attribuer des rôles"
       }
     }
   },
@@ -429,7 +429,7 @@
     "NEWORG": "Nouvelle organisation",
     "IAMADMIN": "Vous êtes un administrateur d'instance. Notez que vous disposez de permissions étendues.",
     "SHOWORGS": "Afficher toutes les organisations",
-    "GRANTS": "Autorisations",
+    "GRANTS": "Attributions de rôles",
     "ACTIONS": "Actions",
     "PRIVACY": "Vie privée",
     "TOS": "Conditions de service",
@@ -447,8 +447,8 @@
     "FRAMEWORK": "Framework",
     "FRAMEWORK_OTHER": "Autre (OIDC, SAML, API)",
     "ALMOSTDONE": "Vous avez presque terminé",
-    "REVIEWCONFIGURATION": "Aperçu de la configuration",
-    "REVIEWCONFIGURATION_DESCRIPTION": "Nous avons créé une configuration de base pour les applications {{value}}. Vous pouvez adapter cette configuration à vos besoins après sa création.",
+    "REVIEWCONFIGURATION": "Aperçu des paramètres",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Nous avons créé une configuration de base pour les applications {{value}}. Vous pouvez adapter ces paramètres à vos besoins après sa création.",
     "REDIRECTS": "Configurer les redirections",
     "DEVMODEWARN": "Le mode développement est activé par défaut. Vous pouvez mettre à jour les valeurs pour la production ultérieurement.",
     "GUIDE": "Guide",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs de l'organisation",
     "ORG_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'organisation",
     "ORG_SETTINGS_MANAGER": "A le droit de gérer les paramètres de l'organisation",
-    "ORG_USER_PERMISSION_EDITOR": "A le droit d'octroyer des droits aux utilisateurs",
+    "ORG_USER_PERMISSION_EDITOR": "A le droit de gérer les attributions de rôles",
     "ORG_PROJECT_PERMISSION_EDITOR": "A le droit d'octroyer des droits aux projets",
     "ORG_PROJECT_CREATOR": "A le droit de créer ses propres projets et leurs paramètres sous-jacents.",
     "ORG_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de l'organisation",
@@ -702,7 +702,7 @@
     "USERNAME": "Nom de l'utilisateur",
     "ORGNAME": "Nom de l'organisation",
     "ORGID": "ID de l'organisation",
-    "PRIMARYDOMAIN": "Domaine principal",
+    "PRIMARYDOMAIN": "Domaine de l'organisation",
     "PROJECTNAME": "Nom du projet",
     "RESOURCEOWNER": "Propriétaire des ressources",
     "METHODS": {
@@ -724,7 +724,7 @@
       "ME": "Aller à son propre profil",
       "PROJECTS": "Aller à Projets",
       "USERS": "Aller à Utilisateurs",
-      "USERGRANTS": "Aller à Autorisations",
+      "ROLEASSIGNMENTS": "Aller à Attributions de rôles",
       "ACTIONS": "Aller à Actions et Flux",
       "DOMAINS": "Aller à Domaines"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Mot de passe et sécurité",
       "KEYS": "Clés",
       "PAT": "Jetons d'accès personnels",
-      "USERGRANTS": "Autorisations",
+      "ROLEASSIGNMENTS": "Attributions de rôles",
       "MEMBERSHIPS": "Rôles d'administrateur",
       "METADATA": "Métadonnées"
     },
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Doit comporter au moins {{value}} caractères.",
       "MAXLENGTHERROR": "Doit contenir moins de {{value}} caractères"
     },
-    "ID": "ID",
+    "ID": "ID de l'utilisateur",
     "EMAIL": "E-mail",
     "PHONE": "Numéro de téléphone",
     "PHONEEMPTY": "Pas de numéro de téléphone défini",
@@ -1119,8 +1119,8 @@
       "ADDITIONAL-EXTERNAL": "Nom de connexion (organisation externe)"
     },
     "TARGET": {
-      "SELF": "Si vous souhaitez accorder une autorisation à un utilisateur d'une autre organisation",
-      "EXTERNAL": "Pour accorder un utilisateur de votre organisation",
+      "SELF": "Si vous souhaitez attribuer un rôle à un utilisateur d'une autre organisation",
+      "EXTERNAL": "Pour attribuer un rôle à un utilisateur de votre organisation",
       "CLICKHERE": "cliquez ici"
     },
     "SIGNEDOUT": "Vous êtes déconnecté. Cliquez sur le bouton \"Se connecter\" pour vous reconnecter.",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nom",
-      "ID": "ID",
+      "ID": "ID de l'organisation",
       "CREATIONDATE": "Date de création",
       "DATECHANGED": "Modifié",
       "FILTER": "Filtre",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Télécharger le fichier",
       "SELECTORGTOOLTIP": "Sélectionnez cette organisation.",
-      "PRIMARYDOMAIN": "Domaine primaire",
+      "PRIMARYDOMAIN": "Domaine de l'organisation",
       "STATE": "État",
       "USEPASSWORD": "Définir le mot de passe initial",
       "USEPASSWORDDESC": "L'utilisateur n'a pas à définir le mot de passe lors de l'initialisation."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Ajouter un domaine",
-      "TITLE": "Domaines vérifiés",
+      "TITLE": "Domaine de l'organisation",
       "DESCRIPTION": "Configurez vos domaines. Ce domaine peut être utilisé pour se connecter avec vos utilisateurs.",
-      "SETPRIMARY": "Définir comme primaire",
+      "SETPRIMARY": "Domaine de l'organisation",
       "DELETE": {
         "TITLE": "Supprimer un domaine",
         "DESCRIPTION": "Vous êtes sur le point de supprimer l'un de vos domaines. Notez que vos utilisateurs ne peuvent plus utiliser ce domaine pour leur connexion."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administrateur ajouté.",
       "MEMBERREMOVED": "Administrateur supprimé.",
       "MEMBERCHANGED": "Administrateur modifié.",
-      "SETPRIMARY": "Domaine primaire défini.",
+      "SETPRIMARY": "Le domaine de l'organisation a été défini avec succès.",
       "DELETED": "Organisation supprimée avec succès",
       "DEFAULTORGNOTFOUND": "L'organisation par défaut est introuvable",
       "ORG_WAS_DELETED": "L'organisation a été supprimée"
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "Paramètres SMTP et SMS",
       "MESSAGETEXTS": "Textes des messages",
       "IDP": "Fournisseurs d'identité",
-      "VERIFIED_DOMAINS": "Domaines vérifiés",
+      "VERIFIED_DOMAINS": "Domaine de l'organisation",
       "DOMAIN": "Paramètres du domaine",
       "LOGINTEXTS": "Textes de l'interface de connexion",
       "BRANDING": "Image de marque",
@@ -1581,7 +1581,7 @@
       "ADDPROVIDER": "Ajouter un fournisseur de SMS",
       "ADDPROVIDERDESCRIPTION": "Choisissez l'un des fournisseurs disponibles et saisissez les données requises.",
       "REMOVEPROVIDER": "Supprimer le fournisseur",
-      "REMOVEPROVIDER_DESC": "Vous êtes sur le point de supprimer une configuration de fournisseur. Voulez-vous continuer",
+      "REMOVEPROVIDER_DESC": "Vous êtes sur le point de supprimer un fournisseur. Voulez-vous continuer?",
       "SMSPROVIDERSTATE": {
         "0": "non spécifié",
         "1": "Actif",
@@ -1667,7 +1667,7 @@
     "DIALOG": {
       "RESET": {
         "DEFAULTTITLE": "Réinitialiser les paramètres",
-        "DEFAULTDESCRIPTION": "Vous êtes sur le point de réinitialiser vos paramètres à la configuration par défaut de votre instance. Êtes-vous sûr de vouloir continuer ?",
+        "DEFAULTDESCRIPTION": "Vous êtes sur le point de réinitialiser vos paramètres aux paramètres par défaut de votre instance. Êtes-vous sûr de vouloir continuer ?",
         "LOGINPOLICY_DESCRIPTION": "Avertissement"
       }
     }
@@ -1691,7 +1691,7 @@
       "DESCRIPTION": "Donnez à la connexion votre style personnalisé et modifiez son comportement.",
       "PREVIEW_DESCRIPTION": "Les modifications de la politique seront automatiquement déployées dans l'environnement de prévisualisation.",
       "BTN": "Sélectionner le fichier",
-      "ACTIVATEPREVIEW": "Appliquer la configuration",
+      "ACTIVATEPREVIEW": "Appliquer les paramètres",
       "DARK": "Mode sombre",
       "LIGHT": "Mode clair",
       "CHANGEVIEW": "Modifier la vue",
@@ -1716,7 +1716,7 @@
       "FONTCOLOR": "Couleur de la police",
       "VIEWS": {
         "PREVIEW": "Aperçu",
-        "CURRENT": "Configuration actuelle"
+        "CURRENT": "Paramètres actuels"
       },
       "PREVIEW": {
         "TITLE": "Connexion",
@@ -1743,7 +1743,7 @@
       "TITLE": "Image de marque",
       "BTN": "Sélectionner le fichier",
       "DESCRIPTION": "Personnaliser l'apparence de la connexion",
-      "ACTIVATEPREVIEW": "Activer la configuration"
+      "ACTIVATEPREVIEW": "Activer les paramètres"
     },
     "LOGIN_POLICY": {
       "TITLE": "Paramètres de connexion",
@@ -1772,7 +1772,7 @@
       "DESCRIPTION": "Définissez vos textes pour les interfaces de connexion. Si les textes sont vides, la valeur par défaut affichée dans l'espace réservé sera utilisée.",
       "DESCRIPTION_SHORT": "Définissez vos textes pour les interfaces de connexion.",
       "NEWERVERSIONEXISTS": "Une version plus récente existe",
-      "CURRENTDATE": "Configuration actuelle",
+      "CURRENTDATE": "Paramètres actuels",
       "CHANGEDATE": "Version plus récente de",
       "KEYNAME": "Interface / Page de connexion",
       "RESET_TITLE": "Restaurer les valeurs par défaut",
@@ -1930,7 +1930,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "Organisation",
-    "DESCRIPTION": "Ici, vous pouvez modifier la configuration de votre organisation et gérer les membres.",
+    "DESCRIPTION": "Ici, vous pouvez modifier les paramètres de votre organisation et gérer les membres.",
     "DETAIL": {
       "TITLE": "Détail",
       "NAME": "Nom",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "Voulez-vous vraiment supprimer votre projet ?",
           "TYPENAME": "Tapez le nom du projet pour le supprimer définitivement."
         }
-      }
+      },
+      "ID": "ID du projet"
     },
     "SETTINGS": {
       "TITLE": "Paramètres",
@@ -2091,7 +2092,7 @@
       "GRANTEDORGDOMAIN": "Domaine",
       "RESOURCEOWNER": "Propriétaire de la ressource",
       "GRANTEDORGNAME": "Nom de l'organisation",
-      "GRANTID": "Id de l'octroi",
+      "GRANTID": "ID de l'octroi",
       "CREATIONDATE": "Date de création",
       "CHANGEDATE": "Dernière modification",
       "DATES": "Dates",
@@ -2242,7 +2243,7 @@
     },
     "DETAIL": {
       "TITLE": "Fournisseur d'identité",
-      "DESCRIPTION": "Mettez à jour la configuration de votre fournisseur",
+      "DESCRIPTION": "Mettez à jour les paramètres de votre fournisseur",
       "DATECREATED": "Créé",
       "DATECHANGED": "Modifié"
     },
@@ -2293,7 +2294,7 @@
     "ADD": "Ajouter un fournisseur d'identité",
     "TYPE": "Type",
     "OWNER": "Propriétaire",
-    "ID": "ID",
+    "ID": "ID du fournisseur d'identité",
     "NAME": "Nom",
     "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
     "TOKENENDPOINT": "Token Endpoint",
@@ -2304,7 +2305,7 @@
     "AVAILABLEBUTINACTIVE": "disponible mais inactif",
     "SETAVAILABLE": "définir comme disponible",
     "SETUNAVAILABLE": "définir comme non disponible",
-    "CONFIG": "Configuration",
+    "CONFIG": "Paramètres",
     "STATE": "Statut",
     "ISSUER": "Émetteur",
     "SCOPESLIST": "Liste des champs d'application",
@@ -2354,11 +2355,11 @@
     "EMPTY": "Aucun IDP disponible",
     "OIDC": {
       "GENERAL": "Informations générales",
-      "TITLE": "Configuration de l'OIDC",
+      "TITLE": "Paramètres OIDC",
       "DESCRIPTION": "Saisissez les données pour le fournisseur d'identité OIDC."
     },
     "JWT": {
-      "TITLE": "Configuration JWT",
+      "TITLE": "Paramètres JWT",
       "DESCRIPTION": "Entrez les données pour le fournisseur d'identité JWT.",
       "HEADERNAME": "Nom de l'en-tête",
       "JWTENDPOINT": "Point de terminaison JWT",
@@ -2492,12 +2493,12 @@
     "LIST": "Applications",
     "COMPLIANCE": "Conformité à l'OIDC",
     "URLS": "URLs",
-    "CONFIGURATION": "Configuration",
+    "CONFIGURATION": "Paramètres",
     "TOKEN": "Paramètres du jeton",
     "PAGES": {
       "TITLE": "Application",
-      "ID": "ID",
-      "DESCRIPTION": "Ici vous pouvez modifier les données de votre application et sa configuration.",
+      "ID": "ID de l'application",
+      "DESCRIPTION": "Ici vous pouvez modifier les données de votre application et ses paramètres.",
       "CREATE": "Créer une application",
       "CREATE_SELECT_PROJECT": "Sélectionnez d'abord votre projet",
       "CREATE_NEW_PROJECT": "ou entrez le nom de votre nouveau projet",
@@ -2508,7 +2509,7 @@
       "DATECHANGED": "Modifié",
       "URLS": "URLs",
       "DELETE": "Supprimer l'application",
-      "JUMPTOPROJECT": "Pour configurer des rôles, des autorisations et bien plus encore, accédez au projet.",
+      "JUMPTOPROJECT": "Pour configurer des rôles, des attributions de rôles et bien plus encore, accédez au projet.",
       "DETAIL": {
         "TITLE": "Détail",
         "STATE": {
@@ -2519,7 +2520,7 @@
       },
       "DIALOG": {
         "CONFIG": {
-          "TITLE": "Modifier la configuration de l'OIDC"
+          "TITLE": "Modifier les paramètres OIDC"
         },
         "DELETE": {
           "TITLE": "Supprimer l'application",
@@ -2576,7 +2577,7 @@
       "REDIRECTNOTVALID": "Cet URI de redirection n'est pas valide.",
       "COMMAORENTERSEPERATION": "séparer par ↵",
       "TYPEREQUIRED": "Le type est obligatoire.",
-      "TITLE": "Configuration de l'OIDC",
+      "TITLE": "Paramètres OIDC",
       "CLIENTID": "ID client",
       "CLIENTSECRET": "Secret du client",
       "CLIENTSECRET_NOSECRET": "Avec le flux d'authentification que vous avez choisi, aucun secret n'est requis et n'est donc pas disponible.",
@@ -2625,7 +2626,7 @@
       "TOKENTYPE1": "JWT",
       "UNSECUREREDIRECT": "J'espère que vous savez ce que vous faites.",
       "OVERVIEWSECTION": "Vue d'ensemble",
-      "OVERVIEWTITLE": "Vous avez maintenant terminé. Revoyez votre configuration.",
+      "OVERVIEWTITLE": "Vous avez maintenant terminé. Revoyez vos paramètres.",
       "ACCESSTOKENROLEASSERTION": "Ajouter les rôles des utilisateurs au jeton d'accès",
       "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Si cette option est sélectionnée, les rôles demandés de l'utilisateur authentifié sont ajoutés au jeton d'accès.",
       "IDTOKENROLEASSERTION": "Rôles de l'utilisateur dans le jeton d'identification",
@@ -2672,8 +2673,8 @@
         "TITLE": "SAML",
         "DESCRIPTION": "Applications SAML"
       },
-      "CONFIGSECTION": "Configuration SAML",
-      "CHOOSEMETADATASOURCE": "Fournissez votre configuration SAML à l'aide de l'une des options suivantes :",
+      "CONFIGSECTION": "Paramètres SAML",
+      "CHOOSEMETADATASOURCE": "Fournissez vos paramètres SAML à l'aide de l'une des options suivantes :",
       "METADATAOPT1": "Option 1. Spécifiez l'URL où se trouve le fichier de métadonnées",
       "METADATAOPT2": "Option 2. Téléchargez un fichier contenant vos métadonnées XML",
       "METADATAOPT3": "Option 3. Créer un fichier de métadonnées minimal à la volée fournissant l'ENTITYID et l'URL ACS",
@@ -2786,42 +2787,42 @@
   },
   "ROLESLABEL": "Rôles",
   "GRANTS": {
-    "TITLE": "Autorisations",
-    "DESC": "Ce sont toutes les autorisations sur votre organisation.",
-    "DELETE": "Supprimer une autorisation",
-    "EMPTY": "Aucune autorisation trouvée",
-    "ADD": "Créer une autorisation",
+    "TITLE": "Attributions de rôles",
+    "DESC": "Ce sont toutes les attributions de rôles sur votre organisation.",
+    "DELETE": "Supprimer une attribution de rôle",
+    "EMPTY": "Aucune attribution de rôle trouvée",
+    "ADD": "Créer une attribution de rôle",
     "ADD_BTN": "Nouveau",
     "PROJECT": {
-      "TITLE": "Autorisation",
-      "DESCRIPTION": "Définit les autorisations pour le projet spécifié. Notez que vous ne pouvez voir que les entrées des projets et des utilisateurs pour lesquels vous avez les autorisations."
+      "TITLE": "Attribution de rôle",
+      "DESCRIPTION": "Définit les attributions de rôles pour le projet spécifié. Notez que vous ne pouvez voir que les entrées des projets et des utilisateurs pour lesquels vous avez les permissions."
     },
     "USER": {
-      "TITLE": "Autorisation",
-      "DESCRIPTION": "Définit les autorisations pour l'utilisateur spécifié. Notez que vous pouvez seulement voir les entrées des projets et des utilisateurs pour lesquels vous avez les permissions."
+      "TITLE": "Attribution de rôle",
+      "DESCRIPTION": "Définit les attributions de rôles pour l'utilisateur spécifié. Notez que vous pouvez seulement voir les entrées des projets et des utilisateurs pour lesquels vous avez les permissions."
     },
     "CREATE": {
-      "TITLE": "Créer une autorisation",
+      "TITLE": "Créer une attribution de rôle",
       "DESCRIPTION": "Rechercher l'organisation, le projet et les rôles correspondants."
     },
     "EDIT": {
-      "TITLE": "Modifier l'autorisation"
+      "TITLE": "Modifier l'attribution de rôle"
     },
     "DETAIL": {
-      "TITLE": "Détail de l'autorisation",
-      "DESCRIPTION": "Vous pouvez voir ici tous les détails de l'autorisation."
+      "TITLE": "Détail de l'attribution de rôle",
+      "DESCRIPTION": "Vous pouvez voir ici tous les détails de l'attribution de rôle."
     },
     "TOAST": {
-      "UPDATED": "Autorisation mise à jour.",
-      "REMOVED": "Autorisation supprimée",
-      "BULKREMOVED": "Autorisations supprimées.",
+      "UPDATED": "Attribution de rôle mise à jour.",
+      "REMOVED": "Attribution de rôle supprimée",
+      "BULKREMOVED": "Attributions de rôles supprimées.",
       "CANTSHOWINFO": "Vous ne pouvez pas visiter le profil de cet utilisateur car vous n'êtes pas membre de l'organisation à laquelle appartient cet utilisateur."
     },
     "DIALOG": {
-      "DELETE_TITLE": "Supprimer une autorisation",
-      "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer une autorisation. Voulez-vous continuer ?",
-      "BULK_DELETE_TITLE": "Supprimer des autorisations",
-      "BULK_DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer plusieurs autorisations. Voulez-vous continuer ?"
+      "DELETE_TITLE": "Supprimer une attribution de rôle",
+      "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer une attribution de rôle. Voulez-vous continuer ?",
+      "BULK_DELETE_TITLE": "Supprimer des attributions de rôles",
+      "BULK_DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer plusieurs attributions de rôles. Voulez-vous continuer ?"
     }
   },
   "CHANGES": {
@@ -2840,5 +2841,6 @@
       "TITLE": "Activité",
       "DESCRIPTION": "Vous pouvez voir ici les derniers événements qui ont généré un changement d'utilisateur."
     }
-  }
+  },
+  "INSTANCEID": "ID de l'instance"
 }

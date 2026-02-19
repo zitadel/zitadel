@@ -22,6 +22,7 @@ import { trackEvent, MixpanelEvents } from "@/lib/mixpanel";
 
 type Inputs =
   | {
+      currentPassword: string;
       password: string;
       confirmPassword: string;
     }
@@ -41,8 +42,9 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onChange",
     defaultValues: {
+      currentPassword: "",
       password: "",
-      comfirmPassword: "",
+      confirmPassword: "",
     },
   });
 
@@ -58,6 +60,7 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
 
     const changeResponse = await checkSessionAndSetPassword({
       sessionId,
+      currentPassword: values.currentPassword,
       password: values.password,
     }).catch(() => {
       setError(t("change.errors.couldNotChangePassword"));
@@ -128,6 +131,20 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
       <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
+        <div className="">
+          <TextInput
+            type="password"
+            autoComplete="current-password"
+            autoFocus
+            required
+            {...register("currentPassword", {
+              required: t("change.required.currentPassword"),
+            })}
+            label={t("change.labels.currentPassword")}
+            error={errors.currentPassword?.message as string}
+            data-testid="password-change-current-text-input"
+          />
+        </div>
         <div className="">
           <TextInput
             type="password"

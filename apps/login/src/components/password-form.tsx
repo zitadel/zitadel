@@ -126,6 +126,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
           <TextInput
             type="password"
             autoComplete="password"
+            autoFocus
             {...register("password", { required: t("verify.required.password") })}
             label={t("verify.labels.password")}
             data-testid="password-text-input"

@@ -9,7 +9,7 @@
         "DESCRIPTION": "完成以下步骤来保护你的应用程序。",
         "CREATE_PROJECT": {
           "TITLE": "创建项目",
-          "DESCRIPTION": "添加一个项目并定义其角色和权限。"
+          "DESCRIPTION": "添加项目并定义角色及角色分配。"
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "一个项目托管一个或多个应用，你可以用它们来验证你的用户。例如，你可能有一个包含3个应用的项目；一个用于你的Web前端，一个用于你的移动应用，一个用于你的后端。你还可以通过项目对用户进行授权。为了允许其他组织的用户登录到你的应用，给予他们访问你的项目的权限。<br/><br/>如果你找不到一个项目，请联系项目所有者或拥有相应权利的人以获得访问权限。",
       "OWNED": {
         "TITLE": "所拥有的项目",
-        "DESCRIPTION": "这些是你拥有的项目。你可以管理这些项目的设置、权限和应用。"
+        "DESCRIPTION": "这些是您拥有的项目。您可以管理其设置、角色分配和应用程序。"
       },
       "GRANTED": {
         "TITLE": "授予的项目",
@@ -61,9 +61,9 @@
         "METADATA": "为你自己添加自定义属性，如你的部门。你可以在你的组织的行动中使用这些信息。"
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "授权",
-      "DESCRIPTION": "授权定义了用户对项目的访问权限。您可以授予用户访问项目的权限并在该项目内定义用户的角色。"
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "角色分配",
+      "DESCRIPTION": "角色分配定义用户对项目的访问权限。您可以授予用户访问项目的权限，并定义他们在项目中的角色。"
     },
     "ACTIONS": {
       "TITLE": "操作",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "创建你的第一个项目",
-        "description": "添加你的第一个项目并定义其角色和授权。",
+        "description": "添加项目并定义角色及角色分配。",
         "action": "创建项目"
       },
       "APPLICATION_CREATED": {
@@ -429,7 +429,7 @@
     "NEWORG": "创建组织",
     "IAMADMIN": "您是实例管理员。请注意您具有扩展权限。",
     "SHOWORGS": "查看所有组织",
-    "GRANTS": "授权",
+    "GRANTS": "角色分配",
     "ACTIONS": "认证流程",
     "PRIVACY": "隐私",
     "TOS": "服务条款",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
     "ORG_SETTINGS_MANAGER": "有权管理组织的设置",
-    "ORG_USER_PERMISSION_EDITOR": "有权管理用户授权",
+    "ORG_USER_PERMISSION_EDITOR": "具有管理角色分配的权限",
     "ORG_PROJECT_PERMISSION_EDITOR": "有权管理项目授权",
     "ORG_PROJECT_CREATOR": "有权创建自己的项目和基础设置",
     "ORG_ADMIN_IMPERSONATOR": "有权模拟组织的管理员和最终用户",
@@ -702,7 +702,7 @@
     "USERNAME": "用户名",
     "ORGNAME": "组织名称",
     "ORGID": "组织ID",
-    "PRIMARYDOMAIN": "主域",
+    "PRIMARYDOMAIN": "组织域名",
     "PROJECTNAME": "项目名称",
     "RESOURCEOWNER": "资源所有者",
     "METHODS": {
@@ -724,7 +724,7 @@
       "ME": "前往个人资料",
       "PROJECTS": "前往项目",
       "USERS": "前往用户",
-      "USERGRANTS": "前往授权",
+      "ROLEASSIGNMENTS": "角色分配",
       "ACTIONS": "前往认证流程",
       "DOMAINS": "前往域名"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "密码和安全",
       "KEYS": "秘钥",
       "PAT": "个人访问令牌",
-      "USERGRANTS": "授权",
+      "ROLEASSIGNMENTS": "角色分配",
       "MEMBERSHIPS": "管理员角色",
       "METADATA": "元数据"
     },
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
       "MAXLENGTHERROR": "必须少于{{value}}个字符"
     },
-    "ID": "ID",
+    "ID": "用户ID",
     "EMAIL": "电子邮件",
     "PHONE": "手机号码",
     "PHONEEMPTY": "未定义手机号码",
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "验证码"
     },
     "GRANTS": {
-      "TITLE": "用户授权",
+      "TITLE": "角色分配",
       "DESCRIPTION": "授予此用户对某些项目的访问权限",
       "CREATE": {
-        "TITLE": "创建用户授权",
+        "TITLE": "创建角色分配",
         "DESCRIPTION": "搜索组织、项目和相应的项目角色。"
       },
       "PROJECTNAME": "项目名称",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "名称",
-      "ID": "ID",
+      "ID": "组织ID",
       "CREATIONDATE": "创建于",
       "DATECHANGED": "修改于",
       "FILTER": "筛选",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "下载文件",
       "SELECTORGTOOLTIP": "选择此组织。",
-      "PRIMARYDOMAIN": "主域名",
+      "PRIMARYDOMAIN": "组织域名",
       "STATE": "状态",
       "USEPASSWORD": "设置初始密码",
       "USEPASSWORDDESC": "用户初始化时无需设置密码。"
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "添加域名",
-      "TITLE": "已验证的域名",
+      "TITLE": "组织域名",
       "DESCRIPTION": "配置您的域名。此域名可用于您的用户登录。",
-      "SETPRIMARY": "设置为主域名",
+      "SETPRIMARY": "组织域名",
       "DELETE": {
         "TITLE": "删除域名",
         "DESCRIPTION": "您即将删除您的一个域名。请注意，您的用户不能再使用此域进行登录。"
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "管理员已添加。",
       "MEMBERREMOVED": "管理员已删除。",
       "MEMBERCHANGED": "管理员以改变。",
-      "SETPRIMARY": "已设为主域名。",
+      "SETPRIMARY": "组织域名已成功设置。",
       "DELETED": "成功删除的组织",
       "DEFAULTORGNOTFOUND": "未找到默认组织",
       "ORG_WAS_DELETED": "组织被删除"
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP 和 SMS 设置",
       "MESSAGETEXTS": "消息文本",
       "IDP": "身份提供者",
-      "VERIFIED_DOMAINS": "已验证的域名",
+      "VERIFIED_DOMAINS": "组织域名",
       "DOMAIN": "域名设置",
       "LOGINTEXTS": "登录界面文本",
       "BRANDING": "品牌标识",
@@ -2017,7 +2017,8 @@
           "DESCRIPTION": "您真的要删除您的项目吗？",
           "TYPENAME": "键入项目的名称以将其永久删除。"
         }
-      }
+      },
+      "ID": "项目ID"
     },
     "SETTINGS": {
       "TITLE": "设置",
@@ -2143,7 +2144,7 @@
       "ASSERTION": "身份验证时附加角色信息",
       "ASSERTION_DESCRIPTION": "角色信息将包含在用户信息中，具体取决于令牌类型和应用程序设置。",
       "CHECK": "身份验证时检查用户授权",
-      "CHECK_DESCRIPTION": "如果设置，则只有在为其帐户分配了任何角色时才允许用户进行身份验证。",
+      "CHECK_DESCRIPTION": "若用户未被分配到该项目中的任何角色，则拒绝认证。允许向项目分配角色权限，但无需为用户指定具体角色。",
       "DIALOG": {
         "DELETE_TITLE": "删除角色",
         "DELETE_DESCRIPTION": "您即将删除项目角色。你确定吗？"
@@ -2304,7 +2305,7 @@
     "ADD": "添加身份提供者",
     "TYPE": "类型",
     "OWNER": "所有者",
-    "ID": "ID",
+    "ID": "身份提供商ID",
     "NAME": "名称",
     "AUTHORIZATIONENDPOINT": "授权端点",
     "TOKENENDPOINT": "令牌端点",
@@ -2528,7 +2529,7 @@
     "TOKEN": "令牌设置",
     "PAGES": {
       "TITLE": "应用",
-      "ID": "ID",
+      "ID": "应用ID",
       "DESCRIPTION": "在这里您可以编辑您的应用程序数据及其配置。",
       "CREATE": "OIDC 应用",
       "CREATE_SELECT_PROJECT": "首先选择你的项目",
@@ -2540,7 +2541,7 @@
       "DATECHANGED": "修改于",
       "URLS": "URLs",
       "DELETE": "删除应用",
-      "JUMPTOPROJECT": "要配置角色、授权等，请导航到项目。",
+      "JUMPTOPROJECT": "要配置角色、角色分配等设置，请导航至项目页面。",
       "DETAIL": {
         "TITLE": "详情",
         "STATE": {
@@ -2818,42 +2819,42 @@
   },
   "ROLESLABEL": "角色",
   "GRANTS": {
-    "TITLE": "授权",
-    "DESC": "这里列出的是当前组织已授权的用户列表",
-    "DELETE": "删除授权",
-    "EMPTY": "没有用户授权数据",
-    "ADD": "创建用户授权",
+    "TITLE": "角色分配",
+    "DESC": "这些是您组织中的所有角色分配。",
+    "DELETE": "删除角色分配",
+    "EMPTY": "未找到角色分配",
+    "ADD": "创建角色分配",
     "ADD_BTN": "创建",
     "PROJECT": {
-      "TITLE": "授权",
-      "DESCRIPTION": "为指定项目定义授权。请注意：您只能查看您拥有权限的项目和用户的条目。"
+      "TITLE": "角色分配",
+      "DESCRIPTION": "为指定项目定义角色分配。请注意，您仅能查看具有权限的项目和用户条目。"
     },
     "USER": {
-      "TITLE": "授权",
-      "DESCRIPTION": "为指定用户定义授权。请注意，您只能查看您拥有权限的项目和用户的条目。"
+      "TITLE": "角色分配",
+      "DESCRIPTION": "为指定用户定义角色分配。请注意，您仅能查看具有权限的项目和用户条目。"
     },
     "CREATE": {
-      "TITLE": "创建授权",
+      "TITLE": "创建角色分配",
       "DESCRIPTION": "搜索组织、项目和相应的角色。"
     },
     "EDIT": {
-      "TITLE": "更改授权"
+      "TITLE": "更改角色分配"
     },
     "DETAIL": {
-      "TITLE": "授权详情",
-      "DESCRIPTION": "在这里您可以看到授权的所有详细信息。"
+      "TITLE": "角色分配的详细信息",
+      "DESCRIPTION": "此处可查看角色分配的所有详细信息"
     },
     "TOAST": {
-      "UPDATED": "授权已更新。",
-      "REMOVED": "已移除授权。",
-      "BULKREMOVED": "已移除授权。",
+      "UPDATED": "角色分配已更新",
+      "REMOVED": "角色分配已被移除",
+      "BULKREMOVED": "角色分配已被移除",
       "CANTSHOWINFO": "您无法访问该用户的个人资料，因为您不是该用户所属组织的管理员"
     },
     "DIALOG": {
-      "DELETE_TITLE": "删除授权",
-      "DELETE_DESCRIPTION": "您即将删除授权。你想继续吗？",
-      "BULK_DELETE_TITLE": "删除授权",
-      "BULK_DELETE_DESCRIPTION": "您将要删除多个授权。你想继续吗？"
+      "DELETE_TITLE": "删除角色分配",
+      "DELETE_DESCRIPTION": "您即将移除一个角色分配。继续？",
+      "BULK_DELETE_TITLE": "删除角色分配",
+      "BULK_DELETE_DESCRIPTION": "您即将移除多个角色分配。继续？"
     }
   },
   "CHANGES": {
@@ -2872,5 +2873,6 @@
       "TITLE": "当前用户事件",
       "DESCRIPTION": "在这里您可以看到用户变更的最新事件。"
     }
-  }
+  },
+  "INSTANCEID": "实例ID"
 }

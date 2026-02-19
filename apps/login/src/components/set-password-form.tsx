@@ -207,6 +207,7 @@ export function SetPasswordForm({
           <div>
             <TextInput
               type="text"
+              autoFocus
               required
               {...register("code", {
                 required: t("set.required.code"),
@@ -222,6 +223,7 @@ export function SetPasswordForm({
           <TextInput
             type="password"
             autoComplete="new-password"
+            autoFocus={!codeRequired}
             required
             {...register("password", {
               required: t("set.required.newPassword"),
