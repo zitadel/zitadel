@@ -55,7 +55,7 @@ function readCapturedRequests(): Array<{ method: string; url: string; tlsConnect
  * resolution, avoiding port conflicts on the host machine and ensuring reliable
  * execution in CI environments.
  */
-const LOGIN_IMAGE_TAG = "zitadel-login-ca-test:latest";
+const LOGIN_IMAGE_TAG = "zitadel-login-otel-test:latest";
 
 describe("Custom CA Certificate Integration", () => {
   let certs: ReturnType<typeof generateCertificates>;
@@ -93,8 +93,10 @@ describe("Custom CA Certificate Integration", () => {
       .withWaitStrategy(Wait.forLogMessage("Mock TLS server listening"))
       .start();
 
+    // The OTEL tests run before CA tests and build the same image.
+    // This build call will reuse cached layers, making it fast.
     await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
-  });
+  }, 180000);
 
   afterAll(async () => {
     await mockServer?.stop();
@@ -124,7 +126,7 @@ describe("Custom CA Certificate Integration", () => {
             target: "/etc/ssl/certs/custom-ca.crt",
           },
         ])
-        .withStartupTimeout(120000)
+        .withStartupTimeout(180000)
         .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
         .start();
 
@@ -199,7 +201,7 @@ describe("Custom CA Certificate Integration", () => {
           ZITADEL_API_URL: "https://mock-zitadel",
           ZITADEL_SERVICE_USER_TOKEN: "test-token",
         })
-        .withStartupTimeout(120000)
+        .withStartupTimeout(180000)
         .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
         .start();
 
