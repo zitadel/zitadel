@@ -237,15 +237,15 @@
         "DESCRIPTION": "Define restrictions on your domains and configure your login name patterns.",
         "REQUIRE_VERIFICATION": {
           "TITLE": "Require custom domains to be be verified",
-          "DESCRIPTION": "If this is activated, organization domains have to be verified before they can be used for domain discovery or username suffixing."
+          "DESCRIPTION": "If this is activated, Organization Domains have to be verified before they can be used for domain discovery or username suffixing."
         },
         "LOGIN_NAME_PATTERN": {
           "TITLE": "Login Name Pattern",
-          "DESCRIPTION": "Control the pattern of your users login names. Zitadel selects your users organization as soon as they enter their login name. Therefore the loginnames need to be unique across all organizations. If you have users that have an account in multiple domains, you can ensure uniqueness by suffixing your login names with the organization domain."
+          "DESCRIPTION": "Control the pattern of your users login names. Zitadel selects your users organization as soon as they enter their login name. Therefore the loginnames need to be unique across all organizations. If you have users that have an account in multiple domains, you can ensure uniqueness by suffixing your login names with the Organization Domain."
         },
         "DOMAIN_VERIFICATION": {
           "TITLE": "Domain Verification",
-          "DESCRIPTION": "Only allow your organization to use the domains they actually control. If activated, organization domains are periodically verified by DNS or HTTP challenge before they can be used. This is a security feature to prevent domain hijacking."
+          "DESCRIPTION": "Only allow your organization to use the domains they actually control. If activated, Organization Domains are periodically verified by DNS or HTTP challenge before they can be used. This is a security feature to prevent domain hijacking."
         },
         "SMTP_SENDER_ADDRESS": {
           "TITLE": "SMTP Sender Address",
@@ -700,7 +700,7 @@
     "ORGNAME": "Organization Name",
     "ORGID": "Organization ID",
     "STATE": "State",
-    "PRIMARYDOMAIN": "Primary Domain",
+    "PRIMARYDOMAIN": "Organization Domain",
     "DISPLAYNAME": "User Display Name",
     "EMAIL": "Email",
     "USERNAME": "User Name",
@@ -1416,13 +1416,13 @@
         "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your domain this step has to be completed!",
         "VERIFICATION_VALIDATION_DESC": "Do not delete the verification code, as Zitadel will re-check the ownership of your domain from time to time.",
         "VERIFICATION_NEWTOKEN_TITLE": "Request New Token",
-        "VERIFICATION_VALIDATION_ONGOING": "The {{ value }} method has been selected to verify your domain. Click on the button to trigger a verification check or reset the verification process.",
+        "VERIFICATION_VALIDATION_ONGOING": "The {{ value }} method has been selected to verify your Organization Domain. Click on the button to trigger a verification check or reset the verification process.",
         "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
         "RESETMETHOD": "Reset verification method"
       },
       "DOWNLOAD_FILE": "Download File",
       "SELECTORGTOOLTIP": "Select this organization.",
-      "PRIMARYDOMAIN": "Primary Domain",
+      "PRIMARYDOMAIN": "Organization Domain",
       "STATE": "State",
       "USEPASSWORD": "Set Initial Password",
       "USEPASSWORDDESC": "The user does not have to set the password during initialization."
@@ -1433,9 +1433,9 @@
     },
     "DOMAINS": {
       "NEW": "Add Domain",
-      "TITLE": "Verified domains",
-      "DESCRIPTION": "Configure your organization domains. This domain can be used for domain discovery and username suffixing.",
-      "SETPRIMARY": "Set as Primary",
+      "TITLE": "Organization Domains",
+      "DESCRIPTION": "Configure your Organization Domains. This domain can be used for domain discovery and username suffixing.",
+      "SETPRIMARY": "Set as Organization Domain",
       "DELETE": {
         "TITLE": "Delete Domain",
         "DESCRIPTION": "You are about to delete one of your domains."
@@ -1463,7 +1463,7 @@
       "MEMBERADDED": "Administrator added.",
       "MEMBERREMOVED": "Administrator removed.",
       "MEMBERCHANGED": "Administrator changed.",
-      "SETPRIMARY": "Primary domain set.",
+      "SETPRIMARY": "Organization Domain set successfully.",
       "DELETED": "Organization deleted successfully",
       "DEFAULTORGNOTFOUND": "The default organization was not found",
       "ORG_WAS_DELETED": "Organization has been deleted."
@@ -1501,7 +1501,7 @@
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
-      "VERIFIED_DOMAINS": "Verified domains",
+      "VERIFIED_DOMAINS": "Organization Domains",
       "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
@@ -1902,9 +1902,9 @@
       "MAXOTPATTEMPTS": "OTP maximum attempts",
       "EXPIREWARNDAYS": "Expiration Warning after days",
       "MAXAGEDAYS": "Maximum validity in days",
-      "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
-      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
-      "VALIDATEORGDOMAINS": "Organization domain verification required (DNS or HTTP challenge)",
+      "USERLOGINMUSTBEDOMAIN": "Add Organization Domain as suffix to loginnames",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the Organization Domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
+      "VALIDATEORGDOMAINS": "Organization Domain verification required (DNS or HTTP challenge)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
@@ -1916,7 +1916,7 @@
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
       "HIDELOGINNAMESUFFIX_DESC": "Hides the login name suffix in the login interface",
       "IGNOREUNKNOWNUSERNAMES_DESC": "If the option is selected, the password screen will be displayed in the login process even if the user was not found. The error on the password check will not disclose if the username or password was wrong.",
-      "ALLOWDOMAINDISCOVERY_DESC": "If the option is selected, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the organization domains and will redirect to the registration of that organisation on success.",
+      "ALLOWDOMAINDISCOVERY_DESC": "If the option is selected, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the Organization Domains and will redirect to the registration of that organisation on success.",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",
