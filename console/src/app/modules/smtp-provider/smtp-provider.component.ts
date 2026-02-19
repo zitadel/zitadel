@@ -9,7 +9,7 @@ import { UserService } from '../../services/user.service';
 import { injectMutation, injectQuery, QueryFunction } from '@tanstack/angular-query-experimental';
 import { NewAdminService } from '../../services/new-admin.service';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { AddEmailProviderSMTPRequestSchema, GetEmailProviderByIdResponse } from '@zitadel/proto/zitadel/admin_pb';
+import { AddEmailProviderSMTPRequestSchema, GetEmailProviderByIdResponse, TestEmailProviderSMTPRequestSchema } from '@zitadel/proto/zitadel/admin_pb';
 import { EMPTY, map, switchMap } from 'rxjs';
 import { filter, startWith } from 'rxjs/operators';
 import { EmailProviderState } from '@zitadel/proto/zitadel/settings_pb';
@@ -456,6 +456,20 @@ export class SMTPProviderComponent {
       const { senderAddress, senderName } = state.senderForm.getRawValue();
 
       if ('config' in state) {
+        const Auth: MessageInitShape<typeof TestEmailProviderSMTPRequestSchema>['Auth'] | undefined = 'tokenEndpoint' in authValues ? {
+          case: 'xoauth2',
+          value: {
+            tokenEndpoint: authValues.tokenEndpoint,
+            scopes: authValues.scopes.replace(/\s/g, '').split(','),
+            OAuth2Type: {
+              case: 'clientCredentials',
+              value: {
+                clientId: authValues.clientId,
+              },
+            },
+          }
+        } : undefined
+
         return {
           id: state.config.id,
           senderAddress,
@@ -464,6 +478,7 @@ export class SMTPProviderComponent {
           user,
           tls,
           receiverAddress,
+          Auth,
         };
       }
 
