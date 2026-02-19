@@ -660,6 +660,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
             items: [
               "guides/integrate/identity-providers/migrate",
               "guides/integrate/identity-providers/additional-information",
+              "guides/integrate/identity-providers/satosa-saml",
             ]
           }
         ],
