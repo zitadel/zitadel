@@ -216,6 +216,8 @@ func CreateLogin(
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
 	login.router = CreateRouter(login,
+		middleware.CallDurationHandler,
+		middleware.RequestIDHandler(),
 		middleware.TraceHandler(IgnoreInstanceEndpoints...),
 		middleware.LogHandler("login_v1", IgnoreInstanceEndpoints...),
 		oidcInstanceHandler,
