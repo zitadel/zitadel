@@ -249,7 +249,13 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
 	steps.s69CacheTablesLogged = &CacheTablesLogged{dbClient: dbClient}
 
-	projection.CreateAll(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
+	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
+	logging.OnError(ctx, err).Fatal("unable to start key storage")
+
+	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
+	logging.OnError(ctx, err).Fatal("unable to ensure encryption keys")
+
+	projection.CreateAll(ctx, dbClient, eventstoreClient, config.Projections, keys.OIDC, keys.SAML, nil)
 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
