@@ -341,12 +341,52 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	}
 
 	// V2:
+	// Check if federated logout is needed before terminating the session
+	if path := o.federatedLogoutV2(ctx, endSessionRequest.IDTokenHintClaims.SessionID, endSessionRequest.RedirectURI); path != "" {
+		return path, nil
+	}
+
 	// Terminate the v2 session of the id_token_hint
 	_, err = o.command.TerminateSessionWithoutTokenCheck(ctx, endSessionRequest.IDTokenHintClaims.SessionID)
 	if err != nil {
 		return "", err
 	}
 	return v2PostLogoutRedirectURI(endSessionRequest.RedirectURI), nil
+}
+
+// federatedLogoutV2 checks if a V2 session requires federated logout
+// If so, it creates a logout intent and returns the redirect URL to the IdP
+func (o *OPStorage) federatedLogoutV2(ctx context.Context, sessionID string, postLogoutRedirectURI string) string {
+	// Start federated logout process
+	logoutRequest, err := o.command.StartFederatedLogout(ctx, o.query, o.eventstore, sessionID, postLogoutRedirectURI)
+	if err != nil {
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "sessionID", sessionID).
+			WithError(err).Error("error starting federated logout")
+		return ""
+	}
+
+	// If no federated logout is needed (no IdP or not enabled), return empty
+	if logoutRequest == nil {
+		return ""
+	}
+
+	// TODO: Long-term, redirect to Login V2 federated logout page which calls the API
+	// return login.FederatedLogoutV2Path(logoutRequest.LogoutID)
+
+	// SHORT-TERM FIX: Redirect directly to the IdP logout endpoint
+	// This bypasses Login V2 and makes the logout work immediately
+	if logoutRequest.SAMLBindingType == "redirect" && logoutRequest.SAMLRedirectURL != "" {
+		logging.WithFields("sessionID", sessionID, "logoutID", logoutRequest.LogoutID,
+			"redirectURL", logoutRequest.SAMLRedirectURL).
+			Info("redirecting directly to IdP for SAML logout (HTTP-Redirect binding)")
+		return logoutRequest.SAMLRedirectURL
+	}
+
+	// For POST binding, we still need Login V2 to render the form
+	// Fall back to Login V2 path (will 404 until Login V2 is implemented)
+	logging.WithFields("sessionID", sessionID, "logoutID", logoutRequest.LogoutID).
+		Warn("POST binding requires Login V2 - falling back to Login V2 path (may 404)")
+	return login.FederatedLogoutV2Path(logoutRequest.LogoutID)
 }
 
 // federatedLogout checks whether the session has an idp session linked and the IDP template is configured for federated logout.
