@@ -430,8 +430,9 @@ func createSuccessfulOAuthIntent(ctx context.Context, cmd *command.Commands, req
 	idpSession := &oauth.Session{
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 			Token: &oauth2.Token{
-				AccessToken: "accessToken",
-				Expiry:      req.Expiry,
+				AccessToken:  "accessToken",
+				RefreshToken: "refreshToken",
+				Expiry:       req.Expiry,
 			},
 			IDToken: "idToken",
 		},
@@ -468,8 +469,9 @@ func createSuccessfulAzureADIntent(ctx context.Context, cmd *command.Commands, r
 	idpSession := &oauth.Session{
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 			Token: &oauth2.Token{
-				AccessToken: "accessToken",
-				Expiry:      req.Expiry,
+				AccessToken:  "accessToken",
+				RefreshToken: "refreshToken",
+				Expiry:       req.Expiry,
 			},
 			IDToken: "idToken",
 		},
@@ -500,8 +502,9 @@ func createSuccessfulOIDCIntent(ctx context.Context, cmd *command.Commands, req 
 	idpSession := &openid.Session{
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 			Token: &oauth2.Token{
-				AccessToken: "accessToken",
-				Expiry:      req.Expiry,
+				AccessToken:  "accessToken",
+				RefreshToken: "refreshToken",
+				Expiry:       req.Expiry,
 			},
 			IDToken: "idToken",
 		},
