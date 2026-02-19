@@ -46,7 +46,7 @@ CREATE TABLE zitadel.users(
     , password_failed_attempts              SMALLINT    CHECK ((type = 'machine' AND password_failed_attempts IS NULL)              OR (type = 'human') AND (password_failed_attempts >= 0))
 
     , email                                 TEXT        CHECK ((type = 'machine' AND email IS NULL)                                 OR (type = 'human'))
-    , unverified_email                      TEXT        CHECK ((type = 'machine' AND unverified_email IS NULL)                      OR (type = 'human')) -- after successful verification this column is not cleared.
+    , unverified_email                      TEXT        CHECK ((type = 'machine' AND unverified_email IS NULL)                      OR (type = 'human' AND unverified_email <> '')) -- after successful verification this column is not cleared.
     , email_verified_at                     TIMESTAMPTZ CHECK ((type = 'machine' AND email_verified_at IS NULL)                     OR (type = 'human'))
     , email_verification_id                 TEXT        CHECK ((type = 'machine' AND email_verification_id IS NULL)                 OR (type = 'human' AND (email IS DISTINCT FROM unverified_email OR email_verification_id IS NULL)))
     , email_otp_enabled_at                  TIMESTAMPTZ CHECK ((type = 'machine' AND email_otp_enabled_at IS NULL)                  OR (type = 'human'))
