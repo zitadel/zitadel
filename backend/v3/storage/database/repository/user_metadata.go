@@ -9,7 +9,7 @@ import (
 
 type userMetadata struct{}
 
-// AddMetadata implements [domain.UserRepository.AddMetadata].
+// AddMetadata implements [domain.UserRepository].
 func (u userMetadata) AddMetadata(metadata ...*domain.Metadata) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
@@ -64,7 +64,7 @@ func (userMetadata) unqualifiedTableName() string {
 // conditions
 // -------------------------------------------------------------
 
-// RemoveMetadata implements [domain.UserRepository.RemoveMetadata].
+// RemoveMetadata implements [domain.UserRepository].
 func (u userMetadata) RemoveMetadata(condition database.Condition) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {

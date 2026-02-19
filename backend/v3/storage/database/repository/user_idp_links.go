@@ -19,7 +19,7 @@ func (u userIdentityProviderLink) qualifiedTableName() string {
 // changes
 // -------------------------------------------------------------
 
-// AddIdentityProviderLink implements [domain.HumanUserRepository.AddIdentityProviderLink].
+// AddIdentityProviderLink implements [domain.HumanUserRepository].
 func (u userIdentityProviderLink) AddIdentityProviderLink(link *domain.IdentityProviderLink) database.Change {
 	var createdAt, updatedAt any = database.NowInstruction, database.NowInstruction
 	if !link.CreatedAt.IsZero() {
@@ -52,7 +52,7 @@ func (u userIdentityProviderLink) AddIdentityProviderLink(link *domain.IdentityP
 	)
 }
 
-// UpdateIdentityProviderLink implements [domain.HumanUserRepository.UpdateIdentityProviderLink].
+// UpdateIdentityProviderLink implements [domain.HumanUserRepository].
 func (u userIdentityProviderLink) UpdateIdentityProviderLink(condition database.Condition, changes ...database.Change) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
@@ -69,7 +69,7 @@ func (u userIdentityProviderLink) UpdateIdentityProviderLink(condition database.
 	)
 }
 
-// RemoveIdentityProviderLink implements [domain.HumanUserRepository.RemoveIdentityProviderLink].
+// RemoveIdentityProviderLink implements [domain.HumanUserRepository].
 func (u userIdentityProviderLink) RemoveIdentityProviderLink(providerID string, providedUserID string) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
@@ -101,12 +101,12 @@ func (u userIdentityProviderLink) RemoveIdentityProviderLink(providerID string, 
 	)
 }
 
-// SetIdentityProviderLinkUsername implements [domain.HumanUserRepository.SetIdentityProviderLinkUsername].
+// SetIdentityProviderLinkUsername implements [domain.HumanUserRepository].
 func (u userIdentityProviderLink) SetIdentityProviderLinkUsername(username string) database.Change {
 	return database.NewChange(u.providedUsernameColumn(), username)
 }
 
-// SetIdentityProviderLinkProvidedID implements [domain.HumanUserRepository.SetIdentityProviderLinkProvidedID].
+// SetIdentityProviderLinkProvidedID implements [domain.HumanUserRepository].
 func (u userIdentityProviderLink) SetIdentityProviderLinkProvidedID(providedUserID string) database.Change {
 	return database.NewChange(u.providedUserIDColumn(), providedUserID)
 }
@@ -115,22 +115,22 @@ func (u userIdentityProviderLink) SetIdentityProviderLinkProvidedID(providedUser
 // conditions
 // -------------------------------------------------------------
 
-// IdentityProviderLinkConditions implements [domain.HumanUserRepository.IdentityProviderLinkConditions].
+// IdentityProviderLinkConditions implements [domain.HumanUserRepository].
 func (u userIdentityProviderLink) IdentityProviderLinkConditions() domain.HumanIdentityProviderLinkConditions {
 	return u
 }
 
-// ProviderIDCondition implements [domain.HumanUserRepository.ProviderIDCondition].
+// ProviderIDCondition implements [domain.HumanUserRepository].
 func (u userIdentityProviderLink) ProviderIDCondition(idpID string) database.Condition {
 	return database.NewTextCondition(u.providerIDColumn(), database.TextOperationEqual, idpID)
 }
 
-// ProvidedUserIDCondition implements [domain.HumanUserRepository.ProvidedUserIDCondition].
+// ProvidedUserIDCondition implements [domain.HumanUserRepository].
 func (u userIdentityProviderLink) ProvidedUserIDCondition(providedUserID string) database.Condition {
 	return database.NewTextCondition(u.providedUserIDColumn(), database.TextOperationEqual, providedUserID)
 }
 
-// ProvidedUsernameCondition implements [domain.HumanUserRepository.ProvidedUsernameCondition].
+// ProvidedUsernameCondition implements [domain.HumanUserRepository].
 func (u userIdentityProviderLink) ProvidedUsernameCondition(op database.TextOperation, username string) database.Condition {
 	return database.NewTextCondition(u.providedUsernameColumn(), op, username)
 }

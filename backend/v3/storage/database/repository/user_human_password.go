@@ -16,7 +16,7 @@ func (u userHuman) SetPassword(password string) database.Change {
 	return database.NewChange(u.passwordHashColumn(), password)
 }
 
-// SetResetPasswordVerification implements [domain.HumanUserRepository.SetResetPasswordVerification].
+// SetResetPasswordVerification implements [domain.HumanUserRepository].
 func (u userHuman) SetResetPasswordVerification(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
 	case *domain.VerificationTypeInit:
@@ -37,7 +37,7 @@ func (u userHuman) SetResetPasswordVerification(verification domain.Verification
 	panic(fmt.Sprintf("undefined verification type %T", verification))
 }
 
-// SetPasswordChangeRequired implements [domain.HumanUserRepository.SetPasswordChangeRequired].
+// SetPasswordChangeRequired implements [domain.HumanUserRepository].
 func (u userHuman) SetPasswordChangeRequired(required bool) database.Change {
 	return database.NewChange(u.passwordChangeRequiredColumn(), required)
 }

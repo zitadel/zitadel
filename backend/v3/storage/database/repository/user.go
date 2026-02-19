@@ -39,7 +39,7 @@ func (u user) HumanRepository() domain.HumanUserRepository {
 // existingUser is used to get the columns and conditions for the CTE that selects the existing user in update and delete operations.
 var existingUser = user{tableName: "existing_user"}
 
-// Create implements [domain.UserRepository.Create].
+// Create implements [domain.UserRepository].
 func (u user) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
 	var create func(context.Context, *database.StatementBuilder, database.QueryExecutor, *domain.User) error
 	switch {
@@ -56,7 +56,7 @@ func (u user) Create(ctx context.Context, client database.QueryExecutor, user *d
 	return create(ctx, builder, client, user)
 }
 
-// Delete implements [domain.UserRepository.Delete].
+// Delete implements [domain.UserRepository].
 func (u user) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	if err := checkPKCondition(u, condition); err != nil {
 		return 0, err
@@ -104,7 +104,7 @@ func verificationQuery(column database.Column) string {
 	return builder.String()
 }
 
-// Get implements [domain.UserRepository.Get].
+// Get implements [domain.UserRepository].
 func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range u.appendQueryOpts(opts) {
@@ -121,7 +121,7 @@ func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...da
 	return scanUser(ctx, client, builder)
 }
 
-// List implements [domain.UserRepository.List].
+// List implements [domain.UserRepository].
 func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.User, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range u.appendQueryOpts(opts) {
@@ -150,7 +150,7 @@ func (u user) appendQueryOpts(opts []database.QueryOption) []database.QueryOptio
 	)
 }
 
-// Update implements [domain.UserRepository.Update].
+// Update implements [domain.UserRepository].
 func (u user) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if err := checkPKCondition(u, condition); err != nil {
 		return 0, err
@@ -191,17 +191,17 @@ func (u user) unqualifiedTableName() string {
 // changes
 // -------------------------------------------------------------
 
-// SetState implements [domain.UserRepository.SetState].
+// SetState implements [domain.UserRepository].
 func (u user) SetState(state domain.UserState) database.Change {
 	return database.NewChange(u.StateColumn(), state)
 }
 
-// SetUpdatedAt implements [domain.UserRepository.SetUpdatedAt].
+// SetUpdatedAt implements [domain.UserRepository].
 func (u user) SetUpdatedAt(updatedAt time.Time) database.Change {
 	return database.NewChange(u.updatedAtColumn(), updatedAt)
 }
 
-// SetUsername implements [domain.UserRepository.SetUsername].
+// SetUsername implements [domain.UserRepository].
 func (u user) SetUsername(username string) database.Change {
 	return database.NewChange(u.UsernameColumn(), username)
 }
@@ -214,27 +214,27 @@ func (u user) clearUpdatedAt() database.Change {
 // conditions
 // -------------------------------------------------------------
 
-// IDCondition implements [domain.UserRepository.IDCondition].
+// IDCondition implements [domain.UserRepository].
 func (u user) IDCondition(userID string) database.Condition {
 	return database.NewTextCondition(u.IDColumn(), database.TextOperationEqual, userID)
 }
 
-// InstanceIDCondition implements [domain.UserRepository.InstanceIDCondition].
+// InstanceIDCondition implements [domain.UserRepository].
 func (u user) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(u.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
-// LoginNameCondition implements [domain.UserRepository.LoginNameCondition].
+// LoginNameCondition implements [domain.UserRepository].
 func (u user) LoginNameCondition(op database.TextOperation, loginName string) database.Condition {
 	panic("unimplemented")
 }
 
-// OrganizationIDCondition implements [domain.UserRepository.OrganizationIDCondition].
+// OrganizationIDCondition implements [domain.UserRepository].
 func (u user) OrganizationIDCondition(orgID string) database.Condition {
 	return database.NewTextCondition(u.organizationIDColumn(), database.TextOperationEqual, orgID)
 }
 
-// PrimaryKeyCondition implements [domain.UserRepository.PrimaryKeyCondition].
+// PrimaryKeyCondition implements [domain.UserRepository].
 func (u user) PrimaryKeyCondition(instanceID string, userID string) database.Condition {
 	return database.And(
 		u.InstanceIDCondition(instanceID),
@@ -242,22 +242,22 @@ func (u user) PrimaryKeyCondition(instanceID string, userID string) database.Con
 	)
 }
 
-// StateCondition implements [domain.UserRepository.StateCondition].
+// StateCondition implements [domain.UserRepository].
 func (u user) StateCondition(state domain.UserState) database.Condition {
 	return database.NewNumberCondition(u.StateColumn(), database.NumberOperationEqual, state)
 }
 
-// TypeCondition implements [domain.UserRepository.TypeCondition].
+// TypeCondition implements [domain.UserRepository].
 func (u user) TypeCondition(userType domain.UserType) database.Condition {
 	return database.NewNumberCondition(u.TypeColumn(), database.NumberOperationEqual, userType)
 }
 
-// UsernameCondition implements [domain.UserRepository.UsernameCondition].
+// UsernameCondition implements [domain.UserRepository].
 func (u user) UsernameCondition(op database.TextOperation, username string) database.Condition {
 	return database.NewTextCondition(u.UsernameColumn(), op, username)
 }
 
-// ExistsMetadata implements [domain.UserRepository.ExistsMetadata].
+// ExistsMetadata implements [domain.UserRepository].
 func (u user) ExistsMetadata(condition database.Condition) database.Condition {
 	return database.Exists(
 		u.userMetadata.qualifiedTableName(),
@@ -269,7 +269,7 @@ func (u user) ExistsMetadata(condition database.Condition) database.Condition {
 	)
 }
 
-// ExistsPasskey implements [domain.HumanUserRepository.ExistsPasskey].
+// ExistsPasskey implements [domain.HumanUserRepository].
 func (u user) ExistsPasskey(condition database.Condition) database.Condition {
 	return database.Exists(
 		u.userPasskey.qualifiedTableName(),
@@ -281,7 +281,7 @@ func (u user) ExistsPasskey(condition database.Condition) database.Condition {
 	)
 }
 
-// ExistsIdentityProviderLink implements [domain.HumanUserRepository.ExistsIdentityProviderLink].
+// ExistsIdentityProviderLink implements [domain.HumanUserRepository].
 func (u user) ExistsIdentityProviderLink(condition database.Condition) database.Condition {
 	return database.Exists(
 		u.userIdentityProviderLink.qualifiedTableName(),
@@ -297,7 +297,7 @@ func (u user) ExistsIdentityProviderLink(condition database.Condition) database.
 // columns
 // -------------------------------------------------------------
 
-// PrimaryKeyColumns implements [domain.UserRepository.PrimaryKeyColumns].
+// PrimaryKeyColumns implements [domain.UserRepository].
 func (u user) PrimaryKeyColumns() []database.Column {
 	return database.Columns{
 		u.InstanceIDColumn(),
@@ -305,27 +305,27 @@ func (u user) PrimaryKeyColumns() []database.Column {
 	}
 }
 
-// CreatedAtColumn implements [domain.UserRepository.CreatedAtColumn].
+// CreatedAtColumn implements [domain.UserRepository].
 func (u user) CreatedAtColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "created_at")
 }
 
-// StateColumn implements [domain.UserRepository.StateColumn].
+// StateColumn implements [domain.UserRepository].
 func (u user) StateColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "state")
 }
 
-// TypeColumn implements [domain.UserRepository.TypeColumn].
+// TypeColumn implements [domain.UserRepository].
 func (u user) TypeColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "type")
 }
 
-// UsernameColumn implements [domain.UserRepository.UsernameColumn].
+// UsernameColumn implements [domain.UserRepository].
 func (u user) UsernameColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "username")
 }
 
-// IDColumn implements [domain.UserRepository.IDColumn].
+// IDColumn implements [domain.UserRepository].
 func (u user) IDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "id")
 }
@@ -405,12 +405,12 @@ func scanUsers(ctx context.Context, client database.QueryExecutor, builder *data
 // sub repositories
 // -------------------------------------------------------------
 
-// Human implements [domain.UserRepository.Human].
+// Human implements [domain.UserRepository].
 func (u user) Human() domain.HumanUserRepository {
 	return userHuman{user: u}
 }
 
-// Machine implements [domain.UserRepository.Machine].
+// Machine implements [domain.UserRepository].
 func (u user) Machine() domain.MachineUserRepository {
 	return userMachine{user: u}
 }

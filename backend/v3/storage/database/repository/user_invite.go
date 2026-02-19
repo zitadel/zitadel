@@ -11,26 +11,7 @@ import (
 // changes
 // -------------------------------------------------------------
 
-// // AcceptInvite implements [domain.HumanUserRepository.AcceptInvite].
-// func (u userHuman) AcceptInvite(acceptedAt time.Time) database.Change {
-// 	if acceptedAt.IsZero() {
-// 		return database.NewChanges(
-// 			database.NewChange(u.inviteAcceptedAtColumn(), database.NowInstruction),
-// 			database.NewChange(u.failedInviteAttemptsColumn(), 0),
-// 		)
-// 	}
-// 	return database.NewChanges(
-// 		database.NewChange(u.inviteAcceptedAtColumn(), acceptedAt),
-// 		database.NewChange(u.failedInviteAttemptsColumn(), 0),
-// 	)
-// }
-
-// // IncrementInviteFailedAttempts implements [domain.HumanUserRepository.IncrementInviteFailedAttempts].
-// func (u userHuman) IncrementInviteFailedAttempts() database.Change {
-// 	return database.NewIncrementColumnChange(u.failedInviteAttemptsColumn(), database.Coalesce(u.failedInviteAttemptsColumn(), 0))
-// }
-
-// SetInviteVerification implements [domain.HumanUserRepository.SetInviteVerification].
+// SetInviteVerification implements [domain.HumanUserRepository].
 func (u userHuman) SetInviteVerification(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
 	case *domain.VerificationTypeInit:

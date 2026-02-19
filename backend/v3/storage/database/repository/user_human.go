@@ -250,32 +250,32 @@ var _ domain.HumanUserRepository = (*userHuman)(nil)
 // changes
 // -------------------------------------------------------------
 
-// SetAvatarKey implements [domain.HumanUserRepository.SetAvatarKey].
+// SetAvatarKey implements [domain.HumanUserRepository].
 func (u userHuman) SetAvatarKey(avatarKey *string) database.Change {
 	return database.NewChangePtr(u.avatarKeyColumn(), avatarKey)
 }
 
-// SetDisplayName implements [domain.HumanUserRepository.SetDisplayName].
+// SetDisplayName implements [domain.HumanUserRepository].
 func (u userHuman) SetDisplayName(displayName string) database.Change {
 	return database.NewChange(u.DisplayNameColumn(), displayName)
 }
 
-// SetFirstName implements [domain.HumanUserRepository.SetFirstName].
+// SetFirstName implements [domain.HumanUserRepository].
 func (u userHuman) SetFirstName(firstName string) database.Change {
 	return database.NewChange(u.FirstNameColumn(), firstName)
 }
 
-// SetGender implements [domain.HumanUserRepository.SetGender].
+// SetGender implements [domain.HumanUserRepository].
 func (u userHuman) SetGender(gender domain.HumanGender) database.Change {
 	return database.NewChange(u.genderColumn(), gender)
 }
 
-// SetLastName implements [domain.HumanUserRepository.SetLastName].
+// SetLastName implements [domain.HumanUserRepository].
 func (u userHuman) SetLastName(lastName string) database.Change {
 	return database.NewChange(u.LastNameColumn(), lastName)
 }
 
-// SkipMultifactorInitializationAt implements [domain.HumanUserRepository.SkipMultifactorInitializationAt].
+// SkipMultifactorInitializationAt implements [domain.HumanUserRepository].
 func (u userHuman) SkipMultifactorInitializationAt(skippedAt time.Time) database.Change {
 	if skippedAt.IsZero() {
 		return u.SkipMultifactorInitialization()
@@ -283,17 +283,17 @@ func (u userHuman) SkipMultifactorInitializationAt(skippedAt time.Time) database
 	return database.NewChange(u.multifactorInitializationSkippedAtColumn(), skippedAt)
 }
 
-// SkipMultifactorInitialization implements [domain.HumanUserRepository.SkipMultifactorInitialization].
+// SkipMultifactorInitialization implements [domain.HumanUserRepository].
 func (u userHuman) SkipMultifactorInitialization() database.Change {
 	return database.NewChange(u.multifactorInitializationSkippedAtColumn(), database.NowInstruction)
 }
 
-// SetNickname implements [domain.HumanUserRepository.SetNickname].
+// SetNickname implements [domain.HumanUserRepository].
 func (u userHuman) SetNickname(nickname string) database.Change {
 	return database.NewChange(u.NicknameColumn(), nickname)
 }
 
-// SetPreferredLanguage implements [domain.HumanUserRepository.SetPreferredLanguage].
+// SetPreferredLanguage implements [domain.HumanUserRepository].
 func (u userHuman) SetPreferredLanguage(preferredLanguage language.Tag) database.Change {
 	if preferredLanguage == language.Und {
 		return database.NewChangeToNull(u.preferredLanguageColumn())
@@ -301,7 +301,7 @@ func (u userHuman) SetPreferredLanguage(preferredLanguage language.Tag) database
 	return database.NewChange(u.preferredLanguageColumn(), preferredLanguage.String())
 }
 
-// SetVerification implements [domain.HumanUserRepository.SetVerification].
+// SetVerification implements [domain.HumanUserRepository].
 func (u userHuman) SetVerification(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
 	case *domain.VerificationTypeInit:
@@ -384,27 +384,27 @@ func (u userHuman) SetVerification(verification domain.VerificationType) databas
 // conditions
 // -------------------------------------------------------------
 
-// DisplayNameCondition implements [domain.HumanUserRepository.DisplayNameCondition].
+// DisplayNameCondition implements [domain.HumanUserRepository].
 func (u userHuman) DisplayNameCondition(op database.TextOperation, displayName string) database.Condition {
 	return database.NewTextCondition(u.DisplayNameColumn(), op, displayName)
 }
 
-// FirstNameCondition implements [domain.HumanUserRepository.FirstNameCondition].
+// FirstNameCondition implements [domain.HumanUserRepository].
 func (u userHuman) FirstNameCondition(op database.TextOperation, firstName string) database.Condition {
 	return database.NewTextCondition(u.FirstNameColumn(), op, firstName)
 }
 
-// LastNameCondition implements [domain.HumanUserRepository.LastNameCondition].
+// LastNameCondition implements [domain.HumanUserRepository].
 func (u userHuman) LastNameCondition(op database.TextOperation, lastName string) database.Condition {
 	return database.NewTextCondition(u.LastNameColumn(), op, lastName)
 }
 
-// NicknameCondition implements [domain.HumanUserRepository.NicknameCondition].
+// NicknameCondition implements [domain.HumanUserRepository].
 func (u userHuman) NicknameCondition(op database.TextOperation, nickname string) database.Condition {
 	return database.NewTextCondition(u.NicknameColumn(), op, nickname)
 }
 
-// PreferredLanguageCondition implements [domain.HumanUserRepository.PreferredLanguageCondition].
+// PreferredLanguageCondition implements [domain.HumanUserRepository].
 func (u userHuman) PreferredLanguageCondition(lang language.Tag) database.Condition {
 	return database.NewTextCondition(u.preferredLanguageColumn(), database.TextOperationEqual, lang.String())
 }
@@ -413,7 +413,7 @@ func (u userHuman) PreferredLanguageCondition(lang language.Tag) database.Condit
 // columns
 // -------------------------------------------------------------
 
-// DisplayNameColumn implements [domain.HumanUserRepository.DisplayNameColumn].
+// DisplayNameColumn implements [domain.HumanUserRepository].
 func (u userHuman) DisplayNameColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "display_name")
 }
@@ -426,17 +426,17 @@ func (u userHuman) avatarKeyColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "avatar_key")
 }
 
-// FirstNameColumn implements [domain.HumanUserRepository.FirstNameColumn].
+// FirstNameColumn implements [domain.HumanUserRepository].
 func (u userHuman) FirstNameColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "first_name")
 }
 
-// LastNameColumn implements [domain.HumanUserRepository.LastNameColumn].
+// LastNameColumn implements [domain.HumanUserRepository].
 func (u userHuman) LastNameColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "last_name")
 }
 
-// NicknameColumn implements [domain.HumanUserRepository.NicknameColumn].
+// NicknameColumn implements [domain.HumanUserRepository].
 func (u userHuman) NicknameColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "nickname")
 }

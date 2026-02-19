@@ -109,10 +109,6 @@ type humanConditions interface {
 	// VerifiedPhoneCondition searches for the given phone number in the verified phone number column
 	VerifiedPhoneCondition(op database.TextOperation, phone string) database.Condition
 
-	// PasswordConditions() HumanPasswordConditions
-
-	// TOTPConditions() HumanTOTPConditions
-
 	ExistsPasskey(condition database.Condition) database.Condition
 	PasskeyConditions() HumanPasskeyConditions
 	// ExistsVerification(condition database.Condition) database.Condition

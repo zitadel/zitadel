@@ -11,12 +11,12 @@ import (
 // changes
 // -------------------------------------------------------------
 
-// SetTOTPSecret implements [domain.HumanUserRepository.SetTOTPSecret].
+// SetTOTPSecret implements [domain.HumanUserRepository].
 func (u userHuman) SetTOTPSecret(secret *crypto.CryptoValue) database.Change {
 	return database.NewChange(u.totpSecretColumn(), secret)
 }
 
-// SetTOTPVerifiedAt implements [domain.HumanUserRepository.SetTOTPVerifiedAt].
+// SetTOTPVerifiedAt implements [domain.HumanUserRepository].
 func (u userHuman) SetTOTPVerifiedAt(verifiedAt time.Time) database.Change {
 	if verifiedAt.IsZero() {
 		return database.NewChange(u.totpVerifiedAtColumn(), database.NowInstruction)
@@ -24,7 +24,7 @@ func (u userHuman) SetTOTPVerifiedAt(verifiedAt time.Time) database.Change {
 	return database.NewChange(u.totpVerifiedAtColumn(), verifiedAt)
 }
 
-// RemoveTOTP implements [domain.HumanUserRepository.RemoveTOTP].
+// RemoveTOTP implements [domain.HumanUserRepository].
 func (u userHuman) RemoveTOTP() database.Change {
 	return database.NewChanges(
 		database.NewChangeToNull(u.totpSecretColumn()),
@@ -33,7 +33,7 @@ func (u userHuman) RemoveTOTP() database.Change {
 	)
 }
 
-// SetLastSuccessfulTOTPCheck implements [domain.HumanUserRepository.SetLastSuccessfulTOTPCheck].
+// SetLastSuccessfulTOTPCheck implements [domain.HumanUserRepository].
 func (u userHuman) SetLastSuccessfulTOTPCheck(checkedAt time.Time) database.Change {
 	if checkedAt.IsZero() {
 		return database.NewChanges(
@@ -47,12 +47,12 @@ func (u userHuman) SetLastSuccessfulTOTPCheck(checkedAt time.Time) database.Chan
 	)
 }
 
-// IncrementTOTPFailedAttempts implements [domain.HumanUserRepository.IncrementTOTPFailedAttempts].
+// IncrementTOTPFailedAttempts implements [domain.HumanUserRepository].
 func (u userHuman) IncrementTOTPFailedAttempts() database.Change {
 	return database.NewIncrementColumnChange(u.totpFailedAttemptsColumn(), database.Coalesce(u.totpFailedAttemptsColumn(), 0))
 }
 
-// ResetTOTPFailedAttempts implements [domain.HumanUserRepository.ResetTOTPFailedAttempts].
+// ResetTOTPFailedAttempts implements [domain.HumanUserRepository].
 func (u userHuman) ResetTOTPFailedAttempts() database.Change {
 	return database.NewChange(u.totpFailedAttemptsColumn(), 0)
 }

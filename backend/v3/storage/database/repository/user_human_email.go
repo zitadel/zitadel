@@ -20,7 +20,7 @@ func (u userHuman) SetUnverifiedEmail(email string) database.Change {
 	return database.NewChange(u.unverifiedEmailColumn(), email)
 }
 
-// SetEmailVerification implements [domain.HumanUserRepository.SetEmailVerification].
+// SetEmailVerification implements [domain.HumanUserRepository].
 func (u userHuman) SetEmailVerification(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
 	case *domain.VerificationTypeInit:
@@ -43,17 +43,17 @@ func (u userHuman) SetEmailVerification(verification domain.VerificationType) da
 	panic(fmt.Sprintf("type not allowed for email verification change %T", verification))
 }
 
-// EnableEmailOTPAt implements [domain.HumanUserRepository.EnableEmailOTPAt].
+// EnableEmailOTPAt implements [domain.HumanUserRepository].
 func (u userHuman) EnableEmailOTPAt(enabledAt time.Time) database.Change {
 	return database.NewChange(u.emailOTPEnabledAtColumn(), enabledAt)
 }
 
-// EnableEmailOTP implements [domain.HumanUserRepository.EnableEmailOTP].
+// EnableEmailOTP implements [domain.HumanUserRepository].
 func (u userHuman) EnableEmailOTP() database.Change {
 	return database.NewChange(u.emailOTPEnabledAtColumn(), database.NowInstruction)
 }
 
-// DisableEmailOTP implements [domain.HumanUserRepository.DisableEmailOTP].
+// DisableEmailOTP implements [domain.HumanUserRepository].
 func (u userHuman) DisableEmailOTP() database.Change {
 	return database.NewChangeToNull(u.emailOTPEnabledAtColumn())
 }
@@ -83,7 +83,7 @@ func (u userHuman) ResetEmailOTPFailedAttempts() database.Change {
 // conditions
 // -------------------------------------------------------------
 
-// EmailCondition implements [domain.HumanUserRepository.EmailCondition].
+// EmailCondition implements [domain.HumanUserRepository].
 func (u userHuman) EmailCondition(op database.TextOperation, email string) database.Condition {
 	return database.Or(u.VerifiedEmailCondition(op, email), u.UnverifiedEmailCondition(op, email))
 }
@@ -102,7 +102,7 @@ func (u userHuman) VerifiedEmailCondition(op database.TextOperation, email strin
 // columns
 // -------------------------------------------------------------
 
-// EmailColumn implements [domain.HumanUserRepository.EmailColumn].
+// EmailColumn implements [domain.HumanUserRepository].
 func (u userHuman) EmailColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "email")
 }

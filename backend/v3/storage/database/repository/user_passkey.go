@@ -21,7 +21,7 @@ func (u userPasskey) qualifiedTableName() string {
 // changes
 // -------------------------------------------------------------
 
-// AddPasskey implements [domain.HumanUserRepository.AddPasskey].
+// AddPasskey implements [domain.HumanUserRepository].
 func (u userPasskey) AddPasskey(passkey *domain.Passkey) database.Change {
 	var (
 		createdAt  any = database.NowInstruction
@@ -86,7 +86,7 @@ func (u userPasskey) AddPasskey(passkey *domain.Passkey) database.Change {
 	)
 }
 
-// RemovePasskey implements [domain.HumanUserRepository.RemovePasskey].
+// RemovePasskey implements [domain.HumanUserRepository].
 func (u userPasskey) RemovePasskey(condition database.Condition) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
@@ -104,7 +104,7 @@ func (u userPasskey) RemovePasskey(condition database.Condition) database.Change
 	)
 }
 
-// UpdatePasskey implements [domain.HumanUserRepository.UpdatePasskey].
+// UpdatePasskey implements [domain.HumanUserRepository].
 func (u userPasskey) UpdatePasskey(condition database.Condition, changes ...database.Change) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
@@ -124,42 +124,42 @@ func (u userPasskey) UpdatePasskey(condition database.Condition, changes ...data
 	)
 }
 
-// SetPasskeyAttestationType implements [domain.HumanUserRepository.SetPasskeyAttestationType].
+// SetPasskeyAttestationType implements [domain.HumanUserRepository].
 func (u userPasskey) SetPasskeyAttestationType(attestationType string) database.Change {
 	return database.NewChange(u.attestationTypeColumn(), attestationType)
 }
 
-// SetPasskeyAuthenticatorAttestationGUID implements [domain.HumanUserRepository.SetPasskeyAuthenticatorAttestationGUID].
+// SetPasskeyAuthenticatorAttestationGUID implements [domain.HumanUserRepository].
 func (u userPasskey) SetPasskeyAuthenticatorAttestationGUID(aaguid []byte) database.Change {
 	return database.NewChange(u.authenticatorAttestationGUIDColumn(), aaguid)
 }
 
-// SetPasskeyKeyID implements [domain.HumanUserRepository.SetPasskeyKeyID].
+// SetPasskeyKeyID implements [domain.HumanUserRepository].
 func (u userPasskey) SetPasskeyKeyID(keyID []byte) database.Change {
 	return database.NewChange(u.keyIDColumn(), keyID)
 }
 
-// SetPasskeyName implements [domain.HumanUserRepository.SetPasskeyName].
+// SetPasskeyName implements [domain.HumanUserRepository].
 func (u userPasskey) SetPasskeyName(name string) database.Change {
 	return database.NewChange(u.nameColumn(), name)
 }
 
-// SetPasskeyPublicKey implements [domain.HumanUserRepository.SetPasskeyPublicKey].
+// SetPasskeyPublicKey implements [domain.HumanUserRepository].
 func (u userPasskey) SetPasskeyPublicKey(publicKey []byte) database.Change {
 	return database.NewChange(u.publicKeyColumn(), publicKey)
 }
 
-// SetPasskeySignCount implements [domain.HumanUserRepository.SetPasskeySignCount].
+// SetPasskeySignCount implements [domain.HumanUserRepository].
 func (u userPasskey) SetPasskeySignCount(signCount uint32) database.Change {
 	return database.NewChange(u.signCountColumn(), signCount)
 }
 
-// SetPasskeyUpdatedAt implements [domain.HumanUserRepository.SetPasskeyUpdatedAt].
+// SetPasskeyUpdatedAt implements [domain.HumanUserRepository].
 func (u userPasskey) SetPasskeyUpdatedAt(updatedAt time.Time) database.Change {
 	return database.NewChange(u.updatedAtColumn(), updatedAt)
 }
 
-// SetPasskeyVerifiedAt implements [domain.HumanUserRepository.SetPasskeyVerifiedAt].
+// SetPasskeyVerifiedAt implements [domain.HumanUserRepository].
 func (u userPasskey) SetPasskeyVerifiedAt(verifiedAt time.Time) database.Change {
 	verifiedAtChange := database.NewChange(u.verifiedAtColumn(), database.NowInstruction)
 	if !verifiedAt.IsZero() {
@@ -172,27 +172,27 @@ func (u userPasskey) SetPasskeyVerifiedAt(verifiedAt time.Time) database.Change 
 // conditions
 // -------------------------------------------------------------
 
-// PasskeyConditions implements [domain.HumanUserRepository.PasskeyConditions].
+// PasskeyConditions implements [domain.HumanUserRepository].
 func (u userPasskey) PasskeyConditions() domain.HumanPasskeyConditions {
 	return u
 }
 
-// ChallengeCondition implements [domain.HumanPasskeyConditions.ChallengeCondition].
+// ChallengeCondition implements [domain.HumanPasskeyConditions].
 func (u userPasskey) ChallengeCondition(challenge []byte) database.Condition {
 	return database.NewBytesCondition[[]byte](database.SHA256Column(u.challengeColumn()), database.BytesOperationEqual, database.SHA256Value(challenge))
 }
 
-// IDCondition implements [domain.HumanPasskeyConditions.IDCondition].
+// IDCondition implements [domain.HumanPasskeyConditions].
 func (u userPasskey) IDCondition(passkeyID string) database.Condition {
 	return database.NewTextCondition(u.tokenIDColumn(), database.TextOperationEqual, passkeyID)
 }
 
-// KeyIDCondition implements [domain.HumanPasskeyConditions.KeyIDCondition].
+// KeyIDCondition implements [domain.HumanPasskeyConditions].
 func (u userPasskey) KeyIDCondition(keyID string) database.Condition {
 	return database.NewTextCondition(u.keyIDColumn(), database.TextOperationEqual, keyID)
 }
 
-// TypeCondition implements [domain.HumanPasskeyConditions.TypeCondition].
+// TypeCondition implements [domain.HumanPasskeyConditions].
 func (u userPasskey) TypeCondition(passkeyType domain.PasskeyType) database.Condition {
 	return database.NewTextCondition(u.typeColumn(), database.TextOperationEqual, passkeyType.String())
 }
