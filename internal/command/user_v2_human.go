@@ -142,6 +142,10 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			return err
 		}
 	}
+	err = c.checkOrgExists(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
 	// only check if user is already existing
 	existingHuman, err := c.userExistsWriteModel(
 		ctx,
