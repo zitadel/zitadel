@@ -5,10 +5,8 @@ import axios from "axios";
 import dotenv from "dotenv";
 import { request } from "gaxios";
 import path from "path";
-import { fileURLToPath } from "url";
 import { OtpType, userProps } from "./user";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
 
 export async function addUser(props: userProps) {
