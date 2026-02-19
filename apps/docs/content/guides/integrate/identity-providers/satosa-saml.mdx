@@ -15,9 +15,9 @@ import TestSetup from './_test_setup.mdx';
 
 ## Overview
 
-Integrating with a federation containing dozens or hundreds of IDPs can be a challenge as it would require you to declare a new IDP in Zitadel for each member of the federation. On top of this, most federations require you to provide a single Service Provider identity (EntityID) to identify your service in their system.
+Integrating with a federation containing dozens or hundreds of IDPs can be a challenge as it would require you to declare a new IDP in ZITADEL for each member of the federation. On top of this, most federations require you to provide a single Service Provider identity (EntityID) to identify your service in their system.
 
-To solve this, you can use SATOSA to declare a single instance-wide IDP in Zitadel and enable it for everyone or on a per-organization basis.
+To solve this, you can use SATOSA to declare a single instance-wide IDP in ZITADEL and enable it for everyone or on a per-organization basis.
 
 [SATOSA](https://github.com/IdentityPython/SATOSA) is a configurable proxy for translating between different authentication protocols. In this guide, we will use SATOSA to bridge **ZITADEL** (acting as a Service Provider) with the **SWITCHaai Federation** (acting as the Identity Provider via a Discovery Service). The instructions below can be used to integrate with most federations with minor changes (mainly endpoint URLs and SAML attribute mappings).
 
@@ -28,7 +28,7 @@ The architecture looks like this:
 - **SATOSA**: `https://satosa.example.com`
 - **Federation**: `switch.ch` (SWITCHaai)
 
-This way, from Zitadel's point of view we have a single IDP and from the federation's point of view only a single SP.
+This way, from ZITADEL's point of view we have a single IDP and from the federation's point of view only a single SP.
 
 ## SATOSA Configuration
 
@@ -38,7 +38,8 @@ For this example we will deploy SATOSA using Docker Compose. We need to generate
 
 1.  A server with Docker and Docker Compose installed.
 2.  DNS records configured for `satosa.example.com`.
-3.  Access to the [SWITCHaai Resource Registry](https://rr.aai.switch.ch/) (or your target federation's registry) to register the SATOSA Service Provider.
+3.  A Reverse proxy with TLS termination.
+4.  Access to the [SWITCHaai Resource Registry](https://rr.aai.switch.ch/) (or your target federation's registry) to register the SATOSA Service Provider.
 
 Most federations have a test environment to freely test your integration before officially submitting your registration as a Service Provider. Adjust URLs accordingly.
 
@@ -154,7 +155,7 @@ config:
   entityid_endpoint: true
 
   sp_config:
-    name: "Zitadel Satosa Bridge"
+    name: "ZITADEL SATOSA Bridge"
     # This entityID is what we register with SWITCHaai, here it will be "https://satosa.example.com/switch"
     # You can change to anything you want as long as it's uniquely identifying you within the federation
     entityid: "<base_url>/<name>"
@@ -258,8 +259,11 @@ Create `docker-compose.yaml`. Replace the `STATE_ENCRYPTION_KEY` with a random s
 ```yaml
 services:
   satosa:
-    image: satosa/satosa:latest
+    image: satosa/satosa:8.5.1-alpine3.22
     container_name: satosa
+    # We assume a reverse proxy with TLS termination is sitting in front of SATOSA
+    ports:
+      - "8000:8000"
     environment:
       # General
       SATOSA_BIND_ADDRESS: 0.0.0.0
@@ -273,8 +277,8 @@ services:
       SWITCH_METADATA_URL: "https://metadata.aai.switch.ch/metadata.switchaai+idp.xml"
 
       # ZITADEL Config
-      # This URL comes from your ZITADEL Instance (see next section), we pre-fill it here.
-      ZITADEL_METADATA_URL: "https://zitadel.example.com/saml/v2/metadata"
+      # This URL comes from your ZITADEL SAML IdP configuration (see next section).
+      ZITADEL_METADATA_URL: "https://zitadel.example.com/idps/<id>/saml/metadata"
 
     volumes:
       - ./config/proxy_conf.yaml:/etc/satosa/proxy_conf.yaml
