@@ -62,12 +62,8 @@ func Test_humanUser_create(t *testing.T) {
 						Human: &domain.HumanUser{
 							FirstName: firstName,
 							LastName:  lastName,
-							Password: domain.HumanPassword{
-								Hash:             password,
-								IsChangeRequired: true,
-							},
 							Email: domain.HumanEmail{
-								Address: email,
+								UnverifiedAddress: email,
 							},
 						},
 					},
@@ -85,13 +81,7 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Email: domain.HumanEmail{
-								Address:    email,
-								VerifiedAt: createdAt,
-							},
-							Password: domain.HumanPassword{
-								Hash:             password,
-								IsChangeRequired: true,
-								ChangedAt:        createdAt,
+								UnverifiedAddress: email,
 							},
 						},
 					},
@@ -153,8 +143,9 @@ func Test_humanUser_create(t *testing.T) {
 							AvatarKey:                          "http://localhost:8080/my/profile/picture",
 							MultifactorInitializationSkippedAt: createdAt,
 							Email: domain.HumanEmail{
-								Address:    email,
-								VerifiedAt: createdAt,
+								Address:           email,
+								UnverifiedAddress: email,
+								VerifiedAt:        createdAt,
 							},
 							Password: domain.HumanPassword{
 								Hash:             password,
@@ -393,8 +384,9 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Email: domain.HumanEmail{
-								Address:    email,
-								VerifiedAt: createdAt,
+								Address:           email,
+								UnverifiedAddress: email,
+								VerifiedAt:        createdAt,
 							},
 							Password: domain.HumanPassword{
 								Hash:             password,
@@ -467,8 +459,9 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Email: domain.HumanEmail{
-								Address:    email,
-								VerifiedAt: createdAt,
+								Address:           email,
+								UnverifiedAddress: email,
+								VerifiedAt:        createdAt,
 							},
 							Password: domain.HumanPassword{
 								Hash:             password,
@@ -533,8 +526,9 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Email: domain.HumanEmail{
-								Address:    email,
-								VerifiedAt: createdAt,
+								Address:           email,
+								UnverifiedAddress: email,
+								VerifiedAt:        createdAt,
 							},
 							Password: domain.HumanPassword{
 								Hash:             password,
@@ -588,8 +582,6 @@ func Test_humanUser_create(t *testing.T) {
 					t.Log("rollback savepoint failed", err)
 				}
 			})
-			// savepoint := tx
-			// var err error
 
 			err = userRepo.Create(t.Context(), savepoint, tt.args.user)
 			require.ErrorIs(t, err, tt.want.err)

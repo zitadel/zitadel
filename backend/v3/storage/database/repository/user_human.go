@@ -203,7 +203,7 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 	}
 
 	for i, metadata := range user.Metadata {
-		ctes[fmt.Sprintf("metadata_%d", i)] = u.AddMetadata(metadata).(database.CTEChange)
+		ctes[fmt.Sprintf("metadata_%d", i)] = u.SetMetadata(metadata).(database.CTEChange)
 	}
 
 	// write CTE changes

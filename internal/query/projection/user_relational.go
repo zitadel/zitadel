@@ -1366,7 +1366,7 @@ func (p *userRelationalProjection) reduceMetadataSet(event eventstore.Event) (*h
 		repo := repository.UserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.AddMetadata(&domain.Metadata{
+			repo.SetMetadata(&domain.Metadata{
 				Key:       e.Key,
 				Value:     e.Value,
 				CreatedAt: e.CreationDate(),

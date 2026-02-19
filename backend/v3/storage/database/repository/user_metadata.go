@@ -9,8 +9,20 @@ import (
 
 type userMetadata struct{}
 
-// AddMetadata implements [domain.UserRepository].
-func (u userMetadata) AddMetadata(metadata ...*domain.Metadata) database.Change {
+func (userMetadata) qualifiedTableName() string {
+	return "zitadel.user_metadata"
+}
+
+func (userMetadata) unqualifiedTableName() string {
+	return "user_metadata"
+}
+
+// -------------------------------------------------------------
+// changes
+// -------------------------------------------------------------
+
+// SetMetadata implements [domain.UserRepository].
+func (u userMetadata) SetMetadata(metadata ...*domain.Metadata) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
 			builder.WriteString("INSERT INTO zitadel.user_metadata(instance_id, user_id, key, value, created_at, updated_at)")
@@ -52,18 +64,6 @@ func (u userMetadata) AddMetadata(metadata ...*domain.Metadata) database.Change 
 	)
 }
 
-func (userMetadata) qualifiedTableName() string {
-	return "zitadel.user_metadata"
-}
-
-func (userMetadata) unqualifiedTableName() string {
-	return "user_metadata"
-}
-
-// -------------------------------------------------------------
-// conditions
-// -------------------------------------------------------------
-
 // RemoveMetadata implements [domain.UserRepository].
 func (u userMetadata) RemoveMetadata(condition database.Condition) database.Change {
 	return database.NewCTEChange(
@@ -79,6 +79,10 @@ func (u userMetadata) RemoveMetadata(condition database.Condition) database.Chan
 		nil,
 	)
 }
+
+// -------------------------------------------------------------
+// conditions
+// -------------------------------------------------------------
 
 func (u userMetadata) MetadataConditions() domain.UserMetadataConditions {
 	return u

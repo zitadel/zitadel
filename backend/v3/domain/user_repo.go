@@ -56,8 +56,8 @@ type userChanges interface {
 	// SetUpdatedAt sets the updated at field
 	// This is used to replay events
 	SetUpdatedAt(updatedAt time.Time) database.Change
-	// AddMetadata adds metadata for the user
-	AddMetadata(metadata ...*Metadata) database.Change
+	// SetMetadata adds metadata for the user
+	SetMetadata(metadata ...*Metadata) database.Change
 	// RemoveMetadata removes the metadata for the user
 	// Use one of the following conditions to specify which metadata to remove:
 	//  - [userMetadataConditions.MetadataKeyCondition]

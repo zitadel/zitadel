@@ -768,7 +768,7 @@ func Test_user_ListConditions(t *testing.T) {
 			name: "by metadata key",
 			setup: func(t *testing.T, tx database.Transaction) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
-					userRepo.AddMetadata(
+					userRepo.SetMetadata(
 						&domain.Metadata{
 							InstanceID: instanceID1,
 							Key:        "key1",
@@ -783,7 +783,7 @@ func Test_user_ListConditions(t *testing.T) {
 				)
 				require.NoError(t, err)
 				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
-					userRepo.AddMetadata(
+					userRepo.SetMetadata(
 						&domain.Metadata{
 							InstanceID: instanceID1,
 							Key:        "key2",
@@ -810,7 +810,7 @@ func Test_user_ListConditions(t *testing.T) {
 			name: "by metadata value",
 			setup: func(t *testing.T, tx database.Transaction) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
-					userRepo.AddMetadata(
+					userRepo.SetMetadata(
 						&domain.Metadata{
 							InstanceID: instanceID1,
 							Key:        "key1",
@@ -825,7 +825,7 @@ func Test_user_ListConditions(t *testing.T) {
 				)
 				require.NoError(t, err)
 				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
-					userRepo.AddMetadata(
+					userRepo.SetMetadata(
 						&domain.Metadata{
 							InstanceID: instanceID1,
 							Key:        "key2",
@@ -835,7 +835,7 @@ func Test_user_ListConditions(t *testing.T) {
 				)
 				require.NoError(t, err)
 				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID2, "h3"),
-					userRepo.AddMetadata(
+					userRepo.SetMetadata(
 						&domain.Metadata{
 							InstanceID: instanceID2,
 							Key:        "key2",
@@ -862,7 +862,7 @@ func Test_user_ListConditions(t *testing.T) {
 			name: "by metadata key and value",
 			setup: func(t *testing.T, tx database.Transaction) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
-					userRepo.AddMetadata(
+					userRepo.SetMetadata(
 						&domain.Metadata{
 							InstanceID: instanceID1,
 							Key:        "key1",
@@ -877,7 +877,7 @@ func Test_user_ListConditions(t *testing.T) {
 				)
 				require.NoError(t, err)
 				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h2"),
-					userRepo.AddMetadata(
+					userRepo.SetMetadata(
 						&domain.Metadata{
 							InstanceID: instanceID1,
 							Key:        "key2",
@@ -887,7 +887,7 @@ func Test_user_ListConditions(t *testing.T) {
 				)
 				require.NoError(t, err)
 				_, err = userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID2, "h3"),
-					userRepo.AddMetadata(
+					userRepo.SetMetadata(
 						&domain.Metadata{
 							InstanceID: instanceID2,
 							Key:        "key1",
@@ -1740,7 +1740,7 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: machineCondition,
 				changes: []database.Change{
-					userRepo.AddMetadata(
+					userRepo.SetMetadata(
 						&domain.Metadata{
 							InstanceID: instanceID,
 							Key:        "key1",
@@ -1775,7 +1775,7 @@ func Test_user_Update(t *testing.T) {
 			name: "remove metadata",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := userRepo.Update(t.Context(), tx, machineCondition,
-					userRepo.AddMetadata(&domain.Metadata{
+					userRepo.SetMetadata(&domain.Metadata{
 						InstanceID: instanceID,
 						Key:        "key1",
 						Value:      []byte("value"),

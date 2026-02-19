@@ -38,6 +38,12 @@ BEGIN
         WHERE instance_id = NEW.instance_id
         AND id = OLD.phone_verification_id;
     END IF;
+    
+    IF (NEW.invite_verification_id IS DISTINCT FROM OLD.invite_verification_id) THEN
+        DELETE FROM zitadel.verifications
+        WHERE instance_id = NEW.instance_id
+        AND id = OLD.invite_verification_id;
+    END IF;
 
     RETURN NEW;
 END;
