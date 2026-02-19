@@ -222,7 +222,7 @@ Errors:
     DomainVerificationHTTPNotFound: "A kihívást tartalmazó fájl nem található a várt URL-en. Ellenőrizd, hogy feltöltötted-e a fájlt a megfelelő helyre olvasási jogosultsággal"
     DomainVerificationHTTPNoMatch: "A kihívást tartalmazó fájl megtalálható a várt URL-en, de nem tartalmazza a megfelelő token szöveget. Ellenőrizd a tartalmát"
     DomainVerificationTimeout: "Időtúllépés történt a DNS szerver lekérdezésekor"
-    PrimaryDomainNotDeletable: "Az elsődleges domain nem törölhető"
+    PrimaryDomainNotDeletable: "A szervezeti domain nem törölhető"
     DomainNotFound: "A domain nem található"
     MemberIDMissing: "A tagazonosító hiányzik"
     MemberNotFound: "A szervezeti tag nem található"
@@ -896,7 +896,7 @@ EventTypes:
       verified: "Domain ellenőrizve"
       removed: "Domain eltávolítva"
       primary:
-        set: "Elsődleges domain beállítva"
+        set: "Szervezeti domain beállítva"
       reserved: "Domain lefoglalva"
       released: "Domain feloldva"
     name:

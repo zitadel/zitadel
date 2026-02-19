@@ -222,7 +222,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Het bestand met de uitdaging is niet gevonden op de verwachte URL. Controleer of u het bestand op de juiste plaats heeft geüpload met leesrechten"
     DomainVerificationHTTPNoMatch: "Het bestand met de uitdaging is gevonden op de verwachte URL, maar het bevat niet de juiste token-tekst. Controleer de inhoud"
     DomainVerificationTimeout: "Er was een time-out bij het opvragen van de DNS-server"
-    PrimaryDomainNotDeletable: "Primair domein mag niet worden verwijderd"
+    PrimaryDomainNotDeletable: "Het organisatiedomein mag niet worden verwijderd"
     DomainNotFound: "Domein niet gevonden"
     MemberIDMissing: "Lid ID ontbreekt"
     MemberNotFound: "Organisatielid niet gevonden"
@@ -897,7 +897,7 @@ EventTypes:
       verified: "Domein geverifieerd"
       removed: "Domein verwijderd"
       primary:
-        set: "Primair domein ingesteld"
+        set: "Organisatiedomein ingesteld"
       reserved: "Domein gereserveerd"
       released: "Domein vrijgegeven"
     name:
