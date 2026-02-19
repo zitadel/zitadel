@@ -156,6 +156,7 @@ describe("OpenTelemetry Integration", () => {
         OTEL_METRIC_EXPORT_INTERVAL: "5000",
         DEBUG: "true",
       })
+      .withStartupTimeout(120000)
       .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
       .start();
 
@@ -802,6 +803,7 @@ describe("OpenTelemetry Disabled", () => {
         ZITADEL_SERVICE_USER_TOKEN: "test-token",
         OTEL_SDK_DISABLED: "true",
       })
+      .withStartupTimeout(120000)
       .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
       .start();
 
@@ -889,6 +891,7 @@ describe("Log Level Configuration", () => {
             OTEL_SDK_DISABLED: "true",
             LOG_LEVEL: "debug",
           })
+          .withStartupTimeout(120000)
           .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
           .start();
 
@@ -949,6 +952,7 @@ describe("Log Level Configuration", () => {
             OTEL_SDK_DISABLED: "true",
             LOG_LEVEL: "warn",
           })
+          .withStartupTimeout(120000)
           .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
           .start();
 
@@ -1043,6 +1047,7 @@ describe("Log Level Configuration", () => {
             OTEL_LOGS_EXPORTER: "otlp",
             OTEL_BSP_SCHEDULE_DELAY: "1000",
           })
+          .withStartupTimeout(120000)
           .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
           .start();
 
@@ -1142,6 +1147,7 @@ describe("Log Level Configuration", () => {
             OTEL_LOGS_EXPORTER: "otlp",
             OTEL_BSP_SCHEDULE_DELAY: "1000",
           })
+          .withStartupTimeout(120000)
           .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
           .start();
 

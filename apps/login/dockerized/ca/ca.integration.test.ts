@@ -124,6 +124,7 @@ describe("Custom CA Certificate Integration", () => {
             target: "/etc/ssl/certs/custom-ca.crt",
           },
         ])
+        .withStartupTimeout(120000)
         .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
         .start();
 
@@ -198,6 +199,7 @@ describe("Custom CA Certificate Integration", () => {
           ZITADEL_API_URL: "https://mock-zitadel",
           ZITADEL_SERVICE_USER_TOKEN: "test-token",
         })
+        .withStartupTimeout(120000)
         .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
         .start();
 
