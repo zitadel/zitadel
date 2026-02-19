@@ -176,7 +176,7 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.UserDeactivatedType,
-					Reduce: p.reduceUserDeactivated,
+					Reduce: p.reduceUserStateNotActive,
 				},
 			},
 		},
@@ -185,7 +185,16 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.UserRemovedType,
-					Reduce: p.reduceUserRemoved,
+					Reduce: p.reduceUserStateNotActive,
+				},
+			},
+		},
+		{
+			Aggregate: user.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  user.UserLockedType,
+					Reduce: p.reduceUserStateNotActive,
 				},
 			},
 		},
@@ -484,30 +493,19 @@ func (p *sessionProjection) reducePasswordChanged(event eventstore.Event) (*hand
 	), nil
 }
 
-func (p *sessionProjection) reduceUserDeactivated(event eventstore.Event) (*handler.Statement, error) {
-	e, err := assertEvent[*user.UserDeactivatedEvent](event)
-	if err != nil {
-		return nil, err
+func (p *sessionProjection) reduceUserStateNotActive(event eventstore.Event) (_ *handler.Statement, err error) {
+	switch event.(type) {
+	case *user.UserDeactivatedEvent, *user.UserRemovedEvent, *user.UserLockedEvent:
+		// ok
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-7zALpR", "reduce.wrong.event.type %v", []eventstore.EventType{user.UserDeactivatedType, user.UserRemovedType, user.UserLockedType})
 	}
-	return handler.NewDeleteStatement(
-		e,
-		[]handler.Condition{
-			handler.NewCond(SessionColumnUserID, e.Aggregate().ID),
-			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
-		},
-	), nil
-}
 
-func (p *sessionProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, err := assertEvent[*user.UserRemovedEvent](event)
-	if err != nil {
-		return nil, err
-	}
 	return handler.NewDeleteStatement(
-		e,
+		event,
 		[]handler.Condition{
-			handler.NewCond(SessionColumnUserID, e.Aggregate().ID),
-			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(SessionColumnUserID, event.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
