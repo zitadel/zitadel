@@ -125,11 +125,22 @@ type projection interface {
 }
 
 var (
-	projections             []projection
-	fields                  []*handler.FieldHandler
-	relationalTableCreation sync.Once
-	projectionCreation      sync.Once
+	projections   []projection
+	projectionsMu sync.Mutex
+	fields        []*handler.FieldHandler
 )
+
+func setOrAppendProjection(p projection) {
+	projectionsMu.Lock()
+	defer projectionsMu.Unlock()
+
+	idx := slices.IndexFunc(projections, func(proj projection) bool { return proj.ProjectionName() == p.ProjectionName() })
+	if idx > -1 {
+		projections[idx] = p
+		return
+	}
+	projections = append(projections, p)
+}
 
 func InitRelationalTables(ctx context.Context, config Config) {
 	InstanceRelationalProjection = newInstanceRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
@@ -225,7 +236,7 @@ func initFields(projectionConfig handler.Config, customization map[string]Custom
 }
 
 // CreateAll initializes both ES projection handlers and relational table ones
-func CreateAll(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, systemUsers map[string]*internal_authz.SystemAPIUser) {
+func CreateAll(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) {
 	creationBootstrap(sqlClient, es, &config)
 
 	InitProjections(ctx, config, keyEncryptionAlgorithm, certEncryptionAlgorithm)
@@ -233,8 +244,8 @@ func CreateAll(ctx context.Context, sqlClient *database.DB, es handler.EventStor
 
 	InitRelationalTables(ctx, config)
 
-	projectionCreation.Do(newProjectionsList)
-	relationalTableCreation.Do(newRelationalTablesList)
+	newProjectionsList()
+	newRelationalTablesList()
 	newFieldsList()
 }
 
@@ -263,7 +274,7 @@ func creationBootstrap(sqlClient *database.DB, es handler.EventStore, config *Co
 func CreateRelational(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config) {
 	creationBootstrap(sqlClient, es, &config)
 	InitRelationalTables(ctx, config)
-	relationalTableCreation.Do(newRelationalTablesList)
+	newRelationalTablesList()
 }
 
 func Projections() []projection {
@@ -446,16 +457,9 @@ func newProjectionsList() {
 		GroupUsersProjection,
 	}
 
-	if len(projections) == 0 {
-		projections = projectionList
-		return
+	for _, p := range projectionList {
+		setOrAppendProjection(p)
 	}
-	for _, toAdd := range projectionList {
-		if slices.ContainsFunc(projections, func(p projection) bool { return p.ProjectionName() == toAdd.ProjectionName() }) {
-			return
-		}
-	}
-	projections = append(projections, projectionList...)
 }
 
 // newRelationalTablesList adds to the projections singleton the relational tables
@@ -476,14 +480,8 @@ func newRelationalTablesList() {
 		// TODO(adlerhurst): Uncomment once users table is created and FK can be enforced
 		// IDPIntentRelationalProjection,
 	}
-	if len(projections) == 0 {
-		projections = relTables
-		return
+
+	for _, p := range relTables {
+		setOrAppendProjection(p)
 	}
-	for _, toAdd := range relTables {
-		if slices.ContainsFunc(projections, func(p projection) bool { return p.ProjectionName() == toAdd.ProjectionName() }) {
-			return
-		}
-	}
-	projections = append(projections, relTables...)
 }

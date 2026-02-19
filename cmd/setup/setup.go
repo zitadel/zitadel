@@ -255,7 +255,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
 	logging.OnError(ctx, err).Fatal("unable to ensure encryption keys")
 
-	projection.CreateAll(ctx, dbClient, eventstoreClient, config.Projections, keys.OIDC, keys.SAML, nil)
+	projection.CreateAll(ctx, dbClient, eventstoreClient, config.Projections, keys.OIDC, keys.SAML)
 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
@@ -475,7 +475,6 @@ func startCommandsQueries(
 		},
 		keys.OIDC,
 		keys.SAML,
-		config.SystemAPIUsers,
 	)
 
 	staticStorage, err := config.AssetStorage.NewStorage(dbClient.DB)
