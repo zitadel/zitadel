@@ -6,9 +6,6 @@ RUN addgroup --system --gid 1001 nodejs && \
 RUN mkdir -p /.env-file && touch /.env-file/.env && chown -R nextjs:nodejs /.env-file
 
 COPY --chown=nextjs:nodejs .next/standalone ./
-COPY --chown=nextjs:nodejs scripts/entrypoint.sh /app/entrypoint.sh
-COPY --chown=nextjs:nodejs scripts/healthcheck.js /app/healthcheck.js
-RUN chmod +x /app/entrypoint.sh
 
 USER nextjs
 ENV HOSTNAME="::" \
