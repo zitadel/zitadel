@@ -123,7 +123,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "with id, already exists, precondition error",
+			name: "with id, already exists, already exists error",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -152,7 +152,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting"))
+					return errors.Is(err, zerrors.ThrowAlreadyExists(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting"))
 				},
 			},
 		},
