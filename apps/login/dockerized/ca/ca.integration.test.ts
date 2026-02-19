@@ -93,12 +93,9 @@ describe("Custom CA Certificate Integration", () => {
       .withWaitStrategy(Wait.forLogMessage("Mock TLS server listening"))
       .start();
 
-    // The OTEL tests run before CA tests and build the same image.
-    // This build call will reuse cached layers, making it fast.
     await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
   }, 180000);
 
-  // Cleanup is handled by testcontainers' Ryuk
 
   describe("when custom CA certificate is provided", () => {
     let container: StartedTestContainer;
@@ -138,8 +135,7 @@ describe("Custom CA Certificate Integration", () => {
       }
     });
 
-    // Cleanup is handled by testcontainers' Ryuk
-
+  
     it("connects to mock server over TLS", () => {
       const requests = readCapturedRequests();
       expect(requests.length).toBeGreaterThan(0);
@@ -209,8 +205,7 @@ describe("Custom CA Certificate Integration", () => {
       }
     });
 
-    // Cleanup is handled by testcontainers' Ryuk
-
+  
     it("uses system CA store by default", async () => {
       const result = await container.exec(["printenv", "SSL_CERT_FILE"]);
       expect(result.output.trim()).toBe("/etc/ssl/certs/ca-certificates.crt");
