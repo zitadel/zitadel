@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"sync"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
@@ -124,8 +125,10 @@ type projection interface {
 }
 
 var (
-	projections []projection
-	fields      []*handler.FieldHandler
+	projections             []projection
+	fields                  []*handler.FieldHandler
+	relationalTableCreation sync.Once
+	projectionCreation      sync.Once
 )
 
 func InitRelationalTables(ctx context.Context, config Config) {
@@ -230,8 +233,8 @@ func CreateAll(ctx context.Context, sqlClient *database.DB, es handler.EventStor
 
 	InitRelationalTables(ctx, config)
 
-	newProjectionsList()
-	newRelationalTablesList()
+	projectionCreation.Do(newProjectionsList)
+	relationalTableCreation.Do(newRelationalTablesList)
 	newFieldsList()
 }
 
@@ -256,11 +259,11 @@ func creationBootstrap(sqlClient *database.DB, es handler.EventStore, config *Co
 	handler.StartWorkerPool(config.MaxParallelTriggers)
 }
 
-// CreateAll initializes relational table handlers
+// CreateRelational initializes relational table handlers
 func CreateRelational(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config) {
 	creationBootstrap(sqlClient, es, &config)
 	InitRelationalTables(ctx, config)
-	newRelationalTablesList()
+	relationalTableCreation.Do(newRelationalTablesList)
 }
 
 func Projections() []projection {
