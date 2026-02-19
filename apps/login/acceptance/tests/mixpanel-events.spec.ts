@@ -109,7 +109,7 @@ const test = base.extend<{ user: PasswordUser }>({
 });
 
 test.describe("Mixpanel Events - Username Submission", () => {
-  test.only("should send username_submitted event when username is submitted", async ({ browser }) => {
+  test("should send username_submitted event when username is submitted", async ({ browser }) => {
     const { context, mixpanelRequests } = await createMixpanelTrackingContext(browser);
     const user = await ensurePasswordUser(context);
 
@@ -141,7 +141,8 @@ test.describe("Mixpanel Events - Password Submission", () => {
 
     try {
       const page = await context.newPage();
-      await page.goto("./loginname");
+      await page.goto("http://localhost:3000/ui/v2/login/loginname");
+      // await page.goto("./loginname");
       await page.waitForTimeout(2000);
 
       // Submit username
@@ -153,7 +154,7 @@ test.describe("Mixpanel Events - Password Submission", () => {
       await page.getByTestId("password-text-input").pressSequentially(user.getPassword());
       await page.getByTestId("submit-button").click();
 
-      await page.waitForTimeout(4000);
+      await page.waitForTimeout(8000);
 
       const passwordEvent = findMixpanelEvent(mixpanelRequests, "password_submitted");
       expect(passwordEvent).toBeTruthy();
@@ -174,7 +175,8 @@ test.describe("Mixpanel Events - Password Submission", () => {
 
     try {
       const page = await context.newPage();
-      await page.goto("./loginname");
+      await page.goto("http://localhost:3000/ui/v2/login/loginname");
+      // await page.goto("./loginname");
       await page.waitForTimeout(2000);
 
       // Submit username
@@ -186,7 +188,7 @@ test.describe("Mixpanel Events - Password Submission", () => {
       await page.getByTestId("password-text-input").pressSequentially("WrongPassword1!");
       await page.getByTestId("submit-button").click();
 
-      await page.waitForTimeout(4000);
+      await page.waitForTimeout(8000);
 
       const passwordEvent = findMixpanelEvent(mixpanelRequests, "password_submitted");
       expect(passwordEvent).toBeTruthy();
@@ -208,7 +210,9 @@ test.describe("Mixpanel Events - Password Reset", () => {
 
     try {
       const page = await context.newPage();
-      await page.goto("./loginname");
+      await page.goto("http://localhost:3000/ui/v2/login/loginname");
+      // await page.goto("./loginname");
+      // await page.goto("./loginname");
       await page.waitForTimeout(2000);
 
       // Submit username
@@ -219,7 +223,7 @@ test.describe("Mixpanel Events - Password Reset", () => {
       // Click reset password
       await page.getByTestId("reset-button").click();
 
-      await page.waitForTimeout(4000);
+      await page.waitForTimeout(8000);
 
       const resetEvent = findMixpanelEvent(mixpanelRequests, "password_reset_requested");
       expect(resetEvent).toBeTruthy();
@@ -238,6 +242,8 @@ test.describe("Mixpanel Events - Registration", () => {
 
     try {
       await page.goto("./register");
+      await page.goto("http://localhost:3000/ui/v2/login/register");
+      // await page.goto("./loginname");
       await page.waitForTimeout(2000);
 
       const firstname = faker.person.firstName();
@@ -266,8 +272,10 @@ test.describe("Mixpanel Events - Page View", () => {
     const page = await context.newPage();
 
     try {
-      await page.goto("./loginname");
-      await page.waitForTimeout(4000);
+      await page.goto("http://localhost:3000/ui/v2/login/loginname");
+      // await page.goto("./loginname");
+      // We need a long timeout for mixpanel sometimes
+      await page.waitForTimeout(8000);
 
       const pageViewEvent = findMixpanelEvent(mixpanelRequests, "page_view");
       expect(pageViewEvent).toBeTruthy();
@@ -297,8 +305,9 @@ test.describe("Mixpanel Events - Consent Required", () => {
     const page = await context.newPage();
 
     try {
-      await page.goto("./loginname");
-      await page.waitForTimeout(4000);
+      await page.goto("http://localhost:3000/ui/v2/login/loginname");
+
+      await page.waitForTimeout(8000);
 
       // No mixpanel requests should have been made
       expect(mixpanelRequests.length).toBe(0);
@@ -314,7 +323,7 @@ test.describe("Mixpanel Events - Language Selection", () => {
     const page = await context.newPage();
 
     try {
-      await page.goto("./loginname");
+      await page.goto("http://localhost:3000/ui/v2/login/loginname");
       await page.waitForTimeout(2000);
 
       // Open the language switcher and select a different language
