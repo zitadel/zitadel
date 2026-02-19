@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "En az {{value}} karakter uzunluğunda olmalıdır.",
       "MAXLENGTHERROR": "{{value}} karakterden az olmalıdır."
     },
-    "ID": "ID",
+    "ID": "Kullanıcı Kimliği",
     "EMAIL": "E-posta",
     "PHONE": "Telefon numarası",
     "PHONEEMPTY": "Telefon numarası tanımlanmamış",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Ad",
-      "ID": "ID",
+      "ID": "Organizasyon Kimliği",
       "CREATIONDATE": "Oluşturma Tarihi",
       "DATECHANGED": "Değiştirildi",
       "FILTER": "Filtre",
@@ -2017,7 +2017,8 @@
           "DESCRIPTION": "Projenizi gerçekten silmek istiyor musunuz?",
           "TYPENAME": "Kalıcı olarak silmek için projenin adını yazın."
         }
-      }
+      },
+      "ID": "Proje Kimliği"
     },
     "SETTINGS": {
       "TITLE": "Ayarlar",
@@ -2094,7 +2095,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Kaynak Sahibi",
       "GRANTEDORGNAME": "Organizasyon Adı",
-      "GRANTID": "Yetki Id",
+      "GRANTID": "Yetki ID",
       "CREATIONDATE": "Oluşturma Tarihi",
       "CHANGEDATE": "Son değişiklik",
       "DATES": "Tarihler",
@@ -2299,7 +2300,7 @@
     "ADD": "Kimlik Sağlayıcısı Ekle",
     "TYPE": "Tür",
     "OWNER": "Sahibi",
-    "ID": "ID",
+    "ID": "Kimlik Sağlayıcı Kimliği",
     "NAME": "Ad",
     "AUTHORIZATIONENDPOINT": "Yetkilendirme Uç Noktası",
     "TOKENENDPOINT": "Token Uç Noktası",
@@ -2524,7 +2525,7 @@
     "TOKEN": "Token Ayarları",
     "PAGES": {
       "TITLE": "Uygulama",
-      "ID": "ID",
+      "ID": "Uygulama Kimliği",
       "DESCRIPTION": "Burada uygulama verilerinizi ve yapılandırmasını düzenleyebilirsiniz.",
       "CREATE": "Uygulama oluştur",
       "CREATE_SELECT_PROJECT": "Önce projenizi seçin",
@@ -2868,5 +2869,6 @@
       "TITLE": "Aktivite",
       "DESCRIPTION": "Burada kullanıcı değişikliği oluşturan en son olayları görebilirsiniz."
     }
-  }
+  },
+  "INSTANCEID": "Instans Kimliği"
 }

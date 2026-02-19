@@ -730,6 +730,7 @@
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
     }
   },
+  "INSTANCEID": "Instance ID",
   "RESOURCEID": "Resource Id",
   "NAME": "Name",
   "VERSION": "Version",
@@ -1045,7 +1046,7 @@
       "MINLENGTHERROR": "Must be at least {{value}} characters long.",
       "MAXLENGTHERROR": "Must be less than {{value}} characters."
     },
-    "ID": "ID",
+    "ID": "User ID",
     "EMAIL": "E-mail",
     "PHONE": "Phone number",
     "PHONEEMPTY": "No phone number defined",
@@ -1375,7 +1376,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Name",
-      "ID": "ID",
+      "ID": "Organization ID",
       "CREATIONDATE": "Creation Date",
       "DATECHANGED": "Changed",
       "FILTER": "Filter",
@@ -1966,6 +1967,7 @@
   },
   "PROJECT": {
     "PAGES": {
+      "ID": "Project ID",
       "TITLE": "Project",
       "DESCRIPTION": "Here you can define applications, manage roles and grant other organizations to use your project.",
       "DELETE": "Delete Project",
@@ -2095,7 +2097,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Resource Owner",
       "GRANTEDORGNAME": "Organization Name",
-      "GRANTID": "Grant Id",
+      "GRANTID": "Grant ID",
       "CREATIONDATE": "Creation Date",
       "CHANGEDATE": "Last modified",
       "DATES": "Dates",
@@ -2300,7 +2302,7 @@
     "ADD": "Add Identity Provider",
     "TYPE": "Type",
     "OWNER": "Owner",
-    "ID": "ID",
+    "ID": "Identity Provider ID",
     "NAME": "Name",
     "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
     "TOKENENDPOINT": "Token Endpoint",
@@ -2525,7 +2527,7 @@
     "TOKEN": "Token Settings",
     "PAGES": {
       "TITLE": "Application",
-      "ID": "ID",
+      "ID": "Application ID",
       "DESCRIPTION": "Here you can edit your application data and its settings.",
       "CREATE": "Create application",
       "CREATE_SELECT_PROJECT": "Select your project first",

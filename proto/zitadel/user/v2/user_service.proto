@@ -3494,7 +3494,6 @@ message HumanMFAInitSkippedResponse {
 }
 
 message AddSecretRequest {
-  // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3521,7 +3520,6 @@ message AddSecretResponse {
 }
 
 message RemoveSecretRequest {
-  // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3540,7 +3538,6 @@ message RemoveSecretResponse {
 }
 
 message AddKeyRequest {
-  // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3583,7 +3580,6 @@ message AddKeyResponse {
 
 
 message RemoveKeyRequest {
-  // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3635,7 +3631,6 @@ message ListKeysResponse {
 }
 
 message AddPersonalAccessTokenRequest {
-  // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3675,7 +3670,6 @@ message AddPersonalAccessTokenResponse {
 }
 
 message RemovePersonalAccessTokenRequest {
-  // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
