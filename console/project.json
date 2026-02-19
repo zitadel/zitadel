@@ -28,7 +28,9 @@
         "{projectRoot}/buf.gen.yaml",
         "{projectRoot}/package.json",
         "{workspaceRoot}/pnpm-lock.yaml",
-        { "dependentTasksOutputFiles": ".artifacts/bin/*/*/protoc-gen-{js,grpc-web,openapiv2}" }
+        { "dependentTasksOutputFiles": ".artifacts/bin/*/*/protoc-gen-js" },
+        { "dependentTasksOutputFiles": ".artifacts/bin/*/*/protoc-gen-grpc-web" },
+        { "dependentTasksOutputFiles": ".artifacts/bin/*/*/protoc-gen-openapiv2" }
       ],
       "outputs": ["{projectRoot}/src/app/proto/generated"]
     },

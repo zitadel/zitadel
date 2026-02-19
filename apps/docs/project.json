@@ -80,6 +80,9 @@
         "{workspaceRoot}/proto/**/*",
         {
           "dependentTasksOutputFiles": "apps/docs/content/versions.json"
+        },
+        {
+          "dependentTasksOutputFiles": ".artifacts/bin/*/*/protoc-gen-connect-openapi"
         }
       ]
     },
