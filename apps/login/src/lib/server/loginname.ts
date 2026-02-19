@@ -493,7 +493,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
     const suffix = matched?.[1] ?? "";
 
-    // this just returns orgs where the suffix is set as primary domain
+    // this just returns orgs where the suffix is set as the Organization Domain 
     const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix });
 
     const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;

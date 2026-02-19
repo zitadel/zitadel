@@ -222,7 +222,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Le fichier contenant le défi n'a pas été trouvé dans l'URL attendue. Vérifiez que vous avez téléchargé le fichier au bon endroit avec les autorisations de lecture"
     DomainVerificationHTTPNoMatch: "Le fichier contenant le défi a été trouvé dans l'URL attendue mais il ne contient pas le bon texte de token. Vérifiez son contenu"
     DomainVerificationTimeout: "Il y a eu un délai d'attente lors de l'interrogation du serveur DNS"
-    PrimaryDomainNotDeletable: "Le domaine primaire ne doit pas être supprimé"
+    PrimaryDomainNotDeletable: "Le domaine de l'organisation ne doit pas être supprimé"
     DomainNotFound: "Domaine non trouvé"
     MemberIDMissing: "ID du membre manquant"
     MemberNotFound: "Membre de l'organisation non trouvé"
@@ -892,7 +892,7 @@ EventTypes:
       verified: "Domaine vérifié"
       removed: "Domaine supprimé"
       primary:
-        set: "Domaine primaire défini"
+        set: "Domaine de l'organisation modifié"
       reserved: "Domaine réservé"
       released: "Domaine libéré"
     name:
