@@ -122,6 +122,7 @@ export function RegisterForm({
             <TextInput
               type="firstname"
               autoComplete="firstname"
+              autoFocus
               required
               {...register("firstname", { required: t("required.firstname") })}
               label={t("labels.firstname")}
