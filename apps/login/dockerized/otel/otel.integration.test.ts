@@ -181,12 +181,7 @@ describe("OpenTelemetry Integration", () => {
     if (!metricsReady) throw new Error("Metrics file not found");
   }, DOCKER_TIMEOUT);
 
-  afterAll(async () => {
-    await loginApp?.stop();
-    await mockZitadel?.stop();
-    await otelCollector?.stop();
-    await network?.stop();
-  }, DOCKER_TIMEOUT);
+  // Cleanup is handled by testcontainers' Ryuk
 
   describe("Traces", () => {
     describe("OTLP Export", () => {
@@ -811,11 +806,7 @@ describe("OpenTelemetry Disabled", () => {
     console.log(`[OTEL DISABLED] APP_URL: ${appUrl}`);
   }, DOCKER_TIMEOUT);
 
-  afterAll(async () => {
-    await loginApp?.stop();
-    await mockZitadel?.stop();
-    await network?.stop();
-  }, DOCKER_TIMEOUT);
+  // Cleanup is handled by testcontainers' Ryuk
 
   describe("Application Health", () => {
     it("starts successfully with OTEL_SDK_DISABLED=true", async () => {
@@ -903,11 +894,7 @@ describe("Log Level Configuration", () => {
         await new Promise((r) => setTimeout(r, 1000));
       }, DOCKER_TIMEOUT);
 
-      afterAll(async () => {
-        await loginApp?.stop();
-        await mockZitadel?.stop();
-        await network?.stop();
-      }, DOCKER_TIMEOUT);
+      // Cleanup is handled by testcontainers' Ryuk
 
       it("starts successfully", async () => {
         const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
@@ -963,11 +950,7 @@ describe("Log Level Configuration", () => {
         await new Promise((r) => setTimeout(r, 1000));
       }, DOCKER_TIMEOUT);
 
-      afterAll(async () => {
-        await loginApp?.stop();
-        await mockZitadel?.stop();
-        await network?.stop();
-      }, DOCKER_TIMEOUT);
+      // Cleanup is handled by testcontainers' Ryuk
 
       it("starts successfully", async () => {
         const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
@@ -1061,12 +1044,7 @@ describe("Log Level Configuration", () => {
         await waitForFile(path.join(logOutputDir, "logs.json"), 30, 1000);
       }, DOCKER_TIMEOUT);
 
-      afterAll(async () => {
-        await loginApp?.stop();
-        await mockZitadel?.stop();
-        await otelCollector?.stop();
-        await network?.stop();
-      }, DOCKER_TIMEOUT);
+      // Cleanup is handled by testcontainers' Ryuk
 
       it("starts successfully", async () => {
         const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
@@ -1159,12 +1137,7 @@ describe("Log Level Configuration", () => {
         await new Promise((r) => setTimeout(r, 3000));
       }, DOCKER_TIMEOUT);
 
-      afterAll(async () => {
-        await loginApp?.stop();
-        await mockZitadel?.stop();
-        await otelCollector?.stop();
-        await network?.stop();
-      }, DOCKER_TIMEOUT);
+      // Cleanup is handled by testcontainers' Ryuk
 
       it("starts successfully", async () => {
         const response = await fetch(`${appUrl}/ui/v2/login/healthy`);

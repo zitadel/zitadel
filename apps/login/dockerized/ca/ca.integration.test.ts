@@ -98,10 +98,7 @@ describe("Custom CA Certificate Integration", () => {
     await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
   }, 180000);
 
-  afterAll(async () => {
-    await mockServer?.stop();
-    await network?.stop();
-  });
+  // Cleanup is handled by testcontainers' Ryuk
 
   describe("when custom CA certificate is provided", () => {
     let container: StartedTestContainer;
@@ -141,9 +138,7 @@ describe("Custom CA Certificate Integration", () => {
       }
     });
 
-    afterAll(async () => {
-      await container?.stop();
-    });
+    // Cleanup is handled by testcontainers' Ryuk
 
     it("connects to mock server over TLS", () => {
       const requests = readCapturedRequests();
@@ -214,9 +209,7 @@ describe("Custom CA Certificate Integration", () => {
       }
     });
 
-    afterAll(async () => {
-      await container?.stop();
-    });
+    // Cleanup is handled by testcontainers' Ryuk
 
     it("uses system CA store by default", async () => {
       const result = await container.exec(["printenv", "SSL_CERT_FILE"]);
