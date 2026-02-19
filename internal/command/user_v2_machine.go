@@ -11,11 +11,12 @@ import (
 )
 
 type ChangeMachine struct {
-	ID            string
-	ResourceOwner string
-	Username      *string
-	Name          *string
-	Description   *string
+	ID              string
+	ResourceOwner   string
+	Username        *string
+	Name            *string
+	Description     *string
+	AccessTokenType *domain.OIDCTokenType
 
 	// Details are set after a successful execution of the command
 	Details *domain.ObjectDetails
@@ -29,6 +30,9 @@ func (h *ChangeMachine) Changed() bool {
 		return true
 	}
 	if h.Description != nil {
+		return true
+	}
+	if h.AccessTokenType != nil {
 		return true
 	}
 	return false
@@ -63,6 +67,9 @@ func (c *Commands) ChangeUserMachine(ctx context.Context, machine *ChangeMachine
 	}
 	if machine.Description != nil && *machine.Description != existingMachine.Description {
 		machineChanges = append(machineChanges, user.ChangeDescription(*machine.Description))
+	}
+	if machine.AccessTokenType != nil && *machine.AccessTokenType != existingMachine.AccessTokenType {
+		machineChanges = append(machineChanges, user.ChangeAccessTokenType(*machine.AccessTokenType))
 	}
 	if len(machineChanges) > 0 {
 		cmds = append(cmds, user.NewMachineChangedEvent(ctx, &existingMachine.Aggregate().Aggregate, machineChanges))

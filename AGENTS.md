@@ -39,7 +39,7 @@ ZITADEL follows a strict hierarchical containment model. When generating code, l
 - **System (Installation):** The entire ZITADEL deployment. Global settings are applied through runtime configuration files or environment variables. See `cmd/defaults.yaml`.
 - **Instance (The "Identity System"):**
   - **Definition:** A logical partition/virtual tenant. It is a "System inside a System."
-  - **Isolation:** Data and configurations are strictly isolated between instances.
+  - **Isolation:** Data and settings are strictly isolated between instances.
   - **Translation Rule:** NEVER translate as "Example" or "Case." Use technical terms like "Tenant," "Environment," or the local equivalent of "Logical System Entity."
 - **Organization:** A group within an Instance. It owns Users, Projects, and Roles.
 - **Project:** A collection of Applications and Auth Policies within an Org.
@@ -89,6 +89,16 @@ Run commands from the repository root.
 - `@zitadel/login`: `dev`, `build`, `lint`, `test`, `test-unit`, `test-integration`
 - `@zitadel/docs`: `dev`, `build`, `generate`, `check-links`, `check-types`, `test`, `lint`
 - `@zitadel/console`: `dev`, `build`, `generate`, `lint`
+
+## PR Title Convention
+
+PR titles are validated by the Semantic PR app. Format:
+
+`<type>(<scope>): <short summary>`
+
+**Types**: must come from the list in [`.github/semantic.yml`](.github/semantic.yml) under `types:` — e.g. `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+
+**Scopes**: optional, but if used must come from the list in [`.github/semantic.yml`](.github/semantic.yml) under `scopes:`. When in doubt, omit the scope — do not invent values not on that list.
 
 ## Documentation
 - **Human Guide**: See `CONTRIBUTING.md` for setup and contribution details.

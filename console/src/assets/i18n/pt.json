@@ -9,7 +9,7 @@
         "DESCRIPTION": "Complete os seguintes passos para proteger sua aplicação.",
         "CREATE_PROJECT": {
           "TITLE": "Criar um projeto",
-          "DESCRIPTION": "Adicione um projeto e defina suas funções e autorizações."
+          "DESCRIPTION": "Adicione projetos e defina funções e atribuições de funções."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Um projeto hospeda um ou mais aplicativos, que você pode usar para autenticar seus usuários. Por exemplo, você pode ter um único projeto com 3 aplicativos; um para o seu frontend da web, um para o seu aplicativo móvel e um para o seu backend. Você também pode autorizar seus usuários com projetos. Para permitir que usuários de outras organizações façam login em seus aplicativos, conceda-lhes acesso ao seu projeto.<br/><br/>Se você não conseguir encontrar um projeto, entre em contato com o proprietário do projeto ou alguém com os direitos correspondentes para obter acesso.",
       "OWNED": {
         "TITLE": "Projetos Proprietários",
-        "DESCRIPTION": "Estes são os projetos que você possui. Você pode gerenciar as configurações desses projetos, autorizações e aplicativos."
+        "DESCRIPTION": "Estes são projetos que você possui. Você pode gerenciar suas configurações, atribuições de funções e aplicações."
       },
       "GRANTED": {
         "TITLE": "Projetos Concedidos",
@@ -61,9 +61,9 @@
         "METADATA": "Adicione atributos personalizados ao seu usuário, como seu departamento. Você pode usar essas informações nas ações da sua organização."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Autorizações",
-      "DESCRIPTION": "Autorizações definem os direitos de acesso de um usuário a um projeto. Você pode conceder acesso de um usuário a um projeto e definir os papéis dos usuários dentro desse projeto."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Atribuições de funções",
+      "DESCRIPTION": "Atribuições de funções definem os direitos de acesso de um usuário a um projeto. Você pode conceder acesso de um usuário a um projeto e definir os papéis dos usuários dentro desse projeto."
     },
     "ACTIONS": {
       "TITLE": "Ações",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Crie um projeto",
-        "description": "Adicione um projeto e defina suas funções e autorizações.",
+        "description": "Adicione projetos e defina funções e atribuições de funções.",
         "action": "Criar projeto"
       },
       "APPLICATION_CREATED": {
@@ -429,7 +429,7 @@
     "NEWORG": "Nova Organização",
     "IAMADMIN": "Você é um Administrador de instância. Observe que você possui permissões estendidas.",
     "SHOWORGS": "Mostrar Todas as Organizações",
-    "GRANTS": "Autorizações",
+    "GRANTS": "Atribuições de funções",
     "ACTIONS": "Ações",
     "PRIVACY": "Privacidade",
     "TOS": "Termos de Serviço",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "Tem permissão para criar e gerenciar usuários da organização",
     "ORG_OWNER_VIEWER": "Tem permissão para revisar toda a organização",
     "ORG_SETTINGS_MANAGER": "Tem permissão para gerenciar as configurações da organização",
-    "ORG_USER_PERMISSION_EDITOR": "Tem permissão para gerenciar concessões de usuários",
+    "ORG_USER_PERMISSION_EDITOR": "Tem permissão para gerenciar atribuições de funções",
     "ORG_PROJECT_PERMISSION_EDITOR": "Tem permissão para gerenciar concessões de projetos",
     "ORG_PROJECT_CREATOR": "Tem permissão para criar seus próprios projetos e configurações subjacentes",
     "ORG_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais da organização",
@@ -702,7 +702,7 @@
     "USERNAME": "Nome de Usuário",
     "ORGNAME": "Nome da Organização",
     "ORGID": "ID da Organização",
-    "PRIMARYDOMAIN": "Domínio primário",
+    "PRIMARYDOMAIN": "Domínio da Organização",
     "PROJECTNAME": "Nome do Projeto",
     "RESOURCEOWNER": "Proprietário do Recurso",
     "METHODS": {
@@ -724,7 +724,7 @@
       "ME": "Ir para meu perfil",
       "PROJECTS": "<strong>I</strong>r para <strong>P</strong>rojetos",
       "USERS": "<strong>I</strong>r para <strong>U</strong>suários",
-      "USERGRANTS": "<strong>I</strong>r para <strong>A</strong>utorizações",
+      "ROLEASSIGNMENTS": "<strong>I</strong>r para <strong>A</strong>tribuições de funções",
       "ACTIONS": "<strong>I</strong>r para <strong>A</strong>ções e <strong>F</strong>luxos",
       "DOMAINS": "<strong>I</strong>r para <strong>D</strong>omínios"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Senha e Segurança",
       "KEYS": "Chaves",
       "PAT": "Tokens de Acesso Pessoal",
-      "USERGRANTS": "Autorizações",
+      "ROLEASSIGNMENTS": "Atribuições de funções",
       "MEMBERSHIPS": "Funções de Administrador",
       "METADATA": "Metadados"
     },
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Deve ter pelo menos {{value}} caracteres.",
       "MAXLENGTHERROR": "Deve ter menos de {{value}} caracteres"
     },
-    "ID": "ID",
+    "ID": "ID do utilizador",
     "EMAIL": "E-mail",
     "PHONE": "Número de Telefone",
     "PHONEEMPTY": "Nenhum número de telefone definido",
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "Digite o código de verificação"
     },
     "GRANTS": {
-      "TITLE": "Permissões de Usuário",
+      "TITLE": "Atribuições de funções",
       "DESCRIPTION": "Conceda a este usuário acesso a determinados projetos.",
       "CREATE": {
-        "TITLE": "Criar Permissão de Usuário",
+        "TITLE": "Criar atribuição de função",
         "DESCRIPTION": "Pesquise a organização, o projeto e as funções do projeto correspondentes."
       },
       "PROJECTNAME": "Nome do Projeto",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nome",
-      "ID": "ID",
+      "ID": "ID da organização",
       "CREATIONDATE": "Data de Criação",
       "DATECHANGED": "Alterado",
       "FILTER": "Filtro",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Baixar Arquivo",
       "SELECTORGTOOLTIP": "Selecionar esta organização.",
-      "PRIMARYDOMAIN": "Domínio Principal",
+      "PRIMARYDOMAIN": "Domínio da Organização",
       "STATE": "Estado",
       "USEPASSWORD": "Definir Senha Inicial",
       "USEPASSWORDDESC": "O usuário não precisa definir a senha durante a inicialização."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Adicionar Domínio",
-      "TITLE": "Domínios verificados",
+      "TITLE": "Domínio da Organização",
       "DESCRIPTION": "Configure seus domínios. Este domínio pode ser usado para o login dos seus usuários.",
-      "SETPRIMARY": "Definir como Principal",
+      "SETPRIMARY": "Domínio da Organização",
       "DELETE": {
         "TITLE": "Excluir Domínio",
         "DESCRIPTION": "Você está prestes a excluir um dos seus domínios. Observe que seus usuários não poderão mais usar este domínio para fazer login."
@@ -1462,7 +1462,7 @@
       "MEMBERADDED": "Administrador adicionado.",
       "MEMBERREMOVED": "Administrador removido.",
       "MEMBERCHANGED": "Administrador alterado.",
-      "SETPRIMARY": "Domínio principal definido.",
+      "SETPRIMARY": "O domínio da organização foi definido com sucesso.",
       "DELETED": "Organização excluída com sucesso",
       "DEFAULTORGNOTFOUND": "A organização padrão não foi encontrada",
       "ORG_WAS_DELETED": "Organização foi excluída."
@@ -1500,7 +1500,7 @@
       "NOTIFICATIONS_DESC": "Configurações de SMTP e SMS",
       "MESSAGETEXTS": "Textos de Mensagem",
       "IDP": "Provedores de Identidade",
-      "VERIFIED_DOMAINS": "Domínios verificados",
+      "VERIFIED_DOMAINS": "Domínio da Organização",
       "DOMAIN": "Configurações de Domínio",
       "LOGINTEXTS": "Textos da Interface de Login",
       "BRANDING": "Marca",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "Tem certeza de que deseja excluir o seu projeto?",
           "TYPENAME": "Digite o nome do projeto para excluí-lo permanentemente."
         }
-      }
+      },
+      "ID": "ID do projeto"
     },
     "SETTINGS": {
       "TITLE": "Configurações",
@@ -2142,7 +2143,7 @@
       "ASSERTION": "Afirma Funções na Autenticação",
       "ASSERTION_DESCRIPTION": "As informações de função são enviadas pelo ponto de extremidade Userinfo e dependendo das configurações do seu aplicativo em tokens e outros tipos.",
       "CHECK": "Verificar autorização na Autenticação",
-      "CHECK_DESCRIPTION": "Se definido, os usuários só podem fazer login se alguma função for atribuída à sua conta.",
+      "CHECK_DESCRIPTION": "Negar autenticação se o utilizador não tiver funções atribuídas a este projeto. São permitidas atribuições de funções ao projeto sem atribuir uma função específica ao utilizador.",
       "DIALOG": {
         "DELETE_TITLE": "Excluir função",
         "DELETE_DESCRIPTION": "Você está prestes a excluir uma função de projeto. Tem certeza?"
@@ -2290,7 +2291,7 @@
     "ADD": "Adicionar Provedor de Identidade",
     "TYPE": "Tipo",
     "OWNER": "Proprietário",
-    "ID": "ID",
+    "ID": "ID do provedor de identidade",
     "NAME": "Nome",
     "AUTHORIZATIONENDPOINT": "Ponto de Autorização",
     "TOKENENDPOINT": "Ponto de Token",
@@ -2491,7 +2492,7 @@
     "TOKEN": "Configurações de Token",
     "PAGES": {
       "TITLE": "Aplicativo",
-      "ID": "ID",
+      "ID": "ID da aplicação",
       "DESCRIPTION": "Aqui você pode editar os dados do seu aplicativo e sua configuração.",
       "CREATE": "Criar aplicativo",
       "CREATE_SELECT_PROJECT": "Selecione o seu projeto primeiro",
@@ -2503,7 +2504,7 @@
       "DATECHANGED": "Alterado",
       "URLS": "URLs",
       "DELETE": "Excluir App",
-      "JUMPTOPROJECT": "Para configurar funções, autorizações e muito mais, navegue até o projeto.",
+      "JUMPTOPROJECT": "Para configurar funções, atribuições de funções e muito mais, navegue até ao projeto.",
       "DETAIL": {
         "TITLE": "Detalhe",
         "STATE": {
@@ -2781,42 +2782,42 @@
   },
   "ROLESLABEL": "Funções",
   "GRANTS": {
-    "TITLE": "Autorizações",
-    "DESC": "Estas são todas as autorizações na sua organização.",
-    "DELETE": "Excluir Autorização",
-    "EMPTY": "Nenhuma autorização encontrada",
-    "ADD": "Criar Autorização",
+    "TITLE": "Atribuições de funções",
+    "DESC": "Estas são todas as atribuições de funções na sua organização.",
+    "DELETE": "Eliminar uma atribuição de função",
+    "EMPTY": "Nenhuma atribuição de função encontrada",
+    "ADD": "Criar uma atribuição de função",
     "ADD_BTN": "Novo",
     "PROJECT": {
-      "TITLE": "Autorização",
-      "DESCRIPTION": "Defina as autorizações para o projeto especificado. Observe que você só pode ver entradas de projetos e usuários para os quais você tem permissão."
+      "TITLE": "Atribuição de função",
+      "DESCRIPTION": "Defina atribuições de funções para o projeto especificado. Note que só pode ver entradas de projetos e utilizadores para os quais tem permissões."
     },
     "USER": {
-      "TITLE": "Autorização",
-      "DESCRIPTION": "Defina as autorizações para o usuário especificado. Observe que você só pode ver entradas de projetos e usuários para os quais você tem permissão."
+      "TITLE": "Atribuição de função",
+      "DESCRIPTION": "Defina atribuições de funções para o utilizador especificado. Observe que só pode ver entradas de projetos e utilizadores para os quais tem permissões."
     },
     "CREATE": {
-      "TITLE": "Criar autorização",
+      "TITLE": "Criar uma atribuição de função",
       "DESCRIPTION": "Pesquise a organização, o projeto e as funções correspondentes."
     },
     "EDIT": {
-      "TITLE": "Alterar autorização"
+      "TITLE": "Alterar atribuição de função"
     },
     "DETAIL": {
-      "TITLE": "Detalhes da Autorização",
-      "DESCRIPTION": "Aqui você pode ver todos os detalhes da autorização."
+      "TITLE": "Detalhes da atribuição de função",
+      "DESCRIPTION": "Aqui você pode ver todos os detalhes da atribuição de função."
     },
     "TOAST": {
-      "UPDATED": "Autorização atualizada.",
-      "REMOVED": "Autorização removida",
-      "BULKREMOVED": "Autorizações removidas.",
+      "UPDATED": "Atribuição de função atualizada.",
+      "REMOVED": "Atribuição de função removida",
+      "BULKREMOVED": "Atribuições de função removidas.",
       "CANTSHOWINFO": "Não é possível visitar o perfil deste utilizador, pois não é administrador da organização à qual este utilizador pertence."
     },
     "DIALOG": {
-      "DELETE_TITLE": "Excluir autorização",
-      "DELETE_DESCRIPTION": "Você está prestesa excluir uma autorização. Deseja continuar?",
-      "BULK_DELETE_TITLE": "Excluir autorizações",
-      "BULK_DELETE_DESCRIPTION": "Você está prestes a excluir várias autorizações. Deseja continuar?"
+      "DELETE_TITLE": "Excluir atribuição de função",
+      "DELETE_DESCRIPTION": "Você está prestesa excluir uma atribuição de função. Deseja continuar?",
+      "BULK_DELETE_TITLE": "Excluir atribuições de função",
+      "BULK_DELETE_DESCRIPTION": "Você está prestes a excluir várias atribuições de função. Deseja continuar?"
     }
   },
   "CHANGES": {
@@ -2835,5 +2836,6 @@
       "TITLE": "Atividade",
       "DESCRIPTION": "Aqui você pode ver os eventos mais recentes que geraram uma alteração no usuário."
     }
-  }
+  },
+  "INSTANCEID": "ID da instância"
 }

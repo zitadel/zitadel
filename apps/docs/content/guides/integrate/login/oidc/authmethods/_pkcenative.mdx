@@ -9,7 +9,7 @@ You're also allowed to use http://localhost, http://127.0.0.1 and http:[::1] wit
 After the application creation, you might want to set additional options like `refresh_token` and `additional origins`.
 
 If you want to request refresh_tokens and use them to renew the user's access_tokens without their interaction,
-enable them in the OIDC Configuration section by ticking the checkbox.
+enable them in the OIDC Settings section by ticking the checkbox.
 
 When calling the userinfo_endpoint or any ZITADEL API, we will check if an origin header is sent. This is automatically done
 by the user agent. If one is sent we will check if the origin is allowed for your application. By default, all computed
@@ -51,7 +51,7 @@ Depending on your authentication method you'll need additional headers and param
 
 Send your `client_id` and the previously generated string as `code_verifier` for us to recompute the `code_challenge` of the authorization request:
 
-```curl
+```bash
 curl --request POST \
 --url ${CUSTOM_DOMAIN}/oauth/v2/token \
 --header 'Content-Type: application/x-www-form-urlencoded' \
