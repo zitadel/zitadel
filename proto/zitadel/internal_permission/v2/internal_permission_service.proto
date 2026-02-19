@@ -194,7 +194,7 @@ message UpdateAdministratorRequest {
   string user_id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
-  }];
+  }, (google.api.field_behavior) = REQUIRED];
 
   // Resource is the type of the resource the administrator roles should be granted for.
   ResourceType resource = 2 [(google.api.field_behavior) = REQUIRED];
@@ -222,7 +222,7 @@ message DeleteAdministratorRequest {
   string user_id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
-  }];
+  }, (google.api.field_behavior) = REQUIRED];
 
   // Resource is the type of the resource the administrator roles should be removed for.
   ResourceType resource = 2 [(google.api.field_behavior) = REQUIRED];

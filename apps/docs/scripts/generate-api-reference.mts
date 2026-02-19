@@ -21,6 +21,63 @@ const OPENAPI_ROOT = join(ROOT_DIR, 'openapi');
 const CONTENT_ROOT = join(ROOT_DIR, 'content');
 const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content');
 
+/**
+ * Workaround for fumadocs-openapi bug: when a schema has both root-level
+ * `required` fields AND `oneOf`/`anyOf`, fumadocs' `...item` spread overwrites
+ * `schema.required` with `item.required`, losing root-level required fields.
+ *
+ * Fix: merge parent `required` into each variant and remove from parent.
+ * Handles both direct oneOf and allOf-wrapped oneOf patterns.
+ */
+function fixSchemaRequired(schema: any, parentRequired: string[] = []): void {
+  if (!schema || typeof schema !== 'object') return;
+
+  // Combine parent required with this level's required
+  const effectiveRequired = [...new Set([...parentRequired, ...(schema.required ?? [])])];
+
+  // Pattern 1: Direct oneOf/anyOf with required at same level
+  const union = schema.oneOf ?? schema.anyOf;
+  if (Array.isArray(union) && effectiveRequired.length > 0) {
+    for (const variant of union) {
+      if (typeof variant !== 'object' || variant === null) continue;
+      variant.required = [...new Set([...effectiveRequired, ...(variant.required ?? [])])];
+    }
+    delete schema.required;
+  }
+
+  // Pattern 2: allOf containing oneOf - propagate required through allOf
+  if (Array.isArray(schema.allOf) && effectiveRequired.length > 0) {
+    for (const item of schema.allOf) {
+      // Pass down the required from this level
+      fixSchemaRequired(item, effectiveRequired);
+    }
+    // Remove required from parent since we pushed it down
+    if (schema.required) delete schema.required;
+  }
+
+  // Recurse into nested schemas
+  for (const prop of Object.values(schema.properties ?? {})) {
+    fixSchemaRequired(prop, []);
+  }
+  for (const item of (schema.oneOf ?? schema.anyOf ?? schema.allOf ?? [])) {
+    fixSchemaRequired(item, parentRequired);
+  }
+  if (schema.items) fixSchemaRequired(schema.items, []);
+}
+
+function fixOneOfRequired(doc: any): void {
+  for (const schema of Object.values(doc.components?.schemas ?? {})) {
+    fixSchemaRequired(schema);
+  }
+  for (const pathItem of Object.values(doc.paths ?? {})) {
+    for (const op of Object.values(pathItem as Record<string, any>)) {
+      if (!op || typeof op !== 'object') continue;
+      const bodySchema = (op as any)?.requestBody?.content?.['application/json']?.schema;
+      if (bodySchema) fixSchemaRequired(bodySchema);
+    }
+  }
+}
+
 async function generateVersionApiDocs(version: string) {
   const sourceRoot = join(OPENAPI_ROOT, version);
   if (!existsSync(sourceRoot)) return;
@@ -41,6 +98,10 @@ async function generateVersionApiDocs(version: string) {
     const doc = JSON.parse(content) as any;
 
     if (!doc.paths || Object.keys(doc.paths).length === 0) continue;
+
+    // Fix required fields lost during fumadocs oneOf rendering
+    fixOneOfRequired(doc);
+    writeFileSync(fullPath, JSON.stringify(doc, null, 2));
 
     let service = basename(specPath, '.openapi.json');
     if (service.endsWith('_service')) {

@@ -12,6 +12,7 @@ import "validate/validate.proto";
 message LDAPCredentials {
   string username = 1[
     (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Username used to login through LDAP"
       min_length: 1;
@@ -21,6 +22,7 @@ message LDAPCredentials {
   ];
   string password = 2[
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Password used to login through LDAP"
       min_length: 1;
@@ -33,6 +35,7 @@ message LDAPCredentials {
 message RedirectURLs {
   string success_url = 1 [
     (validate.rules).string = {min_len: 1, max_len: 2048, uri_ref: true},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "URL on which the user will be redirected after a successful login"
       min_length: 1;
@@ -42,6 +45,7 @@ message RedirectURLs {
   ];
   string failure_url = 2 [
     (validate.rules).string = {min_len: 1, max_len: 2048, uri_ref: true},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "URL on which the user will be redirected after a failed login"
       min_length: 1;
@@ -144,6 +148,7 @@ message IDPSAMLAccessInformation{
 message IDPLink {
   string idp_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "ID of the identity provider"
       min_length: 1;
@@ -153,6 +158,7 @@ message IDPLink {
   ];
   string user_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "ID of the user of the identity provider"
       min_length: 1;
@@ -162,6 +168,7 @@ message IDPLink {
   ];
   string user_name = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "username of the user of the identity provider"
       min_length: 1;

@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/field_behavior.proto";
 import "validate/validate.proto";
 
 package zitadel.quota.v1;
@@ -38,6 +39,7 @@ message Notification {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "The URL, which is called with HTTP method POST and a JSON payload with the properties \"unit\", \"id\" (notification id), \"callURL\", \"periodStart\", \"threshold\" and \"usage\".";
-        }
+        },
+        (google.api.field_behavior) = REQUIRED
     ];
 }

@@ -233,7 +233,8 @@ message UpdateAuthorizationRequest {
       min_length: 1;
       max_length: 200;
       example: "\"163840776835432345\"";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
   // RoleKeys are the keys of the roles the user should be granted.
   // Note that any role keys previously granted to the user and not present in the list will be revoked.

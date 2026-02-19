@@ -2097,6 +2097,7 @@ message CreateUserRequest{
     // The machine users name is a human readable field that helps identifying the user.
     string name = 1 [
       (validate.rules).string = {min_len: 1, max_len: 200},
+      (google.api.field_behavior) = REQUIRED,
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1,
         max_length: 200,
@@ -2116,6 +2117,7 @@ message CreateUserRequest{
   // The unique identifier of the organization the user belongs to.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1,
       max_length: 200,
@@ -3201,7 +3203,7 @@ message AddIDPLinkResponse {
 }
 
 message ListIDPLinksRequest{
-  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}, (google.api.field_behavior) = REQUIRED];
   //list limitations and ordering
   zitadel.object.v2.ListQuery query = 2;
 }
@@ -3471,6 +3473,7 @@ message AddSecretRequest {
   // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432345\"";
     }
@@ -3498,6 +3501,7 @@ message RemoveSecretRequest {
   // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432345\"";
     }
@@ -3517,6 +3521,7 @@ message AddKeyRequest {
   // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -3526,6 +3531,7 @@ message AddKeyRequest {
   // The date the key will expire and no logins will be possible anymore.
   google.protobuf.Timestamp expiration_date = 2 [
     (validate.rules).timestamp.required = true,
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2519-04-01T08:45:00.000000Z\"";
     }
@@ -3560,6 +3566,7 @@ message RemoveKeyRequest {
   // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -3569,6 +3576,7 @@ message RemoveKeyRequest {
   // The keys ID.
   string key_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -3612,6 +3620,7 @@ message AddPersonalAccessTokenRequest {
   // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -3621,6 +3630,7 @@ message AddPersonalAccessTokenRequest {
   // The timestamp when the token will expire.
   google.protobuf.Timestamp expiration_date = 2 [
     (validate.rules).timestamp.required = true,
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2519-04-01T08:45:00.000000Z\"";
     }
@@ -3652,6 +3662,7 @@ message RemovePersonalAccessTokenRequest {
   // The users resource ID.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -3661,6 +3672,7 @@ message RemovePersonalAccessTokenRequest {
   // The tokens ID.
   string token_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -3703,7 +3715,7 @@ message ListPersonalAccessTokensResponse {
 
 message Metadata {
   // Key in the metadata key/value pair.
-  string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}, (google.api.field_behavior) = REQUIRED];
   // Value in the metadata key/value pair.
   bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
 }
@@ -3763,7 +3775,10 @@ message ListUserMetadataResponse {
 
 message DeleteUserMetadataRequest {
   // ID of the user which metadata is to be deleted is stored on.
-  string user_id = 1;
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED
+  ];
   // The keys for the user metadata to be deleted.
   repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
 }

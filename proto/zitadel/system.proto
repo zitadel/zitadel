@@ -9,6 +9,7 @@ import "zitadel/auth_n_key.proto";
 import "zitadel/feature.proto";
 
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -617,7 +618,7 @@ message ListInstancesResponse {
 }
 
 message GetInstanceRequest {
-  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}, (google.api.field_behavior) = REQUIRED];
 }
 
 message GetInstanceResponse {
@@ -730,7 +731,7 @@ message UpdateInstanceResponse{
 }
 
 message RemoveInstanceRequest {
-  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}, (google.api.field_behavior) = REQUIRED];
 }
 
 message RemoveInstanceResponse {
@@ -750,11 +751,11 @@ message ListIAMMembersResponse {
 }
 
 message GetUsageRequest {
-  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}, (google.api.field_behavior) = REQUIRED];
 }
 
 message AddQuotaRequest {
-  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}, (google.api.field_behavior) = REQUIRED];
   // the unit a quota should be imposed on
   zitadel.quota.v1.Unit unit = 2 [
     (validate.rules).enum = {defined_only: true, not_in: [0]},
