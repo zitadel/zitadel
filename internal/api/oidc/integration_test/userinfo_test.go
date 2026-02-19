@@ -3,6 +3,7 @@
 package oidc_test
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"testing"
@@ -308,6 +309,172 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, user.GetUserId(), provider)
 	require.NoError(t, err)
 	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, []string{roleFoo}, []string{Instance.DefaultOrg.Id})
+}
+
+func TestServer_UserInfo_RoleAddedAfterLogin(t *testing.T) {
+	//-------------------------
+	// HELPER FUNCTIONS
+	//-------------------------
+	assignRole := func(tt *testing.T, projectId string, grantId string, userId string, role string) {
+		grant, err := Instance.Client.Mgmt.AddUserGrant(CTX, &management.AddUserGrantRequest{
+			UserId:         userId,
+			ProjectId:      projectId,
+			ProjectGrantId: grantId,
+			RoleKeys:       []string{role},
+		})
+		require.NoError(tt, err)
+		g, err := Instance.Client.Mgmt.GetUserGrantByID(CTX, &management.GetUserGrantByIDRequest{
+			UserId:  userId,
+			GrantId: grant.GetUserGrantId(),
+		})
+		require.NoError(tt, err)
+		require.NotNil(tt, g)
+	}
+
+	login := func(tt *testing.T, clientId string, scopes []string) string {
+		authRequestID := createAuthRequest(tt, Instance, clientId, redirectURI, scopes...)
+		sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
+		linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+			AuthRequestId: authRequestID,
+			CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+				Session: &oidc_pb.Session{
+					SessionId:    sessionID,
+					SessionToken: sessionToken,
+				},
+			},
+		})
+		require.NoError(tt, err)
+		code := assertCodeResponse(tt, linkResp.GetCallbackUrl())
+		tokens, err := exchangeTokens(tt, Instance, clientId, code, redirectURI)
+		require.NoError(tt, err)
+		assertTokens(tt, tokens, false)
+		assertIDTokenClaims(tt, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
+		return tokens.AccessToken
+	}
+
+	//-------------------------
+	// TEST CASES
+	//-------------------------
+	type TestCase struct {
+		Name                  string
+		ClientId              string
+		RoleGrantedProjectId  string
+		RoleGrantingProjectId string
+		Role                  string
+		ProjectGrantId        string // For cross-org project grants
+	}
+	testCases := []TestCase{
+		func() TestCase {
+			clientId, projectId := createClientWithOpts(t, Instance, clientOpts{
+				redirectURI:  redirectURI,
+				logoutURI:    logoutRedirectURI,
+				devMode:      false,
+				LoginVersion: nil,
+			})
+			const role = "role_1"
+			Instance.AddProjectRole(CTX, t, projectId, role, role, "")
+			return TestCase{
+				Name:                  "single project",
+				ClientId:              clientId,
+				RoleGrantedProjectId:  projectId,
+				RoleGrantingProjectId: projectId,
+				Role:                  role,
+			}
+		}(),
+		func() TestCase {
+			clientId, project1Id := createClientWithOpts(t, Instance, clientOpts{
+				redirectURI:  redirectURI,
+				logoutURI:    logoutRedirectURI,
+				devMode:      false,
+				LoginVersion: nil,
+			})
+			project2 := Instance.CreateProject(CTX, t, "", "single-org-project-2", false, false)
+			project2Id := project2.GetId()
+			const role = "role_2"
+			Instance.AddProjectRole(CTX, t, project2.GetId(), role, role, "")
+			return TestCase{
+				Name:                  "project2 owns role, project 1 is granted",
+				ClientId:              clientId,
+				RoleGrantedProjectId:  project1Id,
+				RoleGrantingProjectId: project2Id,
+				Role:                  role,
+			}
+		}(),
+		func() TestCase {
+			clientId, project1Id := createClientWithOpts(t, Instance, clientOpts{
+				redirectURI:  redirectURI,
+				logoutURI:    logoutRedirectURI,
+				devMode:      false,
+				LoginVersion: nil,
+			})
+			grantedOrg := Instance.CreateOrganization(CTXIAM, integration.OrganizationName(), integration.Email())
+			grantedOrgId := grantedOrg.GetOrganizationId()
+			ctxOrg := metadata.AppendToOutgoingContext(CTXIAM, "x-zitadel-orgid", grantedOrgId)
+			project3 := Instance.CreateProject(ctxOrg, t, grantedOrgId, "cross-org-project-3", false, false)
+			project3Id := project3.GetId()
+			const role = "role_3"
+			Instance.AddProjectRole(ctxOrg, t, project3Id, role, role, "")
+			projectGrant, err := Instance.Client.Mgmt.AddProjectGrant(ctxOrg, &management.AddProjectGrantRequest{
+				ProjectId:    project3Id,
+				GrantedOrgId: Instance.DefaultOrg.GetId(),
+				RoleKeys:     []string{role},
+			})
+			require.NoError(t, err)
+			return TestCase{
+				Name:                  "project3 (other org) owns role, project 1 is granted",
+				ClientId:              clientId,
+				RoleGrantedProjectId:  project1Id,
+				RoleGrantingProjectId: project3Id,
+				Role:                  role,
+				ProjectGrantId:        projectGrant.GetGrantId(),
+			}
+		}(),
+	}
+
+	//-------------------------
+	// TEST
+	//-------------------------
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(tt *testing.T) {
+			// create app to log in with
+			app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, testCase.RoleGrantedProjectId, false)
+			require.NoError(tt, err)
+			userInfoServer, err := Instance.CreateRelyingParty(CTX, app.ClientId, redirectURI)
+			require.NoError(tt, err)
+
+			scopes := []string{
+				oidc.ScopeOpenID,
+				oidc.ScopeProfile,
+				oidc_api.ScopeProjectsRoles,
+				fmt.Sprintf("urn:zitadel:iam:org:project:id:%s:aud", testCase.RoleGrantingProjectId),
+			}
+			accessToken := login(t, app.GetClientId(), scopes)
+
+			// introspect token and verify role is not present
+			projectRolesClaimName := fmt.Sprintf(oidc_api.ClaimProjectRolesFormat, testCase.RoleGrantingProjectId)
+			info, err := rp.Userinfo[*oidc.UserInfo](context.Background(), accessToken, oidc.BearerToken, User.UserId, userInfoServer)
+			require.NoError(tt, err)
+			if roles, ok := info.Claims[projectRolesClaimName]; ok {
+				if rolesMap, ok := roles.(map[string]interface{}); ok {
+					assert.Contains(tt, rolesMap, testCase.Role, "role should not be present before granting")
+				}
+			}
+
+			assignRole(t, testCase.RoleGrantingProjectId, testCase.ProjectGrantId, User.UserId, testCase.Role)
+
+			// introspect token and verify role is present
+			info, err = rp.Userinfo[*oidc.UserInfo](context.Background(), accessToken, oidc.BearerToken, User.UserId, userInfoServer)
+			require.NoError(tt, err)
+
+			roles, ok := info.Claims[projectRolesClaimName]
+			require.True(tt, ok, "project roles claim should be present after granting")
+
+			rolesMapAfter, ok := roles.(map[string]interface{})
+			require.True(tt, ok, "project roles claim should be a map")
+
+			assert.Contains(tt, rolesMapAfter, testCase.Role)
+		})
+	}
 }
 
 func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...string) {
