@@ -18,6 +18,7 @@ WORKDIR /app
 ENV PATH="/app:${PATH}"
 
 USER zitadel
+VOLUME [ "/current-dir" ]
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Final stage: Creates a minimal container image with just the Zitadel binary and necessary files
