@@ -2,11 +2,10 @@
 title: Download and adjust the example configuration file containing standard configuration
 ---
 
-import CodeBlock from '@/components/docusaurus/code-block';
-
-import ExampleZITADELConfigSource from "./example-zitadel-config.yaml"
-import ExampleZITADELSecretsSource from "./example-zitadel-secrets.yaml"
-import ExampleZITADELInitStepsSource from "./example-zitadel-init-steps.yaml"
+import ExampleZitadelConfig from './example-zitadel-config.yaml';
+import ExampleZitadelSecrets from './example-zitadel-secrets.yaml';
+import ExampleZitadelInitSteps from './example-zitadel-init-steps.yaml';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 
 ### Configure by Files
 
@@ -14,17 +13,17 @@ By executing the commands below, you will download the following files:
 
 <details>
     <summary>example-zitadel-config.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELConfigSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelConfig} />
 </details>
 
 <details>
     <summary>example-zitadel-secrets.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELSecretsSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelSecrets} />
 </details>
 
 <details>
     <summary>example-zitadel-init-steps.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELInitStepsSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelInitSteps} />
 </details>
 
 ```bash

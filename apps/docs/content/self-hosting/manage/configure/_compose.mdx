@@ -2,12 +2,11 @@
 title: Download the docker compose example configuration.
 ---
 
-import CodeBlock from '@/components/docusaurus/code-block';
-
-import DockerComposeSource from "./docker-compose.yaml"
-import ExampleZITADELConfigSource from "./example-zitadel-config.yaml"
-import ExampleZITADELSecretsSource from "./example-zitadel-secrets.yaml"
-import ExampleZITADELInitStepsSource from "./example-zitadel-init-steps.yaml"
+import DockerComposeYaml from './docker-compose.yaml';
+import ExampleZitadelConfig from './example-zitadel-config.yaml';
+import ExampleZitadelSecrets from './example-zitadel-secrets.yaml';
+import ExampleZitadelInitSteps from './example-zitadel-init-steps.yaml';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 
 The docker compose example mounts the example zitadel configuration files to the ZITADEL container.
 
@@ -15,22 +14,22 @@ By executing the commands below, you will download the following files:
 
 <details>
     <summary>docker-compose.yaml</summary>
-    <CodeBlock  language="yaml">{DockerComposeSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={DockerComposeYaml} />
 </details>
 
 <details>
     <summary>example-zitadel-config.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELConfigSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelConfig} />
 </details>
 
 <details>
     <summary>example-zitadel-secrets.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELSecretsSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelSecrets} />
 </details>
 
 <details>
     <summary>example-zitadel-init-steps.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELInitStepsSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelInitSteps} />
 </details>
 
 ```bash

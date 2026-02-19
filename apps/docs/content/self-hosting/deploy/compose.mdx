@@ -3,10 +3,10 @@ title: Set up Zitadel with Docker Compose
 sidebar_label: Docker Compose
 ---
 
-import CodeBlock from '@/components/docusaurus/code-block';
 import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
+import DockerCompose from './docker-compose.yaml';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 
-import DockerComposeSource from "./docker-compose.yaml"
 import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
@@ -54,7 +54,7 @@ The comments give context to the used variables and show examples for commonly u
 
 <details>
     <summary>docker-compose.yaml</summary>
-    <CodeBlock  language="yaml">{DockerComposeSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={DockerCompose} />
 </details>
 
 Here are some natural steps forward to go from the current setup to production:
