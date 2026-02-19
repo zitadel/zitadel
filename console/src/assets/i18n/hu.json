@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Legalább {{value}} karakter hosszúnak kell lennie.",
       "MAXLENGTHERROR": "Kevesebb, mint {{value}} karakter kell legyen."
     },
-    "ID": "Azonosító",
+    "ID": "Felhasználói azonosító",
     "EMAIL": "E-mail",
     "PHONE": "Telefonszám",
     "PHONEEMPTY": "Nincs megadott telefonszám",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Név",
-      "ID": "Azonosító",
+      "ID": "Szervezeti azonosító",
       "CREATIONDATE": "Létrehozás dátuma",
       "DATECHANGED": "Módosítva",
       "FILTER": "Szűrő",
@@ -2012,7 +2012,8 @@
           "DESCRIPTION": "Tényleg törölni szeretnéd a projekted?",
           "TYPENAME": "Írd be a projekt nevét a végleges törléshez."
         }
-      }
+      },
+      "ID": "Projektazonosító"
     },
     "SETTINGS": {
       "TITLE": "Beállítások",
@@ -2294,7 +2295,7 @@
     "ADD": "Azonosítószolgáltató hozzáadása",
     "TYPE": "Típus",
     "OWNER": "Tulajdonos",
-    "ID": "Azonosító",
+    "ID": "Identitásszolgáltató azonosító",
     "NAME": "Név",
     "AUTHORIZATIONENDPOINT": "Hitelesítési végpont",
     "TOKENENDPOINT": "Token végpont",
@@ -2519,7 +2520,7 @@
     "TOKEN": "Token Beállítások",
     "PAGES": {
       "TITLE": "Alkalmazás",
-      "ID": "ID",
+      "ID": "Alkalmazásazonosító",
       "DESCRIPTION": "Itt szerkesztheted az alkalmazásod adatait és a konfigurációját.",
       "CREATE": "Alkalmazás létrehozása",
       "CREATE_SELECT_PROJECT": "Először válaszd ki a projekted",
@@ -2863,5 +2864,6 @@
       "TITLE": "Tevékenység",
       "DESCRIPTION": "Itt láthatod a legújabb eseményeket, amelyek felhasználói változást hoztak létre."
     }
-  }
+  },
+  "INSTANCEID": "Példányazonosító"
 }
