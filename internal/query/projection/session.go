@@ -169,31 +169,16 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanPasswordChangedType,
 					Reduce: p.reducePasswordChanged,
 				},
-			},
-		},
-		{
-			Aggregate: user.AggregateType,
-			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.UserDeactivatedType,
 					Reduce: p.reduceUserStateNotActive,
 				},
-			},
-		},
-		{
-			Aggregate: user.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  user.UserRemovedType,
-					Reduce: p.reduceUserStateNotActive,
-				},
-			},
-		},
-		{
-			Aggregate: user.AggregateType,
-			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.UserLockedType,
+					Reduce: p.reduceUserStateNotActive,
+				},
+				{
+					Event:  user.UserRemovedType,
 					Reduce: p.reduceUserStateNotActive,
 				},
 			},
