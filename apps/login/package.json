@@ -13,7 +13,7 @@
     "lint-fix": "prettier --write .",
     "test-unit": "vitest --run",
     "lint-staged": "lint-staged",
-    "clean": "rm -rf node_modules .next cypress"
+    "clean": "rm -rf node_modules .next"
   },
   "git": {
     "pre-commit": "lint-staged"
@@ -67,7 +67,6 @@
     "@zitadel/proto": "workspace:*",
     "autoprefixer": "^10.4.23",
     "concurrently": "^9.2.1",
-    "cypress": "^14.5.4",
     "dotenv-cli": "^8.0.0",
     "env-cmd": "^10.1.0",
     "esbuild": "^0.27.3",
