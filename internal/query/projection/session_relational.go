@@ -583,17 +583,17 @@ func (p *sessionRelationalProjection) reducePasswordChanged(event eventstore.Eve
 }
 
 func (p *sessionRelationalProjection) reduceUserStateNotActive(event eventstore.Event) (*handler.Statement, error) {
-	switch event.(type) {
+	switch t := event.(type) {
 	case *user.UserDeactivatedEvent, *user.UserLockedEvent:
 		// ok
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-XBglbF", "reduce.wrong.event.type %v", []eventstore.EventType{user.UserDeactivatedType, user.UserLockedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-XBglbF", "reduce.wrong.event.type %v", t)
 	}
 
 	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-fcxV68", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 

@@ -479,11 +479,11 @@ func (p *sessionProjection) reducePasswordChanged(event eventstore.Event) (*hand
 }
 
 func (p *sessionProjection) reduceUserStateNotActive(event eventstore.Event) (_ *handler.Statement, err error) {
-	switch event.(type) {
+	switch t := event.(type) {
 	case *user.UserDeactivatedEvent, *user.UserRemovedEvent, *user.UserLockedEvent:
 		// ok
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-7zALpR", "reduce.wrong.event.type %v", []eventstore.EventType{user.UserDeactivatedType, user.UserRemovedType, user.UserLockedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-7zALpR", "reduce.wrong.event.type %v", t)
 	}
 
 	return handler.NewDeleteStatement(
