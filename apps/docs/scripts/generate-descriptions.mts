@@ -112,7 +112,7 @@ const CATEGORY_PROMPTS: Record<ContentCategory, { focusClause: string; pageKind:
     pageKind: 'how-to or integration guide',
     focusClause:
       'Identify the specific task or problem being solved. ' +
-      'Name the exact tools, frameworks, or ZITADEL features involved. ' +
+      'Name the exact tools, frameworks, or ZITADEL features involved — if the page belongs to a named ZITADEL feature (e.g., Actions, Console, Login), include that feature name. ' +
       'If a specific tech stack or platform is mentioned, include it. ' +
       'If the page is a collection of code examples, say so — include the words "code examples" in the description. ' +
       'Closely paraphrase the page\'s own introductory sentence for accuracy — do not reinterpret or generalize it.',
@@ -222,20 +222,49 @@ function hasRealDescription(rawFm: string): boolean {
  * Build a rich context string for the LLM by sending up to ~8000 chars of page content.
  *
  * Strategy:
- *   1. Extract all ## / ### headings as a full document outline.
- *   2. Send cleaned body prose up to 8000 chars (imports and code fence bodies stripped,
- *      MDX component tags kept for structural signal).
+ *   1. Extract the introductory sentence/paragraph and label it prominently.
+ *   2. Extract all ## / ### headings as a full document outline.
+ *   3. Send cleaned body prose up to 8000 chars with noise stripped:
+ *      - imports, code fences, empty HTML detail/summary shells,
+ *      - raw MDX/JSX expressions, markdown link URLs (keep display text),
+ *      - markdown table alignment rows (keep header + data rows as text).
  */
 function extractContext(body: string): string {
   const maxBodyChars = 8000;
 
-  // Strip imports and code fence bodies entirely (method names are
-  // extracted separately by extractMethodNames, so we don't need hints here)
-  const cleaned = body
+  let cleaned = body
+    // Strip imports
     .replace(/^import\s.*$/gm, '')
+    // Strip code fence bodies entirely (method names are
+    // extracted separately by extractMethodNames, so we don't need hints here)
     .replace(/```[^\n]*\n[\s\S]*?```/g, '')
+    // Strip empty HTML detail/summary shells left after code fence removal
+    .replace(/<details[^>]*>\s*<\/details>/gi, '')
+    .replace(/<details[^>]*>\s*<summary[^>]*>.*?<\/summary>\s*<\/details>/gi, '')
+    .replace(/<\/?(?:details|summary)[^>]*>/gi, '')
+    // Strip raw MDX/JSX expressions (e.g. {props.summary ? props.summary : 'Code example'})
+    .replace(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g, '')
+    // Simplify markdown links: [display text](url) → display text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    // Simplify markdown table alignment rows: |:---|:---|
+    .replace(/^\|[\s:|-]+\|$/gm, '')
+    // Strip table pipe formatting but keep cell content: | a | b | → a | b
+    .replace(/^\|\s*/gm, '')
+    .replace(/\s*\|$/gm, '')
+    // Collapse triple+ newlines
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+
+  // Extract the introductory paragraph (first non-empty, non-heading block)
+  let intro = '';
+  const introMatch = cleaned.match(/^([^#\n][^\n]+(?:\n[^#\n][^\n]+)*)/);
+  if (introMatch) {
+    const candidate = introMatch[1].trim();
+    // Only use if it's real prose (not just a link or very short)
+    if (candidate.length > 30) {
+      intro = candidate;
+    }
+  }
 
   // Build full heading outline
   const headings: string[] = [];
@@ -260,7 +289,9 @@ function extractContext(body: string): string {
     prose += '\n[…truncated]';
   }
 
-  let result = outline;
+  let result = '';
+  if (intro) result += `[INTRODUCTORY SENTENCE]\n${intro}\n\n`;
+  result += outline;
   if (prose) result += `[PAGE CONTENT]\n${prose}`;
   return result.trim();
 }
@@ -276,6 +307,9 @@ function sanitizeDescription(text: string): string {
 
   // Strip rogue markdown (bold, italic, inline code)
   clean = clean.replace(/[*`_]/g, '');
+
+  // Replace vague "manipulating users" with specific domain nouns
+  clean = clean.replace(/manipulat(e|ing) users/gi, 'user roles, metadata, and attributes');
 
   // Strip banned openers the model sometimes ignores
   clean = clean.replace(/^(Use|Explore|Discover|Learn( how( to)?)?|This (page|guide|document|article)|ZITADEL (guides|helps|shows|describes|walks)( you| developers?)?( through| how)?)[:\s,]+/i, '').trim();
@@ -487,6 +521,8 @@ async function generateDescription(
     'Always specify the actor or subject: say "OAuth clients", "service users", "applications", or "administrators" — never leave "authentication" or "authorization" unqualified.\n' +
     'Name the primary protocol or entity (OIDC, SAML, OAuth, tokens, claims) within the first 60 characters.\n' +
     'Prefer terms searchers use (claims, attributes, roles, tokens) over internal terms (parameters, flows, triggers).\n' +
+    'BANNED PHRASES: Never write "manipulating users" or "manipulate users" — instead name what is changed: "user roles, metadata, and attributes" or "user roles and email verification".\n' +
+    'Prefer specific domain nouns (roles, metadata, attributes, claims) over vague action verbs (manipulating, managing, handling, processing).\n' +
     'End with a concrete noun or specific outcome — NEVER with vague words like "management", "workflows", "and more", "solutions", or "tasks".\n' +
     'Prefer stating WHERE something applies (endpoints, flows, scopes) or WHAT problem is solved over HOW bytes are formatted (headers, payloads, encodings).\n' +
     'Do not end with low-level transport details like header names or encoding schemes.\n' +
@@ -503,6 +539,7 @@ async function generateDescription(
     '- "Learn how to customize attributes before they are set in the" ← truncated, starts with Learn how\n' +
     '- "Configure token creation with parameters for userinfo endpoints" ← uses internal term "parameters" instead of "claims"\n' +
     '- "Use Client Secret Basic or JWT with Private Key for secure authentication in ZITADEL" ← starts with Use, ambiguous subject, missing endpoint context\n' +
+    '- "ZITADEL Actions for manipulating users and customizing responses" ← "manipulating users" is vague; say "user roles, metadata, and attributes" instead\n' +
     '\n' +
     '## ACCURACY RULES\n' +
     'Closely paraphrase the page\'s own introductory sentence — do not reinterpret or generalize it.\n' +
