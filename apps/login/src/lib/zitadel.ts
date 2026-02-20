@@ -29,7 +29,7 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { unstable_cacheLife as cacheLife } from "next/cache";
+import { cacheLife } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
 
@@ -40,6 +40,13 @@ const useCache = process.env.DEBUG !== "true";
 async function cacheWrapper<T>(callback: Promise<T>) {
   "use cache";
   cacheLife("hours");
+
+  return callback;
+}
+
+async function cacheWrapperTenMinutes<T>(callback: Promise<T>) {
+  "use cache";
+  cacheLife({ revalidate: 600 });
 
   return callback;
 }
@@ -89,7 +96,7 @@ export async function getBrandingSettings({
     .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapperTenMinutes(callback) : callback;
 }
 
 export async function getLoginSettings({
@@ -104,7 +111,7 @@ export async function getLoginSettings({
     .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapperTenMinutes(callback) : callback;
 }
 
 export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) {
@@ -112,7 +119,7 @@ export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) 
 
   const callback = settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapperTenMinutes(callback) : callback;
 }
 
 export async function getLockoutSettings({ serviceConfig, orgId }: WithServiceConfig<{ orgId?: string }>) {
@@ -194,7 +201,7 @@ export async function getPasswordComplexitySettings({
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapperTenMinutes(callback) : callback;
 }
 
 export async function createSessionFromChecksAndChallenges({
