@@ -84,6 +84,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     loginSettings = await getLoginSettings({ serviceConfig, organization });
   }
 
+  const redirectUri = await resolveRedirectUri(
+    requestId && sessionId
+      ? { sessionId, requestId }
+      : { loginName: loginName ?? sessionFactors?.factors?.user?.loginName },
+    loginSettings?.defaultRedirectUri,
+  );
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col space-y-4">
@@ -109,28 +116,17 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </Alert>
         )}
 
-        {(async () => {
-          const redirectUri = await resolveRedirectUri(
-            requestId && sessionId
-              ? { sessionId, requestId }
-              : { loginName: loginName ?? sessionFactors?.factors?.user?.loginName },
-            loginSettings?.defaultRedirectUri,
-          );
+        {redirectUri && (
+          <div className="mt-8 flex w-full flex-row items-center">
+            <span className="flex-grow"></span>
 
-          if (redirectUri) {
-            return (
-              <div className="mt-8 flex w-full flex-row items-center">
-                <span className="flex-grow"></span>
-
-                <Link href={redirectUri}>
-                  <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
-                    <Translated i18nKey="continue" namespace="signedin" />
-                  </Button>
-                </Link>
-              </div>
-            );
-          }
-        })()}
+            <Link href={redirectUri}>
+              <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
+                <Translated i18nKey="continue" namespace="signedin" />
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
     </DynamicTheme>
   );
