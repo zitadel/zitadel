@@ -111,8 +111,8 @@ export const OIDC_CONFIGURATIONS: OidcAppConfigurations = {
     .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
     .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
     .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:5000/signin-oidc'])
-    .setPostLogoutRedirectUrisList(['http://localhost:5000/signout-callback-oidc']),
+    .setRedirectUrisList(['http://localhost:3000/auth/callback'])
+    .setPostLogoutRedirectUrisList(['http://localhost:3000/auth/logout/callback']),
   ['astro']: new AddOIDCAppRequest()
     .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
     .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
