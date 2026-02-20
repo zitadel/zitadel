@@ -14,6 +14,7 @@
  *   --file <path>       Process a single file only (relative to content/)
  *   --delay <ms>        Delay between API calls in ms (default: 200)
  *   --start-from <n>    Skip the first N eligible files (resume after interruption)
+ *   --limit <n>         Process at most N files then stop
  *
  * Excluded directories (generated / versioned content that should not be edited):
  *   - content/reference/  (auto-generated gRPC / protobuf API reference)
@@ -59,6 +60,7 @@ const DRY_RUN = args.includes('--dry-run');
 const SINGLE_FILE = getArg('--file');
 const DELAY_MS = Number(getArg('--delay') ?? '200');
 const START_FROM = Number(getArg('--start-from') ?? '0');
+const LIMIT = getArg('--limit') !== undefined ? Number(getArg('--limit')) : Infinity;
 
 const CONTENT_DIR = new URL('../content', import.meta.url).pathname;
 
@@ -95,24 +97,48 @@ function parseFrontmatter(content: string): {
   return { fm, rawFm, body };
 }
 
-/** Strip MDX-specific syntax to get readable plain-text context for the LLM. */
-function extractContext(body: string, maxChars = 900): string {
-  return (
-    body
-      // Remove import statements
-      .replace(/^import\s.*$/gm, '')
-      // Remove JSX/HTML tags
-      .replace(/<[^>]+>/g, ' ')
-      // Replace code fences: keep only the first line (often the most informative command/type)
-      // so the model can pick up concrete keywords (e.g. endpoint names, action types)
-      .replace(/```(?:\w+)?\n([^\n]*)(?:[\s\S]*?)```/g, '[$1]')
-      // Remove any remaining bare ``` delimiters
-      .replace(/```/g, '')
-      // Collapse extra whitespace
-      .replace(/\n{3,}/g, '\n\n')
-      .trim()
-      .slice(0, maxChars)
-  );
+/**
+ * Build a compact, representative context string for the LLM.
+ *
+ * Strategy:
+ *   1. Extract all ## / ### headings as a page-scope outline (the model sees
+ *      every major topic even on long pages).
+ *   2. Append the first ~900 chars of cleaned body prose so specific keywords
+ *      and phrasing are available.
+ *
+ * This avoids both the "only summarised the first subsection" problem (fixed by
+ * the outline) and the "fed 3000 chars of repetitive code fences" problem (fixed
+ * by the char cap on the prose portion).
+ */
+function extractContext(body: string, maxBodyChars = 900): string {
+  // --- 1. Strip code fences, imports, and JSX before doing anything else ------
+  const cleaned = body
+    .replace(/^import\s.*$/gm, '')
+    .replace(/<[^>]+>/g, ' ')
+    // Keep only the first (most informative) line of each code fence
+    .replace(/```(?:\w+)?\n([^\n]*)(?:[\s\S]*?)```/g, '[$1]')
+    .replace(/```/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  // --- 2. Build heading outline (## and ###, deduplicated) --------------------
+  const headings: string[] = [];
+  for (const line of cleaned.split('\n')) {
+    const m = line.match(/^(#{2,3})\s+(.+)/);
+    if (m) headings.push(`${m[1]} ${m[2].trim()}`);
+  }
+  const outline =
+    headings.length > 0 ? `Page sections:\n${headings.join('\n')}\n\n` : '';
+
+  // --- 3. Prose excerpt (non-heading lines, up to maxBodyChars) ---------------
+  const prose = cleaned
+    .split('\n')
+    .filter((l) => !l.match(/^#{1,6}\s/))
+    .join('\n')
+    .slice(0, maxBodyChars)
+    .trim();
+
+  return (outline + prose).trim();
 }
 
 /**
@@ -238,8 +264,10 @@ async function generateDescription(
     'Avoid semicolons; one sentence, you may use one comma clause. ' +
     'Avoid generic openings like "This guide", "This page", "Learn how", "In this article". ' +
     'Include "ZITADEL" when it improves clarity. ' +
-    'Prefer one concrete technical keyword from the content (e.g. Actions V2, webhook, OIDC, PAT). ' +
-    'If the page covers deprecation or migration, mention it neutrally.';
+    'Summarize the overall scope of the page (top 2–3 topics), not a single subsection. ' +
+    'If the excerpt contains multiple major sections (e.g., OIDC, SAML, users, IDPs), reflect 2–3 of them rather than focusing on the first. ' +
+    'Extract 1–2 relevant technical keywords directly from the content. Do NOT invent version numbers or features not present in the excerpt. ' +
+    'If the page covers deprecation or migration, mention it neutrally.'
 
   const userPrompt =
     `Title: ${title}\n` +
@@ -337,7 +365,7 @@ async function main() {
   if (START_FROM > 0) console.log(`Skipping first                : ${START_FROM}`);
   console.log('');
 
-  const toProcess = eligible.slice(START_FROM);
+  const toProcess = eligible.slice(START_FROM, START_FROM + (isFinite(LIMIT) ? LIMIT : eligible.length));
   let succeeded = 0;
   let failed = 0;
 
