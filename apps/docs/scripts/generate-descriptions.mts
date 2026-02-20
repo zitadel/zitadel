@@ -105,6 +105,7 @@ const CATEGORY_PROMPTS: Record<ContentCategory, { focusClause: string; pageKind:
       'Name the exact protocol, API, or benchmark scenario. ' +
       'For API reference pages, include the primary function or method names documented on the page (e.g., setClaim, setCustomAttribute). ' +
       'State what a developer can achieve and name what is affected (claims, tokens, assertions, responses). ' +
+      'Specify the subject performing the action (e.g., "OAuth clients", "service users") — do not use generic "authentication" without stating who or what authenticates. ' +
       'Closely paraphrase the page\'s own introductory sentence for accuracy — do not reinterpret or generalize it.',
   },
   guide: {
@@ -277,7 +278,7 @@ function sanitizeDescription(text: string): string {
   clean = clean.replace(/[*`_]/g, '');
 
   // Strip banned openers the model sometimes ignores
-  clean = clean.replace(/^(Explore|Discover|Learn( how( to)?)?|This (page|guide|document|article)|ZITADEL (guides|helps|shows|describes|walks)( you| developers?)?( through| how)?)[:\s,]+/i, '').trim();
+  clean = clean.replace(/^(Use|Explore|Discover|Learn( how( to)?)?|This (page|guide|document|article)|ZITADEL (guides|helps|shows|describes|walks)( you| developers?)?( through| how)?)[:\s,]+/i, '').trim();
   // Re-capitalize first letter after stripping
   if (clean.length > 0) clean = clean[0].toUpperCase() + clean.slice(1);
 
@@ -308,7 +309,7 @@ function sanitizeDescription(text: string): string {
 
   // Detect dangling fragments left after truncation (e.g. "functions like", "in the SAML")
   // If the description ends with a preposition, conjunction, article, or dangling word, trim it.
-  const danglingPattern = /\s+(like|using|with|for|in|on|at|to|of|the|a|an|and|or|by|from|into|through|via|such|as|including|between|across|within|about|during|over)$/i;
+  const danglingPattern = /\s+(like|using|with|for|in|on|at|to|of|the|a|an|and|or|by|from|into|through|via|such|as|including|between|across|within|about|during|over|your|their|its|our|this|that|these|those)$/i;
   while (danglingPattern.test(clean)) {
     clean = clean.replace(danglingPattern, '').trim();
     clean = clean.replace(/[.!?:,\-–—]+$/, '').trim();
@@ -482,21 +483,26 @@ async function generateDescription(
     '\n' +
     '## SENTENCE STRUCTURE\n' +
     'Start with a concrete noun, feature name, or action verb from the page — NEVER with filler openers.\n' +
-    'BANNED first words: "Explore", "Discover", "Learn", "This page", "This guide", "ZITADEL guides", "ZITADEL helps", "ZITADEL shows", "ZITADEL describes".\n' +
+    'BANNED first words: "Use", "Explore", "Discover", "Learn", "This page", "This guide", "ZITADEL guides", "ZITADEL helps", "ZITADEL shows", "ZITADEL describes".\n' +
+    'Always specify the actor or subject: say "OAuth clients", "service users", "applications", or "administrators" — never leave "authentication" or "authorization" unqualified.\n' +
     'Name the primary protocol or entity (OIDC, SAML, OAuth, tokens, claims) within the first 60 characters.\n' +
     'Prefer terms searchers use (claims, attributes, roles, tokens) over internal terms (parameters, flows, triggers).\n' +
     'End with a concrete noun or specific outcome — NEVER with vague words like "management", "workflows", "and more", "solutions", or "tasks".\n' +
+    'Prefer stating WHERE something applies (endpoints, flows, scopes) or WHAT problem is solved over HOW bytes are formatted (headers, payloads, encodings).\n' +
+    'Do not end with low-level transport details like header names or encoding schemes.\n' +
     '\n' +
     '## GOOD EXAMPLES (imitate these patterns)\n' +
     '- "Add custom claims to ZITADEL ID tokens and access tokens during token creation for identity enrichment"\n' +
     '- "ZITADEL Personal Access Tokens let service users authenticate for API calls without interactive login"\n' +
     '- "Mirror events between ZITADEL instances using the cockroach and postgres export commands"\n' +
+    '- "Authenticate OAuth clients in ZITADEL using Client Secret Basic or private key JWT for token and introspection endpoints"\n' +
     '\n' +
     '## BAD EXAMPLES (never produce these)\n' +
     '- "Explore ZITADEL features for managing authentication" ← starts with Explore, too vague\n' +
     '- "ZITADEL guides you through configuring session parameters" ← starts with ZITADEL guides\n' +
     '- "Learn how to customize attributes before they are set in the" ← truncated, starts with Learn how\n' +
     '- "Configure token creation with parameters for userinfo endpoints" ← uses internal term "parameters" instead of "claims"\n' +
+    '- "Use Client Secret Basic or JWT with Private Key for secure authentication in ZITADEL" ← starts with Use, ambiguous subject, missing endpoint context\n' +
     '\n' +
     '## ACCURACY RULES\n' +
     'Closely paraphrase the page\'s own introductory sentence — do not reinterpret or generalize it.\n' +
