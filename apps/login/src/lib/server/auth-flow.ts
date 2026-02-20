@@ -1,12 +1,15 @@
 "use server";
 
 import { getAllSessions } from "@/lib/cookies";
+import { createLogger } from "@/lib/logger";
 import { loginWithOIDCAndSession } from "@/lib/oidc";
 import { loginWithSAMLAndSession } from "@/lib/saml";
 import { getServiceConfig } from "@/lib/service-url";
 import { listSessions, ServiceConfig } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
+
+const logger = createLogger("auth-flow");
 
 export interface AuthFlowParams {
   sessionId: string;
@@ -54,7 +57,7 @@ export async function completeAuthFlow(
 
     // Safety net - ensure we always return a valid object
     if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
-      console.error("Auth flow: Invalid result from loginWithOIDCAndSession:", result);
+      logger.error("Auth flow: Invalid result from loginWithOIDCAndSession:", { result });
       return { error: "Authentication completed but navigation failed" };
     }
 
@@ -75,7 +78,7 @@ export async function completeAuthFlow(
       typeof result !== "object" ||
       (!("redirect" in result) && !("error" in result) && !("samlData" in result))
     ) {
-      console.error("Auth flow: Invalid result from loginWithSAMLAndSession:", result);
+      logger.error("Auth flow: Invalid result from loginWithSAMLAndSession:", { result });
       return { error: "Authentication completed but navigation failed" };
     }
 

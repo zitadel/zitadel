@@ -1,5 +1,6 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
 import {
   createInviteCode,
   getLoginSettings,
@@ -26,6 +27,8 @@ import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHostWithProtocol } from "./host";
 import { getTranslations } from "next-intl/server";
+
+const logger = createLogger("verify");
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
   const _headers = await headers();
@@ -62,11 +65,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   const verifyResponse = command.isInvite
     ? await verifyInviteCode({ serviceConfig, userId: command.userId, verificationCode: command.code }).catch((error) => {
-        console.warn(error);
+        logger.warn("Could not verify invite:", { error });
         return { error: t("errors.couldNotVerifyInvite") };
       })
     : await verifyEmail({ serviceConfig, userId: command.userId, verificationCode: command.code }).catch((error) => {
-        console.warn(error);
+        logger.warn("Could not verify email:", { error });
         return { error: t("errors.couldNotVerifyEmail") };
       });
 
@@ -101,7 +104,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       })
       .catch((error) => {
         // user session is not found, so we create a new one
-        console.warn("[verify] user session is not found, so we create a new one", error);
+        logger.warn("[verify] user session is not found, so we create a new one", { error });
         return undefined;
       });
   }

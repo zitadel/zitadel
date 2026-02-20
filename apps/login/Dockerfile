@@ -13,9 +13,11 @@ ENV HOSTNAME="::" \
     NODE_ENV="production" \
     NODE_OPTIONS="--use-openssl-ca" \
     SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt" \
-    SSL_CERT_DIR="/etc/ssl/certs"
+    SSL_CERT_DIR="/etc/ssl/certs" \
+    OTEL_SERVICE_NAME="zitadel-login" \
+    OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
 
 # TODO: Check healthy, not ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD ["/bin/sh", "-c", "node /app/healthcheck.js http://localhost:${PORT}/ui/v2/login/healthy"]
-ENTRYPOINT ["/app/entrypoint.sh", "node", "apps/login/server.js" ]
+ENTRYPOINT ["/app/entrypoint.sh", "node", "apps/login/server.js"]

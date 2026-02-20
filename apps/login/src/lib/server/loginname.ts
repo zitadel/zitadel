@@ -1,5 +1,6 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -24,6 +25,8 @@ import {
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
+
+const logger = createLogger("loginname");
 
 export type SendLoginnameCommand = {
   loginName: string;
@@ -60,17 +63,17 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   // Safety check: ensure searchResult is defined
   if (!searchResult) {
-    console.error("searchUsers returned undefined or null");
+    logger.error("searchUsers returned undefined or null");
     return { error: t("errors.couldNotSearchUsers") };
   }
 
   if ("error" in searchResult && searchResult.error) {
-    console.log("searchUsers returned error, returning early:", searchResult.error);
+    logger.debug("searchUsers returned error, returning early", { error: searchResult.error });
     return searchResult;
   }
 
   if (!("result" in searchResult)) {
-    console.log("searchUsers has no result field");
+    logger.debug("searchUsers has no result field");
     return { error: t("errors.couldNotSearchUsers") };
   }
 
@@ -80,12 +83,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   const users = potentialUsers ?? [];
 
   if (users.length === 0) {
-    console.log("No users found, will proceed with org discovery");
+    logger.debug("No users found, will proceed with org discovery");
   }
 
   const preventUserEnumeration = (organization: string | undefined) => {
     if (command.ignoreUnknownUsernames) {
-      console.log("ignoreUnknownUsernames is true, redirecting to password");
+      logger.debug("ignoreUnknownUsernames is true, redirecting to password");
       const paramsPasswordDefault = new URLSearchParams({
         loginName: command.loginName,
       });
@@ -228,7 +231,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   };
 
   if (users.length > 1) {
-    console.log("multiple users found, returning error");
+    logger.debug("multiple users found, returning error");
     if (loginSettingsByContext?.ignoreUnknownUsernames) {
       return preventUserEnumeration(command.organization);
     }
@@ -322,7 +325,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     // always resend invite if user has no auth method set
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
-      console.log("humanUser.email?.isVerified", humanUser?.email?.isVerified);
+      logger.debug("User has no auth methods set", { isEmailVerified: humanUser?.email?.isVerified });
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
         send: "true", // set this to true to request a new code immediately
@@ -473,7 +476,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
-  console.log("user not found (0 potential users), checking registration options");
+  logger.debug("User not found (0 potential users), checking registration options");
 
   // user not found, perform organization discovery if no org context provided
   let discoveredOrganization = command.organization;
@@ -499,33 +502,33 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const orgLoginSettings = await getLoginSettings({ serviceConfig, organization: orgToCheckForDiscovery });
 
       if (orgLoginSettings?.allowDomainDiscovery) {
-        console.log("org discovery successful, using org:", orgToCheckForDiscovery);
+        logger.debug("Org discovery successful", { organization: orgToCheckForDiscovery });
         discoveredOrganization = orgToCheckForDiscovery;
         // Use the discovered organization's login settings for subsequent checks
         effectiveLoginSettings = orgLoginSettings;
       } else {
-        console.log("org does not allow domain discovery");
+        logger.debug("Org does not allow domain discovery");
       }
     } else {
-      console.log("no single org found for discovery");
+      logger.debug("No single org found for discovery");
     }
   }
 
   // user not found, check if register is enabled on instance / organization context
   if (effectiveLoginSettings?.allowRegister && !effectiveLoginSettings?.allowLocalAuthentication) {
-    console.log("redirecting to IDP (register allowed, password not allowed)");
+    logger.debug("redirecting to IDP (register allowed, password not allowed)");
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);
     if (resp) {
       return resp;
     }
-    console.log("IDP redirect failed, returning user not found");
+    logger.debug("IDP redirect failed, returning user not found");
 
     return preventUserEnumeration(discoveredOrganization);
   } else if (effectiveLoginSettings?.allowRegister && effectiveLoginSettings?.allowLocalAuthentication) {
-    console.log("register and password both allowed");
+    logger.debug("register and password both allowed");
     // do not register user if ignoreUnknownUsernames is set
     if (discoveredOrganization && !effectiveLoginSettings?.ignoreUnknownUsernames) {
-      console.log("redirecting to registration page with org:", discoveredOrganization);
+      logger.debug("Redirecting to registration page", { organization: discoveredOrganization });
       const params = new URLSearchParams({ organization: discoveredOrganization });
 
       if (command.requestId) {
@@ -538,7 +541,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       return { redirect: "/register?" + params };
     } else {
-      console.log("not redirecting to register:", {
+      logger.debug("Not redirecting to register", {
         hasDiscoveredOrg: !!discoveredOrganization,
         ignoreUnknownUsernames: effectiveLoginSettings?.ignoreUnknownUsernames,
       });

@@ -1,4 +1,5 @@
 import { idpTypeToSlug } from "@/lib/idp";
+import { createLogger } from "@/lib/logger";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
 import { findValidSession } from "@/lib/session";
@@ -22,6 +23,8 @@ import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_s
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../../../constants/csp";
 import escapeHtml from "escape-html";
+
+const logger = createLogger("flow-initiation");
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;
@@ -82,7 +85,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
         const orgDomain = matched?.[1] ?? "";
 
-        console.log("Extracted Organization Domain:", orgDomain);
+        logger.info("Extracted org domain:", { orgDomain });
         if (orgDomain) {
           const orgs = await getOrgsByDomain({ serviceConfig, domain: orgDomain });
 
@@ -217,7 +220,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
             return NextResponse.redirect(absoluteUrl.toString());
           }
         } catch (error) {
-          console.error("Failed to execute sendLoginname:", error);
+          logger.error("Failed to execute sendLoginname:", { error });
         }
       }
 
@@ -328,7 +331,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         if (callbackUrl) {
           return NextResponse.redirect(callbackUrl);
         } else {
-          console.log("could not create callback, redirect user to choose other account");
+          logger.info("could not create callback, redirect user to choose other account");
           return gotoAccounts({
             request,
             organization,
@@ -336,7 +339,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           });
         }
       } catch (error) {
-        console.error(error);
+        logger.error("Error creating callback:", { error });
         return gotoAccounts({
           request,
           requestId,
@@ -446,7 +449,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
       });
     }
   } catch (error) {
-    console.error("SAML createResponse failed:", error);
+    logger.error("SAML createResponse failed:", { error });
   }
 
   // Final fallback: SAML response creation failed - show account selection

@@ -8,6 +8,10 @@ import {
   getUserAgent,
 } from "./fingerprint";
 
+import { cookies, headers } from "next/headers";
+import { userAgent } from "next/server";
+import { create } from "@zitadel/client";
+
 // Mock dependencies
 vi.mock("uuid");
 vi.mock("next/headers", () => ({
@@ -20,10 +24,6 @@ vi.mock("next/server", () => ({
 vi.mock("@zitadel/client", () => ({
   create: vi.fn(),
 }));
-
-import { cookies, headers } from "next/headers";
-import { userAgent } from "next/server";
-import { create } from "@zitadel/client";
 
 describe("fingerprint", () => {
   beforeEach(() => {

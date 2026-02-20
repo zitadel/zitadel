@@ -83,10 +83,11 @@
       ]
     },
     "test": {
-      "description": "Runs all tests (unit and integration)",
+      "description": "Runs all tests (unit, integration, and dockerized)",
       "dependsOn": [
         "test-unit",
-        "test-integration"
+        "test-integration",
+        "test-dockerized"
       ]
     },
     "test-unit": {
@@ -95,8 +96,8 @@
         "^build"
       ]
     },
-    "test-ca": {
-      "description": "Runs custom CA certificate integration tests using testcontainers",
+    "test-dockerized": {
+      "description": "Runs dockerized integration tests (OpenTelemetry and custom CA certificate tests)",
       "dependsOn": [
         "build"
       ],
@@ -111,7 +112,7 @@
       "options": {
         "cwd": "{projectRoot}",
         "commands": [
-          "pnpm vitest --run --config vitest.config.ca.mts"
+          "pnpm vitest --run --config vitest.config.dockerized.mts"
         ]
       }
     },

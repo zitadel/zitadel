@@ -3,7 +3,12 @@ import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_se
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../constants/csp";
+import { createLogger } from "./lib/logger";
 import { getServiceConfig } from "./lib/service-url";
+
+export const runtime = "nodejs";
+
+const logger = createLogger("middleware");
 export const config = {
   matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
 };
@@ -12,14 +17,14 @@ async function loadSecuritySettings(request: NextRequest): Promise<SecuritySetti
   const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
 
   if (!securityResponse.ok) {
-    console.error("Failed to fetch security settings:", securityResponse.statusText);
+    logger.error("Failed to fetch security settings:", { status: securityResponse.statusText });
     return null;
   }
 
   const response = await securityResponse.json();
 
   if (!response || !response.settings) {
-    console.error("No security settings found in the response.");
+    logger.error("No security settings found in the response.");
     return null;
   }
 

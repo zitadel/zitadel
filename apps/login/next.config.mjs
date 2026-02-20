@@ -41,6 +41,27 @@ const nextConfig = {
     optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
     useCache: true,
   },
+  // Packages that must not be bundled by webpack and should remain as external
+  // requires at runtime. These packages use native modules or have bundling
+  // incompatibilities. Keep this list in sync with package.json dependencies
+  // when adding new OpenTelemetry or logging packages.
+  serverExternalPackages: [
+    'winston',
+    '@opentelemetry/api',
+    '@opentelemetry/api-logs',
+    '@opentelemetry/sdk-node',
+    '@opentelemetry/sdk-metrics',
+    '@opentelemetry/sdk-logs',
+    '@opentelemetry/exporter-metrics-otlp-http',
+    '@opentelemetry/exporter-logs-otlp-http',
+    '@opentelemetry/exporter-prometheus',
+    '@opentelemetry/resources',
+    '@opentelemetry/semantic-conventions',
+    '@opentelemetry/auto-instrumentations-node',
+    '@opentelemetry/winston-transport',
+    '@opentelemetry/resource-detector-container',
+    '@opentelemetry/resource-detector-gcp',
+  ],
   // Improve SSR stability - not actually needed for React 19 SSR issues
   // onDemandEntries: {
   //   maxInactiveAge: 25 * 1000,
