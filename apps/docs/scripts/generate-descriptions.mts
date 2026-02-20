@@ -65,10 +65,10 @@ function isExcluded(contentRelPath: string): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Content-category classification (4 broad categories)
+// Content-category classification
 // ---------------------------------------------------------------------------
 
-type ContentCategory = 'reference' | 'guide' | 'sdk-example' | 'concept' | 'other';
+type ContentCategory = 'reference' | 'guide' | 'sdk-example' | 'concept' | 'advisory' | 'self-hosting' | 'other';
 
 /** Map path prefixes to broad categories. Order matters — first match wins. */
 const CATEGORY_RULES: Array<{ prefix: string; category: ContentCategory }> = [
@@ -80,18 +80,23 @@ const CATEGORY_RULES: Array<{ prefix: string; category: ContentCategory }> = [
   // SDK examples: framework integration code examples
   { prefix: 'sdk-examples/',    category: 'sdk-example' },
 
-  // Guide: how-tos, quickstarts, deployment, operations
+  // Guide: how-tos, quickstarts
   { prefix: 'guides/',          category: 'guide' },
   { prefix: 'examples/',        category: 'guide' },
-  { prefix: 'self-hosting/',    category: 'guide' },
+
+  // Self-hosting: deployment, operations, configuration
+  { prefix: 'self-hosting/',    category: 'self-hosting' },
 
   // Concept: architecture, IAM model, product/roadmap
   { prefix: 'concepts/',        category: 'concept' },
   { prefix: 'product/',         category: 'concept' },
 
-  // Other: legal, advisories, everything else
+  // Advisory: breaking-change and migration notices
+  { prefix: 'support/advisory/', category: 'advisory' },
+  { prefix: 'support/',          category: 'advisory' },
+
+  // Other: legal, everything else
   { prefix: 'legal/',           category: 'other' },
-  { prefix: 'support/advisory/', category: 'other' },
 ];
 
 function detectCategory(relPath: string): ContentCategory {
@@ -119,9 +124,28 @@ const CATEGORY_PROMPTS: Record<ContentCategory, { hint: string; pageKind: string
     pageKind: 'conceptual / architectural docs',
     hint: 'Lead with the concept or feature name and why it matters.',
   },
+  advisory: {
+    pageKind: 'technical advisory / breaking-change notice',
+    hint:
+      'This is a technical advisory, NOT a how-to guide. ' +
+      'Extract the advisory number from the title (e.g. "Technical Advisory 10003" → "A-10003") and start with it. ' +
+      'State what changed or broke and which ZITADEL versions are affected. ' +
+      'Frame as a notice about a change, not as an instruction to the reader. ' +
+      'Good: "A-10003: Default organization settings now apply to Login-UI when no org context is provided in ZITADEL v2.38.0" ' +
+      'Bad: "Update default organization settings for ZITADEL Login-UI to improve registration flows effectively now"',
+  },
+  'self-hosting': {
+    pageKind: 'self-hosting / operations guide',
+    hint:
+      'Lead with the specific operational task: deploy, configure, scale, migrate, or monitor. ' +
+      'Name the exact technology when relevant: Kubernetes, Helm, Docker Compose, PostgreSQL, Prometheus, etc. ' +
+      'Write naturally — do NOT pad with filler words like "quickly", "always", "securely always", "ready", or "efficiently now". ' +
+      'Good: "Deploy ZITADEL on Kubernetes using Helm with PostgreSQL and an Ingress controller" ' +
+      'Bad: "Install ZITADEL on Kubernetes using Helm with a PostgreSQL database and Ingress controller for secure access"',
+  },
   other: {
     pageKind: 'documentation page',
-    hint: 'For legal pages, omit "ZITADEL". For advisories, include the advisory ID.',
+    hint: 'Omit "ZITADEL" from the description when possible.',
   },
 };
 
@@ -307,6 +331,12 @@ function sanitizeDescription(text: string): string {
   // Remove trailing period (prompt asks for none)
   clean = clean.replace(/\.$/, '');
 
+  // Strip trailing filler words/phrases the LLM often pads with
+  clean = clean.replace(
+    /\s+(?:effectively\s+now|efficiently\s+now|effectively\s+always|securely\s+always|manually\s+afterwards|right\s+now|effectively|efficiently|smoothly|immediately|always|quickly|securely|ready|now)\s*$/i,
+    '',
+  );
+
   // Normalize terminology casing
   clean = clean.replace(/\bid[_\s]?tokens?\b/gi, 'ID token');
   clean = clean.replace(/\baccess[_\s]?tokens?\b/gi, 'access token');
@@ -441,6 +471,7 @@ async function generateDescription(
     '- Prefer industry terms like: tokens, claims, SAML assertions, OIDC, webhooks, provisioning, SCIM, IdP, service provider.\n' +
     '- DO NOT use the words "trigger", "triggers", "pre userinfo", "pre creation", "post creation", or "lifecycle phases". Use standard terms like "custom authentication logic" or "OIDC claims enrichment" instead.\n' +
     '- Never start with "Learn", "This guide", or "In this guide".\n' +
+    '- Do NOT pad the end of the description with filler words like "now", "quickly", "always", "effectively", "smoothly", "immediately", or "ready".\n' +
     '\n' +
     'Good examples:\n' +
     '- Add custom claims to ID tokens during token creation to support downstream authorization\n' +
