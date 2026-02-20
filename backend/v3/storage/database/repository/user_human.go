@@ -55,128 +55,14 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 	if !user.Human.MultifactorInitializationSkippedAt.IsZero() {
 		columnValues["multifactor_initialization_skipped_at"] = user.Human.MultifactorInitializationSkippedAt
 	}
-	if !user.Human.PreferredLanguage.IsRoot() {
-		columnValues["preferred_language"] = user.Human.PreferredLanguage
-	}
-	if user.Human.DisplayName != "" {
-		columnValues["display_name"] = user.Human.DisplayName
-	}
-	if user.Human.Nickname != "" {
-		columnValues["nickname"] = user.Human.Nickname
-	}
-	if user.Human.Gender != domain.HumanGenderUnspecified {
-		columnValues["gender"] = user.Human.Gender
-	}
-	if user.Human.AvatarKey != "" {
-		columnValues["avatar_key"] = user.Human.AvatarKey
-	}
-	if user.Human.Password.IsChangeRequired {
-		columnValues["password_change_required"] = true
-	}
+	columnValues = u.setOptionalProfileColumns(columnValues, user.Human)
 
 	ctes := make(map[string]database.CTEChange)
 
-	if user.Human.Password.PendingVerification != nil {
-		verification := &domain.VerificationTypeInit{
-			CreatedAt: user.CreatedAt,
-			Code:      user.Human.Password.PendingVerification.Code,
-		}
-		if user.Human.Password.PendingVerification.ID != "" {
-			verification.ID = &user.Human.Password.PendingVerification.ID
-		}
-		if user.Human.Password.PendingVerification.ExpiresAt != nil && !user.Human.Password.PendingVerification.ExpiresAt.IsZero() {
-			verification.Expiry = gu.Ptr(time.Since(*user.Human.Password.PendingVerification.ExpiresAt))
-		}
-
-		ctes["password_verification"] = u.SetResetPasswordVerification(verification).(database.CTEChange)
-		columnValues["password_verification_id"] = func(builder *database.StatementBuilder) {
-			builder.WriteString(`(SELECT id FROM password_verification)`)
-		}
-	} else if user.Human.Password.Hash != "" {
-		columnValues["password_hash"] = user.Human.Password.Hash
-		columnValues["password_changed_at"] = createdAt
-		if !user.Human.Password.ChangedAt.IsZero() {
-			columnValues["password_changed_at"] = user.Human.Password.ChangedAt
-		}
-	}
-
-	if user.Human.Email.PendingVerification != nil {
-		verification := &domain.VerificationTypeInit{
-			CreatedAt: user.CreatedAt,
-			Code:      user.Human.Email.PendingVerification.Code,
-		}
-		if user.Human.Email.PendingVerification.ID != "" {
-			verification.ID = &user.Human.Email.PendingVerification.ID
-		}
-		if user.Human.Email.PendingVerification.ExpiresAt != nil && !user.Human.Email.PendingVerification.ExpiresAt.IsZero() {
-			verification.Expiry = gu.Ptr(time.Since(*user.Human.Email.PendingVerification.ExpiresAt))
-		}
-
-		ctes["email_verification"] = u.SetEmailVerification(verification).(database.CTEChange)
-		columnValues["email_verification_id"] = func(builder *database.StatementBuilder) {
-			builder.WriteString(`(SELECT id FROM email_verification)`)
-		}
-	}
-	if user.Human.Email.Address != "" {
-		columnValues["email"] = user.Human.Email.Address
-		columnValues["unverified_email"] = user.Human.Email.Address
-		columnValues["email_verified_at"] = createdAt
-		if !user.Human.Email.VerifiedAt.IsZero() {
-			columnValues["email_verified_at"] = user.Human.Email.VerifiedAt
-		}
-	}
-	if user.Human.Email.UnverifiedAddress != "" {
-		columnValues["unverified_email"] = user.Human.Email.UnverifiedAddress
-	}
-	if user.Human.Phone != nil {
-		if user.Human.Phone.PendingVerification != nil {
-			verification := &domain.VerificationTypeInit{
-				CreatedAt: user.CreatedAt,
-				Code:      user.Human.Phone.PendingVerification.Code,
-			}
-			if user.Human.Phone.PendingVerification.ID != "" {
-				verification.ID = &user.Human.Phone.PendingVerification.ID
-			}
-			if user.Human.Phone.PendingVerification.ExpiresAt != nil && !user.Human.Phone.PendingVerification.ExpiresAt.IsZero() {
-				verification.Expiry = gu.Ptr(time.Since(*user.Human.Phone.PendingVerification.ExpiresAt))
-			}
-
-			ctes["phone_verification"] = u.SetPhoneVerification(verification).(database.CTEChange)
-			columnValues["phone_verification_id"] = func(builder *database.StatementBuilder) {
-				builder.WriteString(`(SELECT id FROM phone_verification)`)
-			}
-		}
-		if user.Human.Phone.Number != "" {
-			columnValues["phone"] = user.Human.Phone.Number
-			columnValues["unverified_phone"] = user.Human.Phone.Number
-			columnValues["phone_verified_at"] = createdAt
-			if !user.Human.Phone.VerifiedAt.IsZero() {
-				columnValues["phone_verified_at"] = user.Human.Phone.VerifiedAt
-			}
-		}
-		if user.Human.Phone.UnverifiedNumber != "" {
-			columnValues["unverified_phone"] = user.Human.Phone.UnverifiedNumber
-		}
-	}
-
-	if user.Human.Invite != nil {
-		if user.Human.Invite.PendingVerification != nil {
-			verification := &domain.VerificationTypeInit{
-				CreatedAt: user.CreatedAt,
-				Code:      user.Human.Invite.PendingVerification.Code,
-			}
-			if user.Human.Invite.PendingVerification.ID != "" {
-				verification.ID = &user.Human.Invite.PendingVerification.ID
-			}
-			if user.Human.Invite.PendingVerification.ExpiresAt != nil && !user.Human.Invite.PendingVerification.ExpiresAt.IsZero() {
-				verification.Expiry = gu.Ptr(time.Since(*user.Human.Invite.PendingVerification.ExpiresAt))
-			}
-			ctes["invite_verification"] = u.SetInviteVerification(verification).(database.CTEChange)
-		}
-		if !user.Human.Invite.AcceptedAt.IsZero() {
-			columnValues["invite_accepted_at"] = createdAt
-		}
-	}
+	columnValues, ctes = u.setPasswordColumns(columnValues, ctes, user, createdAt)
+	columnValues, ctes = u.setEmailColumns(columnValues, ctes, user, createdAt)
+	columnValues, ctes = u.setPhoneColumns(columnValues, ctes, user, createdAt)
+	columnValues, ctes = u.setInviteColumns(columnValues, ctes, user, createdAt)
 
 	for i, passkey := range user.Human.Passkeys {
 		ctes[fmt.Sprintf("passkey_%d", i)] = u.AddPasskey(passkey).(database.CTEChange)
@@ -235,6 +121,145 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 	builder.WriteString(") RETURNING created_at, updated_at")
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+}
+
+func (u userHuman) setPasswordColumns(columnValues map[string]any, ctes map[string]database.CTEChange, user *domain.User, createdAt any) (map[string]any, map[string]database.CTEChange) {
+	if user.Human.Password.PendingVerification != nil {
+		verification := &domain.VerificationTypeInit{
+			CreatedAt: user.CreatedAt,
+			Code:      user.Human.Password.PendingVerification.Code,
+		}
+		if user.Human.Password.PendingVerification.ID != "" {
+			verification.ID = &user.Human.Password.PendingVerification.ID
+		}
+		if user.Human.Password.PendingVerification.ExpiresAt != nil && !user.Human.Password.PendingVerification.ExpiresAt.IsZero() {
+			verification.Expiry = gu.Ptr(time.Since(*user.Human.Password.PendingVerification.ExpiresAt))
+		}
+
+		ctes["password_verification"] = u.SetResetPasswordVerification(verification).(database.CTEChange)
+		columnValues["password_verification_id"] = func(builder *database.StatementBuilder) {
+			builder.WriteString(`(SELECT id FROM password_verification)`)
+		}
+	} else if user.Human.Password.Hash != "" {
+		columnValues["password_hash"] = user.Human.Password.Hash
+		columnValues["password_changed_at"] = createdAt
+		if !user.Human.Password.ChangedAt.IsZero() {
+			columnValues["password_changed_at"] = user.Human.Password.ChangedAt
+		}
+	}
+	return columnValues, ctes
+}
+
+func (u userHuman) setEmailColumns(columnValues map[string]any, ctes map[string]database.CTEChange, user *domain.User, createdAt any) (map[string]any, map[string]database.CTEChange) {
+	if user.Human.Email.PendingVerification != nil {
+		verification := &domain.VerificationTypeInit{
+			CreatedAt: user.CreatedAt,
+			Code:      user.Human.Email.PendingVerification.Code,
+		}
+		if user.Human.Email.PendingVerification.ID != "" {
+			verification.ID = &user.Human.Email.PendingVerification.ID
+		}
+		if user.Human.Email.PendingVerification.ExpiresAt != nil && !user.Human.Email.PendingVerification.ExpiresAt.IsZero() {
+			verification.Expiry = gu.Ptr(time.Since(*user.Human.Email.PendingVerification.ExpiresAt))
+		}
+
+		ctes["email_verification"] = u.SetEmailVerification(verification).(database.CTEChange)
+		columnValues["email_verification_id"] = func(builder *database.StatementBuilder) {
+			builder.WriteString(`(SELECT id FROM email_verification)`)
+		}
+	}
+	if user.Human.Email.Address != "" {
+		columnValues["email"] = user.Human.Email.Address
+		columnValues["unverified_email"] = user.Human.Email.Address
+		columnValues["email_verified_at"] = createdAt
+		if !user.Human.Email.VerifiedAt.IsZero() {
+			columnValues["email_verified_at"] = user.Human.Email.VerifiedAt
+		}
+	}
+	if user.Human.Email.UnverifiedAddress != "" {
+		columnValues["unverified_email"] = user.Human.Email.UnverifiedAddress
+	}
+	return columnValues, ctes
+}
+
+func (u userHuman) setPhoneColumns(columnValues map[string]any, ctes map[string]database.CTEChange, user *domain.User, createdAt any) (map[string]any, map[string]database.CTEChange) {
+	if user.Human.Phone == nil {
+		return columnValues, ctes
+	}
+	if user.Human.Phone.PendingVerification != nil {
+		verification := &domain.VerificationTypeInit{
+			CreatedAt: user.CreatedAt,
+			Code:      user.Human.Phone.PendingVerification.Code,
+		}
+		if user.Human.Phone.PendingVerification.ID != "" {
+			verification.ID = &user.Human.Phone.PendingVerification.ID
+		}
+		if user.Human.Phone.PendingVerification.ExpiresAt != nil && !user.Human.Phone.PendingVerification.ExpiresAt.IsZero() {
+			verification.Expiry = gu.Ptr(time.Since(*user.Human.Phone.PendingVerification.ExpiresAt))
+		}
+
+		ctes["phone_verification"] = u.SetPhoneVerification(verification).(database.CTEChange)
+		columnValues["phone_verification_id"] = func(builder *database.StatementBuilder) {
+			builder.WriteString(`(SELECT id FROM phone_verification)`)
+		}
+	}
+	if user.Human.Phone.Number != "" {
+		columnValues["phone"] = user.Human.Phone.Number
+		columnValues["unverified_phone"] = user.Human.Phone.Number
+		columnValues["phone_verified_at"] = createdAt
+		if !user.Human.Phone.VerifiedAt.IsZero() {
+			columnValues["phone_verified_at"] = user.Human.Phone.VerifiedAt
+		}
+	}
+	if user.Human.Phone.UnverifiedNumber != "" {
+		columnValues["unverified_phone"] = user.Human.Phone.UnverifiedNumber
+	}
+	return columnValues, ctes
+}
+
+func (u userHuman) setInviteColumns(columnValues map[string]any, ctes map[string]database.CTEChange, user *domain.User, createdAt any) (map[string]any, map[string]database.CTEChange) {
+	if user.Human.Phone == nil {
+		return columnValues, ctes
+	}
+	if user.Human.Invite.PendingVerification != nil {
+		verification := &domain.VerificationTypeInit{
+			CreatedAt: user.CreatedAt,
+			Code:      user.Human.Invite.PendingVerification.Code,
+		}
+		if user.Human.Invite.PendingVerification.ID != "" {
+			verification.ID = &user.Human.Invite.PendingVerification.ID
+		}
+		if user.Human.Invite.PendingVerification.ExpiresAt != nil && !user.Human.Invite.PendingVerification.ExpiresAt.IsZero() {
+			verification.Expiry = gu.Ptr(time.Since(*user.Human.Invite.PendingVerification.ExpiresAt))
+		}
+		ctes["invite_verification"] = u.SetInviteVerification(verification).(database.CTEChange)
+	}
+	if !user.Human.Invite.AcceptedAt.IsZero() {
+		columnValues["invite_accepted_at"] = createdAt
+	}
+	return columnValues, ctes
+}
+
+func (u userHuman) setOptionalProfileColumns(columnValues map[string]any, human *domain.HumanUser) map[string]any {
+	if !human.PreferredLanguage.IsRoot() {
+		columnValues["preferred_language"] = human.PreferredLanguage
+	}
+	if human.DisplayName != "" {
+		columnValues["display_name"] = human.DisplayName
+	}
+	if human.Nickname != "" {
+		columnValues["nickname"] = human.Nickname
+	}
+	if human.Gender != domain.HumanGenderUnspecified {
+		columnValues["gender"] = human.Gender
+	}
+	if human.AvatarKey != "" {
+		columnValues["avatar_key"] = human.AvatarKey
+	}
+	if human.Password.IsChangeRequired {
+		columnValues["password_change_required"] = true
+	}
+	return columnValues
 }
 
 func (u userHuman) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
