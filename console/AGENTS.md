@@ -86,19 +86,29 @@ loadUser(userId: string): Observable<UserData> {
   );
 }
 
-// In Component
+// In Component (preferred: derive observable, consume via async pipe — no manual subscription)
 export class UserComponent {
-  userData$ = this.userService.userData$;
+  // Drive the view from an observable; no subscribe() needed in the component.
+  readonly userData$ = this.userService.loadUser('user-id');
 
-  constructor(private userService: UserService) {
-    this.userService.loadUser('user-id').subscribe();
-  }
+  constructor(private readonly userService: UserService) {}
 }
 
-// In Template (preferred - automatic subscription management)
+// In Template (preferred - automatic subscription management with no memory leaks)
 <div *ngIf="userData$ | async as user">
   {{ user.name }}
 </div>
+
+// If a manual subscription is unavoidable, use takeUntilDestroyed to prevent leaks:
+export class UserComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
+  ngOnInit() {
+    this.userService.loadUser('user-id').pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe();
+  }
+}
 ```
 
 ### gRPC-web and connectRPC Integration
