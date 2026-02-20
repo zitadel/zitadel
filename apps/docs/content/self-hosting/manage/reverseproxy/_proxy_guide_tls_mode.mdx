@@ -39,7 +39,7 @@ export const Commands = ({mode, name, lower, configfilename}) => {
     }
     const code = [
         '# Download the configuration files.',
-        'export ZITADEL_CONFIG_FILES=https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/manage/reverseproxy',
+        'export ZITADEL_CONFIG_FILES=https://raw.githubusercontent.com/zitadel/zitadel/main/apps/docs/content/self-hosting/manage/reverseproxy',
         'wget ${ZITADEL_CONFIG_FILES}/docker-compose.yaml -O docker-compose-base.yaml --quiet ',
         `wget \${ZITADEL_CONFIG_FILES}/${lower}/docker-compose.yaml -O docker-compose-${lower}.yaml --quiet `,
         `wget \${ZITADEL_CONFIG_FILES}/${lower}/${configfilename} -O ${configfilename} --quiet `,
@@ -73,7 +73,7 @@ export const LoginURL = ({mode}) => {
 
 <details open>
     <summary>{props.configfilename}</summary>
-    <DynamicCodeBlock lang={props.lower === 'nginx' ? 'nginx' : props.lower === 'httpd' ? 'apache' : props.lower === 'caddy' ? 'caddyfile' : 'yaml'} code={props.configfilecontent} />
+    <DynamicCodeBlock lang={props.lower === 'nginx' ? 'nginx' : props.lower === 'httpd' ? 'conf' : props.lower === 'caddy' ? 'caddy' : 'yaml'} code={props.configfilecontent} />
 </details>
 
 <Commands mode={props.mode} name={props.providername} lower={props.lower} configfilename={props.configfilename}/>
