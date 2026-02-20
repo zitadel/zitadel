@@ -11,7 +11,7 @@ const LOGIN_APP_DIR = path.join(TEST_DIR, "../..");
 const DOCKER_TIMEOUT = 180000;
 const TEST_TIMEOUT = 30000;
 
-const LOGIN_IMAGE_TAG = "zitadel-login-otel-test:latest";
+const LOGIN_IMAGE_TAG = `zitadel-login-otel-test:${Date.now()}`;
 
 function readTraces(): string {
   try {
@@ -136,7 +136,11 @@ describe("OpenTelemetry Integration", () => {
       .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
       .start();
 
-    await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+    try {
+      await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+    } catch (err) {
+      throw new Error(`Failed to build login Docker image: ${err instanceof Error ? err.message : err}`);
+    }
 
     loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
       .withNetwork(network)

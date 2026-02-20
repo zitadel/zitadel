@@ -7,12 +7,11 @@ import {
 } from "testcontainers";
 import type { StartedNetwork } from "testcontainers";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import { generateCertificates } from "./utils/tls.ts";
 
 const TEST_DIR = path.dirname(new URL(import.meta.url).pathname);
-const OUTPUT_DIR = path.join(TEST_DIR, "output");
-const CERTS_DIR = path.join(OUTPUT_DIR, "certs");
 const LOGIN_APP_DIR = path.join(TEST_DIR, "../..");
 
 const SMOCKER_MOCK_PORT = 443;
@@ -29,7 +28,7 @@ const SMOCKER_ADMIN_PORT = 8081;
  * from inside the container - this verifies TLS at the transport layer without
  * needing gRPC/HTTP2 support.
  */
-const LOGIN_IMAGE_TAG = "zitadel-login-otel-test:latest";
+const LOGIN_IMAGE_TAG = `zitadel-login-ca-test:${Date.now()}`;
 
 async function testTlsConnection(
   container: StartedTestContainer,
@@ -45,24 +44,22 @@ async function testTlsConnection(
 describe("Custom CA Certificate Integration", () => {
   let network: StartedNetwork;
   let mockServer: StartedTestContainer;
+  let certsDir: string;
 
   beforeAll(async () => {
-    if (fs.existsSync(OUTPUT_DIR)) {
-      fs.rmSync(OUTPUT_DIR, { recursive: true });
-    }
-    fs.mkdirSync(CERTS_DIR, { recursive: true });
+    certsDir = fs.mkdtempSync(path.join(os.tmpdir(), "ca-test-certs-"));
 
     const certs = generateCertificates();
-    fs.writeFileSync(path.join(CERTS_DIR, "ca.crt"), certs.ca.cert);
-    fs.writeFileSync(path.join(CERTS_DIR, "server.key"), certs.server.key);
-    fs.writeFileSync(path.join(CERTS_DIR, "server.crt"), certs.server.cert);
+    fs.writeFileSync(path.join(certsDir, "ca.crt"), certs.ca.cert);
+    fs.writeFileSync(path.join(certsDir, "server.key"), certs.server.key);
+    fs.writeFileSync(path.join(certsDir, "server.crt"), certs.server.cert);
 
     network = await new Network().start();
 
     mockServer = await new GenericContainer("ghcr.io/smocker-dev/smocker")
       .withNetwork(network)
       .withNetworkAliases("mock-zitadel")
-      .withBindMounts([{ source: CERTS_DIR, target: "/certs", mode: "ro" }])
+      .withBindMounts([{ source: certsDir, target: "/certs", mode: "ro" }])
       .withEnvironment({
         SMOCKER_MOCK_SERVER_LISTEN_PORT: "443",
         SMOCKER_CONFIG_LISTEN_PORT: "8081",
@@ -75,7 +72,11 @@ describe("Custom CA Certificate Integration", () => {
       .withWaitStrategy(Wait.forLogMessage(/Starting mock server/))
       .start();
 
-    await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+    try {
+      await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+    } catch (err) {
+      throw new Error(`Failed to build login Docker image: ${err instanceof Error ? err.message : err}`);
+    }
   }, 180_000);
 
   afterAll(async () => {
@@ -95,7 +96,7 @@ describe("Custom CA Certificate Integration", () => {
         })
         .withCopyFilesToContainer([
           {
-            source: path.join(CERTS_DIR, "ca.crt"),
+            source: path.join(certsDir, "ca.crt"),
             target: "/etc/ssl/certs/custom-ca.crt",
           },
         ])
