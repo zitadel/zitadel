@@ -39,7 +39,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Key Concepts",
           slug: "concepts",
           description:
-            "This part of our documentation contains ZITADEL specific or general concepts required to understand the system or our guides.",
+            "ZITADEL documentation for specific or general concepts required to understand the system or our guides.",
         },
         items: [
           "concepts/structure/instance",
@@ -244,7 +244,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Authenticate users with OpenID Connect (OIDC)",
           slug: "guides/integrate/login/oidc",
           description:
-            "This guide explains how to utilize ZITADEL for user authentication within your applications using OpenID Connect (OIDC). Here, we offer comprehensive guidance on seamlessly integrating ZITADEL's authentication features, ensuring both security and user experience excellence. Throughout this documentation, we'll cover the setup process for ZITADEL authentication, including the recommended OIDC flows tailored to different application types. Additionally, we'll provide clear instructions on securely signing out or logging out users from your application, ensuring data security and user privacy. With our guidance, you'll be equipped to leverage ZITADEL's authentication capabilities effectively, enhancing your application's security posture while delivering a seamless login experience for your users.",
+            "Comprehensive guide to user authentication in ZITADEL using OpenID Connect (OIDC), including recommended flows and session management.",
         },
         items: [
           "guides/integrate/login/oidc/oauth-recommended-flows",
@@ -518,7 +518,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Build your own Login UI",
           slug: "/guides/integrate/login-ui",
           description:
-            "In the following guides you will learn how to create your own login UI with our APIs. The different scenarios like username/password, external identity provider, etc. will be shown.",
+            "Create a custom login UI using ZITADEL APIs for username/password and external identity provider scenarios.",
         },
         collapsed: true,
         items: [
