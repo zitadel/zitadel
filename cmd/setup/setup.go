@@ -158,9 +158,15 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	i18n.MustLoadSupportedLanguagesFromDir()
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(ctx, err).Fatal("unable to connect to database")
+	q, err := queue.NewQueue(&queue.Config{
+		Client: dbClient,
+	})
+	if err != nil {
+		return err
+	}
 
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
-	esV3 := new_es.NewEventstore(dbClient)
+	esV3 := new_es.NewEventstore(dbClient, new_es.WithExecutionQueueOption(q))
 	config.Eventstore.Pusher = esV3
 	config.Eventstore.Searcher = esV3
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
@@ -579,6 +585,8 @@ func startCommandsQueries(
 	)
 	logging.OnError(ctx, err).Fatal("unable to start commands")
 
+	// TODO(IAM-Marco): This queue is going to be a duplicate of what we already have in eventstoreClient.queue
+	// set at line 169
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})

@@ -356,7 +356,8 @@ func TestServer_ExecutionTarget_Event(t *testing.T) {
 			// wait for called target
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				assert.True(ttt, calledF() == tt.expectedCalls)
+				actualCalls := calledF()
+				assert.Equal(ttt, tt.expectedCalls, actualCalls)
 			}, retryDuration, tick, "timeout waiting for expected execution result")
 		})
 	}
