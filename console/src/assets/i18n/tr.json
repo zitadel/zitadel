@@ -699,7 +699,7 @@
     "ORGNAME": "Organizasyon Adı",
     "ORGID": "Organizasyon ID",
     "STATE": "Durum",
-    "PRIMARYDOMAIN": "Birincil Alan Adı",
+    "PRIMARYDOMAIN": "Organizasyon Domain'i",
     "DISPLAYNAME": "Kullanıcı Görünen Adı",
     "EMAIL": "E-posta",
     "USERNAME": "Kullanıcı Adı",
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "En az {{value}} karakter uzunluğunda olmalıdır.",
       "MAXLENGTHERROR": "{{value}} karakterden az olmalıdır."
     },
-    "ID": "ID",
+    "ID": "Kullanıcı Kimliği",
     "EMAIL": "E-posta",
     "PHONE": "Telefon numarası",
     "PHONEEMPTY": "Telefon numarası tanımlanmamış",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Ad",
-      "ID": "ID",
+      "ID": "Organizasyon Kimliği",
       "CREATIONDATE": "Oluşturma Tarihi",
       "DATECHANGED": "Değiştirildi",
       "FILTER": "Filtre",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Dosyayı İndir",
       "SELECTORGTOOLTIP": "Bu organizasyonu seç.",
-      "PRIMARYDOMAIN": "Birincil Domain",
+      "PRIMARYDOMAIN": "Organizasyon Domain'i",
       "STATE": "Durum",
       "USEPASSWORD": "İlk Şifreyi Ayarla",
       "USEPASSWORDDESC": "Kullanıcının başlatma sırasında şifre ayarlaması gerekmez."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Domain Ekle",
-      "TITLE": "Doğrulanmış domain'ler",
+      "TITLE": "Organizasyon Domain'i",
       "DESCRIPTION": "Organizasyon domain'lerinizi yapılandırın. Bu domain, domain keşfi ve kullanıcı adı soneki için kullanılabilir.",
-      "SETPRIMARY": "Birincil Olarak Ayarla",
+      "SETPRIMARY": "Organizasyon Domain'i",
       "DELETE": {
         "TITLE": "Domain'i Sil",
         "DESCRIPTION": "Domain'lerinizden birini silmek üzeresiniz."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Yönetici eklendi.",
       "MEMBERREMOVED": "Yönetici kaldırıldı.",
       "MEMBERCHANGED": "Yönetici değiştirildi.",
-      "SETPRIMARY": "Birincil domain ayarlandı.",
+      "SETPRIMARY": "Organizasyon domain'i başarıyla ayarlandı.",
       "DELETED": "Organizasyon başarıyla silindi",
       "DEFAULTORGNOTFOUND": "Varsayılan organizasyon bulunamadı",
       "ORG_WAS_DELETED": "Organizasyon silindi."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP ve SMS Ayarları",
       "MESSAGETEXTS": "Mesaj Metinleri",
       "IDP": "Kimlik Sağlayıcıları",
-      "VERIFIED_DOMAINS": "Doğrulanmış domain'ler",
+      "VERIFIED_DOMAINS": "Organizasyon Domain'i",
       "DOMAIN": "Domain ayarları",
       "LOGINTEXTS": "Giriş Arayüzü Metinleri",
       "BRANDING": "Marka",
@@ -2017,7 +2017,8 @@
           "DESCRIPTION": "Projenizi gerçekten silmek istiyor musunuz?",
           "TYPENAME": "Kalıcı olarak silmek için projenin adını yazın."
         }
-      }
+      },
+      "ID": "Proje Kimliği"
     },
     "SETTINGS": {
       "TITLE": "Ayarlar",
@@ -2094,7 +2095,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Kaynak Sahibi",
       "GRANTEDORGNAME": "Organizasyon Adı",
-      "GRANTID": "Yetki Id",
+      "GRANTID": "Yetki ID",
       "CREATIONDATE": "Oluşturma Tarihi",
       "CHANGEDATE": "Son değişiklik",
       "DATES": "Tarihler",
@@ -2299,7 +2300,7 @@
     "ADD": "Kimlik Sağlayıcısı Ekle",
     "TYPE": "Tür",
     "OWNER": "Sahibi",
-    "ID": "ID",
+    "ID": "Kimlik Sağlayıcı Kimliği",
     "NAME": "Ad",
     "AUTHORIZATIONENDPOINT": "Yetkilendirme Uç Noktası",
     "TOKENENDPOINT": "Token Uç Noktası",
@@ -2524,7 +2525,7 @@
     "TOKEN": "Token Ayarları",
     "PAGES": {
       "TITLE": "Uygulama",
-      "ID": "ID",
+      "ID": "Uygulama Kimliği",
       "DESCRIPTION": "Burada uygulama verilerinizi ve yapılandırmasını düzenleyebilirsiniz.",
       "CREATE": "Uygulama oluştur",
       "CREATE_SELECT_PROJECT": "Önce projenizi seçin",
@@ -2868,5 +2869,6 @@
       "TITLE": "Aktivite",
       "DESCRIPTION": "Burada kullanıcı değişikliği oluşturan en son olayları görebilirsiniz."
     }
-  }
+  },
+  "INSTANCEID": "Instans Kimliği"
 }

@@ -217,7 +217,7 @@ Errors:
     DomainVerificationTypeInvalid: "Недопустимый тип подтверждения домена"
     DomainVerificationMissing: "Подтверждение домена ещё не началось"
     DomainVerificationFailed: "Ошибка подтверждения домена"
-    PrimaryDomainNotDeletable: "Невозможно удалить основной домен"
+    PrimaryDomainNotDeletable: "Невозможно удалить домен организации"
     DomainNotFound: "Домен не найден"
     MemberIDMissing: "ID участника отсутствует"
     MemberNotFound: "Участник организации не найден"
@@ -886,7 +886,7 @@ EventTypes:
       verified: "Домен проверен"
       removed: "Домен удалён"
       primary:
-        set: "Основной домен установлен"
+        set: "Домен организации установлен"
       reserved: "Домен зарезервирован"
       released: "Домен опубликован"
     name:

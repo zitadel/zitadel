@@ -85,10 +85,23 @@ Run commands from the repository root.
 - Known exception: `@zitadel/console` has no configured `test` target.
 
 ## Verified Common Targets
-- `@zitadel/api`: `prod`, `build`, `generate`, `lint`, `test`, `test-unit`, `test-integration`
+- `@zitadel/api`: `prod`, `build`, `generate`, `generate-install`, `lint`, `test`, `test-unit`, `test-integration`
 - `@zitadel/login`: `dev`, `build`, `lint`, `test`, `test-unit`, `test-integration`
-- `@zitadel/docs`: `dev`, `build`, `generate`, `check-links`, `check-types`, `test`, `lint`
-- `@zitadel/console`: `dev`, `build`, `generate`, `lint`
+- `@zitadel/docs`: `dev`, `build`, `generate`, `install-proto-plugins`, `check-links`, `check-types`, `test`, `lint`
+- `@zitadel/console`: `dev`, `build`, `generate`, `install-proto-plugins`, `lint`
+
+## Proto Plugin Binaries
+All proto plugins are installed to `.artifacts/bin/<GOOS>/<GOARCH>/` and Nx-cached. `generate` targets wire up the correct install dependency and prepend `.artifacts/bin/` to `$PATH` — no manual install step is needed.
+
+## PR Title Convention
+
+PR titles are validated by the Semantic PR app. Format:
+
+`<type>(<scope>): <short summary>`
+
+**Types**: must come from the list in [`.github/semantic.yml`](.github/semantic.yml) under `types:` — e.g. `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+
+**Scopes**: optional, but if used must come from the list in [`.github/semantic.yml`](.github/semantic.yml) under `scopes:`. When in doubt, omit the scope — do not invent values not on that list.
 
 ## Documentation
 - **Human Guide**: See `CONTRIBUTING.md` for setup and contribution details.

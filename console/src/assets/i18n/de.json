@@ -702,7 +702,7 @@
     "USERNAME": "Nutzername",
     "ORGNAME": "Organisationsname",
     "ORGID": "Organisations ID",
-    "PRIMARYDOMAIN": "Primäre Domäne",
+    "PRIMARYDOMAIN": "Organisationsdomäne",
     "PROJECTNAME": "Projektname",
     "RESOURCEOWNER": "Ressourcenbesitzer",
     "METHODS": {
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
       "MAXLENGTHERROR": "Muss weniger als {{value}} Zeichen umfassen."
     },
-    "ID": "ID",
+    "ID": "Benutzer-ID",
     "EMAIL": "E-Mail",
     "PHONE": "Telefonnummer",
     "PHONEEMPTY": "Keine Telefonnummer hinterlegt",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Name",
-      "ID": "ID",
+      "ID": "Organisations-ID",
       "CREATIONDATE": "Erstelldatum",
       "DATECHANGED": "Geändert",
       "FILTER": "Filter",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Datei herunterladen",
       "SELECTORGTOOLTIP": "Diese Organisation auswählen",
-      "PRIMARYDOMAIN": "Primäre Domain",
+      "PRIMARYDOMAIN": "Organisationsdomäne",
       "STATE": "Status",
       "USEPASSWORD": "Initiales Passwort setzen",
       "USEPASSWORDDESC": "Der Nutzer muss das Passwort bei der Initialisierung nicht setzen."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
-      "TITLE": "Verifizierte Domains",
+      "TITLE": "Organisationsdomäne",
       "DESCRIPTION": "Konfiguriere die Domains, die für Domain Discovery und als Suffix für die Benutzer verwendet werden können.",
-      "SETPRIMARY": "Primäre Domain setzen",
+      "SETPRIMARY": "Als Organisationsdomäne festlegen",
       "DELETE": {
         "TITLE": "Domain löschen?",
         "DESCRIPTION": "Du bist im Begriff, eine Domain aus deiner Organisation zu löschen."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administrator hinzugefügt.",
       "MEMBERREMOVED": "Administrator entfernt.",
       "MEMBERCHANGED": "Administrator geändert.",
-      "SETPRIMARY": "Primäre Domain gesetzt.",
+      "SETPRIMARY": "Organisationsdomäne wurde erfolgreich festgelegt.",
       "DELETED": "Organisation erfolgreich gelöscht",
       "DEFAULTORGNOTFOUND": "Die Standardorganisation wurde nicht gefunden",
       "ORG_WAS_DELETED": "Organisation wurde gelöscht."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP und SMS Einstellungen",
       "MESSAGETEXTS": "Benachrichtigungstexte",
       "IDP": "Identitätsanbieter",
-      "VERIFIED_DOMAINS": "Verifizierte Domains",
+      "VERIFIED_DOMAINS": "Organisationsdomäne",
       "DOMAIN": "Domain Einstellungen",
       "LOGINTEXTS": "Login Interface Texte",
       "BRANDING": "Branding",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "Willst Du das Projekt wirklich löschen?",
           "TYPENAME": "Wiederholen Sie den Namen des Projektes um es zu löschen."
         }
-      }
+      },
+      "ID": "Projekt-ID"
     },
     "SETTINGS": {
       "TITLE": "Einstellungen",
@@ -2091,7 +2092,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Besitzer",
       "GRANTEDORGNAME": "Name der Organisation",
-      "GRANTID": "Grant Id",
+      "GRANTID": "Grant ID",
       "CREATIONDATE": "Erstelldatum",
       "CHANGEDATE": "Letzte Änderung",
       "DATES": "Datum",
@@ -2156,7 +2157,7 @@
       "DELETE": "Projekt löschen",
       "ORGNAME": "Name der Organisation",
       "ORGID": "Organisations ID",
-      "ORGDOMAIN": "Domain der Organisation",
+      "ORGDOMAIN": "Organisationsdomäne",
       "STATE": "Status",
       "TYPE": "Typ",
       "CREATIONDATE": "Erstelldatum",
@@ -2289,7 +2290,7 @@
     "UPDATECLIENTSECRET": "Client Secret updaten",
     "TYPE": "Typ",
     "OWNER": "Besitzer",
-    "ID": "ID",
+    "ID": "Identitätsanbieter-ID",
     "AVAILABILITY": "Verfügbarkeit",
     "AVAILABLE": "verfügbar",
     "AVAILABLEBUTINACTIVE": "verfügbar aber inaktiv",
@@ -2495,7 +2496,7 @@
     "TOKEN": "Token Einstellungen",
     "PAGES": {
       "TITLE": "Anwendung",
-      "ID": "ID",
+      "ID": "Applikations-ID",
       "DESCRIPTION": "Hier kannst Du Deine Applikationen bearbeiten und deren Konfiguration anpassen.",
       "CREATE": "Applikation erstellen",
       "CREATE_SELECT_PROJECT": "Wähle zuerst dein Projekt aus",
@@ -2839,5 +2840,6 @@
       "TITLE": "Aktivität",
       "DESCRIPTION": "Hier siehst Du die letzten Vorkommnisse, die den Benutzer betreffen."
     }
-  }
+  },
+  "INSTANCEID": "Instanz-ID"
 }

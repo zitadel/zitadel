@@ -101,6 +101,7 @@ export function UsernameForm({
           <TextInput
             type="text"
             autoComplete="username"
+            autoFocus
             {...register("loginName", { required: t("required.loginName") })}
             label={inputLabel}
             data-testid="username-text-input"
