@@ -86,9 +86,9 @@ After creating a SAML app, you can either:
 1.  Add a link to a SAML metadata file.
 2.  Upload the metadata XML file directly.
 
-You can find example configurations for SAML 2.0 in our [integrate services](../../integrate/login/saml) guides.
+You can find example settings for SAML 2.0 in our [integrate services](../../integrate/login/saml) guides.
 
-## Configuration
+## Settings
 
 ### Redirect URIs
 
@@ -134,15 +134,15 @@ IPv6
 When IPv6 URIs are used as redirects in development mode, square brackets must be escaped as they are special terms for globs. Example: `http://\[::1\]:80`
 </Callout>
 
-### Review Configuration
+### Review Settings
 
 <ReviewConfig components={props.components} authType="code" />
 
 ## Application Settings
 
-After creating an application, you can modify its configuration.
+After creating an application, you can modify its settings.
 * **Auth Method:** You can switch authentication methods (e.g., from Basic to Private Key JWT) via the toggle or dropdowns.
-* **OIDC Compliance:** The Management Console checks if your configuration is OIDC compliant and shows tasks for completion if anything is missing.
+* **OIDC Compliance:** The Management Console checks if your settings are OIDC compliant and shows tasks for completion if anything is missing.
 
 <Callout type="caution">
 You **cannot** change the Application Type (e.g., from Web to Native) after creation. You must delete and recreate the application.
@@ -179,10 +179,10 @@ If your application makes requests from domains other than the Redirect URI (e.g
 
 ## Security Considerations
 
-Ensure the configuration of application settings is limited to authorized users only.
+Ensure the management of application settings is limited to authorized users only.
 
 * Use [Administrator roles](./administrators) to limit permissions for your users to make changes to your applications.
-* When [granting projects](../../../concepts/structure/granted_projects) to other organizations, the receiving organization **cannot** see or change the application configuration. They can only assign roles.
+* When [granting projects](../../../concepts/structure/granted_projects) to other organizations, the receiving organization **cannot** see or change the application settings. They can only assign roles.
 
 ## References
 

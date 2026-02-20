@@ -82,7 +82,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
         const orgDomain = matched?.[1] ?? "";
 
-        console.log("Extracted org domain:", orgDomain);
+        console.log("Extracted Organization Domain:", orgDomain);
         if (orgDomain) {
           const orgs = await getOrgsByDomain({ serviceConfig, domain: orgDomain });
 

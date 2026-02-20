@@ -20,7 +20,7 @@ NEXT_PUBLIC_THEME_SPACING=regular        # regular | compact
 // Server-safe theme configuration
 import { getThemeConfig, getComponentRoundness } from "@/lib/theme";
 
-// Get full theme configuration
+// Get full theme settings
 const themeConfig = getThemeConfig();
 // Returns: { roundness: 'mid', layout: 'side-by-side', appearance: 'material', ... }
 
