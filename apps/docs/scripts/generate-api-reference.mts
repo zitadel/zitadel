@@ -204,28 +204,86 @@ async function fixAllGeneratedLinks() {
       return match;
     });
 
-    // Add description to frontmatter if missing and it's an API reference page
-    if (file.includes('reference/api') && !newContent.includes('\ndescription:')) {
-      const titleMatch = newContent.match(/^title:\s*(.+)$/m);
+    // Add description to frontmatter if missing or corrupted and it's an API reference page
+    if (file.includes('reference/api')) {
+      const titleMatch = newContent.match(/^title:\s*(.*)$/m);
       if (titleMatch) {
-        const title = titleMatch[1].replace(/['"]/g, '').trim();
+        let title = titleMatch[1].replace(/['"]/g, '').trim();
+        // Handle multiline titles
+        if (title === '|' || title === '|-' || title === '>') {
+          const lines = newContent.slice(titleMatch.index).split('\n');
+          if (lines.length > 1) {
+            title = lines[1].trim();
+          }
+        }
+
         // Try to find the operation summary in _openapi contents
-        const summaryMatch = newContent.match(/contents:\s*-\s*content:\s*>?-?\s*([\s\S]+?)(?=\n\s*\w+:|$)/);
+        const summaryMatch = newContent.match(/contents:\s*-\s*content:\s*(?:[|>]-?\s*)?([\s\S]+?)(?=\n\s*---|\n\s*(_|\w)+:|$)/);
         let description = '';
         if (summaryMatch) {
-          description = summaryMatch[1].trim().split('\n').map(line => line.trim()).join(' ');
+          description = summaryMatch[1]
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0 && !line.startsWith('- ') && !line.startsWith('---'))
+            .join(' ');
+          
           if (description.length > 200) {
             description = description.slice(0, 197) + '...';
           }
         }
 
         if (!description || description.length < 50) {
-            description = `Explore the ${title} operation in the ZITADEL API. Learn about request parameters, response schemas, and integration details for this endpoint.`;
+          description = `Explore the ${title} operation in the ZITADEL API. Learn about request parameters, response schemas, and integration details for this endpoint.`;
         }
 
-        newContent = newContent.replace(/^(title:\s*.+)$/m, `$1\ndescription: "${description.replace(/"/g, '\\"')}"`);
-        modified = true;
+        // Clean up title for description use
+        const cleanTitle = title.replace(/\n\s+/g, ' ').trim();
+        if (!description.includes(cleanTitle)) {
+           description = `${cleanTitle}: ${description}`;
+        }
+        
+        // Final sanitization for YAML double-quoted string
+        description = description
+            .replace(/\n/g, ' ')
+            .replace(/"/g, "'") // Use single quotes internally
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        const newDescLine = `description: "${description}"`;
+
+        // Clean existing descriptions to avoid duplicates or corrupted ones
+        const oldContent = newContent;
+        
+        // Split frontmatter and body
+        const parts = newContent.split('---');
+        if (parts.length >= 3) {
+            let frontmatter = parts[1];
+            // Remove any existing description keys and their potential multiline values
+            // This regex matches "description:" and then everything until it sees a new key (word followed by colon) 
+            // or the end of the frontmatter section.
+            frontmatter = frontmatter.replace(/description:\s*[\s\S]*?(?=\n\w+:|$)/g, '');
+            
+            // Also explicitly fix the "iam.member.read" type corruption by looking for lines that start with quotes 
+            // but have no colon, which follow a description line.
+            // Actually the regex above should have caught it if it matched until the next key.
+            
+            // Clean up any double newlines and trim
+            frontmatter = frontmatter.split('\n').filter(line => line.trim().length > 0).join('\n');
+            
+            parts[1] = `\n${newDescLine}\n${frontmatter}\n`;
+            newContent = parts.join('---');
+        }
+
+        if (newContent !== oldContent) {
+            modified = true;
+        }
       }
+    }
+
+    // Fix previously corrupted frontmatter (title followed immediately by description)
+    if (newContent.match(/^title: \|-?\ndescription: /m)) {
+      newContent = newContent.replace(/^(title: \|-?)\ndescription: (.*)\n/m, "description: $2\n$1\n");
+      modified = true;
     }
 
     if (modified) {
