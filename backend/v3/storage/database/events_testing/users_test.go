@@ -169,92 +169,6 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// TODO
-	// t.Run("test human user added init reduced", func(t *testing.T) {
-	// 	humanUserRequest := &management.AddHumanUserRequest{
-	// UserName: gofakeit.Username(),
-	// 		Profile: &management.AddHumanUserRequest_Profile{
-	// 			FirstName:         "first",
-	// 			LastName:          "last",
-	// 			NickName:          "nick",
-	// 			DisplayName:       "display",
-	// 			PreferredLanguage: "en",
-	// 			Gender:            user.Gender_GENDER_MALE,
-	// 		},
-	// 		Email: &management.AddHumanUserRequest_Email{
-	// 			Email:           gofakeit.Email(),
-	// 			IsEmailVerified: true,
-	// 		},
-	// 		Phone: &management.AddHumanUserRequest_Phone{
-	// 			Phone:           "+" + gofakeit.Phone(),
-	// 			IsPhoneVerified: true,
-	// 		},
-	// 		InitialPassword: "Password1!",
-	// 	}
-
-	// 	resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
-	// 	require.NoError(t, err)
-
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		user, err := userRepo.Get(
-	// 			CTX,
-	// 			pool,
-	// 			database.WithCondition(database.And(
-	// 				userRepo.InstanceIDCondition(instanceID),
-	// 				userRepo.OrganizationIDCondition(orgID),
-	// 				userRepo.IDCondition(resp.UserId),
-	// 			)),
-	// 		)
-	// 		require.NoError(t, err)
-
-	// 		// event user.human.added.initialization.code.added
-	// 	}, retryDuration, tick)
-	// })
-
-	// TODO
-	// t.Run("test human user added init check succeeded reduced", func(t *testing.T) {
-	// 	humanUserRequest := &management.AddHumanUserRequest{
-	// UserName: gofakeit.Username(),
-	// 		Profile: &management.AddHumanUserRequest_Profile{
-	// 			FirstName:         "first",
-	// 			LastName:          "last",
-	// 			NickName:          "nick",
-	// 			DisplayName:       "display",
-	// 			PreferredLanguage: "en",
-	// 			Gender:            user.Gender_GENDER_MALE,
-	// 		},
-	// 		Email: &management.AddHumanUserRequest_Email{
-	// 			Email:           gofakeit.Email(),
-	// 			IsEmailVerified: true,
-	// 		},
-	// 		Phone: &management.AddHumanUserRequest_Phone{
-	// 			Phone:           "+" + gofakeit.Phone(),
-	// 			IsPhoneVerified: true,
-	// 		},
-	// 		InitialPassword: "Password1!",
-	// 	}
-
-	// 	resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
-	// 	require.NoError(t, err)
-
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		user, err := userRepo.Get(
-	// 			CTX,
-	// 			pool,
-	// 			database.WithCondition(database.And(
-	// 				userRepo.InstanceIDCondition(instanceID),
-	// 				userRepo.OrganizationIDCondition(orgID),
-	// 				userRepo.IDCondition(resp.UserId),
-	// 			)),
-	// 		)
-	// 		require.NoError(t, err)
-
-	// 		// event user.human.added.initialization.check.succeeded
-	// 	}, retryDuration, tick)
-	// })
-
 	t.Run("test human user locked reduced", func(t *testing.T) {
 		humanUserRequest := &management.AddHumanUserRequest{
 			UserName: gofakeit.Username(),
@@ -686,167 +600,6 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// TODO
-	// t.Run("test user domain claimed reduced", func(t *testing.T) {
-	// 	org, err := OrgClient.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-	// 		Name: gofakeit.Name(),
-	// 	})
-	// 	require.NoError(t, err)
-	// 	orgID := org.Id
-
-	// 	// change custom domain policy to make validation mandatory
-	// 	_, err = AdminClient.AddCustomDomainPolicy(IAMCTX, &admin.AddCustomDomainPolicyRequest{
-	// 		OrgId:              orgID,
-	// 		ValidateOrgDomains: true,
-	// 	})
-	// 	require.NoError(t, err)
-
-	// 	// add user
-	// 	userName := gofakeit.Name()
-	// 	userID := gofakeit.Name()
-	// 	UserClient.AddHumanUser(IAMCTX,
-	// 		&v2beta_user.AddHumanUserRequest{
-	// 			Username: &userName,
-	// 			UserId:   &userID,
-	// 			Organization: &object.Organization{
-	// 				Org: &object.Organization_OrgId{
-	// 					OrgId: orgID,
-	// 				},
-	// 			},
-	// 			Profile: &v2beta_user.SetHumanProfile{
-	// 				GivenName:         "Donald",
-	// 				FamilyName:        "Duck",
-	// 				NickName:          gu.Ptr("Dukkie"),
-	// 				DisplayName:       gu.Ptr("Donald Duck"),
-	// 				PreferredLanguage: gu.Ptr("en"),
-	// 				Gender:            v2beta_user.Gender_GENDER_DIVERSE.Enum(),
-	// 			},
-	// 			Email: &v2beta_user.SetHumanEmail{
-	// 				Email: gofakeit.Email(),
-	// 			},
-	// 			Phone: &v2beta_user.SetHumanPhone{},
-	// 			Metadata: []*v2beta_user.SetMetadataEntry{
-	// 				{
-	// 					Key:   "somekey",
-	// 					Value: []byte("somevalue"),
-	// 				},
-	// 			},
-	// 			PasswordType: &v2beta_user.AddHumanUserRequest_Password{
-	// 				Password: &v2beta_user.Password{
-	// 					Password:       "DifficultPW666!",
-	// 					ChangeRequired: true,
-	// 				},
-	// 			},
-	// 		})
-	// 	// humanUserRequest := &management.AddHumanUserRequest{
-	// 	// 	UserName: userName,
-	// 	// 	Profile: &management.AddHumanUserRequest_Profile{
-	// 	// 		FirstName:         "first",
-	// 	// 		LastName:          "last",
-	// 	// 		NickName:          "nick",
-	// 	// 		DisplayName:       "display",
-	// 	// 		PreferredLanguage: "en",
-	// 	// 		Gender:            user.Gender_GENDER_MALE,
-	// 	// 	},
-	// 	// 	Email: &management.AddHumanUserRequest_Email{
-	// 	// 		Email:           gofakeit.Email(),
-	// 	// 		IsEmailVerified: true,
-	// 	// 	},
-	// 	// 	Phone: &management.AddHumanUserRequest_Phone{
-	// 	// 		Phone:           "+" + gofakeit.Phone(),
-	// 	// 		IsPhoneVerified: true,
-	// 	// 	},
-	// 	// 	InitialPassword: "Password1!",
-	// 	// }
-	// 	// resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
-	// 	require.NoError(t, err)
-
-	// 	// check user exists
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		user, err := userRepo.Get(
-	// 			CTX,
-	// 			pool,
-	// 			database.WithCondition(database.And(
-	// 				userRepo.InstanceIDCondition(instanceID),
-	// 				userRepo.OrganizationIDCondition(orgID),
-	// 				userRepo.IDCondition(userID),
-	// 			)),
-	// 		)
-	// 		require.NoError(t, err)
-
-	// 		assert.NotNil(t, user)
-	// 	}, retryDuration, tick)
-
-	// 	domain := "localhost:8383"
-
-	// 	// add organization domain
-	// 	_, err = OrgClient.AddOrganizationDomain(IAMCTX, &v2beta_org.AddOrganizationDomainRequest{
-	// 		OrganizationId: orgID,
-	// 		Domain:         domain,
-	// 	})
-	// 	require.NoError(t, err)
-
-	// 	// request validation for domain
-	// 	r, err := OrgClient.GenerateOrganizationDomainValidation(IAMCTX, &v2beta_org.GenerateOrganizationDomainValidationRequest{
-	// 		OrganizationId: orgID,
-	// 		Domain:         domain,
-	// 		Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
-	// 	})
-	// 	require.NoError(t, err)
-
-	// 	token := r.Token
-
-	// 	// crate http server for domain validation
-	// 	http.HandleFunc("/.well-known/zitadel-challenge/"+token+".txt", func(w http.ResponseWriter, req *http.Request) {
-	// 		w.Header().Set("Content-Type", "text/plain")
-	// 		w.Write([]byte(token))
-	// 	})
-	// 	// NOTE Apple introduced a policy change where TLS server certificates issued after July 1, 2019, must have a validity period of 825 days or fewer.
-	// 	// to regenerate; openssl req -new -x509 -key server.key -out server.crt -days 800 -subj "/CN=localhost" -addext "subjectAltName = DNS:localhost,IP:127.0.0.1
-	// 	cert, err := tls.X509KeyPair(serverCrt, serverKey)
-	// 	require.NoError(t, err)
-	// 	tlsConfig := &tls.Config{
-	// 		Certificates: []tls.Certificate{cert},
-	// 		MinVersion:   tls.VersionTLS12, // Recommended for security
-	// 	}
-	// 	server := &http.Server{
-	// 		Addr:      ":8383",
-	// 		Handler:   http.DefaultServeMux,
-	// 		TLSConfig: tlsConfig,
-	// 	}
-	// 	go func() {
-	// 		err := server.ListenAndServeTLS("", "")
-	// 		require.NoError(t, err)
-	// 	}()
-	// 	defer server.Close()
-
-	// 	// validate domain
-	// 	_, err = OrgClient.VerifyOrganizationDomain(IAMCTX, &v2beta_org.VerifyOrganizationDomainRequest{
-	// 		OrganizationId: orgID,
-	// 		Domain:         domain,
-	// 	})
-	// 	require.NoError(t, err)
-
-	// 	// check usernme now includes the domain
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		user, err := userRepo.Get(
-	// 			CTX,
-	// 			pool,
-	// 			database.WithCondition(database.And(
-	// 				userRepo.InstanceIDCondition(instanceID),
-	// 				userRepo.OrganizationIDCondition(orgID),
-	// 				userRepo.IDCondition(userID),
-	// 			)),
-	// 		)
-	// 		require.NoError(t, err)
-
-	// 		// event user.domain.claimed
-	// 		assert.Equal(t, userName+domain, user.Username)
-	// 	}, retryDuration, tick)
-	// })
-
 	t.Run("test human user profile change reduced", func(t *testing.T) {
 		humanUserRequest := &management.AddHumanUserRequest{
 			UserName: gofakeit.Username(),
@@ -925,7 +678,6 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// TODO fix this: the issue is that a user called tester needs to be created for this test to work on the default instance and default organization
 	// I added a delete user command (Over REST because there is no gRPC client (as far as I can tell) for the default instance)
 	// the issue is if the user does not exist it will throw and error when trying to delete it
 	t.Run("test human user avatar added reduced", func(t *testing.T) {
@@ -1032,7 +784,6 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// TODO fix this: the issue is that a user called tester needs to be created for this test to work on the default instance and default organization
 	// I added a delete user command (Over REST because there is no gRPC client (as far as I can tell) for the default instance)
 	// the issue is if the user does not exist it will throw and error when trying to delete it
 	t.Run("test human user avatar removed reduced", func(t *testing.T) {
@@ -1139,7 +890,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		before := time.Now()
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
-			Delete("http://localhost:8082" + "/auth/v1" + "/users/me/avatar")
+			Delete("http://localhost:8082/auth/v1/users/me/avatar")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 		after := time.Now()
