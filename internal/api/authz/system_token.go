@@ -114,7 +114,7 @@ func (s *SystemAPIUser) readKey() (*SystemAPIPublicKey, error) {
 	// when x.509 cert is provided, parse it and extract RSA key
 	block, _ := pem.Decode(s.KeyData)
 	if block == nil {
-		return nil, zerrors.ThrowInternal(nil, "AUTHZ-FC8ohc", "Errors.SystemApiUser.CertDecodeFailed")
+		return nil, zerrors.ThrowInternal(err, "AUTHZ-FC8ohc", "Errors.SystemApiUser.CertDecodeFailed")
 	}
 	cert, err := x509.ParseCertificate(block.Bytes)
 	if err != nil {
@@ -145,7 +145,7 @@ func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID st
 			return nil, err
 		}
 		s.cachedKeys[userID] = key
-		s.mutex.RUnlock()
+		s.mutex.Unlock()
 	}
 
 	now := time.Now().UTC()
