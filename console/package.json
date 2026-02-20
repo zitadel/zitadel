@@ -81,7 +81,7 @@
     "@typescript-eslint/parser": "^8.54.0",
     "@zitadel/client": "workspace:*",
     "@zitadel/proto": "workspace:*",
-    "eslint": "^8.57.1",
+    "eslint": "^9.26.0",
     "jasmine-core": "~5.12.1",
     "jasmine-spec-reporter": "~7.0.0",
     "karma": "^6.4.4",
