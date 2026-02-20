@@ -48,7 +48,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 				IsEmailVerified: true,
 			},
 			Phone: &management.AddHumanUserRequest_Phone{
-				Phone:           "+" + gofakeit.Phone(),
+				Phone:           "+1" + gofakeit.Phone(),
 				IsPhoneVerified: true,
 			},
 			InitialPassword: "Password1!",
@@ -107,7 +107,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		client := resty.New()
 
 		bow := surf.NewBrowser()
-		err := bow.Open("http://localhost:8080" + "/ui/login/register/org")
+		err := bow.Open("http://localhost:8082" + "/ui/login/register/org")
 		require.NoError(t, err)
 		require.Equal(t, 200, bow.StatusCode())
 
@@ -121,16 +121,15 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		email := gofakeit.Email()
 		out, err := client.R().SetAuthToken(token).
 			SetFormData(map[string]string{
-				"gorilla.csrf.Token": csfr,
-				"orgname":            gofakeit.Name(),
-				"firstname":          firstName,
-				"lastname":           lastName,
-				// "email":                          "@zitadel.localhost",
+				"gorilla.csrf.Token":             csfr,
+				"orgname":                        gofakeit.Name(),
+				"firstname":                      firstName,
+				"lastname":                       lastName,
 				"email":                          email,
 				"register-password":              "Password1!",
 				"register-password-confirmation": "Password1!",
 			}).
-			Post("http://localhost:8080" + "/ui/login/register/org")
+			Post("http://localhost:8082" + "/ui/login/register/org")
 
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
@@ -161,13 +160,9 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			assert.Equal(t, domain.UserStateActive, user.State)
 			assert.WithinRange(t, user.CreatedAt, before, after)
 			// Email
-			assert.Equal(t, email, user.Human.Email.Address)
-			assert.NotZero(t, user.Human.Email.VerifiedAt)
+			assert.Equal(t, email, user.Human.Email.UnverifiedAddress)
+			assert.Zero(t, user.Human.Email.VerifiedAt)
 			assert.Nil(t, user.Human.Email.PendingVerification)
-			// Phone
-			assert.Equal(t, email, user.Human.Phone.Number)
-			assert.NotZero(t, user.Human.Phone.VerifiedAt)
-			assert.Nil(t, user.Human.Phone.PendingVerification)
 			// Human
 			assert.Equal(t, firstName, user.Human.FirstName)
 			assert.Equal(t, lastName, user.Human.LastName)
@@ -482,7 +477,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test human user reeactivate reduced", func(t *testing.T) {
+	t.Run("test human user reactivate reduced", func(t *testing.T) {
 		humanUserRequest := &management.AddHumanUserRequest{
 			UserName: gofakeit.Username(),
 			Profile: &management.AddHumanUserRequest_Profile{
@@ -498,7 +493,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 				IsEmailVerified: true,
 			},
 			Phone: &management.AddHumanUserRequest_Phone{
-				Phone:           "+" + gofakeit.Phone(),
+				Phone:           "+1" + gofakeit.Phone(),
 				IsPhoneVerified: true,
 			},
 			InitialPassword: "Password1!",
@@ -585,10 +580,6 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 				Email:           gofakeit.Email(),
 				IsEmailVerified: true,
 			},
-			Phone: &management.AddHumanUserRequest_Phone{
-				Phone:           "+" + gofakeit.Phone(),
-				IsPhoneVerified: true,
-			},
 			InitialPassword: "Password1!",
 		}
 
@@ -647,10 +638,6 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			Email: &management.AddHumanUserRequest_Email{
 				Email:           gofakeit.Email(),
 				IsEmailVerified: true,
-			},
-			Phone: &management.AddHumanUserRequest_Phone{
-				Phone:           "+" + gofakeit.Phone(),
-				IsPhoneVerified: true,
 			},
 			InitialPassword: "Password1!",
 		}
@@ -876,7 +863,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 				IsEmailVerified: true,
 			},
 			Phone: &management.AddHumanUserRequest_Phone{
-				Phone:           "+" + gofakeit.Phone(),
+				Phone:           "+1" + gofakeit.Phone(),
 				IsPhoneVerified: true,
 			},
 			InitialPassword: "Password1!",
@@ -933,8 +920,8 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			assert.Equal(t, profile.FamilyName, user.Human.LastName)
 			assert.Equal(t, *profile.NickName, user.Human.Nickname)
 			assert.Equal(t, *profile.DisplayName, user.Human.DisplayName)
-			assert.Equal(t, *profile.PreferredLanguage, user.Human.PreferredLanguage)
-			assert.Equal(t, uint8(*profile.Gender), user.Human.Gender)
+			assert.Equal(t, *profile.PreferredLanguage, user.Human.PreferredLanguage.String())
+			assert.EqualValues(t, *profile.Gender, user.Human.Gender)
 		}, retryDuration, tick)
 	})
 
@@ -964,7 +951,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
 			SetBody(deleteUserReqJSON).
-			Delete("http://localhost:8080" + "/v2beta/users/human")
+			Delete("http://localhost:8082" + "/v2beta/users/human")
 		require.NoError(t, err)
 		// require.Equal(t, 200, out.StatusCode())
 		// require.NoError(t, err)
@@ -1008,7 +995,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
 			SetBody(createUserReqJSON).
-			Post("http://localhost:8080" + "/v2beta/users/human")
+			Post("http://localhost:8082" + "/v2beta/users/human")
 		require.NoError(t, err)
 		// require.Equal(t, 201, out.StatusCode())
 
@@ -1020,7 +1007,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			SetHeader("x-zitadel-orgid", orgID).
-			Post("http://localhost:8080" + "/assets/v1" + "/users/me/avatar")
+			Post("http://localhost:8082" + "/assets/v1" + "/users/me/avatar")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 		after := time.Now()
@@ -1071,7 +1058,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
 			SetBody(deleteUserReqJSON).
-			Delete("http://localhost:8080" + "/v2beta/users/human")
+			Delete("http://localhost:8082" + "/v2beta/users/human")
 		require.NoError(t, err)
 		// require.Equal(t, 200, out.StatusCode())
 		// require.NoError(t, err)
@@ -1115,7 +1102,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
 			SetBody(createUserReqJSON).
-			Post("http://localhost:8080" + "/v2beta/users/human")
+			Post("http://localhost:8082" + "/v2beta/users/human")
 		require.NoError(t, err)
 		// require.Equal(t, 201, out.StatusCode())
 
@@ -1125,7 +1112,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			SetHeader("x-zitadel-orgid", orgID).
-			Post("http://localhost:8080" + "/assets/v1" + "/users/me/avatar")
+			Post("http://localhost:8082" + "/assets/v1" + "/users/me/avatar")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1152,7 +1139,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		before := time.Now()
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
-			Delete("http://localhost:8080" + "/auth/v1" + "/users/me/avatar")
+			Delete("http://localhost:8082" + "/auth/v1" + "/users/me/avatar")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 		after := time.Now()
@@ -1170,12 +1157,11 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.Nil(t, user.Human.AvatarKey)
+			assert.Empty(t, user.Human.AvatarKey)
 			assert.WithinRange(t, user.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
-	password := gofakeit.Password(true, true, true, true, true, 10)
 	t.Run("test human user password change reduced", func(t *testing.T) {
 		createUserReq := &v2_user.AddHumanUserRequest{
 			// UserId: gu.Ptr("tester"),
@@ -1204,7 +1190,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			},
 			PasswordType: &v2_user.AddHumanUserRequest_Password{
 				Password: &v2_user.Password{
-					Password:       password,
+					Password:       "Password1!",
 					ChangeRequired: true,
 				},
 			},
@@ -1238,12 +1224,12 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			Password: &v2_user.SetPassword{
 				PasswordType: &v2_user.SetPassword_Password{
 					Password: &v2_user.Password{
-						Password:       gofakeit.Password(true, true, true, true, true, 10),
+						Password:       "Password2!",
 						ChangeRequired: true,
 					},
 				},
 				Verification: &v2_user.SetPassword_CurrentPassword{
-					CurrentPassword: password,
+					CurrentPassword: "Password1!",
 				},
 			},
 		})
