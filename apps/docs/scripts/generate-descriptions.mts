@@ -9,7 +9,7 @@
  *
  * Options:
  *   --base-url <url>    LLM server base URL  (default: http://127.0.0.1:1234)
- *   --model <id>        Model identifier     (default: qwen2.5-14b-instruct)
+ *   --model <id>        Model identifier     (default: meta/llama-3.3-70b)
  *   --dry-run           Preview without writing files
  *   --force             Re-generate even if a description already exists
  *   --file <path>       Process a single file only (relative to content/)
@@ -66,7 +66,7 @@ function isExcluded(contentRelPath: string): boolean {
 // Content-category classification (4 broad categories)
 // ---------------------------------------------------------------------------
 
-type ContentCategory = 'reference' | 'guide' | 'concept' | 'other';
+type ContentCategory = 'reference' | 'guide' | 'sdk-example' | 'concept' | 'other';
 
 /** Map path prefixes to broad categories. Order matters — first match wins. */
 const CATEGORY_RULES: Array<{ prefix: string; category: ContentCategory }> = [
@@ -75,9 +75,11 @@ const CATEGORY_RULES: Array<{ prefix: string; category: ContentCategory }> = [
   { prefix: 'apis/actions/',    category: 'guide' },      // cookbook/how-to, not spec
   { prefix: 'apis/',            category: 'reference' },
 
-  // Guide: how-tos, quickstarts, deployment, operations, SDK examples
+  // SDK examples: framework integration code examples
+  { prefix: 'sdk-examples/',    category: 'sdk-example' },
+
+  // Guide: how-tos, quickstarts, deployment, operations
   { prefix: 'guides/',          category: 'guide' },
-  { prefix: 'sdk-examples/',    category: 'guide' },
   { prefix: 'examples/',        category: 'guide' },
   { prefix: 'self-hosting/',    category: 'guide' },
 
@@ -97,38 +99,27 @@ function detectCategory(relPath: string): ContentCategory {
   return 'other';
 }
 
-/** Per-category prompt configuration. */
-const CATEGORY_PROMPTS: Record<ContentCategory, { focusClause: string; pageKind: string }> = {
+/** Per-category prompt hint — just a nudge, not a recipe. */
+const CATEGORY_PROMPTS: Record<ContentCategory, { hint: string; pageKind: string }> = {
   reference: {
-    pageKind: 'API or protocol reference page',
-    focusClause:
-      'Name the exact protocol, API, or benchmark scenario. ' +
-      'State what a developer can achieve and name the protocol-level concepts affected (claims, tokens, assertions, attributes, responses, scopes). ' +
-      'Do NOT include internal method names (e.g. setClaim, getUser, setMetadata) — describe outcomes, not API calls. ' +
-      'Specify the subject performing the action (e.g., "OAuth clients", "service users") — do not use generic "authentication" without stating who or what authenticates.',
+    pageKind: 'API / protocol reference',
+    hint: 'Name the specific protocol, endpoint, or API resource and describe its exact purpose.',
   },
   guide: {
-    pageKind: 'how-to or integration guide',
-    focusClause:
-      'Identify the specific task or problem being solved. ' +
-      'Name the exact tools, frameworks, or ZITADEL features involved — if the page belongs to a named ZITADEL feature (e.g., Actions, Console, Login), include that feature name. ' +
-      'If a specific tech stack or platform is mentioned, include it. ' +
-      'If the page is a collection of code examples, say so — include the words "code examples" in the description. ' +
-      'Do NOT include internal method names, trigger names, or lifecycle phases — describe what the page enables, not how the internals work.',
+    pageKind: 'how-to / integration guide',
+    hint: 'Focus on the specific task the developer will accomplish. Mention exact tools, providers (e.g., Okta, GitHub), or protocols involved.',
+  },
+  'sdk-example': {
+    pageKind: 'SDK / framework integration example',
+    hint: 'Lead with the framework or library name. Mention the auth library if one is used.',
   },
   concept: {
-    pageKind: 'conceptual or architectural documentation page',
-    focusClause:
-      'Open with the concept or feature name. ' +
-      'Define what it is and why it matters within the ZITADEL IAM model. ' +
-      'Use architectural or domain-specific terms from the content.',
+    pageKind: 'conceptual / architectural docs',
+    hint: 'Lead with the concept or feature name and why it matters.',
   },
   other: {
     pageKind: 'documentation page',
-    focusClause:
-      'Identify the main topic and state the key information this page provides. ' +
-      'For legal documents, do not include "ZITADEL". ' +
-      'For advisories, include the advisory ID and affected versions if present.',
+    hint: 'For legal pages, omit "ZITADEL". For advisories, include the advisory ID.',
   },
 };
 
@@ -140,7 +131,7 @@ const { values: _args } = parseArgs({
   args: process.argv.slice(2),
   options: {
     'base-url':   { type: 'string',  default: 'http://127.0.0.1:1234' },
-    model:        { type: 'string',  default: 'Qwen2.5-72B-Instruct-GGUF' },
+    model:        { type: 'string',  default: 'finetuned-meta-llama-4-scout-17b-16e-instruct-i1' },
     'dry-run':    { type: 'boolean', default: false },
     force:        { type: 'boolean', default: false },
     file:         { type: 'string' },
@@ -262,7 +253,7 @@ function extractContext(body: string): string {
     }
   }
 
-  // Build full heading outline
+  // Build full heading outline (translate lifecycle-phase headings)
   const headings: string[] = [];
   for (const line of cleaned.split('\n')) {
     const m = line.match(/^\s*(#{2,3})\s+(.+?)\s*$/);
@@ -286,7 +277,7 @@ function extractContext(body: string): string {
   }
 
   let result = '';
-  if (intro) result += `[INTRODUCTORY SENTENCE]\n${intro}\n\n`;
+  if (intro) result += `${intro}\n\n`;
   result += outline;
   if (prose) result += `[PAGE CONTENT]\n${prose}`;
   return result.trim();
@@ -294,77 +285,26 @@ function extractContext(body: string): string {
 
 /**
  * Sanitize LLM output: strip formatting artifacts, normalize casing, enforce length cap.
+ * Content quality is the prompt's job — this only handles formatting.
  */
 function sanitizeDescription(text: string): string {
   let clean = text.trim();
 
-  // Strip surrounding quotes
+  // Strip surrounding quotes the LLM sometimes adds despite being told not to
   clean = clean.replace(/^["']|["']$/g, '').trim();
-
-  // Strip rogue markdown (bold, italic, inline code)
-  clean = clean.replace(/[*`_]/g, '');
-
-  // Replace vague "manipulating users" with specific domain nouns
-  clean = clean.replace(/manipulat(e|ing) users/gi, 'user roles, metadata, and attributes');
-
-  // Normalize industry-standard OAuth/OIDC/SAML terminology
-  clean = clean.replace(/\bidtoken\b/gi, 'ID token');
-  clean = clean.replace(/\baccesstoken\b/gi, 'access token');
-  clean = clean.replace(/\brefreshtoken\b/gi, 'refresh token');
-  clean = clean.replace(/\bSAMLResponse\b/g, 'SAML response');
-
-  // Strip leaked internal method names (camelCase function calls)
-  clean = clean.replace(/\b(setClaim|setCustomClaim|setCustomAttribute|getUser|getMetadata|setMetadata|appendLogIntoClaims|getUserGrants|getAction|setEmail|setPhone|getClaimsFromHeader)\b/g, '').trim();
-  // Strip orphaned "methods"/"functions" words left after method name removal
-  clean = clean.replace(/\b(methods?|functions?|function names?)\b/gi, '');
-  // Strip internal lifecycle / trigger names
-  clean = clean.replace(/\bPre\s+(SAMLResponse|SAML\s+response|Token|Access\s+Token|ID\s+Token)\s+(creation|introspection)\s*(flow|trigger)?/gi, (_m, entity: string, phase: string) => {
-    const ent = entity.replace(/samlresponse/i, 'SAML response').replace(/token/i, 'token');
-    return `before ${ent} ${phase}`;
-  });
-  clean = clean.replace(/\bPost\s+(Authentication|Creation)\s*(flow|trigger)?/gi, 'after $1');
-  // Collapse double spaces, orphaned commas/conjunctions, and "with ,"-style debris
-  clean = clean.replace(/,\s*,/g, ',').replace(/\s{2,}/g, ' ').replace(/\s+,/g, ',');
-  clean = clean.replace(/\bwith\s*,?\s*(and\s*)?$/i, '').trim();
-  clean = clean.replace(/,\s*(and\s*)?$/i, '').trim();
-
-  // Strip banned openers the model sometimes ignores
-  clean = clean.replace(/^(Use|Explore|Discover|Learn( how( to)?)?|This (page|guide|document|article)|ZITADEL (guides|helps|shows|describes|walks)( you| developers?)?( through| how)?)[:\s,]+/i, '').trim();
-  // Re-capitalize first letter after stripping
-  if (clean.length > 0) clean = clean[0].toUpperCase() + clean.slice(1);
 
   // Collapse newlines and whitespace runs
   clean = clean.replace(/\r?\n+/g, ' ').replace(/\s{2,}/g, ' ').trim();
 
-  // Extract first sentence only (cut at ". " / "? " / "! " boundary)
-  const sentEnd = clean.search(/[.?!]\s/);
-  if (sentEnd !== -1) clean = clean.slice(0, sentEnd).trim();
-
-  // Strip leading/trailing dashes, em-dashes, colons
-  clean = clean.replace(/^[\s\-–—:]+/, '').replace(/[\s\-–—:]+$/, '').trim();
-
-  // Remove trailing period
+  // Remove trailing period (prompt asks for none)
   clean = clean.replace(/\.$/, '');
 
-  // Normalize ZITADEL casing
+  // Normalize terminology casing
+  clean = clean.replace(/\bid[_\s]?tokens?\b/gi, 'ID token');
+  clean = clean.replace(/\baccess[_\s]?tokens?\b/gi, 'access token');
+  clean = clean.replace(/\brefresh[_\s]?tokens?\b/gi, 'refresh token');
+  clean = clean.replace(/\bSAMLResponse\b/g, 'SAML response');
   clean = clean.replace(/\bzitadel\b/gi, 'ZITADEL');
-
-  // Hard cap at 160 chars, cut at last whole word
-  if (clean.length > 160) {
-    const cut = clean.slice(0, 160);
-    const lastSpace = cut.lastIndexOf(' ');
-    clean = lastSpace > 40 ? cut.slice(0, lastSpace) : cut.trim();
-    // Strip trailing punctuation after truncation
-    clean = clean.replace(/[.!?:,\-–—]+$/, '').trim();
-  }
-
-  // Detect dangling fragments left after truncation (e.g. "functions like", "in the SAML")
-  // If the description ends with a preposition, conjunction, article, or dangling word, trim it.
-  const danglingPattern = /\s+(like|using|with|for|in|on|at|to|of|the|a|an|and|or|by|from|into|through|via|such|as|including|between|across|within|about|during|over|your|their|its|our|this|that|these|those)$/i;
-  while (danglingPattern.test(clean)) {
-    clean = clean.replace(danglingPattern, '').trim();
-    clean = clean.replace(/[.!?:,\-–—]+$/, '').trim();
-  }
 
   return clean;
 }
@@ -382,7 +322,12 @@ function splitFrontmatter(content: string): { hasFm: boolean; fmRaw: string; bod
  * Inject or replace the `description` field inside the frontmatter block only.
  */
 function injectDescription(content: string, description: string): string {
-  const escaped = description.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  // Use single-quote wrapping when description contains double quotes to avoid ugly escaping
+  const hasDoubleQuotes = description.includes('"');
+  const quote = hasDoubleQuotes ? "'" : '"';
+  const escaped = hasDoubleQuotes
+    ? description.replace(/'/g, "''")
+    : description.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   const { hasFm, fmRaw, body } = splitFrontmatter(content);
 
   const eol = content.includes('\r\n') ? '\r\n' : '\n';
@@ -391,16 +336,16 @@ function injectDescription(content: string, description: string): string {
   const descIdx = lines.findIndex((l) => /^description:\s*/.test(l));
   if (descIdx !== -1) {
     // Replace existing — also remove any continuation lines (block scalar)
-    lines[descIdx] = `description: "${escaped}"`;
+    lines[descIdx] = `description: ${quote}${escaped}${quote}`;
     while (descIdx + 1 < lines.length && /^\s/.test(lines[descIdx + 1])) {
       lines.splice(descIdx + 1, 1);
     }
   } else {
     const titleIdx = lines.findIndex((l) => /^title:\s*/.test(l));
     if (titleIdx !== -1) {
-      lines.splice(titleIdx + 1, 0, `description: "${escaped}"`);
+      lines.splice(titleIdx + 1, 0, `description: ${quote}${escaped}${quote}`);
     } else {
-      lines.unshift(`description: "${escaped}"`);
+      lines.unshift(`description: ${quote}${escaped}${quote}`);
     }
   }
 
@@ -413,7 +358,7 @@ function injectDescription(content: string, description: string): string {
  */
 async function callLLM(
   messages: Array<{ role: string; content: string }>,
-  maxTokens = 200,
+  maxTokens = 150,
 ): Promise<string> {
   const MAX_ATTEMPTS = 3;
   let lastError: Error | undefined;
@@ -432,7 +377,6 @@ async function callLLM(
             messages,
             max_tokens: maxTokens,
             temperature: 0.3,
-            top_p: 0.9,
             stop: ['\n\n'],
           }),
           signal: controller.signal,
@@ -463,64 +407,6 @@ async function callLLM(
   throw lastError;
 }
 
-/**
- * Extract ## headings from body text (not ### or deeper).
- * Used to surface the major page sections explicitly in the user prompt.
- */
-function extractMajorSections(body: string): string[] {
-  const headings: string[] = [];
-  for (const line of body.split('\n')) {
-    const m = line.match(/^\s*##\s+(.+?)\s*$/);
-    // Only match ## (not ### or deeper)
-    if (m && !line.match(/^\s*###/)) headings.push(m[1]);
-  }
-  return headings;
-}
-
-/**
- * Extract API method / function names from body text.
- * Looks for patterns like `methodName(` or `api.v1.something.methodName(`.
- * Returns deduplicated list of short method names.
- */
-function extractMethodNames(body: string): string[] {
-  const methods = new Set<string>();
-  // Match patterns like setClaim(, setCustomAttribute(, getMetadata(, appendLogIntoClaims(
-  const re = /\b([a-z][a-zA-Z]+)\s*\(/g;
-  let match: RegExpExecArray | null;
-  while ((match = re.exec(body)) !== null) {
-    const name = match[1];
-    // Filter out common noise words, JS builtins, and generic identifiers
-    const NOISE = new Set([
-      // JS keywords & builtins
-      'function', 'import', 'require', 'return', 'export', 'const', 'console',
-      'typeof', 'async', 'await', 'yield', 'delete', 'throw', 'catch',
-      'undefined', 'null', 'true', 'false', 'this', 'super', 'class',
-      // Common JS/TS methods & globals
-      'forEach', 'push', 'filter', 'splice', 'slice', 'reduce', 'trim',
-      'join', 'split', 'replace', 'match', 'test', 'indexOf', 'lastIndexOf',
-      'find', 'findIndex', 'some', 'every', 'includes', 'concat', 'sort',
-      'reverse', 'keys', 'values', 'entries', 'from', 'parse', 'stringify',
-      'toString', 'valueOf', 'hasOwnProperty', 'apply', 'call', 'bind',
-      'then', 'resolve', 'reject', 'finally',
-      'fetch', 'abort', 'clearTimeout', 'setTimeout', 'setInterval',
-      'warn', 'error', 'info', 'debug', 'trace', 'assert',
-      'JSON', 'Math', 'Date', 'Array', 'Object', 'String', 'Number',
-      // React / MDX / framework noise
-      'props', 'details', 'summary', 'useState', 'useEffect', 'useRef',
-      'useCallback', 'useMemo', 'useContext', 'createElement',
-      // Generic identifiers that are not API-specific
-      'name', 'data', 'type', 'value', 'result', 'response', 'request',
-      'callback', 'handler', 'config', 'options', 'params', 'args',
-      'item', 'items', 'list', 'next', 'prev', 'emit', 'send',
-      'write', 'read', 'open', 'close', 'init', 'start', 'stop',
-      'encode', 'decode', 'length', 'size', 'count', 'index',
-    ]);
-    if (name.length >= 4 && !NOISE.has(name)) {
-      methods.add(name);
-    }
-  }
-  return [...methods];
-}
 
 /**
  * Generate a meta description for a single page.
@@ -534,77 +420,33 @@ async function generateDescription(
   relPath: string,
   fm: Record<string, string> = {},
 ): Promise<string> {
-  const { focusClause, pageKind } = CATEGORY_PROMPTS[category];
-
-  const isLegal = category === 'other' && /\blegal\b/i.test(title);
-  const brandRule = isLegal
-    ? 'Do not include "ZITADEL" in the description.'
-    : 'Include "ZITADEL" exactly once.';
-
-  // Extract top-level sections to surface them explicitly in the prompt.
-  const majorSections = extractMajorSections(body);
-  let breadthRule = '';
-  if (majorSections.length >= 2) {
-    breadthRule =
-      `CRITICAL: This page covers ${majorSections.length} major topics: ${majorSections.join(', ')}. ` +
-      'Your description MUST reflect this breadth — do NOT focus only on the first topic. ' +
-      'Mention at least 2–3 of these topics in a single flowing sentence.\n';
-  }
+  const { hint, pageKind } = CATEGORY_PROMPTS[category];
 
   const systemPrompt =
-    'You write SEO meta descriptions for ZITADEL technical documentation.\n' +
-    'Output ONLY the description text — no labels, no quotes, no markdown.\n' +
+    'You are an expert technical SEO copywriter. Write exactly ONE meta description for a developer docs page.\n' +
+    'Rules:\n' +
+    '- Output exactly ONE plain-text sentence, no trailing period. If you cannot comply, output exactly: INVALID\n' +
+    '- Target 16–20 words. If word count and character count conflict, prioritize word count.\n' +
+    '- Structure: Verb + what (object) + when/where (context) + why (benefit).\n' +
+    '- Start with a strong, specific action verb. Vary your verbs and DO NOT overuse "Enrich", "Configure", or "Customize".\n' +
+    '- Include "ZITADEL" only when it reads naturally and adds clarity; otherwise omit.\n' +
+    '- Prefer industry terms like: tokens, claims, SAML assertions, OIDC, webhooks, provisioning, SCIM, IdP, service provider.\n' +
+    '- DO NOT use the words "trigger", "triggers", "pre userinfo", "pre creation", "post creation", or "lifecycle phases". Use standard terms like "custom authentication logic" or "OIDC claims enrichment" instead.\n' +
+    '- Never start with "Learn", "This guide", or "In this guide".\n' +
     '\n' +
-    '## FORMAT RULES\n' +
-    'Exactly ONE sentence, plain text, 100–150 characters. Never exceed 155.\n' +
-    `${brandRule}\n` +
+    'Good examples:\n' +
+    '- Add custom claims to ID tokens during token creation to support downstream authorization\n' +
+    '- Authenticate service users for API calls without interactive login using Personal Access Tokens\n' +
+    '- Mirror events between instances using the cockroach and postgres export commands to ensure data consistency\n' +
+    '- Sync user profiles from Okta and GitHub during login to maintain up-to-date identity records\n' +
     '\n' +
-    '## SENTENCE STRUCTURE\n' +
-    'Start with a concrete noun, feature name, or action verb from the page — NEVER with filler openers.\n' +
-    'BANNED first words: "Use", "Explore", "Discover", "Learn", "This page", "This guide", "ZITADEL guides", "ZITADEL helps", "ZITADEL shows", "ZITADEL describes".\n' +
-    'Always specify the actor or subject: say "OAuth clients", "service users", "applications", or "administrators" — never leave "authentication" or "authorization" unqualified.\n' +
-    'Name the primary protocol or entity (OIDC, SAML, OAuth, tokens, claims) within the first 60 characters.\n' +
-    'Prefer terms searchers use (claims, attributes, roles, tokens) over internal terms (parameters, flows, triggers).\n' +
-    'Use industry-standard terminology: "ID token" not "idtoken", "access token" not "accesstoken", "refresh token" not "refreshtoken", "SAML response" not "SAMLResponse", "userinfo" not "user info".\n' +
-    'BANNED PHRASES: Never write "manipulating users" or "manipulate users" — instead name what is changed: "user roles, metadata, and attributes" or "user roles and email verification".\n' +
-    'Prefer specific domain nouns (roles, metadata, attributes, claims) over vague action verbs (manipulating, managing, handling, processing).\n' +
-    'NEVER include internal method names (setClaim, getUser, setMetadata, appendLogIntoClaims, setCustomAttribute, etc.) in the description — describe outcomes and protocol-level concepts instead.\n' +
-    'NEVER include internal lifecycle or trigger names ("Pre SAMLResponse creation", "Pre Token creation flow", "Post Authentication") — use user-facing language instead ("before the response is returned", "during token creation").\n' +
-    'Describe WHAT the page enables and WHY, not HOW the internal machinery works.\n' +
-    'End with a concrete noun or specific outcome — NEVER with vague words like "management", "workflows", "and more", "solutions", or "tasks".\n' +
-    'Prefer stating WHERE something applies (endpoints, flows, scopes) or WHAT problem is solved over HOW bytes are formatted (headers, payloads, encodings).\n' +
-    'Do not end with low-level transport details like header names or encoding schemes.\n' +
+    'Bad examples (DO NOT DO THIS):\n' +
+    '- Enrich OIDC tokens with custom claims during issuance to support downstream authorization (DO NOT overuse "Enrich")\n' +
+    '- Learn how to configure custom authentication logic for identity enrichment (DO NOT start with "Learn")\n' +
+    '- This guide explains how to customize authentication flows using external identity providers (DO NOT start with "This guide")\n' +
+    '- Configure custom authentication logic using post authentication triggers during login flows (DO NOT use internal jargon like "post authentication triggers")\n' +
     '\n' +
-    '## GOOD EXAMPLES (imitate these patterns)\n' +
-    '- "Add custom claims to ZITADEL ID tokens and access tokens during token creation for identity enrichment"\n' +
-    '- "ZITADEL Personal Access Tokens let service users authenticate for API calls without interactive login"\n' +
-    '- "Mirror events between ZITADEL instances using the cockroach and postgres export commands"\n' +
-    '- "Authenticate OAuth clients in ZITADEL using Client Secret Basic or private key JWT for token and introspection endpoints"\n' +
-    '\n' +
-    '## BAD EXAMPLES (never produce these)\n' +
-    '- "Explore ZITADEL features for managing authentication" ← starts with Explore, too vague\n' +
-    '- "ZITADEL guides you through configuring session parameters" ← starts with ZITADEL guides\n' +
-    '- "Learn how to customize attributes before they are set in the" ← truncated, starts with Learn how\n' +
-    '- "Configure token creation with parameters for userinfo endpoints" ← uses internal term "parameters" instead of "claims"\n' +
-    '- "Use Client Secret Basic or JWT with Private Key for secure authentication in ZITADEL" ← starts with Use, ambiguous subject, missing endpoint context\n' +
-    '- "ZITADEL Actions for manipulating users and customizing responses" ← "manipulating users" is vague; say "user roles, metadata, and attributes" instead\n' +
-    '- "Customize SAML response attributes using ZITADEL\'s Pre SAML response creation flow with getUser and setCustomAttribute" ← includes internal lifecycle name and method names; say "Customize SAML response attributes in ZITADEL before the response is returned" instead\n' +
-    '\n' +
-    '## ACCURACY RULES\n' +
-    'Closely paraphrase the page\'s own introductory sentence — do not reinterpret or generalize it.\n' +
-    'Use only domain-level terms and facts from the page content — never copy internal method names, trigger names, flow IDs, or API IDs into the description.\n' +
-    'Write for search engine users, not API consumers — abstract implementation details into user-facing outcomes.\n' +
-    'Do NOT invent versions, feature names, or specs not present in the content.\n' +
-    `${breadthRule}` +
-    '\n' +
-    focusClause;
-
-  // Surface API method names as background context (the model must NOT copy them into the description).
-  const methodNames = extractMethodNames(body);
-  let methodHint = '';
-  if (methodNames.length > 0) {
-    methodHint = `\n[INTERNAL METHODS — for understanding only, do NOT include in description]: ${methodNames.join(', ')}\n`;
-  }
+    hint;
 
   // Surface SDK-example frontmatter when available
   let sdkHint = '';
@@ -612,15 +454,12 @@ async function generateDescription(
     const parts: string[] = [];
     if (fm['auth_library']) parts.push(`Auth library: ${fm['auth_library']}`);
     if (fm['auth_flow']) parts.push(`Auth flow: ${fm['auth_flow']}`);
-    if (fm['status']) parts.push(`Status: ${fm['status']}`);
-    if (parts.length > 0) sdkHint = `\n[SDK METADATA]: ${parts.join(' | ')}\n`;
+    if (parts.length > 0) sdkHint = `\n${parts.join(' | ')}\n`;
   }
 
   const userPrompt =
-    `Page kind: ${pageKind}\n` +
-    `Path: ${relPath}\n` +
-    `Title: ${title}\n` +
-    `${methodHint}` +
+    `File path: ${relPath}\n` +
+    `${pageKind}: ${title}\n` +
     `${sdkHint}\n` +
     `${context}`;
 
@@ -629,8 +468,41 @@ async function generateDescription(
     { role: 'user', content: userPrompt },
   ];
 
-  const raw = await callLLM(messages);
-  return sanitizeDescription(raw);
+  // Retry up to 3 times if the model misses the length target
+  const MAX_ATTEMPTS = 3;
+  let result = '';
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const raw = await callLLM(messages);
+    result = sanitizeDescription(raw);
+    if (result.length >= 90 && result.length <= 160) break;
+    if (attempt < MAX_ATTEMPTS) {
+      messages.push({ role: 'assistant', content: raw });
+      if (result.length > 160) {
+        messages.push({ role: 'user', content: `Too long (${result.length} chars). Shorten to under 150 characters while keeping it a complete sentence.` });
+      } else {
+        messages.push({ role: 'user', content: `Too short (${result.length} chars). Expand to 100–145 characters by adding more specific detail from the page content.` });
+      }
+    }
+  }
+
+  // Post-strip ZITADEL from legal documents — the LLM often ignores the in-prompt ban
+  const isLegal = category === 'other' && /\blegal\b/i.test(relPath);
+  if (isLegal) {
+    result = result
+      .replace(/\bZITADEL['']s\s+/gi, '')
+      .replace(/\bZITADEL['']s\b/gi, '')
+      .replace(/\bfor\s+ZITADEL\b/gi, '')
+      .replace(/\bof\s+ZITADEL\b/gi, '')
+      .replace(/\bin\s+ZITADEL\b/gi, '')
+      .replace(/\bZITADEL\s+/gi, '')
+      .replace(/\bZITADEL\b/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    // Re-capitalize after stripping
+    if (result.length > 0) result = result[0].toUpperCase() + result.slice(1);
+  }
+
+  return result;
 }
 
 /** Sleep helper. */
@@ -704,8 +576,8 @@ async function main() {
       const description = await generateDescription(title, context, category, body, relPath, fm);
       const charCount = description.length;
 
-      if (charCount < 20) {
-        console.log(`SKIPPED — description too short (${charCount} chars)`);
+      if (charCount < 50) {
+        console.log(`SKIPPED — description too short after sanitization (${charCount} chars)`);
         failed++;
         continue;
       }
