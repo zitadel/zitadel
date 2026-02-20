@@ -10,6 +10,7 @@ import {
   recordSessionCreationDuration,
 } from "@/lib/metrics";
 
+export const runtime = "nodejs";
 const logger = createLogger("otel-test");
 
 export async function GET() {
