@@ -54,7 +54,7 @@ function getArg(flag: string): string | undefined {
 }
 
 const BASE_URL = getArg('--base-url') ?? 'http://127.0.0.1:1234';
-const MODEL = getArg('--model') ?? 'google/gemma-3-12b';
+const MODEL = getArg('--model') ?? 'qwen2.5-coder-14b-instruct';
 const DRY_RUN = args.includes('--dry-run');
 const SINGLE_FILE = getArg('--file');
 const DELAY_MS = Number(getArg('--delay') ?? '200');
@@ -133,8 +133,16 @@ function sanitizeDescription(text: string, maxLen = 160): string {
   // Strip rogue markdown that could corrupt YAML (bold, italic, inline code)
   clean = clean.replace(/[*`_]/g, '');
 
-  // Collapse double spaces left by markdown stripping
+  // Guard against YAML-breaking newlines (belt-and-suspenders: stop seqs should
+  // prevent these, but a model that prefixes a blank line can still sneak one in)
+  clean = clean.replace(/\r?\n+/g, ' ');
+
+  // Collapse double spaces left by markdown stripping or newline removal
   clean = clean.replace(/  +/g, ' ').trim();
+
+  // Strip leading/trailing dashes, em-dashes, and colons the model occasionally adds
+  clean = clean.replace(/^[\s\-–—:]+/, '').trim();
+  clean = clean.replace(/[\s\-–—:]+$/, '').trim();
 
   // Remove trailing period for consistency
   clean = clean.replace(/\.$/, '');
@@ -165,7 +173,10 @@ function injectDescription(content: string, description: string): string {
 }
 
 /** Perform a single chat completion call and return raw content. */
-async function callLLM(messages: Array<{ role: string; content: string }>): Promise<string> {
+async function callLLM(
+  messages: Array<{ role: string; content: string }>,
+  stopSeqs: string[] = ['\n', '\r\n'],
+): Promise<string> {
   const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -174,7 +185,7 @@ async function callLLM(messages: Array<{ role: string; content: string }>): Prom
       messages,
       max_tokens: 120,
       temperature: 0.3,
-      stop: ['\n'], // prevent second lines or trailing commentary
+      stop: stopSeqs, // prevent second lines or trailing commentary
     }),
   });
 
@@ -190,12 +201,34 @@ async function callLLM(messages: Array<{ role: string; content: string }>): Prom
   return json.choices?.[0]?.message?.content ?? '';
 }
 
+/**
+ * Returns true when the raw LLM output has obvious format problems that the
+ * sanitizer can fix but that also indicate the model ignored the instructions.
+ * Used to decide whether to retry even when the length happens to be fine.
+ */
+function looksBad(raw: string): boolean {
+  const t = raw.trim();
+  if (!t) return true; // empty — model hit stop on a leading newline
+  if (/^["'].*["']$/.test(t)) return true; // fully quoted
+  // Label prefixes: "Meta description:", "Meta description -", "- item", "* item"
+  if (/^(meta\s*description\s*[:\-]|description\s*[:\-])/i.test(t)) return true;
+  if (/^[-*]\s+/.test(t)) return true; // bullet list start
+  if (/[`*_]/.test(t)) return true; // markdown artifacts
+  return false;
+}
+
+interface GenerateResult {
+  description: string;
+  rawFirstLen: number;
+  retried: boolean;
+}
+
 /** Call the local LLM and return a sanitized, length-validated description.
- *  Automatically retries once if the first result is out of the 130–160 char range. */
+ *  Retries once if the first result is out of the 130–160 char range OR has bad formatting. */
 async function generateDescription(
   title: string,
   context: string,
-): Promise<string> {
+): Promise<GenerateResult> {
   const systemPrompt =
     'You write SEO meta descriptions for ZITADEL technical documentation. ' +
     'Return ONLY the meta description text (no labels, no JSON, no quotes). ' +
@@ -204,7 +237,7 @@ async function generateDescription(
     'No markdown, no emojis, no exclamation marks, no ellipses. Do not end with a period. ' +
     'Avoid semicolons; one sentence, you may use one comma clause. ' +
     'Avoid generic openings like "This guide", "This page", "Learn how", "In this article". ' +
-    'Include "ZITADEL" if it fits naturally. ' +
+    'Include "ZITADEL" when it improves clarity. ' +
     'Prefer one concrete technical keyword from the content (e.g. Actions V2, webhook, OIDC, PAT). ' +
     'If the page covers deprecation or migration, mention it neutrally.';
 
@@ -218,7 +251,13 @@ async function generateDescription(
     { role: 'user', content: userPrompt },
   ];
 
-  const rawFirst = await callLLM(messages);
+  // If the model starts with a leading newline, stop:[LF/CRLF] yields empty output.
+  // Retry once with double-newline stops to recover.
+  let rawFirst = await callLLM(messages);
+  if (!rawFirst.trim()) {
+    rawFirst = await callLLM(messages, ['\n\n', '\r\n\r\n']);
+  }
+
   let desc = sanitizeDescription(rawFirst);
 
   // Score the RAW output length, not the sanitized length.
@@ -226,26 +265,32 @@ async function generateDescription(
   // masking the fact that the model didn't follow the length constraint at all.
   const distToRange = (len: number) => Math.max(0, 130 - len, len - 160);
 
-  // Retry whenever the raw output missed the target range (too short or too long).
-  if (distToRange(rawFirst.length) > 0) {
+  // Retry when the raw output missed the length target OR had obvious format problems
+  // (quotes, label prefix, markdown) — so the model gets corrective feedback.
+  const needsRetry = distToRange(rawFirst.trim().length) > 0 || looksBad(rawFirst);
+  let retried = false;
+
+  if (needsRetry) {
+    retried = true;
     const retryMessages = [
       ...messages,
       { role: 'assistant', content: rawFirst },
       {
         role: 'user',
         content:
-          `That was ${rawFirst.length} characters. Rewrite to be 130–160 characters (inclusive), including spaces. ` +
+          `That was ${rawFirst.trim().length} characters. Rewrite to be 130–160 characters (inclusive), including spaces. ` +
+          `Return ONLY plain text — no quotes, no labels, no markdown. ` +
           `Make sure it is a complete sentence that does not need to be cut off. Keep the technical meaning.\n\nMeta description:`,
       },
     ];
     const rawRetry = await callLLM(retryMessages);
-    // Only replace if the retry obeyed the rules better (judge both by raw length)
-    if (distToRange(rawRetry.length) < distToRange(rawFirst.length)) {
+    // Accept the retry if it is better-formatted AND no further from the target range
+    if (!looksBad(rawRetry) && distToRange(rawRetry.trim().length) <= distToRange(rawFirst.trim().length)) {
       desc = sanitizeDescription(rawRetry);
     }
   }
 
-  return desc;
+  return { description: desc, rawFirstLen: rawFirst.trim().length, retried };
 }
 
 /** Sleep helper. */
@@ -310,11 +355,12 @@ async function main() {
     process.stdout.write(`${progress} ${relPath} … `);
 
     try {
-      const description = await generateDescription(title, context);
+      const { description, rawFirstLen, retried } = await generateDescription(title, context);
       const charCount = description.length;
 
       if (DRY_RUN) {
-        console.log(`\n  → (dry-run) ${description} [${charCount} chars]`);
+        const retryTag = retried ? ` retry=yes raw1=${rawFirstLen}` : ` raw1=${rawFirstLen}`;
+        console.log(`\n  → (dry-run) ${description} [${charCount} chars${retryTag}]`);
       } else {
         const updated = injectDescription(content, description);
         writeFileSync(filePath, updated, 'utf-8');
