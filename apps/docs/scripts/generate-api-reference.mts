@@ -72,6 +72,7 @@ async function generateVersionApiDocs(version: string) {
     const title = uniqueService.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
     const indexContent = `---
 title: ${title} API
+description: API reference documentation for the ${title} service in ZITADEL
 ---
 
 API Reference for ${title}

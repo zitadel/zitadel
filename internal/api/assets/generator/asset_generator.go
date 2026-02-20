@@ -253,6 +253,7 @@ func RegisterRoutes(router *mux.Router, s {{.Name}}) {
 
 const docsTmpl = `---
 title: zitadel/assets
+description: "Upload and manage instance, organization, or user assets using ZITADEL's AssetsService API endpoints"
 ---
 
 {/*
