@@ -36,6 +36,9 @@ export async function middleware(request: NextRequest) {
     requestHeaders.set("x-zitadel-i18n-organization", organization);
   }
 
+  // Load security settings to apply iframe embedding rules to all routes
+  const securitySettings = await loadSecuritySettings(request);
+
   // Only run the rest of the logic for the original matcher paths
   const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/"];
 
@@ -43,9 +46,20 @@ export async function middleware(request: NextRequest) {
 
   // Only proxy in self-hosted mode
   if (!isMatched) {
-    // For multi-tenant or non-proxied routes, just add the header and continue
+    // For multi-tenant or non-proxied routes, apply security headers and continue
+    const responseHeaders = new Headers();
+
+    if (securitySettings?.embeddedIframe?.enabled) {
+      responseHeaders.set(
+        "Content-Security-Policy",
+        `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
+      );
+      responseHeaders.delete("X-Frame-Options");
+    }
+
     return NextResponse.next({
       request: { headers: requestHeaders },
+      headers: responseHeaders,
     });
   }
 
@@ -63,8 +77,6 @@ export async function middleware(request: NextRequest) {
   const responseHeaders = new Headers();
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
-
-  const securitySettings = await loadSecuritySettings(request);
 
   if (securitySettings?.embeddedIframe?.enabled) {
     responseHeaders.set(
