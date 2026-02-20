@@ -11,6 +11,7 @@
  *   --base-url <url>    LLM server base URL  (default: http://127.0.0.1:1234)
  *   --model <id>        Model identifier     (default: qwen2.5-coder-14b-instruct)
  *   --dry-run           Preview without writing files
+ *   --force             Re-generate even if a description already exists
  *   --file <path>       Process a single file only (relative to content/)
  *   --delay <ms>        Delay between API calls in ms (default: 200)
  *   --start-from <n>    Skip the first N eligible files (resume after interruption)
@@ -70,6 +71,7 @@ type ContentType =
   | 'advisory'      // support/advisory/a*.mdx — structured security/breaking-change advisories
   | 'benchmark'     // apis/benchmarks/**       — versioned performance benchmark results
   | 'api-reference' // apis/**                  — protocol specs (OIDC/OAuth/SAML/SCIM/Actions)
+  | 'catalogue'     // **/code-examples.mdx, similar multi-topic example catalogues
   | 'concept'       // concepts/**              — architectural explainers and IAM model docs
   | 'quickstart'    // guides/start/**          — getting-started / quickstart guides
   | 'guide'         // guides/**                — how-to guides (integrate/manage/migrate/scenarios)
@@ -89,6 +91,8 @@ function detectContentType(relPath: string, excerpt = ''): ContentType {
   let type: ContentType;
   if      (relPath.startsWith('support/advisory/'))   type = 'advisory';
   else if (relPath.startsWith('apis/benchmarks/'))    type = 'benchmark';
+  // apis/actions/ pages are cookbook/how-to guides, not protocol specs.
+  else if (relPath.startsWith('apis/actions/'))       type = 'guide';
   else if (relPath.startsWith('apis/'))               type = 'api-reference';
   else if (relPath.startsWith('concepts/'))           type = 'concept';
   else if (relPath.startsWith('guides/start/'))       type = 'quickstart';
@@ -99,6 +103,14 @@ function detectContentType(relPath: string, excerpt = ''): ContentType {
   else if (relPath.startsWith('legal/'))              type = 'legal';
   else if (relPath.startsWith('product/'))            type = 'product';
   else                                                type = 'generic';
+
+  // Catalogue override: multi-topic collections of code examples (e.g. code-examples.mdx).
+  // These are classified as 'guide' by path but are structurally different — they cover
+  // many topics rather than solving a single task, requiring a different prompt style.
+  if ((type === 'guide' || type === 'api-reference') &&
+      /(?:^|\/)code-examples\.mdx$/.test(relPath)) {
+    return 'catalogue';
+  }
 
   // Content-based override: paths like apis/ occasionally contain walkthrough content
   if (excerpt) {
@@ -126,110 +138,118 @@ const PROMPT_CONFIGS: Record<ContentType, { focusClause: string; pageKind: strin
     pageKind: 'Technical Advisory',
     focusClause:
       'This is a Technical Advisory. ' +
-      'Include the advisory ID if it appears in the title or excerpt — do NOT invent an ID. ' +
-      'State the ZITADEL versions affected if mentioned, otherwise omit version numbers. ' +
-      'Name the category of change (security vulnerability, breaking behaviour change, deprecation). ' +
-      'Mention whether a mitigation or upgrade path is available. ' +
-      'Do not sensationalise; use neutral, factual language.',
+      'Include the advisory ID if present. State the affected ZITADEL versions. ' +
+      'Clearly identify the threat or breaking change and state if a patch or mitigation is available. ' +
+      'Use neutral, factual language. State the impact, affected versions (if present in the excerpt), and mitigation or upgrade path (if available). Do not alarm.',
   },
   benchmark: {
     pageKind: 'performance benchmark page',
     focusClause:
       'This is a performance benchmark page. ' +
-      'Mention the ZITADEL version tested and the benchmark scenario or test name (e.g. machine JWT grant, /token endpoint). ' +
-      'Describe what was measured (e.g. request latency, throughput, error rate) rather than quoting raw numbers. ' +
-      'If the excerpt states tests were halted or degraded at a certain load, mention that outcome briefly. ' +
-      'Do NOT reproduce numeric tables or percentile notation. ' +
-      'Extract 1–2 technical terms (e.g. endpoint name, test tool) directly from the excerpt.',
+      'Name the ZITADEL version and the specific scenario tested (e.g., machine JWT grant, high-throughput token validation). ' +
+      'Focus on the scale or metric evaluated (latency, requests per second) so architects understand the testing scope. ' +
+      'Do NOT quote specific raw numbers or percentile notations.',
   },
   'api-reference': {
     pageKind: 'protocol or API reference page',
     focusClause:
-      'This is a protocol or API reference page. ' +
-      'Name the specific protocol or API covered (OIDC, OAuth 2.0, SAML 2.0, SCIM 2.0, Actions, etc.). ' +
-      'Describe which endpoints, parameters, grant types, or scripting objects the page defines. ' +
-      'Mention RFC or OpenID spec identifiers ONLY if they appear verbatim in the excerpt — otherwise omit them. ' +
-      'Focus on what a developer can configure or call. ' +
-      'Extract 1–2 technical keywords directly from the excerpt.',
+      'This is an API or protocol reference page. ' +
+      'Name the exact protocol (OIDC, SAML, SCIM) or API grouping. ' +
+      'Define exactly what a developer can do with these endpoints or objects (e.g., manage users, issue tokens). ' +
+      'Extract 1–2 specific endpoint names or technical keywords directly from the excerpt to capture exact-match searches. ' +
+      'Do not include more than two endpoint or protocol names in the description. ' +
+      'If the page covers multiple protocols or groups, focus on the single most prominent one and describe what it enables — do not try to list all sections.',
   },
   concept: {
     pageKind: 'conceptual documentation page',
     focusClause:
-      'This is a conceptual/architectural documentation page. ' +
-      'Explain what the concept IS and its specific role in ZITADEL\'s IAM model. ' +
-      'Do NOT use action-verb openings like "Learn how" or "Discover". ' +
-      'Instead, open with the concept name or a defining noun phrase. ' +
-      'Mention which use cases or design decisions the concept enables. ' +
-      'Use specific terminology from the excerpt rather than generic IAM vocabulary.',
+      'This is a conceptual architecture page. ' +
+      'Open with the concept name. Define what the concept is and its specific role within the ZITADEL IAM model. ' +
+      'Focus on "what it is" and "why it matters" for system design, rather than how to configure it. ' +
+      'Include specific architectural terminology from the excerpt.',
   },
   quickstart: {
     pageKind: 'quickstart guide',
     focusClause:
-      'This is a quickstart or getting-started guide. ' +
-      'State the concrete end-to-end goal, the protocol or framework used (e.g. OIDC PKCE, Next.js), ' +
-      'and the tangible outcome the reader achieves. ' +
-      'Convey that the guide is fast to complete without inventing a time estimate not in the content. ' +
-      'Extract 1–2 technical keywords (e.g. framework name, auth flow) directly from the excerpt.',
+      'This is a quickstart guide. ' +
+      'State the exact tech stack (e.g., Next.js, Python) and the concrete developer outcome (e.g., authenticating users, securing an API). ' +
+      'Focus on the concrete outcome and the tech stack; do not invent time estimates. ' +
+      'Extract 1–2 framework or protocol keywords directly from the excerpt to capture long-tail developer searches.',
   },
   guide: {
     pageKind: 'how-to guide',
     focusClause:
       'This is a how-to guide. ' +
-      'Name the specific task or goal (e.g. configuring an IDP, migrating users, enabling MFA). ' +
-      'Mention the relevant protocol, tool, or ZITADEL feature involved. ' +
-      'Note if the guide applies to ZITADEL Cloud, self-hosted deployments, or both. ' +
-      'For migration guides, name the source system if the excerpt mentions one. ' +
-      'Extract 1–2 technical keywords directly from the excerpt.',
+      'Identify the specific problem being solved or task being completed (e.g., configuring an external IDP, migrating from Auth0). ' +
+      'Name the exact tools, protocols, or ZITADEL features required to achieve the goal. ' +
+      'Clarify if this applies to ZITADEL Cloud or self-hosted environments if explicitly mentioned.',
   },
   'sdk-example': {
     pageKind: 'SDK or framework example page',
     focusClause:
-      'This is an SDK or framework integration example. ' +
-      'Name the framework (e.g. Next.js, Angular, Go) and the auth library if one is used. ' +
-      'State the authentication flow (e.g. PKCE, device code, client credentials). ' +
-      'Describe what the working example demonstrates end-to-end. ' +
-      'Extract 1–2 technical keywords (framework, auth library, flow) directly from the excerpt.',
+      'This is an SDK integration example. ' +
+      'Name the specific language/framework (e.g., Angular, Go) and the authentication flow used (e.g., PKCE). ' +
+      'Describe the end-to-end working implementation so developers know exactly what code this page provides. ' +
+      'Extract 1–2 specific library or framework keywords from the excerpt.',
   },
   deploy: {
     pageKind: 'platform deployment guide',
     focusClause:
-      'This is a platform deployment guide for self-hosting ZITADEL. ' +
-      'Name the target platform (e.g. Linux, macOS, Docker Compose, Kubernetes). ' +
-      'Mention key prerequisites and the deployment outcome (a running ZITADEL instance). ' +
-      'Do not mention cloud-hosted ZITADEL unless the content explicitly does. ' +
-      'Extract 1–2 technical keywords (e.g. platform name, database) directly from the excerpt.',
+      'This is a self-hosting deployment guide. ' +
+      'Name the exact target infrastructure or platform (e.g., Kubernetes, Docker Compose, Linux). ' +
+      'State the outcome—running a secure ZITADEL instance—and mention key prerequisites (e.g., PostgreSQL). ' +
+      'Target DevOps search intent by extracting 1–2 specific infrastructure keywords from the excerpt. ' +
+      'Prefer exact platform or tool names from the excerpt (e.g., Kubernetes, Docker Compose, PostgreSQL)',
   },
   operations: {
     pageKind: 'production operations guide',
     focusClause:
       'This is a production operations guide for self-hosted ZITADEL. ' +
-      'Name the specific operations concern (e.g. high availability, TLS configuration, ' +
-      'database tuning, horizontal scaling, metrics/monitoring, reverse proxy setup). ' +
-      'Emphasise the production-readiness or reliability angle. ' +
-      'Extract 1–2 technical keywords directly from the excerpt.',
+      'Name the specific DevOps concern covered (e.g., high availability, TLS, database tuning, monitoring). ' +
+      'Emphasize reliability and production-readiness to match infrastructure engineer search intent. ' +
+      'Extract 1–2 operational keywords directly from the excerpt. ' +
+      'Prefer exact tool or configuration names from the excerpt (e.g., Kubernetes, PostgreSQL, Prometheus)',
   },
   legal: {
     pageKind: 'legal document',
     focusClause:
-      'This is a legal document. ' +
-      'State the document type (Terms of Service, Data Processing Agreement, Privacy Policy, etc.), ' +
-      'identify the relevant parties (e.g. ZITADEL and its customers/users), ' +
-      'and describe the key service scope or obligation covered. ' +
-      'Use neutral, non-promotional language. ' +
-      'Do NOT include protocol names (OIDC, OAuth, SAML) or technical keywords unless they appear in the excerpt.',
+      'This is a legal document. Do not include "ZITADEL". ' +
+      'State the document type (Privacy Policy, ToS, DPA) and identify the parties involved. ' +
+      'Describe the core compliance or service obligation covered in neutral, professional language. ' +
+      'Do not include technical keywords or protocol names.',
   },
   product: {
     pageKind: 'product roadmap or release page',
     focusClause:
-      'This is a product roadmap or release-cycle page. ' +
-      'Mention the version(s) or quarter(s) in scope. ' +
-      'Highlight which features reach GA, enter beta, or are deprecated. ' +
-      'Note any breaking changes if present in the excerpt. ' +
-      'Use specific feature names from the excerpt rather than generic product vocabulary.',
+      'This is a product roadmap or release page. ' +
+      'Mention the specific release version or timeline. ' +
+      'Highlight the most significant updates: what features are reaching GA, entering beta, or being deprecated. ' +
+      'Use exact feature names from the excerpt to capture searches from existing users looking for updates.',
+  },
+  catalogue: {
+    pageKind: 'code examples catalogue',
+    focusClause:
+      'This is a multi-topic catalogue of code examples, NOT a single-task how-to guide. ' +
+      'Start with a noun that names the feature directly (e.g. "ZITADEL Actions examples for …") — ' +
+      'do NOT use promotional openers like "Explore", "Browse", "Discover", or "Learn how". ' +
+      'Do NOT use a colon anywhere in the output. Write a flowing sentence; never use a "Label: payload" format. ' +
+      'Pick 3 representative topic areas from DIFFERENT parts of the [DOCUMENT OUTLINE]: ' +
+      'one from early sections, one from a middle section, one from a late section. ' +
+      'Use user-facing concepts, not internal product jargon: ' +
+      'say "token enrichment" not "complement token", ' +
+      '"user automation" not "manipulate user", ' +
+      '"IdP field syncing" not "provided fields". ' +
+      'Do not invent terms not in the excerpt (e.g. avoid "hooks" — use "triggers" instead). ' +
+      'The description must signal the breadth of the page; do not focus only on the first section. ' +
+      'Preferred user-facing phrases (use when applicable): token enrichment, user automation, ' +
+      'IdP field syncing, OIDC claims, SAML attributes, context-aware execution.',
   },
   generic: {
     pageKind: 'documentation page',
-    focusClause: '', // rely solely on the shared base prompt
+    focusClause:
+      'Focus on the primary technical value of this page. ' +
+      'Identify the main topic and state exactly what information or solution it provides to the reader. ' +
+      'Prefer exact nouns from the page headings over generic terms.',
   },
 };
 
@@ -241,8 +261,9 @@ const { values: _args } = parseArgs({
   args: process.argv.slice(2),
   options: {
     'base-url':   { type: 'string',  default: 'http://127.0.0.1:1234' },
-    model:        { type: 'string',  default: 'qwen2.5-coder-14b-instruct' },
+    model:        { type: 'string',  default: 'qwen2.5-14b-instruct' },
     'dry-run':    { type: 'boolean', default: false },
+    force:        { type: 'boolean', default: false },
     file:         { type: 'string' },
     delay:        { type: 'string',  default: '200' },
     'start-from': { type: 'string',  default: '0' },
@@ -253,6 +274,7 @@ const { values: _args } = parseArgs({
 const BASE_URL   = _args['base-url'] as string;
 const MODEL      = _args.model as string;
 const DRY_RUN    = _args['dry-run'] as boolean;
+const FORCE      = _args['force'] as boolean;
 const SINGLE_FILE = _args.file as string | undefined;
 const DELAY_MS   = Number(_args.delay);
 const START_FROM = Number(_args['start-from']);
@@ -332,6 +354,23 @@ function hasRealDescription(rawFm: string): boolean {
 }
 
 /**
+ * For catalogue pages, sample headings from the start, middle, and end of the
+ * document so the model sees breadth without flooding the context window.
+ * For all other types the existing cap of 24 is sufficient.
+ */
+function sampleHeadings(uniq: string[], contentType?: ContentType): string[] {
+  if (contentType !== 'catalogue') return uniq.slice(0, 24);
+  const n = uniq.length;
+  if (n <= 30) return uniq; // small enough to keep all
+  const take = 10;
+  const head = uniq.slice(0, take);
+  const midStart = Math.max(0, Math.floor(n / 2) - Math.floor(take / 2));
+  const mid  = uniq.slice(midStart, midStart + take);
+  const tail = uniq.slice(Math.max(0, n - take));
+  return Array.from(new Set([...head, ...mid, ...tail]));
+}
+
+/**
  * Build a compact, representative context string for the LLM.
  *
  * Strategy:
@@ -344,6 +383,8 @@ function hasRealDescription(rawFm: string): boolean {
  *      scenario context even when the main excerpt is mostly tables.
  */
 function extractContext(body: string, maxBodyChars = 900, contentType?: ContentType): string {
+  // Catalogue pages cover many topic areas — give them a larger prose budget.
+  if (contentType === 'catalogue') maxBodyChars = Math.max(maxBodyChars, 1200);
   // --- 1. Strip code fences and import lines ---------------------------------
   // MDX component tags are intentionally left intact; LLMs handle them well
   // as structural context, and stripping them can silently delete inline text.
@@ -355,35 +396,83 @@ function extractContext(body: string, maxBodyChars = 900, contentType?: ContentT
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 
-  // --- 2. Build heading outline (## and ###, deduplicated) --------------------
+  // --- 2. Build heading outline from the FULL document -----------------------
+  // We deliberately do not limit by maxBodyChars here: the outline is the
+  // primary signal for multi-section pages, and capping it would re-introduce
+  // the "first-heading trap" where the model only sees early sections.
   const headings: string[] = [];
   for (const line of cleaned.split('\n')) {
-    // Trim leading whitespace (indented headings) and trailing spaces
     const m = line.match(/^\s*(#{2,3})\s+(.+?)\s*$/);
-    if (m) headings.push(`${m[1]} ${m[2]}`);
-  }
-  const uniqHeadings = Array.from(new Set(headings));
-  const outline =
-    uniqHeadings.length > 0 ? `Page sections:\n${uniqHeadings.join('\n')}\n\n` : '';
-
-  // --- 3. Prose excerpt: cap bullet lines to avoid list domination ------------
-  const allLines = cleaned
-    .split('\n')
-    .filter((l) => !l.match(/^\s*#{1,6}\s/))
-    .filter((l) => !l.match(/^\s*(Code examples?|Examples?)\s*$/i))
-    .filter((l) => !l.match(/^\s*https?:\/\/\S+\s*$/))
-    .filter((l) => !l.match(/^\s*\|.*\|\s*$/)); // strip Markdown table rows
-
-  const proseLines: string[] = [];
-  let bulletCount = 0;
-  for (const line of allLines) {
-    if (/^\s*[-*]\s/.test(line)) {
-      if (bulletCount < 8) { proseLines.push(line); bulletCount++; }
-    } else {
-      proseLines.push(line);
+    if (m) {
+      // Use indentation to convey hierarchy without markdown hash symbols
+      // that can confuse smaller models into thinking they're still in the body.
+      const indent = m[1].length === 3 ? '  -' : '-';
+      headings.push(`${indent} ${m[2]}`);
     }
   }
-  let prose = proseLines.join('\n').slice(0, maxBodyChars).trim();
+  const uniqHeadings = Array.from(new Set(headings));
+  // Use sampleHeadings so catalogue pages get breadth coverage (head+mid+tail)
+  // while all other types keep the 24-heading cap to avoid flooding the context.
+  const chosen = sampleHeadings(uniqHeadings, contentType);
+  const outline =
+    chosen.length > 0
+      ? `[DOCUMENT OUTLINE]\n${chosen.join('\n')}\n\n`
+      : '';
+
+  // --- 3. Section-aware prose sampling ---------------------------------------
+  // Problem: a simple top-N-chars slice starves later ## sections when a page
+  // has a long introduction (e.g. code-examples.mdx has 15+ ## sections but
+  // the intro is dense enough to exhaust 900 chars alone).
+  // Solution: split the document at ## boundaries, allocate the budget
+  // proportionally (intro gets up to 40%, remainder split evenly), then
+  // sample the first lines of each segment.  The heading outline already
+  // carries the full structure, so prose only needs to anchor each section
+  // with a few concrete lines for the model to latch onto.
+  const lines = cleaned.split('\n');
+  const segments: string[][] = [[]];
+  for (const line of lines) {
+    if (/^\s*#{2}\s/.test(line)) segments.push([]);
+    segments[segments.length - 1].push(line);
+  }
+
+  const segCount = segments.length;
+  const introAlloc = Math.floor(maxBodyChars * (segCount > 1 ? 0.4 : 1.0));
+  const restAlloc =
+    segCount > 1 ? Math.floor((maxBodyChars - introAlloc) / (segCount - 1)) : 0;
+
+  /** Filter and cap bullets within a single segment's lines. */
+  function sampleSegment(segLines: string[], charBudget: number): string {
+    const kept: string[] = [];
+    let bullets = 0;
+    for (const line of segLines) {
+      if (line.match(/^\s*#{1,6}\s/)) continue;
+      if (line.match(/^\s*(Code examples?|Examples?)\s*$/i)) continue;
+      if (line.match(/^\s*https?:\/\/\S+\s*$/)) continue;
+      if (line.match(/^\s*\|.*\|\s*$/)) continue; // table rows
+      if (/^\s*[-*]\s/.test(line)) {
+        if (bullets < 4) { kept.push(line); bullets++; }
+      } else {
+        kept.push(line);
+      }
+    }
+    return kept.join('\n').slice(0, charBudget).trim();
+  }
+
+  const proseParts: string[] = [];
+  let totalChars = 0;
+  for (let i = 0; i < segments.length; i++) {
+    const budget = i === 0 ? introAlloc : restAlloc;
+    const part = sampleSegment(segments[i], budget);
+    if (part) {
+      proseParts.push(part);
+      totalChars += part.length;
+    }
+    if (totalChars >= maxBodyChars) break;
+  }
+  // The per-segment budgets already cap the total; the outer slice is not needed
+  // and can silently truncate the last section mid-sentence.  The loop's
+  // `totalChars >= maxBodyChars` break is the real guard.
+  let prose = proseParts.join('\n\n').trim();
 
   // --- 4. Benchmark signal lines: keyword-matched lines anchor the scenario ---
   // These lines are extracted separately so numeric/load context reaches the
@@ -400,7 +489,12 @@ function extractContext(body: string, maxBodyChars = 900, contentType?: ContentT
     if (signals) prose = `${prose}\n\nKey signals:\n${signals}`;
   }
 
-  return (outline + prose).trim();
+  // Wrap prose in an explicit tag so the LLM can distinguish page structure
+  // (outline) from sampled body text and attend to both zones.
+  let finalContext = outline;
+  if (prose) finalContext += `[SELECTED CONTENT SNIPPETS]\n${prose}`;
+
+  return finalContext.trim();
 }
 
 /**
@@ -421,12 +515,22 @@ function sanitizeDescription(text: string, maxLen = 160): { text: string; trunca
   // Strip rogue markdown that could corrupt YAML (bold, italic, inline code)
   clean = clean.replace(/[*`_]/g, '');
 
-  // Guard against YAML-breaking newlines (belt-and-suspenders: stop seqs should
-  // prevent these, but a model that prefixes a blank line can still sneak one in)
+  // Strip semicolons — banned in the prompt but models sometimes emit them anyway.
+  // Replace with a comma so the sentence structure isn't broken.
+  clean = clean.replace(/;/g, ',');
+
+  // Collapse newlines to spaces — models that emit multi-line output are handled
+  // here rather than in callLLM so the full content reaches sanitization first.
   clean = clean.replace(/\r?\n+/g, ' ');
 
   // Collapse any runs of whitespace (spaces, tabs, stray CRs) left by stripping
   clean = clean.replace(/\s{2,}/g, ' ').trim();
+
+  // Extract first sentence only — cut at the first ". " / "? " / "! " boundary
+  // so multi-sentence outputs are trimmed rather than flagged-and-retried.
+  // We do this after collapsing newlines so the whole output is on one line.
+  const firstSentEnd = clean.search(/[.?!]\s/);
+  if (firstSentEnd !== -1) clean = clean.slice(0, firstSentEnd).trim();
 
   // Strip leading/trailing dashes, em-dashes, and colons the model occasionally adds
   clean = clean.replace(/^[\s\-–—:]+/, '').trim();
@@ -504,7 +608,8 @@ function injectDescription(content: string, description: string): string {
  */
 async function callLLM(
   messages: Array<{ role: string; content: string }>,
-  stopSeqs: string[] = ['\n\n', '\r\n\r\n'],
+  stopSeqs: string[] = ['\n\n'],
+  maxTokens = 1500,
 ): Promise<string> {
   const MAX_ATTEMPTS = 3;
   let lastError: Error | undefined;
@@ -521,8 +626,9 @@ async function callLLM(
           body: JSON.stringify({
             model: MODEL,
             messages,
-            max_tokens: 120,
-            temperature: 0.3,
+            max_tokens: maxTokens,
+            temperature: 0.2,
+            top_p: 0.9,
             stop: stopSeqs,
           }),
           signal: controller.signal,
@@ -542,10 +648,10 @@ async function callLLM(
         choices: Array<{ message: { content: string } }>;
       };
 
-      // Keep only the first line — defends against models that prefix with a blank
-      // line (which stop:[LF] would turn into empty output).
+      // Return the full raw content — sanitizeDescription handles newline collapsing
+      // and first-sentence extraction, so we don't discard any content here.
       const rawContent = json.choices?.[0]?.message?.content ?? '';
-      return rawContent.split(/\r?\n/)[0];
+      return rawContent;
     } catch (err) {
       lastError = err as Error;
       if (attempt < MAX_ATTEMPTS) {
@@ -563,7 +669,7 @@ async function callLLM(
  * sanitizer can fix but that also indicate the model ignored the instructions.
  * Used to decide whether to retry even when the length happens to be fine.
  */
-function looksBad(raw: string): boolean {
+function looksBad(raw: string, contentType?: ContentType): boolean {
   const t = raw.trim();
   if (!t) return true; // empty — model hit stop on a leading newline
   if (/^["'].*["']$/.test(t)) return true; // fully quoted
@@ -571,7 +677,52 @@ function looksBad(raw: string): boolean {
   if (/^(meta\s*description\s*[:\-]|description\s*[:\-])/i.test(t)) return true;
   if (/^[-*]\s+/.test(t)) return true; // bullet list start
   if (/[`*_]/.test(t)) return true; // markdown artifacts
+  if (/;/.test(t)) return true; // semicolons are banned in the base prompt
+  // A colon within the first 20 characters violates the base prompt constraint
+  // and often indicates the model produced a "Label: text" opener.
+  if (t.indexOf(':') !== -1 && t.indexOf(':') < 20) return true;
+  // "Label: payload" anywhere in the string — e.g. "ZITADEL Actions examples: Foo bar".
+  // The pattern matches a colon preceded by 6–50 non-colon chars (the "label" segment)
+  // followed by at least one non-whitespace character (the "payload").
+  if (/^[A-Za-z0-9][^:]{6,50}:\s+\S/.test(t)) return true;
+  // Catalogue pages must never contain a colon — enforce here as belt-and-suspenders.
+  if (contentType === 'catalogue' && t.includes(':')) return true;
+  // Dangling endings indicate the model was cut off mid-clause.
+  if (/\b(and|including|with|using|like|such as),?\s*$/i.test(t)) return true;
   return false;
+}
+
+/**
+ * Deterministic last-resort length adjuster.
+ * Applied only when the LLM (including the repair pass) still fails to land in
+ * 130–160 chars.  Strategy: strip leading fluff → drop last comma clause →
+ * remove filler adjectives → hard word-boundary truncate.
+ * Never pads short text (short is still better than invented filler).
+ */
+function localAdjust(text: string): string {
+  let s = text.trim();
+  // Strip common lead-in fluff that adds length without value.
+  s = s.replace(/^(code examples? for|examples? for|an? overview of|a guide (to|for))\s+/i, '');
+  // Too long: trim to the last word boundary ≤ 160 characters.
+  // Cutting at the last comma risks dangling dependent clauses (e.g. ending on
+  // "…using"), so use the same word-boundary strategy applied below.
+  if (s.length > 160) {
+    const cut = s.slice(0, 160);
+    const sp  = cut.lastIndexOf(' ');
+    s = sp > 60 ? cut.slice(0, sp) : cut;
+  }
+  // Still too long: remove filler adjectives.
+  if (s.length > 160) {
+    s = s.replace(/\b(secure|powerful|reliable|fast|simple|easy|robust|comprehensive)\s+/gi, '');
+  }
+  // Hard truncate at the last word boundary ≤ 160.
+  if (s.length > 160) {
+    const cut = s.slice(0, 160);
+    const sp  = cut.lastIndexOf(' ');
+    s = sp > 40 ? cut.slice(0, sp) : cut;
+  }
+  // Strip trailing punctuation that would look odd after truncation.
+  return s.replace(/[.!?:,\-–—]+$/, '').trim();
 }
 
 interface GenerateResult {
@@ -579,6 +730,40 @@ interface GenerateResult {
   rawFirstLen: number;
   rawRetryLen: number | null; // null when no retry was attempted
   retried: boolean;
+}
+
+/**
+ * Two-pass helper for catalogue pages: ask the model to pick 3 topic phrases
+ * (one each from early, middle, and late outline sections) before writing the
+ * full description.  This forces breadth coverage and prevents the model from
+ * drifting toward the intro alone.
+ *
+ * Returns a comma-separated string of up to 3 noun phrases, or null on failure.
+ */
+async function extractCatalogueTopics(context: string, maxTokens: number): Promise<string | null> {
+  const messages = [
+    {
+      role: 'system',
+      content:
+        'You analyze technical documentation outlines to identify representative topic areas.\n' +
+        'Output EXACTLY three lines, each a short user-facing noun phrase (3–6 words).\n' +
+        'Pick them from DIFFERENT parts of the [DOCUMENT OUTLINE]:\n' +
+        '  Line 1: a topic from the EARLY sections\n' +
+        '  Line 2: a topic from a MIDDLE section\n' +
+        '  Line 3: a topic from the LATE sections\n' +
+        'Use user-facing language: "token enrichment", "user automation", "IdP field syncing".\n' +
+        'Output ONLY the three noun phrases, one per line, no numbering, no punctuation.',
+    },
+    { role: 'user', content: context },
+  ];
+  try {
+    const raw = await callLLM(messages, ['\n\n\n'], Math.min(maxTokens, 80));
+    const lines = raw.trim().split(/\r?\n/).map((l) => l.replace(/^\d+\.\s*/, '').trim()).filter(Boolean).slice(0, 3);
+    if (lines.length >= 2) return lines.join(', ');
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 /** Call the local LLM and return a sanitized, length-validated description.
@@ -590,39 +775,71 @@ async function generateDescription(
 ): Promise<GenerateResult> {
   const { focusClause, pageKind } = PROMPT_CONFIGS[contentType];
 
-  // Shared base constraints — format, length, tone — applied to every content type.
-  // Keyword extraction is intentionally NOT here; it is added per-type to avoid
-  // forcing technical terms into legal, advisory, or product descriptions.
+  // Catalogue pages need a larger token budget to produce breadth-covering sentences.
+  const maxTokens = contentType === 'catalogue' ? 300 : 200;
+
+  // Per-type comma limit — must be computed before building the prompt so the
+  // model's own PASS CHECKLIST reflects the correct threshold.
+  const maxCommas = contentType === 'catalogue' ? 3 : 2;
+  const maxCommasWord = maxCommas === 2 ? 'two' : 'three';
+
+  // Catalogue pages need to cover multiple topic areas, so the usual
+  // "≤2 protocols" restriction is relaxed to "≤3 topics".
+  const protocolRule = contentType === 'catalogue'
+    ? 'Name up to three representative topic areas from across the outline; do not focus only on the first section.'
+    : 'Front-load 1–2 concrete technical nouns from the excerpt early in the sentence; do not list more than two protocols or frameworks.';
+
+  // Shared base constraints — format, length, tone, and SEO intent — applied to every content type.
+  // Per-type focusClauses handle keyword extraction specifics to avoid forcing
+  // technical terms into legal, advisory, or product descriptions.
   const basePrompt =
-    'You write SEO meta descriptions for ZITADEL technical documentation. ' +
-    'Return ONLY the meta description text (no labels, no JSON, no quotes). ' +
-    'Write exactly ONE sentence in plain text. ' +
-    'Length MUST be 130–160 characters INCLUDING spaces. Do NOT exceed 160. ' +
-    'No markdown, no emojis, no exclamation marks, no ellipses. Do not end with a period. ' +
-    'Use at most two commas; avoid listing more than two protocol or product names. ' +
-    'Avoid semicolons. Avoid generic openings like "This guide", "This page", "Learn how", "In this article". ' +
-    'Include "ZITADEL" exactly once; omit it entirely in legal documents where it is already implied. ' +
-    'Summarize the overall scope of the page (top 2–3 topics), not a single subsection. ' +
-    'If the excerpt contains multiple major sections (e.g., OIDC, SAML, users, IDPs), reflect 2–3 of them rather than focusing on the first. ' +
-    'Do NOT invent version numbers, feature names, or identifiers not present in the excerpt. ' +
-    'If the page covers deprecation or migration, mention it neutrally.';
+    'You write SEO meta descriptions for ZITADEL technical documentation.\n' +
+    'Output ONLY the description text.\n' +
+    'Start immediately with a letter or digit (no leading whitespace).\n' +
+    'Exactly ONE sentence, plain text.\n' +
+    'Aim for ~150 characters; MUST be 130–160 characters including spaces.\n' +
+    'No quotes, no labels, no markdown, no emojis, no exclamation marks, no semicolons, no ellipses.\n' +
+    'Do NOT end with a period, colon, dash, or semicolon.\n' +
+    'Do not use the words "Meta description", "Description", "This page", "This guide", "Learn how", "Discover", "Explore", "Browse", "Find out", "See how", or "In this article".\n' +
+    'No colon within the first 20 characters of the output.\n' +
+    `Use at most ${maxCommasWord} commas.\n` +
+    `${protocolRule}\n` +
+    'If trimming is needed, remove adjectives first, not nouns or technical terms.\n' +
+    'No invented versions, IDs, feature names, or specs; only use what appears in the excerpt.\n' +
+    'Brand rule: include "ZITADEL" exactly once; for legal documents, do not include "ZITADEL" at all.\n' +
+    '\n' +
+    `PASS CHECKLIST (must satisfy all): 1 sentence • 130–160 chars • <=${maxCommas} commas • no labels/quotes • brand rule met`;
 
   // Append the type-specific focus clause when present.
   const systemPrompt = focusClause ? `${basePrompt}\n\n${focusClause}` : basePrompt;
 
+  // Two-pass for catalogue: first extract 3 representative topics from different
+  // parts of the outline so the model cannot collapse everything into the intro.
+  let catalogueTopics: string | null = null;
+  if (contentType === 'catalogue') {
+    catalogueTopics = await extractCatalogueTopics(context, maxTokens);
+  }
+
   const userPrompt =
-    `This is a ${pageKind}.\n` +
+    `Kind: ${pageKind}\n` +
     `Title: ${title}\n` +
-    `Excerpt:\n${context}\n\n` +
-    `Meta description:`;
+    (catalogueTopics ? `Required topics to cover (one from each of start/middle/end of outline): ${catalogueTopics}\n` : '') +
+    `Excerpt data:\n${context}\n\n` +
+    `Instructions: Look at the [DOCUMENT OUTLINE]. Select 3 topics from DIFFERENT major bullet points ` +
+    `(start, middle, and end of the outline) — do not just summarize the first section. ` +
+    `Use the [SELECTED CONTENT SNIPPETS] to find specific technical keywords for those topics. ` +
+    `Write the final meta description.`;
 
   const messages = [
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt },
   ];
 
-  let rawFirst = await callLLM(messages);
-  const { text: firstText, truncated: firstTruncated } = sanitizeDescription(rawFirst);
+  let rawFirst = await callLLM(messages, ['\n\n'], maxTokens);
+  const { text: firstTextRaw, truncated: firstTruncated } = sanitizeDescription(rawFirst);
+  // Apply label-colon fixer; re-clamp if the replacement pushed the length over 160.
+  const firstTextFixed = stripLabelColon(firstTextRaw);
+  const firstText = firstTextFixed.length > 160 ? localAdjust(firstTextFixed) : firstTextFixed;
   let desc = firstText;
 
   // Quality helpers --------------------------------------------------------
@@ -641,48 +858,79 @@ async function generateDescription(
   // want a spurious retry just because a trailing quote bumps raw by 2 chars.
   const rawTooFarOff   = distFromRange(rawFirst.trim().length) > 20;
 
+  // Detect multi-sentence output (a sentence-ending punctuation followed by a space).
+  const hasMultipleSentences = /[.!?]\s/.test(firstText);
+  // Detect forbidden generic openers that indicate the model ignored instructions.
+  const hasGenericOpener =
+    /^(this\s+(page|guide|article|doc)\b|learn\s+how\b|discover\b|explore\b|browse\b|find\s+out\b|see\s+how\b|in\s+this\s+article\b)/i.test(firstText);
+  // Detect a colon within the first 20 sanitized characters — "Label: text" pattern.
+  const hasEarlyColon = firstText.indexOf(':') !== -1 && firstText.indexOf(':') < 20;
+  // Detect "Label: payload" pattern (colon anywhere after 6–50 leading chars).
+  // stripLabelColon() already tried to fix this, but if the fixed result is still
+  // out of range or looks odd, flag for a model retry.
+  const looksLikeLabel = /^[A-Za-z0-9][^:]{6,50}:\s+\S/.test(firstText);
+  // Catalogue pages must have no colon at all (covers labels that survive the fixer).
+  const hasAnyColonInCatalogue = contentType === 'catalogue' && firstText.includes(':');
+  // Detect dangling endings that indicate the model was cut off mid-clause.
+  const hasDanglingEnding = /\b(and|including|with|using|like|such as),?\s*$/i.test(firstText);
+
   // Trigger retry when sanitized output misses the window, has bad format,
-  // was truncated, has the wrong ZITADEL count, or has more than 2 commas.
-  // (2 commas is a reasonable limit: "OIDC, OAuth 2.0, and SAML" = 2 commas.)
+  // was truncated, has the wrong ZITADEL count, or has more than the allowed commas.
+  // Catalogue pages list multiple topics and legitimately need up to 3 commas;
+  // all other types are capped at 2 (e.g. "OIDC, OAuth 2.0, and SAML" = 2 commas).
   const needsRetry =
     rawTooFarOff ||
     !inRange(firstText.length) ||
-    looksBad(rawFirst) ||
+    looksBad(rawFirst, contentType) ||
     firstTruncated ||
     !zOkFor(firstText) ||
-    countCommas(firstText) > 2;
+    countCommas(firstText) > maxCommas ||
+    hasMultipleSentences ||
+    hasGenericOpener ||
+    hasEarlyColon ||
+    looksLikeLabel ||
+    hasAnyColonInCatalogue ||
+    hasDanglingEnding;
 
   let retried = false;
   let rawRetryLen: number | null = null;
 
   if (needsRetry) {
     retried = true;
+    const issues: string[] = [];
+    if (!inRange(firstText.length)) issues.push(`length=${firstText.length} (need 130–160)`);
+    if (looksBad(rawFirst, contentType)) issues.push('format (labels/markdown/bullets)');
+    if (!zOkFor(firstText)) issues.push(`ZITADEL count=${countZITADEL(firstText)}`);
+    if (countCommas(firstText) > maxCommas) issues.push(`commas=${countCommas(firstText)} (max ${maxCommas})`);
+    if (hasMultipleSentences) issues.push('multiple sentences (. or ? followed by space)');
+    if (hasGenericOpener) issues.push('generic opener (This page/guide/Learn how/Discover)');
+    if (hasEarlyColon) issues.push('colon within first 20 chars (label-style opener)');
+    if (looksLikeLabel) issues.push('label-style colon pattern (e.g. "X: payload") — write a flowing sentence without a colon');
+    if (hasAnyColonInCatalogue) issues.push('colon found in catalogue description — no colons allowed');
+    if (hasDanglingEnding) issues.push('dangling ending (ends with "and"/"including"/etc.) — complete the sentence');
     const retryMessages = [
       ...messages,
-      { role: 'assistant', content: rawFirst },
+      { role: 'assistant', content: firstText },
       {
         role: 'user',
         content:
-          `That was ${rawFirst.trim().length} characters. Rewrite to be 130–160 characters (inclusive), including spaces. ` +
-          `Return ONLY plain text — no quotes, no labels, no markdown. ` +
-          `Make sure it is a complete sentence that does not need to be cut off. Keep the technical meaning.\n\nMeta description:`,
+          `Fix: ${issues.join(', ')}. ` +
+          `Rewrite once; keep meaning and technical terms; do not invent facts. ` +
+          `Aim ~150 chars; must be 130–160. Output only the sentence.`,
       },
     ];
-    const rawRetry = await callLLM(retryMessages);
+    const rawRetry = await callLLM(retryMessages, ['\n\n'], maxTokens);
     rawRetryLen = rawRetry.trim().length;
-    const { text: retryText, truncated: retryTruncated } = sanitizeDescription(rawRetry);
+    const { text: retryTextRaw, truncated: retryTruncated } = sanitizeDescription(rawRetry);
+    const retryTextFixed = stripLabelColon(retryTextRaw);
+    const retryText = retryTextFixed.length > 160 ? localAdjust(retryTextFixed) : retryTextFixed;
 
     // Accept the retry only when format, length (sanitized), ZITADEL count, and
     // comma count are all acceptable.
     // When the first was semantically bad, tolerate up to 5 chars outside range;
     // otherwise only accept if the retry is no further from range than the first.
-    const retryOk = !looksBad(rawRetry) && !retryTruncated && zOkFor(retryText) && countCommas(retryText) <= 2;
-    const firstWasBad = looksBad(rawFirst) || firstTruncated || !inRange(firstText.length) || !zOkFor(firstText);
-    const acceptRetry = retryOk && (
-      firstWasBad
-        ? distFromRange(retryText.length) <= 5
-        : distFromRange(retryText.length) <= distFromRange(firstText.length)
-    );
+    const retryOk = !looksBad(rawRetry, contentType) && !retryTruncated && zOkFor(retryText) && countCommas(retryText) <= maxCommas && !(contentType === 'catalogue' && retryText.includes(':'));
+    const acceptRetry = retryOk && inRange(retryText.length);
     if (acceptRetry) {
       desc = retryText;
     } else {
@@ -691,26 +939,90 @@ async function generateDescription(
       // rewriting from scratch and helps when small models struggle to hit
       // 130–160 in one or two shots.
       const candidate = (retryOk ? retryText : firstText) || firstText;
+      const repairIssues: string[] = [];
+      if (!inRange(candidate.length)) repairIssues.push(`length=${candidate.length} (need 130–160)`);
+      if (!zOkFor(candidate)) repairIssues.push(`ZITADEL count=${countZITADEL(candidate)}`);
+      if (countCommas(candidate) > maxCommas) repairIssues.push(`commas=${countCommas(candidate)} (max ${maxCommas})`);
       const repairMessages = [
         ...messages,
         { role: 'assistant', content: candidate },
         {
           role: 'user',
           content:
-            `Adjust this to exactly 130–160 characters. Keep all technical terminology and meaning intact. ` +
-            `Return ONLY the adjusted plain text — no quotes, no labels.\n\nMeta description:`,
+            `Fix: ${repairIssues.join(', ')}. ` +
+            `Adjust length only — keep all technical terms and meaning intact. ` +
+            `If trimming, remove adjectives first, not nouns. ` +
+            `Output only the plain text sentence.`,
         },
       ];
-      const rawRepair = await callLLM(repairMessages);
-      const { text: repairText, truncated: repairTruncated } = sanitizeDescription(rawRepair);
-      if (!looksBad(rawRepair) && !repairTruncated && zOkFor(repairText) && countCommas(repairText) <= 2) {
+      const rawRepair = await callLLM(repairMessages, ['\n\n'], maxTokens);
+      const { text: repairTextRaw, truncated: repairTruncated } = sanitizeDescription(rawRepair);
+      const repairTextFixed = stripLabelColon(repairTextRaw);
+      const repairText = repairTextFixed.length > 160 ? localAdjust(repairTextFixed) : repairTextFixed;
+      if (!looksBad(rawRepair, contentType) && !repairTruncated && zOkFor(repairText) && countCommas(repairText) <= maxCommas && !(contentType === 'catalogue' && repairText.includes(':'))) {
         desc = repairText;
       }
-      // If repair still fails, desc remains firstText (truncated last resort).
+      // Deterministic last resort: if still out of range after the repair LLM pass,
+      // trim/pad locally rather than shipping an out-of-range description.
+      if (!inRange(desc.length)) {
+        desc = localAdjust(desc);
+      }
+    }
+  }
+
+  // Expand pass: when the final candidate is still too short (< 130 chars),
+  // ask the model to add one clause from a late outline section.
+  // localAdjust can only trim, so this is the only recovery path for short outputs.
+  // Skip for legal pages where the ZITADEL-free constraint makes expansion risky.
+  if (desc.length < 130 && contentType !== 'legal') {
+    const expandMessages = [
+      ...messages,
+      { role: 'assistant', content: desc },
+      {
+        role: 'user',
+        content:
+          `Too short (len=${desc.length}). Expand to 140–155 chars by adding ONE extra topic from a ` +
+          `late section in the [DOCUMENT OUTLINE]. Keep one sentence, no colon, no new facts. ` +
+          `Keep the ZITADEL brand rule. Output only the plain text sentence.`,
+      },
+    ];
+    const rawExpand = await callLLM(expandMessages, ['\n\n'], maxTokens);
+    const { text: expandRaw, truncated: expandTruncated } = sanitizeDescription(rawExpand);
+    const expandFixed = stripLabelColon(expandRaw);
+    const expand = expandFixed.length > 160 ? localAdjust(expandFixed) : expandFixed;
+    if (
+      expand.length >= 130 &&
+      expand.length <= 160 &&
+      zOkFor(expand) &&
+      countCommas(expand) <= maxCommas &&
+      !looksBad(rawExpand, contentType) &&
+      !(contentType === 'catalogue' && expand.includes(':')) &&
+      !expandTruncated
+    ) {
+      desc = expand;
     }
   }
 
   return { description: desc, rawFirstLen: rawFirst.trim().length, rawRetryLen, retried };
+}
+
+/**
+ * Deterministic fixer for the common "Label: payload" pattern.
+ * Converts e.g. "ZITADEL Actions examples: Foo bar" into
+ * "ZITADEL Actions examples for Foo bar".
+ * Applied after sanitizeDescription so it operates on already-clean text.
+ * Callers must re-check length and call localAdjust() if the result exceeds 160 chars.
+ */
+function stripLabelColon(s: string): string {
+  // Only rewrite when the colon sits within the first 40 chars AND the label
+  // clearly looks like a section heading (contains ZITADEL, Actions, or "examples").
+  // This prevents accidental rewrites of legitimate technical uses like
+  // "OIDC: token validation" that can appear in api-reference pages.
+  const idx = s.indexOf(':');
+  if (idx === -1 || idx > 40) return s;
+  const label = s.slice(0, idx);
+  if (!/(ZITADEL|Actions|examples?)/i.test(label)) return s;
+  return s.replace(/^([^:]{6,60}):\s+/, '$1 for ');
 }
 
 /** Sleep helper. */
@@ -724,6 +1036,7 @@ async function main() {
   console.log(`LLM endpoint : ${BASE_URL}`);
   console.log(`Model        : ${MODEL}`);
   console.log(`Dry run      : ${DRY_RUN}`);
+  console.log(`Force        : ${FORCE}`);
   console.log(`Delay        : ${DELAY_MS}ms`);
   console.log(`Excluded     : reference/, v*/, apis/proto/, **/index.mdx\n`);
 
@@ -762,7 +1075,7 @@ async function main() {
     // Use hasRealDescription() on the raw frontmatter rather than the flat-parsed
     // map — it correctly handles block scalars (description: >\n  ...) and empty
     // quoted strings that the simple parser misidentifies as present.
-    if (!hasRealDescription(rawFm)) {
+    if (FORCE || !hasRealDescription(rawFm)) {
       eligible.push({ path: f, relPath: relative(CONTENT_DIR, f), content, fm, body });
     }
   }
