@@ -72,7 +72,7 @@ async function generateVersionApiDocs(version: string) {
     const title = uniqueService.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
     const indexContent = `---
 title: ${title} API
-description: API reference documentation for the ${title} service in ZITADEL
+description: Explore the ZITADEL ${title} API reference documentation. Learn how to manage resources, handle authentication, and integrate ${title} services into your application.
 ---
 
 API Reference for ${title}
@@ -203,6 +203,30 @@ async function fixAllGeneratedLinks() {
       }
       return match;
     });
+
+    // Add description to frontmatter if missing and it's an API reference page
+    if (file.includes('reference/api') && !newContent.includes('\ndescription:')) {
+      const titleMatch = newContent.match(/^title:\s*(.+)$/m);
+      if (titleMatch) {
+        const title = titleMatch[1].replace(/['"]/g, '').trim();
+        // Try to find the operation summary in _openapi contents
+        const summaryMatch = newContent.match(/contents:\s*-\s*content:\s*>?-?\s*([\s\S]+?)(?=\n\s*\w+:|$)/);
+        let description = '';
+        if (summaryMatch) {
+          description = summaryMatch[1].trim().split('\n').map(line => line.trim()).join(' ');
+          if (description.length > 200) {
+            description = description.slice(0, 197) + '...';
+          }
+        }
+
+        if (!description || description.length < 50) {
+            description = `Explore the ${title} operation in the ZITADEL API. Learn about request parameters, response schemas, and integration details for this endpoint.`;
+        }
+
+        newContent = newContent.replace(/^(title:\s*.+)$/m, `$1\ndescription: "${description.replace(/"/g, '\\"')}"`);
+        modified = true;
+      }
+    }
 
     if (modified) {
       writeFileSync(fullPath, newContent);

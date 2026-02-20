@@ -39,7 +39,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Key Concepts",
           slug: "concepts",
           description:
-            "ZITADEL documentation for specific or general concepts required to understand the system or our guides.",
+            "Learn about ZITADEL's core architecture and terminology. This section covers identity management concepts, multi-tenancy, and technical structures essential for understanding our platform.",
         },
         items: [
           "concepts/structure/instance",
@@ -74,7 +74,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Example Applications",
           slug: "/examples/introduction",
           description:
-            "Practical examples showing how to integrate ZITADEL authentication and secure APIs across different application types and frameworks.",
+            "Discover practical quickstart guides and example applications for ZITADEL. We provide step-by-step instructions for popular frameworks like React, Angular, Vue, Next.js, and more.",
         },
         items: [
           {
@@ -85,7 +85,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Frontend (SPA) Quickstart Guides",
               slug: "/examples/introduction/frontend",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into frontend single-page applications.",
+                "Step-by-step instructions for integrating ZITADEL authentication into your frontend single-page applications. Includes guides for React, Angular, Vue, and vanilla JS.",
             },
             items: [
               {
@@ -106,7 +106,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Mobile & Native Quickstart Guides",
               slug: "/examples/introduction/mobile",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into Mobile & Native applications.",
+                "Quickstart guides for integrating ZITADEL authentication into mobile and native applications. Learn how to secure your mobile apps with our Flutter and .NET guides.",
             },
             items: [
               "examples/login/flutter",
@@ -120,7 +120,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Full-Stack / SSR Quickstart Guides",
               slug: "/examples/introduction/fullstack",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into Full-Stack / SSR applications.",
+                "Integrate ZITADEL with your full-stack and server-side rendered (SSR) applications. Follow our guides for Next.js, B2B scenarios, and other modern web frameworks.",
             },
             items: [
               "examples/login/nextjs",
@@ -135,7 +135,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Web App (Server-Side) Quickstart Guides",
               slug: "/examples/introduction/webapp",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into Web App (Server-Side) applications.",
+                "Step-by-step guides for integrating ZITADEL into traditional server-side web applications. Learn how to secure Java Spring, PHP Symfony, Django, and Go apps.",
             },
             items: [
               "examples/login/symfony",
@@ -152,7 +152,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "APIs / Backend Quickstart Guides",
               slug: "/examples/introduction/backend",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into APIs / Backend Services.",
+                "Learn how to secure your APIs and backend services using ZITADEL. Includes examples for Node.js, Python, Go, Java, and NestJS to implement robust authentication.",
             },
             items: [
               "examples/secure-api/go",
@@ -444,7 +444,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Integrate ZITADEL with your Favorite Services",
               slug: "/guides/integrate/services",
               description:
-                "With the guides in this section you will learn how to integrate ZITADEL with your services.",
+                "Step-by-step guides for integrating ZITADEL with popular services and tools including Google Workspace, AWS, Atlassian, Cloudflare, GitLab, and many other software solutions.",
             },
             items: [
               "guides/integrate/services/google-workspace",
@@ -518,7 +518,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Build your own Login UI",
           slug: "/guides/integrate/login-ui",
           description:
-            "Create a custom login UI using ZITADEL APIs for username/password and external identity provider scenarios.",
+            "Create a completely customized login experience using the ZITADEL Session and OIDC APIs. Learn how to handle username/password, MFA, passkeys, and external identity providers.",
         },
         collapsed: true,
         items: [
@@ -1092,7 +1092,7 @@ export const legalSidebar: readonly SidebarItem[] = [
           title: "Service description",
           slug: "/legal/service-description",
           description:
-            "Description of services and service levels for ZITADEL Cloud and Enterprise subscriptions.",
+            "Detailed description of services, service levels (SLA), and support commitments for ZITADEL Cloud and Enterprise subscriptions to ensure transparency and reliability.",
         },
         items: [
           {
@@ -1115,7 +1115,7 @@ export const legalSidebar: readonly SidebarItem[] = [
           title: "Policies",
           slug: "/legal/policies",
           description:
-            "Policies and guidelines in addition to our terms of services.",
+            "Find all policy documents and guidelines for ZITADEL services, including our privacy policy, acceptable use policy, and other legal frameworks that govern our platform.",
         },
         items: [
           {

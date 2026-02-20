@@ -66,9 +66,15 @@ export async function generateMetadata(
     }
   }
 
+  let description = page.data.description;
+  if (!description || description.length < 120) {
+    const fallback = `Explore ZITADEL documentation for ${page.data.title}. Learn how to integrate, manage, and secure your applications with our comprehensive identity and access management solutions.`;
+    description = description ? `${description} ${fallback}` : fallback;
+  }
+
   return {
     title: page.data.title,
-    description: page.data.description,
+    description: description.length > 200 ? description.substring(0, 197) + '...' : description,
     alternates: {
       canonical: canonicalUrl,
     },
