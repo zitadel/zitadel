@@ -228,11 +228,11 @@ function hasRealDescription(rawFm: string): boolean {
 function extractContext(body: string): string {
   const maxBodyChars = 8000;
 
-  // Strip imports and code fence bodies (keep first line as a signal)
+  // Strip imports and code fence bodies entirely (method names are
+  // extracted separately by extractMethodNames, so we don't need hints here)
   const cleaned = body
     .replace(/^import\s.*$/gm, '')
-    .replace(/```(?:\w+)?\n([^\n]*)(?:[\s\S]*?)```/g, '[$1]')
-    .replace(/```/g, '')
+    .replace(/```[^\n]*\n[\s\S]*?```/g, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 
