@@ -79,7 +79,6 @@
     "jose": "^5.10.0"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.64.0",
     "@bufbuild/protocompile": "^0.0.1",
     "@types/node": "^24.10.9",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
