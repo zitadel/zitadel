@@ -39,7 +39,7 @@ export const LANGS: Lang[] = [
   {
     name: "Русский",
     code: "ru",
-  },  
+  },
   {
     name: "Türkçe",
     code: "tr",
@@ -60,3 +60,15 @@ export const LANGS: Lang[] = [
 
 export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";
 export const LANGUAGE_HEADER_NAME = "accept-language";
+
+export function getLanguage(code: string): Lang {
+  const lang = LANGS.find((l) => l.code === code);
+  if (lang) {
+    return lang;
+  }
+
+  return {
+    code,
+    name: new Intl.DisplayNames([code], { type: "language" }).of(code) || code,
+  };
+}
