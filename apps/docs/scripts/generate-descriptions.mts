@@ -104,7 +104,7 @@ const CATEGORY_PROMPTS: Record<ContentCategory, { focusClause: string; pageKind:
     focusClause:
       'Name the exact protocol, API, or benchmark scenario. ' +
       'For API reference pages, include the primary function or method names documented on the page (e.g., setClaim, setCustomAttribute). ' +
-      'State what a developer can do with these endpoints or methods. ' +
+      'State what a developer can achieve and name what is affected (claims, tokens, assertions, responses). ' +
       'Closely paraphrase the page\'s own introductory sentence for accuracy — do not reinterpret or generalize it.',
   },
   guide: {
@@ -483,17 +483,20 @@ async function generateDescription(
     '## SENTENCE STRUCTURE\n' +
     'Start with a concrete noun, feature name, or action verb from the page — NEVER with filler openers.\n' +
     'BANNED first words: "Explore", "Discover", "Learn", "This page", "This guide", "ZITADEL guides", "ZITADEL helps", "ZITADEL shows", "ZITADEL describes".\n' +
+    'Name the primary protocol or entity (OIDC, SAML, OAuth, tokens, claims) within the first 60 characters.\n' +
+    'Prefer terms searchers use (claims, attributes, roles, tokens) over internal terms (parameters, flows, triggers).\n' +
     'End with a concrete noun or specific outcome — NEVER with vague words like "management", "workflows", "and more", "solutions", or "tasks".\n' +
     '\n' +
     '## GOOD EXAMPLES (imitate these patterns)\n' +
-    '- "Configure ZITADEL session tokens with custom lifetime, metadata, and multi-factor requirements"\n' +
-    '- "ZITADEL Personal Access Tokens let you authenticate service users for API calls without interactive login"\n' +
+    '- "Add custom claims to ZITADEL ID tokens and access tokens during token creation for identity enrichment"\n' +
+    '- "ZITADEL Personal Access Tokens let service users authenticate for API calls without interactive login"\n' +
     '- "Mirror events between ZITADEL instances using the cockroach and postgres export commands"\n' +
     '\n' +
     '## BAD EXAMPLES (never produce these)\n' +
     '- "Explore ZITADEL features for managing authentication" ← starts with Explore, too vague\n' +
     '- "ZITADEL guides you through configuring session parameters" ← starts with ZITADEL guides\n' +
     '- "Learn how to customize attributes before they are set in the" ← truncated, starts with Learn how\n' +
+    '- "Configure token creation with parameters for userinfo endpoints" ← uses internal term "parameters" instead of "claims"\n' +
     '\n' +
     '## ACCURACY RULES\n' +
     'Closely paraphrase the page\'s own introductory sentence — do not reinterpret or generalize it.\n' +
