@@ -101,15 +101,53 @@ function extractContext(body: string, maxChars = 900): string {
     body
       // Remove import statements
       .replace(/^import\s.*$/gm, '')
-      // Remove JSX/HTML tags (keep inner text via a naive approach)
+      // Remove JSX/HTML tags
       .replace(/<[^>]+>/g, ' ')
-      // Remove code fences
-      .replace(/```[\s\S]*?```/g, '')
+      // Replace code fences: keep only the first line (often the most informative command/type)
+      // so the model can pick up concrete keywords (e.g. endpoint names, action types)
+      .replace(/```(?:\w+)?\n([^\n]*)(?:[\s\S]*?)```/g, '[$1]')
+      // Remove any remaining bare ``` delimiters
+      .replace(/```/g, '')
       // Collapse extra whitespace
       .replace(/\n{3,}/g, '\n\n')
       .trim()
       .slice(0, maxChars)
   );
+}
+
+/**
+ * Sanitize LLM output to prevent frontmatter corruption and ensure quality.
+ * Strips markdown, conversational prefixes, and enforces a hard character cap.
+ */
+function sanitizeDescription(text: string, maxLen = 160): string {
+  let clean = text.trim();
+
+  // Strip surrounding quotes
+  clean = clean.replace(/^["']|["']$/g, '').trim();
+
+  // Strip common conversational/label prefixes the model might add
+  clean = clean
+    .replace(/^(meta\s+description:|description:|here is (the )?meta description:|sure[,!]?\s)/i, '')
+    .trim();
+
+  // Strip rogue markdown that could corrupt YAML (bold, italic, inline code)
+  clean = clean.replace(/[*`_]/g, '');
+
+  // Collapse double spaces left by markdown stripping
+  clean = clean.replace(/  +/g, ' ').trim();
+
+  // Remove trailing period for consistency
+  clean = clean.replace(/\.$/, '');
+
+  // Hard cap at maxLen: cut to last whole word, never append ellipses
+  // (ellipses can push the string back over the cap and look bad in SERPs)
+  if (clean.length > maxLen) {
+    const truncated = clean.slice(0, maxLen);
+    const lastSpace = truncated.lastIndexOf(' ');
+    clean = lastSpace > 40 ? truncated.slice(0, lastSpace) : truncated.trim();
+  }
+
+  return clean;
 }
 
 /** Inject a description field into a frontmatter block, right after the title line. */
@@ -126,32 +164,17 @@ function injectDescription(content: string, description: string): string {
   return content.replace(/^---\r?\n/, `---\ndescription: "${escaped}"\n`);
 }
 
-/** Call the local LLM and return a generated description. */
-async function generateDescription(
-  title: string,
-  context: string,
-): Promise<string> {
-  const systemPrompt =
-    'You are an SEO specialist writing meta descriptions for technical documentation pages. ' +
-    'Write a single plain-text sentence (no quotation marks around it) that accurately summarises ' +
-    'the page content. Target length: 130–160 characters. No markdown, no trailing period required.';
-
-  const userPrompt =
-    `Page title: ${title}\n\n` +
-    `Page content excerpt:\n${context}\n\n` +
-    `Write the meta description now (130–160 characters, plain text, no surrounding quotes):`;
-
+/** Perform a single chat completion call and return raw content. */
+async function callLLM(messages: Array<{ role: string; content: string }>): Promise<string> {
   const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: MODEL,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
+      messages,
       max_tokens: 120,
-      temperature: 0.4,
+      temperature: 0.3,
+      stop: ['\n'], // prevent second lines or trailing commentary
     }),
   });
 
@@ -164,13 +187,63 @@ async function generateDescription(
     choices: Array<{ message: { content: string } }>;
   };
 
-  let desc = json.choices?.[0]?.message?.content?.trim() ?? '';
+  return json.choices?.[0]?.message?.content ?? '';
+}
 
-  // Strip any surrounding quotes the model might have added
-  desc = desc.replace(/^["']|["']$/g, '').trim();
+/** Call the local LLM and return a sanitized, length-validated description.
+ *  Automatically retries once if the first result is out of the 130–160 char range. */
+async function generateDescription(
+  title: string,
+  context: string,
+): Promise<string> {
+  const systemPrompt =
+    'You write SEO meta descriptions for ZITADEL technical documentation. ' +
+    'Return ONLY the meta description text (no labels, no JSON, no quotes). ' +
+    'Write exactly ONE sentence in plain text. ' +
+    'Length MUST be 130–160 characters INCLUDING spaces. Do NOT exceed 160. ' +
+    'No markdown, no emojis, no exclamation marks, no ellipses. Do not end with a period. ' +
+    'Avoid semicolons; one sentence, you may use one comma clause. ' +
+    'Avoid generic openings like "This guide", "This page", "Learn how", "In this article". ' +
+    'Include "ZITADEL" if it fits naturally. ' +
+    'Prefer one concrete technical keyword from the content (e.g. Actions V2, webhook, OIDC, PAT). ' +
+    'If the page covers deprecation or migration, mention it neutrally.';
 
-  // Strip leading label the model sometimes prefixes ("Meta description: …")
-  desc = desc.replace(/^meta\s+description:\s*/i, '').trim();
+  const userPrompt =
+    `Title: ${title}\n` +
+    `Excerpt:\n${context}\n\n` +
+    `Meta description:`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt },
+  ];
+
+  const rawFirst = await callLLM(messages);
+  let desc = sanitizeDescription(rawFirst);
+
+  // Score the RAW output length, not the sanitized length.
+  // Sanitizing a 200-char response to 158 chars would make distToRange return 0,
+  // masking the fact that the model didn't follow the length constraint at all.
+  const distToRange = (len: number) => Math.max(0, 130 - len, len - 160);
+
+  // Retry whenever the raw output missed the target range (too short or too long).
+  if (distToRange(rawFirst.length) > 0) {
+    const retryMessages = [
+      ...messages,
+      { role: 'assistant', content: rawFirst },
+      {
+        role: 'user',
+        content:
+          `That was ${rawFirst.length} characters. Rewrite to be 130–160 characters (inclusive), including spaces. ` +
+          `Make sure it is a complete sentence that does not need to be cut off. Keep the technical meaning.\n\nMeta description:`,
+      },
+    ];
+    const rawRetry = await callLLM(retryMessages);
+    // Only replace if the retry obeyed the rules better (judge both by raw length)
+    if (distToRange(rawRetry.length) < distToRange(rawFirst.length)) {
+      desc = sanitizeDescription(rawRetry);
+    }
+  }
 
   return desc;
 }
