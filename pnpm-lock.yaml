@@ -57,9 +57,6 @@ importers:
       clsx:
         specifier: 1.2.1
         version: 1.2.1
-      fast-glob:
-        specifier: ^3.3.3
-        version: 3.3.3
       fumadocs-core:
         specifier: 16.6.3
         version: 16.6.3(@mdx-js/mdx@3.1.1)(@types/estree-jsx@1.0.5)(@types/hast@3.0.4)(@types/mdast@4.0.4)(@types/react@19.2.7)(algoliasearch@5.37.0)(lucide-react@0.556.0(react@19.2.1))(next@16.1.6(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.97.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(zod@4.3.6)
