@@ -2299,8 +2299,9 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{
 						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
 						},
 					},
 					IdpId:    oauthIdpID,
@@ -2339,8 +2340,9 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{
 						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
 						},
 					},
 					IdpId:    oauthIdpID,
@@ -2401,8 +2403,9 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{
 						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
 						},
 					},
 					IdpId:    oidcIdpID,
@@ -2439,8 +2442,9 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{
 						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
 						},
 					},
 					IdpId:    oidcIdpID,

@@ -1043,7 +1043,7 @@
       "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków.",
       "MAXLENGTHERROR": "Musi zawierać mniej niż {{value}} znaków"
     },
-    "ID": "ID",
+    "ID": "ID użytkownika",
     "EMAIL": "E-mail",
     "PHONE": "Numer telefonu",
     "PHONEEMPTY": "Nie podano numeru telefonu",
@@ -1373,7 +1373,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nazwa",
-      "ID": "ID",
+      "ID": "ID organizacji",
       "CREATIONDATE": "Data utworzenia",
       "DATECHANGED": "Zmieniono",
       "FILTER": "Filtr",
@@ -2013,7 +2013,8 @@
           "DESCRIPTION": "Czy na pewno chcesz usunąć swój projekt?",
           "TYPENAME": "Wpisz nazwę projektu, aby trwale go usunąć."
         }
-      }
+      },
+      "ID": "ID projektu"
     },
     "SETTINGS": {
       "TITLE": "Ustawienia",
@@ -2292,7 +2293,7 @@
     "ADD": "Dodaj dostawcę tożsamości",
     "TYPE": "Typ",
     "OWNER": "Właściciel",
-    "ID": "ID",
+    "ID": "ID dostawcy tożsamości",
     "NAME": "Nazwa",
     "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
     "TOKENENDPOINT": "Token Endpoint",
@@ -2495,7 +2496,7 @@
     "TOKEN": "Ustawienia tokenów",
     "PAGES": {
       "TITLE": "Aplikacja",
-      "ID": "ID",
+      "ID": "ID aplikacji",
       "DESCRIPTION": "Tutaj możesz edytować dane swojej aplikacji i jej konfigurację.",
       "CREATE": "Utwórz aplikację",
       "CREATE_SELECT_PROJECT": "Najpierw wybierz swój projekt",
@@ -2839,5 +2840,6 @@
       "TITLE": "Aktywność",
       "DESCRIPTION": "Tutaj możesz zobaczyć ostatnie wydarzenia, które spowodowały zmiany w użytkowniku."
     }
-  }
+  },
+  "INSTANCEID": "ID instancji"
 }
