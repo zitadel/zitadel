@@ -219,7 +219,7 @@ func (u userHuman) setPhoneColumns(columnValues map[string]any, ctes map[string]
 }
 
 func (u userHuman) setInviteColumns(columnValues map[string]any, ctes map[string]database.CTEChange, user *domain.User, createdAt any) (map[string]any, map[string]database.CTEChange) {
-	if user.Human.Phone == nil {
+	if user.Human.Invite == nil {
 		return columnValues, ctes
 	}
 	if user.Human.Invite.PendingVerification != nil {
