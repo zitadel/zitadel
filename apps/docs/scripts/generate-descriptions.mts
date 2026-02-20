@@ -16,6 +16,7 @@
  *   --delay <ms>        Delay between API calls in ms (default: 200)
  *   --start-from <n>    Skip the first N eligible files (resume after interruption)
  *   --limit <n>         Process at most N files then stop
+ *   --category <name>   Only process files matching this category (e.g. advisory, self-hosting, guide)
  *
  * Excluded content (generated / versioned — must not be edited):
  *   - content/reference/          auto-generated REST/gRPC API reference (generate-api-reference target)
@@ -164,6 +165,7 @@ const { values: _args } = parseArgs({
     delay:        { type: 'string',  default: '200' },
     'start-from': { type: 'string',  default: '0' },
     limit:        { type: 'string' },
+    category:     { type: 'string' },
   },
 });
 
@@ -175,10 +177,15 @@ const SINGLE_FILE = _args.file as string | undefined;
 const DELAY_MS    = Number(_args.delay);
 const START_FROM  = Number(_args['start-from']);
 const LIMIT       = _args.limit !== undefined ? Number(_args.limit) : Infinity;
+const CATEGORY_FILTER = _args.category as ContentCategory | undefined;
 
 if (isNaN(DELAY_MS))   { console.error('Error: --delay must be a number'); process.exit(1); }
 if (isNaN(START_FROM)) { console.error('Error: --start-from must be a number'); process.exit(1); }
 if (_args.limit !== undefined && isNaN(LIMIT)) { console.error('Error: --limit must be a number'); process.exit(1); }
+if (CATEGORY_FILTER && !(CATEGORY_FILTER in CATEGORY_PROMPTS)) {
+  console.error(`Error: --category must be one of: ${Object.keys(CATEGORY_PROMPTS).join(', ')}`);
+  process.exit(1);
+}
 
 const CONTENT_DIR = fileURLToPath(new URL('../content', import.meta.url));
 
@@ -573,7 +580,8 @@ async function main() {
   console.log(`Dry run      : ${DRY_RUN}`);
   console.log(`Force        : ${FORCE}`);
   console.log(`Delay        : ${DELAY_MS}ms`);
-  console.log(`Excluded     : reference/, v*/, apis/proto/, **/index.mdx\n`);
+  if (CATEGORY_FILTER) console.log(`Category     : ${CATEGORY_FILTER}`);
+  console.log(`Excluded     : reference/, legal/, v*/, apis/proto/, **/index.mdx\n`);
 
   // Build file list
   let files: string[];
@@ -602,8 +610,10 @@ async function main() {
   for (const f of files) {
     const content = await readFile(f, 'utf-8');
     const { fm, rawFm, body } = parseFrontmatter(content);
+    const rel = relative(CONTENT_DIR, f);
+    if (CATEGORY_FILTER && detectCategory(rel) !== CATEGORY_FILTER) continue;
     if (FORCE || !hasRealDescription(rawFm)) {
-      eligible.push({ path: f, relPath: relative(CONTENT_DIR, f), content, fm, body });
+      eligible.push({ path: f, relPath: rel, content, fm, body });
     }
   }
 
