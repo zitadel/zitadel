@@ -50,8 +50,9 @@ func Test_user_Get(t *testing.T) {
 			Gender:            domain.HumanGenderMale,
 			AvatarKey:         "https://my.avatar/key",
 			Email: domain.HumanEmail{
-				Address:    "john@doe.com",
-				VerifiedAt: now,
+				Address:           "john@doe.com",
+				UnverifiedAddress: "john@doe.com",
+				VerifiedAt:        now,
 			},
 		},
 	}
@@ -167,12 +168,14 @@ func Test_user_List(t *testing.T) {
 			Gender:            domain.HumanGenderMale,
 			AvatarKey:         "https://my.avatar/key",
 			Email: domain.HumanEmail{
-				Address:    "john@doe.com",
-				VerifiedAt: now,
+				Address:           "john@doe.com",
+				UnverifiedAddress: "john@doe.com",
+				VerifiedAt:        now,
 			},
 			Phone: &domain.HumanPhone{
-				Number:     "+1234567890",
-				VerifiedAt: now,
+				Number:           "+1234567890",
+				UnverifiedNumber: "+1234567890",
+				VerifiedAt:       now,
 			},
 			Passkeys: []*domain.Passkey{
 				{
