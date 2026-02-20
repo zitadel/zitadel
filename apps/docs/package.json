@@ -30,6 +30,7 @@
     "@shikijs/types": "^3.21.0",
     "@types/js-yaml": "^4.0.9",
     "clsx": "1.2.1",
+    "fast-glob": "^3.3.3",
     "fumadocs-core": "16.6.3",
     "fumadocs-mdx": "14.2.6",
     "fumadocs-openapi": "10.3.6",
