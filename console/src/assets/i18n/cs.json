@@ -702,7 +702,7 @@
     "USERNAME": "Uživatelské jméno",
     "ORGNAME": "Název organizace",
     "ORGID": "ID organizace",
-    "PRIMARYDOMAIN": "Primární doména",
+    "PRIMARYDOMAIN": "Doména organizace",
     "PROJECTNAME": "Název projektu",
     "RESOURCEOWNER": "Vlastník zdroje",
     "METHODS": {
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Musí být alespoň {{value}} znaků dlouhé.",
       "MAXLENGTHERROR": "Musí být kratší než {{value}} znaků."
     },
-    "ID": "ID",
+    "ID": "ID uživatele",
     "EMAIL": "E-mail",
     "PHONE": "Telefonní číslo",
     "PHONEEMPTY": "Není definováno telefonní číslo",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Název",
-      "ID": "ID",
+      "ID": "ID organizace",
       "CREATIONDATE": "Datum vytvoření",
       "DATECHANGED": "Změněno",
       "FILTER": "Filtr",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Stáhnout soubor",
       "SELECTORGTOOLTIP": "Vybrat tuto organizaci.",
-      "PRIMARYDOMAIN": "Primární doména",
+      "PRIMARYDOMAIN": "Doména organizace",
       "STATE": "Stav",
       "USEPASSWORD": "Nastavit počáteční heslo",
       "USEPASSWORDDESC": "Uživatel nemusí během inicializace nastavovat heslo."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Přidat doménu",
-      "TITLE": "Ověřené domény",
+      "TITLE": "Doména organizace",
       "DESCRIPTION": "Konfigurujte domény vaší organizace. Tato doména může být použita pro zjišťování domény a připojení uživatelských jmen.",
-      "SETPRIMARY": "Nastavit jako primární",
+      "SETPRIMARY": "Doména organizace",
       "DELETE": {
         "TITLE": "Smazat doménu",
         "DESCRIPTION": "Chystáte se smazat jednu z vašich domén."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Správce přidán.",
       "MEMBERREMOVED": "Správce odstraněn.",
       "MEMBERCHANGED": "Správce změněn.",
-      "SETPRIMARY": "Nastavena primární doména.",
+      "SETPRIMARY": "Doména organizace byla úspěšně nastavena.",
       "DELETED": "Organizace úspěšně smazána",
       "DEFAULTORGNOTFOUND": "Výchozí organizace nebyla nalezena",
       "ORG_WAS_DELETED": "Organizace byla smazána."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "Nastavení SMTP a SMS",
       "MESSAGETEXTS": "Texty zpráv",
       "IDP": "Poskytovatelé identity",
-      "VERIFIED_DOMAINS": "Ověřené domény",
+      "VERIFIED_DOMAINS": "Doména organizace",
       "DOMAIN": "Nastavení domény",
       "LOGINTEXTS": "Texty přihlašovací stránky",
       "BRANDING": "Branding",
@@ -2015,7 +2015,8 @@
           "DESCRIPTION": "Opravdu chcete odstranit váš projekt?",
           "TYPENAME": "Pro trvalé odstranění napište název projektu."
         }
-      }
+      },
+      "ID": "ID projektu"
     },
     "SETTINGS": {
       "TITLE": "Nastavení",
@@ -2293,7 +2294,7 @@
     "ADD": "Přidat poskytovatele identity",
     "TYPE": "Typ",
     "OWNER": "Vlastník",
-    "ID": "ID",
+    "ID": "ID poskytovatele identity",
     "NAME": "Název",
     "AUTHORIZATIONENDPOINT": "Koncový bod autorizace",
     "TOKENENDPOINT": "Koncový bod tokenu",
@@ -2504,7 +2505,7 @@
     "TOKEN": "Nastavení tokenu",
     "PAGES": {
       "TITLE": "Aplikace",
-      "ID": "ID",
+      "ID": "ID aplikace",
       "DESCRIPTION": "Zde můžete upravovat data vaší aplikace a její konfiguraci.",
       "CREATE": "Vytvořit aplikaci",
       "CREATE_SELECT_PROJECT": "Nejprve vyberte váš projekt",
@@ -2848,5 +2849,6 @@
       "TITLE": "Aktivita",
       "DESCRIPTION": "Zde můžete vidět nejnovější události, které generovaly změnu u uživatele."
     }
-  }
+  },
+  "INSTANCEID": "ID instance"
 }

@@ -700,7 +700,7 @@
     "USERNAME": "Numele utilizatorului",
     "ORGNAME": "Numele organizației",
     "ORGID": "ID-ul organizației",
-    "PRIMARYDOMAIN": "Domeniu principal",
+    "PRIMARYDOMAIN": "Domeniu organizație",
     "PROJECTNAME": "Numele proiectului",
     "RESOURCEOWNER": "Proprietarul resursei",
     "METHODS": {
@@ -1042,7 +1042,7 @@
       "MINLENGTHERROR": "Trebuie să aibă cel puțin {{value}} caractere.",
       "MAXLENGTHERROR": "Trebuie să aibă mai puțin de {{value}} caractere."
     },
-    "ID": "ID",
+    "ID": "ID utilizator",
     "EMAIL": "E-mail",
     "PHONE": "Număr de telefon",
     "PHONEEMPTY": "Niciun număr de telefon definit",
@@ -1372,7 +1372,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nume",
-      "ID": "ID",
+      "ID": "ID organizație",
       "CREATIONDATE": "Data creării",
       "DATECHANGED": "Modificat",
       "FILTER": "Filtru",
@@ -1418,7 +1418,7 @@
       },
       "DOWNLOAD_FILE": "Descărcați fișierul",
       "SELECTORGTOOLTIP": "Selectați această organizație.",
-      "PRIMARYDOMAIN": "Domeniu principal",
+      "PRIMARYDOMAIN": "Domeniu organizație",
       "STATE": "Stare",
       "USEPASSWORD": "Setați parola inițială",
       "USEPASSWORDDESC": "Utilizatorul nu trebuie să seteze parola în timpul inițializării."
@@ -1429,9 +1429,9 @@
     },
     "DOMAINS": {
       "NEW": "Adăugați domeniu",
-      "TITLE": "Domenii verificate",
+      "TITLE": "Domeniu organizație",
       "DESCRIPTION": "Configurați domeniile organizației dvs. Acest domeniu poate fi utilizat pentru descoperirea domeniului și sufixarea numelui de utilizator.",
-      "SETPRIMARY": "Setați ca principal",
+      "SETPRIMARY": "Domeniu organizație",
       "DELETE": {
         "TITLE": "Ștergeți domeniul",
         "DESCRIPTION": "Sunteți pe cale să ștergeți unul dintre domeniile dvs."
@@ -1459,7 +1459,7 @@
       "MEMBERADDED": "Administrator adăugat.",
       "MEMBERREMOVED": "Administrator eliminat.",
       "MEMBERCHANGED": "Administrator modificat.",
-      "SETPRIMARY": "Domeniu principal setat.",
+      "SETPRIMARY": "Domeniul organizației a fost setat cu succes.",
       "DELETED": "Organizația a fost ștearsă cu succes",
       "DEFAULTORGNOTFOUND": "Organizația implicită nu a fost găsită",
       "ORG_WAS_DELETED": "Organizația a fost ștearsă."
@@ -1497,7 +1497,7 @@
       "NOTIFICATIONS_DESC": "Setări SMTP și SMS",
       "MESSAGETEXTS": "Texte de mesaje",
       "IDP": "Furnizori de identitate",
-      "VERIFIED_DOMAINS": "Domenii verificate",
+      "VERIFIED_DOMAINS": "Domeniu organizație",
       "DOMAIN": "Setări domeniu",
       "LOGINTEXTS": "Texte interfață de conectare",
       "BRANDING": "Branding",
@@ -2012,7 +2012,8 @@
           "DESCRIPTION": "Doriți cu adevărat să vă ștergeți proiectul?",
           "TYPENAME": "Tastați numele proiectului pentru a-l șterge definitiv."
         }
-      }
+      },
+      "ID": "ID proiect"
     },
     "SETTINGS": {
       "TITLE": "Setări",
@@ -2089,7 +2090,7 @@
       "GRANTEDORGDOMAIN": "Domeniu",
       "RESOURCEOWNER": "Proprietarul resursei",
       "GRANTEDORGNAME": "Nume organizație",
-      "GRANTID": "Id-ul grantului",
+      "GRANTID": "ID-ul grantului",
       "CREATIONDATE": "Data creării",
       "CHANGEDATE": "Ultima modificare",
       "DATES": "Date",
@@ -2294,7 +2295,7 @@
     "ADD": "Adăugați furnizor de identitate",
     "TYPE": "Tip",
     "OWNER": "Proprietar",
-    "ID": "ID",
+    "ID": "ID furnizor de identitate",
     "NAME": "Nume",
     "AUTHORIZATIONENDPOINT": "Punct final de autorizare",
     "TOKENENDPOINT": "Punct final de token",
@@ -2517,7 +2518,7 @@
     "TOKEN": "Setări token",
     "PAGES": {
       "TITLE": "Aplicație",
-      "ID": "ID",
+      "ID": "ID aplicație",
       "DESCRIPTION": "Aici puteți edita datele aplicației și configurația acesteia.",
       "CREATE": "Creați aplicația",
       "CREATE_SELECT_PROJECT": "Selectați mai întâi proiectul dvs.",
@@ -2861,5 +2862,6 @@
       "TITLE": "Activitate",
       "DESCRIPTION": "Aici puteți vedea ultimele evenimente care au generat o modificare a utilizatorului."
     }
-  }
+  },
+  "INSTANCEID": "ID instanță"
 }

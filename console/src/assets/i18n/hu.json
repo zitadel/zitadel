@@ -702,7 +702,7 @@
     "USERNAME": "Felhasználói Név",
     "ORGNAME": "Szervezet Neve",
     "ORGID": "Szervezet ID",
-    "PRIMARYDOMAIN": "Elsődleges Domain",
+    "PRIMARYDOMAIN": "Szervezet domainje",
     "PROJECTNAME": "Projekt Neve",
     "RESOURCEOWNER": "Erőforrás Tulajdonos",
     "METHODS": {
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Legalább {{value}} karakter hosszúnak kell lennie.",
       "MAXLENGTHERROR": "Kevesebb, mint {{value}} karakter kell legyen."
     },
-    "ID": "Azonosító",
+    "ID": "Felhasználói azonosító",
     "EMAIL": "E-mail",
     "PHONE": "Telefonszám",
     "PHONEEMPTY": "Nincs megadott telefonszám",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Név",
-      "ID": "Azonosító",
+      "ID": "Szervezeti azonosító",
       "CREATIONDATE": "Létrehozás dátuma",
       "DATECHANGED": "Módosítva",
       "FILTER": "Szűrő",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Fájl letöltése",
       "SELECTORGTOOLTIP": "Ezt a szervezetet válaszd.",
-      "PRIMARYDOMAIN": "Elsődleges Domain",
+      "PRIMARYDOMAIN": "Szervezet domainje",
       "STATE": "Állapot",
       "USEPASSWORD": "Első jelszó beállítása",
       "USEPASSWORDDESC": "A felhasználónak nem kell jelszót beállítania az inicializálás során."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Domain hozzáadása",
-      "TITLE": "Ellenőrzött domainek",
+      "TITLE": "Szervezet domainje",
       "DESCRIPTION": "Konfiguráld a szervezeted domainjeit. Ez a domain használható domain felfedezéshez és felhasználói név utótagként.",
-      "SETPRIMARY": "Beállítás elsődlegesnek",
+      "SETPRIMARY": "Szervezet domainje",
       "DELETE": {
         "TITLE": "Domain törlése",
         "DESCRIPTION": "Készülsz törölni az egyik domained."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Adminisztrátor hozzáadva.",
       "MEMBERREMOVED": "Adminisztrátor eltávolítva.",
       "MEMBERCHANGED": "Adminisztrátor megváltozott.",
-      "SETPRIMARY": "Az elsődleges domain beállítva.",
+      "SETPRIMARY": "A szervezet domainje sikeresen be lett állítva.",
       "DELETED": "A szervezet sikeresen törölve.",
       "DEFAULTORGNOTFOUND": "Az alapértelmezett szervezet nem található.",
       "ORG_WAS_DELETED": "A szervezet törölve lett."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP és SMS beállítások",
       "MESSAGETEXTS": "Üzenet szövegek",
       "IDP": "Identitásszolgáltatók",
-      "VERIFIED_DOMAINS": "Ellenőrzött domainek",
+      "VERIFIED_DOMAINS": "Szervezet domainje",
       "DOMAIN": "Domain beállítások",
       "LOGINTEXTS": "Bejelentkezési felület szövegei",
       "BRANDING": "Márkaépítés",
@@ -2012,7 +2012,8 @@
           "DESCRIPTION": "Tényleg törölni szeretnéd a projekted?",
           "TYPENAME": "Írd be a projekt nevét a végleges törléshez."
         }
-      }
+      },
+      "ID": "Projektazonosító"
     },
     "SETTINGS": {
       "TITLE": "Beállítások",
@@ -2294,7 +2295,7 @@
     "ADD": "Azonosítószolgáltató hozzáadása",
     "TYPE": "Típus",
     "OWNER": "Tulajdonos",
-    "ID": "Azonosító",
+    "ID": "Identitásszolgáltató azonosító",
     "NAME": "Név",
     "AUTHORIZATIONENDPOINT": "Hitelesítési végpont",
     "TOKENENDPOINT": "Token végpont",
@@ -2519,7 +2520,7 @@
     "TOKEN": "Token Beállítások",
     "PAGES": {
       "TITLE": "Alkalmazás",
-      "ID": "ID",
+      "ID": "Alkalmazásazonosító",
       "DESCRIPTION": "Itt szerkesztheted az alkalmazásod adatait és a konfigurációját.",
       "CREATE": "Alkalmazás létrehozása",
       "CREATE_SELECT_PROJECT": "Először válaszd ki a projekted",
@@ -2863,5 +2864,6 @@
       "TITLE": "Tevékenység",
       "DESCRIPTION": "Itt láthatod a legújabb eseményeket, amelyek felhasználói változást hoztak létre."
     }
-  }
+  },
+  "INSTANCEID": "Példányazonosító"
 }

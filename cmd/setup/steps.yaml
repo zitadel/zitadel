@@ -128,7 +128,7 @@ FirstInstance:
     # If FirstInstance.Org.Machine.Machine is defined, a service account is created with the IAM_OWNER role.
     Human:
       # In case UserLoginMustBeDomain is false (default) and you don't overwrite the username with an email,
-      # it will be suffixed by the org domain (org-name + domain from config).
+      # it will be suffixed by the Organization Domain (org-name + domain from config).
       # for example zitadel-admin in org ZITADEL on domain.tld -> zitadel-admin@zitadel.domain.tld
       UserName: zitadel-admin # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME
       FirstName: ZITADEL # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_FIRSTNAME
