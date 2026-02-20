@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
@@ -111,7 +112,8 @@ func (u userPasskey) UpdatePasskey(condition database.Condition, changes ...data
 			builder.WriteString("UPDATE ")
 			builder.WriteString(u.qualifiedTableName())
 			builder.WriteString(" SET ")
-			database.Changes(changes).Write(builder)
+			err := database.Changes(changes).Write(builder)
+			logging.New(logging.StreamRuntime).Debug("write changes in cte failed", "error", err)
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(

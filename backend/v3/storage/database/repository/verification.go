@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
@@ -63,7 +64,8 @@ func (v verification) update(update *domain.VerificationTypeUpdate, existingTabl
 		builder.WriteString("UPDATE ")
 		builder.WriteString(v.qualifiedTableName())
 		builder.WriteString(" SET ")
-		changes.Write(builder)
+		err := changes.Write(builder)
+		logging.New(logging.StreamRuntime).Debug("write changes in cte failed", "error", err)
 		builder.WriteString(" FROM ")
 		builder.WriteString(existingTableName)
 		writeCondition(builder, database.And(
@@ -125,7 +127,8 @@ func (v verification) failed(existingTableName string, instanceID, verificationI
 		builder.WriteString("UPDATE ")
 		builder.WriteString(v.qualifiedTableName())
 		builder.WriteString(" SET ")
-		database.NewIncrementColumnChange(v.failedAttemptsColumn(), database.Coalesce(v.failedAttemptsColumn(), 0)).Write(builder)
+		err := database.NewIncrementColumnChange(v.failedAttemptsColumn(), database.Coalesce(v.failedAttemptsColumn(), 0)).Write(builder)
+		logging.New(logging.StreamRuntime).Debug("write cte failed", "error", err)
 		builder.WriteString(" FROM ")
 		builder.WriteString(existingTableName)
 		writeCondition(builder, database.And(

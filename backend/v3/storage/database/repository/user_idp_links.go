@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
@@ -57,7 +58,8 @@ func (u userIdentityProviderLink) UpdateIdentityProviderLink(condition database.
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
 			builder.WriteString("UPDATE zitadel.user_identity_provider_links SET ")
-			database.Changes(changes).Write(builder)
+			err := database.Changes(changes).Write(builder)
+			logging.New(logging.StreamRuntime).Debug("write changes in cte failed", "error", err)
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(

@@ -12,6 +12,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
@@ -373,7 +374,8 @@ func (u userHuman) SetVerification(verification domain.VerificationType) databas
 		return database.NewCTEChange(
 			func(builder *database.StatementBuilder) {
 				builder.WriteString("UPDATE zitadel.verifications SET ")
-				changes.Write(builder)
+				err := changes.Write(builder)
+				logging.New(logging.StreamRuntime).Debug("write changes in cte failed", "error", err)
 				builder.WriteString(" FROM existing_user")
 				writeCondition(builder, database.And(
 					database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
@@ -391,7 +393,8 @@ func (u userHuman) SetVerification(verification domain.VerificationType) databas
 				builder.WriteString("UPDATE ")
 				builder.WriteString(u.verification.qualifiedTableName())
 				builder.WriteString(" SET ")
-				database.NewIncrementColumnChange(u.verification.failedAttemptsColumn(), database.Coalesce(u.verification.failedAttemptsColumn(), 0)).Write(builder)
+				err := database.NewIncrementColumnChange(u.verification.failedAttemptsColumn(), database.Coalesce(u.verification.failedAttemptsColumn(), 0)).Write(builder)
+				logging.New(logging.StreamRuntime).Debug("write cte failed", "error", err)
 				builder.WriteString(" FROM existing_user")
 				writeCondition(builder, database.And(
 					database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),

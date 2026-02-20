@@ -5,6 +5,8 @@ import (
 	"slices"
 
 	"go.uber.org/mock/gomock"
+
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 )
 
 // Change represents a change to a column in a database table.
@@ -47,7 +49,8 @@ func (c *change[V]) String() string {
 
 // WriteArg implements [Change].
 func (c change[V]) WriteArg(builder *StatementBuilder) {
-	c.Write(builder)
+	err := c.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
 }
 
 // Write implements [Change].
@@ -160,7 +163,8 @@ func (c Changes) NoChange() bool {
 
 // WriteArg implements [Change].
 func (c Changes) WriteArg(builder *StatementBuilder) {
-	c.Write(builder)
+	err := c.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
 }
 
 var _ Change = Changes(nil)
@@ -207,7 +211,8 @@ func (c *changeToColumn) Write(builder *StatementBuilder) error {
 
 // WriteArg implements [Change].
 func (c *changeToColumn) WriteArg(builder *StatementBuilder) {
-	c.Write(builder)
+	err := c.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
 }
 
 var _ Change = (*changeToColumn)(nil)
@@ -254,7 +259,8 @@ func (i incrementColumnChange[V]) Write(builder *StatementBuilder) error {
 
 // WriteArg implements [Change].
 func (i incrementColumnChange[V]) WriteArg(builder *StatementBuilder) {
-	i.Write(builder)
+	err := i.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
 }
 
 var _ Change = (*incrementColumnChange[any])(nil)
@@ -318,7 +324,8 @@ func (c *changeToStatement) Write(builder *StatementBuilder) error {
 
 // WriteArg implements [Change].
 func (c *changeToStatement) WriteArg(builder *StatementBuilder) {
-	c.Write(builder)
+	err := c.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
 }
 
 var _ Change = (*changeToStatement)(nil)
@@ -411,5 +418,6 @@ func (c cteChange) NoChange() bool {
 
 // WriteArg implements [Change].
 func (c cteChange) WriteArg(builder *StatementBuilder) {
-	c.Write(builder)
+	err := c.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
 }
