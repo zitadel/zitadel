@@ -61,7 +61,7 @@ The user provided by flags needs privileges to
 		},
 	}
 
-	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant())
+	cmd.AddCommand(newSchema(), newDatabase(), newUser(), newGrant())
 	return cmd
 }
 
