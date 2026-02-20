@@ -33,7 +33,7 @@ ZITADEL has two backend architectures in use:
 ## Command/Query Pattern (V2)
 
 ### Command Structure
-Commands modify state and return events. Example pattern from `internal/command/user.go`:
+Commands modify state and return events. The following is a **simplified pseudocode example** illustrating the pattern (see the actual implementation in `internal/command/user.go` for full details including domain policy and org-scoped username checks):
 
 ```go
 func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName string) (*domain.ObjectDetails, error) {
@@ -169,8 +169,8 @@ Repositories abstract data access:
 - Support transactions where needed
 
 ## Security & Permissions
-- **Authentication checks**: Use `auth_checks.go` patterns
-- **Permission checks**: Use `permission_checks.go` patterns
+- **Authentication checks**: Use `internal/api/grpc/management/auth_checks.go` patterns
+- **Permission checks**: Use `internal/command/permission_checks.go` patterns
 - **Crypto operations**: Use `internal/crypto/` package for encryption/hashing
 - **Never log sensitive data**: Passwords, tokens, secrets
 

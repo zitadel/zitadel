@@ -34,18 +34,20 @@ console/src/app/
   providedIn: 'root',  // Singleton service
 })
 export class GrpcService {
-  // Old V1 API clients (being phased out)
+  // Old gRPC-web clients (legacy, maintenance mode)
   public auth!: AuthServiceClient;
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;
 
-  // New V2 connectRPC clients (prefer these for new features)
+  // connectRPC clients from @zitadel/client/v2 (prefer for new features)
   public userNew!: ReturnType<typeof createUserServiceClient>;
   public session!: ReturnType<typeof createSessionServiceClient>;
-  public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
-  public authNew!: ReturnType<typeof createAuthServiceClient>;
   public featureNew!: ReturnType<typeof createFeatureServiceClient>;
   public organizationNew!: ReturnType<typeof createOrganizationServiceClient>;
+
+  // connectRPC clients from @zitadel/client/v1 (wrap the V1 API surface via connectRPC)
+  public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
+  public authNew!: ReturnType<typeof createAuthServiceClient>;
   public adminNew!: ReturnType<typeof createAdminServiceClient>;
 
   constructor(
@@ -53,7 +55,8 @@ export class GrpcService {
     private readonly authenticationService: AuthenticationService,
     private readonly translate: TranslateService,
   ) {
-    this.initializeClients();
+    // Clients are NOT initialized in the constructor.
+    // Call loadAppEnvironment() before using any client.
   }
 }
 ```
@@ -99,8 +102,9 @@ export class UserComponent {
 ```
 
 ### gRPC-web and connectRPC Integration
-- **V1 API**: Old gRPC-web clients (legacy, maintenance mode)
-- **V2 API**: New connectRPC clients from `@zitadel/client` (prefer for new features)
+- **Legacy gRPC-web clients** (`auth`, `mgmt`, `admin`): Being phased out; maintenance mode only.
+- **connectRPC clients from `@zitadel/client/v2`** (`userNew`, `session`, `featureNew`, `organizationNew`): Preferred for new features targeting the V2 API surface.
+- **connectRPC clients from `@zitadel/client/v1`** (`mgmtNew`, `authNew`, `adminNew`): These use the connectRPC transport but wrap the V1 API proto surface — do **not** confuse with V2 API.
 - **Transport**: Uses `createGrpcWebTransport` from `@connectrpc/connect-web`
 - **Interceptors**: 
   - `AuthInterceptor`: Adds bearer token to requests
