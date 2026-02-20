@@ -103,10 +103,9 @@ const CATEGORY_PROMPTS: Record<ContentCategory, { focusClause: string; pageKind:
     pageKind: 'API or protocol reference page',
     focusClause:
       'Name the exact protocol, API, or benchmark scenario. ' +
-      'For API reference pages, include the primary function or method names documented on the page (e.g., setClaim, setCustomAttribute). ' +
-      'State what a developer can achieve and name what is affected (claims, tokens, assertions, responses). ' +
-      'Specify the subject performing the action (e.g., "OAuth clients", "service users") — do not use generic "authentication" without stating who or what authenticates. ' +
-      'Closely paraphrase the page\'s own introductory sentence for accuracy — do not reinterpret or generalize it.',
+      'State what a developer can achieve and name the protocol-level concepts affected (claims, tokens, assertions, attributes, responses, scopes). ' +
+      'Do NOT include internal method names (e.g. setClaim, getUser, setMetadata) — describe outcomes, not API calls. ' +
+      'Specify the subject performing the action (e.g., "OAuth clients", "service users") — do not use generic "authentication" without stating who or what authenticates.',
   },
   guide: {
     pageKind: 'how-to or integration guide',
@@ -115,23 +114,21 @@ const CATEGORY_PROMPTS: Record<ContentCategory, { focusClause: string; pageKind:
       'Name the exact tools, frameworks, or ZITADEL features involved — if the page belongs to a named ZITADEL feature (e.g., Actions, Console, Login), include that feature name. ' +
       'If a specific tech stack or platform is mentioned, include it. ' +
       'If the page is a collection of code examples, say so — include the words "code examples" in the description. ' +
-      'Closely paraphrase the page\'s own introductory sentence for accuracy — do not reinterpret or generalize it.',
+      'Do NOT include internal method names, trigger names, or lifecycle phases — describe what the page enables, not how the internals work.',
   },
   concept: {
     pageKind: 'conceptual or architectural documentation page',
     focusClause:
       'Open with the concept or feature name. ' +
       'Define what it is and why it matters within the ZITADEL IAM model. ' +
-      'Use architectural or domain-specific terms from the content. ' +
-      'Closely paraphrase the page\'s own introductory sentence for accuracy — do not reinterpret or generalize it.',
+      'Use architectural or domain-specific terms from the content.',
   },
   other: {
     pageKind: 'documentation page',
     focusClause:
       'Identify the main topic and state the key information this page provides. ' +
       'For legal documents, do not include "ZITADEL". ' +
-      'For advisories, include the advisory ID and affected versions if present. ' +
-      'Closely paraphrase the page\'s own introductory sentence for accuracy — do not reinterpret or generalize it.',
+      'For advisories, include the advisory ID and affected versions if present.',
   },
 };
 
@@ -248,9 +245,8 @@ function extractContext(body: string): string {
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     // Simplify markdown table alignment rows: |:---|:---|
     .replace(/^\|[\s:|-]+\|$/gm, '')
-    // Strip table pipe formatting but keep cell content: | a | b | → a | b
-    .replace(/^\|\s*/gm, '')
-    .replace(/\s*\|$/gm, '')
+    // Strip table pipe formatting but keep cell content (only for actual table rows with ≥2 pipes)
+    .replace(/^(\|.*\|.*\|.*)$/gm, (_match, row: string) => row.replace(/^\|\s*/, '').replace(/\s*\|$/, ''))
     // Collapse triple+ newlines
     .replace(/\n{3,}/g, '\n\n')
     .trim();
@@ -310,6 +306,27 @@ function sanitizeDescription(text: string): string {
 
   // Replace vague "manipulating users" with specific domain nouns
   clean = clean.replace(/manipulat(e|ing) users/gi, 'user roles, metadata, and attributes');
+
+  // Normalize industry-standard OAuth/OIDC/SAML terminology
+  clean = clean.replace(/\bidtoken\b/gi, 'ID token');
+  clean = clean.replace(/\baccesstoken\b/gi, 'access token');
+  clean = clean.replace(/\brefreshtoken\b/gi, 'refresh token');
+  clean = clean.replace(/\bSAMLResponse\b/g, 'SAML response');
+
+  // Strip leaked internal method names (camelCase function calls)
+  clean = clean.replace(/\b(setClaim|setCustomClaim|setCustomAttribute|getUser|getMetadata|setMetadata|appendLogIntoClaims|getUserGrants|getAction|setEmail|setPhone|getClaimsFromHeader)\b/g, '').trim();
+  // Strip orphaned "methods"/"functions" words left after method name removal
+  clean = clean.replace(/\b(methods?|functions?|function names?)\b/gi, '');
+  // Strip internal lifecycle / trigger names
+  clean = clean.replace(/\bPre\s+(SAMLResponse|SAML\s+response|Token|Access\s+Token|ID\s+Token)\s+(creation|introspection)\s*(flow|trigger)?/gi, (_m, entity: string, phase: string) => {
+    const ent = entity.replace(/samlresponse/i, 'SAML response').replace(/token/i, 'token');
+    return `before ${ent} ${phase}`;
+  });
+  clean = clean.replace(/\bPost\s+(Authentication|Creation)\s*(flow|trigger)?/gi, 'after $1');
+  // Collapse double spaces, orphaned commas/conjunctions, and "with ,"-style debris
+  clean = clean.replace(/,\s*,/g, ',').replace(/\s{2,}/g, ' ').replace(/\s+,/g, ',');
+  clean = clean.replace(/\bwith\s*,?\s*(and\s*)?$/i, '').trim();
+  clean = clean.replace(/,\s*(and\s*)?$/i, '').trim();
 
   // Strip banned openers the model sometimes ignores
   clean = clean.replace(/^(Use|Explore|Discover|Learn( how( to)?)?|This (page|guide|document|article)|ZITADEL (guides|helps|shows|describes|walks)( you| developers?)?( through| how)?)[:\s,]+/i, '').trim();
@@ -472,8 +489,33 @@ function extractMethodNames(body: string): string[] {
   let match: RegExpExecArray | null;
   while ((match = re.exec(body)) !== null) {
     const name = match[1];
-    // Filter out common noise words and JS builtins
-    if (name.length >= 4 && !['function', 'import', 'require', 'return', 'export', 'const', 'console', 'props', 'details', 'summary'].includes(name)) {
+    // Filter out common noise words, JS builtins, and generic identifiers
+    const NOISE = new Set([
+      // JS keywords & builtins
+      'function', 'import', 'require', 'return', 'export', 'const', 'console',
+      'typeof', 'async', 'await', 'yield', 'delete', 'throw', 'catch',
+      'undefined', 'null', 'true', 'false', 'this', 'super', 'class',
+      // Common JS/TS methods & globals
+      'forEach', 'push', 'filter', 'splice', 'slice', 'reduce', 'trim',
+      'join', 'split', 'replace', 'match', 'test', 'indexOf', 'lastIndexOf',
+      'find', 'findIndex', 'some', 'every', 'includes', 'concat', 'sort',
+      'reverse', 'keys', 'values', 'entries', 'from', 'parse', 'stringify',
+      'toString', 'valueOf', 'hasOwnProperty', 'apply', 'call', 'bind',
+      'then', 'resolve', 'reject', 'finally',
+      'fetch', 'abort', 'clearTimeout', 'setTimeout', 'setInterval',
+      'warn', 'error', 'info', 'debug', 'trace', 'assert',
+      'JSON', 'Math', 'Date', 'Array', 'Object', 'String', 'Number',
+      // React / MDX / framework noise
+      'props', 'details', 'summary', 'useState', 'useEffect', 'useRef',
+      'useCallback', 'useMemo', 'useContext', 'createElement',
+      // Generic identifiers that are not API-specific
+      'name', 'data', 'type', 'value', 'result', 'response', 'request',
+      'callback', 'handler', 'config', 'options', 'params', 'args',
+      'item', 'items', 'list', 'next', 'prev', 'emit', 'send',
+      'write', 'read', 'open', 'close', 'init', 'start', 'stop',
+      'encode', 'decode', 'length', 'size', 'count', 'index',
+    ]);
+    if (name.length >= 4 && !NOISE.has(name)) {
       methods.add(name);
     }
   }
@@ -489,6 +531,8 @@ async function generateDescription(
   context: string,
   category: ContentCategory,
   body: string,
+  relPath: string,
+  fm: Record<string, string> = {},
 ): Promise<string> {
   const { focusClause, pageKind } = CATEGORY_PROMPTS[category];
 
@@ -521,8 +565,12 @@ async function generateDescription(
     'Always specify the actor or subject: say "OAuth clients", "service users", "applications", or "administrators" — never leave "authentication" or "authorization" unqualified.\n' +
     'Name the primary protocol or entity (OIDC, SAML, OAuth, tokens, claims) within the first 60 characters.\n' +
     'Prefer terms searchers use (claims, attributes, roles, tokens) over internal terms (parameters, flows, triggers).\n' +
+    'Use industry-standard terminology: "ID token" not "idtoken", "access token" not "accesstoken", "refresh token" not "refreshtoken", "SAML response" not "SAMLResponse", "userinfo" not "user info".\n' +
     'BANNED PHRASES: Never write "manipulating users" or "manipulate users" — instead name what is changed: "user roles, metadata, and attributes" or "user roles and email verification".\n' +
     'Prefer specific domain nouns (roles, metadata, attributes, claims) over vague action verbs (manipulating, managing, handling, processing).\n' +
+    'NEVER include internal method names (setClaim, getUser, setMetadata, appendLogIntoClaims, setCustomAttribute, etc.) in the description — describe outcomes and protocol-level concepts instead.\n' +
+    'NEVER include internal lifecycle or trigger names ("Pre SAMLResponse creation", "Pre Token creation flow", "Post Authentication") — use user-facing language instead ("before the response is returned", "during token creation").\n' +
+    'Describe WHAT the page enables and WHY, not HOW the internal machinery works.\n' +
     'End with a concrete noun or specific outcome — NEVER with vague words like "management", "workflows", "and more", "solutions", or "tasks".\n' +
     'Prefer stating WHERE something applies (endpoints, flows, scopes) or WHAT problem is solved over HOW bytes are formatted (headers, payloads, encodings).\n' +
     'Do not end with low-level transport details like header names or encoding schemes.\n' +
@@ -540,27 +588,40 @@ async function generateDescription(
     '- "Configure token creation with parameters for userinfo endpoints" ← uses internal term "parameters" instead of "claims"\n' +
     '- "Use Client Secret Basic or JWT with Private Key for secure authentication in ZITADEL" ← starts with Use, ambiguous subject, missing endpoint context\n' +
     '- "ZITADEL Actions for manipulating users and customizing responses" ← "manipulating users" is vague; say "user roles, metadata, and attributes" instead\n' +
+    '- "Customize SAML response attributes using ZITADEL\'s Pre SAML response creation flow with getUser and setCustomAttribute" ← includes internal lifecycle name and method names; say "Customize SAML response attributes in ZITADEL before the response is returned" instead\n' +
     '\n' +
     '## ACCURACY RULES\n' +
     'Closely paraphrase the page\'s own introductory sentence — do not reinterpret or generalize it.\n' +
-    'Use only terms, method names, and facts that appear in the page content.\n' +
-    'Do NOT reference internal API IDs, flow IDs, or trigger IDs — write for search engine users, not API consumers.\n' +
+    'Use only domain-level terms and facts from the page content — never copy internal method names, trigger names, flow IDs, or API IDs into the description.\n' +
+    'Write for search engine users, not API consumers — abstract implementation details into user-facing outcomes.\n' +
     'Do NOT invent versions, feature names, or specs not present in the content.\n' +
     `${breadthRule}` +
     '\n' +
     focusClause;
 
-  // Surface API method names explicitly so the model can include them.
+  // Surface API method names as background context (the model must NOT copy them into the description).
   const methodNames = extractMethodNames(body);
   let methodHint = '';
   if (methodNames.length > 0) {
-    methodHint = `\n[KEY METHODS on this page]: ${methodNames.join(', ')}\n`;
+    methodHint = `\n[INTERNAL METHODS — for understanding only, do NOT include in description]: ${methodNames.join(', ')}\n`;
+  }
+
+  // Surface SDK-example frontmatter when available
+  let sdkHint = '';
+  if (relPath.startsWith('sdk-examples/')) {
+    const parts: string[] = [];
+    if (fm['auth_library']) parts.push(`Auth library: ${fm['auth_library']}`);
+    if (fm['auth_flow']) parts.push(`Auth flow: ${fm['auth_flow']}`);
+    if (fm['status']) parts.push(`Status: ${fm['status']}`);
+    if (parts.length > 0) sdkHint = `\n[SDK METADATA]: ${parts.join(' | ')}\n`;
   }
 
   const userPrompt =
     `Page kind: ${pageKind}\n` +
+    `Path: ${relPath}\n` +
     `Title: ${title}\n` +
-    `${methodHint}\n` +
+    `${methodHint}` +
+    `${sdkHint}\n` +
     `${context}`;
 
   const messages = [
@@ -640,7 +701,7 @@ async function main() {
     process.stdout.write(`${progress} [${category}] ${relPath} … `);
 
     try {
-      const description = await generateDescription(title, context, category, body);
+      const description = await generateDescription(title, context, category, body, relPath, fm);
       const charCount = description.length;
 
       if (charCount < 20) {
