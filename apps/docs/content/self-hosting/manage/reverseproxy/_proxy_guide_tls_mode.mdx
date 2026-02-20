@@ -54,7 +54,7 @@ export const Commands = ({mode, name, lower, configfilename}) => {
         `curl ${connInsecureFlag}${connScheme}://127.0.0.1.sslip.io:${connPort}/admin/v1/healthz`,
     ].join('\n')
     return (
-        <div>
+        <div className="mt-4">
             <DynamicCodeBlock lang="bash" code={code} />
         </div>
     )
