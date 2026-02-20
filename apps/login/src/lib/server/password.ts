@@ -195,6 +195,7 @@ export async function sendPassword(
     // Force fallback if settings can't be loaded
     if (!loginSettingsByContext) {
       // this is a fake error message to hide that the user does not even exist
+      recordAuthFailure("password", "settings_unavailable", command.organization);
       return { error: t("errors.couldNotVerifyPassword") };
     }
 
@@ -221,6 +222,7 @@ export async function sendPassword(
       if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
         if (user.preferredLoginName !== command.loginName) {
           // emulate user not found to prevent enumeration (use context settings not user settings)
+          recordAuthFailure("password", "login_name_mismatch", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
@@ -228,6 +230,7 @@ export async function sendPassword(
         }
       } else if (userLoginSettings?.disableLoginWithEmail) {
         if (user.preferredLoginName !== command.loginName && humanUser?.phone?.phone !== command.loginName) {
+          recordAuthFailure("password", "login_name_mismatch", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
@@ -235,6 +238,7 @@ export async function sendPassword(
         }
       } else if (userLoginSettings?.disableLoginWithPhone) {
         if (user.preferredLoginName !== command.loginName && humanUser?.email?.email !== command.loginName) {
+          recordAuthFailure("password", "login_name_mismatch", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
@@ -257,6 +261,7 @@ export async function sendPassword(
         sessionCookie = result.sessionCookie;
       } catch (error: any) {
         if ("failedAttempts" in error && error.failedAttempts) {
+          recordAuthFailure("password", "invalid_password", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
@@ -275,6 +280,7 @@ export async function sendPassword(
             }),
           };
         }
+        recordAuthFailure("password", "session_creation_failed", command.organization);
         if (loginSettingsByContext?.ignoreUnknownUsernames) {
           return { error: t("errors.failedToAuthenticateNoLimit") };
         }
@@ -282,6 +288,7 @@ export async function sendPassword(
       }
     } else {
       // this is a fake error message to hide that the user does not even exist
+      recordAuthFailure("password", "user_not_found", command.organization);
       if (loginSettingsByContext?.ignoreUnknownUsernames) {
         return { error: t("errors.failedToAuthenticateNoLimit") };
       }
@@ -290,6 +297,7 @@ export async function sendPassword(
   }
 
   if (!session?.factors?.user?.id) {
+    recordAuthFailure("password", "session_invalid", command.organization);
     if (loginSettingsByContext?.ignoreUnknownUsernames) {
       return { error: t("errors.failedToAuthenticateNoLimit") };
     }
@@ -299,12 +307,14 @@ export async function sendPassword(
   if (!user) {
     const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id });
     if (!userResponse.user) {
+      recordAuthFailure("password", "user_not_found", command.organization);
       return { error: t("errors.userNotFound") };
     }
     user = userResponse.user;
   }
 
   if (!session?.factors?.user?.id || !sessionCookie) {
+    recordAuthFailure("password", "session_invalid", command.organization);
     if (loginSettingsByContext?.ignoreUnknownUsernames) {
       return { error: t("errors.failedToAuthenticateNoLimit") };
     }
@@ -340,6 +350,7 @@ export async function sendPassword(
 
   // throw error if user is in initial state here and do not continue
   if (user.state === UserState.INITIAL) {
+    recordAuthFailure("password", "user_initial_state", command.organization);
     return { error: t("errors.initialUserNotSupported") };
   }
 
@@ -360,6 +371,7 @@ export async function sendPassword(
   }
 
   if (!authMethods) {
+    recordAuthFailure("password", "no_auth_methods", command.organization);
     return { error: t("errors.couldNotVerifyPassword") };
   }
 
