@@ -414,6 +414,84 @@ func TestSessionProjection_reduces(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "reduce UserDeactivated",
+			args: args{
+				event: getEvent(testEvent(
+					user.UserDeactivatedType,
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.UserDeactivatedEventMapper),
+			},
+			reduce: (&sessionProjection{}).reduceUserStateNotActive,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("user"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.sessions8 WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedArgs: []any{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduce UserRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					user.UserRemovedType,
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.UserRemovedEventMapper),
+			},
+			reduce: (&sessionProjection{}).reduceUserStateNotActive,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("user"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.sessions8 WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedArgs: []any{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduce UserLocked",
+			args: args{
+				event: getEvent(testEvent(
+					user.UserLockedType,
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.UserLockedEventMapper),
+			},
+			reduce: (&sessionProjection{}).reduceUserStateNotActive,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("user"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.sessions8 WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedArgs: []any{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
