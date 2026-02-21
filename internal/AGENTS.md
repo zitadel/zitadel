@@ -77,7 +77,8 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 ```
 
 **Key Principles:**
-- Input validation first (use `zerrors` package)
+- **Structural input validation** belongs at the API/adapter layer (proto validate handles most of it; anything proto validate cannot express should be validated in the gRPC handler / converter, not in the command).
+- Commands handle **business-rule enforcement** (e.g., "username not changed", "user not found") that must run against current state.
 - Load write model to get current state
 - Check business rules
 - Push events to eventstore
@@ -95,15 +96,15 @@ Queries read data without side effects. Located in `internal/query/`. Pattern:
 ### Using `internal/zerrors/`
 All errors MUST use the `zerrors` package for consistent error handling and gRPC status code mapping.
 
-**Error Kinds** (mapped to gRPC status codes):
-- `KindInvalidArgument`: Bad request (400) - use for validation failures
-- `KindNotFound`: Resource not found (404)
-- `KindAlreadyExists`: Conflict (409) - resource already exists
-- `KindPermissionDenied`: Forbidden (403) - authorization failure
-- `KindUnauthenticated`: Unauthorized (401) - authentication failure
-- `KindPreconditionFailed`: Precondition failed (412) - business rule violation
-- `KindInternal`: Internal error (500) - system failures
-- `KindUnavailable`: Service unavailable (503)
+**Error Kinds** (mapped to gRPC status codes — see `internal/zerrors/zerror.go` for the full list):
+- `KindInvalidArgument` → `INVALID_ARGUMENT` — use for validation failures
+- `KindNotFound` → `NOT_FOUND` — resource does not exist
+- `KindAlreadyExists` → `ALREADY_EXISTS` — resource already exists (conflict)
+- `KindPermissionDenied` → `PERMISSION_DENIED` — authorization failure
+- `KindUnauthenticated` → `UNAUTHENTICATED` — authentication failure
+- `KindPreconditionFailed` → `FAILED_PRECONDITION` — business rule violation
+- `KindInternal` → `INTERNAL` — system / unexpected failures
+- `KindUnavailable` → `UNAVAILABLE` — service temporarily unavailable
 
 **Usage Pattern:**
 ```go
@@ -123,8 +124,15 @@ if userName == "" {
 
 ## Testing Patterns
 
+### Testify
+Use `github.com/stretchr/testify` for assertions in all Go tests:
+- **`assert`** (`github.com/stretchr/testify/assert`): non-fatal assertions — test continues on failure (`assert.Equal()`, `assert.NotZero()`, `assert.Nil()`, etc.).
+- **`require`** (`github.com/stretchr/testify/require`): fatal gates — test stops immediately on failure (`require.NoError()`, `require.NotNil()`, etc.).
+
+Prefer `require` when subsequent assertions are meaningless if the guarded condition fails.
+
 ### Unit Tests
-Use table-driven tests for command/query logic:
+Use table-driven tests throughout the Go codebase (command, query, API handlers, converters, etc.):
 
 ```go
 func TestChangeUsername(t *testing.T) {
@@ -175,8 +183,8 @@ Repositories abstract data access:
 - **Never log sensitive data**: Passwords, tokens, secrets
 
 ## Observability
-- **Logging**: Use `github.com/zitadel/logging` package
-- **Tracing**: Import `internal/telemetry/tracing` for distributed tracing
+- **Logging**: Use `github.com/zitadel/logging` package (current V2 codebase). New V3 code uses `backend/v3/instrumentation/logging`.
+- **Tracing**: Import `backend/v3/instrumentation/tracing` for distributed tracing. The `internal/telemetry/tracing` package is a shim that delegates to the V3 package and is used in existing V2 code during the migration.
 - **Context propagation**: Always pass `context.Context` through call chains
 
 ## Boundary Rules
@@ -196,3 +204,4 @@ Repositories abstract data access:
 - **Development Setup**: See `CONTRIBUTING.md` for local environment, database setup
 - **Proto Definitions**: See `proto/AGENTS.md` for API contract changes
 - **V3 Architecture**: See `backend/v3/doc.go` for new hexagonal architecture details
+- **Architecture Wiki**: Broader architecture documentation is maintained at https://github.com/zitadel/zitadel/wiki
