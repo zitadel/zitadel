@@ -183,9 +183,11 @@ Repositories abstract data access:
 - **Never log sensitive data**: Passwords, tokens, secrets
 
 ## Observability
-- **Logging**: Use `github.com/zitadel/logging` package (current V2 codebase). New V3 code uses `backend/v3/instrumentation/logging`.
-- **Tracing**: Import `backend/v3/instrumentation/tracing` for distributed tracing. The `internal/telemetry/tracing` package is a shim that delegates to the V3 package and is used in existing V2 code during the migration.
+- **Logging**: Use `backend/v3/instrumentation/logging` package
+- **Tracing**: Import `backend/v3/instrumentation/tracing` for distributed tracing
 - **Context propagation**: Always pass `context.Context` through call chains
+
+> **Note:** Existing V2 code (`internal/`) still uses `github.com/zitadel/logging` and the `internal/telemetry/tracing` shim (which delegates to the V3 tracing package). When working in V2 code, follow the existing import style; the V3 packages are the forward target.
 
 ## Boundary Rules
 - Prefer implementing business behavior in command/query layers and repository packages, not in transport handlers.
