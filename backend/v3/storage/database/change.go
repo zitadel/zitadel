@@ -15,7 +15,7 @@ type Change interface {
 	gomock.Matcher
 	argWriter
 	// Write writes the change to the given statement builder.
-	Write(builder *StatementBuilder) error
+	Write(builder *StatementBuilder)
 	// IsOnColumn checks if the change is on the given column.
 	IsOnColumn(col Column) bool
 }
@@ -54,11 +54,10 @@ func (c change[V]) WriteArg(builder *StatementBuilder) {
 }
 
 // Write implements [Change].
-func (c change[V]) Write(builder *StatementBuilder) error {
+func (c change[V]) Write(builder *StatementBuilder) {
 	c.column.WriteUnqualified(builder)
 	builder.WriteString(" = ")
 	builder.WriteArg(c.value)
-	return nil
 }
 
 // IsOnColumn implements [Change].
@@ -103,7 +102,7 @@ func (c Changes) IsOnColumn(col Column) bool {
 }
 
 // Write implements [Change].
-func (c Changes) Write(builder *StatementBuilder) error {
+func (c Changes) Write(builder *StatementBuilder) {
 	var hadChanges bool
 	for _, change := range c {
 		ch, ok := change.(NoChange)
@@ -113,15 +112,12 @@ func (c Changes) Write(builder *StatementBuilder) error {
 		if hadChanges && hasChanges {
 			builder.WriteString(", ")
 		}
-		if err := change.Write(builder); err != nil {
-			return err
-		}
+		change.Write(builder)
 		// if the change had changes, mark that we had changes for the next iteration
 		if hasChanges {
 			hadChanges = hasChanges
 		}
 	}
-	return nil
 }
 
 // Matches implements [gomock.Matcher].
@@ -202,11 +198,10 @@ func (c *changeToColumn) String() string {
 }
 
 // Write implements [Change].
-func (c *changeToColumn) Write(builder *StatementBuilder) error {
+func (c *changeToColumn) Write(builder *StatementBuilder) {
 	c.to.WriteUnqualified(builder)
 	builder.WriteString(" = ")
 	c.from.WriteQualified(builder)
-	return nil
 }
 
 // WriteArg implements [Change].
@@ -249,12 +244,11 @@ func (i incrementColumnChange[V]) String() string {
 }
 
 // Write implements [Change].
-func (i incrementColumnChange[V]) Write(builder *StatementBuilder) error {
+func (i incrementColumnChange[V]) Write(builder *StatementBuilder) {
 	i.column.WriteUnqualified(builder)
 	builder.WriteString(" = ")
 	builder.WriteArg(i.value)
 	builder.WriteString(" + 1")
-	return nil
 }
 
 // WriteArg implements [Change].
@@ -307,7 +301,7 @@ func (c *changeToStatement) String() string {
 }
 
 // Write implements [Change].
-func (c *changeToStatement) Write(builder *StatementBuilder) error {
+func (c *changeToStatement) Write(builder *StatementBuilder) {
 	_, ok := c.column.(Columns)
 	if ok {
 		builder.WriteRune('(')
@@ -319,7 +313,6 @@ func (c *changeToStatement) Write(builder *StatementBuilder) error {
 	builder.WriteString(" = (")
 	c.stmt(builder)
 	builder.WriteString(")")
-	return nil
 }
 
 // WriteArg implements [Change].
@@ -370,15 +363,11 @@ func (c *cteChange) Matches(x any) bool {
 	var expectedCTEBuilder, actualCTEBuilder StatementBuilder
 	c.cte(&expectedCTEBuilder)
 	if c.change != nil {
-		if err := c.change(c.name).Write(&expectedCTEBuilder); err != nil {
-			return false
-		}
+		c.change(c.name).Write(&expectedCTEBuilder)
 	}
 	toMatch.cte(&actualCTEBuilder)
 	if toMatch.change != nil {
-		if err := toMatch.change(toMatch.name).Write(&actualCTEBuilder); err != nil {
-			return false
-		}
+		toMatch.change(toMatch.name).Write(&actualCTEBuilder)
 	}
 
 	if expectedCTEBuilder.String() != actualCTEBuilder.String() {
@@ -398,11 +387,11 @@ func (c *cteChange) String() string {
 }
 
 // Write implements [CTEChange].
-func (c cteChange) Write(builder *StatementBuilder) error {
+func (c cteChange) Write(builder *StatementBuilder) {
 	if c.change == nil {
-		return nil
+		return
 	}
-	return c.change(c.name).Write(builder)
+	c.change(c.name).Write(builder)
 }
 
 // WriteCTE implements [CTEChange].

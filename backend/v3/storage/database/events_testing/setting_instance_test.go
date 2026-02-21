@@ -65,7 +65,7 @@ func uploadInstanceAsset(ctx context.Context, t *testing.T, instance *integratio
 func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.LoginSettingsRepository()
+	settingsRepo := repository.LoginSettings()
 	before := time.Now()
 	newInstance := integration.NewInstance(t.Context())
 	after := time.Now()
@@ -85,15 +85,15 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 
 			// event instance.policy.login.added
 			// these values are found in default.yaml
-			assert.Equal(collect, true, *setting.AllowRegister)
-			assert.Equal(collect, true, *setting.AllowExternalIDP)
-			assert.Equal(collect, domain.PasswordlessTypeAllowed, *setting.PasswordlessType)
-			assert.Equal(collect, true, *setting.AllowDomainDiscovery)
-			assert.Equal(collect, true, *setting.AllowUserNamePassword)
-			assert.Equal(collect, time.Duration(time.Hour*240), *setting.PasswordCheckLifetime)
-			assert.Equal(collect, time.Duration(time.Hour*12), *setting.MultiFactorCheckLifetime)
-			assert.Equal(collect, time.Duration(time.Hour*18), *setting.SecondFactorCheckLifetime)
-			assert.Equal(collect, time.Duration(time.Hour*240), *setting.ExternalLoginCheckLifetime)
+			assert.Equal(collect, true, setting.AllowRegister)
+			assert.Equal(collect, true, setting.AllowExternalIDP)
+			assert.Equal(collect, domain.PasswordlessTypeAllowed, setting.PasswordlessType)
+			assert.Equal(collect, true, setting.AllowDomainDiscovery)
+			assert.Equal(collect, true, setting.AllowUsernamePassword)
+			assert.Equal(collect, time.Duration(time.Hour*240), setting.PasswordCheckLifetime)
+			assert.Equal(collect, time.Duration(time.Hour*12), setting.MultiFactorCheckLifetime)
+			assert.Equal(collect, time.Duration(time.Hour*18), setting.SecondFactorCheckLifetime)
+			assert.Equal(collect, time.Duration(time.Hour*240), setting.ExternalLoginCheckLifetime)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -132,26 +132,26 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			)
 			require.NoError(collect, err)
 
-			require.NotNil(collect, setting.ForceMFA)
+			require.NotNil(collect, setting.ForceMultiFactor)
 
 			// event instance.policy.login.changed
-			assert.Equal(collect, false, *setting.AllowRegister)
-			assert.Equal(collect, true, *setting.AllowExternalIDP)
-			assert.Equal(collect, true, *setting.ForceMFA)
-			assert.Equal(collect, domain.PasswordlessTypeNotAllowed, *setting.PasswordlessType)
-			assert.Equal(collect, true, *setting.HidePasswordReset)
-			assert.Equal(collect, true, *setting.IgnoreUnknownUsernames)
-			assert.Equal(collect, "http://www.example.com", *setting.DefaultRedirectURI)
-			assert.Equal(collect, false, *setting.AllowDomainDiscovery)
-			assert.Equal(collect, false, *setting.AllowUserNamePassword)
-			assert.Equal(collect, time.Duration(time.Second*20*20), *setting.PasswordCheckLifetime)
-			assert.Equal(collect, time.Duration(time.Second*20*21), *setting.ExternalLoginCheckLifetime)
-			assert.Equal(collect, time.Duration(time.Second*20*22), *setting.MFAInitSkipLifetime)
-			assert.Equal(collect, time.Duration(time.Second*20*23), *setting.SecondFactorCheckLifetime)
-			assert.Equal(collect, time.Duration(time.Second*20*24), *setting.MultiFactorCheckLifetime)
-			assert.Equal(collect, true, *setting.DisableLoginWithEmail)
-			assert.Equal(collect, true, *setting.DisableLoginWithPhone)
-			assert.Equal(collect, true, *setting.ForceMFALocalOnly)
+			assert.Equal(collect, false, setting.AllowRegister)
+			assert.Equal(collect, true, setting.AllowExternalIDP)
+			assert.Equal(collect, true, setting.ForceMultiFactor)
+			assert.Equal(collect, domain.PasswordlessTypeNotAllowed, setting.PasswordlessType)
+			assert.Equal(collect, true, setting.HidePasswordReset)
+			assert.Equal(collect, true, setting.IgnoreUnknownUsernames)
+			assert.Equal(collect, "http://www.example.com", setting.DefaultRedirectURI)
+			assert.Equal(collect, false, setting.AllowDomainDiscovery)
+			assert.Equal(collect, false, setting.AllowUsernamePassword)
+			assert.Equal(collect, time.Duration(time.Second*20*20), setting.PasswordCheckLifetime)
+			assert.Equal(collect, time.Duration(time.Second*20*21), setting.ExternalLoginCheckLifetime)
+			assert.Equal(collect, time.Duration(time.Second*20*22), setting.MultiFactorInitSkipLifetime)
+			assert.Equal(collect, time.Duration(time.Second*20*23), setting.SecondFactorCheckLifetime)
+			assert.Equal(collect, time.Duration(time.Second*20*24), setting.MultiFactorCheckLifetime)
+			assert.Equal(collect, true, setting.DisableLoginWithEmail)
+			assert.Equal(collect, true, setting.DisableLoginWithPhone)
+			assert.Equal(collect, true, setting.ForceMultiFactorLocalOnly)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -168,7 +168,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			)
 			require.NoError(collect, err)
 
-			assert.Equal(collect, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.MFAType)
+			assert.Equal(collect, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.MultiFactorTypes)
 		}, retryDuration, tick)
 
 		// remove MFAType
@@ -188,7 +188,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.login.multifactor.remove
-			assert.Equal(collect, []domain.MultiFactorType{}, setting.MFAType)
+			assert.Equal(collect, []domain.MultiFactorType{}, setting.MultiFactorTypes)
 		}, retryDuration, tick)
 
 		before := time.Now()
@@ -210,7 +210,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.login.multifactor.added
-			assert.Equal(collect, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.MFAType)
+			assert.Equal(collect, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.MultiFactorTypes)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -325,7 +325,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.BrandingSettingsRepository()
+	settingsRepo := repository.BrandingSettings()
 
 	before := time.Now().Add(-time.Second)
 	newInstance := integration.NewInstance(t.Context())
@@ -346,18 +346,18 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.added
 			// these values are found in default.yaml
-			assert.Equal(collect, "#5469d4", *setting.PrimaryColorLight)
-			assert.Equal(collect, "#fafafa", *setting.BackgroundColorLight)
-			assert.Equal(collect, "#cd3d56", *setting.WarnColorLight)
-			assert.Equal(collect, "#000000", *setting.FontColorLight)
-			assert.Equal(collect, "#2073c4", *setting.PrimaryColorDark)
-			assert.Equal(collect, "#111827", *setting.BackgroundColorDark)
-			assert.Equal(collect, "#ff3b5b", *setting.WarnColorDark)
-			assert.Equal(collect, "#ff3b5b", *setting.WarnColorDark)
-			assert.Equal(collect, "#ffffff", *setting.FontColorDark)
-			assert.Equal(collect, false, *setting.HideLoginNameSuffix)
-			assert.Equal(collect, false, *setting.ErrorMsgPopup)
-			assert.Equal(collect, false, *setting.DisableWatermark)
+			assert.Equal(collect, "#5469d4", setting.PrimaryColorLight)
+			assert.Equal(collect, "#fafafa", setting.BackgroundColorLight)
+			assert.Equal(collect, "#cd3d56", setting.WarnColorLight)
+			assert.Equal(collect, "#000000", setting.FontColorLight)
+			assert.Equal(collect, "#2073c4", setting.PrimaryColorDark)
+			assert.Equal(collect, "#111827", setting.BackgroundColorDark)
+			assert.Equal(collect, "#ff3b5b", setting.WarnColorDark)
+			assert.Equal(collect, "#ff3b5b", setting.WarnColorDark)
+			assert.Equal(collect, "#ffffff", setting.FontColorDark)
+			assert.Equal(collect, false, setting.HideLoginNameSuffix)
+			assert.Equal(collect, false, setting.ErrorMessagePopup)
+			assert.Equal(collect, false, setting.DisableWatermark)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
@@ -394,19 +394,19 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.change
-			assert.Equal(collect, "#055000", *setting.PrimaryColorLight)
-			assert.Equal(collect, "#055000", *setting.BackgroundColorLight)
-			assert.Equal(collect, "#055000", *setting.WarnColorLight)
-			assert.Equal(collect, "#055000", *setting.FontColorLight)
-			assert.Equal(collect, "#055000", *setting.PrimaryColorDark)
-			assert.Equal(collect, "#055000", *setting.BackgroundColorDark)
-			assert.Equal(collect, "#055000", *setting.WarnColorDark)
-			assert.Equal(collect, "#055000", *setting.WarnColorDark)
-			assert.Equal(collect, "#055000", *setting.FontColorDark)
-			assert.Equal(collect, true, *setting.HideLoginNameSuffix)
-			assert.Equal(collect, false, *setting.ErrorMsgPopup)
-			assert.Equal(collect, true, *setting.DisableWatermark)
-			assert.Equal(collect, domain.BrandingPolicyThemeLight, *setting.ThemeMode)
+			assert.Equal(collect, "#055000", setting.PrimaryColorLight)
+			assert.Equal(collect, "#055000", setting.BackgroundColorLight)
+			assert.Equal(collect, "#055000", setting.WarnColorLight)
+			assert.Equal(collect, "#055000", setting.FontColorLight)
+			assert.Equal(collect, "#055000", setting.PrimaryColorDark)
+			assert.Equal(collect, "#055000", setting.BackgroundColorDark)
+			assert.Equal(collect, "#055000", setting.WarnColorDark)
+			assert.Equal(collect, "#055000", setting.WarnColorDark)
+			assert.Equal(collect, "#055000", setting.FontColorDark)
+			assert.Equal(collect, true, setting.HideLoginNameSuffix)
+			assert.Equal(collect, false, setting.ErrorMessagePopup)
+			assert.Equal(collect, true, setting.DisableWatermark)
+			assert.Equal(collect, domain.BrandingPolicyThemeLight, setting.ThemeMode)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -476,7 +476,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.logo.removed
-			assert.Equal(collect, url.URL{}, *setting.LogoURLLight)
+			assert.Equal(collect, url.URL{}, setting.LogoURLLight)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -522,7 +522,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.logo.dark.removed
-			assert.Equal(collect, url.URL{}, *setting.LogoURLDark)
+			assert.Equal(collect, url.URL{}, setting.LogoURLDark)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -591,7 +591,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.icon.removed
-			assert.Equal(collect, url.URL{}, *setting.IconURLLight)
+			assert.Equal(collect, url.URL{}, setting.IconURLLight)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -615,7 +615,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.icon.dark.removed
-			assert.Equal(collect, url.URL{}, *setting.IconURLDark)
+			assert.Equal(collect, url.URL{}, setting.IconURLDark)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -662,7 +662,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.font.removed
-			assert.Equal(collect, url.URL{}, *setting.FontURL)
+			assert.Equal(collect, url.URL{}, setting.FontURL)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -734,7 +734,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.PasswordComplexitySettingsRepository()
+	settingsRepo := repository.PasswordComplexitySettings()
 
 	before := time.Now()
 	newInstance := integration.NewInstance(t.Context())
@@ -754,11 +754,11 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 
 			// event instance.policy.password.complexity.added
 			// these values are found in default.yaml
-			assert.Equal(collect, uint64(8), *setting.MinLength)
-			assert.Equal(collect, true, *setting.HasUppercase)
-			assert.Equal(collect, true, *setting.HasLowercase)
-			assert.Equal(collect, true, *setting.HasNumber)
-			assert.Equal(collect, true, *setting.HasSymbol)
+			assert.Equal(collect, uint64(8), setting.MinLength)
+			assert.Equal(collect, true, setting.HasUppercase)
+			assert.Equal(collect, true, setting.HasLowercase)
+			assert.Equal(collect, true, setting.HasNumber)
+			assert.Equal(collect, true, setting.HasSymbol)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -787,11 +787,11 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.password.complexity.changed
-			assert.Equal(collect, uint64(5), *setting.MinLength)
-			assert.Equal(collect, false, *setting.HasUppercase)
-			assert.Equal(collect, false, *setting.HasLowercase)
-			assert.Equal(collect, false, *setting.HasNumber)
-			assert.Equal(collect, false, *setting.HasSymbol)
+			assert.Equal(collect, uint64(5), setting.MinLength)
+			assert.Equal(collect, false, setting.HasUppercase)
+			assert.Equal(collect, false, setting.HasLowercase)
+			assert.Equal(collect, false, setting.HasNumber)
+			assert.Equal(collect, false, setting.HasSymbol)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -836,7 +836,7 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.PasswordExpirySettingsRepository()
+	settingsRepo := repository.PasswordExpirySettings()
 	before := time.Now()
 	newInstance := integration.NewInstance(t.Context())
 	after := time.Now()
@@ -855,8 +855,8 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.password.age.added
-			assert.Equal(collect, uint64(0), *setting.ExpireWarnDays)
-			assert.Equal(collect, uint64(0), *setting.MaxAgeDays)
+			assert.Equal(collect, uint64(0), setting.ExpireWarnDays)
+			assert.Equal(collect, uint64(0), setting.MaxAgeDays)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -882,8 +882,8 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.password.age.changed
-			assert.Equal(collect, uint64(30), *setting.ExpireWarnDays)
-			assert.Equal(collect, uint64(30), *setting.MaxAgeDays)
+			assert.Equal(collect, uint64(30), setting.ExpireWarnDays)
+			assert.Equal(collect, uint64(30), setting.MaxAgeDays)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -928,7 +928,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.DomainSettingsRepository()
+	settingsRepo := repository.DomainSettings()
 	before := time.Now()
 	newInstance := integration.NewInstance(t.Context())
 	after := time.Now()
@@ -948,9 +948,9 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.domain.added
-			assert.Equal(collect, false, *setting.SMTPSenderAddressMatchesInstanceDomain)
-			assert.Equal(collect, false, *setting.LoginNameIncludesDomain)
-			assert.Equal(collect, false, *setting.RequireOrgDomainVerification)
+			assert.Equal(collect, false, setting.SMTPSenderAddressMatchesInstanceDomain)
+			assert.Equal(collect, false, setting.LoginNameIncludesDomain)
+			assert.Equal(collect, false, setting.RequireOrgDomainVerification)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -977,9 +977,9 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.changed
-			assert.Equal(collect, true, *setting.SMTPSenderAddressMatchesInstanceDomain)
-			assert.Equal(collect, true, *setting.LoginNameIncludesDomain)
-			assert.Equal(collect, true, *setting.RequireOrgDomainVerification)
+			assert.Equal(collect, true, setting.SMTPSenderAddressMatchesInstanceDomain)
+			assert.Equal(collect, true, setting.LoginNameIncludesDomain)
+			assert.Equal(collect, true, setting.RequireOrgDomainVerification)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1024,7 +1024,7 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.LockoutSettingsRepository()
+	settingsRepo := repository.LockoutSettings()
 
 	before := time.Now()
 	newInstance := integration.NewInstance(t.Context())
@@ -1044,9 +1044,9 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.lockout.added
-			assert.Equal(collect, uint64(0), *setting.MaxOTPAttempts)
-			assert.Equal(collect, uint64(0), *setting.MaxPasswordAttempts)
-			assert.Equal(collect, true, *setting.ShowLockOutFailures)
+			assert.Equal(collect, uint64(0), setting.MaxOTPAttempts)
+			assert.Equal(collect, uint64(0), setting.MaxPasswordAttempts)
+			assert.Equal(collect, true, setting.ShowLockOutFailures)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1072,8 +1072,8 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.lockout.changed
-			assert.Equal(collect, uint64(5), *setting.MaxOTPAttempts)
-			assert.Equal(collect, uint64(5), *setting.MaxPasswordAttempts)
+			assert.Equal(collect, uint64(5), setting.MaxOTPAttempts)
+			assert.Equal(collect, uint64(5), setting.MaxPasswordAttempts)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1118,7 +1118,7 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.SecuritySettingsRepository()
+	settingsRepo := repository.SecuritySettings()
 
 	newInstance := integration.NewInstance(t.Context())
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
@@ -1145,9 +1145,9 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.security.set
-			assert.Equal(collect, true, *setting.EnableIframeEmbedding)
+			assert.Equal(collect, true, setting.EnableIframeEmbedding)
 			assert.Equal(collect, []string{"value"}, setting.AllowedOrigins)
-			assert.Equal(collect, true, *setting.EnableImpersonation)
+			assert.Equal(collect, true, setting.EnableImpersonation)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1174,9 +1174,9 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.security.set
-			assert.Equal(collect, false, *setting.EnableIframeEmbedding)
+			assert.Equal(collect, false, setting.EnableIframeEmbedding)
 			assert.Equal(collect, []string{"new_value"}, setting.AllowedOrigins)
-			assert.Equal(collect, false, *setting.EnableImpersonation)
+			assert.Equal(collect, false, setting.EnableImpersonation)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1207,7 +1207,7 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 func TestServer_TestInstanceNotificationSettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.NotificationSettingsRepository()
+	settingsRepo := repository.NotificationSettings()
 
 	before := time.Now()
 	newInstance := integration.NewInstance(t.Context())
@@ -1225,7 +1225,7 @@ func TestServer_TestInstanceNotificationSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, true, *setting.PasswordChange)
+			assert.Equal(t, true, setting.PasswordChange)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1249,7 +1249,7 @@ func TestServer_TestInstanceNotificationSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, false, *setting.PasswordChange)
+			assert.Equal(t, false, setting.PasswordChange)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1290,7 +1290,7 @@ func TestServer_TestInstanceNotificationSettingsReduces(t *testing.T) {
 func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.LegalAndSupportSettingsRepository()
+	settingsRepo := repository.LegalAndSupportSettings()
 
 	before := time.Now()
 	newInstance := integration.NewInstance(t.Context())
@@ -1309,13 +1309,13 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, "", *setting.TOSLink)
-			assert.Equal(t, "", *setting.PrivacyPolicyLink)
-			assert.Equal(t, "", *setting.HelpLink)
-			assert.Equal(t, "", *setting.SupportEmail)
-			assert.Equal(t, "https://zitadel.com/docs", *setting.DocsLink)
-			assert.Equal(t, "", *setting.CustomLink)
-			assert.Equal(t, "", *setting.CustomLinkText)
+			assert.Equal(t, "", setting.TOSLink)
+			assert.Equal(t, "", setting.PrivacyPolicyLink)
+			assert.Equal(t, "", setting.HelpLink)
+			assert.Equal(t, "", setting.SupportEmail)
+			assert.Equal(t, "https://zitadel.com/docs", setting.DocsLink)
+			assert.Equal(t, "", setting.CustomLink)
+			assert.Equal(t, "", setting.CustomLinkText)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1345,13 +1345,13 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, "https://tos.example2.com", *setting.TOSLink)
-			assert.Equal(t, "https://privacy.example2.com", *setting.PrivacyPolicyLink)
-			assert.Equal(t, "https://help.example2.com", *setting.HelpLink)
-			assert.Equal(t, "support@example2.com", *setting.SupportEmail)
-			assert.Equal(t, "https://docs.example2.com", *setting.DocsLink)
-			assert.Equal(t, "https://custom.example2.com", *setting.CustomLink)
-			assert.Equal(t, "Custom link text2", *setting.CustomLinkText)
+			assert.Equal(t, "https://tos.example2.com", setting.TOSLink)
+			assert.Equal(t, "https://privacy.example2.com", setting.PrivacyPolicyLink)
+			assert.Equal(t, "https://help.example2.com", setting.HelpLink)
+			assert.Equal(t, "support@example2.com", setting.SupportEmail)
+			assert.Equal(t, "https://docs.example2.com", setting.DocsLink)
+			assert.Equal(t, "https://custom.example2.com", setting.CustomLink)
+			assert.Equal(t, "Custom link text2", setting.CustomLinkText)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1391,7 +1391,7 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 
 func TestServer_TestInstanceSecretGeneratorSettingsReduces(t *testing.T) {
 	t.Parallel()
-	settingsRepo := repository.SecretGeneratorSettingsRepository()
+	settingsRepo := repository.SecretGeneratorSettings()
 	newInstance := integration.NewInstance(t.Context())
 
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
@@ -1409,74 +1409,74 @@ func TestServer_TestInstanceSecretGeneratorSettingsReduces(t *testing.T) {
 			require.NotNil(collect, setting)
 
 			// ClientSecret
-			assert.Equal(collect, uint(64), *setting.ClientSecret.Length)
-			assert.Equal(collect, true, *setting.ClientSecret.IncludeLowerLetters)
-			assert.Equal(collect, true, *setting.ClientSecret.IncludeUpperLetters)
-			assert.Equal(collect, true, *setting.ClientSecret.IncludeDigits)
-			assert.Equal(collect, false, *setting.ClientSecret.IncludeSymbols)
+			assert.Equal(collect, uint(64), setting.ClientSecret.Length)
+			assert.Equal(collect, true, setting.ClientSecret.IncludeLowerLetters)
+			assert.Equal(collect, true, setting.ClientSecret.IncludeUpperLetters)
+			assert.Equal(collect, true, setting.ClientSecret.IncludeDigits)
+			assert.Equal(collect, false, setting.ClientSecret.IncludeSymbols)
 
 			// InitializeUserCode
-			assert.Equal(collect, uint(6), *setting.InitializeUserCode.Length)
-			assert.Equal(collect, 72*time.Hour, *setting.InitializeUserCode.Expiry)
-			assert.Equal(collect, false, *setting.InitializeUserCode.IncludeLowerLetters)
-			assert.Equal(collect, true, *setting.InitializeUserCode.IncludeUpperLetters)
-			assert.Equal(collect, true, *setting.InitializeUserCode.IncludeDigits)
-			assert.Equal(collect, false, *setting.InitializeUserCode.IncludeSymbols)
+			assert.Equal(collect, uint(6), setting.InitializeUserCode.Length)
+			assert.Equal(collect, 72*time.Hour, setting.InitializeUserCode.Expiry)
+			assert.Equal(collect, false, setting.InitializeUserCode.IncludeLowerLetters)
+			assert.Equal(collect, true, setting.InitializeUserCode.IncludeUpperLetters)
+			assert.Equal(collect, true, setting.InitializeUserCode.IncludeDigits)
+			assert.Equal(collect, false, setting.InitializeUserCode.IncludeSymbols)
 
 			// EmailVerificationCode
-			assert.Equal(collect, uint(6), *setting.EmailVerificationCode.Length)
-			assert.Equal(collect, 1*time.Hour, *setting.EmailVerificationCode.Expiry)
-			assert.Equal(collect, false, *setting.EmailVerificationCode.IncludeLowerLetters)
-			assert.Equal(collect, true, *setting.EmailVerificationCode.IncludeUpperLetters)
-			assert.Equal(collect, true, *setting.EmailVerificationCode.IncludeDigits)
-			assert.Equal(collect, false, *setting.EmailVerificationCode.IncludeSymbols)
+			assert.Equal(collect, uint(6), setting.EmailVerificationCode.Length)
+			assert.Equal(collect, 1*time.Hour, setting.EmailVerificationCode.Expiry)
+			assert.Equal(collect, false, setting.EmailVerificationCode.IncludeLowerLetters)
+			assert.Equal(collect, true, setting.EmailVerificationCode.IncludeUpperLetters)
+			assert.Equal(collect, true, setting.EmailVerificationCode.IncludeDigits)
+			assert.Equal(collect, false, setting.EmailVerificationCode.IncludeSymbols)
 
 			// PhoneVerificationCode
-			assert.Equal(collect, uint(6), *setting.PhoneVerificationCode.Length)
-			assert.Equal(collect, 1*time.Hour, *setting.PhoneVerificationCode.Expiry)
-			assert.Equal(collect, false, *setting.PhoneVerificationCode.IncludeLowerLetters)
-			assert.Equal(collect, true, *setting.PhoneVerificationCode.IncludeUpperLetters)
-			assert.Equal(collect, true, *setting.PhoneVerificationCode.IncludeDigits)
-			assert.Equal(collect, false, *setting.PhoneVerificationCode.IncludeSymbols)
+			assert.Equal(collect, uint(6), setting.PhoneVerificationCode.Length)
+			assert.Equal(collect, 1*time.Hour, setting.PhoneVerificationCode.Expiry)
+			assert.Equal(collect, false, setting.PhoneVerificationCode.IncludeLowerLetters)
+			assert.Equal(collect, true, setting.PhoneVerificationCode.IncludeUpperLetters)
+			assert.Equal(collect, true, setting.PhoneVerificationCode.IncludeDigits)
+			assert.Equal(collect, false, setting.PhoneVerificationCode.IncludeSymbols)
 
 			// PasswordVerificationCode
-			assert.Equal(collect, uint(6), *setting.PasswordVerificationCode.Length)
-			assert.Equal(collect, 1*time.Hour, *setting.PasswordVerificationCode.Expiry)
-			assert.Equal(collect, false, *setting.PasswordVerificationCode.IncludeLowerLetters)
-			assert.Equal(collect, true, *setting.PasswordVerificationCode.IncludeUpperLetters)
-			assert.Equal(collect, true, *setting.PasswordVerificationCode.IncludeDigits)
-			assert.Equal(collect, false, *setting.PasswordVerificationCode.IncludeSymbols)
+			assert.Equal(collect, uint(6), setting.PasswordVerificationCode.Length)
+			assert.Equal(collect, 1*time.Hour, setting.PasswordVerificationCode.Expiry)
+			assert.Equal(collect, false, setting.PasswordVerificationCode.IncludeLowerLetters)
+			assert.Equal(collect, true, setting.PasswordVerificationCode.IncludeUpperLetters)
+			assert.Equal(collect, true, setting.PasswordVerificationCode.IncludeDigits)
+			assert.Equal(collect, false, setting.PasswordVerificationCode.IncludeSymbols)
 
 			// PasswordlessInitCode
-			assert.Equal(collect, uint(12), *setting.PasswordlessInitCode.Length)
-			assert.Equal(collect, 1*time.Hour, *setting.PasswordlessInitCode.Expiry)
-			assert.Equal(collect, true, *setting.PasswordlessInitCode.IncludeLowerLetters)
-			assert.Equal(collect, true, *setting.PasswordlessInitCode.IncludeUpperLetters)
-			assert.Equal(collect, true, *setting.PasswordlessInitCode.IncludeDigits)
-			assert.Equal(collect, false, *setting.PasswordlessInitCode.IncludeSymbols)
+			assert.Equal(collect, uint(12), setting.PasswordlessInitCode.Length)
+			assert.Equal(collect, 1*time.Hour, setting.PasswordlessInitCode.Expiry)
+			assert.Equal(collect, true, setting.PasswordlessInitCode.IncludeLowerLetters)
+			assert.Equal(collect, true, setting.PasswordlessInitCode.IncludeUpperLetters)
+			assert.Equal(collect, true, setting.PasswordlessInitCode.IncludeDigits)
+			assert.Equal(collect, false, setting.PasswordlessInitCode.IncludeSymbols)
 
 			// DomainVerification
-			assert.Equal(collect, uint(32), *setting.DomainVerification.Length)
-			assert.Equal(collect, true, *setting.DomainVerification.IncludeLowerLetters)
-			assert.Equal(collect, true, *setting.DomainVerification.IncludeUpperLetters)
-			assert.Equal(collect, true, *setting.DomainVerification.IncludeDigits)
-			assert.Equal(collect, false, *setting.DomainVerification.IncludeSymbols)
+			assert.Equal(collect, uint(32), setting.DomainVerification.Length)
+			assert.Equal(collect, true, setting.DomainVerification.IncludeLowerLetters)
+			assert.Equal(collect, true, setting.DomainVerification.IncludeUpperLetters)
+			assert.Equal(collect, true, setting.DomainVerification.IncludeDigits)
+			assert.Equal(collect, false, setting.DomainVerification.IncludeSymbols)
 
 			// OTPSMS
-			assert.Equal(collect, uint(8), *setting.OTPSMS.Length)
-			assert.Equal(collect, 5*time.Minute, *setting.OTPSMS.Expiry)
-			assert.Equal(collect, false, *setting.OTPSMS.IncludeLowerLetters)
-			assert.Equal(collect, false, *setting.OTPSMS.IncludeUpperLetters)
-			assert.Equal(collect, true, *setting.OTPSMS.IncludeDigits)
-			assert.Equal(collect, false, *setting.OTPSMS.IncludeSymbols)
+			assert.Equal(collect, uint(8), setting.OTPSMS.Length)
+			assert.Equal(collect, 5*time.Minute, setting.OTPSMS.Expiry)
+			assert.Equal(collect, false, setting.OTPSMS.IncludeLowerLetters)
+			assert.Equal(collect, false, setting.OTPSMS.IncludeUpperLetters)
+			assert.Equal(collect, true, setting.OTPSMS.IncludeDigits)
+			assert.Equal(collect, false, setting.OTPSMS.IncludeSymbols)
 
 			// OTPEmail
-			assert.Equal(collect, uint(8), *setting.OTPEmail.Length)
-			assert.Equal(collect, 5*time.Minute, *setting.OTPEmail.Expiry)
-			assert.Equal(collect, false, *setting.OTPEmail.IncludeLowerLetters)
-			assert.Equal(collect, false, *setting.OTPEmail.IncludeUpperLetters)
-			assert.Equal(collect, true, *setting.OTPEmail.IncludeDigits)
-			assert.Equal(collect, false, *setting.OTPEmail.IncludeSymbols)
+			assert.Equal(collect, uint(8), setting.OTPEmail.Length)
+			assert.Equal(collect, 5*time.Minute, setting.OTPEmail.Expiry)
+			assert.Equal(collect, false, setting.OTPEmail.IncludeLowerLetters)
+			assert.Equal(collect, false, setting.OTPEmail.IncludeUpperLetters)
+			assert.Equal(collect, true, setting.OTPEmail.IncludeDigits)
+			assert.Equal(collect, false, setting.OTPEmail.IncludeSymbols)
 		}, retryDuration, tick)
 	})
 
@@ -1500,9 +1500,9 @@ func TestServer_TestInstanceSecretGeneratorSettingsReduces(t *testing.T) {
 				),
 			)
 			require.NoError(t, err)
-			assert.Equal(collect, uint(8), *setting.InitializeUserCode.Length)
-			assert.Equal(collect, 24*time.Hour, *setting.InitializeUserCode.Expiry)
-			assert.Equal(collect, true, *setting.InitializeUserCode.IncludeLowerLetters)
+			assert.Equal(collect, uint(8), setting.InitializeUserCode.Length)
+			assert.Equal(collect, 24*time.Hour, setting.InitializeUserCode.Expiry)
+			assert.Equal(collect, true, setting.InitializeUserCode.IncludeLowerLetters)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})

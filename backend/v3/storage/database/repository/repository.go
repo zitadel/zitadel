@@ -85,9 +85,7 @@ func updateOne[Target updatable](ctx context.Context, client database.QueryExecu
 	builder := database.NewStatementBuilder("UPDATE ")
 	builder.WriteString(target.qualifiedTableName())
 	builder.WriteString(" SET ")
-	if err := database.Changes(changes).Write(builder); err != nil {
-		return 0, err
-	}
+	database.Changes(changes).Write(builder)
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)

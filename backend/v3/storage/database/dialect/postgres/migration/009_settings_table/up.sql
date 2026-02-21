@@ -23,7 +23,7 @@ CREATE TABLE zitadel.settings (
     , id TEXT NOT NULL DEFAULT gen_random_uuid()
     , type zitadel.settings_type NOT NULL
     , state zitadel.settings_state NOT NULL
-    , settings JSONB -- the storage does not really care about what is configured so we store it as json
+    , attributes JSONB -- the storage does not really care about what is configured so we store it as json
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -43,54 +43,41 @@ FOR EACH ROW
 WHEN (NEW.updated_at IS NULL)
 EXECUTE FUNCTION zitadel.set_updated_at();
 
-CREATE OR REPLACE FUNCTION zitadel.jsonb_array_remove(
-    source JSONB
-    , path TEXT[]
-    , value anyelement
-
-    , outt out jsonb
+CREATE OR REPLACE FUNCTION zitadel.jsonb_patch(
+  INOUT source JSONB
+  , path TEXT[]
+  , p_value ANYELEMENT
+  , is_array BOOLEAN DEFAULT FALSE -- indicates if the property is an array. If true p_value is added to the array or removed if delete_array_element is true.
+  , delete_array_element BOOLEAN DEFAULT FALSE -- if true, p_value is removed from the array instead of added (only if is_array is true)
 )
-    language 'plpgsql'
+IMMUTABLE
+PARALLEL SAFE
+COST 5
+LANGUAGE 'plpgsql'
 AS $$
   BEGIN
-    outt = jsonb_set(source, path,
-    (CASE WHEN (SELECT source ?& path) then
-      coalesce(
-      (SELECT jsonb_agg(v)
-      FROM jsonb_array_elements(source #>path) AS elem(v)
-      WHERE v::text <> value::text),
-      jsonb_build_array())
-    ELSe
-      jsonb_build_array()
-    END)::jsonb, TRUE);
+    IF source #> path[1:array_length(path, 1)-1] IS NULL THEN
+      source := zitadel.jsonb_patch(source, path[1:array_length(path, 1)-1], '{}'::JSONB);
+    END IF;
+
+    IF is_array THEN
+      IF delete_array_element THEN
+        source := jsonb_set(source, path, (SELECT jsonb_agg(elem) FROM jsonb_array_elements(source #> path) AS elem WHERE elem <> to_jsonb(p_value)));
+        RETURN;
+      END IF;
+      IF source #> path IS NULL THEN
+        source := jsonb_set(source, path, jsonb_build_array(p_value));
+        RETURN;
+      END IF;
+
+      source := jsonb_set(source, path, source #> path || to_jsonb(p_value));
+      RETURN;
+    END IF;
+
+    IF p_value IS NULL THEN
+      source := jsonb_set_lax(source, path, NULL, true, 'delete_key');
+      RETURN;
+    END IF;
+    source := jsonb_set_lax(source, path, to_jsonb(p_value), true, 'delete_key');
   END;
 $$;
-
-CREATE OR REPLACE FUNCTION zitadel.jsonb_array_append(
-    source jsonb
-    , path text[]
-    , value anyelement
-
-    , outt out jsonb
-)
-    language 'plpgsql'
-AS $$
-  BEGIN
-    outt := jsonb_insert(
-      source,
-      (CASE WHEN (SELECT source ?& path) then
-        array_append(path, '-1')
-      ELSE
-        path
-      END)::text[],
-      (CASE WHEN (select source ?& path) then
-        value::TEXT::jsonb
-      ELSE
-        jsonb_build_array(value)
-      END),
-      TRUE
-  );
-
-  END;
-$$;
-

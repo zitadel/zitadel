@@ -92,15 +92,10 @@ func (i *idProvider) Update(ctx context.Context, client database.QueryExecutor, 
 		i.InstanceIDCondition(instanceID),
 		i.OrgIDCondition(orgID),
 	}
-	err := database.Changes(changes).Write(&builder)
-	if err != nil {
-		return 0, err
-	}
+	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, database.And(conditions...))
 
-	stmt := builder.String()
-
-	return client.Exec(ctx, stmt, builder.Args()...)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 func (i *idProvider) Delete(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (int64, error) {

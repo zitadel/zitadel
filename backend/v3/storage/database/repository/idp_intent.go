@@ -153,10 +153,7 @@ func (i idpIntentRepository) Update(ctx context.Context, client database.QueryEx
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.identity_provider_intents SET `)
 
-	err := database.Changes(changes).Write(&builder)
-	if err != nil {
-		return 0, err
-	}
+	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)

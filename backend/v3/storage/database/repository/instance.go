@@ -110,10 +110,7 @@ func (i instance) Update(ctx context.Context, client database.QueryExecutor, id 
 
 	var builder database.StatementBuilder
 	builder.WriteString(`UPDATE zitadel.instances SET `)
-	err := database.Changes(changes).Write(&builder)
-	if err != nil {
-		return 0, err
-	}
+	database.Changes(changes).Write(&builder)
 	idCondition := i.IDCondition(id)
 	writeCondition(&builder, idCondition)
 
