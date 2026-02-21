@@ -1,7 +1,6 @@
 import { getPageImage, getPage, source } from '@/lib/source';
 import {
   DocsBody,
-  DocsDescription,
   DocsPage,
   DocsTitle,
 } from 'fumadocs-ui/layouts/docs/page';
@@ -23,7 +22,6 @@ export default async function Page(props: any) {
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
         <MDX
           components={getMDXComponents({
