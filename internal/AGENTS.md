@@ -37,29 +37,26 @@ Commands modify state and return events. The following is a **simplified pseudoc
 
 ```go
 func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName string) (*domain.ObjectDetails, error) {
-    // 1. Validate inputs
-    userName = strings.TrimSpace(userName)
-    if orgID == "" || userID == "" || userName == "" {
-        return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2N9fs", "Errors.IDMissing")
-    }
+    // Note: structural input validation (empty fields, format checks) belongs in the
+    // API/adapter layer via proto validate or the gRPC handler — not here.
 
-    // 2. Load current state via write model
+    // 1. Load current state via write model
     existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
     if err != nil {
         return nil, err
     }
 
-    // 3. Check preconditions
+    // 2. Check preconditions
     if !isUserStateExists(existingUser.UserState) {
         return nil, zerrors.ThrowNotFound(nil, "COMMAND-5N9ds", "Errors.User.NotFound")
     }
 
-    // 4. Apply business logic checks
+    // 3. Apply business logic checks
     if existingUser.UserName == userName {
         return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-6m9gs", "Errors.User.UsernameNotChanged")
     }
 
-    // 5. Create aggregate and push events
+    // 4. Create aggregate and push events
     userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
     pushedEvents, err := c.eventstore.Push(ctx,
         user.NewUsernameChangedEvent(ctx, userAgg, existingUser.UserName, userName, ...))
@@ -67,7 +64,7 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
         return nil, err
     }
 
-    // 6. Update model and return
+    // 5. Update model and return
     err = AppendAndReduce(existingUser, pushedEvents...)
     if err != nil {
         return nil, err
