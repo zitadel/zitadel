@@ -47,6 +47,40 @@ The following commands set up services for a PostgreSQL database, a Zitadel API 
 
 <DefaultUser components={props.components} />
 
+## Updating Zitadel
+
+To update Zitadel to a newer version, update the image tags in the `docker-compose.yaml` file and restart the services.
+The `start-from-init` command used in the quickstart is idempotent: the init and setup phases are safe to re-run and will skip steps that are already complete.
+
+1. Edit `docker-compose.yaml` and change the image tags for the `zitadel` and `login` services to the desired version, for example:
+   ```yaml
+   zitadel:
+     image: ghcr.io/zitadel/zitadel:v4.11.0
+   login:
+     image: ghcr.io/zitadel/zitadel-login:v4.11.0
+   ```
+   Or use `latest` to always pull the newest release:
+   ```yaml
+   zitadel:
+     image: ghcr.io/zitadel/zitadel:latest
+   login:
+     image: ghcr.io/zitadel/zitadel-login:latest
+   ```
+2. Pull the new images:
+   ```shell
+   docker compose pull
+   ```
+3. Recreate and restart the services:
+   ```shell
+   docker compose up --detach --wait
+   ```
+
+:::note
+The `ZITADEL_FIRSTINSTANCE_*` and `ZITADEL_DEFAULTINSTANCE_*` environment variables are only applied during the **initial setup** of a new Zitadel instance.
+Changing them after the first start has no effect.
+To change instance settings on an existing installation, use the [Admin Console](/self-hosting/manage/login-client) or the Admin API.
+:::
+
 ## What's next
 
 Before proceeding, review the downloaded `docker-compose.yaml` file:

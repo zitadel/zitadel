@@ -28,7 +28,7 @@ Traefik is used because it provides:
 ## 3. Quick Start (Mode 1: Local Dev, No TLS)
 
 ```bash
-cd /Users/ffo/git/zitadel/zitadel/deploy/compose-v4
+cd deploy/compose-v4
 cp .env.example .env
 
 docker compose --env-file .env -f docker-compose.yml up -d --wait
@@ -167,7 +167,45 @@ docker compose --env-file .env \
   up -d --wait
 ```
 
-## 9. Scaling and Externalization
+## 9. Updating ZITADEL
+
+To update ZITADEL to a new version:
+
+1. Edit `.env` and bump the image versions:
+   ```
+   ZITADEL_API_IMAGE=ghcr.io/zitadel/zitadel:v4.11.0
+   ZITADEL_LOGIN_IMAGE=ghcr.io/zitadel/zitadel-login:v4.11.0
+   ```
+2. Pull the new images:
+   ```bash
+   docker compose --env-file .env -f docker-compose.yml pull
+   ```
+3. Recreate the stack:
+   ```bash
+   docker compose --env-file .env -f docker-compose.yml up -d --wait
+   ```
+
+**How `start-from-init` handles upgrades**: The default quickstart command is idempotent.
+The init phase skips resources (database, user, grants) that already exist.
+The setup phase runs only the migration steps for the new version and leaves the rest untouched.
+Log messages such as `role "zitadel" already exists` are expected and harmless.
+
+**Production-like upgrades**: When using `docker-compose.prodlike.yml`, the `zitadel-setup` one-shot container
+runs the new version's migrations before `zitadel-api` starts. This gives you a controlled, serialized upgrade:
+
+```bash
+docker compose --env-file .env \
+  -f docker-compose.yml \
+  -f docker-compose.prodlike.yml \
+  up -d --wait
+```
+
+**FIRSTINSTANCE / DEFAULTINSTANCE settings**: Variables prefixed `ZITADEL_FIRSTINSTANCE_` and
+`ZITADEL_DEFAULTINSTANCE_` are applied **once** during the very first setup of a new instance.
+Changing them in `.env` after the first start has no effect on the running instance.
+Use the Admin Console or Admin API to change instance settings on an existing installation.
+
+## 10. Scaling and Externalization
 
 ### Scale API replicas
 
@@ -191,7 +229,7 @@ Use a centralized cache backend (Redis/Postgres connector strategy) for multi-re
 - Set `ZITADEL_CACHES_CONNECTORS_REDIS_ADDR` to external Redis
 - Keep connector toggles explicit in `.env`
 
-## 10. Kubernetes Migration Mapping
+## 11. Kubernetes Migration Mapping
 
 Compose concepts map directly to Kubernetes:
 
@@ -201,7 +239,7 @@ Compose concepts map directly to Kubernetes:
 - `.env` settings -> ConfigMaps/Secrets
 - external Postgres/Redis -> managed services
 
-## 11. Tradeoffs and Rejected Alternatives
+## 12. Tradeoffs and Rejected Alternatives
 
 Chosen:
 
@@ -214,7 +252,7 @@ Rejected:
 - `/grpc` path-prefix routing (tool/client incompatibility risk)
 - collapsing API and Login into one container (not aligned with v4 architecture)
 
-## 12. Release Flow Placeholder
+## 13. Release Flow Placeholder
 
 Version bump automation is intentionally deferred until the Nx release PR merges.
 
@@ -223,7 +261,7 @@ Current state:
 - image versions are manually pinned in `.env.example`
 - `make release-bump` is a placeholder target for future Nx integration
 
-## 13. Validation Checklist
+## 14. Validation Checklist
 
 Render final Compose config for each variant:
 
