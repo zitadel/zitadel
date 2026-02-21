@@ -1,5 +1,6 @@
 ---
 title: Connect your Self-Hosted Login UI to Zitadel
+description: "Create a Personal Access Token for login client user with IAM_LOGIN_CLIENT role to connect self-hosted Login UI to ZITADEL API"
 sidebar_label: Create a Login Client
 ---
 
@@ -19,7 +20,7 @@ In the following URLs, replace the base URL and the user ID according to your en
 3. Save the PAT to a file, for example `/path/on/your/host/login-client.pat`
 4. Make sure the user has the `Instance Login Client` role (internally called `IAM_LOGIN_CLIENT`), for example at http://localhost:8080/ui/console/instance/members
 
-# Configure the Login UI
+## Configure the Login UI
 
 Make sure your Login UI has the environment variable `ZITADEL_SERVICE_USER_TOKEN` set with your PAT.
 If you run the Login UI with Docker, you can also mount the file into the container and reference it by passing the environment variable `ZITADEL_SERVICE_USER_TOKEN_FILE`.
@@ -29,7 +30,7 @@ For example:
 docker run -p 3000:3000 -v /path/on/your/host/login-client.pat:/path/in/container/login-client.pat:ro -e ZITADEL_SERVICE_USER_TOKEN_FILE=/path/in/container/login-client.pat ghcr.io/zitadel/zitadel-login:latest
 ```
 
-# Enable the Login UI for all users
+## Enable the Login UI for all users
 
 <Callout type="warn">
 Before doing this, make sure you have a working PAT for an instance Owner user.
@@ -40,7 +41,7 @@ Create a service account PAT like you created the [login client PAT above](#crea
 Enable the `Login V2` feature flag, for example at the bottom of http://localhost:8080/ui/console/instance?id=features.
 Enter the base URI of your Login UI, for example `http://localhost:3000/ui/v2/login`.
 
-# Test
+## Test
 
 That's it!
 Click your users avatar in the top right corner of the management console and select `Log in With Another Account`.
