@@ -106,6 +106,10 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine, state *doma
 			return nil, err
 		}
 	}
+	err = c.checkOrgExists(ctx, machine.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(agg, machine))
 	if err != nil {
 		return nil, err

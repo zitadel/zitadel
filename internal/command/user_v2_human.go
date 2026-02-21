@@ -118,14 +118,14 @@ func (h *ChangeHuman) Changed() bool {
 	return false
 }
 
-func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm) (err error) {
-	if resourceOwner == "" {
+func (c *Commands) AddUserHuman(ctx context.Context, organizationID string, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm) (err error) {
+	if organizationID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMA-095xh8fll1", "Errors.Internal")
 	}
 	if human.Details == nil {
 		human.Details = &domain.ObjectDetails{}
 	}
-	human.Details.ResourceOwner = resourceOwner
+	human.Details.ResourceOwner = organizationID
 	if err := human.Validate(c.userPasswordHasher); err != nil {
 		return err
 	}
@@ -136,11 +136,15 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			return err
 		}
 	}
-	// check for permission to create user on resourceOwner
+	// check for permission to create user on organizationID
 	if !human.Register {
-		if err := c.checkPermissionUpdateUser(ctx, resourceOwner, human.ID, true); err != nil {
+		if err := c.checkPermissionUpdateUser(ctx, organizationID, human.ID, true); err != nil {
 			return err
 		}
+	}
+	err = c.checkOrgExists(ctx, organizationID)
+	if err != nil {
+		return err
 	}
 	// only check if user is already existing
 	existingHuman, err := c.userExistsWriteModel(
@@ -154,18 +158,18 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting")
 	}
 	// add resourceowner for the events with the aggregate
-	existingHuman.ResourceOwner = resourceOwner
+	existingHuman.ResourceOwner = organizationID
 
-	domainPolicy, err := c.domainPolicyWriteModel(ctx, resourceOwner)
+	domainPolicy, err := c.domainPolicyWriteModel(ctx, organizationID)
 	if err != nil {
 		return err
 	}
 
-	if err = c.userValidateDomain(ctx, resourceOwner, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
+	if err = c.userValidateDomain(ctx, organizationID, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
 		return err
 	}
 
-	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, resourceOwner)
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, organizationID)
 	if err != nil {
 		return err
 	}
