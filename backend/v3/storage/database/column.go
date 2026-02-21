@@ -2,6 +2,18 @@ package database
 
 import "go.uber.org/mock/gomock"
 
+// Column represents a column in a database table.
+type Column interface {
+	gomock.Matcher
+	argWriter
+	// WriteQualified writes the column with the table name as prefix.
+	WriteQualified(builder *StatementBuilder)
+	// WriteUnqualified writes the column without the table name as prefix.
+	WriteUnqualified(builder *StatementBuilder)
+	// Equals checks if two columns are equal.
+	Equals(col Column) bool
+}
+
 type Columns []Column
 
 // Matches implements [Column].
@@ -59,22 +71,20 @@ func (c Columns) Equals(col Column) bool {
 	return true
 }
 
-var _ Column = (Columns)(nil)
-
-// Column represents a column in a database table.
-type Column interface {
-	gomock.Matcher
-	// WriteQualified writes the column with the table name as prefix.
-	WriteQualified(builder *StatementBuilder)
-	// WriteUnqualified writes the column without the table name as prefix.
-	WriteUnqualified(builder *StatementBuilder)
-	// Equals checks if two columns are equal.
-	Equals(col Column) bool
+// WriteArg implements [Column].
+func (c Columns) WriteArg(builder *StatementBuilder) {
+	c.WriteQualified(builder)
 }
+
+var _ Column = (Columns)(nil)
 
 type column struct {
 	table string
 	name  string
+}
+
+func NewColumn(table, name string) Column {
+	return &column{table: table, name: name}
 }
 
 // Matches implements [Column].
@@ -89,10 +99,6 @@ func (c column) Matches(x any) bool {
 // String implements [Column].
 func (c column) String() string {
 	return "database.column"
-}
-
-func NewColumn(table, name string) Column {
-	return &column{table: table, name: name}
 }
 
 // WriteQualified implements [Column].
@@ -120,6 +126,26 @@ func (c *column) Equals(col Column) bool {
 	return c.table == toMatch.table && c.name == toMatch.name
 }
 
+// WriteArg implements [Column].
+func (c column) WriteArg(builder *StatementBuilder) {
+	c.WriteQualified(builder)
+}
+
+var _ Column = (*column)(nil)
+
+type functionColumn struct {
+	fn  function
+	col Column
+}
+
+type function string
+
+const (
+	_              function = ""
+	functionLower  function = "LOWER"
+	functionSHA256 function = "SHA256"
+)
+
 // LowerColumn returns a column that represents LOWER(col).
 func LowerColumn(col Column) Column {
 	return &functionColumn{fn: functionLower, col: col}
@@ -128,11 +154,6 @@ func LowerColumn(col Column) Column {
 // SHA256Column returns a column that represents SHA256(col).
 func SHA256Column(col Column) Column {
 	return &functionColumn{fn: functionSHA256, col: col}
-}
-
-type functionColumn struct {
-	fn  function
-	col Column
 }
 
 // Matches implements [Column].
@@ -154,14 +175,6 @@ func (c *functionColumn) Matches(x any) bool {
 func (c *functionColumn) String() string {
 	return "database.functionColumn"
 }
-
-type function string
-
-const (
-	_              function = ""
-	functionLower  function = "LOWER"
-	functionSHA256 function = "SHA256"
-)
 
 // WriteQualified implements [Column].
 func (c functionColumn) WriteQualified(builder *StatementBuilder) {
@@ -191,6 +204,11 @@ func (c *functionColumn) Equals(col Column) bool {
 		return false
 	}
 	return c.col.Equals(toMatch.col)
+}
+
+// WriteArg implements [Column].
+func (c functionColumn) WriteArg(builder *StatementBuilder) {
+	c.WriteQualified(builder)
 }
 
 var _ Column = (*functionColumn)(nil)

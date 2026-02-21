@@ -5,12 +5,15 @@ import (
 	"slices"
 
 	"go.uber.org/mock/gomock"
+
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 )
 
 // Change represents a change to a column in a database table.
 // Its written in the SET clause of an UPDATE statement.
 type Change interface {
 	gomock.Matcher
+	argWriter
 	// Write writes the change to the given statement builder.
 	Write(builder *StatementBuilder) error
 	// IsOnColumn checks if the change is on the given column.
@@ -44,6 +47,25 @@ func (c *change[V]) String() string {
 	return "database.change"
 }
 
+// WriteArg implements [Change].
+func (c change[V]) WriteArg(builder *StatementBuilder) {
+	err := c.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
+}
+
+// Write implements [Change].
+func (c change[V]) Write(builder *StatementBuilder) error {
+	c.column.WriteUnqualified(builder)
+	builder.WriteString(" = ")
+	builder.WriteArg(c.value)
+	return nil
+}
+
+// IsOnColumn implements [Change].
+func (c change[V]) IsOnColumn(col Column) bool {
+	return c.column.Equals(col)
+}
+
 var (
 	_ Change         = (*change[string])(nil)
 	_ gomock.Matcher = (*change[string])(nil)
@@ -67,22 +89,9 @@ func NewChangePtr[V Value](col Column, value *V) Change {
 	return NewChange(col, *value)
 }
 
-// Write implements [Change].
-func (c change[V]) Write(builder *StatementBuilder) error {
-	c.column.WriteUnqualified(builder)
-	builder.WriteString(" = ")
-	builder.WriteArg(c.value)
-	return nil
-}
-
-// IsOnColumn implements [Change].
-func (c change[V]) IsOnColumn(col Column) bool {
-	return c.column.Equals(col)
-}
-
 type Changes []Change
 
-func NewChanges(cols ...Change) Change {
+func NewChanges(cols ...Change) Changes {
 	return Changes(cols)
 }
 
@@ -152,6 +161,12 @@ func (c Changes) NoChange() bool {
 	return true
 }
 
+// WriteArg implements [Change].
+func (c Changes) WriteArg(builder *StatementBuilder) {
+	err := c.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
+}
+
 var _ Change = Changes(nil)
 
 func NewChangeToNull(col Column) Change {
@@ -194,26 +209,34 @@ func (c *changeToColumn) Write(builder *StatementBuilder) error {
 	return nil
 }
 
-var _ Change = (*changeToColumn)(nil)
-
-type incrementColumnChange struct {
-	column Column
+// WriteArg implements [Change].
+func (c *changeToColumn) WriteArg(builder *StatementBuilder) {
+	err := c.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
 }
 
-func NewIncrementColumnChange(col Column) Change {
-	return &incrementColumnChange{
+var _ Change = (*changeToColumn)(nil)
+
+type incrementColumnChange[V Value] struct {
+	column Column
+	value  V
+}
+
+func NewIncrementColumnChange[V Value](col Column, value V) *incrementColumnChange[V] {
+	return &incrementColumnChange[V]{
 		column: col,
+		value:  value,
 	}
 }
 
 // IsOnColumn implements [Change].
-func (i *incrementColumnChange) IsOnColumn(col Column) bool {
+func (i incrementColumnChange[V]) IsOnColumn(col Column) bool {
 	return i.column.Equals(col)
 }
 
 // Matches implements [Change].
-func (i *incrementColumnChange) Matches(x any) bool {
-	toMatch, ok := x.(*incrementColumnChange)
+func (i *incrementColumnChange[V]) Matches(x any) bool {
+	toMatch, ok := x.(*incrementColumnChange[V])
 	if !ok {
 		return false
 	}
@@ -221,20 +244,26 @@ func (i *incrementColumnChange) Matches(x any) bool {
 }
 
 // String implements [Change].
-func (i *incrementColumnChange) String() string {
+func (i incrementColumnChange[V]) String() string {
 	return "database.incrementColumnChange"
 }
 
 // Write implements [Change].
-func (i *incrementColumnChange) Write(builder *StatementBuilder) error {
+func (i incrementColumnChange[V]) Write(builder *StatementBuilder) error {
 	i.column.WriteUnqualified(builder)
 	builder.WriteString(" = ")
-	i.column.WriteUnqualified(builder)
+	builder.WriteArg(i.value)
 	builder.WriteString(" + 1")
 	return nil
 }
 
-var _ Change = (*incrementColumnChange)(nil)
+// WriteArg implements [Change].
+func (i incrementColumnChange[V]) WriteArg(builder *StatementBuilder) {
+	err := i.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
+}
+
+var _ Change = (*incrementColumnChange[any])(nil)
 
 func NewChangeToStatement(col Column, stmt func(builder *StatementBuilder)) Change {
 	return &changeToStatement{
@@ -293,6 +322,12 @@ func (c *changeToStatement) Write(builder *StatementBuilder) error {
 	return nil
 }
 
+// WriteArg implements [Change].
+func (c *changeToStatement) WriteArg(builder *StatementBuilder) {
+	err := c.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
+}
+
 var _ Change = (*changeToStatement)(nil)
 
 // CTEChange represents a change that uses a Common Table Expression (CTE).
@@ -322,7 +357,7 @@ type cteChange struct {
 }
 
 // IsOnColumn implements [CTEChange].
-func (c *cteChange) IsOnColumn(col Column) bool {
+func (c cteChange) IsOnColumn(col Column) bool {
 	return false
 }
 
@@ -335,11 +370,15 @@ func (c *cteChange) Matches(x any) bool {
 	var expectedCTEBuilder, actualCTEBuilder StatementBuilder
 	c.cte(&expectedCTEBuilder)
 	if c.change != nil {
-		c.change(c.name).Write(&expectedCTEBuilder)
+		if err := c.change(c.name).Write(&expectedCTEBuilder); err != nil {
+			return false
+		}
 	}
 	toMatch.cte(&actualCTEBuilder)
 	if toMatch.change != nil {
-		toMatch.change(toMatch.name).Write(&actualCTEBuilder)
+		if err := toMatch.change(toMatch.name).Write(&actualCTEBuilder); err != nil {
+			return false
+		}
 	}
 
 	if expectedCTEBuilder.String() != actualCTEBuilder.String() {
@@ -359,21 +398,26 @@ func (c *cteChange) String() string {
 }
 
 // Write implements [CTEChange].
-func (c *cteChange) Write(builder *StatementBuilder) error {
+func (c cteChange) Write(builder *StatementBuilder) error {
 	if c.change == nil {
 		return nil
 	}
-	c.change(c.name).Write(builder)
-	return nil
+	return c.change(c.name).Write(builder)
 }
 
 // WriteCTE implements [CTEChange].
-func (c *cteChange) WriteCTE(builder *StatementBuilder) {
+func (c cteChange) WriteCTE(builder *StatementBuilder) {
 	c.cte(builder)
 }
 
 // NoChange implements [NoChange].
 // It returns true if there is no change function defined.
-func (c *cteChange) NoChange() bool {
+func (c cteChange) NoChange() bool {
 	return c.change == nil
+}
+
+// WriteArg implements [Change].
+func (c cteChange) WriteArg(builder *StatementBuilder) {
+	err := c.Write(builder)
+	logging.New(logging.StreamRuntime).Debug("write arg failed", "error", err)
 }

@@ -14,7 +14,7 @@ func StartEmbedded() (embeddedpostgres.Config, func()) {
 
 	port, close := getPort()
 
-	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).Port(uint32(port)).RuntimePath(path)
+	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V17).Port(uint32(port)).RuntimePath(path)
 	embedded := embeddedpostgres.NewDatabase(config)
 
 	close()

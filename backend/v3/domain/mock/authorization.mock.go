@@ -158,6 +158,44 @@ func (c *MockAuthorizationRepositoryDeleteCall) DoAndReturn(f func(context.Conte
 	return c
 }
 
+// ExistsRole mocks base method.
+func (m *MockAuthorizationRepository) ExistsRole(cond database.Condition) database.Condition {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExistsRole", cond)
+	ret0, _ := ret[0].(database.Condition)
+	return ret0
+}
+
+// ExistsRole indicates an expected call of ExistsRole.
+func (mr *MockAuthorizationRepositoryMockRecorder) ExistsRole(cond any) *MockAuthorizationRepositoryExistsRoleCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsRole", reflect.TypeOf((*MockAuthorizationRepository)(nil).ExistsRole), cond)
+	return &MockAuthorizationRepositoryExistsRoleCall{Call: call}
+}
+
+// MockAuthorizationRepositoryExistsRoleCall wrap *gomock.Call
+type MockAuthorizationRepositoryExistsRoleCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockAuthorizationRepositoryExistsRoleCall) Return(arg0 database.Condition) *MockAuthorizationRepositoryExistsRoleCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockAuthorizationRepositoryExistsRoleCall) Do(f func(database.Condition) database.Condition) *MockAuthorizationRepositoryExistsRoleCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockAuthorizationRepositoryExistsRoleCall) DoAndReturn(f func(database.Condition) database.Condition) *MockAuthorizationRepositoryExistsRoleCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Get mocks base method.
 func (m *MockAuthorizationRepository) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Authorization, error) {
 	m.ctrl.T.Helper()

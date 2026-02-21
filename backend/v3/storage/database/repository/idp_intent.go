@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"time"
 
@@ -95,7 +94,6 @@ func (i idpIntentRepository) Get(ctx context.Context, client database.QueryExecu
 	var builder database.StatementBuilder
 	builder.WriteString(queryIDPIntentStmt)
 	options.Write(&builder)
-	fmt.Println(builder.String())
 
 	return scanIDPIntent(ctx, client, &builder)
 }

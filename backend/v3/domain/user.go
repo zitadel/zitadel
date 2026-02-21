@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 type User struct {
@@ -15,48 +17,50 @@ type User struct {
 	CreatedAt      time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt      time.Time `json:"updatedAt,omitzero" db:"updated_at"`
 
-	Machine  *MachineUser    `json:"machine,omitempty" db:"machine"`
-	Human    *HumanUser      `json:"human,omitempty" db:"human"`
-	Metadata []*UserMetadata `json:"metadata,omitempty" db:"metadata"`
+	Machine  *MachineUser `json:"machine,omitempty" db:"-"`
+	Human    *HumanUser   `json:"human,omitempty" db:"-"`
+	Metadata []*Metadata  `json:"metadata,omitempty" db:"metadata"`
 }
 
 type MachineUser struct {
-	Name            string                  `json:"name,omitempty" db:"name"`
-	Description     string                  `json:"description,omitempty" db:"description"`
-	Secret          string                  `json:"secret,omitempty" db:"secret"`
-	AccessTokenType PersonalAccessTokenType `json:"access_token_type,omitempty" db:"access_token_type"`
+	Name            string          `json:"name,omitempty" db:"-"`
+	Description     string          `json:"description,omitempty" db:"-"`
+	Secret          string          `json:"secret,omitempty" db:"-"`
+	AccessTokenType AccessTokenType `json:"accessTokenType,omitempty" db:"-"`
 
-	PATs []*PersonalAccessToken `json:"pats,omitempty" db:"pats"`
-	Keys []*MachineKey          `json:"keys,omitempty" db:"keys"`
+	PATs []*PersonalAccessToken `json:"pats,omitempty" db:"-"`
+	Keys []*MachineKey          `json:"keys,omitempty" db:"-"`
 }
 
 type HumanUser struct {
-	FirstName         string       `json:"firstName,omitempty" db:"first_name"`
-	LastName          string       `json:"lastName,omitempty" db:"last_name"`
-	Nickname          string       `json:"nickname,omitempty" db:"nickname"`
-	DisplayName       string       `json:"displayName,omitempty" db:"display_name"`
-	PreferredLanguage language.Tag `json:"preferredLanguage,omitzero" db:"preferred_language"`
-	Gender            HumanGender  `json:"gender,omitempty" db:"gender"`
-	AvatarKey         string       `json:"avatarKey,omitempty" db:"avatar_key"`
+	FirstName         string       `json:"firstName,omitempty" db:"-"`
+	LastName          string       `json:"lastName,omitempty" db:"-"`
+	Nickname          string       `json:"nickname,omitempty" db:"-"`
+	DisplayName       string       `json:"displayName,omitempty" db:"-"`
+	PreferredLanguage language.Tag `json:"preferredLanguage,omitzero" db:"-"`
+	Gender            HumanGender  `json:"gender,omitempty" db:"-"`
+	AvatarKey         string       `json:"avatarKey,omitempty" db:"-"`
 
-	MultifactorInitializationSkippedAt time.Time `json:"multifactorInitializationSkippedAt,omitzero" db:"multifactor_initialization_skipped_at"`
+	MultifactorInitializationSkippedAt time.Time `json:"multifactorInitializationSkippedAt,omitzero" db:"-"`
 
-	Email    HumanEmail    `json:"email,omitzero" db:"email"`
-	Phone    *HumanPhone   `json:"phone,omitempty" db:"phone"`
-	Passkeys []*Passkey    `json:"passkeys,omitempty" db:"passkeys"`
-	Password HumanPassword `json:"password,omitzero" db:"password"`
-	TOTP     HumanTOTP     `json:"totp,omitzero" db:"totp"`
+	Email    HumanEmail    `json:"email,omitzero" db:"-"`
+	Phone    *HumanPhone   `json:"phone,omitempty" db:"-"`
+	Passkeys []*Passkey    `json:"passkeys,omitempty" db:"-"`
+	Password HumanPassword `json:"password,omitzero" db:"-"`
+	TOTP     *HumanTOTP    `json:"totp,omitempty" db:"-"`
 
-	IdentityProviderLinks []*IdentityProviderLink `json:"identityProviderLinks,omitempty" db:"identity_provider_links"`
+	IdentityProviderLinks []*IdentityProviderLink `json:"identityProviderLinks,omitempty" db:"-"`
+
+	Invite *HumanInvite `json:"invite,omitempty" db:"-"`
 
 	// Verifications are used if the Login does something on behalf of the user that requires verification
 	// e.g. starting passkey registration
-	Verifications []*Verification `db:"verifications" json:"verifications,omitempty"`
+	Verifications []*Verification `json:"verifications,omitempty" db:"-"`
 }
 
 type UserMetadata struct {
 	Metadata
-	UserID string `json:"userId,omitempty" db:"user_id"`
+	UserID string `json:"userId,omitempty" db:"-"`
 }
 
 //go:generate enumer -type UserState -transform lower -trimprefix UserState -sql
@@ -83,81 +87,84 @@ const (
 )
 
 type HumanPassword struct {
-	// Password is the hashed password
-	Password string `json:"-" db:"password"`
+	// Hash is the hashed password
+	Hash string `json:"hash" db:"-"`
 	// IsChangeRequired indicates if the user must change their password
-	IsChangeRequired bool `json:"isChangeRequired,omitempty" db:"is_change_required"`
-	// VerifiedAt is the time when the current password was verified
-	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
-	// Unverified is the verification data for setting a new password
+	IsChangeRequired bool `json:"isChangeRequired,omitempty" db:"-"`
+	// ChangedAt is the time when the current password was last updated
+	ChangedAt time.Time `json:"changedAt,omitzero" db:"-"`
+	// PendingVerification is the verification data for setting a new password
 	// If nil, no password change is in progress
-	Unverified *Verification `json:"-"`
+	PendingVerification *Verification `json:"pendingVerification,omitempty" db:"-"`
+	// LastSuccessfullyCheckedAt is the time when the password was last successfully checked
+	LastSuccessfullyCheckedAt *time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"-"`
 	// FailedAttempts is the number of consecutive failed password attempts
 	// It is reset to 0 on successful verification
-	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"failed_attempts"`
+	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"-"`
 }
 
 type HumanEmail struct {
-	Address    string    `json:"address" db:"email"`
-	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
-	OTP        OTP       `json:"-"`
-	// Unverified is the verification data for setting a new email
+	Address           string    `json:"address" db:"-"`
+	UnverifiedAddress string    `json:"unverifiedAddress,omitempty" db:"-"`
+	VerifiedAt        time.Time `json:"verifiedAt,omitzero" db:"-"`
+	OTP               OTP       `json:"otp" db:"-"`
+	// PendingVerification is the verification data for UnverifiedAddress
 	// If nil, no email change is in progress
-	Unverified *Verification `json:"-"`
+	PendingVerification *Verification `json:"pendingVerification,omitempty" db:"-"`
 }
 
 type HumanPhone struct {
-	Number     string    `json:"number" db:"phone"`
-	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
-	OTP        OTP       `json:"-"`
-	// Unverified is the verification data for setting a new phone number
+	Number           string    `json:"number" db:"-"`
+	UnverifiedNumber string    `json:"unverifiedNumber,omitempty" db:"-"`
+	VerifiedAt       time.Time `json:"verifiedAt,omitzero" db:"-"`
+	OTP              OTP       `json:"otp,omitzero" db:"-"`
+	// PendingVerification is the verification data for setting a new phone number
 	// If nil, no phone change is in progress
-	Unverified *Verification `json:"-"`
+	PendingVerification *Verification `json:"pendingVerification,omitempty" db:"-"`
 }
 
 type HumanTOTP struct {
-	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
+	VerifiedAt time.Time           `json:"verifiedAt,omitzero" db:"-"`
+	Secret     *crypto.CryptoValue `json:"secret,omitempty" db:"-"`
+	// LastSuccessfullyCheckedAt is the time when the TOTP was last successfully checked
+	LastSuccessfullyCheckedAt *time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"-"`
 
-	LastSuccessfullyCheckedAt time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"last_successfully_checked_at"`
-	// Check is the verified secret
-	Check *Check `json:"-"`
-	// Unverified is the unverified secret
-	Unverified *Verification `json:"-"`
+	// FailedAttempts is the number of consecutive failed password attempts
+	// It is reset to 0 on successful verification
+	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"-"`
 }
 
 type OTP struct {
-	EnabledAt                 time.Time `json:"enabledAt,omitzero" db:"enabled_at"`
-	LastSuccessfullyCheckedAt time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"last_successfully_checked_at"`
-	// Check is the currently active OTP check
-	// If nil, no OTP check is active
-	Check *Check `json:"-"`
+	EnabledAt time.Time `json:"enabledAt,omitzero" db:"-"`
+	// LastSuccessfullyCheckedAt is the time when the OTP was last successfully checked
+	LastSuccessfullyCheckedAt *time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"-"`
+	// FailedAttempts is the number of consecutive failed password attempts
+	// It is reset to 0 on successful verification
+	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"-"`
 }
 
 type PersonalAccessToken struct {
-	ID        string                  `json:"id" db:"id"`
-	CreatedAt time.Time               `json:"createdAt,omitzero" db:"created_at"`
-	ExpiresAt time.Time               `json:"expiresAt,omitzero" db:"expires_at"`
-	Type      PersonalAccessTokenType `json:"type" db:"type"`
-	PublicKey string                  `json:"-" db:"public_key"`
-	Scopes    []string                `json:"scopes" db:"scopes"`
+	ID        string    `json:"id" db:"-"`
+	CreatedAt time.Time `json:"createdAt,omitzero" db:"-"`
+	ExpiresAt time.Time `json:"expiresAt,omitzero" db:"-"`
+	Scopes    []string  `json:"scopes" db:"-"`
 }
 
-//go:generate enumer -type PersonalAccessTokenType -transform lower -trimprefix PersonalAccessTokenType
-
-type PersonalAccessTokenType uint8
+//go:generate enumer -type AccessTokenType -transform lower -trimprefix AccessTokenType
+type AccessTokenType uint8
 
 const (
-	PersonalAccessTokenTypeUnspecified PersonalAccessTokenType = iota
-	PersonalAccessTokenTypeBearer
-	PersonalAccessTokenTypeJWT
+	AccessTokenTypeUnspecified AccessTokenType = iota
+	AccessTokenTypeBearer
+	AccessTokenTypeJWT
 )
 
 type MachineKey struct {
-	ID        string         `json:"id" db:"id"`
-	PublicKey []byte         `json:"-" db:"public_key"`
-	CreatedAt time.Time      `json:"createdAt,omitzero" db:"created_at"`
-	ExpiresAt time.Time      `json:"expiresAt,omitzero" db:"expires_at"`
-	Type      MachineKeyType `json:"type" db:"type"`
+	ID        string         `json:"id" db:"-"`
+	PublicKey []byte         `json:"publicKey" db:"-"`
+	CreatedAt time.Time      `json:"createdAt,omitzero" db:"-"`
+	ExpiresAt time.Time      `json:"expiresAt,omitzero" db:"-"`
+	Type      MachineKeyType `json:"type" db:"-"`
 }
 
 //go:generate enumer -type MachineKeyType -transform lower -trimprefix MachineKeyType
@@ -165,35 +172,34 @@ type MachineKey struct {
 type MachineKeyType uint8
 
 const (
-	MachineKeyTypeUnspecified MachineKeyType = iota
+	MachineKeyTypeNone MachineKeyType = iota
 	MachineKeyTypeJSON
-	MachineKeyTypeNone
 )
 
 type Passkey struct {
-	ID                           string      `json:"id" db:"id"`
-	KeyID                        []byte      `json:"-" db:"key_id"`
-	Name                         string      `json:"name" db:"name"`
-	SignCount                    uint32      `json:"-" db:"sign_count"`
-	PublicKey                    []byte      `json:"-" db:"public_key"`
-	AttestationType              string      `json:"attestationType" db:"attestation_type"`
-	AuthenticatorAttestationGUID []byte      `json:"aaGuid" db:"authenticator_attestation_guid"`
-	Type                         PasskeyType `json:"type" db:"type"`
+	ID                           string      `json:"id" db:"-"`
+	KeyID                        []byte      `json:"keyId" db:"-"`
+	Name                         string      `json:"name" db:"-"`
+	SignCount                    uint32      `json:"signCount" db:"-"`
+	PublicKey                    []byte      `json:"publicKey" db:"-"`
+	AttestationType              string      `json:"attestationType" db:"-"`
+	AuthenticatorAttestationGUID []byte      `json:"aaGuid" db:"-"`
+	Type                         PasskeyType `json:"type" db:"-"`
 
-	CreatedAt  time.Time `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt  time.Time `json:"updatedAt,omitzero" db:"updated_at"`
-	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
+	CreatedAt  time.Time `json:"createdAt,omitzero" db:"-"`
+	UpdatedAt  time.Time `json:"updatedAt,omitzero" db:"-"`
+	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"-"`
 
 	// Challenge is used during device registration
-	Challenge []byte `json:"-" db:"challenge"`
+	Challenge []byte `json:"challenge" db:"-"`
 	// RelyingPartyID is used during device registration
-	RelyingPartyID string `json:"-" db:"relying_party_id"`
+	RelyingPartyID string `json:"rpId" db:"-"`
 
 	// Initialization is used during user registration
-	Initialization *Verification `json:"-" db:"initialization"`
+	Initialization *Verification `json:"-" db:"-"`
 }
 
-//go:generate enumer -type PasskeyType -transform lower -trimprefix PasskeyType
+//go:generate enumer -type PasskeyType -transform lower -trimprefix PasskeyType -json -sql
 
 type PasskeyType uint8
 
@@ -204,12 +210,12 @@ const (
 )
 
 type IdentityProviderLink struct {
-	ProviderID       string `json:"providerId" db:"provider_id"`
-	ProvidedUserID   string `json:"providedUserId" db:"provided_user_id"`
-	ProvidedUsername string `json:"providedUsername" db:"provided_username"`
+	ProviderID       string `json:"providerId" db:"-"`
+	ProvidedUserID   string `json:"providedUserId" db:"-"`
+	ProvidedUsername string `json:"providedUsername" db:"-"`
 
-	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`
+	CreatedAt time.Time `json:"createdAt,omitzero" db:"-"`
+	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"-"`
 }
 
 //go:generate enumer -type UserType -transform lower -trimprefix UserType
@@ -221,3 +227,12 @@ const (
 	UserTypeHuman
 	UserTypeMachine
 )
+
+type HumanInvite struct {
+	AcceptedAt time.Time `json:"acceptedAt,omitzero" db:"-"`
+	// PendingVerification is the verification data for UnverifiedAddress
+	// If nil, no email change is in progress
+	PendingVerification *Verification `json:"pendingVerification,omitempty" db:"-"`
+	// FailedAttempts is the number of consecutive failed invite attempts
+	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"-"`
+}
