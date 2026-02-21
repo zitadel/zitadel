@@ -29,7 +29,7 @@ services:
         condition: service_healthy
 
   zitadel-api:
-    image: ${ZITADEL_API_IMAGE}
+    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION}
     restart: unless-stopped
     command: start-from-init --masterkey "${ZITADEL_MASTERKEY}"
     environment:
@@ -138,7 +138,7 @@ services:
       - traefik.http.routers.zitadel-canonical-websecure.priority=100
 
   zitadel-login:
-    image: ${ZITADEL_LOGIN_IMAGE}
+    image: ghcr.io/zitadel/zitadel-login:${ZITADEL_VERSION}
     restart: unless-stopped
     environment:
       ZITADEL_API_URL: http://zitadel-api:8080

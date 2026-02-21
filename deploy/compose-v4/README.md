@@ -1,6 +1,8 @@
-# ZITADEL v4 Docker Compose Deployment Pack
+# ZITADEL Docker Compose Deployment
 
-A low-friction but production-aware single-node deployment for ZITADEL v4.
+A production-aware single-node deployment for ZITADEL.
+
+For full documentation including upgrade instructions, reverse proxy configuration and troubleshooting, see the **[ZITADEL Docker Compose guide](https://zitadel.com/docs/self-hosting/deploy/compose)**.
 
 ## 1. Architecture Summary
 
@@ -169,41 +171,20 @@ docker compose --env-file .env \
 
 ## 9. Updating ZITADEL
 
-To update ZITADEL to a new version:
+To update ZITADEL to a new version, edit `.env` and bump `ZITADEL_VERSION`:
 
-1. Edit `.env` and bump the image versions:
-   ```
-   ZITADEL_API_IMAGE=ghcr.io/zitadel/zitadel:v4.11.0
-   ZITADEL_LOGIN_IMAGE=ghcr.io/zitadel/zitadel-login:v4.11.0
-   ```
-2. Pull the new images:
-   ```bash
-   docker compose --env-file .env -f docker-compose.yml pull
-   ```
-3. Recreate the stack:
-   ```bash
-   docker compose --env-file .env -f docker-compose.yml up -d --wait
-   ```
-
-**How `start-from-init` handles upgrades**: The default quickstart command is idempotent.
-The init phase skips resources (database, user, grants) that already exist.
-The setup phase runs only the migration steps for the new version and leaves the rest untouched.
-Log messages such as `role "zitadel" already exists` are expected and harmless.
-
-**Production-like upgrades**: When using `docker-compose.prodlike.yml`, the `zitadel-setup` one-shot container
-runs the new version's migrations before `zitadel-api` starts. This gives you a controlled, serialized upgrade:
-
-```bash
-docker compose --env-file .env \
-  -f docker-compose.yml \
-  -f docker-compose.prodlike.yml \
-  up -d --wait
+```
+ZITADEL_VERSION=v4.11.0
 ```
 
-**FIRSTINSTANCE / DEFAULTINSTANCE settings**: Variables prefixed `ZITADEL_FIRSTINSTANCE_` and
-`ZITADEL_DEFAULTINSTANCE_` are applied **once** during the very first setup of a new instance.
-Changing them in `.env` after the first start has no effect on the running instance.
-Use the Admin Console or Admin API to change instance settings on an existing installation.
+Then pull and recreate:
+
+```bash
+docker compose --env-file .env -f docker-compose.yml pull
+docker compose --env-file .env -f docker-compose.yml up -d --wait
+```
+
+For production-like deployments using `docker-compose.prodlike.yml`, the `zitadel-setup` one-shot container runs migrations before `zitadel-api` starts, giving you a controlled upgrade. See the [ZITADEL Docker Compose guide](https://zitadel.com/docs/self-hosting/deploy/compose) for full upgrade guidance.
 
 ## 10. Scaling and Externalization
 
@@ -229,17 +210,7 @@ Use a centralized cache backend (Redis/Postgres connector strategy) for multi-re
 - Set `ZITADEL_CACHES_CONNECTORS_REDIS_ADDR` to external Redis
 - Keep connector toggles explicit in `.env`
 
-## 11. Kubernetes Migration Mapping
-
-Compose concepts map directly to Kubernetes:
-
-- `zitadel-init` / `zitadel-setup` -> Jobs (or Helm hooks)
-- `zitadel-api` / `zitadel-login` -> separate Deployments
-- Traefik container -> ingress controller + ingress routes
-- `.env` settings -> ConfigMaps/Secrets
-- external Postgres/Redis -> managed services
-
-## 12. Tradeoffs and Rejected Alternatives
+## 11. Tradeoffs and Rejected Alternatives
 
 Chosen:
 
@@ -252,7 +223,7 @@ Rejected:
 - `/grpc` path-prefix routing (tool/client incompatibility risk)
 - collapsing API and Login into one container (not aligned with v4 architecture)
 
-## 13. Release Flow Placeholder
+## 12. Release Flow Placeholder
 
 Version bump automation is intentionally deferred until the Nx release PR merges.
 
@@ -261,7 +232,7 @@ Current state:
 - image versions are manually pinned in `.env.example`
 - `make release-bump` is a placeholder target for future Nx integration
 
-## 14. Validation Checklist
+## 13. Validation Checklist
 
 Render final Compose config for each variant:
 
