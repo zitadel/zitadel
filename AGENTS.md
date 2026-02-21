@@ -22,12 +22,15 @@ ZITADEL is an open-source Identity Management System (IAM) written in Go and Ang
 ## Technology Stack & Conventions
 - **Orchestration**: Nx is used for build and task orchestration.
 - **Package Manager**: pnpm.
+- **Development Environment**: `.devcontainer/` available for consistent development setup with Docker.
 - **Backend**:
   - **Go Version Source of Truth**: Inspect `go.mod` before Go work (`go` and optional `toolchain` directives).
   - **Communication**: For V2 APIs, connectRPC is the primary transport. gRPC and HTTP/JSON endpoints are also supported.
-  - **Pattern**: The backend is transitioning to a relational design. Events are still persisted in a separate table for history/audit, but events are not the system of record.
+  - **Architecture Pattern**: The backend is transitioning to a relational design where relational data is the system of record. Events are still persisted in a separate eventstore table for history/audit trails, but they are no longer the single source of truth. This transition is ongoing.
+    - **V2 Pattern** (`internal/`): Current architecture with eventstore integration and command/query patterns.
+    - **V3 Pattern** (`backend/v3/`): New hexagonal architecture with improved separation of concerns. See `backend/v3/doc.go`.
 - **Frontend**:
-  - **Console**: Angular + RxJS.
+  - **Console**: Angular + RxJS + Angular Material.
   - **Login/Docs**: Next.js + React.
 
 ## ZITADEL Domain & Multi-Tenancy Logic
@@ -77,12 +80,14 @@ If a translation is requested for a language not listed above, follow these prio
 4. **Strict Ban:** NEVER use words that mean "an illustration", "a case", "a sample", or "an example."
 
 ## Command Rules
-Run commands from the repository root.
+Run commands from the repository root using Nx targets.
 
+- **Always use `pnpm nx run <project>:<target>`** — never `cd` into a package and run `pnpm <script>` directly. Running package scripts directly bypasses Nx's dependency graph: generated outputs (e.g. protobuf stubs, built packages) that a target depends on will be missing and cause import resolution errors.
 - Use verified Nx targets only.
 - If target availability is unclear, run `pnpm nx show project <project>`.
 - Do not assume all projects have `test`, `lint`, `build`, or `generate` targets.
 - Known exception: `@zitadel/console` has no configured `test` target.
+- **Debugging**: If a target produces an unexpected result and you suspect a stale cache, append `--skip-nx-cache` to force a fresh run: `pnpm nx run <project>:<target> --skip-nx-cache`.
 
 ## Verified Common Targets
 - `@zitadel/api`: `prod`, `build`, `generate`, `generate-install`, `lint`, `test`, `test-unit`, `test-integration`

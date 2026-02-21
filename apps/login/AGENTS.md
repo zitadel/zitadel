@@ -22,3 +22,16 @@ The **Login App** (`apps/login`) provides the user interface for authentication 
 - **Test (all)**: `pnpm nx run @zitadel/login:test`
 - **Test (unit)**: `pnpm nx run @zitadel/login:test-unit`
 - **Test (integration)**: `pnpm nx run @zitadel/login:test-integration`
+
+## Important: Always Use Nx, Never Run Package Scripts Directly
+
+The unit tests depend on `@zitadel/proto` and `@zitadel/client`, which are generated/built packages whose outputs (`packages/zitadel-proto/{cjs,es,types}`, `packages/zitadel-client/dist`) are **not committed to git**.
+
+`test-unit` declares `dependsOn: ["^build"]` in `project.json`, so Nx automatically runs `@zitadel/proto:generate` and `@zitadel/client:build` before the tests when invoked correctly.
+
+**Always run tests from the repository root via Nx:**
+```bash
+pnpm nx run @zitadel/login:test-unit
+```
+
+**Never** invoke the test runner directly inside the package directory (e.g. `cd apps/login && pnpm test-unit`), as this bypasses Nx's dependency graph and the generated packages will be missing.
