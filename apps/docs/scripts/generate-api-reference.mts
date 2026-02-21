@@ -244,6 +244,7 @@ async function fixAllGeneratedLinks() {
         
         // Final sanitization for YAML double-quoted string
         description = description
+            .replace(/\\/g, '\\\\') // Escape backslashes first to avoid double-processing
             .replace(/\n/g, ' ')
             .replace(/"/g, "'") // Use single quotes internally
             .replace(/\s+/g, ' ')
