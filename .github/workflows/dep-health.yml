@@ -27,7 +27,9 @@ jobs:
         with:
           node-version: "22"
           cache: "pnpm"
-      - name: Install dependencies (frozen lockfile)
-        run: pnpm install --frozen-lockfile
+      - name: Update Go dependencies to latest
+        run: go get -u ./... && go mod tidy
+      - name: Update npm dependencies to latest
+        run: pnpm update --latest --recursive
       - name: Build all projects
         run: pnpm nx run-many --target build --all --nxBail
