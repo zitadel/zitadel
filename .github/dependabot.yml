@@ -17,8 +17,7 @@ updates:
         patterns: ["*"]
     labels: ["gomod", "dependencies"]
     commit-message:
-      prefix: chore
-      include: scope
+      prefix: "chore(deps)"
 
   # ── npm: console, e2e, login, docs (consolidated) ─────────────────────────
   - package-ecosystem: npm
@@ -44,8 +43,7 @@ updates:
         versions: ["9.x"]
     labels: ["npm", "dependencies"]
     commit-message:
-      prefix: chore
-      include: scope
+      prefix: "chore(deps)"
 
   # ── Docker: build ─────────────────────────────────────────────────────────
   - package-ecosystem: docker
@@ -64,8 +62,7 @@ updates:
         patterns: ["*"]
     labels: ["dependencies"]
     commit-message:
-      prefix: chore
-      include: scope
+      prefix: "chore(deps)"
 
   # ── Docker: devcontainer ──────────────────────────────────────────────────
   - package-ecosystem: docker
@@ -84,8 +81,7 @@ updates:
         patterns: ["*"]
     labels: ["dependencies"]
     commit-message:
-      prefix: chore
-      include: scope
+      prefix: "chore(deps)"
 
   # ── GitHub Actions ────────────────────────────────────────────────────────
   - package-ecosystem: github-actions
@@ -103,5 +99,4 @@ updates:
         patterns: ["*"]
     labels: ["dependencies"]
     commit-message:
-      prefix: chore
-      include: scope
+      prefix: "chore(deps)"
