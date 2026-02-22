@@ -18,7 +18,7 @@ services:
       # Create an IAM_OWNER machine user and write its PAT to the bootstrap volume.
       # The PAT is consumed by test-login-acceptance to call the management API.
       ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: zitadel-admin-sa
-      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: Zitadel Admin SA
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: ZITADEL Admin SA
       ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: "2519-04-01T08:45:00.000000Z"
       ZITADEL_FIRSTINSTANCE_PATPATH: /zitadel/bootstrap/admin.pat
 
