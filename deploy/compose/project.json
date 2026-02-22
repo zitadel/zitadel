@@ -50,6 +50,12 @@
             ]
         },
         "test": {
+            "description": "Lightweight test target safe for nx affected. Validates compose config syntax only (no Docker daemon needed).",
+            "dependsOn": [
+                "test-config"
+            ]
+        },
+        "test-full": {
             "description": "Builds local images, starts the compose stack, runs curl smoke tests through Traefik (OIDC discovery, login health, API health, root redirect), runs Playwright login smoke test, then tears down.",
             "dependsOn": [
                 "test-config",
