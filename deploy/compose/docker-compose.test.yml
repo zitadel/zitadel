@@ -1,0 +1,22 @@
+# Test overlay: replaces published images with locally-built ones.
+# Used by the NX smoke-test target (@zitadel/compose:test).
+#
+# Usage:
+#   docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml \
+#     -p zitadel-compose-test up --force-recreate --renew-anon-volumes --wait
+
+services:
+  zitadel-api:
+    image: zitadel/zitadel:local
+    # Expose directly so smoke tests can reach the API without going through Traefik.
+    # Traefik's Docker-discovery provider may not work in all local dev environments
+    # (e.g. Docker Desktop). Tests use port 8081 to avoid conflicting with the
+    # proxy's published port 8080.
+    ports:
+      - "8081:8080"
+
+  zitadel-login:
+    image: zitadel/zitadel-login:local
+    # Expose directly for the same reason as zitadel-api above.
+    ports:
+      - "3001:3000"

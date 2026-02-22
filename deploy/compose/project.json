@@ -1,0 +1,47 @@
+{
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "name": "@zitadel/compose",
+    "targets": {
+        "test-run": {
+            "description": "Starts the full compose stack using locally-built images. Waits until all containers are healthy before exiting.",
+            "dependsOn": [
+                "@zitadel/api:pack",
+                "@zitadel/login:pack"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "command": "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes --remove-orphans && docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test up --force-recreate --wait"
+            }
+        },
+        "test": {
+            "description": "Builds local images, starts the compose stack, runs a smoke test (health + OIDC discovery + login health), then tears down. Validates the deployment pack works end-to-end with locally-built containers.",
+            "dependsOn": [
+                "test-run"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "parallel": false,
+                "commands": [
+                    "curl -sf http://localhost:8081/.well-known/openid-configuration -o /dev/null",
+                    "curl -sf http://localhost:3001/ui/v2/login/healthy -o /dev/null",
+                    "nx run @zitadel/compose:stop"
+                ]
+            },
+            "inputs": [
+                "{projectRoot}/docker-compose.yml",
+                "{projectRoot}/docker-compose.test.yml",
+                "{projectRoot}/.env.test"
+            ]
+        },
+        "stop": {
+            "description": "Tears down the compose smoke-test stack and removes all volumes.",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "command": "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes"
+            }
+        }
+    }
+}

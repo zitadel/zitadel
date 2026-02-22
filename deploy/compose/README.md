@@ -1,6 +1,8 @@
-# ZITADEL v4 Docker Compose Deployment Pack
+# ZITADEL Docker Compose Deployment
 
-A low-friction but production-aware single-node deployment for ZITADEL v4.
+A production-aware single-node deployment for ZITADEL.
+
+For full documentation including upgrade instructions, reverse proxy configuration and troubleshooting, see the **[ZITADEL Docker Compose guide](https://zitadel.com/docs/self-hosting/deploy/compose)**.
 
 ## 1. Architecture Summary
 
@@ -28,7 +30,7 @@ Traefik is used because it provides:
 ## 3. Quick Start (Mode 1: Local Dev, No TLS)
 
 ```bash
-cd /Users/ffo/git/zitadel/zitadel/deploy/compose-v4
+cd deploy/compose
 cp .env.example .env
 
 docker compose --env-file .env -f docker-compose.yml up -d --wait
@@ -167,7 +169,24 @@ docker compose --env-file .env \
   up -d --wait
 ```
 
-## 9. Scaling and Externalization
+## 9. Updating ZITADEL
+
+To update ZITADEL to a new version, edit `.env` and bump `ZITADEL_VERSION`:
+
+```
+ZITADEL_VERSION=v4.11.0
+```
+
+Then pull and recreate:
+
+```bash
+docker compose --env-file .env -f docker-compose.yml pull
+docker compose --env-file .env -f docker-compose.yml up -d --wait
+```
+
+For production-like deployments using `docker-compose.prodlike.yml`, the `zitadel-setup` one-shot container runs migrations before `zitadel-api` starts, giving you a controlled upgrade. See the [ZITADEL Docker Compose guide](https://zitadel.com/docs/self-hosting/deploy/compose) for full upgrade guidance.
+
+## 10. Scaling and Externalization
 
 ### Scale API replicas
 
@@ -190,16 +209,6 @@ Use a centralized cache backend (Redis/Postgres connector strategy) for multi-re
 - Keep `redis` profile disabled
 - Set `ZITADEL_CACHES_CONNECTORS_REDIS_ADDR` to external Redis
 - Keep connector toggles explicit in `.env`
-
-## 10. Kubernetes Migration Mapping
-
-Compose concepts map directly to Kubernetes:
-
-- `zitadel-init` / `zitadel-setup` -> Jobs (or Helm hooks)
-- `zitadel-api` / `zitadel-login` -> separate Deployments
-- Traefik container -> ingress controller + ingress routes
-- `.env` settings -> ConfigMaps/Secrets
-- external Postgres/Redis -> managed services
 
 ## 11. Tradeoffs and Rejected Alternatives
 

@@ -1,5 +1,5 @@
 ---
-title: Set up Zitadel with Docker Compose
+title: Set up ZITADEL with Docker Compose
 sidebar_label: Docker Compose
 ---
 
@@ -11,9 +11,9 @@ import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
 
-This guide is the entrypoint for running the Zitadel platform locally for the first time.
-It is for demonstration and development purposes only and does not set up a production-ready and security hardened instance of Zitadel.
-Once Zitadel up is and running, learn more about a production setup in the [What's Next section](#next-steps).
+This guide shows how to run the ZITADEL platform locally for the first time using Docker Compose.
+It is for demonstration and development purposes only and does not set up a production-ready, security-hardened instance of ZITADEL.
+Once ZITADEL is up and running, learn more about a production setup in the [What's Next section](#whats-next).
 
 ## Prerequisites
 
@@ -24,66 +24,112 @@ The setup is likely to work with other software versions too, but it is tested a
 - Docker Compose v2.38.2
 - curl 8.5.0
 
-## Docker compose
+## Quick start
 
-The following commands set up services for a PostgreSQL database, a Zitadel API and a Zitadel login:
+The following three commands download, start, and verify a working ZITADEL installation with a PostgreSQL database and a Login UI.
+By default, the `latest` ZITADEL release is used. To pin a specific version, create a `.env` file containing `ZITADEL_VERSION=v4.11.0` in the same directory before running step 2.
 
-1. Download the `docker-compose.yaml` file from the Zitadel repository:
+1. Download the `docker-compose.yaml` file:
    ```shell
    curl -L https://raw.githubusercontent.com/zitadel/zitadel/main/apps/docs/content/self-hosting/deploy/docker-compose.yaml -o docker-compose.yaml
    ```
-2. Make sure the containers use the latest image versions.
-    ```shell
-    docker compose pull
-    ```
-3. Run the PostgreSQL database, the Zitadel API, and the Zitadel login.
+2. Start all services and wait until they are healthy:
     ```shell
     docker compose up --detach --wait
     ```
-4. Verify the containers are running and healthy.
+3. Verify all containers are running:
     ```shell
     docker compose ps
     ```
 
 <DefaultUser components={props.components} />
 
+## Updating ZITADEL
+
+The `docker-compose.yaml` uses `${ZITADEL_VERSION:-latest}` for image tags — if no `.env` file is present, it defaults to `latest`.
+
+**Upgrade using `latest` (default):** simply restart with updated images:
+```shell
+docker compose up --detach --wait
+```
+
+**Upgrade to a specific version:** create or update a `.env` file in the same directory:
+```shell
+echo "ZITADEL_VERSION=v4.11.0" > .env
+docker compose up --detach --wait
+```
+
+:::note
+`ZITADEL_FIRSTINSTANCE_*` and `ZITADEL_DEFAULTINSTANCE_*` environment variables are only applied during the **initial setup** of a new ZITADEL instance.
+Changing them after the first start has no effect.
+To change instance settings on an existing installation, use the [Admin Console](/self-hosting/manage/login-client) or the Admin API.
+:::
+
 ## What's next
 
-Before proceeding, review the downloaded `docker-compose.yaml` file:
-The comments give context to the used variables and show examples for commonly used configuration variants.
+Before proceeding, review the downloaded `docker-compose.yaml` file.
+The comments give context to the used variables and show examples for commonly used settings.
 
 <details>
     <summary>docker-compose.yaml</summary>
     <CodeBlock  language="yaml">{DockerComposeSource}</CodeBlock>
 </details>
 
-Here are some natural steps forward to go from the current setup to production:
+Here are natural steps to go from this quickstart to a production setup:
 
-- **Use a different master key**: Set up an instance from scratch and use a different master key. For example, generate one by running `tr -dc A-Za-z0-9 </dev/urandom | head -c 32`
-- **Use files for secrets instead of environment variables, and don't commit them to Git**: Learn how to [configure the platform](/self-hosting/manage/configure)
-- **Run the containers as non-root users**: Remove the `user: "0"` lines from the `docker-compose.yaml` file.
-- **Configure a different external domain or IP**: Beware that the login only works with HTTPS on non-localhost domains. [Run and configure a reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)
-- **Serve the API and the UI together on the same port**: [Run and configure a reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)
-- **Encrypt Traffic**: [Run and configure a reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)
+### Secrets and settings
 
-For more detailed recommendations, read the [Zitadel Production Setup Guide](/self-hosting/manage/production).
+- **Use a different master key for a new installation**: generate a secure one with `tr -dc A-Za-z0-9 </dev/urandom | head -c 32`
+- **Use files for secrets instead of environment variables**: prevents secrets appearing in `docker inspect` output and shell history. Learn how to [configure ZITADEL](/self-hosting/manage/configure/configure)
+- **Run the containers as non-root users**: remove the `user: "0"` lines from the `docker-compose.yaml` file
+
+### Networking and TLS
+
+The quickstart runs on `localhost` with TLS disabled (`ZITADEL_EXTERNALSECURE: false`).
+ZITADEL supports three TLS modes — see [TLS Modes](/self-hosting/manage/tls_modes) for details:
+
+| Mode | How it works | When to use |
+|------|-------------|-------------|
+| `disabled` | Plain HTTP end-to-end | Local development only |
+| `external` | Reverse proxy terminates TLS, forwards h2c to ZITADEL | Most production setups |
+| `enabled` | ZITADEL itself terminates TLS | End-to-end encryption without a proxy |
+
+To run on a real domain or IP address, you must use HTTPS (`external` or `enabled` mode) and configure a reverse proxy.
+See [Reverse Proxy Configuration](/self-hosting/manage/reverseproxy/reverse_proxy) for Traefik, NGINX, Caddy, and other options.
+
+### Production-ready Compose pack
+
+The quickstart above uses a minimal single-file compose setup for first-time use.
+For a production-aware deployment on a single node, use the [Docker Compose deployment pack](https://github.com/zitadel/zitadel/tree/main/deploy/compose) from the repository.
+It adds:
+
+- **Traefik** as a reverse proxy with path-based routing, HTTP/2, and optional TLS (Let's Encrypt or self-signed)
+- **Named volumes** instead of bind mounts
+- Optional **Redis** caching (`--profile cache`)
+- Optional **OpenTelemetry + Jaeger** observability (`--profile observability`)
+
+### Compatibility
+
+See [ZITADEL Requirements](/self-hosting/manage/requirements) for supported PostgreSQL, Redis, and Docker Compose versions.
+
+For production recommendations, read the [ZITADEL Production Setup Guide](/self-hosting/manage/production).
 
 <details>
-    <summary>Read this if the environment uses the login v1</summary>
+    <summary>Read this if the environment uses the Login V1</summary>
     <p>
-        The login v2 is the next generation of the Zitadel login.
+        The Login V2 is the next generation of the ZITADEL login UI.
         Its code and deployment are easily customizable.
-        Unlike the login v1, it runs in its own process.
-        The login v2 is enabled by default in new installations.
-        But if an existing `docker-compose.yaml` file is updated by following this guide,
-        an additional `zitadel-login` service is now running which is actually not doing anything, yet.
-        The following steps give guidance on how to enable the login v2 in an environment.
+        Unlike the Login V1, it runs in its own process.
+        The Login V2 is enabled by default in ZITADEL v4 and in new installations.
+        But if an existing <code>docker-compose.yaml</code> file is updated by following this guide,
+        an additional <code>zitadel-login</code> service is now running which is not yet doing anything.
+        The following steps give guidance on how to enable the Login V2 for an existing environment.
     </p>
     <ol>
-        <li>Read the login v2 related comments in the docker-compose.yaml.</li>
-        <li><a href="../../self-hosting/manage/login-client#create-login-client">Manually create a login client personal access token (PAT) for the now running v2 login</a>.</li>
-        <li>Move the PAT to `./login-client.pat`</li>
-        <li>Restart the login process: `docker compose restart login`</li>
+        <li>Read the Login V2 related comments in the docker-compose.yaml.</li>
+        <li><a href="../../self-hosting/manage/login-client#create-login-client">Manually create a login client personal access token (PAT) for the now running Login V2</a>.</li>
+        <li>Move the PAT to <code>./login-client.pat</code></li>
+        <li>Restart the login process: <code>docker compose restart login</code></li>
         <li><a href="../../self-hosting/manage/login-client#require-login-v2">Enable the Login UI for all users</a></li>
     </ol>
 </details>

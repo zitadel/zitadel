@@ -1,0 +1,30 @@
+# Test overlay: replaces published images with locally-built ones.
+# Used by the NX smoke-test target (nx run @zitadel/docs:test-compose).
+#
+# Usage:
+#   docker compose \
+#     --project-directory /tmp/zitadel-docs-compose-test \
+#     -f apps/docs/content/self-hosting/deploy/docker-compose.yaml \
+#     -f apps/docs/content/self-hosting/deploy/docker-compose.test.yml \
+#     -p zitadel-docs-test \
+#     up --force-recreate --wait
+
+services:
+  zitadel:
+    image: zitadel/zitadel:local
+
+  login:
+    image: zitadel/zitadel-login:local
+    # Add a healthcheck so `docker compose up --wait` can confirm the login UI is ready.
+    # The login container shares the zitadel container's network namespace
+    # (network_mode: service:zitadel), so localhost:3000 resolves to the login process.
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - /app/healthcheck.js
+        - http://localhost:3000/ui/v2/login/healthy
+      interval: 5s
+      timeout: 15s
+      retries: 24
+      start_period: 20s

@@ -40,6 +40,22 @@
         "{projectRoot}/.next/standalone"
       ]
     },
+    "pack": {
+      "description": "Builds a local Docker image for the ZITADEL Login UI (zitadel/zitadel-login:local). Requires Docker daemon.",
+      "dependsOn": [
+        "build"
+      ],
+      "command": "docker build -f apps/login/Dockerfile -t zitadel/zitadel-login:local apps/login",
+      "cache": false,
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "{projectRoot}/Dockerfile",
+        "!{projectRoot}/.env.*",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*"
+      ]
+    },
     "build-vercel": {
       "description": "Builds the Next.js Login application for Vercel deployment",
       "cache": true,

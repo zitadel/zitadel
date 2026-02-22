@@ -1,4 +1,4 @@
-name: zitadel-v4
+name: zitadel
 
 services:
   proxy:
@@ -29,8 +29,9 @@ services:
         condition: service_healthy
 
   zitadel-api:
-    image: ${ZITADEL_API_IMAGE}
+    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION}
     restart: unless-stopped
+    user: "0"
     command: start-from-init --masterkey "${ZITADEL_MASTERKEY}"
     environment:
       ZITADEL_PORT: 8080
@@ -138,8 +139,9 @@ services:
       - traefik.http.routers.zitadel-canonical-websecure.priority=100
 
   zitadel-login:
-    image: ${ZITADEL_LOGIN_IMAGE}
+    image: ghcr.io/zitadel/zitadel-login:${ZITADEL_VERSION}
     restart: unless-stopped
+    user: "0"
     environment:
       ZITADEL_API_URL: http://zitadel-api:8080
       NEXT_PUBLIC_BASE_PATH: /ui/v2/login

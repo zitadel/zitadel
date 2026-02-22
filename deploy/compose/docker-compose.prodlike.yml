@@ -1,6 +1,6 @@
 services:
   zitadel-init:
-    image: ${ZITADEL_API_IMAGE}
+    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION}
     restart: "no"
     command: init
     environment:
@@ -20,7 +20,7 @@ services:
       - zitadel
 
   zitadel-setup:
-    image: ${ZITADEL_API_IMAGE}
+    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION}
     restart: "no"
     command: setup --masterkey "${ZITADEL_MASTERKEY}"
     environment:
