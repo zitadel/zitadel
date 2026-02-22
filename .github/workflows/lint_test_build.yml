@@ -19,6 +19,8 @@ jobs:
   dte-agents:
     name: DTE Agent ${{ matrix.agent }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     strategy:
       matrix:
