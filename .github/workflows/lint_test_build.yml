@@ -121,8 +121,12 @@ jobs:
         uses: nrwl/nx-set-shas@v4
       - name: Start DTE CI Run
         run: pnpm exec nx-cloud start-ci-run --distribute-on="manual" --stop-agents-after="build"
-      - name: Lint, Test and Build
-        run: pnpm nx affected --nxBail --targets lint test build --exclude @zitadel/docs
+      - name: Lint
+        run: pnpm nx affected --nxBail --target lint --exclude @zitadel/docs
+      - name: Test
+        run: pnpm nx affected --nxBail --target test --exclude @zitadel/docs
+      - name: Build
+        run: pnpm nx affected --nxBail --target build --exclude @zitadel/docs
       - name: Check for uncommitted changes (Codegen mismatch)
         run: git diff --exit-code
       - name: Suggest Pipeline Fix By Nx Cloud AI
