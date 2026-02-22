@@ -107,3 +107,6 @@ AGENTS.md
 .gemini/*
 
 docs_old
+# Playwright (deploy/compose smoke tests)
+deploy/compose/playwright-report/
+deploy/compose/test-results/

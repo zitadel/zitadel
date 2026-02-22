@@ -35,8 +35,22 @@
                 "command": "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes --remove-orphans && docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test up --force-recreate --wait"
             }
         },
+        "test-e2e": {
+            "description": "Runs the Playwright login smoke test against the running compose stack via localhost:8080 (through Traefik). Run 'pnpm exec playwright install chromium' once before using this target.",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "command": "pnpm exec playwright test --config playwright.config.ts"
+            },
+            "inputs": [
+                "{projectRoot}/playwright.config.ts",
+                "{projectRoot}/tests/**",
+                "{projectRoot}/.env.test",
+                "{projectRoot}/package.json"
+            ]
+        },
         "test": {
-            "description": "Builds local images, starts the compose stack, runs smoke tests through Traefik (OIDC discovery, login health, API health, root redirect), then tears down.",
+            "description": "Builds local images, starts the compose stack, runs curl smoke tests through Traefik (OIDC discovery, login health, API health, root redirect), runs Playwright login smoke test, then tears down.",
             "dependsOn": [
                 "test-config",
                 "test-run"
@@ -50,13 +64,16 @@
                     "echo '--- Login health (Traefik -> Login) ---' && curl -sf http://localhost:8080/ui/v2/login/healthy -o /dev/null",
                     "echo '--- API health via /api alias (Traefik -> API) ---' && curl -sf http://localhost:8080/api/admin/v1/healthz -o /dev/null",
                     "echo '--- Root redirect (Traefik -> Login) ---' && curl -sf -o /dev/null -w '%{redirect_url}' http://localhost:8080/ | grep -q '/ui/v2/login'",
-                    "nx run @zitadel/compose:stop"
+                    "pnpm exec playwright install chromium",
+                    "r=0; nx run @zitadel/compose:test-e2e || r=$?; nx run @zitadel/compose:stop; exit $r",
                 ]
             },
             "inputs": [
                 "{projectRoot}/docker-compose.yml",
                 "{projectRoot}/docker-compose.test.yml",
-                "{projectRoot}/.env.test"
+                "{projectRoot}/.env.test",
+                "{projectRoot}/playwright.config.ts",
+                "{projectRoot}/tests/**"
             ]
         },
         "stop": {
@@ -65,6 +82,18 @@
             "options": {
                 "cwd": "{projectRoot}",
                 "command": "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes"
+            }
+        },
+        "test-login-acceptance": {
+            "description": "Runs the @zitadel/login acceptance (Playwright) suite against the running compose stack. Requires the stack to be up (run test-run first). Reads the admin machine-user PAT from the bootstrap volume, runs setup.sh to seed the test service account, then delegates to @zitadel/login:test-acceptance.",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{workspaceRoot}",
+                "parallel": false,
+                "commands": [
+                    "echo '--- Extracting admin PAT from bootstrap volume ---' && ADMIN_PAT=$(docker run --rm -v zitadel-compose-test_zitadel-bootstrap:/b alpine cat /b/admin.pat) && echo 'PAT extracted.' && PAT=$ADMIN_PAT LOGIN_BASE_URL=http://localhost:8080 ZITADEL_API_URL=http://localhost:8080 WRITE_ENVIRONMENT_FILE=$(pwd)/apps/login/.env.test.local apps/login/acceptance/setup/setup.sh",
+                    "nx run @zitadel/login:test-acceptance"
+                ]
             }
         }
     }

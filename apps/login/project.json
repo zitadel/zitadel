@@ -168,6 +168,20 @@
         "description": "Stops the gRPC mock container used for integration tests.",
         "command": "nx run @zitadel/login-api-mock:down"
     },
+    "test-acceptance": {
+      "description": "Runs the Playwright acceptance test suite in apps/login/acceptance/ against a running ZITADEL stack. Requires LOGIN_BASE_URL, ZITADEL_API_URL, and ZITADEL_ADMIN_TOKEN to be set (or apps/login/.env.test.local to exist). Run the setup script at acceptance/setup/setup.sh first to seed config.",
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm exec playwright test --config acceptance/playwright.config.ts"
+      },
+      "inputs": [
+        "{projectRoot}/acceptance/**",
+        "!{projectRoot}/acceptance/playwright-report/**",
+        "!{projectRoot}/acceptance/test-results/**",
+        "{workspaceRoot}/pnpm-lock.yaml"
+      ]
+    },
     "pack-archive": {
       "description": "Packages the standalone Login application build into an archive",
       "dependsOn": [

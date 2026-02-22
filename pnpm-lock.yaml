@@ -637,6 +637,15 @@ importers:
         specifier: 5.9.2
         version: 5.9.2
 
+  deploy/compose:
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.58.0
+        version: 1.58.0
+      dotenv:
+        specifier: ^16.0.0
+        version: 16.6.1
+
   packages/zitadel-client:
     dependencies:
       '@bufbuild/protobuf':

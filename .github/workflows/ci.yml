@@ -32,6 +32,69 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       NX_CLOUD_ACCESS_TOKEN_READONLY: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
+  compose_smoke_test:
+    name: Compose Smoke Test (Playwright)
+    runs-on: depot-ubuntu-22.04-16
+    if: ${{ github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+        with:
+          version: v28.3.2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: v0.28.0
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v1
+        with:
+          version: v2.38.2
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build images and start compose stack
+        run: pnpm nx run @zitadel/compose:test-run
+        env:
+          NX_DAEMON: "false"
+          NX_DISABLE_DB: "true"
+      - name: Install Playwright Chromium browser and system dependencies
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: deploy/compose
+      - name: Run Playwright login smoke test
+        run: pnpm nx run @zitadel/compose:test-e2e
+        env:
+          NX_DAEMON: "false"
+          NX_DISABLE_DB: "true"
+      - name: Tear down compose stack
+        if: always()
+        run: pnpm nx run @zitadel/compose:stop
+        env:
+          NX_DAEMON: "false"
+          NX_DISABLE_DB: "true"
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compose-playwright-report
+          path: deploy/compose/playwright-report/
+
   pack:
     uses: ./.github/workflows/pack.yml
     permissions:
