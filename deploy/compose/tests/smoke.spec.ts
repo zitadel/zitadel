@@ -11,7 +11,11 @@
  * For feature-level login tests (MFA, OIDC flows, IdP, etc.) see:
  *   apps/login/acceptance/  – run via @zitadel/compose:test-login-acceptance
  *
- * Credentials are read from .env.test so nothing is hardcoded here.
+ * Credentials are read from SMOKE_TEST_ADMIN_USERNAME / SMOKE_TEST_ADMIN_PASSWORD
+ * (set in .env.test). The fallback values below match the defaults in .env.test and
+ * docker-compose.test.yml — they are intentional so the test works out-of-the-box
+ * without any extra configuration. If you change the seeded admin password, update
+ * .env.test accordingly.
  * The initial admin password is seeded via ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD
  * in docker-compose.test.yml.
  */
