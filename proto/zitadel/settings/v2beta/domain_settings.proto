@@ -15,7 +15,7 @@ message DomainSettings {
   ];
   bool require_org_domain_verification = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines if organization domains should be verified upon creation, otherwise will be created already verified"
+      description: "defines if Organization Domains should be verified upon creation, otherwise will be created already verified"
     }
   ];
   bool smtp_sender_address_matches_instance_domain = 3 [

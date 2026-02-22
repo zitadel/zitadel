@@ -15,7 +15,7 @@ import {
   ORG,
   ORGSETTINGS,
   PROJECTS,
-  USERGRANTS,
+  ROLEASSIGNMENTS,
   USERS,
 } from './keyboard-shortcuts';
 
@@ -84,9 +84,9 @@ export class KeyboardShortcutsService implements OnDestroy {
             this.router.navigate(USERS.link);
           }
         }
-        if (firstKey.code === 'KeyG' && secondKey.code === 'KeyA') {
-          if (this.hasPermission(USERGRANTS)) {
-            this.router.navigate(USERGRANTS.link);
+        if (firstKey.code === 'KeyG' && secondKey.code === 'KeyR') {
+          if (this.hasPermission(ROLEASSIGNMENTS)) {
+            this.router.navigate(ROLEASSIGNMENTS.link);
           }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyF') {

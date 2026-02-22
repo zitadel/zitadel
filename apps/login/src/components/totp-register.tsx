@@ -116,6 +116,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
             <div className="">
               <TextInput
                 type="text"
+                autoFocus
                 {...register("code", { required: t("set.required.code") })}
                 label={t("set.labels.code")}
                 data-testid="code-text-input"

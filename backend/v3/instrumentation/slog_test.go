@@ -72,7 +72,7 @@ func TestLogConfig_replacer(t *testing.T) {
 			name: "masking configured key",
 			c: LogConfig{
 				Mask: MaskConfig{
-					Keys:  []string{"sensitive"},
+					Keys:  []string{"sensitive", "foo", "bar"},
 					Value: "masked",
 				},
 			},
@@ -85,7 +85,7 @@ func TestLogConfig_replacer(t *testing.T) {
 			name: "masking configured key in any group",
 			c: LogConfig{
 				Mask: MaskConfig{
-					Keys:  []string{"sensitive"},
+					Keys:  []string{"sensitive", "foo", "bar"},
 					Value: "masked",
 				},
 			},
@@ -96,10 +96,38 @@ func TestLogConfig_replacer(t *testing.T) {
 			want: slog.String("sensitive", "masked"),
 		},
 		{
+			name: "masking configured group",
+			c: LogConfig{
+				Mask: MaskConfig{
+					Keys:  []string{"sensitive", "foo", "bar"},
+					Value: "masked",
+				},
+			},
+			args: args{
+				groups: []string{"sensitive"},
+				a:      slog.String("unmatched", "value"),
+			},
+			want: slog.String("unmatched", "masked"),
+		},
+		{
+			name: "masking configured sub-group",
+			c: LogConfig{
+				Mask: MaskConfig{
+					Keys:  []string{"sensitive", "foo", "bar"},
+					Value: "masked",
+				},
+			},
+			args: args{
+				groups: []string{"a", "sensitive", "b"},
+				a:      slog.String("unmatched", "value"),
+			},
+			want: slog.String("unmatched", "masked"),
+		},
+		{
 			name: "not masking unmatched key",
 			c: LogConfig{
 				Mask: MaskConfig{
-					Keys:  []string{"sensitive"},
+					Keys:  []string{"sensitive", "foo", "bar"},
 					Value: "masked",
 				},
 			},

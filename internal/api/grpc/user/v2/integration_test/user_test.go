@@ -3639,6 +3639,28 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 				},
 			}
 		},
+	}, {
+		name: "machine access token type jwt",
+		testCase: func(runId string) testCase {
+			return testCase{
+				args: args{
+					ctx: OrgCTX,
+					req: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserId:         &runId,
+						UserType: &user.CreateUserRequest_Machine_{
+							Machine: &user.CreateUserRequest_Machine{
+								Name:            "donald",
+								AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+							},
+						},
+					},
+				},
+				assert: func(t *testing.T, createResponse *user.CreateUserResponse, getResponse *user.GetUserByIDResponse) {
+					assert.Equal(t, user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT, getResponse.GetUser().GetMachine().GetAccessTokenType())
+				},
+			}
+		},
 	}}
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -4305,6 +4327,35 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 				},
 				assert: func(t *testing.T, getResponse *user.GetUserByIDResponse) {
 					assert.Equal(t, username, getResponse.GetUser().GetUsername())
+				},
+			}
+		},
+	}, {
+		name: "machine accessTokenType",
+		testCase: func(runId string) testCase {
+			return testCase{
+				args: args{
+					ctx: OrgCTX,
+					create: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserId:         &runId,
+						UserType: &user.CreateUserRequest_Machine_{
+							Machine: &user.CreateUserRequest_Machine{
+								Name: "Donald",
+							},
+						},
+					},
+					update: &user.UpdateUserRequest{
+						UserId: runId,
+						UserType: &user.UpdateUserRequest_Machine_{
+							Machine: &user.UpdateUserRequest_Machine{
+								AccessTokenType: gu.Ptr(user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT),
+							},
+						},
+					},
+				},
+				assert: func(t *testing.T, getResponse *user.GetUserByIDResponse) {
+					assert.Equal(t, user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT, getResponse.GetUser().GetMachine().GetAccessTokenType())
 				},
 			}
 		},

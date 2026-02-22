@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with React
+description: "Integrate ZITADEL into React applications for user login and profile management using OIDC and PKCE."
 sidebar_label: React
 ---
 
@@ -10,12 +11,12 @@ By the end of this guide, your application will have login functionality and wil
 
 <Callout>
 This documentation references our [example](https://github.com/zitadel/zitadel-react) on GitHub.
-It also uses the @zitadel/react package with its default configuration.
+It also uses the @zitadel/react package with its default settings.
 </Callout>
 
 ## Set up application and obtain keys
 
-Before we begin developing our application, we need to perform a few configuration steps in the ZITADEL Console.
+Before we begin developing our application, we need to perform a few setup steps in the ZITADEL Console.
 You'll need to provide some information about your app.
 We recommend creating a new app to start from scratch.
 Navigate to your project, then add a new application at the top of the page.
@@ -42,13 +43,13 @@ After successful creation of the app, make sure copy the client ID, as you will 
 
 ## Create a project role "admin" and assign it to your user
 
-Also note the projects resource ID, as you will need it to configure your React application.
+Also note the Project ID, as you will need it to configure your React application.
 
 ![](../../../public/img/react/project-role.png)
 
 ![](../../../public/img/react/project-authz.png)
 
-If you want to read your users roles from user info endpoint, make sure to enable the checkbox in your project.
+If you want to read your users roles from the user info endpoint, make sure to enable the checkbox in your project.
 
 ## React setup
 

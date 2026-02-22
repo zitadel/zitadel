@@ -65,7 +65,7 @@ All documentation content is located in the `content` directory. Note that the s
 
 To add a new page:
 1.  Create a `.mdx` file in the appropriate subdirectory of [`content`](./content).
-2.  Register the new page in the sidebar configuration at [`lib/sidebar-data.ts`](./lib/sidebar-data.ts) to make it accessible in the navigation.
+2.  Register the new page in the sidebar settings at [`lib/sidebar-data.ts`](./lib/sidebar-data.ts) to make it accessible in the navigation.
 
 
 ### Pull Requests

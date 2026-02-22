@@ -1,5 +1,6 @@
 ---
-title: Configure Local OpenLDAP as an Identity Provider in ZITADEL
+title: Set up Local OpenLDAP as an Identity Provider in ZITADEL
+description: "Configure a local OpenLDAP server as an Identity Provider in ZITADEL to authenticate users with custom credentials"
 sidebar_label: Local OpenLDAP
 ---
 
@@ -20,7 +21,7 @@ The easiest way to do so is [by following the Docker Compose installation guide]
 </Callout>
 
 <Callout type="caution">
-Beware that this example configuration neither supports LDAPS nor StartTLS.
+Beware that these example settings neither supports LDAPS nor StartTLS.
 We highly recommend to enable LDAPS or StartTLS in your production setup.
 Otherwise, your users passwords are sent in clear text through the wire.
 </Callout>
@@ -33,7 +34,7 @@ Otherwise, your users passwords are sent in clear text through the wire.
 
 ## OpenLDAP Configuration
 
-### Basic configuration
+### Basic settings
 
 You can run OpenLdap via `docker-compose` using the following:
 ```
@@ -140,7 +141,7 @@ directory       /usr/local/var/openldap-data
 #index  objectClass     eq
 ```
 
-Which is the default configuration with an admin user under the DN `cn=admin,dc=example,dc=com` and password `Password1!`, BaseDN `"dc=example,dc=com` and database set to `ldif`.
+Which are the default settings with an admin user under the DN `cn=admin,dc=example,dc=com` and password `Password1!`, BaseDN `"dc=example,dc=com` and database set to `ldif`.
 In addition, there are some schemas included which can be used to create the users.
 
 ### Example users
@@ -177,7 +178,7 @@ The user can be applied after OpenLDAP is running with
 ldapadd -x -h localhost -D "cn=admin,dc=example,dc=com" -f example.ldif -w 'Password1!'
 ```
 
-## ZITADEL Configuration
+## ZITADEL Setup
 
 ### Go to the IdP Providers Overview
 

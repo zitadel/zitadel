@@ -1,5 +1,6 @@
 ---
 title: Let Users Login with Preferred Identity Provider
+description: "Configure external Identity Providers (IdPs) like Google, GitHub, and Microsoft Entra ID with ZITADEL for Single Sign-On."
 sidebar_label: Login users with SSO
 ---
 
@@ -19,7 +20,7 @@ ZITADEL positions itself as the central hub or the identity broker in the intera
 
 With ZITADEL, you can enhance your application's accessibility by integrating social login IdPs such as Google or other IdPs such as EntraID (formerly known as AzureAD) and Auth0. For organizations with bespoke identity solutions, ZITADEL supports integration with custom-built IdPs that adhere to OpenID Connect or SAML protocols. By default, ZITADEL can serve as the primary user store for your applications. This centralizes user management and simplifies the authentication process, allowing users to sign in with their email and password, or via the external IdPs you've integrated.
 
-ZITADEL excels in B2B scenarios by offering the flexibility to configure different IdPs for distinct customers, enhancing ease of use and customization. For instance, you could have Customer A utilize EntraID for authentication, while Customer B uses Okta. This versatility enables you to tailor authentication solutions to meet the specific needs of each customer, streamlining their access while maintaining a centralized management system.
+ZITADEL excels in B2B scenarios by offering the flexibility to set up different IdPs for distinct customers, enhancing ease of use and customization. For instance, you could have Customer A utilize EntraID for authentication, while Customer B uses Okta. This versatility enables you to tailor authentication solutions to meet the specific needs of each customer, streamlining their access while maintaining a centralized management system.
 
 ## The advantages of using ZITADEL
 
@@ -61,7 +62,7 @@ In ZITADEL, you have the flexibility to link an external Identity Provider (IdP)
 
 ### Adjusting the custom login policy
 
-The login policy can be set as a default at the instance level and can be customized for each organization. The configuration process varies slightly depending on your focus:
+The login policy can be set as a default at the instance level and can be customized for each organization. The setup process varies slightly depending on your focus:
 
 - **For default settings**, navigate to: `${CUSTOM_DOMAIN}/ui/console/instance?id=general`
 - **For specific organization settings**, select the organization from the menu and visit: `${CUSTOM_DOMAIN}/ui/console/org-settings?id=login`
@@ -71,17 +72,17 @@ Once in the settings:
 
 ![](../../../../public/img/guides/zitadel_allow_external_idp.png)
 
-### Configuring IdP Providers
+### Setting up IdP Providers
 
 Access the settings page of your instance or the specific organization and select **Identity Providers**.
 
-The ZITADEL Management Console will display a list of all the IdPs you've configured, along with available provider templates. Selecting any listed IdP will guide you through the process of configuring that specific Identity Provider.
+The ZITADEL Management Console will display a list of all the IdPs you've set up, along with available provider templates. Selecting any listed IdP will guide you through the process of setting up that specific Identity Provider.
 
 ![](../../../../public/img/guides/zitadel_identity_provider_overview.png)
 
 ## Available guides
 
-In the guides below, some of which utilize the Generic OIDC or SAML templates for configuration, you'll learn how to configure and set up your preferred external Identity Provider (IdP) in ZITADEL.
+In the guides below, some of which utilize the Generic OIDC or SAML templates for settings, you'll learn how to configure and set up your preferred external Identity Provider (IdP) in ZITADEL.
 
 - [Google](./google)
 - [Entra ID (OIDC)](./azure-ad-oidc)
@@ -99,7 +100,7 @@ In the guides below, some of which utilize the Generic OIDC or SAML templates fo
 
 ### Configuring IdPs without predefined templates
 
-If ZITADEL doesn't offer a specific template for your Identity Provider (IdP) and your IdP is fully compliant with OpenID Connect (OIDC), you have the option to use the generic OIDC provider configuration.
+If ZITADEL doesn't offer a specific template for your Identity Provider (IdP) and your IdP is fully compliant with OpenID Connect (OIDC), you have the option to use the generic OIDC provider settings.
 
 For those utilizing a SAML Service Provider, the SAML Service Provider option is available. You can learn how to set up a SAML Service Provider with our [MockSAML example](/guides/integrate/identity-providers/mocksaml).
 

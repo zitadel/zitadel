@@ -65,7 +65,7 @@
   </div>
 
   <div class="info-wrapper">
-    <p class="info-row-title">{{ 'RESOURCEID' | translate }}</p>
+    <p class="info-row-title">{{ 'INSTANCEID' | translate }}</p>
     <p *ngIf="instance?.id" class="info-row-desc">{{ instance.id }}</p>
   </div>
 
@@ -122,7 +122,7 @@
   </div>
 
   <div class="info-wrapper">
-    <p class="info-row-title">{{ 'RESOURCEID' | translate }}</p>
+    <p class="info-row-title">{{ 'ORG.PAGES.ID' | translate }}</p>
     <p *ngIf="org?.id" class="info-row-desc">{{ org.id }}</p>
   </div>
 
@@ -172,7 +172,7 @@
   </div>
 
   <div class="info-wrapper">
-    <p class="info-row-title">{{ 'RESOURCEID' | translate }}</p>
+    <p class="info-row-title">{{ 'PROJECT.PAGES.ID' | translate }}</p>
     <p *ngIf="project?.id" class="info-row-desc">{{ project.id }}</p>
   </div>
 
@@ -207,7 +207,7 @@
   </div>
 
   <div class="info-wrapper">
-    <p class="info-row-title">{{ 'RESOURCEID' | translate }}</p>
+    <p class="info-row-title">{{ 'PROJECT.PAGES.ID' | translate }}</p>
     <p *ngIf="grantedProject?.projectId" class="info-row-desc">{{ grantedProject.projectId }}</p>
   </div>
 
@@ -306,37 +306,3 @@
     </div>
   </div>
 </ng-container>
-
-<div class="info-row" *ngIf="idp">
-  <div class="info-wrapper width">
-    <p class="info-row-title">{{ 'IDP.ID' | translate }}</p>
-    <p class="info-row-desc">
-      {{ idp.id }}
-    </p>
-  </div>
-
-  <div class="info-wrapper">
-    <p class="info-row-title">{{ 'IDP.DETAIL.DATECREATED' | translate }}</p>
-    <p class="info-row-desc" *ngIf="idp?.details?.creationDate as creationDate">
-      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
-    </p>
-  </div>
-
-  <div class="info-wrapper">
-    <p class="info-row-title">{{ 'IDP.DETAIL.DATECHANGED' | translate }}</p>
-    <p class="info-row-desc" *ngIf="idp?.details?.changeDate as changeDate">
-      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
-    </p>
-  </div>
-
-  <div class="info-wrapper">
-    <p class="info-row-title">{{ 'IDP.STATE' | translate }}</p>
-    <p
-      *ngIf="idp?.state"
-      class="state"
-      [ngClass]="{ active: idp.state === IDPState.IDP_STATE_ACTIVE, inactive: idp.state === IDPState.IDP_STATE_INACTIVE }"
-    >
-      {{ 'IDP.STATES.' + idp.state | translate }}
-    </p>
-  </div>
-</div>

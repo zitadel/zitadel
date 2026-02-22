@@ -72,6 +72,7 @@ async function generateVersionApiDocs(version: string) {
     const title = uniqueService.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
     const indexContent = `---
 title: ${title} API
+description: Explore the ZITADEL ${title} API reference documentation. Learn how to manage resources, handle authentication, and integrate ${title} services into your application.
 ---
 
 API Reference for ${title}
@@ -202,6 +203,89 @@ async function fixAllGeneratedLinks() {
       }
       return match;
     });
+
+    // Add description to frontmatter if missing or corrupted and it's an API reference page
+    if (file.includes('reference/api')) {
+      const titleMatch = newContent.match(/^title:\s*(.*)$/m);
+      if (titleMatch) {
+        let title = titleMatch[1].replace(/['"]/g, '').trim();
+        // Handle multiline titles
+        if (title === '|' || title === '|-' || title === '>') {
+          const lines = newContent.slice(titleMatch.index).split('\n');
+          if (lines.length > 1) {
+            title = lines[1].trim();
+          }
+        }
+
+        // Try to find the operation summary in _openapi contents
+        const summaryMatch = newContent.match(/contents:\s*-\s*content:\s*(?:[|>]-?\s*)?([\s\S]+?)(?=\n\s*---|\n\s*(_|\w)+:|$)/);
+        let description = '';
+        if (summaryMatch) {
+          description = summaryMatch[1]
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0 && !line.startsWith('- ') && !line.startsWith('---'))
+            .join(' ');
+          
+          if (description.length > 200) {
+            description = description.slice(0, 197) + '...';
+          }
+        }
+
+        if (!description || description.length < 50) {
+          description = `Explore the ${title} operation in the ZITADEL API. Learn about request parameters, response schemas, and integration details for this endpoint.`;
+        }
+
+        // Clean up title for description use
+        const cleanTitle = title.replace(/\n\s+/g, ' ').trim();
+        if (!description.includes(cleanTitle)) {
+           description = `${cleanTitle}: ${description}`;
+        }
+        
+        // Final sanitization for YAML double-quoted string
+        description = description
+            .replace(/\\/g, '\\\\') // Escape backslashes first to avoid double-processing
+            .replace(/\n/g, ' ')
+            .replace(/"/g, "'") // Use single quotes internally
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        const newDescLine = `description: "${description}"`;
+
+        // Clean existing descriptions to avoid duplicates or corrupted ones
+        const oldContent = newContent;
+        
+        // Split frontmatter and body
+        const parts = newContent.split('---');
+        if (parts.length >= 3) {
+            let frontmatter = parts[1];
+            // Remove any existing description keys and their potential multiline values
+            // This regex matches "description:" and then everything until it sees a new key (word followed by colon) 
+            // or the end of the frontmatter section.
+            frontmatter = frontmatter.replace(/description:\s*[\s\S]*?(?=\n\w+:|$)/g, '');
+            
+            // Also explicitly fix the "iam.member.read" type corruption by looking for lines that start with quotes 
+            // but have no colon, which follow a description line.
+            // Actually the regex above should have caught it if it matched until the next key.
+            
+            // Clean up any double newlines and trim
+            frontmatter = frontmatter.split('\n').filter(line => line.trim().length > 0).join('\n');
+            
+            parts[1] = `\n${newDescLine}\n${frontmatter}\n`;
+            newContent = parts.join('---');
+        }
+
+        if (newContent !== oldContent) {
+            modified = true;
+        }
+      }
+    }
+
+    // Fix previously corrupted frontmatter (title followed immediately by description)
+    if (newContent.match(/^title: \|-?\ndescription: /m)) {
+      newContent = newContent.replace(/^(title: \|-?)\ndescription: (.*)\n/m, "description: $2\n$1\n");
+      modified = true;
+    }
 
     if (modified) {
       writeFileSync(fullPath, newContent);

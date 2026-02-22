@@ -9,7 +9,7 @@
         "DESCRIPTION": "Completa i seguenti passaggi per proteggere la tua applicazione.",
         "CREATE_PROJECT": {
           "TITLE": "Crea un progetto",
-          "DESCRIPTION": "Aggiungi un progetto e definisci i suoi ruoli e autorizzazioni."
+          "DESCRIPTION": "Aggiungi un progetto e definisci i suoi ruoli e le assegnazioni ruoli."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Un progetto ospita una o più applicazioni, che puoi utilizzare per autenticare i tuoi utenti. Ad esempio, potresti avere un singolo progetto con 3 applicazioni: una per il tuo frontend web, una per la tua applicazione mobile e una per il tuo backend. Puoi anche autorizzare i tuoi utenti con i progetti. Per permettere agli utenti di altre organizzazioni di accedere alle tue applicazioni, concedi loro l'accesso al tuo progetto.<br/><br/>Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
       "OWNED": {
         "TITLE": "Progetti di Proprietà",
-        "DESCRIPTION": "Questi sono i progetti che possiedi. Puoi gestire le impostazioni di questi progetti, le autorizzazioni e le applicazioni."
+        "DESCRIPTION": "Questi sono i progetti che possiedi. Puoi gestire le impostazioni di questi progetti, le assegnazioni ruoli e le applicazioni."
       },
       "GRANTED": {
         "TITLE": "Progetti Concessi",
@@ -61,9 +61,9 @@
         "METADATA": "Aggiungi attributi personalizzati al tuo utente come il tuo dipartimento. Puoi utilizzare queste informazioni nelle azioni della tua organizzazione."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Autorizzazioni",
-      "DESCRIPTION": "Le autorizzazioni definiscono i diritti di accesso di un utente a un progetto. Puoi concedere a un utente l'accesso a un progetto e definire i ruoli degli utenti all'interno di quel progetto."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Assegnazioni Ruoli",
+      "DESCRIPTION": "Le assegnazioni ruoli definiscono i diritti di accesso di un utente a un progetto. Puoi concedere a un utente l'accesso a un progetto e definire i ruoli degli utenti all'interno di quel progetto."
     },
     "ACTIONS": {
       "TITLE": "Azioni",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Crea il tuo primo progetto",
-        "description": "Aggiungere il primo progetto e definire i ruoli e le autorizzazioni.",
+        "description": "Aggiungere il primo progetto e definire i ruoli e le assegnazioni ruoli.",
         "action": "Crea progetto"
       },
       "APPLICATION_CREATED": {
@@ -401,9 +401,9 @@
         "action": "Aggiungi utente"
       },
       "user.grant.added": {
-        "title": "Crea autorizzazioni per gli utenti",
+        "title": "Assegna ruoli agli utenti",
         "description": "Consenti agli utenti di accedere alla tua applicazione e imposta il loro ruolo.",
-        "action": "Crea autorizzazione"
+        "action": "Assegna ruoli"
       }
     }
   },
@@ -429,7 +429,7 @@
     "NEWORG": "Nuova organizzazione",
     "IAMADMIN": "Sei un amministratore d'istanza. Nota che hai autorizzazioni estese.",
     "SHOWORGS": "Mostra tutte le organizzazioni",
-    "GRANTS": "Autorizzazioni",
+    "GRANTS": "Assegnazioni Ruoli",
     "ACTIONS": "Azioni",
     "PRIVACY": "Informativa sulla privacy",
     "TOS": "Termini di servizio",
@@ -660,7 +660,7 @@
     "ORG_USER_MANAGER": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
     "ORG_OWNER_VIEWER": "Ha il permesso di esaminare l'intera organizzazione",
     "ORG_SETTINGS_MANAGER": "Ha il permesso di gestire le impostazioni dell'organizzazione",
-    "ORG_USER_PERMISSION_EDITOR": "Ha l'autorizzazione per gestire le autorizzazioni degli utenti",
+    "ORG_USER_PERMISSION_EDITOR": "Ha l'autorizzazione per gestire le assegnazioni ruoli",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ha il permesso di gestire le sovvenzioni di progetto (Project Grant)",
     "ORG_PROJECT_CREATOR": "Ha il permesso di creare propri progetti e le impostazioni sottostanti",
     "ORG_ADMIN_IMPERSONATOR": "Ha il permesso per rappresentare l'amministratore e gli utenti finali dell'organizzazione",
@@ -701,7 +701,7 @@
     "USERNAME": "User Name",
     "ORGNAME": "Nome organizzazione",
     "ORGID": "ID organizzazione",
-    "PRIMARYDOMAIN": "Dominio primario",
+    "PRIMARYDOMAIN": "Dominio dell'organizzazione",
     "PROJECTNAME": "Nome del progetto",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
@@ -723,7 +723,7 @@
       "ME": "Vai al profilo",
       "PROJECTS": "Vai ai progetti",
       "USERS": "Vai ai utenti",
-      "USERGRANTS": "Vai ai Autorizzazioni",
+      "ROLEASSIGNMENTS": "Vai ai Assegnazioni Ruoli",
       "ACTIONS": "Vai ai azioni e processi",
       "DOMAINS": "Vai ai domini"
     }
@@ -764,7 +764,7 @@
       "SECURITY": "Password e sicurezza",
       "KEYS": "Chiavi",
       "PAT": "Personal Access Tokens",
-      "USERGRANTS": "Autorizzazioni",
+      "ROLEASSIGNMENTS": "Assegnazioni Ruoli",
       "MEMBERSHIPS": "Ruoli di amministratore",
       "METADATA": "Metadati"
     },
@@ -1043,7 +1043,7 @@
       "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
       "MAXLENGTHERROR": "Deve contenere meno di {{value}} caratteri"
     },
-    "ID": "ID",
+    "ID": "ID utente",
     "EMAIL": "E-mail",
     "PHONE": "Numero di telefono",
     "PHONEEMPTY": "Nessun numero di telefono definito",
@@ -1118,8 +1118,8 @@
       "ADDITIONAL-EXTERNAL": "Loginname (organizzazione esterna)"
     },
     "TARGET": {
-      "SELF": "Se vuoi concedere l'accesso a un utente di un'altra organizzazione",
-      "EXTERNAL": "Per concedere l'accesso a un utente della tua organizzazione",
+      "SELF": "Se vuoi assegnare un ruolo a un utente di un'altra organizzazione",
+      "EXTERNAL": "Per assegnare un ruolo a un utente della tua organizzazione",
       "CLICKHERE": "clicca qui"
     },
     "SIGNEDOUT": "Ti sei disconnesso. Clicca sul pulsante \"Accedi\" per accedere di nuovo.",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nome",
-      "ID": "ID",
+      "ID": "ID organizzazione",
       "CREATIONDATE": "Data di creazione",
       "DATECHANGED": "Cambiato",
       "FILTER": "Filtro",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Scaricare il file",
       "SELECTORGTOOLTIP": "Seleziona questa organizzazione.",
-      "PRIMARYDOMAIN": "Dominio primario",
+      "PRIMARYDOMAIN": "Dominio dell'Organizzazione",
       "STATE": "Stato",
       "USEPASSWORD": "Imposta la password iniziale",
       "USEPASSWORDDESC": "L'utente non deve impostare la password durante l'inizializzazione."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Aggiungi dominio",
-      "TITLE": "Domini verificati",
+      "TITLE": "Dominio dell'Organizzazione",
       "DESCRIPTION": "Configura i tuoi domini. Questo dominio può essere utilizzato per accedere con i tuoi utenti.",
-      "SETPRIMARY": "Impostato come primario",
+      "SETPRIMARY": "Impostato come Dominio dell'Organizzazione",
       "DELETE": {
         "TITLE": "Cancellare il dominio",
         "DESCRIPTION": "Stai per eliminare uno dei tuoi domini. Nota che i tuoi utenti non possono più usare questo dominio per il loro login."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Amministratore aggiunto con successo",
       "MEMBERREMOVED": "Amministratore rimosso con successo",
       "MEMBERCHANGED": "Amministratore cambiato con successo",
-      "SETPRIMARY": "Dominio primario cambiato con successo",
+      "SETPRIMARY": "Il dominio dell'organizzazione è stato impostato correttamente.",
       "DELETED": "Organizzazione eliminata con successo",
       "DEFAULTORGNOTFOUND": "Impossibile trovare l'organizzazione predefinita",
       "ORG_WAS_DELETED": "Organizzazione è stata eliminata"
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Fornitori di identità",
-      "VERIFIED_DOMAINS": "Domini verificati",
+      "VERIFIED_DOMAINS": "Domini dell'Organizzazione",
       "DOMAIN": "Impostazioni del dominio",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "Vuoi davvero rimuovere il tuo progetto?",
           "TYPENAME": "Ripeti il nome del progetto per eliminarlo."
         }
-      }
+      },
+      "ID": "ID progetto"
     },
     "SETTINGS": {
       "TITLE": "Impostazioni",
@@ -2091,7 +2092,7 @@
       "GRANTEDORGDOMAIN": "Dominio",
       "RESOURCEOWNER": "Resource owner",
       "GRANTEDORGNAME": "Nome dell'organizzazione",
-      "GRANTID": "Grant Id",
+      "GRANTID": "Grant ID",
       "CREATIONDATE": "Data di creazione",
       "CHANGEDATE": "Ultima modifica",
       "DATES": "Date",
@@ -2293,7 +2294,7 @@
     "UPDATECLIENTSECRET": "Aggiorna secret",
     "TYPE": "Tipo",
     "OWNER": "Owner",
-    "ID": "ID",
+    "ID": "ID provider di identità",
     "NAME": "Nome",
     "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
     "TOKENENDPOINT": "Token Endpoint",
@@ -2496,7 +2497,7 @@
     "TOKEN": "Impostazioni Token",
     "PAGES": {
       "TITLE": "Applicazione",
-      "ID": "ID",
+      "ID": "ID applicazione",
       "DESCRIPTION": "Qui puoi modificare i dati della tua applicazione e la sua configurazione.",
       "CREATE": "Crea Applicazione",
       "CREATE_SELECT_PROJECT": "Seleziona il tuo progetto",
@@ -2508,7 +2509,7 @@
       "DATECHANGED": "Cambiato",
       "URLS": "URLs",
       "DELETE": "Rimuovi App",
-      "JUMPTOPROJECT": "Per configurare ruoli, autorizzazioni e altro, vai al progetto.",
+      "JUMPTOPROJECT": "Per configurare ruoli, assegnazioni ruoli e altro, vai al progetto.",
       "DETAIL": {
         "TITLE": "Dettagli",
         "STATE": {
@@ -2786,42 +2787,42 @@
   },
   "ROLESLABEL": "Ruoli",
   "GRANTS": {
-    "TITLE": "Autorizzazioni",
-    "DESC": "Qui puoi vedere tutte le autorizzazioni della tua organizzazione.",
-    "DELETE": "Cancellare l'autorizzazione",
-    "EMPTY": "Nessuna autorizzazione trovata",
-    "ADD": "Creare autorizzazione",
+    "TITLE": "Assegnazione dei ruoli",
+    "DESC": "Questi sono tutti i ruoli assegnati nella tua organizzazione.",
+    "DELETE": "Elimina assegnazione ruolo",
+    "EMPTY": "Nessuna assegnazione ruolo trovata",
+    "ADD": "Crea assegnazione ruolo",
     "ADD_BTN": "Nuovo",
     "PROJECT": {
-      "TITLE": "Autorizzazione",
-      "DESCRIPTION": "Definisci le autorizzazioni per il progetto specificato. Nota che puoi vedere solo le voci dei progetti e degli utenti per i quali hai le autorizzazioni."
+      "TITLE": "Assegnazione Ruolo",
+      "DESCRIPTION": "Definisci le assegnazioni ruoli per il progetto specificato. Nota che puoi vedere solo le voci dei progetti e degli utenti per i quali hai le autorizzazioni."
     },
     "USER": {
-      "TITLE": "Autorizzazioni",
-      "DESCRIPTION": "Definisci le autorizzazioni per l'utente specificato. Nota che puoi vedere solo le voci dei progetti e degli utenti per i quali hai le autorizzazioni."
+      "TITLE": "Assegnazione Ruolo",
+      "DESCRIPTION": "Definisci le assegnazioni ruoli per l'utente specificato. Nota che puoi vedere solo le voci dei progetti e degli utenti per i quali hai le autorizzazioni."
     },
     "CREATE": {
-      "TITLE": "Creare autorizzazione",
+      "TITLE": "Crea assegnazione ruolo",
       "DESCRIPTION": "Cerca l'organizzazione, il progetto e i ruoli corrispondenti."
     },
     "EDIT": {
-      "TITLE": "Modifica autorizzazione"
+      "TITLE": "Modifica assegnazione ruolo"
     },
     "DETAIL": {
-      "TITLE": "Dettaglio dell'autorizzazione",
-      "DESCRIPTION": "Qui potete vedere tutti i dettagli dell'autorizzazione."
+      "TITLE": "Dettaglio dell'assegnazione ruolo",
+      "DESCRIPTION": "Qui potete vedere tutti i dettagli dell'assegnazione ruolo."
     },
     "TOAST": {
-      "UPDATED": "Autorizzazione aggiornata.",
-      "REMOVED": "Autorizzazione rimossa con successo.",
-      "BULKREMOVED": "Autorizzazioni rimossi con successo.",
+      "UPDATED": "Assegnazione ruolo aggiornata.",
+      "REMOVED": "Assegnazione ruolo rimossa con successo.",
+      "BULKREMOVED": "Assegnazioni ruoli rimossi con successo.",
       "CANTSHOWINFO": "Non puoi visitare il profilo di questo utente poiché non sei un amministratore dell'organizzazione a cui appartiene questo utente"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Elimina autorizzazione",
-      "DELETE_DESCRIPTION": "Stai per eliminare un' autorizzazione. Vuoi continuare?",
-      "BULK_DELETE_TITLE": "Elimina autorizzazioni",
-      "BULK_DELETE_DESCRIPTION": "Stai per eliminare diverse autorizzazioni. Vuoi continuare?"
+      "DELETE_TITLE": "Elimina assegnazione ruolo",
+      "DELETE_DESCRIPTION": "Stai per eliminare un' assegnazione ruolo. Vuoi continuare?",
+      "BULK_DELETE_TITLE": "Elimina assegnazioni ruoli",
+      "BULK_DELETE_DESCRIPTION": "Stai per eliminare diverse assegnazioni ruoli. Vuoi continuare?"
     }
   },
   "CHANGES": {
@@ -2840,5 +2841,6 @@
       "TITLE": "Attività",
       "DESCRIPTION": "Qui puoi vedere gli ultimi eventi che hanno generato un cambiamento dell'utente."
     }
-  }
+  },
+  "INSTANCEID": "ID istanza"
 }

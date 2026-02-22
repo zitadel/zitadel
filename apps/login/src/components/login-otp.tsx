@@ -241,6 +241,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
         <div className="mt-4">
           <TextInput
             type="text"
+            autoFocus
             {...register("code", { required: t("verify.required.code") })}
             label={t("verify.labels.code")}
             autoComplete="one-time-code"

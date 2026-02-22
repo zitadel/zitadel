@@ -222,7 +222,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Pod oczekiwanym adresem URL nie znaleziono pliku zawierającego wyzwanie. Sprawdź, czy przesłałeś plik we właściwe miejsce z uprawnieniami do odczytu"
     DomainVerificationHTTPNoMatch: "Znaleziono plik zawierający wyzwanie pod oczekiwanym adresem URL, ale nie zawiera on prawidłowego tekstu tokena. Sprawdź jego zawartość"
     DomainVerificationTimeout: "Upłynął limit czasu podczas wysyłania zapytania do serwera DNS"
-    PrimaryDomainNotDeletable: "Domena główna nie może być usunięta"
+    PrimaryDomainNotDeletable: "Domena organizacji nie może być usunięta"
     DomainNotFound: "Domena nie znaleziona"
     MemberIDMissing: "Brak identyfikatora członka"
     MemberNotFound: "Członek organizacji nie znaleziony"
@@ -897,7 +897,7 @@ EventTypes:
       verified: "Domena zweryfikowana"
       removed: "Usunięto domenę"
       primary:
-        set: "Ustawiono domenę główną"
+        set: "Ustawiono domenę organizacji"
       reserved: "Zarezerwowano domenę"
       released: "Zwolniono domenę"
     name:

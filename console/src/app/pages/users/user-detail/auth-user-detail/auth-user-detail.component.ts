@@ -62,7 +62,7 @@ export class AuthUserDetailComponent implements OnInit {
     { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' },
     { id: 'security', i18nKey: 'USER.SETTINGS.SECURITY' },
     { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' },
-    { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' },
+    { id: 'grants', i18nKey: 'USER.SETTINGS.ROLEASSIGNMENTS' },
     { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' },
     {
       id: 'metadata',

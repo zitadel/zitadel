@@ -101,7 +101,7 @@ message DomainSearchFilter {
   oneof filter {
     option (validate.required) = true;
 
-    // Filter organization domains by their domain name.
+    // Filter Organization Domains by their domain name.
     OrganizationDomainQuery domain_filter = 1;
   }
 }

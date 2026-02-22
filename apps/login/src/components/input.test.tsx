@@ -125,6 +125,12 @@ describe("TextInput Component", () => {
       expect(input?.maxLength).toBe(10);
       expect(input?.type).toBe("email");
     });
+
+    it("should support autoFocus", () => {
+      const { container } = render(<TextInput label="Test" autoFocus />);
+      const input = container.querySelector("input");
+      expect(input).toHaveFocus();
+    });
   });
 
   describe("Styling", () => {

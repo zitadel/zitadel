@@ -1,5 +1,6 @@
 ---
 title: SCIM v2.0
+description: "Automate user provisioning and lifecycle management using ZITADEL's SCIM v2.0 compliant service provider interface."
 ---
 
 Zitadel’s **[SCIM v2](https://scim.cloud/) service provider interface** enables standardized provisioning and lifecycle management of users and other instance resources.
@@ -58,8 +59,8 @@ For more information about user metadata, see [here](../customize/user-metadata)
 | `timezone`             | `metadata[urn:zitadel:scim:timezone]`                                                                     |                                                                                                                                                                                                                                                |
 | `active`               | `state`                                                                                                   | `Initial` and `Active` are mapped to `active = true`, all other states are mapped to `active = false`.<br />The `active` value can only be updated if the user is in the state `Active` or `Inactive`.                                         |
 | `password`             | `password`                                                                                                |                                                                                                                                                                                                                                                |
-| `emails`               | `email`                                                                                                   | Only the `primary` email is stored in Zitadel, if there is no `primary` email, the first one is stored. By default emails from SCIM are considered verified, this can be adjusted in the [configuration](#configuration).                      |
-| `phoneNumbers`         | `phone`                                                                                                   | Only the `primary` phone number is stored in Zitadel, if there is no `primary` phone number, the first one is stored. By default phone numbers from SCIM are considered verified, this can be adjusted in the [configuration](#configuration). |
+| `emails`               | `email`                                                                                                   | Only the `primary` email is stored in Zitadel, if there is no `primary` email, the first one is stored. By default emails from SCIM are considered verified, this can be adjusted in the [settings](#settings).                      |
+| `phoneNumbers`         | `phone`                                                                                                   | Only the `primary` phone number is stored in Zitadel, if there is no `primary` phone number, the first one is stored. By default phone numbers from SCIM are considered verified, this can be adjusted in the [settings](#settings). |
 | `ims`                  | `metadata[urn:zitadel:scim:ims]`                                                                          | Serialized as JSON.                                                                                                                                                                                                                            |
 | `photos`               | `metadata[urn:zitadel:scim:photos]`                                                                       | Serialized as JSON.                                                                                                                                                                                                                            |
 | `addresses`            | `metadata[urn:zitadel:scim:addresses]`                                                                    | Serialized as JSON.                                                                                                                                                                                                                            |
@@ -67,9 +68,9 @@ For more information about user metadata, see [here](../customize/user-metadata)
 | `roles`                | `metadata[urn:zitadel:scim:roles]`                                                                        | Serialized as JSON.                                                                                                                                                                                                                            |
 | `externalId`           | `metadata[urn:zitadel:scim:externalId]`<br />`metadata[urn:zitadel:scim:{provisioningDomain}:externalId]` | See [provisioning domain](#provisioning-domain).                                                                                                                                                                                               |
 
-## Configuration
+## Settings
 
-This section provides details on the runtime configuration of the SCIM interface of Zitadel.
+This section provides details on the runtime settings of the SCIM interface of Zitadel.
 
 ### Defaults
 
@@ -78,7 +79,7 @@ This section provides details on the runtime configuration of the SCIM interface
 - Bulk SCIM operations can include up to **100 operations**
 - Maximum SCIM request body size is **1 MB**
 
-This behavior can be adjusted through the Zitadel runtime configuration settings:
+This behavior can be adjusted through the Zitadel runtime settings:
 
 ```yaml
 SCIM:

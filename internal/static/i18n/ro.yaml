@@ -223,7 +223,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Fișierul care conține provocarea nu a fost găsit în URL-ul așteptat. Verificați dacă ați încărcat fișierul în locul potrivit cu permisiuni de citire"
     DomainVerificationHTTPNoMatch: "Fișierul care conține provocarea a fost găsit în URL-ul așteptat, dar nu conține textul corect al token-ului. Verificați conținutul acestuia"
     DomainVerificationTimeout: "A existat o depășire a timpului de așteptare la interogarea serverului DNS"
-    PrimaryDomainNotDeletable: "Domeniul principal nu trebuie să fie șters"
+    PrimaryDomainNotDeletable: "Domeniul organizației nu trebuie să fie șters"
     DomainNotFound: "Domeniul nu a fost găsit"
     MemberIDMissing: "ID-ul membrului lipsește"
     MemberNotFound: "Membrul organizației nu a fost găsit"
@@ -892,7 +892,7 @@ Errors:
           verified: "Domeniu verificat"
           removed: "Domeniu șters"
           primary:
-            set: "Domeniu principal setat"
+            set: "Domeniu organizației setat"
           reserved: "Domeniu rezervat"
           released: "Domeniu eliberat"
         name:

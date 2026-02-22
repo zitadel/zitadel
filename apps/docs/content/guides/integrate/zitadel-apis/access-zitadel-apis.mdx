@@ -1,5 +1,6 @@
 ---
 title: Access ZITADEL APIs
+description: "Authenticate and authorize requests to ZITADEL APIs to manage instances, organizations, and user resources."
 ---
 
 This guide explains what ZITADEL APIs are and how to access ZITADEL APIs using a service account to manage all types of resources and settings.
@@ -15,7 +16,7 @@ Here's a breakdown of some key points about ZITADEL APIs:
 * **Auth API:** Used by authenticated users for tasks related to their accounts.
 * **Management API:** Used by organization administrators for administrative tasks.
 * **Admin API:** Used for administrative functions on the ZITADEL instance itself (may require separate user setup).
-* **System API:** For ZITADEL self-hosted deployments only, providing superordinate control (requires specific configuration).
+* **System API:** For ZITADEL self-hosted deployments only, providing superordinate control (requires specific settings).
 
 <Callout title="Resource-based APIs">
 ZITADEL is transitioning from a use-case based API structure to a resource-based one, aiming to simplify API usage.
@@ -43,7 +44,7 @@ Instead, you call the Auth API with the token of the user.
 ### Accessing System API
 
 With the System API developers can manage different ZITADEL instances.
-The System API can't be accessed by service accounts and requires a special configuration and authentication that can be found in our [guide to access ZITADEL's System API](./access-zitadel-system-api).
+The System API can't be accessed by service accounts and requires special settings and authentication that can be found in our [guide to access ZITADEL's System API](./access-zitadel-system-api).
 
 [Reference documentation for system API](/apis/introduction#system)
 

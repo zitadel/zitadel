@@ -284,6 +284,60 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "change machine accessTokenType, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(userAddedEvent),
+					),
+					expectPush(
+						user.NewMachineChangedEvent(context.Background(),
+							&userAgg.Aggregate,
+							[]user.MachineChanges{
+								user.ChangeAccessTokenType(domain.OIDCTokenTypeJWT),
+							},
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				machine: &ChangeMachine{
+					AccessTokenType: gu.Ptr(domain.OIDCTokenTypeJWT),
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change machine accessTokenType, no change",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(userAddedEvent),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				machine: &ChangeMachine{
+					AccessTokenType: gu.Ptr(domain.OIDCTokenTypeBearer),
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

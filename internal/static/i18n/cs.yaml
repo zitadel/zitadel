@@ -222,7 +222,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Soubor obsahující výzvu nebyl nalezen na očekávané URL. Zkontrolujte, zda jste soubor nahráli na správné místo s právy ke čtení"
     DomainVerificationHTTPNoMatch: "Soubor obsahující výzvu byl nalezen na očekávané URL, ale neobsahuje správný token. Zkontrolujte jeho obsah"
     DomainVerificationTimeout: "Při dotazování DNS serveru došlo k timeoutu"
-    PrimaryDomainNotDeletable: "Primární doména nesmí být smazána"
+    PrimaryDomainNotDeletable: "Doména organizace nesmí být smazána"
     DomainNotFound: "Doména nenalezena"
     MemberIDMissing: "Chybí ID člena"
     MemberNotFound: "Člen organizace nenalezen"
@@ -895,7 +895,7 @@ EventTypes:
       verified: "Doména ověřena"
       removed: "Doména odstraněna"
       primary:
-        set: "Hlavní doména nastavena"
+        set: "Doména organizace nastavena"
       reserved: "Doména rezervována"
       released: "Doména uvolněna"
     name:

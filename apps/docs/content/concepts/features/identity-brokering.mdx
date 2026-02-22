@@ -1,5 +1,6 @@
 ---
 title: Identity Brokering
+description: "Establish trust between your central IdP and third-party providers for login with preferred identity sources"
 sidebar_label: Identity Brokering
 ---
 
@@ -34,7 +35,7 @@ The schema is a very simplified version, but shows the essential steps for ident
 
 1. An unauthenticated user wants to use the alpha.com's application.
 2. The application redirects the user to alpha.com's identity provider (IdP).
-3. Based on the user's tenants configuration the IdP presents the configured identity providers, or redirects the user directly to the primary external IdP. The user authenticates with their external identity provider (eg, Entra ID).
+3. Based on the user's tenants settings the IdP presents the configured identity providers, or redirects the user directly to the primary external IdP. The user authenticates with their external identity provider (eg, Entra ID).
 4. After the authentication, the user is redirected back to alpha.com's identity provider. If the user doesn't exist in the IdP the user will be created just-in-time and linked to the external identity provider for future reference.
 5. As with a local authentication, the IdP issues a token to the user that can be used to access the application. The IdP redirects the user, which is now authenticated, eventually to the application.
 
@@ -57,7 +58,7 @@ For example some organizations might use their EntraID, some other want to log i
 Using an identity provider with strong multitenancy capabilities such as ZITADEL, you can configure a different set of external identity providers per organization.
 
 [Domain discovery](/guides/solution-scenarios/domain-discovery) ensures that users are redirected to their external identity provider based on their email-address or username.
-[Administrators](../structure/administrators) can configure organization domains that are used for domain-based redirection to an external IdP.
+[Administrators](../structure/administrators) can configure Organization Domains that are used for domain-based redirection to an external IdP.
 
 ![](../../../public/img/concepts/features/domain-discovery.png)
 
@@ -66,7 +67,7 @@ Using an identity provider with strong multitenancy capabilities such as ZITADEL
 ZITADEL works with SAML, OpenID Connect, and LDAP external identity providers.
 
 For popular IdPs such as EntraID, Okta, Google, Facebook, and GitHub, ZITADEL [offers pre-configured templates](/guides/integrate/identity-providers/introduction).
-These templates expedite the configuration process, allowing organizations to quickly integrate these providers with minimal effort.
+These templates expedite the setup process, allowing organizations to quickly integrate these providers with minimal effort.
 
 ZITADEL recognizes that specific needs may extend beyond pre-built templates.
 To address this, ZITADEL provides generic templates that enable connection to virtually any IdP.  This ensures maximum flexibility and future-proofs login infrastructure, accommodating future integrations with ease.

@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Python
+description: "Secure Python Flask APIs with ZITADEL token validation and role-based access control."
 sidebar_label: Python
 ---
 
@@ -23,7 +24,7 @@ In this example we will use a service account with a [personal access token](/gu
 
 In order to run the example you need to have `python3` and `pip3` installed.
 
-### ZITADEL configuration for the API
+### ZITADEL settings for the API
 
 ![](../../../public/img/python-flask/2.png)
 
@@ -174,7 +175,7 @@ class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
         return res
 ```
 
-3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Custom Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/guides/start/quickstart#5-collect-your-integration-keys).
+3. Create a new file named ".env" in the directory. Copy the settings in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Custom Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/guides/start/quickstart#5-collect-your-integration-keys).
 
 ```python
 ZITADEL_DOMAIN = "https://custom-domain-abcdef.zitadel.cloud"
@@ -182,13 +183,13 @@ CLIENT_ID = "197....@projectname"
 CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 ```
 
-### ZITADEL configuration to create a service account
+### ZITADEL settings to create a service account
 
 ![](../../../public/img/python-flask/3.png)
 
 1. Create a service account and a Personal Access Token (PAT) for that user by following [this guide](/guides/integrate/service-accounts/personal-access-token#create-a-service-account-with-a-pat).
-2. To enable authorization, follow [this guide](/guides/manage/console/roles) to create a role `read:messages` on your project.
-3. Next, create an authorization for the service account you created by adding the role `read:messages` to the user. Follow this [guide](/guides/manage/console/roles#authorizations) for more information on creating an authorization.
+2. To assign roles, follow [this guide](/guides/manage/console/roles) to create a role `read:messages` on your project.
+3. Next, add the role `read:messages` to the service account you created. Follow this [guide](/guides/manage/console/roles#role-assignments) for more information on creating a role assignment.
 
 ### Run the API
 

@@ -1,6 +1,6 @@
 <p align="center">
-    <img src="./apps/docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
-    <img src="./apps/docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
+    <img src="./apps/docs/public/img/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
+    <img src="./apps/docs/public/img/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 <p align="center">
     <a href="https://openid.net/certification/#OPs" alt="OpenID Connect Certified">
-        <img src="./apps/docs/static/logos/oidc-cert.png" /></a>
+        <img src="./apps/docs/public/img/logos/oidc-cert.png" /></a>
 </p>
 
 Are you searching for a user management tool that is quickly set up like Auth0 and open source like Keycloak?

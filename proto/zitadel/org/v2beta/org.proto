@@ -24,7 +24,7 @@ message Organization {
     }
   ];
 
-  //  The timestamp of the verification of the organization domain.
+  //  The timestamp of the verification of the Organization Domain.
   google.protobuf.Timestamp changed_date = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -40,7 +40,7 @@ message Organization {
       example: "\"ZITADEL\"";
     }
   ];
-  // Primary domain used in the organization.
+  // Organization Domain used in the organization.
   string primary_domain = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"zitadel.cloud\"";
@@ -155,7 +155,7 @@ message Domain {
     ];
     // Defines if the domain is verified.
     bool is_verified = 3;
-    // Defines if the domain is the primary domain.
+    // Defines if the domain is the Organization Domain.
     bool is_primary = 4;
     // Defines the protocol the domain was validated with.
     DomainValidationType validation_type = 5;

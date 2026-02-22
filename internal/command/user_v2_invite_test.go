@@ -662,6 +662,86 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 				returnCode: gu.Ptr("code2"),
 			},
 		},
+		{
+			"return ok after previous code created",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						// first invite code generated and returned
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code1"),
+								},
+								time.Minute, // expired code
+								"",
+								true,
+								"",
+								"",
+							),
+						),
+						// simulate a failed verification attempt due to expiry
+						eventFromEventPusher(
+							user.NewHumanInviteCheckFailedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code2"),
+								},
+								time.Hour,
+								"",
+								true,
+								"",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code2", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
+			},
+			args{
+				ctx: context.Background(),
+				invite: &CreateUserInvite{
+					UserID:     "userID",
+					ReturnCode: true,
+				},
+			},
+			want{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "userID",
+				},
+				returnCode: gu.Ptr("code2"),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

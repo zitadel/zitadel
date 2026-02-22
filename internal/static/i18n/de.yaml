@@ -222,7 +222,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Das File der Challenge wurde unter der erwarteten URL nicht gefunden. Überprüfen Sie, ob Sie die Datei mit Leseberechtigungen an der richtigen Stelle hochgeladen haben"
     DomainVerificationHTTPNoMatch: "Das File der Challenge wurde in der erwarteten URL gefunden, enthält jedoch nicht den richtigen Token-Text. Überprüfen Sie den Inhalt"
     DomainVerificationTimeout: "There was a timeout querying the DNS server."
-    PrimaryDomainNotDeletable: "Primäre Domäne kann nicht gelöscht werden"
+    PrimaryDomainNotDeletable: "Die Organisationsdomäne kann nicht gelöscht werden"
     DomainNotFound: "Domäne konnte nicht gefunden werden"
     MemberIDMissing: "Member ID fehlt"
     MemberNotFound: "Organisations Member konnte nicht gefunden werden"
@@ -897,7 +897,7 @@ EventTypes:
       verified: "Domäne verifiziert"
       removed: "Domäne entfernt"
       primary:
-        set: "Primäre Domäne gesetzt"
+        set: "Organisationsdomäne gesetzt"
       reserved: "Domäne reserviert"
       released: "Domäne freigegeben"
     name:

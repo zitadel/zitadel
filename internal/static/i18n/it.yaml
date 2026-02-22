@@ -222,7 +222,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Il file della challenge non è stato trovato nell'URL previsto. Verifica di aver caricato il file nel posto giusto con permessi di lettura"
     DomainVerificationHTTPNoMatch: "Il file della challenge è stato trovato nell'URL previsto ma non contiene il testo del token corretto. Controlla il suo contenuto"
     DomainVerificationTimeout: "Si è verificato un timeout nella richiesta del server DNS"
-    PrimaryDomainNotDeletable: "Il dominio primario non deve essere cancellato"
+    PrimaryDomainNotDeletable: "Il dominio dell'organizzazione non deve essere cancellato"
     DomainNotFound: "Dominio non trovato"
     MemberIDMissing: "ID membro mancante"
     MemberNotFound: "Membro non trovato"
@@ -896,7 +896,7 @@ EventTypes:
       verified: "Dominio verificato"
       removed: "Dominio rimosso"
       primary:
-        set: "Set di dominio primario"
+        set: "Set di dominio dell'organizzazione"
       reserved: "Dominio riservato"
       released: "Dominio rilasciato"
     name:
@@ -1224,7 +1224,7 @@ EventTypes:
     domain:
       added: "Dominio aggiunto"
       primary:
-        set: "Insieme di domini primari"
+        set: "Dominio primario impostato"
       removed: "Dominio rimosso"
     iam:
       console:

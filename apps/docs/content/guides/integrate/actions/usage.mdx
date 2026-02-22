@@ -1,5 +1,6 @@
 ---
 title: Using Actions
+description: "Define targets and executions to create custom workflows triggered by API requests, events, or internal scripts with ZITADEL Actions."
 ---
 
 The Action API provides a flexible mechanism for customizing and extending the functionality of ZITADEL. By allowing you to define targets and executions, you can implement custom workflows triggered on an API requests and responses, events or specific functions.
@@ -117,7 +118,7 @@ The information sent to the Endpoint is structured as JSON:
   "org": {
     "id": "ID of the organization the user belongs to",
     "name": "Name of the organization the user belongs to",
-    "primary_domain": "Primary domain of the organization the user belongs to"
+    "primary_domain": "Organization Domain the user belongs to"
   },
   "user_grants": [
     {
@@ -211,7 +212,7 @@ The information sent to the Endpoint is structured as JSON:
   "org": {
     "id": "ID of the organization the user belongs to",
     "name": "Name of the organization the user belongs to",
-    "primary_domain": "Primary domain of the organization the user belongs to"
+    "primary_domain": "Organization Domain the user belongs to"
   },
   "user_grants": [
     {

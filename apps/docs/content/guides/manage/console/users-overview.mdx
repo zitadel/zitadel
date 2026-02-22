@@ -1,5 +1,6 @@
 ---
 title: Users
+description: "Manage users, authentication methods, and identity providers in the ZITADEL Console."
 sidebar_label: Users
 sidebar_position: 3
 ---
@@ -47,7 +48,7 @@ A user with an administrator role is not just an end-user of your application bu
 
 ### Uniqueness of Users
 * **Scope:** Users exist strictly within **one** [Organization](./organizations-overview). It is currently not possible to move users between organizations.
-* **Identifier:** User accounts are uniquely identified by their `id` or their `loginname` combined with the `organization domain` (e.g., `road.runner@acme.zitadel.local`).
+* **Identifier:** User accounts are uniquely identified by their `id` or their `loginname` combined with the `Organization Domain` (e.g., `road.runner@acme.zitadel.local`).
 * **Emails:** You can reuse the same email address for different user accounts across organizations.
 
 ### Structuring User Pools
@@ -93,11 +94,11 @@ Metadata can be requested via the Auth and Management APIs, the Userinfo endpoin
   alt="ID Token settings"
 />
 
-### Authorizations
-User authorizations (roles) are displayed on user profile pages.
+### Role Assignments
+The roles assigned to a user are displayed on user profile pages.
 
 To access these roles in your application:
-* **Userinfo Endpoint:** Check the **Assert roles on authentication** box in your [Project Settings](./roles#authorizations).
+* **Userinfo Endpoint:** Check the **Assert roles on authentication** box in your [Project Settings](./roles#role-assignments).
 * **ID Token:** Toggle **User roles inside ID Token** in your [Application Settings](./applications-overview).
 
 ## References

@@ -9,7 +9,7 @@
         "DESCRIPTION": "Teljesítsd a következő lépéseket az alkalmazásod biztonságáért.",
         "CREATE_PROJECT": {
           "TITLE": "Projekt létrehozása",
-          "DESCRIPTION": "Adj hozzá egy projektet, és határozd meg annak szerepeit és jogosultságait."
+          "DESCRIPTION": "Adj hozzá egy projektet, és határozd meg annak szerepeit és szerepkör hozzárendeléseit."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Egy projekt egy vagy több alkalmazást tartalmaz, amelyeket a felhasználók hitelesítésére használhatsz. Például lehet egyetlen projekted 3 alkalmazással; egy a webes frontendhez, egy a mobilalkalmazásodhoz és egy a backendhez. Emellett a projektjeiddel felhatalmazhatod a felhasználóidat. Ha azt szeretnéd, hogy más szervezetek felhasználói bejelentkezhessenek az alkalmazásaidba, adj nekik hozzáférést a projekthez.<br/><br/>Ha nem találsz egy projektet, vedd fel a kapcsolatot a projekt tulajdonosával vagy valakivel, akinek megvannak a megfelelő jogai, hogy hozzáférést kapj.",
       "OWNED": {
         "TITLE": "Tulajdonolt Projektek",
-        "DESCRIPTION": "Ezek a te tulajdonodban lévő projektek. Ezeknek a projekteknek a beállításait, jogosultságait és alkalmazásait te menedzselheted."
+        "DESCRIPTION": "Ezek a te tulajdonodban lévő projektek. Ezeknek a projekteknek a beállításait, szerepkör hozzárendeléseit és alkalmazásait te menedzselheted."
       },
       "GRANTED": {
         "TITLE": "Odaítélt projektek",
@@ -61,9 +61,9 @@
         "METADATA": "Adj hozzá egyéni attribútumokat a felhasználódhoz, mint például az osztályod. Ezt az információt felhasználhatod a szervezeted műveleteiben."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Engedélyek",
-      "DESCRIPTION": "Az engedélyek meghatározzák a felhasználók hozzáférési jogait egy projekthez. Hozzáférést adhatsz egy projekthez egy felhasználónak és definiálhatod a felhasználó szerepköreit a projektben."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Szerepkör hozzárendelések",
+      "DESCRIPTION": "A szerepkör hozzárendelések meghatározzák a felhasználók hozzáférési jogait egy projekthez. Hozzáférést adhatsz egy projekthez egy felhasználónak és definiálhatod a felhasználó szerepköreit a projektben."
     },
     "ACTIONS": {
       "TITLE": "Műveletek",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Projekt létrehozása",
-        "description": "Adj hozzá egy projektet és határozd meg annak szerepeit és jogosultságait.",
+        "description": "Adj hozzá egy projektet és határozd meg annak szerepeit és szerepkör hozzárendeléseit.",
         "action": "Projekt létrehozása"
       },
       "APPLICATION_CREATED": {
@@ -401,9 +401,9 @@
         "action": "Felhasználó hozzáadása"
       },
       "user.grant.added": {
-        "title": "Felhasználók engedélyezése",
+        "title": "Szerepkör hozzárendelése felhasználókhoz",
         "description": "Engedélyezd a felhasználóknak az alkalmazásodhoz való hozzáférést, és állítsd be a szerepkörüket.",
-        "action": "Felhasználó engedélyezése"
+        "action": "Szerepkör hozzárendelése felhasználókhoz"
       }
     }
   },
@@ -429,7 +429,7 @@
     "NEWORG": "Új Szervezet",
     "IAMADMIN": "Te egy példány Adminisztrátor vagy. Ne felejtsd el, hogy kibővített jogosultságokkal rendelkezel.",
     "SHOWORGS": "Show All Organizations",
-    "GRANTS": "Engedélyek",
+    "GRANTS": "Szerepkör hozzárendelések",
     "ACTIONS": "Műveletek",
     "PRIVACY": "Adatvédelem",
     "TOS": "Szolgáltatási feltételek",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "Engedélye van a szervezet felhasználóinak létrehozására és kezelésére",
     "ORG_OWNER_VIEWER": "Engedélye van az egész szervezet áttekintésére",
     "ORG_SETTINGS_MANAGER": "Engedélye van a szervezet beállításainak kezelésére",
-    "ORG_USER_PERMISSION_EDITOR": "Engedélye van a felhasználói jogok kezelésére",
+    "ORG_USER_PERMISSION_EDITOR": "Engedélye van a szerepkör hozzárendelések kezelésére",
     "ORG_PROJECT_PERMISSION_EDITOR": "Engedélye van a projektjogosultságok kezelésére",
     "ORG_PROJECT_CREATOR": "Engedélye van saját projektek és alapbeállítások létrehozására",
     "ORG_ADMIN_IMPERSONATOR": "Engedélye van a szervezet adminisztrátorainak és véghasználóinak megszemélyesítésére",
@@ -702,7 +702,7 @@
     "USERNAME": "Felhasználói Név",
     "ORGNAME": "Szervezet Neve",
     "ORGID": "Szervezet ID",
-    "PRIMARYDOMAIN": "Elsődleges Domain",
+    "PRIMARYDOMAIN": "Szervezet domainje",
     "PROJECTNAME": "Projekt Neve",
     "RESOURCEOWNER": "Erőforrás Tulajdonos",
     "METHODS": {
@@ -724,7 +724,7 @@
       "ME": "Menj a saját profilodra",
       "PROJECTS": "<strong>M</strong>enj a <strong>P</strong>rojektekhez",
       "USERS": "<strong>M</strong>enj a <strong>F</strong>elhasználókhoz",
-      "USERGRANTS": "<strong>M</strong>enj az <strong>E</strong>ngedélyekhez",
+      "ROLEASSIGNMENTS": "<strong>M</strong>enj a <strong>S</strong>zerepkör hozzárendelésekhez",
       "ACTIONS": "<strong>M</strong>enj az Akciókhoz és a <strong>F</strong>olyamatokhoz",
       "DOMAINS": "<strong>M</strong>enj a <strong>D</strong>oménekhez"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Jelszó és Biztonság",
       "KEYS": "Kulcsok",
       "PAT": "Személyes Hozzáférési Tokenek",
-      "USERGRANTS": "Engedélyek",
+      "ROLEASSIGNMENTS": "Szerepkör hozzárendelések",
       "MEMBERSHIPS": "Adminisztrátor Szerepkörök",
       "METADATA": "Metaadatok"
     },
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Legalább {{value}} karakter hosszúnak kell lennie.",
       "MAXLENGTHERROR": "Kevesebb, mint {{value}} karakter kell legyen."
     },
-    "ID": "Azonosító",
+    "ID": "Felhasználói azonosító",
     "EMAIL": "E-mail",
     "PHONE": "Telefonszám",
     "PHONEEMPTY": "Nincs megadott telefonszám",
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "Kód ellenőrzése"
     },
     "GRANTS": {
-      "TITLE": "Felhasználói jogosultságok",
+      "TITLE": "Szerepkör hozzárendelések",
       "DESCRIPTION": "Adj hozzáférést ennek a felhasználónak bizonyos projektekhez",
       "CREATE": {
-        "TITLE": "Felhasználói jogosultság létrehozása",
+        "TITLE": "Szerepkör hozzárendelés létrehozása",
         "DESCRIPTION": "Keresd meg a szervezetet, a projektet és a megfelelő projektszerepeket."
       },
       "PROJECTNAME": "Projekt neve",
@@ -1119,8 +1119,8 @@
       "ADDITIONAL-EXTERNAL": "Belépési név (külső szervezet)"
     },
     "TARGET": {
-      "SELF": "Ha egy másik szervezet felhasználójának szeretnél jogosultságot adni",
-      "EXTERNAL": "Ha szervezeted egy felhasználójának szeretnél jogosultságot adni",
+      "SELF": "Ha szerepkört szeretnél hozzárendelni egy másik szervezet felhasználójához",
+      "EXTERNAL": "Ha szerepkört szeretnél hozzárendelni a saját szervezeted felhasználójához",
       "CLICKHERE": "kattints ide"
     },
     "SIGNEDOUT": "Ki vagy jelentkezve. Kattints a \"Bejelentkezés\" gombra a belépéshez.",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Név",
-      "ID": "Azonosító",
+      "ID": "Szervezeti azonosító",
       "CREATIONDATE": "Létrehozás dátuma",
       "DATECHANGED": "Módosítva",
       "FILTER": "Szűrő",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Fájl letöltése",
       "SELECTORGTOOLTIP": "Ezt a szervezetet válaszd.",
-      "PRIMARYDOMAIN": "Elsődleges Domain",
+      "PRIMARYDOMAIN": "Szervezet domainje",
       "STATE": "Állapot",
       "USEPASSWORD": "Első jelszó beállítása",
       "USEPASSWORDDESC": "A felhasználónak nem kell jelszót beállítania az inicializálás során."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Domain hozzáadása",
-      "TITLE": "Ellenőrzött domainek",
+      "TITLE": "Szervezet domainje",
       "DESCRIPTION": "Konfiguráld a szervezeted domainjeit. Ez a domain használható domain felfedezéshez és felhasználói név utótagként.",
-      "SETPRIMARY": "Beállítás elsődlegesnek",
+      "SETPRIMARY": "Szervezet domainje",
       "DELETE": {
         "TITLE": "Domain törlése",
         "DESCRIPTION": "Készülsz törölni az egyik domained."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Adminisztrátor hozzáadva.",
       "MEMBERREMOVED": "Adminisztrátor eltávolítva.",
       "MEMBERCHANGED": "Adminisztrátor megváltozott.",
-      "SETPRIMARY": "Az elsődleges domain beállítva.",
+      "SETPRIMARY": "A szervezet domainje sikeresen be lett állítva.",
       "DELETED": "A szervezet sikeresen törölve.",
       "DEFAULTORGNOTFOUND": "Az alapértelmezett szervezet nem található.",
       "ORG_WAS_DELETED": "A szervezet törölve lett."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP és SMS beállítások",
       "MESSAGETEXTS": "Üzenet szövegek",
       "IDP": "Identitásszolgáltatók",
-      "VERIFIED_DOMAINS": "Ellenőrzött domainek",
+      "VERIFIED_DOMAINS": "Szervezet domainje",
       "DOMAIN": "Domain beállítások",
       "LOGINTEXTS": "Bejelentkezési felület szövegei",
       "BRANDING": "Márkaépítés",
@@ -2012,7 +2012,8 @@
           "DESCRIPTION": "Tényleg törölni szeretnéd a projekted?",
           "TYPENAME": "Írd be a projekt nevét a végleges törléshez."
         }
-      }
+      },
+      "ID": "Projektazonosító"
     },
     "SETTINGS": {
       "TITLE": "Beállítások",
@@ -2294,7 +2295,7 @@
     "ADD": "Azonosítószolgáltató hozzáadása",
     "TYPE": "Típus",
     "OWNER": "Tulajdonos",
-    "ID": "Azonosító",
+    "ID": "Identitásszolgáltató azonosító",
     "NAME": "Név",
     "AUTHORIZATIONENDPOINT": "Hitelesítési végpont",
     "TOKENENDPOINT": "Token végpont",
@@ -2519,7 +2520,7 @@
     "TOKEN": "Token Beállítások",
     "PAGES": {
       "TITLE": "Alkalmazás",
-      "ID": "ID",
+      "ID": "Alkalmazásazonosító",
       "DESCRIPTION": "Itt szerkesztheted az alkalmazásod adatait és a konfigurációját.",
       "CREATE": "Alkalmazás létrehozása",
       "CREATE_SELECT_PROJECT": "Először válaszd ki a projekted",
@@ -2531,7 +2532,7 @@
       "DATECHANGED": "Módosítva",
       "URLS": "URL-ek",
       "DELETE": "Alkalmazás törlése",
-      "JUMPTOPROJECT": "A szerepkörök, jogosultságok és további beállításokhoz navigálj a projekthez.",
+      "JUMPTOPROJECT": "A szerepkörök, szerepkör hozzárendelések és további beállításokhoz navigálj a projekthez.",
       "DETAIL": {
         "TITLE": "Részlet",
         "STATE": {
@@ -2809,42 +2810,42 @@
   },
   "ROLESLABEL": "Szerepkörök",
   "GRANTS": {
-    "TITLE": "Jogosultságok",
-    "DESC": "Ezek a te szervezeted összes jogosultságai.",
-    "DELETE": "Engedély törlése",
-    "EMPTY": "Nem található engedély",
-    "ADD": "Engedély létrehozása",
+    "TITLE": "Szerepkör hozzárendelések",
+    "DESC": "Ezek a te szervezeted összes szerepkör hozzárendelései.",
+    "DELETE": "Szerepkör hozzárendelés törlése",
+    "EMPTY": "Nem található szerepkör hozzárendelés",
+    "ADD": "Szerepkör hozzárendelés létrehozása",
     "ADD_BTN": "Új",
     "PROJECT": {
-      "TITLE": "Engedély",
-      "DESCRIPTION": "Határozd meg az engedélyeket a megadott projekthez. Ne feledd, hogy csak azoknak a projekteknek és felhasználóknak a bejegyzéseit láthatod, amelyekhez van jogosultságod."
+      "TITLE": "Szerepkör hozzárendelés",
+      "DESCRIPTION": "Határozd meg a szerepkör hozzárendeléseket a megadott projekthez. Ne feledd, hogy csak azoknak a projekteknek és felhasználóknak a bejegyzéseit láthatod, amelyekhez van jogosultságod."
     },
     "USER": {
-      "TITLE": "Engedély",
-      "DESCRIPTION": "Határozd meg az engedélyeket a megadott felhasználóhoz. Ne feledd, hogy csak azoknak a projekteknek és felhasználóknak a bejegyzéseit láthatod, amelyekhez van jogosultságod."
+      "TITLE": "Szerepkör hozzárendelés",
+      "DESCRIPTION": "Határozd meg a szerepkör hozzárendeléseket a megadott felhasználóhoz. Ne feledd, hogy csak azoknak a projekteknek és felhasználóknak a bejegyzéseit láthatod, amelyekhez van jogosultságod."
     },
     "CREATE": {
-      "TITLE": "Engedély létrehozása",
+      "TITLE": "Szerepkör hozzárendelés létrehozása",
       "DESCRIPTION": "Keresd meg a szervezetet, a projektet és a hozzá tartozó szerepköröket."
     },
     "EDIT": {
-      "TITLE": "Engedély megváltoztatása"
+      "TITLE": "Szerepkör hozzárendelés megváltoztatása"
     },
     "DETAIL": {
-      "TITLE": "Engedély részlete",
-      "DESCRIPTION": "Itt láthatod az engedély összes részletét."
+      "TITLE": "Szerepkör hozzárendelés részlete",
+      "DESCRIPTION": "Itt láthatod a szerepkör hozzárendelés összes részletét."
     },
     "TOAST": {
-      "UPDATED": "Engedély frissítve.",
-      "REMOVED": "Engedély eltávolítva",
-      "BULKREMOVED": "Engedélyek eltávolítva.",
+      "UPDATED": "Szerepkör hozzárendelés frissítve.",
+      "REMOVED": "Szerepkör hozzárendelés eltávolítva",
+      "BULKREMOVED": "Szerepkör hozzárendelések eltávolítva.",
       "CANTSHOWINFO": "Nem látogathatod meg ennek a felhasználónak a profilját, mivel nem vagy adminisztrátora annak a szervezetnek, amelyhez a felhasználó tartozik."
     },
     "DIALOG": {
-      "DELETE_TITLE": "Engedély törlése",
-      "DELETE_DESCRIPTION": "Az engedély törlésére készülsz. Folytatod?",
-      "BULK_DELETE_TITLE": "Engedélyek törlése",
-      "BULK_DELETE_DESCRIPTION": "Most több jogosultságot készülsz törölni. Folytatod?"
+      "DELETE_TITLE": "Szerepkör hozzárendelés törlése",
+      "DELETE_DESCRIPTION": "A szerepkör hozzárendelés törlésére készülsz. Folytatod?",
+      "BULK_DELETE_TITLE": "Szerepkör hozzárendelések törlése",
+      "BULK_DELETE_DESCRIPTION": "Most több szerepkör hozzárendelést készülsz törölni. Folytatod?"
     }
   },
   "CHANGES": {
@@ -2863,5 +2864,6 @@
       "TITLE": "Tevékenység",
       "DESCRIPTION": "Itt láthatod a legújabb eseményeket, amelyek felhasználói változást hoztak létre."
     }
-  }
+  },
+  "INSTANCEID": "Példányazonosító"
 }

@@ -1,5 +1,6 @@
 ---
 title: Organizations
+description: "Manage organizations, data isolation, and branding within ZITADEL."
 sidebar_label: Organizations
 ---
 
@@ -66,7 +67,7 @@ When no specific organization is selected (e.g., during an auth request or via [
 
 ## Usernames and Domains
 
-Each organization has its own pool of users, covering both users and service accounts. How these users authenticate depends on your domain configuration.
+Each organization has its own pool of users, covering both users and service accounts. How these users authenticate depends on your domain settings.
 
 ### Login Name Formats
 By default, if the setting **User Loginname must contain orgdomain** is **disabled**, usernames are unique across the entire instance.
@@ -88,26 +89,26 @@ You can verify your own domain names (e.g., `acme.ch`) to simplify the user expe
 Only one user with the username `john.doe` can exist within the organization `ACME`, regardless of which domain suffix they use to log in.
 </Callout>
 
-### Primary Domain
-An organization can have multiple domain names, but only one is **Primary**. The primary domain determines:
+### Organization Domain
+An organization can have multiple domain names, but only one is configured as the **Organization Domain**. The Organization Domain determines:
 * Which login name is displayed to the user in the UI.
 * What information is asserted in `access_tokens` (specifically the `preferred_username` claim).
 
 <Callout type="caution">
-Setting a Primary Domain affects users.
+Setting an Organization Domain affects users.
 If a user `coyote` exists in the global organization with the login name `coyote@acme.ch`, and you subsequently verify `acme.ch` for a specific organization, the global user's login name will be replaced with `coyote@{randomvalue.tld}`. ZITADEL will notify users affected by this change.
 </Callout>
 
 ## Domain Verification Guide
 
-If the **validate org domains** setting in [Domain Settings](./default-settings#domain-settings) is set to `true`, you must prove ownership of your domain via DNS or HTTP challenge.
+If the **validate Organization Domains** setting in [Domain Settings](./default-settings#domain-settings) is set to `true`, you must prove ownership of your domain via DNS or HTTP challenge.
 
 <Callout type="info">
 You can disable domain verification requirements in the [default settings](/guides/manage/console/default-settings#domain-settings) if you are running a self-hosted instance and do not require strict validation.
 </Callout>
 
 1.  Navigate to your **Organization Settings**.
-2.  Select the menu entry **Verified domains**.
+2.  Select the menu entry **Organization Domains**.
 3.  Click on the domain name you wish to verify. A dialog will appear offering DNS or HTTP challenge methods.
 
 <img
@@ -131,7 +132,7 @@ Do not delete the DNS verification record after success. ZITADEL re-checks domai
 
 ## Organization Settings
 
-Organizations can inherit configuration from the instance defaults or override them with specific policies. Settings configured at the Organization level take priority over Default settings.
+Organizations can inherit settings from the instance defaults or override them with specific policies. Settings configured at the Organization level take priority over Default settings.
 
 * [**Login Behavior and Access**](./default-settings#login-behavior-and-access): MFA options, passwordless authentication rules, and session lifetimes.
 * [**Identity Providers**](./default-settings#identity-providers): Configure IDPs available specifically for this organization.

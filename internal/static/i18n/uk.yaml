@@ -217,7 +217,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Файл з викликом не знайдено за очікуваним URL. Переконайтеся, що ви завантажили файл у правильне місце з правами читання"
     DomainVerificationHTTPNoMatch: "Файл з викликом знайдено за очікуваним URL, але він не містить правильний текст токену. Перевірте його вміст"
     DomainVerificationTimeout: "Сталася помилка часу очікування при запиті до DNS сервера"
-    PrimaryDomainNotDeletable: "Основний домен не може бути видалений"
+    PrimaryDomainNotDeletable: "Домен організації не може бути видалений"
     DomainNotFound: "Домен не знайдено"
     MemberIDMissing: "Відсутній ідентифікатор члена"
     MemberNotFound: "Член організації не знайдений"
@@ -891,7 +891,7 @@ EventTypes:
       verified: "Домен верифіковано"
       removed: "Домен видалений"
       primary:
-        set: "Основний домен встановлено"
+        set: "Домен організації встановлено"
       reserved: "Домен зарезервовано"
       released: "Домен звільнено"
     name:

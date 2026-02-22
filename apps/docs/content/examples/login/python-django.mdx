@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Django Python
+description: "Integrate ZITADEL into Python Django applications for user login and role mapping using OIDC."
 sidebar_label: Django
 ---
 
@@ -18,7 +19,7 @@ This documentation references our [example](https://github.com/zitadel/example-d
 
 ## ZITADEL setup
 
-Before we can start building our application, we have to do a few configuration steps in ZITADEL Management Console.
+Before we can start building our application, we have to do a few setup steps in ZITADEL Management Console.
 
 ### Project roles
 
@@ -42,9 +43,9 @@ If none of the roles is provided as a user, the user in Django will not be creat
 
 ![Project roles in management console](../../../public/img/django/project-roles.png)
 
-Finally, we can assign the roles to users in the project's authorizations tab.
+Finally, we can assign the roles to users in the project's `Role Assignments` tab.
 
-![Project authorizations in management console](../../../public/img/django/project-authorizations.png)
+![Project role assignments in management console](../../../public/img/django/project-authorizations.png)
 
 ### Set up application and obtain secrets
 
@@ -83,7 +84,7 @@ The secret will not be displayed again, but you can regenerate one if you loose 
 
 For this example we need the following dependencies:
 - `django`: to create an API with django
-- `python-dotenv`: to use environment variables in the configuration
+- `python-dotenv`: to use environment variables in the settings
 - `mozilla-django-oidc`: client-side OIDC functionality
 
 For the dependencies we need a requirements.txt-file with the following content:
@@ -137,13 +138,13 @@ AUTHENTICATION_BACKENDS = (
 )
 ```
 
-Add configuration:
+Add settings:
 
 ```python reference
 https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/settings.py#L130-L174
 ```
 
-and create a ".env"-file in the root folder with the configuration:
+and create a ".env"-file in the root folder with the settings:
 
 ```bash
 ZITADEL_PROJECT = "ID of the project you created the application in ZITADEL"
@@ -198,7 +199,7 @@ Never store and commit secrets in the ".env" or settings.py file
 
 ### Authentication and authorization
 
-To check the authentication and authorization the views in the polls application are extended with decorators:
+To check the authentication and authorization, the views in the polls application are extended with decorators:
 
 ```python reference
 https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/views.py

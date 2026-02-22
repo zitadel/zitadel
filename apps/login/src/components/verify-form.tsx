@@ -138,6 +138,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
           <TextInput
             type="text"
             autoComplete="one-time-code"
+            autoFocus
             {...register("code", { required: t("verify.required.code") })}
             label={t("verify.labels.code")}
             data-testid="code-text-input"

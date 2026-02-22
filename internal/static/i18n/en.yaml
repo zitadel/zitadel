@@ -223,7 +223,7 @@ Errors:
     DomainVerificationHTTPNotFound: "The file containing the challenge was not found in the expected URL. Check that you've uploaded the file in the right place with read permissions"
     DomainVerificationHTTPNoMatch: "The file containing the challenge has been found in the expected URL but it doesn't contain the right token text. Check its content"
     DomainVerificationTimeout: "There was a timeout querying the DNS server"
-    PrimaryDomainNotDeletable: "Primary domain must not be deleted"
+    PrimaryDomainNotDeletable: "Organization Domain must not be deleted"
     DomainNotFound: "Domain not found"
     MemberIDMissing: "Member ID missing"
     MemberNotFound: "Organisation member not found"
@@ -897,7 +897,7 @@ EventTypes:
       verified: "Domain verified"
       removed: "Domain removed"
       primary:
-        set: "Primary domain set"
+        set: "Organization Domain set"
       reserved: "Domain reserved"
       released: "Domain released"
     name:

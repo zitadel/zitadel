@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Next.js
+description: "Integrate ZITADEL authentication in Next.js applications using OIDC and the Authorization Code flow."
 sidebar_label: Next.js
 ---
 
@@ -27,7 +28,7 @@ then open [http://localhost:3000](http://localhost:3000) with your browser to se
 
 ## Setup Application and Get Keys
 
-Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
+Before we can start building our application, we have to do a few setup steps in ZITADEL Console.
 You will need to provide some information about your app.
 
 Navigate to your Project, then add a new application at the top of the page.
@@ -54,10 +55,10 @@ After successful app creation, a pop-up will appear, showing the app's client ID
 
 Now that you have your web application configured on the ZITADEL side, you can go ahead and integrate your NextJS app.
 
-### Configuration
+### Setup
 
 NextAuth.js exposes a REST API which is used by your application.
-To setup your configuration, create a file called `src/lib/auth.ts`.
+To setup your auth, create a file called `src/lib/auth.ts`.
 You can directly import the ZITADEL provider from [next-auth](https://next-auth.js.org/providers/zitadel).
 
 ```ts reference
@@ -149,7 +150,7 @@ Now go to Token settings and check the checkbox for **User Info inside ID Token*
 Create a file `.env` in the root of the project and add the following keys to it.
 You can find your Issuer Url on the application detail page in console.
 
-```env reference
+```bash reference
 https://github.com/zitadel/zitadel-nextjs/blob/main/.env.example
 ```
 

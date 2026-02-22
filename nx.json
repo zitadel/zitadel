@@ -5,7 +5,7 @@
     "libsDir": "packages"
   },
   "tui": {
-    "enabled": false
+    "enabled": true
   },
   "namedInputs": {
     "default": [

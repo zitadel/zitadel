@@ -13,7 +13,7 @@ import {
   setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
-import { create, Duration, timestampDate } from "@zitadel/client";
+import { create, Duration } from "@zitadel/client";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -90,7 +90,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
       return { error: t("errors.couldNotSendResetLink") };
     }
   } else if (userLoginSettings?.disableLoginWithEmail) {
-    if (user.preferredLoginName !== command.loginName || humanUser?.phone?.phone !== command.loginName) {
+    if (user.preferredLoginName !== command.loginName && humanUser?.phone?.phone !== command.loginName) {
       if (userLoginSettings?.ignoreUnknownUsernames) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         return {};
@@ -98,7 +98,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
       return { error: t("errors.couldNotSendResetLink") };
     }
   } else if (userLoginSettings?.disableLoginWithPhone) {
-    if (user.preferredLoginName !== command.loginName || humanUser?.email?.email !== command.loginName) {
+    if (user.preferredLoginName !== command.loginName && humanUser?.email?.email !== command.loginName) {
       if (userLoginSettings?.ignoreUnknownUsernames) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         return {};
@@ -221,14 +221,14 @@ export async function sendPassword(
           return { error: t("errors.couldNotVerifyPassword") };
         }
       } else if (userLoginSettings?.disableLoginWithEmail) {
-        if (user.preferredLoginName !== command.loginName || humanUser?.phone?.phone !== command.loginName) {
+        if (user.preferredLoginName !== command.loginName && humanUser?.phone?.phone !== command.loginName) {
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
           return { error: t("errors.couldNotVerifyPassword") };
         }
       } else if (userLoginSettings?.disableLoginWithPhone) {
-        if (user.preferredLoginName !== command.loginName || humanUser?.email?.email !== command.loginName) {
+        if (user.preferredLoginName !== command.loginName && humanUser?.email?.email !== command.loginName) {
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
@@ -448,10 +448,15 @@ export async function changePassword(command: { code?: string; userId: string; p
 
 type CheckSessionAndSetPasswordCommand = {
   sessionId: string;
+  currentPassword: string;
   password: string;
 };
 
-export async function checkSessionAndSetPassword({ sessionId, password }: CheckSessionAndSetPasswordCommand) {
+export async function checkSessionAndSetPassword({
+  sessionId,
+  currentPassword,
+  password,
+}: CheckSessionAndSetPasswordCommand) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
   const t = await getTranslations("password");
@@ -479,26 +484,62 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
     return { error: t("errors.couldNotLoadSession") };
   }
 
+  const loginSettings = await getLoginSettings({
+    serviceConfig,
+    organization: sessionCookie.organization,
+  });
+
+  let lifetime = loginSettings?.passwordCheckLifetime;
+  if (!lifetime || !lifetime.seconds) {
+    lifetime = {
+      seconds: BigInt(60 * 60 * 24),
+      nanos: 0,
+    } as Duration;
+  }
+
+  const checks = create(ChecksSchema, {
+    password: { password: currentPassword },
+  });
+
+  try {
+    await setSessionAndUpdateCookie({
+      recentCookie: sessionCookie,
+      checks,
+      lifetime,
+      requestId: sessionCookie.requestId,
+    });
+  } catch (error: any) {
+    if ("failedAttempts" in error && error.failedAttempts) {
+      if (loginSettings?.ignoreUnknownUsernames) {
+        return { error: t("errors.failedToAuthenticateNoLimit") };
+      }
+      const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: sessionCookie.organization });
+
+      const hasLimit =
+        lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
+      const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
+      const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
+
+      return {
+        error: t(messageKey, {
+          failedAttempts: error.failedAttempts,
+          maxPasswordAttempts: hasLimit ? (lockoutSettings?.maxPasswordAttempts).toString() : "?",
+          lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
+        }),
+      };
+    }
+    if (loginSettings?.ignoreUnknownUsernames) {
+      return { error: t("change.errors.couldNotVerifyPassword") };
+    }
+    return { error: t("change.errors.currentPasswordInvalid") };
+  }
+
   const payload = create(SetPasswordRequestSchema, {
     userId: session.factors.user.id,
     newPassword: {
       password,
     },
   });
-
-  // check if the password factor is set and not older than 5 minutes
-  const passwordVerifiedAt = session.factors?.password?.verifiedAt;
-  if (!passwordVerifiedAt) {
-    return { error: t("errors.passwordVerificationMissing") };
-  }
-
-  const passwordVerifiedDate = timestampDate(passwordVerifiedAt);
-  const now = new Date();
-  const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
-
-  if (passwordVerifiedDate < fiveMinutesAgo) {
-    return { error: t("errors.passwordVerificationTooOld") };
-  }
 
   return setPassword({ serviceConfig, payload }).catch((error) => {
     // throw error if failed precondition (ex. User is not yet initialized)

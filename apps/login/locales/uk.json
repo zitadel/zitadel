@@ -108,14 +108,17 @@
       "description": "Встановіть пароль для свого облікового запису",
       "submit": "Продовжити",
       "labels": {
+        "currentPassword": "Поточний пароль",
         "newPassword": "Новий пароль",
         "confirmPassword": "Підтвердити пароль"
       },
       "required": {
+        "currentPassword": "Ви повинні вказати поточний пароль!",
         "newPassword": "Ви повинні вказати новий пароль!",
         "confirmPassword": "Це поле обов'язкове"
       },
       "errors": {
+        "currentPasswordInvalid": "Поточний пароль невірний.",
         "couldNotChangePassword": "Не вдалося змінити пароль",
         "couldNotVerifyPassword": "Не вдалося перевірити пароль",
         "unknownError": "Невідома помилка"

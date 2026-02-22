@@ -1,5 +1,6 @@
 ---
 title: Hono
+description: "Implement secure authentication in Hono applications with ZITADEL and Auth.js using the OAuth 2.0 PKCE flow."
 sidebar_label: Hono
 framework_url: https://hono.dev
 auth_library: "@auth/core"
@@ -66,7 +67,7 @@ Once you have your Zitadel application configured:
 	- The **post-logout redirect URI** for handling logout callbacks
 	- A strong random **session secret** (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
 
-> **Note:** While PKCE doesn't require a client secret for public clients, Auth.js requires a value for internal configuration. You can leave `ZITADEL_CLIENT_SECRET` empty or provide a random string.
+> **Note:** While PKCE doesn't require a client secret for public clients, Auth.js requires a value for internal settings. You can leave `ZITADEL_CLIENT_SECRET` empty or provide a random string.
 
 3. Install dependencies using [npm](https://www.npmjs.com) and start the development server:
    ```bash

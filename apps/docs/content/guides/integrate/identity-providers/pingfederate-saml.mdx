@@ -1,5 +1,6 @@
 ---
-title: Configure PingFederate as a SAML Identity Provider in ZITADEL
+title: Set up PingFederate as a SAML Identity Provider in ZITADEL
+description: "Configure PingFederate as a SAML Identity Provider in ZITADEL to enable secure authentication and single sign-on"
 sidebar_label: PingFederate SAML
 id: pingfederate-saml
 ---
@@ -13,12 +14,12 @@ import TestSetup from './_test_setup.mdx';
 
 <Intro components={props.components} provider="PingFederate"/>
 
-## PingFederate SAML configuration
+## PingFederate SAML settings
 
 You need access to a PingFederate administrative console with permission to create **SP Connections**.
 
 We’ll first configure PingFederate sufficiently to **export IdP metadata**, which we then import into ZITADEL.
-After the ZITADEL SAML provider exists, we’ll return to PingFederate and finish the SP configuration using the ZITADEL URLs.
+After the ZITADEL SAML provider exists, we’ll return to PingFederate and finish the SP settings using the ZITADEL URLs.
 
 ### Create a new SP Connection for ZITADEL
 
@@ -59,9 +60,9 @@ Keep either:
 - the **Metadata URL**, or
 - the **XML file** contents,
 
-ready for the ZITADEL configuration steps.
+ready for the ZITADEL setup steps.
 
-## ZITADEL configuration
+## ZITADEL settings
 
 ### Go to the IdP providers overview
 
@@ -71,7 +72,7 @@ ready for the ZITADEL configuration steps.
 
 The SAML provider template has everything you need preconfigured.
 Add the metadata.xml or the URL to the metadata which are accessible by your ZITADEL instance.
-All the necessary configuration is contained in the metadata which has to be exchanged by the ServiceProvider and the IdentityProvider.
+All the necessary settings are contained in the metadata which has to be exchanged by the ServiceProvider and the IdentityProvider.
 
 <GeneralConfigDescription components={props.components} provider_account="PingFederate" />
 

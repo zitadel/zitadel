@@ -9,7 +9,7 @@
         "DESCRIPTION": "Selesaikan langkah-langkah berikut untuk mengamankan aplikasi Anda.",
         "CREATE_PROJECT": {
           "TITLE": "Buat proyek",
-          "DESCRIPTION": "Tambahkan proyek dan tentukan peran dan otorisasinya."
+          "DESCRIPTION": "Tambahkan proyek dan tentukan peran dan penugasan perannya."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Sebuah proyek menghosting satu atau beberapa aplikasi, yang dapat Anda gunakan untuk mengautentikasi pengguna Anda. Misalnya, Anda mungkin memiliki satu proyek dengan 3 aplikasi; satu untuk frontend web Anda, satu untuk aplikasi seluler Anda, dan satu untuk backend Anda. Anda juga dapat mengotorisasi pengguna Anda dengan proyek. Untuk mengizinkan pengguna dari organisasi lain masuk ke aplikasi Anda, beri mereka akses ke proyek Anda.<br/><br/>Jika Anda tidak dapat menemukan proyek, hubungi pemilik proyek atau seseorang dengan hak yang sesuai untuk mendapatkan akses .",
       "OWNED": {
         "TITLE": "Proyek Milik",
-        "DESCRIPTION": "Ini adalah proyek yang Anda miliki. Anda dapat mengelola pengaturan, otorisasi, dan aplikasi proyek ini."
+        "DESCRIPTION": "Ini adalah proyek yang Anda miliki. Anda dapat mengelola pengaturan, penugasan peran, dan aplikasi proyek ini."
       },
       "GRANTED": {
         "TITLE": "Proyek yang Diberikan",
@@ -61,9 +61,9 @@
         "METADATA": "Tambahkan atribut khusus ke pengguna Anda seperti departemen Anda. Anda dapat menggunakan informasi ini dalam tindakan organisasi Anda."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Otorisasi",
-      "DESCRIPTION": "Otorisasi menentukan hak akses pengguna ke suatu proyek. Anda dapat memberikan akses pengguna ke suatu proyek dan menentukan peran pengguna dalam proyek tersebut."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Penugasan Peran",
+      "DESCRIPTION": "Penugasan peran menentukan hak akses pengguna ke suatu proyek. Anda dapat memberikan akses pengguna ke suatu proyek dan menentukan peran pengguna dalam proyek tersebut."
     },
     "ACTIONS": {
       "TITLE": "Tindakan",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Buat proyek",
-        "description": "Tambahkan proyek dan tentukan peran dan otorisasinya.",
+        "description": "Tambahkan proyek dan tentukan peran dan penugasan perannya.",
         "action": "Buat proyek"
       },
       "APPLICATION_CREATED": {
@@ -401,9 +401,9 @@
         "action": "Tambahkan pengguna"
       },
       "user.grant.added": {
-        "title": "Berikan pengguna",
+        "title": "Tugaskan peran",
         "description": "Izinkan pengguna mengakses aplikasi Anda dan mengatur peran mereka.",
-        "action": "Berikan pengguna"
+        "action": "Tugaskan peran"
       }
     }
   },
@@ -429,7 +429,7 @@
     "NEWORG": "Organisasi Baru",
     "IAMADMIN": "Anda adalah Administrator instance. Perhatikan bahwa Anda memiliki izin yang diperluas.",
     "SHOWORGS": "Tampilkan Semua Organisasi",
-    "GRANTS": "Otorisasi",
+    "GRANTS": "Penugasan Peran",
     "ACTIONS": "Tindakan",
     "PRIVACY": "Pribadi",
     "TOS": "Ketentuan Layanan",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna organisasi",
     "ORG_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh organisasi",
     "ORG_SETTINGS_MANAGER": "Memiliki izin untuk mengelola pengaturan organisasi",
-    "ORG_USER_PERMISSION_EDITOR": "Memiliki izin untuk mengelola izin pengguna",
+    "ORG_USER_PERMISSION_EDITOR": "Memiliki izin untuk mengelola penugasan peran",
     "ORG_PROJECT_PERMISSION_EDITOR": "Memiliki izin untuk mengelola hibah proyek",
     "ORG_PROJECT_CREATOR": "Memiliki izin untuk membuat proyeknya sendiri dan pengaturan yang mendasarinya",
     "ORG_ADMIN_IMPERSONATOR": "Memiliki izin untuk menyamar sebagai admin dan pengguna akhir dari organisasi",
@@ -702,7 +702,7 @@
     "USERNAME": "Nama belakang",
     "ORGNAME": "Nama Organisasi",
     "ORGID": "ID Organisasi",
-    "PRIMARYDOMAIN": "Domain Utama",
+    "PRIMARYDOMAIN": "Domain Organisasi",
     "PROJECTNAME": "Nama Proyek",
     "RESOURCEOWNER": "Pemilik Sumber Daya",
     "METHODS": {
@@ -724,7 +724,7 @@
       "ME": "Buka profil sendiri",
       "PROJECTS": "<strong>Buka</strong>ke <strong>P</strong>proyek",
       "USERS": "<strong>G</strong>ke <strong>U</strong>ser",
-      "USERGRANTS": "<strong>Lakukan <strong>A</strong>otorisasi",
+      "ROLEASSIGNMENTS": "<strong>Ke</strong> <strong>P</strong>enugasan Peran",
       "ACTIONS": "<strong>G</strong>ke Tindakan dan <strong>F</strong>terendah",
       "DOMAINS": "<strong>Pergi</strong>ke <strong>D</strong>omain"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Kata Sandi dan Keamanan",
       "KEYS": "Kunci",
       "PAT": "Token Akses Pribadi",
-      "USERGRANTS": "Otorisasi",
+      "ROLEASSIGNMENTS": "Penugasan Peran",
       "MEMBERSHIPS": "Peran Administrator",
       "METADATA": "Metadata"
     },
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Panjangnya minimal harus {{value}} karakter.",
       "MAXLENGTHERROR": "Harus kurang dari {{value}} karakter."
     },
-    "ID": "PENGENAL",
+    "ID": "ID Pengguna",
     "EMAIL": "E-mail",
     "PHONE": "Nomor telepon",
     "PHONEEMPTY": "Tidak ada nomor telepon yang ditentukan",
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "Verifikasi Kode"
     },
     "GRANTS": {
-      "TITLE": "Hibah Pengguna",
+      "TITLE": "Penugasan Peran",
       "DESCRIPTION": "Berikan pengguna ini akses ke proyek tertentu",
       "CREATE": {
-        "TITLE": "Buat Hibah Pengguna",
+        "TITLE": "Buat Penugasan Peran",
         "DESCRIPTION": "Cari organisasi, proyek, dan peran proyek terkait."
       },
       "PROJECTNAME": "Nama Proyek",
@@ -1119,8 +1119,8 @@
       "ADDITIONAL-EXTERNAL": "Nama login (organisasi eksternal)"
     },
     "TARGET": {
-      "SELF": "Jika Anda ingin memberikan pengguna dari organisasi lain",
-      "EXTERNAL": "Untuk memberikan pengguna organisasi Anda",
+      "SELF": "Jika Anda ingin menugaskan peran kepada pengguna dari organisasi lain",
+      "EXTERNAL": "Untuk menugaskan peran kepada pengguna organisasi Anda",
       "CLICKHERE": "klik disini"
     },
     "SIGNEDOUT": "Anda sudah keluar. Klik tombol \"Masuk\" untuk masuk lagi.",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nama",
-      "ID": "PENGENAL",
+      "ID": "ID Organisasi",
       "CREATIONDATE": "Tanggal Pembuatan",
       "DATECHANGED": "Berubah",
       "FILTER": "Menyaring",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Unduh Berkas",
       "SELECTORGTOOLTIP": "Pilih organisasi ini.",
-      "PRIMARYDOMAIN": "Domain Utama",
+      "PRIMARYDOMAIN": "Domain Organisasi",
       "STATE": "Negara",
       "USEPASSWORD": "Tetapkan Kata Sandi Awal",
       "USEPASSWORDDESC": "Pengguna tidak perlu mengatur kata sandi selama inisialisasi."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Tambahkan Domain",
-      "TITLE": "Domain terverifikasi",
+      "TITLE": "Domain Organisasi",
       "DESCRIPTION": "Konfigurasikan domain organisasi Anda. Domain ini dapat digunakan untuk penemuan domain dan akhiran nama pengguna.",
-      "SETPRIMARY": "Tetapkan sebagai Utama",
+      "SETPRIMARY": "Domain Organisasi",
       "DELETE": {
         "TITLE": "Hapus Domain",
         "DESCRIPTION": "Anda akan menghapus salah satu domain Anda."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administrator menambahkan.",
       "MEMBERREMOVED": "Administrator dihapus.",
       "MEMBERCHANGED": "Administrator berubah.",
-      "SETPRIMARY": "Kumpulan domain primer.",
+      "SETPRIMARY": "Domain organisasi berhasil ditetapkan.",
       "DELETED": "Organisasi berhasil dihapus",
       "DEFAULTORGNOTFOUND": "Organisasi default tidak ditemukan",
       "ORG_WAS_DELETED": "Organisasi telah dihapus."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "Pengaturan SMTP dan SMS",
       "MESSAGETEXTS": "Teks Pesan",
       "IDP": "Penyedia Identitas",
-      "VERIFIED_DOMAINS": "Domain terverifikasi",
+      "VERIFIED_DOMAINS": "Domain Organisasi",
       "DOMAIN": "Pengaturan domain",
       "LOGINTEXTS": "Teks Antarmuka Masuk",
       "BRANDING": "merek",
@@ -2012,7 +2012,8 @@
           "DESCRIPTION": "Apakah Anda benar-benar ingin menghapus proyek Anda?",
           "TYPENAME": "Ketikkan nama proyek untuk menghapusnya secara permanen."
         }
-      }
+      },
+      "ID": "ID Proyek"
     },
     "SETTINGS": {
       "TITLE": "Pengaturan",
@@ -2089,7 +2090,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Pemilik Sumber Daya",
       "GRANTEDORGNAME": "Nama Organisasi",
-      "GRANTID": "Id Hibah",
+      "GRANTID": "ID Hibah",
       "CREATIONDATE": "Tanggal Pembuatan",
       "CHANGEDATE": "Terakhir diubah",
       "DATES": "Tanggal",
@@ -2294,7 +2295,7 @@
     "ADD": "Tambahkan Penyedia Identitas",
     "TYPE": "Jenis",
     "OWNER": "Pemilik",
-    "ID": "PENGENAL",
+    "ID": "ID Penyedia Identitas",
     "NAME": "Nama",
     "AUTHORIZATIONENDPOINT": "Titik Akhir Otorisasi",
     "TOKENENDPOINT": "Titik Akhir Token",
@@ -2519,7 +2520,7 @@
     "TOKEN": "Pengaturan Token",
     "PAGES": {
       "TITLE": "Aplikasi",
-      "ID": "PENGENAL",
+      "ID": "ID Aplikasi",
       "DESCRIPTION": "Di sini Anda dapat mengedit data aplikasi dan konfigurasinya.",
       "CREATE": "Buat aplikasi",
       "CREATE_SELECT_PROJECT": "Pilih proyek Anda terlebih dahulu",
@@ -2531,7 +2532,7 @@
       "DATECHANGED": "Berubah",
       "URLS": "URL",
       "DELETE": "Hapus Aplikasi",
-      "JUMPTOPROJECT": "Untuk mengonfigurasi peran, otorisasi, dan lainnya, navigasikan ke proyek.",
+      "JUMPTOPROJECT": "Untuk mengonfigurasi peran, penugasan peran, dan lainnya, navigasikan ke proyek.",
       "DETAIL": {
         "TITLE": "Detil",
         "STATE": {
@@ -2809,42 +2810,42 @@
   },
   "ROLESLABEL": "Peran",
   "GRANTS": {
-    "TITLE": "Otorisasi",
-    "DESC": "Ini semua adalah otorisasi pada organisasi Anda.",
-    "DELETE": "Hapus Otorisasi",
-    "EMPTY": "Tidak ada otorisasi yang ditemukan",
-    "ADD": "Buat Otorisasi",
+    "TITLE": "Penugasan Peran",
+    "DESC": "Ini semua adalah penugasan peran pada organisasi Anda.",
+    "DELETE": "Hapus Penugasan Peran",
+    "EMPTY": "Tidak ada penugasan peran yang ditemukan",
+    "ADD": "Buat Penugasan Peran",
     "ADD_BTN": "Baru",
     "PROJECT": {
-      "TITLE": "Otorisasi",
-      "DESCRIPTION": "Tentukan otorisasi untuk proyek yang ditentukan. Perhatikan bahwa Anda hanya dapat melihat entri proyek dan pengguna yang Anda miliki izinnya."
+      "TITLE": "Penugasan Peran",
+      "DESCRIPTION": "Tentukan penugasan peran untuk proyek yang ditentukan. Perhatikan bahwa Anda hanya dapat melihat entri proyek dan pengguna yang Anda miliki izinnya."
     },
     "USER": {
-      "TITLE": "Otorisasi",
-      "DESCRIPTION": "Tentukan otorisasi untuk pengguna tertentu. Perhatikan bahwa Anda hanya dapat melihat entri proyek dan pengguna yang Anda miliki izinnya."
+      "TITLE": "Penugasan Peran",
+      "DESCRIPTION": "Tentukan penugasan peran untuk pengguna tertentu. Perhatikan bahwa Anda hanya dapat melihat entri proyek dan pengguna yang Anda miliki izinnya."
     },
     "CREATE": {
-      "TITLE": "Buat otorisasi",
+      "TITLE": "Buat Penugasan Peran",
       "DESCRIPTION": "Cari organisasi, proyek, dan peran terkait."
     },
     "EDIT": {
-      "TITLE": "Ubah otorisasi"
+      "TITLE": "Ubah Penugasan Peran"
     },
     "DETAIL": {
-      "TITLE": "Detail Otorisasi",
-      "DESCRIPTION": "Di sini Anda dapat melihat semua detail otorisasi."
+      "TITLE": "Detail Penugasan Peran",
+      "DESCRIPTION": "Di sini Anda dapat melihat semua detail penugasan peran."
     },
     "TOAST": {
-      "UPDATED": "Otorisasi diperbarui.",
-      "REMOVED": "Otorisasi dihapus",
-      "BULKREMOVED": "Otorisasi dihapus.",
+      "UPDATED": "Penugasan peran diperbarui.",
+      "REMOVED": "Penugasan peran dihapus",
+      "BULKREMOVED": "Penugasan peran dihapus.",
       "CANTSHOWINFO": "Anda tidak dapat mengunjungi profil pengguna ini karena Anda bukan administrator organisasi tempat pengguna ini berada"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Hapus otorisasi",
-      "DELETE_DESCRIPTION": "Anda akan menghapus otorisasi. Apakah Anda ingin melanjutkan?",
-      "BULK_DELETE_TITLE": "Hapus otorisasi",
-      "BULK_DELETE_DESCRIPTION": "Anda akan menghapus beberapa otorisasi. Apakah Anda ingin melanjutkan?"
+      "DELETE_TITLE": "Hapus penugasan peran",
+      "DELETE_DESCRIPTION": "Anda akan menghapus penugasan peran. Apakah Anda ingin melanjutkan?",
+      "BULK_DELETE_TITLE": "Hapus penugasan peran",
+      "BULK_DELETE_DESCRIPTION": "Anda akan menghapus beberapa penugasan peran. Apakah Anda ingin melanjutkan?"
     }
   },
   "CHANGES": {
@@ -2863,5 +2864,6 @@
       "TITLE": "Aktivitas",
       "DESCRIPTION": "Di sini Anda dapat melihat peristiwa terbaru yang menghasilkan perubahan pengguna."
     }
-  }
+  },
+  "INSTANCEID": "ID Instans"
 }

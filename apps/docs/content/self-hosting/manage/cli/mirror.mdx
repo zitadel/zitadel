@@ -1,5 +1,6 @@
 ---
 title: Mirror data from cockroach to postgres
+description: "Migrate data from CockroachDB to PostgreSQL using ZITADEL mirror commands for database-to-database migrations and replication"
 sidebar_label: Mirror command
 ---
 
@@ -94,7 +95,7 @@ Flags:
       --tlsMode externalSecure   start Zitadel with (enabled), without (disabled) TLS or external component e.g. reverse proxy (external) terminating TLS, this flag will overwrite externalSecure and `tls.enabled` in configs files
 ```
 
-## Configuration
+## Settings
 
 ```yaml
 # The source database the data are copied from. Use either cockroach or postgres, by default cockroach is used

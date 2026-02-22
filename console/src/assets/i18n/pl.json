@@ -9,7 +9,7 @@
         "DESCRIPTION": "Wykonaj następujące kroki, aby zabezpieczyć swoją aplikację.",
         "CREATE_PROJECT": {
           "TITLE": "Utwórz projekt",
-          "DESCRIPTION": "Dodaj projekt i zdefiniuj jego role i uprawnienia."
+          "DESCRIPTION": "Dodaj projekty i zdefiniuj role oraz przypisania ról."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Projekt gości jedną lub więcej aplikacji, których możesz użyć do uwierzytelniania swoich użytkowników. Na przykład, możesz mieć jeden projekt z 3 aplikacjami; jedną dla swojego frontendu internetowego, jedną dla swojej aplikacji mobilnej i jedną dla swojego backendu. Możesz również autoryzować swoich użytkowników za pomocą projektów. Aby umożliwić użytkownikom z innych organizacji logowanie się do twoich aplikacji, udziel im dostępu do twojego projektu.<br/><br/>Jeśli nie możesz znaleźć projektu, skontaktuj się z właścicielem projektu lub osobą z odpowiednimi uprawnieniami, aby uzyskać dostęp.",
       "OWNED": {
         "TITLE": "Posiadane projekty",
-        "DESCRIPTION": "To są projekty, które posiadasz. Możesz zarządzać ustawieniami tych projektów, uprawnieniami i aplikacjami."
+        "DESCRIPTION": "Są to projekty, których jesteś właścicielem. Możesz zarządzać ich ustawieniami, przypisaniami ról i aplikacjami."
       },
       "GRANTED": {
         "TITLE": "Przyznane projekty",
@@ -61,9 +61,9 @@
         "METADATA": "Dodaj niestandardowe atrybuty do siebie, takie jak twój dział. Możesz użyć tych informacji w działaniach swojej organizacji."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Autoryzacje",
-      "DESCRIPTION": "Autoryzacje definiują prawa dostępu użytkownika do projektu. Możesz przyznać użytkownikowi dostęp do projektu i zdefiniować role użytkowników w tym projekcie."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Przypisania ról",
+      "DESCRIPTION": "Przypisania ról definiują prawa dostępu użytkownika do projektu. Możesz przyznać użytkownikowi dostęp do projektu i zdefiniować role użytkowników w tym projekcie."
     },
     "ACTIONS": {
       "TITLE": "Akcje",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Stwórz swój pierwszy projekt",
-        "description": "Dodaj swój pierwszy projekt i określ jego role i uprawnienia.",
+        "description": "Dodaj projekty i zdefiniuj role oraz przypisania ról.",
         "action": "Utwórz projekt"
       },
       "APPLICATION_CREATED": {
@@ -429,7 +429,7 @@
     "NEWORG": "Nowa Organizacja",
     "IAMADMIN": "Jesteś administratorem instancja. Zauważ, że masz rozszerzone uprawnienia.",
     "SHOWORGS": "Pokaż wszystkie organizacje",
-    "GRANTS": "Autoryzacje",
+    "GRANTS": "Przypisania ról",
     "ACTIONS": "Akcje",
     "PRIVACY": "Prywatność",
     "TOS": "Warunki korzystania z usług",
@@ -660,7 +660,7 @@
     "ORG_USER_MANAGER": "Ma uprawnienie do tworzenia i zarządzania użytkownikami organizacji",
     "ORG_OWNER_VIEWER": "Ma uprawnienie do przeglądania całej organizacji",
     "ORG_SETTINGS_MANAGER": "Ma uprawnienie do zarządzania ustawieniami organizacji",
-    "ORG_USER_PERMISSION_EDITOR": "Ma uprawnienie do zarządzania uprawnieniami użytkowników",
+    "ORG_USER_PERMISSION_EDITOR": "Ma uprawnienia do zarządzania przypisaniami ról",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ma uprawnienie do zarządzania uprawnieniami projektu",
     "ORG_PROJECT_CREATOR": "Ma uprawnienie do tworzenia własnych projektów i podstawowych ustawień",
     "ORG_ADMIN_IMPERSONATOR": "Ma uprawnienia do podszywania się pod administratora i użytkowników końcowych z organizacji",
@@ -701,7 +701,7 @@
     "USERNAME": "Nazwa Użytkownika",
     "ORGNAME": "Nazwa Organizacji",
     "ORGID": "ID Organizacji",
-    "PRIMARYDOMAIN": "Domena podstawowa",
+    "PRIMARYDOMAIN": "Domena organizacji",
     "PROJECTNAME": "Nazwa Projektu",
     "RESOURCEOWNER": "Właściciel Zasobu",
     "METHODS": {
@@ -723,7 +723,7 @@
       "ME": "Idź do Własnego Profilu",
       "PROJECTS": "Idź do <strong>P</strong>rojektów",
       "USERS": "Idź do <strong>U</strong>żytkowników",
-      "USERGRANTS": "Idź do <strong>A</strong>utoryzacji",
+      "ROLEASSIGNMENTS": "Idź do <strong>P</strong>rzypisania ról",
       "ACTIONS": "Idź do Działań i Przepływów",
       "DOMAINS": "Idź do <strong>D</strong>omen"
     }
@@ -764,7 +764,7 @@
       "SECURITY": "Hasło i Bezpieczeństwo",
       "KEYS": "Klucze",
       "PAT": "Tokeny Dostępu Osobistego",
-      "USERGRANTS": "Autoryzacje",
+      "ROLEASSIGNMENTS": "Przypisania ról",
       "MEMBERSHIPS": "Role administratora",
       "METADATA": "Metadane"
     },
@@ -1043,7 +1043,7 @@
       "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków.",
       "MAXLENGTHERROR": "Musi zawierać mniej niż {{value}} znaków"
     },
-    "ID": "ID",
+    "ID": "ID użytkownika",
     "EMAIL": "E-mail",
     "PHONE": "Numer telefonu",
     "PHONEEMPTY": "Nie podano numeru telefonu",
@@ -1080,10 +1080,10 @@
       "ENTERCODE_DESC": "Zweryfikuj kod"
     },
     "GRANTS": {
-      "TITLE": "Uprawnienia użytkownika",
+      "TITLE": "Przypisania ról",
       "DESCRIPTION": "Przydziel temu użytkownikowi dostęp do określonych projektów",
       "CREATE": {
-        "TITLE": "Utwórz uprawnienie użytkownika",
+        "TITLE": "Utwórz przypisania ról",
         "DESCRIPTION": "Wyszukaj organizację, projekt i odpowiednie role projektu."
       },
       "PROJECTNAME": "Nazwa projektu",
@@ -1373,7 +1373,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nazwa",
-      "ID": "ID",
+      "ID": "ID organizacji",
       "CREATIONDATE": "Data utworzenia",
       "DATECHANGED": "Zmieniono",
       "FILTER": "Filtr",
@@ -1419,7 +1419,7 @@
       },
       "DOWNLOAD_FILE": "Pobierz plik",
       "SELECTORGTOOLTIP": "Wybierz tę organizację.",
-      "PRIMARYDOMAIN": "Domena główna",
+      "PRIMARYDOMAIN": "Domena organizacji",
       "STATE": "Stan",
       "USEPASSWORD": "Ustaw hasło początkowe",
       "USEPASSWORDDESC": "Użytkownik nie musi ustawiać hasła podczas inicjalizacji."
@@ -1430,9 +1430,9 @@
     },
     "DOMAINS": {
       "NEW": "Dodaj domenę",
-      "TITLE": "Zweryfikowane domeny",
+      "TITLE": "Domena organizacji",
       "DESCRIPTION": "Skonfiguruj swoje domeny. Ta domena może być używana do logowania się z Twoimi użytkownikami.",
-      "SETPRIMARY": "Ustaw jako główną",
+      "SETPRIMARY": "Domena organizacji",
       "DELETE": {
         "TITLE": "Usuń domenę",
         "DESCRIPTION": "Zamierzasz usunąć jedną z twoich domen. Zauważ, że twoi użytkownicy już nie będą mogli używać tej domeny do logowania się."
@@ -1460,7 +1460,7 @@
       "MEMBERADDED": "Dodano administratora.",
       "MEMBERREMOVED": "Usunięto administratora.",
       "MEMBERCHANGED": "Zmieniono administratora.",
-      "SETPRIMARY": "Ustawiono domenę podstawową.",
+      "SETPRIMARY": "Domena organizacji została ustawiona pomyślnie.",
       "DELETED": "Organizacja została usunięta pomyślnie",
       "DEFAULTORGNOTFOUND": "Nie znaleziono organizacji domyślnej",
       "ORG_WAS_DELETED": "Organizacja została usunięta."
@@ -1498,7 +1498,7 @@
       "NOTIFICATIONS_DESC": "Ustawienia SMTP i SMS",
       "MESSAGETEXTS": "Teksty wiadomości",
       "IDP": "Dostawcy tożsamości",
-      "VERIFIED_DOMAINS": "Zweryfikowane domeny",
+      "VERIFIED_DOMAINS": "Domena organizacji",
       "DOMAIN": "Ustawienia domeny",
       "LOGINTEXTS": "Teksty interfejsu logowania",
       "BRANDING": "Marka",
@@ -2013,7 +2013,8 @@
           "DESCRIPTION": "Czy na pewno chcesz usunąć swój projekt?",
           "TYPENAME": "Wpisz nazwę projektu, aby trwale go usunąć."
         }
-      }
+      },
+      "ID": "ID projektu"
     },
     "SETTINGS": {
       "TITLE": "Ustawienia",
@@ -2139,7 +2140,7 @@
       "ASSERTION": "Twierdzenie ról podczas uwierzytelniania",
       "ASSERTION_DESCRIPTION": "Informacje o rolach są wysyłane z punktu końcowego Userinfo i zależą od ustawień aplikacji w tokenach i innych typach.",
       "CHECK": "Sprawdź autoryzację podczas uwierzytelniania",
-      "CHECK_DESCRIPTION": "Jeśli jest ustawione, użytkownicy mogą się uwierzytelniać tylko wtedy, gdy przypisana jest im jakaś rola.",
+      "CHECK_DESCRIPTION": "Odmów uwierzytelnienia, jeśli użytkownik nie ma przypisanych ról do tego projektu. Przypisania ról do projektu bez przypisywania konkretnej roli użytkownikowi są dozwolone.",
       "DIALOG": {
         "DELETE_TITLE": "Usuń rolę",
         "DELETE_DESCRIPTION": "Zamierzasz usunąć rolę projektu. Jesteś pewny?"
@@ -2292,7 +2293,7 @@
     "ADD": "Dodaj dostawcę tożsamości",
     "TYPE": "Typ",
     "OWNER": "Właściciel",
-    "ID": "ID",
+    "ID": "ID dostawcy tożsamości",
     "NAME": "Nazwa",
     "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
     "TOKENENDPOINT": "Token Endpoint",
@@ -2495,7 +2496,7 @@
     "TOKEN": "Ustawienia tokenów",
     "PAGES": {
       "TITLE": "Aplikacja",
-      "ID": "ID",
+      "ID": "ID aplikacji",
       "DESCRIPTION": "Tutaj możesz edytować dane swojej aplikacji i jej konfigurację.",
       "CREATE": "Utwórz aplikację",
       "CREATE_SELECT_PROJECT": "Najpierw wybierz swój projekt",
@@ -2507,7 +2508,7 @@
       "DATECHANGED": "Zmienione",
       "URLS": "Adresy URL",
       "DELETE": "Usuń aplikację",
-      "JUMPTOPROJECT": "Aby skonfigurować role, uprawnienia i nie tylko, przejdź do projektu.",
+      "JUMPTOPROJECT": "Aby skonfigurować role, przypisania ról i inne elementy, przejdź do projektu.",
       "DETAIL": {
         "TITLE": "Szczegóły",
         "STATE": {
@@ -2785,42 +2786,42 @@
   },
   "ROLESLABEL": "Role",
   "GRANTS": {
-    "TITLE": "Uprawnienia",
-    "DESC": "To są wszystkie uprawnienia w twojej organizacji.",
-    "DELETE": "Usuń uprawnienie",
-    "EMPTY": "Nie znaleziono uprawnienia",
-    "ADD": "Utwórz uprawnienie",
+    "TITLE": "Przypisania ról",
+    "DESC": "To są wszystkie przypisania ról w twojej organizacji.",
+    "DELETE": "Usuń przypisanie roli",
+    "EMPTY": "Nie znaleziono przypisania roli",
+    "ADD": "Utwórz przypisania roli",
     "ADD_BTN": "Nowe",
     "PROJECT": {
-      "TITLE": "Uprawnienie",
-      "DESCRIPTION": "Zdefiniuj uprawnienia dla określonego projektu. Pamiętaj, że możesz widzieć tylko wpisy projektów i użytkowników, dla których masz uprawnienia."
+      "TITLE": "Przypisania roli",
+      "DESCRIPTION": "Zdefiniuj przypisania ról dla określonego projektu. Pamiętaj, że możesz wyświetlić tylko wpisy projektów i użytkowników, do których masz uprawnienia."
     },
     "USER": {
-      "TITLE": "Uprawnienie",
-      "DESCRIPTION": "Zdefiniuj uprawnienia dla określonego użytkownika. Pamiętaj, że możesz widzieć tylko wpisy projektów i użytkowników, dla których masz uprawnienia."
+      "TITLE": "Utwórz przypisania roli",
+      "DESCRIPTION": "Zdefiniuj przypisania ról dla określonego użytkownika. Pamiętaj, że możesz wyświetlić tylko wpisy dotyczące projektów i użytkowników, do których masz uprawnienia."
     },
     "CREATE": {
-      "TITLE": "Utwórz uprawnienie",
+      "TITLE": "Utwórz przypisania roli",
       "DESCRIPTION": "Wyszukaj organizację, projekt i odpowiednie role."
     },
     "EDIT": {
-      "TITLE": "Zmiana uprawnienia"
+      "TITLE": "Zmiana przypisania roli"
     },
     "DETAIL": {
-      "TITLE": "Szczegóły uprawnienia",
-      "DESCRIPTION": "Tutaj możesz zobaczyć wszystkie szczegóły uprawnienia."
+      "TITLE": "Szczegóły przypisania roli",
+      "DESCRIPTION": "Tutaj możesz zobaczyć wszystkie szczegóły przypisania roli."
     },
     "TOAST": {
-      "UPDATED": "Autoryzacja zaktualizowana.",
-      "REMOVED": "Autoryzacja usunięta",
-      "BULKREMOVED": "Autoryzacje usunięte.",
+      "UPDATED": "Przypisanie roli zaktualizowane",
+      "REMOVED": "Przypisanie roli usunięte",
+      "BULKREMOVED": "Przypisanie roli usunięte.",
       "CANTSHOWINFO": "Nie możesz odwiedzić profilu tego użytkownika, ponieważ nie jesteś członkiem organizacji, do której należy ten użytkownik"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Usuń autoryzację",
-      "DELETE_DESCRIPTION": "Zamierzasz usunąć autoryzację. Czy chcesz kontynuować?",
-      "BULK_DELETE_TITLE": "Usuń autoryzacje",
-      "BULK_DELETE_DESCRIPTION": "Zamierzasz usunąć wiele autoryzacji. Czy chcesz kontynuować?"
+      "DELETE_TITLE": "Usuń przypisanie roli",
+      "DELETE_DESCRIPTION": "Zamierzasz usunąć przypisanie roli. Czy chcesz kontynuować?",
+      "BULK_DELETE_TITLE": "Usuń przypisania ról",
+      "BULK_DELETE_DESCRIPTION": "Zamierzasz usunąć wiele przypisania ról. Czy chcesz kontynuować?"
     }
   },
   "CHANGES": {
@@ -2839,5 +2840,6 @@
       "TITLE": "Aktywność",
       "DESCRIPTION": "Tutaj możesz zobaczyć ostatnie wydarzenia, które spowodowały zmiany w użytkowniku."
     }
-  }
+  },
+  "INSTANCEID": "ID instancji"
 }

@@ -1,5 +1,6 @@
 ---
 title: Migrate from Actions V1 to V2
+description: "Migrate from Actions V1 to V2 by transitioning custom logic to external HTTP endpoints using webhooks for better scalability and flexibility"
 sidebar_label: Migrate from V1 to V2
 ---
 
@@ -32,7 +33,7 @@ Custom JavaScript code executed directly inside ZITADEL's process. For a complet
 
 - **Context:** Embedded goja JavaScript engine
 - **Risks:** Shared memory space; errors could affect core functionality
-- **Constraints:** Bound to ZITADEL process resources; limited timeout configuration
+- **Constraints:** Bound to ZITADEL process resources; limited timeout settings
 - **V1 Triggers:** Pre-event hooks (fire before operation) and Post-event hooks (fire after success)
 
 ### Actions V2: The Webhook Model

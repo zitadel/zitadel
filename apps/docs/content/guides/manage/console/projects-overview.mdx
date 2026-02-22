@@ -1,5 +1,6 @@
 ---
 title: Organize applications, services, and roles with projects
+description: "Use projects to group applications and manage roles and authorizations across multiple clients."
 sidebar_label: Projects
 sidebar_position: 4
 ---
@@ -16,7 +17,7 @@ A Project is the vessel that holds your Applications and Roles. It defines the s
 Imagine you are building a **Point of Sales (POS)** platform. In ZITADEL, you would create one Project (e.g., named `POS`).
 * **Applications:** Your web portal for administration, your iOS app, and your Android app would all be defined as **Applications** within this single Project.
 * **Roles:** You would create **Roles** (e.g., `admin`, `cashier`, `viewer`) inside this Project.
-* **Authorization:** All applications in this project share these roles, allowing you to create unified authorizations for your users across all platforms.
+* **Role assignment:** All applications in this project share these roles, allowing you to create unified role assignments for your users across all platforms.
 
 ![POS Project](../../../../public/img/guides/console/posproject.png)
 
@@ -28,7 +29,7 @@ At the moment, we support OIDC and almost every OAuth2 client. We'll be expandin
 Go to [Applications](./applications-overview) for more details.
 
 ### Roles
-A role consists of different attributes, but only the **Key** is relevant to the authorization and must be unique within the project.
+A role consists of different attributes, but only the **Key** is relevant to the role assignment and must be unique within the project.
 * **Key:** The identifier used in code (e.g., `role.admin`).
 * **Display Name:** A human-readable name for the UI.
 * **Group:** Enables better handling in the ZITADEL Management Console (e.g., giving a user all roles of a specific group).
@@ -65,7 +66,7 @@ To create a project:
 A powerful feature of ZITADEL is the ability to **Grant** a project to other organizations. This is essential for B2B scenarios where you sell your software to business partners.
 
 * **The Concept:** You enable another organization to use your Project.
-* **Delegation:** The granted organization can manage the authorizations of *their own users* for your project. They can assign the roles you defined to their employees without your intervention.
+* **Delegation:** The granted organization can manage the role assignments of *their own users* for your project. They can assign the roles you defined to their employees without your intervention.
 * **Isolation:** You can select specifically which roles are available to the granted organization. This allows you to restrict features (e.g., "Premium" roles) per customer.
 
 Using the POS example above: You could grant the `POS` project to a partner organization. That partner can then log in with their own domain, use their own branding, and manage their own cashier users, all while using your underlying application structure.
@@ -79,7 +80,7 @@ Using the POS example above: You could grant the `POS` project to a partner orga
 ### How to Grant a Project
 
 1.  Navigate to the Project you want to share (e.g., `POS`).
-2.  In the **Grants** section, click **New**.
+2.  In the **Project Grants** section, click **New**.
 
 <img src="/docs/img/guides/console/grantsmenu.png" alt="Grants" width="170px" />
 
@@ -101,13 +102,13 @@ If you have different designs for your organizations (Private Labeling), you can
   width="400px"
 />
 
-| Setting | Description |
-| :--- | :--- |
-| **Unspecified** | If nothing is specified, the system default settings will trigger. |
+| Setting                      | Description                                                                                                                                                                                               |
+|:-----------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Unspecified**              | If nothing is specified, the system default settings will trigger.                                                                                                                                        |
 | **Enforce project's policy** | This forces the branding of the organization that *owns* the project throughout the entire login process. Useful if you want your users to always see *your* brand, even if they belong to a partner org. |
-| **Allow login user policy** | The login starts with the project's branding. However, as soon as the user is identified (e.g., by entering their email), the branding switches to match the user's organization. |
+| **Allow login user policy**  | The login starts with the project's branding. However, as soon as the user is identified (e.g., by entering their email), the branding switches to match the user's organization.                         |
 
-In a B2B use case, you would typically use **Allow login user policy**. If you want to skip the detection step, you can preselect an organization using the [primary domain scope](/apis/openidoauth/scopes#reserved-scopes) (e.g., `urn:zitadel:iam:org:domain:primary:{domainname}`).
+In a B2B use case, you would typically use **Allow login user policy**. If you want to skip the detection step, you can preselect an organization using the [Organization Domain scope](/apis/openidoauth/scopes#reserved-scopes) (e.g., `urn:zitadel:iam:org:domain:primary:{domainname}`).
 
 ### Role Settings
 You can configure strict security checks regarding roles during authentication.
@@ -119,7 +120,7 @@ You can configure strict security checks regarding roles during authentication.
 />
 
 * **Assert Roles on Authentication:** Role information is sent from the Userinfo endpoint (and in tokens, depending on app settings).
-* **Check authorization on Authentication:** Users are **only** allowed to login if they have at least one role assigned for this project. If they have no roles, access is denied immediately.
+* **Check Role Assignment on Authentication:** Users are **only** allowed to log in if they have at least one role assigned for this project. If they have no roles, access is denied immediately.
 * **Check for Project on Authentication:** Checks if the user's organization actually has a grant for this project. If not, the user cannot be authenticated.
 
 ### Roles in Tokens

@@ -1,5 +1,6 @@
 ---
 title: OAuth 2.0 Proxy
+description: "Configure OAuth2-proxy with ZITADEL as an Identity Provider (IdP) using the Authorization Code flow."
 ---
 
 [OAuth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) is a project which allows services to delegate the authentication flow to a IDP, for example **ZITADEL**
@@ -8,7 +9,7 @@ title: OAuth 2.0 Proxy
 
 ### Setup Application and get Keys
 
-Before we can start building our application we have do do a few configuration steps in ZITADEL Console.
+Before we can start building our application we have to do a few setup steps in ZITADEL Console.
 You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your project and add a new application at the top of the page.
 Select Web Application and continue.
 We recommend that you use [Authorization Code](/apis/openidoauth/grant-types#authorization-code) for the OAuth 2.0 Proxy.
@@ -61,7 +62,7 @@ http_address = "127.0.0.1:4180" #localdev only
 
 ### Check for groups
 
-If you want oauth2-proxy to check for roles in the tokens you have to add an [action](/guides/manage/console/actions-overview) in ZITADEL to [complement the token](/guides/manage/console/actions-overview) in ZITADEL to [complement the token](/apis/actions/complement-token) according to [this example](/guides/manage/console/actions-overview) in ZITADEL to [complement the token](/apis/actions/complement-token) according to [this example](https://github.com/zitadel/actions/blob/main/examples/custom_roles.js) and add the following configuration to the config:
+If you want oauth2-proxy to check for roles in the tokens you have to add an [action](/guides/manage/console/actions-overview) in ZITADEL to [complement the token](/guides/manage/console/actions-overview) in ZITADEL to [complement the token](/apis/actions/complement-token) according to [this example](/guides/manage/console/actions-overview) in ZITADEL to [complement the token](/apis/actions/complement-token) according to [this example](https://github.com/zitadel/actions/blob/main/examples/custom_roles.js) and add the following settings to the config:
 
 ```toml
 oidc_groups_claim = "{your_actions_group_key}"

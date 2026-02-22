@@ -1,13 +1,14 @@
 ---
 title: ZITADEL Production Checklist
+description: "Comprehensive checklist for deploying ZITADEL in production, covering infrastructure, security, and operational readiness."
 sidebar_label: Production Checklist
 ---
 
 To apply best practices to your production setup we created a step by step checklist you may wish to follow.
 
-### Infrastructure Configuration
+### Infrastructure Setup
 
-- [ ] Make use of configuration management tools such as Terraform to provision all of the below
+- [ ] Make use of infrastructure as code tools such as Terraform to provision all of the below
 - [ ] Use a secrets manager to store your confidential information
 - [ ] Reduce the manual interaction with your platform to an absolute minimum
 
@@ -36,14 +37,14 @@ To apply best practices to your production setup we created a step by step check
   - [ ] Secure the access by rate limits for specific endpoints (e.g. API vs frontend) to secure availability on high load. See the [ZITADEL Cloud rate limits](/legal/policies/rate-limit-policy) for reference.
   - [ ] Check that your firewall also filters IPv6 traffic
 
-### ZITADEL configuration
+### ZITADEL setup
 
-- [ ] Configure a valid [SMTP Server](/guides/manage/console/default-settings#smtp) and test the email delivery
+- [ ] Set up a valid [SMTP Server](/guides/manage/console/default-settings#smtp) and test the email delivery
 - [ ] Add [Custom Branding](/guides/manage/customize/branding) if required
-- [ ] Configure a valid [SMS Service](/guides/manage/console/default-settings#sms) such as Twilio if needed
-- [ ] Configure your privacy policy, terms of service and a help Link if needed
+- [ ] Set up a valid [SMS Service](/guides/manage/console/default-settings#sms) such as Twilio if needed
+- [ ] Set your privacy policy, terms of service and a help Link if needed
 - [ ] Keep your [masterkey](/self-hosting/manage/configure) in a secure storage
-- [ ] Declare and apply zitadel configuration using the zitadel terraform [provider](https://github.com/zitadel/terraform-provider-zitadel)
+- [ ] Declare and apply zitadel settings using the zitadel terraform [provider](https://github.com/zitadel/terraform-provider-zitadel)
 
 ### Security
 

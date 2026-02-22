@@ -2,8 +2,14 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm exec buf generate ../../proto",
+        "cwd": "packages/zitadel-proto"
+      },
       "inputs": [
-        "default",
+        "{projectRoot}/buf.gen.yaml",
+        "{projectRoot}/package.json",
         "{workspaceRoot}/pnpm-lock.yaml",
         "{workspaceRoot}/proto/**/*"
       ],
