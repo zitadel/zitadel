@@ -73,6 +73,8 @@ type organizationChanges interface {
 	SetName(name string) database.Change
 	// SetState sets the name column.
 	SetState(state OrgState) database.Change
+	// SetUpdatedAt sets the updated at column.
+	SetUpdatedAt(updatedAt time.Time) database.Change
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/org.mock.go . OrganizationRepository

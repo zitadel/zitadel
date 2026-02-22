@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -145,6 +146,14 @@ func (o org) SetName(name string) database.Change {
 // SetState implements [domain.organizationChanges].
 func (o org) SetState(state domain.OrgState) database.Change {
 	return database.NewChange(o.StateColumn(), state)
+}
+
+// SetUpdatedAt implements [domain.organizationChanges].
+func (o org) SetUpdatedAt(updatedAt time.Time) database.Change {
+	if updatedAt.IsZero() {
+		return database.NewChangeToNull(o.UpdatedAtColumn())
+	}
+	return database.NewChange(o.UpdatedAtColumn(), updatedAt)
 }
 
 // -------------------------------------------------------------
