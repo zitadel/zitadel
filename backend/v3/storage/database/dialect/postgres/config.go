@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mitchellh/mapstructure"
 
@@ -37,12 +38,34 @@ type Config struct {
 	// configuredFields []string
 }
 
+// WithAfterConnectFunc returns a [database.ConnectorOpts] that can set the [pgxpool.Config.AfterConnect]
+// callback to the input afterConn function specified.
+//
+// The option is called when [Config.Connect] is called.
+//
+// This option is specific to the postgres dialect implementation, hence if [database.Connector]
+// cannot be type asserted to *[Config], the option has no effect.
+func WithAfterConnectFunc(afterConn func(context.Context, *pgx.Conn) error) database.ConnectorOpts {
+	return func(c database.Connector) {
+		config, ok := c.(*Config)
+		if !ok {
+			return
+		}
+
+		config.AfterConnect = afterConn
+	}
+}
+
 // Connect implements [database.Connector].
-func (c *Config) Connect(ctx context.Context) (database.Pool, error) {
+func (c *Config) Connect(ctx context.Context, opts ...database.ConnectorOpts) (database.Pool, error) {
+	for _, o := range opts {
+		o(c)
+	}
 	pool, err := c.getPool(ctx)
 	if err != nil {
 		return nil, wrapError(err)
 	}
+
 	if err = pool.Ping(ctx); err != nil {
 		return nil, wrapError(err)
 	}
@@ -81,9 +104,7 @@ func DecodeConfig(input any) (database.Connector, error) {
 		if err = decoder.Decode(c); err != nil {
 			return nil, err
 		}
-		return &Config{
-			Config: &pgxpool.Config{},
-		}, nil
+		return connector, nil
 	}
 	return nil, errors.New("invalid configuration")
 }

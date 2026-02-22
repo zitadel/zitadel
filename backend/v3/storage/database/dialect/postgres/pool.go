@@ -4,16 +4,44 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/migration"
+	internal_db "github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 type pgxPool struct {
 	*pgxpool.Pool
 }
 
+// InternalDB implements [database.PoolTest].
+func (p *pgxPool) InternalDB() *internal_db.DB {
+	return &internal_db.DB{
+		DB:       stdlib.OpenDBFromPool(p.Pool),
+		Database: p,
+		Pool:     p.Pool,
+	}
+}
+
+// DatabaseName implements [database.PoolTest].
+func (p *pgxPool) DatabaseName() string {
+	return p.Config().ConnConfig.Database
+}
+
+// Type implements [database.PoolTest].
+func (p *pgxPool) Type() dialect.DatabaseType {
+	return dialect.DatabaseTypePostgres
+}
+
+// Username implements [database.PoolTest].
+func (p *pgxPool) Username() string {
+	return p.Config().ConnConfig.User
+}
+
 var _ database.Pool = (*pgxPool)(nil)
+var _ database.PoolTest = (*pgxPool)(nil)
 
 func PGxPool(pool *pgxpool.Pool) *pgxPool {
 	return &pgxPool{
@@ -103,5 +131,9 @@ func (p *pgxPool) MigrateTest(ctx context.Context) error {
 
 	err = migration.Migrate(ctx, client.Conn())
 	isMigrated = err == nil
-	return err
+	if !isMigrated {
+		return err
+	}
+
+	return nil
 }

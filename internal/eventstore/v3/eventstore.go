@@ -156,8 +156,12 @@ func RegisterEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
 }
 
 func NewEventstore(client *database.DB, opts ...EventstoreOption) *Eventstore {
+	return NewEventstoreFromPool(new_sql.SQLPool(client.DB), opts...)
+}
+
+func NewEventstoreFromPool(client new_db.Pool, opts ...EventstoreOption) *Eventstore {
 	es := &Eventstore{
-		client: new_sql.SQLPool(client.DB),
+		client: client,
 	}
 	for _, opt := range opts {
 		opt(es)

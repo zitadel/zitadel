@@ -31,3 +31,8 @@ func registerSQLMigration(sequence int32, up, down string) {
 		DownSQL:  down,
 	})
 }
+
+func RegisterSQLMigrationNoSequence(up, down string) {
+	lastMigIdx := max(len(migrations)-1, 0)
+	registerSQLMigration(migrations[lastMigIdx].Sequence+1, up, down)
+}

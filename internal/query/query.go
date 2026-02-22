@@ -89,10 +89,8 @@ func StartQueries(
 	repo.checkPermission = permissionCheck(repo)
 
 	projections.ActiveInstancer = repo
-	err = projection.Create(ctx, projectionSqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm, systemAPIUsers)
-	if err != nil {
-		return nil, err
-	}
+	projection.CreateAll(ctx, projectionSqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
+
 	if startProjections {
 		err = projection.Start(ctx)
 		if err != nil {

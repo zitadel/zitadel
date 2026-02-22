@@ -2,6 +2,9 @@ package database
 
 import (
 	"context"
+
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 // Pool is a connection pool. e.g. pgxpool
@@ -18,8 +21,10 @@ type Pool interface {
 
 type PoolTest interface {
 	Pool
+	dialect.Database
 	// MigrateTest is the same as [Migrator] but executes the migrations multiple times instead of only once.
 	MigrateTest(ctx context.Context) error
+	InternalDB() *database.DB
 }
 
 // Connection is a single database connection which can be released back to the pool.

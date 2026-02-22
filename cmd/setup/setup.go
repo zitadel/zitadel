@@ -158,9 +158,15 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	i18n.MustLoadSupportedLanguagesFromDir()
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(ctx, err).Fatal("unable to connect to database")
+	q, err := queue.NewQueue(&queue.Config{
+		Client: dbClient,
+	})
+	if err != nil {
+		return err
+	}
 
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
-	esV3 := new_es.NewEventstore(dbClient)
+	esV3 := new_es.NewEventstore(dbClient, new_es.WithExecutionQueueOption(q))
 	config.Eventstore.Pusher = esV3
 	config.Eventstore.Searcher = esV3
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
@@ -249,10 +255,13 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
 	steps.s69CacheTablesLogged = &CacheTablesLogged{dbClient: dbClient}
 
-	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
-	if err != nil {
-		return fmt.Errorf("unable to create projections: %w", err)
-	}
+	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
+	logging.OnError(ctx, err).Fatal("unable to start key storage")
+
+	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
+	logging.OnError(ctx, err).Fatal("unable to ensure encryption keys")
+
+	projection.CreateAll(ctx, dbClient, eventstoreClient, config.Projections, keys.OIDC, keys.SAML)
 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
@@ -461,7 +470,7 @@ func startCommandsQueries(
 	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
 	logging.OnError(ctx, err).Fatal("unable to ensure encryption keys")
 
-	err = projection.Create(
+	projection.CreateAll(
 		ctx,
 		dbClient,
 		eventstoreClient,
@@ -472,9 +481,7 @@ func startCommandsQueries(
 		},
 		keys.OIDC,
 		keys.SAML,
-		config.SystemAPIUsers,
 	)
-	logging.OnError(ctx, err).Fatal("unable to start projections")
 
 	staticStorage, err := config.AssetStorage.NewStorage(dbClient.DB)
 	logging.OnError(ctx, err).Fatal("unable to start asset storage")
@@ -578,6 +585,8 @@ func startCommandsQueries(
 	)
 	logging.OnError(ctx, err).Fatal("unable to start commands")
 
+	// TODO(IAM-Marco): This queue is going to be a duplicate of what we already have in eventstoreClient.queue
+	// set at line 169
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
