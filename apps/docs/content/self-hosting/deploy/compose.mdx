@@ -4,6 +4,7 @@ sidebar_label: Docker Compose
 description: Deploy ZITADEL with Docker Compose — from a 2-minute localhost quickstart to a hardened homelab setup with TLS, caching, and observability.
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout';
 import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
 import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
@@ -37,10 +38,10 @@ That's it. Visit [http://localhost:8080](http://localhost:8080) to open the logi
 
 <DefaultUser components={props.components} />
 
-:::tip
+<Callout type="info">
 The base stack runs: **Traefik** (reverse proxy) → **ZITADEL API** (Go) + **ZITADEL Login** (Next.js) → **PostgreSQL**.
 All routing, including gRPC, is handled automatically by Traefik — no extra configuration needed.
-:::
+</Callout>
 
 ## Stage 2 — Homelab / Semi-Production
 
@@ -161,10 +162,10 @@ docker compose --env-file .env -f docker-compose.yml pull
 docker compose --env-file .env -f docker-compose.yml up -d --wait
 ```
 
-:::note
+<Callout>
 `ZITADEL_FIRSTINSTANCE_*` and `ZITADEL_DEFAULTINSTANCE_*` environment variables are only applied during the **initial setup**.
 To change settings on an existing installation, use the Admin Console or Admin API.
-:::
+</Callout>
 
 ### Moving to Kubernetes
 
