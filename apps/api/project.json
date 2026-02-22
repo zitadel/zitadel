@@ -62,6 +62,7 @@
         },
         "build": {
             "description": "Compiles the Go-based API backend into an executable binary.",
+            "cache": true,
             "dependsOn": [
                 "generate",
                 "build-console"
@@ -130,6 +131,7 @@
         },
         "test-unit": {
             "description": "Runs the unit tests with coverage",
+            "cache": true,
             "dependsOn": [
                 "generate"
             ],
@@ -192,6 +194,7 @@
         },
         "test-integration": {
             "description": "Runs the integration tests sequentially with coverage and race condition detection. Go test caching is disabled, because the tests run against an out-of-process API.",
+            "cache": true,
             "dependsOn": [
                 "test-integration-run-db",
                 "test-integration-run-api"

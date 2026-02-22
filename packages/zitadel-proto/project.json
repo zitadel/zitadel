@@ -2,6 +2,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "generate": {
+      "cache": true,
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm exec buf generate ../../proto",

@@ -125,6 +125,7 @@
     },
     "test-integration": {
       "description": "Runs integration tests using Cypress against a running Login and a mocked API",
+      "cache": true,
       "dependsOn": [
         "test-integration-run-login",
         "@zitadel/login-api-mock:build",
