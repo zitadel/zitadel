@@ -66,7 +66,7 @@ jobs:
         run: pnpm cypress install
         working-directory: apps/login
       - name: Start DTE Agent
-        run: pnpm dlx nx-cloud start-agent
+        run: pnpm exec nx-cloud start-agent
         env:
           NX_AGENT_NAME: ${{ matrix.agent }}
 
@@ -120,7 +120,7 @@ jobs:
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
       - name: Start DTE CI Run
-        run: pnpm dlx nx-cloud start-ci-run --distribute-on="manual" --stop-agents-after="build"
+        run: pnpm exec nx-cloud start-ci-run --distribute-on="manual" --stop-agents-after="build"
       - name: Lint, Test and Build
         run: pnpm nx affected --nxBail --targets lint test build --exclude @zitadel/docs
       - name: Check for uncommitted changes (Codegen mismatch)
