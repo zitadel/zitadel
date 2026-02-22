@@ -1,7 +1,7 @@
 services:
   zitadel:
     restart: unless-stopped
-    image: ghcr.io/zitadel/zitadel:latest
+    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION:-latest}
     command: start-from-init --masterkey "MasterkeyNeedsToHave32Characters"
     environment:
       # See "What's next" to learn about how to serve Zitadel on a different domain or IP.
@@ -89,7 +89,7 @@ services:
 
   login:
     restart: unless-stopped
-    image: ghcr.io/zitadel/zitadel-login:latest
+    image: ghcr.io/zitadel/zitadel-login:${ZITADEL_VERSION:-latest}
     # If you can't use the network_mode service:zitadel, you can pass the environment variables ZITADEL_API_URL=http://zitadel:8080 and CUSTOM_REQUEST_HEADERS=Host:localhost instead.
     environment:
       - ZITADEL_API_URL=http://localhost:8080

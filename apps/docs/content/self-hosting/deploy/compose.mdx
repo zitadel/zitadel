@@ -26,21 +26,18 @@ The setup is likely to work with other software versions too, but it is tested a
 
 ## Quick start
 
-The following four commands download, start, and verify a working ZITADEL installation with a PostgreSQL database and a Login UI:
+The following three commands download, start, and verify a working ZITADEL installation with a PostgreSQL database and a Login UI.
+By default, the `latest` ZITADEL release is used. To pin a specific version, create a `.env` file containing `ZITADEL_VERSION=v4.11.0` in the same directory before running step 2.
 
 1. Download the `docker-compose.yaml` file:
    ```shell
    curl -L https://raw.githubusercontent.com/zitadel/zitadel/main/apps/docs/content/self-hosting/deploy/docker-compose.yaml -o docker-compose.yaml
    ```
-2. Pull the latest images:
-    ```shell
-    docker compose pull
-    ```
-3. Start all services and wait until they are healthy:
+2. Start all services and wait until they are healthy:
     ```shell
     docker compose up --detach --wait
     ```
-4. Verify all containers are running:
+3. Verify all containers are running:
     ```shell
     docker compose ps
     ```
@@ -49,29 +46,18 @@ The following four commands download, start, and verify a working ZITADEL instal
 
 ## Updating ZITADEL
 
-The quickstart `docker-compose.yaml` uses `latest` image tags, so pulling and restarting is all you need to upgrade:
+The `docker-compose.yaml` uses `${ZITADEL_VERSION:-latest}` for image tags — if no `.env` file is present, it defaults to `latest`.
 
-1. Pull the latest images:
-   ```shell
-   docker compose pull
-   ```
-2. Recreate and restart the services:
-   ```shell
-   docker compose up --detach --wait
-   ```
-
-To pin a specific version instead of using `latest`, create a `.env` file next to `docker-compose.yaml`:
+**Upgrade using `latest` (default):** simply restart with updated images:
 ```shell
-echo "ZITADEL_VERSION=v4.11.0" >> .env
+docker compose up --detach --wait
 ```
-Then update `docker-compose.yaml` to reference the variable:
-```yaml
-zitadel:
-  image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION}
-login:
-  image: ghcr.io/zitadel/zitadel-login:${ZITADEL_VERSION}
+
+**Upgrade to a specific version:** create or update a `.env` file in the same directory:
+```shell
+echo "ZITADEL_VERSION=v4.11.0" > .env
+docker compose up --detach --wait
 ```
-With a pinned version in `.env`, upgrading means bumping `ZITADEL_VERSION` there and re-running `docker compose pull && docker compose up --detach --wait`.
 
 :::note
 `ZITADEL_FIRSTINSTANCE_*` and `ZITADEL_DEFAULTINSTANCE_*` environment variables are only applied during the **initial setup** of a new ZITADEL instance.
@@ -113,11 +99,7 @@ See [Reverse Proxy Configuration](/self-hosting/manage/reverseproxy/reverse_prox
 
 ### Compatibility
 
-ZITADEL is tested against and supports the following infrastructure versions:
-
-- **PostgreSQL**: versions 14 to 18 (see [Database](/self-hosting/manage/database))
-- **Redis** (optional, for caching): standalone mode (see [Caches](/self-hosting/manage/cache))
-- **Docker Compose**: v2.x (Compose V1 `docker-compose` is not supported)
+See [ZITADEL Requirements](/self-hosting/manage/requirements) for supported PostgreSQL, Redis, and Docker Compose versions.
 
 For production recommendations, read the [ZITADEL Production Setup Guide](/self-hosting/manage/production).
 
