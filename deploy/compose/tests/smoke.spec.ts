@@ -29,8 +29,12 @@ test.describe("compose stack wiring", () => {
   test("admin can complete username/password login (proves Traefik → Login → API → DB chain)", async ({
     page,
   }) => {
-    // Step 1 – enter login name
+    // Step 1 – enter login name.
+    // Use a long timeout for the first navigation: even though the compose stack
+    // is healthy, ZITADEL's LoginName page makes server-side gRPC calls to the
+    // API on first render and can be slow when the instance is still warming up.
     await page.goto("/ui/v2/login/loginname");
+    await page.getByTestId("username-text-input").waitFor({ timeout: 60_000 });
     await page.getByTestId("username-text-input").pressSequentially(username);
     await page.getByTestId("submit-button").click();
 
