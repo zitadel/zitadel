@@ -276,4 +276,3 @@ networks:
 volumes:
   postgres-data:
   zitadel-bootstrap:
-  letsencrypt:

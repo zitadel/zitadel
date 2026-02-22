@@ -2,6 +2,27 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "name": "@zitadel/compose",
     "targets": {
+        "test-config": {
+            "description": "Validates that all compose file combinations parse correctly (no Docker daemon needed).",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "parallel": false,
+                "commands": [
+                    "docker compose --env-file .env.example -f docker-compose.yml config > /dev/null",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-letsencrypt.yml config > /dev/null",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-external-tls.yml config > /dev/null",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-local-tls.yml config > /dev/null",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.prodlike.yml config > /dev/null"
+                ]
+            },
+            "inputs": [
+                "{projectRoot}/docker-compose.yml",
+                "{projectRoot}/docker-compose.mode-*.yml",
+                "{projectRoot}/docker-compose.prodlike.yml",
+                "{projectRoot}/.env.example"
+            ]
+        },
         "test-run": {
             "description": "Starts the full compose stack using locally-built images. Waits until all containers are healthy before exiting.",
             "dependsOn": [
@@ -15,8 +36,9 @@
             }
         },
         "test": {
-            "description": "Builds local images, starts the compose stack, runs a smoke test (health + OIDC discovery + login health), then tears down. Validates the deployment pack works end-to-end with locally-built containers.",
+            "description": "Builds local images, starts the compose stack, runs smoke tests through Traefik (OIDC discovery, login health, API health, root redirect), then tears down.",
             "dependsOn": [
+                "test-config",
                 "test-run"
             ],
             "executor": "nx:run-commands",
@@ -24,8 +46,10 @@
                 "cwd": "{projectRoot}",
                 "parallel": false,
                 "commands": [
-                    "curl -sf http://localhost:8081/.well-known/openid-configuration -o /dev/null",
-                    "curl -sf http://localhost:3001/ui/v2/login/healthy -o /dev/null",
+                    "echo '--- OIDC discovery (Traefik -> API) ---' && curl -sf http://localhost:8080/.well-known/openid-configuration -o /dev/null",
+                    "echo '--- Login health (Traefik -> Login) ---' && curl -sf http://localhost:8080/ui/v2/login/healthy -o /dev/null",
+                    "echo '--- API health via /api alias (Traefik -> API) ---' && curl -sf http://localhost:8080/api/admin/v1/healthz -o /dev/null",
+                    "echo '--- Root redirect (Traefik -> Login) ---' && curl -sf -o /dev/null -w '%{redirect_url}' http://localhost:8080/ | grep -q '/ui/v2/login'",
                     "nx run @zitadel/compose:stop"
                 ]
             },

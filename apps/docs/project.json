@@ -237,49 +237,6 @@
         "{projectRoot}/eslint.config.mjs",
         "{projectRoot}/content/**/*.{md,mdx}"
       ]
-    },
-    "test-compose-run": {
-      "description": "Starts the quickstart docker-compose.yaml (the file users download) using locally-built images. Waits until all containers are healthy. The --project-directory flag redirects the PAT bind-mount to a temp directory so no files are written into the repository.",
-      "dependsOn": [
-        "@zitadel/api:pack",
-        "@zitadel/login:pack"
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "docker compose --project-directory /tmp/zitadel-docs-compose-test -f apps/docs/content/self-hosting/deploy/docker-compose.yaml -f apps/docs/content/self-hosting/deploy/docker-compose.test.yml -p zitadel-docs-test down --volumes --remove-orphans && mkdir -p /tmp/zitadel-docs-compose-test && docker compose --project-directory /tmp/zitadel-docs-compose-test -f apps/docs/content/self-hosting/deploy/docker-compose.yaml -f apps/docs/content/self-hosting/deploy/docker-compose.test.yml -p zitadel-docs-test up --force-recreate --wait"
-      },
-      "cache": false
-    },
-    "test-compose": {
-      "description": "Builds local images, starts the quickstart compose stack, runs smoke tests (OIDC discovery + login health), then tears down. Validates the compose file shipped to users works end-to-end with locally-built containers.",
-      "dependsOn": [
-        "test-compose-run"
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "parallel": false,
-        "commands": [
-          "curl -sf http://localhost:8080/.well-known/openid-configuration -o /dev/null",
-          "curl -sf http://localhost:3000/ui/v2/login/healthy -o /dev/null",
-          "nx run @zitadel/docs:stop-compose"
-        ]
-      },
-      "cache": false,
-      "inputs": [
-        "{projectRoot}/content/self-hosting/deploy/docker-compose.yaml",
-        "{projectRoot}/content/self-hosting/deploy/docker-compose.test.yml"
-      ]
-    },
-    "stop-compose": {
-      "description": "Tears down the quickstart compose smoke-test stack, removes all volumes, and cleans up the temp project directory.",
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "docker compose --project-directory /tmp/zitadel-docs-compose-test -f apps/docs/content/self-hosting/deploy/docker-compose.yaml -f apps/docs/content/self-hosting/deploy/docker-compose.test.yml -p zitadel-docs-test down --volumes; rm -rf /tmp/zitadel-docs-compose-test"
-      },
-      "cache": false
     }
   }
 }

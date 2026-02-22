@@ -37,3 +37,6 @@ services:
   zitadel-login:
     environment:
       CUSTOM_REQUEST_HEADERS: Host:${ZITADEL_DOMAIN},X-Forwarded-Proto:https
+
+volumes:
+  letsencrypt:

@@ -168,7 +168,7 @@
         "description": "Stops the gRPC mock container used for integration tests.",
         "command": "nx run @zitadel/login-api-mock:down"
     },
-    "pack": {
+    "pack-archive": {
       "description": "Packages the standalone Login application build into an archive",
       "dependsOn": [
         "build"
