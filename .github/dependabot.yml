@@ -1,106 +1,102 @@
 version: 2
 updates:
-- package-ecosystem: npm
-  groups:
-    console:
-      applies-to: version-updates
-      patterns:
-        - "*"
-      update-types:
-        - "minor"
-        - "patch"
-  directories:
-    - "/console"
-    - "/e2e"
-  schedule:
-    interval: weekly
-    time: "02:00"
-  labels:
-   - "npm"
-   - "dependencies"
-  open-pull-requests-limit: 10
-  commit-message:
-    prefix: chore
-    include: scope
-- package-ecosystem: npm
-  directory: '/login'
-  open-pull-requests-limit: 3
-  schedule:
-    interval: daily
-  groups:
-    prod:
-      dependency-type: production
-    dev:
-      dependency-type: development
-  ignore:
-    - dependency-name: "eslint"
-      versions: [ "9.x" ]
-- package-ecosystem: gomod
-  groups:
-    go:
-      applies-to: version-updates
-      patterns:
-        - "*"
-      update-types:
-        - "minor"
-        - "patch"
-  directory: "/"
-  schedule:
-    interval: weekly
-    time: "02:00"
-  labels:
-   - "gomod"
-   - "dependencies"
-  open-pull-requests-limit: 10
-  commit-message:
-    prefix: chore
-    include: scope
-- package-ecosystem: "docker"
-  groups:
-    docker:
-      applies-to: version-updates
-      patterns:
-        - "*"
-      update-types:
-        - "minor"
-        - "patch"
-  directory: "/build"
-  schedule:
-    interval: "weekly"
-    time: "02:00"
-  open-pull-requests-limit: 10
-  commit-message:
-    prefix: chore
-    include: scope
-- package-ecosystem: "github-actions"
-  groups:
-    actions:
-      applies-to: version-updates
-      patterns:
-        - "*"
-  directory: "/"
-  schedule:
-    interval: weekly
-    time: "02:00"
-  open-pull-requests-limit: 10
-  commit-message:
-    prefix: chore
-    include: scope
-- package-ecosystem: npm
-  directory: '/apps/docs'
-  open-pull-requests-limit: 10
-  schedule:
-    interval: weekly
-    time: "02:00"
-  groups:
-    prod:
-      dependency-type: production
-    dev:
-      dependency-type: development
-  commit-message:
-    prefix: chore
-    include: scope
-  labels:
-    - "npm"
-    - "dependencies"
-    - "documentation"
+  # ── Go modules ────────────────────────────────────────────────────────────
+  - package-ecosystem: gomod
+    directory: "/"
+    schedule:
+      interval: monthly
+      day: monday
+      time: "02:00"
+    groups:
+      go-version-updates:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      go-security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
+    labels: ["gomod", "dependencies"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  # ── npm: console, e2e, login, docs (consolidated) ─────────────────────────
+  - package-ecosystem: npm
+    directories:
+      - "/console"
+      - "/e2e"
+      - "/login"
+      - "/apps/docs"
+    schedule:
+      interval: monthly
+      day: monday
+      time: "02:00"
+    groups:
+      npm-version-updates:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      npm-security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
+    ignore:
+      - dependency-name: "eslint"
+        versions: ["9.x"]
+    labels: ["npm", "dependencies"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  # ── Docker: build ─────────────────────────────────────────────────────────
+  - package-ecosystem: docker
+    directory: "/build"
+    schedule:
+      interval: monthly
+      day: monday
+      time: "02:00"
+    groups:
+      docker-version-updates:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      docker-security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
+    labels: ["dependencies"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  # ── Docker: devcontainer ──────────────────────────────────────────────────
+  - package-ecosystem: docker
+    directory: "/.devcontainer"
+    schedule:
+      interval: monthly
+      day: monday
+      time: "02:00"
+    groups:
+      devcontainer-version-updates:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      devcontainer-security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
+    labels: ["dependencies"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  # ── GitHub Actions ────────────────────────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+      day: monday
+      time: "02:00"
+    groups:
+      actions-version-updates:
+        applies-to: version-updates
+        patterns: ["*"]
+      actions-security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
+    labels: ["dependencies"]
+    commit-message:
+      prefix: "chore(deps)"

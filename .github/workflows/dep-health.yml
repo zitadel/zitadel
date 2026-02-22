@@ -1,0 +1,35 @@
+name: Dependency Health
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (Nx)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - name: Update Go dependencies to latest
+        run: go get -u ./... && go mod tidy
+      - name: Update npm dependencies to latest
+        run: pnpm update --latest --recursive
+      - name: Build all projects
+        run: pnpm nx run-many --target build --all --nxBail
