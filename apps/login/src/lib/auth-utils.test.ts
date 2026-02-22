@@ -1,7 +1,58 @@
 import { describe, it, expect } from "vitest";
-import { validateAuthRequest, isRSCRequest } from "./auth-utils";
+import { validateAuthRequest, isRSCRequest, isValidLanguage, getValidLocaleFromUILocales } from "./auth-utils";
 
 describe("auth-utils", () => {
+  describe("isValidLanguage", () => {
+    it("should return true for valid language codes", () => {
+      expect(isValidLanguage("en")).toBe(true);
+      expect(isValidLanguage("de")).toBe(true);
+      expect(isValidLanguage("fr")).toBe(true);
+      expect(isValidLanguage("zh")).toBe(true);
+    });
+
+    it("should return false for invalid language codes", () => {
+      expect(isValidLanguage("invalid")).toBe(false);
+      expect(isValidLanguage("xx")).toBe(false);
+      expect(isValidLanguage("")).toBe(false);
+    });
+
+    it("should be case-sensitive", () => {
+      expect(isValidLanguage("EN")).toBe(false);
+      expect(isValidLanguage("De")).toBe(false);
+    });
+  });
+
+  describe("getValidLocaleFromUILocales", () => {
+    it("should return null for undefined or empty array", () => {
+      expect(getValidLocaleFromUILocales(undefined)).toBeNull();
+      expect(getValidLocaleFromUILocales([])).toBeNull();
+    });
+
+    it("should extract valid language from simple locale codes", () => {
+      expect(getValidLocaleFromUILocales(["de"])).toBe("de");
+      expect(getValidLocaleFromUILocales(["en", "de"])).toBe("en");
+    });
+
+    it("should extract language code from language tags", () => {
+      expect(getValidLocaleFromUILocales(["de-CH"])).toBe("de");
+      expect(getValidLocaleFromUILocales(["en-US"])).toBe("en");
+      expect(getValidLocaleFromUILocales(["zh-CN"])).toBe("zh");
+    });
+
+    it("should return first valid language when multiple provided", () => {
+      expect(getValidLocaleFromUILocales(["xx-XX", "de", "en"])).toBe("de");
+    });
+
+    it("should return null when no valid languages found", () => {
+      expect(getValidLocaleFromUILocales(["xx", "yy", "zz"])).toBeNull();
+    });
+
+    it("should handle case-insensitive matching", () => {
+      expect(getValidLocaleFromUILocales(["DE"])).toBe("de");
+      expect(getValidLocaleFromUILocales(["En-US"])).toBe("en");
+    });
+  });
+
   describe("validateAuthRequest", () => {
     it("should return null when no auth parameters are present", () => {
       const searchParams = new URLSearchParams();

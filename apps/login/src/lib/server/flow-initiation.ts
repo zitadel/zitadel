@@ -1,3 +1,5 @@
+import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
+import { setLanguageCookie } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
@@ -84,6 +86,11 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
   const { serviceConfig, requestId, sessions, sessionCookies, request } = params;
 
   const { authRequest } = await getAuthRequest({ serviceConfig, authRequestId: requestId.replace("oidc_", "") });
+
+  const locale = getValidLocaleFromUILocales(authRequest?.uiLocales);
+  if (locale) {
+    await setLanguageCookie(locale);
+  }
 
   let organization = "";
   let suffix = "";
