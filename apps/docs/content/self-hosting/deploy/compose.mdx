@@ -1,6 +1,7 @@
 ---
 title: Set up ZITADEL with Docker Compose
 sidebar_label: Docker Compose
+description: Deploy ZITADEL with Docker Compose — from a 2-minute localhost quickstart to a hardened homelab setup with TLS, caching, and observability.
 ---
 
 import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
@@ -21,7 +22,8 @@ This guide takes you from zero to a running ZITADEL instance in minutes and then
 Download the deployment pack, copy the example config, and start:
 
 ```shell
-# Download the compose pack
+# Download the compose pack from the main branch.
+# The tar prefix (zitadel-main/) matches the branch name in the URL.
 curl -L https://github.com/zitadel/zitadel/archive/refs/heads/main.tar.gz \
   | tar xz --strip-components=2 zitadel-main/deploy/compose
 cd compose

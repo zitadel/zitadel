@@ -64,8 +64,8 @@
                     "echo '--- Login health (Traefik -> Login) ---' && curl -sf http://localhost:8080/ui/v2/login/healthy -o /dev/null",
                     "echo '--- API health via /api alias (Traefik -> API) ---' && curl -sf http://localhost:8080/api/admin/v1/healthz -o /dev/null",
                     "echo '--- Root redirect (Traefik -> Login) ---' && curl -sf -o /dev/null -w '%{redirect_url}' http://localhost:8080/ | grep -q '/ui/v2/login'",
-                    "pnpm exec playwright install chromium",
-                    "r=0; nx run @zitadel/compose:test-e2e || r=$?; nx run @zitadel/compose:stop; exit $r",
+                    "pnpm exec playwright install --with-deps chromium",
+                    "r=0; nx run @zitadel/compose:test-e2e || r=$?; nx run @zitadel/compose:stop; exit $r"
                 ]
             },
             "inputs": [
