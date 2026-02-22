@@ -76,6 +76,22 @@ If a translation is requested for a language not listed above, follow these prio
 3. **Priority 3 (Tenant):** If 'Instance' is ambiguous, use the local word for 'Tenant' (e.g., 租户 in Chinese).
 4. **Strict Ban:** NEVER use words that mean "an illustration", "a case", "a sample", or "an example."
 
+### 5. Deployment Targets
+
+ZITADEL supports multiple deployment methods. Each has its own directory and conventions:
+
+| Target | Location | Status | Notes |
+|--------|----------|--------|-------|
+| Docker Compose | `deploy/compose/` | Supported | Single-node, graduated from quickstart to semi-production. See `deploy/compose/agents.md` for directory-specific rules. |
+| Kubernetes (Helm) | External ([zitadel-charts](https://github.com/zitadel/zitadel-charts)) | Supported | Official Helm chart for production workloads. Docs at `apps/docs/content/self-hosting/deploy/kubernetes/`. |
+| apt/rpm packages | Planned | Not yet available | Future packaging target. |
+
+When generating deployment-related content:
+- Docker Compose is the recommended path for **getting started** and **homelab/single-node** deployments
+- Kubernetes is the recommended path for **production** workloads
+- Always reference the correct deployment method for the user's context
+- The same `ZITADEL_*` environment variable model applies across all deployment methods
+
 ## Command Rules
 Run commands from the repository root.
 
@@ -89,6 +105,7 @@ Run commands from the repository root.
 - `@zitadel/login`: `dev`, `build`, `lint`, `test`, `test-unit`, `test-integration`
 - `@zitadel/docs`: `dev`, `build`, `generate`, `install-proto-plugins`, `check-links`, `check-types`, `test`, `lint`
 - `@zitadel/console`: `dev`, `build`, `generate`, `install-proto-plugins`, `lint`
+- `@zitadel/compose`: `test-config`, `test-run`, `test-e2e`, `test`, `stop`, `test-login-acceptance`
 
 ## Proto Plugin Binaries
 All proto plugins are installed to `.artifacts/bin/<GOOS>/<GOARCH>/` and Nx-cached. `generate` targets wire up the correct install dependency and prepend `.artifacts/bin/` to `$PATH` — no manual install step is needed.

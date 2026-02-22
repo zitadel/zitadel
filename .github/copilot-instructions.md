@@ -14,6 +14,7 @@ You are working in the ZITADEL monorepo. This codebase uses specific conventions
 - `proto/AGENTS.md`: API schema and generation guidance.
 - `packages/AGENTS.md`: Shared client/proto package workflows.
 - `tests/functional-ui/AGENTS.md`: Cypress functional UI test workflows.
+- `deploy/compose/agents.md`: Docker Compose deployment invariants, file conventions, and rejected alternatives.
 
 ## Behavior
 - Before Go-related work, inspect `go.mod` for required Go version/toolchain.
@@ -21,3 +22,4 @@ You are working in the ZITADEL monorepo. This codebase uses specific conventions
 - For backend changes, note we are in transition: relational data is becoming the system of record, while event writes are still required for history/audit.
 - Respect terminology defined in the `Technical Glossary` section of `AGENTS.md` when generating UI text or documentation.
 - Distinguish between `apps/login` (Next.js) and `console` (Angular) when suggesting frontend code.
+- For deployment-related work, consult the directory-specific agents files (e.g., `deploy/compose/agents.md`) for invariants, file conventions, and rejected alternatives.

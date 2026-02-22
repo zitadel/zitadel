@@ -24,11 +24,11 @@ services:
     networks:
       - 'zitadel'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      test: ["CMD-SHELL", "pg_isready -d zitadel -U root"]
       interval: 10s
-      timeout: 60s
+      timeout: 30s
       retries: 5
-      start_period: 10s
+      start_period: 20s
     volumes:
       - 'data:/var/lib/postgresql/data:rw'
 

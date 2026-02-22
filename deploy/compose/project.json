@@ -1,0 +1,100 @@
+{
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "name": "@zitadel/compose",
+    "targets": {
+        "test-config": {
+            "description": "Validates that all compose file combinations parse correctly (no Docker daemon needed).",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "parallel": false,
+                "commands": [
+                    "docker compose --env-file .env.example -f docker-compose.yml config > /dev/null",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-letsencrypt.yml config > /dev/null",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-external-tls.yml config > /dev/null",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-local-tls.yml config > /dev/null",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.prodlike.yml config > /dev/null"
+                ]
+            },
+            "inputs": [
+                "{projectRoot}/docker-compose.yml",
+                "{projectRoot}/docker-compose.mode-*.yml",
+                "{projectRoot}/docker-compose.prodlike.yml",
+                "{projectRoot}/.env.example"
+            ]
+        },
+        "test-run": {
+            "description": "Starts the full compose stack using locally-built images. Waits until all containers are healthy before exiting.",
+            "dependsOn": [
+                "@zitadel/api:pack",
+                "@zitadel/login:pack"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "command": "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes --remove-orphans && docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test up --force-recreate --wait"
+            }
+        },
+        "test-e2e": {
+            "description": "Runs the Playwright login smoke test against the running compose stack via localhost:8080 (through Traefik). Run 'pnpm exec playwright install chromium' once before using this target.",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "command": "pnpm exec playwright test --config playwright.config.ts"
+            },
+            "inputs": [
+                "{projectRoot}/playwright.config.ts",
+                "{projectRoot}/tests/**",
+                "{projectRoot}/.env.test",
+                "{projectRoot}/package.json"
+            ]
+        },
+        "test": {
+            "description": "Builds local images, starts the compose stack, runs curl smoke tests through Traefik (OIDC discovery, login health, API health, root redirect), runs Playwright login smoke test, then tears down.",
+            "dependsOn": [
+                "test-config",
+                "test-run"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "parallel": false,
+                "commands": [
+                    "echo '--- OIDC discovery (Traefik -> API) ---' && curl -sf http://localhost:8080/.well-known/openid-configuration -o /dev/null",
+                    "echo '--- Login health (Traefik -> Login) ---' && curl -sf http://localhost:8080/ui/v2/login/healthy -o /dev/null",
+                    "echo '--- API health via /api alias (Traefik -> API) ---' && curl -sf http://localhost:8080/api/admin/v1/healthz -o /dev/null",
+                    "echo '--- Root redirect (Traefik -> Login) ---' && curl -sf -o /dev/null -w '%{redirect_url}' http://localhost:8080/ | grep -q '/ui/v2/login'",
+                    "pnpm exec playwright install --with-deps chromium",
+                    "r=0; nx run @zitadel/compose:test-e2e || r=$?; nx run @zitadel/compose:stop; exit $r"
+                ]
+            },
+            "inputs": [
+                "{projectRoot}/docker-compose.yml",
+                "{projectRoot}/docker-compose.test.yml",
+                "{projectRoot}/.env.test",
+                "{projectRoot}/playwright.config.ts",
+                "{projectRoot}/tests/**"
+            ]
+        },
+        "stop": {
+            "description": "Tears down the compose smoke-test stack and removes all volumes.",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "command": "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes"
+            }
+        },
+        "test-login-acceptance": {
+            "description": "Runs the @zitadel/login acceptance (Playwright) suite against the running compose stack. Requires the stack to be up (run test-run first). Reads the admin machine-user PAT from the bootstrap volume, runs setup.sh to seed the test service account, then delegates to @zitadel/login:test-acceptance.",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{workspaceRoot}",
+                "parallel": false,
+                "commands": [
+                    "echo '--- Extracting admin PAT from bootstrap volume ---' && ADMIN_PAT=$(docker run --rm -v zitadel-compose-test_zitadel-bootstrap:/b alpine cat /b/admin.pat) && echo 'PAT extracted.' && PAT=$ADMIN_PAT LOGIN_BASE_URL=http://localhost:8080 ZITADEL_API_URL=http://localhost:8080 WRITE_ENVIRONMENT_FILE=$(pwd)/apps/login/.env.test.local apps/login/acceptance/setup/setup.sh",
+                    "nx run @zitadel/login:test-acceptance"
+                ]
+            }
+        }
+    }
+}

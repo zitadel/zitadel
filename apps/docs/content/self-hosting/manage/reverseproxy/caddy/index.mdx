@@ -28,6 +28,21 @@ You can either setup your environment for <a href={'#tls-mode-external'}>TLS mod
 
 <ProxyGuideTLSMode components={props.components}  mode="enabled" configfilename="enabled-tls.Caddyfile" configfilecontent={ConfigEnabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
 
+## Known issues
+
+### TE: trailers header causes requests to hang
+
+When a browser sends a `TE: trailers` HTTP header (common with HTTP/2), Caddy may forward it upstream where it conflicts with ZITADEL's gRPC-gateway handling.
+Requests that result in an error response will hang indefinitely instead of returning the error to the client.
+
+**Workaround**: strip the header in Caddy before it reaches ZITADEL:
+
+```
+reverse_proxy h2c://zitadel:8080 {
+    header_up -TE
+}
+```
+
 ## More Information
 
 <ProxyGuideMore components={props.components} ></ProxyGuideMore>

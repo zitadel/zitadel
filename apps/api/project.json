@@ -83,6 +83,34 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel.local"
             ]
         },
+        "build-linux": {
+            "description": "Compiles the Go-based API backend into a Linux executable binary for Docker packaging.",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "command": "bash -c 'CGO_ENABLED=0 GOOS=linux go build -o .artifacts/bin/linux/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w\"'",
+            "inputs": [
+                {
+                    "runtime": "go env GOARCH"
+                },
+                "runtime",
+                {
+                    "dependentTasksOutputFiles": "internal/api/ui/console/static/**/*"
+                }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/linux/*/zitadel.local"
+            ]
+        },
+        "pack": {
+            "description": "Builds a local Docker image for the ZITADEL API (zitadel/zitadel:local). Requires Docker daemon.",
+            "dependsOn": [
+                "build-linux"
+            ],
+            "command": "bash -c 'docker build --build-arg TARGETPLATFORM=linux/$(go env GOARCH) --build-arg BINARY=zitadel.local -f apps/api/Dockerfile -t zitadel/zitadel:local .'",
+            "cache": false
+        },
         "generate": {
             "description": "Generates the code needed to start a full-featured API: gRPC and OpenAPI stubs, static files for the embedded login v1, asset routes and documentation.",
             "dependsOn": [

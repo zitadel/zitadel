@@ -1,0 +1,26 @@
+# Test overlay: replaces published images with locally-built ones.
+# Used by the NX smoke-test target (@zitadel/compose:test).
+#
+# All test traffic flows through the Traefik proxy (port 8080)
+# so the routing rules are validated end-to-end.
+#
+# Usage:
+#   docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml \
+#     -p zitadel-compose-test up --force-recreate --renew-anon-volumes --wait
+
+services:
+  zitadel-api:
+    image: zitadel/zitadel:local
+    environment:
+      # Set a known password for the initial admin so Playwright smoke tests
+      # can authenticate without a setup API call.
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: ${SMOKE_TEST_ADMIN_PASSWORD}
+      # Create an IAM_OWNER machine user and write its PAT to the bootstrap volume.
+      # The PAT is consumed by test-login-acceptance to call the management API.
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: zitadel-admin-sa
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: ZITADEL Admin SA
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: "2519-04-01T08:45:00.000000Z"
+      ZITADEL_FIRSTINSTANCE_PATPATH: /zitadel/bootstrap/admin.pat
+
+  zitadel-login:
+    image: zitadel/zitadel-login:local

@@ -1,0 +1,64 @@
+x-zitadel-db-env: &zitadel-db-env
+  ZITADEL_DATABASE_POSTGRES_HOST: postgres
+  ZITADEL_DATABASE_POSTGRES_PORT: 5432
+  ZITADEL_DATABASE_POSTGRES_DATABASE: ${POSTGRES_DB}
+  ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: ${POSTGRES_ADMIN_USER}
+  ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
+  ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+  ZITADEL_DATABASE_POSTGRES_USER_USERNAME: ${POSTGRES_ZITADEL_USER}
+  ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: ${POSTGRES_ZITADEL_PASSWORD}
+  ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+
+services:
+  zitadel-init:
+    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION}
+    restart: "no"
+    command: init
+    environment:
+      <<: *zitadel-db-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - zitadel
+
+  zitadel-setup:
+    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION}
+    restart: "no"
+    command: setup --masterkey "${ZITADEL_MASTERKEY}"
+    environment:
+      <<: *zitadel-db-env
+      ZITADEL_EXTERNALDOMAIN: ${ZITADEL_DOMAIN}
+      ZITADEL_EXTERNALPORT: ${ZITADEL_EXTERNALPORT}
+      ZITADEL_EXTERNALSECURE: ${ZITADEL_EXTERNALSECURE}
+
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
+      ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /zitadel/bootstrap/login-client.pat
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME: login-client
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME: Automatically Initialized IAM_LOGIN_CLIENT
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: ${LOGIN_CLIENT_PAT_EXPIRATION}
+
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: true
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: ${ZITADEL_LOGIN_BASE_URI}
+      ZITADEL_OIDC_DEFAULTLOGINURLV2: ${ZITADEL_OIDC_DEFAULTLOGINURLV2}
+      ZITADEL_OIDC_DEFAULTLOGOUTURLV2: ${ZITADEL_OIDC_DEFAULTLOGOUTURLV2}
+      ZITADEL_SAML_DEFAULTLOGINURLV2: ${ZITADEL_SAML_DEFAULTLOGINURLV2}
+    volumes:
+      - zitadel-bootstrap:/zitadel/bootstrap:rw
+    depends_on:
+      postgres:
+        condition: service_healthy
+      zitadel-init:
+        condition: service_completed_successfully
+    networks:
+      - zitadel
+
+  zitadel-api:
+    command: start --masterkey "${ZITADEL_MASTERKEY}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      zitadel-init:
+        condition: service_completed_successfully
+      zitadel-setup:
+        condition: service_completed_successfully
