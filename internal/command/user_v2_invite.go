@@ -62,7 +62,7 @@ func (c *Commands) sendInviteCode(ctx context.Context, invite *CreateUserInvite,
 	if !wm.CreationAllowed() {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-EF34g", "Errors.User.AlreadyInitialised")
 	}
-	if requireExisting && wm.InviteCode == nil || wm.CodeReturned {
+	if requireExisting && (wm.InviteCode == nil || wm.CodeReturned) {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Wr3gq", "Errors.User.Code.NotFound")
 	}
 	code, err := c.newUserInviteCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint

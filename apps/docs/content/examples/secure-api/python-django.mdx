@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Django Python
+description: "Integrate ZITADEL with Django Python to validate tokens and check permissions for secure API access using OIDC protocol standards"
 sidebar_label: Django
 ---
 
@@ -11,7 +12,7 @@ import SetupPython from '../imports/_setup_python.mdx';
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your Django Python application.
 It explains how to check the token validity in the API and how to check for permissions.
 
-By the end of this guide, your application will have three different endpoint which are public, private(valid token) and private-scoped(valid token with specific role).
+By the end of this guide, your application will have three different endpoints that are public, private (valid token) and private-scoped (valid token with a specific role).
 
 <Callout>
 This documentation references our [example](https://github.com/zitadel/example-django-python-oauth) on GitHub.
@@ -19,7 +20,7 @@ This documentation references our [example](https://github.com/zitadel/example-d
 
 ## ZITADEL setup
 
-Before we can start building our application, we have to do a few setup steps in ZITADEL Management Console.
+Before we can start building our application, we have to do a few setup steps in the ZITADEL Management Console.
 
 ### Create application
 
@@ -29,7 +30,7 @@ Before we can start building our application, we have to do a few setup steps in
 
 <ServiceAccountJWT components={props.components} />
 
-### Give Service Account an authorization
+### Assign a role to the Service Account
 
 <ServiceAccountRole components={props.components} />
 

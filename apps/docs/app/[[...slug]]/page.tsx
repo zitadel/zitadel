@@ -1,7 +1,6 @@
 import { getPageImage, getPage, source } from '@/lib/source';
 import {
   DocsBody,
-  DocsDescription,
   DocsPage,
   DocsTitle,
 } from 'fumadocs-ui/layouts/docs/page';
@@ -23,7 +22,6 @@ export default async function Page(props: any) {
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
         <MDX
           components={getMDXComponents({
@@ -66,9 +64,14 @@ export async function generateMetadata(
     }
   }
 
+  let description = page.data.description;
+  if (!description) {
+    description = `Explore ZITADEL documentation for ${page.data.title}. Learn how to integrate, manage, and secure your applications with our comprehensive identity and access management solutions.`;
+  }
+
   return {
     title: page.data.title,
-    description: page.data.description,
+    description: description.length > 200 ? description.substring(0, 197) + '...' : description,
     alternates: {
       canonical: canonicalUrl,
     },
