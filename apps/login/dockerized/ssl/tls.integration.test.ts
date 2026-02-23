@@ -3,9 +3,10 @@ import { GenericContainer, type StartedTestContainer, Wait } from "testcontainer
 import * as https from "node:https";
 import * as fs from "fs";
 import * as path from "path";
+import { fileURLToPath } from "node:url";
 import { generateCertificates } from "../ca/utils/tls.ts";
 
-const TEST_DIR = path.dirname(new URL(import.meta.url).pathname);
+const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = path.join(TEST_DIR, "output");
 const CERTS_DIR = path.join(OUTPUT_DIR, "certs");
 const LOGIN_APP_DIR = path.join(TEST_DIR, "../..");
