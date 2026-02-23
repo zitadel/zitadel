@@ -17,15 +17,15 @@ if (process.env.ZITADEL_TLS_ENABLED !== "true") {
 
   try {
     accessSync(certPath, constants.R_OK);
-  } catch {
-    console.error(`Certificate file is not readable: ${certPath}`);
+  } catch (err) {
+    console.error(`Certificate file is not readable: ${certPath}`, err);
     process.exit(1);
   }
 
   try {
     accessSync(keyPath, constants.R_OK);
-  } catch {
-    console.error(`Key file is not readable: ${keyPath}`);
+  } catch (err) {
+    console.error(`Key file is not readable: ${keyPath}`, err);
     process.exit(1);
   }
 
