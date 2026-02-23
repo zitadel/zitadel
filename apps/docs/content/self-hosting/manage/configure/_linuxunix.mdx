@@ -2,11 +2,10 @@
 title: Download and adjust the example configuration file containing standard configuration
 ---
 
-import CodeBlock from '@/components/docusaurus/code-block';
-
-import ExampleZITADELConfigSource from "./example-zitadel-config.yaml"
-import ExampleZITADELSecretsSource from "./example-zitadel-secrets.yaml"
-import ExampleZITADELInitStepsSource from "./example-zitadel-init-steps.yaml"
+import ExampleZitadelConfig from './example-zitadel-config.yaml';
+import ExampleZitadelSecrets from './example-zitadel-secrets.yaml';
+import ExampleZitadelInitSteps from './example-zitadel-init-steps.yaml';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 
 ### Configure by Files
 
@@ -14,28 +13,28 @@ By executing the commands below, you will download the following files:
 
 <details>
     <summary>example-zitadel-config.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELConfigSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelConfig} />
 </details>
 
 <details>
     <summary>example-zitadel-secrets.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELSecretsSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelSecrets} />
 </details>
 
 <details>
     <summary>example-zitadel-init-steps.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELInitStepsSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelInitSteps} />
 </details>
 
 ```bash
 # Download and adjust the example configuration file containing standard configuration
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/manage/configure/example-zitadel-config.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/apps/docs/content/self-hosting/manage/configure/example-zitadel-config.yaml
 
 # Download and adjust the example configuration file containing secret configuration
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/manage/configure/example-zitadel-secrets.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/apps/docs/content/self-hosting/manage/configure/example-zitadel-secrets.yaml
 
 # Download and adjust the example configuration file containing database initialization configuration
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/manage/configure/example-zitadel-init-steps.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/apps/docs/content/self-hosting/manage/configure/example-zitadel-init-steps.yaml
 
 # A single ZITADEL instance always needs the same 32 characters long masterkey
 # If you haven't done so already, you can generate a new one
