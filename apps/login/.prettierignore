@@ -2,4 +2,5 @@
 !constants
 !src
 !locales
-!scripts/healthcheck.js
+!scripts/healthcheck.mjs
+!scripts/server.mjs
