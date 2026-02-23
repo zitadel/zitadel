@@ -32,6 +32,7 @@ if (process.env.ZITADEL_TLS_ENABLED !== "true") {
   const cert = readFileSync(certPath);
   const key = readFileSync(keyPath);
 
+  // Requires Node.js >= 20.11.0 (or >= 21.2.0) for import.meta.dirname support.
   const appDir = import.meta.dirname;
   const requiredServerFiles = JSON.parse(
     readFileSync(new URL(".next/required-server-files.json", import.meta.url), "utf8"),
