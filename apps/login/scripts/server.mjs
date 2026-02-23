@@ -3,6 +3,17 @@ import { createServer } from "node:https";
 import { createRequire } from "node:module";
 
 if (process.env.ZITADEL_TLS_ENABLED !== "true") {
+  // The build script must rename the Next.js-generated server.js to next-server.js.
+  // Validate that the file exists before importing to provide a clearer error if the build step fails.
+  try {
+    accessSync(new URL("./next-server.js", import.meta.url), constants.R_OK);
+  } catch (err) {
+    console.error(
+      'Unable to find or read "./next-server.js". Ensure the build script has renamed Next.js\'s server.js to next-server.js.',
+      err,
+    );
+    process.exit(1);
+  }
   await import("./next-server.js");
 } else {
   const certPath = process.env.ZITADEL_TLS_CERTPATH;
