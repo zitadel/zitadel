@@ -28,6 +28,7 @@ updates:
       - "/packages/zitadel-client"
       - "/packages/zitadel-proto"
       - "/tests/functional-ui"
+      - "/benchmark"
     schedule:
       interval: monthly
       day: monday
