@@ -25,11 +25,65 @@ func Test_user_Get(t *testing.T) {
 	t.Cleanup(rollback)
 
 	userRepo := repository.UserRepository()
+	orgDomainRepo := repository.OrganizationDomainRepository()
 
 	instanceID := createInstance(t, tx)
 
+	err := repository.DomainSettingsRepository().Set(t.Context(), tx, &domain.DomainSettings{
+		Settings: domain.Settings{
+			InstanceID: instanceID,
+			Type:       domain.SettingTypeDomain,
+			State:      domain.SettingStateActive,
+		},
+		DomainSettingsAttributes: domain.DomainSettingsAttributes{
+			LoginNameIncludesDomain:                gu.Ptr(false),
+			RequireOrgDomainVerification:           gu.Ptr(false),
+			SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(false),
+		},
+	})
+	require.NoError(t, err)
+
 	orgID1 := createOrganization(t, tx, instanceID)
 	orgID2 := createOrganization(t, tx, instanceID)
+
+	err = repository.DomainSettingsRepository().Set(t.Context(), tx, &domain.DomainSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: &orgID2,
+			Type:           domain.SettingTypeDomain,
+			State:          domain.SettingStateActive,
+		},
+		DomainSettingsAttributes: domain.DomainSettingsAttributes{
+			LoginNameIncludesDomain:                gu.Ptr(true),
+			RequireOrgDomainVerification:           gu.Ptr(false),
+			SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(false),
+		},
+	})
+	require.NoError(t, err)
+	err = orgDomainRepo.Add(t.Context(), tx, &domain.AddOrganizationDomain{
+		InstanceID: instanceID,
+		OrgID:      orgID2,
+		Domain:     "primary.zitadel.com",
+		IsVerified: true,
+		IsPrimary:  true,
+	})
+	require.NoError(t, err)
+	err = orgDomainRepo.Add(t.Context(), tx, &domain.AddOrganizationDomain{
+		InstanceID: instanceID,
+		OrgID:      orgID2,
+		Domain:     "verified.zitadel.com",
+		IsVerified: true,
+		IsPrimary:  false,
+	})
+	require.NoError(t, err)
+	err = orgDomainRepo.Add(t.Context(), tx, &domain.AddOrganizationDomain{
+		InstanceID: instanceID,
+		OrgID:      orgID2,
+		Domain:     "unverified.zitadel.com",
+		IsVerified: false,
+		IsPrimary:  false,
+	})
+	require.NoError(t, err)
 
 	now := time.Now().Round(time.Millisecond)
 
@@ -41,6 +95,12 @@ func Test_user_Get(t *testing.T) {
 		State:          domain.UserStateActive,
 		CreatedAt:      now,
 		UpdatedAt:      now,
+		LoginNames: []domain.LoginName{
+			{
+				LoginName:   "human-user",
+				IsPreferred: true,
+			},
+		},
 		Human: &domain.HumanUser{
 			FirstName:         "John",
 			LastName:          "Doe",
@@ -65,20 +125,28 @@ func Test_user_Get(t *testing.T) {
 		State:          domain.UserStateActive,
 		CreatedAt:      now,
 		UpdatedAt:      now,
+		LoginNames: []domain.LoginName{
+			{
+				LoginName:   "machine-user@primary.zitadel.com",
+				IsPreferred: true,
+			},
+			{
+				LoginName: "machine-user@verified.zitadel.com",
+			},
+		},
 		Machine: &domain.MachineUser{
 			Name:        "My Machine",
 			Description: "This is my machine user",
 		},
 	}
 
-	err := userRepo.Create(t.Context(), tx, human)
+	err = userRepo.Create(t.Context(), tx, human)
 	require.NoError(t, err)
 	err = userRepo.Create(t.Context(), tx, machine)
 	require.NoError(t, err)
 
 	tests := []struct {
 		name      string
-		setup     func(t *testing.T, tx database.Transaction) error
 		condition database.Condition
 		wantErr   error
 		expected  *domain.User
@@ -119,10 +187,6 @@ func Test_user_Get(t *testing.T) {
 					t.Log("rollback savepoint failed", err)
 				}
 			})
-			if tt.setup != nil {
-				err := tt.setup(t, savepoint)
-				require.NoError(t, err)
-			}
 
 			user, err := userRepo.Get(t.Context(), savepoint, database.WithCondition(tt.condition))
 			require.ErrorIs(t, err, tt.wantErr)
@@ -535,10 +599,57 @@ func Test_user_ListConditions(t *testing.T) {
 
 	userRepo := repository.UserRepository()
 	humanRepo := repository.HumanUserRepository()
+	orgDomainRepo := repository.OrganizationDomainRepository()
 
 	instanceID1 := createInstance(t, tx)
+
+	err := repository.DomainSettingsRepository().Set(t.Context(), tx, &domain.DomainSettings{
+		Settings: domain.Settings{
+			InstanceID: instanceID1,
+			Type:       domain.SettingTypeDomain,
+			State:      domain.SettingStateActive,
+		},
+		DomainSettingsAttributes: domain.DomainSettingsAttributes{
+			LoginNameIncludesDomain:                gu.Ptr(true),
+			RequireOrgDomainVerification:           gu.Ptr(false),
+			SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(false),
+		},
+	})
+	require.NoError(t, err)
+
 	instance1OrgID1 := createOrganization(t, tx, instanceID1)
+	err = orgDomainRepo.Add(t.Context(), tx, &domain.AddOrganizationDomain{
+		InstanceID: instanceID1,
+		OrgID:      instance1OrgID1,
+		Domain:     "org1.zitadel.com",
+		IsVerified: true,
+		IsPrimary:  true,
+	})
+	require.NoError(t, err)
+
 	instance1OrgID2 := createOrganization(t, tx, instanceID1)
+	err = orgDomainRepo.Add(t.Context(), tx, &domain.AddOrganizationDomain{
+		InstanceID: instanceID1,
+		OrgID:      instance1OrgID2,
+		Domain:     "org2-primary.zitadel.com",
+		IsVerified: true,
+		IsPrimary:  true,
+	})
+	require.NoError(t, err)
+	err = orgDomainRepo.Add(t.Context(), tx, &domain.AddOrganizationDomain{
+		InstanceID: instanceID1,
+		OrgID:      instance1OrgID2,
+		Domain:     "org2-verified.zitadel.com",
+		IsVerified: true,
+	})
+	require.NoError(t, err)
+	err = orgDomainRepo.Add(t.Context(), tx, &domain.AddOrganizationDomain{
+		InstanceID: instanceID1,
+		OrgID:      instance1OrgID2,
+		Domain:     "org2-unverified.zitadel.com",
+	})
+	require.NoError(t, err)
+
 	idpID := createIdentityProvider(t, tx, instanceID1, instance1OrgID1)
 
 	instanceID2 := createInstance(t, tx)
@@ -644,7 +755,7 @@ func Test_user_ListConditions(t *testing.T) {
 	}
 	tests := []struct {
 		name  string
-		setup func(t *testing.T, tx database.Transaction)
+		setup func(t *testing.T, tx database.QueryExecutor)
 		opts  []database.QueryOption
 		want  want
 	}{
@@ -710,7 +821,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by state",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					userRepo.SetState(domain.UserStateInactive),
 				)
@@ -738,7 +849,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by type",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 			},
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
@@ -751,25 +862,24 @@ func Test_user_ListConditions(t *testing.T) {
 				ids: []string{"m1", "m2"},
 			},
 		},
-		// {
-		// 	name: "by login name",
-		// 	setup: func(t *testing.T, tx database.Transaction) {
-		// 	},
-		// 	opts: []database.QueryOption{
-		// 	database.WithCondition(database.And(
-		// 		userRepo.InstanceIDCondition(instanceID1),
-		// 	)),
-		// },
-		// 	want: want{
-		// 		err: nil,
-		// 		ids: []string{},
-		// 	},
-		// },
+		{
+			name: "by login name found",
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.InstanceIDCondition(instanceID1),
+					userRepo.LoginNameCondition(database.TextOperationEqual, "human-user-2@org2-primary.zitadel.com"),
+				)),
+			},
+			want: want{
+				err: nil,
+				ids: []string{"h2"},
+			},
+		},
 
 		// metadata conditions
 		{
 			name: "by metadata key",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					userRepo.SetMetadata(
 						&domain.Metadata{
@@ -811,7 +921,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by metadata value",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					userRepo.SetMetadata(
 						&domain.Metadata{
@@ -863,7 +973,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by metadata key and value",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					userRepo.SetMetadata(
 						&domain.Metadata{
@@ -920,7 +1030,7 @@ func Test_user_ListConditions(t *testing.T) {
 		// human conditions
 		{
 			name: "by display name",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 			},
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
@@ -935,7 +1045,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by first name",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 			},
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
@@ -950,7 +1060,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by last name",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 			},
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
@@ -965,7 +1075,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by nickname",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 			},
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
@@ -980,7 +1090,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by preferred language",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 			},
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
@@ -997,7 +1107,7 @@ func Test_user_ListConditions(t *testing.T) {
 		// phone conditions
 		{
 			name: "by phone",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.SetPhone("+1234567890"),
 					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{}),
@@ -1024,7 +1134,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by unverified phone",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.SetPhone("+1234567890"),
 					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{}),
@@ -1051,7 +1161,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by verified phone",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.SetPhone("+1234567890"),
 					humanRepo.SetPhoneVerification(&domain.VerificationTypeSkipped{}),
@@ -1080,7 +1190,7 @@ func Test_user_ListConditions(t *testing.T) {
 		// human email conditions
 		{
 			name: "by email",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.SetEmail("test@email.com"),
 					humanRepo.SetEmailVerification(&domain.VerificationTypeSkipped{}),
@@ -1107,7 +1217,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by unverified email",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.SetEmail("test@email.com"),
 					humanRepo.SetEmailVerification(&domain.VerificationTypeSkipped{}),
@@ -1134,7 +1244,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by verified email",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := humanRepo.Update(t.Context(), tx, humanRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.SetEmail("test@email.com"),
 					humanRepo.SetEmailVerification(&domain.VerificationTypeSkipped{}),
@@ -1163,7 +1273,7 @@ func Test_user_ListConditions(t *testing.T) {
 		// passkey conditions
 		{
 			name: "by passkey same challenge",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.AddPasskey(
 						&domain.Passkey{
@@ -1223,7 +1333,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by passkey challenge",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.AddPasskey(
 						&domain.Passkey{
@@ -1283,7 +1393,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by passkey id",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.AddPasskey(
 						&domain.Passkey{
@@ -1343,7 +1453,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by passkey key id",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.AddPasskey(
 						&domain.Passkey{
@@ -1403,7 +1513,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by passkey type",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.AddPasskey(
 						&domain.Passkey{
@@ -1465,7 +1575,7 @@ func Test_user_ListConditions(t *testing.T) {
 		// idp link conditions
 		{
 			name: "by idp link provider id",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
 						ProviderID:       idpID,
@@ -1504,7 +1614,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by idp link provided user id",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
 						ProviderID:       idpID,
@@ -1543,7 +1653,7 @@ func Test_user_ListConditions(t *testing.T) {
 		},
 		{
 			name: "by idp link username",
-			setup: func(t *testing.T, tx database.Transaction) {
+			setup: func(t *testing.T, tx database.QueryExecutor) {
 				_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID1, "h1"),
 					humanRepo.AddIdentityProviderLink(&domain.IdentityProviderLink{
 						ProviderID:       idpID,
@@ -3917,6 +4027,7 @@ func assertUser(t *testing.T, expected, actual *domain.User) {
 	require.Equal(t, expected.Human == nil, actual.Human == nil, "human check")
 
 	assertMetadata(t, expected.Metadata, actual.Metadata)
+	assertLoginNames(t, expected.LoginNames, actual.LoginNames)
 
 	if expected.Machine != nil {
 		assertMachineUser(t, expected.Machine, actual.Machine)
@@ -3929,6 +4040,25 @@ func assertUser(t *testing.T, expected, actual *domain.User) {
 	}
 	t.Log("either machine or human must be set")
 	t.Fail()
+}
+
+func assertLoginNames(t *testing.T, expected, gotten []domain.LoginName) {
+	t.Helper()
+
+	assert.Len(t, gotten, len(expected), "login names length mismatch")
+	for _, exp := range expected {
+		var actual domain.LoginName
+		gotten = slices.DeleteFunc(gotten, func(ln domain.LoginName) bool {
+			if ln.LoginName != exp.LoginName {
+				return false
+			}
+			actual = ln
+			return true
+		})
+		require.NotEmpty(t, actual, "login name %s not found", exp.LoginName)
+		assert.Equal(t, exp.IsPreferred, actual.IsPreferred, "login name %s is preferred", exp.LoginName)
+	}
+	assert.Empty(t, gotten, "unmatched login names found")
 }
 
 func assertMachineUser(t *testing.T, expected, actual *domain.MachineUser) {

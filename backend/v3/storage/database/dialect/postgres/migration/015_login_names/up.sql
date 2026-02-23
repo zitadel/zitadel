@@ -95,6 +95,7 @@ EXECUTE FUNCTION zitadel.apply_domain_manipulation_to_login_names();
 
 CREATE OR REPLACE FUNCTION zitadel.apply_user_update_to_login_names() RETURNS TRIGGER AS $$
 BEGIN
+    RAISE NOTICE 'Updating login names for user % with new username %', NEW.id, NEW.username;
     UPDATE
         zitadel.login_names
     SET
@@ -132,12 +133,14 @@ BEGIN
     LIMIT 1;
 
     IF NOT (setting.settings->'loginNameIncludesDomain')::BOOLEAN THEN
+        RAISE NOTICE 'inserting username as login name for setting user %', NEW.id;
         INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, is_preferred, used_setting)
         VALUES (NEW.instance_id, NEW.organization_id, NEW.id, NEW.username, TRUE, setting.id);
         
         RETURN NULL;
     END IF;
 
+    RAISE NOTICE 'inserting login names of user % based on setting %', NEW.id, setting.id;
     INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
     SELECT
         NEW.instance_id
@@ -159,13 +162,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER trg_apply_user_insert_to_login_names
-AFTER insert ON zitadel.users
+AFTER INSERT ON zitadel.users
 FOR EACH ROW
 EXECUTE FUNCTION zitadel.apply_user_insert_to_login_names();
 
 CREATE OR REPLACE FUNCTION zitadel.apply_domain_policy_manipulation_to_login_names() RETURNS TRIGGER AS $$
-DECLARE
-    integer_var INTEGER;
 BEGIN
     CASE TG_OP
         WHEN 'DELETE' THEN
@@ -247,9 +248,6 @@ BEGIN
         AND org_domains.org_id = au.organization_id
         AND org_domains.is_verified
         AND (NEW.settings->'loginNameIncludesDomain')::BOOLEAN;
-
-    GET DIAGNOSTICS integer_var = ROW_COUNT;
-    RAISE NOTICE 'updated login names for % users', integer_var;
 
     RETURN NULL;
 END;
