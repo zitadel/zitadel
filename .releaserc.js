@@ -43,6 +43,10 @@ module.exports = {
           {
             path: ".artifacts/pack/checksums.txt",
             label: "checksums.txt",
+          },
+          {
+            path: ".artifacts/pack/zitadel-config-schema.json",
+            label: "zitadel-config-schema.json",
           }
         ],
       },
