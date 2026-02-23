@@ -17,7 +17,7 @@ updates:
         patterns: ["*"]
     labels: ["gomod", "dependencies"]
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore(deps-go)"
 
   # ── npm (consolidated) ────────────────────────────────────────────────────
   - package-ecosystem: npm
@@ -46,11 +46,16 @@ updates:
         versions: ["9.x"]
     labels: ["npm", "dependencies"]
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore(deps-npm)"
 
-  # ── Docker: build ─────────────────────────────────────────────────────────
+  # ── Docker (consolidated) ────────────────────────────────────────────────
   - package-ecosystem: docker
-    directory: "/build"
+    directories:
+      - "/build"
+      - "/.devcontainer"
+      - "/apps/login"
+      - "/apps/login/integration/api-mock"
+      - "/apps/api"
     schedule:
       interval: monthly
       day: monday
@@ -65,26 +70,7 @@ updates:
         patterns: ["*"]
     labels: ["dependencies"]
     commit-message:
-      prefix: "chore(deps)"
-
-  # ── Docker: devcontainer ──────────────────────────────────────────────────
-  - package-ecosystem: docker
-    directory: "/.devcontainer"
-    schedule:
-      interval: monthly
-      day: monday
-      time: "02:00"
-    groups:
-      devcontainer-version-updates:
-        applies-to: version-updates
-        patterns: ["*"]
-        update-types: ["minor", "patch"]
-      devcontainer-security-updates:
-        applies-to: security-updates
-        patterns: ["*"]
-    labels: ["dependencies"]
-    commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore(deps-docker)"
 
   # ── GitHub Actions ────────────────────────────────────────────────────────
   - package-ecosystem: github-actions
@@ -102,4 +88,4 @@ updates:
         patterns: ["*"]
     labels: ["dependencies"]
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore(deps-actions)"
