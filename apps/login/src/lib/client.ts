@@ -143,8 +143,8 @@ export async function isSafeRedirectUri(uri: string): Promise<boolean> {
  * Resolves the redirect URI based on the following priority:
  * 1. DEFAULT_REDIRECT_URI environment variable
  * 2. defaultRedirectUri from organization settings
- * 3. Request host (absolute URL)
- * 4. Relative signed-in page fallback
+ * 3. Relative signed-in page fallback
+ * 4. Reserved for future extensions
  */
 export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedirectUri?: string): Promise<string> {
   // 1. Environment variable override
