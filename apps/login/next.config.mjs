@@ -41,9 +41,9 @@ const nextConfig = {
     optimizePackageImports: ["@radix-ui/react-tooltip", "@heroicons/react"],
     useCache: true,
     serverActions: {
-      allowedOrigins: process.env.SERVER_ACTION_ALLOWED_ORIGINS
-        ? process.env.SERVER_ACTION_ALLOWED_ORIGINS.split(",").map((o) => o.trim())
-        : [],
+      ...(process.env.SERVER_ACTION_ALLOWED_ORIGINS
+        ? { allowedOrigins: process.env.SERVER_ACTION_ALLOWED_ORIGINS.split(",").map((o) => o.trim()) }
+        : {}),
     },
   },
 
