@@ -73,6 +73,12 @@ if (process.env.ZITADEL_TLS_ENABLED !== "true") {
 
   const require = createRequire(import.meta.url);
   require("next");
+  // NOTE: This imports an internal Next.js API that is not part of the public, semver-stable surface.
+  // - Verified with Next.js version 15.5.10 (see package.json).
+  // - This may break on Next.js upgrades; if Next.js is updated, re-check that
+  //   `next/dist/server/lib/start-server` still exists and that `getRequestHandlers` behaves as expected.
+  // - This is currently required to support HTTPS with self-signed certificates in production mode,
+  //   as there is no equivalent public API in Next.js at this time.
   const { getRequestHandlers } = require("next/dist/server/lib/start-server");
 
   const httpsServer = createServer({ key, cert });
