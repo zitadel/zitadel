@@ -133,7 +133,7 @@ export async function isSafeRedirectUri(uri: string): Promise<boolean> {
     }
 
     return true;
-  } catch (error) {
+  } catch {
     // If it can't be parsed as a URL and didn't start with /, it's unsafe
     return false;
   }

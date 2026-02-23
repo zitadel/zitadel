@@ -91,6 +91,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     loginSettings?.defaultRedirectUri,
   );
 
+  const isSamePage = redirectUri?.startsWith("/signedin") ?? false;
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col space-y-4">
@@ -116,7 +118,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </Alert>
         )}
 
-        {redirectUri && (
+        {redirectUri && !isSamePage && (
           <div className="mt-8 flex w-full flex-row items-center">
             <span className="flex-grow"></span>
 
