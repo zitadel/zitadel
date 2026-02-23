@@ -12,6 +12,7 @@ CREATE TABLE zitadel.login_names(
 
 	, PRIMARY KEY (instance_id, user_id, login_name)
 	, FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
+    , FOREIGN KEY (instance_id, organization_id, domain) REFERENCES zitadel.org_domains(instance_id, org_id, domain) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX idx_login_names_instance_login_name ON zitadel.login_names(instance_id, lower(login_name));
@@ -23,19 +24,9 @@ CREATE OR REPLACE FUNCTION zitadel.apply_domain_manipulation_to_login_names() RE
 DECLARE
     setting zitadel.settings%ROWTYPE;
 BEGIN
-
-    IF TG_OP = 'DELETE' THEN
-        DELETE FROM zitadel.login_names
-            WHERE
-                login_names.instance_id = OLD.instance_id
-                AND login_names.organization_id = OLD.org_id
-                AND login_names.domain = OLD.domain;
-
-        RETURN NULL;
-    END IF;
-
     IF (NOT NEW.is_verified) THEN
         -- TODO(adlerhurst): is it possible that the domain is updated from verified to unverified?
+        RAISE NOTICE 'Domain % is not verified, skipping login name manipulation', NEW.domain;
         RETURN NULL;
     END IF;
 
@@ -49,58 +40,56 @@ BEGIN
     ORDER BY settings.organization_id NULLS LAST
     LIMIT 1;
 
+    RAISE NOTICE 'Found setting % for domain %', setting.id, NEW.domain;
+
     IF NOT (setting.settings->'loginNameIncludesDomain')::BOOLEAN THEN
+        RAISE NOTICE 'skipping because loginNameIncludesDomain is false for setting %', setting.id;
         RETURN NULL;
     END IF;
 
-    IF NEW.is_primary AND (NEW.is_primary IS DISTINCT FROM OLD.is_primary) THEN
+    IF NEW.is_primary IS DISTINCT FROM OLD.is_primary THEN
+        RAISE NOTICE 'Updating preferred login name for domain % to %', NEW.domain, NEW.is_primary;
         UPDATE zitadel.login_names
-        SET is_preferred = login_names.domain = NEW.domain
+        SET is_preferred = NEW.is_primary
+        WHERE
+            login_names.instance_id = NEW.instance_id
+            AND login_names.domain = NEW.domain;
+    END IF;
+
+    IF NEW.domain IS DISTINCT FROM OLD.domain THEN
+        RAISE NOTICE 'Domain is changed from % to %, updating login names', OLD.domain, NEW.domain;
+        UPDATE zitadel.login_names
+        SET domain = NEW.domain
         WHERE
             login_names.instance_id = NEW.instance_id
             AND login_names.organization_id = NEW.org_id
-            AND (login_names.domain = NEW.domain OR login_names.is_preferred);
+            AND login_names.domain = OLD.domain;
     END IF;
 
-    IF NEW.domain IS NOT DISTINCT FROM OLD.domain THEN
-        RETURN NULL;
+    IF NEW.is_verified IS DISTINCT FROM OLD.is_verified THEN
+        RAISE NOTICE 'Domain verification status is changed from % to % for domain %, inserting login names for verified domain', OLD.is_verified, NEW.is_verified, NEW.domain;
+        INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
+        SELECT
+            NEW.instance_id
+            , NEW.org_id
+            , users.id
+            , users.username
+            , NEW.domain
+            , NEW.is_primary
+            , setting.id
+        FROM
+            zitadel.users
+        WHERE
+            users.instance_id = NEW.instance_id
+            AND users.organization_id = NEW.org_id;
     END IF;
-
-    CASE TG_OP
-        WHEN 'INSERT' THEN
-            INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
-            SELECT
-                NEW.instance_id
-                , NEW.org_id
-                , users.id
-                , users.username
-                , NEW.domain
-                , NEW.is_primary
-                , setting.id
-            FROM
-                zitadel.users
-            WHERE
-                users.instance_id = NEW.instance_id
-                AND users.organization_id = NEW.org_id;
-        WHEN 'UPDATE' THEN
-            UPDATE zitadel.login_names
-            SET 
-                domain = NEW.domain
-                , is_preferred = login_names.domain = NEW.domain
-            WHERE
-                login_names.instance_id = NEW.instance_id
-                AND login_names.organization_id = NEW.org_id
-                AND login_names.domain = OLD.domain;
-        ELSE
-            -- should never happen, because the trigger is only set for insert and delete, but we want to be sure that we don't accidentally do an update without a where clause
-    END CASE;
 
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER trg_apply_domain_manipulation_to_login_names
-AFTER INSERT OR UPDATE OR DELETE ON zitadel.org_domains
+AFTER INSERT OR UPDATE ON zitadel.org_domains
 FOR EACH ROW
 EXECUTE FUNCTION zitadel.apply_domain_manipulation_to_login_names();
 
@@ -126,15 +115,10 @@ EXECUTE FUNCTION zitadel.apply_user_update_to_login_names();
 
 CREATE OR REPLACE FUNCTION zitadel.apply_user_insert_to_login_names() RETURNS TRIGGER AS $$
 DECLARE
-    includes_domain BOOLEAN := FALSE;
-    setting_id TEXT;
+    setting zitadel.settings%ROWTYPE;
 BEGIN
-    SELECT 
-        id
-        , (settings.settings->'loginNameIncludesDomain')::BOOLEAN
-    INTO 
-        setting_id
-        , includes_domain
+    SELECT settings.*
+    INTO setting
     FROM
         zitadel.settings
     WHERE
@@ -147,9 +131,9 @@ BEGIN
     ORDER BY settings.organization_id NULLS LAST
     LIMIT 1;
 
-    IF NOT includes_domain THEN
+    IF NOT (setting.settings->'loginNameIncludesDomain')::BOOLEAN THEN
         INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, is_preferred, used_setting)
-        VALUES (NEW.instance_id, NEW.organization_id, NEW.id, NEW.username, TRUE, setting_id);
+        VALUES (NEW.instance_id, NEW.organization_id, NEW.id, NEW.username, TRUE, setting.id);
         
         RETURN NULL;
     END IF;
@@ -161,8 +145,8 @@ BEGIN
         , NEW.id
         , NEW.username
         , org_domains.domain
-        , org_domains.is_primary
-        , setting_id
+        , org_domains.is_primary IS NULL OR org_domains.is_primary
+        , setting.id
     FROM
         zitadel.org_domains
     WHERE
@@ -212,14 +196,15 @@ BEGIN
     END CASE;
     
     IF (OLD.settings->'loginNameIncludesDomain')::BOOLEAN IS NOT DISTINCT FROM (NEW.settings->'loginNameIncludesDomain')::BOOLEAN THEN
-        IF TG_OP = 'DELETE' THEN
+        IF TG_OP = 'DELETE' OR TG_OP = 'INSERT' THEN
             UPDATE
-                zitadel.login_names 
+                zitadel.login_names
             SET
                 used_setting = NEW.id
             WHERE
                 login_names.instance_id = OLD.instance_id
-                AND login_names.used_setting = OLD.id;
+                AND login_names.used_setting = OLD.id
+                AND (NEW.organization_id IS NULL OR login_names.organization_id = NEW.organization_id);
         END IF;
 
         -- no change in the setting, so we can skip the update
