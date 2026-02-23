@@ -9,7 +9,7 @@
         "DESCRIPTION": "Uygulamanızı güvence altına almak için aşağıdaki adımları tamamlayın.",
         "CREATE_PROJECT": {
           "TITLE": "Bir proje oluşturun",
-          "DESCRIPTION": "Bir proje ekleyin ve rollerini ve yetkilendirmelerini tanımlayın."
+          "DESCRIPTION": "Projeler ekleyin ve roller ile rol atamalarını tanımlayın."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Bir proje, kullanıcılarınızı doğrulamak için kullanabileceğiniz bir veya daha fazla uygulamayı barındırır. Örneğin, web ön ucunuz, mobil uygulamanız ve arka ucunuz için birer tane olmak üzere 3 uygulamalı tek bir projeniz olabilir. Ayrıca kullanıcılarınızı projelerle yetkilendirebilirsiniz. Diğer organizasyonlardan kullanıcıların uygulamalarınıza giriş yapmasına izin vermek için onlara projenize erişim izni verin.<br/><br/>Bir proje bulamazsanız, proje sahibiyle veya ilgili haklara sahip biriyle iletişime geçerek erişim sağlayın.",
       "OWNED": {
         "TITLE": "Sahip Olunan Projeler",
-        "DESCRIPTION": "Bunlar sahip olduğunuz projelerdir. Bu proje ayarlarını, yetkilendirmelerini ve uygulamalarını yönetebilirsiniz."
+        "DESCRIPTION": "Bunlar sizin sahip olduğunuz projeler. Ayarlarını, rol atamalarını ve uygulamalarını yönetebilirsiniz."
       },
       "GRANTED": {
         "TITLE": "Verilen Projeler",
@@ -61,9 +61,9 @@
         "METADATA": "Kullanıcınıza departmanınız gibi özel öznitelikler ekleyin. Bu bilgileri organizasyonunuzun eylemlerinde kullanabilirsiniz."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Yetkilendirmeler",
-      "DESCRIPTION": "Yetkilendirmeler, bir kullanıcının bir projeye erişim haklarını tanımlar. Bir kullanıcıya projeye erişim verebilir ve kullanıcının o proje içindeki rollerini tanımlayabilirsiniz."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Rol Atamaları",
+      "DESCRIPTION": "Rol atamaları, kullanıcıların proje erişim izinlerini tanımlar. Kullanıcılara projelere erişim izni verebilir ve bu projelerdeki rollerini tanımlayabilirsiniz."
     },
     "ACTIONS": {
       "TITLE": "Eylemler",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Bir proje oluşturun",
-        "description": "Bir proje ekleyin ve rollerini ve yetkilendirmelerini tanımlayın.",
+        "description": "Projeler ekleyin ve roller ile rol atamalarını tanımlayın.",
         "action": "Proje oluştur"
       },
       "APPLICATION_CREATED": {
@@ -429,7 +429,7 @@
     "NEWORG": "Yeni Organizasyon",
     "IAMADMIN": "instans Yöneticisisiniz. Genişletilmiş izinleriniz olduğunu unutmayın.",
     "SHOWORGS": "Tüm Organizasyonları Göster",
-    "GRANTS": "Yetkilendirmeler",
+    "GRANTS": "Rol Atamaları",
     "ACTIONS": "Eylemler",
     "PRIVACY": "Gizlilik",
     "TOS": "Hizmet Şartları",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "Organizasyonun kullanıcılarını oluşturma ve yönetme iznine sahiptir",
     "ORG_OWNER_VIEWER": "Tüm organizasyonu gözden geçirme iznine sahiptir",
     "ORG_SETTINGS_MANAGER": "Organizasyon ayarlarını yönetme iznine sahiptir",
-    "ORG_USER_PERMISSION_EDITOR": "Kullanıcı yetkilerini yönetme iznine sahiptir",
+    "ORG_USER_PERMISSION_EDITOR": "Rol atamalarını yönetme izni var",
     "ORG_PROJECT_PERMISSION_EDITOR": "Proje yetkilerini yönetme iznine sahiptir",
     "ORG_PROJECT_CREATOR": "Kendi projelerini ve altyapı ayarlarını oluşturma iznine sahiptir",
     "ORG_ADMIN_IMPERSONATOR": "Organizasyondan admin ve son kullanıcıların kimliğine bürünme iznine sahiptir",
@@ -699,7 +699,7 @@
     "ORGNAME": "Organizasyon Adı",
     "ORGID": "Organizasyon ID",
     "STATE": "Durum",
-    "PRIMARYDOMAIN": "Birincil Alan Adı",
+    "PRIMARYDOMAIN": "Organizasyon Domain'i",
     "DISPLAYNAME": "Kullanıcı Görünen Adı",
     "EMAIL": "E-posta",
     "USERNAME": "Kullanıcı Adı",
@@ -724,7 +724,7 @@
       "ME": "Kendi profiline git",
       "PROJECTS": "<strong>P</strong>rojelere git",
       "USERS": "<strong>K</strong>ullanıcılara git",
-      "USERGRANTS": "<strong>Y</strong>etkilendirmelere git",
+      "ROLEASSIGNMENTS": "<strong>R</strong>ol Atamaları",
       "ACTIONS": "<strong>E</strong>ylemler ve <strong>A</strong>kışlara git",
       "DOMAINS": "<strong>A</strong>lan <strong>A</strong>dlarına git"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Şifre ve Güvenlik",
       "KEYS": "Anahtarlar",
       "PAT": "Kişisel Erişim Token'ları",
-      "USERGRANTS": "Yetkilendirmeler",
+      "ROLEASSIGNMENTS": "Rol Atamaları",
       "MEMBERSHIPS": "Yönetici Rolleri",
       "METADATA": "Meta Veri"
     },
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "En az {{value}} karakter uzunluğunda olmalıdır.",
       "MAXLENGTHERROR": "{{value}} karakterden az olmalıdır."
     },
-    "ID": "ID",
+    "ID": "Kullanıcı Kimliği",
     "EMAIL": "E-posta",
     "PHONE": "Telefon numarası",
     "PHONEEMPTY": "Telefon numarası tanımlanmamış",
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "Kodu Doğrula"
     },
     "GRANTS": {
-      "TITLE": "Kullanıcı Yetkileri",
+      "TITLE": "Rol Atamaları",
       "DESCRIPTION": "Bu kullanıcıya belirli projelere erişim yetkisi verin",
       "CREATE": {
-        "TITLE": "Kullanıcı Yetkisi Oluştur",
+        "TITLE": "Rol Atamaları Oluştur",
         "DESCRIPTION": "Organizasyon, proje ve ilgili proje rollerini arayın."
       },
       "PROJECTNAME": "Proje Adı",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Ad",
-      "ID": "ID",
+      "ID": "Organizasyon Kimliği",
       "CREATIONDATE": "Oluşturma Tarihi",
       "DATECHANGED": "Değiştirildi",
       "FILTER": "Filtre",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Dosyayı İndir",
       "SELECTORGTOOLTIP": "Bu organizasyonu seç.",
-      "PRIMARYDOMAIN": "Birincil Domain",
+      "PRIMARYDOMAIN": "Organizasyon Domain'i",
       "STATE": "Durum",
       "USEPASSWORD": "İlk Şifreyi Ayarla",
       "USEPASSWORDDESC": "Kullanıcının başlatma sırasında şifre ayarlaması gerekmez."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Domain Ekle",
-      "TITLE": "Doğrulanmış domain'ler",
+      "TITLE": "Organizasyon Domain'i",
       "DESCRIPTION": "Organizasyon domain'lerinizi yapılandırın. Bu domain, domain keşfi ve kullanıcı adı soneki için kullanılabilir.",
-      "SETPRIMARY": "Birincil Olarak Ayarla",
+      "SETPRIMARY": "Organizasyon Domain'i",
       "DELETE": {
         "TITLE": "Domain'i Sil",
         "DESCRIPTION": "Domain'lerinizden birini silmek üzeresiniz."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Yönetici eklendi.",
       "MEMBERREMOVED": "Yönetici kaldırıldı.",
       "MEMBERCHANGED": "Yönetici değiştirildi.",
-      "SETPRIMARY": "Birincil domain ayarlandı.",
+      "SETPRIMARY": "Organizasyon domain'i başarıyla ayarlandı.",
       "DELETED": "Organizasyon başarıyla silindi",
       "DEFAULTORGNOTFOUND": "Varsayılan organizasyon bulunamadı",
       "ORG_WAS_DELETED": "Organizasyon silindi."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP ve SMS Ayarları",
       "MESSAGETEXTS": "Mesaj Metinleri",
       "IDP": "Kimlik Sağlayıcıları",
-      "VERIFIED_DOMAINS": "Doğrulanmış domain'ler",
+      "VERIFIED_DOMAINS": "Organizasyon Domain'i",
       "DOMAIN": "Domain ayarları",
       "LOGINTEXTS": "Giriş Arayüzü Metinleri",
       "BRANDING": "Marka",
@@ -2017,7 +2017,8 @@
           "DESCRIPTION": "Projenizi gerçekten silmek istiyor musunuz?",
           "TYPENAME": "Kalıcı olarak silmek için projenin adını yazın."
         }
-      }
+      },
+      "ID": "Proje Kimliği"
     },
     "SETTINGS": {
       "TITLE": "Ayarlar",
@@ -2094,7 +2095,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Kaynak Sahibi",
       "GRANTEDORGNAME": "Organizasyon Adı",
-      "GRANTID": "Yetki Id",
+      "GRANTID": "Yetki ID",
       "CREATIONDATE": "Oluşturma Tarihi",
       "CHANGEDATE": "Son değişiklik",
       "DATES": "Tarihler",
@@ -2143,7 +2144,7 @@
       "ASSERTION": "Kimlik Doğrulamada Rolleri Doğrula",
       "ASSERTION_DESCRIPTION": "Rol bilgisi Userinfo uç noktasından gönderilir ve uygulama ayarlarınıza bağlı olarak token'larda ve diğer türlerde yer alır.",
       "CHECK": "Kimlik Doğrulamada yetkilendirmeyi kontrol et",
-      "CHECK_DESCRIPTION": "Ayarlanırsa, kullanıcılar yalnızca hesaplarına herhangi bir rol atanmışsa kimlik doğrulaması yapabilirler.",
+      "CHECK_DESCRIPTION": "Kullanıcıya bu projeye atanmış rol yoksa kimlik doğrulamayı reddedin. Kullanıcıya belirli bir rol atamadan projeye rol atamaları yapılabilir.",
       "DIALOG": {
         "DELETE_TITLE": "Rolü sil",
         "DELETE_DESCRIPTION": "Bir proje rolünü silmek üzeresiniz. Emin misiniz?"
@@ -2299,7 +2300,7 @@
     "ADD": "Kimlik Sağlayıcısı Ekle",
     "TYPE": "Tür",
     "OWNER": "Sahibi",
-    "ID": "ID",
+    "ID": "Kimlik Sağlayıcı Kimliği",
     "NAME": "Ad",
     "AUTHORIZATIONENDPOINT": "Yetkilendirme Uç Noktası",
     "TOKENENDPOINT": "Token Uç Noktası",
@@ -2524,7 +2525,7 @@
     "TOKEN": "Token Ayarları",
     "PAGES": {
       "TITLE": "Uygulama",
-      "ID": "ID",
+      "ID": "Uygulama Kimliği",
       "DESCRIPTION": "Burada uygulama verilerinizi ve yapılandırmasını düzenleyebilirsiniz.",
       "CREATE": "Uygulama oluştur",
       "CREATE_SELECT_PROJECT": "Önce projenizi seçin",
@@ -2536,7 +2537,7 @@
       "DATECHANGED": "Değiştirildi",
       "URLS": "URL'ler",
       "DELETE": "Uygulamayı Sil",
-      "JUMPTOPROJECT": "Roller, yetkilendirmeler ve daha fazlasını yapılandırmak için projeye gidin.",
+      "JUMPTOPROJECT": "Rolleri, rol atamalarını ve daha fazlasını yapılandırmak için projeye gidin.",
       "DETAIL": {
         "TITLE": "Detay",
         "STATE": {
@@ -2814,42 +2815,42 @@
   },
   "ROLESLABEL": "Roller",
   "GRANTS": {
-    "TITLE": "Yetkilendirmeler",
-    "DESC": "Bunlar organizasyonunuzdaki tüm yetkilendirmelerdir.",
-    "DELETE": "Yetkilendirmeyi Sil",
-    "EMPTY": "Yetkilendirme bulunamadı",
-    "ADD": "Yetkilendirme Oluştur",
+    "TITLE": "Rol Atamaları",
+    "DESC": "Bunlar, kuruluşunuzdaki tüm rol atamalarıdır.",
+    "DELETE": "Rol atamasını sil",
+    "EMPTY": "Rol ataması bulunamadı",
+    "ADD": "Rol ataması oluştur",
     "ADD_BTN": "Yeni",
     "PROJECT": {
-      "TITLE": "Yetkilendirme",
-      "DESCRIPTION": "Belirtilen proje için yetkilendirmeleri tanımlayın. Sadece izinleriniz olan proje ve kullanıcı girişlerini görebileceğinizi unutmayın."
+      "TITLE": "Rol ataması",
+      "DESCRIPTION": "Belirtilen proje için rol atamalarını tanımlayın. Yalnızca izinlerinizin olduğu projelerin ve kullanıcıların girişlerini görebileceğinizi unutmayın."
     },
     "USER": {
-      "TITLE": "Yetkilendirme",
-      "DESCRIPTION": "Belirtilen kullanıcı için yetkilendirmeleri tanımlayın. Sadece izinleriniz olan proje ve kullanıcı girişlerini görebileceğinizi unutmayın."
+      "TITLE": "Rol ataması",
+      "DESCRIPTION": "Belirtilen kullanıcı için rol atamaları tanımlayın. Yalnızca izinlerinizin olduğu projelerin ve kullanıcıların girişlerini görebileceğinizi unutmayın."
     },
     "CREATE": {
-      "TITLE": "Yetkilendirme oluştur",
+      "TITLE": "Rol ataması oluştur",
       "DESCRIPTION": "Organizasyon, proje ve ilgili rolleri arayın."
     },
     "EDIT": {
-      "TITLE": "Yetkilendirmeyi değiştir"
+      "TITLE": "Rol atamasını değiştirme"
     },
     "DETAIL": {
-      "TITLE": "Yetkilendirme Detayı",
-      "DESCRIPTION": "Burada yetkilendirmenin tüm detaylarını görebilirsiniz."
+      "TITLE": "Rol Atama Ayrıntıları",
+      "DESCRIPTION": "Burada rol atamasının tüm ayrıntılarını görebilirsiniz."
     },
     "TOAST": {
-      "UPDATED": "Yetkilendirme güncellendi.",
-      "REMOVED": "Yetkilendirme kaldırıldı",
-      "BULKREMOVED": "Yetkilendirmeler kaldırıldı.",
+      "UPDATED": "Rol ataması güncellendi",
+      "REMOVED": "Rol ataması kaldırıldı",
+      "BULKREMOVED": "Rol atamaları kaldırıldı",
       "CANTSHOWINFO": "Bu kullanıcının ait olduğu organizasyonun yöneticisi olmadığınız için bu kullanıcının profilini ziyaret edemezsiniz"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Yetkilendirmeyi sil",
-      "DELETE_DESCRIPTION": "Bir yetkilendirmeyi silmek üzeresiniz. Devam etmek istiyor musunuz?",
-      "BULK_DELETE_TITLE": "Yetkilendirmeleri sil",
-      "BULK_DELETE_DESCRIPTION": "Birden fazla yetkilendirmeyi silmek üzeresiniz. Devam etmek istiyor musunuz?"
+      "DELETE_TITLE": "Rol atamasını sil",
+      "DELETE_DESCRIPTION": "Bir rol atamasını silmek üzeresiniz. Devam etmek istiyor musunuz?",
+      "BULK_DELETE_TITLE": "Rol atamalarını sil",
+      "BULK_DELETE_DESCRIPTION": "Birden fazla rol atamasını silmek üzeresiniz. Devam etmek istiyor musunuz?"
     }
   },
   "CHANGES": {
@@ -2868,5 +2869,6 @@
       "TITLE": "Aktivite",
       "DESCRIPTION": "Burada kullanıcı değişikliği oluşturan en son olayları görebilirsiniz."
     }
-  }
+  },
+  "INSTANCEID": "Instans Kimliği"
 }

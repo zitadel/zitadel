@@ -1,5 +1,6 @@
 ---
 title: ZITADEL Default Settings
+description: "Configure default settings in ZITADEL to establish fallback organizational settings for features, branding, and authentication preferences"
 sidebar_label: Default Settings
 ---
 
@@ -66,7 +67,7 @@ In the Branding settings, you can upload you Logo for the login interface, set y
 | Font              | Upload your custom font                                                                                                                                                                                                    |
 | Advanced Behavior | **Hide Loginname suffix**: If enabled, your loginname suffix (Domain) will not be shown in the login page. **Disable Watermark**: If you disable the watermark you will not see the "Powered by ZITADEL" in the login page |
 
-Make sure you click the "Apply configuration" button after you finish your configuration. This will ensure your design is visible for your customers.
+Make sure you click the "Apply settings" button after you finish your settings. This will ensure your design is visible for your customers.
 
 Branding settings applied on you instance act as a default for all your organizations. If you need custom branding on a organization take a look at our guide under [organization setting](./organizations-overview#organization-settings).
 
@@ -115,7 +116,7 @@ To configure your custom SMTP please fill the following fields:
 
 <img src="/docs/img/guides/console/smtp.png" alt="SMTP" width="800px" />
 
-While you create/update a SMTP provider you have the chance to test your SMTP configuration
+While you create/update a SMTP provider you have the chance to test your SMTP settings
 
 <img src="/docs/img/guides/console/smtp_test.png" alt="SMTP" width="800px" />
 
@@ -125,7 +126,7 @@ In the SMTP providers table you can hover on a provider row to show buttons that
 
 ### SMS
 
-No default provider is configured to send some SMS to your users. If you like to validate the phone numbers of your users make sure to add your twilio configuration by adding your Sid, Token and either a Sender Number or a Verification Service Sid.
+No default provider is configured to send some SMS to your users. If you like to validate the phone numbers of your users make sure to add your twilio settings by adding your Sid, Token and either a Sender Number or a Verification Service Sid.
 Setting a Verification Service Sid allows using the Twilio Verify Service instead of the Messages Service for verification.
 
 <img src="/docs/img/guides/console/twilio.png" alt="Twilio" />
@@ -140,7 +141,7 @@ The Login Policy defines how the login process should look like and which authen
 | Register allowed                 | Enable self register possibility in the login ui, this enables username password registration as well as registration with configured external identity providers                                                                                                                                                                                                                                                                                             |
 | External IDP allowed             | Possibility to login with an external identity (e.g Google, Microsoft, Apple, etc), If you like to allow external Identity providers add them to the providers list                                                                                                                                                                                                                                                                                           |
 | Hide password reset              | Disable the self-service option for users to reset their password.                                                                                                                                                                                                                                                                                                                                                                                            |
-| Domain discovery allowed         | If this setting is enabled, the user doesn't have to exist when entering the username. It is required to have verified domains on the organization. Example: ZITADEL is registered as organization with the domain zitadel.com and Entra ID as identity provider. A user enters john@zitadel.com in the login but the user doesn't exist. The domain can be mapped to the organization and therefore the user can be redirected to the Entra ID. |
+| Domain discovery allowed         | If this setting is enabled, the user doesn't have to exist when entering the username. It is required to have an Organization Domain on the organization. Example: ZITADEL is registered as organization with the domain zitadel.com and Entra ID as identity provider. A user enters john@zitadel.com in the login but the user doesn't exist. The domain can be mapped to the organization and therefore the user can be redirected to the Entra ID. |
 | Ignore unknown usernames         | This setting can be enabled, if no error message should be shown if the user doesn't exist. Example: A user enters the login name john@zitadel.com, the user doesn't exist, but will be redirected to the password screen. After entering a password, the user will get an error that either username or password are wrong.                                                                                                                                  |
 | Disable login with email address | By default users can additionally [login with the email attribute](/guides/solution-scenarios/configurations#use-an-email-address-as-username) of their user. Check this option to disable.                                                                                                                                                                                                                                                              |
 | Disable login with phone number  | By default users can additionally [login with the phonenumber attribute](/guides/solution-scenarios/configurations#use-a-phone-number-as-username) of their user. Check this option to disable.                                                                                                                                                                                                                                                          |
@@ -155,7 +156,7 @@ The Login Policy defines how the login process should look like and which authen
 
 The Default Redirect URI will be used, if a user calls the login page directly.
 More specifically, typically an application will initiate login with an auth request.
-The auth request contains a client-id and a redirect uri, that must match the configuration in ZITADEL.
+The auth request contains a client-id and a redirect uri, that must match the settings in ZITADEL.
 If there is no [auth request](https://zitadel.com/playgrounds/oidc), users will be redirected to the Default Redirect URI, which is by default `https://${CUSTOM_DOMAIN}/ui/console/`
 
 Reasons why ZITADEL doesn't have a redirect URI:
@@ -208,10 +209,10 @@ Configure the different lifetimes checks for the login process:
 
 ## Identity Providers
 
-You can configure all kinds of external identity providers for identity brokering, which support OIDC (OpenID Connect).
+You can set up all kinds of external identity providers for identity brokering, which support OIDC (OpenID Connect).
 Create a new identity provider configuration and enable it in the list afterwards.
 
-For a detailed guide about how to configure a new identity provider for identity brokering have a look at our [identity provider guides](/guides/integrate/identity-providers/introduction).
+For a detailed guide about how to set up a new identity provider for identity brokering have a look at our [identity provider guides](/guides/integrate/identity-providers/introduction).
 
 ## Password Complexity
 
@@ -264,11 +265,11 @@ If an account is locked, the administrator has to unlock it in the ZITADEL Manag
 
 ## Domain settings
 
-### Add organization domain as suffix to loginnames
+### Add Organization Domain as suffix to loginnames
 
-If you enable this setting, all loginnames will be suffixed with the organization domain. If this setting is disabled, you have to ensure that usernames are unique over all organizations.
+If you enable this setting, all loginnames will be suffixed with the Organization Domain. If this setting is disabled, you have to ensure that usernames are unique over all organizations.
 
-### Validate Org domains
+### Validate Organization Domains
 
 If this is enabled all created domains on an organization must be verified per dns/acme challenge.
 
@@ -288,7 +289,7 @@ All usernames will then be globally unique within your instance.
 
 You can either set this attribute on your whole ZITADEL instance or just on some specific organizations.
 
-Please refer to the [configuration guide](/guides/solution-scenarios/configurations#use-email-to-login) for more information.
+Please refer to the [settings guide](/guides/solution-scenarios/configurations#use-email-to-login) for more information.
 
 ## External links
 
@@ -358,7 +359,7 @@ Choose a default language which acts as a fallback, if no language header is set
 
 ## OIDC token lifetimes and expiration
 
-Configure how long the different oidc tokens should life.
+Set up how long the different oidc tokens should live.
 You can set the following times:
 
 - Access Token Lifetime
@@ -375,8 +376,8 @@ You can set the following times:
 ## Secret generator
 
 ZITADEL has some different codes and secrets, that can be specified.
-You can configure what kind of characters should be included, how long the secret should be and the expiration.
-The following secrets can be configured:
+You can specify what kind of characters should be included, how long the secret should be and the expiration.
+The following secrets can be specified:
 
 - Initialization Mail Code
 - Email verification code

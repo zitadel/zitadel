@@ -9,7 +9,7 @@
         "DESCRIPTION": "애플리케이션 보안을 위해 다음 단계를 완료하세요.",
         "CREATE_PROJECT": {
           "TITLE": "프로젝트 생성",
-          "DESCRIPTION": "프로젝트를 추가하고 역할과 권한을 정의하세요."
+          "DESCRIPTION": "프로젝트를 추가하고 역할과 역할 할당을 정의하세요."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "프로젝트는 하나 이상의 애플리케이션을 호스팅하여 사용자를 인증할 수 있습니다. 예를 들어, 웹 프론트엔드, 모바일 애플리케이션, 백엔드용으로 각각 하나씩, 총 3개의 애플리케이션을 가진 단일 프로젝트를 가질 수 있습니다. 또한 프로젝트를 통해 사용자에게 권한을 부여할 수 있습니다. 다른 조직의 사용자가 애플리케이션에 로그인할 수 있도록 프로젝트에 대한 액세스를 부여하세요.<br/><br/>프로젝트를 찾을 수 없는 경우 프로젝트 소유자 또는 관련 권한이 있는 사람에게 문의하여 액세스를 얻으세요.",
       "OWNED": {
         "TITLE": "소유한 프로젝트",
-        "DESCRIPTION": "이 프로젝트는 사용자가 소유한 프로젝트입니다. 프로젝트 설정, 권한 및 애플리케이션을 관리할 수 있습니다."
+        "DESCRIPTION": "이 프로젝트는 사용자가 소유한 프로젝트입니다. 프로젝트 설정, 역할 할당 및 애플리케이션을 관리할 수 있습니다."
       },
       "GRANTED": {
         "TITLE": "부여된 프로젝트",
@@ -61,9 +61,9 @@
         "METADATA": "부서와 같은 사용자 정의 속성을 사용자에게 추가하세요. 이 정보를 조직의 작업에 사용할 수 있습니다."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "권한",
-      "DESCRIPTION": "권한은 사용자의 프로젝트 접근 권한을 정의합니다. 사용자가 프로젝트에 액세스할 수 있도록 하고, 프로젝트 내의 역할을 정의할 수 있습니다."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "역할 할당",
+      "DESCRIPTION": "역할 할당은 사용자의 프로젝트 접근 권한을 정의합니다. 사용자가 프로젝트에 액세스할 수 있도록 하고, 프로젝트 내의 역할을 정의할 수 있습니다."
     },
     "ACTIONS": {
       "TITLE": "작업",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "프로젝트 생성",
-        "description": "프로젝트를 추가하고 역할과 권한을 정의하세요.",
+        "description": "프로젝트를 추가하고 역할과 역할 할당을 정의하세요.",
         "action": "프로젝트 생성"
       },
       "APPLICATION_CREATED": {
@@ -401,9 +401,9 @@
         "action": "사용자 추가"
       },
       "user.grant.added": {
-        "title": "사용자 권한 부여",
+        "title": "역할 할당",
         "description": "사용자가 애플리케이션에 접근할 수 있도록 하고 역할을 설정하세요.",
-        "action": "사용자 권한 부여"
+        "action": "역할 할당"
       }
     }
   },
@@ -429,7 +429,7 @@
     "NEWORG": "새 조직",
     "IAMADMIN": "인스턴스 관리자입니다. 확장된 권한이 부여되었습니다.",
     "SHOWORGS": "모든 조직 보기",
-    "GRANTS": "권한",
+    "GRANTS": "역할 할당",
     "ACTIONS": "작업",
     "PRIVACY": "개인정보처리방침",
     "TOS": "이용 약관",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "조직의 사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER_VIEWER": "조직 전체를 검토할 수 있는 권한이 있습니다",
     "ORG_SETTINGS_MANAGER": "조직 설정을 관리할 수 있는 권한이 있습니다",
-    "ORG_USER_PERMISSION_EDITOR": "사용자 권한을 관리할 수 있는 권한이 있습니다",
+    "ORG_USER_PERMISSION_EDITOR": "역할 할당을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_PERMISSION_EDITOR": "프로젝트 권한을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_CREATOR": "자신의 프로젝트와 하위 설정을 생성할 수 있는 권한이 있습니다",
     "ORG_ADMIN_IMPERSONATOR": "조직의 관리자 및 최종 사용자를 대리할 수 있는 권한이 있습니다",
@@ -702,7 +702,7 @@
     "USERNAME": "사용자 이름",
     "ORGNAME": "조직 이름",
     "ORGID": "조직 ID",
-    "PRIMARYDOMAIN": "기본 도메인",
+    "PRIMARYDOMAIN": "조직 도메인",
     "PROJECTNAME": "프로젝트 이름",
     "RESOURCEOWNER": "리소스 소유자",
     "METHODS": {
@@ -724,7 +724,7 @@
       "ME": "내 프로필로 이동",
       "PROJECTS": "프로젝트로 이동 (<strong>GP</strong>)",
       "USERS": "사용자로 이동 (<strong>GU</strong>)",
-      "USERGRANTS": "인증으로 이동 (<strong>GA</strong>)",
+      "ROLEASSIGNMENTS": "역할 할당으로 이동 (<strong>GR</strong>)",
       "ACTIONS": "액션 플로우로 이동 (<strong>GF</strong>)",
       "DOMAINS": "도메인으로 이동 (<strong>GD</strong>)"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "비밀번호 및 보안",
       "KEYS": "키",
       "PAT": "개인 접근 토큰",
-      "USERGRANTS": "권한 부여",
+      "ROLEASSIGNMENTS": "역할 할당",
       "MEMBERSHIPS": "관리자 역할",
       "METADATA": "메타데이터"
     },
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "{{value}}자 이상이어야 합니다.",
       "MAXLENGTHERROR": "{{value}}자 이하이어야 합니다."
     },
-    "ID": "ID",
+    "ID": "사용자 ID",
     "EMAIL": "이메일",
     "PHONE": "전화번호",
     "PHONEEMPTY": "정의된 전화번호가 없습니다",
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "코드 확인"
     },
     "GRANTS": {
-      "TITLE": "사용자 권한",
+      "TITLE": "역할 할당",
       "DESCRIPTION": "특정 프로젝트에 대한 이 사용자의 접근을 부여하세요",
       "CREATE": {
-        "TITLE": "사용자 권한 생성",
+        "TITLE": "역할 할당 생성",
         "DESCRIPTION": "조직, 프로젝트 및 관련 프로젝트 역할을 검색하세요."
       },
       "PROJECTNAME": "프로젝트 이름",
@@ -1119,8 +1119,8 @@
       "ADDITIONAL-EXTERNAL": "로그인 이름 (외부 조직)"
     },
     "TARGET": {
-      "SELF": "다른 조직의 사용자에게 권한을 부여하려면",
-      "EXTERNAL": "조직의 사용자에게 권한을 부여하려면",
+      "SELF": "다른 조직의 사용자에게 역할을 할당하려면",
+      "EXTERNAL": "조직의 사용자에게 역할을 할당하려면",
       "CLICKHERE": "여기를 클릭하세요"
     },
     "SIGNEDOUT": "로그아웃되었습니다. 다시 로그인하려면 '로그인' 버튼을 클릭하세요.",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "이름",
-      "ID": "ID",
+      "ID": "조직 ID",
       "CREATIONDATE": "생성일",
       "DATECHANGED": "변경일",
       "FILTER": "필터",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "파일 다운로드",
       "SELECTORGTOOLTIP": "이 조직을 선택하세요.",
-      "PRIMARYDOMAIN": "기본 도메인",
+      "PRIMARYDOMAIN": "조직 도메인",
       "STATE": "상태",
       "USEPASSWORD": "초기 비밀번호 설정",
       "USEPASSWORDDESC": "초기화 중에 사용자가 비밀번호를 설정할 필요가 없습니다."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "도메인 추가",
-      "TITLE": "검증된 도메인",
+      "TITLE": "조직 도메인",
       "DESCRIPTION": "조직 도메인을 구성하세요. 이 도메인은 도메인 검색 및 사용자 이름 접미사에 사용할 수 있습니다.",
-      "SETPRIMARY": "기본으로 설정",
+      "SETPRIMARY": "조직 도메인",
       "DELETE": {
         "TITLE": "도메인 삭제",
         "DESCRIPTION": "도메인 중 하나를 삭제하려고 합니다."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "관리자가 추가되었습니다.",
       "MEMBERREMOVED": "관리자가 제거되었습니다.",
       "MEMBERCHANGED": "관리자가 변경되었습니다.",
-      "SETPRIMARY": "기본 도메인이 설정되었습니다.",
+      "SETPRIMARY": "조직 도메인이 성공적으로 설정되었습니다.",
       "DELETED": "조직이 성공적으로 삭제되었습니다",
       "DEFAULTORGNOTFOUND": "기본 조직을 찾을 수 없습니다",
       "ORG_WAS_DELETED": "조직이 삭제되었습니다."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP 및 SMS 설정",
       "MESSAGETEXTS": "메시지 텍스트",
       "IDP": "ID 제공자",
-      "VERIFIED_DOMAINS": "검증된 도메인",
+      "VERIFIED_DOMAINS": "조직 도메인",
       "DOMAIN": "도메인 설정",
       "LOGINTEXTS": "로그인 인터페이스 텍스트",
       "BRANDING": "브랜딩",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "프로젝트를 정말로 삭제하시겠습니까?",
           "TYPENAME": "영구적으로 삭제하려면 프로젝트 이름을 입력하세요."
         }
-      }
+      },
+      "ID": "프로젝트 ID"
     },
     "SETTINGS": {
       "TITLE": "설정",
@@ -2296,7 +2297,7 @@
     "ADD": "ID 제공자 추가",
     "TYPE": "유형",
     "OWNER": "소유자",
-    "ID": "ID",
+    "ID": "신원 제공자 ID",
     "NAME": "이름",
     "AUTHORIZATIONENDPOINT": "인증 엔드포인트",
     "TOKENENDPOINT": "토큰 엔드포인트",
@@ -2521,7 +2522,7 @@
     "TOKEN": "토큰 설정",
     "PAGES": {
       "TITLE": "애플리케이션",
-      "ID": "ID",
+      "ID": "애플리케이션 ID",
       "DESCRIPTION": "여기서 애플리케이션 데이터와 구성을 편집할 수 있습니다.",
       "CREATE": "애플리케이션 생성",
       "CREATE_SELECT_PROJECT": "먼저 프로젝트를 선택하세요",
@@ -2533,7 +2534,7 @@
       "DATECHANGED": "변경됨",
       "URLS": "URL",
       "DELETE": "앱 삭제",
-      "JUMPTOPROJECT": "역할, 권한 등을 구성하려면 프로젝트로 이동하세요.",
+      "JUMPTOPROJECT": "역할, 역할 할당 등을 구성하려면 프로젝트로 이동하세요.",
       "DETAIL": {
         "TITLE": "세부사항",
         "STATE": {
@@ -2807,42 +2808,42 @@
   },
   "ROLESLABEL": "역할",
   "GRANTS": {
-    "TITLE": "권한",
-    "DESC": "조직의 모든 권한입니다.",
-    "DELETE": "권한 삭제",
-    "EMPTY": "권한이 없습니다",
-    "ADD": "권한 생성",
+    "TITLE": "역할 할당",
+    "DESC": "조직의 모든 역할 할당입니다.",
+    "DELETE": "역할 할당 삭제",
+    "EMPTY": "역할 할당이 없습니다",
+    "ADD": "역할 할당 생성",
     "ADD_BTN": "새로 추가",
     "PROJECT": {
-      "TITLE": "권한",
-      "DESCRIPTION": "지정된 프로젝트에 대한 권한을 정의합니다. 권한이 있는 프로젝트와 사용자만 볼 수 있습니다."
+      "TITLE": "역할 할당",
+      "DESCRIPTION": "지정된 프로젝트에 대한 역할 할당을 정의합니다. 권한이 있는 프로젝트와 사용자만 볼 수 있습니다."
     },
     "USER": {
-      "TITLE": "권한",
-      "DESCRIPTION": "지정된 사용자에 대한 권한을 정의합니다. 권한이 있는 프로젝트와 사용자만 볼 수 있습니다."
+      "TITLE": "역할 할당",
+      "DESCRIPTION": "지정된 사용자에 대한 역할 할당을 정의합니다. 권한이 있는 프로젝트와 사용자만 볼 수 있습니다."
     },
     "CREATE": {
-      "TITLE": "권한 생성",
+      "TITLE": "역할 할당 생성",
       "DESCRIPTION": "조직, 프로젝트 및 해당 역할을 검색하세요."
     },
     "EDIT": {
-      "TITLE": "권한 변경"
+      "TITLE": "역할 할당 변경"
     },
     "DETAIL": {
-      "TITLE": "권한 세부 정보",
-      "DESCRIPTION": "여기에서 권한의 모든 세부 정보를 볼 수 있습니다."
+      "TITLE": "역할 할당 세부 정보",
+      "DESCRIPTION": "여기에서 역할 할당의 모든 세부 정보를 볼 수 있습니다."
     },
     "TOAST": {
-      "UPDATED": "권한이 업데이트되었습니다.",
-      "REMOVED": "권한이 제거되었습니다.",
-      "BULKREMOVED": "권한이 삭제되었습니다.",
+      "UPDATED": "역할 할당이 업데이트되었습니다.",
+      "REMOVED": "역할 할당이 제거되었습니다.",
+      "BULKREMOVED": "역할 할당이 삭제되었습니다.",
       "CANTSHOWINFO": "이 사용자가 속한 조직의 관리자가 아니기 때문에 사용자의 프로필을 볼 수 없습니다."
     },
     "DIALOG": {
-      "DELETE_TITLE": "권한 삭제",
-      "DELETE_DESCRIPTION": "권한을 삭제하려고 합니다. 계속하시겠습니까?",
-      "BULK_DELETE_TITLE": "권한 삭제",
-      "BULK_DELETE_DESCRIPTION": "여러 권한을 삭제하려고 합니다. 계속하시겠습니까?"
+      "DELETE_TITLE": "역할 할당 삭제",
+      "DELETE_DESCRIPTION": "역할 할당을 삭제하려고 합니다. 계속하시겠습니까?",
+      "BULK_DELETE_TITLE": "역할 할당 삭제",
+      "BULK_DELETE_DESCRIPTION": "여러 역할 할당을 삭제하려고 합니다. 계속하시겠습니까?"
     }
   },
   "CHANGES": {
@@ -2861,5 +2862,6 @@
       "TITLE": "활동",
       "DESCRIPTION": "사용자 변경을 유발한 최신 이벤트를 볼 수 있습니다."
     }
-  }
+  },
+  "INSTANCEID": "인스턴스 ID"
 }

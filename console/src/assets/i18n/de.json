@@ -9,7 +9,7 @@
         "DESCRIPTION": "Führe die folgenden Schritte aus, um deine Anwendung zu sichern.",
         "CREATE_PROJECT": {
           "TITLE": "Erstelle ein Projekt",
-          "DESCRIPTION": "Füge ein Projekt hinzu und definiere Rollen und Berechtigungen."
+          "DESCRIPTION": "Füge ein Projekt hinzu und definiere Rollen und Rollen-Zuweisungen."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Ein Projekt enthält eine oder mehrere Anwendungen, die du nutzen kannst, um deine Benutzer zu authentifizieren. Zum Beispiel könntest du ein einziges Projekt mit 3 Anwendungen haben; eine für dein Web-Frontend, eine für deine mobile Anwendung, und eine für dein Backend. Außerdem kannst du deine Benutzer mit Projekten autorisieren. Um Benutzern aus anderen Organisationen das Einloggen in deine Anwendungen zu erlauben, gewähre ihnen Zugriff auf dein Projekt.<br/><br/>Wenn du ein Projekt nicht finden kannst, kontaktiere den Projekteigentümer oder jemanden mit den entsprechenden Rechten, um Zugang zu erhalten.",
       "OWNED": {
         "TITLE": "Eigene Projekte",
-        "DESCRIPTION": "Dies sind die Projekte, die du besitzt. Du kannst die Einstellungen, Berechtigungen und Anwendungen dieser Projekte verwalten."
+        "DESCRIPTION": "Dies sind die Projekte, die du besitzt. Du kannst die Einstellungen, Rollen-Zuweisungen und Anwendungen dieser Projekte verwalten."
       },
       "GRANTED": {
         "TITLE": "Gewährte Projekte",
@@ -61,9 +61,9 @@
         "METADATA": "Füge deinem Benutzer benutzerdefinierte Attribute hinzu, wie deine Abteilung. Du kannst diese Informationen in den Aktionen deiner Organisation nutzen."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Berechtigungen",
-      "DESCRIPTION": "Berechtigungen definieren die Zugriffsrechte eines Benutzers auf ein Projekt. Du kannst einem Benutzer Zugriff auf ein Projekt gewähren und die Rollen des Benutzers innerhalb dieses Projekts einstellen."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Rollen-Zuweisungen",
+      "DESCRIPTION": "Rollen-Zuweisungen definieren die Zugriffsrechte eines Benutzers auf ein Projekt. Du kannst einem Benutzer Zugriff auf ein Projekt gewähren und die Rollen des Benutzers innerhalb dieses Projekts einstellen."
     },
     "ACTIONS": {
       "TITLE": "Aktionen",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Erstelle ein Projekt",
-        "description": "Erstelle dein erstes Projekt und definiere Rollen",
+        "description": "Erstelle dein erstes Projekt und definiere Rollen und Rollen-Zuweisungen.",
         "action": "Projekt erstellen"
       },
       "APPLICATION_CREATED": {
@@ -401,9 +401,9 @@
         "action": "Benutzer erfassen"
       },
       "user.grant.added": {
-        "title": "Berechtige Benutzer",
+        "title": "Weise Rollen zu",
         "description": "Erlaube es deinen Nutzern, auf deine Apps zuzugreifen und gebe ihnen Rollen.",
-        "action": "Benutzer berechtigen"
+        "action": "Rollen zuweisen"
       }
     }
   },
@@ -429,7 +429,7 @@
     "NEWORG": "Neue Organisation",
     "IAMADMIN": "Du bist ein Instanz-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
     "SHOWORGS": "Alle Organisationen anzeigen",
-    "GRANTS": "Berechtigungen",
+    "GRANTS": "Rollen-Zuweisungen",
     "ACTIONS": "Aktionen",
     "PRIVACY": "Datenschutz",
     "TOS": "AGB",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "Hat die Berechtigung, Benutzer der Organisation zu erstellen und zu verwalten",
     "ORG_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Organisation zu überprüfen",
     "ORG_SETTINGS_MANAGER": "Hat die Berechtigung, die Einstellungen der Organisation zu verwalten",
-    "ORG_USER_PERMISSION_EDITOR": "Verfügt über die Berechtigung zum Verwalten von User grants",
+    "ORG_USER_PERMISSION_EDITOR": "Verfügt über die Berechtigung zum Verwalten von Rollen-Zuweisungen",
     "ORG_PROJECT_PERMISSION_EDITOR": "Hat die Berechtigung, Projektberechtigungen für externe Organisationen zu verwalten",
     "ORG_PROJECT_CREATOR": "Hat die Berechtigung, seine eigenen Projekte und dessen Einstellungen zu erstellen",
     "ORG_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer der Organisation auszugeben",
@@ -702,7 +702,7 @@
     "USERNAME": "Nutzername",
     "ORGNAME": "Organisationsname",
     "ORGID": "Organisations ID",
-    "PRIMARYDOMAIN": "Primäre Domäne",
+    "PRIMARYDOMAIN": "Organisationsdomäne",
     "PROJECTNAME": "Projektname",
     "RESOURCEOWNER": "Ressourcenbesitzer",
     "METHODS": {
@@ -724,7 +724,7 @@
       "ME": "Zum eigenen Profil",
       "PROJECTS": "Zu den <strong>P</strong>rojekten",
       "USERS": "Zu den Benutzern",
-      "USERGRANTS": "Zu den <strong>A</strong>utorisierungen",
+      "ROLEASSIGNMENTS": "Zu den <strong>R</strong>ollen-Zuweisungen",
       "ACTIONS": "Zu den Aktionen und Flows",
       "DOMAINS": "Zu den <strong>D</strong>omains"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Passwort und Sicherheit",
       "KEYS": "Schlüssel",
       "PAT": "Personal Access Tokens",
-      "USERGRANTS": "Berechtigungen",
+      "ROLEASSIGNMENTS": "Rollen-Zuweisungen",
       "MEMBERSHIPS": "Administrator-Rollen",
       "METADATA": "Metadaten"
     },
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
       "MAXLENGTHERROR": "Muss weniger als {{value}} Zeichen umfassen."
     },
-    "ID": "ID",
+    "ID": "Benutzer-ID",
     "EMAIL": "E-Mail",
     "PHONE": "Telefonnummer",
     "PHONEEMPTY": "Keine Telefonnummer hinterlegt",
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "Verifikationscode senden und verifizieren."
     },
     "GRANTS": {
-      "TITLE": "Benutzerberechtigungen",
+      "TITLE": "Rollen-Zuweisungen",
       "DESCRIPTION": "Erteile diesem Benutzer Verwaltungszugriff auf bestimmte Projekte.",
       "CREATE": {
-        "TITLE": "Benutzerberechtigung erstellen",
+        "TITLE": "Rollen-Zuweisung erstellen",
         "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
       },
       "PROJECTNAME": "Projektname",
@@ -1119,8 +1119,8 @@
       "ADDITIONAL-EXTERNAL": "Loginname (externe Organisation)"
     },
     "TARGET": {
-      "SELF": "Um einen Benutzer aus einer anderen Organisation zu berechtigen, ",
-      "EXTERNAL": "Um einen Benutzer Ihrer eigenen Organisation zu berechtigen, ",
+      "SELF": "Um einem Benutzer eine Rolle aus einer anderen Organisation zuzuweisen, ",
+      "EXTERNAL": "Um einem Benutzer Ihrer eigenen Organisation eine Rolle zuzuweisen, ",
       "CLICKHERE": "klicke hier"
     },
     "SIGNEDOUT": "Du wurdest abgemeldet. Klicke auf \"Anmelden\", um Dich erneut anzumelden.",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Name",
-      "ID": "ID",
+      "ID": "Organisations-ID",
       "CREATIONDATE": "Erstelldatum",
       "DATECHANGED": "Geändert",
       "FILTER": "Filter",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Datei herunterladen",
       "SELECTORGTOOLTIP": "Diese Organisation auswählen",
-      "PRIMARYDOMAIN": "Primäre Domain",
+      "PRIMARYDOMAIN": "Organisationsdomäne",
       "STATE": "Status",
       "USEPASSWORD": "Initiales Passwort setzen",
       "USEPASSWORDDESC": "Der Nutzer muss das Passwort bei der Initialisierung nicht setzen."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
-      "TITLE": "Verifizierte Domains",
+      "TITLE": "Organisationsdomäne",
       "DESCRIPTION": "Konfiguriere die Domains, die für Domain Discovery und als Suffix für die Benutzer verwendet werden können.",
-      "SETPRIMARY": "Primäre Domain setzen",
+      "SETPRIMARY": "Als Organisationsdomäne festlegen",
       "DELETE": {
         "TITLE": "Domain löschen?",
         "DESCRIPTION": "Du bist im Begriff, eine Domain aus deiner Organisation zu löschen."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administrator hinzugefügt.",
       "MEMBERREMOVED": "Administrator entfernt.",
       "MEMBERCHANGED": "Administrator geändert.",
-      "SETPRIMARY": "Primäre Domain gesetzt.",
+      "SETPRIMARY": "Organisationsdomäne wurde erfolgreich festgelegt.",
       "DELETED": "Organisation erfolgreich gelöscht",
       "DEFAULTORGNOTFOUND": "Die Standardorganisation wurde nicht gefunden",
       "ORG_WAS_DELETED": "Organisation wurde gelöscht."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP und SMS Einstellungen",
       "MESSAGETEXTS": "Benachrichtigungstexte",
       "IDP": "Identitätsanbieter",
-      "VERIFIED_DOMAINS": "Verifizierte Domains",
+      "VERIFIED_DOMAINS": "Organisationsdomäne",
       "DOMAIN": "Domain Einstellungen",
       "LOGINTEXTS": "Login Interface Texte",
       "BRANDING": "Branding",
@@ -1581,7 +1581,7 @@
       "ADDPROVIDER": "Anbieter hinzufügen",
       "ADDPROVIDERDESCRIPTION": "Wählen Sie einen der verfügbaren Anbieter und geben Sie die erforderlichen Daten ein.",
       "REMOVEPROVIDER": "Anbieter entfernen",
-      "REMOVEPROVIDER_DESC": "Sie sind im Begriff eine Konfiguration zu löschen. Wollen Sie fortfahren?",
+      "REMOVEPROVIDER_DESC": "Sie sind im Begriff einen Anbieter zu löschen. Wollen Sie fortfahren?",
       "SMSPROVIDERSTATE": {
         "0": "Unbekannt",
         "1": "Aktiv",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "Willst Du das Projekt wirklich löschen?",
           "TYPENAME": "Wiederholen Sie den Namen des Projektes um es zu löschen."
         }
-      }
+      },
+      "ID": "Projekt-ID"
     },
     "SETTINGS": {
       "TITLE": "Einstellungen",
@@ -2056,8 +2057,8 @@
       "EDITTITLE": "Rollen editieren",
       "CREATE": {
         "TITLE": "Projektberechtigung erstellen",
-        "SEL_USERS": "Selektiere die gewünschten Benutzer für das Erstellen der Berechtigung.",
-        "SEL_ROLES": "Selektiere die gewünschten Rollen für das Erstellen der Berechtigung.",
+        "SEL_USERS": "Selektiere die gewünschten Benutzer für das Erstellen der Rollen-Zuweisung.",
+        "SEL_ROLES": "Selektiere die gewünschten Rollen für das Erstellen der Rollen-Zuweisung.",
         "SEL_PROJECT": "Suchen nach Projekt",
         "SEL_USER": "Benutzer auswählen",
         "SEL_ORG": "Durchsuchen Sie eine Organisation",
@@ -2091,7 +2092,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Besitzer",
       "GRANTEDORGNAME": "Name der Organisation",
-      "GRANTID": "Grant Id",
+      "GRANTID": "Grant ID",
       "CREATIONDATE": "Erstelldatum",
       "CHANGEDATE": "Letzte Änderung",
       "DATES": "Datum",
@@ -2156,7 +2157,7 @@
       "DELETE": "Projekt löschen",
       "ORGNAME": "Name der Organisation",
       "ORGID": "Organisations ID",
-      "ORGDOMAIN": "Domain der Organisation",
+      "ORGDOMAIN": "Organisationsdomäne",
       "STATE": "Status",
       "TYPE": "Typ",
       "CREATIONDATE": "Erstelldatum",
@@ -2178,7 +2179,7 @@
       "DEACTIVATED": "Deaktiviert",
       "CREATED": "Projekt erstellt.",
       "UPDATED": "Projekt gespeichert.",
-      "GRANTUPDATED": "Berechtigung geändert.",
+      "GRANTUPDATED": "Rollen-Zuweisung geändert.",
       "DELETED": "Projekt gelöscht."
     }
   },
@@ -2238,7 +2239,7 @@
     },
     "DETAIL": {
       "TITLE": "Identitäts Provider",
-      "DESCRIPTION": "Bearbeite deine Providerkonfiguration",
+      "DESCRIPTION": "Bearbeite deine Provider-Einstellungen",
       "DATECREATED": "Erstellt",
       "DATECHANGED": "Geändert"
     },
@@ -2289,7 +2290,7 @@
     "UPDATECLIENTSECRET": "Client Secret updaten",
     "TYPE": "Typ",
     "OWNER": "Besitzer",
-    "ID": "ID",
+    "ID": "Identitätsanbieter-ID",
     "AVAILABILITY": "Verfügbarkeit",
     "AVAILABLE": "verfügbar",
     "AVAILABLEBUTINACTIVE": "verfügbar aber inaktiv",
@@ -2349,7 +2350,7 @@
     "FEDERATEDLOGOUTENABLED_DESC": "Wenn aktiviert, wird der Benutzer auch vom IdP abgemeldet, wenn der Benutzer die Sitzung in Zitadel beendet.",
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
-      "TITLE": "OIDC Konfiguration",
+      "TITLE": "OIDC Einstellungen",
       "DESCRIPTION": "Geben Sie die Daten OIDC Identitätsanbieter ein."
     },
     "OAUTH": {
@@ -2357,7 +2358,7 @@
       "DESCRIPTION": "Geben Sie die Daten OAuth Identity Providers ein."
     },
     "JWT": {
-      "TITLE": "JWT Konfiguration",
+      "TITLE": "JWT Einstellungen",
       "DESCRIPTION": "Geben Sie die Daten JWT Identitätsanbieter ein. ",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
@@ -2495,7 +2496,7 @@
     "TOKEN": "Token Einstellungen",
     "PAGES": {
       "TITLE": "Anwendung",
-      "ID": "ID",
+      "ID": "Applikations-ID",
       "DESCRIPTION": "Hier kannst Du Deine Applikationen bearbeiten und deren Konfiguration anpassen.",
       "CREATE": "Applikation erstellen",
       "CREATE_SELECT_PROJECT": "Wähle zuerst dein Projekt aus",
@@ -2507,7 +2508,7 @@
       "DATECHANGED": "Geändert",
       "URLS": "URLs",
       "DELETE": "App löschen",
-      "JUMPTOPROJECT": "Um Rollen, Berechtigungen und mehr zu konfigurieren, navigieren Sie zum Projekt.",
+      "JUMPTOPROJECT": "Um Rollen, Rollen-Zuweisungen und mehr zu konfigurieren, navigieren Sie zum Projekt.",
       "DETAIL": {
         "TITLE": "Details",
         "STATE": {
@@ -2518,7 +2519,7 @@
       },
       "DIALOG": {
         "CONFIG": {
-          "TITLE": "OIDC Konfiguration ändern"
+          "TITLE": "OIDC Einstellungen ändern"
         },
         "DELETE": {
           "TITLE": "App löschen",
@@ -2575,7 +2576,7 @@
       "COMMAORENTERSEPERATION": "mit ↵ trennen",
       "POSTREDIRECTTITLE": "Das ist die Weiterleitung nach einem Log-out.",
       "TYPEREQUIRED": "Der Typ ist notwendig.",
-      "TITLE": "OIDC-Konfiguration",
+      "TITLE": "OIDC-Einstellungen",
       "CLIENTID": "Client ID",
       "CLIENTSECRET": "Client Secret",
       "CLIENTSECRET_NOSECRET": "Bei ihrem gewählten Authentication Flow wird kein Secret benötigt und steht daher nicht zur Verfügung.",
@@ -2671,8 +2672,8 @@
         "TITLE": "SAML",
         "DESCRIPTION": "SAML Applikationen"
       },
-      "CONFIGSECTION": "SAML Konfiguration",
-      "CHOOSEMETADATASOURCE": "Stellen Sie Ihre SAML-Konfiguration mit einer der folgenden Optionen bereit:",
+      "CONFIGSECTION": "SAML Einstellungen",
+      "CHOOSEMETADATASOURCE": "Stellen Sie Ihre SAML-Einstellungen mit einer der folgenden Optionen bereit:",
       "METADATAOPT1": "Option 1: Geben Sie die URL an, unter der sich die Metadatendatei befindet",
       "METADATAOPT2": "Option 2: Laden Sie eine Datei hoch, die Ihre XML-Metadaten enthält",
       "METADATAOPT3": "Option 3: Erstellen Sie spontan eine minimale Metadatendatei mit ENTITYID und ACS-URL",
@@ -2785,42 +2786,42 @@
   },
   "ROLESLABEL": "Rollen",
   "GRANTS": {
-    "TITLE": "Berechtigungen",
-    "DESC": "Hier werden alle Berechtigungen deiner Organisation angezeigt.",
-    "DELETE": "Berechtigung löschen",
-    "EMPTY": "Keine Berechtigungen gefunden",
-    "ADD": "Berechtigung erstellen",
+    "TITLE": "Rollen-Zuweisungen",
+    "DESC": "Dies sind alle Rollen-Zuweisungen deiner Organisation.",
+    "DELETE": "Rollen-Zuweisung löschen",
+    "EMPTY": "Keine Rollen-Zuweisung gefunden",
+    "ADD": "Rollen-Zuweisung erstellen",
     "ADD_BTN": "Neu",
     "PROJECT": {
-      "TITLE": "Autorisierung",
-      "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Autorisierung besitzt."
+      "TITLE": "Rollen-Zuweisung",
+      "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Rollen-Zuweisung besitzt."
     },
     "USER": {
-      "TITLE": "Autorisierung",
-      "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Autorisierung besitzt."
+      "TITLE": "Rollen-Zuweisung",
+      "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Rollen-Zuweisung besitzt."
     },
     "CREATE": {
-      "TITLE": "Autorisierung erstellen",
+      "TITLE": "Rollen-Zuweisung erstellen",
       "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
     },
     "EDIT": {
-      "TITLE": "Autorisierung bearbeiten"
+      "TITLE": "Rollen-Zuweisung bearbeiten"
     },
     "DETAIL": {
-      "TITLE": "Autorisierungsdetails",
+      "TITLE": "Details zur Rollen-Zuweisung",
       "DESCRIPTION": ""
     },
     "TOAST": {
-      "UPDATED": "Berechtigung geändert.",
-      "REMOVED": "Berechtigung entfernt.",
-      "BULKREMOVED": "Berechtigungen entfernt.",
+      "UPDATED": "Rollen-Zuweisung geändert.",
+      "REMOVED": "Rollen-Zuweisung entfernt.",
+      "BULKREMOVED": "Rollen-Zuweisungen entfernt.",
       "CANTSHOWINFO": "Sie können das Profil dieses Benutzers nicht besuchen, da Sie kein Administrator der Organisation sind, zu der dieser Benutzer gehört"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Authorisierung löschen",
-      "DELETE_DESCRIPTION": "Sie sind im Begriff eine Autorisierung zu entfernen. Wollen Sie fortfahren?",
-      "BULK_DELETE_TITLE": "Autorisierungen löschen",
-      "BULK_DELETE_DESCRIPTION": "Sie sind im Begriff mehrere Autorisierungen zu entfernen. Wollen Sie fortfahren?"
+      "DELETE_TITLE": "Rollen-Zuweisung löschen",
+      "DELETE_DESCRIPTION": "Sie sind im Begriff eine Rollen-Zuweisung zu entfernen. Wollen Sie fortfahren?",
+      "BULK_DELETE_TITLE": "Rollen-Zuweisungen löschen",
+      "BULK_DELETE_DESCRIPTION": "Sie sind im Begriff mehrere Rollen-Zuweisungen zu entfernen. Wollen Sie fortfahren?"
     }
   },
   "CHANGES": {
@@ -2839,5 +2840,6 @@
       "TITLE": "Aktivität",
       "DESCRIPTION": "Hier siehst Du die letzten Vorkommnisse, die den Benutzer betreffen."
     }
-  }
+  },
+  "INSTANCEID": "Instanz-ID"
 }

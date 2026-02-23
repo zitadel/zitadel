@@ -100,6 +100,7 @@ export function RegisterFormIDPIncomplete({
               <TextInput
                 type="text"
                 autoComplete="username"
+                autoFocus
                 required
                 {...register("username", { required: "Username is required" })}
                 label="Username"
@@ -113,6 +114,7 @@ export function RegisterFormIDPIncomplete({
               <TextInput
                 type="firstname"
                 autoComplete="firstname"
+                autoFocus={!!idpUserName}
                 required
                 {...register("firstname", { required: t("required.firstname") })}
                 label={t("labels.firstname")}

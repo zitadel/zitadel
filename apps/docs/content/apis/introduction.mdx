@@ -1,5 +1,6 @@
 ---
 title: ZITADEL API Reference Overview
+description: "Explore ZITADEL's APIs for authentication and authorization. Integrate identity management using OpenID Connect, OAuth 2.0, and SAML standards."
 sidebar_label: Overview
 ---
 
@@ -10,18 +11,19 @@ ZITADEL exposes all features via different gRPC and REST APIs and provides SDKs 
 
 The [OpenID Connect & OAuth endpoints](/apis/openidoauth/endpoints) and [SAML 2.0 endpoints](/apis/saml/endpoints) are implemented and exposed according to the specific standards. Managing resources such as users, organizations, instances, or settings must be done with the different [ZITADEL APIs](#zitadel-apis-resource-based).
 
-[Actions](/guides/manage/console/actions-overview) allow to extend ZITADEL with custom code to change default behaviors or calling external systems.
+[Actions](/guides/manage/console/actions-overview) allow extending ZITADEL with custom code to change default behaviors or calling external systems.
 
-## Authentication & authorization
+## Authentication & Authorization
 
+In this section, “authorization” refers to protocol- and API-level authorization (for example OAuth scopes and claims, OIDC, SAML assertions, and API access) and is distinct from the “authorization” term used in ZITADEL role-assignment APIs.
 ### Authentication for users (interactive)
 
 ZITADEL implements industry standards such as OpenID Connect, OAuth 2.0, or SAML for authentication.
-Please refer to our guides how to [authenticate users](/guides/integrate/login/login-users) through an interactive authentication process.
+Please refer to our guides on how to [authenticate users](/guides/integrate/login/login-users) through an interactive authentication process.
 
-For user authentication on devices with limited accessibility (eg, SmartTV, Smart Watch etc.) use the [device authorization grant](/guides/integrate/login/oidc/device-authorization).
+For user authentication on devices with limited accessibility (eg, SmartTV, Smartwatch, etc.) use the [device authorization grant](/guides/integrate/login/oidc/device-authorization).
 
-Additionally, you can use the [session API](/reference/api/session) to authenticate users, for example by building a [custom login UI](/guides/integrate/login-ui).
+Additionally, you can use the [session API](/reference/api/session) to authenticate users, for example, by building a [custom login UI](/guides/integrate/login-ui).
 
 ### Authenticate service accounts
 
@@ -45,8 +47,8 @@ The [OIDC Playground](https://zitadel.com/playgrounds/oidc) is for testing OpenI
 
 ### Custom
 
-ZITADEL allows to authenticate users by creating a session with the [Session API](/reference/api/session), get OIDC authentication request details with the [OIDC service API](/reference/api/oidc) or get SAML request details with the [SAML service API](/reference/api/saml).
-User authorizations can be [retrieved as roles from our APIs](/guides/integrate/retrieve-user-roles).
+ZITADEL allows authenticating users by creating a session with the [Session API](/reference/api/session/zitadel.session.v2.SessionService.CreateSession), get OIDC authentication request details with the [OIDC service API](/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetAuthRequest) or get SAML request details with the [SAML service API](/reference/api/saml/zitadel.saml.v2.SAMLService.GetSAMLRequest).
+User role assignments can be [retrieved as roles from our APIs](/guides/integrate/retrieve-user-roles).
 
 Refer to our guide to learn how to [build your own login UI](/guides/integrate/login-ui)
 
@@ -316,7 +318,7 @@ For easy copying to your reverse proxy configuration, here is the list of URL pa
 
 We published an official Postman collection to help you explore and test the ZITADEL APIs.
 
-The collection is organized by services, and includes a script to automatically authenticate requests. Before using it, make sure to configure the required environment variables in Postman:
+The collection is organized by services and includes a script to automatically authenticate requests. Before using it, make sure to configure the required environment variables in Postman:
 
 | Variable Name           | Description |
 |-------------------------|-------------|

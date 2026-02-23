@@ -9,7 +9,7 @@
         "DESCRIPTION": "Slutför följande steg för att säkra din applikation.",
         "CREATE_PROJECT": {
           "TITLE": "Skapa ett projekt",
-          "DESCRIPTION": "Lägg till ett projekt och definiera dess roller och behörigheter."
+          "DESCRIPTION": "Lägg till projekt och definiera roller och rolltilldelningar."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Ett projekt är värd för en eller flera applikationer som du kan använda för att autentisera dina användare. Till exempel kan du ha ett enda projekt med 3 applikationer; en för din webbfrontend, en för din mobilapplikation, och en för din backend. Du kan också auktorisera dina användare med projekt. För att tillåta användare från andra organisationer att logga in på dina applikationer, ge dem åtkomst till ditt projekt.<br/><br/>Om du inte kan hitta ett projekt, kontakta projektets ägare eller någon med motsvarande rättigheter för att få åtkomst.",
       "OWNED": {
         "TITLE": "Ägda projekt",
-        "DESCRIPTION": "Detta är de projekt du äger. Du kan hantera dessa projekts inställningar, behörigheter och applikationer."
+        "DESCRIPTION": "Det här är projekt som du äger. Du kan hantera deras inställningar, rolltilldelningar och applikationer."
       },
       "GRANTED": {
         "TITLE": "Beviljade projekt",
@@ -61,9 +61,9 @@
         "METADATA": "Lägg till anpassade attribut till din användare som din avdelning. Du kan använda denna information i din organisations åtgärder."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Behörigheter",
-      "DESCRIPTION": "Behörigheter definierar en användares åtkomsträttigheter till ett projekt. Du kan ge en användare åtkomst till ett projekt och definiera användarens roller inom det projektet."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Rolltilldelningar",
+      "DESCRIPTION": "Rolltilldelningar definierar användarnas åtkomstbehörigheter till projekt. Du kan ge användare åtkomst till projekt och definiera deras roller inom dessa projekt."
     },
     "ACTIONS": {
       "TITLE": "Åtgärder",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Skapa ett projekt",
-        "description": "Lägg till ett projekt och definiera dess roller och behörigheter.",
+        "description": "Lägg till projekt och definiera roller och rolltilldelningar.",
         "action": "Skapa projekt"
       },
       "APPLICATION_CREATED": {
@@ -429,7 +429,7 @@
     "NEWORG": "Ny Organisation",
     "IAMADMIN": "Du är en instans-administratör. Observera att du har utökade behörigheter.",
     "SHOWORGS": "Visa Alla Organisationer",
-    "GRANTS": "Behörigheter",
+    "GRANTS": "Rolltilldelningar",
     "ACTIONS": "Åtgärder",
     "PRIVACY": "Integritet",
     "TOS": "Användarvillkor",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "Har behörighet att skapa och hantera användare i organisationen",
     "ORG_OWNER_VIEWER": "Har behörighet att granska hela organisationen",
     "ORG_SETTINGS_MANAGER": "Har behörighet att hantera organisationens inställningar",
-    "ORG_USER_PERMISSION_EDITOR": "Har behörighet att hantera användarbehörigheter",
+    "ORG_USER_PERMISSION_EDITOR": "Har behörighet att hantera rolltilldelningar",
     "ORG_PROJECT_PERMISSION_EDITOR": "Har behörighet att hantera projektbehörigheter",
     "ORG_PROJECT_CREATOR": "Har behörighet att skapa egna projekt och underliggande inställningar",
     "ORG_ADMIN_IMPERSONATOR": "Har behörighet att imitera administratörer och slutanvändare från organisationen",
@@ -702,7 +702,7 @@
     "USERNAME": "Användarnamn",
     "ORGNAME": "Organisationsnamn",
     "ORGID": "Organisations ID",
-    "PRIMARYDOMAIN": "Primär domän",
+    "PRIMARYDOMAIN": "Organisationsdomän",
     "PROJECTNAME": "Projektnamn",
     "RESOURCEOWNER": "Resursägare",
     "METHODS": {
@@ -724,7 +724,7 @@
       "ME": "Gå till egen profil",
       "PROJECTS": "<strong>G</strong>å till <strong>P</strong>rojekt",
       "USERS": "<strong>G</strong>å till <strong>A</strong>nvändare",
-      "USERGRANTS": "<strong>G</strong>å till <strong>A</strong>uktorisationer",
+      "ROLEASSIGNMENTS": "<strong>G</strong>å till <strong>R</strong>olltilldelningar",
       "ACTIONS": "<strong>G</strong>å till Åtgärder och <strong>F</strong>löden",
       "DOMAINS": "<strong>G</strong>å till <strong>D</strong>omäner"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Lösenord och Säkerhet",
       "KEYS": "Nycklar",
       "PAT": "Personliga Åtkomsttoken",
-      "USERGRANTS": "Auktorisationer",
+      "ROLEASSIGNMENTS": "Rolltilldelningar",
       "MEMBERSHIPS": "Administratörsroller",
       "METADATA": "Metadata"
     },
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Måste vara minst {{value}} tecken långt.",
       "MAXLENGTHERROR": "Måste vara mindre än {{value}} tecken."
     },
-    "ID": "ID",
+    "ID": "Användar-ID",
     "EMAIL": "E-post",
     "PHONE": "Telefonnummer",
     "PHONEEMPTY": "Inget telefonnummer definierat",
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "Verifiera kod"
     },
     "GRANTS": {
-      "TITLE": "Användarbehörigheter",
+      "TITLE": "Rolltilldelningar",
       "DESCRIPTION": "Ge denna användare åtkomst till vissa projekt",
       "CREATE": {
-        "TITLE": "Skapa användarbehörighet",
+        "TITLE": "Skapa rolltilldelning",
         "DESCRIPTION": "Sök efter organisationen, projektet och motsvarande projektroller."
       },
       "PROJECTNAME": "Projektnamn",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Namn",
-      "ID": "ID",
+      "ID": "Organisations-ID",
       "CREATIONDATE": "Skapelsedatum",
       "DATECHANGED": "Ändrad",
       "FILTER": "Filter",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Ladda ner fil",
       "SELECTORGTOOLTIP": "Välj denna organisation.",
-      "PRIMARYDOMAIN": "Primär domän",
+      "PRIMARYDOMAIN": "Organisationsdomän",
       "STATE": "Status",
       "USEPASSWORD": "Ange initialt lösenord",
       "USEPASSWORDDESC": "Användaren behöver inte ange lösenordet under initialiseringen."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Lägg till domän",
-      "TITLE": "Verifierade domäner",
+      "TITLE": "Organisationsdomän",
       "DESCRIPTION": "Konfigurera dina organisationsdomäner. Denna domän kan användas för domänupptäckt och användarnamnssuffix.",
-      "SETPRIMARY": "Ange som primär",
+      "SETPRIMARY": "Organisationsdomän",
       "DELETE": {
         "TITLE": "Radera domän",
         "DESCRIPTION": "Du är på väg att radera en av dina domäner."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administratör tillagd.",
       "MEMBERREMOVED": "Administratör borttagen.",
       "MEMBERCHANGED": "Administratör ändrad.",
-      "SETPRIMARY": "Primär domän inställd.",
+      "SETPRIMARY": "Organisationsdomänen har ställts in.",
       "DELETED": "Organisation raderad framgångsrikt",
       "DEFAULTORGNOTFOUND": "Standardorganisationen hittades inte",
       "ORG_WAS_DELETED": "Organisationen har raderats."
@@ -1503,7 +1503,7 @@
       "NOTIFICATIONS_DESC": "SMTP- och SMS-inställningar",
       "MESSAGETEXTS": "Meddelandetexter",
       "IDP": "Identitetsleverantörer",
-      "VERIFIED_DOMAINS": "Verifierade domäner",
+      "VERIFIED_DOMAINS": "Organisationsdomän",
       "DOMAIN": "Domäninställningar",
       "LOGINTEXTS": "Inloggningsgränssnittstexter",
       "BRANDING": "Varumärke",
@@ -2018,7 +2018,8 @@
           "DESCRIPTION": "Vill du verkligen radera ditt projekt?",
           "TYPENAME": "Skriv namnet på projektet för att radera det permanent."
         }
-      }
+      },
+      "ID": "Projekt-ID"
     },
     "SETTINGS": {
       "TITLE": "Inställningar",
@@ -2144,7 +2145,7 @@
       "ASSERTION": "Bekräfta roller vid autentisering",
       "ASSERTION_DESCRIPTION": "Rollinformation skickas från Userinfo-endpoint och beroende på dina applikationsinställningar i tokens och andra typer.",
       "CHECK": "Kontrollera auktorisering vid autentisering",
-      "CHECK_DESCRIPTION": "Om inställt, tillåts användare endast autentisera om någon roll är tilldelad deras konto.",
+      "CHECK_DESCRIPTION": "Neka autentisering om användaren inte har några roller tilldelade till detta projekt. Rolltilldelningar till projektet utan att tilldela en specifik roll till användaren är tillåtna.",
       "DIALOG": {
         "DELETE_TITLE": "Ta bort roll",
         "DELETE_DESCRIPTION": "Du håller på att ta bort en projektroll. Är du säker?"
@@ -2300,7 +2301,7 @@
     "ADD": "Lägg till identitetsleverantör",
     "TYPE": "Typ",
     "OWNER": "Ägare",
-    "ID": "ID",
+    "ID": "ID för identitetsleverantör",
     "NAME": "Namn",
     "AUTHORIZATIONENDPOINT": "Auktoriseringsslutpunkt",
     "TOKENENDPOINT": "Token-slutpunkt",
@@ -2524,7 +2525,7 @@
     "TOKEN": "Token-inställningar",
     "PAGES": {
       "TITLE": "Applikation",
-      "ID": "ID",
+      "ID": "Applikations-ID",
       "DESCRIPTION": "Här kan du redigera dina applikationsdata och dess konfiguration.",
       "CREATE": "Skapa applikation",
       "CREATE_SELECT_PROJECT": "Välj ditt projekt först",
@@ -2536,7 +2537,7 @@
       "DATECHANGED": "Ändrad",
       "URLS": "URL:er",
       "DELETE": "Ta bort app",
-      "JUMPTOPROJECT": "För att konfigurera roller, behörigheter och mer, navigera till projektet.",
+      "JUMPTOPROJECT": "För att konfigurera roller, rolltilldelningar och mer, navigera till projektet.",
       "DETAIL": {
         "TITLE": "Detalj",
         "STATE": {
@@ -2814,42 +2815,42 @@
   },
   "ROLESLABEL": "Roller",
   "GRANTS": {
-    "TITLE": "Auktoriseringar",
-    "DESC": "Dessa är alla auktoriseringar på din organisation.",
-    "DELETE": "Radera auktorisering",
-    "EMPTY": "Ingen auktorisering hittades",
-    "ADD": "Skapa auktorisering",
+    "TITLE": "Rolltilldelningar",
+    "DESC": "Dessa är alla rolltilldelningar i din organisation.",
+    "DELETE": "Radera rolltilldelning",
+    "EMPTY": "Ingen rolltilldelning hittades",
+    "ADD": "Skapa rolltilldelning",
     "ADD_BTN": "Ny",
     "PROJECT": {
-      "TITLE": "Auktorisering",
-      "DESCRIPTION": "Definiera auktoriseringar för det specificerade projektet. Observera att du bara kan se poster för projekt och användare som du har behörighet för."
+      "TITLE": "Rolltilldelning",
+      "DESCRIPTION": "Definiera rolltilldelningar för det specificerade projektet. Observera att du bara kan se poster för projekt och användare som du har behörighet för."
     },
     "USER": {
-      "TITLE": "Auktorisering",
-      "DESCRIPTION": "Definiera auktoriseringar för den specificerade användaren. Observera att du bara kan se poster för projekt och användare som du har behörighet för."
+      "TITLE": "Rolltilldelning",
+      "DESCRIPTION": "Definiera rolltilldelningar för den specificerade användaren. Observera att du bara kan se poster för projekt och användare som du har behörighet för."
     },
     "CREATE": {
-      "TITLE": "Skapa auktorisering",
+      "TITLE": "Skapa rolltilldelning",
       "DESCRIPTION": "Sök efter organisationen, projektet och de motsvarande rollerna."
     },
     "EDIT": {
-      "TITLE": "Ändra auktorisering"
+      "TITLE": "Ändra rolltilldelning"
     },
     "DETAIL": {
-      "TITLE": "Auktoriseringsdetalj",
-      "DESCRIPTION": "Här kan du se alla detaljer om auktoriseringen."
+      "TITLE": "Detaljer om rolltilldelning",
+      "DESCRIPTION": "Här kan du se alla detaljer om rolltilldelningen."
     },
     "TOAST": {
-      "UPDATED": "Auktorisering uppdaterad.",
-      "REMOVED": "Auktorisering borttagen",
-      "BULKREMOVED": "Auktoriseringar borttagna.",
+      "UPDATED": "Rolltilldelning uppdaterad.",
+      "REMOVED": "Rolltilldelning borttagen",
+      "BULKREMOVED": "Rolltilldelningar borttagna.",
       "CANTSHOWINFO": "Du kan inte besöka denna användares profil eftersom du inte är administratör i organisationen där denna användare tillhör"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Radera auktorisering",
-      "DELETE_DESCRIPTION": "Du håller på att radera en auktorisering. Vill du fortsätta?",
-      "BULK_DELETE_TITLE": "Radera auktoriseringar",
-      "BULK_DELETE_DESCRIPTION": "Du håller på att radera flera auktoriseringar. Vill du fortsätta?"
+      "DELETE_TITLE": "Radera rolltilldelning",
+      "DELETE_DESCRIPTION": "Du håller på att radera en rolltilldelning. Vill du fortsätta?",
+      "BULK_DELETE_TITLE": "Radera rolltilldelningar",
+      "BULK_DELETE_DESCRIPTION": "Du håller på att radera flera rolltilldelningar. Vill du fortsätta?"
     }
   },
   "CHANGES": {
@@ -2868,5 +2869,6 @@
       "TITLE": "Aktivitet",
       "DESCRIPTION": "Här kan du se de senaste händelserna som har genererat en användarförändring."
     }
-  }
+  },
+  "INSTANCEID": "Instans-ID"
 }

@@ -9,7 +9,7 @@
         "DESCRIPTION": "Finalizați următorii pași pentru a vă securiza aplicația.",
         "CREATE_PROJECT": {
           "TITLE": "Creați un proiect",
-          "DESCRIPTION": "Adăugați un proiect și definiți rolurile și autorizațiile acestuia."
+          "DESCRIPTION": "Adăugați proiecte și definiți roluri și atribuiri de roluri."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Un proiect găzduiește una sau mai multe aplicații, pe care le puteți utiliza pentru a vă autentifica utilizatorii. De exemplu, ați putea avea un singur proiect cu 3 aplicații: una pentru frontend-ul web, una pentru aplicația mobilă și una pentru backend. De asemenea, vă puteți autoriza utilizatorii cu proiecte. Pentru a permite utilizatorilor din alte organizații să se conecteze la aplicațiile dvs., acordați-le acces la proiectul dvs.<br/><br/>Dacă nu găsiți un proiect, contactați proprietarul proiectelor sau pe cineva cu drepturile corespunzătoare pentru a obține acces.",
       "OWNED": {
         "TITLE": "Proiecte deținute",
-        "DESCRIPTION": "Acestea sunt proiectele pe care le dețineți. Puteți gestiona setările acestor proiecte, autorizațiile și aplicațiile."
+        "DESCRIPTION": "Acestea sunt proiectele pe care le dețineți. Puteți gestiona setările, atribuirea rolurilor și aplicațiile acestora."
       },
       "GRANTED": {
         "TITLE": "Proiecte acordate",
@@ -61,9 +61,9 @@
         "METADATA": "Adăugați atribute personalizate utilizatorului dvs., cum ar fi departamentul. Puteți utiliza aceste informații în acțiunile organizațiilor dvs."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Autorizații",
-      "DESCRIPTION": "Autorizațiile definesc drepturile de acces ale unui utilizator la un proiect. Puteți acorda unui utilizator acces la un proiect și puteți defini rolurile utilizatorilor în cadrul acelui proiect."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Atribuirea rolurilor",
+      "DESCRIPTION": "Atribuirea rolurilor definește permisiunile de acces ale utilizatorilor la proiecte. Puteți acorda utilizatorilor acces la proiecte și puteți defini rolurile acestora în cadrul acelor proiecte."
     },
     "ACTIONS": {
       "TITLE": "Acțiuni",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Creați un proiect",
-        "description": "Adăugați un proiect și definiți rolurile și autorizațiile acestuia.",
+        "description": "Adăugați proiecte și definiți roluri și atribuiri de roluri.",
         "action": "Creați proiect"
       },
       "APPLICATION_CREATED": {
@@ -429,7 +429,7 @@
     "NEWORG": "Organizație nouă",
     "IAMADMIN": "Sunteți administrator de instanță. Rețineți că aveți permisiuni extinse.",
     "SHOWORGS": "Afișați toate organizațiile",
-    "GRANTS": "Autorizații",
+    "GRANTS": "Atribuirea rolurilor",
     "ACTIONS": "Acțiuni",
     "PRIVACY": "Confidențialitate",
     "TOS": "Termeni și condiții",
@@ -660,7 +660,7 @@
     "ORG_OWNER": "Are permisiunea asupra întregii organizații",
     "ORG_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatorii organizației",
     "ORG_OWNER_VIEWER": "Are permisiunea de a revizui întreaga organizație",
-    "ORG_USER_PERMISSION_EDITOR": "Are permisiunea de a gestiona granturile utilizatorilor",
+    "ORG_USER_PERMISSION_EDITOR": "Are permisiunea de a gestiona atribuirea rolurilor",
     "ORG_PROJECT_PERMISSION_EDITOR": "Are permisiunea de a gestiona granturile proiectelor",
     "ORG_PROJECT_CREATOR": "Are permisiunea de a-și crea propriile proiecte și setările de bază",
     "ORG_ADMIN_IMPERSONATOR": "Are permisiunea de a impersona administratorul și utilizatorii finali din organizație",
@@ -700,7 +700,7 @@
     "USERNAME": "Numele utilizatorului",
     "ORGNAME": "Numele organizației",
     "ORGID": "ID-ul organizației",
-    "PRIMARYDOMAIN": "Domeniu principal",
+    "PRIMARYDOMAIN": "Domeniu organizație",
     "PROJECTNAME": "Numele proiectului",
     "RESOURCEOWNER": "Proprietarul resursei",
     "METHODS": {
@@ -722,7 +722,7 @@
       "ME": "Du-te la propriul profil",
       "PROJECTS": "<strong>Du-te</strong> la <strong>P</strong>roiecte",
       "USERS": "<strong>Du-te</strong> la <strong>U</strong>tilizatori",
-      "USERGRANTS": "<strong>Du-te</strong> la <strong>A</strong>utorizații",
+      "ROLEASSIGNMENTS": "<strong>Du-te</strong> la <strong>A</strong>tribuirea rolurilor",
       "ACTIONS": "<strong>Du-te</strong> la Acțiuni și <strong>F</strong>luxuri",
       "DOMAINS": "<strong>Du-te</strong> la <strong>D</strong>omenii"
     }
@@ -763,7 +763,7 @@
       "SECURITY": "Parolă și securitate",
       "KEYS": "Chei",
       "PAT": "Tokenuri de acces personal",
-      "USERGRANTS": "Autorizații",
+      "ROLEASSIGNMENTS": "Atribuirea rolurilor",
       "MEMBERSHIPS": "Roluri de administrator",
       "METADATA": "Metadata"
     },
@@ -1042,7 +1042,7 @@
       "MINLENGTHERROR": "Trebuie să aibă cel puțin {{value}} caractere.",
       "MAXLENGTHERROR": "Trebuie să aibă mai puțin de {{value}} caractere."
     },
-    "ID": "ID",
+    "ID": "ID utilizator",
     "EMAIL": "E-mail",
     "PHONE": "Număr de telefon",
     "PHONEEMPTY": "Niciun număr de telefon definit",
@@ -1079,10 +1079,10 @@
       "ENTERCODE_DESC": "Verificați codul"
     },
     "GRANTS": {
-      "TITLE": "Granturi de utilizator",
+      "TITLE": "Atribuirea rolurilor",
       "DESCRIPTION": "Acordați acestui utilizator acces la anumite proiecte",
       "CREATE": {
-        "TITLE": "Creați grant de utilizator",
+        "TITLE": "Creați atribuirea rolurilor",
         "DESCRIPTION": "Căutați organizația, proiectul și rolurile de proiect corespunzătoare."
       },
       "PROJECTNAME": "Numele proiectului",
@@ -1372,7 +1372,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nume",
-      "ID": "ID",
+      "ID": "ID organizație",
       "CREATIONDATE": "Data creării",
       "DATECHANGED": "Modificat",
       "FILTER": "Filtru",
@@ -1418,7 +1418,7 @@
       },
       "DOWNLOAD_FILE": "Descărcați fișierul",
       "SELECTORGTOOLTIP": "Selectați această organizație.",
-      "PRIMARYDOMAIN": "Domeniu principal",
+      "PRIMARYDOMAIN": "Domeniu organizație",
       "STATE": "Stare",
       "USEPASSWORD": "Setați parola inițială",
       "USEPASSWORDDESC": "Utilizatorul nu trebuie să seteze parola în timpul inițializării."
@@ -1429,9 +1429,9 @@
     },
     "DOMAINS": {
       "NEW": "Adăugați domeniu",
-      "TITLE": "Domenii verificate",
+      "TITLE": "Domeniu organizație",
       "DESCRIPTION": "Configurați domeniile organizației dvs. Acest domeniu poate fi utilizat pentru descoperirea domeniului și sufixarea numelui de utilizator.",
-      "SETPRIMARY": "Setați ca principal",
+      "SETPRIMARY": "Domeniu organizație",
       "DELETE": {
         "TITLE": "Ștergeți domeniul",
         "DESCRIPTION": "Sunteți pe cale să ștergeți unul dintre domeniile dvs."
@@ -1459,7 +1459,7 @@
       "MEMBERADDED": "Administrator adăugat.",
       "MEMBERREMOVED": "Administrator eliminat.",
       "MEMBERCHANGED": "Administrator modificat.",
-      "SETPRIMARY": "Domeniu principal setat.",
+      "SETPRIMARY": "Domeniul organizației a fost setat cu succes.",
       "DELETED": "Organizația a fost ștearsă cu succes",
       "DEFAULTORGNOTFOUND": "Organizația implicită nu a fost găsită",
       "ORG_WAS_DELETED": "Organizația a fost ștearsă."
@@ -1497,7 +1497,7 @@
       "NOTIFICATIONS_DESC": "Setări SMTP și SMS",
       "MESSAGETEXTS": "Texte de mesaje",
       "IDP": "Furnizori de identitate",
-      "VERIFIED_DOMAINS": "Domenii verificate",
+      "VERIFIED_DOMAINS": "Domeniu organizație",
       "DOMAIN": "Setări domeniu",
       "LOGINTEXTS": "Texte interfață de conectare",
       "BRANDING": "Branding",
@@ -2012,7 +2012,8 @@
           "DESCRIPTION": "Doriți cu adevărat să vă ștergeți proiectul?",
           "TYPENAME": "Tastați numele proiectului pentru a-l șterge definitiv."
         }
-      }
+      },
+      "ID": "ID proiect"
     },
     "SETTINGS": {
       "TITLE": "Setări",
@@ -2089,7 +2090,7 @@
       "GRANTEDORGDOMAIN": "Domeniu",
       "RESOURCEOWNER": "Proprietarul resursei",
       "GRANTEDORGNAME": "Nume organizație",
-      "GRANTID": "Id-ul grantului",
+      "GRANTID": "ID-ul grantului",
       "CREATIONDATE": "Data creării",
       "CHANGEDATE": "Ultima modificare",
       "DATES": "Date",
@@ -2138,7 +2139,7 @@
       "ASSERTION": "Afirmați rolurile la autentificare",
       "ASSERTION_DESCRIPTION": "Informațiile despre roluri sunt trimise din endpoint-ul Userinfo și, în funcție de setările aplicației dvs., în tokenuri și alte tipuri.",
       "CHECK": "Verificați autorizarea la autentificare",
-      "CHECK_DESCRIPTION": "Dacă este setat, utilizatorilor li se permite să se autentifice numai dacă oricărui cont le este atribuit vreun rol.",
+      "CHECK_DESCRIPTION": "Refuzați autentificarea dacă utilizatorul nu are roluri atribuite acestui proiect. Sunt permise atribuirea de roluri proiectului fără a atribui un rol specific utilizatorului.",
       "DIALOG": {
         "DELETE_TITLE": "Ștergeți rolul",
         "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți un rol de proiect. Sigur doriți să continuați?"
@@ -2294,7 +2295,7 @@
     "ADD": "Adăugați furnizor de identitate",
     "TYPE": "Tip",
     "OWNER": "Proprietar",
-    "ID": "ID",
+    "ID": "ID furnizor de identitate",
     "NAME": "Nume",
     "AUTHORIZATIONENDPOINT": "Punct final de autorizare",
     "TOKENENDPOINT": "Punct final de token",
@@ -2517,7 +2518,7 @@
     "TOKEN": "Setări token",
     "PAGES": {
       "TITLE": "Aplicație",
-      "ID": "ID",
+      "ID": "ID aplicație",
       "DESCRIPTION": "Aici puteți edita datele aplicației și configurația acesteia.",
       "CREATE": "Creați aplicația",
       "CREATE_SELECT_PROJECT": "Selectați mai întâi proiectul dvs.",
@@ -2529,7 +2530,7 @@
       "DATECHANGED": "Modificat",
       "URLS": "Adrese URL",
       "DELETE": "Ștergeți aplicația",
-      "JUMPTOPROJECT": "Pentru a configura roluri, autorizații și multe altele, navigați la proiect.",
+      "JUMPTOPROJECT": "Pentru a configura roluri, atribuiri de roluri și altele, navigați la proiect.",
       "DETAIL": {
         "TITLE": "Detalii",
         "STATE": {
@@ -2807,42 +2808,42 @@
   },
   "ROLESLABEL": "Roluri",
   "GRANTS": {
-    "TITLE": "Autorizații",
-    "DESC": "Acestea sunt toate autorizațiile din organizația dvs.",
-    "DELETE": "Ștergeți autorizarea",
-    "EMPTY": "Nicio autorizare găsită",
-    "ADD": "Creați autorizarea",
+    "TITLE": "Atribuirea rolurilor",
+    "DESC": "Acestea sunt toate atribuirea de roluri din organizația dvs.",
+    "DELETE": "Ștergeți o atribuire de rol",
+    "EMPTY": "Nu s-a găsit nicio atribuire de rol",
+    "ADD": "Creați o atribuire de rol",
     "ADD_BTN": "Nou",
     "PROJECT": {
-      "TITLE": "Autorizare",
-      "DESCRIPTION": "Definiți autorizații pentru proiectul specificat. Rețineți că puteți vedea numai intrările proiectelor și utilizatorilor pentru care aveți permisiunile."
+      "TITLE": "Atribuire rol",
+      "DESCRIPTION": "Definiți atribuirea de roluri pentru proiectul specificat. Rețineți că puteți vedea numai intrările proiectelor și utilizatorilor pentru care aveți permisiuni."
     },
     "USER": {
-      "TITLE": "Autorizare",
-      "DESCRIPTION": "Definiți autorizații pentru utilizatorul specificat. Rețineți că puteți vedea numai intrările proiectelor și utilizatorilor pentru care aveți permisiunile."
+      "TITLE": "Atribuire rol",
+      "DESCRIPTION": "Definiți atribuirea de roluri pentru utilizatorul specificat. Rețineți că puteți vedea numai intrările proiectelor și utilizatorilor pentru care aveți permisiuni."
     },
     "CREATE": {
-      "TITLE": "Creați autorizarea",
+      "TITLE": "Creați o atribuire de rol",
       "DESCRIPTION": "Căutați organizația, proiectul și rolurile corespunzătoare."
     },
     "EDIT": {
-      "TITLE": "Modificați autorizarea"
+      "TITLE": "Modificați o atribuire de rol"
     },
     "DETAIL": {
-      "TITLE": "Detaliile autorizării",
-      "DESCRIPTION": "Aici puteți vedea toate detaliile autorizării."
+      "TITLE": "Detalii atribuire rol",
+      "DESCRIPTION": "Aici puteți vedea toate detaliile atribuirii rolului."
     },
     "TOAST": {
-      "UPDATED": "Autorizarea a fost actualizată.",
-      "REMOVED": "Autorizarea a fost eliminată",
-      "BULKREMOVED": "Autorizațiile au fost eliminate.",
+      "UPDATED": "Atribuire rol actualizată",
+      "REMOVED": "Atribuire rol eliminată",
+      "BULKREMOVED": "Atribuiri rol eliminate",
       "CANTSHOWINFO": "Nu puteți vizita profilul acestui utilizator, deoarece nu sunteți administrator al organizației căreia îi aparține acest utilizator"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Ștergeți autorizarea",
-      "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți o autorizare. Doriți să continuați?",
-      "BULK_DELETE_TITLE": "Ștergeți autorizațiile",
-      "BULK_DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți mai multe autorizații. Doriți să continuați?"
+      "DELETE_TITLE": "Ștergeți atribuirea rolului",
+      "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți o atribuirea rolului. Doriți să continuați?",
+      "BULK_DELETE_TITLE": "Ștergeți atribuiri de rol",
+      "BULK_DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți mai multe atribuiri de rol. Doriți să continuați?"
     }
   },
   "CHANGES": {
@@ -2861,5 +2862,6 @@
       "TITLE": "Activitate",
       "DESCRIPTION": "Aici puteți vedea ultimele evenimente care au generat o modificare a utilizatorului."
     }
-  }
+  },
+  "INSTANCEID": "ID instanță"
 }

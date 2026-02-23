@@ -71,6 +71,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
         autoCapitalize="none"
         autoCorrect="off"
         spellCheck={false}
+        autoFocus
         {...register("loginName", { required: t("required.username") })}
         label={t("labels.username")}
         data-testid="username-text-input"

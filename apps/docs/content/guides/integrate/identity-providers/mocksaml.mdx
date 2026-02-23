@@ -1,5 +1,6 @@
 ---
-title: Configure MockSAML as an Identity Provider in ZITADEL
+title: Set up MockSAML as an Identity Provider in ZITADEL
+description: "Set up MockSAML as an Identity Provider in ZITADEL to test user authentication and autofill user data using Actions"
 sidebar_label: MockSAML
 id: mocksaml
 ---
@@ -25,7 +26,7 @@ MockSAML is not intended for any production environment, only for test purposes
 You can either download the metadata under [https://mocksaml.com/api/saml/metadata?download=true](https://mocksaml.com/api/saml/metadata?download=true) or skip this step and
 fill in the URL when creating the SAML Provider in ZITADEL.
 
-## ZITADEL configuration
+## ZITADEL settings
 
 ### Go to the IdP providers overview
 
@@ -35,7 +36,7 @@ fill in the URL when creating the SAML Provider in ZITADEL.
 
 The SAML provider template has everything you need preconfigured.
 Add the metadata.xml or the URL to the metadata which are accessible by you ZITADEL instance.
-All the necessary configuration is contained in the metadata which has to be exchanged by the ServiceProvider and the IdentityProvider.
+All the necessary settings are contained in the metadata which has to be exchanged by the ServiceProvider and the IdentityProvider.
 
 <GeneralConfigDescription components={props.components}  provider_account="SAML account" />
 

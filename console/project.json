@@ -17,13 +17,39 @@
     },
     "generate": {
       "description": "Generates code from protobuf definitions for API v1 endpoints",
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash -c 'PATH=\"${PWD}/../.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" pnpm exec buf generate ../proto --include-imports --include-wkt'",
+        "cwd": "console"
+      },
+      "dependsOn": ["install-proto-plugins"],
       "inputs": [
         "{workspaceRoot}/proto/**/*",
         "{projectRoot}/buf.gen.yaml",
         "{projectRoot}/package.json",
-        "{workspaceRoot}/pnpm-lock.yaml"
+        "{workspaceRoot}/pnpm-lock.yaml",
+        { "dependentTasksOutputFiles": ".artifacts/bin/*/*/protoc-gen-js" },
+        { "dependentTasksOutputFiles": ".artifacts/bin/*/*/protoc-gen-grpc-web" },
+        { "dependentTasksOutputFiles": ".artifacts/bin/*/*/protoc-gen-openapiv2" }
       ],
       "outputs": ["{projectRoot}/src/app/proto/generated"]
+    },
+    "install-proto-plugins": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash ./console/scripts/install-proto-plugins.sh"
+      },
+      "cache": true,
+      "inputs": [
+        { "runtime": "uname -s" },
+        { "runtime": "uname -m" },
+        "{projectRoot}/scripts/install-proto-plugins.sh"
+      ],
+      "outputs": [
+        "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-grpc-web",
+        "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-js",
+        "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-openapiv2"
+      ]
     },
     "build": {
       "description": "Builds the Management Console for production",
