@@ -65,7 +65,7 @@ if (process.env.ZITADEL_TLS_ENABLED !== "true") {
 
   const httpsServer = createServer({ key, cert });
 
-  if (keepAliveTimeout) {
+  if (keepAliveTimeout !== undefined) {
     httpsServer.keepAliveTimeout = keepAliveTimeout;
   }
 
