@@ -10,7 +10,7 @@ if (process.env.ZITADEL_TLS_ENABLED !== "true") {
 
   if (!certPath || !keyPath) {
     console.error(
-      "ZITADEL_TLS_ENABLED is set to true but ZITADEL_TLS_CERTPATH and/or ZITADEL_TLS_KEYPATH are not set.",
+      "ZITADEL_TLS_ENABLED is set to true but ZITADEL_TLS_CERTPATH or ZITADEL_TLS_KEYPATH are missing. Both must be set when TLS is enabled.",
     );
     process.exit(1);
   }
