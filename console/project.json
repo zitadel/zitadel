@@ -67,7 +67,7 @@
     },
     "build": {
       "description": "Builds the Management Console for production",
-      "dependsOn": ["generate"],
+      "dependsOn": ["^build", "generate"],
       "inputs": [
         "sources",
         "!{projectRoot}/dist/**/*",
