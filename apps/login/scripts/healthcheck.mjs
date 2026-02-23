@@ -9,9 +9,7 @@ const get = scheme === "https" ? https.get : http.get;
 
 try {
   const res = await new Promise((resolve, reject) => {
-    // This healthcheck only ever targets `localhost` in the same container.
-    // We disable TLS certificate verification here to allow self-signed certs for the local endpoint.
-    // Do NOT reuse this pattern for external or non-localhost HTTPS connections.
+    // Safe: localhost-only probe, self-signed certs expected
     get(url, { rejectUnauthorized: false }, (res) => {
       res.resume();
       resolve(res);

@@ -125,7 +125,8 @@
       "inputs": [
         "default",
         "!{projectRoot}/integration/**/*",
-        "!{projectRoot}/acceptance/**/*"
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/dockerized/**/output/**/*"
       ],
       "options": {
         "cwd": "{projectRoot}",

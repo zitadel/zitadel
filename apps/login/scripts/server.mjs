@@ -125,6 +125,8 @@ if (process.env.ZITADEL_TLS_ENABLED !== "true") {
   }
 
   httpsServer.listen(currentPort, hostname, () => {
-    console.log(`> Ready on https://${hostname}:${currentPort}`);
+    const readyUrl = new URL(`https://localhost:${currentPort}`);
+    readyUrl.hostname = hostname;
+    console.log(`> Ready on ${readyUrl}`);
   });
 }
