@@ -120,11 +120,9 @@ jobs:
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
       - name: Start DTE CI Run
-        run: pnpm exec nx-cloud start-ci-run --distribute-on="manual" --stop-agents-after="build,lint,test"
-      - name: Generate
-        run: pnpm nx affected --nxBail --target generate
-      - name: Lint, Test and Build
-        run: pnpm nx affected --nxBail --targets lint,test,build
+        run: pnpm exec nx-cloud start-ci-run --distribute-on="manual" --stop-agents-after="generate,build,lint,test"
+      - name: Generate, Lint, Test and Build
+        run: pnpm nx affected --nxBail --targets generate,lint,test,build
       - name: Check for uncommitted changes (Codegen mismatch)
         run: git diff --exit-code
       - name: Suggest Pipeline Fix By Nx Cloud AI
