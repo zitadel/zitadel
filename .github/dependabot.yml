@@ -19,13 +19,15 @@ updates:
     commit-message:
       prefix: "chore(deps)"
 
-  # ── npm: console, e2e, login, docs (consolidated) ─────────────────────────
+  # ── npm (consolidated) ────────────────────────────────────────────────────
   - package-ecosystem: npm
     directories:
       - "/console"
-      - "/e2e"
-      - "/login"
+      - "/apps/login"
       - "/apps/docs"
+      - "/packages/zitadel-client"
+      - "/packages/zitadel-proto"
+      - "/tests/functional-ui"
     schedule:
       interval: monthly
       day: monday
