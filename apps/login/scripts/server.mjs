@@ -110,8 +110,12 @@ if (process.env.ZITADEL_TLS_ENABLED !== "true") {
     if (cleanupStarted) return;
     cleanupStarted = true;
     httpsServer.close((err) => {
-      if (err) console.error(err);
-      process.exit(0);
+      if (err) {
+        console.error(err);
+        process.exit(1);
+      } else {
+        process.exit(0);
+      }
     });
   };
 
