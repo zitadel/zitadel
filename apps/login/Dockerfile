@@ -18,5 +18,5 @@ ENV HOSTNAME="::" \
 
 # TODO: Check healthy, not ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD ["node", "/app/healthcheck.mjs"]
+    CMD ["/usr/local/bin/node", "/app/healthcheck.mjs"]
 ENTRYPOINT ["/app/entrypoint.sh", "node", "apps/login/server.js" ]
