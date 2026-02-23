@@ -120,7 +120,7 @@ jobs:
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
       - name: Start DTE CI Run
-        run: pnpm exec nx-cloud start-ci-run --distribute-on="manual" --stop-agents-after="build"
+        run: pnpm exec nx-cloud start-ci-run --distribute-on="manual" --stop-agents-after="build,lint,test"
       - name: Generate
         run: pnpm nx affected --nxBail --target generate
       - name: Lint, Test and Build
