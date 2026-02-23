@@ -28,6 +28,7 @@ type FirstInstance struct {
 	PatPath            string
 	LoginClientPatPath string
 	Features           *command.InstanceFeatures
+	TrustedDomains     []string
 
 	Skip bool
 
@@ -102,6 +103,7 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 
 	mig.instanceSetup.InstanceName = mig.InstanceName
 	mig.instanceSetup.CustomDomain = mig.externalDomain
+	mig.instanceSetup.TrustedDomains = mig.TrustedDomains
 	mig.instanceSetup.DefaultLanguage = mig.DefaultLanguage
 	mig.instanceSetup.Org = mig.Org
 	// check if username is email style or else append @<orgname>.<custom-domain>
