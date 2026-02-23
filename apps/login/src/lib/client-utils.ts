@@ -5,12 +5,12 @@ export type ServerActionResponse =
   | undefined
   | null;
 
-export async function handleServerActionResponse(
+export function handleServerActionResponse(
   response: ServerActionResponse,
   router: { push: (url: string) => void },
   setSamlData: (data: { url: string; fields: Record<string, string> }) => void,
   setError: (error: string) => void,
-): Promise<boolean> {
+): boolean {
   if (!response) {
     return false;
   }
