@@ -24,11 +24,12 @@ jobs:
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     strategy:
       matrix:
-        agent: [1, 2, 3, 4, 5, 6, 7, 8]
+        agent: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     env:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
       NX_DAEMON: "false"
       NX_DISABLE_DB: "true"
+      NX_PARALLEL: "1"
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
