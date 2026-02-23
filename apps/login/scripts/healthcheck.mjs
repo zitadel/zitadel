@@ -3,7 +3,7 @@ import * as http from "node:http";
 
 const scheme = process.env.ZITADEL_TLS_ENABLED === "true" ? "https" : "http";
 const port = process.env.PORT || "3000";
-const url = process.argv[2] || `${scheme}://localhost:${port}/ui/v2/login/healthy`;
+const url = new URL(process.argv[2] || `/ui/v2/login/healthy`, `${scheme}://localhost:${port}`);
 
 const get = scheme === "https" ? https.get : http.get;
 
