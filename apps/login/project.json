@@ -99,7 +99,8 @@
     "test-dockerized": {
       "description": "Runs dockerized integration tests (OpenTelemetry and custom CA certificate tests)",
       "dependsOn": [
-        "build"
+        "build",
+        "test-integration"
       ],
       "executor": "nx:run-commands",
       "cache": true,
