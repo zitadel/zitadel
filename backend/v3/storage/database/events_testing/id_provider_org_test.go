@@ -25,7 +25,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 	instanceID := Instance.ID()
 	orgID := Instance.DefaultOrg.Id
 
-	t.Run("test iam idp add reduces", func(t *testing.T) {
+	t.Run("test instance idp add reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		before := time.Now()
@@ -71,7 +71,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test iam idp update reduces", func(t *testing.T) {
+	// t.Run("test instance idp update reduces", func(t *testing.T) {
 	// 	name := gofakeit.Name()
 
 	// 	addOIDC, err := MgmtClient.AddOrgOIDCIDP(IAMCTX, &management.AddOrgOIDCIDPRequest{
@@ -119,7 +119,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 	// 	}, retryDuration, tick)
 	// })
 
-	t.Run("test iam idp deactivate reduces", func(t *testing.T) {
+	t.Run("test instance idp deactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		addOIDC, err := MgmtClient.AddOrgOIDCIDP(IAMCTX, &management.AddOrgOIDCIDPRequest{
@@ -161,7 +161,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp reactivate reduces", func(t *testing.T) {
+	t.Run("test instance idp reactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		addOIDC, err := MgmtClient.AddOrgOIDCIDP(IAMCTX, &management.AddOrgOIDCIDPRequest{
@@ -222,7 +222,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp remove reduces", func(t *testing.T) {
+	t.Run("test instance idp remove reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
@@ -260,7 +260,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp oidc added reduces", func(t *testing.T) {
+	t.Run("test instance idp oidc added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
@@ -307,7 +307,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp oidc changed reduces", func(t *testing.T) {
+	t.Run("test instance idp oidc changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
@@ -379,7 +379,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp jwt added reduces", func(t *testing.T) {
+	t.Run("test instance idp jwt added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
@@ -422,7 +422,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp jwt changed reduces", func(t *testing.T) {
+	t.Run("test instance idp jwt changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
@@ -2298,7 +2298,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test org iam remove reduces", func(t *testing.T) {
+	t.Run("test org instance remove reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp

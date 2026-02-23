@@ -222,7 +222,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Das File der Challenge wurde unter der erwarteten URL nicht gefunden. Überprüfen Sie, ob Sie die Datei mit Leseberechtigungen an der richtigen Stelle hochgeladen haben"
     DomainVerificationHTTPNoMatch: "Das File der Challenge wurde in der erwarteten URL gefunden, enthält jedoch nicht den richtigen Token-Text. Überprüfen Sie den Inhalt"
     DomainVerificationTimeout: "There was a timeout querying the DNS server."
-    PrimaryDomainNotDeletable: "Primäre Domäne kann nicht gelöscht werden"
+    PrimaryDomainNotDeletable: "Die Organisationsdomäne kann nicht gelöscht werden"
     DomainNotFound: "Domäne konnte nicht gefunden werden"
     MemberIDMissing: "Member ID fehlt"
     MemberNotFound: "Organisations Member konnte nicht gefunden werden"
@@ -283,10 +283,6 @@ Errors:
       Empty: "Passwort Age Policy ist leer"
       NotExisting: "Passwort Age Policy existiert nicht"
       AlreadyExists: "Passwort Age Policy existiert bereits"
-    OrgIAMPolicy:
-      Empty: "Org IAM Policy ist leer"
-      NotExisting: "Org IAM Policy existiert nicht"
-      AlreadyExists: "Org IAM Policy existiert bereits"
     NotificationPolicy:
       NotFound: "Notification Policy konnte nicht gefunden werden"
       NotChanged: "Notification Policy wurde nicht verändert"
@@ -343,12 +339,12 @@ Errors:
     Grant:
       AlreadyExists: "Projekt Grant existiert bereits"
       Invalid: "Projekt Grant ist ungültig"
-      NotFound: "Grant konnte nicht gefunden werden"
+      NotFound: "Project Grant konnte nicht gefunden werden"
       NotExisting: "Projekt Grant existiert nicht"
       HasNotExistingRole: "Eine der Rollen existiert nicht auf dem Projekt"
       NotActive: "Projekt Grant ist nicht aktiv"
       NotInactive: "Projekt Grant ist nicht inaktiv"
-  IAM:
+  Instance:
     NotFound: "Instanz nicht gefunden. Stelle sicher, dass Du die richtige Domain hast. Schau unter https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Rollen wurden nicht verändert"
@@ -356,8 +352,6 @@ Errors:
     MemberAlreadyExisting: "Member existiert bereits"
     MemberNotExisting: "Member existiert nicht"
     IDMissing: "ID fehlt"
-    IAMProjectIDMissing: "IAM Project ID fehlt"
-    IamProjectAlreadySet: "IAM Project ID wurde bereits gesetzt"
     IdpInvalid: "IDP Konfiguration ist ungültig"
     IdpNotExisting: "IDP Konfiguration existiert nicht"
     OIDCConfigInvalid: "OIDC IDP Konfiguration ist ungültig"
@@ -903,7 +897,7 @@ EventTypes:
       verified: "Domäne verifiziert"
       removed: "Domäne entfernt"
       primary:
-        set: "Primäre Domäne gesetzt"
+        set: "Organisationsdomäne gesetzt"
       reserved: "Domäne reserviert"
       released: "Domäne freigegeben"
     name:

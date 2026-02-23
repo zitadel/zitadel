@@ -1,5 +1,6 @@
 ---
 title: Configuration Options in ZITADEL
+description: "Detailed guide to configuring ZITADEL using runtime files, database initialization settings, and environment variables."
 sidebar_label: Configuration
 ---
 
@@ -7,10 +8,10 @@ import LinuxUnix from "./_linuxunix.mdx";
 import Compose from "./_compose.mdx";
 import Helm from "./_helm.mdx";
 import Login from "./_login.mdx";
-import CodeBlock from "@/components/docusaurus/code-block";
-import DefaultsYamlSource from "../../../../../../cmd/defaults.yaml";
-import StepsYamlSource from "../../../../../../cmd/setup/steps.yaml";
-import SkipSuperUserDatabaseQueries from "./example-skip-superuser-queries.yaml";
+import DefaultsYaml from '../../../../../../cmd/defaults.yaml';
+import StepsYaml from '../../../../../../cmd/setup/steps.yaml';
+import SkipSuperUserQueries from './example-skip-superuser-queries.yaml';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 
 This guide assumes you are familiar with [running ZITADEL using the least amount of configuration possible](/self-hosting/deploy/overview).
 
@@ -27,7 +28,7 @@ For overwriting the default configuration for the first instance created by zita
 
 <details>
   <summary>defaults.yaml</summary>
-  <CodeBlock  language="yaml">{DefaultsYamlSource}</CodeBlock>
+  <DynamicCodeBlock lang="yaml" code={DefaultsYaml} />
 </details>
 
 ### Database initialization file
@@ -42,7 +43,7 @@ By using the FirstInstance section, you can overwrite the [DefaultInstance confi
 
 <details>
   <summary>steps.yaml</summary>
-  <CodeBlock  language="yaml">{StepsYamlSource}</CodeBlock>
+  <DynamicCodeBlock lang="yaml" code={StepsYaml} />
 </details>
 
 ### Pre-existing Database and User
@@ -54,7 +55,7 @@ To skip the checks, you must ensure the database objects (database, user, grant)
 
 <details>
   <summary>skip-superuser-queries-config.yaml</summary>
-  <CodeBlock  language="yaml">{SkipSuperUserDatabaseQueries}</CodeBlock>
+  <DynamicCodeBlock lang="yaml" code={SkipSuperUserQueries} />
 </details>
 
 ### Multiple configuration files
@@ -68,7 +69,7 @@ To use private information — such as a database admin credential — without s
 
 All configuration properties are configurable using environment variables.
 ZITADEL environment variable keys are prefixed with `ZITADEL_`.
-For example, to configure the default ZITADEL IAM admin username and password set the `zitadel` binary runtime environment variables `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME` and `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD`.
+For example, to configure the default ZITADEL instance admin username and password set the `zitadel` binary runtime environment variables `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME` and `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD`.
 All supported environment variables are listed in the [runtime configuration file](#runtime-configuration-file) and the [database initialization file](#database-initialization-file).
 
 ### Proxy configuration

@@ -73,7 +73,8 @@ select
 	f.features,
 	ed.domains as external_domains,
 	td.domains as trusted_domains,
-	et.execution_targets
+	et.execution_targets,
+	r.allowed_languages
 from domain d
 join projections.instances i on i.id = d.instance_id
 left join projections.security_policies2 s on i.id = s.instance_id
@@ -81,4 +82,5 @@ left join projections.limits l on i.id = l.instance_id
 left join features f on i.id = f.instance_id
 left join external_domains ed on i.id = ed.instance_id
 left join trusted_domains td on i.id = td.instance_id
-left join execution_targets et on i.id = et.instance_id;
+left join execution_targets et on i.id = et.instance_id
+left join projections.restrictions2 r on i.id = r.instance_id;

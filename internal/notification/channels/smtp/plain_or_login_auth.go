@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-// golang net/smtp SMTP AUTH LOGIN or PLAIN Auth Handler
+// golang net/smtp: SMTP AUTH LOGIN or PLAIN Auth Handler
 // Reference: https://gist.github.com/andelf/5118732?permalink_comment_id=4825669#gistcomment-4825669
 
 func PlainOrLoginAuth(config PlainAuthConfig, host string) smtp.Auth {

@@ -47,7 +47,7 @@ function goToSignedInPage(
 export async function completeFlowOrGetUrl(
   command: FinishFlowCommand & { organization?: string },
   defaultRedirectUri?: string,
-): Promise<{ redirect: string } | { error: string }> {
+): Promise<{ redirect: string } | { error: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   console.log("completeFlowOrGetUrl called with:", command, "defaultRedirectUri:", defaultRedirectUri);
 
   // Complete OIDC/SAML flows directly with server action
@@ -62,16 +62,16 @@ export async function completeFlowOrGetUrl(
       sessionId: command.sessionId,
       requestId: command.requestId,
     });
-    console.log("completeFlowOrGetUrl: OIDC/SAML flow result:", result);
+    console.log("completeFlowOrGetUrl: got OIDC/SAML flow result");
     return result;
   }
 
   console.log("completeFlowOrGetUrl: Regular flow, getting next URL");
   // For all other cases, return URL for navigation
   const url = await getNextUrl(command, defaultRedirectUri);
-  console.log("completeFlowOrGetUrl: Next URL:", url);
+  console.log("completeFlowOrGetUrl: got Next URL:", url);
   const result = { redirect: url };
-  console.log("completeFlowOrGetUrl: Final result:", result);
+  console.log("completeFlowOrGetUrl: got final result");
   return result;
 }
 
@@ -97,7 +97,7 @@ export async function getNextUrl(
       ...command,
       organization: command.organization,
     });
-    console.log("getNextUrl: Device flow result:", result);
+    console.log("getNextUrl: Got Device flow result");
     return result;
   }
 
@@ -181,4 +181,39 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
   const result = goToSignedInPage(command);
   console.log("resolveRedirectUri: Using relative goToSignedInPage result:", result);
   return result;
+}
+
+export type ServerActionResponse =
+  | { redirect: string }
+  | { error: string }
+  | { samlData: { url: string; fields: Record<string, string> } }
+  | undefined
+  | null;
+
+export function handleServerActionResponse(
+  response: ServerActionResponse,
+  router: { push: (url: string) => void },
+  setSamlData: (data: { url: string; fields: Record<string, string> }) => void,
+  setError: (error: string) => void,
+): boolean {
+  if (!response) {
+    return false;
+  }
+
+  if ("redirect" in response && response.redirect) {
+    router.push(response.redirect);
+    return true;
+  }
+
+  if ("samlData" in response && response.samlData) {
+    setSamlData(response.samlData);
+    return true;
+  }
+
+  if ("error" in response && response.error) {
+    setError(response.error);
+    return true;
+  }
+
+  return false;
 }

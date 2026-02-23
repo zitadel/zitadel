@@ -1,5 +1,6 @@
 ---
 title: Private Key JWT
+description: "Authenticate with ZITADEL's token introspection endpoint using Private Key JWT to validate access tokens"
 sidebar_label: Private Key JWT
 ---
 
@@ -7,7 +8,7 @@ import IntrospectionResponse from './_introspection-response.mdx';
 
 This guide explains how to use ZITADEL's [Private Key JWT authentication method](/apis/openidoauth/authn-methods#jwt-with-private-key) to authenticate your application and call the token introspection endpoint. This is not about securing an API, but about allowing your backend to introspect access tokens in a secure way.
 
-If you're looking to set up Private Key JWT authentication specifically for Service Users, see our dedicated guide [here](/guides/integrate/service-users/private-key-jwt).
+If you're looking to set up Private Key JWT authentication specifically for Service Accounts, see our dedicated guide [here](/guides/integrate/service-accounts/private-key-jwt).
 
 ## Register an Application & Generate a Key Pair
 
@@ -97,12 +98,12 @@ To use Private Key JWT for introspection, you must register your client applicat
     alt="OIDC Endpoints"
 />
 
-11. Optionally, note your **Resource ID** for reference.
+11. Optionally, note your **Project ID** for reference.
 
 <img
     src="/docs/img/guides/integrate/token-introspection-jwt-profile-11.png"
     width="75%"
-    alt="Resource ID"
+    alt="Project ID"
 />
 
 ## Calling the Introspection Endpoint

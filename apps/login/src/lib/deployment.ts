@@ -15,7 +15,7 @@ export function hasSystemUserCredentials(): boolean {
 }
 
 /**
- * Checks if service user token is available for authentication.
+ * Checks if service account token is available for authentication.
  *
  * @returns true if ZITADEL_SERVICE_USER_TOKEN is present, false otherwise
  */

@@ -186,6 +186,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.FirstInstance.externalDomain = config.ExternalDomain
 	steps.FirstInstance.externalSecure = config.ExternalSecure
 	steps.FirstInstance.externalPort = config.ExternalPort
+	steps.FirstInstance.defaultPaths = config.Login.DefaultPaths
 
 	steps.s5LastFailed = &LastFailed{dbClient: dbClient.DB}
 	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient.DB}
@@ -573,9 +574,7 @@ func startCommandsQueries(
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
-
-		nil,
-		nil,
+		config.Login.DefaultPaths,
 	)
 	logging.OnError(ctx, err).Fatal("unable to start commands")
 
@@ -599,7 +598,7 @@ func startCommandsQueries(
 		commands,
 		queries,
 		eventstoreClient,
-		config.Login.DefaultPaths.OTPEmailPath,
+		config.Login.DefaultPaths.DefaultOTPEmailURLTemplate,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,

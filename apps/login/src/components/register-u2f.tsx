@@ -1,7 +1,7 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
-import { completeFlowOrGetUrl } from "@/lib/client";
+import { completeFlowOrGetUrl, handleServerActionResponse } from "@/lib/client";
 import { addU2F, verifyU2F } from "@/lib/server/u2f";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -12,6 +12,7 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { AutoSubmitForm } from "./auto-submit-form";
 
 type Props = {
   loginName?: string;
@@ -24,6 +25,7 @@ type Props = {
 
 export function RegisterU2f({ loginName, sessionId, organization, requestId, checkAfter, loginSettings }: Props) {
   const [error, setError] = useState<string>("");
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -155,14 +157,7 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
             loginSettings?.defaultRedirectUri,
           );
 
-          if ("error" in callbackResponse) {
-            setError(callbackResponse.error);
-            return;
-          }
-
-          if ("redirect" in callbackResponse) {
-            return router.push(callbackResponse.redirect);
-          }
+          handleServerActionResponse(callbackResponse, router, setSamlData, setError);
         } else if (loginName) {
           const callbackResponse = await completeFlowOrGetUrl(
             {
@@ -172,42 +167,38 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
             loginSettings?.defaultRedirectUri,
           );
 
-          if ("error" in callbackResponse) {
-            setError(callbackResponse.error);
-            return;
-          }
-
-          if ("redirect" in callbackResponse) {
-            return router.push(callbackResponse.redirect);
-          }
+          handleServerActionResponse(callbackResponse, router, setSamlData, setError);
         }
       }
     }
   }
 
   return (
-    <form className="w-full">
-      {error && (
-        <div className="py-4">
-          <Alert>{error}</Alert>
+    <>
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
+      <form className="w-full">
+        {error && (
+          <div className="py-4">
+            <Alert>{error}</Alert>
+          </div>
+        )}
+
+        <div className="mt-8 flex w-full flex-row items-center">
+          <BackButton data-testid="back-button" />
+
+          <span className="flex-grow"></span>
+          <Button
+            type="submit"
+            className="self-end"
+            variant={ButtonVariants.Primary}
+            disabled={loading}
+            onClick={submitRegisterAndContinue}
+            data-testid="submit-button"
+          >
+            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="u2f" />
+          </Button>
         </div>
-      )}
-
-      <div className="mt-8 flex w-full flex-row items-center">
-        <BackButton data-testid="back-button" />
-
-        <span className="flex-grow"></span>
-        <Button
-          type="submit"
-          className="self-end"
-          variant={ButtonVariants.Primary}
-          disabled={loading}
-          onClick={submitRegisterAndContinue}
-          data-testid="submit-button"
-        >
-          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="u2f" />
-        </Button>
-      </div>
-    </form>
+      </form>
+    </>
   );
 }

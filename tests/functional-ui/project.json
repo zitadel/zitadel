@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "implicitDependencies": ["@zitadel/api"],
+  "implicitDependencies": ["@zitadel/api", "@zitadel/console"],
   "targets": {
     "run-db": {
       "continuous": true,

@@ -101,14 +101,17 @@
       "description": "アカウントのパスワードを設定してください",
       "submit": "続行",
       "labels": {
+        "currentPassword": "現在のパスワード",
         "newPassword": "新しいパスワード",
         "confirmPassword": "パスワード確認"
       },
       "required": {
+        "currentPassword": "現在のパスワードを入力してください！",
         "newPassword": "新しいパスワードを入力してください！",
         "confirmPassword": "必須項目です"
       },
       "errors": {
+        "currentPasswordInvalid": "現在のパスワードが正しくありません。",
         "couldNotChangePassword": "パスワードを変更できませんでした",
         "couldNotVerifyPassword": "パスワードを確認できませんでした",
         "unknownError": "不明なエラー"

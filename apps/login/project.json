@@ -33,6 +33,7 @@
         "!{projectRoot}/.local.env",
         "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/dockerized/**/*",
         "!{projectRoot}/cypress.config.ts"
       ],
       "outputs": [
@@ -52,6 +53,7 @@
         "!{projectRoot}/.local.env",
         "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/dockerized/**/*",
         "!{projectRoot}/cypress.config.ts"
       ],
       "outputs": [
@@ -92,6 +94,26 @@
       "dependsOn": [
         "^build"
       ]
+    },
+    "test-ca": {
+      "description": "Runs custom CA certificate integration tests using testcontainers",
+      "dependsOn": [
+        "build"
+      ],
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "default",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/dockerized/**/output/**/*"
+      ],
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "pnpm vitest --run --config vitest.config.ca.mts"
+        ]
+      }
     },
     "test-integration-run-login": {
       "description": "Runs the Login application under test. It has its own target, separate from test-integration, because it's a continuous task.",

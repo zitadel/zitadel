@@ -1,5 +1,6 @@
 ---
 title: Users
+description: "Manage users, authentication methods, and identity providers in the ZITADEL Console."
 sidebar_label: Users
 sidebar_position: 3
 ---
@@ -8,27 +9,27 @@ import CreateUser from './_create-user.mdx';
 
 ## Overview
 
-ZITADEL supports authentication and authorization for different user types. We mainly differentiate between **Human Users** (interactive) and **Service Users** (machine-to-machine).
+ZITADEL supports authentication and authorization for different user types. We mainly differentiate between **users** (interactive) and **Service Accounts** (machine-to-machine).
 
 <img src="/docs/img/guides/console/usersmenu.png" width="420px" alt="User types" />
 
 ## Types of Users
 
-### Human Users
-Human users represent actual people who log in via an interactive interface (e.g., a login page).
+### Users (Human)
+Users represent actual people who log in via an interactive interface (e.g., a login page).
 * **Profile:** Has an email address, password, and optional profile data (phone, nickname, gender, language).
 * **Authentication:** Can authenticate via password, multiple factors (MFA), or passwordless authentication (Passkeys).
 * **Flow:** The application redirects the user to ZITADEL, which handles the credentials and issues a token to the application.
 
 Read more on how to [login users with ZITADEL](/guides/integrate/login/login-users).
 
-### Service Users (Machine Accounts)
-Service users represent machines, backend services, or IoT devices requiring non-interactive access.
+### Service Accounts
+Service accounts represent machines, backend services, or IoT devices requiring non-interactive access.
 * **Profile:** Only has a name, description, and username.
 * **Authentication:** Authenticates via **JWT Profile** or **Personal Access Tokens (PAT)**. Both methods support expiration settings.
 * **Usage:** Primarily used to gain access to the ZITADEL Management API or to secure backend-to-backend communication.
 
-To see how service users are utilized in practice, check out our [NextJS B2B Demo application](https://github.com/zitadel/zitadel-nextjs-b2b).
+To see how service accounts are utilized in practice, check out our [NextJS B2B Demo application](https://github.com/zitadel/zitadel-nextjs-b2b).
 
 ### Federated Users
 Federated users are identities managed by a third-party Identity Provider (IdP) such as Google, Azure AD, or GitHub.
@@ -39,15 +40,15 @@ Federated users are identities managed by a third-party Identity Provider (IdP) 
 In a multi-tenancy architecture, users are typically isolated within [Organizations](./organizations-overview).
 However, using [External User Grants](../../../concepts/features/external-user-grant), an organization can invite users from *another* organization to access their projects. These invited users are referred to as **External Users** within the context of the inviting organization.
 
-### Managers
-Any user—whether Human or Service User—can be assigned an [Administrator Role](/concepts/structure/managers).
+### Administrators
+Any user—whether User or Service Account—can be assigned an [Administrator Role](/concepts/structure/administrators).
 A user with an administrator role is not just an end-user of your application but also has permissions to manage specific aspects of the ZITADEL instance, organization, or project (e.g., `ORG_OWNER`, `PROJECT_OWNER`).
 
 ## Considerations
 
 ### Uniqueness of Users
 * **Scope:** Users exist strictly within **one** [Organization](./organizations-overview). It is currently not possible to move users between organizations.
-* **Identifier:** User accounts are uniquely identified by their `id` or their `loginname` combined with the `organization domain` (e.g., `road.runner@acme.zitadel.local`).
+* **Identifier:** User accounts are uniquely identified by their `id` or their `loginname` combined with the `Organization Domain` (e.g., `road.runner@acme.zitadel.local`).
 * **Emails:** You can reuse the same email address for different user accounts across organizations.
 
 ### Structuring User Pools
@@ -93,11 +94,11 @@ Metadata can be requested via the Auth and Management APIs, the Userinfo endpoin
   alt="ID Token settings"
 />
 
-### Authorizations
-User authorizations (roles) are displayed on user profile pages.
+### Role Assignments
+The roles assigned to a user are displayed on user profile pages.
 
 To access these roles in your application:
-* **Userinfo Endpoint:** Check the **Assert roles on authentication** box in your [Project Settings](./roles#authorizations).
+* **Userinfo Endpoint:** Check the **Assert roles on authentication** box in your [Project Settings](./roles#role-assignments).
 * **ID Token:** Toggle **User roles inside ID Token** in your [Application Settings](./applications-overview).
 
 ## References

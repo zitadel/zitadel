@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, Ou
 import { FeatureToggleComponent } from '../feature-toggle.component';
 import { ToggleStates } from 'src/app/components/features/features.component';
 import { distinctUntilKeyChanged, ReplaySubject } from 'rxjs';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -17,7 +17,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   imports: [
     FeatureToggleComponent,
     AsyncPipe,
-    NgIf,
     ReactiveFormsModule,
     InputModule,
     HasRolePipeModule,
@@ -36,7 +35,7 @@ export class LoginV2FeatureToggleComponent {
   public toggleChanged = new EventEmitter<ToggleStates['loginV2']>();
 
   protected readonly toggleState$ = new ReplaySubject<ToggleStates['loginV2']>(1);
-  protected readonly baseUri = new FormControl('', { nonNullable: true, validators: [Validators.required] });
+  protected readonly baseUri = new FormControl('', { nonNullable: true });
 
   constructor(destroyRef: DestroyRef) {
     this.toggleState$.pipe(distinctUntilKeyChanged('baseUri'), takeUntilDestroyed(destroyRef)).subscribe(({ baseUri }) => {

@@ -156,7 +156,7 @@ func (c *Commands) changeUserEmailWithGeneratorEvents(ctx context.Context, userI
 	}
 
 	if urlTmpl == "" {
-		urlTmpl = c.defaultEmailCodeURLTemplate(ctx)
+		urlTmpl = c.loginPaths.DefaultEmailCodeURLTemplate(ctx)
 	}
 
 	if err = cmd.AddGeneratedCode(ctx, gen, urlTmpl, returnCode); err != nil {
@@ -178,7 +178,7 @@ func (c *Commands) sendUserEmailCodeWithGeneratorEvents(ctx context.Context, use
 	}
 
 	if urlTmpl == "" {
-		urlTmpl = c.defaultEmailCodeURLTemplate(ctx)
+		urlTmpl = c.loginPaths.DefaultEmailCodeURLTemplate(ctx)
 	}
 
 	if err = cmd.AddGeneratedCode(ctx, gen, urlTmpl, returnCode); err != nil {
@@ -286,7 +286,7 @@ func generateCodeCommand(ctx context.Context, agg *eventstore.Aggregate, gen cry
 		return nil, "", err
 	}
 
-	cmd := user.NewHumanEmailCodeAddedEventV2(ctx, agg, value, gen.Expiry(), urlTmpl, returnCode, "")
+	cmd := user.NewHumanEmailCodeAddedEvent(ctx, agg, value, gen.Expiry(), urlTmpl, returnCode, "")
 	if returnCode {
 		return cmd, plain, nil
 	}

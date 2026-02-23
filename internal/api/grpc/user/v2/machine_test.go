@@ -9,6 +9,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -40,15 +41,17 @@ func Test_patchMachineUserToCommand(t *testing.T) {
 			userId:   "userId",
 			userName: gu.Ptr("userName"),
 			machine: &user.UpdateUserRequest_Machine{
-				Name:        gu.Ptr("name"),
-				Description: gu.Ptr("description"),
+				Name:            gu.Ptr("name"),
+				Description:     gu.Ptr("description"),
+				AccessTokenType: gu.Ptr(user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT),
 			},
 		},
 		want: &command.ChangeMachine{
-			ID:          "userId",
-			Username:    gu.Ptr("userName"),
-			Name:        gu.Ptr("name"),
-			Description: gu.Ptr("description"),
+			ID:              "userId",
+			Username:        gu.Ptr("userName"),
+			Name:            gu.Ptr("name"),
+			Description:     gu.Ptr("description"),
+			AccessTokenType: gu.Ptr(domain.OIDCTokenTypeJWT),
 		},
 	}}
 	for _, tt := range tests {

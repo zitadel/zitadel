@@ -83,8 +83,8 @@ type userColumns interface {
 //go:generate mockgen -typed -package domainmock -destination ./mock/human_user.mock.go . HumanUserRepository
 
 type HumanUserRepository interface {
-	// Update updates the human user
-	// It ensures that updates are only applied to human users
+	// Update updates the user
+	// It ensures that updates are only applied to user
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	humanConditions
 	humanChanges
@@ -234,8 +234,8 @@ type humanColumns interface {
 //go:generate mockgen -typed -package domainmock -destination ./mock/machine_user.mock.go . MachineUserRepository
 
 type MachineUserRepository interface {
-	// Update updates the machine user
-	// It ensures that updates are only applied to machine users
+	// Update updates the service account
+	// It ensures that updates are only applied to service accounts
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	machineConditions
 	machineChanges
@@ -258,14 +258,14 @@ type machineChanges interface {
 	// SetAccessTokenType sets the personal access token type field
 	SetAccessTokenType(tokenType PersonalAccessTokenType) database.Change
 
-	// AddKey adds a key for the machine user
+	// AddKey adds a key for the service account
 	AddKey(key *MachineKey) database.Change
-	// RemoveKey removes a key for the machine user
+	// RemoveKey removes a key for the service account
 	RemoveKey(id string) database.Change
 
-	// AddPersonalAccessToken adds a personal access token for the machine user
+	// AddPersonalAccessToken adds a personal access token for the service account
 	AddPersonalAccessToken(pat *PersonalAccessToken) database.Change
-	// RemovePersonalAccessToken removes a personal access token for the machine user
+	// RemovePersonalAccessToken removes a personal access token for the service account
 	RemovePersonalAccessToken(id string) database.Change
 }
 

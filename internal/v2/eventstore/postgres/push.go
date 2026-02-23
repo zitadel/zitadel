@@ -246,8 +246,8 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (er
 	return nil
 }
 
-// the query is so complex because we accidentally stored unique constraint case sensitive
-// the query checks first if there is a case sensitive match and afterwards if there is a case insensitive match
+// the query is so complex because we accidentally stored unique constraint case-sensitive
+// the query checks first if there is a case-sensitive match and afterward if there is a case-insensitive match
 var deleteUniqueConstraintClause = `
 (instance_id = $1 AND unique_type = $2 AND unique_field = (
     SELECT unique_field from (

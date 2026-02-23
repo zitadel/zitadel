@@ -512,7 +512,7 @@ func (h *Handler) lockInstance(ctx context.Context, config *triggerConfig) func(
 	}
 
 	// in case we want to wait for a running trigger / lock (e.g. query),
-	// we try to lock as long as the context is not cancelled
+	// we try to lock as long as the context is not canceled
 	select {
 	case instanceLock.(chan bool) <- true:
 		return func() {

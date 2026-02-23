@@ -36,7 +36,7 @@ services:
       # Activate the login v2 on an installation from scratch.
       # To activate the login v2 on an existing installation, read the "What's next" section.
       ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: true # To use the login v1, set this to false.
-      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: http://localhost:3000/ui/v2/login
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: http://localhost:3000/ui/v2/login/
       # Configure the redirection paths to the login v2.
       ZITADEL_OIDC_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?authRequest=
       ZITADEL_OIDC_DEFAULTLOGOUTURLV2: http://localhost:3000/ui/v2/login/logout?post_logout_redirect=

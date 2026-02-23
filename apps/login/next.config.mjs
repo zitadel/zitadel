@@ -13,10 +13,6 @@ const secureHeaders = [
     value: "origin-when-cross-origin",
   },
   {
-    key: "X-Frame-Options",
-    value: "SAMEORIGIN",
-  },
-  {
     key: "X-Content-Type-Options",
     value: "nosniff",
   },
@@ -26,7 +22,7 @@ const secureHeaders = [
   },
   {
     key: "Content-Security-Policy",
-    value: `${DEFAULT_CSP} frame-ancestors 'none'`,
+    value: DEFAULT_CSP,
   },
   { key: "X-Frame-Options", value: "deny" },
 ];
