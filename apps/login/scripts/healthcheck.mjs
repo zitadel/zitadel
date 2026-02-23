@@ -16,5 +16,6 @@ try {
   });
   process.exit(res.statusCode >= 200 && res.statusCode < 400 ? 0 : 1);
 } catch (e) {
+  console.error("Healthcheck failed:", e);
   process.exit(1);
 }
