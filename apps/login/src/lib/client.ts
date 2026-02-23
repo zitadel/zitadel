@@ -111,13 +111,13 @@ export async function getNextUrl(
 }
 
 /**
- * Resolves the redirect URI based on the following priority:
+ * Returns a configured redirect URI from env or settings, without user-provided data fallback.
+ * Returns null if no configured redirect is set.
+ * Priority:
  * 1. DEFAULT_REDIRECT_URI environment variable
  * 2. defaultRedirectUri from organization settings
- * 3. Relative signed-in page fallback
- * 4. Reserved for future extensions
  */
-export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedirectUri?: string): Promise<string> {
+export async function getConfiguredRedirectUri(defaultRedirectUri?: string): Promise<string | null> {
   // 1. Environment variable override
   const envOverride = process.env.DEFAULT_REDIRECT_URI;
   if (envOverride) {
@@ -126,14 +126,12 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
       try {
         const _headers = await headers();
         const host = getPublicHostWithProtocol(_headers);
-        const result = `${host}${envOverride}`;
-        console.log("resolveRedirectUri: Using host-based redirect from override:", result);
-        return result;
+        return `${host}${envOverride}`;
       } catch (error) {
-        console.warn("resolveRedirectUri: Could not determine host for override, falling back", error);
+        console.warn("getConfiguredRedirectUri: Could not determine host for override, returning null", error);
+        return null;
       }
     } else {
-      console.log("resolveRedirectUri: Using DEFAULT_REDIRECT_URI override:", envOverride);
       return envOverride;
     }
   }
@@ -141,14 +139,29 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
   // 2. Default redirect URI from settings
   if (defaultRedirectUri) {
     if (isSafeRedirectUri(defaultRedirectUri)) {
-      console.log("resolveRedirectUri: Using defaultRedirectUri from settings:", defaultRedirectUri);
       return defaultRedirectUri;
     } else {
-      console.warn("resolveRedirectUri: Unsafe defaultRedirectUri prevented:", defaultRedirectUri);
+      console.warn("getConfiguredRedirectUri: Unsafe defaultRedirectUri prevented:", defaultRedirectUri);
     }
   }
 
-  // 3. Default signed-in page (relative)
+  return null;
+}
+
+/**
+ * Resolves the redirect URI based on the following priority:
+ * 1. DEFAULT_REDIRECT_URI environment variable
+ * 2. defaultRedirectUri from organization settings
+ * 3. Relative signed-in page fallback
+ * 4. Reserved for future extensions
+ */
+export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedirectUri?: string): Promise<string> {
+  const configured = await getConfiguredRedirectUri(defaultRedirectUri);
+  if (configured !== null) {
+    return configured;
+  }
+
+  // Fallback: relative signed-in page
   const result = goToSignedInPage(command);
   console.log("resolveRedirectUri: Using relative goToSignedInPage result:", result);
   return result;
