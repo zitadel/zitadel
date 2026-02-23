@@ -218,13 +218,10 @@
                 "sources",
                 "{workspaceRoot}/internal/integration/**",
                 "{workspaceRoot}/go*"
-            ],
-            "outputs": [
-                "{workspaceRoot}/profile.api.test-integration.cov"
             ]
         },
         "test-integration": {
-            "description": "Runs the integration tests sequentially with coverage and race condition detection. Go test caching is disabled, because the tests run against an out-of-process API.",
+            "description": "Runs the integration tests and generates the coverage profile. This is a wrapper around test-integration-run-tests that adds the coverage report generation after the tests are run.",
             "dependsOn": [
                 "test-integration-run-tests"
             ],
@@ -235,7 +232,7 @@
                     "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage"
                 },
                 "commands": [
-                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov",
+                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov"
                 ]
             },
             "inputs": [
