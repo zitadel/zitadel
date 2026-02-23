@@ -8,10 +8,7 @@
         "command": "pnpm build",
         "cwd": "apps/docs"
       },
-      "outputs": [
-        "{projectRoot}/.next",
-        "!{projectRoot}/.next/cache"
-      ],
+      "outputs": [],
       "dependsOn": [
         "^build",
         "check-links"
@@ -20,7 +17,7 @@
         "default",
         "^production"
       ],
-      "cache": true
+      "cache": false
     },
     "dev": {
       "executor": "nx:run-commands",
