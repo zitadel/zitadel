@@ -80,9 +80,7 @@
                     "dependentTasksOutputFiles": "internal/api/ui/console/static/**/*"
                 }
             ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/bin/*/*/zitadel.local"
-            ]
+            "outputs": []
         },
         "generate": {
             "description": "Generates the code needed to start a full-featured API: gRPC and OpenAPI stubs, static files for the embedded login v1, asset routes and documentation.",

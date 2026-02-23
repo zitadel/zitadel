@@ -9,7 +9,8 @@
         "cwd": "apps/docs"
       },
       "outputs": [
-        "{projectRoot}/.next"
+        "{projectRoot}/.next",
+        "!{projectRoot}/.next/cache"
       ],
       "dependsOn": [
         "^build",
