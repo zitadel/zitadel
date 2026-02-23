@@ -1,6 +1,10 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "jsGlobals"
+    ],
     "sources": ["{projectRoot}/src/**/*"]
   },
   "targets": {

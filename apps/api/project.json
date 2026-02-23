@@ -4,6 +4,7 @@
     "projectType": "application",
     "namedInputs": {
         "sources": [
+            "goGlobals",
             "{workspaceRoot}/cmd/**/*.go",
             "{workspaceRoot}/internal/**/*.go",
             "{workspaceRoot}/backend/**/*.go",
@@ -80,7 +81,9 @@
                     "dependentTasksOutputFiles": "internal/api/ui/console/static/**/*"
                 }
             ],
-            "outputs": []
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/zitadel.local"
+            ]
         },
         "generate": {
             "description": "Generates the code needed to start a full-featured API: gRPC and OpenAPI stubs, static files for the embedded login v1, asset routes and documentation.",
@@ -312,7 +315,8 @@
             "inputs": [
                 "{workspaceRoot}/proto/**/*",
                 "{workspaceRoot}/buf.gen.yaml",
-                "{workspaceRoot}/buf.yaml"
+                "{workspaceRoot}/buf.yaml",
+                "{workspaceRoot}/buf.work.yaml"
             ],
             "outputs": [
                 "{workspaceRoot}/pkg/grpc/**/*",

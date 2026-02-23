@@ -1,5 +1,18 @@
 {
   "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "jsGlobals"
+    ],
+    "sources": [
+      "{projectRoot}/src/**/*",
+      "{projectRoot}/angular.json",
+      "{projectRoot}/tsconfig*.json",
+      "{projectRoot}/package.json",
+      "jsGlobals"
+    ]
+  },
   "targets": {
     "lint": {
       "description": "Runs all linters",
@@ -54,11 +67,11 @@
     },
     "build": {
       "description": "Builds the Management Console for production",
+      "dependsOn": ["generate"],
       "inputs": [
-        "{projectRoot}/**/*",
+        "sources",
         "!{projectRoot}/dist/**/*",
         "!{projectRoot}/.angular/**/*",
-        "{workspaceRoot}/pnpm-lock.yaml",
         "{workspaceRoot}/docs/frameworks.json"
       ],
       "outputs": ["{projectRoot}/dist"]

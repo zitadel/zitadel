@@ -1,5 +1,20 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "jsGlobals"
+    ],
+    "sources": [
+      "{projectRoot}/app/**/*",
+      "{projectRoot}/components/**/*",
+      "{projectRoot}/lib/**/*",
+      "{projectRoot}/ui/**/*",
+      "{projectRoot}/utils/**/*",
+      "{projectRoot}/*.{ts,tsx,mjs,json}",
+      "jsGlobals"
+    ]
+  },
   "targets": {
     "prod": {
       "description": "Runs the Next.js Login application in production mode from the standalone build",

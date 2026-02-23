@@ -10,10 +10,16 @@
   },
   "namedInputs": {
     "sharedGlobals": [
-      "{workspaceRoot}/go.mod",
-      "{workspaceRoot}/go.sum",
-      "{workspaceRoot}/pnpm-lock.yaml",
       "{workspaceRoot}/nx.json"
+    ],
+    "goGlobals": [
+      "sharedGlobals",
+      "{workspaceRoot}/go.mod",
+      "{workspaceRoot}/go.sum"
+    ],
+    "jsGlobals": [
+      "sharedGlobals",
+      "{workspaceRoot}/pnpm-lock.yaml"
     ],
     "default": [
       "{projectRoot}/**/*",
