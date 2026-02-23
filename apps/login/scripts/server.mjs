@@ -34,9 +34,21 @@ if (process.env.ZITADEL_TLS_ENABLED !== "true") {
 
   // Requires Node.js >= 20.11.0 (or >= 21.2.0) for import.meta.dirname support.
   const appDir = import.meta.dirname;
-  const requiredServerFiles = JSON.parse(
-    readFileSync(new URL(".next/required-server-files.json", import.meta.url), "utf8"),
-  );
+
+  const requiredServerFilesPath = new URL(".next/required-server-files.json", import.meta.url);
+
+  let requiredServerFiles;
+  try {
+    accessSync(requiredServerFilesPath, constants.R_OK);
+    const requiredServerFilesContent = readFileSync(requiredServerFilesPath, "utf8");
+    requiredServerFiles = JSON.parse(requiredServerFilesContent);
+  } catch (err) {
+    console.error(
+      "Failed to load .next/required-server-files.json. The Next.js build may be incomplete or the file may contain invalid JSON.",
+      err,
+    );
+    process.exit(1);
+  }
   process.env.__NEXT_PRIVATE_STANDALONE_CONFIG = JSON.stringify(requiredServerFiles.config);
 
   process.env.NODE_ENV = "production";
