@@ -4,6 +4,7 @@
   "workspaceLayout": {
     "libsDir": "packages"
   },
+  "parallel": 1,
   "tui": {
     "enabled": true
   },
