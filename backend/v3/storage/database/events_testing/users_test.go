@@ -185,7 +185,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 				IsEmailVerified: true,
 			},
 			Phone: &management.AddHumanUserRequest_Phone{
-				Phone:           "+" + gofakeit.Phone(),
+				Phone:           "+1" + gofakeit.Phone(),
 				IsPhoneVerified: true,
 			},
 			InitialPassword: "Password1!",
@@ -252,7 +252,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 				IsEmailVerified: true,
 			},
 			Phone: &management.AddHumanUserRequest_Phone{
-				Phone:           "+" + gofakeit.Phone(),
+				Phone:           "+1" + gofakeit.Phone(),
 				IsPhoneVerified: true,
 			},
 			InitialPassword: "Password1!",
@@ -340,7 +340,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 				IsEmailVerified: true,
 			},
 			Phone: &management.AddHumanUserRequest_Phone{
-				Phone:           "+" + gofakeit.Phone(),
+				Phone:           "+1" + gofakeit.Phone(),
 				IsPhoneVerified: true,
 			},
 			InitialPassword: "Password1!",
