@@ -83,6 +83,12 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
         </AppConfig>
     </Tab>
+    <Tab value="ASP.NET Core">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/auth/logout/callback">
+        </AppConfig>
+    </Tab>
     <Tab value="Django">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback"
@@ -210,6 +216,9 @@ ZITADEL automatically configures the best security settings for your selected fr
     <Tab value="Astro">
         <AppValues valueCount="three" clientSecret={true} ></AppValues>
     </Tab>
+    <Tab value="ASP.NET Core">
+        <AppValues valueCount="three" clientSecret={true}></AppValues>
+    </Tab>
     <Tab value="Django">
         <AppValues valueCount="two" clientSecret={false}></AppValues>
     </Tab>
@@ -291,6 +300,9 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     <Tab value="Astro">
         - [Node.js](https://nodejs.org/)
         - [npm](https://www.npmjs.com/)
+    </Tab>
+    <Tab value="ASP.NET Core">
+        - [.NET SDK 8 or later](https://dotnet.microsoft.com/download)
     </Tab>
     <Tab value="Django">
         - [Python](https://www.python.org/)
@@ -381,6 +393,12 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```bash
         git clone https://github.com/zitadel/example-auth-astro.git
         cd example-auth-astro
+        ```
+    </Tab>
+    <Tab value="ASP.NET Core">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-dotnet.git
+        cd example-auth-dotnet
         ```
     </Tab>
     <Tab value="Django">
@@ -532,6 +550,19 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ZITADEL_POST_LOGIN_URL="/profile"
         ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
         NEXTAUTH_URL="http://localhost:3000"
+        ```
+    </Tab>
+    <Tab value="ASP.NET Core">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        PORT=3000
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-zitadel-domain"
+        ZITADEL_CLIENT_ID="your-zitadel-application-client-id"
+        ZITADEL_CLIENT_SECRET="your-randomly-generated-client-secret"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
         ```
     </Tab>
     <Tab value="Django">
@@ -853,6 +884,14 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         Your app will be live at `http://localhost:3000`.
 
         ![Astro Example App](../../../public/img/guides/quickstart/astro_example_app.png)
+    </Tab>
+    <Tab value="ASP.NET Core">
+        ```bash
+        make start
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
     </Tab>
     <Tab value="Django">
         ```bash
