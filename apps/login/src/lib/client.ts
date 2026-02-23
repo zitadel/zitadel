@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { completeAuthFlow } from "./server/auth-flow";
 import { getPublicHostWithProtocol } from "./server/host";
+import { isSafeRedirectUri } from "./client-utils";
 
 type FinishFlowCommand =
   | {
@@ -110,36 +111,6 @@ export async function getNextUrl(
 }
 
 /**
- * Validates whether a given redirect URI is safe.
- * Safe URIs are either relative paths or absolute URLs matching the current host.
- * This prevents open redirect vulnerabilities and XSS via javascript:/data: URIs.
- */
-export async function isSafeRedirectUri(uri: string): Promise<boolean> {
-  if (!uri) return false;
-
-  // 1. Relative paths are generally safe
-  if (uri.startsWith("/") && !uri.startsWith("//")) {
-    return true;
-  }
-
-  // 2. Check absolute URLs for safe protocols (http/https)
-  // We allow external domains, but strictly forbid javascript:/data: etc.
-  try {
-    const parsedUri = new URL(uri);
-
-    // Only allow http(s) protocols
-    if (parsedUri.protocol !== "http:" && parsedUri.protocol !== "https:") {
-      return false;
-    }
-
-    return true;
-  } catch {
-    // If it can't be parsed as a URL and didn't start with /, it's unsafe
-    return false;
-  }
-}
-
-/**
  * Resolves the redirect URI based on the following priority:
  * 1. DEFAULT_REDIRECT_URI environment variable
  * 2. defaultRedirectUri from organization settings
@@ -169,7 +140,7 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
 
   // 2. Default redirect URI from settings
   if (defaultRedirectUri) {
-    if (await isSafeRedirectUri(defaultRedirectUri)) {
+    if (isSafeRedirectUri(defaultRedirectUri)) {
       console.log("resolveRedirectUri: Using defaultRedirectUri from settings:", defaultRedirectUri);
       return defaultRedirectUri;
     } else {
@@ -183,37 +154,3 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
   return result;
 }
 
-export type ServerActionResponse =
-  | { redirect: string }
-  | { error: string }
-  | { samlData: { url: string; fields: Record<string, string> } }
-  | undefined
-  | null;
-
-export async function handleServerActionResponse(
-  response: ServerActionResponse,
-  router: { push: (url: string) => void },
-  setSamlData: (data: { url: string; fields: Record<string, string> }) => void,
-  setError: (error: string) => void,
-): Promise<boolean> {
-  if (!response) {
-    return false;
-  }
-
-  if ("redirect" in response && response.redirect) {
-    router.push(response.redirect);
-    return true;
-  }
-
-  if ("samlData" in response && response.samlData) {
-    setSamlData(response.samlData);
-    return true;
-  }
-
-  if ("error" in response && response.error) {
-    setError(response.error);
-    return true;
-  }
-
-  return false;
-}
