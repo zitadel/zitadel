@@ -493,10 +493,10 @@ async function run() {
   await Promise.all(others.map(async (tag) => {
     let sourceRef = tag;
 
-    // Explicit logic for version 4.10.x to use active branch (Faking 4.10.x)
-    // This prevents fetching incompatible legacy docs for 4.10.1 etc.
-    if (tag === FALLBACK_VERSION || (semver.major(tag) === 4 && semver.minor(tag) === 10)) {
-      console.log(`[fake-override] Version ${tag} matches 4.10.x. Using fallback source (main/current) instead of tag.`);
+    // Explicit logic for version 4.10.x and 4.11.x to use active branch (Faking legacy versions)
+    // This prevents fetching incompatible legacy docs for 4.10.1, 4.11.0 etc.
+    if (tag === FALLBACK_VERSION || (semver.major(tag) === 4 && semver.minor(tag) <= 11)) {
+      console.log(`[fake-override] Version ${tag} matches legacy (<= 4.11). Using fallback source (main/current) instead of tag.`);
       sourceRef = getCurrentRef();
     }
 

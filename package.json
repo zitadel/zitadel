@@ -13,6 +13,7 @@
     "clean:all": "pnpm run clean && rm -rf .nx node_modules"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.65.0",
     "@changesets/cli": "^2.29.8",
     "nx": "21.6.9",
     "shiki": "^3.21.0",

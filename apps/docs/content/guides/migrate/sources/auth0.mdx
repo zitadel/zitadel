@@ -1,5 +1,6 @@
 ---
 title: Migrate from Auth0 to ZITADEL (Including Password Hashes)
+description: "Migrate users, metadata, and password hashes from Auth0 to ZITADEL."
 sidebar_label: From Auth0
 ---
 
@@ -26,7 +27,7 @@ You'll need a target organization in ZITADEL to import your users. You can creat
 If you don't have a ZITADEL instance, you can [sign up for free here](https://zitadel.com) to create a new one for you.
 See: [Managing Organizations in ZITADEL](https://zitadel.com/docs/guides/manage/console/organizations-overview).
 
-> **Note:** Copy your Organization ID (Resource ID) since you will use the id in the later steps.
+> **Note:** Copy your Organization ID since you will use the id in the later steps.
 
 ---
 
@@ -117,7 +118,7 @@ The tool will merge both objects into a single one in the importBody.json output
 
 ### 5.1. Obtain Access Token (or PAT) for API Access
 
-To call the ZITADEL Admin API, you need to authenticate using a **Service User** with the `IAM_OWNER` Manager permissions.
+To call the ZITADEL Admin API, you need to authenticate using a **Service Account** with the `IAM_OWNER` Manager permissions.
 
 There are two recommended authentication methods:
 
@@ -127,7 +128,7 @@ There are two recommended authentication methods:
 - **Personal Access Token (PAT)**
   [Learn how to create and use a PAT.](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts#personal-access-token)
 
-**Reference:** [Service Users & API Authentication](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts#authentication-methods)
+**Reference:** [Service Accounts & API Authentication](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts#authentication-methods)
 
 ### 5.2. Import Data with the ZITADEL API
 

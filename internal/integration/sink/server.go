@@ -413,7 +413,7 @@ func successfulIntentHandler(cmd *command.Commands, createIntent func(ctx contex
 }
 
 func createIntent(ctx context.Context, cmd *command.Commands, instanceID, idpID string) (string, error) {
-	writeModel, _, err := cmd.CreateIntent(ctx, "", idpID, "https://example.com/success", "https://example.com/failure", instanceID, nil)
+	writeModel, _, err := cmd.CreateIntent(ctx, "", idpID, "https://example.com/success", "https://example.com/failure", instanceID, "", nil)
 	if err != nil {
 		return "", err
 	}
@@ -438,8 +438,9 @@ func createSuccessfulOAuthIntent(ctx context.Context, cmd *command.Commands, req
 	idpSession := &oauth.Session{
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 			Token: &oauth2.Token{
-				AccessToken: "accessToken",
-				Expiry:      req.Expiry,
+				AccessToken:  "accessToken",
+				RefreshToken: "refreshToken",
+				Expiry:       req.Expiry,
 			},
 			IDToken: "idToken",
 		},
@@ -476,8 +477,9 @@ func createSuccessfulAzureADIntent(ctx context.Context, cmd *command.Commands, r
 	idpSession := &oauth.Session{
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 			Token: &oauth2.Token{
-				AccessToken: "accessToken",
-				Expiry:      req.Expiry,
+				AccessToken:  "accessToken",
+				RefreshToken: "refreshToken",
+				Expiry:       req.Expiry,
 			},
 			IDToken: "idToken",
 		},
@@ -508,8 +510,9 @@ func createSuccessfulOIDCIntent(ctx context.Context, cmd *command.Commands, req 
 	idpSession := &openid.Session{
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 			Token: &oauth2.Token{
-				AccessToken: "accessToken",
-				Expiry:      req.Expiry,
+				AccessToken:  "accessToken",
+				RefreshToken: "refreshToken",
+				Expiry:       req.Expiry,
 			},
 			IDToken: "idToken",
 		},

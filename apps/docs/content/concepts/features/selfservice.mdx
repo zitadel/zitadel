@@ -1,5 +1,6 @@
 ---
 title: Self Service in ZITADEL
+description: "Enable self-service registration, login, and profile management to reduce administrative overhead and improve user experience."
 sidebar_label: Self Service
 ---
 
@@ -9,7 +10,7 @@ For these tasks we either provide a user interface, or the tasks can be initiate
 It is important to understand that, depending on your use case, there will exist different user-types that want to perform different actions:
 
 - `Users` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators, etc. There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
-- `Administrators` are users with a [special administrator role](../../guides/manage/console/administrators) within ZITADEL and can perform administrative actions such as system configuration or granting access rights to users.
+- `Administrators` are users with a [special administrator role](../../guides/manage/console/administrators) within ZITADEL and can perform administrative actions such as organization settings or granting access rights to users.
 
 All self-service interfaces are available in different [languages](/guides/manage/customize/texts#internationalization-i-18-n).
 
@@ -67,8 +68,8 @@ Given an external identity provider is configured on the instance or on the orga
 
 ### Machines
 
-Machine accounts can't use an interactive login but require other means of authentication, such as privately signed JWT or personal access tokens.
-Read more about [Service Users](/guides/integrate/service-accounts/authenticate-service-accounts) and recommended [OpenID Connect Flows](/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles).
+Service acounts can't use an interactive login but require other means of authentication, such as privately signed JWT or personal access tokens.
+Read more about [Service Accounts](/guides/integrate/service-accounts/authenticate-service-accounts) and recommended [OpenID Connect Flows](/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles).
 
 ## Logout
 
@@ -136,7 +137,7 @@ Thus, we will explain service for two of the most common scenarios in ZITADEL:
 - `Administrators in delegation`: Granting administrative permissions to a user from a different organization where the organizations depend on each other
 
 A list of [Administrator Roles](../../guides/manage/console/administrators#roles) is available with a description of permissions.
-Administrators can be assigned to both human users and service users, e.g., for managing certain tasks programmatically.
+Administrators can be assigned to both human users and service accounts, e.g., for managing certain tasks programmatically.
 
 ### Administrators in isolation
 

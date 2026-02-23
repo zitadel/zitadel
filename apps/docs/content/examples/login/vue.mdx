@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Vue
+description: "Integrate ZITADEL with a Vue application to enable secure user login and fetch user profile data using OIDC"
 sidebar_label: Vue
 ---
 
@@ -10,12 +11,12 @@ By the end of this guide, your application will have login functionality and wil
 
 <Callout title="">
 This documentation references our [example](https://github.com/zitadel/zitadel-vue) on GitHub.
-It also uses the @zitadel/vue package with its default configuration.
+It also uses the @zitadel/vue package with its default settings.
 </Callout>
 
 ## Set up application and obtain keys
 
-Before we begin developing our application, we need to perform a few configuration steps in the ZITADEL Management Console.
+Before we begin developing our application, we need to perform a few setup steps in the ZITADEL Management Console.
 You'll need to provide some information about your app.
 We recommend creating a new app to start from scratch.
 Navigate to your project, then add a new application at the top of the page.
@@ -38,14 +39,14 @@ Continue and create the application.
 
 ### Refresh Token and Client ID
 
-After successful creation of the app, make sure you tick the checkbox to enable refresh tokens.
-Also copy the client ID, as you will need it to configure your Vue application.
+After the successful creation of the app, make sure you tick the checkbox to enable refresh tokens.
+Also, copy the client ID, as you will need it to configure your Vue application.
 
 ![](../../../public/img/vue/tick-refresh-token.png)
 
 ## Create a project role "admin" and assign it to your user
 
-Also note the projects resource ID, as you will need it to configure your Vue application.
+Also note the Project ID, as you will need it to configure your Vue application.
 
 ![](../../../public/img/vue/project-role.png)
 

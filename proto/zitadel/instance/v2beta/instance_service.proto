@@ -499,7 +499,7 @@ message UpdateInstanceResponse {
 }
 
 message ListInstancesRequest {
-  // Criterias the client is looking for.
+  // Criteria the client is looking for.
   repeated Query queries = 1;
 
   // Pagination and sorting.
@@ -585,7 +585,7 @@ message ListCustomDomainsRequest {
   // The field the result is sorted by.
   DomainFieldName sorting_column = 3;
 
-  // Criterias the client is looking for.
+  // Criteria the client is looking for.
   repeated DomainSearchQuery queries = 4;
 }
 
@@ -668,7 +668,7 @@ message ListTrustedDomainsRequest {
   // The field the result is sorted by.
   TrustedDomainFieldName sorting_column = 3;
   
-  // Criterias the client is looking for.
+  // Criteria the client is looking for.
   repeated TrustedDomainSearchQuery queries = 4;
 }
 

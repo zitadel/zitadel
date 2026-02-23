@@ -11,7 +11,7 @@
     "human": null,
     "machine": {
       "name": "tests",
-      "description": "My test service user"
+      "description": "My test service account"
     }
   },
   "org": {

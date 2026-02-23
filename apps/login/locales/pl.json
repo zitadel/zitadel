@@ -108,14 +108,17 @@
       "description": "Ustaw nowe hasło dla swojego konta",
       "submit": "Kontynuuj",
       "labels": {
+        "currentPassword": "Aktualne hasło",
         "newPassword": "Nowe hasło",
         "confirmPassword": "Potwierdź nowe hasło"
       },
       "required": {
+        "currentPassword": "Musisz podać aktualne hasło!",
         "newPassword": "Musisz podać nowe hasło!",
         "confirmPassword": "To pole jest wymagane"
       },
       "errors": {
+        "currentPasswordInvalid": "Aktualne hasło jest nieprawidłowe.",
         "couldNotChangePassword": "Nie można zmienić hasła",
         "couldNotVerifyPassword": "Nie można zweryfikować hasła",
         "unknownError": "Nieznany błąd"

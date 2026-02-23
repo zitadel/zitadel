@@ -2,12 +2,12 @@ declare namespace NodeJS {
   interface ProcessEnv {
     // Allow any environment variable that matches the pattern
     [key: `${string}_AUDIENCE`]: string; // The system api url
-    [key: `${string}_SYSTEM_USER_ID`]: string; // The service user id
-    [key: `${string}_SYSTEM_USER_PRIVATE_KEY`]: string; // The service user private key
+    [key: `${string}_SYSTEM_USER_ID`]: string; // The service account id
+    [key: `${string}_SYSTEM_USER_PRIVATE_KEY`]: string; // The service account private key
 
     AUDIENCE: string; // The fallback system api url
-    SYSTEM_USER_ID: string; // The fallback service user id
-    SYSTEM_USER_PRIVATE_KEY: string; // The fallback service user private key
+    SYSTEM_USER_ID: string; // The fallback service account id
+    SYSTEM_USER_PRIVATE_KEY: string; // The fallback service account private key
 
     /**
      * The Zitadel API url
@@ -15,7 +15,7 @@ declare namespace NodeJS {
     ZITADEL_API_URL: string;
 
     /**
-     * The service user token
+     * The service account token
      * If ZITADEL_SERVICE_USER_TOKEN is set, its value is used.
      * If ZITADEL_SERVICE_USER_TOKEN is not set but ZITADEL_SERVICE_USER_TOKEN_FILE is set, the application blocks until the file is created.
      * As soon as the file exists, its content is read and ZITADEL_SERVICE_USER_TOKEN is set.

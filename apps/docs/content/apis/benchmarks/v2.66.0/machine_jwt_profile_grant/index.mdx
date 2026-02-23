@@ -10,29 +10,29 @@ The tests showed heavy database load by time by the first two database queries. 
 
 ## Performance test results
 
-| Metric                                | Value |
-|:--------------------------------------|:------|
-| Baseline                              | none  |
-| Purpose                               | Test current performance |
-| Test start                            | 15:39 UTC |
-| Test duration                         | 30min |
-| Executed test                         | machine\_jwt\_profile\_grant |
-| k6 version                            | v0.54.0 |
-| VUs                                   | 150 |
-| Client location                       | US1 |
-| ZITADEL location                      | US1 |
-| ZITADEL container specification       | vCPU: 2<br/> Memory: 512 Mib <br/>Container count: 5 |
-| ZITADEL Version                       | v2.66.0 |
+| Metric                                | Value                                                                                                                                                                                                                                                  |
+|:--------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Baseline                              | none                                                                                                                                                                                                                                                   |
+| Purpose                               | Test current performance                                                                                                                                                                                                                               |
+| Test start                            | 15:39 UTC                                                                                                                                                                                                                                              |
+| Test duration                         | 30min                                                                                                                                                                                                                                                  |
+| Executed test                         | machine\_jwt\_profile\_grant                                                                                                                                                                                                                           |
+| k6 version                            | v0.54.0                                                                                                                                                                                                                                                |
+| VUs                                   | 150                                                                                                                                                                                                                                                    |
+| Client location                       | US1                                                                                                                                                                                                                                                    |
+| ZITADEL location                      | US1                                                                                                                                                                                                                                                    |
+| ZITADEL container specification       | vCPU: 2<br/> Memory: 512 Mib <br/>Container count: 5                                                                                                                                                                                                   |
+| ZITADEL Version                       | v2.66.0                                                                                                                                                                                                                                                |
 | ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
-| Database                              | type: psql<br />version: v15.8 |
-| Database location                     | US1 |
-| Database specification                | vCPU: 8<br/> memory: 32Gib |
-| ZITADEL metrics during test           |  |
-| Observed errors                       |  |
-| Top 3 most expensive database queries | 1: Write events using the newly added eventstore.push function<br/>2: Query events by instance\_id, aggregate\_type, aggregate\_id, event\_types<br/>3: Query user<br/> |
-| k6 Iterations per second              | 439 |
-| k6 output                             | [output](#k6-output) |
-| flowchart outcome                     | Scale out |
+| Database                              | type: psql<br />version: v15.8                                                                                                                                                                                                                         |
+| Database location                     | US1                                                                                                                                                                                                                                                    |
+| Database specification                | vCPU: 8<br/> memory: 32Gib                                                                                                                                                                                                                             |
+| ZITADEL metrics during test           |                                                                                                                                                                                                                                                        |
+| Observed errors                       |                                                                                                                                                                                                                                                        |
+| Top 3 most expensive database queries | 1: Write events using the newly added eventstore.push function<br/>2: Query events by instance\_id, aggregate\_type, aggregate\_id, event\_types<br/>3: Query user<br/>                                                                                |
+| k6 Iterations per second              | 439                                                                                                                                                                                                                                                    |
+| k6 output                             | [output](#k6-output)                                                                                                                                                                                                                                   |
+| flowchart outcome                     | Scale out                                                                                                                                                                                                                                              |
 
 ## Endpoint latencies
 

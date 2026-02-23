@@ -1,5 +1,6 @@
 ---
 title: Log in with ZITADEL on Gitlab through SAML 2.0
+description: "Configure SAML 2.0 Single Sign-On for GitLab using ZITADEL as the Identity Provider."
 sidebar_label: Gitlab
 ---
 
@@ -26,7 +27,7 @@ Prerequisites:
 Please follow the instructions on [Gitlab docs](https://docs.gitlab.com/ee/user/group/saml_sso/index.html) to configure a SAML identity provider for SSO.
 The following instructions give you a quick overview of the most important steps.
 
-[Open the group](https://gitlab.com/dashboard/groups) to which you want to add the SSO configuration.
+[Open the group](https://gitlab.com/dashboard/groups) to which you want to add the SSO settings.
 Select on the menu Settings and then SAML SSO.
 Copy `GitLab metadata URL` for the next step.
 ![](../../../../public/img/saml/gitlab/gitlab-01.png)
@@ -47,9 +48,9 @@ Enter the URL from before, then click "Continue".
 Check your application, if everything is correct, press "Create".
 ![](../../../../public/img/saml/zitadel/application_saml_create.png)
 
-## **Gitlab**: Configuration
+## **Gitlab**: Setup
 
-Complete the configuration as follows:
+Complete the setup as follows:
 
 - `Identity provider single sign-on URL`: `${CUSTOM_DOMAIN}/saml/v2/SSO`
 - `Certificate fingerprint`: You need to download the certificate from \{your_instance_domain}/saml/v2/certificate and create a SHA1 fingerprint
@@ -58,9 +59,9 @@ Save the changes.
 
 ![](../../../../public/img/saml/gitlab/gitlab-02.png)
 
-## **Gitlab**: Verify SAML configuration
+## **Gitlab**: Verify SAML setup
 
-Once you saved the changes, click on the button "Verify SAML configuration".
+Once you saved the changes, click on the button "Verify SAML settings".
 
 You should be redirected to ZITADEL.
 Login with your user.
