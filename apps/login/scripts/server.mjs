@@ -44,11 +44,16 @@ if (process.env.ZITADEL_TLS_ENABLED !== "true") {
   const currentPort = parseInt(process.env.PORT, 10) || 3000;
   const hostname = process.env.HOSTNAME || "0.0.0.0";
 
+  // KEEP_ALIVE_TIMEOUT is expected to be in milliseconds.
+  // Reject values that are negative or unreasonably large to avoid resource issues.
+  const MAX_KEEP_ALIVE_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+
   let keepAliveTimeout = parseInt(process.env.KEEP_ALIVE_TIMEOUT, 10);
   if (
     Number.isNaN(keepAliveTimeout) ||
     !Number.isFinite(keepAliveTimeout) ||
-    keepAliveTimeout < 0
+    keepAliveTimeout < 0 ||
+    keepAliveTimeout > MAX_KEEP_ALIVE_TIMEOUT_MS
   ) {
     keepAliveTimeout = undefined;
   }
