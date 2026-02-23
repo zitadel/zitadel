@@ -40,6 +40,7 @@ type InstanceSetup struct {
 	zitadel          ZitadelConfig
 	InstanceName     string
 	CustomDomain     string
+	TrustedDomains   []string
 	DefaultLanguage  language.Tag
 	Org              InstanceOrgSetup
 	SecretGenerators *SecretGenerators
@@ -294,6 +295,7 @@ func setUpInstance(ctx context.Context, c *Commands, setup *InstanceSetup) (vali
 		return nil, nil, nil, nil, err
 	}
 	setupCustomDomain(c, &validations, instanceAgg, setup.CustomDomain)
+	setupTrustedDomains(c, &validations, instanceAgg, setup.TrustedDomains)
 
 	// optional setting if set
 	setupMessageTexts(&validations, setup.MessageTexts, instanceAgg)
@@ -509,6 +511,14 @@ func setupGeneratedDomain(ctx context.Context, commands *Commands, validations *
 	}
 	*validations = append(*validations, addGeneratedDomain...)
 	return nil
+}
+
+func setupTrustedDomains(commands *Commands, validations *[]preparation.Validation, instanceAgg *instance.Aggregate, trustedDomains []string) {
+	for _, trustedDomain := range trustedDomains {
+		*validations = append(*validations,
+			commands.setupTrustedDomain(instanceAgg, trustedDomain),
+		)
+	}
 }
 
 func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Validation, instanceAgg *instance.Aggregate, orgAgg *org.Aggregate, projectOwner string, ids ZitadelConfig) {
