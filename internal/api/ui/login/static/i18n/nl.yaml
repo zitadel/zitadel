@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Factor Verificatie
   DescriptionPhone: Maak uw 2-factor aan. Voer uw telefoonnummer in om te verifiëren.
   DescriptionCode: Maak uw 2-factor aan. Voer de ontvangen code in om uw telefoonnummer te verifiëren.
+  CountryCodeLabel: Land
   PhoneLabel: Telefoon
   CodeLabel: Code
   EditButtonText: Bewerken
@@ -268,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -314,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -394,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:

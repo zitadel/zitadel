@@ -365,7 +365,7 @@ var totalCountOfHumanUsers = 13
 				prepare: func(t require.TestingT) *scim.ListRequest {
 					resp := createHumanUser(t, CTX, Instance.DefaultOrg.Id, 102)
 
-					// set provisioning domain of service user
+					// set provisioning domain of service account
 					setProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID, "fooBar")
 
 					// set externalID for provisioning domain
@@ -379,7 +379,7 @@ var totalCountOfHumanUsers = 13
 					assert.Equal(t, resp.Resources[0].ExternalID, "100-scopedExternalId")
 				},
 				cleanup: func(t require.TestingT) {
-					// delete provisioning domain of service user
+					// delete provisioning domain of service account
 					removeProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID)
 				},
 			},

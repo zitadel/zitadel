@@ -47,7 +47,7 @@
       "userNotFound": "Użytkownik nie został znaleziony w systemie",
       "couldNotCreateSession": "Nie udało się utworzyć sesji dla użytkownika",
       "initialUserNotSupported": "Użytkownik inicjalny nie jest obsługiwany",
-      "usernamePasswordNotAllowed": "Logowanie przy użyciu nazwy użytkownika i hasła jest niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
       "passkeysNotAllowed": "Klucze dostępu są niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
       "couldNotFindIdentityProvider": "Nie udało się znaleźć dostawcy tożsamości.",
       "userNotActive": "Użytkownik jest nieaktywny. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
@@ -108,14 +108,17 @@
       "description": "Ustaw nowe hasło dla swojego konta",
       "submit": "Kontynuuj",
       "labels": {
+        "currentPassword": "Aktualne hasło",
         "newPassword": "Nowe hasło",
         "confirmPassword": "Potwierdź nowe hasło"
       },
       "required": {
+        "currentPassword": "Musisz podać aktualne hasło!",
         "newPassword": "Musisz podać nowe hasło!",
         "confirmPassword": "To pole jest wymagane"
       },
       "errors": {
+        "currentPasswordInvalid": "Aktualne hasło jest nieprawidłowe.",
         "couldNotChangePassword": "Nie można zmienić hasła",
         "couldNotVerifyPassword": "Nie można zweryfikować hasła",
         "unknownError": "Nieznany błąd"
@@ -315,7 +318,7 @@
       "description": "Podaj e-mail, imię i nazwisko, aby się zarejestrować."
     },
     "title": "Rejestracja",
-    "description": "Utwórz konto ZITADEL.",
+    "description": "Utwórz konto Zitadel.",
     "noMethodAvailableWarning": "Brak dostępnych metod uwierzytelniania. Skontaktuj się z administratorem.",
     "selectMethod": "Wybierz metodę uwierzytelniania, której chcesz użyć",
     "agreeTo": "Aby się zarejestrować, musisz zaakceptować warunki korzystania",

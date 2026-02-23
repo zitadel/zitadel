@@ -1,8 +1,8 @@
 import { Component, DestroyRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { BehaviorSubject, defer, from, Observable, of, shareReplay, TimeoutError } from 'rxjs';
-import { catchError, finalize, map, timeout } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { InstanceDetail, State } from 'src/app/proto/generated/zitadel/instance_pb';
@@ -34,10 +34,11 @@ import {
   FAILEDEVENTS,
   EVENTS,
   FEATURESETTINGS,
+  ACTIONS,
+  ACTIONS_TARGETS,
 } from 'src/app/modules/settings-list/settings';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { EnvironmentService } from 'src/app/services/environment.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'cnsl-instance',
@@ -77,6 +78,9 @@ export class InstanceComponent {
     VIEWS,
     EVENTS,
     FAILEDEVENTS,
+    //actions
+    ACTIONS,
+    ACTIONS_TARGETS,
     // others
     PRIVACYPOLICY,
     LANGUAGES,

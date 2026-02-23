@@ -4,8 +4,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/tls"
 )
@@ -23,6 +23,7 @@ func init() {
 func startFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlagSet(startFlagSet)
 	logging.OnError(
+		cmd.Context(),
 		viper.BindPFlags(startFlagSet),
 	).Fatal("start flags")
 

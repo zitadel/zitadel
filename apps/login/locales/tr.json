@@ -47,7 +47,7 @@
       "userNotFound": "Kullanıcı sistemde bulunamadı",
       "couldNotCreateSession": "Kullanıcı için oturum oluşturulamadı",
       "initialUserNotSupported": "İlk kullanıcı desteklenmiyor",
-      "usernamePasswordNotAllowed": "Kullanıcı adı ve şifre izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
+      "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun.",
       "passkeysNotAllowed": "Passkey'ler izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
       "couldNotFindIdentityProvider": "Kimlik sağlayıcı bulunamadı.",
       "userNotActive": "Kullanıcı aktif değil. Daha fazla bilgi için yöneticinizle iletişime geçin."
@@ -108,14 +108,17 @@
       "description": "Hesabınız için şifre belirleyin",
       "submit": "Devam",
       "labels": {
+        "currentPassword": "Mevcut Şifre",
         "newPassword": "Yeni Şifre",
         "confirmPassword": "Şifreyi Onayla"
       },
       "required": {
+        "currentPassword": "Mevcut şifrenizi girmelisiniz!",
         "newPassword": "Yeni bir şifre sağlamalısınız!",
         "confirmPassword": "Bu alan zorunludur"
       },
       "errors": {
+        "currentPasswordInvalid": "Mevcut şifre yanlış.",
         "couldNotChangePassword": "Şifre değiştirilemedi",
         "couldNotVerifyPassword": "Şifre doğrulanamadı",
         "unknownError": "Bilinmeyen hata"
@@ -315,7 +318,7 @@
       "description": "Kayıt olmak için e-posta, ad ve soyadı sağlayın."
     },
     "title": "Kayıt",
-    "description": "ZITADEL hesabınızı oluşturun.",
+    "description": "Zitadel hesabınızı oluşturun.",
     "noMethodAvailableWarning": "Kullanılabilir kimlik doğrulama yöntemi yok. Lütfen yöneticinizle iletişime geçin.",
     "selectMethod": "Kimlik doğrulaması yapmak istediğiniz yöntemi seçin",
     "agreeTo": "Kayıt olmak için şartları ve koşulları kabul etmelisiniz",

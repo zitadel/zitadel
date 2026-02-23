@@ -68,14 +68,12 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceResetEventType,
 			feature_v2.InstanceLoginDefaultOrgEventType,
 			feature_v2.InstanceUserSchemaEventType,
-			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
 			feature_v2.InstanceDebugOIDCParentErrorEventType,
 			feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
-			feature_v2.InstanceEnableBackChannelLogout,
 			feature_v2.InstanceLoginVersion,
 			feature_v2.InstancePermissionCheckV2,
-			feature_v2.InstanceConsoleUseV2UserApi,
+			feature_v2.InstanceManagementConsoleUseV2UserApi,
 			feature_v2.InstanceEnableRelationalTables,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
@@ -92,9 +90,6 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyLoginDefaultOrg:
 		v := value.(bool)
 		features.LoginDefaultOrg = &v
-	case feature.KeyTokenExchange:
-		v := value.(bool)
-		features.TokenExchange = &v
 	case feature.KeyUserSchema:
 		v := value.(bool)
 		features.UserSchema = &v
@@ -107,17 +102,14 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyOIDCSingleV1SessionTermination:
 		v := value.(bool)
 		features.OIDCSingleV1SessionTermination = &v
-	case feature.KeyEnableBackChannelLogout:
-		v := value.(bool)
-		features.EnableBackChannelLogout = &v
 	case feature.KeyLoginV2:
 		features.LoginV2 = value.(*feature.LoginV2)
 	case feature.KeyPermissionCheckV2:
 		v := value.(bool)
 		features.PermissionCheckV2 = &v
-	case feature.KeyConsoleUseV2UserApi:
+	case feature.KeyManagementConsoleUseV2UserApi:
 		v := value.(bool)
-		features.ConsoleUseV2UserApi = &v
+		features.ManagementConsoleUseV2UserApi = &v
 	case feature.KeyEnableRelationalTables:
 		v := value.(bool)
 		features.EnableRelationalTables = &v
@@ -128,15 +120,13 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	aggregate := feature_v2.NewAggregate(wm.AggregateID, wm.ResourceOwner)
 	cmds := make([]eventstore.Command, 0, len(feature.KeyValues())-1)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginDefaultOrg, f.LoginDefaultOrg, feature_v2.InstanceLoginDefaultOrgEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.InstanceTokenExchangeEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.InstanceUserSchemaEventType)
 	cmds = appendFeatureSliceUpdate(ctx, cmds, aggregate, wm.ImprovedPerformance, f.ImprovedPerformance, feature_v2.InstanceImprovedPerformanceEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.DebugOIDCParentError, f.DebugOIDCParentError, feature_v2.InstanceDebugOIDCParentErrorEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.OIDCSingleV1SessionTermination, f.OIDCSingleV1SessionTermination, feature_v2.InstanceOIDCSingleV1SessionTerminationEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableBackChannelLogout, f.EnableBackChannelLogout, feature_v2.InstanceEnableBackChannelLogout)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginV2, f.LoginV2, feature_v2.InstanceLoginVersion)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.PermissionCheckV2, f.PermissionCheckV2, feature_v2.InstancePermissionCheckV2)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.ConsoleUseV2UserApi, f.ConsoleUseV2UserApi, feature_v2.InstanceConsoleUseV2UserApi)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.ManagementConsoleUseV2UserApi, f.ManagementConsoleUseV2UserApi, feature_v2.InstanceManagementConsoleUseV2UserApi)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableRelationalTables, f.EnableRelationalTables, feature_v2.InstanceEnableRelationalTables)
 	return cmds
 }

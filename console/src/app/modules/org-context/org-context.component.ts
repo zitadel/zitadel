@@ -8,6 +8,7 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
+import { Org as OrgV1 } from '@zitadel/proto/zitadel/org_pb';
 
 const ORG_QUERY_LIMIT = 100;
 
@@ -46,10 +47,10 @@ export class OrgContextComponent implements OnInit {
   );
 
   public filterControl: UntypedFormControl = new UntypedFormControl('');
-  @Input({ required: true }) public org!: Organization;
+  @Input({ required: true }) public org!: Organization | OrgV1;
   @ViewChild('input', { static: false }) input!: ElementRef;
   @Output() public closedCard: EventEmitter<void> = new EventEmitter();
-  @Output() public setOrg: EventEmitter<Org.AsObject> = new EventEmitter();
+  @Output() public setOrg: EventEmitter<string> = new EventEmitter();
 
   constructor(
     public authService: AuthenticationService,
@@ -67,8 +68,8 @@ export class OrgContextComponent implements OnInit {
     this.init();
   }
 
-  public setActiveOrg(org: Org.AsObject) {
-    this.setOrg.emit(org);
+  protected setActiveOrg(org: Org.AsObject) {
+    this.setOrg.emit(org.id);
     this.closedCard.emit();
   }
 

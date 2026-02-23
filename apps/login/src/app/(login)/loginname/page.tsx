@@ -57,7 +57,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       </div>
 
       <div className="w-full">
-        <UsernameForm
+        {loginSettings?.allowLocalAuthentication && <UsernameForm
           loginName={loginName}
           requestId={requestId}
           organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
@@ -66,7 +66,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           suffix={suffix}
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
-        ></UsernameForm>
+        ></UsernameForm>}
 
         {loginSettings?.allowExternalIdp && !!identityProviders?.length && (
           <div className="w-full pb-4 pt-6">
@@ -75,6 +75,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               requestId={requestId}
               organization={organization}
               postErrorRedirectUrl="/loginname"
+              showLabel={loginSettings?.allowLocalAuthentication}
             ></SignInWithIdp>
           </div>
         )}

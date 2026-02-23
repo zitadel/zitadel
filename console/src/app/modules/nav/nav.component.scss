@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 @mixin nav-theme($theme) {
   $primary: map-get($theme, primary);
   $warn: map-get($theme, warn);
@@ -17,14 +19,13 @@
     height: auto;
     position: relative;
     align-items: flex-start;
-    transform: transale3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
     transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
 
     .nav-row {
       position: relative;
       width: 100%;
-      height: 40px; // Increased height to accommodate the line
-      overflow: visible; // Allow the indicator line to show below
+      height: 36px;
 
       .nav-row-abs {
         padding: 0 2rem;
@@ -33,7 +34,7 @@
         display: flex;
         align-items: center;
         overflow-x: auto;
-        overflow-y: hidden; // Allow the indicator line to show
+        overflow-y: hidden;
         align-self: stretch;
         position: absolute;
         top: 0;
@@ -52,45 +53,19 @@
         .nav-item {
           display: flex;
           align-items: center;
+          font-size: 14px;
+          line-height: 14px;
+          padding: 0.4rem 12px;
+          color: map-get($foreground, text);
           transition: all 0.2s ease;
           text-decoration: none;
           border-radius: 50vw;
           font-weight: 500;
           margin: 0.25rem 2px;
-          font-size: 14px;
           white-space: nowrap;
           position: relative;
-          height: 36px;
           box-sizing: border-box;
-          display: flex;
-          align-items: center;
-          border: 0;
-          background: transparent;
-          border-radius: 6px;
-          padding: 0 0.5rem;
-          cursor: pointer;
-          color: map-get($foreground, text);
-          opacity: 0.8;
-
-          &::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            width: 0;
-            height: 2px;
-            background-color: map-get($foreground, text);
-            // transition: width 0.2s ease;
-            border-radius: 2px;
-            z-index: 999;
-          }
-
-          &:hover {
-            opacity: 1;
-            color: map-get($foreground, text);
-            background-color: if($is-dark-theme, #ffffff10, #00000010);
-          }
+          height: 27px;
 
           .c_label {
             display: flex;
@@ -124,12 +99,13 @@
             }
           }
 
-          &.active {
-            opacity: 1;
+          &:hover {
+            background: if($is-dark-theme, #ffffff40, #00000010);
+          }
 
-            &::after {
-              width: 100%;
-            }
+          &.active {
+            background-color: $primary-color;
+            color: map-get($primary, default-contrast);
 
             .c_label {
               .count {

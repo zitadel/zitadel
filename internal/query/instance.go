@@ -16,6 +16,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
@@ -66,12 +67,12 @@ var (
 		name:  projection.InstanceColumnProjectID,
 		table: instanceTable,
 	}
-	InstanceColumnConsoleID = Column{
-		name:  projection.InstanceColumnConsoleID,
+	InstanceColumnManagementConsoleID = Column{
+		name:  projection.InstanceColumnManagementConsoleID,
 		table: instanceTable,
 	}
-	InstanceColumnConsoleAppID = Column{
-		name:  projection.InstanceColumnConsoleAppID,
+	InstanceColumnManagementConsoleAppID = Column{
+		name:  projection.InstanceColumnManagementConsoleAppID,
 		table: instanceTable,
 	}
 	InstanceColumnDefaultLanguage = Column{
@@ -99,12 +100,12 @@ type Instance struct {
 	Sequence     uint64
 	Name         string
 
-	DefaultOrgID string
-	IAMProjectID string
-	ConsoleID    string
-	ConsoleAppID string
-	DefaultLang  language.Tag
-	Domains      []*InstanceDomain
+	DefaultOrgID           string
+	IAMProjectID           string
+	ManagementConsoleID    string
+	ManagementConsoleAppID string
+	DefaultLang            language.Tag
+	Domains                []*InstanceDomain
 }
 
 type Instances struct {
@@ -280,8 +281,8 @@ func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder
 				InstanceColumnName.identifier(),
 				InstanceColumnDefaultOrgID.identifier(),
 				InstanceColumnProjectID.identifier(),
-				InstanceColumnConsoleID.identifier(),
-				InstanceColumnConsoleAppID.identifier(),
+				InstanceColumnManagementConsoleID.identifier(),
+				InstanceColumnManagementConsoleAppID.identifier(),
 				InstanceColumnDefaultLanguage.identifier(),
 				InstanceDomainDomainCol.identifier(),
 				InstanceDomainIsPrimaryCol.identifier(),
@@ -328,8 +329,8 @@ func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder
 					&instance.Name,
 					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
-					&instance.ConsoleID,
-					&instance.ConsoleAppID,
+					&instance.ManagementConsoleID,
+					&instance.ManagementConsoleAppID,
 					&lang,
 					&domain,
 					&isPrimary,
@@ -385,8 +386,8 @@ func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance,
 			InstanceColumnName.identifier(),
 			InstanceColumnDefaultOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
-			InstanceColumnConsoleID.identifier(),
-			InstanceColumnConsoleAppID.identifier(),
+			InstanceColumnManagementConsoleID.identifier(),
+			InstanceColumnManagementConsoleAppID.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
 			InstanceDomainDomainCol.identifier(),
 			InstanceDomainIsPrimaryCol.identifier(),
@@ -420,8 +421,8 @@ func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance,
 					&instance.Name,
 					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
-					&instance.ConsoleID,
-					&instance.ConsoleAppID,
+					&instance.ManagementConsoleID,
+					&instance.ManagementConsoleAppID,
 					&lang,
 					&domain,
 					&isPrimary,
@@ -447,7 +448,7 @@ func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance,
 				})
 			}
 			if instance.ID == "" {
-				return nil, zerrors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.Instance.NotFound")
 			}
 			instance.DefaultLang = language.Make(lang)
 			if err := rows.Close(); err != nil {
@@ -458,20 +459,21 @@ func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance,
 }
 
 type authzInstance struct {
-	ID               string                     `json:"id,omitempty"`
-	IAMProjectID     string                     `json:"iam_project_id,omitempty"`
-	ConsoleID        string                     `json:"console_id,omitempty"`
-	ConsoleAppID     string                     `json:"console_app_id,omitempty"`
-	DefaultLang      language.Tag               `json:"default_lang,omitempty"`
-	DefaultOrgID     string                     `json:"default_org_id,omitempty"`
-	CSP              csp                        `json:"csp,omitempty"`
-	Impersonation    bool                       `json:"impersonation,omitempty"`
-	IsBlocked        *bool                      `json:"is_blocked,omitempty"`
-	LogRetention     *time.Duration             `json:"log_retention,omitempty"`
-	Feature          feature.Features           `json:"feature,omitempty"`
-	ExternalDomains  database.TextArray[string] `json:"external_domains,omitempty"`
-	TrustedDomains   database.TextArray[string] `json:"trusted_domains,omitempty"`
-	ExecutionTargets target_domain.Router       `json:"execution_targets,omitzero"`
+	ID                     string                     `json:"id,omitempty"`
+	IAMProjectID           string                     `json:"iam_project_id,omitempty"`
+	ManagementConsoleID    string                     `json:"console_id,omitempty"`
+	ManagementConsoleAppID string                     `json:"console_app_id,omitempty"`
+	DefaultLang            language.Tag               `json:"default_lang,omitempty"`
+	DefaultOrgID           string                     `json:"default_org_id,omitempty"`
+	CSP                    csp                        `json:"csp,omitempty"`
+	Impersonation          bool                       `json:"impersonation,omitempty"`
+	IsBlocked              *bool                      `json:"is_blocked,omitempty"`
+	LogRetention           *time.Duration             `json:"log_retention,omitempty"`
+	Feature                feature.Features           `json:"feature,omitempty"`
+	ExternalDomains        database.TextArray[string] `json:"external_domains,omitempty"`
+	TrustedDomains         database.TextArray[string] `json:"trusted_domains,omitempty"`
+	ExecutionTargets       target_domain.Router       `json:"execution_targets,omitzero"`
+	AllowedLangs           []language.Tag             `json:"allowed_langs,omitempty"`
 }
 
 type csp struct {
@@ -487,16 +489,20 @@ func (i *authzInstance) ProjectID() string {
 	return i.IAMProjectID
 }
 
-func (i *authzInstance) ConsoleClientID() string {
-	return i.ConsoleID
+func (i *authzInstance) ManagementConsoleClientID() string {
+	return i.ManagementConsoleID
 }
 
-func (i *authzInstance) ConsoleApplicationID() string {
-	return i.ConsoleAppID
+func (i *authzInstance) ManagementConsoleApplicationID() string {
+	return i.ManagementConsoleAppID
 }
 
 func (i *authzInstance) DefaultLanguage() language.Tag {
 	return i.DefaultLang
+}
+
+func (i *authzInstance) AllowedLanguages() []language.Tag {
+	return i.AllowedLangs
 }
 
 func (i *authzInstance) DefaultOrganisationID() string {
@@ -538,7 +544,7 @@ func (i *authzInstance) checkDomain(instanceDomain, publicDomain string) error {
 		return nil
 	}
 	if !slices.Contains(i.TrustedDomains, publicDomain) {
-		return zerrors.ThrowNotFound(fmt.Errorf(errPublicDomain, publicDomain), "QUERY-IuGh1", "Errors.IAM.NotFound")
+		return zerrors.ThrowNotFound(fmt.Errorf(errPublicDomain, publicDomain), "QUERY-IuGh1", "Errors.Instance.NotFound")
 	}
 	return nil
 }
@@ -566,13 +572,14 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			block                 sql.NullBool
 			features              []byte
 			executionTargetsBytes []byte
+			allowedLanguages      database.TextArray[string]
 		)
 		err := row.Scan(
 			&instance.ID,
 			&instance.DefaultOrgID,
 			&instance.IAMProjectID,
-			&instance.ConsoleID,
-			&instance.ConsoleAppID,
+			&instance.ManagementConsoleID,
+			&instance.ManagementConsoleAppID,
 			&lang,
 			&enableIframeEmbedding,
 			&instance.CSP.AllowedOrigins,
@@ -583,9 +590,10 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			&instance.ExternalDomains,
 			&instance.TrustedDomains,
 			&executionTargetsBytes,
+			&allowedLanguages,
 		)
 		if errors.Is(err, sql.ErrNoRows) {
-			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
+			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.Instance.NotFound")
 		}
 		if err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-d3fas", "Errors.Internal")
@@ -611,6 +619,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			}
 			instance.ExecutionTargets = target_domain.NewRouter(targets)
 		}
+		instance.AllowedLangs = domain.StringsToLanguages(allowedLanguages)
 		return nil
 	}
 }

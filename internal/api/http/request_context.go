@@ -61,11 +61,16 @@ func (r *DomainCtx) RequestedDomain() string {
 // Origin returns the origin (protocol://hostname[:port]) for which the request was handled.
 // The instance host is used if no public host was set.
 func (r *DomainCtx) Origin() string {
-	host := r.PublicHost
-	if host == "" {
-		host = r.InstanceHost
+	return fmt.Sprintf("%s://%s", r.Protocol, r.RequestedHost())
+}
+
+// OriginURL returns the origin (protocol://hostname[:port]) for which the request was handled as [*url.URL].
+// The instance host is used if no public host was set.
+func (r *DomainCtx) OriginURL() *url.URL {
+	return &url.URL{
+		Scheme: r.Protocol,
+		Host:   r.RequestedHost(),
 	}
-	return fmt.Sprintf("%s://%s", r.Protocol, host)
 }
 
 var _ slog.LogValuer = (*DomainCtx)(nil)

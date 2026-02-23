@@ -33,7 +33,7 @@
       "name": "Zitadel authentication token",
       "description": "Authentication scheme using the OAuth Bearer Token Standard",
       "specUri": "https://www.rfc-editor.org/info/rfc6750",
-      "documentationUri": "https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users",
+      "documentationUri": "https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts",
       "type": "oauthbearertoken",
       "primary": false
     }

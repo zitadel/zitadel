@@ -33,7 +33,7 @@ DefaultInstance:
     AllowDomainDiscovery: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWDOMAINDISCOVERY
     # 1 is allowed, 0 is not allowed
     PasswordlessType: 1 # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDLESSTYPE
-    # DefaultRedirectURL is empty by default because we use the Console UI
+    # DefaultRedirectURL is empty by default because we use the Management Console UI
     DefaultRedirectURI: # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_DEFAULTREDIRECTURI
     # 240h = 10d
     PasswordCheckLifetime: 240h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDCHECKLIFETIME

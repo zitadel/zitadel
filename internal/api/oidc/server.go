@@ -120,11 +120,7 @@ func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.
 		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
-	restrictions, err := s.query.GetInstanceRestrictions(ctx)
-	if err != nil {
-		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("internal server error"), http.StatusInternalServerError)
-	}
-	allowedLanguages := restrictions.AllowedLanguages
+	allowedLanguages := authz.GetInstance(ctx).AllowedLanguages()
 	if len(allowedLanguages) == 0 {
 		allowedLanguages = i18n.SupportedLanguages()
 	}
@@ -178,7 +174,6 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 
 func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
-	backChannelLogoutSupported := authz.GetInstance(ctx).Features().EnableBackChannelLogout
 
 	return &oidc.DiscoveryConfiguration{
 		Issuer:                      issuer,
@@ -211,8 +206,8 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		CodeChallengeMethodsSupported:                      op.CodeChallengeMethods(s.Provider()),
 		UILocalesSupported:                                 supportedUILocales,
 		RequestParameterSupported:                          s.Provider().RequestObjectSupported(),
-		BackChannelLogoutSupported:                         backChannelLogoutSupported,
-		BackChannelLogoutSessionSupported:                  backChannelLogoutSupported,
+		BackChannelLogoutSupported:                         true,
+		BackChannelLogoutSessionSupported:                  true,
 	}
 }
 

@@ -1,6 +1,5 @@
-import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
+import { Component, DestroyRef, Injector, Input, OnInit, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Subscription } from 'rxjs';
 import {
   AddCustomDomainPolicyRequest,
   GetCustomOrgIAMPolicyResponse,
@@ -10,12 +9,12 @@ import { GetOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/managem
 import { DomainPolicy, OrgIAMPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
-import { NewOrganizationService } from '../../../services/new-organization.service';
+import { GrpcAuthService } from '../../../services/grpc-auth.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'cnsl-domain-policy',
@@ -23,15 +22,13 @@ import { NewOrganizationService } from '../../../services/new-organization.servi
   styleUrls: ['./domain-policy.component.scss'],
   standalone: false,
 })
-export class DomainPolicyComponent implements OnInit, OnDestroy {
+export class DomainPolicyComponent implements OnInit {
   private managementService!: ManagementService;
   @Input() public serviceType!: PolicyComponentServiceType;
 
   public domainData!: DomainPolicy.AsObject;
 
   public loading: boolean = false;
-  private sub: Subscription = new Subscription();
-  private orgId = this.newOrganizationService.getOrgId();
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
@@ -40,33 +37,29 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private injector: Injector,
     private adminService: AdminService,
-    private readonly newOrganizationService: NewOrganizationService,
+    private readonly authService: GrpcAuthService,
+    private readonly destroyRef: DestroyRef,
   ) {}
 
   ngOnInit(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
     }
-    this.fetchData();
+    this.fetchData().then();
   }
 
-  public ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
-
-  public fetchData(): void {
+  public async fetchData(): Promise<void> {
     this.loading = true;
-    this.getData()
-      .then((resp) => {
-        this.loading = false;
-        if (resp?.policy) {
-          this.domainData = resp.policy;
-        }
-      })
-      .catch((error) => {
-        this.loading = false;
-        this.toast.showError(error);
-      });
+    try {
+      const resp = await this.getData();
+      if (resp?.policy) {
+        this.domainData = resp.policy;
+      }
+    } catch (error) {
+      this.toast.showError(error);
+    } finally {
+      this.loading = false;
+    }
   }
 
   private async getData(): Promise<GetCustomOrgIAMPolicyResponse.AsObject | GetOrgIAMPolicyResponse.AsObject | any> {
@@ -80,12 +73,17 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
     }
   }
 
-  public savePolicy(): void {
+  public async savePolicy(): Promise<void> {
+    const org = await this.authService.getActiveOrg();
+    if (!org) {
+      console.log('No active organization found. Cannot save domain policy.');
+      return;
+    }
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.domainData as OrgIAMPolicy.AsObject).isDefault) {
           const req = new AddCustomDomainPolicyRequest();
-          req.setOrgId(this.orgId());
+          req.setOrgId(org.id);
           req.setUserLoginMustBeDomain(this.domainData.userLoginMustBeDomain);
           req.setValidateOrgDomains(this.domainData.validateOrgDomains);
           req.setSmtpSenderAddressMatchesInstanceDomain(this.domainData.smtpSenderAddressMatchesInstanceDomain);
@@ -101,7 +99,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
           break;
         } else {
           const req = new AddCustomDomainPolicyRequest();
-          req.setOrgId(this.orgId());
+          req.setOrgId(org.id);
           req.setUserLoginMustBeDomain(this.domainData.userLoginMustBeDomain);
           req.setValidateOrgDomains(this.domainData.validateOrgDomains);
           req.setSmtpSenderAddressMatchesInstanceDomain(this.domainData.smtpSenderAddressMatchesInstanceDomain);
@@ -146,21 +144,28 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
         width: '400px',
       });
 
-      dialogRef.afterClosed().subscribe((resp) => {
-        if (resp) {
-          this.adminService
-            .resetCustomDomainPolicyToDefault(this.orgId())
-            .then(() => {
-              this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-              setTimeout(() => {
-                this.fetchData();
-              }, 1000);
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        }
-      });
+      dialogRef
+        .afterClosed()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(async (resp) => {
+          if (!resp) {
+            return;
+          }
+
+          try {
+            const org = await this.authService.getActiveOrg();
+            if (!org) {
+              console.log('No active organization found. Cannot reset domain policy.');
+              return;
+            }
+            await this.adminService.resetCustomDomainPolicyToDefault(org.id);
+            this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+            await new Promise((res) => setTimeout(res, 1000));
+            await this.fetchData();
+          } catch (error) {
+            this.toast.showError(error);
+          }
+        });
     }
   }
 

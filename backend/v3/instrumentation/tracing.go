@@ -2,6 +2,7 @@ package instrumentation
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -9,6 +10,7 @@ import (
 
 	google_trace "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -16,12 +18,13 @@ import (
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type TraceConfig struct {
-	Fraction float64
-	Exporter ExporterConfig
+	Fraction         float64
+	Exporter         ExporterConfig
+	TrustRemoteSpans bool
 }
 
 // TODO: remove for v5 release
@@ -118,10 +121,16 @@ func (s *Span) SetStatusByError(err error) {
 	}
 	if err != nil {
 		s.span.RecordError(err)
+		s.span.SetStatus(codes.Error, err.Error())
 	}
-
-	code, msg, id := gerrors.ExtractZITADELError(err)
-	s.span.SetAttributes(attribute.Int("grpc_code", int(code)), attribute.String("grpc_msg", msg), attribute.String("error_id", id))
+	var zerr *zerrors.ZitadelError
+	if errors.As(err, &zerr) {
+		s.span.SetAttributes(
+			attribute.Stringer("error_kind", zerr.Kind),
+			attribute.String("error_msg", zerr.Message),
+			attribute.String("error_id", zerr.ID),
+		)
+	}
 }
 
 func newTracerProvider(ctx context.Context, cfg TraceConfig, resource *resource.Resource) (_ *sdk_trace.TracerProvider, err error) {

@@ -9,6 +9,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
@@ -44,6 +45,7 @@ type FirstInstance struct {
 	externalSecure    bool
 	externalPort      uint16
 	domain            string
+	defaultPaths      *login.DefaultPaths
 }
 
 func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error {
@@ -93,8 +95,7 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 		0,
 		0,
 		nil,
-		nil,
-		nil,
+		mig.defaultPaths,
 	)
 	if err != nil {
 		return err

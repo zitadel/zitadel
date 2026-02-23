@@ -1,8 +1,6 @@
 module github.com/zitadel/zitadel
 
-go 1.24.0
-
-toolchain go1.24.7
+go 1.25
 
 require (
 	cloud.google.com/go/profiler v0.4.3
@@ -67,7 +65,6 @@ require (
 	github.com/muesli/gamut v0.3.1
 	github.com/muhlemmer/gu v0.3.1
 	github.com/muhlemmer/httpforwarded v0.1.0
-	github.com/muhlemmer/sloggcp v0.1.0
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/pashagolub/pgxmock/v4 v4.9.0
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
@@ -87,7 +84,7 @@ require (
 	github.com/samber/slog-multi v1.6.0
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/shopspring/decimal v1.4.0
-	github.com/sirupsen/logrus v1.9.3
+	github.com/sirupsen/logrus v1.9.4
 	github.com/sony/gobreaker/v2 v2.3.0
 	github.com/sony/sonyflake v1.3.0
 	github.com/spf13/cobra v1.10.1
@@ -99,11 +96,12 @@ require (
 	github.com/veqryn/slog-context v0.8.0
 	github.com/veqryn/slog-context/otel v0.8.0
 	github.com/zitadel/exifremove v0.1.0
-	github.com/zitadel/logging v0.6.2
+	github.com/zitadel/logging v0.7.0
 	github.com/zitadel/oidc/v3 v3.45.0
 	github.com/zitadel/passwap v0.10.0
 	github.com/zitadel/saml v0.4.1
 	github.com/zitadel/schema v1.3.1
+	github.com/zitadel/sloggcp v0.5.1
 	go.opentelemetry.io/contrib/bridges/otelslog v0.13.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.63.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0
@@ -130,7 +128,7 @@ require (
 	golang.org/x/net v0.47.0
 	golang.org/x/oauth2 v0.33.0
 	golang.org/x/sync v0.18.0
-	golang.org/x/sys v0.39.0
+	golang.org/x/sys v0.40.0
 	golang.org/x/text v0.31.0
 	google.golang.org/api v0.256.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20251202230838-ff82c1b0f217

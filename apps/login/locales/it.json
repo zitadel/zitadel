@@ -47,7 +47,7 @@
       "userNotFound": "Utente non trovato nel sistema",
       "couldNotCreateSession": "Impossibile creare la sessione per l'utente",
       "initialUserNotSupported": "Utente iniziale non supportato",
-      "usernamePasswordNotAllowed": "Nome utente e password non consentiti! Contatta l'amministratore per maggiori informazioni.",
+      "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni.",
       "passkeysNotAllowed": "Passkey non consentite! Contatta l'amministratore per maggiori informazioni.",
       "couldNotFindIdentityProvider": "Impossibile trovare il provider di identità.",
       "userNotActive": "L'utente non è attivo. Contatta l'amministratore per maggiori informazioni."
@@ -108,14 +108,17 @@
       "description": "Imposta la password per il tuo account",
       "submit": "Continua",
       "labels": {
+        "currentPassword": "Password attuale",
         "newPassword": "Nuova password",
         "confirmPassword": "Conferma password"
       },
       "required": {
+        "currentPassword": "Devi fornire la tua password attuale!",
         "newPassword": "Devi fornire una nuova password!",
         "confirmPassword": "Questo campo è obbligatorio"
       },
       "errors": {
+        "currentPasswordInvalid": "La password attuale non è corretta.",
         "couldNotChangePassword": "Impossibile modificare la password",
         "couldNotVerifyPassword": "Impossibile verificare la password",
         "unknownError": "Errore sconosciuto"
@@ -315,7 +318,7 @@
       "description": "Inserisci i tuoi dati per registrarti."
     },
     "title": "Registrati",
-    "description": "Crea il tuo account ZITADEL.",
+    "description": "Crea il tuo account Zitadel.",
     "noMethodAvailableWarning": "Nessun metodo di autenticazione disponibile. Contatta l'amministratore di sistema per assistenza.",
     "selectMethod": "Seleziona il metodo con cui desideri autenticarti",
     "agreeTo": "Per registrarti devi accettare i termini e le condizioni",

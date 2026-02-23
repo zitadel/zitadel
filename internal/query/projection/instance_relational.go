@@ -52,8 +52,8 @@ func (p *instanceRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceIAMProjectSet,
 				},
 				{
-					Event:  instance.ConsoleSetEventType,
-					Reduce: p.reduceConsoleSet,
+					Event:  instance.ManagementConsoleSetEventType,
+					Reduce: p.reduceManagementConsoleSet,
 				},
 				{
 					Event:  instance.DefaultLanguageSetEventType,
@@ -145,10 +145,10 @@ func (p *instanceRelationalProjection) reduceIAMProjectSet(event eventstore.Even
 	}), nil
 }
 
-func (p *instanceRelationalProjection) reduceConsoleSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.ConsoleSetEvent)
+func (p *instanceRelationalProjection) reduceManagementConsoleSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.ManagementConsoleSetEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ManagementConsoleSetEventType)
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -157,7 +157,7 @@ func (p *instanceRelationalProjection) reduceConsoleSet(event eventstore.Event) 
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.InstanceRepository()
-		return p.updateInstance(ctx, v3_sql.SQLTx(tx), event, repo, repo.SetConsoleClientID(e.ClientID), repo.SetConsoleAppID(e.AppID))
+		return p.updateInstance(ctx, v3_sql.SQLTx(tx), event, repo, repo.SetManagementConsoleClientID(e.ClientID), repo.SetManagementConsoleAppID(e.AppID))
 	}), nil
 }
 

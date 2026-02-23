@@ -13,16 +13,16 @@ import (
 const (
 	InstanceProjectionTable = "projections.instances"
 
-	InstanceColumnID              = "id"
-	InstanceColumnName            = "name"
-	InstanceColumnChangeDate      = "change_date"
-	InstanceColumnCreationDate    = "creation_date"
-	InstanceColumnDefaultOrgID    = "default_org_id"
-	InstanceColumnProjectID       = "iam_project_id"
-	InstanceColumnConsoleID       = "console_client_id"
-	InstanceColumnConsoleAppID    = "console_app_id"
-	InstanceColumnSequence        = "sequence"
-	InstanceColumnDefaultLanguage = "default_language"
+	InstanceColumnID                     = "id"
+	InstanceColumnName                   = "name"
+	InstanceColumnChangeDate             = "change_date"
+	InstanceColumnCreationDate           = "creation_date"
+	InstanceColumnDefaultOrgID           = "default_org_id"
+	InstanceColumnProjectID              = "iam_project_id"
+	InstanceColumnManagementConsoleID    = "console_client_id"
+	InstanceColumnManagementConsoleAppID = "console_app_id"
+	InstanceColumnSequence               = "sequence"
+	InstanceColumnDefaultLanguage        = "default_language"
 )
 
 type instanceProjection struct{}
@@ -44,8 +44,8 @@ func (*instanceProjection) Init() *old_handler.Check {
 			handler.NewColumn(InstanceColumnCreationDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(InstanceColumnDefaultOrgID, handler.ColumnTypeText, handler.Default("")),
 			handler.NewColumn(InstanceColumnProjectID, handler.ColumnTypeText, handler.Default("")),
-			handler.NewColumn(InstanceColumnConsoleID, handler.ColumnTypeText, handler.Default("")),
-			handler.NewColumn(InstanceColumnConsoleAppID, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(InstanceColumnManagementConsoleID, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(InstanceColumnManagementConsoleAppID, handler.ColumnTypeText, handler.Default("")),
 			handler.NewColumn(InstanceColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(InstanceColumnDefaultLanguage, handler.ColumnTypeText, handler.Default("")),
 		},
@@ -80,8 +80,8 @@ func (p *instanceProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceIAMProjectSet,
 				},
 				{
-					Event:  instance.ConsoleSetEventType,
-					Reduce: p.reduceConsoleSet,
+					Event:  instance.ManagementConsoleSetEventType,
+					Reduce: p.reduceManagementConsoleSet,
 				},
 				{
 					Event:  instance.DefaultLanguageSetEventType,
@@ -178,18 +178,18 @@ func (p *instanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *instanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.ConsoleSetEvent)
+func (p *instanceProjection) reduceManagementConsoleSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.ManagementConsoleSetEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ManagementConsoleSetEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
-			handler.NewCol(InstanceColumnConsoleID, e.ClientID),
-			handler.NewCol(InstanceColumnConsoleAppID, e.AppID),
+			handler.NewCol(InstanceColumnManagementConsoleID, e.ClientID),
+			handler.NewCol(InstanceColumnManagementConsoleAppID, e.AppID),
 		},
 		[]handler.Condition{
 			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),

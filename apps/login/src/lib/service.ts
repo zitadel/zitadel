@@ -23,11 +23,11 @@ export async function createServiceForHost<T extends ServiceClass>(service: T, s
   let token;
 
   // Determine authentication method based on available credentials
-  // Prefer system user JWT if available, fallback to service user token
+  // Prefer system user JWT if available, fallback to service account token
   if (hasSystemUserCredentials()) {
     token = await systemAPIToken();
   } else if (hasServiceUserToken()) {
-    // Use service user token authentication (self-hosted)
+    // Use service account token authentication (self-hosted)
     token = process.env.ZITADEL_SERVICE_USER_TOKEN;
   } else {
     throw new Error(

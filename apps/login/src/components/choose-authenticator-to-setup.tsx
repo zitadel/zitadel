@@ -21,7 +21,7 @@ export function ChooseAuthenticatorToSetup({ authMethods, params, loginSettings 
     return (
       <div className="grid w-full grid-cols-1 gap-5 pt-4">
         {!authMethods.includes(AuthenticationMethodType.PASSWORD) &&
-          loginSettings.allowUsernamePassword &&
+          loginSettings.allowLocalAuthentication &&
           PASSWORD(false, "/password/set?" + params)}
         {!authMethods.includes(AuthenticationMethodType.PASSKEY) &&
           loginSettings.passkeysType == PasskeysType.ALLOWED &&

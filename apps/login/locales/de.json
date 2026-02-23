@@ -47,7 +47,7 @@
       "userNotFound": "Benutzer im System nicht gefunden",
       "couldNotCreateSession": "Sitzung für Benutzer konnte nicht erstellt werden",
       "initialUserNotSupported": "Initialer Benutzer wird nicht unterstützt",
-      "usernamePasswordNotAllowed": "Benutzername und Passwort nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
       "passkeysNotAllowed": "Passkeys nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
       "couldNotFindIdentityProvider": "Identitätsanbieter konnte nicht gefunden werden.",
       "userNotActive": "Das Benutzerkonto ist inaktiv. Wenden Sie sich für weitere Informationen an Ihren Administrator."
@@ -108,14 +108,17 @@
       "description": "Legen Sie das Passwort für Ihr Konto fest",
       "submit": "Weiter",
       "labels": {
+        "currentPassword": "Aktuelles Passwort",
         "newPassword": "Neues Passwort",
         "confirmPassword": "Neues Passwort wiederholen"
       },
       "required": {
+        "currentPassword": "Bitte geben Sie Ihr aktuelles Passwort ein!",
         "newPassword": "Bitte geben Sie ein neues Passwort ein!",
         "confirmPassword": "Dieses Feld ist erforderlich"
       },
       "errors": {
+        "currentPasswordInvalid": "Das aktuelle Passwort ist falsch.",
         "couldNotChangePassword": "Passwort konnte nicht geändert werden",
         "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
         "unknownError": "Unbekannter Fehler"
@@ -315,7 +318,7 @@
       "description": "Einige Daten fehlen. Bitte überprüfen Sie Ihre Eingaben."
     },
     "title": "Registrieren",
-    "description": "Erstellen Sie Ihr ZITADEL-Konto.",
+    "description": "Erstellen Sie Ihr Zitadel-Konto.",
     "noMethodAvailableWarning": "Keine Authentifizierungsmethode verfügbar. Bitte wenden Sie sich an den Administrator.",
     "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
     "agreeTo": "Um sich zu registrieren, müssen Sie den Nutzungsbedingungen zustimmen",

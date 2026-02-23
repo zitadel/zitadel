@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	_ "embed"
 	"errors"
 	"io"
@@ -9,8 +10,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/admin"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/initialise"
@@ -45,7 +46,7 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.SetConfigType("yaml")
 	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
-	logging.OnError(err).Fatal("unable to read default config")
+	logging.OnError(context.Background(), err).Fatal("unable to read default config")
 
 	cobra.OnInitialize(initConfig)
 	cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
@@ -71,6 +72,6 @@ func initConfig() {
 	for _, file := range configFiles {
 		viper.SetConfigFile(file)
 		err := viper.MergeInConfig()
-		logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
+		logging.OnError(context.Background(), err).Warn("unable to read config file", "file", file)
 	}
 }

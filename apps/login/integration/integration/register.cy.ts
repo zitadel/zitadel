@@ -15,7 +15,7 @@ describe("register", () => {
         settings: {
           passkeysType: 1,
           allowRegister: true,
-          allowUsernamePassword: true,
+          allowLocalAuthentication: true,
           defaultRedirectUri: "",
         },
       },
