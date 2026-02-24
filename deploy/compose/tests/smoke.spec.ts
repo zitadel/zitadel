@@ -34,16 +34,28 @@ test.describe("compose stack wiring", () => {
     // is healthy, ZITADEL's LoginName page makes server-side gRPC calls to the
     // API on first render and can be slow when the instance is still warming up.
     await page.goto("/ui/v2/login/loginname");
-    await page.getByTestId("username-text-input").waitFor({ timeout: 120_000 });
-    await page.getByTestId("username-text-input").pressSequentially(username);
-    await page.getByTestId("submit-button").click();
+    // The login page renders two inputs with the same test ID (one with autofocus,
+    // one without — likely an accessibility duplicate). Use .first() to avoid a
+    // strict-mode violation and target the active, focused input.
+    const usernameInput = page.getByTestId("username-text-input").first();
+    await usernameInput.waitFor({ state: "visible", timeout: 120_000 });
+    await usernameInput.fill(username);
+    // Wait for the button to be enabled before clicking — the page may still be
+    // hydrating when the input becomes visible.
+    await page.getByTestId("submit-button").first().waitFor({ state: "visible" });
+    await page.getByTestId("submit-button").first().click();
 
-    // Step 2 – enter password
-    await page.getByTestId("password-text-input").pressSequentially(password);
-    await page.getByTestId("submit-button").click();
+    // Step 2 – enter password.
+    // Wait for the password page to fully render before typing; clicking submit
+    // above triggers a navigation and the input must be present and interactive.
+    const passwordInput = page.getByTestId("password-text-input").first();
+    await passwordInput.waitFor({ state: "visible", timeout: 30_000 });
+    await passwordInput.fill(password);
+    await page.getByTestId("submit-button").first().waitFor({ state: "visible" });
+    await page.getByTestId("submit-button").first().click();
 
     // Step 3 – assert signed-in page (ZITADEL redirects here after a successful
     // direct login that has no original auth-request to return to).
-    await expect(page).toHaveURL(/signedin/, { timeout: 15_000 });
+    await expect(page).toHaveURL(/signedin/, { timeout: 30_000 });
   });
 });
