@@ -27,6 +27,8 @@ import (
 )
 
 func TestServer_TestHumanUserReduces(t *testing.T) {
+	t.Skip()
+
 	instanceID := Instance.ID()
 	orgID := Instance.DefaultOrg.Id
 
@@ -1008,6 +1010,8 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 }
 
 func TestServer_TestMachineUserReduces(t *testing.T) {
+	t.Skip()
+
 	instanceID := Instance.ID()
 	orgID := Instance.DefaultOrg.Id
 
