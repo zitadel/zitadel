@@ -3,7 +3,7 @@
 ## Introduction
 
 At ZITADEL we are extremely grateful for security aware people who disclose vulnerabilities to us and the open source community.
-All reports will be investigated by our team and we will work with you closely to validate and fix vulnerabilities reported to us.
+All reports will be investigated by our team, and we will work with you closely to validate and fix vulnerabilities reported to us.
 
 We require that you keep vulnerabilities confidential until we are able to address them, since public disclosure of security vulnerabilities could put the ZITADEL community at risk.
 
@@ -32,7 +32,7 @@ To file an incident, please disclose it by e-mail to [security@zitadel.com](mail
 At the moment GPG encryption is no yet supported, however you may sign your message at will.
 
 Your email will be acknowledged within 48 hours.
-We will follow-up within the next 3 business days indicating next steps in handling your report.
+We will follow up within the next 3 business days indicating next steps in handling your report.
 
 If you haven't received a response within 48 hours, or you didn't get a reply from our security team within the last 5 days, please contact [support@zitadel.com](mailto:support@zitadel.com).
 
@@ -41,7 +41,7 @@ We will not publish this information by default to protect your privacy.
 
 ### When should I NOT report a vulnerability
 
-- Disclosure of known public files or directories, e.g. robots.txt, files under .well-known, or files that are included in our public repositories (eg, go.mod)
+- Disclosure of known public files or directories, e.g. robots.txt, files under .well-known, or files that are included in our public repositories (e.g. `go.mod`)
 - DoS of users when [Lockout Policy is enabled](https://zitadel.com/docs/guides/manage/console/default-settings#lockout)
 - You need help applying security related settings
 

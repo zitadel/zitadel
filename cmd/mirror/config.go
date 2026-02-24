@@ -94,6 +94,7 @@ func newConfig(v *viper.Viper, config any) error {
 			hooks.MapHTTPHeaderStringDecode,
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),

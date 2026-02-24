@@ -1,5 +1,6 @@
 ---
 title: Domain Discovery in ZITADEL
+description: "Enable automatic routing to the correct organization identity provider using domain-based discovery for multi-tenant login."
 sidebar_label: Domain Discovery
 ---
 
@@ -7,7 +8,7 @@ This guide should explain how domain discovery works and how to configure it in 
 
 ## Overview
 
-Domain discovery is typically used in [B2B](./b2b) or [SaaS](./saas) scenarios where you have users from different organizations and you want to route them according to their login methods, which could be a user name or, depending on your configuration, also an [email / phone number](./configurations#use-email-to-login).
+Domain discovery is typically used in [B2B](./b2b) or [SaaS](./saas) scenarios where you have users from different organizations and you want to route them according to their login methods, which could be a user name or, depending on your settings, also an [email / phone number](./configurations#use-email-to-login).
 
 ![](../../../public/img/guides/solution-scenarios/domain-discovery.png)
 
@@ -28,7 +29,7 @@ Follow this guide to configure your ZITADEL instance for this scenario.
 
 You will use the instance default settings for the login for the organization **CIAM**.
 When opening `login.mycompany.com` then the login policy of the instance will be applied.
-This means that you have to configure the [Login and Access](/guides/manage/console/default-settings#login-behavior-and-access) Policy and [Identity Providers](/guides/manage/console/default-settings#identity-providers) for the **CIAM** users on the instance itself.
+This means that you have to set up the [Login and Access](/guides/manage/console/default-settings#login-behavior-and-access) Policy and [Identity Providers](/guides/manage/console/default-settings#identity-providers) for the **CIAM** users on the instance itself.
 
 <Callout>
 You can also configure these settings on the default organization (see below) and send the scope `urn:zitadel:iam:org:id:{id}` with every [auth request](https://zitadel.com/playgrounds/oidc).
@@ -47,11 +48,11 @@ In the [Login Behavior and Security Settings](/guides/manage/console/default-set
 
 ### Configure login with email
 
-Follow this [configuration guide](/guides/solution-scenarios/configurations#use-email-to-login) to allow users to login with their email address.
+Follow this [settings guide](/guides/solution-scenarios/configurations#use-email-to-login) to allow users to login with their email address.
 
 ### Other considerations
 
-You can also have multiple Custom Domains pointing to the same instance as described in this [configuration guide](/guides/solution-scenarios/configurations#custom-application-domain-per-organization). In our example you could also use `alpha.mycompany.com` to show the login page of your instance.
+You can also have multiple Custom Domains pointing to the same instance as described in this [settings guide](/guides/solution-scenarios/configurations#custom-application-domain-per-organization). In our example you could also use `alpha.mycompany.com` to show the login page of your instance.
 
 The domain of your email notification can be changed by [setting up your SMTP](/guides/manage/console/default-settings#smtp).
 
@@ -64,14 +65,14 @@ Users of **Alpha** should only be allowed to authenticate with their company's i
 In the organization settings under Login Behavior and Access make sure the following settings are applied:
 
 - **Username Password allowed**: Disabled
-- **Register allowed**: Disabled - we will configure this on the external identity provider
+- **Register allowed**: Disabled - we will set this up on the external identity provider
 - **External IDP allowed**: Enabled
 
-Now you can configure an [external identity provider](/guides/manage/console/default-settings#identity-providers).
+Now you can set up an [external identity provider](/guides/manage/console/default-settings#identity-providers).
 
 <Callout>
-Given you have only one external identity provider configured, when a user tries to login on that organization, then the user will be automatically redirected to the external identity provider.
-In case multiple providers are configured, then the user will be prompted to select an identity provider.
+Given you have only one external identity provider set up, when a user tries to login on that organization, then the user will be automatically redirected to the external identity provider.
+In case multiple providers are set up, then the user will be prompted to select an identity provider.
 </Callout>
 
 ### Beta organization
@@ -88,7 +89,7 @@ Make sure to [Force MFA](/guides/manage/console/default-settings#multifactor-mfa
 
 ### Verify domains
 
-Switch to the organization **Alpha** and navigate to the settings and "Verified domains".
+Switch to the organization **Alpha** and navigate to the settings and "Organization Domains".
 Verify the domain alpha.com following the [organization guide](/guides/manage/console/organizations-overview#usernames-and-domains).
 
 Do the same for the **Beta** organization.

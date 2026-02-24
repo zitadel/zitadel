@@ -315,6 +315,8 @@ func TestUpdateIDPIntent(t *testing.T) {
 	err = idpIntentRepo.Create(t.Context(), tx, &intent2)
 	require.NoError(t, err)
 
+	userID := createHumanUser(t, tx, instanceID, orgID)
+
 	now := time.Now()
 	tomorrow := now.AddDate(0, 0, 1)
 	tt := []struct {
@@ -344,7 +346,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 				idpIntentRepo.SetIDPUser([]byte("update user")),
 				idpIntentRepo.SetIDPUserID("idp user id updated"),
 				idpIntentRepo.SetIDPUsername("idp username updated"),
-				idpIntentRepo.SetUserID("some-user-id"),
+				idpIntentRepo.SetUserID(userID),
 				idpIntentRepo.SetIDPAccessToken([]byte(`{"secret": "g1g4 s3cr3t 4cc3ss t0k3n"}`)),
 				idpIntentRepo.SetIDPIDToken("idp id token"),
 				idpIntentRepo.SetSucceededAt(now),
@@ -355,7 +357,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 				toReturn.IDPUser = []byte("update user")
 				toReturn.IDPUserID = "idp user id updated"
 				toReturn.IDPUsername = "idp username updated"
-				toReturn.UserID = "some-user-id"
+				toReturn.UserID = userID
 				toReturn.IDPAccessToken = []byte(`{"secret": "g1g4 s3cr3t 4cc3ss t0k3n"}`)
 				toReturn.IDPIDToken = "idp id token"
 				toReturn.SucceededAt = &now
@@ -373,7 +375,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 				idpIntentRepo.SetIDPUser([]byte("update user")),
 				idpIntentRepo.SetIDPUserID("idp user id updated"),
 				idpIntentRepo.SetIDPUsername("idp username updated"),
-				idpIntentRepo.SetUserID("some-user-id"),
+				idpIntentRepo.SetUserID(userID),
 				idpIntentRepo.SetAssertion([]byte(`{"assertion": "val1"}`)),
 				idpIntentRepo.SetSucceededAt(now),
 				idpIntentRepo.SetExpiresAt(tomorrow),
@@ -383,7 +385,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 				toReturn.IDPUser = []byte("update user")
 				toReturn.IDPUserID = "idp user id updated"
 				toReturn.IDPUsername = "idp username updated"
-				toReturn.UserID = "some-user-id"
+				toReturn.UserID = userID
 				toReturn.Assertion = []byte(`{"assertion": "val1"}`)
 				toReturn.SucceededAt = &now
 				toReturn.ExpiresAt = &tomorrow
@@ -400,7 +402,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 				idpIntentRepo.SetIDPUser([]byte("update user")),
 				idpIntentRepo.SetIDPUserID("idp user id updated"),
 				idpIntentRepo.SetIDPUsername("idp username updated"),
-				idpIntentRepo.SetUserID("some-user-id"),
+				idpIntentRepo.SetUserID(userID),
 				idpIntentRepo.SetIDPEntryAttributes(marshalledAttrs),
 				idpIntentRepo.SetSucceededAt(now),
 				idpIntentRepo.SetExpiresAt(tomorrow),
@@ -410,7 +412,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 				toReturn.IDPUser = []byte("update user")
 				toReturn.IDPUserID = "idp user id updated"
 				toReturn.IDPUsername = "idp username updated"
-				toReturn.UserID = "some-user-id"
+				toReturn.UserID = userID
 				toReturn.EntryAttributes = entryAttrs
 				toReturn.SucceededAt = &now
 				toReturn.ExpiresAt = &tomorrow

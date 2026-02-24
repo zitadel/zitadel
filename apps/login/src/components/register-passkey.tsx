@@ -21,9 +21,19 @@ type Props = {
   organization?: string;
   code?: string;
   codeId?: string;
+  loginName?: string;
 };
 
-export function RegisterPasskey({ sessionId, userId, isPrompt, organization, requestId, code, codeId }: Props) {
+export function RegisterPasskey({
+  sessionId,
+  userId,
+  isPrompt,
+  organization,
+  requestId,
+  code,
+  codeId,
+  loginName: initialLoginName,
+}: Props) {
   const { handleSubmit, formState } = useForm<Inputs>({
     mode: "onChange",
   });
@@ -155,7 +165,7 @@ export function RegisterPasskey({ sessionId, userId, isPrompt, organization, req
       return;
     }
 
-    continueAndLogin();
+    continueAndLogin(verificationResponse.loginName);
   }, [sessionId, userId, code]);
 
   // Auto-submit when code is provided (similar to VerifyForm)
@@ -165,7 +175,7 @@ export function RegisterPasskey({ sessionId, userId, isPrompt, organization, req
     }
   }, [code, submitRegisterAndContinue]);
 
-  function continueAndLogin() {
+  function continueAndLogin(loginName?: string) {
     const params = new URLSearchParams();
 
     if (organization) {
@@ -182,6 +192,10 @@ export function RegisterPasskey({ sessionId, userId, isPrompt, organization, req
 
     if (userId) {
       params.set("userId", userId);
+    }
+
+    if (loginName ?? initialLoginName) {
+      params.set("loginName", loginName ?? initialLoginName ?? "");
     }
 
     router.push("/passkey?" + params);

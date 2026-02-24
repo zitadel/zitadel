@@ -69,7 +69,9 @@ describe("checkSessionAndSetPassword", () => {
   let mockGetSession: any;
   let mockListAuthenticationMethodTypes: any;
   let mockGetLoginSettings: any;
-  let mockSetPassword: any; // Service account
+  let mockGetLockoutSettings: any;
+  let mockSetPassword: any;
+  let mockSetSessionAndUpdateCookie: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -77,7 +79,9 @@ describe("checkSessionAndSetPassword", () => {
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("../service-url");
     const { getSessionCookieById } = await import("../cookies");
-    const { getSession, listAuthenticationMethodTypes, getLoginSettings, setPassword } = await import("../zitadel");
+    const { getSession, listAuthenticationMethodTypes, getLoginSettings, getLockoutSettings, setPassword } =
+      await import("../zitadel");
+    const { setSessionAndUpdateCookie } = await import("./cookie");
 
     mockHeaders = vi.mocked(headers);
     mockGetServiceConfig = vi.mocked(getServiceConfig);
@@ -85,18 +89,20 @@ describe("checkSessionAndSetPassword", () => {
     mockGetSession = vi.mocked(getSession);
     mockListAuthenticationMethodTypes = vi.mocked(listAuthenticationMethodTypes);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
+    mockGetLockoutSettings = vi.mocked(getLockoutSettings);
     mockSetPassword = vi.mocked(setPassword);
+    mockSetSessionAndUpdateCookie = vi.mocked(setSessionAndUpdateCookie);
 
     mockHeaders.mockResolvedValue({});
     mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
 
     // Default session setup
-    mockGetSessionCookieById.mockResolvedValue({ id: "session123", token: "token123" });
+    mockGetSessionCookieById.mockResolvedValue({ id: "session123", token: "token123", organization: "org123" });
     mockGetSession.mockResolvedValue({
       session: {
         factors: {
           user: { id: "user123", organizationId: "org123" },
-          password: { verifiedAt: { seconds: Math.floor(Date.now() / 1000) } }, // Password verified recently
+          password: { verifiedAt: { seconds: Math.floor(Date.now() / 1000) } },
         },
       },
     });
@@ -106,110 +112,175 @@ describe("checkSessionAndSetPassword", () => {
       authMethodTypes: [AuthenticationMethodType.PASSWORD],
     });
 
-    // Default: No forced MFA
-    mockGetLoginSettings.mockResolvedValue({ forceMfa: false });
+    // Default: login settings with password check lifetime
+    mockGetLoginSettings.mockResolvedValue({
+      forceMfa: false,
+      passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
+    });
 
-    // Mock user service client
+    // Default: current password verification succeeds
+    mockSetSessionAndUpdateCookie.mockResolvedValue({});
 
     mockSetPassword.mockResolvedValue({});
   });
 
-  test("should use service account when no MFA is configured", async () => {
-    await checkSessionAndSetPassword({ sessionId: "session123", password: "newpassword" });
+  test("should verify current password and set new password", async () => {
+    await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "oldpassword",
+      password: "newpassword",
+    });
 
+    expect(mockSetSessionAndUpdateCookie).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recentCookie: expect.objectContaining({ id: "session123" }),
+      }),
+    );
     expect(mockSetPassword).toHaveBeenCalled();
   });
 
-  test("should use service account when MFA is configured but NOT verified in session", async () => {
-    // User has TOTP configured
-    mockListAuthenticationMethodTypes.mockResolvedValue({
-      authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.TOTP],
+  test("should return error when current password is incorrect", async () => {
+    mockSetSessionAndUpdateCookie.mockRejectedValue(new Error("invalid password"));
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "wrongpassword",
+      password: "newpassword",
     });
 
-    // Session only has password verified (no OTP)
-    const now = Math.floor(Date.now() / 1000);
-    mockGetSession.mockResolvedValue({
-      session: {
-        factors: {
-          user: { id: "user123", organizationId: "org123" },
-          password: { verifiedAt: { seconds: now - 60 } }, // Verified 1 minute ago
-          // otp missing
-        },
-      },
-    });
-
-    await checkSessionAndSetPassword({ sessionId: "session123", password: "newpassword" });
-
-    expect(mockSetPassword).toHaveBeenCalled();
-  });
-
-  test("should use service account when MFA is configured AND verified in session", async () => {
-    // User has TOTP configured
-    mockListAuthenticationMethodTypes.mockResolvedValue({
-      authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.TOTP],
-    });
-
-    // Session has both password and OTP verified
-    mockGetSession.mockResolvedValue({
-      session: {
-        factors: {
-          user: { id: "user123", organizationId: "org123" },
-          password: { verifiedAt: { seconds: Math.floor(Date.now() / 1000) } },
-          totp: { verifiedAt: { seconds: Math.floor(Date.now() / 1000) } }, // Verified
-        },
-      },
-    });
-
-    await checkSessionAndSetPassword({ sessionId: "session123", password: "newpassword" });
-
-    expect(mockSetPassword).toHaveBeenCalled();
-  });
-
-  test("should fail when MFA is configured but not verified, and password verification is too old", async () => {
-    // User has TOTP configured
-    mockListAuthenticationMethodTypes.mockResolvedValue({
-      authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.TOTP],
-    });
-
-    // Session has password verified 10 minutes ago (600 seconds)
-    const now = Math.floor(Date.now() / 1000);
-    mockGetSession.mockResolvedValue({
-      session: {
-        factors: {
-          user: { id: "user123", organizationId: "org123" },
-          password: { verifiedAt: { seconds: now - 600 } },
-          // otp missing
-        },
-      },
-    });
-
-    const result = await checkSessionAndSetPassword({ sessionId: "session123", password: "newpassword" });
-
-    expect(result).toEqual({ error: "errors.passwordVerificationTooOld" });
+    expect(result).toEqual({ error: "change.errors.currentPasswordInvalid" });
     expect(mockSetPassword).not.toHaveBeenCalled();
   });
 
-  test("should use service account when MFA is configured but not verified, and password verification is recent", async () => {
-    // User has TOTP configured
-    mockListAuthenticationMethodTypes.mockResolvedValue({
-      authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.TOTP],
+  test("should return generic error when current password is incorrect and ignoreUnknownUsernames is true", async () => {
+    mockGetLoginSettings.mockResolvedValue({
+      forceMfa: false,
+      passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
+      ignoreUnknownUsernames: true,
+    });
+    mockSetSessionAndUpdateCookie.mockRejectedValue(new Error("invalid password"));
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "wrongpassword",
+      password: "newpassword",
     });
 
-    // Session has password verified 1 minute ago (60 seconds)
-    const now = Math.floor(Date.now() / 1000);
+    expect(result).toEqual({ error: "change.errors.couldNotVerifyPassword" });
+    expect(mockSetPassword).not.toHaveBeenCalled();
+  });
+
+  test("should pass requestId from session cookie to setSessionAndUpdateCookie", async () => {
+    mockGetSessionCookieById.mockResolvedValue({
+      id: "session123",
+      token: "token123",
+      organization: "org123",
+      requestId: "oidc-request-456",
+    });
+
+    await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "oldpassword",
+      password: "newpassword",
+    });
+
+    expect(mockSetSessionAndUpdateCookie).toHaveBeenCalledWith(
+      expect.objectContaining({
+        requestId: "oidc-request-456",
+      }),
+    );
+  });
+
+  test("should return lockout error with attempt counts when failedAttempts error is thrown", async () => {
+    mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 3 });
+    mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(5) });
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "wrongpassword",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticate" });
+    expect(mockGetLockoutSettings).toHaveBeenCalled();
+    expect(mockSetPassword).not.toHaveBeenCalled();
+  });
+
+  test("should return generic error for failedAttempts when ignoreUnknownUsernames is true", async () => {
+    mockGetLoginSettings.mockResolvedValue({
+      forceMfa: false,
+      passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
+      ignoreUnknownUsernames: true,
+    });
+    mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 3 });
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "wrongpassword",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
+    expect(mockGetLockoutSettings).not.toHaveBeenCalled();
+    expect(mockSetPassword).not.toHaveBeenCalled();
+  });
+
+  test("should return error when session cookie not found", async () => {
+    mockGetSessionCookieById.mockResolvedValue(null);
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "oldpassword",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "Could not load session cookie" });
+    expect(mockSetSessionAndUpdateCookie).not.toHaveBeenCalled();
+    expect(mockSetPassword).not.toHaveBeenCalled();
+  });
+
+  test("should return error when session has no user", async () => {
     mockGetSession.mockResolvedValue({
-      session: {
-        factors: {
-          user: { id: "user123", organizationId: "org123" },
-          password: { verifiedAt: { seconds: now - 60 } },
-          // otp missing
-        },
-      },
+      session: { factors: {} },
     });
 
-    await checkSessionAndSetPassword({ sessionId: "session123", password: "newpassword" });
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "oldpassword",
+      password: "newpassword",
+    });
 
+    expect(result).toEqual({ error: "errors.couldNotLoadSession" });
+    expect(mockSetPassword).not.toHaveBeenCalled();
+  });
+
+  test("should use default lifetime when login settings have no passwordCheckLifetime", async () => {
+    mockGetLoginSettings.mockResolvedValue({ forceMfa: false });
+
+    await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "oldpassword",
+      password: "newpassword",
+    });
+
+    expect(mockSetSessionAndUpdateCookie).toHaveBeenCalledWith(
+      expect.objectContaining({
+        lifetime: expect.objectContaining({ seconds: BigInt(60 * 60 * 24) }),
+      }),
+    );
     expect(mockSetPassword).toHaveBeenCalled();
+  });
+
+  test("should handle setPassword failure with failed precondition", async () => {
+    mockSetPassword.mockRejectedValue({ code: 9, message: "User is not yet initialized" });
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "oldpassword",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "errors.failedPrecondition" });
   });
 });
 

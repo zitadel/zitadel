@@ -106,6 +106,7 @@ export function SetRegisterPasswordForm({
             <TextInput
               type="password"
               autoComplete="new-password"
+              autoFocus
               required
               {...register("password", {
                 required: t("password.required.password"),

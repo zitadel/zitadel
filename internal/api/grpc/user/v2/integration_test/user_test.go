@@ -3358,7 +3358,7 @@ func TestServer_CreateUser(t *testing.T) {
 			},
 		},
 		{
-			name: "machine user",
+			name: "service account",
 			testCase: func(runId string) testCase {
 				username := fmt.Sprintf("donald.duck+%s", runId)
 				return testCase{
@@ -3577,7 +3577,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 			}
 		},
 	}, {
-		name: "machine username given",
+		name: "service accountname given",
 		testCase: func(runId string) testCase {
 			username := fmt.Sprintf("donald.duck+%s", runId)
 			return testCase{
@@ -3599,7 +3599,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 			}
 		},
 	}, {
-		name: "machine username default to generated id",
+		name: "service accountname default to generated id",
 		testCase: func(runId string) testCase {
 			return testCase{
 				args: args{
@@ -3619,7 +3619,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 			}
 		},
 	}, {
-		name: "machine username default to given id",
+		name: "service accountname default to given id",
 		testCase: func(runId string) testCase {
 			return testCase{
 				args: args{
@@ -3636,6 +3636,28 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 				},
 				assert: func(t *testing.T, createResponse *user.CreateUserResponse, getResponse *user.GetUserByIDResponse) {
 					assert.Equal(t, runId, getResponse.GetUser().GetUsername())
+				},
+			}
+		},
+	}, {
+		name: "machine access token type jwt",
+		testCase: func(runId string) testCase {
+			return testCase{
+				args: args{
+					ctx: OrgCTX,
+					req: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserId:         &runId,
+						UserType: &user.CreateUserRequest_Machine_{
+							Machine: &user.CreateUserRequest_Machine{
+								Name:            "donald",
+								AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+							},
+						},
+					},
+				},
+				assert: func(t *testing.T, createResponse *user.CreateUserResponse, getResponse *user.GetUserByIDResponse) {
+					assert.Equal(t, user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT, getResponse.GetUser().GetMachine().GetAccessTokenType())
 				},
 			}
 		},
@@ -3795,7 +3817,7 @@ func TestServer_CreateUser_Permission(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "machine user, error",
+			name: "service account, error",
 			args: args{
 				UserCTX,
 				&user.CreateUserRequest{
@@ -4150,7 +4172,7 @@ func TestServer_UpdateUserTypeMachine(t *testing.T) {
 			},
 		},
 		{
-			name: "update machine user with human fields, error",
+			name: "update service account with human fields, error",
 			testCase: func(runId, userId string) testCase {
 				return testCase{
 					args: args{
@@ -4280,7 +4302,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 			}
 		},
 	}, {
-		name: "machine username",
+		name: "service accountname",
 		testCase: func(runId string) testCase {
 			username := fmt.Sprintf("donald.duck+%s", runId)
 			return testCase{
@@ -4305,6 +4327,35 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 				},
 				assert: func(t *testing.T, getResponse *user.GetUserByIDResponse) {
 					assert.Equal(t, username, getResponse.GetUser().GetUsername())
+				},
+			}
+		},
+	}, {
+		name: "machine accessTokenType",
+		testCase: func(runId string) testCase {
+			return testCase{
+				args: args{
+					ctx: OrgCTX,
+					create: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserId:         &runId,
+						UserType: &user.CreateUserRequest_Machine_{
+							Machine: &user.CreateUserRequest_Machine{
+								Name: "Donald",
+							},
+						},
+					},
+					update: &user.UpdateUserRequest{
+						UserId: runId,
+						UserType: &user.UpdateUserRequest_Machine_{
+							Machine: &user.UpdateUserRequest_Machine{
+								AccessTokenType: gu.Ptr(user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT),
+							},
+						},
+					},
+				},
+				assert: func(t *testing.T, getResponse *user.GetUserByIDResponse) {
+					assert.Equal(t, user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT, getResponse.GetUser().GetMachine().GetAccessTokenType())
 				},
 			}
 		},
@@ -4493,7 +4544,7 @@ func TestServer_UpdateUser_Permission(t *testing.T) {
 			},
 		},
 		{
-			name: "machine user, error",
+			name: "service account, error",
 			testCase: func() testCase {
 				return testCase{
 					args: args{

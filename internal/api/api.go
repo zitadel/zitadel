@@ -239,16 +239,16 @@ func (a *API) HandleFunc(path string, f http.HandlerFunc) {
 	a.router.HandleFunc(path, f)
 }
 
-// RegisterHandlerOnPrefix registers a http handler on a path prefix
-// the prefix will not be passed to the actual handler
+// RegisterHandlerOnPrefix registers an http handler on a path prefix.
+// The prefix will not be passed to the actual handler.
 func (a *API) RegisterHandlerOnPrefix(prefix string, handler http.Handler) {
 	prefix = strings.TrimSuffix(prefix, "/")
 	subRouter := a.router.PathPrefix(prefix).Name(prefix).Subrouter()
 	subRouter.PathPrefix("").Handler(http.StripPrefix(prefix, handler))
 }
 
-// RegisterHandlerPrefixes registers a http handler on a multiple path prefixes
-// the prefix will remain when calling the actual handler
+// RegisterHandlerPrefixes registers an http handler on multiple path prefixes.
+// The prefix will remain when calling the actual handler.
 func (a *API) RegisterHandlerPrefixes(handler http.Handler, prefixes ...string) {
 	for _, prefix := range prefixes {
 		prefix = strings.TrimSuffix(prefix, "/")

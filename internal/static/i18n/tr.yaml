@@ -223,7 +223,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Challenge içeren dosya beklenen URL'de bulunamadı. Dosyayı okuma izinleriyle doğru yere yüklediğinizden emin olun"
     DomainVerificationHTTPNoMatch: "Challenge içeren dosya beklenen URL'de bulundu ancak doğru token metnini içermiyor. İçeriğini kontrol edin"
     DomainVerificationTimeout: "DNS sunucusunu sorgularken zaman aşımı oluştu"
-    PrimaryDomainNotDeletable: "Birincil domain silinmemeli"
+    PrimaryDomainNotDeletable: "Organizasyon alan adı silinmemeli"
     DomainNotFound: "Domain bulunamadı"
     MemberIDMissing: "Üye ID eksik"
     MemberNotFound: "Organizasyon üyesi bulunamadı"
@@ -897,7 +897,7 @@ EventTypes:
       verified: "Domain doğrulandı"
       removed: "Domain kaldırıldı"
       primary:
-        set: "Birincil domain ayarlandı"
+        set: "Organizasyon alan adı ayarlandı"
       reserved: "Domain rezerve edildi"
       released: "Domain serbest bırakıldı"
     name:

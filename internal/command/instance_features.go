@@ -56,16 +56,11 @@ func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures)
 	return pushedEventsToObjectDetails(events), nil
 }
 
-func prepareSetFeatures(instanceID string, f *InstanceSetupFeatures) preparation.Validation {
+func prepareSetFeatures(instanceID string, f *InstanceFeatures) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		features, err := f.ToInstanceFeatures()
-		if err != nil {
-			return nil, err
-		}
-
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			wm := NewInstanceFeaturesWriteModel(instanceID)
-			return wm.setCommands(ctx, features), nil
+			return wm.setCommands(ctx, f), nil
 		}, nil
 	}
 }

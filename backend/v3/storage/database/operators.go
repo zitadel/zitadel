@@ -31,7 +31,7 @@ func (b wrappedValue[V]) WriteArg(builder *StatementBuilder) {
 var _ argWriter = (*wrappedValue[string])(nil)
 
 type Value interface {
-	Boolean | Number | Text | Instruction | Bytes
+	Boolean | Number | Text | Instruction | Bytes | any
 }
 
 //go:generate enumer -type NumberOperation,TextOperation,BytesOperation -linecomment -output ./operators_enumer.go

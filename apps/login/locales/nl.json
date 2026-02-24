@@ -108,14 +108,17 @@
       "description": "Stel het wachtwoord voor jouw account in",
       "submit": "Verder",
       "labels": {
+        "currentPassword": "Huidig wachtwoord",
         "newPassword": "Nieuw wachtwoord",
         "confirmPassword": "Bevestig wachtwoord"
       },
       "required": {
+        "currentPassword": "Je moet je huidige wachtwoord opgeven!",
         "newPassword": "Je moet een nieuw wachtwoord opgeven!",
         "confirmPassword": "Dit veld is verplicht"
       },
       "errors": {
+        "currentPasswordInvalid": "Het huidige wachtwoord is onjuist.",
         "couldNotChangePassword": "Kon wachtwoord niet wijzigen",
         "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
         "unknownError": "Onbekende fout"
