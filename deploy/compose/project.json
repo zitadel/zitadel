@@ -9,11 +9,11 @@
                 "cwd": "{projectRoot}",
                 "parallel": false,
                 "commands": [
-                    "docker compose --env-file .env.example -f docker-compose.yml config > /dev/null",
-                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-letsencrypt.yml config > /dev/null",
-                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-external-tls.yml config > /dev/null",
-                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-local-tls.yml config > /dev/null",
-                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.prodlike.yml config > /dev/null"
+                    "docker compose --env-file .env.example -f docker-compose.yml config --quiet",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-letsencrypt.yml config --quiet",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-external-tls.yml config --quiet",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-local-tls.yml config --quiet",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.prodlike.yml config --quiet"
                 ]
             },
             "inputs": [
