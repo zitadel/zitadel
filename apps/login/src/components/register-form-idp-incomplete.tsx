@@ -1,7 +1,7 @@
 "use client";
 
 import { registerUserAndLinkToIDP } from "@/lib/server/register";
-import { handleServerActionResponse } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
