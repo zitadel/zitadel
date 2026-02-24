@@ -14,19 +14,18 @@ This guide takes you from zero to a running ZITADEL instance in minutes and then
 ## Prerequisites
 
 - Docker Engine 24+ with the Compose plugin (`docker compose`)
-- `curl` (for the quickstart download)
 - A machine with at least 2 GB RAM
 
 ## Stage 1 — Quickstart (2 minutes)
 
-Download the deployment pack, copy the example config, and start:
+Download the two required files, copy the example config, and start:
 
 ```shell
-# Download the compose pack from the main branch.
-# The tar prefix (zitadel-main/) matches the branch name in the URL.
-curl -L https://github.com/zitadel/zitadel/archive/refs/heads/main.tar.gz \
-  | tar xz --strip-components=2 zitadel-main/deploy/compose
-cd compose
+mkdir zitadel-compose && cd zitadel-compose
+
+# Download the compose file and example environment
+curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/docker-compose.yml &&
+curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/.env.example
 
 # Create your environment file and start
 cp .env.example .env
@@ -72,6 +71,13 @@ Other TLS options:
 | Let's Encrypt | `docker-compose.mode-letsencrypt.yml` | Public domain, automatic certs |
 | External TLS | `docker-compose.mode-external-tls.yml` | Behind a load balancer, CDN, or WAF that terminates TLS |
 | Local TLS | `docker-compose.mode-local-tls.yml` | Self-signed certs for LAN-only access |
+
+**For Stage 2** (TLS overlays), users download the specific overlay they need the same way:
+
+```shell
+# Example: download the Let's Encrypt overlay
+curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/docker-compose.mode-letsencrypt.yml
+```
 
 ### Harden secrets
 
