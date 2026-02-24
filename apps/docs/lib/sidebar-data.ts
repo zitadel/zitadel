@@ -857,6 +857,8 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "self-hosting/manage/cache",
         ],
       },
+
+      "guides/manage/production-checklist",
     ],
   },
   {

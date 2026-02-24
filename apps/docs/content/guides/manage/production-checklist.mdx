@@ -1,0 +1,45 @@
+---
+title: ZITADEL Cloud Production Checklist
+description: Ensure your ZITADEL Cloud instance is production-ready. Our checklist covers custom domains, SMTP configuration, security hardening, and OIDC best practices for reliable IAM scaling.
+sidebar_label: Production Checklist
+keywords: [Go-Live, Production Checklist, IAM Security]
+---
+
+This checklist is specifically designed for teams deploying on **ZITADEL Cloud**.
+Following these steps ensures your managed instance is resilient, branded and recovery-ready.
+
+<Callout>
+    **Self-Hosting ZITADEL**
+    If you are managing your own infrastructure this list does not cover host-level concerns like database maintenance, high availability, or TLS termination.
+    Please refer to our [Self-Hosting Production Guide](/self-hosting/manage/productionchecklist) for infrastructure-specific requirements.
+</Callout>
+
+### Infrastructure
+
+Prioritize environment isolation to prevent development testing from impacting live users.
+
+- [ ] **Multi-Instance Isolation**: Never test configurations in production. Use the [ZITADEL Customer Portal](https://zitadel.com/admin/dashboard) to spin up dedicated instances for dev, test, and prod.
+- [ ] **Custom Domain Implementation**: Configure a custom domain (e.g., auth.yourdomain.com) to ensure brand consistency and avoid problems with domain bound authentication methods such as passkey.
+- [ ] **Production SMTP Server**: Replace the default ZITADEL Email Provider with your own [SMTP Provider](/guides/manage/console/default-settings#smtp) (SendGrid, Postmark, Google, Microsoft, etc) for reliable delivery of MFA codes and welcome emails.
+- [ ] **Verified Sender Identity**: Ensure the "From" address matches your custom domain and has valid SPF/DKIM/DMARC records to prevent emails from landing in spam.
+
+### Account Lockout & Access Lost Prevention
+
+Eliminate Single Points of Failure (SPOF) for administrative access.
+
+- [ ] **Secondary Administrator**: Invite at least one other trusted team member as [Customer Portal Administrator](https://zitadel.com/admin/users) and as an IAM Owner into your specific ZITADEL instances
+  - **Why**: This prevents a single point of failure. If your primary account (e.g., via a lost Passkey or MFA device) is locked, the secondary admin can restore your access.
+- [ ] **Diverse MFA Methods**: Ensure your administrators enroll multiple MFA methods (e.g., one on a YubiKey, one on an Authenticator app) to maximize recovery options.
+- [ ] **Backup Service Account**: Create a dedicated Service Account with a PAT and with administrative roles (IAM_OWNER).
+  - **Why**: If a misconfigured "Action" or a CSS error breaks the Management Console UI, you can still revert changes or manage the instance directly via the ZITADEL Management API using this PAT.
+
+
+### ZITADEL Setup and Configuration
+
+Finalize the user experience and security policies before going live.
+
+- [ ] **Branding**: Apply your logo, colors, fonts for your [Custom Branding](/guides/manage/customize/branding) if required
+- [ ] **SMS Provider**: Set up a valid [SMS Service](/guides/manage/console/default-settings#sms) such as Twilio if needed
+- [ ] **Terms of Service & Privacy Links**: Set your privacy policy, terms of service and a help Link if needed
+- [ ] **Security Policy Audit**: Review your Login Policy and Password Complexity settings.
+- [ ] **Token & Session Lifetimes**: Audit your [OIDC Token settings](/guides/manage/console/default-settings#oidc-token-lifetimes-and-expiration) to ensure they match your application's security needs.
