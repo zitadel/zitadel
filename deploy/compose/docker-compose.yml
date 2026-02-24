@@ -103,16 +103,8 @@ services:
       - traefik.http.middlewares.zitadel-strip-api.stripprefix.prefixes=/api
       - traefik.http.middlewares.zitadel-strip-api.stripprefix.forceSlash=false
 
-      - traefik.http.routers.zitadel-grpc-web.rule=Host(`${ZITADEL_DOMAIN}`) && HeadersRegexp(`Content-Type`, `^application/grpc.*`)
-      - traefik.http.routers.zitadel-grpc-web.entrypoints=web
-      - traefik.http.routers.zitadel-grpc-web.service=zitadel-api
-      - traefik.http.routers.zitadel-grpc-web.priority=300
-
-      - traefik.http.routers.zitadel-grpc-websecure.rule=Host(`${ZITADEL_DOMAIN}`) && HeadersRegexp(`Content-Type`, `^application/grpc.*`)
-      - traefik.http.routers.zitadel-grpc-websecure.entrypoints=websecure
-      - traefik.http.routers.zitadel-grpc-websecure.tls=true
-      - traefik.http.routers.zitadel-grpc-websecure.service=zitadel-api
-      - traefik.http.routers.zitadel-grpc-websecure.priority=300
+      # Note: no dedicated gRPC router needed. All gRPC and Connect-RPC traffic
+      # is handled by the catch-all router below since the backend already uses h2c.
 
       - traefik.http.routers.zitadel-api-alias-web.rule=Host(`${ZITADEL_DOMAIN}`) && PathPrefix(`/api`)
       - traefik.http.routers.zitadel-api-alias-web.entrypoints=web

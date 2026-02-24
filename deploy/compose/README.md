@@ -48,10 +48,11 @@ Traefik routes all traffic for `${ZITADEL_DOMAIN}` via Docker labels:
 | Priority | Rule | Target | Middleware |
 |----------|------|--------|------------|
 | 400 | `Path(/)` | `zitadel-login` | `replacepath=/ui/v2/login/` |
-| 300 | `HeadersRegexp(Content-Type, ^application/grpc.*)` | `zitadel-api` (h2c) | — |
 | 250 | `PathPrefix(/ui/v2/login)` | `zitadel-login` | — |
 | 200 | `PathPrefix(/api)` | `zitadel-api` | `stripprefix=/api` |
-| 100 | Everything else (canonical ZITADEL paths) | `zitadel-api` | — |
+| 100 | Everything else (OIDC, SAML, gRPC, gRPC-web, API v2 REST, ...) | `zitadel-api` (h2c) | — |
+
+No dedicated gRPC router is needed: Traefik's h2c backend scheme forwards gRPC and gRPC-web transparently. API v2 is served as REST/JSON via the gRPC-gateway at `/v2/...` paths.
 
 Both `web` (HTTP) and `websecure` (HTTPS) entrypoints have identical router sets.
 
@@ -59,7 +60,7 @@ Both `web` (HTTP) and `websecure` (HTTPS) entrypoints have identical router sets
 
 - `/api` alias exists for DX — tools can use `https://auth.example.com/api/...`
 - Canonical paths (e.g., `/.well-known/openid-configuration`, `/oauth/v2/...`) must remain at root for OIDC/SAML protocol compliance
-- gRPC uses `Content-Type` header matching because gRPC clients send to the root path (not a `/grpc` prefix)
+- gRPC, gRPC-web, and REST all share the catch-all router — no separate gRPC router is needed because the `h2c` backend scheme makes Traefik forward all protocols transparently over HTTP/2
 
 ## External Settings Invariant
 
@@ -73,9 +74,9 @@ Local NX targets for testing the compose stack:
 |--------|-------------|------------------|
 | `test-config` | Validates all overlay combinations parse with `docker compose config` | No (just the CLI) |
 | `test-run` | Builds local images (`@zitadel/api:pack` + `@zitadel/login:pack`), starts the stack with `docker compose up --wait` | Yes |
-| `test-e2e` | Runs the Playwright login smoke test against `localhost:8080` through Traefik | Yes (stack must be running) |
+| `test-e2e` | Runs the full Playwright suite (`wiring.spec.ts` + `smoke.spec.ts`) against `localhost:8080` through Traefik: per-service wiring checks (login, console, OIDC, SAML, API v1 REST, gRPC h2c, gRPC-web, API v2 REST HTTP/1.1 + HTTP/2) and the browser login flow | Yes (stack must be running) |
 | `test` | Lightweight — delegates to `test-config` only. Safe for `nx affected` | No |
-| `test-full` | Full pipeline: `test-config` → `test-run` → curl smoke tests (4 endpoints through Traefik) → Playwright → teardown | Yes |
+| `test-full` | Full pipeline: `test-config` → `test-run` → Playwright wiring + browser tests → teardown | Yes |
 | `stop` | Tears down the `zitadel-compose-test` stack and removes volumes | Yes |
 | `test-login-acceptance` | Extracts admin PAT, runs setup script, delegates to `@zitadel/login:test-acceptance` | Yes (stack must be running) |
 
@@ -85,6 +86,7 @@ Local NX targets for testing the compose stack:
 |-------------|-------------|
 | Strict `/api`-only rewrite | Breaks canonical protocol paths (OIDC, SAML) |
 | `/grpc` path-prefix routing | gRPC clients/tools don't use path prefixes |
+| Dedicated gRPC router (`HeaderRegexp(Content-Type, ^application/grpc.*)`) | Redundant: h2c backend handles gRPC, gRPC-web, and Connect-RPC natively; the catch-all covers all three |
 | Single container (API + Login) | Not aligned with v4 architecture; Login is a separate Next.js process |
 | Merged TLS configs | Each TLS mode must remain independently composable |
 | `network_mode: service:` for Login | Fragile, port conflicts, doesn't work with Traefik routing |
