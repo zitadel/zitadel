@@ -288,11 +288,11 @@ const v2Permutations: ApiPermutation[] = [
 // Tests — service-level reachability (non-API)
 // ---------------------------------------------------------------------------
 
-// The base URL comes from playwright.config.ts (PROXY_HTTP_PUBLISHED_PORT, default 8080).
+// The base URL comes from playwright.config.ts (PROXY_HTTP_PUBLISHED_PORT, default 8888).
 // We resolve it here so h2Post()/h2Get() can connect to the same host.
 const BASE =
   process.env.PLAYWRIGHT_BASE_URL ??
-  `http://localhost:${process.env.PROXY_HTTP_PUBLISHED_PORT ?? "8080"}`;
+  `http://localhost:${process.env.PROXY_HTTP_PUBLISHED_PORT ?? "8888"}`;
 
 test.describe("traefik routing", () => {
   test("GET / → redirects to /ui/v2/login/", async ({ request }) => {

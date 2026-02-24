@@ -40,7 +40,7 @@
             }
         },
         "test-e2e": {
-            "description": "Runs the Playwright test suite (wiring.spec.ts + smoke.spec.ts) against the running compose stack via localhost:8080 through Traefik. Covers login, console, OIDC, SAML, API v1 REST, gRPC h2c, gRPC-web, API v2 REST (gRPC-gateway JSON) HTTP/1.1 and HTTP/2. Run 'pnpm exec playwright install chromium' once before using this target.",
+            "description": "Runs the Playwright test suite (wiring.spec.ts + smoke.spec.ts) against the running compose stack via localhost:8888 through Traefik. Covers login, console, OIDC, SAML, API v1 REST, gRPC h2c, gRPC-web, API v2 REST (gRPC-gateway JSON) HTTP/1.1 and HTTP/2. Run 'pnpm exec playwright install chromium' once before using this target.",
             "executor": "nx:run-commands",
             "options": {
                 "cwd": "{projectRoot}",

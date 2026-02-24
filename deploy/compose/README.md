@@ -74,7 +74,7 @@ Local NX targets for testing the compose stack:
 |--------|-------------|------------------|
 | `test-config` | Validates all overlay combinations parse with `docker compose config` | No (just the CLI) |
 | `test-run` | Builds local images (`@zitadel/api:pack` + `@zitadel/login:pack`), starts the stack with `docker compose up --wait` | Yes |
-| `test-e2e` | Runs the full Playwright suite (`wiring.spec.ts` + `smoke.spec.ts`) against `localhost:8080` through Traefik: per-service wiring checks (login, console, OIDC, SAML, API v1 REST, gRPC h2c, gRPC-web, API v2 REST HTTP/1.1 + HTTP/2) and the browser login flow | Yes (stack must be running) |
+| `test-e2e` | Runs the full Playwright suite (`wiring.spec.ts` + `smoke.spec.ts`) against `localhost:8888` through Traefik: per-service wiring checks (login, console, OIDC, SAML, API v1 REST, gRPC h2c, gRPC-web, API v2 REST HTTP/1.1 + HTTP/2) and the browser login flow | Yes (stack must be running) |
 | `test` | Lightweight — delegates to `test-config` only. Safe for `nx affected` | No |
 | `test-full` | Full pipeline: `test-config` → `test-run` → Playwright wiring + browser tests → teardown | Yes |
 | `stop` | Tears down the `zitadel-compose-test` stack and removes volumes | Yes |

@@ -5,7 +5,7 @@
  * These are INFRASTRUCTURE tests, not login-feature tests.
  * They answer: "does the compose stack work end-to-end?"
  *
- * Test path:  browser → Traefik (port 8080) → zitadel-login → zitadel-api → postgres
+ * Test path:  browser → Traefik (port 8888) → zitadel-login → zitadel-api → postgres
  * A single successful login proves every link in that chain is functioning.
  *
  * For feature-level login tests (MFA, OIDC flows, IdP, etc.) see:

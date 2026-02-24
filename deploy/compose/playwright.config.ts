@@ -15,7 +15,8 @@ export default defineConfig({
     // All navigation goes through Traefik on the published port.
     baseURL:
       process.env.PLAYWRIGHT_BASE_URL ??
-      `http://localhost:${process.env.PROXY_HTTP_PUBLISHED_PORT ?? "8080"}`,
+      `http://localhost:${process.env.PROXY_HTTP_PUBLISHED_PORT ?? "8888"}`,
+
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
