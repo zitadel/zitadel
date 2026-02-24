@@ -69,10 +69,10 @@ type IdentityProvider struct {
 	AllowAutoUpdate   bool                 `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
 	AllowLinking      bool                 `json:"allowLinking,omitempty" db:"allow_linking"`
 	AutoLinkingField  *IDPAutoLinkingField `json:"autoLinkingField,omitempty" db:"auto_linking_field"`
-	StylingType       *int16               `json:"stylingType,omitempty" db:"styling_type"`
-	Payload           json.RawMessage      `json:"payload,omitempty" db:"payload"`
-	CreatedAt         time.Time            `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt         time.Time            `json:"updatedAt,omitzero" db:"updated_at"`
+	// StylingType       *int16               `json:"stylingType,omitempty" db:"styling_type"`
+	Payload   json.RawMessage `json:"payload,omitempty" db:"payload"`
+	CreatedAt time.Time       `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt time.Time       `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type OIDC struct {
@@ -289,7 +289,6 @@ type idProviderColumns interface {
 	AllowAutoUpdateColumn() database.Column
 	AllowLinkingColumn() database.Column
 	AllowAutoLinkingColumn() database.Column
-	StylingTypeColumn() database.Column
 	PayloadColumn() database.Column
 	CreatedAtColumn() database.Column
 	UpdatedAtColumn() database.Column
@@ -310,7 +309,6 @@ type idProviderConditions interface {
 	AllowAutoUpdateCondition(allow bool) database.Condition
 	AllowLinkingCondition(allow bool) database.Condition
 	AllowAutoLinkingCondition(linkingType IDPAutoLinkingField) database.Condition
-	StylingTypeCondition(style int16) database.Condition
 	PayloadCondition(payload string) database.Condition
 }
 
@@ -323,7 +321,6 @@ type idProviderChanges interface {
 	SetAllowAutoUpdate(allow bool) database.Change
 	SetAllowLinking(allow bool) database.Change
 	SetAutoAllowLinking(allow bool) database.Change
-	SetStylingType(stylingType int16) database.Change
 	SetPayload(payload string) database.Change
 	SetUpdatedAt(createdAt *time.Time) database.Change
 }

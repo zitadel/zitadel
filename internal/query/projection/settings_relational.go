@@ -21,364 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const (
-	SettingsRelationalProjectionTable = "zitadel.settings"
-)
-
-type settingsRelationalProjection struct{}
-
-func newSettingsRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(settingsRelationalProjection))
-}
-
-func (*settingsRelationalProjection) Name() string {
-	return SettingsRelationalProjectionTable
-}
-
-func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: org.AggregateType,
-			EventReducers: []handler.EventReducer{
-				// 		// Login
-				{
-					Event:  org.LoginPolicyAddedEventType,
-					Reduce: s.reduceLoginPolicyAdded,
-				},
-				{
-					Event:  org.LoginPolicyChangedEventType,
-					Reduce: s.reduceLoginPolicyChanged,
-				},
-				{
-					Event:  org.LoginPolicyRemovedEventType,
-					Reduce: s.reduceLoginPolicyRemoved,
-				},
-				{
-					Event:  org.LoginPolicyMultiFactorAddedEventType,
-					Reduce: s.reduceMFAAdded,
-				},
-				{
-					Event:  org.LoginPolicyMultiFactorRemovedEventType,
-					Reduce: s.reduceMFARemoved,
-				},
-				{
-					Event:  org.LoginPolicySecondFactorAddedEventType,
-					Reduce: s.reduceSecondFactorAdded,
-				},
-				{
-					Event:  org.LoginPolicySecondFactorRemovedEventType,
-					Reduce: s.reduceSecondFactorRemoved,
-				},
-				// label
-				{
-					Event:  org.LabelPolicyAddedEventType,
-					Reduce: s.reduceLabelAdded,
-				},
-				{
-					Event:  org.LabelPolicyChangedEventType,
-					Reduce: s.reduceLabelChanged,
-				},
-				{
-					Event:  org.LabelPolicyRemovedEventType,
-					Reduce: s.reduceLabelPolicyRemoved,
-				},
-				{
-					Event:  org.LabelPolicyActivatedEventType,
-					Reduce: s.reduceLabelActivated,
-				},
-				{
-					Event:  org.LabelPolicyLogoAddedEventType,
-					Reduce: s.reduceLogoAdded,
-				},
-				{
-					Event:  org.LabelPolicyLogoRemovedEventType,
-					Reduce: s.reduceLogoRemoved,
-				},
-				{
-					Event:  org.LabelPolicyLogoDarkAddedEventType,
-					Reduce: s.reduceLogoDarkAdded,
-				},
-				{
-					Event:  org.LabelPolicyLogoDarkRemovedEventType,
-					Reduce: s.reduceLogoDarkRemoved,
-				},
-				{
-					Event:  org.LabelPolicyIconAddedEventType,
-					Reduce: s.reduceIconAdded,
-				},
-				{
-					Event:  org.LabelPolicyIconRemovedEventType,
-					Reduce: s.reduceIconRemoved,
-				},
-				{
-					Event:  org.LabelPolicyIconDarkAddedEventType,
-					Reduce: s.reduceIconDarkAdded,
-				},
-				{
-					Event:  org.LabelPolicyIconDarkRemovedEventType,
-					Reduce: s.reduceIconDarkRemoved,
-				},
-				{
-					Event:  org.LabelPolicyFontAddedEventType,
-					Reduce: s.reduceFontAdded,
-				},
-				{
-					Event:  org.LabelPolicyFontRemovedEventType,
-					Reduce: s.reduceFontRemoved,
-				},
-				// 		// Password Complexity
-				{
-					Event:  org.PasswordComplexityPolicyAddedEventType,
-					Reduce: s.reducePasswordComplexityAdded,
-				},
-				{
-					Event:  org.PasswordComplexityPolicyChangedEventType,
-					Reduce: s.reducePasswordComplexityChanged,
-				},
-				{
-					Event:  org.PasswordComplexityPolicyRemovedEventType,
-					Reduce: s.reducePasswordComplexityRemoved,
-				},
-				// 		// Password Policy
-				{
-					Event:  org.PasswordAgePolicyAddedEventType,
-					Reduce: s.reducePasswordPolicyAdded,
-				},
-				{
-					Event:  org.PasswordAgePolicyChangedEventType,
-					Reduce: s.reducePasswordPolicyChanged,
-				},
-				{
-					Event:  org.PasswordAgePolicyRemovedEventType,
-					Reduce: s.reducePasswordPolicyRemoved,
-				},
-				// 		// Lockout Policy
-				{
-					Event:  org.LockoutPolicyAddedEventType,
-					Reduce: s.reduceLockoutPolicyAdded,
-				},
-				{
-					Event:  org.LockoutPolicyChangedEventType,
-					Reduce: s.reduceLockoutPolicyChanged,
-				},
-				{
-					Event:  org.LockoutPolicyRemovedEventType,
-					Reduce: s.reduceOrgLockoutPolicyRemoved,
-				},
-				// 		// Domain Policy
-				{
-					Event:  org.DomainPolicyAddedEventType,
-					Reduce: s.reduceDomainPolicyAdded,
-				},
-				{
-					Event:  org.DomainPolicyChangedEventType,
-					Reduce: s.reduceDomainPolicyChanged,
-				},
-				{
-					Event:  org.DomainPolicyRemovedEventType,
-					Reduce: s.reduceOrgDomainPolicyRemoved,
-				},
-				// Notification
-				{
-					Event:  org.NotificationPolicyAddedEventType,
-					Reduce: s.reduceNotificationPolicyAdded,
-				},
-				{
-					Event:  org.NotificationPolicyChangedEventType,
-					Reduce: s.reduceNotificationPolicyChanged,
-				},
-				{
-					Event:  org.NotificationPolicyRemovedEventType,
-					Reduce: s.reduceOrgNotificationPolicyRemoved,
-				},
-				// Privacy
-				{
-					Event:  org.PrivacyPolicyAddedEventType,
-					Reduce: s.reducePrivacyPolicyAdded,
-				},
-				{
-					Event:  org.PrivacyPolicyChangedEventType,
-					Reduce: s.reducePrivacyPolicyChanged,
-				},
-				{
-					Event:  org.PrivacyPolicyRemovedEventType,
-					Reduce: s.reduceOrgPrivacyPolicyRemoved,
-				},
-			},
-		},
-		// // settings
-		{
-			Aggregate: settings.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  settings.OrganizationSettingsSetEventType,
-					Reduce: s.reduceOrganizationSettingsSet,
-				},
-				{
-					Event:  settings.OrganizationSettingsRemovedEventType,
-					Reduce: s.reduceOrganizationSettingsRemoved,
-				},
-			},
-		},
-		{
-			Aggregate: instance.AggregateType,
-			EventReducers: []handler.EventReducer{
-				// 		// Login
-				{
-					Event:  instance.LoginPolicyAddedEventType,
-					Reduce: s.reduceLoginPolicyAdded,
-				},
-				{
-					Event:  instance.LoginPolicyChangedEventType,
-					Reduce: s.reduceLoginPolicyChanged,
-				},
-				{
-					Event:  instance.LoginPolicyMultiFactorAddedEventType,
-					Reduce: s.reduceMFAAdded,
-				},
-				{
-					Event:  instance.LoginPolicyMultiFactorRemovedEventType,
-					Reduce: s.reduceMFARemoved,
-				},
-				{
-					Event:  instance.LoginPolicySecondFactorAddedEventType,
-					Reduce: s.reduceSecondFactorAdded,
-				},
-				{
-					Event:  instance.LoginPolicySecondFactorRemovedEventType,
-					Reduce: s.reduceSecondFactorRemoved,
-				},
-				// 		// Label
-				{
-					Event:  instance.LabelPolicyAddedEventType,
-					Reduce: s.reduceLabelAdded,
-				},
-				{
-					Event:  instance.LabelPolicyChangedEventType,
-					Reduce: s.reduceLabelChanged,
-				},
-				{
-					Event:  instance.LabelPolicyActivatedEventType,
-					Reduce: s.reduceLabelActivated,
-				},
-				{
-					Event:  instance.LabelPolicyLogoAddedEventType,
-					Reduce: s.reduceLogoAdded,
-				},
-				{
-					Event:  instance.LabelPolicyLogoRemovedEventType,
-					Reduce: s.reduceLogoRemoved,
-				},
-				{
-					Event:  instance.LabelPolicyLogoDarkAddedEventType,
-					Reduce: s.reduceLogoDarkAdded,
-				},
-				{
-					Event:  instance.LabelPolicyLogoDarkRemovedEventType,
-					Reduce: s.reduceLogoDarkRemoved,
-				},
-				{
-					Event:  instance.LabelPolicyIconAddedEventType,
-					Reduce: s.reduceIconAdded,
-				},
-				{
-					Event:  instance.LabelPolicyIconRemovedEventType,
-					Reduce: s.reduceIconRemoved,
-				},
-				{
-					Event:  instance.LabelPolicyIconDarkAddedEventType,
-					Reduce: s.reduceIconDarkAdded,
-				},
-				{
-					Event:  instance.LabelPolicyIconDarkRemovedEventType,
-					Reduce: s.reduceIconDarkRemoved,
-				},
-				{
-					Event:  instance.LabelPolicyFontAddedEventType,
-					Reduce: s.reduceFontAdded,
-				},
-				{
-					Event:  instance.LabelPolicyFontRemovedEventType,
-					Reduce: s.reduceFontRemoved,
-				},
-				// 		// Password Complexity
-				{
-					Event:  instance.PasswordComplexityPolicyAddedEventType,
-					Reduce: s.reducePasswordComplexityAdded,
-				},
-				{
-					Event:  instance.PasswordComplexityPolicyChangedEventType,
-					Reduce: s.reducePasswordComplexityChanged,
-				},
-				// 		// Password Policy
-				{
-					Event:  instance.PasswordAgePolicyAddedEventType,
-					Reduce: s.reducePasswordPolicyAdded,
-				},
-				{
-					Event:  instance.PasswordAgePolicyChangedEventType,
-					Reduce: s.reducePasswordPolicyChanged,
-				},
-				// 		// Lockout Policy
-				{
-					Event:  instance.LockoutPolicyAddedEventType,
-					Reduce: s.reduceLockoutPolicyAdded,
-				},
-				{
-					Event:  instance.LockoutPolicyChangedEventType,
-					Reduce: s.reduceLockoutPolicyChanged,
-				},
-				// 		// Domain Policy
-				{
-					Event:  instance.DomainPolicyAddedEventType,
-					Reduce: s.reduceDomainPolicyAdded,
-				},
-				{
-					Event:  instance.DomainPolicyChangedEventType,
-					Reduce: s.reduceDomainPolicyChanged,
-				},
-				// 		// Security Policy
-				{
-					Event:  instance.SecurityPolicySetEventType,
-					Reduce: s.reduceSecurityPolicySet,
-				},
-				// 	Notification
-				{
-					Event:  instance.NotificationPolicyAddedEventType,
-					Reduce: s.reduceNotificationPolicyAdded,
-				},
-				{
-					Event:  instance.NotificationPolicyChangedEventType,
-					Reduce: s.reduceNotificationPolicyChanged,
-				},
-				// Privacy policy
-				{
-					Event:  instance.PrivacyPolicyAddedEventType,
-					Reduce: s.reducePrivacyPolicyAdded,
-				},
-				{
-					Event:  instance.PrivacyPolicyChangedEventType,
-					Reduce: s.reducePrivacyPolicyChanged,
-				},
-				// Secret Generator
-				{
-					Event:  instance.SecretGeneratorAddedEventType,
-					Reduce: s.reduceSecretGeneratorAdded,
-				},
-				{
-					Event:  instance.SecretGeneratorChangedEventType,
-					Reduce: s.reduceSecretGeneratorChanged,
-				},
-				{
-					Event:  instance.SecretGeneratorRemovedEventType,
-					Reduce: s.reduceSecretGeneratorRemoved,
-				},
-			},
-		},
-	}
-}
-
-func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLoginPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LoginPolicyAddedEvent
 	switch e := event.(type) {
@@ -432,8 +75,8 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 	}), nil
 }
 
-// //nolint:gocognit
-func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
+// olint:gocognit
+func (p *relationalTablesProjection) reduceLoginPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LoginPolicyChangedEvent
 	switch e := event.(type) {
@@ -491,7 +134,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLoginPolicyMFAAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.MultiFactorAddedEvent
 	switch e := event.(type) {
@@ -522,7 +165,7 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLoginPolicyMFARemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.MultiFactorRemovedEvent
 	switch e := event.(type) {
@@ -553,7 +196,7 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 	}), nil
 }
 
-func (*settingsRelationalProjection) reduceLoginPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (*relationalTablesProjection) reduceLoginPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	loginPolicyRemovedEvent, ok := event.(*org.LoginPolicyRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-oRSvD", "reduce.wrong.event.type %s", org.LoginPolicyRemovedEventType)
@@ -573,7 +216,7 @@ func (*settingsRelationalProjection) reduceLoginPolicyRemoved(event eventstore.E
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLoginPolicySecondFactorAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.SecondFactorAddedEvent
 	switch e := event.(type) {
@@ -604,7 +247,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLoginPolicySecondFactorRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.SecondFactorRemovedEvent
 	switch e := event.(type) {
@@ -635,7 +278,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 }
 
 // label
-func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyAddedEvent
 	switch e := event.(type) {
@@ -686,7 +329,7 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyChangedEvent
 	switch e := event.(type) {
@@ -739,7 +382,7 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceLabelPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.LabelPolicyRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-ATMBz", "reduce.wrong.event.type %s", org.LabelPolicyRemovedEventType)
@@ -759,7 +402,7 @@ func (s *settingsRelationalProjection) reduceLabelPolicyRemoved(event eventstore
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyActivated(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyActivatedEvent
 	switch e := event.(type) {
@@ -787,7 +430,7 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceLogoAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyLogoAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyLogoAddedEvent
 	switch e := event.(type) {
@@ -825,7 +468,7 @@ func (s *settingsRelationalProjection) reduceLogoAdded(event eventstore.Event) (
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceLogoDarkAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyLogoDarkAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyLogoDarkAddedEvent
 	switch e := event.(type) {
@@ -864,7 +507,7 @@ func (s *settingsRelationalProjection) reduceLogoDarkAdded(event eventstore.Even
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyLogoRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyLogoRemovedEvent
 	switch e := event.(type) {
@@ -898,7 +541,7 @@ func (s *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceLogoDarkRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyLogoDarkRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyLogoDarkRemovedEvent
 	switch e := event.(type) {
@@ -931,7 +574,7 @@ func (s *settingsRelationalProjection) reduceLogoDarkRemoved(event eventstore.Ev
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyIconAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyIconAddedEvent
 	switch e := event.(type) {
@@ -970,7 +613,7 @@ func (s *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceIconDarkAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyIconDarkAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyIconDarkAddedEvent
 	switch e := event.(type) {
@@ -1009,7 +652,7 @@ func (s *settingsRelationalProjection) reduceIconDarkAdded(event eventstore.Even
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyIconRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyIconRemovedEvent
 	switch e := event.(type) {
@@ -1043,7 +686,7 @@ func (s *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceIconDarkRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyIconDarkRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyIconDarkRemovedEvent
 	switch e := event.(type) {
@@ -1077,7 +720,7 @@ func (s *settingsRelationalProjection) reduceIconDarkRemoved(event eventstore.Ev
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyFontAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyFontAddedEvent
 	switch e := event.(type) {
@@ -1116,7 +759,7 @@ func (s *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLabelPolicyFontRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyFontRemovedEvent
 	switch e := event.(type) {
@@ -1150,7 +793,7 @@ func (s *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reducePasswordComplexityAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasswordComplexityPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.PasswordComplexityPolicyAddedEvent
 	switch e := event.(type) {
@@ -1189,7 +832,7 @@ func (s *settingsRelationalProjection) reducePasswordComplexityAdded(event event
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasswordComplexityPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.PasswordComplexityPolicyChangedEvent
 	switch e := event.(type) {
@@ -1227,7 +870,7 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reducePasswordComplexityRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasswordComplexityPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordComplexityPolicyRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-wttCd", "reduce.wrong.event.type %s", org.PasswordComplexityPolicyRemovedEventType)
@@ -1247,7 +890,7 @@ func (s *settingsRelationalProjection) reducePasswordComplexityRemoved(event eve
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasswordAgePolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.PasswordAgePolicyAddedEvent
 	switch e := event.(type) {
@@ -1283,7 +926,7 @@ func (s *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reducePasswordPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasswordAgePolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.PasswordAgePolicyChangedEvent
 	switch e := event.(type) {
@@ -1317,7 +960,7 @@ func (s *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reducePasswordPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasswordAgePolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordAgePolicyRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-EtHWB", "reduce.wrong.event.type %s", org.PasswordAgePolicyRemovedEventType)
@@ -1336,7 +979,7 @@ func (s *settingsRelationalProjection) reducePasswordPolicyRemoved(event eventst
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceOrgLockoutPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgLockoutPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.LockoutPolicyRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Bqut9", "reduce.wrong.event.type %s", org.LockoutPolicyRemovedEventType)
@@ -1355,7 +998,7 @@ func (s *settingsRelationalProjection) reduceOrgLockoutPolicyRemoved(event event
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLockoutPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LockoutPolicyAddedEvent
 	switch e := event.(type) {
@@ -1391,7 +1034,7 @@ func (s *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLockoutPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LockoutPolicyChangedEvent
 	switch e := event.(type) {
@@ -1428,7 +1071,7 @@ func (s *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceDomainPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.DomainPolicyAddedEvent
 	switch e := event.(type) {
@@ -1465,7 +1108,7 @@ func (s *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceDomainPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.DomainPolicyChangedEvent
 	switch e := event.(type) {
@@ -1501,7 +1144,7 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceOrgDomainPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgDomainPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.DomainPolicyRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Bqut9", "reduce.wrong.event.type %s", org.LockoutPolicyRemovedEventType)
@@ -1520,7 +1163,7 @@ func (s *settingsRelationalProjection) reduceOrgDomainPolicyRemoved(event events
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceNotificationPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceNotificationPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.NotificationPolicyAddedEvent
 	switch e := event.(type) {
@@ -1555,7 +1198,7 @@ func (s *settingsRelationalProjection) reduceNotificationPolicyAdded(event event
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceNotificationPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceNotificationPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.NotificationPolicyChangedEvent
 	switch e := event.(type) {
@@ -1590,7 +1233,7 @@ func (s *settingsRelationalProjection) reduceNotificationPolicyChanged(event eve
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceOrgNotificationPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgNotificationPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.NotificationPolicyRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Bqut9", "reduce.wrong.event.type %s", org.NotificationPolicyRemovedEventType)
@@ -1609,7 +1252,7 @@ func (s *settingsRelationalProjection) reduceOrgNotificationPolicyRemoved(event 
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reducePrivacyPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePrivacyPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.PrivacyPolicyAddedEvent
 	switch e := event.(type) {
@@ -1651,7 +1294,7 @@ func (s *settingsRelationalProjection) reducePrivacyPolicyAdded(event eventstore
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reducePrivacyPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePrivacyPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.PrivacyPolicyChangedEvent
 	switch e := event.(type) {
@@ -1695,7 +1338,7 @@ func (s *settingsRelationalProjection) reducePrivacyPolicyChanged(event eventsto
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceOrgPrivacyPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgPrivacyPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PrivacyPolicyRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Bqut9", "reduce.wrong.event.type %s", org.PrivacyPolicyRemovedEventType)
@@ -1714,7 +1357,7 @@ func (s *settingsRelationalProjection) reduceOrgPrivacyPolicyRemoved(event event
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceSecurityPolicySet(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*instance.SecurityPolicySetEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-83U8p", "reduce.wrong.event.type %s", instance.SecurityPolicySetEventType)
@@ -1749,7 +1392,7 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrganizationSettingsSet(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, err := assertEvent[*settings.OrganizationSettingsSetEvent](event)
 	if err != nil {
 		return nil, err
@@ -1777,7 +1420,7 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceOrganizationSettingsRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrganizationSettingsRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*settings.OrganizationSettingsRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1797,7 +1440,7 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsRemoved(event e
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceSecretGeneratorAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceSecretGeneratorAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-yTuWKA", "reduce.wrong.event.type %s", instance.SecretGeneratorAddedEventType)
@@ -1835,7 +1478,7 @@ func (s *settingsRelationalProjection) reduceSecretGeneratorAdded(event eventsto
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceSecretGeneratorChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceSecretGeneratorChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorChangedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-HhaZbQ", "reduce.wrong.event.type %s", instance.SecretGeneratorChangedEventType)
@@ -1872,7 +1515,7 @@ func (s *settingsRelationalProjection) reduceSecretGeneratorChanged(event events
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceSecretGeneratorRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceSecretGeneratorRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fmiIf", "reduce.wrong.event.type %s", instance.SecretGeneratorRemovedEventType)

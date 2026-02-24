@@ -20,13 +20,16 @@ CREATE INDEX idx_login_names_instance_user ON zitadel.login_names(instance_id, u
 CREATE INDEX idx_login_names_setting ON zitadel.login_names(instance_id, used_setting);
 CREATE INDEX idx_login_names_domain ON zitadel.login_names(instance_id, domain); -- used for cleanup of login names when a domain is deleted
 
-CREATE OR REPLACE FUNCTION zitadel.apply_domain_manipulation_to_login_names() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION zitadel.apply_domain_manipulation_to_login_names() RETURNS TRIGGER
+VOLATILE
+PARALLEL UNSAFE
+AS $$
 DECLARE
     setting zitadel.settings%ROWTYPE;
 BEGIN
     IF (NOT NEW.is_verified) THEN
         -- TODO(adlerhurst): is it possible that the domain is updated from verified to unverified?
-        RAISE NOTICE 'Domain % is not verified, skipping login name manipulation', NEW.domain;
+        RAISE LOG 'Domain % is not verified, skipping login name manipulation', NEW.domain;
         RETURN NULL;
     END IF;
 
@@ -40,15 +43,15 @@ BEGIN
     ORDER BY settings.organization_id NULLS LAST
     LIMIT 1;
 
-    RAISE NOTICE 'Found setting % for domain %', setting.id, NEW.domain;
+    RAISE LOG 'Found setting % for domain %', setting.id, NEW.domain;
 
     IF NOT (setting.settings->'loginNameIncludesDomain')::BOOLEAN THEN
-        RAISE NOTICE 'skipping because loginNameIncludesDomain is false for setting %', setting.id;
+        RAISE LOG 'skipping because loginNameIncludesDomain is false for setting %', setting.id;
         RETURN NULL;
     END IF;
 
     IF NEW.is_primary IS DISTINCT FROM OLD.is_primary THEN
-        RAISE NOTICE 'Updating preferred login name for domain % to %', NEW.domain, NEW.is_primary;
+        RAISE LOG 'Updating preferred login name for domain % to %', NEW.domain, NEW.is_primary;
         UPDATE zitadel.login_names
         SET is_preferred = NEW.is_primary
         WHERE
@@ -57,7 +60,7 @@ BEGIN
     END IF;
 
     IF NEW.domain IS DISTINCT FROM OLD.domain THEN
-        RAISE NOTICE 'Domain is changed from % to %, updating login names', OLD.domain, NEW.domain;
+        RAISE LOG 'Domain is changed from % to %, updating login names', OLD.domain, NEW.domain;
         UPDATE zitadel.login_names
         SET domain = NEW.domain
         WHERE
@@ -67,7 +70,7 @@ BEGIN
     END IF;
 
     IF NEW.is_verified IS DISTINCT FROM OLD.is_verified THEN
-        RAISE NOTICE 'Domain verification status is changed from % to % for domain %, inserting login names for verified domain', OLD.is_verified, NEW.is_verified, NEW.domain;
+        RAISE LOG 'Domain verification status is changed from % to % for domain %, inserting login names for verified domain', OLD.is_verified, NEW.is_verified, NEW.domain;
         INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
         SELECT
             NEW.instance_id
@@ -93,9 +96,14 @@ AFTER INSERT OR UPDATE ON zitadel.org_domains
 FOR EACH ROW
 EXECUTE FUNCTION zitadel.apply_domain_manipulation_to_login_names();
 
-CREATE OR REPLACE FUNCTION zitadel.apply_user_update_to_login_names() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION zitadel.apply_user_update_to_login_names() RETURNS TRIGGER
+VOLATILE
+PARALLEL UNSAFE
+AS $$
+DECLARE
+    counter INTEGER;
 BEGIN
-    RAISE NOTICE 'Updating login names for user % with new username %', NEW.id, NEW.username;
+    RAISE LOG 'Updating login names for user % with new username %', NEW.id, NEW.username;
     UPDATE
         zitadel.login_names
     SET
@@ -103,6 +111,9 @@ BEGIN
     WHERE
         login_names.instance_id = NEW.instance_id
         AND login_names.user_id = NEW.id;
+
+    GET DIAGNOSTICS counter = ROW_COUNT;
+    RAISE LOG 'Updated % login names for user %', counter, NEW.id;
 
     RETURN NULL;
 END;
@@ -114,7 +125,10 @@ FOR EACH ROW
 WHEN (NEW.username IS DISTINCT FROM OLD.username)
 EXECUTE FUNCTION zitadel.apply_user_update_to_login_names();
 
-CREATE OR REPLACE FUNCTION zitadel.apply_user_insert_to_login_names() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION zitadel.apply_user_insert_to_login_names() RETURNS TRIGGER
+VOLATILE
+PARALLEL UNSAFE
+AS $$
 DECLARE
     setting zitadel.settings%ROWTYPE;
 BEGIN
@@ -133,14 +147,14 @@ BEGIN
     LIMIT 1;
 
     IF NOT (setting.settings->'loginNameIncludesDomain')::BOOLEAN THEN
-        RAISE NOTICE 'inserting username as login name for setting user %', NEW.id;
+        RAISE LOG 'inserting username as login name for setting user %', NEW.id;
         INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, is_preferred, used_setting)
         VALUES (NEW.instance_id, NEW.organization_id, NEW.id, NEW.username, TRUE, setting.id);
         
         RETURN NULL;
     END IF;
 
-    RAISE NOTICE 'inserting login names of user % based on setting %', NEW.id, setting.id;
+    RAISE LOG 'inserting login names of user % based on setting %', NEW.id, setting.id;
     INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
     SELECT
         NEW.instance_id
@@ -166,7 +180,12 @@ AFTER INSERT ON zitadel.users
 FOR EACH ROW
 EXECUTE FUNCTION zitadel.apply_user_insert_to_login_names();
 
-CREATE OR REPLACE FUNCTION zitadel.apply_domain_policy_manipulation_to_login_names() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION zitadel.apply_domain_policy_manipulation_to_login_names() RETURNS TRIGGER
+VOLATILE
+PARALLEL UNSAFE
+AS $$
+DECLARE
+    counter INTEGER;
 BEGIN
     CASE TG_OP
         WHEN 'DELETE' THEN
@@ -212,7 +231,7 @@ BEGIN
         RETURN NULL;
     END IF;
 
-    RAISE NOTICE 'deleted_login_names params: instance_id: %, used_setting: %', NEW.instance_id, OLD.id;
+    RAISE LOG 'deleted_login_names params: instance_id: %, used_setting: %', NEW.instance_id, OLD.id;
 
     WITH affected_users AS (
         DELETE FROM zitadel.login_names
@@ -241,6 +260,9 @@ BEGIN
         AND org_domains.org_id = au.organization_id
         AND org_domains.is_verified
         AND (NEW.settings->'loginNameIncludesDomain')::BOOLEAN;
+
+    GET DIAGNOSTICS counter = ROW_COUNT;
+    RAISE LOG 'Updated % login names for setting %', counter, NEW.id;
 
     RETURN NULL;
 END;

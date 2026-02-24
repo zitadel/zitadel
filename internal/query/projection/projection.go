@@ -89,20 +89,7 @@ var (
 	HostedLoginTranslationProjection    *handler.Handler
 	OrganizationSettingsProjection      *handler.Handler
 
-	InstanceRelationalProjection             *handler.Handler
-	OrganizationRelationalProjection         *handler.Handler
-	InstanceDomainRelationalProjection       *handler.Handler
-	OrganizationDomainRelationalProjection   *handler.Handler
-	IDPTemplateRelationalProjection          *handler.Handler
-	ProjectRelationalProjection              *handler.Handler
-	ProjectRoleRelationalProjection          *handler.Handler
-	OrganizationMetadataRelationalProjection *handler.Handler
-	AuthorizationRelationalProjection        *handler.Handler
-	ProjectGrantRelationalProjection         *handler.Handler
-	SessionRelationalProjection              *handler.Handler
-	SettingsRelationalProjection             *handler.Handler
-	UserRelationalProjection                 *handler.Handler
-	IDPIntentRelationalProjection            *handler.Handler
+	RelationalTablesProjection *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
@@ -220,20 +207,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
 	GroupUsersProjection = newGroupUsersProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_users"]))
 
-	InstanceRelationalProjection = newInstanceRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
-	OrganizationRelationalProjection = newOrgRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organizations_relational"]))
-	InstanceDomainRelationalProjection = newInstanceDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_domains_relational"]))
-	OrganizationDomainRelationalProjection = newOrgDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_domains_relational"]))
-	SettingsRelationalProjection = newSettingsRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["settings_relational"]))
-	IDPTemplateRelationalProjection = newIDPTemplateRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates_relational"]))
-	ProjectRelationalProjection = newProjectRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects_relational"]))
-	ProjectRoleRelationalProjection = newProjectRoleRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles_relational"]))
-	OrganizationMetadataRelationalProjection = newOrgMetadataRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_metadata_relational"]))
-	AuthorizationRelationalProjection = newAuthorizationRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authorizations_relational"]))
-	ProjectGrantRelationalProjection = newProjectGrantRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_relational"]))
-	SessionRelationalProjection = newSessionRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["session_relational"]))
-	UserRelationalProjection = newUserRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_relational"]))
-	IDPIntentRelationalProjection = newIDPIntentRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_intent_relational"]))
+	RelationalTablesProjection = newRelationalTablesProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
 
 	newProjectionsList()
 	newFieldsList()
@@ -419,19 +393,6 @@ func newProjectionsList() {
 		GroupProjection,
 		GroupUsersProjection,
 
-		InstanceRelationalProjection,
-		OrganizationRelationalProjection,
-		InstanceDomainRelationalProjection,
-		OrganizationDomainRelationalProjection,
-		SettingsRelationalProjection,
-		IDPTemplateRelationalProjection,
-		ProjectRelationalProjection,
-		ProjectRoleRelationalProjection,
-		OrganizationMetadataRelationalProjection,
-		UserRelationalProjection,
-		AuthorizationRelationalProjection,
-		ProjectGrantRelationalProjection,
-		SessionRelationalProjection,
-		IDPIntentRelationalProjection,
+		RelationalTablesProjection,
 	}
 }

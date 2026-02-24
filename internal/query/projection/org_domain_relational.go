@@ -14,47 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type orgDomainRelationalProjection struct{}
-
-func newOrgDomainRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(orgDomainRelationalProjection))
-}
-
-func (*orgDomainRelationalProjection) Name() string {
-	return "zitadel.org_domains"
-}
-
-func (p *orgDomainRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: org.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  org.OrgDomainAddedEventType,
-					Reduce: p.reduceAdded,
-				},
-				{
-					Event:  org.OrgDomainPrimarySetEventType,
-					Reduce: p.reducePrimarySet,
-				},
-				{
-					Event:  org.OrgDomainRemovedEventType,
-					Reduce: p.reduceRemoved,
-				},
-				{
-					Event:  org.OrgDomainVerificationAddedEventType,
-					Reduce: p.reduceVerificationAdded,
-				},
-				{
-					Event:  org.OrgDomainVerifiedEventType,
-					Reduce: p.reduceVerified,
-				},
-			},
-		},
-	}
-}
-
-func (p *orgDomainRelationalProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrganizationDomainAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZX9Fw", "reduce.wrong.event.type %s", org.OrgDomainAddedEventType)
@@ -74,7 +34,7 @@ func (p *orgDomainRelationalProjection) reduceAdded(event eventstore.Event) (*ha
 	}), nil
 }
 
-func (p *orgDomainRelationalProjection) reducePrimarySet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrganizationDomainPrimarySet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dmFdb", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
@@ -94,7 +54,7 @@ func (p *orgDomainRelationalProjection) reducePrimarySet(event eventstore.Event)
 	}), nil
 }
 
-func (p *orgDomainRelationalProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrganizationDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-MzC0n", "reduce.wrong.event.type %s", org.OrgDomainRemovedEventType)
@@ -112,7 +72,7 @@ func (p *orgDomainRelationalProjection) reduceRemoved(event eventstore.Event) (*
 	}), nil
 }
 
-func (p *orgDomainRelationalProjection) reduceVerificationAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrganizationDomainVerificationAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainVerificationAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-oGzip", "reduce.wrong.event.type %s", org.OrgDomainVerificationAddedEventType)
@@ -142,7 +102,7 @@ func (p *orgDomainRelationalProjection) reduceVerificationAdded(event eventstore
 	}), nil
 }
 
-func (p *orgDomainRelationalProjection) reduceVerified(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrganizationDomainVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainVerifiedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-7WrI2", "reduce.wrong.event.type %s", org.OrgDomainVerifiedEventType)
