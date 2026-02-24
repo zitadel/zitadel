@@ -1,11 +1,12 @@
 ---
 title: Verify Payload Integrity
+description: "Validate payload integrity by verifying JSON, JWT, or JWE signatures when receiving data from ZITADEL actions"
 ---
 
-import JSONCode from "./go/json.go";
-import JWTCode from "./go/jwt.go";
-import JWECode from "./go/jwe.go";
-import CodeBlock from "@/components/docusaurus/code-block";
+import JsonGo from './go/json.go';
+import JwtGo from './go/jwt.go';
+import JweGo from './go/jwe.go';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 
 This guide shows you how to verify the integrity of the received data on your target.
 There are three options available, which will be demonstrated in the following sections.
@@ -133,13 +134,13 @@ As mentioned before, this validation can and should be applied to any target imp
 
 <Tabs>
     <Tab value="JSON">
-        <CodeBlock language="go">{JSONCode}</CodeBlock>
+        <DynamicCodeBlock lang="go" code={JsonGo} />
     </Tab>
     <Tab value="JWT">
-        <CodeBlock language="go">{JWTCode}</CodeBlock>
+        <DynamicCodeBlock lang="go" code={JwtGo} />
     </Tab>
     <Tab value="JWE">
-        <CodeBlock language="go">{JWECode}</CodeBlock>
+        <DynamicCodeBlock lang="go" code={JweGo} />
     </Tab>
 </Tabs>
 

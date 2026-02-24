@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Musí být alespoň {{value}} znaků dlouhé.",
       "MAXLENGTHERROR": "Musí být kratší než {{value}} znaků."
     },
-    "ID": "ID",
+    "ID": "ID uživatele",
     "EMAIL": "E-mail",
     "PHONE": "Telefonní číslo",
     "PHONEEMPTY": "Není definováno telefonní číslo",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Název",
-      "ID": "ID",
+      "ID": "ID organizace",
       "CREATIONDATE": "Datum vytvoření",
       "DATECHANGED": "Změněno",
       "FILTER": "Filtr",
@@ -2015,7 +2015,8 @@
           "DESCRIPTION": "Opravdu chcete odstranit váš projekt?",
           "TYPENAME": "Pro trvalé odstranění napište název projektu."
         }
-      }
+      },
+      "ID": "ID projektu"
     },
     "SETTINGS": {
       "TITLE": "Nastavení",
@@ -2293,7 +2294,7 @@
     "ADD": "Přidat poskytovatele identity",
     "TYPE": "Typ",
     "OWNER": "Vlastník",
-    "ID": "ID",
+    "ID": "ID poskytovatele identity",
     "NAME": "Název",
     "AUTHORIZATIONENDPOINT": "Koncový bod autorizace",
     "TOKENENDPOINT": "Koncový bod tokenu",
@@ -2504,7 +2505,7 @@
     "TOKEN": "Nastavení tokenu",
     "PAGES": {
       "TITLE": "Aplikace",
-      "ID": "ID",
+      "ID": "ID aplikace",
       "DESCRIPTION": "Zde můžete upravovat data vaší aplikace a její konfiguraci.",
       "CREATE": "Vytvořit aplikaci",
       "CREATE_SELECT_PROJECT": "Nejprve vyberte váš projekt",
@@ -2848,5 +2849,6 @@
       "TITLE": "Aktivita",
       "DESCRIPTION": "Zde můžete vidět nejnovější události, které generovaly změnu u uživatele."
     }
-  }
+  },
+  "INSTANCEID": "ID instance"
 }
