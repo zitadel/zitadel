@@ -2,16 +2,8 @@ DO
 $do$
 BEGIN
    -- Convert objects to logged first (if unlogged)
-   IF EXISTS (SELECT 1 FROM pg_class WHERE oid = 'cache.objects'::REGCLASS AND relpersistence = 'u') THEN
-        ALTER TABLE IF EXISTS cache.objects
-            SET LOGGED;
-   END IF;
-
-   -- Convert string_keys to logged (if unlogged)
-   -- Drop the FK constraint first to allow converting cache.string_keys (and avoid loggedness-change restrictions involving the FK)
-   IF EXISTS (SELECT 1 FROM pg_class WHERE oid = to_regclass('cache.objects') AND relpersistence = 'u') THEN
-        ALTER TABLE IF EXISTS cache.objects
-            SET LOGGED;
+    IF EXISTS (SELECT 1 FROM pg_class WHERE oid = to_regclass('cache.objects') AND relpersistence = 'u') THEN
+        ALTER TABLE IF EXISTS cache.objects SET LOGGED;
    END IF;
 
    -- Convert string_keys to logged (if unlogged)
@@ -28,10 +20,14 @@ BEGIN
             ON DELETE CASCADE;
    END IF;
 
-   CREATE UNLOGGED TABLE IF NOT EXISTS cache.objects_default 
-        PARTITION OF cache.objects DEFAULT;
+       IF to_regclass('cache.objects') IS NOT NULL THEN
+         CREATE UNLOGGED TABLE IF NOT EXISTS cache.objects_default
+             PARTITION OF cache.objects DEFAULT;
+       END IF;
 
-   CREATE UNLOGGED TABLE IF NOT EXISTS cache.string_keys_default 
-        PARTITION OF cache.string_keys DEFAULT;
+       IF to_regclass('cache.string_keys') IS NOT NULL THEN
+         CREATE UNLOGGED TABLE IF NOT EXISTS cache.string_keys_default
+             PARTITION OF cache.string_keys DEFAULT;
+       END IF;
 END
 $do$
