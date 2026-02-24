@@ -1,7 +1,7 @@
 "use client";
 
 import { sendLoginname } from "@/lib/server/loginname";
-import { handleServerActionResponse } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -101,6 +101,7 @@ export function UsernameForm({
           <TextInput
             type="text"
             autoComplete="username"
+            autoFocus
             {...register("loginName", { required: t("required.loginName") })}
             label={inputLabel}
             data-testid="username-text-input"

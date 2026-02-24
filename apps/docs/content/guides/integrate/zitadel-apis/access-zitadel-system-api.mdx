@@ -1,5 +1,6 @@
 ---
 title: Access ZITADEL System API
+description: "Authenticate with the ZITADEL System API using JWT profiles to manage instances and global settings in self-hosted deployments."
 sidebar_label: System API
 ---
 
@@ -11,7 +12,7 @@ The ZITADEL System API is currently only available for ZITADEL Self-Hosted deplo
 ## System API User
 
 The System API works superordinate over all instances. Therefore, you need to define a separate users to get access to this API.
-You can do so by customizing the [runtime configuration](/self-hosting/manage/configure/configure#runtime-configuration-file).
+You can do so by customizing the [runtime settings](/self-hosting/manage/configure/configure#runtime-configuration-file).
 
 To authenticate the user a self-signed JWT will be created and utilized.
 
@@ -33,9 +34,9 @@ and export a public key from the newly created private key:
 openssl rsa -in system-user-1.pem -outform PEM -pubout -out system-user-1.pub
 ```
 
-## Runtime Configuration
+## Runtime Settings
 
-Provide the **public** key to the ZITADEL runtime configuration.
+Provide the **public** key to the ZITADEL runtime settings.
 
 Either with the path to the key:
 
@@ -179,7 +180,7 @@ You should get a successful response with a `totalResult` number of 1 and the de
 ## Summary
 
 * Create an RSA keypair
-* Provide the public key with a userID to ZITADEL using the runtime configuration
+* Provide the public key with a userID to ZITADEL using the runtime settings
 * Authorize the request with a JWT signed with your private key
 
 Where to go from here:

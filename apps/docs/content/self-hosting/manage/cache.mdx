@@ -1,5 +1,6 @@
 ---
 title: Caches
+description: "Configure cache connectors for frequently needed objects to speed up internal business logic and improve performance with ZITADEL caching"
 sidebar_label: Caches [Beta]
 ---
 
@@ -11,9 +12,9 @@ Caches is currently an [experimental beta](https://help.zitadel.com/zitadel-soft
 Test the feature and add improvement or bug reports directly to the [github repository](https://github.com/zitadel/zitadel) or let us know your general feedback in the [discord thread](https://discord.com/channels/927474939156643850/1332343909900222506)!
 </Callout>
 
-## Configuration
+## Settings
 
-The `Caches` configuration entry defines *connectors* which can be used by several objects. It is possible to mix *connectors* with different objects based on operational needs.
+The `Caches` settings entry defines *connectors* which can be used by several objects. It is possible to mix *connectors* with different objects based on operational needs.
 
 ```yaml
 Caches:
@@ -32,7 +33,7 @@ Caches:
       Level: error
 ```
 
-For a full configuration reference, please see the [runtime configuration file](/self-hosting/manage/configure/configure#runtime-configuration-file) section's `defaults.yaml`.
+For a full settings reference, please see the [runtime configuration file](/self-hosting/manage/configure/configure#runtime-configuration-file) section's `defaults.yaml`.
 
 ## Connectors
 
@@ -179,19 +180,19 @@ For single instance setups which fulfilled all milestone (*your next steps* in t
 
 ### Organization
 
-Most resources like users, project and applications are part of an [organization](/guides/manage/console/organizations-overview). Therefore many parts of the ZITADEL logic search for an organization by ID or by their primary domain.
+Most resources like users, project and applications are part of an [organization](/guides/manage/console/organizations-overview). Therefore many parts of the ZITADEL logic search for an organization by ID or by their Organization Domain.
 Organization objects are quite small and receive infrequent updates after they are created:
 
 - Change of organization name
 - Deactivation / Reactivation
-- Change of primary domain
+- Change of Organization Domain
 - Removal
 
 ## Examples
 
-Currently caches are in beta and disabled by default. However, if you want to give caching a try, the following sections contains some suggested configurations for different setups.
+Currently caches are in beta and disabled by default. However, if you want to give caching a try, the following sections contains some suggested settings for different setups.
 
-The following configuration is recommended for single instance setups with a single ZITADEL server:
+The following setup is recommended for single instance setups with a single ZITADEL server:
 
 ```yaml
 Caches:
@@ -205,7 +206,7 @@ Caches:
     MaxAge: 1h
 ```
 
-The following configuration is recommended for single instance setups with high traffic on multiple servers, where Redis is not available:
+The following setup is recommended for single instance setups with high traffic on multiple servers, where Redis is not available:
 
 ```yaml
 Caches:

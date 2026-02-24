@@ -46,6 +46,21 @@ declare namespace NodeJS {
     NEXT_PUBLIC_APPLICATION_NAME?: string;
 
     /**
+     * Optional: override the redirect URI after successful login.
+     * If the value starts with "/", it will be used as a relative path and prepended with the host of the request (useful for rewrites).
+     * Otherwise, it will use the value as an absolute redirect URI.
+     * Takes precedence over organization settings.
+     */
+    DEFAULT_REDIRECT_URI?: string;
+
+    /**
+     * Optional: Comma-separated list of additional allowed origins for Server Actions.
+     * Origins should include the protocol, e.g., 'https://zitadel.com,http://localhost:3000'.
+     * If not set, it defaults to an empty list, allowing only same-origin requests.
+     */
+    SERVER_ACTION_ALLOWED_ORIGINS?: string;
+
+    /**
      * Optional: Enable automatic code submission on page load.
      * Set to "true" to auto-submit verification codes (e.g. email verification, Email OTP).
      * Default behavior (undefined) requires users to click a Submit button,

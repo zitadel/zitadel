@@ -117,6 +117,14 @@ func (p *sessionRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanPasswordChangedType,
 					Reduce: p.reducePasswordChanged,
 				},
+				{
+					Event:  user.UserDeactivatedType,
+					Reduce: p.reduceUserStateNotActive,
+				},
+				{
+					Event:  user.UserLockedType,
+					Reduce: p.reduceUserStateNotActive,
+				},
 			},
 		},
 	}
@@ -570,6 +578,31 @@ func (p *sessionRelationalProjection) reducePasswordChanged(event eventstore.Eve
 			sessionRepo.SetUpdatedAt(e.CreatedAt()),
 			sessionRepo.ClearFactor(domain.SessionFactorTypePassword),
 		)
+		return err
+	}), nil
+}
+
+func (p *sessionRelationalProjection) reduceUserStateNotActive(event eventstore.Event) (*handler.Statement, error) {
+	switch t := event.(type) {
+	case *user.UserDeactivatedEvent, *user.UserLockedEvent:
+		// ok
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-XBglbF", "reduce.wrong.event.type %v", t)
+	}
+
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-fcxV68", "reduce.wrong.db.pool %T", ex)
+		}
+		v3Tx := v3_sql.SQLTx(tx)
+
+		sessionRepo := repository.SessionRepository()
+		condition := database.And(
+			sessionRepo.InstanceIDCondition(event.Aggregate().InstanceID),
+			sessionRepo.UserIDCondition(event.Aggregate().ID),
+		)
+		_, err := sessionRepo.Delete(ctx, v3Tx, condition)
 		return err
 	}), nil
 }

@@ -7,12 +7,12 @@ export default function AppValue({ valueCount, clientSecret }) {
     return (
         <div>
             <p>
-                To connect your application to ZITADEL, you need {valueCount} primary configuration values.
+                To connect your application to ZITADEL, you need {valueCount} primary settings.
                 These are typically stored as environment variables in your project.
             </p>
             <ol>
                 {!!clientSecret == false && (<li>
-                    <b>Client ID</b> Navigate to Configurations in the left sidebar. This is the unique public identifier for your React application.
+                    <b>Client ID</b> Navigate to Settings in the left sidebar. This is the unique public identifier for your React application.
                     <img
                         src={ProjectClientIdImg.src} alt="Get Client ID"/>
                 </li>)}
