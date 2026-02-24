@@ -43,7 +43,7 @@ export async function loginServiceKeyToken() {
     const key = readFileSync(keyFile, "utf-8");
 
     return newSystemToken({
-      audience: process.env.AUDIENCE || process.env.ZITADEL_API_URL!,
+      audience: process.env.AUDIENCE || process.env.ZITADEL_API_URL,
       subject: getLoginSystemUserId()!,
       key: key,
     });
