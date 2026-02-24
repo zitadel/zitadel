@@ -3,7 +3,7 @@
     "repository": "ssh://git@github.com/zitadel/zitadel.git",
     "author": "ZITADEL Authors <hi@zitadel.com>",
     "engines": {
-        "node": "18 || 20"
+        "node": ">=18"
     },
     "license": "Apache-2.0",
     "devDependencies": {

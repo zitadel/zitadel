@@ -19,16 +19,9 @@ updates:
     commit-message:
       prefix: "chore(deps-go)"
 
-  # ── npm (consolidated) ────────────────────────────────────────────────────
+  # ── npm (pnpm workspace — use root only, see dependabot/dependabot-core#11487)
   - package-ecosystem: npm
-    directories:
-      - "/console"
-      - "/apps/login"
-      - "/apps/docs"
-      - "/packages/zitadel-client"
-      - "/packages/zitadel-proto"
-      - "/tests/functional-ui"
-      - "/benchmark"
+    directory: "/"
     schedule:
       interval: monthly
       day: monday
