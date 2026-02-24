@@ -386,6 +386,11 @@ export const guidesSidebar: readonly SidebarItem[] = [
               },
               {
                 type: "category",
+                label: ".NET",
+                items: ["sdk-examples/dotnet"],
+              },
+              {
+                type: "category",
                 label: "Other Languages",
                 items: [
                   "sdk-examples/client-libraries/ruby",
@@ -853,6 +858,8 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "self-hosting/manage/cache",
         ],
       },
+
+      "guides/manage/production-checklist",
     ],
   },
   {
