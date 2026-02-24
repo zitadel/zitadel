@@ -38,7 +38,7 @@ Optional services via profiles: `redis` (`cache`), `otel-collector` (`observabil
 | `.env.test` | CI-only config | Used by NX targets: `test-run`, `test-e2e`, `test-full`, `stop` |
 | `otel-collector-config.yaml` | OTEL Collector pipeline config | Logs traces to stdout; configure `OTEL_BACKEND_ENDPOINT` to forward to a backend |
 | `traefik-local-tls.yml` | Traefik dynamic config for local certs | Referenced by local-tls overlay |
-| `project.json` | NX project definition | Targets: `test-config`, `test-run`, `test-e2e`, `test`, `test-full`, `stop`, `test-login-acceptance` |
+| `project.json` | NX project definition | Targets: `test-config`, `test-run`, `test-e2e`, `test`, `test-full`, `stop` |
 | `AGENTS.md` | AI agent instructions for this directory | |
 
 ## Routing Rules
@@ -78,7 +78,6 @@ Local NX targets for testing the compose stack:
 | `test` | Lightweight — delegates to `test-config` only. Safe for `nx affected` | No |
 | `test-full` | Full pipeline: `test-config` → `test-run` → Playwright wiring + browser tests → teardown | Yes |
 | `stop` | Tears down the `zitadel-compose-test` stack and removes volumes | Yes |
-| `test-login-acceptance` | Extracts admin PAT, runs setup script, delegates to `@zitadel/login:test-acceptance` | Yes (stack must be running) |
 
 ## Rejected Alternatives
 

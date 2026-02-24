@@ -105,7 +105,7 @@ Run commands from the repository root.
 - `@zitadel/login`: `dev`, `build`, `pack`, `lint`, `test`, `test-unit`, `test-integration`
 - `@zitadel/docs`: `dev`, `build`, `generate`, `install-proto-plugins`, `check-links`, `check-types`, `test`, `lint`
 - `@zitadel/console`: `dev`, `build`, `generate`, `install-proto-plugins`, `lint`
-- `@zitadel/compose`: `test-config`, `test-run`, `test-e2e`, `test`, `test-full`, `stop`, `test-login-acceptance`
+- `@zitadel/compose`: `test-config`, `test-run`, `test-e2e`, `test`, `test-full`, `stop`
 
 ## Proto Plugin Binaries
 All proto plugins are installed to `.artifacts/bin/<GOOS>/<GOARCH>/` and Nx-cached. `generate` targets wire up the correct install dependency and prepend `.artifacts/bin/` to `$PATH` — no manual install step is needed.

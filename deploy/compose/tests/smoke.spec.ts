@@ -9,7 +9,7 @@
  * A single successful login proves every link in that chain is functioning.
  *
  * For feature-level login tests (MFA, OIDC flows, IdP, etc.) see:
- *   apps/login/acceptance/  – run via @zitadel/compose:test-login-acceptance
+ *   apps/login/acceptance/  – run via @zitadel/login:test-acceptance
  *
  * Credentials are read from SMOKE_TEST_ADMIN_USERNAME / SMOKE_TEST_ADMIN_PASSWORD
  * (set in .env.test). The fallback values below match the defaults in .env.test and

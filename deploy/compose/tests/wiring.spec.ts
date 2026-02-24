@@ -44,7 +44,7 @@
  *   see smoke.spec.ts
  *
  * For feature-level login tests (MFA, OIDC flows, IdPs, etc.):
- *   see apps/login/acceptance/ — run via @zitadel/compose:test-login-acceptance
+ *   see apps/login/acceptance/ — run via @zitadel/login:test-acceptance
  */
 import { expect, test, type APIRequestContext, type TestInfo } from "@playwright/test";
 import http2 from "node:http2";
