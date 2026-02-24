@@ -3,6 +3,7 @@ import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
+import { resolveRedirectUri } from "@/lib/client";
 import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/cookies";
 import { completeDeviceAuthorization } from "@/lib/server/device";
 import { getServiceConfig } from "@/lib/service-url";
@@ -83,6 +84,15 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     loginSettings = await getLoginSettings({ serviceConfig, organization });
   }
 
+  const redirectUri = await resolveRedirectUri(
+    requestId && sessionId
+      ? { sessionId, requestId }
+      : { loginName: loginName ?? sessionFactors?.factors?.user?.loginName },
+    loginSettings?.defaultRedirectUri,
+  );
+
+  const isSamePage = redirectUri?.startsWith("/signedin") ?? false;
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col space-y-4">
@@ -108,11 +118,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </Alert>
         )}
 
-        {loginSettings?.defaultRedirectUri && (
+        {redirectUri && !isSamePage && (
           <div className="mt-8 flex w-full flex-row items-center">
             <span className="flex-grow"></span>
 
-            <Link href={loginSettings?.defaultRedirectUri}>
+            <Link href={redirectUri}>
               <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
                 <Translated i18nKey="continue" namespace="signedin" />
               </Button>
