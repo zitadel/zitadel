@@ -51,13 +51,13 @@ These designs were considered and explicitly rejected — do not re-propose them
 | Start (Let's Encrypt) | `docker compose --env-file .env -f docker-compose.yml -f docker-compose.mode-letsencrypt.yml up -d --wait` |
 | Start (production-like) | `docker compose --env-file .env -f docker-compose.yml -f docker-compose.prodlike.yml up -d --wait` |
 | Validate all configs | `docker compose --env-file .env.example -f docker-compose.yml -f <overlay> config > /dev/null` for each overlay |
-| Run CI smoke test | `pnpm nx run @zitadel/compose:test` |
+| Run CI smoke test | `pnpm nx run @zitadel/compose:test-full` |
 | Smoke check | `curl -sS http://localhost:8080/.well-known/openid-configuration` |
 
 ### 6. Terminology
 
-Follow the root `agents.md` glossary. Key rules:
+Follow the root `AGENTS.md` glossary. Key rules:
 
 - **Instance** = a logical ZITADEL tenant/partition, NEVER "example"
 - **System** = the entire ZITADEL installation/deployment
-- See the [Technical Glossary](../../agents.md) for all user-facing text in any language
+- See the [Technical Glossary](../../AGENTS.md) for all user-facing text in any language

@@ -1,5 +1,5 @@
 # Test overlay: replaces published images with locally-built ones.
-# Used by the NX smoke-test target (@zitadel/compose:test).
+# Used by the NX smoke-test targets (@zitadel/compose:test-run, :test-full, :stop).
 #
 # All test traffic flows through the Traefik proxy (port 8080)
 # so the routing rules are validated end-to-end.

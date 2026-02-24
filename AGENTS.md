@@ -82,7 +82,7 @@ ZITADEL supports multiple deployment methods. Each has its own directory and con
 
 | Target | Location | Status | Notes |
 |--------|----------|--------|-------|
-| Docker Compose | `deploy/compose/` | Supported | Single-node, graduated from quickstart to semi-production. See `deploy/compose/agents.md` for directory-specific rules. |
+| Docker Compose | `deploy/compose/` | Supported | Single-node, graduated from quickstart to semi-production. See `deploy/compose/AGENTS.md` for directory-specific rules. |
 | Kubernetes (Helm) | External ([zitadel-charts](https://github.com/zitadel/zitadel-charts)) | Supported | Official Helm chart for production workloads. Docs at `apps/docs/content/self-hosting/deploy/kubernetes/`. |
 | apt/rpm packages | Planned | Not yet available | Future packaging target. |
 
