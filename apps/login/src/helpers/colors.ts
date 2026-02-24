@@ -30,13 +30,13 @@ export type ColorMap = {
   [_key in MapName]: Color[];
 };
 
-export const DARK_PRIMARY = "#2073c4";
+export const DARK_PRIMARY = "#eeeeee";
 export const PRIMARY = "#5469d4";
 
 export const DARK_WARN = "#ff3b5b";
 export const WARN = "#cd3d56";
 
-export const DARK_BACKGROUND = "#111827";
+export const DARK_BACKGROUND = "#252526";
 export const BACKGROUND = "#fafafa";
 
 export const DARK_TEXT = "#ffffff";

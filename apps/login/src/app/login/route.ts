@@ -10,8 +10,6 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
-// Add this to prevent RSC requests
-export const runtime = "nodejs";
 
 async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConfig; ids: string[] }): Promise<Session[]> {
   const response = await listSessions({ serviceConfig, ids: ids.filter((id: string | undefined) => !!id) });
