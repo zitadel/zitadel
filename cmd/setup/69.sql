@@ -20,14 +20,14 @@ BEGIN
             ON DELETE CASCADE;
    END IF;
 
-       IF to_regclass('cache.objects') IS NOT NULL THEN
-         CREATE UNLOGGED TABLE IF NOT EXISTS cache.objects_default
-             PARTITION OF cache.objects DEFAULT;
-       END IF;
+    IF to_regclass('cache.objects') IS NOT NULL THEN
+        CREATE UNLOGGED TABLE IF NOT EXISTS cache.objects_default
+            PARTITION OF cache.objects DEFAULT;
+    END IF;
 
-       IF to_regclass('cache.string_keys') IS NOT NULL THEN
-         CREATE UNLOGGED TABLE IF NOT EXISTS cache.string_keys_default
-             PARTITION OF cache.string_keys DEFAULT;
-       END IF;
+    IF to_regclass('cache.string_keys') IS NOT NULL THEN
+        CREATE UNLOGGED TABLE IF NOT EXISTS cache.string_keys_default
+            PARTITION OF cache.string_keys DEFAULT;
+    END IF;
 END
 $do$
