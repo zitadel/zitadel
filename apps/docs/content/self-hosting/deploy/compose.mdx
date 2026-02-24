@@ -162,7 +162,7 @@ docker compose --env-file .env -f docker-compose.yml --profile observability up 
 
 Traces are logged to the collector's stdout by default (`docker compose logs otel-collector`).
 To forward traces to your own backend (Grafana Tempo, Jaeger, OpenObserve, etc.), set `OTEL_BACKEND_ENDPOINT` in `.env` and uncomment the `otlp` exporter in `otel-collector-config.yaml`.
-See [Metrics](/self-hosting/manage/metrics) for Prometheus scraping and available metric types.
+See [Metrics](/self-hosting/manage/metrics/overview) for Prometheus scraping and available metric types.
 
 ### Scale API replicas
 
