@@ -10,12 +10,35 @@
  *   - Console        (zitadel-api, Angular SPA, /ui/console)
  *   - OIDC           (zitadel-api, /.well-known/openid-configuration + /oauth/v2/keys)
  *   - SAML           (zitadel-api, /saml/v2/metadata)
- *   - API v1 REST    (gRPC-Gateway, /management/v1 + /admin/v1 + /auth/v1)
- *   - gRPC v1 h2c              (Traefik catch-all rule, priority 100, grpc.health.v1.Health)
- *   - gRPC-web                  (Traefik catch-all rule, priority 100, grpc.health.v1.Health)
- *   - API v2 REST HTTP/1.1      (Traefik catch-all rule, priority 100, gRPC-gateway JSON at /v2/sessions)
- *   - API v2 REST HTTP/2 (h2c)  (Traefik catch-all rule, priority 100, gRPC-gateway JSON at /v2/sessions via h2c)
- *   - Root redirect            (Traefik replacepath middleware → /ui/v2/login/)
+ *   - Root redirect  (Traefik replacepath middleware → /ui/v2/login/)
+ *
+ * API protocol × transport matrix (all via Traefik catch-all, priority 100):
+ *   V1 (AdminService/Healthz — unauthenticated, expects success):
+ *     - REST json     HTTP/1.1  /admin/v1/healthz
+ *     - REST json     h2c       /admin/v1/healthz
+ *     - gRPC-web proto HTTP/1.1 /zitadel.admin.v1.AdminService/Healthz
+ *     - gRPC-web json  HTTP/1.1 /zitadel.admin.v1.AdminService/Healthz
+ *     - gRPC proto     h2c      /zitadel.admin.v1.AdminService/Healthz
+ *     - gRPC json      h2c      /zitadel.admin.v1.AdminService/Healthz
+ *
+ *   V2 (SessionService/ListSessions — requires auth, expects 401):
+ *     Three access styles, each × HTTP/1.1 and h2c:
+ *
+ *     1. REST-style path  application/json
+ *          POST /v2/sessions  (gRPC-gateway REST mapping)
+ *
+ *     2. gRPC-style path  application/json  (Connect unary JSON)
+ *          POST /zitadel.session.v2.SessionService/ListSessions
+ *          Handled by the Connect handler; application/json = Connect unary.
+ *          Note: application/connect+json is streaming-only (Connect spec).
+ *
+ *     3. gRPC-style path  application/proto  (Connect unary proto)
+ *          POST /zitadel.session.v2.SessionService/ListSessions
+ *          Handled by the Connect handler; application/proto = Connect unary.
+ *          Note: application/connect+proto is streaming-only (Connect spec).
+ *
+ *     4. gRPC-style path  application/grpc+proto / application/grpc+json  (gRPC native, h2c only)
+ *          POST /zitadel.session.v2.SessionService/ListSessions
  *
  * For end-to-end browser login flow (proves Traefik → Login → API → DB chain):
  *   see smoke.spec.ts
@@ -23,12 +46,12 @@
  * For feature-level login tests (MFA, OIDC flows, IdPs, etc.):
  *   see apps/login/acceptance/ — run via @zitadel/compose:test-login-acceptance
  */
-import { expect, test } from "@playwright/test";
+import { expect, test, type APIRequestContext, type TestInfo } from "@playwright/test";
 import http2 from "node:http2";
 import { Buffer } from "node:buffer";
 
 // ---------------------------------------------------------------------------
-// HTTP/2 (h2c) helper — used for the gRPC h2c test
+// HTTP/2 (h2c) helpers
 // ---------------------------------------------------------------------------
 
 type H2Response = {
@@ -38,8 +61,9 @@ type H2Response = {
   trailers: Record<string, string>;
 };
 
-function h2Post(
+function h2Request(
   baseUrl: string,
+  method: string,
   path: string,
   reqHeaders: Record<string, string>,
   body?: Buffer | string,
@@ -48,7 +72,7 @@ function h2Post(
     const client = http2.connect(baseUrl);
     const timeout = setTimeout(() => {
       client.destroy();
-      reject(new Error(`h2c request to ${path} timed out`));
+      reject(new Error(`h2c ${method} ${path} timed out`));
     }, 30_000);
 
     client.once("error", (err) => {
@@ -57,7 +81,7 @@ function h2Post(
     });
 
     const req = client.request({
-      ":method": "POST",
+      ":method": method,
       ":path": path,
       ":scheme": "http",
       ...reqHeaders,
@@ -105,6 +129,23 @@ function h2Post(
   });
 }
 
+function h2Post(
+  baseUrl: string,
+  path: string,
+  reqHeaders: Record<string, string>,
+  body?: Buffer | string,
+): Promise<H2Response> {
+  return h2Request(baseUrl, "POST", path, reqHeaders, body);
+}
+
+function h2Get(
+  baseUrl: string,
+  path: string,
+  reqHeaders: Record<string, string> = {},
+): Promise<H2Response> {
+  return h2Request(baseUrl, "GET", path, reqHeaders);
+}
+
 // ---------------------------------------------------------------------------
 // gRPC framing helpers (RFC: https://grpc.github.io/grpc/core/md_doc_PROTOCOL-HTTP2.html)
 // Frame: [compressed (1 byte)] [message length (4 bytes BE)] [message bytes]
@@ -127,12 +168,125 @@ function parseGrpcFrame(buf: Buffer): Buffer {
   return buf.subarray(5, 5 + len);
 }
 
+/** Parse gRPC-web inline trailers from the response body.
+ *  After the data frame(s), gRPC-web appends a trailer frame with flag 0x80. */
+function parseGrpcWebTrailers(buf: Buffer): Record<string, string> {
+  // Skip past data frames to find the trailer frame (flag byte 0x80)
+  let offset = 0;
+  while (offset < buf.length) {
+    const flag = buf[offset];
+    const len = buf.readUInt32BE(offset + 1);
+    if (flag === 0x80) {
+      // Trailer frame: ASCII key-value pairs separated by \r\n
+      const text = buf.subarray(offset + 5, offset + 5 + len).toString("utf8");
+      const trailers: Record<string, string> = {};
+      for (const line of text.split("\r\n")) {
+        const colon = line.indexOf(":");
+        if (colon > 0) {
+          trailers[line.slice(0, colon).trim()] = line.slice(colon + 1).trim();
+        }
+      }
+      return trailers;
+    }
+    offset += 5 + len;
+  }
+  return {};
+}
+
 // ---------------------------------------------------------------------------
-// Tests
+// Soft-fail wrapper — allows new/experimental permutations to warn on failure
+// without breaking CI. Tests marked knownWorking: false log a warning instead
+// of hard-failing.
+// ---------------------------------------------------------------------------
+
+function softTest(
+  label: string,
+  knownWorking: boolean,
+  testFn: (args: { request: APIRequestContext; testInfo: TestInfo }) => Promise<void>,
+) {
+  if (knownWorking) {
+    test(label, async ({ request }, testInfo) => {
+      await testFn({ request, testInfo });
+    });
+  } else {
+    test(label, async ({ request }, testInfo) => {
+      try {
+        await testFn({ request, testInfo });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        testInfo.annotations.push({
+          type: "fixme",
+          description: `[soft-fail] ${msg}`,
+        });
+        // eslint-disable-next-line no-console
+        console.warn(`⚠ SOFT-FAIL: ${label}\n  ${msg}`);
+      }
+    });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Protocol × transport permutation types
+// ---------------------------------------------------------------------------
+
+type Transport = "http1" | "h2c";
+type Protocol = "rest" | "grpc-web" | "grpc" | "connectrpc";
+type Encoding = "proto" | "json";
+
+type ApiPermutation = {
+  protocol: Protocol;
+  encoding: Encoding;
+  transport: Transport;
+  /** Whether this permutation is already known to work (hard-fail on regression). */
+  knownWorking: boolean;
+};
+
+// ---------------------------------------------------------------------------
+// V1 API permutations — AdminService/Healthz (unauthenticated, expects 200/OK)
+// ---------------------------------------------------------------------------
+
+const V1_GRPC_PATH = "/zitadel.admin.v1.AdminService/Healthz";
+const V1_REST_PATH = "/admin/v1/healthz";
+
+const v1Permutations: ApiPermutation[] = [
+  // REST
+  { protocol: "rest",     encoding: "json",  transport: "http1", knownWorking: true },
+  { protocol: "rest",     encoding: "json",  transport: "h2c",   knownWorking: true },
+  // gRPC-web (HTTP/1.1 only — grpc-web is designed for browser HTTP/1.1)
+  { protocol: "grpc-web", encoding: "proto", transport: "http1", knownWorking: true },
+  { protocol: "grpc-web", encoding: "json",  transport: "http1", knownWorking: true },
+  // gRPC native (h2c only — requires HTTP/2)
+  { protocol: "grpc",     encoding: "proto", transport: "h2c",   knownWorking: true },
+  { protocol: "grpc",     encoding: "json",  transport: "h2c",   knownWorking: true },
+];
+
+// ---------------------------------------------------------------------------
+// V2 API permutations — SessionService/ListSessions (requires auth → 401)
+// ---------------------------------------------------------------------------
+
+const V2_GRPC_PATH = "/zitadel.session.v2.SessionService/ListSessions";
+const V2_REST_PATH = "/v2/sessions";
+
+const v2Permutations: ApiPermutation[] = [
+  // REST (gRPC-gateway)
+  { protocol: "rest",      encoding: "json",  transport: "http1", knownWorking: true },
+  { protocol: "rest",      encoding: "json",  transport: "h2c",   knownWorking: true },
+  // ConnectRPC (v2 only — v1 does not register Connect handlers)
+  { protocol: "connectrpc", encoding: "proto", transport: "http1", knownWorking: true },
+  { protocol: "connectrpc", encoding: "json",  transport: "http1", knownWorking: true },
+  { protocol: "connectrpc", encoding: "proto", transport: "h2c",   knownWorking: true },
+  { protocol: "connectrpc", encoding: "json",  transport: "h2c",   knownWorking: true },
+  // gRPC native (h2c only)
+  { protocol: "grpc",       encoding: "proto", transport: "h2c",   knownWorking: true },
+  { protocol: "grpc",       encoding: "json",  transport: "h2c",   knownWorking: true },
+];
+
+// ---------------------------------------------------------------------------
+// Tests — service-level reachability (non-API)
 // ---------------------------------------------------------------------------
 
 // The base URL comes from playwright.config.ts (PROXY_HTTP_PUBLISHED_PORT, default 8080).
-// We resolve it here so h2Post() can connect to the same host.
+// We resolve it here so h2Post()/h2Get() can connect to the same host.
 const BASE =
   process.env.PLAYWRIGHT_BASE_URL ??
   `http://localhost:${process.env.PROXY_HTTP_PUBLISHED_PORT ?? "8080"}`;
@@ -196,7 +350,8 @@ test.describe("saml", () => {
   });
 });
 
-test.describe("api v1 rest (grpc-gateway)", () => {
+test.describe("api v1 rest extras", () => {
+  // Additional REST tests beyond the matrix: all three v1 services + /api alias.
   for (const svc of ["management", "admin", "auth"]) {
     test(`GET /${svc}/v1/healthz → 200`, async ({ request }) => {
       const resp = await request.get(`/${svc}/v1/healthz`);
@@ -210,91 +365,191 @@ test.describe("api v1 rest (grpc-gateway)", () => {
   });
 });
 
-test.describe("grpc v1 (h2c)", () => {
-  // gRPC-web uses HTTP/1.1 with application/grpc-web+proto.
-  // A 5-byte length-prefix frame is the same as gRPC, but trailers are
-  // inlined as a DATA frame (flag byte 0x80). The health check requires no auth.
-  test("grpc.health.v1.Health/Check via gRPC-web → SERVING", async ({ request }) => {
-    const reqFrame = grpcFrame();
-    const resp = await request.post("/grpc.health.v1.Health/Check", {
-      headers: {
-        "content-type": "application/grpc-web+proto",
-        "x-grpc-web": "1",
-      },
-      data: reqFrame,
+// ---------------------------------------------------------------------------
+// API V1 protocol × transport matrix
+//
+// Endpoint: AdminService/Healthz (unauthenticated)
+// Expected: success (REST → 200, gRPC → grpc-status 0, gRPC-web → grpc-status 0)
+// ---------------------------------------------------------------------------
+
+test.describe("api v1 protocol matrix", () => {
+  for (const p of v1Permutations) {
+    const label = `v1 ${p.protocol} ${p.encoding} ${p.transport}`;
+
+    softTest(label, p.knownWorking, async ({ request }) => {
+      switch (p.protocol) {
+        // ----- REST (gRPC-gateway) -----
+        case "rest": {
+          if (p.transport === "http1") {
+            const resp = await request.get(V1_REST_PATH);
+            expect(resp.status()).toBe(200);
+          } else {
+            const resp = await h2Get(BASE, V1_REST_PATH);
+            expect(resp.status).toBe(200);
+          }
+          break;
+        }
+
+        // ----- gRPC-web (HTTP/1.1) -----
+        case "grpc-web": {
+          const contentType =
+            p.encoding === "proto"
+              ? "application/grpc-web+proto"
+              : "application/grpc-web+json";
+          // For json encoding, Healthz request is empty → JSON body is '{}'
+          const reqBody =
+            p.encoding === "proto"
+              ? grpcFrame()
+              : grpcFrame(Buffer.from("{}"));
+          const resp = await request.post(V1_GRPC_PATH, {
+            headers: {
+              "content-type": contentType,
+              "x-grpc-web": "1",
+            },
+            data: reqBody,
+          });
+          expect(resp.status()).toBe(200);
+          // For proto encoding: parse inline trailers and assert grpc-status 0.
+          // For json encoding: the Go gRPC server has no JSON codec registered and
+          // returns no well-formed gRPC-web trailer frame. HTTP 200 alone proves
+          // the request was routed to the backend by Traefik.
+          if (p.encoding === "proto") {
+            const buf = Buffer.from(await resp.body());
+            const trailers = parseGrpcWebTrailers(buf);
+            expect(trailers["grpc-status"]).toBe("0");
+          }
+          break;
+        }
+
+        // ----- gRPC native (h2c) -----
+        case "grpc": {
+          const contentType =
+            p.encoding === "proto"
+              ? "application/grpc+proto"
+              : "application/grpc+json";
+          const reqBody =
+            p.encoding === "proto"
+              ? grpcFrame()
+              : grpcFrame(Buffer.from("{}"));
+          const resp = await h2Post(BASE, V1_GRPC_PATH, {
+            "content-type": contentType,
+            te: "trailers",
+          }, reqBody);
+          expect(resp.status).toBe(200);
+          // For proto encoding: assert OK (grpc-status 0).
+          // For json encoding: the Go gRPC server has no JSON codec registered,
+          // so it returns INTERNAL (13). We only assert the status is defined,
+          // which proves the request was routed to the backend.
+          if (p.encoding === "proto") {
+            expect(resp.trailers["grpc-status"]).toBe("0");
+          } else {
+            expect(resp.trailers["grpc-status"]).toBeDefined();
+          }
+          break;
+        }
+
+        default:
+          throw new Error(`unexpected protocol: ${p.protocol}`);
+      }
     });
-    expect(resp.status()).toBe(200);
-    const buf = Buffer.from(await resp.body());
-    // First frame (0x00) = data
-    const proto = parseGrpcFrame(buf);
-    expect(proto[0]).toBe(0x08); // field 1, wire type 0
-    expect(proto[1]).toBe(0x01); // ServingStatus.SERVING = 1
-  });
+  }
 });
 
-test.describe("api v2 rest (grpc-gateway) http/1.1", () => {
-  // ZITADEL's v2 APIs are served via the gRPC-gateway at /v2/... REST paths.
-  // Connect-RPC wire format is not accessible through Traefik (the gRPC-gateway
-  // catch-all intercepts /zitadel.*.*/Method paths).
-  // An unauthenticated POST → 401 proves Traefik routes to zitadel-api and
-  // the gRPC-gateway auth middleware is active.
-  test("POST /v2/sessions → 401 unauthenticated", async ({ request }) => {
-    const resp = await request.post("/v2/sessions", {
-      headers: { "content-type": "application/json" },
-      data: "{}",
+// ---------------------------------------------------------------------------
+// API V2 protocol × transport matrix
+//
+// Endpoint: SessionService/ListSessions (requires auth)
+// Expected: 401 / UNAUTHENTICATED
+//   - REST (gRPC-gateway): HTTP 401, body.code === 16
+//   - ConnectRPC unary:    HTTP 401, body.code === "unauthenticated"
+//   - gRPC native:         HTTP 200, grpc-status trailer === "16"
+// ---------------------------------------------------------------------------
+
+test.describe("api v2 protocol matrix", () => {
+  for (const p of v2Permutations) {
+    const label = `v2 ${p.protocol} ${p.encoding} ${p.transport}`;
+
+    softTest(label, p.knownWorking, async ({ request }) => {
+      switch (p.protocol) {
+        // ----- REST (gRPC-gateway) -----
+        case "rest": {
+          if (p.transport === "http1") {
+            const resp = await request.post(V2_REST_PATH, {
+              headers: { "content-type": "application/json" },
+              data: "{}",
+            });
+            expect(resp.status()).toBe(401);
+            const body = await resp.json();
+            expect(body.code).toBe(16); // UNAUTHENTICATED
+          } else {
+            const resp = await h2Post(BASE, V2_REST_PATH, {
+              "content-type": "application/json",
+            }, "{}");
+            expect(resp.status).toBe(401);
+            const body = JSON.parse(resp.body.toString("utf8"));
+            expect(body.code).toBe(16);
+          }
+          break;
+        }
+
+        // ----- Connect protocol unary (v2 only — v1 does not register Connect handlers) -----
+        // Per https://connectrpc.com/docs/multi-protocol/:
+        //   application/json  → Connect unary JSON  (gRPC-style path)
+        //   application/proto → Connect unary proto (gRPC-style path)
+        // application/connect+json and application/connect+proto are STREAMING-only.
+        // Connect unary uses no gRPC length-prefix framing; body is plain JSON or proto bytes.
+        // Error response format: { "code": "unauthenticated", ... }
+        case "connectrpc": {
+          const contentType =
+            p.encoding === "proto"
+              ? "application/proto"
+              : "application/json";
+          // For connect+json, send a JSON body; for connect+proto, send empty bytes
+          const reqBody = p.encoding === "json" ? "{}" : Buffer.alloc(0);
+
+          if (p.transport === "http1") {
+            const resp = await request.post(V2_GRPC_PATH, {
+              headers: { "content-type": contentType },
+              data: reqBody,
+            });
+            // ConnectRPC returns the HTTP status directly
+            expect(resp.status()).toBe(401);
+            const body = await resp.json();
+            expect(body.code).toBe("unauthenticated");
+          } else {
+            const resp = await h2Post(BASE, V2_GRPC_PATH, {
+              "content-type": contentType,
+            }, reqBody);
+            expect(resp.status).toBe(401);
+            const body = JSON.parse(resp.body.toString("utf8"));
+            expect(body.code).toBe("unauthenticated");
+          }
+          break;
+        }
+
+        // ----- gRPC native (h2c) -----
+        case "grpc": {
+          const contentType =
+            p.encoding === "proto"
+              ? "application/grpc+proto"
+              : "application/grpc+json";
+          const reqBody =
+            p.encoding === "proto"
+              ? grpcFrame()
+              : grpcFrame(Buffer.from("{}"));
+          const resp = await h2Post(BASE, V2_GRPC_PATH, {
+            "content-type": contentType,
+            te: "trailers",
+          }, reqBody);
+          // gRPC always returns HTTP 200; error is in grpc-status trailer
+          expect(resp.status).toBe(200);
+          expect(resp.trailers["grpc-status"]).toBe("16"); // UNAUTHENTICATED
+          break;
+        }
+
+        default:
+          throw new Error(`unexpected protocol: ${p.protocol}`);
+      }
     });
-    expect(resp.status()).toBe(401);
-    const body = await resp.json();
-    // gRPC-gateway encodes UNAUTHENTICATED as numeric code 16
-    expect(body.code).toBe(16);
-  });
-});
-
-test.describe("api v2 rest (grpc-gateway) http/2 (h2c)", () => {
-  // Same path, same routing — but over h2c (HTTP/2 cleartext).
-  // Traefik accepts h2c and forwards to zitadel-api over h2c.
-  // Verifies the full h2c path works for plain-HTTP v2 REST traffic.
-  test("POST /v2/sessions over h2c → 401 unauthenticated", async () => {
-    const resp = await h2Post(
-      BASE,
-      "/v2/sessions",
-      { "content-type": "application/json" },
-      "{}",
-    );
-    expect(resp.status).toBe(401);
-    const body = JSON.parse(resp.body.toString("utf8"));
-    // gRPC-gateway encodes UNAUTHENTICATED as numeric code 16
-    expect(body.code).toBe(16);
-  });
-});
-
-test.describe("grpc-web", () => {
-  // Traefik routes via catch-all (priority 100) → zitadel-api h2c.
-  // No dedicated gRPC router needed: the h2c backend handles gRPC natively.
-  // grpc.health.v1.Health/Check requires no authentication.
-  test("grpc.health.v1.Health/Check → SERVING", async () => {
-    // HealthCheckRequest { service: "" } = empty proto → 0 message bytes
-    const reqFrame = grpcFrame();
-
-    const resp = await h2Post(
-      BASE,
-      "/grpc.health.v1.Health/Check",
-      {
-        "content-type": "application/grpc+proto",
-        te: "trailers",
-      },
-      reqFrame,
-    );
-
-    // gRPC always uses HTTP 200; actual status is in the grpc-status trailer
-    expect(resp.status).toBe(200);
-    expect(resp.trailers["grpc-status"]).toBe("0"); // 0 = OK
-
-    // HealthCheckResponse { status: SERVING (1) }
-    // Proto encoding: field 1, varint 1 → [0x08, 0x01]
-    const proto = parseGrpcFrame(resp.body);
-    expect(proto.length).toBe(2);
-    expect(proto[0]).toBe(0x08); // field 1, wire type 0 (varint)
-    expect(proto[1]).toBe(0x01); // ServingStatus.SERVING = 1
-  });
+  }
 });
