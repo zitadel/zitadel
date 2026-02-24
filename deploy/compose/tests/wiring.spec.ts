@@ -174,6 +174,9 @@ function parseGrpcWebTrailers(buf: Buffer): Record<string, string> {
   // Skip past data frames to find the trailer frame (flag byte 0x80)
   let offset = 0;
   while (offset < buf.length) {
+    if (offset + 5 > buf.length) {
+      throw new Error(`Truncated gRPC-web frame at offset ${offset}: need 5 header bytes but only ${buf.length - offset} remain`);
+    }
     const flag = buf[offset];
     const len = buf.readUInt32BE(offset + 1);
     if (flag === 0x80) {

@@ -89,18 +89,6 @@
                 "cwd": "{projectRoot}",
                 "command": "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes"
             }
-        },
-        "test-login-acceptance": {
-            "description": "Runs the @zitadel/login acceptance (Playwright) suite against the running compose stack. Requires the stack to be up (run test-run first). Reads the admin machine-user PAT from the bootstrap volume, runs setup.sh to seed the test service account, then delegates to @zitadel/login:test-acceptance.",
-            "executor": "nx:run-commands",
-            "options": {
-                "cwd": "{workspaceRoot}",
-                "parallel": false,
-                "commands": [
-                    "echo '--- Extracting admin PAT from bootstrap volume ---' && ADMIN_PAT=$(docker run --rm -v zitadel-compose-test_zitadel-bootstrap:/b alpine cat /b/admin.pat) && echo 'PAT extracted.' && PAT=$ADMIN_PAT LOGIN_BASE_URL=http://localhost:8080 ZITADEL_API_URL=http://localhost:8080 WRITE_ENVIRONMENT_FILE=$(pwd)/apps/login/.env.test.local apps/login/acceptance/setup/setup.sh",
-                    "nx run @zitadel/login:test-acceptance"
-                ]
-            }
         }
     }
 }

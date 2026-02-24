@@ -239,6 +239,7 @@ services:
 
 networks:
   zitadel:
+    name: zitadel
 
 volumes:
   postgres-data:

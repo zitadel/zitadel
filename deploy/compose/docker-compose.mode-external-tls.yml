@@ -5,7 +5,7 @@ services:
       - --providers.docker.exposedbydefault=false
       - --providers.docker.network=zitadel
       - --entrypoints.web.address=:80
-      - --entrypoints.web.forwardedHeaders.insecure=true
+      - --entrypoints.web.forwardedHeaders.trustedIPs=${TRAEFIK_TRUSTED_IPS}
       - --entrypoints.websecure.address=:443
       - --api.dashboard=${TRAEFIK_DASHBOARD_ENABLED}
       - --api.insecure=false
