@@ -38,7 +38,7 @@ Optional services via profiles: `redis` (`cache`), `otel-collector` + `jaeger` (
 | `.env.test` | CI-only config | Used by NX `@zitadel/compose:test` |
 | `otel-collector-config.yaml` | OTEL Collector pipeline config | Traces only (OTLP → Jaeger) |
 | `traefik-local-tls.yml` | Traefik dynamic config for local certs | Referenced by local-tls overlay |
-| `project.json` | NX project definition | Targets: `test-config`, `test-run`, `test`, `stop` |
+| `project.json` | NX project definition | Targets: `test-config`, `test-run`, `test-e2e`, `test`, `test-full`, `stop`, `test-login-acceptance` |
 | `agents.md` | AI agent instructions for this directory | |
 
 ## Routing Rules
@@ -65,13 +65,19 @@ Both `web` (HTTP) and `websecure` (HTTPS) entrypoints have identical router sets
 
 `ZITADEL_EXTERNALDOMAIN`, `ZITADEL_EXTERNALPORT`, and `ZITADEL_EXTERNALSECURE` **must match the public URL** that users see. If they don't, ZITADEL returns "Instance not found" errors. This is the single most common deployment issue.
 
-## CI Testing
+## Testing
 
-The NX target `@zitadel/compose:test` runs:
+Local NX targets for testing the compose stack:
 
-1. **`test-config`** — validates all overlay combinations parse with `docker compose config`
-2. **`test-run`** — builds local images (`@zitadel/api:pack` + `@zitadel/login:pack`), starts the stack with `docker compose up --wait`
-3. **`test`** — curls 4 endpoints **through Traefik** (OIDC discovery, login health, API health, root redirect), then tears down
+| Target | What it does | Requires Docker? |
+|--------|-------------|------------------|
+| `test-config` | Validates all overlay combinations parse with `docker compose config` | No (just the CLI) |
+| `test-run` | Builds local images (`@zitadel/api:pack` + `@zitadel/login:pack`), starts the stack with `docker compose up --wait` | Yes |
+| `test-e2e` | Runs the Playwright login smoke test against `localhost:8080` through Traefik | Yes (stack must be running) |
+| `test` | Lightweight — delegates to `test-config` only. Safe for `nx affected` | No |
+| `test-full` | Full pipeline: `test-config` → `test-run` → curl smoke tests (4 endpoints through Traefik) → Playwright → teardown | Yes |
+| `stop` | Tears down the `zitadel-compose-test` stack and removes volumes | Yes |
+| `test-login-acceptance` | Extracts admin PAT, runs setup script, delegates to `@zitadel/login:test-acceptance` | Yes (stack must be running) |
 
 ## Rejected Alternatives
 

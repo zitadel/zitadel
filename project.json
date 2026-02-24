@@ -38,24 +38,6 @@
       "outputs": [
         "{workspaceRoot}/.artifacts/pack/checksums.txt"
       ]
-    },
-    "ci": {
-      "description": "Reproduces the lint_test_build CI job locally. Phase 1: lint + unit-test + build (no Docker). Phase 2: integration tests (needs Docker).",
-      "executor": "nx:run-commands",
-      "options": {
-        "parallel": false,
-        "commands": [
-          "pnpm nx affected --nxBail --targets lint test build --exclude @zitadel/docs",
-          "pnpm nx affected --nxBail --targets test-integration",
-          "git diff --exit-code"
-        ]
-      }
-    },
-    "ci-compose": {
-      "description": "Reproduces the compose_smoke_test CI job locally. Builds images, starts the stack, runs smoke tests and Playwright, then tears down.",
-      "dependsOn": [
-        "@zitadel/compose:test-full"
-      ]
     }
   }
 }

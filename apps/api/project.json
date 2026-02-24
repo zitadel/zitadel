@@ -150,9 +150,10 @@
             ]
         },
         "test": {
-            "description": "Runs unit tests only. Use test-integration for Docker-dependent integration tests.",
+            "description": "Runs all tests (unit and integration)",
             "dependsOn": [
-                "test-unit"
+                "test-unit",
+                "test-integration"
             ]
         },
         "test-unit": {
