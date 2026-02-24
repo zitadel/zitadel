@@ -144,7 +144,8 @@ Set in `.env`:
 ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE=grpc
 ```
 
-Jaeger UI is available at `http://localhost:16686`.
+Traces are logged to the collector's stdout by default (`docker compose logs otel-collector`).
+To forward traces to your own backend (Grafana Tempo, Jaeger, OpenObserve, etc.), set `OTEL_BACKEND_ENDPOINT` and uncomment the `otlp` exporter in `otel-collector-config.yaml`.
 
 ### Scale API replicas
 

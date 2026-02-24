@@ -22,7 +22,7 @@
           └──────────────┘
 ```
 
-Optional services via profiles: `redis` (`cache`), `otel-collector` + `jaeger` (`observability`).
+Optional services via profiles: `redis` (`cache`), `otel-collector` (`observability`).
 
 ## File Conventions
 
@@ -36,7 +36,7 @@ Optional services via profiles: `redis` (`cache`), `otel-collector` + `jaeger` (
 | `docker-compose.test.yml` | CI smoke test overlay | Overrides images to `:local` tags |
 | `.env.example` | User-facing config template | Copy to `.env` before first run |
 | `.env.test` | CI-only config | Used by NX `@zitadel/compose:test` |
-| `otel-collector-config.yaml` | OTEL Collector pipeline config | Traces only (OTLP → Jaeger) |
+| `otel-collector-config.yaml` | OTEL Collector pipeline config | Logs traces to stdout; configure `OTEL_BACKEND_ENDPOINT` to forward to a backend |
 | `traefik-local-tls.yml` | Traefik dynamic config for local certs | Referenced by local-tls overlay |
 | `project.json` | NX project definition | Targets: `test-config`, `test-run`, `test-e2e`, `test`, `test-full`, `stop`, `test-login-acceptance` |
 | `agents.md` | AI agent instructions for this directory | |

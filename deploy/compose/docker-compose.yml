@@ -244,21 +244,6 @@ services:
       - --config=/etc/otelcol/config.yaml
     volumes:
       - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
-    depends_on:
-      jaeger:
-        condition: service_started
-    networks:
-      - zitadel
-
-  jaeger:
-    image: ${JAEGER_IMAGE}
-    restart: unless-stopped
-    profiles:
-      - observability
-    environment:
-      COLLECTOR_OTLP_ENABLED: true
-    ports:
-      - ${JAEGER_UI_PUBLISHED_PORT}:16686
     networks:
       - zitadel
 

@@ -20,19 +20,35 @@ permissions:
   pull-requests: write
 
 jobs:
+  read-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      go_version: ${{ steps.go.outputs.version }}
+      node_version: ${{ steps.node.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read Go version from go.mod
+        id: go
+        run: echo "version=$(grep -m1 '^go ' go.mod | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - name: Read Node version from .nvmrc
+        id: node
+        run: echo "version=$(cat .nvmrc)" >> "$GITHUB_OUTPUT"
+
   lint_test_build:
+    needs: read-versions
     uses: ./.github/workflows/lint_test_build.yml
     if: ${{ github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: read
     with:
-      go_version: "1.25"
-      node_version: "22"
+      go_version: ${{ needs.read-versions.outputs.go_version }}
+      node_version: ${{ needs.read-versions.outputs.node_version }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       NX_CLOUD_ACCESS_TOKEN_READONLY: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
   pack:
+    needs: read-versions
     uses: ./.github/workflows/pack.yml
     permissions:
       contents: write
@@ -41,8 +57,8 @@ jobs:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
-      go_version: "1.25"
-      node_version: "22"
+      go_version: ${{ needs.read-versions.outputs.go_version }}
+      node_version: ${{ needs.read-versions.outputs.node_version }}
       semantic_version: "23.0.7"
       image_name_github_api: "ghcr.io/zitadel/zitadel"
       image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
@@ -57,6 +73,7 @@ jobs:
       issues: write
       pull-requests: write
     needs:
+      - read-versions
       - lint_test_build
       - pack
     if: ${{ github.event_name == 'workflow_dispatch' }}

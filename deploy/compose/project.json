@@ -32,7 +32,11 @@
             "executor": "nx:run-commands",
             "options": {
                 "cwd": "{projectRoot}",
-                "command": "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes --remove-orphans && docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test up --force-recreate --wait"
+                "parallel": false,
+                "commands": [
+                    "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes --remove-orphans",
+                    "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test up --force-recreate --wait"
+                ]
             }
         },
         "test-e2e": {
