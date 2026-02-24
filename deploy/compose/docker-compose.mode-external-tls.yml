@@ -13,7 +13,7 @@ services:
       - --ping.entrypoint=web
       - --log.level=${TRAEFIK_LOG_LEVEL}
       - --accesslog=${TRAEFIK_ACCESSLOG_ENABLED}
-    ports:
+    ports: !override
       - 80:80
 
   zitadel-api:

@@ -5,7 +5,6 @@ description: Deploy ZITADEL with Docker Compose — from a 2-minute localhost qu
 ---
 
 import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
-import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
 
@@ -15,6 +14,8 @@ This guide takes you from zero to a running ZITADEL instance in minutes and then
 
 - Docker Engine 24+ with the Compose plugin (`docker compose`)
 - A machine with at least 2 GB RAM
+
+See [Requirements](/self-hosting/manage/requirements) for supported database, cache, and proxy versions.
 
 ## Stage 1 — Quickstart (2 minutes)
 
@@ -37,25 +38,37 @@ That's it. Visit [http://localhost:8080](http://localhost:8080) to open the logi
 <DefaultUser components={props.components} />
 
 <Callout type="info">
-The base stack runs: **Traefik** (reverse proxy) → **ZITADEL API** (Go) + **ZITADEL Login** (Next.js) → **PostgreSQL**.
-All routing, including gRPC, is handled automatically by Traefik — no extra configuration needed.
+The base stack runs: **Traefik** ([reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)) → **ZITADEL API** (Go) + **ZITADEL Login** (Next.js) → **PostgreSQL**.
+All routing, including [gRPC over HTTP/2](/self-hosting/manage/http2), is handled automatically by Traefik — no extra configuration needed.
 </Callout>
 
 ## Stage 2 — Homelab / Semi-Production
 
 ### Use your own domain
 
-Edit `.env` and set your real domain:
+Edit `.env` and set your real domain (see [Custom Domains](/self-hosting/manage/custom-domain) for details):
 
 ```dotenv
 ZITADEL_DOMAIN=auth.example.com
 ```
 
-### Enable TLS with Let's Encrypt
+### Enable TLS
 
-The easiest path for a homelab with a public domain:
+Pick a TLS mode and download the matching overlay file:
+
+| Mode | Overlay file | When to use |
+|------|-------------|-------------|
+| Let's Encrypt | `docker-compose.mode-letsencrypt.yml` | Public domain, automatic certs |
+| External TLS | `docker-compose.mode-external-tls.yml` | Behind a load balancer, CDN, or WAF that terminates TLS |
+| Local TLS | `docker-compose.mode-local-tls.yml` | Self-signed certs for LAN-only access |
+
+Download the overlay you need, then start with both files:
 
 ```shell
+# Download the overlay (replace with your chosen mode)
+curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/docker-compose.mode-letsencrypt.yml
+
+# Start with the overlay
 docker compose --env-file .env \
   -f docker-compose.yml \
   -f docker-compose.mode-letsencrypt.yml \
@@ -64,22 +77,11 @@ docker compose --env-file .env \
 
 Set `LETSENCRYPT_EMAIL` in `.env` to receive certificate expiry notifications.
 
-Other TLS options:
-
-| Mode | Overlay file | When to use |
-|------|-------------|-------------|
-| Let's Encrypt | `docker-compose.mode-letsencrypt.yml` | Public domain, automatic certs |
-| External TLS | `docker-compose.mode-external-tls.yml` | Behind a load balancer, CDN, or WAF that terminates TLS |
-| Local TLS | `docker-compose.mode-local-tls.yml` | Self-signed certs for LAN-only access |
-
-**For Stage 2** (TLS overlays), users download the specific overlay they need the same way:
-
-```shell
-# Example: download the Let's Encrypt overlay
-curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/docker-compose.mode-letsencrypt.yml
-```
-
 ### Harden secrets
+
+<Callout type="warn">
+The masterkey [encrypts sensitive data at rest](/concepts/architecture/secrets). Once ZITADEL has been initialized with a masterkey, it **cannot be changed** without losing access to encrypted data. Generate it **before first start** and store it safely.
+</Callout>
 
 ```shell
 # Generate a secure masterkey (must be exactly 32 characters)
@@ -91,7 +93,7 @@ echo "POSTGRES_ADMIN_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)" >>
 echo "POSTGRES_ZITADEL_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)" >> .env
 ```
 
-### Understanding ExternalDomain, ExternalPort, ExternalSecure
+### External URL settings
 
 These three settings **must match your public endpoint exactly**:
 
@@ -107,11 +109,7 @@ If these don't match reality, ZITADEL returns **"Instance not found"** errors. T
 
 ### Enable caching with Redis
 
-```shell
-docker compose --env-file .env -f docker-compose.yml --profile cache up -d --wait
-```
-
-Then set in `.env`:
+See [Cache Configuration](/self-hosting/manage/cache) for all available options. Add these to `.env`:
 
 ```dotenv
 ZITADEL_CACHES_CONNECTORS_REDIS_ENABLED=true
@@ -120,13 +118,21 @@ ZITADEL_CACHES_MILESTONES_CONNECTOR=redis
 ZITADEL_CACHES_ORGANIZATION_CONNECTOR=redis
 ```
 
+Then start with the `cache` profile:
+
+```shell
+docker compose --env-file .env -f docker-compose.yml --profile cache up -d --wait
+```
+
 ## Stage 3 — Beyond Compose
 
 ### Production-like init/setup/start split
 
-For controlled upgrades, separate database initialization from the running API:
+For controlled upgrades, separate [database initialization from the running API](/self-hosting/manage/updating_scaling):
 
 ```shell
+curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/docker-compose.prodlike.yml &&
+
 docker compose --env-file .env \
   -f docker-compose.yml \
   -f docker-compose.prodlike.yml \
@@ -140,23 +146,35 @@ This creates three ZITADEL containers:
 
 ### Enable observability
 
-```shell
-docker compose --env-file .env -f docker-compose.yml --profile observability up -d --wait
-```
-
 Set in `.env`:
 
 ```dotenv
 ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE=grpc
 ```
 
+Download the collector configuration and start with the `observability` profile:
+
+```shell
+curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/otel-collector-config.yaml &&
+
+docker compose --env-file .env -f docker-compose.yml --profile observability up -d --wait
+```
+
 Traces are logged to the collector's stdout by default (`docker compose logs otel-collector`).
-To forward traces to your own backend (Grafana Tempo, Jaeger, OpenObserve, etc.), set `OTEL_BACKEND_ENDPOINT` and uncomment the `otlp` exporter in `otel-collector-config.yaml`.
+To forward traces to your own backend (Grafana Tempo, Jaeger, OpenObserve, etc.), set `OTEL_BACKEND_ENDPOINT` in `.env` and uncomment the `otlp` exporter in `otel-collector-config.yaml`.
+See [Metrics](/self-hosting/manage/metrics) for Prometheus scraping and available metric types.
 
 ### Scale API replicas
 
+<Callout type="info">
+Scaling requires the **prodlike overlay** so that migrations run once in `zitadel-init` instead of on every replica.
+</Callout>
+
 ```shell
-docker compose --env-file .env -f docker-compose.yml up -d --scale zitadel-api=3
+docker compose --env-file .env \
+  -f docker-compose.yml \
+  -f docker-compose.prodlike.yml \
+  up -d --scale zitadel-api=3
 ```
 
 ### Updating ZITADEL
@@ -176,7 +194,7 @@ To change settings on an existing installation, use the Admin Console or Admin A
 ### Moving to Kubernetes
 
 Docker Compose is ideal for getting started and homelab deployments.
-For production workloads, ZITADEL provides an official [Helm chart for Kubernetes](/self-hosting/deploy/kubernetes).
+For production workloads, review the [Production Checklist](/self-hosting/manage/productionchecklist) and deploy with the official [Helm chart for Kubernetes](/self-hosting/deploy/kubernetes).
 
 The compose pack and the Helm chart share the same application configuration model (`ZITADEL_*` environment variables), so migration is straightforward.
 
