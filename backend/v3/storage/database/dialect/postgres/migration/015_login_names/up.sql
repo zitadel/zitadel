@@ -214,35 +214,28 @@ BEGIN
 
     RAISE NOTICE 'deleted_login_names params: instance_id: %, used_setting: %', NEW.instance_id, OLD.id;
 
-    WITH deleted_login_names AS (
+    WITH affected_users AS (
         DELETE FROM zitadel.login_names
         WHERE
             login_names.instance_id = NEW.instance_id
             AND login_names.used_setting = OLD.id
             AND (NEW.organization_id IS NULL OR login_names.organization_id = NEW.organization_id)
         RETURNING instance_id, organization_id, user_id
-    ), affected_users AS (
-    SELECT DISTINCT 
-        deleted_login_names.instance_id
-        , deleted_login_names.organization_id
-        , deleted_login_names.user_id
-        , users.username
-        FROM deleted_login_names
-        JOIN zitadel.users ON 
-            users.instance_id = deleted_login_names.instance_id
-            AND users.id = deleted_login_names.user_id
     )
     INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
-    SELECT DISTINCT
+    SELECT DISTINCT ON (au.instance_id, au.user_id, users.username, org_domains.domain)
         au.instance_id
         , au.organization_id
         , au.user_id
-        , au.username
+        , users.username
         , org_domains.domain
         , org_domains.is_primary IS NULL OR org_domains.is_primary
         , NEW.id
     FROM
         affected_users au
+    JOIN zitadel.users ON
+        users.instance_id = au.instance_id
+        AND users.id = au.user_id
     LEFT JOIN zitadel.org_domains ON 
         org_domains.instance_id = au.instance_id
         AND org_domains.org_id = au.organization_id
