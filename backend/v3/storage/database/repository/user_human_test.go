@@ -571,6 +571,71 @@ func Test_humanUser_create(t *testing.T) {
 				},
 			}
 		}(),
+		func() test {
+			username := gofakeit.Username()
+			id := gofakeit.UUID()
+			firstName := gofakeit.FirstName()
+			lastName := gofakeit.LastName()
+			email := gofakeit.Email()
+
+			return test{
+				name: "with recovery codes",
+				args: args{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Password: domain.HumanPassword{
+								Hash:             password,
+								IsChangeRequired: true,
+							},
+							Email: domain.HumanEmail{
+								Address: email,
+							},
+							RecoveryCodes: &domain.HumanRecoveryCodes{
+								Codes:      []string{"code1", "code2"},
+								VerifiedAt: createdAt,
+							},
+						},
+					},
+				},
+				want: want{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						UpdatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Email: domain.HumanEmail{
+								Address:           email,
+								UnverifiedAddress: email,
+								VerifiedAt:        createdAt,
+							},
+							Password: domain.HumanPassword{
+								Hash:             password,
+								IsChangeRequired: true,
+								ChangedAt:        createdAt,
+							},
+							RecoveryCodes: &domain.HumanRecoveryCodes{
+								VerifiedAt: createdAt,
+								Codes:      []string{"code1", "code2"},
+							},
+						},
+					},
+				},
+			}
+		}(),
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

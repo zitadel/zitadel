@@ -76,6 +76,13 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 		}
 	}
 
+	if user.Human.RecoveryCodes != nil {
+		columnValues["recovery_codes"] = user.Human.RecoveryCodes.Codes
+		if !user.Human.RecoveryCodes.VerifiedAt.IsZero() {
+			columnValues["recovery_code_verified_at"] = user.Human.RecoveryCodes.VerifiedAt
+		}
+	}
+
 	for i, link := range user.Human.IdentityProviderLinks {
 		name := fmt.Sprintf("idp_link_%d", i)
 		ctes[name] = u.AddIdentityProviderLink(link).(database.CTEChange)
@@ -268,6 +275,11 @@ func (u userHuman) Update(ctx context.Context, client database.QueryExecutor, co
 		condition = database.And(condition, u.TypeCondition(domain.UserTypeHuman))
 	}
 	return u.user.Update(ctx, client, condition, changes...)
+}
+
+func (u userHuman) ListRecoveryCodes(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.HumanRecoveryCodes, error) {
+	// TODO: review if this is needed
+	return nil, nil
 }
 
 var _ domain.HumanUserRepository = (*userHuman)(nil)
