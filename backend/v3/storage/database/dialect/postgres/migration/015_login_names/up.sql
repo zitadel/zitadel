@@ -26,9 +26,13 @@ DECLARE
 BEGIN
     IF (NOT NEW.is_verified) THEN
         -- TODO(adlerhurst): is it possible that the domain is updated from verified to unverified?
-        RAISE NOTICE 'Domain % is not verified, skipping login name manipulation', NEW.domain;
+        RAISE NOTICE 'Domain is not verified, skipping login name manipulation';
         RETURN NULL;
     END IF;
+
+    -- we need to prevent concurrent updates on the same instance, otherwise we might end up with inconsistent login names. 
+    -- The lock is released at the end of the transaction, so we are safe even if there are multiple updates for the same instance in the same transaction.
+    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id));
 
     SELECT settings.*
     INTO setting
@@ -40,15 +44,13 @@ BEGIN
     ORDER BY settings.organization_id NULLS LAST
     LIMIT 1;
 
-    RAISE NOTICE 'Found setting % for domain %', setting.id, NEW.domain;
-
     IF NOT (setting.settings->'loginNameIncludesDomain')::BOOLEAN THEN
-        RAISE NOTICE 'skipping because loginNameIncludesDomain is false for setting %', setting.id;
+        RAISE NOTICE 'skip adding domain because loginNameIncludesDomain is false for setting';
         RETURN NULL;
     END IF;
 
     IF NEW.is_primary IS DISTINCT FROM OLD.is_primary THEN
-        RAISE NOTICE 'Updating preferred login name for domain % to %', NEW.domain, NEW.is_primary;
+        RAISE NOTICE 'primary domain changed, updating preferred login name';
         UPDATE zitadel.login_names
         SET is_preferred = NEW.is_primary
         WHERE
@@ -57,7 +59,7 @@ BEGIN
     END IF;
 
     IF NEW.domain IS DISTINCT FROM OLD.domain THEN
-        RAISE NOTICE 'Domain is changed from % to %, updating login names', OLD.domain, NEW.domain;
+        RAISE NOTICE 'domain changed, updating login names';
         UPDATE zitadel.login_names
         SET domain = NEW.domain
         WHERE
@@ -67,7 +69,7 @@ BEGIN
     END IF;
 
     IF NEW.is_verified IS DISTINCT FROM OLD.is_verified THEN
-        RAISE NOTICE 'Domain verification status is changed from % to % for domain %, inserting login names for verified domain', OLD.is_verified, NEW.is_verified, NEW.domain;
+        RAISE NOTICE 'Domain verification changed, inserting login names for verified domain';
         INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
         SELECT
             NEW.instance_id
@@ -95,7 +97,10 @@ EXECUTE FUNCTION zitadel.apply_domain_manipulation_to_login_names();
 
 CREATE OR REPLACE FUNCTION zitadel.apply_user_update_to_login_names() RETURNS TRIGGER AS $$
 BEGIN
-    RAISE NOTICE 'Updating login names for user % with new username %', NEW.id, NEW.username;
+    -- we need to prevent concurrent updates on the same instance, otherwise we might end up with inconsistent login names. 
+    -- The lock is released at the end of the transaction, so we are safe even if there are multiple updates for the same instance in the same transaction.
+    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id));
+
     UPDATE
         zitadel.login_names
     SET
@@ -118,6 +123,10 @@ CREATE OR REPLACE FUNCTION zitadel.apply_user_insert_to_login_names() RETURNS TR
 DECLARE
     setting zitadel.settings%ROWTYPE;
 BEGIN
+    -- we need to prevent concurrent updates on the same instance, otherwise we might end up with inconsistent login names. 
+    -- The lock is released at the end of the transaction, so we are safe even if there are multiple updates for the same instance in the same transaction.
+    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id));
+
     SELECT settings.*
     INTO setting
     FROM
@@ -133,14 +142,14 @@ BEGIN
     LIMIT 1;
 
     IF NOT (setting.settings->'loginNameIncludesDomain')::BOOLEAN THEN
-        RAISE NOTICE 'inserting username as login name for setting user %', NEW.id;
+        RAISE NOTICE 'inserting username as login name';
         INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, is_preferred, used_setting)
         VALUES (NEW.instance_id, NEW.organization_id, NEW.id, NEW.username, TRUE, setting.id);
         
         RETURN NULL;
     END IF;
 
-    RAISE NOTICE 'inserting login names of user % based on setting %', NEW.id, setting.id;
+    RAISE NOTICE 'inserting login names';
     INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
     SELECT
         NEW.instance_id
@@ -169,8 +178,8 @@ EXECUTE FUNCTION zitadel.apply_user_insert_to_login_names();
 CREATE OR REPLACE FUNCTION zitadel.apply_domain_policy_manipulation_to_login_names() RETURNS TRIGGER AS $$
 BEGIN
     CASE TG_OP
+        -- insert and delete can only happen on organization level therefore we can load the instance level setting as OLD or NEW.
         WHEN 'DELETE' THEN
-            -- delete can only be executed on organization level, therefore we check the instance level setting.
             SELECT
                 settings.*
             INTO
@@ -192,11 +201,16 @@ BEGIN
                 settings.instance_id = NEW.instance_id
                 AND settings.type = 'domain'
                 AND settings.organization_id IS NULL;
-        WHEN 'UPDATE' THEN
+        ELSE
             -- OLD and NEW are already populated, do nothing
     END CASE;
+
+    -- we need to prevent concurrent updates on the same instance, otherwise we might end up with inconsistent login names. 
+    -- The lock is released at the end of the transaction, so we are safe even if there are multiple updates for the same instance in the same transaction.
+    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id));
     
     IF (OLD.settings->'loginNameIncludesDomain')::BOOLEAN IS NOT DISTINCT FROM (NEW.settings->'loginNameIncludesDomain')::BOOLEAN THEN
+        -- field not changed but the setting id did change.
         IF TG_OP = 'DELETE' OR TG_OP = 'INSERT' THEN
             UPDATE
                 zitadel.login_names
@@ -212,7 +226,7 @@ BEGIN
         RETURN NULL;
     END IF;
 
-    RAISE NOTICE 'deleted_login_names params: instance_id: %, used_setting: %', NEW.instance_id, OLD.id;
+    RAISE NOTICE 'recompute login names';
 
     WITH affected_users AS (
         DELETE FROM zitadel.login_names
