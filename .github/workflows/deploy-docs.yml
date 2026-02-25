@@ -44,7 +44,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: "pnpm"
 
       - name: Install dependencies
@@ -54,7 +54,12 @@ jobs:
         uses: nrwl/nx-set-shas@v4
 
       - name: Build docs (Nx pipeline)
-        run: pnpm nx affected --target=build --projects=@zitadel/docs
+        run: |
+          if pnpm nx show projects --affected --plain | grep -qxF '@zitadel/docs'; then
+            pnpm nx run @zitadel/docs:build
+          else
+            echo "Docs not affected, skipping build."
+          fi
         env:
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
