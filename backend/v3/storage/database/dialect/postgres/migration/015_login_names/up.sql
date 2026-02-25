@@ -30,10 +30,6 @@ BEGIN
         RETURN NULL;
     END IF;
 
-    -- we need to prevent concurrent updates on the same instance, otherwise we might end up with inconsistent login names. 
-    -- The lock is released at the end of the transaction, so we are safe even if there are multiple updates for the same instance in the same transaction.
-    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id));
-
     SELECT settings.*
     INTO setting
     FROM zitadel.settings
@@ -48,6 +44,13 @@ BEGIN
         RAISE NOTICE 'skip adding domain because loginNameIncludesDomain is false for setting';
         RETURN NULL;
     END IF;
+
+    -- Lock based on the setting scope (organization-specific or instance-level/global).
+    -- The lock is released at transaction end.
+    PERFORM pg_advisory_xact_lock(
+        hashtext('zitadel.login_names')
+        , hashtext(setting.instance_id || ':' || COALESCE(setting.organization_id, 'global'))
+    );
 
     IF NEW.is_primary IS DISTINCT FROM OLD.is_primary THEN
         RAISE NOTICE 'primary domain changed, updating preferred login name';
@@ -97,9 +100,11 @@ EXECUTE FUNCTION zitadel.apply_domain_manipulation_to_login_names();
 
 CREATE OR REPLACE FUNCTION zitadel.apply_user_update_to_login_names() RETURNS TRIGGER AS $$
 BEGIN
-    -- we need to prevent concurrent updates on the same instance, otherwise we might end up with inconsistent login names. 
-    -- The lock is released at the end of the transaction, so we are safe even if there are multiple updates for the same instance in the same transaction.
-    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id));
+    -- Lock global scope and organization scope to serialize with instance-level
+    -- and org-level setting/domain manipulations.
+    -- The lock is released at transaction end.
+    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id || ':global'));
+    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id || ':' || NEW.organization_id));
 
     UPDATE
         zitadel.login_names
@@ -123,10 +128,6 @@ CREATE OR REPLACE FUNCTION zitadel.apply_user_insert_to_login_names() RETURNS TR
 DECLARE
     setting zitadel.settings%ROWTYPE;
 BEGIN
-    -- we need to prevent concurrent updates on the same instance, otherwise we might end up with inconsistent login names. 
-    -- The lock is released at the end of the transaction, so we are safe even if there are multiple updates for the same instance in the same transaction.
-    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id));
-
     SELECT settings.*
     INTO setting
     FROM
@@ -140,6 +141,13 @@ BEGIN
         )
     ORDER BY settings.organization_id NULLS LAST
     LIMIT 1;
+
+    -- Lock based on the setting scope (organization-specific or instance-level/global).
+    -- The lock is released at transaction end.
+    PERFORM pg_advisory_xact_lock(
+        hashtext('zitadel.login_names')
+        , hashtext(setting.instance_id || ':' || COALESCE(setting.organization_id, 'global'))
+    );
 
     IF NOT (setting.settings->'loginNameIncludesDomain')::BOOLEAN THEN
         RAISE NOTICE 'inserting username as login name';
@@ -176,6 +184,9 @@ FOR EACH ROW
 EXECUTE FUNCTION zitadel.apply_user_insert_to_login_names();
 
 CREATE OR REPLACE FUNCTION zitadel.apply_domain_policy_manipulation_to_login_names() RETURNS TRIGGER AS $$
+DECLARE
+    old_lock_key INT4;
+    new_lock_key INT4;
 BEGIN
     CASE TG_OP
         -- insert and delete can only happen on organization level therefore we can load the instance level setting as OLD or NEW.
@@ -205,9 +216,16 @@ BEGIN
             -- OLD and NEW are already populated, do nothing
     END CASE;
 
-    -- we need to prevent concurrent updates on the same instance, otherwise we might end up with inconsistent login names. 
-    -- The lock is released at the end of the transaction, so we are safe even if there are multiple updates for the same instance in the same transaction.
-    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id));
+    -- Lock both OLD and NEW setting scopes to serialize transitions across settings.
+    -- Acquire in deterministic order to avoid deadlocks.
+    old_lock_key := hashtext(OLD.instance_id || ':' || COALESCE(OLD.organization_id, 'global'));
+    new_lock_key := hashtext(NEW.instance_id || ':' || COALESCE(NEW.organization_id, 'global'));
+    IF old_lock_key = new_lock_key THEN
+        PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), old_lock_key);
+    ELSE
+        PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), new_lock_key);
+        PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), old_lock_key);
+    END IF;
     
     IF (OLD.settings->'loginNameIncludesDomain')::BOOLEAN IS NOT DISTINCT FROM (NEW.settings->'loginNameIncludesDomain')::BOOLEAN THEN
         -- field not changed but the setting id did change.
