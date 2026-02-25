@@ -87,6 +87,13 @@ jobs:
             echo "env_name=Production – docs" >> $GITHUB_OUTPUT
           fi
 
+      - name: Build docs (Nx pipeline)
+        if: steps.affected.outputs.affected == 'true'
+        run: pnpm nx run @zitadel/docs:build
+        env:
+          NX_DAEMON: "false"
+          NX_DISABLE_DB: "true"
+
       - name: Pull Vercel project settings
         if: steps.affected.outputs.affected == 'true'
         run: pnpm exec vercel pull --yes --environment=${{ steps.env.outputs.target }} --token=${{ secrets.VERCEL_TOKEN }}
@@ -95,14 +102,13 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
 
-      - name: Build and Package for Vercel
+      - name: Package for Vercel
         if: steps.affected.outputs.affected == 'true'
         run: pnpm exec vercel build ${{ steps.env.outputs.is_prod == 'true' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: apps/docs
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
-
       - name: Deploy to Vercel
         if: steps.affected.outputs.affected == 'true'
         id: deploy
