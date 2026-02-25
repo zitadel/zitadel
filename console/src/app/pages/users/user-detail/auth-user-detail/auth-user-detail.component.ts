@@ -187,7 +187,6 @@ export class AuthUserDetailComponent implements OnInit {
           catchError(() => of(false)),
         ),
       ),
-      startWith(true),
     );
   }
 
