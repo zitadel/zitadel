@@ -90,8 +90,6 @@ go.work.sum
 # Local Netlify folder
 .netlify
 
-.vercel
-
 # PNPM
 .pnpm-store
 
