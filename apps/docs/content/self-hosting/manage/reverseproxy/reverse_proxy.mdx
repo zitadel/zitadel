@@ -3,6 +3,36 @@ title: Reverse Proxy Configuration
 description: "Setup and configure reverse proxies like Traefik, NGINX, and Caddy to manage external traffic for self-hosted ZITADEL."
 ---
 
+ZITADEL exposes a single HTTP/2 port (default `8080`) that serves both gRPC and HTTP APIs, as well as the management console.
+Running a reverse proxy in front of ZITADEL is the recommended approach for production deployments because it:
+
+- Terminates TLS and provides HTTPS to clients
+- Exposes standard ports (`80`/`443`) while keeping ZITADEL on an internal port
+- Handles certificate renewal (e.g. via Let's Encrypt)
+- Enables path-based routing between the ZITADEL API and the Login UI
+
+## HTTP/2 and h2c requirements
+
+ZITADEL relies on HTTP/2 for all gRPC communication.
+When the reverse proxy terminates TLS, it must forward traffic to ZITADEL using **h2c** (unencrypted HTTP/2), not HTTP/1.1.
+Not all reverse proxies support h2c by default — check the proxy-specific guides below for configuration examples.
+
+For more details, see [HTTP/2 Support in ZITADEL](/self-hosting/manage/http2).
+
+## TLS modes
+
+ZITADEL supports three TLS modes that affect how the reverse proxy should be configured:
+
+| Mode | Description | Typical use |
+|------|-------------|-------------|
+| `disabled` | ZITADEL listens on plain HTTP, reverse proxy handles nothing special | Local development, h2c passthrough |
+| `external` | ZITADEL listens on plain HTTP; reverse proxy terminates TLS | Most production setups |
+| `enabled` | ZITADEL itself terminates TLS (end-to-end encryption) | Environments requiring mutual TLS |
+
+For more details, see [TLS Modes](/self-hosting/manage/tls_modes).
+
+## Proxy guides
+
 Check out one of the following guides to configure your favorite reverse proxy:
 
 - [Traefik](/self-hosting/manage/reverseproxy/traefik)
@@ -12,3 +42,14 @@ Check out one of the following guides to configure your favorite reverse proxy:
 - [Cloudflare](/self-hosting/manage/reverseproxy/cloudflare)
 - [Cloudflare Tunnel](/self-hosting/manage/reverseproxy/cloudflare_tunnel)
 - [Fronting Zitadel Cloud](/self-hosting/manage/reverseproxy/zitadel_cloud)
+
+## Login UI routing
+
+When running both the ZITADEL API and the Login V2 UI (`zitadel-login`) behind a reverse proxy, the proxy must route traffic to the correct upstream:
+
+- `/ui/v2/login` → Login UI container (port `3000` by default)
+- All other paths → ZITADEL API container (port `8080` by default)
+
+The proxy-specific guides include Docker Compose examples that demonstrate this split routing.
+
+For tested proxy versions, see [ZITADEL Requirements](/self-hosting/manage/requirements#reverse-proxy).
