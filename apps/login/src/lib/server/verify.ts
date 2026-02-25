@@ -16,6 +16,7 @@ import crypto from "crypto";
 import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { cookies, headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
@@ -113,8 +114,16 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     return { error: t("errors.couldNotLoadAuthenticators") };
   }
 
-  // if no authmethods are found on the user, redirect to set one up
-  if (authMethodResponse && authMethodResponse.authMethodTypes && authMethodResponse.authMethodTypes.length == 0) {
+  const hasPrimaryMethod =
+    authMethodResponse?.authMethodTypes?.some(
+      (m: AuthenticationMethodType) =>
+        m === AuthenticationMethodType.PASSWORD ||
+        m === AuthenticationMethodType.PASSKEY ||
+        m === AuthenticationMethodType.IDP,
+    ) ?? false;
+
+  // if no primary auth methods are found on the user, redirect to set one up
+  if (!hasPrimaryMethod) {
     if (!session) {
       const checks = create(ChecksSchema, {
         user: {
