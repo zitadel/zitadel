@@ -55,7 +55,7 @@ We built ZITADEL to handle the hardest IAM challenges at scale — starting with
 | B2B Organizations | ✅ Native & Unlimited | 🟡 via Entity Management | ✅ (Recent addition) | 🟡 (Plan/Account dependent) |
 | Full audit trail | ✅ Comprehensive Event Stream* | 🟡 Audit logs | 🟡 Audit logs | 🟡 Audit logs |
 | Passkeys (FIDO2) | ✅ | ✅ | ✅ | ✅ |
-| [Actions / webhooks](https://zitadel.com/docs/guides/manage/console/actions-overview) | ✅ | ✅ | 🟡 via SPI | ✅ |
+| [Actions / webhooks](https://zitadel.com/docs/concepts/features/actions_v2) | ✅ | ✅ | 🟡 via SPI | ✅ |
 | API-first (gRPC + REST) | ✅ | 🟡 REST only | 🟡 REST only | 🟡 REST only |
 | SaaS + self-host parity | ✅ | ✅ | ➖ N/A | ➖ N/A |
 
@@ -65,7 +65,7 @@ ZITADEL Cloud and self-hosted ZITADEL run the same codebase.
 - **Relational core, event-driven soul** — every mutation is written as an immutable event for a complete, API-accessible [audit trail](https://zitadel.com/docs/concepts/features/audit-trail). Unlike systems that log only select activities, ZITADEL provides a comprehensive event stream that can be audited or streamed to external systems via Webhooks.
 - **Strict multi-tenant hierarchy** — Identity System → Organizations → Projects, with isolated data and policy scoping at multiple levels
 - **API-first design** — every resource and action is available via [connectRPC, gRPC, and HTTP/JSON APIs](https://zitadel.com/docs/apis/introduction)
-- **[Zero-downtime updates](https://zitadel.com/docs/concepts/architecture/solution#zero-downtime-updates)** and [horizontal scalability](https://zitadel.com/docs/self-hosting/manage/production) without external session stores
+- **[Zero-downtime updates](https://zitadel.com/docs/concepts/architecture/solution#zero-downtime-updates)** and [horizontal scalability](https://zitadel.com/docs/self-hosting/manage/updating_scaling) without external session stores
 
 ---
 
@@ -84,7 +84,8 @@ curl -LO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/d
 ```
 
 Full deployment guides:
-- [Linux](https://zitadel.com/docs/self-hosting/deploy/linux) · [macOS](https://zitadel.com/docs/self-hosting/deploy/macos) · [Docker Compose](https://zitadel.com/docs/self-hosting/deploy/compose) · [Kubernetes](https://zitadel.com/docs/self-hosting/deploy/kubernetes)
+- [Docker Compose](https://zitadel.com/docs/self-hosting/deploy/compose) 
+- [Kubernetes](https://zitadel.com/docs/self-hosting/deploy/kubernetes)
 
 > Need professional support for your self-hosted deployment? [Contact us](https://zitadel.com/contact).
 
@@ -119,21 +120,21 @@ Explore the full [API reference](https://zitadel.com/docs/apis/introduction) —
 - Single Sign On (SSO) · Username/Password · [Passkeys (FIDO2 / WebAuthn)](https://zitadel.com/docs/concepts/features/passkeys)
 - MFA: OTP, U2F, OTP Email, OTP SMS
 - [LDAP](https://zitadel.com/docs/guides/integrate/identity-providers/ldap) · [Enterprise IdPs and social logins](https://zitadel.com/docs/guides/integrate/identity-providers/introduction)
-- [OpenID Connect certified](https://openid.net/certification/#OPs) · [SAML 2.0](https://zitadel.com/docs/apis/saml/endpoints) · [Device authorization](https://zitadel.com/docs/guides/solution-scenarios/device-authorization)
+- [OpenID Connect certified](https://openid.net/certification/#OPs) · [SAML 2.0](https://zitadel.com/docs/apis/saml/endpoints) · [Device authorization](https://zitadel.com/docs/guides/integrate/login/oidc/device-authorization)
 - [Machine-to-machine](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts): JWT Profile, PAT, Client Credentials
 - [Token exchange and impersonation](https://zitadel.com/docs/guides/integrate/token-exchange)
 - [Custom sessions](https://zitadel.com/docs/guides/integrate/login-ui/username-password) for flows beyond OIDC/SAML
-- [Hosted Login V2 (Beta)](https://zitadel.com/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta)
+- [Hosted Login V2](https://zitadel.com/docs/guides/integrate/login/hosted-login)
 
 **Multi-Tenancy**
-- [Identity brokering](https://zitadel.com/docs/guides/integrate/identity-brokering) with pre-built IdP templates
-- [Customizable B2B onboarding](https://zitadel.com/docs/guides/solution-scenarios/onboarding) with self-service for customers
+- [Identity brokering](https://zitadel.com/docs/concepts/features/identity-brokering) with pre-built IdP templates
+- [Customizable B2B onboarding](https://zitadel.com/docs/guides/integrate/onboarding/b2b) with self-service for customers
 - [Delegated role management](https://zitadel.com/docs/guides/manage/console/projects-overview) to third parties
 - [Domain discovery](https://zitadel.com/docs/guides/solution-scenarios/domain-discovery)
 
 **Integration**
 - [gRPC, connectRPC, and REST APIs](https://zitadel.com/docs/apis/introduction) for every resource
-- [Actions](https://zitadel.com/docs/guides/manage/console/actions-overview): webhooks, custom code, token enrichment
+- [Actions](https://zitadel.com/docs/concepts/features/actions_v2): webhooks, custom code, token enrichment
 - [RBAC](https://zitadel.com/docs/guides/integrate/retrieve-user-roles) · [SCIM 2.0 Server](https://zitadel.com/docs/apis/scim2)
 - [Audit log and SOC/SIEM integration](https://zitadel.com/docs/guides/integrate/external-audit-log)
 - [SDKs and example apps](https://zitadel.com/docs/sdk-examples/introduction)
