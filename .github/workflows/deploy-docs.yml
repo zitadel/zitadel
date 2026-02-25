@@ -24,6 +24,8 @@ concurrency:
 permissions:
   contents: read
   pull-requests: write
+  deployments: write
+  statuses: write
 
 jobs:
   deploy:
@@ -53,48 +55,151 @@ jobs:
       - name: Set SHAs for nx affected
         uses: nrwl/nx-set-shas@v4
 
-      - name: Build docs (Nx pipeline)
+      - name: Check if docs are affected
+        id: affected
         run: |
-          if pnpm nx show projects --affected --plain | grep -qxF '@zitadel/docs'; then
-            pnpm nx run @zitadel/docs:build
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "affected=true" >> $GITHUB_OUTPUT
+          elif pnpm nx show projects --affected --plain | grep -qxF '@zitadel/docs'; then
+            echo "affected=true" >> $GITHUB_OUTPUT
           else
-            echo "Docs not affected, skipping build."
+            echo "affected=false" >> $GITHUB_OUTPUT
           fi
         env:
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
 
-      - name: Check if docs were built
-        id: built
+      - name: Determine deploy environment
+        if: steps.affected.outputs.affected == 'true'
+        id: env
         run: |
-          if [ -d "apps/docs/.next" ]; then
-            echo "built=true" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "target=preview" >> $GITHUB_OUTPUT
+            echo "is_prod=false" >> $GITHUB_OUTPUT
+            echo "env_name=Preview – docs" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.environment }}" = "preview" ]; then
+            echo "target=preview" >> $GITHUB_OUTPUT
+            echo "is_prod=false" >> $GITHUB_OUTPUT
+            echo "env_name=Preview – docs" >> $GITHUB_OUTPUT
           else
-            echo "built=false" >> $GITHUB_OUTPUT
+            echo "target=production" >> $GITHUB_OUTPUT
+            echo "is_prod=true" >> $GITHUB_OUTPUT
+            echo "env_name=Production – docs" >> $GITHUB_OUTPUT
           fi
 
       - name: Pull Vercel project settings
-        if: steps.built.outputs.built == 'true'
-        run: pnpm exec vercel pull --yes --environment=${{ github.event_name == 'pull_request' && 'preview' || 'production' }} --token=${{ secrets.VERCEL_TOKEN }}
+        if: steps.affected.outputs.affected == 'true'
+        run: pnpm exec vercel pull --yes --environment=${{ steps.env.outputs.target }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: apps/docs
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
 
-      - name: Package for Vercel
-        if: steps.built.outputs.built == 'true'
-        run: pnpm exec vercel build --yes ${{ github.event_name != 'pull_request' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build and Package for Vercel
+        if: steps.affected.outputs.affected == 'true'
+        run: pnpm exec vercel build ${{ steps.env.outputs.is_prod == 'true' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: apps/docs
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
 
       - name: Deploy to Vercel
-        if: steps.built.outputs.built == 'true'
-        uses: amondnet/vercel-action@v25
+        if: steps.affected.outputs.affected == 'true'
+        id: deploy
+        run: |
+          DEPLOY_URL=$(pnpm exec vercel deploy --prebuilt ${{ steps.env.outputs.is_prod == 'true' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+        working-directory: apps/docs
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
+
+      - name: Create GitHub deployment status
+        if: steps.deploy.outputs.url != ''
+        uses: actions/github-script@v7
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
-          working-directory: ./apps/docs
-          vercel-args: ${{ (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')) && '--prebuilt --prod' || '--prebuilt' }}
+          script: |
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: '${{ steps.env.outputs.env_name }}',
+              auto_merge: false,
+              required_contexts: [],
+              description: 'Docs deployment via Vercel CLI',
+              transient_environment: ${{ steps.env.outputs.is_prod != 'true' }},
+              production_environment: ${{ steps.env.outputs.is_prod == 'true' }},
+            });
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.data.id,
+              state: 'success',
+              environment_url: '${{ steps.deploy.outputs.url }}',
+              log_url: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}',
+              description: 'Deployment succeeded',
+            });
+
+      - name: Set commit status (Vercel – docs)
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const deployed = '${{ steps.deploy.outputs.url }}';
+            const affected = '${{ steps.affected.outputs.affected }}';
+            let state, description, target_url;
+            if (deployed) {
+              state = 'success';
+              description = 'Deployment has completed';
+              target_url = deployed;
+            } else if (affected !== 'true') {
+              state = 'success';
+              description = 'Docs not affected — deploy skipped';
+              target_url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            } else {
+              state = 'failure';
+              description = 'Deployment failed';
+              target_url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            }
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state,
+              description,
+              target_url,
+              context: 'Vercel \u2013 docs',
+            });
+
+      - name: Comment preview URL on PR
+        if: steps.deploy.outputs.url != '' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- vercel-docs-preview -->';
+            const body = [
+              marker,
+              `**Docs Preview** :rocket: ${{ steps.deploy.outputs.url }}`,
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

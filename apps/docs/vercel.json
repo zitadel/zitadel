@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm nx run @zitadel/docs:build",
+  "installCommand": "",
   "framework": "nextjs",
   "github": {
     "enabled": false

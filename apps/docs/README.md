@@ -84,13 +84,13 @@ You can also run specific steps individually:
 
 ## Deployment
 
-Docs are deployed to [Vercel](https://vercel.com) via the [Deploy Docs](https://github.com/zitadel/zitadel/actions/workflows/deploy-docs.yml) GitHub Actions workflow. Vercel's native GitHub integration is intentionally disabled — it requires every contributor who triggers a deployment to hold a paid Vercel team member seat. The GitHub Actions approach removes that restriction entirely.
+Docs are deployed to [Vercel](https://vercel.com) via the [Deploy Docs](https://github.com/zitadel/zitadel/actions/workflows/deploy-docs.yml) GitHub Actions workflow using the **Vercel CLI** directly. Vercel's native GitHub integration is intentionally disabled — it requires every contributor who triggers a deployment to hold a paid Vercel team member seat. The GitHub Actions approach removes that restriction entirely.
 
 | Trigger | Target |
 |:--------|:-------|
 | Push to `main` (when Nx detects docs are affected) | Production |
-| Pull request to `main` | Preview URL (posted as a PR comment) |
-| Manual dispatch (`workflow_dispatch`) | Production or Preview (selectable) |
+| Pull request to `main` | Preview URL (posted as a PR comment + GitHub deployment status) |
+| Manual dispatch (`workflow_dispatch`) | Production or Preview (selectable, always builds — bypasses the Nx affected check) |
 
 ### Redeploying
 
