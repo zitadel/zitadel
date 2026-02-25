@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	crypto_db "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -94,6 +95,7 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 		nil,
 		nil,
 		nil,
+		[]denylist.AddressChecker{},
 	)
 	if err != nil {
 		return err

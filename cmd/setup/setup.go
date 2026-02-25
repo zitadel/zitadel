@@ -570,9 +570,9 @@ func startCommandsQueries(
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
-
 		nil,
 		nil,
+		config.Executions.DenyList,
 	)
 	logging.OnError(ctx, err).Fatal("unable to start commands")
 

@@ -284,6 +284,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.DefaultInstance.SecretGenerators,
 		config.Login.DefaultEmailCodeURLTemplate,
 		config.Login.DefaultPasswordSetURLTemplate,
+		config.Executions.DenyList,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -473,6 +474,7 @@ func startAPIs(
 		keys.Target,
 		translator,
 		config.Instrumentation.Trace.TrustRemoteSpans,
+		config.Executions.DenyList,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
