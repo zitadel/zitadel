@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"slices"
+	"strconv"
 	"testing"
 	"time"
 
@@ -3895,6 +3896,203 @@ func Test_user_Delete(t *testing.T) {
 	}
 }
 
+func Test_user_usernameUniqueness(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	t.Cleanup(rollback)
+
+	userRepo := repository.UserRepository()
+	settingsRepo := repository.OrganizationSettingsRepository()
+
+	instanceID := createInstance(t, tx)
+	// org 1 has no [domain.OrganizationSettings]
+	org1ID := createOrganization(t, tx, instanceID)
+
+	// org 2 has [domain.OrganizationSettings] and uniqueness is not enforced
+	org2ID := createOrganization(t, tx, instanceID)
+	err := settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: &org2ID,
+			Type:           domain.SettingTypeOrganization,
+			State:          domain.SettingStateActive,
+		},
+		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+			OrganizationScopedUsernames: gu.Ptr(false),
+		},
+	})
+	require.NoError(t, err)
+
+	// org 3 has [domain.OrganizationSettings] and uniqueness is enforced
+	org3ID := createOrganization(t, tx, instanceID)
+	err = settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: &org3ID,
+			Type:           domain.SettingTypeOrganization,
+			State:          domain.SettingStateActive,
+		},
+		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+			OrganizationScopedUsernames: gu.Ptr(true),
+		},
+	})
+	require.NoError(t, err)
+
+	// org 4 has [domain.OrganizationSettings] and uniqueness is enforced
+	org4ID := createOrganization(t, tx, instanceID)
+	err = settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: &org4ID,
+			Type:           domain.SettingTypeOrganization,
+			State:          domain.SettingStateActive,
+		},
+		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+			OrganizationScopedUsernames: gu.Ptr(true),
+		},
+	})
+	require.NoError(t, err)
+
+	for name, test := range map[string]func(t *testing.T, tx database.QueryExecutor){
+		"different usernames on all organizations": func(t *testing.T, tx database.QueryExecutor) {
+			for _, orgID := range []string{org1ID, org2ID, org3ID, org4ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             gofakeit.UUID(),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user@" + orgID,
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+		},
+		"same username on orgs with uniqueness": func(t *testing.T, tx database.QueryExecutor) {
+			for _, orgID := range []string{org3ID, org4ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             gofakeit.UUID(),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user",
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+		},
+		"same username on orgs without uniqueness": func(t *testing.T, tx database.QueryExecutor) {
+			err := userRepo.Create(t.Context(), tx, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org1ID,
+				Username:       "user",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org1ID,
+				},
+			})
+			assert.NoError(t, err)
+
+			err = userRepo.Create(t.Context(), tx, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org2ID,
+				Username:       "user",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org2ID,
+				},
+			})
+			assert.Error(t, err)
+		},
+		"same username on orgs with uniqueness and 1 org without": func(t *testing.T, tx database.QueryExecutor) {
+			for _, orgID := range []string{org2ID, org3ID, org4ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             gofakeit.UUID(),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user",
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+		},
+		"same username on orgs with uniqueness and orgs without": func(t *testing.T, tx database.QueryExecutor) {
+			for _, orgID := range []string{org2ID, org3ID, org4ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             gofakeit.UUID(),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user",
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+			err := userRepo.Create(t.Context(), tx, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org1ID,
+				Username:       "user",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org1ID,
+				},
+			})
+			assert.Error(t, err)
+		},
+		"try update username to crash": func(t *testing.T, tx database.QueryExecutor) {
+			for i, orgID := range []string{org1ID, org2ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             strconv.Itoa(i),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user" + strconv.Itoa(i),
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+			_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID, "0"), userRepo.SetUsername("user1"))
+			assert.Error(t, err)
+		},
+		"try update username successful": func(t *testing.T, tx database.QueryExecutor) {
+			for i, orgID := range []string{org3ID, org4ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             strconv.Itoa(i),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user" + strconv.Itoa(i),
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+			_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID, "0"), userRepo.SetUsername("user1"))
+			assert.NoError(t, err)
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			t.Cleanup(rollback)
+
+			test(t, savepoint)
+		})
+	}
+
+}
 func assertUsers(t *testing.T, expected, actual []*domain.User) {
 	t.Helper()
 	require.Len(t, actual, len(expected))
