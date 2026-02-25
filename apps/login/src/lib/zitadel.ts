@@ -29,8 +29,8 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getTranslations } from "next-intl/server";
+import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getUserAgent } from "./fingerprint";
 
 import { createServiceForHost } from "./service";
@@ -159,10 +159,15 @@ export async function registerTOTP({ serviceConfig, userId }: WithServiceConfig<
   return userService.registerTOTP({ userId }, {});
 }
 
-export async function getGeneralSettings({ serviceConfig }: WithServiceConfig) {
+export async function getAllowedLanguages({ serviceConfig }: WithServiceConfig) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-  const callback = settingsService.getGeneralSettings({}, {}).then((resp) => resp.supportedLanguages);
+  const callback = settingsService.getGeneralSettings({}, {}).then((resp) => {
+    return {
+      allowedLanguages: resp.allowedLanguages,
+      defaultLanguage: resp.defaultLanguage,
+    };
+  });
 
   return useCache ? cacheWrapper(callback) : callback;
 }
