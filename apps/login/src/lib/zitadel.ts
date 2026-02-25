@@ -112,7 +112,7 @@ export async function getBrandingSettings({
       .then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache ? freshCache(`getBrandingSettings-${organization || "instance"}`, fetcher, 15_000) : fetcher();
+  return useCache ? freshCache(`getBrandingSettings-${organization || "instance"}`, fetcher, 60_000) : fetcher();
 }
 
 export async function getLoginSettings({
@@ -140,7 +140,7 @@ export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) 
 
     };
 
-  return useCache ? freshCache(`getSecuritySettings-${"instance"}`, fetcher, 15_000) : fetcher();
+  return useCache ? freshCache(`getSecuritySettings-${"instance"}`, fetcher, 60_000) : fetcher();
 }
 
 export async function getLockoutSettings({ serviceConfig, orgId }: WithServiceConfig<{ orgId?: string }>) {
