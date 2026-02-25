@@ -50,6 +50,8 @@ scopes:
   # API layer
   - grpc
   - proto
+  # Deployment
+  - deploy
   # Cross-cutting
   - build
   - ci

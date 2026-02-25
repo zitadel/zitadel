@@ -4,6 +4,7 @@ packages:
   - tests/*
   - packages/*
   - apps/*
+  - deploy/compose
 
 overrides:
   "js-yaml@^4": ">=4.1.1"
