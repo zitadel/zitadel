@@ -17,6 +17,8 @@ The **API App** (`apps/api`) is the Nx application target for building and runni
 - **Test (all)**: `pnpm nx run @zitadel/api:test`
 - **Test (unit)**: `pnpm nx run @zitadel/api:test-unit`
 - **Test (integration)**: `pnpm nx run @zitadel/api:test-integration`
+- **Build Linux**: `pnpm nx run @zitadel/api:build-linux` — cross-compiles a Linux binary for Docker packaging
+- **Pack (Docker)**: `pnpm nx run @zitadel/api:pack` — builds a local Docker image `zitadel/zitadel:local`. Requires Docker daemon.
 
 ## Generation Notes
 - `@zitadel/api:generate` can update generated, tracked files (stubs/assets/statik). Run it intentionally.
