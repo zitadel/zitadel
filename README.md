@@ -62,7 +62,7 @@ We built ZITADEL to handle the hardest IAM challenges at scale — starting with
 ZITADEL Cloud and self-hosted ZITADEL run the same codebase.
 
 **Key differentiators for architects:**
-- **Relational core, event-driven soul** — every mutation is written as an immutable event for a complete, API-accessible [audit trail](https://zitadel.com/docs/concepts/features/audit-trail). Unlike systems that log only select activities, ZITADEL provides a comprehensive event stream that can be audited or stream to external systems via Webhooks.
+- **Relational core, event-driven soul** — every mutation is written as an immutable event for a complete, API-accessible [audit trail](https://zitadel.com/docs/concepts/features/audit-trail). Unlike systems that log only select activities, ZITADEL provides a comprehensive event stream that can be audited or streamed to external systems via Webhooks.
 - **Strict multi-tenant hierarchy** — Identity System → Organizations → Projects, with isolated data and policy scoping at multiple levels
 - **API-first design** — every resource and action is available via [connectRPC, gRPC, and HTTP/JSON APIs](https://zitadel.com/docs/apis/introduction)
 - **[Zero-downtime updates](https://zitadel.com/docs/concepts/architecture/solution#zero-downtime-updates)** and [horizontal scalability](https://zitadel.com/docs/self-hosting/manage/production) without external session stores
