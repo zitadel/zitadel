@@ -286,7 +286,6 @@ BEGIN
             _organization_id := NEW.organization_id;
             _old_organization_scoped_usernames := COALESCE((OLD.settings->'organizationScopedUsernames')::BOOLEAN, FALSE);
             _new_organization_scoped_usernames := COALESCE((NEW.settings->'organizationScopedUsernames')::BOOLEAN, FALSE);
-            -- OLD and NEW are already populated, do nothing
     END CASE;
 
     IF _old_organization_scoped_usernames IS NOT DISTINCT FROM _new_organization_scoped_usernames THEN

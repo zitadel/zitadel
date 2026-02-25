@@ -3907,7 +3907,7 @@ func Test_user_usernameUniqueness(t *testing.T) {
 	// org 1 has no [domain.OrganizationSettings]
 	org1ID := createOrganization(t, tx, instanceID)
 
-	// org 2 has [domain.OrganizationSettings] and uniqueness is not enforced
+	// org 2 has [domain.OrganizationSettings] and organization scoped usernames not enforced
 	org2ID := createOrganization(t, tx, instanceID)
 	err := settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
 		Settings: domain.Settings{
@@ -3922,7 +3922,7 @@ func Test_user_usernameUniqueness(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	// org 3 has [domain.OrganizationSettings] and uniqueness is enforced
+	// org 3 has [domain.OrganizationSettings] and organization scoped usernames enforced
 	org3ID := createOrganization(t, tx, instanceID)
 	err = settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
 		Settings: domain.Settings{
@@ -3937,7 +3937,7 @@ func Test_user_usernameUniqueness(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	// org 4 has [domain.OrganizationSettings] and uniqueness is enforced
+	// org 4 has [domain.OrganizationSettings] and organization scoped usernames enforced
 	org4ID := createOrganization(t, tx, instanceID)
 	err = settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
 		Settings: domain.Settings{
@@ -4049,7 +4049,7 @@ func Test_user_usernameUniqueness(t *testing.T) {
 			})
 			assert.Error(t, err)
 		},
-		"try update username to crash": func(t *testing.T, tx database.QueryExecutor) {
+		"try update username to clash": func(t *testing.T, tx database.QueryExecutor) {
 			for i, orgID := range []string{org1ID, org2ID} {
 				err := userRepo.Create(t.Context(), tx, &domain.User{
 					ID:             strconv.Itoa(i),
@@ -4081,6 +4081,108 @@ func Test_user_usernameUniqueness(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID, "0"), userRepo.SetUsername("user1"))
+			assert.NoError(t, err)
+		},
+		"disable organization scoped usernames setting that causes no username clash": func(t *testing.T, tx database.QueryExecutor) {
+			for i, orgID := range []string{org1ID, org3ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             strconv.Itoa(i),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user" + strconv.Itoa(i),
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+			err := settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: &org3ID,
+				},
+				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+					OrganizationScopedUsernames: gu.Ptr(false),
+				},
+			})
+			assert.NoError(t, err)
+		},
+		"disable organization scoped usernames setting that causes username clash": func(t *testing.T, tx database.QueryExecutor) {
+			for i, orgID := range []string{org1ID, org3ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             strconv.Itoa(i),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "username",
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+			err := settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: &org3ID,
+				},
+				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+					OrganizationScopedUsernames: gu.Ptr(false),
+				},
+			})
+			assert.Error(t, err)
+		},
+		"add organization scoped usernames setting and add new user with same username": func(t *testing.T, tx database.QueryExecutor) {
+			err := userRepo.Create(t.Context(), tx, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org1ID,
+				Username:       "username",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org1ID,
+				},
+			})
+			assert.NoError(t, err)
+
+			sp, err := tx.(database.Transaction).Begin(t.Context())
+			require.NoError(t, err)
+
+			err = userRepo.Create(t.Context(), sp, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org2ID,
+				Username:       "username",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org2ID,
+				},
+			})
+			assert.Error(t, err)
+			require.NoError(t, sp.Rollback(t.Context()))
+
+			err = settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: &org1ID,
+				},
+				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+					OrganizationScopedUsernames: gu.Ptr(true),
+				},
+			})
+			assert.NoError(t, err)
+
+			err = userRepo.Create(t.Context(), tx, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org2ID,
+				Username:       "username",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org2ID,
+				},
+			})
 			assert.NoError(t, err)
 		},
 	} {
