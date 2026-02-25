@@ -64,7 +64,7 @@
               <mat-icon class="icon">refresh</mat-icon>
             </button>
             <cnsl-contact
-              [disableEmailEdit]="(hasLinkedIDPs$ | async) ?? false"
+              [disableEmailEdit]="(hasLinkedIDPs$ | async) ?? true"
               [human]="humanUser.type.value"
               [username]="user.preferredLoginName"
               [canWrite]="true"

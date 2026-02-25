@@ -187,7 +187,7 @@ export class UserDetailComponent implements OnInit {
           catchError(() => of(false)),
         );
       }),
-      startWith(false),
+      startWith(true),
     );
   }
 
