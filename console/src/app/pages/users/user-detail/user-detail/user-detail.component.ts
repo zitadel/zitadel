@@ -179,10 +179,20 @@ export class UserDetailComponent implements OnInit {
   private getHasLinkedIDPs$(user$: Observable<UserQuery>): Observable<boolean> {
     return user$.pipe(
       switchMap((user) => {
-        if (user.state !== 'success' || user.value.type.case !== 'human') {
+        if (user.state !== 'success' && user.state !== 'loading') {
           return of(false);
         }
-        return defer(() => this.mgmtService.listHumanLinkedIDPs(user.value.userId, 1, 0)).pipe(
+
+        if (!user.value) {
+          return of(true);
+        }
+
+        const humanUserId = user.value.type.case === 'human' ? user.value.userId : undefined;
+        if (!humanUserId) {
+          return of(false);
+        }
+
+        return defer(() => this.mgmtService.listHumanLinkedIDPs(humanUserId, 1, 0)).pipe(
           map((resp) => resp.resultList.length > 0),
           catchError(() => of(false)),
         );
