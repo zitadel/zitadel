@@ -18,7 +18,7 @@ on:
         default: production
 
 concurrency:
-  group: deploy-docs-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -28,7 +28,7 @@ permissions:
 jobs:
   deploy:
     name: Build and Deploy Docs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

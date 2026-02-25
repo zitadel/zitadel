@@ -107,7 +107,7 @@ The workflow requires three repository secrets:
 
 | Secret | Description |
 |:-------|:------------|
-| `VERCEL_TOKEN` | A personal Vercel access token. Currently tied to **@fforootd (Florian)**. Generate a replacement at https://vercel.com/account/tokens. |
+| `VERCEL_TOKEN` | A personal Vercel access token from a team member with Vercel project access. Generate a replacement at https://vercel.com/account/tokens. |
 | `VERCEL_ORG_ID` | The Vercel team/org ID. |
 | `VERCEL_PROJECT_ID_DOCS` | The Vercel project ID for the docs app. |
 

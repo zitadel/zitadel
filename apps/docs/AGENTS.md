@@ -35,4 +35,4 @@ The build runs `pnpm nx affected --target=build --projects=@zitadel/docs` on the
 
 Do **not** re-enable `github.enabled` in `vercel.json` — it would both cause double deployments and re-introduce the paid member seat requirement for contributors.
 
-> **Secrets**: Three repository secrets are required: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID_DOCS`. The token is a personal access token (currently belonging to **@fforootd (Florian)**). If deployments fail with auth errors, the token may have been revoked — any team member with Vercel access can generate a replacement at https://vercel.com/account/tokens and update `VERCEL_TOKEN` in GitHub → Settings → Secrets → Actions.
+> **Secrets**: Three repository secrets are required: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID_DOCS`. The token is a personal access token managed by an authorized team member. If deployments fail with auth errors, the token may have been revoked — any team member with Vercel access can generate a replacement at https://vercel.com/account/tokens and update `VERCEL_TOKEN` in GitHub → Settings → Secrets → Actions.
