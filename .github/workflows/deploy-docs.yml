@@ -102,6 +102,15 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
 
+      # Workaround for vercel/vercel#15204: @vercel/next build-utils hardcodes /pnpm9/node_modules/.bin
+      # as a PATH prefix that does not exist outside Vercel's own servers, causing spawn pnpm ENOENT.
+      # Remove this step once a vercel CLI version with the upstream existsSync guard fix is released.
+      - name: Workaround vercel/vercel#15204 (hardcoded pnpm PATH)
+        if: steps.affected.outputs.affected == 'true'
+        run: |
+          sudo mkdir -p /pnpm9/node_modules/.bin
+          sudo ln -sf "$(which pnpm)" /pnpm9/node_modules/.bin/pnpm
+
       - name: Package for Vercel
         if: steps.affected.outputs.affected == 'true'
         run: pnpm exec vercel build ${{ steps.env.outputs.is_prod == 'true' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
@@ -109,49 +118,27 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
+
+      # amondnet/vercel-action handles vercel deploy --prebuilt, GitHub deployment, and PR comment.
       - name: Deploy to Vercel
         if: steps.affected.outputs.affected == 'true'
         id: deploy
-        run: |
-          DEPLOY_URL=$(pnpm exec vercel deploy --prebuilt ${{ steps.env.outputs.is_prod == 'true' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
-          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
-        working-directory: apps/docs
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
-
-      - name: Create GitHub deployment status
-        if: steps.deploy.outputs.url != ''
-        uses: actions/github-script@v7
+        uses: amondnet/vercel-action@888da851026e0573da056b061931bcb765a915c4 # v41.1.4
         with:
-          script: |
-            const deployment = await github.rest.repos.createDeployment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.sha,
-              environment: '${{ steps.env.outputs.env_name }}',
-              auto_merge: false,
-              required_contexts: [],
-              description: 'Docs deployment via Vercel CLI',
-              transient_environment: ${{ steps.env.outputs.is_prod != 'true' }},
-              production_environment: ${{ steps.env.outputs.is_prod == 'true' }},
-            });
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: deployment.data.id,
-              state: 'success',
-              environment_url: '${{ steps.deploy.outputs.url }}',
-              log_url: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}',
-              description: 'Deployment succeeded',
-            });
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
+          vercel-args: ${{ steps.env.outputs.is_prod == 'true' && '--prod --prebuilt' || '--prebuilt' }}
+          working-directory: apps/docs
+          github-deployment: 'true'
 
       - name: Set commit status (Vercel – docs)
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
-            const deployed = '${{ steps.deploy.outputs.url }}';
+            const deployed = '${{ steps.deploy.outputs.preview-url }}';
             const affected = '${{ steps.affected.outputs.affected }}';
             let state, description, target_url;
             if (deployed) {
@@ -176,36 +163,3 @@ jobs:
               target_url,
               context: 'Vercel \u2013 docs',
             });
-
-      - name: Comment preview URL on PR
-        if: steps.deploy.outputs.url != '' && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const marker = '<!-- vercel-docs-preview -->';
-            const body = [
-              marker,
-              `**Docs Preview** :rocket: ${{ steps.deploy.outputs.url }}`,
-            ].join('\n');
-
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            const existing = comments.find(c => c.body.includes(marker));
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body,
-              });
-            }
