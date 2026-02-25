@@ -84,11 +84,11 @@ You can also run specific steps individually:
 
 ## Deployment
 
-Docs are deployed to [Vercel](https://vercel.com) via the [Deploy Docs](.github/workflows/deploy-docs.yml) GitHub Actions workflow. Vercel's native GitHub integration is intentionally disabled — it requires every contributor who triggers a deployment to hold a paid Vercel team member seat. The GitHub Actions approach removes that restriction entirely.
+Docs are deployed to [Vercel](https://vercel.com) via the [Deploy Docs](https://github.com/zitadel/zitadel/actions/workflows/deploy-docs.yml) GitHub Actions workflow. Vercel's native GitHub integration is intentionally disabled — it requires every contributor who triggers a deployment to hold a paid Vercel team member seat. The GitHub Actions approach removes that restriction entirely.
 
 | Trigger | Target |
 |:--------|:-------|
-| Push to `main` (paths under `apps/docs/**`) | Production |
+| Push to `main` (when Nx detects docs are affected) | Production |
 | Pull request to `main` | Preview URL (posted as a PR comment) |
 | Manual dispatch (`workflow_dispatch`) | Production or Preview (selectable) |
 
@@ -101,14 +101,14 @@ To manually redeploy without a code change:
 3. Select the target branch (`main`) and environment (`production` or `preview`).
 4. Click **Run workflow**.
 
-### Required Secret
+### Required Secrets
 
-The workflow requires a single repository secret:
+The workflow requires three repository secrets:
 
 | Secret | Description |
 |:-------|:------------|
 | `VERCEL_TOKEN` | A personal Vercel access token. Currently tied to **@fforootd (Florian)**. Generate a replacement at https://vercel.com/account/tokens. |
-| `VERCEL_ORG_ID` | The Vercel team ID (`team_IDtOs36TGPOejsKm40wr1p3C`). |
-| `VERCEL_PROJECT_ID_DOCS` | The Vercel project ID for the docs app (`prj_EvJmonEWBdOXCE4RhOZOoy2eFbPj`). |
+| `VERCEL_ORG_ID` | The Vercel team/org ID. |
+| `VERCEL_PROJECT_ID_DOCS` | The Vercel project ID for the docs app. |
 
 > **Note**: If the deployment stops working, check whether the token has been revoked or the Vercel account owner has changed. A new token from any team member with Vercel access can replace it in GitHub → Settings → Secrets → Actions → `VERCEL_TOKEN`.

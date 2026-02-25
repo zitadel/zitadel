@@ -17,6 +17,14 @@ on:
           - preview
         default: production
 
+concurrency:
+  group: deploy-docs-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   deploy:
     name: Build and Deploy Docs
@@ -50,7 +58,6 @@ jobs:
         env:
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
-          GITHUB_REF_NAME: ${{ github.head_ref || github.ref_name }}
 
       - name: Check if docs were built
         id: built
@@ -63,14 +70,12 @@ jobs:
 
       - name: Package for Vercel
         if: steps.built.outputs.built == 'true'
-        run: pnpm dlx vercel@latest build --yes
+        run: pnpm dlx vercel@39 build --yes
         working-directory: apps/docs
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
-          NX_DAEMON: "false"
-          NX_DISABLE_DB: "true"
 
       - name: Deploy to Vercel
         if: steps.built.outputs.built == 'true'
