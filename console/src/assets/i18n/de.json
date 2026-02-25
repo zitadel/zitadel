@@ -1556,7 +1556,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "nb": "Norsk bokmål"
       }
     },
     "SMTP": {
@@ -1804,7 +1805,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "nb": "Norsk bokmål"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -2763,7 +2765,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+        "ar": "العربية",
+        "nb": "Norsk bokmål"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

@@ -56,6 +56,10 @@ export const LANGS: Lang[] = [
     name: "العربية",
     code: "ar",
   },
+  {
+    name: "Norsk Bokmål",
+    code: "nb",
+  },
 ];
 
 export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";

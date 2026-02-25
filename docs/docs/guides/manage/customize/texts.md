@@ -56,6 +56,7 @@ ZITADEL is available in the following languages
 - Turkish (tr)
 - Ukrainian (uk)
 - Arabic (ar)
+- Norwegian Bokmål (nb)
 
 A language is displayed based on your agent's language header.
 If a users language header doesn't match any of the supported or [restricted](#restrict-languages) languages, the instances default language will be used.

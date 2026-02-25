@@ -1556,7 +1556,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "nb": "Norsk bokmål"
       }
     },
     "SMTP": {
@@ -1804,7 +1805,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "nb": "Norsk bokmål"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -2772,7 +2774,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+        "ar": "العربية",
+        "nb": "Norsk bokmål"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",

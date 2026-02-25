@@ -3671,5 +3671,338 @@
       "failedLoading": "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.",
       "tryagain": "حاول مرة أخرى"
     }
+  },
+  "nb": {
+    "common": {
+      "back": "Tilbake",
+      "title": "Logg inn med Zitadel"
+    },
+    "accounts": {
+      "title": "Kontoer",
+      "description": "Velg kontoen du vil bruke.",
+      "addAnother": "Legg til en annen konto",
+      "noResults": "Ingen kontoer funnet",
+      "verified": "verifisert",
+      "expired": "utløpt"
+    },
+    "logout": {
+      "title": "Logg ut",
+      "description": "Klikk på en konto for å avslutte økten",
+      "noResults": "Ingen kontoer funnet",
+      "clear": "Avslutt økt",
+      "verifiedAt": "Sist aktiv: {time}",
+      "success": {
+        "title": "Utlogging vellykket",
+        "description": "Du har logget ut."
+      }
+    },
+    "loginname": {
+      "title": "Velkommen tilbake!",
+      "description": "Skriv inn påloggingsinformasjonen din.",
+      "register": "Registrer ny bruker",
+      "submit": "Fortsett",
+      "labels": {
+        "loginname": "Brukernavn",
+        "username": "Brukernavn",
+        "usernameOrPhoneNumber": "Brukernavn eller telefonnummer",
+        "usernameOrEmail": "Brukernavn eller e-post"
+      },
+      "required": {
+        "loginName": "Dette feltet er påkrevd"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "Passord",
+        "description": "Skriv inn passordet ditt.",
+        "resetPassword": "Tilbakestill passord",
+        "submit": "Fortsett",
+        "labels": {
+          "password": "Passord"
+        },
+        "required": {
+          "password": "Dette feltet er påkrevd"
+        }
+      },
+      "set": {
+        "title": "Sett passord",
+        "description": "Sett passordet for kontoen din",
+        "codeSent": "En kode er sendt til e-postadressen din.",
+        "noCodeReceived": "Mottok du ikke en kode?",
+        "resend": "Send kode på nytt",
+        "submit": "Fortsett",
+        "labels": {
+          "code": "Kode",
+          "newPassword": "Nytt passord",
+          "confirmPassword": "Bekreft passord"
+        },
+        "required": {
+          "code": "Dette feltet er påkrevd",
+          "newPassword": "Du må oppgi et passord!",
+          "confirmPassword": "Dette feltet er påkrevd"
+        }
+      },
+      "change": {
+        "title": "Endre passord",
+        "description": "Sett passordet for kontoen din",
+        "submit": "Fortsett",
+        "labels": {
+          "newPassword": "Nytt passord",
+          "confirmPassword": "Bekreft passord"
+        },
+        "required": {
+          "newPassword": "Du må oppgi et nytt passord!",
+          "confirmPassword": "Dette feltet er påkrevd"
+        }
+      }
+    },
+    "idp": {
+      "title": "Logg inn med SSO",
+      "description": "Velg en av følgende leverandører for å logge inn",
+      "orSignInWith": "eller logg inn med",
+      "signInWithApple": "Logg inn med Apple",
+      "signInWithGoogle": "Logg inn med Google",
+      "signInWithAzureAD": "Logg inn med AzureAD",
+      "signInWithGithub": "Logg inn med GitHub",
+      "signInWithGitlab": "Logg inn med GitLab",
+      "loginSuccess": {
+        "title": "Innlogging vellykket",
+        "description": "Du er nå logget inn!"
+      },
+      "linkingSuccess": {
+        "title": "Konto koblet",
+        "description": "Du har koblet kontoen din!"
+      },
+      "registerSuccess": {
+        "title": "Registrering vellykket",
+        "description": "Du er nå registrert!"
+      },
+      "loginError": {
+        "title": "Innlogging mislyktes",
+        "description": "Det oppstod en feil under innlogging."
+      },
+      "linkingError": {
+        "title": "Kontokobling mislyktes",
+        "description": "Det oppstod en feil under kobling av kontoen din."
+      },
+      "completeRegister": {
+        "title": "Fullfør dataene dine",
+        "description": "Du må fullføre registreringen ved å oppgi e-post, fornavn og etternavn."
+      }
+    },
+    "ldap": {
+      "title": "LDAP-innlogging",
+      "description": "Skriv inn LDAP-legitimasjonen din.",
+      "submit": "Fortsett",
+      "labels": {
+        "username": "Brukernavn",
+        "password": "Passord"
+      },
+      "required": {
+        "username": "Dette feltet er påkrevd",
+        "password": "Dette feltet er påkrevd"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "Bekreft identiteten din",
+        "description": "Velg en av følgende faktorer.",
+        "noResults": "Ingen andrefaktorer tilgjengelig for oppsett."
+      },
+      "set": {
+        "title": "Sett opp 2-faktor",
+        "description": "Velg en av følgende andrefaktorer.",
+        "skip": "Hopp over"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "Bekreft 2-faktor",
+        "totpDescription": "Skriv inn koden fra autentiseringsappen din.",
+        "smsDescription": "Skriv inn koden du mottok via SMS.",
+        "emailDescription": "Skriv inn koden du mottok via e-post.",
+        "noCodeReceived": "Mottok du ikke en kode?",
+        "resendCode": "Send kode på nytt",
+        "submit": "Fortsett",
+        "labels": {
+          "code": "Kode"
+        },
+        "required": {
+          "code": "Dette feltet er påkrevd"
+        }
+      },
+      "set": {
+        "title": "Sett opp 2-faktor",
+        "totpDescription": "Skann QR-koden med autentiseringsappen din.",
+        "smsDescription": "Skriv inn telefonnummeret ditt for å motta en kode via SMS.",
+        "emailDescription": "Skriv inn e-postadressen din for å motta en kode via e-post.",
+        "totpRegisterDescription": "Skann QR-koden eller naviger til URL-en manuelt.",
+        "submit": "Fortsett",
+        "labels": {
+          "code": "Kode"
+        },
+        "required": {
+          "code": "Dette feltet er påkrevd"
+        }
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "Autentiser med en passnøkkel",
+        "description": "Enheten din vil be om fingeravtrykk, ansikt eller skjermlås for å bekrefte identiteten din.",
+        "usePassword": "Bruk passord",
+        "submit": "Fortsett"
+      },
+      "set": {
+        "title": "Sett opp en passnøkkel",
+        "description": "Enheten din vil be om fingeravtrykk, ansikt eller skjermlås for å bekrefte identiteten din.",
+        "info": {
+          "description": "En passnøkkel er en autentiseringsmetode på en enhet som din telefon eller datamaskin. Den bruker fingeravtrykk, ansiktsgjenkjenning eller skjermlås for å bekrefte identiteten din.",
+          "link": "Passnøkkel-autentisering"
+        },
+        "skip": "Hopp over",
+        "submit": "Fortsett"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "Bekreft 2-faktor",
+        "description": "Bekreft kontoen din med enheten din."
+      },
+      "set": {
+        "title": "Sett opp 2-faktor",
+        "description": "Sett opp en enhet som andrefaktor.",
+        "submit": "Fortsett"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "Passnøkkel",
+        "password": "Passord"
+      },
+      "disabled": {
+        "title": "Registrering deaktivert",
+        "description": "Registrering er deaktivert. Kontakt administratoren din for mer informasjon."
+      },
+      "missingdata": {
+        "title": "Manglende data",
+        "description": "Oppgi e-post, fornavn og etternavn for å registrere."
+      },
+      "title": "Registrer",
+      "description": "Opprett din ZITADEL-konto.",
+      "noMethodAvailableWarning": "Ingen autentiseringsmetode tilgjengelig. Kontakt administratoren din.",
+      "selectMethod": "Velg metoden du vil autentisere med",
+      "agreeTo": "For å registrere må du godta vilkårene og betingelsene",
+      "termsOfService": "Tjenestevilkår",
+      "privacyPolicy": "Personvernerklæring",
+      "submit": "Fortsett",
+      "password": {
+        "title": "Sett passord",
+        "description": "Sett passordet for kontoen din",
+        "submit": "Fortsett",
+        "labels": {
+          "password": "Passord",
+          "confirmPassword": "Bekreft passord"
+        },
+        "required": {
+          "password": "Du må oppgi et passord!",
+          "confirmPassword": "Dette feltet er påkrevd"
+        }
+      },
+      "labels": {
+        "firstname": "Fornavn",
+        "lastname": "Etternavn",
+        "email": "E-post"
+      },
+      "required": {
+        "firstname": "Dette feltet er påkrevd",
+        "lastname": "Dette feltet er påkrevd",
+        "email": "Dette feltet er påkrevd"
+      }
+    },
+    "invite": {
+      "title": "Inviter bruker",
+      "description": "Oppgi e-postadressen og navnet til brukeren du vil invitere.",
+      "info": "Brukeren vil motta en e-post med videre instruksjoner.",
+      "notAllowed": "Innstillingene dine tillater ikke at du inviterer brukere.",
+      "submit": "Fortsett",
+      "success": {
+        "title": "Bruker invitert",
+        "description": "E-posten er sendt.",
+        "verified": "Brukeren er invitert og har allerede verifisert e-posten sin.",
+        "notVerifiedYet": "Brukeren er invitert. De vil motta en e-post med videre instruksjoner.",
+        "submit": "Inviter en annen bruker"
+      }
+    },
+    "signedin": {
+      "title": "Velkommen {user}!",
+      "description": "Du er logget inn.",
+      "continue": "Fortsett",
+      "error": {
+        "title": "Feil",
+        "description": "Det oppstod en feil under innlogging."
+      }
+    },
+    "verify": {
+      "userIdMissing": "Ingen bruker-ID oppgitt!",
+      "successTitle": "Bruker verifisert",
+      "successDescription": "Brukeren er verifisert.",
+      "setupAuthenticator": "Sett opp autentisering",
+      "verify": {
+        "title": "Verifiser bruker",
+        "description": "Skriv inn koden fra verifiserings-e-posten.",
+        "noCodeReceived": "Mottok du ikke en kode?",
+        "resendCode": "Send kode på nytt",
+        "codeSent": "En kode er nettopp sendt til e-postadressen din.",
+        "submit": "Fortsett",
+        "labels": {
+          "code": "Kode"
+        },
+        "required": {
+          "code": "Dette feltet er påkrevd"
+        }
+      }
+    },
+    "authenticator": {
+      "title": "Velg autentiseringsmetode",
+      "description": "Velg metoden du vil autentisere med",
+      "noMethodsAvailable": "Ingen autentiseringsmetoder tilgjengelig",
+      "allSetup": "Du har allerede satt opp autentisering!",
+      "linkWithIDP": "eller koble med en identitetsleverandør"
+    },
+    "device": {
+      "usercode": {
+        "title": "Enhetskode",
+        "description": "Skriv inn koden som vises på appen eller enheten din.",
+        "submit": "Fortsett",
+        "labels": {
+          "code": "Kode"
+        },
+        "required": {
+          "code": "Dette feltet er påkrevd"
+        }
+      },
+      "request": {
+        "title": "{appName} ønsker å koble til",
+        "description": "{appName} vil ha tilgang til:",
+        "disclaimer": "Ved å klikke Tillat, gir du {appName} og Zitadel tillatelse til å bruke informasjonen din i samsvar med deres respektive tjenestevilkår og personvernregler. Du kan tilbakekalle denne tilgangen når som helst.",
+        "submit": "Tillat",
+        "deny": "Avslå"
+      },
+      "scope": {
+        "openid": "Bekreft identiteten din.",
+        "email": "Se e-postadressen din.",
+        "profile": "Se fullstendig profilinformasjon.",
+        "offline_access": "Tillat frakoblet tilgang til kontoen din."
+      }
+    },
+    "error": {
+      "noUserCode": "Ingen brukerkode oppgitt!",
+      "noDeviceRequest": "Ingen enhetsforespørsel funnet.",
+      "unknownContext": "Kunne ikke hente konteksten til brukeren. Sørg for å skrive inn brukernavnet først eller oppgi et loginName som søkeparameter.",
+      "sessionExpired": "Økten din har utløpt. Vennligst logg inn igjen.",
+      "failedLoading": "Kunne ikke laste data. Vennligst prøv igjen.",
+      "tryagain": "Prøv igjen"
+    }
   }
 }
