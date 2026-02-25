@@ -73,9 +73,17 @@ jobs:
             echo "built=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Pull Vercel project settings
+        if: steps.built.outputs.built == 'true'
+        run: pnpm exec vercel pull --yes --environment=${{ github.event_name == 'pull_request' && 'preview' || 'production' }} --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: apps/docs
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
+
       - name: Package for Vercel
         if: steps.built.outputs.built == 'true'
-        run: pnpm dlx vercel@39 build --yes
+        run: pnpm exec vercel build --yes ${{ github.event_name != 'pull_request' && '--prod' || '' }}
         working-directory: apps/docs
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
