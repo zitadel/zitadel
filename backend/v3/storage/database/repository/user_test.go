@@ -4055,8 +4055,8 @@ func assertLoginNames(t *testing.T, expected, gotten []domain.LoginName) {
 			actual = ln
 			return true
 		})
-		require.NotEmpty(t, actual, "login name %s not found", exp.LoginName)
-		assert.Equal(t, exp.IsPreferred, actual.IsPreferred, "login name %s is preferred", exp.LoginName)
+		require.NotEmpty(t, actual, "login name %q not found", exp.LoginName)
+		assert.Equal(t, exp.IsPreferred, actual.IsPreferred, "login name %q is preferred", exp.LoginName)
 	}
 	assert.Empty(t, gotten, "unmatched login names found")
 }
