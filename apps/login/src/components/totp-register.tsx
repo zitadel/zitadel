@@ -1,6 +1,5 @@
 "use client";
 
-import { completeFlowOrGetUrl, handleServerActionResponse } from "@/lib/client";
 import { verifyTOTP } from "@/lib/server/verify";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import Link from "next/link";
@@ -16,6 +15,8 @@ import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { handleServerActionResponse } from "@/lib/client-utils";
+import { completeFlowOrGetUrl } from "@/lib/client";
 
 type Inputs = {
   code: string;

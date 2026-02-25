@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { EMAIL, SMS, TOTP, U2F } from "./auth-methods";
 import { Translated } from "./translated";
 import { useState } from "react";
-import { handleServerActionResponse } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { AutoSubmitForm } from "./auto-submit-form";
 import { Alert } from "./alert";
 

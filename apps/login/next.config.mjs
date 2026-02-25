@@ -34,8 +34,13 @@ const nextConfig = {
   reactStrictMode: true,
   experimental: {
     // Add React 19 compatibility optimizations
-    optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
+    optimizePackageImports: ["@radix-ui/react-tooltip", "@heroicons/react"],
     useCache: true,
+    serverActions: {
+      ...(process.env.SERVER_ACTION_ALLOWED_ORIGINS
+        ? { allowedOrigins: process.env.SERVER_ACTION_ALLOWED_ORIGINS.split(",").map((o) => o.trim()) }
+        : {}),
+    },
   },
   // Packages that must not be bundled by webpack and should remain as external
   // requires at runtime. These packages use native modules or have bundling
