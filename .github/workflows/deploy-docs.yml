@@ -102,14 +102,14 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
 
-      # Workaround for vercel/vercel#15204: @vercel/next build-utils hardcodes /pnpm9/node_modules/.bin
-      # as a PATH prefix that does not exist outside Vercel's own servers, causing spawn pnpm ENOENT.
-      # Remove this step once a vercel CLI version with the upstream existsSync guard fix is released.
-      - name: Workaround vercel/vercel#15204 (hardcoded pnpm PATH)
+      # Enable corepack so @vercel/next builder uses pnpm@10 (from the packageManager field) via
+      # corepack mode instead of the hardcoded /pnpm9/node_modules/.bin path (vercel/vercel#15204).
+      - name: Enable corepack for pnpm@10
         if: steps.affected.outputs.affected == 'true'
         run: |
-          sudo mkdir -p /pnpm9/node_modules/.bin
-          sudo ln -sf "$(which pnpm)" /pnpm9/node_modules/.bin/pnpm
+          PNPM_VERSION=$(node -p "require('./package.json').packageManager.split('@')[1].split('+')[0]")
+          corepack enable pnpm
+          corepack prepare "pnpm@${PNPM_VERSION}" --activate
 
       - name: Package for Vercel
         if: steps.affected.outputs.affected == 'true'
@@ -118,6 +118,9 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
+          # Tell the Vercel CLI to use corepack for package manager invocation,
+          # bypassing the hardcoded /pnpm9/node_modules/.bin path (vercel/vercel#15204).
+          ENABLE_EXPERIMENTAL_COREPACK: "1"
 
       # amondnet/vercel-action handles vercel deploy --prebuilt, GitHub deployment, and PR comment.
       - name: Deploy to Vercel
