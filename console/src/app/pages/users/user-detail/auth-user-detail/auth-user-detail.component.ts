@@ -73,6 +73,7 @@ export class AuthUserDetailComponent implements OnInit {
   protected readonly metadata$: Observable<MetadataQuery>;
   protected readonly currentSetting$ = signal<SidenavSetting>(this.settingsList[0]);
   protected readonly loginPolicy$: Observable<LoginPolicy>;
+  protected readonly hasLinkedIDPs$: Observable<boolean>;
   protected readonly user = this.userService.userQuery();
   protected readonly refreshChanges$ = new Subject<void>();
 
@@ -106,6 +107,7 @@ export class AuthUserDetailComponent implements OnInit {
     private readonly queryClient: QueryClient,
   ) {
     this.metadata$ = this.getMetadata$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.hasLinkedIDPs$ = this.getHasLinkedIDPs$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
     this.loginPolicy$ = defer(() => this.newMgmtService.getLoginPolicy()).pipe(
       catchError(() => EMPTY),
@@ -173,6 +175,18 @@ export class AuthUserDetailComponent implements OnInit {
       map((metadata) => ({ state: 'success', value: metadata.result }) as const),
       startWith({ state: 'loading', value: [] as Metadata[] } as const),
       catchError((error) => of({ state: 'error', error } as const)),
+    );
+  }
+
+  private getHasLinkedIDPs$(): Observable<boolean> {
+    return this.refreshChanges$.pipe(
+      startWith(undefined),
+      switchMap(() =>
+        defer(() => this.grpcAuthService.listMyLinkedIDPs(1, 0)).pipe(
+          map((resp) => resp.resultList.length > 0),
+          catchError(() => of(false)),
+        ),
+      ),
     );
   }
 

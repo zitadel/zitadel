@@ -16,6 +16,7 @@ import { Human } from '@zitadel/proto/zitadel/user_pb';
 })
 export class ContactComponent {
   @Input() disablePhoneCode: boolean = false;
+  @Input() disableEmailEdit: boolean = false;
   @Input() canWrite: boolean | null = false;
   @Input({ required: true }) human!: HumanUser | Human;
   @Input() username: string = '';
