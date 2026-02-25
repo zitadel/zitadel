@@ -22,3 +22,17 @@ The **Docs App** (`apps/docs`) hosts the ZITADEL documentation. It has recently 
 - **Check Links**: `pnpm nx run @zitadel/docs:check-links`
 - **Check Types**: `pnpm nx run @zitadel/docs:check-types`
 - **Test**: `pnpm nx run @zitadel/docs:test`
+
+## Deployment
+
+Docs are deployed to Vercel via `.github/workflows/deploy-docs.yml` using the `amondnet/vercel-action`. Vercel's own GitHub integration is **disabled** (`vercel.json` → `"github": { "enabled": false }`) because it requires every contributor who triggers a deployment to hold a paid Vercel team member seat — the GitHub Actions approach removes that restriction.
+
+- **Production deploy**: triggered automatically on push to `main` (when `apps/docs/**` changes), or manually via `workflow_dispatch` with `environment: production`.
+- **Preview deploy**: triggered automatically on pull requests to `main`; a URL is posted as a PR comment.
+- **Manual redeploy**: GitHub Actions → Deploy Docs → Run workflow.
+
+The build runs `pnpm nx run @zitadel/docs:build` on the GitHub runner (full Nx pipeline: fetch-remote-content → proto docs → API reference → check-links → build), then `vercel build --prebuilt` packages the `.next` output before upload.
+
+Do **not** re-enable `github.enabled` in `vercel.json` — it would both cause double deployments and re-introduce the paid member seat requirement for contributors.
+
+> **Secrets**: Three repository secrets are required: `VERCEL_TOKEN` (personal access token, currently belonging to **@fforootd (Florian)**), `VERCEL_ORG_ID` (`team_IDtOs36TGPOejsKm40wr1p3C`), and `VERCEL_PROJECT_ID_DOCS` (`prj_EvJmonEWBdOXCE4RhOZOoy2eFbPj`). If deployments fail with auth errors, the token may have been revoked — any team member with Vercel access can generate a replacement at https://vercel.com/account/tokens and update `VERCEL_TOKEN` in GitHub → Settings → Secrets → Actions.

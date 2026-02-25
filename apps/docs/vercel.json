@@ -3,7 +3,7 @@
   "buildCommand": "pnpm nx run @zitadel/docs:build",
   "framework": "nextjs",
   "github": {
-    "enabled": true
+    "enabled": false
   },
   "cleanUrls": true
 }

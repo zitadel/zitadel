@@ -1,0 +1,83 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deploy target (production deploys to live site)"
+        type: choice
+        options:
+          - production
+          - preview
+        default: production
+
+jobs:
+  deploy:
+    name: Build and Deploy Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set SHAs for nx affected
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Build docs (Nx pipeline)
+        run: pnpm nx affected --target=build --projects=@zitadel/docs
+        env:
+          NX_DAEMON: "false"
+          NX_DISABLE_DB: "true"
+          GITHUB_REF_NAME: ${{ github.head_ref || github.ref_name }}
+
+      - name: Check if docs were built
+        id: built
+        run: |
+          if [ -d "apps/docs/.next" ]; then
+            echo "built=true" >> $GITHUB_OUTPUT
+          else
+            echo "built=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Package for Vercel
+        if: steps.built.outputs.built == 'true'
+        run: pnpm dlx vercel@latest build --yes
+        working-directory: apps/docs
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
+          NX_DAEMON: "false"
+          NX_DISABLE_DB: "true"
+
+      - name: Deploy to Vercel
+        if: steps.built.outputs.built == 'true'
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
+          working-directory: ./apps/docs
+          vercel-args: ${{ (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')) && '--prebuilt --prod' || '--prebuilt' }}
