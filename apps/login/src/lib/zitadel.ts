@@ -30,6 +30,7 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getTranslations } from "next-intl/server";
+import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getUserAgent } from "./fingerprint";
 
 import { createServiceForHost } from "./service";
@@ -163,7 +164,6 @@ export async function getPasswordExpirySettings({ serviceConfig, orgId }: WithSe
     return settingsService
       .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
       .then((resp) => (resp.settings ? resp.settings : undefined));
-
     };
 
   return useCache ? freshCache(`getPasswordExpirySettings-${orgId || "instance"}`, fetcher, 60_000) : fetcher();
@@ -193,13 +193,17 @@ export async function registerTOTP({ serviceConfig, userId }: WithServiceConfig<
   return userService.registerTOTP({ userId }, {});
 }
 
-export async function getGeneralSettings({ serviceConfig }: WithServiceConfig) {
+export async function getAllowedLanguages({ serviceConfig }: WithServiceConfig) {
   const fetcher = async () => {
     const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-    return settingsService.getGeneralSettings({}, {}).then((resp) => resp.supportedLanguages);
-
-    };
+    return settingsService.getGeneralSettings({}, {}).then((resp) => {
+      return {
+        allowedLanguages: resp.allowedLanguages,
+        defaultLanguage: resp.defaultLanguage,
+      };
+    });
+  }
 
   return useCache ? freshCache(`getGeneralSettings-${"instance"}`, fetcher, 60_000) : fetcher();
 }

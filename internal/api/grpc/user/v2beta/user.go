@@ -522,7 +522,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 		UserId: intent.UserID,
 	}
 	if intent.IDPIDToken != "" || intent.IDPAccessToken != nil {
-		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, alg)
+		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, intent.IDPRefreshToken, alg)
 		if err != nil {
 			return nil, err
 		}
@@ -547,7 +547,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 	return connect.NewResponse(information), nil
 }
 
-func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
+func idpOAuthTokensToPb(idpIDToken string, idpAccessToken, idpRefreshToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
 	var idToken *string
 	if idpIDToken != "" {
 		idToken = &idpIDToken
@@ -559,10 +559,19 @@ func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, a
 			return nil, err
 		}
 	}
+	var refreshToken *string
+	if idpRefreshToken != nil {
+		decryptedRefreshToken, err := crypto.DecryptString(idpRefreshToken, alg)
+		if err != nil {
+			return nil, err
+		}
+		refreshToken = &decryptedRefreshToken
+	}
 	return &user.IDPInformation_Oauth{
 		Oauth: &user.IDPOAuthAccessInformation{
-			AccessToken: accessToken,
-			IdToken:     idToken,
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+			IdToken:      idToken,
 		},
 	}, nil
 }

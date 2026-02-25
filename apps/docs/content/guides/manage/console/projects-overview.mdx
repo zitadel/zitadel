@@ -1,5 +1,6 @@
 ---
 title: Organize applications, services, and roles with projects
+description: "Use projects to group applications and manage roles and authorizations across multiple clients."
 sidebar_label: Projects
 sidebar_position: 4
 ---
@@ -107,7 +108,7 @@ If you have different designs for your organizations (Private Labeling), you can
 | **Enforce project's policy** | This forces the branding of the organization that *owns* the project throughout the entire login process. Useful if you want your users to always see *your* brand, even if they belong to a partner org. |
 | **Allow login user policy**  | The login starts with the project's branding. However, as soon as the user is identified (e.g., by entering their email), the branding switches to match the user's organization.                         |
 
-In a B2B use case, you would typically use **Allow login user policy**. If you want to skip the detection step, you can preselect an organization using the [primary domain scope](/apis/openidoauth/scopes#reserved-scopes) (e.g., `urn:zitadel:iam:org:domain:primary:{domainname}`).
+In a B2B use case, you would typically use **Allow login user policy**. If you want to skip the detection step, you can preselect an organization using the [Organization Domain scope](/apis/openidoauth/scopes#reserved-scopes) (e.g., `urn:zitadel:iam:org:domain:primary:{domainname}`).
 
 ### Role Settings
 You can configure strict security checks regarding roles during authentication.

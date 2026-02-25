@@ -616,7 +616,7 @@ message UpdateOrganizationRequest {
   // changing the name will also change the domain.
   // Additionally, if the domain is used as suffix for user logins,
   // their login names will also change accordingly.
-  // It will not affect any organization domains added to the organization.
+  // It will not affect any Organization Domains added to the organization.
   string name = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -752,7 +752,7 @@ message AddOrganizationDomainRequest {
 }
 
 message AddOrganizationDomainResponse {
-  // CreationDate is the timestamp when the organization domain was created.
+  // CreationDate is the timestamp when the Organization Domain was created.
   google.protobuf.Timestamp creation_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
@@ -820,7 +820,7 @@ message DeleteOrganizationDomainRequest {
 }
 
 message DeleteOrganizationDomainResponse {
-  // DeletionDate is the timestamp of the deletion of the organization domain.
+  // DeletionDate is the timestamp of the deletion of the Organization Domain.
   google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -902,7 +902,7 @@ message VerifyOrganizationDomainRequest {
 }
 
 message VerifyOrganizationDomainResponse {
-  // ChangeDate is the timestamp of the verification of the organization domain.
+  // ChangeDate is the timestamp of the verification of the Organization Domain.
   google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
