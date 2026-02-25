@@ -83,7 +83,7 @@ jobs:
 
       - name: Package for Vercel
         if: steps.built.outputs.built == 'true'
-        run: pnpm exec vercel build --yes ${{ github.event_name != 'pull_request' && '--prod' || '' }}
+        run: pnpm exec vercel build --yes ${{ github.event_name != 'pull_request' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: apps/docs
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
