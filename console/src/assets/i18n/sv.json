@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Måste vara minst {{value}} tecken långt.",
       "MAXLENGTHERROR": "Måste vara mindre än {{value}} tecken."
     },
-    "ID": "ID",
+    "ID": "Användar-ID",
     "EMAIL": "E-post",
     "PHONE": "Telefonnummer",
     "PHONEEMPTY": "Inget telefonnummer definierat",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Namn",
-      "ID": "ID",
+      "ID": "Organisations-ID",
       "CREATIONDATE": "Skapelsedatum",
       "DATECHANGED": "Ändrad",
       "FILTER": "Filter",
@@ -2018,7 +2018,8 @@
           "DESCRIPTION": "Vill du verkligen radera ditt projekt?",
           "TYPENAME": "Skriv namnet på projektet för att radera det permanent."
         }
-      }
+      },
+      "ID": "Projekt-ID"
     },
     "SETTINGS": {
       "TITLE": "Inställningar",
@@ -2300,7 +2301,7 @@
     "ADD": "Lägg till identitetsleverantör",
     "TYPE": "Typ",
     "OWNER": "Ägare",
-    "ID": "ID",
+    "ID": "ID för identitetsleverantör",
     "NAME": "Namn",
     "AUTHORIZATIONENDPOINT": "Auktoriseringsslutpunkt",
     "TOKENENDPOINT": "Token-slutpunkt",
@@ -2524,7 +2525,7 @@
     "TOKEN": "Token-inställningar",
     "PAGES": {
       "TITLE": "Applikation",
-      "ID": "ID",
+      "ID": "Applikations-ID",
       "DESCRIPTION": "Här kan du redigera dina applikationsdata och dess konfiguration.",
       "CREATE": "Skapa applikation",
       "CREATE_SELECT_PROJECT": "Välj ditt projekt först",
@@ -2868,5 +2869,6 @@
       "TITLE": "Aktivitet",
       "DESCRIPTION": "Här kan du se de senaste händelserna som har genererat en användarförändring."
     }
-  }
+  },
+  "INSTANCEID": "Instans-ID"
 }

@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "{{value}}자 이상이어야 합니다.",
       "MAXLENGTHERROR": "{{value}}자 이하이어야 합니다."
     },
-    "ID": "ID",
+    "ID": "사용자 ID",
     "EMAIL": "이메일",
     "PHONE": "전화번호",
     "PHONEEMPTY": "정의된 전화번호가 없습니다",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "이름",
-      "ID": "ID",
+      "ID": "조직 ID",
       "CREATIONDATE": "생성일",
       "DATECHANGED": "변경일",
       "FILTER": "필터",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "프로젝트를 정말로 삭제하시겠습니까?",
           "TYPENAME": "영구적으로 삭제하려면 프로젝트 이름을 입력하세요."
         }
-      }
+      },
+      "ID": "프로젝트 ID"
     },
     "SETTINGS": {
       "TITLE": "설정",
@@ -2296,7 +2297,7 @@
     "ADD": "ID 제공자 추가",
     "TYPE": "유형",
     "OWNER": "소유자",
-    "ID": "ID",
+    "ID": "신원 제공자 ID",
     "NAME": "이름",
     "AUTHORIZATIONENDPOINT": "인증 엔드포인트",
     "TOKENENDPOINT": "토큰 엔드포인트",
@@ -2521,7 +2522,7 @@
     "TOKEN": "토큰 설정",
     "PAGES": {
       "TITLE": "애플리케이션",
-      "ID": "ID",
+      "ID": "애플리케이션 ID",
       "DESCRIPTION": "여기서 애플리케이션 데이터와 구성을 편집할 수 있습니다.",
       "CREATE": "애플리케이션 생성",
       "CREATE_SELECT_PROJECT": "먼저 프로젝트를 선택하세요",
@@ -2861,5 +2862,6 @@
       "TITLE": "활동",
       "DESCRIPTION": "사용자 변경을 유발한 최신 이벤트를 볼 수 있습니다."
     }
-  }
+  },
+  "INSTANCEID": "인스턴스 ID"
 }

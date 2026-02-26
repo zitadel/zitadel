@@ -1,7 +1,7 @@
 "use client";
 
 import { registerUser } from "@/lib/server/register";
-import { handleServerActionResponse } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
@@ -122,6 +122,7 @@ export function RegisterForm({
             <TextInput
               type="firstname"
               autoComplete="firstname"
+              autoFocus
               required
               {...register("firstname", { required: t("required.firstname") })}
               label={t("labels.firstname")}

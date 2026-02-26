@@ -26,6 +26,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/execution"
@@ -81,6 +82,7 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
 			hooks.MapHTTPHeaderStringDecode,
 			database.DecodeHook(false),
+			denylist.DenyListDecodeHook,
 			actions.HTTPConfigDecodeHook,
 			hook.EnumHookFunc(authz.MemberTypeString),
 			hook.Base64ToBytesHookFunc(),

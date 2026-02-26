@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Moet minstens {{value}} tekens lang zijn.",
       "MAXLENGTHERROR": "Moet minder dan {{value}} tekens bevatten"
     },
-    "ID": "ID",
+    "ID": "Gebruikers-ID",
     "EMAIL": "E-mail",
     "PHONE": "Telefoonnummer",
     "PHONEEMPTY": "Geen telefoonnummer gedefinieerd",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Naam",
-      "ID": "ID",
+      "ID": "Organisatie-ID",
       "CREATIONDATE": "Aanmaakdatum",
       "DATECHANGED": "Gewijzigd",
       "FILTER": "Filter",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "Weet u zeker dat u uw project wilt verwijderen?",
           "TYPENAME": "Typ de naam van het project om het permanent te verwijderen."
         }
-      }
+      },
+      "ID": "Project-ID"
     },
     "SETTINGS": {
       "TITLE": "Instellingen",
@@ -2296,7 +2297,7 @@
     "ADD": "Voeg Identiteitsprovider toe",
     "TYPE": "Type",
     "OWNER": "Eigenaar",
-    "ID": "ID",
+    "ID": "ID van identiteitsprovider",
     "NAME": "Naam",
     "AUTHORIZATIONENDPOINT": "Autorisatie Eindpunt",
     "TOKENENDPOINT": "Token Eindpunt",
@@ -2514,7 +2515,7 @@
     "TOKEN": "Token-instellingen",
     "PAGES": {
       "TITLE": "Toepassing",
-      "ID": "ID",
+      "ID": "Applicatie-ID",
       "DESCRIPTION": "Hier kunt u uw toepassingsgegevens en de configuratie bewerken.",
       "CREATE": "Creëer toepassing",
       "CREATE_SELECT_PROJECT": "Selecteer eerst uw project",
@@ -2858,5 +2859,6 @@
       "TITLE": "Activiteit",
       "DESCRIPTION": "Hier kunt u de laatste gebeurtenissen zien die een gebruikersverandering hebben gegenereerd."
     }
-  }
+  },
+  "INSTANCEID": "Instance-ID"
 }
