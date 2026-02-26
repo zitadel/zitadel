@@ -29,6 +29,13 @@ var (
 	defaultConfig []byte
 )
 
+// DefaultConfig returns the embedded defaults.yaml content.
+// Intended for use by test orchestrators that need to initialise viper
+// without depending on the file being present on disk.
+func DefaultConfig() []byte {
+	return defaultConfig
+}
+
 func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "zitadel",
