@@ -20,6 +20,12 @@
 		"docsLink": "/docs/guides/start/quickstart?framework=django"
 	},
 	{
+		"id": "dotnet",
+		"title": ".NET",
+		"imgSrcDark": "/docs/img/tech/dotnet.svg",
+		"docsLink": "/docs/sdk-examples/dotnet"
+	},
+	{
 		"id": "expressjs",
 		"title": "Express.js",
 		"imgSrcDark": "/docs/img/tech/expressjs.svg",

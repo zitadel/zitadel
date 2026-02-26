@@ -17,7 +17,7 @@ func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.Crea
 		Username:        userName,
 		Name:            machinePb.Name,
 		Description:     machinePb.GetDescription(),
-		AccessTokenType: domain.OIDCTokenTypeBearer,
+		AccessTokenType: accessTokenTypeToDomain(machinePb.GetAccessTokenType()),
 		ObjectRoot: models.ObjectRoot{
 			ResourceOwner: orgId,
 			AggregateID:   userId,
@@ -51,10 +51,27 @@ func (s *Server) updateUserTypeMachine(ctx context.Context, machinePb *user.Upda
 }
 
 func updateMachineUserToCommand(userId string, userName *string, machine *user.UpdateUserRequest_Machine) *command.ChangeMachine {
+	var accessTokenType *domain.OIDCTokenType
+	if machine.AccessTokenType != nil {
+		tokenType := accessTokenTypeToDomain(*machine.AccessTokenType)
+		accessTokenType = &tokenType
+	}
 	return &command.ChangeMachine{
-		ID:          userId,
-		Username:    userName,
-		Name:        machine.Name,
-		Description: machine.Description,
+		ID:              userId,
+		Username:        userName,
+		Name:            machine.Name,
+		Description:     machine.Description,
+		AccessTokenType: accessTokenType,
+	}
+}
+
+func accessTokenTypeToDomain(accessTokenType user.AccessTokenType) domain.OIDCTokenType {
+	switch accessTokenType {
+	case user.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER:
+		return domain.OIDCTokenTypeBearer
+	case user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT:
+		return domain.OIDCTokenTypeJWT
+	default:
+		return domain.OIDCTokenTypeBearer
 	}
 }

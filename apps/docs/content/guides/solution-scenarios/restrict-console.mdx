@@ -1,5 +1,6 @@
 ---
 title: Prevent users from accessing ZITADEL Management Console
+description: "Guidelines and strategies for restricting user access to the ZITADEL Management Console to enforce custom application-level user management."
 sidebar_label: Limit access to management console
 ---
 
@@ -9,7 +10,7 @@ In some use cases you want to prevent users from accessing the management consol
 - Users login via SSO and should not be able to change their data in the Management Console
 - Only administrators should be able to access Management Console to manage their users
 
-At the moment it is not possible to simply disable the Management Console, but with the configuration described in this guide, you can prevent users from accessing the Console.
+At the moment it is not possible to simply disable the Management Console, but with the settings described in this guide, you can prevent users from accessing the Console.
 
 ## Self-hosted
 
@@ -47,7 +48,7 @@ Start by granting the organization of your administrators that should be able to
 To avoid accidental lock-out, the [default project](/guides/manage/console/projects-overview#the-default-project) hides the checkbox "Check Project on Authentication" in the Management Console:
 ![Default Project](../../../public/img/guides/solution-scenarios/console-default-project.png)
 
-You need to use the [update project API call](/reference/api/management/zitadel.management.v1.ManagementService.UpdateProject) to set the configuration on the project.
+You need to use the [update project API call](/reference/api/management/zitadel.management.v1.ManagementService.UpdateProject) to set the settings on the project.
 
 First, you need a user with administrator permissions to change the project settings in that organization.
 This means either you add the manager to the organization or you use an administrator on the instance level with "IAM-OWNER" permissions.

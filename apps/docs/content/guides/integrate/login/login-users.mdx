@@ -1,5 +1,6 @@
 ---
 title: Log users into your application with different authentication options
+description: "Overview of authentication protocols supported by ZITADEL, including OpenID Connect and SAML, for unified user login."
 sidebar_label: Authentication Options
 ---
 
@@ -37,7 +38,7 @@ Authentication with SAML (Security Assertion Markup Language) involves a series 
 
 2. **Service Provider Redirects to Identity Provider**: The service provider (SP) detects that the user needs to be authenticated and redirects the user's browser to the designated identity provider (IdP) for authentication. This redirection often occurs via a SAML request, which includes information about the service provider and a request for authentication.
 
-3. **User Authenticates with Identity Provider**: The user is presented with the identity provider's login page, where they enter their credentials (username and password). Alternatively, depending on the IdP's configuration, the user might be authenticated using single sign-on (SSO) mechanisms such as a pre-existing session or multi-factor authentication.
+3. **User Authenticates with Identity Provider**: The user is presented with the identity provider's login page, where they enter their credentials (username and password). Alternatively, depending on the IdP's settings, the user might be authenticated using single sign-on (SSO) mechanisms such as a pre-existing session or multi-factor authentication.
 
 4. **Identity Provider Generates SAML Assertion**: Upon successful authentication, the identity provider creates a SAML assertion containing information about the user, such as their identity and attributes. This assertion is digitally signed by the identity provider to ensure its integrity and authenticity.
 

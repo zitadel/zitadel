@@ -223,7 +223,7 @@ Errors:
     DomainVerificationHTTPNotFound: "チャレンジを含むファイルが予期された URL に見つかりませんでした。読み取り権限のある適切な場所にファイルがアップロードされていることを確認してください"
     DomainVerificationHTTPNoMatch: "チャレンジを含むファイルが予期された URL で見つかりましたが、正しいトークン テキストが含まれていません。内容を確認してください"
     DomainVerificationTimeout: "DNSサーバーへのクエリでタイムアウトが発生しました"
-    PrimaryDomainNotDeletable: "プライマリドメインは削除できません"
+    PrimaryDomainNotDeletable: "組織ドメインは削除できません"
     DomainNotFound: "ドメインが見つかりません"
     MemberIDMissing: "メンバーIDがありません"
     MemberNotFound: "組織メンバーが見つかりません"
@@ -897,7 +897,7 @@ EventTypes:
       verified: "ドメインの検証"
       removed: "ドメインの削除"
       primary:
-        set: "プライマリドメインのセット"
+        set: "組織ドメインのセット"
       reserved: "ドメインの予約"
       released: "リリースの解放"
     name:

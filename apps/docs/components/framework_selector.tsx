@@ -4,8 +4,8 @@ import { useSearchParams } from 'next/navigation';
 import { Tabs } from 'fumadocs-ui/components/tabs';
 import { ReactNode, Suspense, useMemo } from 'react';
 
-const FRAMEWORKS = ['angular', 'astro', 'django', 'expressjs', 'fastapi', 'fastify', 'flask', 'flutter', 'go', 'hono', 'laravel', 'nestjs', 'nextjs', 'nuxt', 'qwik', 'react', 'solidstart', 'spring', 'symfony', 'svelte', 'vue'];
-const DISPLAY_NAMES = ['Angular', 'Astro', 'Django', 'Express.js', 'FastAPI', 'Fastify', 'Flask', 'Flutter', 'Go', 'Hono', 'Laravel', 'NestJS', 'Next.js', 'Nuxt', 'Qwik', 'React', 'SolidStart', 'Spring', 'Symfony', 'Svelte', 'Vue.js'];
+const FRAMEWORKS = ['angular', 'dotnet', 'astro', 'django', 'expressjs', 'fastapi', 'fastify', 'flask', 'flutter', 'go', 'hono', 'laravel', 'nestjs', 'nextjs', 'nuxt', 'qwik', 'react', 'solidstart', 'spring', 'symfony', 'svelte', 'vue'];
+const DISPLAY_NAMES = ['Angular', 'ASP.NET Core', 'Astro', 'Django', 'Express.js', 'FastAPI', 'Fastify', 'Flask', 'Flutter', 'Go', 'Hono', 'Laravel', 'NestJS', 'Next.js', 'Nuxt', 'Qwik', 'React', 'SolidStart', 'Spring', 'Symfony', 'Svelte', 'Vue.js'];
 
 function FrameworkSelectorInner({ children }: { children: ReactNode }) {
     const searchParams = useSearchParams();

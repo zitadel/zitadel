@@ -1,5 +1,6 @@
 ---
 title: Login users into your application with a hosted login UI
+description: "Securely authenticate users via ZITADEL's hosted Single Sign-On (SSO) login page, supporting OIDC and SAML protocols."
 sidebar_label: Hosted Login UI
 ---
 
@@ -36,7 +37,7 @@ Overall, ZITADEL's hosted login page simplifies the authentication process for d
 ### Flexible usernames
 
 Different login name formats can be used on ZITADEL's hosted login page to select a user.
-Login methods can be a user's username, containing the username and an [organization domain](/guides/manage/console/organizations-overview#usernames-and-domains), their email addresses, or their phone numbers.
+Login methods can be a user's username, containing the username and an [Organization Domain](/guides/manage/console/organizations-overview#usernames-and-domains), their email addresses, or their phone numbers.
 By default, all of these login methods are allowed and can be adjusted by [Administrators](/concepts/structure/administrators) to meet their requirements.
 
 ### Support for multiple authentication methods
@@ -62,8 +63,8 @@ ZITADEL simplifies multi-tenancy authentication by securely managing authenticat
 
 Key features include:
 
-1. **Secure Tenant Isolation**: Ensures robust security measures to prevent unauthorized access between tenants, maintaining data privacy and compliance. [Administrators](/concepts/structure/administrators) for an organization have only access to data and configuration within their Organization.
-2. **Custom Authentication Configurations**: Allows tailored [authentication settings](/guides/manage/console/default-settings#login-behavior-and-access), [branding](/guides/manage/customize/branding), and policies for each tenant.
+1. **Secure Tenant Isolation**: Ensures robust security measures to prevent unauthorized access between tenants, maintaining data privacy and compliance. [Administrators](/concepts/structure/administrators) for an organization have only access to data and settings within their Organization.
+2. **Custom Authentication Settings**: Allows tailored [authentication settings](/guides/manage/console/default-settings#login-behavior-and-access), [branding](/guides/manage/customize/branding), and policies for each tenant.
 3. **Centralized Management**: Provides [centralized administration](/guides/manage/console/administrators) for efficient management across all tenants.
 4. **Scalability and Flexibility**: Scales seamlessly to accommodate growing organizations of all sizes.
 5. **Domain Discovery**: Starting on a central login page, route users to their tenant based on their email address or other user attributes. Authentication settings will be applied automatically based on the organization's policies, this includes routing users seamlessly to third party identity providers like [Entra ID](/guides/integrate/identity-providers/azure-ad-oidc).
@@ -77,7 +78,7 @@ Developers can customize elements such as logos, colors, and messaging to ensure
 Customization and Branding
 The login page can be changed by customizing different branding aspects and you can define a Custom Domain for the login (eg, login.acme.com).
 
-By default, the displayed branding is defined [based on the user's domain](/guides/solution-scenarios/domain-discovery). In case you want to show the branding of a specific organization by default, you need to either pass a primary domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
+By default, the displayed branding is defined [based on the user's domain](/guides/solution-scenarios/domain-discovery). In case you want to show the branding of a specific organization by default, you need to either pass an Organization Domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
 </Callout>
 
 ### Fast account switching
@@ -169,7 +170,7 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
 
         To activate it to authenticate on your Zitadel Cloud apps, you can follow one of these steps:
 
-        1. Enable the new login on your application configuration. Leave the field **Custom base URL for the new Login UI** empty to use the default. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
+        1. Enable the new login on your application settings. Leave the field **Custom base URL for the new Login UI** empty to use the default. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
         ![](../../../../public/img/guides/integrate/login/login-v2-app-config.png)
         2. Enable the [loginV2 feature](/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) on the instance. Leave the base URI empty to use the default. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://your-zitadel-instance.zitadel.cloud/ui/v2/login)
 
@@ -189,7 +190,7 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
         6. Use the new login in your application.
             <PreventLockout components={props.components} />
             You have three different options on how to achieve this:
-            1. Enable the new login on your application configuration and add the URL of your login UI. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
+            1. Enable the new login on your application settings and add the URL of your login UI. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
             ![](../../../../public/img/guides/integrate/login/login-v2-app-config.png)
             2. Enable the [loginV2 feature](/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) on the instance and add the URL of your login. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://my-new-zitadel-login.vercel.app)
             3. Change the issuer in the code of your application to the new domain of your login

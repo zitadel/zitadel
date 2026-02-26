@@ -702,7 +702,7 @@
     "USERNAME": "Nome de Usuário",
     "ORGNAME": "Nome da Organização",
     "ORGID": "ID da Organização",
-    "PRIMARYDOMAIN": "Domínio primário",
+    "PRIMARYDOMAIN": "Domínio da Organização",
     "PROJECTNAME": "Nome do Projeto",
     "RESOURCEOWNER": "Proprietário do Recurso",
     "METHODS": {
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Deve ter pelo menos {{value}} caracteres.",
       "MAXLENGTHERROR": "Deve ter menos de {{value}} caracteres"
     },
-    "ID": "ID",
+    "ID": "ID do utilizador",
     "EMAIL": "E-mail",
     "PHONE": "Número de Telefone",
     "PHONEEMPTY": "Nenhum número de telefone definido",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nome",
-      "ID": "ID",
+      "ID": "ID da organização",
       "CREATIONDATE": "Data de Criação",
       "DATECHANGED": "Alterado",
       "FILTER": "Filtro",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Baixar Arquivo",
       "SELECTORGTOOLTIP": "Selecionar esta organização.",
-      "PRIMARYDOMAIN": "Domínio Principal",
+      "PRIMARYDOMAIN": "Domínio da Organização",
       "STATE": "Estado",
       "USEPASSWORD": "Definir Senha Inicial",
       "USEPASSWORDDESC": "O usuário não precisa definir a senha durante a inicialização."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Adicionar Domínio",
-      "TITLE": "Domínios verificados",
+      "TITLE": "Domínio da Organização",
       "DESCRIPTION": "Configure seus domínios. Este domínio pode ser usado para o login dos seus usuários.",
-      "SETPRIMARY": "Definir como Principal",
+      "SETPRIMARY": "Domínio da Organização",
       "DELETE": {
         "TITLE": "Excluir Domínio",
         "DESCRIPTION": "Você está prestes a excluir um dos seus domínios. Observe que seus usuários não poderão mais usar este domínio para fazer login."
@@ -1462,7 +1462,7 @@
       "MEMBERADDED": "Administrador adicionado.",
       "MEMBERREMOVED": "Administrador removido.",
       "MEMBERCHANGED": "Administrador alterado.",
-      "SETPRIMARY": "Domínio principal definido.",
+      "SETPRIMARY": "O domínio da organização foi definido com sucesso.",
       "DELETED": "Organização excluída com sucesso",
       "DEFAULTORGNOTFOUND": "A organização padrão não foi encontrada",
       "ORG_WAS_DELETED": "Organização foi excluída."
@@ -1500,7 +1500,7 @@
       "NOTIFICATIONS_DESC": "Configurações de SMTP e SMS",
       "MESSAGETEXTS": "Textos de Mensagem",
       "IDP": "Provedores de Identidade",
-      "VERIFIED_DOMAINS": "Domínios verificados",
+      "VERIFIED_DOMAINS": "Domínio da Organização",
       "DOMAIN": "Configurações de Domínio",
       "LOGINTEXTS": "Textos da Interface de Login",
       "BRANDING": "Marca",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "Tem certeza de que deseja excluir o seu projeto?",
           "TYPENAME": "Digite o nome do projeto para excluí-lo permanentemente."
         }
-      }
+      },
+      "ID": "ID do projeto"
     },
     "SETTINGS": {
       "TITLE": "Configurações",
@@ -2290,7 +2291,7 @@
     "ADD": "Adicionar Provedor de Identidade",
     "TYPE": "Tipo",
     "OWNER": "Proprietário",
-    "ID": "ID",
+    "ID": "ID do provedor de identidade",
     "NAME": "Nome",
     "AUTHORIZATIONENDPOINT": "Ponto de Autorização",
     "TOKENENDPOINT": "Ponto de Token",
@@ -2491,7 +2492,7 @@
     "TOKEN": "Configurações de Token",
     "PAGES": {
       "TITLE": "Aplicativo",
-      "ID": "ID",
+      "ID": "ID da aplicação",
       "DESCRIPTION": "Aqui você pode editar os dados do seu aplicativo e sua configuração.",
       "CREATE": "Criar aplicativo",
       "CREATE_SELECT_PROJECT": "Selecione o seu projeto primeiro",
@@ -2835,5 +2836,6 @@
       "TITLE": "Atividade",
       "DESCRIPTION": "Aqui você pode ver os eventos mais recentes que geraram uma alteração no usuário."
     }
-  }
+  },
+  "INSTANCEID": "ID da instância"
 }
