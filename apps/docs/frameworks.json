@@ -177,7 +177,8 @@
 		"imgSrcDark": "/docs/img/tech/dotnet.svg",
 		"docsLink": "https://github.com/smartive/zitadel-net",
 		"external": true,
-		"client": true
+		"client": true,
+		"sdk": true
 	},
 	{
 		"title": "Node.js",
