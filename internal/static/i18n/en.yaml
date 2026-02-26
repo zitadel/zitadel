@@ -180,6 +180,7 @@ Errors:
       Passwordless:
         NotExisting: "Passkey does not exist"
       RecoveryCodes:
+        Empty: "Recovery code is empty"
         InvalidCode: "Invalid recovery code provided"
         MaxCountExceeded: "Maximum number of recovery codes exceeded"
         NotReady: "Recovery codes are not ready for use"
