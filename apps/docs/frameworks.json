@@ -51,6 +51,7 @@
 		"docsLink": "/docs/guides/start/quickstart?framework=flutter"
 	},
 	{
+		"id": "go",
 		"title": "Go",
 		"imgSrcDark": "/docs/img/tech/golang.svg",
 		"docsLink": "/docs/guides/start/quickstart?framework=go"
@@ -68,6 +69,7 @@
 		"docsLink": "/docs/sdk-examples/laravel"
 	},
 	{
+		"id": "nestjs",
 		"title": "NestJS",
 		"imgSrcDark": "/docs/img/tech/nestjs.svg",
 		"docsLink": "/docs/guides/start/quickstart?framework=nestjs"
@@ -133,7 +135,7 @@
 		"id": "java",
 		"title": "Java",
 		"description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
-		"imgSrcDark": "/docs/img/tech/vue.svg",
+		"imgSrcDark": "/docs/img/tech/java.svg",
 		"docsLink": "/docs/guides/start/quickstart?framework=vue"
 	},
 	{
@@ -152,7 +154,6 @@
 		"external": true
 	},
 	{
-		"id": "sdk-go",
 		"title": "Go",
 		"imgSrcDark": "/docs/img/tech/golang.svg",
 		"docsLink": "/docs/sdk-examples/go",
@@ -160,7 +161,6 @@
 		"sdk": true
 	},
 	{
-		"id": "client-java",
 		"title": "Java",
 		"imgSrcDark": "/docs/img/tech/java.svg",
 		"docsLink": "/docs/sdk-examples/client-libraries/java",
@@ -174,28 +174,24 @@
 		"client": true
 	},
 	{
-		"id": "client-node",
 		"title": "Node.js",
 		"imgSrcDark": "/docs/img/tech/nodejs.svg",
 		"docsLink": "/docs/sdk-examples/client-libraries/node",
 		"client": true
 	},
 	{
-		"id": "client-php",
 		"title": "PHP",
 		"imgSrcDark": "/docs/img/tech/php.svg",
 		"docsLink": "/docs/sdk-examples/client-libraries/php",
 		"client": true
 	},
 	{
-		"id": "client-python",
 		"title": "Python",
 		"imgSrcDark": "/docs/img/tech/python.svg",
 		"docsLink": "/docs/sdk-examples/client-libraries/python",
 		"client": true
 	},
 	{
-		"id": "sdk-react",
 		"title": "React",
 		"imgSrcDark": "/docs/img/tech/react.svg",
 		"docsLink": "https://github.com/zitadel/zitadel-react",
@@ -203,7 +199,6 @@
 		"external": true
 	},
 	{
-		"id": "client-ruby",
 		"title": "Ruby",
 		"imgSrcDark": "/docs/img/tech/ruby.svg",
 		"docsLink": "/docs/sdk-examples/client-libraries/ruby",
@@ -219,7 +214,6 @@
 		"external": true
 	},
 	{
-		"id": "sdk-vue",
 		"title": "Vue",
 		"imgSrcDark": "/docs/img/tech/vue.svg",
 		"docsLink": "https://github.com/zitadel/zitadel-vue",
