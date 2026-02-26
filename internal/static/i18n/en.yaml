@@ -197,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "Refresh Token is invalid"
       NotFound: "Refresh Token not found"
-  Instance:
-    NotFound: "Instance not found"
-    AlreadyExists: "Instance already exists"
-    NotChanged: "Instance not changed"
   Org:
     AlreadyExists: "Organisation's name or id already taken"
     Invalid: "Organisation is invalid"
@@ -347,6 +343,8 @@ Errors:
       NotActive: "Project Grant is not active"
       NotInactive: "Project Grant is not inactive"
   Instance:
+    AlreadyExists: "Instance already exists"
+    NotChanged: "Instance not changed"
     NotFound: "Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roles have not been changed"
