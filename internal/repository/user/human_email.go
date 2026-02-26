@@ -18,7 +18,6 @@ const (
 	HumanEmailVerificationFailedType = emailEventPrefix + "verification.failed"
 	HumanEmailCodeAddedType          = emailEventPrefix + "code.added"
 	HumanEmailCodeSentType           = emailEventPrefix + "code.sent"
-	HumanEmailConfirmURLAddedType    = emailEventPrefix + "confirm_url.added"
 )
 
 type HumanEmailChangedEvent struct {

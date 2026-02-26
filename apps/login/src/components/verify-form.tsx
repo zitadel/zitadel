@@ -2,7 +2,7 @@
 
 import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
-import { handleServerActionResponse } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";

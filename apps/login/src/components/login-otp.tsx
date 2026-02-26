@@ -1,6 +1,6 @@
 "use client";
 
-import { handleServerActionResponse, completeFlowOrGetUrl } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { updateOrCreateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
@@ -17,6 +17,7 @@ import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { completeFlowOrGetUrl } from "@/lib/client";
 
 // either loginName or sessionId must be provided
 type Props = {

@@ -4017,6 +4017,56 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 			},
 		},
 		{
+			name: "verified email",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						OrgCTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: integration.Email(),
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: false,
+				}
+			},
+		},
+		{
+			name: "verified email (self-management), error",
+			testCase: func(runId, userId string) testCase {
+				Instance.SetUserPassword(LoginCTX, userId, integration.UserPassword, false)
+				_, token, _, _ := Instance.CreatePasswordSession(t, LoginCTX, userId, integration.UserPassword)
+				return testCase{
+					args: args{
+						integration.WithAuthorizationToken(CTX, token),
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: integration.Email(),
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
 			name: "password not complexity conform",
 			testCase: func(runId, userId string) testCase {
 				return testCase{

@@ -13,9 +13,10 @@ ENV HOSTNAME="::" \
     NODE_ENV="production" \
     NODE_OPTIONS="--use-openssl-ca" \
     SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt" \
-    SSL_CERT_DIR="/etc/ssl/certs"
+    SSL_CERT_DIR="/etc/ssl/certs" \
+    ZITADEL_TLS_ENABLED="false"
 
 # TODO: Check healthy, not ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD ["/bin/sh", "-c", "node /app/healthcheck.js http://localhost:${PORT}/ui/v2/login/healthy"]
+    CMD ["/usr/local/bin/node", "/app/healthcheck.mjs"]
 ENTRYPOINT ["/app/entrypoint.sh", "node", "apps/login/server.js" ]
