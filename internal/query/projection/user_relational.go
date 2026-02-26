@@ -54,8 +54,6 @@ func (p *relationalTablesProjection) reduceHumanAdded(event eventstore.Event) (*
 			State:          domain.UserStateActive,
 			CreatedAt:      e.CreatedAt(),
 			UpdatedAt:      e.CreatedAt(),
-			// TODO check when to set username unique
-			// IsUsernameOrgUnique: ,
 			Human: &domain.HumanUser{
 				FirstName:         e.FirstName,
 				LastName:          e.LastName,
@@ -111,8 +109,6 @@ func (p *relationalTablesProjection) reduceHumanRegistered(event eventstore.Even
 			State:          domain.UserStateActive,
 			CreatedAt:      e.CreatedAt(),
 			UpdatedAt:      e.CreatedAt(),
-			// TODO check when to set username unique
-			// IsUsernameOrgUnique: ,
 			Human: &domain.HumanUser{
 				FirstName:         e.FirstName,
 				LastName:          e.LastName,
@@ -136,21 +132,38 @@ func (p *relationalTablesProjection) reduceUserLocked(event eventstore.Event) (*
 		return nil, err
 	}
 
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
-		}
-		repo := repository.UserRepository()
-		_, err := repo.Update(
-			ctx,
-			v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
-			repo.SetState(domain.UserStateLocked),
-			repo.SetUpdatedAt(e.CreatedAt()),
-		)
-		return err
-	}), nil
+	return handler.NewMultiStatement(e,
+		handler.AddStatement(func(ctx context.Context, ex handler.Executer, projectionName string) error {
+			tx, ok := ex.(*sql.Tx)
+			if !ok {
+				return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			}
+			repo := repository.UserRepository()
+			_, err := repo.Update(
+				ctx,
+				v3_sql.SQLTx(tx),
+				repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
+				repo.SetState(domain.UserStateLocked),
+				repo.SetUpdatedAt(e.CreatedAt()),
+			)
+			return err
+		}),
+		handler.AddStatement(func(ctx context.Context, ex handler.Executer, projectionName string) error {
+			tx, ok := ex.(*sql.Tx)
+			if !ok {
+				return zerrors.ThrowInvalidArgumentf(nil, "HANDL-fcxV68", "reduce.wrong.db.pool %T", ex)
+			}
+			v3Tx := v3_sql.SQLTx(tx)
+
+			sessionRepo := repository.SessionRepository()
+			condition := database.And(
+				sessionRepo.InstanceIDCondition(event.Aggregate().InstanceID),
+				sessionRepo.UserIDCondition(event.Aggregate().ID),
+			)
+			_, err := sessionRepo.Delete(ctx, v3Tx, condition)
+			return err
+		}),
+	), nil
 }
 
 func (p *relationalTablesProjection) reduceUserUnlocked(event eventstore.Event) (*handler.Statement, error) {
@@ -182,21 +195,38 @@ func (p *relationalTablesProjection) reduceUserDeactivated(event eventstore.Even
 		return nil, err
 	}
 
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
-		}
-		repo := repository.UserRepository()
-		_, err := repo.Update(
-			ctx,
-			v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
-			repo.SetState(domain.UserStateInactive),
-			repo.SetUpdatedAt(e.CreatedAt()),
-		)
-		return err
-	}), nil
+	return handler.NewMultiStatement(event,
+		handler.AddStatement(func(ctx context.Context, ex handler.Executer, projectionName string) error {
+			tx, ok := ex.(*sql.Tx)
+			if !ok {
+				return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			}
+			repo := repository.UserRepository()
+			_, err := repo.Update(
+				ctx,
+				v3_sql.SQLTx(tx),
+				repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
+				repo.SetState(domain.UserStateInactive),
+				repo.SetUpdatedAt(e.CreatedAt()),
+			)
+			return err
+		}),
+		handler.AddStatement(func(ctx context.Context, ex handler.Executer, projectionName string) error {
+			tx, ok := ex.(*sql.Tx)
+			if !ok {
+				return zerrors.ThrowInvalidArgumentf(nil, "HANDL-fcxV68", "reduce.wrong.db.pool %T", ex)
+			}
+			v3Tx := v3_sql.SQLTx(tx)
+
+			sessionRepo := repository.SessionRepository()
+			condition := database.And(
+				sessionRepo.InstanceIDCondition(event.Aggregate().InstanceID),
+				sessionRepo.UserIDCondition(event.Aggregate().ID),
+			)
+			_, err := sessionRepo.Delete(ctx, v3Tx, condition)
+			return err
+		}),
+	), nil
 }
 
 func (p *relationalTablesProjection) reduceUserReactivated(event eventstore.Event) (*handler.Statement, error) {
@@ -873,11 +903,9 @@ func (p *relationalTablesProjection) reduceMachineAdded(event eventstore.Event) 
 				InstanceID:     e.Aggregate().InstanceID,
 				OrganizationID: e.Aggregate().ResourceOwner,
 				Username:       e.UserName,
-				// TODO check when to set username unique
-				// IsUsernameOrgUnique: ,
-				State:     domain.UserStateActive,
-				CreatedAt: e.CreatedAt(),
-				UpdatedAt: e.CreatedAt(),
+				State:          domain.UserStateActive,
+				CreatedAt:      e.CreatedAt(),
+				UpdatedAt:      e.CreatedAt(),
 				Machine: &domain.MachineUser{
 					Name:            e.Name,
 					Description:     e.Description,

@@ -2,7 +2,7 @@
 
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { registerUser } from "@/lib/server/register";
-import { handleServerActionResponse } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

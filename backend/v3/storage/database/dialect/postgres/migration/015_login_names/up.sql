@@ -28,8 +28,17 @@ DECLARE
     setting zitadel.settings%ROWTYPE;
 BEGIN
     IF (NOT NEW.is_verified) THEN
-        -- TODO(adlerhurst): is it possible that the domain is updated from verified to unverified?
-        RAISE LOG 'Domain % is not verified, skipping login name manipulation', NEW.domain;
+        IF TG_OP = 'UPDATE' AND OLD.is_verified THEN
+            -- this case can currently not happen but is added for completeness and future-proofing.
+            RAISE NOTICE 'Domain changed from verified to unverified, removing associated login names';
+            DELETE FROM zitadel.login_names
+            WHERE
+                login_names.instance_id = NEW.instance_id
+                AND login_names.organization_id = NEW.org_id
+                AND login_names.domain = NEW.domain;
+        ELSE
+            RAISE NOTICE 'Domain is not verified, skipping login name manipulation';
+        END IF;
         RETURN NULL;
     END IF;
 
@@ -43,15 +52,20 @@ BEGIN
     ORDER BY settings.organization_id NULLS LAST
     LIMIT 1;
 
-    RAISE LOG 'Found setting % for domain %', setting.id, NEW.domain;
-
     IF NOT (setting.settings->'loginNameIncludesDomain')::BOOLEAN THEN
-        RAISE LOG 'skipping because loginNameIncludesDomain is false for setting %', setting.id;
+        RAISE NOTICE 'skip adding domain because loginNameIncludesDomain is false for setting';
         RETURN NULL;
     END IF;
 
+    -- Lock based on the setting scope (organization-specific or instance-level/global).
+    -- The lock is released at transaction end.
+    PERFORM pg_advisory_xact_lock(
+        hashtext('zitadel.login_names')
+        , hashtext(setting.instance_id || ':' || COALESCE(setting.organization_id, 'global'))
+    );
+
     IF NEW.is_primary IS DISTINCT FROM OLD.is_primary THEN
-        RAISE LOG 'Updating preferred login name for domain % to %', NEW.domain, NEW.is_primary;
+        RAISE NOTICE 'primary domain changed, updating preferred login name';
         UPDATE zitadel.login_names
         SET is_preferred = NEW.is_primary
         WHERE
@@ -60,7 +74,7 @@ BEGIN
     END IF;
 
     IF NEW.domain IS DISTINCT FROM OLD.domain THEN
-        RAISE LOG 'Domain is changed from % to %, updating login names', OLD.domain, NEW.domain;
+        RAISE NOTICE 'domain changed, updating login names';
         UPDATE zitadel.login_names
         SET domain = NEW.domain
         WHERE
@@ -70,7 +84,7 @@ BEGIN
     END IF;
 
     IF NEW.is_verified IS DISTINCT FROM OLD.is_verified THEN
-        RAISE LOG 'Domain verification status is changed from % to % for domain %, inserting login names for verified domain', OLD.is_verified, NEW.is_verified, NEW.domain;
+        RAISE NOTICE 'Domain verification changed, inserting login names for verified domain';
         INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
         SELECT
             NEW.instance_id
@@ -103,7 +117,12 @@ AS $$
 DECLARE
     counter INTEGER;
 BEGIN
-    RAISE LOG 'Updating login names for user % with new username %', NEW.id, NEW.username;
+    -- Lock global scope and organization scope to serialize with instance-level
+    -- and org-level setting/domain manipulations.
+    -- The lock is released at transaction end.
+    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id || ':global'));
+    PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), hashtext(NEW.instance_id || ':' || NEW.organization_id));
+
     UPDATE
         zitadel.login_names
     SET
@@ -146,15 +165,22 @@ BEGIN
     ORDER BY settings.organization_id NULLS LAST
     LIMIT 1;
 
+    -- Lock based on the setting scope (organization-specific or instance-level/global).
+    -- The lock is released at transaction end.
+    PERFORM pg_advisory_xact_lock(
+        hashtext('zitadel.login_names')
+        , hashtext(setting.instance_id || ':' || COALESCE(setting.organization_id, 'global'))
+    );
+
     IF NOT (setting.settings->'loginNameIncludesDomain')::BOOLEAN THEN
-        RAISE LOG 'inserting username as login name for setting user %', NEW.id;
+        RAISE NOTICE 'inserting username as login name';
         INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, is_preferred, used_setting)
         VALUES (NEW.instance_id, NEW.organization_id, NEW.id, NEW.username, TRUE, setting.id);
         
         RETURN NULL;
     END IF;
 
-    RAISE LOG 'inserting login names of user % based on setting %', NEW.id, setting.id;
+    RAISE NOTICE 'inserting login names';
     INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
     SELECT
         NEW.instance_id
@@ -180,16 +206,14 @@ AFTER INSERT ON zitadel.users
 FOR EACH ROW
 EXECUTE FUNCTION zitadel.apply_user_insert_to_login_names();
 
-CREATE OR REPLACE FUNCTION zitadel.apply_domain_policy_manipulation_to_login_names() RETURNS TRIGGER
-VOLATILE
-PARALLEL UNSAFE
-AS $$
+CREATE OR REPLACE FUNCTION zitadel.apply_domain_policy_manipulation_to_login_names() RETURNS TRIGGER AS $$
 DECLARE
-    counter INTEGER;
+    old_lock_key INT4;
+    new_lock_key INT4;
 BEGIN
     CASE TG_OP
+        -- insert and delete can only happen on organization level therefore we can load the instance level setting as OLD or NEW.
         WHEN 'DELETE' THEN
-            -- delete can only be executed on organization level, therefore we check the instance level setting.
             SELECT
                 settings.*
             INTO
@@ -211,11 +235,23 @@ BEGIN
                 settings.instance_id = NEW.instance_id
                 AND settings.type = 'domain'
                 AND settings.organization_id IS NULL;
-        WHEN 'UPDATE' THEN
+        ELSE
             -- OLD and NEW are already populated, do nothing
     END CASE;
+
+    -- Lock both OLD and NEW setting scopes to serialize transitions across settings.
+    -- Acquire in deterministic order to avoid deadlocks.
+    old_lock_key := hashtext(OLD.instance_id || ':' || COALESCE(OLD.organization_id, 'global'));
+    new_lock_key := hashtext(NEW.instance_id || ':' || COALESCE(NEW.organization_id, 'global'));
+    IF old_lock_key = new_lock_key THEN
+        PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), old_lock_key);
+    ELSE
+        PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), new_lock_key);
+        PERFORM pg_advisory_xact_lock(hashtext('zitadel.login_names'), old_lock_key);
+    END IF;
     
     IF (OLD.settings->'loginNameIncludesDomain')::BOOLEAN IS NOT DISTINCT FROM (NEW.settings->'loginNameIncludesDomain')::BOOLEAN THEN
+        -- field not changed but the setting id did change.
         IF TG_OP = 'DELETE' OR TG_OP = 'INSERT' THEN
             UPDATE
                 zitadel.login_names
@@ -231,9 +267,9 @@ BEGIN
         RETURN NULL;
     END IF;
 
-    RAISE LOG 'deleted_login_names params: instance_id: %, used_setting: %', NEW.instance_id, OLD.id;
+    RAISE NOTICE 'recompute login names';
 
-    WITH affected_users AS (
+    WITH affected_login_names AS (
         DELETE FROM zitadel.login_names
         WHERE
             login_names.instance_id = NEW.instance_id
@@ -242,22 +278,22 @@ BEGIN
         RETURNING instance_id, organization_id, user_id
     )
     INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
-    SELECT DISTINCT ON (au.instance_id, au.user_id, users.username, org_domains.domain)
-        au.instance_id
-        , au.organization_id
-        , au.user_id
+    SELECT DISTINCT ON (affected_login_names.instance_id, affected_login_names.user_id, users.username, org_domains.domain)
+        affected_login_names.instance_id
+        , affected_login_names.organization_id
+        , affected_login_names.user_id
         , users.username
         , org_domains.domain
         , org_domains.is_primary IS NULL OR org_domains.is_primary
         , NEW.id
     FROM
-        affected_users au
+        affected_login_names
     JOIN zitadel.users ON
-        users.instance_id = au.instance_id
-        AND users.id = au.user_id
+        users.instance_id = affected_login_names.instance_id
+        AND users.id = affected_login_names.user_id
     LEFT JOIN zitadel.org_domains ON 
-        org_domains.instance_id = au.instance_id
-        AND org_domains.org_id = au.organization_id
+        org_domains.instance_id = affected_login_names.instance_id
+        AND org_domains.org_id = affected_login_names.organization_id
         AND org_domains.is_verified
         AND (NEW.settings->'loginNameIncludesDomain')::BOOLEAN;
 

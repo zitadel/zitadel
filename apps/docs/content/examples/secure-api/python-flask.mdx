@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Python
+description: "Secure Python Flask APIs with ZITADEL token validation and role-based access control."
 sidebar_label: Python
 ---
 
@@ -187,7 +188,7 @@ CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 ![](../../../public/img/python-flask/3.png)
 
 1. Create a service account and a Personal Access Token (PAT) for that user by following [this guide](/guides/integrate/service-accounts/personal-access-token#create-a-service-account-with-a-pat).
-2. To enable authorization, follow [this guide](/guides/manage/console/roles) to create a role `read:messages` on your project.
+2. To assign roles, follow [this guide](/guides/manage/console/roles) to create a role `read:messages` on your project.
 3. Next, add the role `read:messages` to the service account you created. Follow this [guide](/guides/manage/console/roles#role-assignments) for more information on creating a role assignment.
 
 ### Run the API
