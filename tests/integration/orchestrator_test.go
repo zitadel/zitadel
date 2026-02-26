@@ -65,7 +65,10 @@ func TestIntegration(t *testing.T) {
 	sigCtx, sigStop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer sigStop()
 
-	ctx, cancel := context.WithTimeout(sigCtx, 30*time.Minute)
+	// The orchestrator timeout must exceed the child go-test timeout (60m) so
+	// that the parent context never expires before the child finishes.
+	// Pattern: orchestrator = child timeout + grace period.
+	ctx, cancel := context.WithTimeout(sigCtx, 65*time.Minute)
 	defer cancel()
 
 	// Use a separate context for cleanup that is NOT tied to signals/timeout.
