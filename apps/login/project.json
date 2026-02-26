@@ -131,6 +131,26 @@
         ]
       }
     },
+    "test-ssl": {
+      "description": "Runs TLS integration tests using testcontainers",
+      "dependsOn": [
+        "build"
+      ],
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "default",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/dockerized/**/output/**/*"
+      ],
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "pnpm vitest --run --config vitest.config.dockerized.mts dockerized/ssl"
+        ]
+      }
+    },
     "test-integration-run-login": {
       "description": "Runs the Login application under test. It has its own target, separate from test-integration, because it's a continuous task.",
       "dependsOn": [
