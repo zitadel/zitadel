@@ -1,0 +1,43 @@
+{
+  "name": "@zitadel/react",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "ZITADEL React SDK — hooks and context for client-side state management",
+  "publishConfig": { "access": "public" },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist/**"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js", "require": "./dist/index.cjs" }
+  },
+  "scripts": {
+    "build": "tsup",
+    "lint-check-eslint": "eslint 'src/**/*.ts*'",
+    "lint-check-knip": "knip",
+    "test-unit": "vitest --run",
+    "clean": "rm -rf node_modules dist"
+  },
+  "dependencies": {
+    "@zitadel/zitadel-js": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.9",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
+    "eslint": "^8.57.1",
+    "knip": "^5.82.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
+  }
+}

@@ -1,0 +1,8 @@
+version: v2
+plugins:
+  - remote: buf.build/bufbuild/es:v1.10.0
+    out: src/generated
+    opt: target=ts
+  - remote: buf.build/connectrpc/es:v1.4.0
+    out: src/generated
+    opt: target=ts
