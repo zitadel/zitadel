@@ -1,0 +1,94 @@
+{
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "name": "@zitadel/compose",
+    "targets": {
+        "test-config": {
+            "description": "Validates that all compose file combinations parse correctly (no Docker daemon needed).",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "parallel": false,
+                "commands": [
+                    "docker compose --env-file .env.example -f docker-compose.yml config --quiet",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-letsencrypt.yml config --quiet",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-external-tls.yml config --quiet",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-local-tls.yml config --quiet",
+                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.prodlike.yml config --quiet"
+                ]
+            },
+            "inputs": [
+                "{projectRoot}/docker-compose.yml",
+                "{projectRoot}/docker-compose.mode-*.yml",
+                "{projectRoot}/docker-compose.prodlike.yml",
+                "{projectRoot}/.env.example"
+            ]
+        },
+        "test-run": {
+            "description": "Starts the full compose stack using locally-built images. Waits until all containers are healthy before exiting.",
+            "dependsOn": [
+                "@zitadel/api:pack",
+                "@zitadel/login:pack"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "parallel": false,
+                "commands": [
+                    "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes --remove-orphans",
+                    "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test up --force-recreate --wait"
+                ]
+            }
+        },
+        "test-e2e": {
+            "description": "Runs the Playwright test suite (wiring.spec.ts + smoke.spec.ts) against the running compose stack via localhost:8888 through Traefik. Covers login, console, OIDC, SAML, API v1 REST, gRPC h2c, gRPC-web, API v2 REST (gRPC-gateway JSON) HTTP/1.1 and HTTP/2. Run 'pnpm exec playwright install chromium' once before using this target.",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "command": "pnpm exec playwright test --config playwright.config.ts"
+            },
+            "inputs": [
+                "{projectRoot}/playwright.config.ts",
+                "{projectRoot}/tests/**",
+                "{projectRoot}/.env.test",
+                "{projectRoot}/package.json"
+            ]
+        },
+        "test": {
+            "description": "Lightweight test target safe for nx affected. Validates compose config syntax only (no Docker daemon needed).",
+            "dependsOn": [
+                "test-config"
+            ]
+        },
+        "test-full": {
+            "description": "Builds local images, starts the compose stack, runs Playwright wiring tests (login, console, OIDC, SAML, API v1 REST, gRPC h2c, gRPC-web, API v2 REST HTTP/1.1 and HTTP/2) and the browser login smoke test through Traefik, then tears down.",
+            "dependsOn": [
+                "test-config",
+                "test-run"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "parallel": false,
+                "commands": [
+                    "pnpm exec playwright install chromium",
+                    "r=0; nx run @zitadel/compose:test-e2e || r=$?; nx run @zitadel/compose:stop; exit $r"
+                ]
+            },
+            "inputs": [
+                "{projectRoot}/docker-compose.yml",
+                "{projectRoot}/docker-compose.test.yml",
+                "{projectRoot}/.env.test",
+                "{projectRoot}/playwright.config.ts",
+                "{projectRoot}/tests/**"
+            ]
+        },
+        "stop": {
+            "description": "Tears down the compose smoke-test stack and removes all volumes.",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "command": "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes"
+            }
+        }
+    }
+}

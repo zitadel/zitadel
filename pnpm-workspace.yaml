@@ -3,6 +3,7 @@ packages:
   - tests/*
   - packages/*
   - apps/*
+  - deploy/compose
 
 exclude:
   - benchmark # because of the node 18 or 20 dependency

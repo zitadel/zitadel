@@ -14,9 +14,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/feature"
 )
@@ -48,10 +48,10 @@ Log:
   Level: info
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
-				&actions.HostChecker{Domain: "localhost"},
-				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
-				&actions.HostChecker{Domain: "foobar"}})
+			assert.Equal(t, config.Actions.HTTP.DenyList, []denylist.AddressChecker{
+				&denylist.HostChecker{Domain: "localhost"},
+				&denylist.HostChecker{IP: net.ParseIP("127.0.0.1")},
+				&denylist.HostChecker{Domain: "foobar"}})
 		},
 	}, {
 		name: "actions deny list string ok",
@@ -64,10 +64,10 @@ Log:
   Level: info
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
-				&actions.HostChecker{Domain: "localhost"},
-				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
-				&actions.HostChecker{Domain: "foobar"}})
+			assert.Equal(t, config.Actions.HTTP.DenyList, []denylist.AddressChecker{
+				&denylist.HostChecker{Domain: "localhost"},
+				&denylist.HostChecker{IP: net.ParseIP("127.0.0.1")},
+				&denylist.HostChecker{Domain: "foobar"}})
 		},
 	}, {
 		name: "features ok",

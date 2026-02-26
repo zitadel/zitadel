@@ -773,6 +773,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
                 label: "Production & Operations",
                 collapsed: false,
                 items: [
+                  "self-hosting/manage/requirements",
                   "self-hosting/manage/production",
                   "self-hosting/manage/productionchecklist",
                   "self-hosting/manage/usage_control",
@@ -857,6 +858,8 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "self-hosting/manage/cache",
         ],
       },
+
+      "guides/manage/production-checklist",
     ],
   },
   {
