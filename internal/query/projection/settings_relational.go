@@ -75,7 +75,6 @@ func (p *relationalTablesProjection) reduceLoginPolicyAdded(event eventstore.Eve
 	}), nil
 }
 
-// olint:gocognit
 func (p *relationalTablesProjection) reduceLoginPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LoginPolicyChangedEvent
