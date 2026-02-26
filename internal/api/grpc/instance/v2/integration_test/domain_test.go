@@ -374,6 +374,17 @@ func TestRemoveTrustedDomain(t *testing.T) {
 	trustedDomainRelational := integration.DomainName()
 	_, err = instRelational.Client.InstanceV2.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: instRelational.ID(), TrustedDomain: trustedDomainRelational})
 	require.Nil(t, err)
+	// Wait for the relational projection to catch up before tests query it.
+	require.EventuallyWithT(t, func(tc *assert.CollectT) {
+		resp, listErr := instRelational.Client.InstanceV2.ListTrustedDomains(ctxWithSysAuthZ, &instance.ListTrustedDomainsRequest{InstanceId: instRelational.ID()})
+		require.NoError(tc, listErr)
+		for _, d := range resp.GetTrustedDomain() {
+			if d.GetDomain() == trustedDomainRelational {
+				return
+			}
+		}
+		assert.Fail(tc, "trusted domain not yet in relational projection")
+	}, 30*time.Second, 500*time.Millisecond)
 
 	t.Cleanup(func() {
 		instES.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: instES.ID(), TrustedDomain: trustedDomainES})

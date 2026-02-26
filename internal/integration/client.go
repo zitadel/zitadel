@@ -7,6 +7,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"math/big"
 	"sync"
@@ -513,7 +514,7 @@ func (i *Instance) CreateMachineUser(ctx context.Context) *mgmt.AddMachineUserRe
 }
 
 func (i *Instance) CreateUserIDPlink(ctx context.Context, userID, externalID, idpID, username string) (*user_v2.AddIDPLinkResponse, error) {
-	return i.Client.UserV2.AddIDPLink(
+	resp, err := i.Client.UserV2.AddIDPLink(
 		ctx,
 		&user_v2.AddIDPLinkRequest{
 			UserId: userID,
@@ -524,6 +525,25 @@ func (i *Instance) CreateUserIDPlink(ctx context.Context, userID, externalID, id
 			},
 		},
 	)
+	if err != nil {
+		return resp, err
+	}
+	// Wait for the idp_user_links projection to catch up: the SAML/OIDC ACS
+	// flow queries that table immediately after the link is written, and can
+	// get a "not linked" result if the projection worker is behind.
+	mustAwait(func() error {
+		links, err := i.Client.UserV2.ListIDPLinks(ctx, &user_v2.ListIDPLinksRequest{UserId: userID})
+		if err != nil {
+			return err
+		}
+		for _, l := range links.GetResult() {
+			if l.GetIdpId() == idpID && l.GetUserId() == externalID {
+				return nil
+			}
+		}
+		return errors.New("idp_user_links projection not yet ready")
+	})
+	return resp, nil
 }
 
 func (i *Instance) RegisterUserPasskey(ctx context.Context, userID string) string {

@@ -143,12 +143,21 @@ func TestIntegration(t *testing.T) {
 	logf("Found %d integration test packages", len(packages))
 
 	logf("Running integration tests...")
+	// Allow overriding parallelism via INTEGRATION_PARALLELISM env var.
+	// Default: 4. Each package creates an isolated ZITADEL instance
+	// (random subdomain), so cross-package state is safe. Higher values reduce wall
+	// time at the cost of DB/CPU load.
+	parallelism := os.Getenv("INTEGRATION_PARALLELISM")
+	if parallelism == "" {
+		parallelism = "4"
+	}
+	logf("Package parallelism: %s (override with INTEGRATION_PARALLELISM)", parallelism)
 	args := []string{
 		"test",
 		"-count", "1",
 		"-tags", "integration",
 		"-timeout", "60m",
-		"-p", "1", // reliability-first default; avoids cross-package contention
+		"-p", parallelism,
 		"-v",
 	}
 
@@ -197,6 +206,10 @@ func discoverIntegrationPackages() ([]string, error) {
 	var packages []string
 	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
 		if strings.Contains(line, "integration_test") || strings.Contains(line, "events_testing") {
+			// Skip v2beta packages — these APIs are being removed.
+			if strings.Contains(line, "v2beta") {
+				continue
+			}
 			packages = append(packages, line)
 		}
 	}

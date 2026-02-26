@@ -991,7 +991,9 @@ func Test_ZITADEL_API_session_not_found(t *testing.T) {
 }
 
 func Test_ZITADEL_API_session_expired(t *testing.T) {
-	id, token, _, _ := Instance.CreateVerifiedWebAuthNSessionWithLifetime(t, LoginCTX, User.GetUserId(), 300*time.Millisecond)
+	// Use 3s lifetime: long enough for the EventuallyWithT projection wait to
+	// succeed before expiry, even under parallel load.
+	id, token, _, _ := Instance.CreateVerifiedWebAuthNSessionWithLifetime(t, LoginCTX, User.GetUserId(), 3*time.Second)
 
 	// test session token works
 	ctx := integration.WithAuthorizationToken(context.Background(), token)
@@ -1004,7 +1006,7 @@ func Test_ZITADEL_API_session_expired(t *testing.T) {
 	}, retryDuration, tick)
 
 	// ensure session expires and does not work anymore
-	time.Sleep(400 * time.Millisecond)
+	time.Sleep(3500 * time.Millisecond)
 	sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.Error(t, err)
 	require.Nil(t, sessionResp)
