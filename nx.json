@@ -8,7 +8,7 @@
   "tui": {
     "enabled": true
   },
-  "maxCacheSize": "5GB",
+  "maxCacheSize": "0",
   "namedInputs": {
     "sharedGlobals": [
       "{workspaceRoot}/nx.json"

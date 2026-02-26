@@ -10,7 +10,7 @@
     "generate:api-reference": "tsx scripts/generate-api-reference.mts --only-generate",
     "fix:api-links": "tsx scripts/generate-api-reference.mts --only-fix",
     "build:mdx-source": "fumadocs-mdx",
-    "build": "next build",
+    "build": "ls -la //home/runner/work/zitadel/zitadel/.nx/cache/ && next build && /home/runner/work/zitadel/zitadel/.nx/cache/",
     "dev": "next dev",
     "generate": "nx run @zitadel/docs:generate",
     "start": "next start",
