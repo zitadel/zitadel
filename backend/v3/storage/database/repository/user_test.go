@@ -3709,6 +3709,184 @@ func Test_user_Update(t *testing.T) {
 				}(),
 			},
 		},
+		{
+			name: "human user - add new recovery codes",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes: []string{"code1", "code2"},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - append recovery codes",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.AddRecoveryCodes([]string{"code3", "code4"}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes: []string{"code1", "code2", "code3", "code4"},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - append recovery codes with duplicates",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.AddRecoveryCodes([]string{"code2", "code3", "code3", "code4"}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes: []string{"code1", "code2", "code3", "code4"},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - remove recovery code",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.RemoveRecoveryCode("code2"),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes: []string{"code1"},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - remove all recovery codes",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2", "code3"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.RemoveAllRecoveryCodes(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes: []string{},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - set recovery code failed attempts",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+					humanRepo.IncrementRecoveryCodeFailedAttempts(),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.IncrementRecoveryCodeFailedAttempts(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes:          []string{"code1", "code2"},
+						FailedAttempts: 2,
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - set recovery code last successfully checked at",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetLastSuccessfulRecoveryCodeCheck(now),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes:                     []string{"code1", "code2"},
+						LastSuccessfullyCheckedAt: &now,
+					}
+					return u
+				}(),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -3963,6 +4141,7 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 
 	assertIdentityProviderLinks(t, expected.IdentityProviderLinks, actual.IdentityProviderLinks)
 	assertVerifications(t, expected.Verifications, actual.Verifications)
+	assertRecoveryCodes(t, expected.RecoveryCodes, actual.RecoveryCodes)
 }
 
 func assertHumanTOTP(t *testing.T, expected, actual *domain.HumanTOTP) {
@@ -4184,4 +4363,21 @@ func assertIdentityProviderLinks(t *testing.T, expected, actual []*domain.Identi
 		assert.True(t, expectedLink.CreatedAt.Equal(actual[i].CreatedAt), "identity provider link[%d] created at", i)
 		assert.True(t, expectedLink.UpdatedAt.Equal(actual[i].UpdatedAt), "identity provider link[%d] updated at", i)
 	}
+}
+
+func assertRecoveryCodes(t *testing.T, expected, actual *domain.HumanRecoveryCodes) {
+	t.Helper()
+
+	require.Equal(t, expected == nil, actual == nil, "human recovery codes nil check")
+	if expected == nil {
+		return
+	}
+	assert.ElementsMatch(t, expected.Codes, actual.Codes)
+	if expected.LastSuccessfullyCheckedAt != nil {
+		require.NotNil(t, actual.LastSuccessfullyCheckedAt, "human recovery codes last successfully checked at not nil")
+		assert.True(t, expected.LastSuccessfullyCheckedAt.Equal(*actual.LastSuccessfullyCheckedAt), "human recovery codes last successfully checked at")
+	} else {
+		assert.Nil(t, actual.LastSuccessfullyCheckedAt, "human recovery codes last successfully checked at nil")
+	}
+	assert.Equal(t, expected.FailedAttempts, actual.FailedAttempts, "human recovery codes failed attempts")
 }
