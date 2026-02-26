@@ -3755,6 +3755,32 @@ func Test_user_Update(t *testing.T) {
 			},
 		},
 		{
+			name: "human user - append recovery codes with duplicates",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.AddRecoveryCodes([]string{"code2", "code3", "code4"}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes: []string{"code1", "code2", "code3", "code4"},
+					}
+					return u
+				}(),
+			},
+		},
+		{
 			name: "human user - remove recovery code",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
