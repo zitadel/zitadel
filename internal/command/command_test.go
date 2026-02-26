@@ -150,15 +150,6 @@ func expectLoginPathsNoCall(t *testing.T) LoginPaths {
 	return NewMockLoginPaths(gomock.NewController(t))
 }
 
-// loginPathsOrDefault avoids a nil-pointer panic when a test case
-// forgets to set the loginPaths field.
-func loginPathsOrDefault(fn func(*testing.T) LoginPaths, t *testing.T) LoginPaths {
-	if fn == nil {
-		return expectLoginPathsNoCall(t)
-	}
-	return fn(t)
-}
-
 func expectLoginPathsDefaultEmailCodeURLTemplate(tmpl string) func(t *testing.T) LoginPaths {
 	return func(t *testing.T) LoginPaths {
 		m := NewMockLoginPaths(gomock.NewController(t))
