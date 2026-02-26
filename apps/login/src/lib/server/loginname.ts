@@ -103,6 +103,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       return { redirect: "/password?" + paramsPasswordDefault };
     }
+
     return { error: t("errors.userNotFound") };
   };
 
@@ -323,9 +324,17 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       userId: session?.factors?.user?.id ?? userId,
     });
 
-    // always resend invite if user has no auth method set
-    if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
-      logger.debug("User has no auth methods set", { isEmailVerified: humanUser?.email?.isVerified });
+    const hasPrimaryMethod =
+      methods.authMethodTypes?.some(
+        (m: AuthenticationMethodType) =>
+          m === AuthenticationMethodType.PASSWORD ||
+          m === AuthenticationMethodType.PASSKEY ||
+          m === AuthenticationMethodType.IDP,
+      ) ?? false;
+
+    // always resend invite or setup email if user has no primary auth method set
+    if (!hasPrimaryMethod) {
+      logger.debug("humanUser.email?.isVerified", humanUser?.email?.isVerified);
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
         send: "true", // set this to true to request a new code immediately
