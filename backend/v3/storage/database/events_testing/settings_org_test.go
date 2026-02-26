@@ -537,7 +537,9 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.removed
-			assert.Equal(t, url.URL{}, *setting.LogoURLLight)
+			if assert.NotNil(t, setting.LogoURLLight) {
+				assert.Equal(t, url.URL{}, *setting.LogoURLLight)
+			}
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -585,7 +587,9 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.dark.removed
-			assert.Equal(t, url.URL{}, *setting.LogoURLDark)
+			if assert.NotNil(t, setting.LogoURLDark) {
+				assert.Equal(t, url.URL{}, *setting.LogoURLDark)
+			}
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -633,7 +637,9 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.removed
-			assert.Equal(t, url.URL{}, *setting.IconURLLight)
+			if assert.NotNil(t, setting.IconURLLight) {
+				assert.Equal(t, url.URL{}, *setting.IconURLLight)
+			}
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -681,7 +687,9 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.dark.removed
-			assert.Equal(t, url.URL{}, *setting.IconURLDark)
+			if assert.NotNil(t, setting.IconURLDark) {
+				assert.Equal(t, url.URL{}, *setting.IconURLDark)
+			}
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -729,7 +737,9 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.font.removed
-			assert.Equal(t, url.URL{}, *setting.FontURL)
+			if assert.NotNil(t, setting.FontURL) {
+				assert.Equal(t, url.URL{}, *setting.FontURL)
+			}
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)

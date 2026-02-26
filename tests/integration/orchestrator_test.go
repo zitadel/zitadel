@@ -157,7 +157,7 @@ func TestIntegration(t *testing.T) {
 		"-count", "1",
 		"-tags", "integration",
 		"-timeout", "60m",
-		"-p", "1", // sequential: go test buffers per-package output when -p > 1, hiding progress
+		"-p", "1", // reliability-first default; avoids cross-package contention
 		"-v",
 	}
 

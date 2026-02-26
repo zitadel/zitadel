@@ -173,6 +173,19 @@
             "dependsOn": [
                 "generate"
             ],
+            "command": "go test -count 1 -tags integration -timeout 60m -v ./tests/integration/...",
+            "inputs": [
+                "sources",
+                "{workspaceRoot}/internal/integration/**",
+                "{workspaceRoot}/tests/integration/**",
+                "{workspaceRoot}/go*"
+            ]
+        },
+        "test-integration-race": {
+            "description": "Runs all integration tests with race detection (slower, higher resource usage).",
+            "dependsOn": [
+                "generate"
+            ],
             "command": "go test -race -count 1 -tags integration -timeout 60m -v ./tests/integration/...",
             "inputs": [
                 "sources",
