@@ -142,15 +142,6 @@ func TestIntegration(t *testing.T) {
 	require.NoError(t, err, "discover packages")
 	logf("Found %d integration test packages", len(packages))
 
-	// Integration test output log (separate from orchestrator log).
-	testLogPath := filepath.Join(logDir, "integration-test-output.log")
-	testLogFile, err := os.Create(testLogPath)
-	require.NoError(t, err, "create integration test log file")
-	defer testLogFile.Close()
-
-	absTestLogPath, _ := filepath.Abs(testLogPath)
-	logf("Integration test output: %s", absTestLogPath)
-
 	logf("Running integration tests...")
 	args := []string{
 		"test",
@@ -183,16 +174,14 @@ func TestIntegration(t *testing.T) {
 	}
 	cmd.WaitDelay = 10 * time.Second // fallback SIGKILL after 10s
 
-	// Tee to both the test log file and the orchestrator log writer so
-	// test output is visible via both tail targets.
-	out := io.MultiWriter(testLogFile, logw)
-	cmd.Stdout = out
-	cmd.Stderr = out
+	// Route all test output through the single orchestrator log writer.
+	cmd.Stdout = logw
+	cmd.Stderr = logw
 	// Inherit all env vars including our ZITADEL_* overrides
 	cmd.Env = os.Environ()
 
 	err = cmd.Run()
-	require.NoError(t, err, "integration tests failed; see %s", absTestLogPath)
+	require.NoError(t, err, "integration tests failed; see %s", absOrchLogPath)
 	logf("All integration tests passed")
 }
 

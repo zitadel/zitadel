@@ -1226,6 +1226,42 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 	return target
 }
 
+// CreateTargetWithTimeout is like CreateTarget but accepts a custom target timeout.
+// Use this when testing behaviour that depends on the relationship between the
+// server response time and the configured target timeout.
+func (i *Instance) CreateTargetWithTimeout(ctx context.Context, t *testing.T, name, endpoint string, ty target_domain.TargetType, interrupt bool, payloadType action.PayloadType, targetTimeout time.Duration) *action.CreateTargetResponse {
+	if name == "" {
+		name = TargetName()
+	}
+	req := &action.CreateTargetRequest{
+		Name:        name,
+		Endpoint:    endpoint,
+		Timeout:     durationpb.New(targetTimeout),
+		PayloadType: payloadType,
+	}
+	switch ty {
+	case target_domain.TargetTypeWebhook:
+		req.TargetType = &action.CreateTargetRequest_RestWebhook{
+			RestWebhook: &action.RESTWebhook{
+				InterruptOnError: interrupt,
+			},
+		}
+	case target_domain.TargetTypeCall:
+		req.TargetType = &action.CreateTargetRequest_RestCall{
+			RestCall: &action.RESTCall{
+				InterruptOnError: interrupt,
+			},
+		}
+	case target_domain.TargetTypeAsync:
+		req.TargetType = &action.CreateTargetRequest_RestAsync{
+			RestAsync: &action.RESTAsync{},
+		}
+	}
+	target, err := i.Client.ActionV2.CreateTarget(ctx, req)
+	require.NoError(t, err)
+	return target
+}
+
 func (i *Instance) DeleteTarget(ctx context.Context, t *testing.T, id string) {
 	_, err := i.Client.ActionV2.DeleteTarget(ctx, &action.DeleteTargetRequest{
 		Id: id,
