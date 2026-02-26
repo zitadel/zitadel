@@ -16,7 +16,7 @@ export interface WebhookVerifyOptions {
 export function verifyZitadelWebhook(options: WebhookVerifyOptions): boolean {
   const { body, signature, signingKey } = options;
   const expected = createHmac("sha256", signingKey)
-    .update(typeof body === "string" ? body : body)
+    .update(body)
     .digest("hex");
 
   const sigBuffer = Buffer.from(signature, "hex");
