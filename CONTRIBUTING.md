@@ -49,8 +49,9 @@ You can build and start any project with Nx commands.
 | **Develop**                   | `pnpm nx run PROJECT:dev`                   | Development server           |                                                                                                                                                                                                  |
 | **Generate**                  | `pnpm nx run PROJECT:generate`              | Generate .gitignored files   |                                                                                                                                                                                                  |
 | **Generate Go Files**         | `pnpm nx run @zitadel/api:generate-go`      | Regenerate checked-in files  | This is needed to generate files using [Stringer](https://pkg.go.dev/golang.org/x/tools/cmd/stringer), [Enumer](https://github.com/dmarkham/enumer) or [gomock](https://github.com/uber-go/mock) |
+| **Install Proto Plugins**     | `pnpm nx run @zitadel/api:generate-install` | Install proto toolchain      | Installs Go-based plugins (protoc-gen-go, connect-go, …) to `.artifacts/bin/`. Run automatically by `generate` targets; Nx caches the outputs. |
 | **Test - Unit**               | `pnpm nx run PROJECT:test-unit`             | Run unit tests               |                                                                                                                                                                                                  |
-| **Test - Integration**        | `pnpm nx run PROJECT:test-integration`      | Run integration tests        | Learn mnore about how to [debug API integration tests](#run-api-integration-tests)                                                                                                               |
+| **Test - Integration**        | `pnpm nx run PROJECT:test-integration`      | Run integration tests        | Learn more about how to [debug API integration tests](#run-api-integration-tests)                                                                                                               |
 | **Test - Integration Stop**   | `pnpm nx run PROJECT:test-integration-stop` | Stop integration containers  |                                                                                                                                                                                                  |
 | **Test - Functional UI**      | `pnpm nx run @zitadel/functional-ui:test`   | Run functional UI tests      | Learn more about how to [develop the Management Console and opening the interactive Test Suite](#pass-management-console-quality-checks)                                                                               |
 | **Test - Functional UI Stop** | `pnpm nx run @zitadel/functional-ui:stop`   | Run functional UI containers |                                                                                                                                                                                                  |
@@ -173,15 +174,13 @@ Make sure you use [semantic release messages format](https://github.com/angular/
 
 #### Type
 
-Must be one of the following:
-
-- **feat**: New Feature
-- **fix**: Bug Fix
-- **docs**: Documentation
+Allowed values are listed in [`.github/semantic.yml`](.github/semantic.yml) under `types:`.
 
 #### Scope
 
-This is optional to indicate which component is affected. If in doubt, leave blank (`<type>: <short summary>`)
+This is optional to indicate which component is affected.
+Allowed values are listed in [`.github/semantic.yml`](.github/semantic.yml) under `scopes:`.
+When in doubt, omit the scope — `<type>: <short summary>` is always valid.
 
 #### Short summary
 
@@ -579,6 +578,18 @@ pnpm nx run @zitadel/proto:generate  # Regenerate after proto changes
 ```bash
 pnpm nx run @zitadel/client:build  # Build after changes
 ```
+
+### Proto Plugin Convention
+
+All binary proto plugins are installed to `.artifacts/bin/<GOOS>/<GOARCH>/` and declared as Nx target outputs, making them eligible for Nx remote cache.
+
+| Scope | Target | Installs |
+|---|---|---|
+| `@zitadel/api` | `generate-install` | Go-based plugins: `buf`, `protoc-gen-go`, `protoc-gen-connect-go`, `protoc-gen-openapiv2`, `protoc-gen-validate`, `protoc-gen-authoption`, … |
+| `@zitadel/console` | `install-proto-plugins` | `protoc-gen-grpc-web`, `protoc-gen-js`, `protoc-gen-openapiv2` (pre-built binaries, no Go required) |
+| `@zitadel/docs` | `install-proto-plugins` | `protoc-gen-connect-openapi` (pre-built binary, no Go required) |
+
+`generate` targets depend on the appropriate install targets and prepend `.artifacts/bin/` to `$PATH` automatically. Running `pnpm nx run PROJECT:generate` is sufficient — no manual plugin installation needed.
 
 ### Contribute to Docs
 

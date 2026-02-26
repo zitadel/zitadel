@@ -1,5 +1,6 @@
 ---
-title: Configure OKTA as a SAML Identity Provider in ZITADEL
+title: Set up OKTA as a SAML Identity Provider in ZITADEL
+description: "Configure OKTA as a SAML Identity Provider in ZITADEL to enable single sign-on with custom attribute mappings"
 sidebar_label: OKTA SAML
 id: okta-saml
 ---
@@ -14,7 +15,7 @@ import TestSetup from './_test_setup.mdx';
 
 <Intro components={props.components}  provider="OKTA"/>
 
-## ZITADEL Configuration
+## ZITADEL Setup
 
 ### Go to the IdP Providers Overview
 
@@ -24,7 +25,7 @@ import TestSetup from './_test_setup.mdx';
 
 To be able to create the application in OKTA we need the provider id from ZITADEL.
 1. Create a new SAML Provider with a name and a random text in the Metadata Xml field.
-We will fill that as soon as we have done the configuration in OKTA.
+We will fill that as soon as we have done the settings in OKTA.
 2. Save Configuration
 
 As an alternative you can add the SAML identity provider through the API, either on the default settings or on a specific organization:
@@ -47,7 +48,7 @@ After you created the SAML Provider in ZITADEL, you can copy the URLs you need t
 4. Click on the ZITADEL URLs that your SAML IDP shows since you created it in ZITADEL and paste them accordingly:
 - **Single sign-on URL**: Paste the *ZITADEL ACS Login Form URL*.
 - **Audience URI (SP Entity ID)**: Paste the *ZITADEL Metadata URL*
-5. Save the configuration
+5. Save the settings
 6. Copy the metadata URL from the details
 
 ![](../../../../public/img/guides/okta_add_saml_app.png)
@@ -76,16 +77,16 @@ To allow users to authenticate with that app go to the "Assign" Tab.
 
 ![](../../../../public/img/guides/okta_assign_user_to_app.png)
 
-## Finish ZITADEL Configuration
+## Finish ZITADEL Setup
 
-You are now finished with the configuration in OKTA and you can switch back to your identity provider configuration in ZITADEL.
+You are now finished with the settings in OKTA and you can switch back to your identity provider settings in ZITADEL.
 
 ### Add Metadata Xml
 
 Add [the metadata URL you have saved before from OKTA](#register-a-new-client) to the Metadata URL.
 As soon as you have saved the provider, and you have a look at the detail you should now see the Metadata Xml field filled.
 
-If you prefer changing the configuration through the API you can update the SAML provider on the default settings or a specific organization:
+If you prefer changing the settings through the API you can update the SAML provider on the default settings or a specific organization:
 - [Update Default SAML Identity Provider](/reference/api/admin/zitadel.admin.v1.AdminService.UpdateSAMLProvider)
 - [Update SAML Identity Provider on Organization](/reference/api/management/zitadel.management.v1.ManagementService.UpdateSAMLProvider)
 

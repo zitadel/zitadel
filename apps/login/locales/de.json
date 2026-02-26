@@ -108,14 +108,17 @@
       "description": "Legen Sie das Passwort für Ihr Konto fest",
       "submit": "Weiter",
       "labels": {
+        "currentPassword": "Aktuelles Passwort",
         "newPassword": "Neues Passwort",
         "confirmPassword": "Neues Passwort wiederholen"
       },
       "required": {
+        "currentPassword": "Bitte geben Sie Ihr aktuelles Passwort ein!",
         "newPassword": "Bitte geben Sie ein neues Passwort ein!",
         "confirmPassword": "Dieses Feld ist erforderlich"
       },
       "errors": {
+        "currentPasswordInvalid": "Das aktuelle Passwort ist falsch.",
         "couldNotChangePassword": "Passwort konnte nicht geändert werden",
         "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
         "unknownError": "Unbekannter Fehler"

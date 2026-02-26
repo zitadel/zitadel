@@ -1,9 +1,10 @@
 ---
 title: Brand Customization
+description: "Customize ZITADEL's logos, colors, fonts, and styles at the instance or organization level for consistent branding."
 ---
 
 ZITADEL offers various customization options for your projects brand design. The branding can be configured on two different levels.
-The configuration on the instance level will set the default settings, which are triggered for all users if not overwritten on an organization specifically.
+The settings on the instance level will set the default settings, which are triggered for all users if not overwritten on an organization specifically.
 The second possibility is to configure it on each organization. This guide will describe the second possibility.
 For this head over to the Branding Setting on your Organization Page.
 
@@ -11,7 +12,7 @@ For this head over to the Branding Setting on your Organization Page.
 
 You are able to customize the light and a dark mode separately.
 All your changes will be shown in the preview window on the right side.
-As soon as you are happy with your configuration click the "Apply configuration" button.
+As soon as you are happy with your settings click the "Apply settings" button.
 After this your settings will trigger in your system. The login and the emails will be sent with your branding.
 
 ## Settings
@@ -41,10 +42,10 @@ In the advanced behavior you can choose if the loginname suffix (domain e.g. roa
 
 If you like to trigger your settings for your applications you have different possibilities.
 
-### 1. Primary Domain Scope
+### 1. Organization Domain Scope
 
 Send a [reserved scope](/apis/openidoauth/scopes) with your [authorization request](../../integrate/login/oidc/login-users) to trigger your organization.
-The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to log in.
+The Organization Domain scope will restrict the login to your organization, so only users of your own organization will be able to log in.
 
 You can use our [OpenID Authentication Request Playground](https://zitadel.com/playgrounds/oidc) to learn more about how to trigger an [organization's policies and branding](https://zitadel.com/playgrounds/oidc#organization-policies-and-branding).
 

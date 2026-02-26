@@ -701,7 +701,7 @@
     "USERNAME": "Nazwa Użytkownika",
     "ORGNAME": "Nazwa Organizacji",
     "ORGID": "ID Organizacji",
-    "PRIMARYDOMAIN": "Domena podstawowa",
+    "PRIMARYDOMAIN": "Domena organizacji",
     "PROJECTNAME": "Nazwa Projektu",
     "RESOURCEOWNER": "Właściciel Zasobu",
     "METHODS": {
@@ -1043,7 +1043,7 @@
       "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków.",
       "MAXLENGTHERROR": "Musi zawierać mniej niż {{value}} znaków"
     },
-    "ID": "ID",
+    "ID": "ID użytkownika",
     "EMAIL": "E-mail",
     "PHONE": "Numer telefonu",
     "PHONEEMPTY": "Nie podano numeru telefonu",
@@ -1373,7 +1373,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Nazwa",
-      "ID": "ID",
+      "ID": "ID organizacji",
       "CREATIONDATE": "Data utworzenia",
       "DATECHANGED": "Zmieniono",
       "FILTER": "Filtr",
@@ -1419,7 +1419,7 @@
       },
       "DOWNLOAD_FILE": "Pobierz plik",
       "SELECTORGTOOLTIP": "Wybierz tę organizację.",
-      "PRIMARYDOMAIN": "Domena główna",
+      "PRIMARYDOMAIN": "Domena organizacji",
       "STATE": "Stan",
       "USEPASSWORD": "Ustaw hasło początkowe",
       "USEPASSWORDDESC": "Użytkownik nie musi ustawiać hasła podczas inicjalizacji."
@@ -1430,9 +1430,9 @@
     },
     "DOMAINS": {
       "NEW": "Dodaj domenę",
-      "TITLE": "Zweryfikowane domeny",
+      "TITLE": "Domena organizacji",
       "DESCRIPTION": "Skonfiguruj swoje domeny. Ta domena może być używana do logowania się z Twoimi użytkownikami.",
-      "SETPRIMARY": "Ustaw jako główną",
+      "SETPRIMARY": "Domena organizacji",
       "DELETE": {
         "TITLE": "Usuń domenę",
         "DESCRIPTION": "Zamierzasz usunąć jedną z twoich domen. Zauważ, że twoi użytkownicy już nie będą mogli używać tej domeny do logowania się."
@@ -1460,7 +1460,7 @@
       "MEMBERADDED": "Dodano administratora.",
       "MEMBERREMOVED": "Usunięto administratora.",
       "MEMBERCHANGED": "Zmieniono administratora.",
-      "SETPRIMARY": "Ustawiono domenę podstawową.",
+      "SETPRIMARY": "Domena organizacji została ustawiona pomyślnie.",
       "DELETED": "Organizacja została usunięta pomyślnie",
       "DEFAULTORGNOTFOUND": "Nie znaleziono organizacji domyślnej",
       "ORG_WAS_DELETED": "Organizacja została usunięta."
@@ -1498,7 +1498,7 @@
       "NOTIFICATIONS_DESC": "Ustawienia SMTP i SMS",
       "MESSAGETEXTS": "Teksty wiadomości",
       "IDP": "Dostawcy tożsamości",
-      "VERIFIED_DOMAINS": "Zweryfikowane domeny",
+      "VERIFIED_DOMAINS": "Domena organizacji",
       "DOMAIN": "Ustawienia domeny",
       "LOGINTEXTS": "Teksty interfejsu logowania",
       "BRANDING": "Marka",
@@ -2013,7 +2013,8 @@
           "DESCRIPTION": "Czy na pewno chcesz usunąć swój projekt?",
           "TYPENAME": "Wpisz nazwę projektu, aby trwale go usunąć."
         }
-      }
+      },
+      "ID": "ID projektu"
     },
     "SETTINGS": {
       "TITLE": "Ustawienia",
@@ -2292,7 +2293,7 @@
     "ADD": "Dodaj dostawcę tożsamości",
     "TYPE": "Typ",
     "OWNER": "Właściciel",
-    "ID": "ID",
+    "ID": "ID dostawcy tożsamości",
     "NAME": "Nazwa",
     "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
     "TOKENENDPOINT": "Token Endpoint",
@@ -2495,7 +2496,7 @@
     "TOKEN": "Ustawienia tokenów",
     "PAGES": {
       "TITLE": "Aplikacja",
-      "ID": "ID",
+      "ID": "ID aplikacji",
       "DESCRIPTION": "Tutaj możesz edytować dane swojej aplikacji i jej konfigurację.",
       "CREATE": "Utwórz aplikację",
       "CREATE_SELECT_PROJECT": "Najpierw wybierz swój projekt",
@@ -2839,5 +2840,6 @@
       "TITLE": "Aktywność",
       "DESCRIPTION": "Tutaj możesz zobaczyć ostatnie wydarzenia, które spowodowały zmiany w użytkowniku."
     }
-  }
+  },
+  "INSTANCEID": "ID instancji"
 }

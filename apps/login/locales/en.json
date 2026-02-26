@@ -108,14 +108,17 @@
       "description": "Set the password for your account",
       "submit": "Continue",
       "labels": {
+        "currentPassword": "Current Password",
         "newPassword": "New Password",
         "confirmPassword": "Confirm Password"
       },
       "required": {
+        "currentPassword": "You have to provide your current password!",
         "newPassword": "You have to provide a new password!",
         "confirmPassword": "This field is required"
       },
       "errors": {
+        "currentPasswordInvalid": "Current password is incorrect.",
         "couldNotChangePassword": "Could not change password",
         "couldNotVerifyPassword": "Could not verify password",
         "unknownError": "Unknown error"

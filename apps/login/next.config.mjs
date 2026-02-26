@@ -13,10 +13,6 @@ const secureHeaders = [
     value: "origin-when-cross-origin",
   },
   {
-    key: "X-Frame-Options",
-    value: "SAMEORIGIN",
-  },
-  {
     key: "X-Content-Type-Options",
     value: "nosniff",
   },
@@ -26,7 +22,7 @@ const secureHeaders = [
   },
   {
     key: "Content-Security-Policy",
-    value: `${DEFAULT_CSP} frame-ancestors 'none'`,
+    value: DEFAULT_CSP,
   },
   { key: "X-Frame-Options", value: "deny" },
 ];
@@ -38,9 +34,15 @@ const nextConfig = {
   reactStrictMode: true,
   experimental: {
     // Add React 19 compatibility optimizations
-    optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
+    optimizePackageImports: ["@radix-ui/react-tooltip", "@heroicons/react"],
     useCache: true,
+    serverActions: {
+      ...(process.env.SERVER_ACTION_ALLOWED_ORIGINS
+        ? { allowedOrigins: process.env.SERVER_ACTION_ALLOWED_ORIGINS.split(",").map((o) => o.trim()) }
+        : {}),
+    },
   },
+
   // Improve SSR stability - not actually needed for React 19 SSR issues
   // onDemandEntries: {
   //   maxInactiveAge: 25 * 1000,

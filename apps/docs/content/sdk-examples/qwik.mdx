@@ -1,5 +1,6 @@
 ---
 title: Qwik
+description: "Integrate ZITADEL authentication into Qwik applications using the OAuth 2.0 PKCE flow."
 sidebar_label: Qwik
 framework_url: https://qwik.dev
 auth_library: "@auth/core"
@@ -63,7 +64,7 @@ Once you have your [Zitadel application](https://zitadel.com/docs/guides/manage/
 	- Your actual Zitadel instance URL (the **Issuer** from your [application settings](https://zitadel.com/docs/guides/integrate/login/oidc/login-users))
 	- The **Client ID** you copied when creating the application
 	- A randomly generated session secret (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
-	- A randomly generated client secret value (Auth.js requires this for internal configuration)
+	- A randomly generated client secret value (Auth.js requires this for internal settings)
 	- The **redirect URI** you configured in the PKCE setup (must match exactly)
 	- The **post-logout redirect URI** you configured (must match exactly)
 3. Install dependencies using [npm](https://www.npmjs.com) and start the development server:

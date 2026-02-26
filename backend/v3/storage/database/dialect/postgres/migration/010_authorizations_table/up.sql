@@ -14,7 +14,6 @@ CREATE TABLE zitadel.authorizations
     created_at  TIMESTAMPTZ                 NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ                 NOT NULL DEFAULT NOW(),
     PRIMARY KEY (instance_id, id),
---     FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users (instance_id, id) ON DELETE CASCADE,
     FOREIGN KEY (instance_id, project_id) REFERENCES zitadel.projects (instance_id, id) ON DELETE CASCADE,
     FOREIGN KEY (instance_id, grant_id) REFERENCES zitadel.project_grants (instance_id, id) ON DELETE CASCADE
 );

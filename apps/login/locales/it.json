@@ -108,14 +108,17 @@
       "description": "Imposta la password per il tuo account",
       "submit": "Continua",
       "labels": {
+        "currentPassword": "Password attuale",
         "newPassword": "Nuova password",
         "confirmPassword": "Conferma password"
       },
       "required": {
+        "currentPassword": "Devi fornire la tua password attuale!",
         "newPassword": "Devi fornire una nuova password!",
         "confirmPassword": "Questo campo è obbligatorio"
       },
       "errors": {
+        "currentPasswordInvalid": "La password attuale non è corretta.",
         "couldNotChangePassword": "Impossibile modificare la password",
         "couldNotVerifyPassword": "Impossibile verificare la password",
         "unknownError": "Errore sconosciuto"
