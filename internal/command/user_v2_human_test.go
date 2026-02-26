@@ -12,6 +12,7 @@ import (
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -2195,7 +2196,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 						CryptoMFA: cryptoAlg,
 					},
 				},
-				loginPaths: tt.fields.loginPaths(t),
+				loginPaths: loginPathsOrDefault(tt.fields.loginPaths, t),
 			}
 			err := r.AddUserHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail, tt.args.codeAlg)
 			if tt.res.err == nil {
@@ -2700,6 +2701,36 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 		},
 		{
+			name: "change human email verified (self-management), not allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
+				tarpit:          expectTarpit(0),
+			},
+			args: args{
+				ctx:   authz.NewMockContext("instance1", "org1", "user1"),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Email: &Email{
+						Address:  "changed@example.com",
+						Verified: true,
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
 			name: "change human email verified, ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -3005,6 +3036,36 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			args: args{
 				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Phone: &Phone{
+						Number:   "+41791234567",
+						Verified: true,
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
+			name: "change human phone verified (self-management), not allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
+				tarpit:          expectTarpit(0),
+			},
+			args: args{
+				ctx:   authz.NewMockContext("instance1", "org1", "user1"),
 				orgID: "org1",
 				human: &ChangeHuman{
 					Phone: &Phone{
@@ -3869,7 +3930,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:             tt.fields.checkPermission,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 				userEncryption:              tt.args.codeAlg,
-				loginPaths:                  tt.fields.loginPaths(t),
+				loginPaths:                  loginPathsOrDefault(tt.fields.loginPaths, t),
 				tarpit:                      tt.fields.tarpit.tarpit,
 			}
 			err := r.ChangeUserHuman(tt.args.ctx, tt.args.human, tt.args.codeAlg)
