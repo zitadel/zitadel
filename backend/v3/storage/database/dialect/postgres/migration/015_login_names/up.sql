@@ -20,10 +20,7 @@ CREATE INDEX idx_login_names_instance_user ON zitadel.login_names(instance_id, u
 CREATE INDEX idx_login_names_setting ON zitadel.login_names(instance_id, used_setting);
 CREATE INDEX idx_login_names_domain ON zitadel.login_names(instance_id, domain); -- used for cleanup of login names when a domain is deleted
 
-CREATE OR REPLACE FUNCTION zitadel.apply_domain_manipulation_to_login_names() RETURNS TRIGGER
-VOLATILE
-PARALLEL UNSAFE
-AS $$
+CREATE OR REPLACE FUNCTION zitadel.apply_domain_manipulation_to_login_names() RETURNS TRIGGER AS $$
 DECLARE
     setting zitadel.settings%ROWTYPE;
 BEGIN
@@ -110,12 +107,7 @@ AFTER INSERT OR UPDATE ON zitadel.org_domains
 FOR EACH ROW
 EXECUTE FUNCTION zitadel.apply_domain_manipulation_to_login_names();
 
-CREATE OR REPLACE FUNCTION zitadel.apply_user_update_to_login_names() RETURNS TRIGGER
-VOLATILE
-PARALLEL UNSAFE
-AS $$
-DECLARE
-    counter INTEGER;
+CREATE OR REPLACE FUNCTION zitadel.apply_user_update_to_login_names() RETURNS TRIGGER AS $$
 BEGIN
     -- Lock global scope and organization scope to serialize with instance-level
     -- and org-level setting/domain manipulations.
@@ -131,9 +123,6 @@ BEGIN
         login_names.instance_id = NEW.instance_id
         AND login_names.user_id = NEW.id;
 
-    GET DIAGNOSTICS counter = ROW_COUNT;
-    RAISE LOG 'Updated % login names for user %', counter, NEW.id;
-
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
@@ -144,10 +133,7 @@ FOR EACH ROW
 WHEN (NEW.username IS DISTINCT FROM OLD.username)
 EXECUTE FUNCTION zitadel.apply_user_update_to_login_names();
 
-CREATE OR REPLACE FUNCTION zitadel.apply_user_insert_to_login_names() RETURNS TRIGGER
-VOLATILE
-PARALLEL UNSAFE
-AS $$
+CREATE OR REPLACE FUNCTION zitadel.apply_user_insert_to_login_names() RETURNS TRIGGER AS $$
 DECLARE
     setting zitadel.settings%ROWTYPE;
 BEGIN
@@ -296,9 +282,6 @@ BEGIN
         AND org_domains.org_id = affected_login_names.organization_id
         AND org_domains.is_verified
         AND (NEW.settings->'loginNameIncludesDomain')::BOOLEAN;
-
-    GET DIAGNOSTICS counter = ROW_COUNT;
-    RAISE LOG 'Updated % login names for setting %', counter, NEW.id;
 
     RETURN NULL;
 END;
