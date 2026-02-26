@@ -3766,7 +3766,7 @@ func Test_user_Update(t *testing.T) {
 			args: args{
 				condition: humanCondition,
 				changes: []database.Change{
-					humanRepo.AddRecoveryCodes([]string{"code2", "code3", "code4"}),
+					humanRepo.AddRecoveryCodes([]string{"code2", "code3", "code3", "code4"}),
 				},
 			},
 			want: want{
