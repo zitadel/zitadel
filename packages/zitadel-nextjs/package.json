@@ -34,7 +34,7 @@
     "@typescript-eslint/parser": "^8.54.0",
     "eslint": "^8.57.1",
     "knip": "^5.82.1",
-    "next": "^15.3.0",
+    "next": "^15.3.9",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tsup": "^8.5.1",

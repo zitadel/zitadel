@@ -16,7 +16,7 @@
   },
   "scripts": {
     "generate": "buf generate buf.build/zitadel/zitadel",
-    "build": "pnpm generate && tsup",
+    "build": "tsup",
     "lint-check-eslint": "eslint 'src/**/*.ts*'",
     "lint-check-knip": "knip",
     "test-unit": "vitest --run",
