@@ -81,5 +81,22 @@ declare namespace NodeJS {
      * which is safer for environments with enterprise email link scanners.
      */
     NEXT_PUBLIC_AUTO_SUBMIT_CODE?: string;
+
+    /**
+     * Optional: Enable the SWR in-memory cache for API requests globally.
+     * Defaults to true. Set to "false" to disable completely.
+     */
+    API_CACHE_ENABLED?: string;
+
+    /**
+     * Optional: JSON string to configure the cache TTLs (in minutes) for specific backend API routes or global fallbacks.
+     * Example: '{"default": 15, "long": 60, "getBrandingSettings": 120}'
+     * 
+     * Properties:
+     * - `default`: The globally utilized default TTL in minutes (falls back to 15 if not set).
+     * - `long`: The TTL utilized string for long-cached routes, like branding/translation (falls back to 60 if not set).
+     * - `[route_name]`: Explicit overrides per specific API method (e.g., `getHostedLoginTranslation`).
+     */
+    API_CACHE_CONFIG?: string;
   }
 }
