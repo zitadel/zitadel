@@ -13,7 +13,7 @@ import (
 func TestUserHuman_RecoveryCodeChanges(t *testing.T) {
 	userRepo := repository.UserRepository()
 
-	verifiedAt := time.Now()
+	checkedAt := time.Now()
 
 	tests := []struct {
 		name              string
@@ -47,9 +47,9 @@ func TestUserHuman_RecoveryCodeChanges(t *testing.T) {
 		},
 		{
 			name:              "set recovery code last successful checked at with a valid checkedAt value",
-			change:            userRepo.Human().SetLastSuccessfulRecoveryCodeCheck(verifiedAt),
+			change:            userRepo.Human().SetLastSuccessfulRecoveryCodeCheck(checkedAt),
 			expectedStatement: `recovery_code_last_successful_check = $1, recovery_code_failed_attempts = $2`,
-			expectedArgs:      []any{verifiedAt, 0},
+			expectedArgs:      []any{checkedAt, 0},
 		},
 		{
 			name:              "increment recovery code failed attempts",
