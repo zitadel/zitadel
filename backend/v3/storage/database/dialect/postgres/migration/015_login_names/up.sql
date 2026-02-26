@@ -255,7 +255,7 @@ BEGIN
 
     RAISE NOTICE 'recompute login names';
 
-    WITH affected_users AS (
+    WITH affected_login_names AS (
         DELETE FROM zitadel.login_names
         WHERE
             login_names.instance_id = NEW.instance_id
@@ -264,22 +264,22 @@ BEGIN
         RETURNING instance_id, organization_id, user_id
     )
     INSERT INTO zitadel.login_names(instance_id, organization_id, user_id, username, domain, is_preferred, used_setting)
-    SELECT DISTINCT ON (au.instance_id, au.user_id, users.username, org_domains.domain)
-        au.instance_id
-        , au.organization_id
-        , au.user_id
+    SELECT DISTINCT ON (affected_login_names.instance_id, affected_login_names.user_id, users.username, org_domains.domain)
+        affected_login_names.instance_id
+        , affected_login_names.organization_id
+        , affected_login_names.user_id
         , users.username
         , org_domains.domain
         , org_domains.is_primary IS NULL OR org_domains.is_primary
         , NEW.id
     FROM
-        affected_users au
+        affected_login_names
     JOIN zitadel.users ON
-        users.instance_id = au.instance_id
-        AND users.id = au.user_id
+        users.instance_id = affected_login_names.instance_id
+        AND users.id = affected_login_names.user_id
     LEFT JOIN zitadel.org_domains ON 
-        org_domains.instance_id = au.instance_id
-        AND org_domains.org_id = au.organization_id
+        org_domains.instance_id = affected_login_names.instance_id
+        AND org_domains.org_id = affected_login_names.organization_id
         AND org_domains.is_verified
         AND (NEW.settings->'loginNameIncludesDomain')::BOOLEAN;
 
