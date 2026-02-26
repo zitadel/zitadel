@@ -270,11 +270,6 @@ func (u userHuman) Update(ctx context.Context, client database.QueryExecutor, co
 	return u.user.Update(ctx, client, condition, changes...)
 }
 
-func (u userHuman) ListRecoveryCodes(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.HumanRecoveryCodes, error) {
-	// TODO: review if this is needed
-	return nil, nil
-}
-
 var _ domain.HumanUserRepository = (*userHuman)(nil)
 
 // -------------------------------------------------------------

@@ -40,18 +40,6 @@ func TestUserHuman_RecoveryCodeChanges(t *testing.T) {
 			expectedArgs:      []any{[]string{}},
 		},
 		{
-			name:              "set recovery code verified at with verifiedAt value zero",
-			change:            userRepo.Human().SetRecoveryCodeVerifiedAt(time.Time{}),
-			expectedStatement: `recovery_code_verified_at = NOW()`,
-			expectedArgs:      nil,
-		},
-		{
-			name:              "set recovery code verified at with a valid verifiedAt value",
-			change:            userRepo.Human().SetRecoveryCodeVerifiedAt(verifiedAt),
-			expectedStatement: `recovery_code_verified_at = $1`,
-			expectedArgs:      []any{verifiedAt},
-		},
-		{
 			name:              "set recovery code last successful checked at with checkedAt value zero",
 			change:            userRepo.Human().SetLastSuccessfulRecoveryCodeCheck(time.Time{}),
 			expectedStatement: `recovery_code_last_successful_check = NOW(), recovery_code_failed_attempts = $1`,

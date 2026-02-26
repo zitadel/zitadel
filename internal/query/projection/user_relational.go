@@ -2186,7 +2186,6 @@ func (p *userRelationalProjection) reduceRecoveryCodeCheckSucceeded(event events
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.RemoveRecoveryCode(e.CodeChecked),
-			repo.SetRecoveryCodeVerifiedAt(e.CreatedAt()), // todo: review
 			repo.SetLastSuccessfulRecoveryCodeCheck(e.CreatedAt()),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)

@@ -83,9 +83,6 @@ type HumanUserRepository interface {
 	// It ensures that updates are only applied to user
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 
-	// todo: review if this is needed, as recovery codes can be obtained via users.Get().Human.RecoveryCodes
-	ListRecoveryCodes(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*HumanRecoveryCodes, error)
-
 	humanConditions
 	humanChanges
 	humanColumns
@@ -287,9 +284,6 @@ type recoveryCodeChanges interface {
 	RemoveRecoveryCode(code string) database.Change
 	// RemoveAllRecoveryCodes removes all recovery codes for the user
 	RemoveAllRecoveryCodes() database.Change
-	// SetRecoveryCodeVerifiedAt sets the recovery code verified at time
-	// If verifiedAt is zero, it will be set to NOW()
-	SetRecoveryCodeVerifiedAt(verifiedAt time.Time) database.Change
 	// SetLastSuccessfulRecoveryCodeCheck sets the last successful recovery code check time
 	// If checkedAt is zero, it will be set to NOW()
 	// It resets the failed attempts

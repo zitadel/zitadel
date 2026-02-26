@@ -11,7 +11,6 @@ import (
 // -------------------------------------------------------------
 
 func (u userHuman) AddRecoveryCodes(codes []string) database.Change {
-	// todo: review if the order should be preserved
 	return database.NewChangeToStatement(u.recoveryCodesColumn(), func(builder *database.StatementBuilder) {
 		// the following lines build the value expression
 		// `ARRAY(SELECT DISTINCT unnest(array_cat(recovery_codes, $1)))`
@@ -41,13 +40,6 @@ func (u userHuman) RemoveAllRecoveryCodes() database.Change {
 	return database.NewChange(u.recoveryCodesColumn(), []string{})
 }
 
-func (u userHuman) SetRecoveryCodeVerifiedAt(verifiedAt time.Time) database.Change {
-	if verifiedAt.IsZero() {
-		return database.NewChange(u.recoveryCodeVerifiedAtColumn(), database.NowInstruction)
-	}
-	return database.NewChange(u.recoveryCodeVerifiedAtColumn(), verifiedAt)
-}
-
 func (u userHuman) SetLastSuccessfulRecoveryCodeCheck(checkedAt time.Time) database.Change {
 	if checkedAt.IsZero() {
 		return database.NewChanges(
@@ -75,10 +67,6 @@ func (u userHuman) ResetRecoveryCodeFailedAttempts() database.Change {
 
 func (u userHuman) recoveryCodesColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "recovery_codes")
-}
-
-func (u userHuman) recoveryCodeVerifiedAtColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "recovery_code_verified_at")
 }
 
 func (u userHuman) lastSuccessfulRecoveryCodeCheckColumn() database.Column {
