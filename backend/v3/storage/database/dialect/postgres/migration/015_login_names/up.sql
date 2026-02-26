@@ -25,8 +25,17 @@ DECLARE
     setting zitadel.settings%ROWTYPE;
 BEGIN
     IF (NOT NEW.is_verified) THEN
-        -- TODO(adlerhurst): is it possible that the domain is updated from verified to unverified?
-        RAISE NOTICE 'Domain is not verified, skipping login name manipulation';
+        IF TG_OP = 'UPDATE' AND OLD.is_verified THEN
+            -- this case can currently not happen but is added for completeness and future-proofing.
+            RAISE NOTICE 'Domain changed from verified to unverified, removing associated login names';
+            DELETE FROM zitadel.login_names
+            WHERE
+                login_names.instance_id = NEW.instance_id
+                AND login_names.organization_id = NEW.org_id
+                AND login_names.domain = NEW.domain;
+        ELSE
+            RAISE NOTICE 'Domain is not verified, skipping login name manipulation';
+        END IF;
         RETURN NULL;
     END IF;
 
