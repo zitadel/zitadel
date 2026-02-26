@@ -424,6 +424,22 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanInviteCheckFailedType,
 					Reduce: p.reduceInviteCheckFailed,
 				},
+				{
+					Event:  user.HumanRecoveryCodesAddedType,
+					Reduce: p.reduceRecoveryCodesAdded,
+				},
+				{
+					Event:  user.HumanRecoveryCodesRemovedType,
+					Reduce: p.reduceRecoveryCodesRemoved,
+				},
+				{
+					Event:  user.HumanRecoveryCodeCheckSucceededType,
+					Reduce: p.reduceRecoveryCodeCheckSucceeded,
+				},
+				{
+					Event:  user.HumanRecoveryCodeCheckFailedType,
+					Reduce: p.reduceRecoveryCodeCheckFailed,
+				},
 			},
 		},
 	}
@@ -2144,7 +2160,7 @@ func (p *userRelationalProjection) reduceRecoveryCodesRemoved(event eventstore.E
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-wr8WuW", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZueNKs", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
