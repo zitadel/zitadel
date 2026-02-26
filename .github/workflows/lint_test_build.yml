@@ -30,6 +30,7 @@ jobs:
       NX_DAEMON: "false"
       NX_DISABLE_DB: "true"
       NX_VERBOSE_LOGGING: "true"
+      NX_CLOUD_NO_TIMEOUTS: "false"
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -80,6 +81,7 @@ jobs:
       NX_DAEMON: "false"
       NX_DISABLE_DB: "true"
       NX_VERBOSE_LOGGING: "true"
+      NX_CLOUD_NO_TIMEOUTS: "false"
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
