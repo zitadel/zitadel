@@ -94,7 +94,7 @@ export function IdpProcessHandler({
   }, [provider, id, token, requestId, organization, link, sessionId, postErrorRedirectUrl, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex items-center justify-center">
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       {loading && (
         <div className="flex flex-col items-center space-y-4">
