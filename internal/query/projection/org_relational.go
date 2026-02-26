@@ -76,7 +76,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalAdded(event eventstore.Even
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ro7g4", "reduce.wrong.db.pool %T", ex)
 		}
 
 		repo := repository.OrganizationRepository()
@@ -124,7 +124,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalDeactivated(event eventstor
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ro7g4", "reduce.wrong.db.pool %T", ex)
 		}
 
 		repo := repository.OrganizationRepository()
@@ -145,13 +145,13 @@ func (p *orgRelationalProjection) reduceOrgRelationalReactivated(event eventstor
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5snmW", "reduce.wrong.db.pool %T", ex)
 		}
 
 		repo := repository.OrganizationRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
-			repo.SetState(domain.OrgStateInactive),
+			repo.SetState(domain.OrgStateActive),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -166,7 +166,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalRemoved(event eventstore.Ev
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-6y7hJ", "reduce.wrong.db.pool %T", ex)
 		}
 
 		repo := repository.OrganizationRepository()
