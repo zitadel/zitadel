@@ -101,7 +101,7 @@ Run commands from the repository root.
 - Known exception: `@zitadel/console` has no configured `test` target.
 
 ## Verified Common Targets
-- `@zitadel/api`: `prod`, `build`, `build-linux`, `pack`, `generate`, `generate-install`, `lint`, `test`, `test-unit`, `test-integration`
+- `@zitadel/api`: `prod`, `build`, `build-linux`, `pack`, `generate`, `generate-install`, `lint`, `test`, `test-unit`, `test-integration`, `test-integration-race`
 - `@zitadel/login`: `dev`, `build`, `pack`, `lint`, `test`, `test-unit`, `test-integration`
 - `@zitadel/docs`: `dev`, `build`, `generate`, `install-proto-plugins`, `check-links`, `check-types`, `test`, `lint`
 - `@zitadel/console`: `dev`, `build`, `generate`, `install-proto-plugins`, `lint`

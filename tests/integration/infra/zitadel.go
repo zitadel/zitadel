@@ -57,11 +57,12 @@ func StartZITADEL(ctx context.Context, configFiles []string, masterKey string) (
 
 	// Create a minimal cobra command to satisfy NewConfig signatures.
 	// NewConfig only uses cmd.Context() and cmd.SetContext().
-	cmd := &cobra.Command{}
-	cmd.SetContext(ctx)
+	// Named cobraCmd to avoid shadowing the imported "cmd" package.
+	cobraCmd := &cobra.Command{}
+	cobraCmd.SetContext(ctx)
 
 	// Phase 1: Initialise (create DB schema, users, grants)
-	initConfig, initShutdown, err := initialise.NewConfig(cmd, viper.GetViper())
+	initConfig, initShutdown, err := initialise.NewConfig(cobraCmd, viper.GetViper())
 	if err != nil {
 		return nil, fmt.Errorf("init config: %w", err)
 	}
@@ -71,13 +72,13 @@ func StartZITADEL(ctx context.Context, configFiles []string, masterKey string) (
 		}
 	}()
 
-	if err = initialise.InitAll(cmd.Context(), initConfig); err != nil {
+	if err = initialise.InitAll(cobraCmd.Context(), initConfig); err != nil {
 		return nil, fmt.Errorf("init all: %w", err)
 	}
-	_ = initShutdown(cmd.Context())
+	_ = initShutdown(cobraCmd.Context())
 
 	// Phase 2: Setup (run migrations, create first instance)
-	setupConfig, setupShutdown, err := setup.NewConfig(cmd, viper.GetViper())
+	setupConfig, setupShutdown, err := setup.NewConfig(cobraCmd, viper.GetViper())
 	if err != nil {
 		return nil, fmt.Errorf("setup config: %w", err)
 	}
@@ -87,24 +88,24 @@ func StartZITADEL(ctx context.Context, configFiles []string, masterKey string) (
 		}
 	}()
 
-	setupSteps, err := setup.NewSteps(cmd.Context(), viper.New())
+	setupSteps, err := setup.NewSteps(cobraCmd.Context(), viper.New())
 	if err != nil {
 		return nil, fmt.Errorf("setup steps: %w", err)
 	}
 
-	if err = setup.Setup(cmd.Context(), setupConfig, setupSteps, masterKey); err != nil {
+	if err = setup.Setup(cobraCmd.Context(), setupConfig, setupSteps, masterKey); err != nil {
 		return nil, fmt.Errorf("setup: %w", err)
 	}
-	_ = setupShutdown(cmd.Context())
+	_ = setupShutdown(cobraCmd.Context())
 
 	// Phase 3: Start server
-	startConfig, startShutdown, err := start.NewConfig(cmd, viper.GetViper())
+	startConfig, startShutdown, err := start.NewConfig(cobraCmd, viper.GetViper())
 	if err != nil {
 		return nil, fmt.Errorf("start config: %w", err)
 	}
 
 	serverCh := make(chan *start.Server, 1)
-	serverCtx, cancel := context.WithCancel(cmd.Context())
+	serverCtx, cancel := context.WithCancel(cobraCmd.Context())
 
 	shutdownCh := make(chan error, 1)
 	go func() {

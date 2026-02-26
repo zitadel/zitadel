@@ -119,6 +119,9 @@ func TestIntegration(t *testing.T) {
 	require.NoError(t, waitForPortFree(ctx, "127.0.0.1:8081", 10*time.Second),
 		"port 8081 is in use; a previous integration test run may still be running — "+
 			"kill the leftover process and retry")
+	require.NoError(t, waitForPortFree(ctx, "127.0.0.1:8082", 10*time.Second),
+		"port 8082 is in use; a previous integration test run may still be running — "+
+			"kill the leftover process and retry")
 	logf("Starting ZITADEL (init → setup → start)...")
 	instance, err := infra.StartZITADEL(ctx, []string{configFile}, masterKey)
 	require.NoError(t, err, "start ZITADEL")
@@ -138,9 +141,12 @@ func TestIntegration(t *testing.T) {
 
 	// Phase 5: Run integration test packages
 	logf("Discovering integration test packages...")
-	packages, err := discoverIntegrationPackages()
+	packages, skippedPkgs, err := discoverIntegrationPackages()
 	require.NoError(t, err, "discover packages")
-	logf("Found %d integration test packages", len(packages))
+	logf("Found %d integration test packages (%d v2beta packages skipped)", len(packages), len(skippedPkgs))
+	for _, s := range skippedPkgs {
+		logf("  skipping v2beta: %s", s)
+	}
 
 	logf("Running integration tests...")
 	// Allow overriding parallelism via INTEGRATION_PARALLELISM env var.
@@ -195,19 +201,20 @@ func TestIntegration(t *testing.T) {
 }
 
 // discoverIntegrationPackages finds all Go packages matching the integration test pattern.
-func discoverIntegrationPackages() ([]string, error) {
+// It returns the packages to run and the packages that were skipped (v2beta).
+func discoverIntegrationPackages() (packages []string, skipped []string, err error) {
 	cmd := exec.Command("go", "list", "-tags", "integration", "./...")
 	cmd.Dir = "."
 	out, err := cmd.Output()
 	if err != nil {
-		return nil, fmt.Errorf("go list: %w", err)
+		return nil, nil, fmt.Errorf("go list: %w", err)
 	}
 
-	var packages []string
 	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
 		if strings.Contains(line, "integration_test") || strings.Contains(line, "events_testing") {
 			// Skip v2beta packages — these APIs are being removed.
 			if strings.Contains(line, "v2beta") {
+				skipped = append(skipped, line)
 				continue
 			}
 			packages = append(packages, line)
@@ -215,9 +222,9 @@ func discoverIntegrationPackages() ([]string, error) {
 	}
 
 	if len(packages) == 0 {
-		return nil, fmt.Errorf("no integration test packages found")
+		return nil, nil, fmt.Errorf("no integration test packages found")
 	}
-	return packages, nil
+	return packages, skipped, nil
 }
 
 // chdirToModuleRoot walks up from the test file's directory until it finds go.mod,
