@@ -240,12 +240,9 @@ type HumanInvite struct {
 
 type HumanRecoveryCodes struct {
 	// Codes are the hashed recovery codes for the user
-	Codes      []string  `json:"codes" db:"-"`
-	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"-"`
-
+	Codes []string `json:"codes" db:"-"`
 	// LastSuccessfullyCheckedAt is the time when a recovery code was last successfully checked
 	LastSuccessfullyCheckedAt *time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"-"`
-
 	// FailedAttempts is the number of consecutive failed recovery code attempts
 	// It is reset to 0 on successful verification
 	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"-"`

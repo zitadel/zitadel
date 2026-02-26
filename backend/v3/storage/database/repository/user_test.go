@@ -4319,8 +4319,6 @@ func assertRecoveryCodes(t *testing.T, expected, actual *domain.HumanRecoveryCod
 	if expected == nil {
 		return
 	}
-
-	assert.True(t, expected.VerifiedAt.Equal(actual.VerifiedAt), "human recovery codes verified at")
 	assert.ElementsMatch(t, expected.Codes, actual.Codes)
 	if expected.LastSuccessfullyCheckedAt != nil {
 		require.NotNil(t, actual.LastSuccessfullyCheckedAt, "human recovery codes last successfully checked at not nil")
