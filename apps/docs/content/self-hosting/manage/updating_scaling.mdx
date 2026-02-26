@@ -64,8 +64,8 @@ when you install ZITADEL from scratch.
 **Schema bootstrapping step** (requires database owner privileges, uses the service user):
 - If they don't exist already, it creates all schemas (`eventstore`, `projections`, `system`) and base tables.
 
-:::note Manual provisioning
-If you handle the provisioning step yourself (e.g. on a managed PostgreSQL service where you don't have superuser access),
+<Callout type="note">
+**Manual provisioning:** If you handle the provisioning step yourself (e.g. on a managed PostgreSQL service where you don't have superuser access),
 you can skip it entirely by running only the schema bootstrapping step:
 
 ```bash
@@ -75,7 +75,7 @@ zitadel init schema
 This sub-command connects using the service user credentials and only performs schema bootstrapping.
 No `Admin.*` credentials are required.
 See the [database documentation](/self-hosting/manage/database) for full details.
-:::
+</Callout>
 
 The init phase is idempotent if executed with the same binary version.
 

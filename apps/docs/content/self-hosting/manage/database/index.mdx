@@ -66,9 +66,9 @@ If you handle the provisioning step manually, you still **must** run the schema 
 
 **Provisioning step — Provision user and database (run as superuser)**
 
-:::caution
+<Callout type="warn">
 Replace `<strong-password>` with a strong, unique password and store it in a secret manager. Do not use trivial passwords in production.
-:::
+</Callout>
 
 ```sql
 CREATE ROLE zitadel LOGIN PASSWORD '<strong-password>';
@@ -98,12 +98,18 @@ ZITADEL_DATABASE_POSTGRES_HOST=<your-host> \
 
 **Run setup and start**
 
-:::note
+<Callout type="note">
 For production deployments, configure TLS to encrypt authentication traffic. See the [TLS configuration guide](/self-hosting/manage/tls_modes) for the available modes.
-:::
+</Callout>
 
 ```bash
-zitadel start-from-setup --masterkey "<32-character-key>"
+ZITADEL_DATABASE_POSTGRES_HOST=<your-host> \
+    ZITADEL_DATABASE_POSTGRES_PORT=5432 \
+    ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel \
+    ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel \
+    ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=<strong-password> \
+    ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=require \
+    zitadel start-from-setup --masterkey "<32-character-key>"
 ```
 
 See the [phases guide](/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime) for details on separating init, setup, and runtime for production deployments.

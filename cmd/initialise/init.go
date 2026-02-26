@@ -44,6 +44,12 @@ The user provided by flags needs privileges to
 - create the database if it does not exist
 - see other users and create a new one if the user does not exist
 - grant all rights of the ZITADEL database to the user created if not yet set
+
+If you don't have admin/superuser credentials (e.g. on a managed PostgreSQL
+service), you can provision the database user and database manually and then
+run only 'zitadel init schema' to bootstrap the required schemas and tables
+using the service user credentials. No admin privileges are needed for that
+sub-command. See the database documentation for details.
 `,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {

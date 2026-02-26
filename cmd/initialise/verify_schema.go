@@ -19,7 +19,7 @@ func newSchema() *cobra.Command {
 	return &cobra.Command{
 		Use:     "schema",
 		Aliases: []string{"zitadel"},
-		Short:   "bootstrap the ZITADEL database schema",
+		Short:   "bootstrap the ZITADEL database schema without admin/superuser privileges",
 		Long: `Bootstrap the ZITADEL database schema.
 
 Creates all required schemas (eventstore, projections, system) and base tables
