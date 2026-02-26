@@ -134,7 +134,7 @@ func (t *hostOverrideTransport) RoundTrip(req *http.Request) (*http.Response, er
 // HTTP connection goes to serverAddr while the Host header still carries target.
 func NewScimClient(target, serverAddr string) *Client {
 	baseURL := "http://" + target + schemas.HandlerPrefix
-	var transport http.RoundTripper = http.DefaultTransport
+	transport := http.DefaultTransport
 	if target != serverAddr {
 		transport = &hostOverrideTransport{
 			serverAddr: serverAddr,
