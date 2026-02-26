@@ -92,7 +92,7 @@ func (a *AccessInterceptor) Limit(w http.ResponseWriter, r *http.Request, public
 	}
 	remaining := a.logstoreSvc.Limit(ctx, instance.InstanceID())
 	if remaining != nil {
-		if remaining != nil && *remaining > 0 {
+		if *remaining > 0 {
 			deleteCookie = true
 			return false
 		}
@@ -133,12 +133,12 @@ func (a *AccessInterceptor) handle(publicAuthPathPrefixes ...string) func(http.H
 		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 			ctx := request.Context()
 			tracingCtx, checkSpan := tracing.NewNamedSpan(ctx, "checkAccessQuota")
-			wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
+			wrappedWriter := newStatusWriter(writer)
 			limited := a.Limit(wrappedWriter, request.WithContext(tracingCtx), publicAuthPathPrefixes...)
 			checkSpan.End()
 			if limited {
 				if a.redirect != "" {
-					// The console guides the user when the cookie is set
+					// The management console guides the user when the cookie is set
 					http.Redirect(wrappedWriter, request, a.redirect, http.StatusFound)
 				} else {
 					http.Error(wrappedWriter, "Your ZITADEL instance is blocked.", http.StatusTooManyRequests)
@@ -151,7 +151,7 @@ func (a *AccessInterceptor) handle(publicAuthPathPrefixes ...string) func(http.H
 	}
 }
 
-func (a *AccessInterceptor) writeLog(ctx context.Context, wrappedWriter *statusRecorder, writer http.ResponseWriter, request *http.Request, notCountable bool) {
+func (a *AccessInterceptor) writeLog(ctx context.Context, wrappedWriter *statusWriter, writer http.ResponseWriter, request *http.Request, notCountable bool) {
 	if !a.logstoreSvc.Enabled() {
 		return
 	}
@@ -177,18 +177,4 @@ func (a *AccessInterceptor) writeLog(ctx context.Context, wrappedWriter *statusR
 		RequestedHost:   domainCtx.RequestedHost(),
 		NotCountable:    notCountable,
 	})
-}
-
-type statusRecorder struct {
-	http.ResponseWriter
-	status       int
-	ignoreWrites bool
-}
-
-func (r *statusRecorder) WriteHeader(status int) {
-	if r.ignoreWrites {
-		return
-	}
-	r.status = status
-	r.ResponseWriter.WriteHeader(status)
 }

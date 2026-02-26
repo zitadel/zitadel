@@ -25,7 +25,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
 
     if (org) {
       defaultOrganization = org.id;
@@ -35,7 +35,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   // also allow no session to be found (ignoreUnkownUsername)
   let sessionFactors;
   try {
-    sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: {
+    sessionFactors = await loadMostRecentSession({
+      serviceConfig,
+      sessionParams: {
         loginName,
         organization,
       },
@@ -45,9 +47,13 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     console.warn(error);
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization,
+  const branding = await getBrandingSettings({
+    serviceConfig,
+    organization: organization ?? sessionFactors?.factors?.user?.organizationId ?? defaultOrganization,
   });
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: organization ?? defaultOrganization,
+  const loginSettings = await getLoginSettings({
+    serviceConfig,
+    organization: organization ?? sessionFactors?.factors?.user?.organizationId ?? defaultOrganization,
   });
 
   return (
@@ -60,14 +66,16 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <Translated i18nKey="verify.description" namespace="password" />
         </p>
 
-        {sessionFactors && (
+        {sessionFactors ? (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
-        )}
+        ) : loginName ? (
+          <UserAvatar loginName={loginName} displayName={loginName} showDropdown searchParams={searchParams}></UserAvatar>
+        ) : null}
       </div>
 
       <div className="w-full">
@@ -85,6 +93,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             loginName={loginName}
             requestId={requestId}
             organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
+            defaultOrganization={defaultOrganization}
             loginSettings={loginSettings}
           />
         )}

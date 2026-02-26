@@ -1,0 +1,71 @@
+package metrics
+
+import (
+	"context"
+	"net/http"
+	"sync"
+
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	"github.com/zitadel/zitadel/cmd/build"
+)
+
+const (
+	ActiveSessionCounter            = "zitadel.active_session_counter"
+	ActiveSessionCounterDescription = "Active session counter"
+	SpoolerDivCounter               = "zitadel.spooler_div_milliseconds"
+	SpoolerDivCounterDescription    = "Spooler div from last successful run to now in milliseconds"
+	Database                        = "database"
+	ViewName                        = "view_name"
+)
+
+type Metrics interface {
+	GetExporter() http.Handler
+	RegisterCounter(name, description string) error
+	AddCount(ctx context.Context, name string, value int64, labels map[string]attribute.Value) error
+	AddHistogramMeasurement(ctx context.Context, name string, value float64, labels map[string]attribute.Value) error
+	RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64Callback) error
+	RegisterValueObserver(name, description string, callbackFunc metric.Int64Callback) error
+	RegisterHistogram(name, description, unit string, buckets []float64) error
+}
+
+var globalMeter = sync.OnceValue(func() Metrics {
+	return instrumentation.NewMeter(
+		instrumentation.Name,
+		metric.WithInstrumentationVersion(build.Version()),
+	)
+})
+
+func GlobalMeter() Metrics {
+	return globalMeter()
+}
+
+func GetExporter() http.Handler {
+	return globalMeter().GetExporter()
+}
+
+func RegisterCounter(name, description string) error {
+	return globalMeter().RegisterCounter(name, description)
+}
+
+func AddCount(ctx context.Context, name string, value int64, labels map[string]attribute.Value) error {
+	return globalMeter().AddCount(ctx, name, value, labels)
+}
+
+func AddHistogramMeasurement(ctx context.Context, name string, value float64, labels map[string]attribute.Value) error {
+	return globalMeter().AddHistogramMeasurement(ctx, name, value, labels)
+}
+
+func RegisterHistogram(name, description, unit string, buckets []float64) error {
+	return globalMeter().RegisterHistogram(name, description, unit, buckets)
+}
+
+func RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64Callback) error {
+	return globalMeter().RegisterUpDownSumObserver(name, description, callbackFunc)
+}
+
+func RegisterValueObserver(name, description string, callbackFunc metric.Int64Callback) error {
+	return globalMeter().RegisterValueObserver(name, description, callbackFunc)
+}

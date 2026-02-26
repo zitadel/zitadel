@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -13,10 +14,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
 func Test_readConfig(t *testing.T) {
@@ -46,10 +48,10 @@ Log:
   Level: info
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
-				&actions.HostChecker{Domain: "localhost"},
-				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
-				&actions.HostChecker{Domain: "foobar"}})
+			assert.Equal(t, config.Actions.HTTP.DenyList, []denylist.AddressChecker{
+				&denylist.HostChecker{Domain: "localhost"},
+				&denylist.HostChecker{IP: net.ParseIP("127.0.0.1")},
+				&denylist.HostChecker{Domain: "foobar"}})
 		},
 	}, {
 		name: "actions deny list string ok",
@@ -62,10 +64,10 @@ Log:
   Level: info
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
-				&actions.HostChecker{Domain: "localhost"},
-				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
-				&actions.HostChecker{Domain: "foobar"}})
+			assert.Equal(t, config.Actions.HTTP.DenyList, []denylist.AddressChecker{
+				&denylist.HostChecker{Domain: "localhost"},
+				&denylist.HostChecker{IP: net.ParseIP("127.0.0.1")},
+				&denylist.HostChecker{Domain: "foobar"}})
 		},
 	}, {
 		name: "features ok",
@@ -84,12 +86,12 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceSetupFeatures{
+			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceFeatures{
 				LoginDefaultOrg: gu.Ptr(true),
 				UserSchema:      gu.Ptr(true),
-				LoginV2: &command.InstanceSetupFeatureLoginV2{
+				LoginV2: &feature.LoginV2{
 					Required: true,
-					BaseURI:  gu.Ptr("http://zitadel:8080"),
+					BaseURI:  &url.URL{Scheme: "http", Host: "zitadel:8080"},
 				},
 			})
 		},

@@ -92,7 +92,7 @@ func SetupMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(step)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-hYp7M", "unable to unmarshal step")
+		return nil, zerrors.ThrowInternal(err, "INST-hYp7M", "unable to unmarshal step")
 	}
 
 	return step, nil

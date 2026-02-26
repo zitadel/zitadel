@@ -58,7 +58,7 @@ func OIDCSettingsAddedEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 	err := event.Unmarshal(oidcSettingsAdded)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-soiwj", "unable to unmarshal oidc config added")
+		return nil, zerrors.ThrowInternal(err, "INST-soiwj", "unable to unmarshal oidc config added")
 	}
 
 	return oidcSettingsAdded, nil
@@ -87,7 +87,7 @@ func NewOIDCSettingsChangeEvent(
 	changes []OIDCSettingsChanges,
 ) (*OIDCSettingsChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-dnlwe", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INST-dnlwe", "Errors.NoChangesFound")
 	}
 	changeEvent := &OIDCSettingsChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -135,7 +135,7 @@ func OIDCSettingsChangedEventMapper(event eventstore.Event) (eventstore.Event, e
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-f98uf", "unable to unmarshal oidc settings changed")
+		return nil, zerrors.ThrowInternal(err, "INST-f98uf", "unable to unmarshal oidc settings changed")
 	}
 
 	return e, nil

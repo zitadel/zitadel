@@ -32,7 +32,7 @@ func init() {
 func (s *Server) TokenExchange(ctx context.Context, r *op.ClientRequest[oidc.TokenExchangeRequest]) (_ *op.Response, err error) {
 	resp, err := s.tokenExchange(ctx, r)
 	if err != nil {
-		return nil, oidcError(err)
+		return nil, oidcError(ctx, err)
 	}
 	return resp, nil
 }
@@ -41,9 +41,6 @@ func (s *Server) tokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if !authz.GetFeatures(ctx).TokenExchange {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-oan4I", "Errors.TokenExchange.FeatureDisabled")
-	}
 	if len(r.Data.Resource) > 0 {
 		return nil, oidc.ErrInvalidTarget().WithDescription("resource parameter not supported")
 	}

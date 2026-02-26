@@ -52,8 +52,8 @@ var (
 	SystemClient        system.SystemServiceClient
 	OrgClient           v2beta_org.OrganizationServiceClient
 	ProjectClient       v2beta_project.ProjectServiceClient
-	SessionClient session.SessionServiceClient
-	UserClient    user.UserServiceClient
+	SessionClient       session.SessionServiceClient
+	UserClient          user.UserServiceClient
 	AdminClient         admin.AdminServiceClient
 	MgmtClient          mgmt.ManagementServiceClient
 	AuthorizationClient authorization.AuthorizationServiceClient
@@ -69,7 +69,7 @@ func TestMain(m *testing.M) {
 		CTX = integration.WithSystemAuthorization(ctx)
 		Instance = integration.NewInstance(CTX)
 
-		IAMCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		IAMCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
 		SystemClient = integration.SystemClient()
 		OrgClient = Instance.Client.OrgV2beta
 		ProjectClient = Instance.Client.Projectv2Beta

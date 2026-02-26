@@ -2,7 +2,7 @@
   <cnsl-top-view
     *ngIf="(userQuery.state === 'success' || userQuery.state === 'loading') && userQuery.value as user"
     title="{{ user.type.case === 'human' ? user.type.value.profile?.displayName : user.type.value?.name }}"
-    docLink="https://zitadel.com/docs/guides/manage/console/users"
+    docLink="https://zitadel.com/docs/guides/manage/console/users-overview"
     sub="{{ user.preferredLoginName }}"
     [isActive]="user.state === UserState.ACTIVE"
     [isInactive]="user.state === UserState.INACTIVE"

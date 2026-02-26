@@ -101,6 +101,8 @@ var (
 	ProjectGrantRelationalProjection         *handler.Handler
 	SessionRelationalProjection              *handler.Handler
 	SettingsRelationalProjection             *handler.Handler
+	UserRelationalProjection                 *handler.Handler
+	IDPIntentRelationalProjection            *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
@@ -230,6 +232,8 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	AuthorizationRelationalProjection = newAuthorizationRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authorizations_relational"]))
 	ProjectGrantRelationalProjection = newProjectGrantRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_relational"]))
 	SessionRelationalProjection = newSessionRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["session_relational"]))
+	UserRelationalProjection = newUserRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_relational"]))
+	IDPIntentRelationalProjection = newIDPIntentRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_intent_relational"]))
 
 	newProjectionsList()
 	newFieldsList()
@@ -424,8 +428,10 @@ func newProjectionsList() {
 		ProjectRelationalProjection,
 		ProjectRoleRelationalProjection,
 		OrganizationMetadataRelationalProjection,
+		UserRelationalProjection,
 		AuthorizationRelationalProjection,
 		ProjectGrantRelationalProjection,
 		SessionRelationalProjection,
+		IDPIntentRelationalProjection,
 	}
 }

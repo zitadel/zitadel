@@ -193,16 +193,20 @@ func (m *mockInstance) ProjectID() string {
 	return "projectID"
 }
 
-func (m *mockInstance) ConsoleClientID() string {
-	return "consoleID"
+func (m *mockInstance) ManagementConsoleClientID() string {
+	return "managementConsoleID"
 }
 
-func (m *mockInstance) ConsoleApplicationID() string {
-	return "consoleApplicationID"
+func (m *mockInstance) ManagementConsoleApplicationID() string {
+	return "managementConsoleApplicationID"
 }
 
 func (m *mockInstance) DefaultLanguage() language.Tag {
 	return AllowedLanguage
+}
+
+func (m *mockInstance) AllowedLanguages() []language.Tag {
+	return []language.Tag{language.English}
 }
 
 func (m *mockInstance) DefaultOrganisationID() string {

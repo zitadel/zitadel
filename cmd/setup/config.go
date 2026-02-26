@@ -2,13 +2,19 @@ package setup
 
 import (
 	"bytes"
+	"context"
+	"errors"
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
@@ -20,6 +26,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/execution"
@@ -27,7 +34,6 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
-	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
 )
 
 type Config struct {
@@ -40,8 +46,9 @@ type Config struct {
 	ExternalDomain  string
 	ExternalPort    uint16
 	ExternalSecure  bool
-	Log             *logging.Config
-	Metrics         metrics.Config
+	Instrumentation instrumentation.Config
+	Log             *old_logging.Config
+	Metrics         *instrumentation.LegacyMetricConfig
 	EncryptionKeys  *encryption.EncryptionKeyConfig
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
@@ -66,7 +73,7 @@ type InitProjections struct {
 	BulkLimit        uint64
 }
 
-func MustNewConfig(v *viper.Viper) *Config {
+func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
 	config := new(Config)
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
@@ -75,30 +82,42 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
 			hooks.MapHTTPHeaderStringDecode,
 			database.DecodeHook(false),
+			denylist.DenyListDecodeHook,
 			actions.HTTPConfigDecodeHook,
 			hook.EnumHookFunc(authz.MemberTypeString),
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
-	logging.OnError(err).Fatal("unable to read default config")
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to read default config: %w", err)
+	}
+
+	config.Instrumentation.Metric.SetLegacyConfig(config.Metrics)
+	config.Instrumentation.Log.SetLegacyConfig(config.Log)
+	shutdown, err := instrumentation.Start(cmd.Context(), config.Instrumentation)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
+	}
+	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 
 	err = config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
-
-	err = config.Metrics.NewMeter()
-	logging.OnError(err).Fatal("unable to set meter")
+	if err != nil {
+		err = errors.Join(err, shutdown(cmd.Context()))
+		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
+	}
 
 	id.Configure(config.Machine)
 
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
 	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
 
-	return config
+	return config, shutdown, nil
 }
 
 type Steps struct {
@@ -165,20 +184,23 @@ type Steps struct {
 	s66SessionRecoveryCodeCheckedAt         *SessionRecoveryCodeCheckedAt
 	s67SyncMemberRoleFields                 *SyncMemberRoleFields
 	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
+	s69CacheTablesLogged                    *CacheTablesLogged
 }
 
-func MustNewSteps(v *viper.Viper) *Steps {
+func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {
 	v.AutomaticEnv()
 	v.SetEnvPrefix("ZITADEL")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.SetConfigType("yaml")
 	err := v.ReadConfig(bytes.NewBuffer(defaultSteps))
-	logging.OnError(err).Fatal("unable to read setup steps")
+	if err != nil {
+		return nil, fmt.Errorf("unable to read default steps: %w", err)
+	}
 
 	for _, file := range stepFiles {
 		v.SetConfigFile(file)
 		err := v.MergeInConfig()
-		logging.WithFields("file", file).OnError(err).Warn("unable to read setup file")
+		logging.OnError(ctx, err).Warn("unable to read setup file", "file", file)
 	}
 
 	steps := new(Steps)
@@ -186,12 +208,15 @@ func MustNewSteps(v *viper.Viper) *Steps {
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
-	logging.OnError(err).Fatal("unable to read steps")
-	return steps
+	if err != nil {
+		return nil, fmt.Errorf("unable to read steps: %w", err)
+	}
+	return steps, nil
 }

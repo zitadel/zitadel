@@ -169,7 +169,7 @@ func TestListApplications(t *testing.T) {
 	createdDeactivatedApiApp, deactivatedApiAppName := createAPIAppWithName(t, IAMOwnerCtx, instance, p.GetId())
 	deactivateApp(t, createdDeactivatedApiApp, p.GetId())
 
-	_, createdSAMLApp, samlAppName := createSAMLAppWithName(t, integration.URL(), p.GetId())
+	_, createdSAMLApp, samlAppName, samlEntityID := createSAMLAppWithName(t, integration.URL(), p.GetId())
 
 	createdOIDCApp, oidcAppName := createOIDCAppWithName(t, integration.URL(), p.GetId())
 
@@ -466,6 +466,99 @@ func TestListApplications(t *testing.T) {
 				slices.Clone(appsSortedByID),
 				func(a appWithName) bool { return a.name != oidcAppName },
 			),
+			expectedOrderedKeys: func(apps []appWithName) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.app.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+			actualOrderedKeys: func(apps []*application.Application) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+		},
+		{
+			testName: "when filtering by clientID should return matching OIDC app only",
+			inputCtx: IAMOwnerCtx,
+			inputRequest: &application.ListApplicationsRequest{
+				Pagination: &filter.PaginationRequest{Asc: true},
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ClientIdFilter{
+							ClientIdFilter: &application.ClientIDFilter{ClientId: createdOIDCApp.GetOidcConfiguration().GetClientId()},
+						},
+					},
+				},
+			},
+			expectedOrderedList: []appWithName{{name: oidcAppName, app: createdOIDCApp}},
+			expectedOrderedKeys: func(apps []appWithName) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.app.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+			actualOrderedKeys: func(apps []*application.Application) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+		},
+		{
+			testName: "when filtering by clientID should return matching API app only",
+			inputCtx: IAMOwnerCtx,
+			inputRequest: &application.ListApplicationsRequest{
+				Pagination: &filter.PaginationRequest{Asc: true},
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ClientIdFilter{
+							ClientIdFilter: &application.ClientIDFilter{ClientId: createdApiApp.GetApiConfiguration().GetClientId()},
+						},
+					},
+				},
+			},
+			expectedOrderedList: []appWithName{{name: apiAppName, app: createdApiApp}},
+			expectedOrderedKeys: func(apps []appWithName) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.app.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+			actualOrderedKeys: func(apps []*application.Application) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+		},
+		{
+			testName: "when filtering by entityID should return matching SAML app only",
+			inputCtx: IAMOwnerCtx,
+			inputRequest: &application.ListApplicationsRequest{
+				Pagination: &filter.PaginationRequest{Asc: true},
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_EntityIdFilter{
+							EntityIdFilter: &application.EntityIDFilter{EntityId: samlEntityID},
+						},
+					},
+				},
+			},
+			expectedOrderedList: []appWithName{{name: samlAppName, app: createdSAMLApp}},
 			expectedOrderedKeys: func(apps []appWithName) any {
 				creationDates := make([]time.Time, len(apps))
 				for i, a := range apps {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/saml/pkg/provider"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -17,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (
@@ -71,7 +71,8 @@ func NewProvider(
 	options := []provider.Option{
 		provider.WithHttpInterceptors(
 			middleware.MetricsHandler(metricTypes),
-			middleware.TelemetryHandler(),
+			middleware.TraceHandler(),
+			middleware.LogHandler("saml"),
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,

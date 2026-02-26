@@ -18,7 +18,7 @@ func (s *Server) RefreshToken(ctx context.Context, r *op.ClientRequest[oidc.Refr
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		span.EndWithError(err)
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 	}()
 
 	client, ok := r.Client.(*Client)

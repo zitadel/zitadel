@@ -25,7 +25,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 	instanceID := Instance.ID()
 	orgID := Instance.DefaultOrg.Id
 
-	t.Run("test iam idp add reduces", func(t *testing.T) {
+	t.Run("test instance idp add reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		before := time.Now()
@@ -71,7 +71,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test iam idp update reduces", func(t *testing.T) {
+	// t.Run("test instance idp update reduces", func(t *testing.T) {
 	// 	name := gofakeit.Name()
 
 	// 	addOIDC, err := MgmtClient.AddOrgOIDCIDP(IAMCTX, &management.AddOrgOIDCIDPRequest{
@@ -119,7 +119,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 	// 	}, retryDuration, tick)
 	// })
 
-	t.Run("test iam idp deactivate reduces", func(t *testing.T) {
+	t.Run("test instance idp deactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		addOIDC, err := MgmtClient.AddOrgOIDCIDP(IAMCTX, &management.AddOrgOIDCIDPRequest{
@@ -161,7 +161,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp reactivate reduces", func(t *testing.T) {
+	t.Run("test instance idp reactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		addOIDC, err := MgmtClient.AddOrgOIDCIDP(IAMCTX, &management.AddOrgOIDCIDPRequest{
@@ -222,7 +222,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp remove reduces", func(t *testing.T) {
+	t.Run("test instance idp remove reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
@@ -260,7 +260,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp oidc added reduces", func(t *testing.T) {
+	t.Run("test instance idp oidc added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
@@ -307,7 +307,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp oidc changed reduces", func(t *testing.T) {
+	t.Run("test instance idp oidc changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
@@ -379,7 +379,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp jwt added reduces", func(t *testing.T) {
+	t.Run("test instance idp jwt added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
@@ -422,7 +422,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp jwt changed reduces", func(t *testing.T) {
+	t.Run("test instance idp jwt changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
@@ -1852,40 +1852,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add ldap
 		before := time.Now()
-		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, &management.AddLDAPProviderRequest{
-			Name:              name,
-			Servers:           []string{"servers"},
-			StartTls:          true,
-			BaseDn:            "baseDN",
-			BindDn:            "bindND",
-			BindPassword:      "bindPassword",
-			UserBase:          "userBase",
-			UserObjectClasses: []string{"userOhjectClasses"},
-			UserFilters:       []string{"userFilters"},
-			Timeout:           durationpb.New(time.Minute),
-			Attributes: &idp_grpc.LDAPAttributes{
-				IdAttribute:                "idAttribute",
-				FirstNameAttribute:         "firstNameAttribute",
-				LastNameAttribute:          "lastNameAttribute",
-				DisplayNameAttribute:       "displayNameAttribute",
-				NickNameAttribute:          "nickNameAttribute",
-				PreferredUsernameAttribute: "preferredUsernameAttribute",
-				EmailAttribute:             "emailAttribute",
-				EmailVerifiedAttribute:     "emailVerifiedAttribute",
-				PhoneAttribute:             "phoneAttribute",
-				PhoneVerifiedAttribute:     "phoneVerifiedAttribute",
-				PreferredLanguageAttribute: "preferredLanguageAttribute",
-				AvatarUrlAttribute:         "avatarUrlAttribute",
-				ProfileAttribute:           "profileAttribute",
-			},
-			ProviderOptions: &idp_grpc.Options{
-				IsLinkingAllowed:  false,
-				IsCreationAllowed: false,
-				IsAutoCreation:    false,
-				IsAutoUpdate:      false,
-				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
-			},
-		})
+		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, defaultOrganizationLDAPRequest(name))
 		after := time.Now()
 		require.NoError(t, err)
 
@@ -1940,40 +1907,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add ldap
-		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, &management.AddLDAPProviderRequest{
-			Name:              name,
-			Servers:           []string{"servers"},
-			StartTls:          true,
-			BaseDn:            "baseDN",
-			BindDn:            "bindND",
-			BindPassword:      "bindPassword",
-			UserBase:          "userBase",
-			UserObjectClasses: []string{"userOhjectClasses"},
-			UserFilters:       []string{"userFilters"},
-			Timeout:           durationpb.New(time.Minute),
-			Attributes: &idp_grpc.LDAPAttributes{
-				IdAttribute:                "idAttribute",
-				FirstNameAttribute:         "firstNameAttribute",
-				LastNameAttribute:          "lastNameAttribute",
-				DisplayNameAttribute:       "displayNameAttribute",
-				NickNameAttribute:          "nickNameAttribute",
-				PreferredUsernameAttribute: "preferredUsernameAttribute",
-				EmailAttribute:             "emailAttribute",
-				EmailVerifiedAttribute:     "emailVerifiedAttribute",
-				PhoneAttribute:             "phoneAttribute",
-				PhoneVerifiedAttribute:     "phoneVerifiedAttribute",
-				PreferredLanguageAttribute: "preferredLanguageAttribute",
-				AvatarUrlAttribute:         "avatarUrlAttribute",
-				ProfileAttribute:           "profileAttribute",
-			},
-			ProviderOptions: &idp_grpc.Options{
-				IsLinkingAllowed:  false,
-				IsCreationAllowed: false,
-				IsAutoCreation:    false,
-				IsAutoUpdate:      false,
-				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
-			},
-		})
+		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, defaultOrganizationLDAPRequest(name))
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -2364,7 +2298,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test org iam remove reduces", func(t *testing.T) {
+	t.Run("test org instance remove reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
@@ -2411,4 +2345,41 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			require.ErrorIs(t, &database.NoRowFoundError{}, err)
 		}, retryDuration, tick)
 	})
+}
+
+func defaultOrganizationLDAPRequest(providerName string) *management.AddLDAPProviderRequest {
+	return &management.AddLDAPProviderRequest{
+		Name:              providerName,
+		Servers:           []string{"servers"},
+		StartTls:          true,
+		BaseDn:            "baseDN",
+		BindDn:            "bindND",
+		BindPassword:      "bindPassword",
+		UserBase:          "userBase",
+		UserObjectClasses: []string{"userOhjectClasses"},
+		UserFilters:       []string{"userFilters"},
+		Timeout:           durationpb.New(time.Minute),
+		Attributes: &idp_grpc.LDAPAttributes{
+			IdAttribute:                "idAttribute",
+			FirstNameAttribute:         "firstNameAttribute",
+			LastNameAttribute:          "lastNameAttribute",
+			DisplayNameAttribute:       "displayNameAttribute",
+			NickNameAttribute:          "nickNameAttribute",
+			PreferredUsernameAttribute: "preferredUsernameAttribute",
+			EmailAttribute:             "emailAttribute",
+			EmailVerifiedAttribute:     "emailVerifiedAttribute",
+			PhoneAttribute:             "phoneAttribute",
+			PhoneVerifiedAttribute:     "phoneVerifiedAttribute",
+			PreferredLanguageAttribute: "preferredLanguageAttribute",
+			AvatarUrlAttribute:         "avatarUrlAttribute",
+			ProfileAttribute:           "profileAttribute",
+		},
+		ProviderOptions: &idp_grpc.Options{
+			IsLinkingAllowed:  false,
+			IsCreationAllowed: false,
+			IsAutoCreation:    false,
+			IsAutoUpdate:      false,
+			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+		},
+	}
 }

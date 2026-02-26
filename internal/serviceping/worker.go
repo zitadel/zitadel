@@ -103,7 +103,7 @@ func (w *Worker) reportBaseInformation(ctx context.Context) (string, error) {
 func (w *Worker) reportResourceCounts(ctx context.Context, reportID string) error {
 	lastID := 0
 	// iterate over the resource counts until there are no more counts to report
-	// or the context gets cancelled
+	// or the context gets canceled
 	for {
 		select {
 		case <-ctx.Done():
@@ -229,7 +229,7 @@ func Register(
 	if err != nil {
 		return err
 	}
-	q.AddWorkers(&Worker{
+	q.AddWorkers(ctx, &Worker{
 		reportClient: NewClient(config),
 		db:           queries,
 		queue:        q,
@@ -240,7 +240,7 @@ func Register(
 	return nil
 }
 
-func Start(config *Config, q *queue.Queue) error {
+func Start(ctx context.Context, config *Config, q *queue.Queue) error {
 	if !config.Enabled {
 		return nil
 	}
@@ -249,6 +249,7 @@ func Start(config *Config, q *queue.Queue) error {
 		return err
 	}
 	q.AddPeriodicJob(
+		ctx,
 		schedule,
 		&ServicePingReport{},
 		queue.WithQueueName(QueueName),

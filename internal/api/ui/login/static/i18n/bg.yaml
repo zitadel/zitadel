@@ -4,7 +4,7 @@ Login:
   TitleLinking: Влезте за потребителско свързване
   DescriptionLinking: >-
     Въведете вашите данни за вход, за да свържете вашия външен потребител с
-    потребител на ZITADEL.
+    потребител на Zitadel.
   LoginNameLabel: Потребителско име
   UsernamePlaceHolder: потребителско име
   LoginnamePlaceHolder: потребителско име@домейн
@@ -20,7 +20,7 @@ LDAP:
   NextButtonText: следващия
 SelectAccount:
   Title: Изберете акаунт
-  Description: Използвайте вашия ZITADEL-акаунт
+  Description: Използвайте вашия Zitadel-акаунт
   TitleLinking: Изберете акаунт за свързване на потребител
   DescriptionLinking: 'Изберете своя акаунт, който да свържете с вашия външен потребител.'
   OtherUser: Друг потребител
@@ -115,6 +115,7 @@ InitMFAOTPSMS:
   Title: 2-факторна проверка
   DescriptionPhone: Създайте своя 2-фактор. Въведете телефонния си номер, за да го потвърдите.
   DescriptionCode: Създайте своя 2-фактор. Въведете получения код, за да потвърдите своя телефонен номер.
+  CountryCodeLabel: Държава
   PhoneLabel: Тайна
   CodeLabel: Код
   EditButtonText: редактиране
@@ -264,6 +265,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -309,6 +311,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -383,6 +386,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:
@@ -431,7 +435,7 @@ Errors:
       NotFound: Профилът не е намерен
       NotChanged: Профилът не е променен
       Empty: Профилът е празен
-      FirstNameEmpty: Първото име в профила е празно
+      FirstNameEmpty: Името в профила е празно
       LastNameEmpty: Фамилията в профила е празна
       IDMissing: Липсва ID на потребителския профил
     Email:

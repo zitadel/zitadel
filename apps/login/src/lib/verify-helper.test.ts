@@ -795,7 +795,7 @@ describe("checkMFAFactors", () => {
     });
   });
 
-  it("should redirect to SMS OTP if only OTP_SMS is available", async () => {
+  it("should redirect to OTP SMS if only OTP_SMS is available", async () => {
     const authMethods = [AuthenticationMethodType.OTP_SMS];
 
     const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
@@ -805,7 +805,7 @@ describe("checkMFAFactors", () => {
     });
   });
 
-  it("should redirect to Email OTP if only OTP_EMAIL is available", async () => {
+  it("should redirect to OTP Email if only OTP_EMAIL is available", async () => {
     const authMethods = [AuthenticationMethodType.OTP_EMAIL];
 
     const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);

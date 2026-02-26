@@ -58,13 +58,13 @@ func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domai
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-0oPew", "Errors.IAM.PrivacyPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-0oPew", "Errors.Instance.PrivacyPolicy.NotFound")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PrivacyPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink, policy.SupportEmail, policy.DocsLink, policy.CustomLink, policy.CustomLinkText)
 	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-9jJfs", "Errors.IAM.PrivacyPolicy.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-9jJfs", "Errors.Instance.PrivacyPolicy.NotChanged")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
@@ -96,7 +96,7 @@ func (c *Commands) getDefaultPrivacyPolicy(ctx context.Context) (*domain.Privacy
 		return nil, err
 	}
 	if !policyWriteModel.State.Exists() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-559os", "Errors.IAM.PrivacyPolicy.NotFound")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-559os", "Errors.Instance.PrivacyPolicy.NotFound")
 	}
 	policy := writeModelToPrivacyPolicy(&policyWriteModel.PrivacyPolicyWriteModel)
 	policy.Default = true

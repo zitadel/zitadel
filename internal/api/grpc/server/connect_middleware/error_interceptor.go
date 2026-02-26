@@ -19,5 +19,5 @@ func ErrorHandler() connect.UnaryInterceptorFunc {
 
 func toConnectError(ctx context.Context, req connect.AnyRequest, handler connect.UnaryFunc) (connect.AnyResponse, error) {
 	resp, err := handler(ctx, req)
-	return resp, gerrors.ZITADELToConnectError(err) // TODO !
+	return resp, gerrors.ZITADELToConnectError(ctx, err)
 }

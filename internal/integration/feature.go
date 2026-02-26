@@ -31,20 +31,33 @@ func EnsureInstanceFeature(t *testing.T, ctx context.Context, instance *Instance
 }
 
 type RelationalTableFeatureMatrix struct {
-	State      string
-	FeatureSet *feature.SetInstanceFeaturesRequest
+	Name      string
+	Inst      *Instance
+	InstOwner context.Context
 }
 
 // TODO(IAM-Marco): Once we have gotten rid of eventstore, this can be removed
-func RelationalTablesEnableMatrix() []RelationalTableFeatureMatrix {
+func RelationalTablesEnableMatrix(t *testing.T, ctx context.Context, sysAuthZ context.Context) []RelationalTableFeatureMatrix {
 	return []RelationalTableFeatureMatrix{
-		{
-			State:      "when relational tables are disabled",
-			FeatureSet: &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(false)},
-		},
-		{
-			State:      "when relational tables are enabled",
-			FeatureSet: &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)},
-		},
+		func() RelationalTableFeatureMatrix {
+			inst := NewInstance(sysAuthZ)
+			instOwner := inst.WithAuthorizationToken(ctx, UserTypeIAMOwner)
+			return RelationalTableFeatureMatrix{
+				Name:      "when relational tables are disabled",
+				Inst:      inst,
+				InstOwner: instOwner,
+			}
+		}(),
+		func() RelationalTableFeatureMatrix {
+			inst := NewInstance(sysAuthZ)
+			instOwner := inst.WithAuthorizationToken(ctx, UserTypeIAMOwner)
+			_, err := inst.Client.FeatureV2.SetInstanceFeatures(instOwner, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(false)})
+			require.NoError(t, err)
+			return RelationalTableFeatureMatrix{
+				Name:      "when relational tables are enabled",
+				Inst:      inst,
+				InstOwner: instOwner,
+			}
+		}(),
 	}
 }

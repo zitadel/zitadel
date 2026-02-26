@@ -34,7 +34,7 @@ func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[app
 		}), nil
 
 	case *app.CreateApplicationRequest_OidcRequest:
-		oidcAppRequest, err := convert.CreateOIDCAppRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetOidcRequest())
+		oidcAppRequest, err := convert.CreateOIDCAppRequestToDomain(req.Msg.GetName(), req.Msg.GetId(), req.Msg.GetProjectId(), req.Msg.GetOidcRequest())
 		if err != nil {
 			return nil, err
 		}

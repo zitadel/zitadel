@@ -140,6 +140,51 @@ message EmailProviderSMTP {
       example: "\"replyto@m.zitadel.cloud\"";
     }
   ];
+  oneof Auth {
+    SMTPNoAuth none = 9;
+    SMTPPlainAuth plain = 10;
+    SMTPXOAuth2Auth xoauth2 = 11;
+  }
+}
+
+// SMTPNoAuth can be used when no authentication is required for the SMTP connection.
+message SMTPNoAuth {}
+
+// SMTPPlainAuth adds plain authentication to the smtp connection. The username of the parent configuration is used in
+// combination with the password in this message.
+message SMTPPlainAuth {}
+
+// SMTPXOAuth2Auth adds XOAut2 authentication to the smtp connection. The username of the parent configuration is used
+// in combination with the other parameters of this message.
+message SMTPXOAuth2Auth {
+  // token_endpoint is the endpoint from which a token will be requested according to the oauth2 specification.
+  string token_endpoint = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"http://auth.example.com/token\"";
+    }
+  ];
+  // scopes is a list of scopes which should be requested from the authorization service. To authorize a token to
+  // use the smtp functionality, the server requires a specific scope. These scopes can be found in the documentation
+  // of the provider.
+  repeated string scopes = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"https://mail.example.com\"]";
+    }
+  ];
+  // OAuth2Type is a oneof used to switch between the different types of oauth2 authorization flows.
+  oneof OAuth2Type {
+    ClientCredentials client_credentials = 3;
+  }
+
+  // ClientCredentials authenticates the SMTP client using Oauth 2.0 Client Credentials grant.
+  // https://datatracker.ietf.org/doc/html/rfc6749#section-4.4
+  message ClientCredentials {
+    string client_id = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+      }
+    ];
+  }
 }
 
 message EmailProviderHTTP {
@@ -201,7 +246,7 @@ message SecurityPolicy {
   zitadel.v1.ObjectDetails details = 1;
   // states if iframe embedding is enabled or disabled
   bool enable_iframe_embedding = 2;
-  // origins allowed loading ZITADEL in an iframe if enable_iframe_embedding is true
+  // origins allowed loading Zitadel in an iframe if enable_iframe_embedding is true
   repeated string allowed_origins = 3;
   // allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
   bool enable_impersonation = 4;

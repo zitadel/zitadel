@@ -3,6 +3,7 @@ import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
+import { resolveRedirectUri } from "@/lib/client";
 import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/cookies";
 import { completeDeviceAuthorization } from "@/lib/server/device";
 import { getServiceConfig } from "@/lib/service-url";
@@ -20,9 +21,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function loadSessionById(serviceConfig: ServiceConfig, sessionId: string, organization?: string) {
   const recent = await getSessionCookieById({ sessionId, organization });
-  return getSession({ serviceConfig, sessionId: recent.id,
-    sessionToken: recent.token,
-  }).then((response) => {
+
+  if (!recent) {
+    return undefined;
+  }
+
+  return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((response) => {
     if (response?.session) {
       return response.session;
     }
@@ -37,8 +41,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const { loginName, requestId, organization, sessionId } = searchParams;
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
   // complete device authorization flow if device requestId is present
   if (requestId && requestId.startsWith("device_")) {
@@ -49,37 +52,46 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           organization: organization,
         });
 
-    await completeDeviceAuthorization(requestId.replace("device_", ""), {
-      sessionId: cookie.id,
-      sessionToken: cookie.token,
-    }).catch((err) => {
-      return (
-        <DynamicTheme branding={branding}>
-          <div className="flex flex-col space-y-4">
-            <h1>
-              <Translated i18nKey="error.title" namespace="signedin" />
-            </h1>
-            <p className="ztdl-p mb-6 block">
-              <Translated i18nKey="error.description" namespace="signedin" />
-            </p>
-            <Alert>{err.message}</Alert>
-          </div>
-          <div className="w-full"></div>
-        </DynamicTheme>
-      );
-    });
+    if (cookie) {
+      await completeDeviceAuthorization(requestId.replace("device_", ""), {
+        sessionId: cookie.id,
+        sessionToken: cookie.token,
+      }).catch((err) => {
+        return (
+          <DynamicTheme branding={branding}>
+            <div className="flex flex-col space-y-4">
+              <h1>
+                <Translated i18nKey="error.title" namespace="signedin" />
+              </h1>
+              <p className="ztdl-p mb-6 block">
+                <Translated i18nKey="error.description" namespace="signedin" />
+              </p>
+              <Alert>{err.message}</Alert>
+            </div>
+            <div className="w-full"></div>
+          </DynamicTheme>
+        );
+      });
+    }
   }
 
   const sessionFactors = sessionId
     ? await loadSessionById(serviceConfig, sessionId, organization)
-    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization },
-      });
+    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
 
   let loginSettings;
   if (!requestId) {
-    loginSettings = await getLoginSettings({ serviceConfig, organization,
-    });
+    loginSettings = await getLoginSettings({ serviceConfig, organization });
   }
+
+  const redirectUri = await resolveRedirectUri(
+    requestId && sessionId
+      ? { sessionId, requestId }
+      : { loginName: loginName ?? sessionFactors?.factors?.user?.loginName },
+    loginSettings?.defaultRedirectUri,
+  );
+
+  const isSamePage = redirectUri?.startsWith("/signedin") ?? false;
 
   return (
     <DynamicTheme branding={branding}>
@@ -93,7 +105,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
         <UserAvatar
           loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
-          displayName={sessionFactors?.factors?.user?.displayName}
+          displayName={sessionFactors?.factors?.user?.displayName ?? loginName}
           showDropdown={!(requestId && requestId.startsWith("device_"))}
           searchParams={searchParams}
         />
@@ -106,11 +118,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </Alert>
         )}
 
-        {loginSettings?.defaultRedirectUri && (
+        {redirectUri && !isSamePage && (
           <div className="mt-8 flex w-full flex-row items-center">
             <span className="flex-grow"></span>
 
-            <Link href={loginSettings?.defaultRedirectUri}>
+            <Link href={redirectUri}>
               <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
                 <Translated i18nKey="continue" namespace="signedin" />
               </Button>

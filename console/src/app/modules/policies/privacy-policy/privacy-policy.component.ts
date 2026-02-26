@@ -147,7 +147,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
           .then(() => {
             this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
             this.loadData();
-            // Reload console as links may have changed
+            // Reload management console as links may have changed
             this.reloadConsole();
           })
           .catch((error) => this.toast.showError(error));
@@ -166,7 +166,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
           .then(() => {
             this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
             this.loadData();
-            // Reload console as links may have changed
+            // Reload management console as links may have changed
             this.reloadConsole();
           })
           .catch((error) => this.toast.showError(error));
@@ -186,7 +186,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
         .then(() => {
           this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
           this.loadData();
-          // Reload console as links may have changed
+          // Reload management console as links may have changed
           this.reloadConsole();
         })
         .catch((error) => this.toast.showError(error));

@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -41,7 +40,7 @@ func (mig *SetupWebkeys) Execute(ctx context.Context, _ eventstore.Event) error 
 
 	for _, instance := range instances {
 		ctx := authz.WithInstanceID(ctx, instance)
-		logging.Info("prepare initial webkeys for instance", "instance_id", instance, "migration", mig)
+		logging.Info(ctx, "prepare initial webkeys for instance", "instance", instance, "migration", mig)
 		if err := mig.commands.GenerateInitialWebKeys(ctx, conf); err != nil {
 			return fmt.Errorf("%s generate initial webkeys: %w", mig, err)
 		}

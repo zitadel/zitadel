@@ -1,7 +1,7 @@
 <cnsl-top-view
   title="{{ app?.name }}"
   [hasActions]="!isZitadel && (['project.app.write:' + projectId, 'project.app.write'] | hasRole | async)"
-  docLink="https://zitadel.com/docs/guides/manage/console/projects"
+  docLink="https://zitadel.com/docs/guides/manage/console/projects-overview"
   [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.' + app?.oidcConfig?.appType | translate) : app?.apiConfig ? 'API' : 'SAML'"
   [isActive]="app?.state === AppState.APP_STATE_ACTIVE"
   [isInactive]="app?.state === AppState.APP_STATE_INACTIVE"
@@ -157,6 +157,11 @@
                   <cnsl-form-field class="app-formfield">
                     <cnsl-label>{{ 'APP.LOGINV2.BASEURL' | translate }}</cnsl-label>
                     <input cnslInput formControlName="loginV2BaseURL" />
+                  </cnsl-form-field>
+
+                  <cnsl-form-field class="app-formfield full-width">
+                    <cnsl-label>{{ 'APP.OIDC.BACKCHANNELLOOGOUTURI' | translate }}</cnsl-label>
+                    <input cnslInput formControlName="backChannelLogoutURI" />
                   </cnsl-form-field>
                 </div>
               </div>

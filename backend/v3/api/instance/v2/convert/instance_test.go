@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/cmd/build"
 	filter_v2 "github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	filter_v2beta "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
@@ -62,7 +63,7 @@ func TestDomainInstanceModelToGRPCBetaResponse(t *testing.T) {
 		ChangeDate:   timestamppb.New(now),
 		CreationDate: timestamppb.New(yesterday),
 		Name:         "Instance One",
-		Version:      "",
+		Version:      build.Version(),
 		Domains: []*instance_v2beta.Domain{
 			{
 				InstanceId:   "instance-1",
@@ -150,7 +151,7 @@ func TestDomainInstanceModelToGRPCResponse(t *testing.T) {
 		CreationDate: timestamppb.New(yesterday),
 		State:        instance_v2.State_STATE_RUNNING,
 		Name:         "Instance One",
-		Version:      "",
+		Version:      build.Version(),
 		CustomDomains: []*instance_v2.CustomDomain{
 			{
 				InstanceId:   "instance-1",
@@ -221,6 +222,7 @@ func TestDomainInstanceListModelToGRPCBetaResponse(t *testing.T) {
 					Name:         "test-instance",
 					CreationDate: timestamppb.New(now),
 					ChangeDate:   timestamppb.New(now),
+					Version:      build.Version(),
 					Domains:      []*instance_v2beta.Domain{},
 				},
 			},
@@ -257,6 +259,7 @@ func TestDomainInstanceListModelToGRPCBetaResponse(t *testing.T) {
 					Name:         "test-instance-1",
 					CreationDate: timestamppb.New(now),
 					ChangeDate:   timestamppb.New(now),
+					Version:      build.Version(),
 					Domains: []*instance_v2beta.Domain{
 						{
 							InstanceId:   "instance1",
@@ -272,6 +275,7 @@ func TestDomainInstanceListModelToGRPCBetaResponse(t *testing.T) {
 					Name:         "test-instance-2",
 					CreationDate: timestamppb.New(now),
 					ChangeDate:   timestamppb.New(now),
+					Version:      build.Version(),
 					Domains:      []*instance_v2beta.Domain{},
 				},
 			},
@@ -322,6 +326,7 @@ func TestDomainInstanceListModelToGRPCResponse(t *testing.T) {
 					CreationDate:  timestamppb.New(now),
 					ChangeDate:    timestamppb.New(now),
 					State:         instance_v2.State_STATE_RUNNING,
+					Version:       build.Version(),
 					CustomDomains: []*instance_v2.CustomDomain{},
 				},
 			},
@@ -359,6 +364,7 @@ func TestDomainInstanceListModelToGRPCResponse(t *testing.T) {
 					CreationDate: timestamppb.New(now),
 					ChangeDate:   timestamppb.New(now),
 					State:        instance_v2.State_STATE_RUNNING,
+					Version:      build.Version(),
 					CustomDomains: []*instance_v2.CustomDomain{
 						{
 							InstanceId:   "instance1",
@@ -375,6 +381,7 @@ func TestDomainInstanceListModelToGRPCResponse(t *testing.T) {
 					CreationDate:  timestamppb.New(now),
 					ChangeDate:    timestamppb.New(now),
 					State:         instance_v2.State_STATE_RUNNING,
+					Version:       build.Version(),
 					CustomDomains: []*instance_v2.CustomDomain{},
 				},
 			},

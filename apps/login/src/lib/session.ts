@@ -25,6 +25,10 @@ export async function loadMostRecentSession({
     organization: sessionParams.organization,
   });
 
+  if (!recent) {
+    return undefined;
+  }
+
   return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then(
     (resp: GetSessionResponse) => resp.session,
   );

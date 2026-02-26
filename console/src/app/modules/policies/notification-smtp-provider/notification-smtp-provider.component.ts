@@ -1,33 +1,20 @@
-import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { AdminService } from 'src/app/services/admin.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
+import { Component } from '@angular/core';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
-import { SMTPKnownProviders } from '../../smtp-provider/known-smtp-providers-settings';
+import * as SMTPKnownProviders from '../../smtp-provider/known-smtp-providers-settings';
+import { TranslatePipe } from '@ngx-translate/core';
+import { SMTPTableModule } from '../../smtp-table/smtp-table.module';
+import { RouterLink } from '@angular/router';
+import { KeyValuePipe, TitleCasePipe } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'cnsl-notification-smtp-provider',
   templateUrl: './notification-smtp-provider.component.html',
   styleUrls: ['./notification-smtp-provider.component.scss'],
-  standalone: false,
+  imports: [TranslatePipe, SMTPTableModule, RouterLink, TitleCasePipe, MatIcon, KeyValuePipe],
 })
-export class NotificationSMTPProviderComponent implements OnInit {
-  @Input() public serviceType!: PolicyComponentServiceType;
-  public service!: ManagementService | AdminService;
-
-  public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public providers = SMTPKnownProviders;
-
-  constructor(private injector: Injector) {}
-
-  ngOnInit(): void {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        this.service = this.injector.get(ManagementService as Type<ManagementService>);
-        break;
-      case PolicyComponentServiceType.ADMIN:
-        this.service = this.injector.get(AdminService as Type<AdminService>);
-        break;
-    }
-  }
+export class NotificationSMTPProviderComponent {
+  protected readonly PolicyComponentServiceType = PolicyComponentServiceType;
+  protected readonly providers = { ...SMTPKnownProviders, generic: { description: 'generic' } } as const;
 }

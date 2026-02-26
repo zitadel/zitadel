@@ -7,4 +7,5 @@ export type { JsonObject } from "@bufbuild/protobuf";
 export type { GenService } from "@bufbuild/protobuf/codegenv1";
 export { TimestampSchema, timestampDate, timestampFromDate, timestampFromMs, timestampMs } from "@bufbuild/protobuf/wkt";
 export type { Duration, Timestamp } from "@bufbuild/protobuf/wkt";
-export type { Client, Code, ConnectError } from "@connectrpc/connect";
+export { Code, ConnectError } from "@connectrpc/connect";
+export type { Client } from "@connectrpc/connect";

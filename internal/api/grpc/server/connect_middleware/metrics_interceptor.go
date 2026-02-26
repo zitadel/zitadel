@@ -10,8 +10,8 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/grpc/codes"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	_ "github.com/zitadel/zitadel/internal/statik"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (

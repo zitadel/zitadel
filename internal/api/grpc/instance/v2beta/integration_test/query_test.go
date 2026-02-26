@@ -140,7 +140,7 @@ func TestListInstances(t *testing.T) {
 
 	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
-	relTableState := integration.RelationalTablesEnableMatrix()
+	relTableState := integration.RelationalTablesEnableMatrix(t, ctx, ctxWithSysAuthZ)
 
 	tt := []struct {
 		testName          string
@@ -196,12 +196,8 @@ func TestListInstances(t *testing.T) {
 	}
 
 	for _, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
-
 		for _, tc := range tt {
-			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.Name, tc.testName), func(t *testing.T) {
 				// Test
 				res, err := inst.Client.InstanceV2Beta.ListInstances(tc.inputContext, tc.inputRequest)
 

@@ -4,12 +4,13 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -22,11 +23,19 @@ func newGrant() *cobra.Command {
 Prerequisites:
 - postgreSQL
 `,
-		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.GetViper())
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).Error("zitadel verify grant command failed")
+			}()
+			config, shutdown, err := NewConfig(cmd, viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 
-			err := initialise(cmd.Context(), config.Database, VerifyGrant(config.Database.DatabaseName(), config.Database.Username()))
-			logging.OnError(err).Fatal("unable to set grant")
+			return initialise(cmd.Context(), config.Database, VerifyGrant(config.Database.DatabaseName(), config.Database.Username()))
 		},
 	}
 }
@@ -41,10 +50,10 @@ func VerifyGrant(databaseName, username string) func(context.Context, *database.
 			return fmt.Errorf("unable to get current user: %w", err)
 		}
 		if currentUser == username {
-			logging.WithFields("username", username).Info("config.database.postgres.user.username is same as config.database.postgres.admin.username, skipping grant")
+			logging.Info(ctx, "config.database.postgres.user.username is same as config.database.postgres.admin.username, skipping grant", "username", username)
 			return nil
 		}
-		logging.WithFields("user", username, "database", databaseName).Info("verify grant")
+		logging.Info(ctx, "verify grant", "user", username, "database", databaseName)
 
 		return exec(ctx, db, fmt.Sprintf(grantStmt, databaseName, username), nil)
 	}

@@ -301,7 +301,7 @@ func TestCommands_MilestonePushed(t *testing.T) {
 
 func TestOIDCSessionEvents_SetMilestones(t *testing.T) {
 	ctx := authz.WithInstanceID(context.Background(), "instanceID")
-	ctx = authz.WithConsoleClientID(ctx, "console")
+	ctx = authz.WithManagementConsoleClientID(ctx, "console")
 	aggregate := milestone.NewAggregate(ctx)
 
 	type fields struct {

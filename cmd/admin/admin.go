@@ -3,6 +3,7 @@ package admin
 import (
 	_ "embed"
 	"errors"
+	"log/slog"
 
 	"github.com/spf13/cobra"
 
@@ -18,7 +19,12 @@ func New() *cobra.Command {
 		Short:      "The ZITADEL admin CLI lets you interact with your instance",
 		Long:       `The ZITADEL admin CLI lets you interact with your instance`,
 		Deprecated: "please use subcommands directly, e.g. `zitadel start`",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				if err != nil {
+					slog.Error("zitadel admin command failed", "err", err)
+				}
+			}()
 			return errors.New("no additional command provided")
 		},
 	}

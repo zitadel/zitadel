@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -198,15 +198,18 @@ func (h *Handler) Init(ctx context.Context) error {
 	if err != nil {
 		return zerrors.ThrowInternal(err, "CRDB-SAdf2", "begin failed")
 	}
+	ctx = logging.With(ctx, "projection", h.ProjectionName())
 	for i, execute := range check.Init().Executes {
-		logging.WithFields("projection", h.projection.Name(), "execute", i).Debug("executing check")
+		logging.Debug(ctx, "executing check", "execute", i)
 		next, err := execute(ctx, tx, h.projection.Name())
 		if err != nil {
-			logging.OnError(tx.Rollback()).Debug("unable to rollback")
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				logging.Error(ctx, "unable to rollback", "err", rollbackErr)
+			}
 			return err
 		}
 		if !next {
-			logging.WithFields("projection", h.projection.Name(), "execute", i).Debug("projection set up")
+			logging.Debug(ctx, "projection set up", "execute", i)
 			break
 		}
 	}

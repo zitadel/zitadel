@@ -9,25 +9,25 @@ import url from './url';
 import { User } from './user';
 import { Tokens } from './oidc';
 
-export function loginByUsernamePassword(user: User) {
+export function loginByUsernamePassword(user: User, client = Client()) {
   check(user, {
     'user defined': (u) => u !== undefined || fail(`user is undefined`),
   });
 
-  const loginUI = initLogin();
+  const loginUI = initLogin(undefined, client);
   const loginNameResponse = enterLoginName(loginUI, user);
   const passwordResponse = enterPassword(loginNameResponse, user);
   return token(new URL(passwordResponse.url).searchParams.get('code'));
 }
 
 const initLoginTrend = new Trend('login_ui_init_login_duration', true);
-export function initLogin(clientId?: string): Response {
+export function initLogin(loginClientId?: string, client = Client()): Response {
   let params = {};
   let expectedStatus = 200;
-  if (clientId) {
+  if (loginClientId) {
     params = {
       headers: {
-        'x-zitadel-login-client': clientId,
+        'x-zitadel-login-client': loginClientId,
       },
       redirects: 0,
     };
@@ -36,7 +36,7 @@ export function initLogin(clientId?: string): Response {
 
   const response = http.get(
     url('/oauth/v2/authorize', {
-      searchParams: Client(),
+      searchParams: client,
     }),
     params,
   );

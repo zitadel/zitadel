@@ -11,15 +11,16 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
@@ -64,6 +65,7 @@ func CreateServer(
 	accessSvc *logstore.Service[*record.AccessLog],
 	targetEncAlg crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
+	deniedIPList []denylist.AddressChecker,
 ) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	serverOptions := []grpc.ServerOption{
@@ -71,6 +73,7 @@ func CreateServer(
 			grpc_middleware.ChainUnaryServer(
 				middleware.CallDurationHandler(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
+				middleware.LogHandler(grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
 				middleware.InstanceInterceptor(queries, externalDomain, translator, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
 				middleware.AccessStorageInterceptor(accessSvc),
@@ -79,7 +82,7 @@ func CreateServer(
 				middleware.AuthorizationInterceptor(verifier, systemAuthz, authConfig),
 				middleware.TranslationHandler(),
 				middleware.QuotaExhaustedInterceptor(accessSvc, system_pb.SystemService_ServiceDesc.ServiceName),
-				middleware.ExecutionHandler(targetEncAlg, queries.GetActiveSigningWebKey),
+				middleware.ExecutionHandler(targetEncAlg, queries.GetActiveSigningWebKey, deniedIPList),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
 				middleware.ActivityInterceptor(),

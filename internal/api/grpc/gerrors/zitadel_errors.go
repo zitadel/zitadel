@@ -1,57 +1,59 @@
 package gerrors
 
 import (
+	"context"
 	"errors"
+	"log/slog"
 
 	"connectrpc.com/connect"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/protoadapt"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
-func ZITADELToGRPCError(err error) error {
+func ZITADELToGRPCError(ctx context.Context, err error) error {
 	if err == nil {
 		return nil
 	}
-	code, key, id, ok := ExtractZITADELError(err)
-	if !ok {
-		return status.Convert(err).Err()
-	}
+
+	code, key, id, lvl := extractError(err)
 	msg := key
 	msg += " (" + id + ")"
+	logging.Log(ctx, lvl, msg, "err", err, "code", code)
 
 	errorInfo := getErrorInfo(id, key, err)
 
 	s, err := status.New(code, msg).WithDetails(errorInfo)
 	if err != nil {
-		logging.WithError(err).WithField("logID", "GRPC-gIeRw").Debug("unable to add detail")
+		logging.WithError(ctx, err).Debug("unable to add error detail")
 		return status.New(code, msg).Err()
 	}
 
 	return s.Err()
 }
 
-func ZITADELToConnectError(err error) error {
+func ZITADELToConnectError(ctx context.Context, err error) error {
 	if err == nil {
 		return nil
 	}
 	connectError := new(connect.Error)
 	if errors.As(err, &connectError) {
+		// Connect error may be returned by other middlewares,
+		// so we assume it's a client error and log as warning.
+		logging.Warn(ctx, connectError.Message(), "err", connectError.Unwrap(), "code", connectError.Code())
 		return err
 	}
-	code, key, id, ok := ExtractZITADELError(err)
-	if !ok {
-		return status.Convert(err).Err()
-	}
+	code, key, id, lvl := extractError(err)
 	msg := key
 	msg += " (" + id + ")"
+	logging.Log(ctx, lvl, msg, "err", err)
 
 	errorInfo := getErrorInfo(id, key, err)
 
@@ -62,44 +64,62 @@ func ZITADELToConnectError(err error) error {
 	return cErr
 }
 
-func ExtractZITADELError(err error) (c codes.Code, msg, id string, ok bool) {
+func ExtractZITADELError(err error) (code codes.Code, msg, id string) {
 	if err == nil {
-		return codes.OK, "", "", false
+		return codes.OK, "", ""
 	}
+	code, msg, id, _ = extractError(err)
+	return code, msg, id
+}
+
+func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
 	connErr := new(pgconn.ConnectError)
 	if ok := errors.As(err, &connErr); ok {
-		return codes.Internal, "db connection error", "", true
+		return codes.Internal, "db connection error", "", slog.LevelError
 	}
-	zitadelErr := new(zerrors.ZitadelError)
-	if ok := errors.As(err, &zitadelErr); !ok {
-		return codes.Unknown, err.Error(), "", false
+	zitadelErr, ok := zerrors.AsZitadelError(err)
+	if !ok {
+		return codes.Unknown, err.Error(), "", slog.LevelError
 	}
-	switch {
-	case zerrors.IsErrorAlreadyExists(err):
-		return codes.AlreadyExists, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case zerrors.IsDeadlineExceeded(err):
-		return codes.DeadlineExceeded, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case zerrors.IsInternal(err):
-		return codes.Internal, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case zerrors.IsErrorInvalidArgument(err):
-		return codes.InvalidArgument, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case zerrors.IsNotFound(err):
-		return codes.NotFound, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case zerrors.IsPermissionDenied(err):
-		return codes.PermissionDenied, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case zerrors.IsPreconditionFailed(err):
-		return codes.FailedPrecondition, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case zerrors.IsUnauthenticated(err):
-		return codes.Unauthenticated, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case zerrors.IsUnavailable(err):
-		return codes.Unavailable, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case zerrors.IsUnimplemented(err):
-		return codes.Unimplemented, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case zerrors.IsResourceExhausted(err):
-		return codes.ResourceExhausted, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+	msg, id = zitadelErr.GetMessage(), zitadelErr.GetID()
+
+	switch zitadelErr.Kind {
+	case zerrors.KindAlreadyExists:
+		c, lvl = codes.AlreadyExists, slog.LevelWarn
+	case zerrors.KindDeadlineExceeded:
+		c, lvl = codes.DeadlineExceeded, slog.LevelError
+	case zerrors.KindInternal:
+		c, lvl = codes.Internal, slog.LevelError
+	case zerrors.KindInvalidArgument:
+		c, lvl = codes.InvalidArgument, slog.LevelWarn
+	case zerrors.KindNotFound:
+		c, lvl = codes.NotFound, slog.LevelWarn
+	case zerrors.KindPermissionDenied:
+		c, lvl = codes.PermissionDenied, slog.LevelWarn
+	case zerrors.KindPreconditionFailed:
+		c, lvl = codes.FailedPrecondition, slog.LevelWarn
+	case zerrors.KindUnauthenticated:
+		c, lvl = codes.Unauthenticated, slog.LevelWarn
+	case zerrors.KindUnavailable:
+		c, lvl = codes.Unavailable, slog.LevelError
+	case zerrors.KindUnimplemented:
+		c, lvl = codes.Unimplemented, slog.LevelInfo
+	case zerrors.KindResourceExhausted:
+		c, lvl = codes.ResourceExhausted, slog.LevelError
+	case zerrors.KindDataLoss:
+		c, lvl = codes.DataLoss, slog.LevelError
+	case zerrors.KindCanceled:
+		c, lvl = codes.Canceled, slog.LevelWarn
+	case zerrors.KindAborted:
+		c, lvl = codes.Aborted, slog.LevelError
+	case zerrors.KindOutOfRange:
+		c, lvl = codes.OutOfRange, slog.LevelWarn
+	case zerrors.KindUnknown:
+		c, lvl = codes.Unknown, slog.LevelError
 	default:
-		return codes.Unknown, err.Error(), "", false
+		c, lvl = codes.Unknown, slog.LevelError
 	}
+	return c, msg, id, lvl
 }
 
 func getErrorInfo(id, key string, err error) protoadapt.MessageV1 {

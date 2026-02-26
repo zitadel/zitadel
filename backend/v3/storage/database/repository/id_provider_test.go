@@ -28,19 +28,7 @@ func TestCreateIDProvider(t *testing.T) {
 	}()
 
 	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
-	}
-	instanceRepo := repository.InstanceRepository()
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceId := createInstance(t, tx)
 
 	// create org
 	orgId := gofakeit.Name()
@@ -61,7 +49,6 @@ func TestCreateIDProvider(t *testing.T) {
 		err      error
 	}
 
-	// TESTS
 	tests := []test{
 		{
 			name: "happy path",
@@ -83,11 +70,10 @@ func TestCreateIDProvider(t *testing.T) {
 		{
 			name: "create idp without name",
 			idp: domain.IdentityProvider{
-				InstanceID: instanceId,
-				OrgID:      &orgId,
-				ID:         gofakeit.Name(),
-				State:      domain.IDPStateActive,
-				// Name:              gofakeit.Name(),
+				InstanceID:        instanceId,
+				OrgID:             &orgId,
+				ID:                gofakeit.Name(),
+				State:             domain.IDPStateActive,
 				Type:              gu.Ptr(domain.IDPTypeOIDC),
 				AllowCreation:     true,
 				AllowAutoCreation: true,
@@ -167,8 +153,8 @@ func TestCreateIDProvider(t *testing.T) {
 						Name:            gofakeit.Name(),
 						DefaultOrgID:    "defaultOrgId",
 						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
+						ConsoleClientID: "managementConsoleCLient",
+						ConsoleAppID:    "managementConsoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
 					instanceRepo := repository.InstanceRepository()
@@ -231,9 +217,8 @@ func TestCreateIDProvider(t *testing.T) {
 		{
 			name: "adding idp with no id",
 			idp: domain.IdentityProvider{
-				InstanceID: instanceId,
-				OrgID:      &orgId,
-				// ID:                gofakeit.Name(),
+				InstanceID:        instanceId,
+				OrgID:             &orgId,
 				State:             domain.IDPStateActive,
 				Name:              gofakeit.Name(),
 				Type:              gu.Ptr(domain.IDPTypeOIDC),
@@ -249,11 +234,10 @@ func TestCreateIDProvider(t *testing.T) {
 		{
 			name: "adding idp with no name",
 			idp: domain.IdentityProvider{
-				InstanceID: instanceId,
-				OrgID:      &orgId,
-				ID:         gofakeit.Name(),
-				State:      domain.IDPStateActive,
-				// Name:              gofakeit.Name(),
+				InstanceID:        instanceId,
+				OrgID:             &orgId,
+				ID:                gofakeit.Name(),
+				State:             domain.IDPStateActive,
 				Type:              gu.Ptr(domain.IDPTypeOIDC),
 				AllowCreation:     true,
 				AllowAutoCreation: true,
@@ -267,7 +251,6 @@ func TestCreateIDProvider(t *testing.T) {
 		{
 			name: "adding idp with no instance id",
 			idp: domain.IdentityProvider{
-				// InstanceID:        instanceId,
 				OrgID:             &orgId,
 				State:             domain.IDPStateActive,
 				Name:              gofakeit.Name(),
@@ -384,31 +367,10 @@ func TestUpdateIDProvider(t *testing.T) {
 	}()
 
 	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
-	}
-	instanceRepo := repository.InstanceRepository()
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceId := createInstance(t, tx)
 
 	// create org
-	orgId := gofakeit.Name()
-	org := domain.Organization{
-		ID:         orgId,
-		Name:       gofakeit.Name(),
-		InstanceID: instanceId,
-		State:      domain.OrgStateActive,
-	}
-	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), tx, &org)
-	require.NoError(t, err)
+	orgId := createOrganization(t, tx, instanceId)
 
 	idpRepo := repository.IDProviderRepository()
 
@@ -669,44 +631,12 @@ func TestGetIDProvider(t *testing.T) {
 		}
 	}()
 
-	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
-	}
-	instanceRepo := repository.InstanceRepository()
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceId := createInstance(t, tx)
+	orgId := createOrganization(t, tx, instanceId)
 
-	// create org
-	orgId := gofakeit.Name()
-	org := domain.Organization{
-		ID:         orgId,
-		Name:       gofakeit.Name(),
-		InstanceID: instanceId,
-		State:      domain.OrgStateActive,
-	}
-	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), tx, &org)
-	require.NoError(t, err)
-
-	// create organization
 	// this org is created as an additional org which should NOT
 	// be returned in the results of the tests
-	preexistingOrg := domain.Organization{
-		ID:         gofakeit.Name(),
-		Name:       gofakeit.Name(),
-		InstanceID: instanceId,
-		State:      domain.OrgStateActive,
-	}
-	err = organizationRepo.Create(t.Context(), tx, &preexistingOrg)
-	require.NoError(t, err)
+	createOrganization(t, tx, instanceId)
 
 	idpRepo := repository.IDProviderRepository()
 	type test struct {
@@ -955,31 +885,10 @@ func TestListIDProvider(t *testing.T) {
 	}()
 
 	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
-	}
-	instanceRepo := repository.InstanceRepository()
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceId := createInstance(t, tx)
 
 	// create org
-	orgId := gofakeit.Name()
-	org := domain.Organization{
-		ID:         orgId,
-		Name:       gofakeit.Name(),
-		InstanceID: instanceId,
-		State:      domain.OrgStateActive,
-	}
-	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), tx, &org)
-	require.NoError(t, err)
+	orgId := createOrganization(t, tx, instanceId)
 
 	idpRepo := repository.IDProviderRepository()
 
@@ -994,30 +903,10 @@ func TestListIDProvider(t *testing.T) {
 			name: "multiple idps filter on instance",
 			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				// create instance
-				newInstanceId := gofakeit.Name()
-				instance := domain.Instance{
-					ID:              newInstanceId,
-					Name:            gofakeit.Name(),
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
-				}
-				err = instanceRepo.Create(t.Context(), tx, &instance)
-				require.NoError(t, err)
+				newInstanceId := createInstance(t, tx)
 
 				// create org
-				newOrgId := gofakeit.Name()
-				org := domain.Organization{
-					ID:         newOrgId,
-					Name:       gofakeit.Name(),
-					InstanceID: newInstanceId,
-					State:      domain.OrgStateActive,
-				}
-				organizationRepo := repository.OrganizationRepository()
-				err = organizationRepo.Create(t.Context(), tx, &org)
-				require.NoError(t, err)
+				newOrgId := createOrganization(t, tx, newInstanceId)
 
 				// create idp
 				// this idp is created as an additional idp which should NOT
@@ -1785,31 +1674,10 @@ func TestDeleteIDProvider(t *testing.T) {
 	}()
 
 	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
-	}
-	instanceRepo := repository.InstanceRepository()
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceId := createInstance(t, tx)
 
 	// create org
-	orgId := gofakeit.Name()
-	org := domain.Organization{
-		ID:         orgId,
-		Name:       gofakeit.Name(),
-		InstanceID: instanceId,
-		State:      domain.OrgStateActive,
-	}
-	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), tx, &org)
-	require.NoError(t, err)
+	orgId := createOrganization(t, tx, instanceId)
 
 	idpRepo := repository.IDProviderRepository()
 
