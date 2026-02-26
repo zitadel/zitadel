@@ -2551,8 +2551,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
-				tarpit:          expectTarpit(0),
 				loginPaths:      expectLoginPathsNoCall,
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   authz.NewMockContext("instance1", "org1", "user1"),
@@ -2901,8 +2901,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
-				tarpit:          expectTarpit(0),
 				loginPaths:      expectLoginPathsNoCall,
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   authz.NewMockContext("instance1", "org1", "user1"),

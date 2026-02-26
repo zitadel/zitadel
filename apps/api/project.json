@@ -65,6 +65,7 @@
                 "generate",
                 "build-console"
             ],
+            "cache": true,
             "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w\"'",
             "inputs": [
                 {
@@ -88,6 +89,7 @@
                 "generate",
                 "build-console"
             ],
+            "cache": true,
             "command": "bash -c 'CGO_ENABLED=0 GOOS=linux go build -o .artifacts/bin/linux/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w\"'",
             "inputs": [
                 {
@@ -160,6 +162,7 @@
             "dependsOn": [
                 "generate"
             ],
+            "cache": true,
             "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...,./backend/...  ./...",
             "inputs": [
                 "sources",
