@@ -2711,6 +2711,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 				tarpit:          expectTarpit(0),
 			},
 			args: args{
@@ -3060,6 +3061,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 				tarpit:          expectTarpit(0),
 			},
 			args: args{
