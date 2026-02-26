@@ -110,9 +110,22 @@ func NewDefaultClient(ctx context.Context) (*Client, error) {
 }
 
 func newClient(ctx context.Context, target string) (*Client, error) {
-	cc, err := grpc.NewClient(target,
+	// Always dial the real server address.  Custom instance domains
+	// (e.g. "abc.integration.localhost:8082") are not resolvable via DNS
+	// outside the devcontainer, so dialling them directly causes pollHealth
+	// to silently retry for up to 15 minutes before the context expires.
+	// ZITADEL routes requests to the correct instance via the gRPC
+	// :authority pseudo-header, so we only need the domain as the authority
+	// value – the physical TCP connection always goes to the server address.
+	serverAddr := loadedConfig.Host()
+	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+	}
+	if target != serverAddr {
+		opts = append(opts, grpc.WithAuthority(target))
+	}
+
+	cc, err := grpc.NewClient(serverAddr, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +154,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		IDPv2:                    idp_pb.NewIdentityProviderServiceClient(cc),
 		UserV3Alpha:              user_v3alpha.NewZITADELUsersClient(cc),
 		SAMLv2:                   saml_pb.NewSAMLServiceClient(cc),
-		SCIM:                     scim.NewScimClient(target),
+		SCIM:                     scim.NewScimClient(target, serverAddr),
 		Projectv2Beta:            project_v2beta.NewProjectServiceClient(cc),
 		ProjectV2:                project_v2.NewProjectServiceClient(cc),
 		InstanceV2Beta:           instance_v2beta.NewInstanceServiceClient(cc),
