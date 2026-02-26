@@ -274,7 +274,7 @@ func (i *Instance) awaitReadProjections(ctx context.Context) {
 	ownerCtx := i.WithAuthorizationToken(ctx, UserTypeIAMOwner)
 	userID := i.Users.Get(UserTypeNoPermission).ID
 
-	// Wait for projections.users14
+	// Wait for projections.users
 	mustAwait(func() error {
 		_, err := i.Client.UserV2.GetUserByID(ownerCtx, &user_v2.GetUserByIDRequest{
 			UserId: userID,
@@ -285,7 +285,7 @@ func (i *Instance) awaitReadProjections(ctx context.Context) {
 		return err
 	})
 
-	// Wait for projections.secret_generators2
+	// Wait for projections.secret_generators
 	mustAwait(func() error {
 		resp, err := i.Client.Admin.ListSecretGenerators(ownerCtx, &admin.ListSecretGeneratorsRequest{})
 		if err != nil {
