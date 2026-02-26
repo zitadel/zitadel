@@ -801,23 +801,27 @@ export async function searchUsers({
 }
 
 export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promise<Organization | null> {
-  const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
+  const fetcher = async () => {
+    const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
 
-  return orgService
-    .listOrganizations(
-      {
-        queries: [
-          {
-            query: {
-              case: "defaultQuery",
-              value: {},
+    return orgService
+      .listOrganizations(
+        {
+          queries: [
+            {
+              query: {
+                case: "defaultQuery",
+                value: {},
+              },
             },
-          },
-        ],
-      },
-      {},
-    )
-    .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
+          ],
+        },
+        {},
+      )
+      .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
+  };
+
+  return useCache ? freshCache(`getDefaultOrg-${"instance"}`, fetcher, getTTLForKey("getDefaultOrg", defaultCacheTTL)) : fetcher();
 }
 
 export async function getOrgsByDomain({ serviceConfig, domain }: WithServiceConfig<{ domain: string }>) {
