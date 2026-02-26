@@ -5,8 +5,8 @@ package infra
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
-	"os"
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -27,7 +27,7 @@ func (c PostgresConfig) ConnectionString() string {
 
 // StartPostgres starts a Postgres 18 container with tuning matching the
 // devcontainer's db-api-integration service.
-func StartPostgres(ctx context.Context) (*postgres.PostgresContainer, *PostgresConfig, error) {
+func StartPostgres(ctx context.Context, logw io.Writer) (*postgres.PostgresContainer, *PostgresConfig, error) {
 	const (
 		user     = "postgres"
 		password = "postgres"
@@ -35,7 +35,7 @@ func StartPostgres(ctx context.Context) (*postgres.PostgresContainer, *PostgresC
 	)
 
 	container, err := postgres.Run(ctx, "postgres:18",
-		testcontainers.WithLogger(log.New(os.Stderr, "[testcontainers/postgres] ", log.LstdFlags)),
+		testcontainers.WithLogger(log.New(logw, "[testcontainers/postgres] ", log.LstdFlags)),
 		postgres.WithDatabase(dbname),
 		postgres.WithUsername(user),
 		postgres.WithPassword(password),
