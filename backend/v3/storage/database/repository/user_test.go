@@ -3834,6 +3834,33 @@ func Test_user_Update(t *testing.T) {
 				}(),
 			},
 		},
+		{
+			name: "human user - set recovery code last successfully checked at",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetLastSuccessfulRecoveryCodeCheck(now),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes:                     []string{"code1", "code2"},
+						LastSuccessfullyCheckedAt: &now,
+					}
+					return u
+				}(),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
