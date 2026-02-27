@@ -13,13 +13,9 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/embedded"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
-	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-var (
-	pool database.PoolTest
-	es   *eventstore.Eventstore
-)
+var pool database.PoolTest
 
 func TestMain(m *testing.M) {
 	os.Exit(runTests(m))

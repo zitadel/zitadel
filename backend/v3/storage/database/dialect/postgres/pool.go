@@ -15,7 +15,7 @@ type pgxPool struct {
 	*pgxpool.Pool
 }
 
-// InternalDB implements [database.PoolTest].
+// RawDB implements [database.PoolTest].
 func (p *pgxPool) RawDB() *sql.DB {
 	return stdlib.OpenDBFromPool(p.Pool)
 }
