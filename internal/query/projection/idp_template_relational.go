@@ -21,17 +21,6 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const (
-	IDPOrgIdCol             = "org_id"
-	IDPPayloadCol           = "payload"
-	IDPOrgId                = "org_id"
-	IDPAllowCreationCol     = "allow_creation"
-	IDPAllowLinkingCol      = "allow_linking"
-	IDPAllowAutoCreationCol = "allow_auto_creation"
-	IDPAllowAutoUpdateCol   = "allow_auto_update"
-	IDPAllowAutoLinkingCol  = "auto_linking_field"
-)
-
 func (p *relationalTablesProjection) reduceIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idpconfig.IDPConfigAddedEvent
@@ -52,13 +41,15 @@ func (p *relationalTablesProjection) reduceIDPAdded(event eventstore.Event) (*ha
 		}
 		repo := repository.IDProviderRepository()
 		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
-			InstanceID:   event.Aggregate().InstanceID,
-			OrgID:        orgId,
-			ID:           idpEvent.ConfigID,
-			State:        domain.IDPStateActive,
-			Name:         idpEvent.Name,
-			Type:         mapIDPConfigType(idpEvent.Typ),
-			AutoRegister: idpEvent.AutoRegister,
+			InstanceID:        event.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ConfigID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              mapIDPConfigType(idpEvent.Typ),
+			AllowAutoCreation: idpEvent.AutoRegister,
+			AllowLinking:      true,
+			AllowCreation:     true,
 		})
 
 	}), nil
@@ -72,21 +63,36 @@ func mapIDPConfigType(typ internal_domain.IDPConfigType) *domain.IDPType {
 		return gu.Ptr(domain.IDPTypeSAML)
 	case internal_domain.IDPConfigTypeJWT:
 		return gu.Ptr(domain.IDPTypeJWT)
+	case internal_domain.IDPConfigTypeUnspecified:
+		return nil
 	default:
 		return nil
 	}
 }
 
+func mapAutoLinkingField(option internal_domain.AutoLinkingOption) *domain.IDPAutoLinkingField {
+	if option == internal_domain.AutoLinkingOptionUnspecified {
+		return nil
+	}
+	return gu.Ptr(domain.IDPAutoLinkingField(option))
+}
+
+func idpScopedCondition(repo domain.IDProviderRepository, instanceID, id string, orgID *string) database.Condition {
+	return database.And(
+		repo.PrimaryKeyCondition(instanceID, id),
+		repo.OrgIDCondition(orgID),
+	)
+}
+
 func (p *relationalTablesProjection) reduceIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
+	var orgID *string
 	var idpEvent idpconfig.IDPConfigChangedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigChangedEvent:
 		idpEvent = e.IDPConfigChangedEvent
-		orgCond = handler.NewCond(IDPOrgId, idpEvent.Aggregate().ResourceOwner)
+		orgID = gu.Ptr(idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPConfigChangedEvent:
 		idpEvent = e.IDPConfigChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YVvJD", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
 	}
@@ -98,7 +104,7 @@ func (p *relationalTablesProjection) reduceIDPChanged(event eventstore.Event) (*
 		changes = append(changes, repo.SetName(*idpEvent.Name))
 	}
 	if idpEvent.AutoRegister != nil {
-		changes = append(changes, repo.SetAutoRegister(*idpEvent.AutoRegister))
+		changes = append(changes, repo.SetAllowAutoCreation(*idpEvent.AutoRegister))
 	}
 	if len(changes) == 0 {
 		return handler.NewNoOpStatement(&idpEvent), nil
@@ -111,21 +117,20 @@ func (p *relationalTablesProjection) reduceIDPChanged(event eventstore.Event) (*
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-9sX8h", "reduce.wrong.db.pool %T", ex)
 		}
 
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx), repo.PrimaryKeyCondition(event.Aggregate().InstanceID, idpEvent.ConfigID), changes...)
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(repo, event.Aggregate().InstanceID, idpEvent.ConfigID, orgID), changes...)
 		return err
 	}), nil
 }
 
 func (p *relationalTablesProjection) reduceIDPDeactivated(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
+	var orgID *string
 	var idpEvent idpconfig.IDPConfigDeactivatedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigDeactivatedEvent:
 		idpEvent = e.IDPConfigDeactivatedEvent
-		orgCond = handler.NewCond(IDPOrgId, idpEvent.Aggregate().ResourceOwner)
+		orgID = gu.Ptr(idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPConfigDeactivatedEvent:
 		idpEvent = e.IDPConfigDeactivatedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y4O5l", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigDeactivatedEventType, instance.IDPConfigDeactivatedEventType})
 	}
@@ -138,121 +143,83 @@ func (p *relationalTablesProjection) reduceIDPDeactivated(event eventstore.Event
 
 		repo := repository.IDProviderRepository()
 
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx), repo.PrimaryKeyCondition(event.Aggregate().InstanceID, idpEvent.ConfigID),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(repo, event.Aggregate().InstanceID, idpEvent.ConfigID, orgID),
 			repo.SetState(domain.IDPStateInactive),
 			repo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
 		)
 		return err
 	}), nil
-
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPStateCol, domain.IDPStateInactive),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-		[]handler.Condition{
-			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
-			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
 }
 
 func (p *relationalTablesProjection) reduceIDPReactivated(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
+	var orgID *string
 	var idpEvent idpconfig.IDPConfigReactivatedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigReactivatedEvent:
 		idpEvent = e.IDPConfigReactivatedEvent
-		orgCond = handler.NewCond(IDPOrgId, idpEvent.Aggregate().ResourceOwner)
+		orgID = gu.Ptr(idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPConfigReactivatedEvent:
 		idpEvent = e.IDPConfigReactivatedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y8QyS", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigReactivatedEventType, instance.IDPConfigReactivatedEventType})
 	}
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-		[]handler.Condition{
-			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
-			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-2Db9P", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(repo, idpEvent.Aggregate().InstanceID, idpEvent.ConfigID, orgID),
+			repo.SetState(domain.IDPStateActive),
+			repo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
+		)
+		return err
+	}), nil
 }
-
-// func (p *relationalTablesProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	var orgCond handler.Condition
-// 	var idpEvent idpconfig.IDPConfigRemovedEvent
-// 	switch e := event.(type) {
-// 	case *org.IDPConfigRemovedEvent:
-// 		idpEvent = e.IDPConfigRemovedEvent
-// 		orgCond = handler.NewCond(IDPOrgId, idpEvent.Aggregate().ResourceOwner)
-// 	case *instance.IDPConfigRemovedEvent:
-// 		idpEvent = e.IDPConfigRemovedEvent
-// 		orgCond = handler.NewIsNullCond((IDPOrgId))
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y4zy8", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
-// 	}
-
-// 	return handler.NewDeleteStatement(
-// 		&idpEvent,
-// 		[]handler.Condition{
-// 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
-// 			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			orgCond,
-// 		},
-// 	), nil
-// }
 
 func (p *relationalTablesProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var (
-		orgCond handler.Condition
-		idpID   string
+		orgID *string
+		idpID string
 	)
 	switch e := event.(type) {
 	case *org.IDPRemovedEvent:
 		idpID = e.ID
-		orgCond = handler.NewCond(IDPOrgId, e.RemovedEvent.Aggregate().ResourceOwner)
+		orgID = gu.Ptr(e.RemovedEvent.Aggregate().ResourceOwner)
 	case *instance.IDPRemovedEvent:
 		idpID = e.ID
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	case *org.IDPConfigRemovedEvent:
 		idpID = e.ID
-		orgCond = handler.NewCond(IDPOrgId, e.IDPConfigRemovedEvent.Aggregate().ResourceOwner)
+		orgID = gu.Ptr(e.IDPConfigRemovedEvent.Aggregate().ResourceOwner)
 	case *instance.IDPConfigRemovedEvent:
 		idpID = e.ID
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ybcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ybcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType, org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
-	return handler.NewDeleteStatement(
-		event,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpID),
-			handler.NewCond(IDPTemplateInstanceIDCol, event.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-PSj7F", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx), idpScopedCondition(repo, event.Aggregate().InstanceID, idpID, orgID))
+		return err
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
+	var orgID *string
 	var idpEvent idpconfig.OIDCConfigAddedEvent
 	switch e := event.(type) {
 	case *org.IDPOIDCConfigAddedEvent:
 		idpEvent = e.OIDCConfigAddedEvent
-		orgCond = handler.NewCond(IDPOrgId, idpEvent.Aggregate().ResourceOwner)
+		orgID = gu.Ptr(idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPOIDCConfigAddedEvent:
 		idpEvent = e.OIDCConfigAddedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YFuAA", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
 	}
@@ -262,33 +229,31 @@ func (p *relationalTablesProjection) reduceOIDCConfigAdded(event eventstore.Even
 		return nil, err
 	}
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(IDPTypeCol, domain.IDPTypeOIDC),
-			handler.NewCol(UpdatedAt, idpEvent.CreatedAt()),
-		},
-		[]handler.Condition{
-			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
-			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5cvzY", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		_, err = repo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(repo, idpEvent.Aggregate().InstanceID, idpEvent.IDPConfigID, orgID),
+			repo.SetPayload(string(payloadJSON)),
+			database.NewChange(repo.TypeColumn(), domain.IDPTypeOIDC),
+			repo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
+		)
+		return err
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idpconfig.OIDCConfigChangedEvent
 	switch e := event.(type) {
 	case *org.IDPOIDCConfigChangedEvent:
 		idpEvent = e.OIDCConfigChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.IDPOIDCConfigChangedEvent:
 		idpEvent = e.OIDCConfigChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigChangedEventType, instance.IDPOIDCConfigChangedEventType})
 	}
@@ -300,7 +265,7 @@ func (p *relationalTablesProjection) reduceOIDCConfigChanged(event eventstore.Ev
 		}
 
 		idpRepo := repository.IDProviderRepository()
-		oidc, err := idpRepo.GetOIDC(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
+		oidc, err := idpRepo.GetOIDC(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.IDPConfigID, orgId)))
 		if err != nil {
 			return err
 		}
@@ -330,37 +295,29 @@ func (p *relationalTablesProjection) reduceOIDCConfigChanged(event eventstore.Ev
 			oidc.UserNameMapping = domain.OIDCMappingField(*idpEvent.UserNameMapping)
 		}
 
-		payloadJSON, err := json.Marshal(idpEvent)
+		payloadJSON, err := json.Marshal(oidc.OIDC)
 		if err != nil {
 			return err
 		}
 
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			[]handler.Column{
-				handler.NewCol(IDPPayloadCol, payloadJSON),
-				handler.NewCol(IDPTypeCol, domain.IDPTypeOIDC),
-				handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-			},
-			[]handler.Condition{
-				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
-				handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.IDPConfigID, orgId),
+			idpRepo.SetPayload(string(payloadJSON)),
+			database.NewChange(idpRepo.TypeColumn(), domain.IDPTypeOIDC),
+			idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
+		)
+		return err
 	}), nil
 }
 
 func (p *relationalTablesProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
+	var orgID *string
 	var idpEvent idpconfig.JWTConfigAddedEvent
 	switch e := event.(type) {
 	case *org.IDPJWTConfigAddedEvent:
 		idpEvent = e.JWTConfigAddedEvent
-		orgCond = handler.NewCond(IDPOrgId, idpEvent.Aggregate().ResourceOwner)
+		orgID = gu.Ptr(idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPJWTConfigAddedEvent:
 		idpEvent = e.JWTConfigAddedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YvPdb", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
 	}
@@ -370,33 +327,31 @@ func (p *relationalTablesProjection) reduceJWTConfigAdded(event eventstore.Event
 		return nil, err
 	}
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(IDPTypeCol, domain.IDPTypeJWT),
-			handler.NewCol(UpdatedAt, idpEvent.CreatedAt()),
-		},
-		[]handler.Condition{
-			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
-			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-tJQ8V", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		_, err = repo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(repo, idpEvent.Aggregate().InstanceID, idpEvent.IDPConfigID, orgID),
+			repo.SetPayload(string(payloadJSON)),
+			database.NewChange(repo.TypeColumn(), domain.IDPTypeJWT),
+			repo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
+		)
+		return err
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idpconfig.JWTConfigChangedEvent
 	switch e := event.(type) {
 	case *org.IDPJWTConfigChangedEvent:
 		idpEvent = e.JWTConfigChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.IDPJWTConfigChangedEvent:
 		idpEvent = e.JWTConfigChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigChangedEventType, instance.IDPJWTConfigChangedEventType})
 	}
@@ -408,7 +363,7 @@ func (p *relationalTablesProjection) reduceJWTConfigChanged(event eventstore.Eve
 		}
 
 		idpRepo := repository.IDProviderRepository()
-		jwt, err := idpRepo.GetJWT(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
+		jwt, err := idpRepo.GetJWT(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.IDPConfigID, orgId)))
 		if err != nil {
 			return err
 		}
@@ -426,24 +381,17 @@ func (p *relationalTablesProjection) reduceJWTConfigChanged(event eventstore.Eve
 			jwt.HeaderName = *idpEvent.HeaderName
 		}
 
-		payloadJSON, err := json.Marshal(idpEvent)
+		payloadJSON, err := json.Marshal(jwt.JWT)
 		if err != nil {
 			return err
 		}
 
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			[]handler.Column{
-				handler.NewCol(IDPPayloadCol, payloadJSON),
-				handler.NewCol(IDPTypeCol, domain.IDPTypeJWT),
-				handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-			},
-			[]handler.Condition{
-				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
-				handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.IDPConfigID, orgId),
+			idpRepo.SetPayload(string(payloadJSON)),
+			database.NewChange(idpRepo.TypeColumn(), domain.IDPTypeJWT),
+			idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
+		)
+		return err
 	}), nil
 }
 
@@ -476,44 +424,41 @@ func (p *relationalTablesProjection) reduceOAuthIDPAdded(event eventstore.Event)
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOAuth),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-mB2hq", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeOAuth),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceOAuthIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.OAuthIDPChangedEvent
 	switch e := event.(type) {
 	case *org.OAuthIDPChangedEvent:
 		idpEvent = e.OAuthIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.OAuthIDPChangedEvent:
 		idpEvent = e.OAuthIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-K1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
 	}
@@ -524,12 +469,12 @@ func (p *relationalTablesProjection) reduceOAuthIDPChanged(event eventstore.Even
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		oauth, err := idpRepo.GetOAuth(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		oauth, err := idpRepo.GetOAuth(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
 		payload := &oauth.OAuth
 		payloadChanged := p.reduceOAuthIDPChangedColumns(payload, &idpEvent)
@@ -538,20 +483,12 @@ func (p *relationalTablesProjection) reduceOAuthIDPChanged(event eventstore.Even
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 
 	}), nil
 }
@@ -574,44 +511,41 @@ func (p *relationalTablesProjection) reduceOIDCIDPAdded(event eventstore.Event) 
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-C9ju3", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeOIDC),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceOIDCIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.OIDCIDPChangedEvent
 	switch e := event.(type) {
 	case *org.OIDCIDPChangedEvent:
 		idpEvent = e.OIDCIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.OIDCIDPChangedEvent:
 		idpEvent = e.OIDCIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1K82ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
 	}
@@ -622,12 +556,12 @@ func (p *relationalTablesProjection) reduceOIDCIDPChanged(event eventstore.Event
 			return zerrors.ThrowInternal(nil, "HANDL-L8CQt", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		oidc, err := idpRepo.GetOIDC(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		oidc, err := idpRepo.GetOIDC(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
 		payload := &oidc.OIDC
 		payloadChanged := p.reduceOIDCIDPChangedColumns(payload, &idpEvent)
@@ -636,33 +570,24 @@ func (p *relationalTablesProjection) reduceOIDCIDPChanged(event eventstore.Event
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 	}), nil
 }
 
 func (p *relationalTablesProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
+	var orgID *string
 	var idpEvent idp.OIDCIDPMigratedAzureADEvent
 	switch e := event.(type) {
 	case *org.OIDCIDPMigratedAzureADEvent:
 		idpEvent = e.OIDCIDPMigratedAzureADEvent
-		orgCond = handler.NewCond(IDPOrgId, idpEvent.Aggregate().ResourceOwner)
+		orgID = gu.Ptr(idpEvent.Aggregate().ResourceOwner)
 	case *instance.OIDCIDPMigratedAzureADEvent:
 		idpEvent = e.OIDCIDPMigratedAzureADEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Yb582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
 	}
@@ -685,42 +610,39 @@ func (p *relationalTablesProjection) reduceOIDCIDPMigratedAzureAD(event eventsto
 		return nil, err
 	}
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzure),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-mj7LQ", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		changes := database.Changes{
+			repo.SetName(idpEvent.Name),
+			database.NewChange(repo.TypeColumn(), domain.IDPTypeAzure),
+			repo.SetAllowCreation(idpEvent.IsCreationAllowed),
+			repo.SetAllowLinking(idpEvent.IsLinkingAllowed),
+			repo.SetAllowAutoCreation(idpEvent.IsAutoCreation),
+			repo.SetAllowAutoUpdate(idpEvent.IsAutoUpdate),
+			repo.SetLinkingField(mapAutoLinkingField(idpEvent.AutoLinkingOption)),
+			repo.SetPayload(string(payloadJSON)),
+			repo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
+		}
+
+		_, err = repo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(repo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgID), changes...)
+		return err
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
+	var orgID *string
 	var idpEvent idp.OIDCIDPMigratedGoogleEvent
 	switch e := event.(type) {
 	case *org.OIDCIDPMigratedGoogleEvent:
 		idpEvent = e.OIDCIDPMigratedGoogleEvent
-		orgCond = handler.NewCond(IDPOrgId, idpEvent.Aggregate().ResourceOwner)
+		orgID = gu.Ptr(idpEvent.Aggregate().ResourceOwner)
 	case *instance.OIDCIDPMigratedGoogleEvent:
 		idpEvent = e.OIDCIDPMigratedGoogleEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1502hk", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
 	}
@@ -736,30 +658,28 @@ func (p *relationalTablesProjection) reduceOIDCIDPMigratedGoogle(event eventstor
 		return nil, err
 	}
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-HDqk9", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		changes := database.Changes{
+			repo.SetName(idpEvent.Name),
+			database.NewChange(repo.TypeColumn(), domain.IDPTypeGoogle),
+			repo.SetAllowCreation(idpEvent.IsCreationAllowed),
+			repo.SetAllowLinking(idpEvent.IsLinkingAllowed),
+			repo.SetAllowAutoCreation(idpEvent.IsAutoCreation),
+			repo.SetAllowAutoUpdate(idpEvent.IsAutoUpdate),
+			repo.SetLinkingField(mapAutoLinkingField(idpEvent.AutoLinkingOption)),
+			repo.SetPayload(string(payloadJSON)),
+			repo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
+		}
+
+		_, err = repo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(repo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgID), changes...)
+		return err
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceJWTIDPAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -787,44 +707,41 @@ func (p *relationalTablesProjection) reduceJWTIDPAdded(event eventstore.Event) (
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeJWT),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZYYyQ", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeJWT),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceJWTIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.JWTIDPChangedEvent
 	switch e := event.(type) {
 	case *org.JWTIDPChangedEvent:
 		idpEvent = e.JWTIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.JWTIDPChangedEvent:
 		idpEvent = e.JWTIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-H15j2il", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
 	}
@@ -835,12 +752,12 @@ func (p *relationalTablesProjection) reduceJWTIDPChanged(event eventstore.Event)
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		jwt, err := idpRepo.GetJWT(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		jwt, err := idpRepo.GetJWT(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
 		payload := &jwt.JWT
 		payloadChanged := p.reduceJWTIDPChangedColumns(payload, &idpEvent)
@@ -849,20 +766,12 @@ func (p *relationalTablesProjection) reduceJWTIDPChanged(event eventstore.Event)
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 	}), nil
 }
 
@@ -897,44 +806,41 @@ func (p *relationalTablesProjection) reduceAzureADIDPAdded(event eventstore.Even
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzure),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-GJ4Kb", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeAzure),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceAzureADIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.AzureADIDPChangedEvent
 	switch e := event.(type) {
 	case *org.AzureADIDPChangedEvent:
 		idpEvent = e.AzureADIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.AzureADIDPChangedEvent:
 		idpEvent = e.AzureADIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YZ5x25s", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
 	}
@@ -945,12 +851,12 @@ func (p *relationalTablesProjection) reduceAzureADIDPChanged(event eventstore.Ev
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		azure, err := idpRepo.GetAzureAD(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		azure, err := idpRepo.GetAzureAD(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
 		payload := &azure.Azure
 		payloadChanged, err := p.reduceAzureADIDPChangedColumns(payload, &idpEvent)
@@ -963,20 +869,12 @@ func (p *relationalTablesProjection) reduceAzureADIDPChanged(event eventstore.Ev
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 
 	}), nil
 }
@@ -1005,44 +903,41 @@ func (p *relationalTablesProjection) reduceGitHubIDPAdded(event eventstore.Event
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHub),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-HNpgd", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeGitHub),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceGitHubIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.GitHubIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitHubIDPChangedEvent:
 		idpEvent = e.GitHubIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.GitHubIDPChangedEvent:
 		idpEvent = e.GitHubIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-L1U89ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
 	}
@@ -1053,12 +948,12 @@ func (p *relationalTablesProjection) reduceGitHubIDPChanged(event eventstore.Eve
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		github, err := idpRepo.GetGithub(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		github, err := idpRepo.GetGithub(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
 		payload := &github.Github
 		payloadChanged := p.reduceGitHubIDPChangedColumns(payload, &idpEvent)
@@ -1067,20 +962,12 @@ func (p *relationalTablesProjection) reduceGitHubIDPChanged(event eventstore.Eve
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 
 	}), nil
 }
@@ -1112,44 +999,41 @@ func (p *relationalTablesProjection) reduceGitHubEnterpriseIDPAdded(event events
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHubEnterprise),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-Kv4Fu", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeGitHubEnterprise),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceGitHubEnterpriseIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.GitHubEnterpriseIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitHubEnterpriseIDPChangedEvent:
 		idpEvent = e.GitHubEnterpriseIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.GitHubEnterpriseIDPChangedEvent:
 		idpEvent = e.GitHubEnterpriseIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
 	}
@@ -1160,12 +1044,12 @@ func (p *relationalTablesProjection) reduceGitHubEnterpriseIDPChanged(event even
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		githubEnterprise, err := idpRepo.GetGithubEnterprise(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		githubEnterprise, err := idpRepo.GetGithubEnterprise(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
 		payload := &githubEnterprise.GithubEnterprise
 		payloadChanged := p.reduceGitHubEnterpriseIDPChangedColumns(payload, &idpEvent)
@@ -1174,20 +1058,12 @@ func (p *relationalTablesProjection) reduceGitHubEnterpriseIDPChanged(event even
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 
 	}), nil
 }
@@ -1216,44 +1092,41 @@ func (p *relationalTablesProjection) reduceGitLabIDPAdded(event eventstore.Event
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLab),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kN8Qx", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeGitLab),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceGitLabIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.GitLabIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitLabIDPChangedEvent:
 		idpEvent = e.GitLabIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.GitLabIDPChangedEvent:
 		idpEvent = e.GitLabIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-mT5827b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
 	}
@@ -1264,12 +1137,12 @@ func (p *relationalTablesProjection) reduceGitLabIDPChanged(event eventstore.Eve
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		gitlab, err := idpRepo.GetGitlab(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		gitlab, err := idpRepo.GetGitlab(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
 		payload := &gitlab.Gitlab
 		payloadChanged := p.reduceGitLabIDPChangedColumns(payload, &idpEvent)
@@ -1278,20 +1151,12 @@ func (p *relationalTablesProjection) reduceGitLabIDPChanged(event eventstore.Eve
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 
 	}), nil
 }
@@ -1309,56 +1174,53 @@ func (p *relationalTablesProjection) reduceGitLabSelfHostedIDPAdded(event events
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YAF3gw", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPAddedEventType, instance.GitLabSelfHostedIDPAddedEventType})
 	}
 
-	gitlabSelfHosting := domain.GitlabSelfHosting{
+	gitlabSelfHosted := domain.GitlabSelfHosted{
 		Issuer:       idpEvent.Issuer,
 		ClientID:     idpEvent.ClientID,
 		ClientSecret: idpEvent.ClientSecret,
 		Scopes:       idpEvent.Scopes,
 	}
 
-	payloadJSON, err := json.Marshal(gitlabSelfHosting)
+	payloadJSON, err := json.Marshal(gitlabSelfHosted)
 	if err != nil {
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLabSelfHosted),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-FQrtw", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeGitLabSelfHosted),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceGitLabSelfHostedIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.GitLabSelfHostedIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitLabSelfHostedIDPChangedEvent:
 		idpEvent = e.GitLabSelfHostedIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.GitLabSelfHostedIDPChangedEvent:
 		idpEvent = e.GitLabSelfHostedIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
 	}
@@ -1369,34 +1231,26 @@ func (p *relationalTablesProjection) reduceGitLabSelfHostedIDPChanged(event even
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		gitlabSelfHosted, err := idpRepo.GetGitlabSelfHosting(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		gitlabSelfHosted, err := idpRepo.GetGitlabSelfHosted(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
-		payload := &gitlabSelfHosted.GitlabSelfHosting
+		payload := &gitlabSelfHosted.GitlabSelfHosted
 		payloadChanged := p.reduceGitLabSelfHostedIDPChangedColumns(payload, &idpEvent)
 		if payloadChanged {
 			payloadJSON, err := json.Marshal(payload)
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 
 	}), nil
 }
@@ -1425,44 +1279,41 @@ func (p *relationalTablesProjection) reduceGoogleIDPAdded(event eventstore.Event
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-B9SPm", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeGoogle),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceGoogleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.GoogleIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GoogleIDPChangedEvent:
 		idpEvent = e.GoogleIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.GoogleIDPChangedEvent:
 		idpEvent = e.GoogleIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YN58hml", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
 	}
@@ -1473,12 +1324,12 @@ func (p *relationalTablesProjection) reduceGoogleIDPChanged(event eventstore.Eve
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		google, err := idpRepo.GetGoogle(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		google, err := idpRepo.GetGoogle(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
 		payload := &google.Google
 		payloadChanged := p.reduceGoogleIDPChangedColumns(payload, &idpEvent)
@@ -1487,20 +1338,12 @@ func (p *relationalTablesProjection) reduceGoogleIDPChanged(event eventstore.Eve
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 
 	}), nil
 }
@@ -1550,44 +1393,41 @@ func (p *relationalTablesProjection) reduceLDAPIDPAdded(event eventstore.Event) 
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeLDAP),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-XCJ8w", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeLDAP),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceLDAPIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.LDAPIDPChangedEvent
 	switch e := event.(type) {
 	case *org.LDAPIDPChangedEvent:
 		idpEvent = e.LDAPIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.LDAPIDPChangedEvent:
 		idpEvent = e.LDAPIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
 	}
@@ -1598,12 +1438,12 @@ func (p *relationalTablesProjection) reduceLDAPIDPChanged(event eventstore.Event
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		ldap, err := idpRepo.GetLDAP(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		ldap, err := idpRepo.GetLDAP(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
 		payload := &ldap.LDAP
 		payloadChanged := p.reduceLDAPIDPChangedColumns(payload, &idpEvent)
@@ -1612,20 +1452,12 @@ func (p *relationalTablesProjection) reduceLDAPIDPChanged(event eventstore.Event
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 
 	}), nil
 }
@@ -1656,44 +1488,41 @@ func (p *relationalTablesProjection) reduceAppleIDPAdded(event eventstore.Event)
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeApple),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ku2YB", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeApple),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceAppleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.AppleIDPChangedEvent
 	switch e := event.(type) {
 	case *org.AppleIDPChangedEvent:
 		idpEvent = e.AppleIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.AppleIDPChangedEvent:
 		idpEvent = e.AppleIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
 	}
@@ -1704,12 +1533,12 @@ func (p *relationalTablesProjection) reduceAppleIDPChanged(event eventstore.Even
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		apple, err := idpRepo.GetApple(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		apple, err := idpRepo.GetApple(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
 		payload := &apple.Apple
 		payloadChanged := p.reduceAppleIDPChangedColumns(payload, &idpEvent)
@@ -1718,20 +1547,12 @@ func (p *relationalTablesProjection) reduceAppleIDPChanged(event eventstore.Even
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 
 	}), nil
 }
@@ -1765,44 +1586,41 @@ func (p *relationalTablesProjection) reduceSAMLIDPAdded(event eventstore.Event) 
 		return nil, err
 	}
 
-	return handler.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCol(IDPOrgId, orgId),
-			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeSAML),
-			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPAllowCreationCol, idpEvent.IsCreationAllowed),
-			handler.NewCol(IDPAllowLinkingCol, idpEvent.IsLinkingAllowed),
-			handler.NewCol(IDPAllowAutoCreationCol, idpEvent.IsAutoCreation),
-			handler.NewCol(IDPAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-			handler.NewCol(IDPAllowAutoLinkingCol, func() any {
-				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-					return nil
-				}
-				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
-			}()),
-			handler.NewCol(IDPPayloadCol, payloadJSON),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ksJ3N", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.IDProviderRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.IdentityProvider{
+			InstanceID:        idpEvent.Aggregate().InstanceID,
+			OrgID:             orgId,
+			ID:                idpEvent.ID,
+			State:             domain.IDPStateActive,
+			Name:              idpEvent.Name,
+			Type:              gu.Ptr(domain.IDPTypeSAML),
+			AllowCreation:     idpEvent.IsCreationAllowed,
+			AllowAutoCreation: idpEvent.IsAutoCreation,
+			AllowAutoUpdate:   idpEvent.IsAutoUpdate,
+			AllowLinking:      idpEvent.IsLinkingAllowed,
+			AutoLinkingField:  mapAutoLinkingField(idpEvent.AutoLinkingOption),
+			Payload:           payloadJSON,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
+		})
+	}), nil
 }
 
 func (p *relationalTablesProjection) reduceSAMLIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var orgCond handler.Condition
 	var idpEvent idp.SAMLIDPChangedEvent
 	switch e := event.(type) {
 	case *org.SAMLIDPChangedEvent:
 		idpEvent = e.SAMLIDPChangedEvent
 		orgId = &idpEvent.Aggregate().ResourceOwner
-		orgCond = handler.NewCond(IDPOrgId, orgId)
 	case *instance.SAMLIDPChangedEvent:
 		idpEvent = e.SAMLIDPChangedEvent
-		orgCond = handler.NewIsNullCond((IDPOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
 	}
@@ -1813,12 +1631,12 @@ func (p *relationalTablesProjection) reduceSAMLIDPChanged(event eventstore.Event
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
 		idpRepo := repository.IDProviderRepository()
-		saml, err := idpRepo.GetSAML(ctx, v3_sql.SQLTx(tx), idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		saml, err := idpRepo.GetSAML(ctx, v3_sql.SQLTx(tx), database.WithCondition(idpScopedCondition(idpRepo, idpEvent.Agg.InstanceID, idpEvent.ID, orgId)))
 		if err != nil {
 			return err
 		}
 
-		columns := p.reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+		changes := p.reduceIDPChangedTemplateColumns(idpRepo, idpEvent.Name, idpEvent.OptionChanges)
 
 		payload := &saml.SAML
 		payloadChanged := p.reduceSAMLIDPChangedColumns(payload, &idpEvent)
@@ -1827,46 +1645,38 @@ func (p *relationalTablesProjection) reduceSAMLIDPChanged(event eventstore.Event
 			if err != nil {
 				return err
 			}
-			columns = append(columns, handler.NewCol(IDPPayloadCol, payloadJSON))
+			changes = append(changes, idpRepo.SetPayload(string(payloadJSON)))
 		}
 
-		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
-
-		return handler.NewUpdateStatement(
-			&idpEvent,
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		).Execute(ctx, ex, projectionName)
+		changes = append(changes, idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
+		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.ID, orgId), changes...)
+		return err
 
 	}), nil
 }
 
-func (p *relationalTablesProjection) reduceIDPChangedTemplateColumns(name *string, optionChanges idp.OptionChanges) []handler.Column {
-	cols := make([]handler.Column, 0, 8)
+func (p *relationalTablesProjection) reduceIDPChangedTemplateColumns(repo domain.IDProviderRepository, name *string, optionChanges idp.OptionChanges) database.Changes {
+	changes := make(database.Changes, 0, 8)
 	if name != nil {
-		cols = append(cols, handler.NewCol(IDPTemplateNameCol, *name))
+		changes = append(changes, repo.SetName(*name))
 	}
 	if optionChanges.IsCreationAllowed != nil {
-		cols = append(cols, handler.NewCol(IDPAllowCreationCol, *optionChanges.IsCreationAllowed))
+		changes = append(changes, repo.SetAllowCreation(*optionChanges.IsCreationAllowed))
 	}
 	if optionChanges.IsLinkingAllowed != nil {
-		cols = append(cols, handler.NewCol(IDPAllowLinkingCol, *optionChanges.IsLinkingAllowed))
+		changes = append(changes, repo.SetAllowLinking(*optionChanges.IsLinkingAllowed))
 	}
 	if optionChanges.IsAutoCreation != nil {
-		cols = append(cols, handler.NewCol(IDPAllowAutoCreationCol, *optionChanges.IsAutoCreation))
+		changes = append(changes, repo.SetAllowAutoCreation(*optionChanges.IsAutoCreation))
 	}
 	if optionChanges.IsAutoUpdate != nil {
-		cols = append(cols, handler.NewCol(IDPAllowAutoUpdateCol, *optionChanges.IsAutoUpdate))
+		changes = append(changes, repo.SetAllowAutoUpdate(*optionChanges.IsAutoUpdate))
 	}
-	if optionChanges.AutoLinkingOption != nil && *optionChanges.AutoLinkingOption != internal_domain.AutoLinkingOptionUnspecified {
-		cols = append(cols, handler.NewCol(IDPAllowAutoLinkingCol, domain.IDPAutoLinkingField(*optionChanges.AutoLinkingOption)))
+	if optionChanges.AutoLinkingOption != nil {
+		changes = append(changes, repo.SetLinkingField(mapAutoLinkingField(*optionChanges.AutoLinkingOption)))
 	}
 
-	return cols
+	return changes
 }
 
 func (p *relationalTablesProjection) reduceOAuthIDPChangedColumns(payload *domain.OAuth, idpEvent *idp.OAuthIDPChangedEvent) bool {
@@ -2050,7 +1860,7 @@ func (p *relationalTablesProjection) reduceGitLabIDPChangedColumns(payload *doma
 	return payloadChange
 }
 
-func (p *relationalTablesProjection) reduceGitLabSelfHostedIDPChangedColumns(payload *domain.GitlabSelfHosting, idpEvent *idp.GitLabSelfHostedIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceGitLabSelfHostedIDPChangedColumns(payload *domain.GitlabSelfHosted, idpEvent *idp.GitLabSelfHostedIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true

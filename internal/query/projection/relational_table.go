@@ -635,19 +635,19 @@ func (p *relationalTablesProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  org.IDPOIDCConfigAddedEventType,
-					Reduce: p.reduceOIDCIDPAdded,
+					Reduce: p.reduceOIDCConfigAdded,
 				},
 				{
 					Event:  org.IDPOIDCConfigChangedEventType,
-					Reduce: p.reduceOIDCIDPChanged,
+					Reduce: p.reduceOIDCConfigChanged,
 				},
 				{
 					Event:  org.IDPJWTConfigAddedEventType,
-					Reduce: p.reduceJWTIDPAdded,
+					Reduce: p.reduceJWTConfigAdded,
 				},
 				{
 					Event:  org.IDPJWTConfigChangedEventType,
-					Reduce: p.reduceJWTIDPChanged,
+					Reduce: p.reduceJWTConfigChanged,
 				},
 				{
 					Event:  org.OAuthIDPAddedEventType,

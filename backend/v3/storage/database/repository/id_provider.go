@@ -18,48 +18,48 @@ func IDProviderRepository() domain.IDProviderRepository {
 }
 
 const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, auto_register, allow_creation, allow_auto_creation,` +
-	` allow_auto_update, allow_linking, auto_linking_field, styling_type, payload, created_at, updated_at` +
+	` allow_auto_update, allow_linking, auto_linking_field, payload, created_at, updated_at` +
 	` FROM zitadel.identity_providers`
 
-func (i *idProvider) Get(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IdentityProvider, error) {
-	builder := database.StatementBuilder{}
-
-	builder.WriteString(queryIDProviderStmt)
-
-	conditions := []database.Condition{id, i.InstanceIDCondition(instanceID), i.OrgIDCondition(orgID)}
-
-	writeCondition(&builder, database.And(conditions...))
-
-	return scanIDProvider(ctx, client, &builder)
-}
-
-func (i *idProvider) List(ctx context.Context, client database.QueryExecutor, conditions ...database.Condition) ([]*domain.IdentityProvider, error) {
-	builder := database.StatementBuilder{}
-
-	builder.WriteString(queryIDProviderStmt)
-
-	if conditions != nil {
-		writeCondition(&builder, database.And(conditions...))
+func (i *idProvider) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IdentityProvider, error) {
+	var options database.QueryOpts
+	for _, opt := range opts {
+		opt(&options)
+	}
+	if err := checkRestrictingColumns(options.Condition, i.InstanceIDColumn()); err != nil {
+		return nil, err
 	}
 
-	orderBy := database.OrderBy(i.CreatedAtColumn())
-	orderBy.Write(&builder)
+	builder := database.NewStatementBuilder(queryIDProviderStmt)
+	options.Write(builder)
 
-	return scanIDProviders(ctx, client, &builder)
+	return scanIDProvider(ctx, client, builder)
 }
 
-const createIDProviderStmtStart = `INSERT INTO zitadel.identity_providers` +
-	` (instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation,` +
-	` allow_auto_update, allow_linking, styling_type, payload) VALUES (`
+func (i *idProvider) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.IdentityProvider, error) {
+	var options database.QueryOpts
+	for _, opt := range opts {
+		opt(&options)
+	}
+	if err := checkRestrictingColumns(options.Condition, i.InstanceIDColumn()); err != nil {
+		return nil, err
+	}
 
-const createIDProviderStmtEnd = `) RETURNING created_at, updated_at`
+	builder := database.NewStatementBuilder(queryIDProviderStmt)
+	options.Write(builder)
+
+	return scanIDProviders(ctx, client, builder)
+}
+
+const (
+	createIDProviderStmtStart = `INSERT INTO zitadel.identity_providers` +
+		` (instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation,` +
+		` allow_auto_update, allow_linking, payload, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, `
+	createIDProviderStmtEnd = `) RETURNING created_at, updated_at`
+)
 
 func (i *idProvider) Create(ctx context.Context, client database.QueryExecutor, idp *domain.IdentityProvider) error {
-	builder := database.StatementBuilder{}
-
-	builder.WriteString(createIDProviderStmtStart)
-
-	builder.WriteArgs(
+	builder := database.NewStatementBuilder(createIDProviderStmtStart,
 		idp.InstanceID,
 		idp.OrgID,
 		idp.ID,
@@ -70,364 +70,223 @@ func (i *idProvider) Create(ctx context.Context, client database.QueryExecutor, 
 		idp.AllowAutoCreation,
 		idp.AllowAutoUpdate,
 		idp.AllowLinking,
-		idp.StylingType,
-		string(idp.Payload))
-
+		idp.Payload,
+	)
+	var createdAt any = database.NowInstruction
+	if !idp.CreatedAt.IsZero() {
+		createdAt = idp.CreatedAt
+	}
+	builder.WriteArgs(createdAt, createdAt)
 	builder.WriteString(createIDProviderStmtEnd)
 
-	err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&idp.CreatedAt, &idp.UpdatedAt)
-	return err
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&idp.CreatedAt, &idp.UpdatedAt)
 }
 
-func (i *idProvider) Update(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string, changes ...database.Change) (int64, error) {
+func (i *idProvider) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if changes == nil {
 		return 0, database.ErrNoChanges
 	}
-	changes = append(changes, i.SetUpdatedAt(nil))
-	builder := database.StatementBuilder{}
-	builder.WriteString(`UPDATE zitadel.identity_providers SET `)
-
-	conditions := []database.Condition{
-		id,
-		i.InstanceIDCondition(instanceID),
-		i.OrgIDCondition(orgID),
+	if err := checkRestrictingColumns(condition, i.InstanceIDColumn(), i.IDColumn()); err != nil {
+		return 0, err
 	}
-	err := database.Changes(changes).Write(&builder)
+	dbChanges := database.Changes(changes)
+	if !dbChanges.IsOnColumn(i.UpdatedAtColumn()) {
+		dbChanges = append(dbChanges, i.SetUpdatedAt(nil))
+	}
+
+	builder := database.NewStatementBuilder(`UPDATE zitadel.identity_providers SET `)
+	err := dbChanges.Write(builder)
 	if err != nil {
 		return 0, err
 	}
-	writeCondition(&builder, database.And(conditions...))
-
-	stmt := builder.String()
-
-	return client.Exec(ctx, stmt, builder.Args()...)
-}
-
-func (i *idProvider) Delete(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (int64, error) {
-	builder := database.StatementBuilder{}
-
-	builder.WriteString(`DELETE FROM zitadel.identity_providers`)
-
-	conditions := []database.Condition{
-		id,
-		i.InstanceIDCondition(instanceID),
-		i.OrgIDCondition(orgID),
-	}
-	writeCondition(&builder, database.And(conditions...))
+	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (i *idProvider) GetOIDC(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPOIDC, error) {
-	idpOIDC := &domain.IDPOIDC{}
-	var err error
-
-	idpOIDC.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
-	if err != nil {
-		return nil, err
+func (i *idProvider) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	if err := checkRestrictingColumns(condition, i.InstanceIDColumn(), i.IDColumn()); err != nil {
+		return 0, err
 	}
 
-	var idpType domain.IDPType
-	if idpOIDC.Type != nil {
-		idpType = *idpOIDC.Type
-	}
+	builder := database.NewStatementBuilder(`DELETE FROM zitadel.identity_providers`)
+	writeCondition(builder, condition)
 
-	if idpType != domain.IDPTypeOIDC {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeOIDC, idpType)
-	}
-
-	err = json.Unmarshal(idpOIDC.Payload, idpOIDC)
-	if err != nil {
-		return nil, err
-	}
-
-	return idpOIDC, nil
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (i *idProvider) GetJWT(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPJWT, error) {
-	idpJWT := &domain.IDPJWT{}
-	var err error
-
-	idpJWT.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+func (i *idProvider) GetOIDC(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPOIDC, error) {
+	idp, typ, err := getIDP[domain.OIDC](ctx, client, i, domain.IDPTypeOIDC, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	var idpType domain.IDPType
-	if idpJWT.Type != nil {
-		idpType = *idpJWT.Type
-	}
-
-	if idpType != domain.IDPTypeJWT {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeJWT, idpType)
-	}
-
-	err = json.Unmarshal(idpJWT.Payload, idpJWT)
-	if err != nil {
-		return nil, err
-	}
-
-	return idpJWT, nil
+	return &domain.IDPOIDC{
+		IdentityProvider: idp,
+		OIDC:             *typ,
+	}, nil
 }
 
-func (i *idProvider) GetOAuth(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPOAuth, error) {
-	idpOAuth := &domain.IDPOAuth{}
-	var err error
-
-	idpOAuth.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+func (i *idProvider) GetJWT(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPJWT, error) {
+	idp, typ, err := getIDP[domain.JWT](ctx, client, i, domain.IDPTypeJWT, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	var idpType domain.IDPType
-	if idpOAuth.Type != nil {
-		idpType = *idpOAuth.Type
-	}
-
-	if idpType != domain.IDPTypeOAuth {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeOAuth, idpType)
-	}
-
-	err = json.Unmarshal(idpOAuth.Payload, idpOAuth)
-	if err != nil {
-		return nil, err
-	}
-
-	return idpOAuth, nil
+	return &domain.IDPJWT{
+		IdentityProvider: idp,
+		JWT:              *typ,
+	}, nil
 }
 
-func (i *idProvider) GetAzureAD(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPAzureAD, error) {
-	idpAzure := &domain.IDPAzureAD{}
-	var err error
-
-	idpAzure.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+func (i *idProvider) GetOAuth(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPOAuth, error) {
+	idp, typ, err := getIDP[domain.OAuth](ctx, client, i, domain.IDPTypeOAuth, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	var idpType domain.IDPType
-	if idpAzure.Type != nil {
-		idpType = *idpAzure.Type
-	}
-
-	if idpType != domain.IDPTypeAzure {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeAzure, idpType)
-	}
-
-	err = json.Unmarshal(idpAzure.Payload, idpAzure)
-	if err != nil {
-		return nil, err
-	}
-
-	return idpAzure, nil
+	return &domain.IDPOAuth{
+		IdentityProvider: idp,
+		OAuth:            *typ,
+	}, nil
 }
 
-func (i *idProvider) GetGoogle(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPGoogle, error) {
-	idpGoogle := &domain.IDPGoogle{}
-	var err error
-
-	idpGoogle.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+func (i *idProvider) GetAzureAD(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPAzureAD, error) {
+	idp, typ, err := getIDP[domain.Azure](ctx, client, i, domain.IDPTypeAzure, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	var idpType domain.IDPType
-	if idpGoogle.Type != nil {
-		idpType = *idpGoogle.Type
-	}
-
-	if idpType != domain.IDPTypeGoogle {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGoogle, idpType)
-	}
-
-	err = json.Unmarshal(idpGoogle.Payload, idpGoogle)
-	if err != nil {
-		return nil, err
-	}
-
-	return idpGoogle, nil
+	return &domain.IDPAzureAD{
+		IdentityProvider: idp,
+		Azure:            *typ,
+	}, nil
 }
 
-func (i *idProvider) GetGithub(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPGithub, error) {
-	idpGithub := &domain.IDPGithub{}
-	var err error
-
-	idpGithub.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+func (i *idProvider) GetGoogle(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPGoogle, error) {
+	idp, typ, err := getIDP[domain.Google](ctx, client, i, domain.IDPTypeGoogle, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	var idpType domain.IDPType
-	if idpGithub.Type != nil {
-		idpType = *idpGithub.Type
-	}
-
-	if idpType != domain.IDPTypeGitHub {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitHub, idpType)
-	}
-
-	err = json.Unmarshal(idpGithub.Payload, idpGithub)
-	if err != nil {
-		return nil, err
-	}
-
-	return idpGithub, nil
+	return &domain.IDPGoogle{
+		IdentityProvider: idp,
+		Google:           *typ,
+	}, nil
 }
 
-func (i *idProvider) GetGithubEnterprise(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPGithubEnterprise, error) {
-	idpGithubEnterprise := &domain.IDPGithubEnterprise{}
-	var err error
-
-	idpGithubEnterprise.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+func (i *idProvider) GetGithub(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPGithub, error) {
+	idp, typ, err := getIDP[domain.Github](ctx, client, i, domain.IDPTypeGitHub, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	var idpType domain.IDPType
-	if idpGithubEnterprise.Type != nil {
-		idpType = *idpGithubEnterprise.Type
-	}
-
-	if idpType != domain.IDPTypeGitHubEnterprise {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitHubEnterprise, idpType)
-	}
-
-	err = json.Unmarshal(idpGithubEnterprise.Payload, idpGithubEnterprise)
-	if err != nil {
-		return nil, err
-	}
-
-	return idpGithubEnterprise, nil
+	return &domain.IDPGithub{
+		IdentityProvider: idp,
+		Github:           *typ,
+	}, nil
 }
 
-func (i *idProvider) GetGitlab(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPGitlab, error) {
-	idpGitlab := &domain.IDPGitlab{}
-	var err error
-
-	idpGitlab.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+func (i *idProvider) GetGithubEnterprise(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPGithubEnterprise, error) {
+	idp, typ, err := getIDP[domain.GithubEnterprise](ctx, client, i, domain.IDPTypeGitHubEnterprise, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	var idpType domain.IDPType
-	if idpGitlab.Type != nil {
-		idpType = *idpGitlab.Type
-	}
-
-	if idpType != domain.IDPTypeGitLab {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitLab, idpType)
-	}
-
-	err = json.Unmarshal(idpGitlab.Payload, idpGitlab)
-	if err != nil {
-		return nil, err
-	}
-
-	return idpGitlab, nil
+	return &domain.IDPGithubEnterprise{
+		IdentityProvider: idp,
+		GithubEnterprise: *typ,
+	}, nil
 }
 
-func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPGitlabSelfHosting, error) {
-	idpGitlabSelfHosting := &domain.IDPGitlabSelfHosting{}
-	var err error
-
-	idpGitlabSelfHosting.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+func (i *idProvider) GetGitlab(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPGitlab, error) {
+	idp, typ, err := getIDP[domain.Gitlab](ctx, client, i, domain.IDPTypeGitLab, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	var idpType domain.IDPType
-	if idpGitlabSelfHosting.Type != nil {
-		idpType = *idpGitlabSelfHosting.Type
-	}
-
-	if idpType != domain.IDPTypeGitLabSelfHosted {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitLabSelfHosted, idpType)
-	}
-
-	err = json.Unmarshal(idpGitlabSelfHosting.Payload, idpGitlabSelfHosting)
-	if err != nil {
-		return nil, err
-	}
-
-	return idpGitlabSelfHosting, nil
+	return &domain.IDPGitlab{
+		IdentityProvider: idp,
+		Gitlab:           *typ,
+	}, nil
 }
 
-func (i *idProvider) GetLDAP(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPLDAP, error) {
-	ldap := &domain.IDPLDAP{}
-	var err error
-
-	ldap.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+func (i *idProvider) GetGitlabSelfHosted(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPGitlabSelfHosted, error) {
+	idp, typ, err := getIDP[domain.GitlabSelfHosted](ctx, client, i, domain.IDPTypeGitLabSelfHosted, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	var idpType domain.IDPType
-	if ldap.Type != nil {
-		idpType = *ldap.Type
-	}
-
-	if idpType != domain.IDPTypeLDAP {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeLDAP, idpType)
-	}
-
-	err = json.Unmarshal(ldap.Payload, ldap)
-	if err != nil {
-		return nil, err
-	}
-
-	return ldap, nil
+	return &domain.IDPGitlabSelfHosted{
+		IdentityProvider: idp,
+		GitlabSelfHosted: *typ,
+	}, nil
 }
 
-func (i *idProvider) GetApple(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPApple, error) {
-	apple := &domain.IDPApple{}
-	var err error
-
-	apple.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+func (i *idProvider) GetLDAP(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPLDAP, error) {
+	idp, typ, err := getIDP[domain.LDAP](ctx, client, i, domain.IDPTypeLDAP, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	var idpType domain.IDPType
-	if apple.Type != nil {
-		idpType = *apple.Type
-	}
-
-	if idpType != domain.IDPTypeApple {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeApple, idpType)
-	}
-
-	err = json.Unmarshal(apple.Payload, apple)
-	if err != nil {
-		return nil, err
-	}
-
-	return apple, nil
+	return &domain.IDPLDAP{
+		IdentityProvider: idp,
+		LDAP:             *typ,
+	}, nil
 }
 
-func (i *idProvider) GetSAML(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPSAML, error) {
-	saml := &domain.IDPSAML{}
-	var err error
-
-	saml.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+func (i *idProvider) GetApple(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPApple, error) {
+	idp, typ, err := getIDP[domain.Apple](ctx, client, i, domain.IDPTypeApple, opts...)
 	if err != nil {
 		return nil, err
+	}
+
+	return &domain.IDPApple{
+		IdentityProvider: idp,
+		Apple:            *typ,
+	}, nil
+}
+
+func (i *idProvider) GetSAML(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPSAML, error) {
+	idp, typ, err := getIDP[domain.SAML](ctx, client, i, domain.IDPTypeSAML, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.IDPSAML{
+		IdentityProvider: idp,
+		SAML:             *typ,
+	}, nil
+}
+
+type idpType interface {
+	domain.OIDC | domain.JWT | domain.OAuth | domain.Azure | domain.Google |
+		domain.Github | domain.GithubEnterprise | domain.Gitlab | domain.GitlabSelfHosted |
+		domain.LDAP | domain.Apple | domain.SAML
+}
+
+func getIDP[T idpType](ctx context.Context, client database.QueryExecutor, repo *idProvider, expectedType domain.IDPType, opts ...database.QueryOption) (*domain.IdentityProvider, *T, error) {
+	idp, err := repo.Get(ctx, client, opts...)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	var idpType domain.IDPType
-	if saml.Type != nil {
-		idpType = *saml.Type
+	if idp.Type != nil {
+		idpType = *idp.Type
 	}
 
-	if idpType != domain.IDPTypeSAML {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeSAML, idpType)
+	if idpType != expectedType {
+		return nil, nil, domain.NewIDPWrongTypeError(expectedType, idpType)
 	}
 
-	err = json.Unmarshal(saml.Payload, saml)
+	var specificIDP T
+	err = json.Unmarshal(idp.Payload, &specificIDP)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return saml, nil
+	return idp, &specificIDP, nil
 }
 
 // -------------------------------------------------------------
@@ -486,12 +345,8 @@ func (idProvider) AllowLinkingColumn() database.Column {
 	return database.NewColumn("identity_providers", "allow_linking")
 }
 
-func (idProvider) AllowAutoLinkingColumn() database.Column {
+func (idProvider) AutoLinkingFieldColumn() database.Column {
 	return database.NewColumn("identity_providers", "auto_linking_field")
-}
-
-func (idProvider) StylingTypeColumn() database.Column {
-	return database.NewColumn("identity_providers", "styling_type")
 }
 
 func (idProvider) PayloadColumn() database.Column {
@@ -528,7 +383,7 @@ func (i idProvider) OrgIDCondition(id *string) database.Condition {
 	return database.NewTextCondition(i.OrgIDColumn(), database.TextOperationEqual, *id)
 }
 
-func (i idProvider) IDCondition(id string) domain.IDPIdentifierCondition {
+func (i idProvider) IDCondition(id string) database.Condition {
 	return database.NewTextCondition(i.IDColumn(), database.TextOperationEqual, id)
 }
 
@@ -536,44 +391,12 @@ func (i idProvider) StateCondition(state domain.IDPState) database.Condition {
 	return database.NewTextCondition(i.StateColumn(), database.TextOperationEqual, state.String())
 }
 
-func (i idProvider) NameCondition(name string) domain.IDPIdentifierCondition {
-	return database.NewTextCondition(i.NameColumn(), database.TextOperationEqual, name)
+func (i idProvider) NameCondition(op database.TextOperation, name string) database.Condition {
+	return database.NewTextCondition(i.NameColumn(), op, name)
 }
 
 func (i idProvider) TypeCondition(typ domain.IDPType) database.Condition {
 	return database.NewNumberCondition(i.TypeColumn(), database.NumberOperationEqual, typ)
-}
-
-func (i idProvider) AutoRegisterCondition(allow bool) database.Condition {
-	return database.NewBooleanCondition(i.AutoRegisterColumn(), allow)
-}
-
-func (i idProvider) AllowCreationCondition(allow bool) database.Condition {
-	return database.NewBooleanCondition(i.AllowCreationColumn(), allow)
-}
-
-func (i idProvider) AllowAutoCreationCondition(allow bool) database.Condition {
-	return database.NewBooleanCondition(i.AllowAutoCreationColumn(), allow)
-}
-
-func (i idProvider) AllowAutoUpdateCondition(allow bool) database.Condition {
-	return database.NewBooleanCondition(i.AllowAutoUpdateColumn(), allow)
-}
-
-func (i idProvider) AllowLinkingCondition(allow bool) database.Condition {
-	return database.NewBooleanCondition(i.AllowLinkingColumn(), allow)
-}
-
-func (i idProvider) AllowAutoLinkingCondition(linkingType domain.IDPAutoLinkingField) database.Condition {
-	return database.NewTextCondition(i.AllowAutoLinkingColumn(), database.TextOperationEqual, linkingType.String())
-}
-
-func (i idProvider) StylingTypeCondition(style int16) database.Condition {
-	return database.NewNumberCondition(i.StylingTypeColumn(), database.NumberOperationEqual, style)
-}
-
-func (i idProvider) PayloadCondition(payload string) database.Condition {
-	return database.NewTextCondition(i.PayloadColumn(), database.TextOperationEqual, payload)
 }
 
 // -------------------------------------------------------------
@@ -608,12 +431,8 @@ func (i idProvider) SetAllowLinking(allow bool) database.Change {
 	return database.NewChange(i.AllowLinkingColumn(), allow)
 }
 
-func (i idProvider) SetAutoAllowLinking(allow bool) database.Change {
-	return database.NewChange(i.AllowAutoLinkingColumn(), allow)
-}
-
-func (i idProvider) SetStylingType(stylingType int16) database.Change {
-	return database.NewChange(i.StylingTypeColumn(), stylingType)
+func (i idProvider) SetLinkingField(field *domain.IDPAutoLinkingField) database.Change {
+	return database.NewChangePtr(i.AutoLinkingFieldColumn(), field)
 }
 
 func (i idProvider) SetPayload(payload string) database.Change {

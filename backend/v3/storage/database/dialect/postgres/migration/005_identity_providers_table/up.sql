@@ -16,7 +16,6 @@ CREATE TABLE zitadel.identity_providers (
     , allow_auto_update BOOLEAN NOT NULL DEFAULT TRUE
     , allow_linking BOOLEAN NOT NULL DEFAULT TRUE
     , auto_linking_field SMALLINT DEFAULT NULL
-    , styling_type SMALLINT
     , payload JSONB
     
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()

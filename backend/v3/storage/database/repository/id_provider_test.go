@@ -63,7 +63,6 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       &stylingType,
 				Payload:           []byte("{}"),
 			},
 		},
@@ -79,7 +78,6 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       &stylingType,
 				Payload:           []byte("{}"),
 			},
 			err: new(database.CheckError),
@@ -100,7 +98,6 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 
@@ -128,7 +125,6 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 
@@ -185,7 +181,6 @@ func TestCreateIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
 
@@ -209,7 +204,6 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				},
 			}
@@ -226,7 +220,6 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       &stylingType,
 				Payload:           []byte("{}"),
 			},
 			err: new(database.CheckError),
@@ -243,7 +236,6 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       &stylingType,
 				Payload:           []byte("{}"),
 			},
 			err: new(database.CheckError),
@@ -259,7 +251,6 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       &stylingType,
 				Payload:           []byte("{}"),
 			},
 			err: new(database.IntegrityViolationError),
@@ -277,7 +268,6 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       &stylingType,
 				Payload:           []byte("{}"),
 			},
 			err: new(database.ForeignKeyError),
@@ -295,7 +285,6 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       &stylingType,
 				Payload:           []byte("{}"),
 			},
 			err: new(database.ForeignKeyError),
@@ -330,11 +319,7 @@ func TestCreateIDProvider(t *testing.T) {
 			afterCreate := time.Now()
 
 			// check organization values
-			idp, err = idpRepo.Get(t.Context(), tx,
-				idpRepo.IDCondition(idp.ID),
-				idp.InstanceID,
-				idp.OrgID,
-			)
+			idp, err = idpRepo.Get(t.Context(), tx, database.WithCondition(database.And(idpRepo.PrimaryKeyCondition(idp.InstanceID, idp.ID), idpRepo.OrgIDCondition(idp.OrgID))))
 			require.NoError(t, err)
 
 			assert.Equal(t, tt.idp.InstanceID, idp.InstanceID)
@@ -347,7 +332,6 @@ func TestCreateIDProvider(t *testing.T) {
 			assert.Equal(t, tt.idp.AllowAutoCreation, idp.AllowAutoCreation)
 			assert.Equal(t, tt.idp.AllowAutoUpdate, idp.AllowAutoUpdate)
 			assert.Equal(t, tt.idp.AllowLinking, idp.AllowLinking)
-			assert.Equal(t, tt.idp.StylingType, idp.StylingType)
 			assert.Equal(t, tt.idp.Payload, idp.Payload)
 			assert.WithinRange(t, idp.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, idp.UpdatedAt, beforeCreate, afterCreate)
@@ -394,7 +378,6 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 
@@ -420,7 +403,6 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 
@@ -446,7 +428,6 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 
@@ -472,7 +453,6 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 
@@ -498,7 +478,6 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 
@@ -508,33 +487,6 @@ func TestUpdateIDProvider(t *testing.T) {
 				return &idp
 			},
 			update:       []database.Change{idpRepo.SetAllowLinking(false)},
-			rowsAffected: 1,
-		},
-		{
-			name: "happy path update StylingType",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateActive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					StylingType:       &stylingType,
-					Payload:           []byte("{}"),
-				}
-
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
-				newStyleType := int16(2)
-				idp.StylingType = &newStyleType
-				return &idp
-			},
-			update:       []database.Change{idpRepo.SetStylingType(2)},
 			rowsAffected: 1,
 		},
 		{
@@ -551,7 +503,6 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 
@@ -582,9 +533,13 @@ func TestUpdateIDProvider(t *testing.T) {
 
 			// update idp
 			rowsAffected, err := idpRepo.Update(t.Context(), tx,
-				idpRepo.IDCondition(createdIDP.ID),
-				createdIDP.InstanceID,
-				createdIDP.OrgID,
+				database.And(
+					idpRepo.PrimaryKeyCondition(
+						createdIDP.InstanceID,
+						createdIDP.ID,
+					),
+					idpRepo.OrgIDCondition(createdIDP.OrgID),
+				),
 				tt.update...,
 			)
 			afterUpdate := time.Now()
@@ -598,9 +553,10 @@ func TestUpdateIDProvider(t *testing.T) {
 
 			// check idp values
 			idp, err := idpRepo.Get(t.Context(), tx,
-				idpRepo.IDCondition(createdIDP.ID),
-				createdIDP.InstanceID,
-				createdIDP.OrgID,
+				database.WithCondition(database.And(
+					idpRepo.PrimaryKeyCondition(createdIDP.InstanceID, createdIDP.ID),
+					idpRepo.OrgIDCondition(createdIDP.OrgID),
+				)),
 			)
 			require.NoError(t, err)
 
@@ -614,7 +570,6 @@ func TestUpdateIDProvider(t *testing.T) {
 			assert.Equal(t, createdIDP.AllowAutoCreation, idp.AllowAutoCreation)
 			assert.Equal(t, createdIDP.AllowAutoUpdate, idp.AllowAutoUpdate)
 			assert.Equal(t, createdIDP.AllowLinking, idp.AllowLinking)
-			assert.Equal(t, createdIDP.StylingType, idp.StylingType)
 			assert.Equal(t, createdIDP.Payload, idp.Payload)
 			assert.WithinRange(t, idp.UpdatedAt, beforeUpdate, afterUpdate)
 		})
@@ -639,218 +594,75 @@ func TestGetIDProvider(t *testing.T) {
 	createOrganization(t, tx, instanceId)
 
 	idpRepo := repository.IDProviderRepository()
+
+	idp := domain.IdentityProvider{
+		InstanceID:        instanceId,
+		OrgID:             &orgId,
+		ID:                gofakeit.UUID(),
+		State:             domain.IDPStateActive,
+		Name:              gofakeit.Name(),
+		Type:              gu.Ptr(domain.IDPTypeOIDC),
+		AllowCreation:     true,
+		AllowAutoCreation: true,
+		AllowAutoUpdate:   true,
+		AllowLinking:      true,
+		Payload:           []byte("{}"),
+	}
+	err = idpRepo.Create(t.Context(), tx, &idp)
+	require.NoError(t, err)
+
 	type test struct {
-		name                   string
-		testFunc               func(t *testing.T) *domain.IdentityProvider
-		idpIdentifierCondition database.Condition
-		err                    error
+		name      string
+		condition database.Condition
+		err       error
 	}
 
 	tests := []test{
-		func() test {
-			id := gofakeit.Name()
-			return test{
-				name: "happy path get using id",
-				testFunc: func(t *testing.T) *domain.IdentityProvider {
-					idp := domain.IdentityProvider{
-						InstanceID:        instanceId,
-						OrgID:             &orgId,
-						ID:                id,
-						State:             domain.IDPStateActive,
-						Name:              gofakeit.Name(),
-						Type:              gu.Ptr(domain.IDPTypeOIDC),
-						AllowCreation:     true,
-						AllowAutoCreation: true,
-						AllowAutoUpdate:   true,
-						AllowLinking:      true,
-						StylingType:       &stylingType,
-						Payload:           []byte("{}"),
-					}
-
-					err := idpRepo.Create(t.Context(), tx, &idp)
-					require.NoError(t, err)
-					return &idp
-				},
-				idpIdentifierCondition: idpRepo.IDCondition(id),
-			}
-		}(),
-		func() test {
-			name := gofakeit.Name()
-			return test{
-				name: "happy path get using name",
-				testFunc: func(t *testing.T) *domain.IdentityProvider {
-					idp := domain.IdentityProvider{
-						InstanceID:        instanceId,
-						OrgID:             &orgId,
-						ID:                gofakeit.Name(),
-						State:             domain.IDPStateActive,
-						Name:              name,
-						Type:              gu.Ptr(domain.IDPTypeOIDC),
-						AllowCreation:     true,
-						AllowAutoCreation: true,
-						AllowAutoUpdate:   true,
-						AllowLinking:      true,
-						StylingType:       &stylingType,
-						Payload:           []byte("{}"),
-					}
-
-					err := idpRepo.Create(t.Context(), tx, &idp)
-					require.NoError(t, err)
-					return &idp
-				},
-				idpIdentifierCondition: idpRepo.NameCondition(name),
-			}
-		}(),
 		{
-			name: "happy path using styling type",
-			testFunc: func(t *testing.T) *domain.IdentityProvider {
-				stylingType := 2
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateActive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					StylingType:       gu.Ptr(int16(stylingType)),
-					Payload:           []byte("{}"),
-				}
-
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
-				return &idp
-			},
-			idpIdentifierCondition: idpRepo.StylingTypeCondition(2),
+			name:      "happy path get using id",
+			condition: idpRepo.PrimaryKeyCondition(idp.InstanceID, idp.ID),
 		},
 		{
-			name: "get using non existent id",
-			testFunc: func(t *testing.T) *domain.IdentityProvider {
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateActive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					StylingType:       &stylingType,
-					Payload:           []byte("{}"),
-				}
-
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
-				return &idp
-			},
-			idpIdentifierCondition: idpRepo.IDCondition("non-existent-id"),
-			err:                    new(database.NoRowFoundError),
+			name: "happy path get using name",
+			condition: database.And(
+				idpRepo.InstanceIDCondition(idp.InstanceID),
+				idpRepo.NameCondition(database.TextOperationEqual, idp.Name),
+			),
+		},
+		{
+			name:      "get using non existent id",
+			condition: idpRepo.PrimaryKeyCondition(idp.InstanceID, "non-existent-id"),
+			err:       new(database.NoRowFoundError),
 		},
 		{
 			name: "get using non existent name",
-			testFunc: func(t *testing.T) *domain.IdentityProvider {
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateActive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					StylingType:       &stylingType,
-					Payload:           []byte("{}"),
-				}
-
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
-				return &idp
-			},
-			idpIdentifierCondition: idpRepo.NameCondition("non-existent-name"),
-			err:                    new(database.NoRowFoundError),
+			condition: database.And(
+				idpRepo.InstanceIDCondition(idp.InstanceID),
+				idpRepo.NameCondition(database.TextOperationEqual, "non-existent-name"),
+			),
+			err: new(database.NoRowFoundError),
 		},
-		func() test {
-			id := gofakeit.Name()
-			return test{
-				name: "non existent orgID",
-				testFunc: func(t *testing.T) *domain.IdentityProvider {
-					idp := domain.IdentityProvider{
-						InstanceID:        instanceId,
-						OrgID:             &orgId,
-						ID:                id,
-						State:             domain.IDPStateActive,
-						Name:              gofakeit.Name(),
-						Type:              gu.Ptr(domain.IDPTypeOIDC),
-						AllowCreation:     true,
-						AllowAutoCreation: true,
-						AllowAutoUpdate:   true,
-						AllowLinking:      true,
-						StylingType:       &stylingType,
-						Payload:           []byte("{}"),
-					}
-
-					err := idpRepo.Create(t.Context(), tx, &idp)
-					require.NoError(t, err)
-					idp.OrgID = gu.Ptr("non-existent-orgID")
-					return &idp
-				},
-				idpIdentifierCondition: idpRepo.IDCondition(id),
-				err:                    new(database.NoRowFoundError),
-			}
-		}(),
-		func() test {
-			name := gofakeit.Name()
-			return test{
-				name: "non existent instanceID",
-				testFunc: func(t *testing.T) *domain.IdentityProvider {
-					idp := domain.IdentityProvider{
-						InstanceID:        instanceId,
-						OrgID:             &orgId,
-						ID:                gofakeit.Name(),
-						State:             domain.IDPStateActive,
-						Name:              name,
-						Type:              gu.Ptr(domain.IDPTypeOIDC),
-						AllowCreation:     true,
-						AllowAutoCreation: true,
-						AllowAutoUpdate:   true,
-						AllowLinking:      true,
-						StylingType:       &stylingType,
-						Payload:           []byte("{}"),
-					}
-
-					err := idpRepo.Create(t.Context(), tx, &idp)
-					require.NoError(t, err)
-					idp.InstanceID = "non-existent-instanceID"
-					return &idp
-				},
-				idpIdentifierCondition: idpRepo.NameCondition(name),
-				err:                    new(database.NoRowFoundError),
-			}
-		}(),
+		{
+			name: "non existent orgID",
+			condition: database.And(
+				idpRepo.PrimaryKeyCondition(idp.InstanceID, idp.ID),
+				idpRepo.OrgIDCondition(gu.Ptr("non-existing-org-id")),
+			),
+			err: new(database.NoRowFoundError),
+		},
+		{
+			name:      "non existent instanceID",
+			condition: idpRepo.PrimaryKeyCondition("non-existent-instance-id", idp.ID),
+			err:       new(database.NoRowFoundError),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			var idp *domain.IdentityProvider
-			if tt.testFunc != nil {
-				idp = tt.testFunc(t)
-			}
-
 			// get idp
-			returnedIDP, err := idpRepo.Get(t.Context(), tx,
-				tt.idpIdentifierCondition,
-				idp.InstanceID,
-				idp.OrgID,
-			)
+			returnedIDP, err := idpRepo.Get(t.Context(), tx, database.WithCondition(tt.condition))
+			require.ErrorIs(t, err, tt.err)
 			if err != nil {
-				require.ErrorIs(t, tt.err, err)
 				return
 			}
 
@@ -864,7 +676,6 @@ func TestGetIDProvider(t *testing.T) {
 			assert.Equal(t, returnedIDP.AllowAutoCreation, idp.AllowAutoCreation)
 			assert.Equal(t, returnedIDP.AllowAutoUpdate, idp.AllowAutoUpdate)
 			assert.Equal(t, returnedIDP.AllowLinking, idp.AllowLinking)
-			assert.Equal(t, returnedIDP.StylingType, idp.StylingType)
 			assert.Equal(t, returnedIDP.Payload, idp.Payload)
 		})
 	}
@@ -922,7 +733,6 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(t.Context(), tx, &idp)
@@ -943,7 +753,6 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
 
@@ -986,7 +795,6 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(t.Context(), tx, &idp)
@@ -1007,7 +815,6 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
 
@@ -1039,7 +846,6 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
 
@@ -1070,7 +876,6 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
 
@@ -1102,7 +907,6 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
 					err := idpRepo.Create(t.Context(), tx, &idp)
@@ -1123,7 +927,6 @@ func TestListIDProvider(t *testing.T) {
 							AllowAutoCreation: true,
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
-							StylingType:       &stylingType,
 							Payload:           []byte("{}"),
 						}
 
@@ -1156,7 +959,6 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(t.Context(), tx, &idp)
@@ -1178,7 +980,6 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
 
@@ -1211,7 +1012,6 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
 					err := idpRepo.Create(t.Context(), tx, &idp)
@@ -1232,7 +1032,6 @@ func TestListIDProvider(t *testing.T) {
 							AllowAutoCreation: true,
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
-							StylingType:       &stylingType,
 							Payload:           []byte("{}"),
 						}
 
@@ -1244,7 +1043,7 @@ func TestListIDProvider(t *testing.T) {
 
 					return idps
 				},
-				conditionClauses: []database.Condition{idpRepo.NameCondition(name)},
+				conditionClauses: []database.Condition{idpRepo.NameCondition(database.TextOperationEqual, name)},
 			}
 		}(),
 		{
@@ -1264,7 +1063,6 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(t.Context(), tx, &idp)
@@ -1286,7 +1084,6 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
 
@@ -1300,329 +1097,6 @@ func TestListIDProvider(t *testing.T) {
 			},
 			conditionClauses: []database.Condition{idpRepo.TypeCondition(domain.IDPTypeLDAP)},
 		},
-		{
-			name: "multiple idps filter on AllowCreation",
-			testFunc: func(t *testing.T) []*domain.IdentityProvider {
-				// create idp
-				// this idp is created as an additional idp which should NOT
-				// be returned in the results of this test case
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateInactive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					StylingType:       &stylingType,
-					Payload:           []byte("{}"),
-				}
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
-
-				noOfIDPs := 5
-				idps := make([]*domain.IdentityProvider, noOfIDPs)
-				for i := range noOfIDPs {
-
-					idp := domain.IdentityProvider{
-						InstanceID: instanceId,
-						OrgID:      &orgId,
-						ID:         gofakeit.Name(),
-						State:      domain.IDPStateActive,
-						Name:       gofakeit.Name(),
-						Type:       gu.Ptr(domain.IDPTypeLDAP),
-						// AllowCreation set to false
-						AllowCreation:     false,
-						AllowAutoCreation: true,
-						AllowAutoUpdate:   true,
-						AllowLinking:      true,
-						StylingType:       &stylingType,
-						Payload:           []byte("{}"),
-					}
-
-					err := idpRepo.Create(t.Context(), tx, &idp)
-					require.NoError(t, err)
-
-					idps[i] = &idp
-				}
-
-				return idps
-			},
-			conditionClauses: []database.Condition{idpRepo.AllowCreationCondition(false)},
-		},
-		{
-			name: "multiple idps filter on AllowAutoCreation",
-			testFunc: func(t *testing.T) []*domain.IdentityProvider {
-				// create idp
-				// this idp is created as an additional idp which should NOT
-				// be returned in the results of this test case
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateInactive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					StylingType:       &stylingType,
-					Payload:           []byte("{}"),
-				}
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
-
-				noOfIDPs := 5
-				idps := make([]*domain.IdentityProvider, noOfIDPs)
-				for i := range noOfIDPs {
-
-					idp := domain.IdentityProvider{
-						InstanceID:    instanceId,
-						OrgID:         &orgId,
-						ID:            gofakeit.Name(),
-						State:         domain.IDPStateActive,
-						Name:          gofakeit.Name(),
-						Type:          gu.Ptr(domain.IDPTypeLDAP),
-						AllowCreation: true,
-						// AllowAutoCreation set to false
-						AllowAutoCreation: false,
-						AllowAutoUpdate:   true,
-						AllowLinking:      true,
-						StylingType:       &stylingType,
-						Payload:           []byte("{}"),
-					}
-
-					err := idpRepo.Create(t.Context(), tx, &idp)
-					require.NoError(t, err)
-
-					idps[i] = &idp
-				}
-
-				return idps
-			},
-			conditionClauses: []database.Condition{idpRepo.AllowAutoCreationCondition(false)},
-		},
-		{
-			name: "multiple idps filter on AllowAutoUpdate",
-			testFunc: func(t *testing.T) []*domain.IdentityProvider {
-				// create idp
-				// this idp is created as an additional idp which should NOT
-				// be returned in the results of this test case
-				idp := domain.IdentityProvider{
-					InstanceID: instanceId,
-					OrgID:      &orgId,
-					ID:         gofakeit.Name(),
-					// state inactive
-					State:             domain.IDPStateInactive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					StylingType:       &stylingType,
-					Payload:           []byte("{}"),
-				}
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
-
-				noOfIDPs := 5
-				idps := make([]*domain.IdentityProvider, noOfIDPs)
-				for i := range noOfIDPs {
-
-					idp := domain.IdentityProvider{
-						InstanceID:        instanceId,
-						OrgID:             &orgId,
-						ID:                gofakeit.Name(),
-						State:             domain.IDPStateActive,
-						Name:              gofakeit.Name(),
-						Type:              gu.Ptr(domain.IDPTypeLDAP),
-						AllowCreation:     true,
-						AllowAutoCreation: true,
-						// AllowAutoUpdate set to false
-						AllowAutoUpdate: false,
-						AllowLinking:    true,
-						StylingType:     &stylingType,
-						Payload:         []byte("{}"),
-					}
-
-					err := idpRepo.Create(t.Context(), tx, &idp)
-					require.NoError(t, err)
-
-					idps[i] = &idp
-				}
-
-				return idps
-			},
-			conditionClauses: []database.Condition{idpRepo.AllowAutoUpdateCondition(false)},
-		},
-		{
-			name: "multiple idps filter on AllowLinking",
-			testFunc: func(t *testing.T) []*domain.IdentityProvider {
-				// create idp
-				// this idp is created as an additional idp which should NOT
-				// be returned in the results of this test case
-				idp := domain.IdentityProvider{
-					InstanceID: instanceId,
-					OrgID:      &orgId,
-					ID:         gofakeit.Name(),
-					// state inactive
-					State:             domain.IDPStateInactive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					StylingType:       &stylingType,
-					Payload:           []byte("{}"),
-				}
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
-
-				noOfIDPs := 5
-				idps := make([]*domain.IdentityProvider, noOfIDPs)
-				for i := range noOfIDPs {
-
-					idp := domain.IdentityProvider{
-						InstanceID:        instanceId,
-						OrgID:             &orgId,
-						ID:                gofakeit.Name(),
-						State:             domain.IDPStateActive,
-						Name:              gofakeit.Name(),
-						Type:              gu.Ptr(domain.IDPTypeLDAP),
-						AllowCreation:     true,
-						AllowAutoCreation: true,
-						AllowAutoUpdate:   true,
-						// AllowLinking set to false
-						AllowLinking: false,
-						StylingType:  &stylingType,
-						Payload:      []byte("{}"),
-					}
-
-					err := idpRepo.Create(t.Context(), tx, &idp)
-					require.NoError(t, err)
-
-					idps[i] = &idp
-				}
-
-				return idps
-			},
-			conditionClauses: []database.Condition{idpRepo.AllowLinkingCondition(false)},
-		},
-		{
-			name: "multiple idps filter on StylingType",
-			testFunc: func(t *testing.T) []*domain.IdentityProvider {
-				// create idp
-				// this idp is created as an additional idp which should NOT
-				// be returned in the results of this test case
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateActive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					StylingType:       &stylingType,
-					Payload:           []byte("{}"),
-				}
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
-
-				var sytlingType int16 = 4
-				noOfIDPs := 1
-				idps := make([]*domain.IdentityProvider, noOfIDPs)
-				for i := range noOfIDPs {
-
-					idp := domain.IdentityProvider{
-						InstanceID:        instanceId,
-						OrgID:             &orgId,
-						ID:                gofakeit.Name(),
-						State:             domain.IDPStateActive,
-						Name:              gofakeit.Name(),
-						Type:              gu.Ptr(domain.IDPTypeOIDC),
-						AllowCreation:     true,
-						AllowAutoCreation: true,
-						AllowAutoUpdate:   true,
-						AllowLinking:      true,
-						// StylingType set to 4
-						StylingType: &sytlingType,
-						Payload:     []byte("{}"),
-					}
-
-					err := idpRepo.Create(t.Context(), tx, &idp)
-					require.NoError(t, err)
-
-					idps[i] = &idp
-				}
-
-				return idps
-			},
-			conditionClauses: []database.Condition{idpRepo.StylingTypeCondition(4)},
-		},
-		func() test {
-			payload := []byte(`{"json": {}}`)
-			return test{
-				name: "multiple idps filter on Payload",
-				testFunc: func(t *testing.T) []*domain.IdentityProvider {
-					// create idp
-					// this idp is created as an additional idp which should NOT
-					// be returned in the results of this test case
-					idp := domain.IdentityProvider{
-						InstanceID:        instanceId,
-						OrgID:             &orgId,
-						ID:                gofakeit.Name(),
-						State:             domain.IDPStateActive,
-						Name:              gofakeit.Name(),
-						Type:              gu.Ptr(domain.IDPTypeOIDC),
-						AllowCreation:     true,
-						AllowAutoCreation: true,
-						AllowAutoUpdate:   true,
-						AllowLinking:      true,
-						StylingType:       &stylingType,
-						Payload:           []byte("{}"),
-					}
-					err := idpRepo.Create(t.Context(), tx, &idp)
-					require.NoError(t, err)
-
-					noOfIDPs := 1
-					idps := make([]*domain.IdentityProvider, noOfIDPs)
-					for i := range noOfIDPs {
-
-						idp := domain.IdentityProvider{
-							InstanceID:        instanceId,
-							OrgID:             &orgId,
-							ID:                gofakeit.Name(),
-							State:             domain.IDPStateActive,
-							Name:              gofakeit.Name(),
-							Type:              gu.Ptr(domain.IDPTypeOIDC),
-							AllowCreation:     true,
-							AllowAutoCreation: true,
-							AllowAutoUpdate:   true,
-							AllowLinking:      true,
-							StylingType:       &stylingType,
-							Payload:           payload,
-						}
-
-						err := idpRepo.Create(t.Context(), tx, &idp)
-						require.NoError(t, err)
-
-						idps[i] = &idp
-					}
-
-					return idps
-				},
-				conditionClauses: []database.Condition{idpRepo.PayloadCondition(string(payload))},
-			}
-		}(),
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1635,7 +1109,7 @@ func TestListIDProvider(t *testing.T) {
 
 			// check idp values
 			returnedIDPs, err := idpRepo.List(t.Context(), tx,
-				tt.conditionClauses...,
+				database.WithCondition(database.And(tt.conditionClauses...)),
 			)
 			require.NoError(t, err)
 			if tt.noIDPsReturned {
@@ -1656,7 +1130,6 @@ func TestListIDProvider(t *testing.T) {
 				assert.Equal(t, returnedIDPs[i].AllowAutoCreation, idp.AllowAutoCreation)
 				assert.Equal(t, returnedIDPs[i].AllowAutoUpdate, idp.AllowAutoUpdate)
 				assert.Equal(t, returnedIDPs[i].AllowLinking, idp.AllowLinking)
-				assert.Equal(t, returnedIDPs[i].StylingType, idp.StylingType)
 				assert.Equal(t, returnedIDPs[i].Payload, idp.Payload)
 			}
 		})
@@ -1684,7 +1157,7 @@ func TestDeleteIDProvider(t *testing.T) {
 	type test struct {
 		name                   string
 		testFunc               func(t *testing.T)
-		idpIdentifierCondition domain.IDPIdentifierCondition
+		idpIdentifierCondition database.Condition
 		noOfDeletedRows        int64
 	}
 	tests := []test{
@@ -1706,7 +1179,6 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoCreation: true,
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
-							StylingType:       &stylingType,
 							Payload:           []byte("{}"),
 						}
 
@@ -1736,7 +1208,6 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoCreation: true,
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
-							StylingType:       &stylingType,
 							Payload:           []byte("{}"),
 						}
 
@@ -1745,13 +1216,13 @@ func TestDeleteIDProvider(t *testing.T) {
 
 					}
 				},
-				idpIdentifierCondition: idpRepo.NameCondition(name),
+				idpIdentifierCondition: idpRepo.NameCondition(database.TextOperationEqual, name),
 				noOfDeletedRows:        noOfIDPs,
 			}
 		}(),
 		{
 			name:                   "delete non existent idp",
-			idpIdentifierCondition: idpRepo.NameCondition(gofakeit.Name()),
+			idpIdentifierCondition: idpRepo.NameCondition(database.TextOperationEqual, gofakeit.Name()),
 		},
 		func() test {
 			name := gofakeit.Name()
@@ -1771,7 +1242,6 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoCreation: true,
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
-							StylingType:       &stylingType,
 							Payload:           []byte("{}"),
 						}
 
@@ -1781,14 +1251,16 @@ func TestDeleteIDProvider(t *testing.T) {
 
 					// delete organization
 					affectedRows, err := idpRepo.Delete(t.Context(), tx,
-						idpRepo.NameCondition(name),
-						instanceId,
-						&orgId,
+						database.And(
+							idpRepo.InstanceIDCondition(instanceId),
+							idpRepo.OrgIDCondition(&orgId),
+							idpRepo.NameCondition(database.TextOperationEqual, name),
+						),
 					)
 					assert.Equal(t, int64(1), affectedRows)
 					require.NoError(t, err)
 				},
-				idpIdentifierCondition: idpRepo.NameCondition(name),
+				idpIdentifierCondition: idpRepo.NameCondition(database.TextOperationEqual, name),
 				// this test should return 0 affected rows as the idp was already deleted
 				noOfDeletedRows: 0,
 			}
@@ -1802,18 +1274,22 @@ func TestDeleteIDProvider(t *testing.T) {
 
 			// delete idp
 			noOfDeletedRows, err := idpRepo.Delete(t.Context(), tx,
-				tt.idpIdentifierCondition,
-				instanceId,
-				&orgId,
+				database.And(
+					tt.idpIdentifierCondition,
+					idpRepo.InstanceIDCondition(instanceId),
+					idpRepo.OrgIDCondition(&orgId),
+				),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
 
 			// check idp was deleted
 			organization, err := idpRepo.Get(t.Context(), tx,
-				tt.idpIdentifierCondition,
-				instanceId,
-				&orgId,
+				database.WithCondition(database.And(
+					tt.idpIdentifierCondition,
+					idpRepo.InstanceIDCondition(instanceId),
+					idpRepo.OrgIDCondition(&orgId),
+				)),
 			)
 			require.ErrorIs(t, err, new(database.NoRowFoundError))
 			assert.Nil(t, organization)
