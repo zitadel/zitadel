@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	crypto_db "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -28,6 +29,7 @@ type FirstInstance struct {
 	PatPath            string
 	LoginClientPatPath string
 	Features           *command.InstanceFeatures
+	TrustedDomains     []string
 
 	Skip bool
 
@@ -95,6 +97,7 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 		0,
 		nil,
 		mig.defaultPaths,
+		[]denylist.AddressChecker{},
 	)
 	if err != nil {
 		return err
@@ -102,6 +105,7 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 
 	mig.instanceSetup.InstanceName = mig.InstanceName
 	mig.instanceSetup.CustomDomain = mig.externalDomain
+	mig.instanceSetup.TrustedDomains = mig.TrustedDomains
 	mig.instanceSetup.DefaultLanguage = mig.DefaultLanguage
 	mig.instanceSetup.Org = mig.Org
 	// check if username is email style or else append @<orgname>.<custom-domain>

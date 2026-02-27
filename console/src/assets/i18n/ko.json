@@ -702,7 +702,7 @@
     "USERNAME": "사용자 이름",
     "ORGNAME": "조직 이름",
     "ORGID": "조직 ID",
-    "PRIMARYDOMAIN": "기본 도메인",
+    "PRIMARYDOMAIN": "조직 도메인",
     "PROJECTNAME": "프로젝트 이름",
     "RESOURCEOWNER": "리소스 소유자",
     "METHODS": {
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "{{value}}자 이상이어야 합니다.",
       "MAXLENGTHERROR": "{{value}}자 이하이어야 합니다."
     },
-    "ID": "ID",
+    "ID": "사용자 ID",
     "EMAIL": "이메일",
     "PHONE": "전화번호",
     "PHONEEMPTY": "정의된 전화번호가 없습니다",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "이름",
-      "ID": "ID",
+      "ID": "조직 ID",
       "CREATIONDATE": "생성일",
       "DATECHANGED": "변경일",
       "FILTER": "필터",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "파일 다운로드",
       "SELECTORGTOOLTIP": "이 조직을 선택하세요.",
-      "PRIMARYDOMAIN": "기본 도메인",
+      "PRIMARYDOMAIN": "조직 도메인",
       "STATE": "상태",
       "USEPASSWORD": "초기 비밀번호 설정",
       "USEPASSWORDDESC": "초기화 중에 사용자가 비밀번호를 설정할 필요가 없습니다."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "도메인 추가",
-      "TITLE": "검증된 도메인",
+      "TITLE": "조직 도메인",
       "DESCRIPTION": "조직 도메인을 구성하세요. 이 도메인은 도메인 검색 및 사용자 이름 접미사에 사용할 수 있습니다.",
-      "SETPRIMARY": "기본으로 설정",
+      "SETPRIMARY": "조직 도메인",
       "DELETE": {
         "TITLE": "도메인 삭제",
         "DESCRIPTION": "도메인 중 하나를 삭제하려고 합니다."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "관리자가 추가되었습니다.",
       "MEMBERREMOVED": "관리자가 제거되었습니다.",
       "MEMBERCHANGED": "관리자가 변경되었습니다.",
-      "SETPRIMARY": "기본 도메인이 설정되었습니다.",
+      "SETPRIMARY": "조직 도메인이 성공적으로 설정되었습니다.",
       "DELETED": "조직이 성공적으로 삭제되었습니다",
       "DEFAULTORGNOTFOUND": "기본 조직을 찾을 수 없습니다",
       "ORG_WAS_DELETED": "조직이 삭제되었습니다."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP 및 SMS 설정",
       "MESSAGETEXTS": "메시지 텍스트",
       "IDP": "ID 제공자",
-      "VERIFIED_DOMAINS": "검증된 도메인",
+      "VERIFIED_DOMAINS": "조직 도메인",
       "DOMAIN": "도메인 설정",
       "LOGINTEXTS": "로그인 인터페이스 텍스트",
       "BRANDING": "브랜딩",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "프로젝트를 정말로 삭제하시겠습니까?",
           "TYPENAME": "영구적으로 삭제하려면 프로젝트 이름을 입력하세요."
         }
-      }
+      },
+      "ID": "프로젝트 ID"
     },
     "SETTINGS": {
       "TITLE": "설정",
@@ -2296,7 +2297,7 @@
     "ADD": "ID 제공자 추가",
     "TYPE": "유형",
     "OWNER": "소유자",
-    "ID": "ID",
+    "ID": "신원 제공자 ID",
     "NAME": "이름",
     "AUTHORIZATIONENDPOINT": "인증 엔드포인트",
     "TOKENENDPOINT": "토큰 엔드포인트",
@@ -2521,7 +2522,7 @@
     "TOKEN": "토큰 설정",
     "PAGES": {
       "TITLE": "애플리케이션",
-      "ID": "ID",
+      "ID": "애플리케이션 ID",
       "DESCRIPTION": "여기서 애플리케이션 데이터와 구성을 편집할 수 있습니다.",
       "CREATE": "애플리케이션 생성",
       "CREATE_SELECT_PROJECT": "먼저 프로젝트를 선택하세요",
@@ -2861,5 +2862,6 @@
       "TITLE": "활동",
       "DESCRIPTION": "사용자 변경을 유발한 최신 이벤트를 볼 수 있습니다."
     }
-  }
+  },
+  "INSTANCEID": "인스턴스 ID"
 }

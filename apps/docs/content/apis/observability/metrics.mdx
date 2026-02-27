@@ -1,5 +1,6 @@
 ---
 title: ZITADEL Metrics
+description: "Expose ZITADEL Metrics via the /debug/metrics endpoint to monitor and analyze performance with tools like Prometheus"
 sidebar_label: Metrics
 ---
 
@@ -11,5 +12,5 @@ The metrics endpoint can be scrubbed by any tool of choice that supports the `ot
 
 For our [Kubernetes/Helm](/self-hosting/deploy/kubernetes) users, we provide an out-of-the-box support for the [ServiceMonitor](https://github.com/zitadel/zitadel-charts/blob/main/charts/zitadel/templates/servicemonitor.yaml) custom resource.
 
-By default, metrics are enabled but can be turned off through ZITADEL's [configuration](/self-hosting/manage/configure).
-The (default) configuration is located in the [defaults.yaml](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
+By default, metrics are enabled but can be turned off through ZITADEL's [settings](/self-hosting/manage/configure).
+The (default) settings are located in the [defaults.yaml](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).

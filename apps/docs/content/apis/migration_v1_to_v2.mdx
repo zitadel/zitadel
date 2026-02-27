@@ -1,5 +1,6 @@
 ---
 title: Migrate from v1 APIs to v2 APIs
+description: "Migrate from ZITADEL's v1 APIs to v2 APIs and adopt a resource-based architecture for improved intuitiveness and efficiency"
 ---
 
 This guide gives you an overview for migrating from our v1 API to the new and improved v2 API.
@@ -146,7 +147,7 @@ In v2, we have unified these into a single set of endpoints for all application 
 The biggest change is in how you create/update applications.
 Instead of calling a specific endpoint for each type (e.g., CreateOidcApp, CreateSamlApp), you will now use a single CreateApp endpoint.
 
-To specify the type of application, you will include its specific configuration object within the request body.
+To specify the type of application, you will include its specific settings object within the request body.
 For example, to create a OIDC app, you will provide an oidc object in the request.
 All properties that are common to every application, such as name, are now top-level fields in the request body, consistent across all types.
 

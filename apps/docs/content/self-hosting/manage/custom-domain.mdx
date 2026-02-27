@@ -1,6 +1,7 @@
 ---
 title: External ZITADEL Access
-sidebar_label: Instance Not Found
+description: "Configure custom domains and solve 'Instance not found' errors by ensuring correct Host header routing for ZITADEL instances."
+sidebar_label: External Access
 ---
 
 ## Why do I get an "Instance not found" error?
@@ -50,7 +51,7 @@ Check out the [reverse proxy configuration examples](/self-hosting/manage/revers
 Note that by default, you cannot access ZITADEL at an organization's domain.
 Organization level domains [are intended for routing users by their login methods to their correct organization](/guides/solution-scenarios/domain-discovery).
 
-However, if you want to access ZITADEL at an organization domain, [you can add additional domains using the System API](/reference/api/system/zitadel.system.v1.SystemService.AddDomain).
+However, if you want to access ZITADEL at an Organization Domain, [you can add additional domains using the System API](/reference/api/system/zitadel.system.v1.SystemService.AddDomain).
 Be aware that you won't automatically have the organizations context when you access ZITADEL like this.
 
 ## Generated Subdomains
