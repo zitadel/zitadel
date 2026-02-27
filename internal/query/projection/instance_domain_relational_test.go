@@ -45,9 +45,9 @@ func TestInstanceDomainReducers(t *testing.T) {
 	handler := instanceDomainRelationalProjection{}
 	rawTx, tx := getTransactions(t, pool)
 
-	defer func() {
+	t.Cleanup(func() {
 		require.NoError(t, rawTx.Rollback())
-	}()
+	})
 	ctx := t.Context()
 
 	instanceDomainRepo := repository.InstanceDomainRepository()
