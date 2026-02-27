@@ -71,6 +71,7 @@ func buildMiddleware(
 ) zhttp_middlware.ErrorHandlerFunc {
 	// content type middleware needs to run at the very beginning to correctly set content types of errors
 	middlewares = append([]zhttp_middlware.MiddlewareWithErrorFunc{smiddleware.ContentTypeMiddleware}, middlewares...)
+	middlewares = append(middlewares, zhttp_middlware.RecoverHandlerWithError)
 	middlewares = append(middlewares, smiddleware.ScimContextMiddleware(query))
 	scimMiddleware := zhttp_middlware.ChainedWithErrorHandler(serrors.ErrorHandler(translator), middlewares...)
 	return func(handler zhttp_middlware.HandlerFuncWithError) http.Handler {
