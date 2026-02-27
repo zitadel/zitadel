@@ -43,7 +43,7 @@ func TestInstanceDomainReducersExist(t *testing.T) {
 
 func TestInstanceDomainReducers(t *testing.T) {
 	handler := instanceDomainRelationalProjection{}
-	rawTx, tx := getTransactions(t, pool)
+	rawTx, tx := getTransactions(t)
 
 	t.Cleanup(func() {
 		require.NoError(t, rawTx.Rollback())
@@ -74,7 +74,6 @@ func TestInstanceDomainReducers(t *testing.T) {
 		require.NoError(t, err)
 
 		// Test
-		require.NoError(t, err)
 		err = callback.Execute(ctx, rawTx, "")
 
 		// Verify
@@ -120,7 +119,6 @@ func TestInstanceDomainReducers(t *testing.T) {
 		require.NoError(t, err)
 
 		// Test
-		require.NoError(t, err)
 		err = callback.Execute(ctx, rawTx, "")
 
 		// Verify
@@ -167,7 +165,6 @@ func TestInstanceDomainReducers(t *testing.T) {
 		require.NoError(t, err)
 
 		// Test
-		require.NoError(t, err)
 		err = callback.Execute(ctx, rawTx, "")
 
 		// Verify
@@ -195,7 +192,6 @@ func TestInstanceDomainReducers(t *testing.T) {
 		require.NoError(t, err)
 
 		// Test
-		require.NoError(t, err)
 		err = callback.Execute(ctx, rawTx, "")
 
 		// Verify
@@ -235,7 +231,6 @@ func TestInstanceDomainReducers(t *testing.T) {
 		require.NoError(t, err)
 
 		// Test
-		require.NoError(t, err)
 		err = callback.Execute(ctx, rawTx, "")
 
 		// Verify

@@ -15,7 +15,10 @@ import (
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 )
 
-var pool database.PoolTest
+var (
+	pool  database.PoolTest
+	rawDB *sql.DB
+)
 
 func TestMain(m *testing.M) {
 	os.Exit(runTests(m))
@@ -31,6 +34,9 @@ func runTests(m *testing.M) int {
 		os.Exit(1)
 	}
 	defer stop()
+
+	rawDB = pool.RawDB()
+
 	return m.Run()
 }
 
@@ -54,8 +60,8 @@ func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), er
 	return pool, stop, err
 }
 
-func getTransactions(t *testing.T, pool database.PoolTest) (rawTx *sql.Tx, v3SQLTx *v3_sql.Transaction) {
-	rawTx, err := pool.RawDB().Begin()
+func getTransactions(t *testing.T) (rawTx *sql.Tx, v3SQLTx *v3_sql.Transaction) {
+	rawTx, err := rawDB.Begin()
 	require.NoError(t, err)
 	v3SQLTx = v3_sql.SQLTx(rawTx)
 	return
