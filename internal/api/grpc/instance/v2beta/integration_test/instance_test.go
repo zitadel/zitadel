@@ -55,7 +55,7 @@ func TestDeleteInstace(t *testing.T) {
 			},
 			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.NotFound,
-			expectedErrorMsg:  "Instance not found (COMMA-AE3GS)",
+			expectedErrorMsg:  "Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains (COMMA-AE3GS)",
 		},
 		{
 			testName: "when delete succeeds should return deletion date",
