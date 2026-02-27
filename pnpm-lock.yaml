@@ -753,6 +753,9 @@ importers:
       '@bufbuild/buf':
         specifier: ^1.34.0
         version: 1.65.0
+      '@bufbuild/protoc-gen-es':
+        specifier: ^2.11.0
+        version: 2.11.0(@bufbuild/protobuf@2.11.0)
       '@types/node':
         specifier: ^24.10.9
         version: 24.10.9
@@ -786,6 +789,9 @@ importers:
       '@zitadel/zitadel-js':
         specifier: workspace:*
         version: link:../zitadel-js
+      oauth4webapi:
+        specifier: ^3.5.0
+        version: 3.8.5
     devDependencies:
       '@types/node':
         specifier: ^24.10.9
@@ -9852,6 +9858,9 @@ packages:
         optional: true
       '@swc/core':
         optional: true
+
+  oauth4webapi@3.8.5:
+    resolution: {integrity: sha512-A8jmyUckVhRJj5lspguklcl90Ydqk61H3dcU0oLhH3Yv13KpAliKTt5hknpGGPZSSfOwGyraNEFmofDYH+1kSg==}
 
   object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
@@ -23081,6 +23090,8 @@ snapshots:
       '@swc/core': 1.15.3(@swc/helpers@0.5.17)
     transitivePeerDependencies:
       - debug
+
+  oauth4webapi@3.8.5: {}
 
   object-assign@4.1.1: {}
 

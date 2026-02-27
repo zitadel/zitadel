@@ -4,3 +4,5 @@ export { createConnectTransport, createGrpcTransport } from "./transport.js";
 export { generatePKCE, generateState } from "./pkce.js";
 export { isSessionExpired, isSessionValid } from "./session.js";
 export { makeReqCtx } from "./context.js";
+export type { RequestContext } from "./context.js";
+export { createAuthorizationBearerInterceptor } from "./interceptors.js";

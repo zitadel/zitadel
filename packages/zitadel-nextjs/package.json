@@ -21,7 +21,8 @@
   },
   "dependencies": {
     "@zitadel/react": "workspace:*",
-    "@zitadel/zitadel-js": "workspace:*"
+    "@zitadel/zitadel-js": "workspace:*",
+    "oauth4webapi": "^3.5.0"
   },
   "peerDependencies": {
     "next": ">=15",

@@ -3,8 +3,14 @@
   "namedInputs": { "sources": ["{projectRoot}/src/**/*"] },
   "targets": {
     "generate": {
-      "description": "Generates Protobuf and Connect artifacts via Buf",
+      "description": "Generates Protobuf artifacts via Buf using local protoc-gen-es",
       "command": "pnpm --filter @zitadel/zitadel-js generate",
+      "inputs": [
+        "{projectRoot}/buf.gen.yaml",
+        "{projectRoot}/package.json",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "{workspaceRoot}/proto/**/*"
+      ],
       "outputs": ["{projectRoot}/src/generated"]
     },
     "build": {

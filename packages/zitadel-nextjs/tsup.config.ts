@@ -8,6 +8,6 @@ export default defineConfig((options: Options) => ({
   sourcemap: true,
   clean: true,
   treeshake: true,
-  external: ["next", "react", "react-dom", "@zitadel/zitadel-js", "@zitadel/react"],
+  external: ["next", "react", "react-dom", "@zitadel/zitadel-js", "@zitadel/zitadel-js/v2", "@zitadel/zitadel-js/webhooks", "@zitadel/zitadel-js/node", "@zitadel/react", "oauth4webapi"],
   ...options,
 }));

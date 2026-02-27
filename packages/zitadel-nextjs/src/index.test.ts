@@ -10,5 +10,7 @@ describe("@zitadel/nextjs", () => {
     expect(mod.createZitadelWebhookHandler).toBeDefined();
     expect(mod.protectedAction).toBeDefined();
     expect(mod.getSession).toBeDefined();
+    expect(mod.createZitadelApiClient).toBeDefined();
+    expect(mod.withApiClient).toBeDefined();
   });
 });
