@@ -3111,7 +3111,7 @@ func TestServer_CreateUser(t *testing.T) {
 			},
 		},
 		{
-			name: "with metadata",
+			name: "with metadata inside human",
 			testCase: func(runId string) testCase {
 				username := fmt.Sprintf("donald.duck+%s", runId)
 				email := username + "@example.com"
@@ -3145,6 +3145,82 @@ func TestServer_CreateUser(t *testing.T) {
 					want: &user.CreateUserResponse{
 						Id: "is generated",
 					},
+				}
+			},
+		},
+		{
+			name: "with metadata",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						OrgCTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+								},
+							},
+							Metadata: []*user.Metadata{
+								{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+								{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
+								{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
+			name: "error - metadata on both root and human",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						OrgCTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+									Metadata: []*user.Metadata{
+										{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+									},
+								},
+							},
+							Metadata: []*user.Metadata{
+								{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
+								{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
+							},
+						},
+					},
+					wantErr: true,
 				}
 			},
 		},
@@ -3371,6 +3447,34 @@ func TestServer_CreateUser(t *testing.T) {
 								Machine: &user.CreateUserRequest_Machine{
 									Name: "donald",
 								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
+			name: "machine with metadata",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						OrgCTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: "donald",
+								},
+							},
+							Metadata: []*user.Metadata{
+								{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+								{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
+								{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
 							},
 						},
 					},
