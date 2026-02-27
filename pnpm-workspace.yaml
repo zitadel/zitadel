@@ -6,5 +6,8 @@ packages:
   - apps/*
   - deploy/compose
 
+exclude:
+  - benchmark # because of the node 18 or 20 dependency
+
 overrides:
   "js-yaml@^4": ">=4.1.1"
