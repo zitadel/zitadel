@@ -14,7 +14,7 @@ export function isValidLanguage(code: string): boolean {
 
 /**
  * Extract a valid language code from uiLocales array.
- * Returns the first valid language code, or null if none found.
+ * Returns the first valid language code (normalized to lowercase), or null if none found.
  */
 export function getValidLocaleFromUILocales(uiLocales: string[] | undefined): string | null {
   if (!uiLocales || uiLocales.length === 0) {
@@ -22,22 +22,25 @@ export function getValidLocaleFromUILocales(uiLocales: string[] | undefined): st
   }
 
   for (const locale of uiLocales) {
-    // Check if locale is valid
-    if (isValidLanguage(locale)) {
-      return locale;
+    const normalized = locale.trim().toLowerCase();
+
+    // Check if the full locale is a valid language code (e.g., "de", "EN")
+    if (isValidLanguage(normalized)) {
+      return normalized;
     }
+
     // uiLocales may contain language tags like "en-US" or "de-CH"
     // Extract the language code (part before the hyphen)
-    // Note this will strip any regional specifyer
-    // e.g. de-CH and de-AT both becomes just de
+    // Note: this strips any regional specifier
+    // e.g., de-CH and de-AT both become just de
     // zh-Hans-CN (Simplified) and zh-Hant-TW (Traditional) both become zh
     // As of time of writing, this is expected behaviour, since there is only one translation for all languages
-    const languageCode = locale.split("-")[0];
+    const languageCode = normalized.split("-")[0];
     if (isValidLanguage(languageCode)) {
       return languageCode;
     }
   }
-  
+
   return null;
 }
 

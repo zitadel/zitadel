@@ -16,9 +16,9 @@ describe("auth-utils", () => {
       expect(isValidLanguage("")).toBe(false);
     });
 
-    it("should be case-sensitive", () => {
-      expect(isValidLanguage("EN")).toBe(false);
-      expect(isValidLanguage("De")).toBe(false);
+    it("should be case-insensitive", () => {
+      expect(isValidLanguage("EN")).toBe(true);
+      expect(isValidLanguage("De")).toBe(true);
     });
   });
 
