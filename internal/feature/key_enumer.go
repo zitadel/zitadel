@@ -16,8 +16,8 @@ const (
 	_KeyLowerName_2 = "improved_performance"
 	_KeyName_3      = "debug_oidc_parent_erroroidc_single_v1_session_termination"
 	_KeyLowerName_3 = "debug_oidc_parent_erroroidc_single_v1_session_termination"
-	_KeyName_4      = "login_v2permission_check_v2management_console_use_v2_user_apienable_relational_tables"
-	_KeyLowerName_4 = "login_v2permission_check_v2management_console_use_v2_user_apienable_relational_tables"
+	_KeyName_4      = "login_v2permission_check_v2console_use_v2_user_apienable_relational_tables"
+	_KeyLowerName_4 = "login_v2permission_check_v2console_use_v2_user_apienable_relational_tables"
 )
 
 var (
@@ -25,7 +25,7 @@ var (
 	_KeyIndex_1 = [...]uint8{0, 11}
 	_KeyIndex_2 = [...]uint8{0, 20}
 	_KeyIndex_3 = [...]uint8{0, 23, 57}
-	_KeyIndex_4 = [...]uint8{0, 8, 27, 61, 85}
+	_KeyIndex_4 = [...]uint8{0, 8, 27, 50, 74}
 )
 
 func (i Key) String() string {
@@ -59,11 +59,11 @@ func _KeyNoOp() {
 	_ = x[KeyOIDCSingleV1SessionTermination-(10)]
 	_ = x[KeyLoginV2-(13)]
 	_ = x[KeyPermissionCheckV2-(14)]
-	_ = x[KeyManagementConsoleUseV2UserApi-(15)]
+	_ = x[KeyConsoleUseV2UserApi-(15)]
 	_ = x[KeyEnableRelationalTables-(16)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyUserSchema, KeyImprovedPerformance, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyLoginV2, KeyPermissionCheckV2, KeyManagementConsoleUseV2UserApi, KeyEnableRelationalTables}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyUserSchema, KeyImprovedPerformance, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi, KeyEnableRelationalTables}
 
 var _KeyNameToValueMap = map[string]Key{
 	_KeyName_0[0:11]:       KeyUnspecified,
@@ -82,10 +82,10 @@ var _KeyNameToValueMap = map[string]Key{
 	_KeyLowerName_4[0:8]:   KeyLoginV2,
 	_KeyName_4[8:27]:       KeyPermissionCheckV2,
 	_KeyLowerName_4[8:27]:  KeyPermissionCheckV2,
-	_KeyName_4[27:61]:      KeyManagementConsoleUseV2UserApi,
-	_KeyLowerName_4[27:61]: KeyManagementConsoleUseV2UserApi,
-	_KeyName_4[61:85]:      KeyEnableRelationalTables,
-	_KeyLowerName_4[61:85]: KeyEnableRelationalTables,
+	_KeyName_4[27:50]:      KeyConsoleUseV2UserApi,
+	_KeyLowerName_4[27:50]: KeyConsoleUseV2UserApi,
+	_KeyName_4[50:74]:      KeyEnableRelationalTables,
+	_KeyLowerName_4[50:74]: KeyEnableRelationalTables,
 }
 
 var _KeyNames = []string{
@@ -97,8 +97,8 @@ var _KeyNames = []string{
 	_KeyName_3[23:57],
 	_KeyName_4[0:8],
 	_KeyName_4[8:27],
-	_KeyName_4[27:61],
-	_KeyName_4[61:85],
+	_KeyName_4[27:50],
+	_KeyName_4[50:74],
 }
 
 // KeyString retrieves an enum value from the enum constants string name.

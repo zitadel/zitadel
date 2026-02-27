@@ -43,11 +43,12 @@ type HumanUser struct {
 
 	MultifactorInitializationSkippedAt time.Time `json:"multifactorInitializationSkippedAt,omitzero" db:"-"`
 
-	Email    HumanEmail    `json:"email,omitzero" db:"-"`
-	Phone    *HumanPhone   `json:"phone,omitempty" db:"-"`
-	Passkeys []*Passkey    `json:"passkeys,omitempty" db:"-"`
-	Password HumanPassword `json:"password,omitzero" db:"-"`
-	TOTP     *HumanTOTP    `json:"totp,omitempty" db:"-"`
+	Email         HumanEmail          `json:"email,omitzero" db:"-"`
+	Phone         *HumanPhone         `json:"phone,omitempty" db:"-"`
+	Passkeys      []*Passkey          `json:"passkeys,omitempty" db:"-"`
+	Password      HumanPassword       `json:"password,omitzero" db:"-"`
+	TOTP          *HumanTOTP          `json:"totp,omitempty" db:"-"`
+	RecoveryCodes *HumanRecoveryCodes `json:"recoveryCodes,omitempty" db:"-"`
 
 	IdentityProviderLinks []*IdentityProviderLink `json:"identityProviderLinks,omitempty" db:"-"`
 
@@ -234,5 +235,15 @@ type HumanInvite struct {
 	// If nil, no email change is in progress
 	PendingVerification *Verification `json:"pendingVerification,omitempty" db:"-"`
 	// FailedAttempts is the number of consecutive failed invite attempts
+	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"-"`
+}
+
+type HumanRecoveryCodes struct {
+	// Codes are the hashed recovery codes for the user
+	Codes []string `json:"codes" db:"-"`
+	// LastSuccessfullyCheckedAt is the time when a recovery code was last successfully checked
+	LastSuccessfullyCheckedAt *time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"-"`
+	// FailedAttempts is the number of consecutive failed recovery code attempts
+	// It is reset to 0 on successful verification
 	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"-"`
 }

@@ -29,12 +29,6 @@ export function getServiceConfig(headers: ReadonlyHeaders): { serviceConfig: Ser
   const instanceHost = getInstanceHost(headers);
   const publicHost = getPublicHost(headers);
 
-  console.log("serviceConfig", {
-    baseUrl: process.env.ZITADEL_API_URL,
-    ...(instanceHost && { instanceHost: stripProtocol(instanceHost) }),
-    ...(publicHost && { publicHost: stripProtocol(publicHost) }),
-  });
-
   return {
     serviceConfig: {
       baseUrl: process.env.ZITADEL_API_URL,
