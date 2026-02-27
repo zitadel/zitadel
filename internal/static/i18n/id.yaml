@@ -341,9 +341,9 @@ Errors:
       NotActive: "Hibah proyek tidak aktif"
       NotInactive: "Hibah proyek bukannya tidak aktif"
   Instance:
-    AlreadyExists: "Contoh sudah ada"
-    NotChanged: "Contoh tidak berubah"
-    NotFound: "Contoh tidak ditemukan. Pastikan Anda memiliki domain yang benar. Lihat https://zitadel.com/docs/apis/introduction#domains"
+    AlreadyExists: "Instans sudah ada"
+    NotChanged: "Instans tidak berubah"
+    NotFound: "Instans tidak ditemukan. Pastikan Anda memiliki domain yang benar. Lihat https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Peran belum diubah"
     MemberInvalid: "Anggota tidak valid"
