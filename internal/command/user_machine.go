@@ -26,6 +26,7 @@ type Machine struct {
 	Description     string
 	AccessTokenType domain.OIDCTokenType
 	PermissionCheck PermissionCheck
+	Metadata        []*AddMetadataEntry
 }
 
 func (m *Machine) IsZero() bool {
@@ -65,9 +66,16 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 			if err != nil {
 				return nil, err
 			}
-			return []eventstore.Command{
-				user.NewMachineAddedEvent(ctx, &a.Aggregate, machine.Username, machine.Name, machine.Description, domainPolicy.UserLoginMustBeDomain || orgScopedUsername, machine.AccessTokenType),
-			}, nil
+			cmds := []eventstore.Command{user.NewMachineAddedEvent(ctx, &a.Aggregate, machine.Username, machine.Name, machine.Description, domainPolicy.UserLoginMustBeDomain || orgScopedUsername, machine.AccessTokenType)}
+			for _, metadataEntry := range machine.Metadata {
+				cmds = append(cmds, user.NewMetadataSetEvent(
+					ctx,
+					&a.Aggregate,
+					metadataEntry.Key,
+					metadataEntry.Value,
+				))
+			}
+			return cmds, nil
 		}, nil
 	}
 }

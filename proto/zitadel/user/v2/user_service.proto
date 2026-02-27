@@ -2078,7 +2078,7 @@ message CreateUserRequest{
     // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
     // Currently no other options are supported, and if anything different is used the validation will fail.
     optional string totp_secret = 8 [
-      (validate.rules).string = {min_len: 1 max_len: 200},
+      (validate.rules).string = {min_len: 1, max_len: 200},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1,
         max_length: 200,
@@ -2086,8 +2086,12 @@ message CreateUserRequest{
       }
     ];
 
+    // Deprecated: Use the metadata field in the user object instead.
+    // If the metadata field in the user object is set, the values in this field will be ignored.
+    //
     // Metadata to bet set. The values have to be base64 encoded.
     repeated Metadata metadata = 9 [
+      deprecated = true,
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
       }
@@ -2177,6 +2181,13 @@ message CreateUserRequest{
     // You can change it to JWT by specifying the access token type in the machine field.
     Machine machine = 5;
   }
+
+  // Metadata to bet set. The values have to be base64 encoded.
+  repeated Metadata metadata = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
+    }
+  ];
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     example: "{\"organizationId\":\"69629026806489455\",\"userId\":\"163840776835432345\",\"username\":\"minnie-mouse\",\"human\":{\"profile\":{\"givenName\":\"Minnie\",\"familyName\":\"Mouse\",\"nickName\":\"Mini\",\"displayName\":\"Minnie Mouse\",\"preferredLanguage\":\"en\",\"gender\":\"GENDER_FEMALE\"},\"email\":{\"email\":\"mini@mouse.com\",\"sendCode\":{\"urlTemplate\":\"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}\"}},\"phone\":{\"phone\":\"+41791234567\",\"isVerified\":true},\"password\":{\"password\":\"Secr3tP4ssw0rd!\",\"changeRequired\":true},\"idpLinks\":[{\"idpId\":\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\",\"userId\":\"6516849804890468048461403518\",\"userName\":\"user@external.com\"}],\"totpSecret\":\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"}}";
   };

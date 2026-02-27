@@ -15,14 +15,14 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUserRequest_Human, orgId string, userName, userId *string) (*connect.Response[user.CreateUserResponse], error) {
-	metadataEntries := make([]*user.SetMetadataEntry, len(humanPb.Metadata))
-	for i, metadataEntry := range humanPb.Metadata {
-		metadataEntries[i] = &user.SetMetadataEntry{
-			Key:   metadataEntry.GetKey(),
-			Value: metadataEntry.GetValue(),
-		}
+func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUserRequest_Human, orgId string, userName, userId *string, metadata []*user.Metadata) (*connect.Response[user.CreateUserResponse], error) {
+	if len(metadata) > 0 && len(humanPb.Metadata) > 0 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "", "metadata set both on the user level and the human level")
 	}
+	if len(metadata) > 0 {
+		humanPb.Metadata = metadata
+	}
+	metadataEntries := setMetadataEntries(humanPb.Metadata)
 	addHumanPb := &user.AddHumanUserRequest{
 		Username: userName,
 		UserId:   userId,
@@ -67,6 +67,17 @@ func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUs
 		EmailCode:    newHuman.EmailCode,
 		PhoneCode:    newHuman.PhoneCode,
 	}), nil
+}
+
+func setMetadataEntries(metadata []*user.Metadata) []*user.SetMetadataEntry {
+	metadataEntries := make([]*user.SetMetadataEntry, len(metadata))
+	for i, metadataEntry := range metadata {
+		metadataEntries[i] = &user.SetMetadataEntry{
+			Key:   metadataEntry.GetKey(),
+			Value: metadataEntry.GetValue(),
+		}
+	}
+	return metadataEntries
 }
 
 func (s *Server) updateUserTypeHuman(ctx context.Context, humanPb *user.UpdateUserRequest_Human, userId string, userName *string) (*connect.Response[user.UpdateUserResponse], error) {
