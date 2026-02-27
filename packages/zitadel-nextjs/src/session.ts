@@ -13,7 +13,7 @@ export interface SessionData {
   refreshToken?: string;
 }
 
-const SESSION_COOKIE = "zitadel.session";
+const SESSION_COOKIE = "zitadel.auth.oidc.session";
 
 /**
  * Retrieves the current session data from the encrypted session cookie.

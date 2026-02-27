@@ -13,7 +13,7 @@ export interface MiddlewareOptions {
   cookieSecret?: string;
 }
 
-const SESSION_COOKIE = "zitadel.session";
+const SESSION_COOKIE = "zitadel.auth.oidc.session";
 
 /**
  * Creates a Next.js middleware function that protects routes based on session state.

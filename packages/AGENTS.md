@@ -9,6 +9,12 @@
 - **`packages/zitadel-js`** (`@zitadel/zitadel-js`): isomorphic core SDK — framework-agnostic primitives for OIDC, session management, JWT/JWE handling, webhook verification, and ConnectRPC transport creation. Generates its own protobuf types from `proto/` using local `protoc-gen-es`.
 - **`packages/zitadel-react`** (`@zitadel/react`): React hooks and context for client-side state management. Depends on `@zitadel/zitadel-js`.
 - **`packages/zitadel-nextjs`** (`@zitadel/nextjs`): Next.js App Router integration — OIDC lifecycle (via `oauth4webapi`), middleware, server actions, v2 API access, and Actions v2 webhook handling. Depends on `@zitadel/zitadel-js` and `@zitadel/react`.
+  - **`auth/oidc`** — OIDC redirect-based login ("add login to your app"). Env: `ZITADEL_ISSUER_URL`, `ZITADEL_CLIENT_ID`, `ZITADEL_CALLBACK_URL`, `ZITADEL_COOKIE_SECRET`.
+  - **`auth/session`** — Session API for custom login UIs *(planned, not yet implemented)*.
+  - **`middleware`** — Route protection middleware. Reads `ZITADEL_COOKIE_SECRET`.
+  - **`api`** — ZITADEL v2 API client factory. Reads `ZITADEL_API_URL`.
+  - **`webhook`** — Actions v2 webhook handler. Reads `ZITADEL_WEBHOOK_SECRET`, `ZITADEL_WEBHOOK_JWKS_ENDPOINT`, `ZITADEL_WEBHOOK_JWE_PRIVATE_KEY`.
+  - **`server-action`** — Protected server action wrapper.
 - **`packages/zitadel-angular`** (`@zitadel/angular`): Angular SDK — injectable services, guards, interceptors. Depends on `@zitadel/zitadel-js`.
 
 ## Verified Nx Targets
@@ -43,4 +49,19 @@
 - `@zitadel/zitadel-js` uses local `protoc-gen-es` (same as `@zitadel/proto`) — no BSR remote plugins.
 - Keep package exports and public typings stable unless a breaking release is explicitly intended.
 - `@zitadel/nextjs` requires `next >=15` and `react >=18` as peer dependencies.
+
+## Environment Variables
+A shared `.env.example` lives at `packages/.env.example` with three sections:
+1. **OIDC** — `ZITADEL_ISSUER_URL`, `ZITADEL_CLIENT_ID`, `ZITADEL_CALLBACK_URL`, `ZITADEL_COOKIE_SECRET`
+2. **API** — `ZITADEL_API_URL`, `ZITADEL_SERVICE_USER_TOKEN` (or private key JWT vars)
+3. **Actions** — `ZITADEL_WEBHOOK_SECRET`, `ZITADEL_WEBHOOK_JWKS_ENDPOINT`, `ZITADEL_WEBHOOK_JWE_PRIVATE_KEY`
+
+All SDK modules auto-read these env vars as fallbacks when options are not passed explicitly.
+
+## Module Naming Convention
+Auth modules live under `auth/` with submodules per integration pattern:
+- `auth/oidc` — Redirect-based OIDC login
+- `auth/session` — Session API for custom login UIs *(planned)*
+
+Check types (password, passkey, TOTP, etc.) are **parameters** within `auth/session`, not separate modules.
 

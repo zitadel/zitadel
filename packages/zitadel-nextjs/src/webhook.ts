@@ -11,17 +11,26 @@ export interface WebhookHandlerOptions {
   payloadType?: PayloadType;
 
   // ---- JSON (HMAC) options ----
-  /** The shared webhook signing key (required when payloadType is "json"). */
+  /**
+   * The shared webhook signing key (required when payloadType is "json").
+   * Falls back to the `ZITADEL_WEBHOOK_SECRET` environment variable.
+   */
   signingKey?: string;
 
   // ---- JWT / JWE options ----
-  /** JWKS endpoint of the ZITADEL instance (required for "jwt" / "jwe"). */
+  /**
+   * JWKS endpoint of the ZITADEL instance (required for "jwt" / "jwe").
+   * Falls back to the `ZITADEL_WEBHOOK_JWKS_ENDPOINT` environment variable.
+   */
   jwksEndpoint?: string;
   /** Expected JWT issuer. */
   issuer?: string;
   /** Expected JWT audience. */
   audience?: string;
-  /** PEM-encoded private key for JWE decryption (required for "jwe"). */
+  /**
+   * PEM-encoded private key for JWE decryption (required for "jwe").
+   * Falls back to the `ZITADEL_WEBHOOK_JWE_PRIVATE_KEY` environment variable.
+   */
   privateKey?: string;
 
   /** Callback invoked with the parsed webhook payload when verification succeeds. */
@@ -50,11 +59,11 @@ export interface WebhookHandlerOptions {
 export function createZitadelWebhookHandler(options: WebhookHandlerOptions) {
   const handler = createWebhookHandler({
     payloadType: options.payloadType,
-    signingKey: options.signingKey,
-    jwksEndpoint: options.jwksEndpoint,
+    signingKey: options.signingKey ?? process.env.ZITADEL_WEBHOOK_SECRET,
+    jwksEndpoint: options.jwksEndpoint ?? process.env.ZITADEL_WEBHOOK_JWKS_ENDPOINT,
     issuer: options.issuer,
     audience: options.audience,
-    privateKey: options.privateKey,
+    privateKey: options.privateKey ?? process.env.ZITADEL_WEBHOOK_JWE_PRIVATE_KEY,
     onEvent: options.onEvent,
   });
 
