@@ -82,6 +82,7 @@ type HumanUserRepository interface {
 	// Update updates the user
 	// It ensures that updates are only applied to user
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+
 	humanConditions
 	humanChanges
 	humanColumns
@@ -152,13 +153,14 @@ type humanChanges interface {
 	identityProviderLinkChanges
 	humanPasskeyChanges
 	inviteChanges
+	recoveryCodeChanges
 }
 
 type humanPasswordChanges interface {
 	// SetPassword overwrites the password field.
 	// It resets the password verification and the last successful password check time.
 	SetPassword(hash string) database.Change
-	// SetResetPassword handles the password reset process based on the verification type:
+	// SetResetPasswordVerification handles the password reset process based on the verification type:
 	//  * [VerificationTypeInit]: to initialize password reset, a verification will be created. The current password remains unchanged
 	//  * [VerificationTypeSucceeded]: to mark the password as reset and remove the verification. The current password remains unchanged use [humanPasswordChanges.SetPassword] to set the new password.
 	//  * [VerificationTypeUpdate]: to update the existing password reset verification. If a new code is requested, use [VerificationTypeInit].
@@ -236,7 +238,7 @@ type humanPhoneChanges interface {
 }
 
 type humanTOTPChanges interface {
-	// SetTOTP changes the TOTP secret and verification timestamp
+	// SetTOTPSecret changes the TOTP secret and verification timestamp
 	SetTOTPSecret(secret *crypto.CryptoValue) database.Change
 	// SetTOTPVerifiedAt sets the TOTP verified at time
 	// If verifiedAt is zero, it will be set to NOW()
@@ -273,6 +275,23 @@ type inviteChanges interface {
 	//  * [VerificationTypeUpdate]: to update the existing invite verification. If a new code is requested, use [VerificationTypeInit].
 	//  * [VerificationTypeFailed]: to increment the failed attempts of the verification.
 	SetInviteVerification(verification VerificationType) database.Change
+}
+
+type recoveryCodeChanges interface {
+	// AddRecoveryCodes adds new recovery codes / appends to the existing recovery codes for the user
+	AddRecoveryCodes(codes []string) database.Change
+	// RemoveRecoveryCode removes a recovery code for the user
+	RemoveRecoveryCode(code string) database.Change
+	// RemoveAllRecoveryCodes removes all recovery codes for the user
+	RemoveAllRecoveryCodes() database.Change
+	// SetLastSuccessfulRecoveryCodeCheck sets the last successful recovery code check time
+	// If checkedAt is zero, it will be set to NOW()
+	// It resets the failed attempts
+	SetLastSuccessfulRecoveryCodeCheck(checkedAt time.Time) database.Change
+	// IncrementRecoveryCodeFailedAttempts increments the recovery code verification failed attempts
+	IncrementRecoveryCodeFailedAttempts() database.Change
+	// ResetRecoveryCodeFailedAttempts resets the recovery code verification failed attempts
+	ResetRecoveryCodeFailedAttempts() database.Change
 }
 
 type HumanIdentityProviderLinkConditions interface {

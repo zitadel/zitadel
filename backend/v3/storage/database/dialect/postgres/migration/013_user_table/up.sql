@@ -70,6 +70,10 @@ CREATE TABLE zitadel.users(
     , invite_accepted_at                    TIMESTAMPTZ CHECK ((type = 'machine' AND invite_accepted_at IS NULL)                    OR (type = 'human'))
     , invite_failed_attempts                SMALLINT    CHECK ((type = 'machine' AND invite_failed_attempts IS NULL)                OR (type = 'human'))
 
+    , recovery_codes                        TEXT[]      CHECK ((type = 'machine' AND recovery_codes IS NULL)                        OR (type = 'human'))
+    , recovery_code_last_successful_check   TIMESTAMPTZ CHECK ((type = 'machine' AND recovery_code_last_successful_check IS NULL)   OR (type = 'human'))
+    , recovery_code_failed_attempts         SMALLINT    CHECK ((type = 'machine' AND recovery_code_failed_attempts IS NULL)         OR (type = 'human'))
+
     -- foreign keys for verifications are created in the verification migration
 
     -- machine

@@ -196,10 +196,6 @@ Errors:
     RefreshToken:
       Invalid: "Refresh Token 无效"
       NotFound: "未找到 Refresh Token"
-  Instance:
-    NotFound: "没有找到实例"
-    AlreadyExists: "实例已经存在"
-    NotChanged: "实例没有改变"
   Org:
     AlreadyExists: "该组织名称或 ID 已被占用"
     Invalid: "组织无效"
@@ -346,6 +342,8 @@ Errors:
       NotActive: "项目授权不是启用状态"
       NotInactive: "项目授权不是停用状态"
   Instance:
+    AlreadyExists: "实例已经存在"
+    NotChanged: "实例没有改变"
     NotFound: "实例未找到。确保您有正确的域。查看 https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "角色没有改变"

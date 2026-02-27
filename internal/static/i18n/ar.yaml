@@ -196,10 +196,6 @@ Errors:
     RefreshToken:
       Invalid: "رمز التحديث غير صالح"
       NotFound: "رمز التحديث غير موجود"
-  Instance:
-    NotFound: "المثيل غير موجود"
-    AlreadyExists: "المثيل موجود بالفعل"
-    NotChanged: "المثيل لم يتغير"
   Org:
     AlreadyExists: "اسم المنظمة أو معرفها مأخوذ بالفعل"
     Invalid: "المنظمة غير صالحة"
@@ -346,6 +342,8 @@ Errors:
       NotActive: "منحة المشروع غير نشطة"
       NotInactive: "منحة المشروع غير معطلة"
   Instance:
+    AlreadyExists: "المثيل موجود بالفعل"
+    NotChanged: "المثيل لم يتغير"
     NotFound: "المثيل غير موجود. تأكد من أن النطاق صحيح. تحقق من https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "الأدوار لم تتغير"
