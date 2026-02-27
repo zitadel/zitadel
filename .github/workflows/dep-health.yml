@@ -31,10 +31,16 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: "pnpm"
-      - name: Update Go dependencies to latest
-        run: go get -u ./... && go mod tidy
       - name: Install npm dependencies
         run: pnpm install
+      - name: Generate proto sources
+        # Generated Go packages (e.g. pkg/grpc/webkey/v2/webkeyconnect) must exist
+        # before `go get -u ./...` can resolve imports across the module.
+        run: pnpm nx run @zitadel/api:generate
+        env:
+          NX_DAEMON: false
+      - name: Update Go dependencies to latest
+        run: go get -u ./... && go mod tidy
       - name: Update npm dependencies to latest
         run: pnpm update --latest --recursive
       - name: Build all projects
