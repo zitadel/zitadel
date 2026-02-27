@@ -116,7 +116,7 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.LoginV2.set(level, event.Value)
 	case feature.KeyPermissionCheckV2:
 		features.PermissionCheckV2.set(level, event.Value)
-	case feature.KeyManagementConsoleUseV2UserApi:
+	case feature.KeyConsoleUseV2UserApi:
 		features.ManagementConsoleUseV2UserApi.set(level, event.Value)
 	}
 	return nil
