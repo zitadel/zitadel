@@ -196,10 +196,6 @@ Errors:
     RefreshToken:
       Invalid: "無効なリフレッシュトークンです"
       NotFound: "リフレッシュトークンが見つかりません"
-  Instance:
-    NotFound: "インスタンスが見つかりません"
-    AlreadyExists: "すでに存在するインスタンス"
-    NotChanged: "インスタンスは変更されていません"
   Org:
     AlreadyExists: "組織名またはIDはすでに使用されています"
     Invalid: "無効な組織です"
@@ -346,6 +342,8 @@ Errors:
       NotActive: "プロジェクトグラントはアクティブではありません"
       NotInactive: "プロジェクトグラントは非アクティブではありません"
   Instance:
+    AlreadyExists: "すでに存在するインスタンス"
+    NotChanged: "インスタンスは変更されていません"
     NotFound: "インスタンスが見つかりません。正しいドメインを持っていることを確認してください。 https://zitadel.com/docs/apis/introduction#domains を参照してください"
     Member:
       RolesNotChanged: "ロールは変更されていません"

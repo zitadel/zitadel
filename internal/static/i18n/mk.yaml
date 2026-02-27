@@ -194,10 +194,6 @@ Errors:
     RefreshToken:
       Invalid: "Токенот за обновување е невалиден"
       NotFound: "Токенот за обновување не е пронајден"
-  Instance:
-    NotFound: "Инстанцата не е пронајдена"
-    AlreadyExists: "Инстанцата веќе постои"
-    NotChanged: "Инстанцата не е променета"
   Org:
     AlreadyExists: "Името или ID-то на организацијата е веќе зафатено"
     Invalid: "Организацијата е невалидна"
@@ -344,6 +340,8 @@ Errors:
       NotActive: "Овластувањето за проектот не е активно"
       NotInactive: "Овластувањето за проектот не е неактивно"
   Instance:
+    AlreadyExists: "Инстанцата веќе постои"
+    NotChanged: "Инстанцата не е променета"
     NotFound: "Инстанцата не е пронајдена. Проверете дали имате точен домен. Погледнете на https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Улогите не се променети"
