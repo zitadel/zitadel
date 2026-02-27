@@ -35,6 +35,7 @@ func StartPostgres(ctx context.Context, logw io.Writer) (*postgres.PostgresConta
 	)
 
 	container, err := postgres.Run(ctx, "postgres:18",
+		testcontainers.WithReuseByName("zitadel-integration-postgres"),
 		testcontainers.WithLogger(log.New(logw, "[testcontainers/postgres] ", log.LstdFlags)),
 		postgres.WithDatabase(dbname),
 		postgres.WithUsername(user),
