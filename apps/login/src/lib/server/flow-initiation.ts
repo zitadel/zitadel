@@ -1,5 +1,6 @@
 import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
-import { setLanguageCookie } from "@/lib/cookies";
+import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
+import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
@@ -68,7 +69,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
   const locale = getValidLocaleFromUILocales(authRequest?.uiLocales);
   if (locale) {
-    await setLanguageCookie(locale);
+    const existingLanguage = await getLanguageCookie();
+    if (shouldUILocalesOverrideCookie() || !existingLanguage) {
+      await setLanguageCookie(locale);
+    }
   }
 
   let organization = "";
