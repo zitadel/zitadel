@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"connectrpc.com/connect"
@@ -91,6 +92,12 @@ func (s *Server) GetFederatedLogoutRequest(ctx context.Context, req *connect.Req
 				FormData: formData,
 			},
 		}
+	} else {
+		// An unrecognised binding type means we cannot give the client actionable
+		// directions. Return an explicit error rather than a response with a nil
+		// LogoutMethod that the client cannot act on.
+		return nil, connect.NewError(connect.CodeInternal,
+			fmt.Errorf("unsupported SAML binding type %q for logout request %s", logoutRequest.SAMLBindingType, req.Msg.GetLogoutId()))
 	}
 
 	return connect.NewResponse(response), nil

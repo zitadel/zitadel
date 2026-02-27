@@ -1,5 +1,16 @@
 "use server";
 
+import crypto from "crypto";
+import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
+import { Code, ConnectError, create } from "@zitadel/client";
+import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
+import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
+import {
+  AddHumanUserRequest,
+  AddHumanUserRequestSchema,
+  UpdateHumanUserRequestSchema,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
 import {
@@ -17,17 +28,6 @@ import {
   ServiceConfig,
   updateHuman,
 } from "@/lib/zitadel";
-import { Code, ConnectError, create } from "@zitadel/client";
-import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
-import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import {
-  AddHumanUserRequest,
-  AddHumanUserRequestSchema,
-  UpdateHumanUserRequestSchema,
-} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getTranslations } from "next-intl/server";
-import crypto from "crypto";
-import { headers } from "next/headers";
 import { getFingerprintIdCookie } from "../fingerprint";
 import { createNewSessionFromIdpIntent } from "./idp";
 

@@ -341,16 +341,25 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	}
 
 	// V2:
-	// Check if federated logout is needed before terminating the session
-	if path := o.federatedLogoutV2(ctx, endSessionRequest.IDTokenHintClaims.SessionID, endSessionRequest.RedirectURI); path != "" {
-		return path, nil
-	}
-
-	// Terminate the v2 session of the id_token_hint
+	// Terminate the local session first, then check if federated logout is needed.
+	// The local session must be invalidated unconditionally so that abandoning the IdP
+	// flow (e.g. user closes the browser, IdP is unreachable, SLO callback never fires)
+	// cannot leave an active Zitadel session behind.
+	//
+	// This matches the V1 behavior: terminateSession / terminateV1Session are called
+	// before federatedLogout above, so the patterns are now consistent.
 	_, err = o.command.TerminateSessionWithoutTokenCheck(ctx, endSessionRequest.IDTokenHintClaims.SessionID)
 	if err != nil {
 		return "", err
 	}
+
+	// After the local session is gone, redirect to the IdP SLO endpoint if configured.
+	// This is best-effort: the Zitadel session is already invalidated regardless of
+	// whether the IdP honours the logout request.
+	if path := o.federatedLogoutV2(ctx, endSessionRequest.IDTokenHintClaims.SessionID, endSessionRequest.RedirectURI); path != "" {
+		return path, nil
+	}
+
 	return v2PostLogoutRedirectURI(endSessionRequest.RedirectURI), nil
 }
 

@@ -283,7 +283,11 @@ func (c *Commands) findSessionIDPID(ctx context.Context, fetcher FederatedLogout
 
 	links, err := fetcher.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
 		Queries: []query.SearchQuery{userIDQuery},
-	}, nil) // Check what permission check should be used. Passing nil for now as command might bypass or handle internally
+		// nil permission check is intentional: this is an internal system call (federated logout),
+		// not a user-facing query. The result is already scoped to a specific userID, so no
+		// additional permission gate is needed. This matches the pattern used throughout the
+		// codebase for system-level IDP link lookups (e.g. auth_request.go).
+	}, nil)
 	if err != nil {
 		return "", err
 	}
@@ -292,10 +296,25 @@ func (c *Commands) findSessionIDPID(ctx context.Context, fetcher FederatedLogout
 		return "", nil
 	}
 
-	// In a real scenario with multiple linked IdPs, we might want to store the
-	// IdP used for the specific session in the session events.
-	// For now, we take the most recent one or the first one if only one exists.
-	// Since IDPUserLinks returns all links, we'll pick the first one.
+	// Known limitation: when a user has more than one IdP link, we cannot
+	// determine which IdP was actually used for the current session and we
+	// fall back to the first link returned by the query. This could cause
+	// federated logout to be sent to the wrong IdP, leaving the original
+	// IdP session active.
+	//
+	// Risk: low in practice today because most users authenticate via a single
+	// SAML IdP, but it is a correctness gap for multi-IdP setups.
+	//
+	// Correct fix: add an IDPID field to session.IntentCheckedEvent so that the
+	// IDP used at authentication time is stored as part of the session event
+	// stream. SessionWriteModel.reduceIntentChecked would then set an IDPID
+	// field that can be read here instead of guessing from the link list.
+	// That change touches session.go, session_model.go, and every call-site of
+	// session.NewIntentCheckedEvent, so it is tracked as a follow-up task.
+	if len(links.Links) > 1 {
+		logging.WithFields("userID", userID, "linkCount", len(links.Links)).
+			Warn("findSessionIDPID: user has multiple IdP links; selecting first as heuristic - federated logout may target wrong IdP")
+	}
 	return links.Links[0].IDPID, nil
 }
 
@@ -312,6 +331,8 @@ func (c *Commands) findIDPUserNameID(ctx context.Context, fetcher FederatedLogou
 
 	links, err := fetcher.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
 		Queries: []query.SearchQuery{userIDQuery, idpIDQuery},
+		// nil permission check is intentional: same reasoning as findSessionIDPID.
+		// The query is scoped to a specific (userID, idpID) pair; no further gate is required.
 	}, nil)
 	if err != nil || len(links.Links) != 1 {
 		return "", zerrors.ThrowPreconditionFailed(err, "COMMAND-Sf4g3", "Errors.User.ExternalIDP.NotFound")
