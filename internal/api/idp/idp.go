@@ -477,6 +477,25 @@ func (h *Handler) handleSLO(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Validate the LogoutResponse before completing the logout.
+		// We don't block on failure because the session is already terminated on our side;
+		// blocking would confuse users. We do log warnings so ops can detect anomalies.
+		if resp, parseErr := parseSAMLLogoutResponse(data.Response); parseErr != nil {
+			logging.WithFields("logoutID", data.RelayState).
+				WithError(parseErr).Warn("handleSLO: could not parse V2 LogoutResponse")
+		} else {
+			if resp.Status.StatusCode.Value != saml.StatusSuccess {
+				logging.WithFields("logoutID", data.RelayState,
+					"status", resp.Status.StatusCode.Value).
+					Warn("handleSLO: V2 LogoutResponse status is not success")
+			}
+			if resp.InResponseTo != "" && resp.InResponseTo != data.RelayState {
+				logging.WithFields("logoutID", data.RelayState,
+					"inResponseTo", resp.InResponseTo).
+					Warn("handleSLO: V2 LogoutResponse InResponseTo does not match expected logoutID")
+			}
+		}
+
 		// Complete the logout
 		postLogoutURI, err := h.commands.CompleteFederatedLogout(ctx, data.RelayState)
 		if err != nil {
@@ -522,8 +541,26 @@ func (h *Handler) handleSLO(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// We could also parse and validate the response here, but for example Azure does not sign it and thus would already fail.
-	// Also we can't really act on it if it fails.
+	// Validate the LogoutResponse before completing the logout.
+	// We don't block on failure: the session is already terminated on our side, and some IdPs
+	// (e.g. Azure) do not sign SLO responses. Warnings make anomalies auditable.
+	if resp, parseErr := parseSAMLLogoutResponse(data.Response); parseErr != nil {
+		logging.WithFields("relayState", data.RelayState).
+			WithError(parseErr).Warn("handleSLO: could not parse V1 LogoutResponse")
+	} else {
+		if resp.Status.StatusCode.Value != saml.StatusSuccess {
+			logging.WithFields("relayState", data.RelayState,
+				"status", resp.Status.StatusCode.Value).
+				Warn("handleSLO: V1 LogoutResponse status is not success")
+		}
+		// RelayState is the SessionID, which is the ID we set in InResponseTo during the LogoutRequest.
+		if resp.InResponseTo != "" && resp.InResponseTo != logoutState.SessionID {
+			logging.WithFields("relayState", data.RelayState,
+				"inResponseTo", resp.InResponseTo,
+				"expectedSessionID", logoutState.SessionID).
+				Warn("handleSLO: V1 LogoutResponse InResponseTo does not match expected sessionID")
+		}
+	}
 
 	err = h.caches.federatedLogouts.Delete(ctx, federatedlogout.IndexRequestID, federatedlogout.Key(logoutState.InstanceID, logoutState.SessionID))
 	logging.WithFields("instanceID", logoutState.InstanceID, "sessionID", logoutState.SessionID).OnError(err).Error("could not delete V1 federated logout from cache")
@@ -650,4 +687,21 @@ func reason(err, description string) string {
 		return err
 	}
 	return err + ": " + description
+}
+
+// parseSAMLLogoutResponse decodes and parses a base64-encoded SAMLResponse into a LogoutResponse.
+// Returns an error if the response is empty or cannot be decoded/parsed.
+func parseSAMLLogoutResponse(encoded string) (*saml.LogoutResponse, error) {
+	if encoded == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "SAML-slo001", "Errors.Intent.ResponseInvalid")
+	}
+	decoded, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return nil, zerrors.ThrowInvalidArgument(err, "SAML-slo002", "Errors.Intent.ResponseInvalid")
+	}
+	var resp saml.LogoutResponse
+	if err := xml.Unmarshal(decoded, &resp); err != nil {
+		return nil, zerrors.ThrowInvalidArgument(err, "SAML-slo003", "Errors.Intent.ResponseInvalid")
+	}
+	return &resp, nil
 }
