@@ -54,11 +54,15 @@ export function Feedback() {
   if (showReasonInput) {
     return (
       <div className="flex flex-col gap-3 max-w-md pt-8 mt-8 border-t">
-        <p className="text-sm font-medium text-fd-foreground">
+        <label
+          htmlFor="feedback-reason"
+          className="text-sm font-medium text-fd-foreground"
+        >
           How can we improve this page?
-        </p>
+        </label>
         <form onSubmit={handleSubmitNegativeFeedback} className="flex flex-col gap-2">
           <textarea
+            id="feedback-reason"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="What was missing or confusing?"
@@ -76,7 +80,10 @@ export function Feedback() {
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => setShowReasonInput(false)}
+                onClick={() => {
+                  setShowReasonInput(false);
+                  setReason('');
+                }}
                 className="px-4 py-2 text-sm font-medium transition-colors border rounded-md border-fd-border hover:bg-fd-accent/10"
               >
                 Cancel
