@@ -195,10 +195,6 @@ Errors:
     RefreshToken:
       Invalid: "Токен обновления недействителен"
       NotFound: "Токен обновления не найден"
-  Instance:
-    NotFound: "Экземпляр не найден"
-    AlreadyExists: "Экземпляр уже существует"
-    NotChanged: "Экземпляр не изменён"
   Org:
     AlreadyExists: "Название организации или идентификатор уже занят"
     Invalid: "Организация недействительна"
@@ -339,6 +335,8 @@ Errors:
       NotActive: "Допуск проекта неактивен"
       NotInactive: "Допуск проекта не является неактивным"
   Instance:
+    AlreadyExists: "Экземпляр уже существует"
+    NotChanged: "Экземпляр не изменён"
     NotFound: "Экземпляр не найден. Убедитесь, что у вас правильный домен. Проверьте https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Роли не изменены"
