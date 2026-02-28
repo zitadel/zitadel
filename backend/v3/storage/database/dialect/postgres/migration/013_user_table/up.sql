@@ -101,7 +101,7 @@ CREATE UNIQUE INDEX ON zitadel.users(password_verification_id) WHERE password_ve
 CREATE UNIQUE INDEX ON zitadel.users(email_verification_id) WHERE email_verification_id IS NOT NULL;
 CREATE UNIQUE INDEX ON zitadel.users(phone_verification_id) WHERE phone_verification_id IS NOT NULL;
 
-CREATE TRIGGER trigger_set_updated_at
+CREATE OR REPLACE TRIGGER trigger_set_updated_at
 BEFORE UPDATE ON zitadel.users
 FOR EACH ROW
 WHEN (NEW.updated_at IS NULL)
@@ -127,7 +127,7 @@ CREATE TABLE zitadel.user_metadata (
 CREATE INDEX idx_user_metadata_key ON zitadel.user_metadata (key);
 CREATE INDEX idx_user_metadata_value ON zitadel.user_metadata (sha256(value));
 
-CREATE TRIGGER trg_set_updated_at_user_metadata
+CREATE OR REPLACE TRIGGER trg_set_updated_at_user_metadata
   BEFORE INSERT OR UPDATE ON zitadel.user_metadata
   FOR EACH ROW
   WHEN (NEW.updated_at IS NULL)
@@ -257,7 +257,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_set_username_org_unique
+CREATE OR REPLACE TRIGGER trg_set_username_org_unique
 BEFORE INSERT ON zitadel.users
 FOR EACH ROW
 EXECUTE FUNCTION zitadel.set_username_org_unique();
