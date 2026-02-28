@@ -59,7 +59,7 @@ func (g *GroupWriteModel) Reduce() error {
 	for _, event := range g.Events {
 		switch e := event.(type) {
 		case *group.GroupAddedEvent:
-			g.AggregateID = e.Aggregate().ID
+			g.AggregateID = e.ID
 			g.Name = e.Name
 			g.Description = e.Description
 			g.State = domain.GroupStateActive
