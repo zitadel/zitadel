@@ -5,6 +5,8 @@ export default defineConfig((options: Options) => ({
     index: "src/index.ts",
     "auth/index": "src/auth/index.ts",
     "auth/oidc": "src/auth/oidc.ts",
+    "auth/session": "src/auth/session.ts",
+    cli: "src/cli/index.ts",
     middleware: "src/middleware.ts",
     "server-action": "src/server-action.ts",
     api: "src/api.ts",
@@ -28,7 +30,6 @@ export default defineConfig((options: Options) => ({
     "@zitadel/zitadel-js/webhooks",
     "@zitadel/zitadel-js/node",
     "@zitadel/react",
-    "oauth4webapi",
   ],
   ...options,
 }));

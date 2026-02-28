@@ -749,6 +749,9 @@ importers:
       jose:
         specifier: ^5.10.0
         version: 5.10.0
+      oauth4webapi:
+        specifier: ^3.5.0
+        version: 3.8.5
     devDependencies:
       '@bufbuild/buf':
         specifier: ^1.34.0
@@ -789,9 +792,6 @@ importers:
       '@zitadel/zitadel-js':
         specifier: workspace:*
         version: link:../zitadel-js
-      oauth4webapi:
-        specifier: ^3.5.0
-        version: 3.8.5
     devDependencies:
       '@types/node':
         specifier: ^24.10.9

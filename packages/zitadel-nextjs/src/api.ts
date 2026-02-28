@@ -18,6 +18,7 @@ import {
   createGrpcTransport,
   createAuthorizationBearerInterceptor,
 } from "@zitadel/zitadel-js";
+import { newSystemToken } from "@zitadel/zitadel-js/node";
 import {
   createUserServiceClient,
   createSettingsServiceClient,
@@ -42,6 +43,30 @@ export interface ApiClientOptions {
    * Useful for service-to-service calls with a system token.
    */
   accessToken?: string;
+  /**
+   * Service user token for machine-to-machine calls.
+   * Falls back to `ZITADEL_SERVICE_USER_TOKEN`.
+   */
+  serviceUserToken?: string;
+  /**
+   * Service user key ID for private key JWT authentication.
+   * Falls back to `ZITADEL_SERVICE_USER_KEY_ID`.
+   */
+  serviceUserKeyId?: string;
+  /**
+   * Service user ID used as issuer/subject for private key JWT authentication.
+   * Falls back to `ZITADEL_SERVICE_USER_ID`.
+   */
+  serviceUserId?: string;
+  /**
+   * PEM-encoded private key for private key JWT authentication.
+   * Falls back to `ZITADEL_SERVICE_USER_PRIVATE_KEY`.
+   */
+  serviceUserPrivateKey?: string;
+  /**
+   * Optional JWT lifetime (seconds) for generated private key JWTs.
+   */
+  serviceUserTokenExpiresInSeconds?: number;
   /**
    * Cookie secret for reading the session (when accessToken is not provided).
    * Falls back to `ZITADEL_COOKIE_SECRET`.
@@ -70,11 +95,66 @@ export interface ZitadelApiClient {
   actionService: ReturnType<typeof createActionServiceClient>;
 }
 
+async function resolveAccessToken(
+  apiUrl: string,
+  options?: ApiClientOptions,
+): Promise<string> {
+  if (options?.accessToken) {
+    return options.accessToken;
+  }
+
+  const serviceUserToken =
+    options?.serviceUserToken ?? process.env.ZITADEL_SERVICE_USER_TOKEN;
+  if (serviceUserToken) {
+    return serviceUserToken;
+  }
+
+  const serviceUserKeyId =
+    options?.serviceUserKeyId ?? process.env.ZITADEL_SERVICE_USER_KEY_ID;
+  const serviceUserId =
+    options?.serviceUserId ?? process.env.ZITADEL_SERVICE_USER_ID;
+  const serviceUserPrivateKey =
+    options?.serviceUserPrivateKey ?? process.env.ZITADEL_SERVICE_USER_PRIVATE_KEY;
+
+  const hasPartialPrivateKeyJwtConfig = Boolean(
+    serviceUserKeyId || serviceUserId || serviceUserPrivateKey,
+  );
+  if (
+    hasPartialPrivateKeyJwtConfig &&
+    !(serviceUserKeyId && serviceUserId && serviceUserPrivateKey)
+  ) {
+    throw new Error(
+      "Incomplete private key JWT configuration. Provide serviceUserKeyId/ZITADEL_SERVICE_USER_KEY_ID, serviceUserId/ZITADEL_SERVICE_USER_ID, and serviceUserPrivateKey/ZITADEL_SERVICE_USER_PRIVATE_KEY together.",
+    );
+  }
+
+  if (serviceUserKeyId && serviceUserId && serviceUserPrivateKey) {
+    return newSystemToken({
+      keyId: serviceUserKeyId,
+      key: serviceUserPrivateKey,
+      issuer: serviceUserId,
+      audience: apiUrl,
+      expiresInSeconds: options?.serviceUserTokenExpiresInSeconds,
+    });
+  }
+
+  const session = await getSession(options?.cookieSecret);
+  if (!session) {
+    throw new Error(
+      "No valid session found. Call signIn() first, provide accessToken/serviceUserToken, or configure service user private key JWT.",
+    );
+  }
+  return session.accessToken;
+}
+
 /**
  * Creates a pre-authenticated ZITADEL v2 API client.
  *
- * If `accessToken` is not provided, reads the session cookie to get
- * the user's access token. Throws if no valid session exists.
+ * Token resolution order:
+ * 1. `accessToken`
+ * 2. `serviceUserToken` / `ZITADEL_SERVICE_USER_TOKEN`
+ * 3. private key JWT options / env vars
+ * 4. current OIDC session cookie token
  */
 export async function createZitadelApiClient(
   options?: ApiClientOptions,
@@ -87,17 +167,7 @@ export async function createZitadelApiClient(
     );
   }
 
-  // Resolve the access token
-  let token = options?.accessToken;
-  if (!token) {
-    const session = await getSession(options?.cookieSecret);
-    if (!session) {
-      throw new Error(
-        "No valid session found. Call signIn() first or provide an accessToken.",
-      );
-    }
-    token = session.accessToken;
-  }
+  const token = await resolveAccessToken(apiUrl, options);
 
   // Create a gRPC transport with the bearer token interceptor
   const transport = createGrpcTransport({

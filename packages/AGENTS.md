@@ -6,11 +6,11 @@
 ## Main Packages
 - **`packages/zitadel-proto`** (`@zitadel/proto`): generated protobuf TypeScript artifacts.
 - **`packages/zitadel-client`** (`@zitadel/client`): higher-level client library built on generated proto/connect types.
-- **`packages/zitadel-js`** (`@zitadel/zitadel-js`): isomorphic core SDK — framework-agnostic primitives for OIDC, session management, JWT/JWE handling, webhook verification, and ConnectRPC transport creation. Generates its own protobuf types from `proto/` using local `protoc-gen-es`.
+- **`packages/zitadel-js`** (`@zitadel/zitadel-js`): isomorphic core SDK — framework-agnostic primitives for OIDC (wrapped via `oauth4webapi`), session management, JWT/JWE handling, webhook verification, and ConnectRPC transport creation. Generates its own protobuf types from `proto/` using local `protoc-gen-es`.
 - **`packages/zitadel-react`** (`@zitadel/react`): React hooks and context for client-side state management. Depends on `@zitadel/zitadel-js`.
-- **`packages/zitadel-nextjs`** (`@zitadel/nextjs`): Next.js App Router integration — OIDC lifecycle (via `oauth4webapi`), middleware, server actions, v2 API access, and Actions v2 webhook handling. Depends on `@zitadel/zitadel-js` and `@zitadel/react`.
+- **`packages/zitadel-nextjs`** (`@zitadel/nextjs`): Next.js App Router integration — OIDC lifecycle, middleware, server actions, v2 API access, and Actions v2 webhook handling. Depends on `@zitadel/zitadel-js` and `@zitadel/react`.
   - **`auth/oidc`** — OIDC redirect-based login ("add login to your app"). Env: `ZITADEL_ISSUER_URL`, `ZITADEL_CLIENT_ID`, `ZITADEL_CALLBACK_URL`, `ZITADEL_COOKIE_SECRET`.
-  - **`auth/session`** — Session API for custom login UIs *(planned, not yet implemented)*.
+  - **`auth/session`** — Session API helper layer for custom login UIs.
   - **`middleware`** — Route protection middleware. Reads `ZITADEL_COOKIE_SECRET`.
   - **`api`** — ZITADEL v2 API client factory. Reads `ZITADEL_API_URL`.
   - **`webhook`** — Actions v2 webhook handler. Reads `ZITADEL_WEBHOOK_SECRET`, `ZITADEL_WEBHOOK_JWKS_ENDPOINT`, `ZITADEL_WEBHOOK_JWE_PRIVATE_KEY`.
@@ -35,11 +35,11 @@
     ↑
 @zitadel/client         (depends on @zitadel/proto)
 
-@zitadel/zitadel-js     (standalone — generates own protos, depends on @connectrpc + jose)
+@zitadel/zitadel-js     (standalone — generates own protos, depends on @connectrpc + jose + oauth4webapi)
     ↑
 @zitadel/react          (depends on @zitadel/zitadel-js)
     ↑
-@zitadel/nextjs         (depends on @zitadel/react + @zitadel/zitadel-js + oauth4webapi)
+@zitadel/nextjs         (depends on @zitadel/react + @zitadel/zitadel-js)
 
 @zitadel/angular        (depends on @zitadel/zitadel-js)
 ```
@@ -61,7 +61,6 @@ All SDK modules auto-read these env vars as fallbacks when options are not passe
 ## Module Naming Convention
 Auth modules live under `auth/` with submodules per integration pattern:
 - `auth/oidc` — Redirect-based OIDC login
-- `auth/session` — Session API for custom login UIs *(planned)*
+- `auth/session` — Session API helper layer for custom login UIs
 
 Check types (password, passkey, TOTP, etc.) are **parameters** within `auth/session`, not separate modules.
-

@@ -28,7 +28,8 @@
     "@connectrpc/connect": "^2.1.1",
     "@connectrpc/connect-node": "^2.1.1",
     "@connectrpc/connect-web": "^2.1.1",
-    "jose": "^5.10.0"
+    "jose": "^5.10.0",
+    "oauth4webapi": "^3.5.0"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.34.0",

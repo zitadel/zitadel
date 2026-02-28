@@ -27,6 +27,19 @@ We provide this list for informational purposes and to foster community engageme
 
 <Frameworks filter={(framework) => framework.sdk === true } />
 
+## Official JavaScript SDK packages
+
+For JavaScript/TypeScript integrations, ZITADEL provides official SDK packages that cover common frontend and Next.js server use cases:
+
+- `@zitadel/zitadel-js`: framework-agnostic core helpers (transport/client factories, v2 client factories, token helpers, webhook verification)
+- `@zitadel/nextjs`: Next.js App Router helpers for OIDC login (`auth/oidc`), custom Login UI/session flows (`auth/session`), v2 API access (`api`), and Actions v2 webhooks (`webhook`)
+
+Use-case guides:
+
+- [Build your own Login UI](/guides/integrate/login-ui/login-app)
+- [Access ZITADEL APIs](/guides/integrate/zitadel-apis/access-zitadel-apis)
+- [Verify Actions payload integrity](/guides/integrate/actions/testing-request-signature)
+
 ## Resources
 
 <Frameworks filter={(framework) => framework.client === false || framework.client == null} />

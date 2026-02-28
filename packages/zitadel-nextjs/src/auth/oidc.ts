@@ -11,10 +11,16 @@
  *
  * @module
  */
-import * as oauth from "oauth4webapi";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { generatePKCE, generateState } from "@zitadel/zitadel-js";
+import {
+  createOIDCAuthorizationUrl,
+  createOIDCEndSessionUrl,
+  discoverOIDCAuthorizationServer,
+  exchangeOIDCAuthorizationCode,
+  generatePKCE,
+  generateState,
+} from "@zitadel/zitadel-js";
 import { encrypt, decrypt } from "../crypto.js";
 
 // ---------------------------------------------------------------------------
@@ -136,14 +142,6 @@ function getCookieSecret(options?: Pick<OIDCOptions, "cookieSecret">): string {
   return secret;
 }
 
-async function discoverIssuer(issuerUrl: string) {
-  const url = new URL(issuerUrl);
-  const response = await oauth.discoveryRequest(url, {
-    algorithm: "oidc",
-  });
-  return oauth.processDiscoveryResponse(url, response);
-}
-
 // ---------------------------------------------------------------------------
 // Public API — OIDC Authorization Code + PKCE
 // ---------------------------------------------------------------------------
@@ -176,7 +174,7 @@ export async function signIn(options?: OIDCOptions): Promise<never> {
   const secret = getCookieSecret(options);
   const scopes = options?.scopes ?? ["openid", "profile", "email"];
 
-  const issuerConfig = await discoverIssuer(issuerUrl);
+  const authorizationServer = await discoverOIDCAuthorizationServer(issuerUrl);
 
   const { codeVerifier, codeChallenge } = await generatePKCE();
   const state = generateState();
@@ -194,20 +192,15 @@ export async function signIn(options?: OIDCOptions): Promise<never> {
     maxAge: 600, // 10 minutes — generous for the auth flow
   });
 
-  // Build the authorization URL
-  const authUrl = new URL(
-    issuerConfig.authorization_endpoint as string,
-  );
-  authUrl.searchParams.set("response_type", "code");
-  authUrl.searchParams.set("client_id", clientId);
-  authUrl.searchParams.set("redirect_uri", callbackUrl);
-  authUrl.searchParams.set("scope", scopes.join(" "));
-  authUrl.searchParams.set("state", state);
-  authUrl.searchParams.set("code_challenge", codeChallenge);
-  authUrl.searchParams.set("code_challenge_method", "S256");
-  if (options?.prompt) {
-    authUrl.searchParams.set("prompt", options.prompt);
-  }
+  const authUrl = createOIDCAuthorizationUrl({
+    authorizationServer,
+    clientId,
+    redirectUri: callbackUrl,
+    scopes,
+    state,
+    codeChallenge,
+    prompt: options?.prompt,
+  });
 
   redirect(authUrl.toString());
   // redirect() throws NEXT_REDIRECT — this line is unreachable
@@ -240,7 +233,7 @@ export async function handleCallback(
   const callbackUrl = getCallbackUrl(options);
   const secret = getCookieSecret(options);
 
-  const issuerConfig = await discoverIssuer(issuerUrl);
+  const authorizationServer = await discoverOIDCAuthorizationServer(issuerUrl);
 
   // Retrieve and decrypt PKCE data
   const cookieStore = await cookies();
@@ -270,42 +263,24 @@ export async function handleCallback(
     throw new Error("State mismatch — possible CSRF attack");
   }
 
-  // Exchange the authorization code for tokens
-  const client: oauth.Client = {
-    client_id: clientId,
-  };
-
-  const params = oauth.validateAuthResponse(
-    issuerConfig,
-    client,
+  const tokenResult = await exchangeOIDCAuthorizationCode({
+    authorizationServer,
+    clientId,
     callbackRequestUrl,
-    state,
-  );
-
-  const tokenResponse = await oauth.authorizationCodeGrantRequest(
-    issuerConfig,
-    client,
-    oauth.None(),
-    params,
     callbackUrl,
+    expectedState: state,
     codeVerifier,
-  );
+  });
 
-  const tokenResult = await oauth.processAuthorizationCodeResponse(
-    issuerConfig,
-    client,
-    tokenResponse,
-  );
-
-  const expiresAt = tokenResult.expires_in
-    ? Math.floor(Date.now() / 1000) + tokenResult.expires_in
+  const expiresAt = tokenResult.expiresIn
+    ? Math.floor(Date.now() / 1000) + tokenResult.expiresIn
     : Math.floor(Date.now() / 1000) + 3600;
 
   const result: OIDCCallbackResult = {
-    accessToken: tokenResult.access_token,
-    idToken: tokenResult.id_token,
+    accessToken: tokenResult.accessToken,
+    idToken: tokenResult.idToken,
     expiresAt,
-    refreshToken: tokenResult.refresh_token,
+    refreshToken: tokenResult.refreshToken,
   };
 
   // Store the session in an encrypted cookie
@@ -317,7 +292,7 @@ export async function handleCallback(
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: tokenResult.expires_in ?? 3600,
+    maxAge: tokenResult.expiresIn ?? 3600,
   });
 
   return result;
@@ -394,20 +369,14 @@ export async function signOut(options?: {
   // Redirect to end_session endpoint if issuerUrl is available
   const issuerUrl = options?.issuerUrl ?? process.env.ZITADEL_ISSUER_URL;
   if (issuerUrl) {
-    const issuerConfig = await discoverIssuer(issuerUrl);
-    const endSessionEndpoint = issuerConfig.end_session_endpoint;
-
-    if (endSessionEndpoint) {
-      const logoutUrl = new URL(endSessionEndpoint as string);
-      if (idTokenHint) {
-        logoutUrl.searchParams.set("id_token_hint", idTokenHint);
-      }
-      if (options?.postLogoutRedirectUri) {
-        logoutUrl.searchParams.set(
-          "post_logout_redirect_uri",
-          options.postLogoutRedirectUri,
-        );
-      }
+    const authorizationServer =
+      await discoverOIDCAuthorizationServer(issuerUrl);
+    const logoutUrl = createOIDCEndSessionUrl({
+      authorizationServer,
+      idTokenHint,
+      postLogoutRedirectUri: options?.postLogoutRedirectUri,
+    });
+    if (logoutUrl) {
       redirect(logoutUrl.toString());
     }
   }

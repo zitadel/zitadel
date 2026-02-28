@@ -44,8 +44,8 @@ export async function getSession(
 
   const session = JSON.parse(json) as SessionData;
 
-  // Check if the session is still valid
-  if (!isSessionValid({ expiresAt: session.expiresAt })) {
+  // `expiresAt` is stored as epoch seconds in the cookie payload.
+  if (!isSessionValid({ expiresAt: session.expiresAt * 1000 })) {
     return null;
   }
 

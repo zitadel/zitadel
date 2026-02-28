@@ -36,5 +36,9 @@ export const createFeatureServiceClient = createClientFor(FeatureService);
 export const createIdpServiceClient = createClientFor(IdentityProviderService);
 export const createActionServiceClient = createClientFor(ActionService);
 
+export type { RequestChallenges } from "./generated/zitadel/session/v2/challenge_pb.js";
+export type { UserAgent } from "./generated/zitadel/session/v2/session_pb.js";
+export type { Checks } from "./generated/zitadel/session/v2/session_service_pb.js";
+
 export { makeReqCtx } from "./context.js";
 export type { RequestContext } from "./context.js";
