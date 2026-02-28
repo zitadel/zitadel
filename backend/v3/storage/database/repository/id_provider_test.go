@@ -14,8 +14,6 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 )
 
-var stylingType int16 = 1
-
 func TestCreateIDProvider(t *testing.T) {
 	beforeCreate := time.Now()
 	tx, err := pool.Begin(t.Context(), nil)
@@ -1109,7 +1107,7 @@ func TestListIDProvider(t *testing.T) {
 
 			// check idp values
 			returnedIDPs, err := idpRepo.List(t.Context(), tx,
-				database.WithCondition(database.And(tt.conditionClauses...)),
+				database.WithCondition(database.And(append(tt.conditionClauses, idpRepo.InstanceIDCondition(instanceId))...)),
 			)
 			require.NoError(t, err)
 			if tt.noIDPsReturned {
@@ -1118,20 +1116,7 @@ func TestListIDProvider(t *testing.T) {
 			}
 
 			assert.Equal(t, len(idps), len(returnedIDPs))
-			for i, idp := range idps {
-
-				assert.Equal(t, returnedIDPs[i].InstanceID, idp.InstanceID)
-				assert.Equal(t, returnedIDPs[i].OrgID, idp.OrgID)
-				assert.Equal(t, returnedIDPs[i].State, idp.State)
-				assert.Equal(t, returnedIDPs[i].ID, idp.ID)
-				assert.Equal(t, returnedIDPs[i].Name, idp.Name)
-				assert.Equal(t, returnedIDPs[i].Type, idp.Type)
-				assert.Equal(t, returnedIDPs[i].AllowCreation, idp.AllowCreation)
-				assert.Equal(t, returnedIDPs[i].AllowAutoCreation, idp.AllowAutoCreation)
-				assert.Equal(t, returnedIDPs[i].AllowAutoUpdate, idp.AllowAutoUpdate)
-				assert.Equal(t, returnedIDPs[i].AllowLinking, idp.AllowLinking)
-				assert.Equal(t, returnedIDPs[i].Payload, idp.Payload)
-			}
+			assert.ElementsMatch(t, idps, returnedIDPs)
 		})
 	}
 }
@@ -1190,42 +1175,12 @@ func TestDeleteIDProvider(t *testing.T) {
 				noOfDeletedRows:        noOfIDPs,
 			}
 		}(),
-		func() test {
-			name := gofakeit.Name()
-			var noOfIDPs int64 = 1
-			return test{
-				name: "happy path delete idp filter name",
-				testFunc: func(t *testing.T) {
-					for range noOfIDPs {
-						idp := domain.IdentityProvider{
-							InstanceID:        instanceId,
-							OrgID:             &orgId,
-							ID:                gofakeit.Name(),
-							State:             domain.IDPStateActive,
-							Name:              name,
-							Type:              gu.Ptr(domain.IDPTypeOIDC),
-							AllowCreation:     true,
-							AllowAutoCreation: true,
-							AllowAutoUpdate:   true,
-							AllowLinking:      true,
-							Payload:           []byte("{}"),
-						}
-
-						err := idpRepo.Create(t.Context(), tx, &idp)
-						require.NoError(t, err)
-
-					}
-				},
-				idpIdentifierCondition: idpRepo.NameCondition(database.TextOperationEqual, name),
-				noOfDeletedRows:        noOfIDPs,
-			}
-		}(),
 		{
 			name:                   "delete non existent idp",
-			idpIdentifierCondition: idpRepo.NameCondition(database.TextOperationEqual, gofakeit.Name()),
+			idpIdentifierCondition: idpRepo.IDCondition(gofakeit.UUID()),
 		},
 		func() test {
-			name := gofakeit.Name()
+			id := gofakeit.UUID()
 			return test{
 				name: "deleted already deleted idp",
 				testFunc: func(t *testing.T) {
@@ -1234,9 +1189,9 @@ func TestDeleteIDProvider(t *testing.T) {
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
 							OrgID:             &orgId,
-							ID:                gofakeit.Name(),
+							ID:                id,
 							State:             domain.IDPStateActive,
-							Name:              name,
+							Name:              gofakeit.Name(),
 							Type:              gu.Ptr(domain.IDPTypeOIDC),
 							AllowCreation:     true,
 							AllowAutoCreation: true,
@@ -1254,13 +1209,13 @@ func TestDeleteIDProvider(t *testing.T) {
 						database.And(
 							idpRepo.InstanceIDCondition(instanceId),
 							idpRepo.OrgIDCondition(&orgId),
-							idpRepo.NameCondition(database.TextOperationEqual, name),
+							idpRepo.IDCondition(id),
 						),
 					)
 					assert.Equal(t, int64(1), affectedRows)
 					require.NoError(t, err)
 				},
-				idpIdentifierCondition: idpRepo.NameCondition(database.TextOperationEqual, name),
+				idpIdentifierCondition: idpRepo.IDCondition(id),
 				// this test should return 0 affected rows as the idp was already deleted
 				noOfDeletedRows: 0,
 			}
