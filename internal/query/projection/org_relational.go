@@ -73,10 +73,10 @@ func (p *orgRelationalProjection) reduceOrgRelationalAdded(event eventstore.Even
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-uYq5R", "reduce.wrong.event.type %s", org.OrgAddedEventType)
 	}
 
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ro7g4", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-K6rs9Y", "reduce.wrong.db.pool %T", ex)
 		}
 
 		repo := repository.OrganizationRepository()
@@ -85,7 +85,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalAdded(event eventstore.Even
 			Name:       e.Name,
 			InstanceID: e.Aggregate().InstanceID,
 			State:      domain.OrgStateActive,
-			CreatedAt:  e.CreationDate(),
+			CreatedAt:  e.CreatedAt(),
 			UpdatedAt:  e.CreatedAt(),
 		})
 	}), nil
@@ -99,15 +99,15 @@ func (p *orgRelationalProjection) reduceOrgRelationalChanged(event eventstore.Ev
 	if e.Name == "" {
 		return handler.NewNoOpStatement(e), nil
 	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZrVXLa", "reduce.wrong.db.pool %T", ex)
 		}
 
 		repo := repository.OrganizationRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetName(e.Name),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
@@ -121,7 +121,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalDeactivated(event eventstor
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-BApK5", "reduce.wrong.event.type %s", org.OrgDeactivatedEventType)
 	}
 
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ro7g4", "reduce.wrong.db.pool %T", ex)
@@ -129,7 +129,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalDeactivated(event eventstor
 
 		repo := repository.OrganizationRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetState(domain.OrgStateInactive),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
@@ -142,7 +142,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalReactivated(event eventstor
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-o38DE", "reduce.wrong.event.type %s", org.OrgReactivatedEventType)
 	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5snmW", "reduce.wrong.db.pool %T", ex)
@@ -150,7 +150,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalReactivated(event eventstor
 
 		repo := repository.OrganizationRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetState(domain.OrgStateActive),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
@@ -161,16 +161,16 @@ func (p *orgRelationalProjection) reduceOrgRelationalReactivated(event eventstor
 func (p *orgRelationalProjection) reduceOrgRelationalRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-DGm9g", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-DGm9g", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-6y7hJ", "reduce.wrong.db.pool %T", ex)
 		}
 
 		repo := repository.OrganizationRepository()
-		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx), repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID))
+		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx), repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID))
 		return err
 	}), nil
 }

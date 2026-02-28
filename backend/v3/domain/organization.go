@@ -71,7 +71,7 @@ type organizationConditions interface {
 type organizationChanges interface {
 	// SetName sets the name column.
 	SetName(name string) database.Change
-	// SetState sets the name column.
+	// SetState sets the state column.
 	SetState(state OrgState) database.Change
 	// SetUpdatedAt sets the updated at column.
 	SetUpdatedAt(updatedAt time.Time) database.Change

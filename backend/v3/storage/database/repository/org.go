@@ -150,9 +150,6 @@ func (o org) SetState(state domain.OrgState) database.Change {
 
 // SetUpdatedAt implements [domain.organizationChanges].
 func (o org) SetUpdatedAt(updatedAt time.Time) database.Change {
-	if updatedAt.IsZero() {
-		return database.NewChangeToNull(o.UpdatedAtColumn())
-	}
 	return database.NewChange(o.UpdatedAtColumn(), updatedAt)
 }
 
