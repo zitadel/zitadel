@@ -54,6 +54,9 @@ describe("Login Container TLS Support", () => {
     beforeAll(async () => {
       container = await loginImage
         .withExposedPorts(3000)
+        .withEnvironment({
+          OTEL_SDK_DISABLED: "true",
+        })
         .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
         .start();
 
@@ -81,6 +84,7 @@ describe("Login Container TLS Support", () => {
           ZITADEL_TLS_ENABLED: "true",
           ZITADEL_TLS_CERTPATH: "/certs/server.crt",
           ZITADEL_TLS_KEYPATH: "/certs/server.key",
+          OTEL_SDK_DISABLED: "true",
         })
         .withCopyFilesToContainer([
           {
