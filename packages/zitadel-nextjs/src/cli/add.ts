@@ -4,6 +4,11 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const SDK_PACKAGE = "@zitadel/nextjs";
+const WORKSPACE_SDK_PACKAGES = [
+  "@zitadel/zitadel-js@workspace:*",
+  "@zitadel/react@workspace:*",
+  "@zitadel/nextjs@workspace:*",
+] as const;
 
 const OIDC_ROUTE_TEMPLATES: Record<string, string> = {
   "api/auth/signin/route": `import { signIn } from "@zitadel/nextjs/auth/oidc";
@@ -171,11 +176,13 @@ type Logger = Pick<Console, "log" | "warn">;
 
 export type PackageManager = "pnpm" | "npm" | "yarn";
 export type AuthMode = "oidc" | "session";
+export type DependencySource = "npm" | "workspace";
 
 export interface AddCommandOptions {
   cwd?: string;
   dryRun?: boolean;
   skipInstall?: boolean;
+  source?: DependencySource;
   auth?: AuthMode;
   withApi?: boolean;
   withWebhook?: boolean;
@@ -189,6 +196,7 @@ export interface AddCommandResult {
   authMode: AuthMode;
   withApi: boolean;
   withWebhook: boolean;
+  dependencySource: DependencySource;
   createdFiles: string[];
   skippedFiles: string[];
   envUpdated: boolean;
@@ -211,14 +219,20 @@ function isTypeScriptProject(
 }
 
 export function detectPackageManager(projectRoot: string): PackageManager {
-  if (existsSync(path.join(projectRoot, "pnpm-lock.yaml"))) {
-    return "pnpm";
-  }
-  if (existsSync(path.join(projectRoot, "yarn.lock"))) {
-    return "yarn";
-  }
-  if (existsSync(path.join(projectRoot, "package-lock.json"))) {
-    return "npm";
+  let currentDir = projectRoot;
+  let previousDir = "";
+  while (currentDir !== previousDir) {
+    if (existsSync(path.join(currentDir, "pnpm-lock.yaml"))) {
+      return "pnpm";
+    }
+    if (existsSync(path.join(currentDir, "yarn.lock"))) {
+      return "yarn";
+    }
+    if (existsSync(path.join(currentDir, "package-lock.json"))) {
+      return "npm";
+    }
+    previousDir = currentDir;
+    currentDir = path.dirname(currentDir);
   }
   return "npm";
 }
@@ -231,6 +245,19 @@ function dedupeEnvVars(envVars: Array<[string, string]>): Array<[string, string]
     }
   }
   return Array.from(map.entries());
+}
+
+function findPnpmWorkspaceRoot(projectRoot: string): string | null {
+  let currentDir = projectRoot;
+  let previousDir = "";
+  while (currentDir !== previousDir) {
+    if (existsSync(path.join(currentDir, "pnpm-workspace.yaml"))) {
+      return currentDir;
+    }
+    previousDir = currentDir;
+    currentDir = path.dirname(currentDir);
+  }
+  return null;
 }
 
 function resolveTemplates(options: {
@@ -335,15 +362,39 @@ function assertNextProject(pkg: ProjectPackageJson): void {
 function installSdkDependency(
   packageManager: PackageManager,
   projectRoot: string,
+  source: DependencySource,
   dryRun: boolean,
   logger: Logger,
 ) {
-  const commandByManager: Record<PackageManager, [string, string[]]> = {
-    pnpm: ["pnpm", ["add", SDK_PACKAGE]],
-    npm: ["npm", ["install", SDK_PACKAGE]],
-    yarn: ["yarn", ["add", SDK_PACKAGE]],
+  if (source === "workspace") {
+    if (packageManager !== "pnpm") {
+      throw new Error(
+        "The --source workspace mode currently requires pnpm. Use pnpm in a workspace project or switch to --source npm.",
+      );
+    }
+    if (!findPnpmWorkspaceRoot(projectRoot)) {
+      throw new Error(
+        "Could not find pnpm-workspace.yaml above the target project. The --source workspace mode requires the app to be inside a pnpm workspace.",
+      );
+    }
+  }
+
+  const commandByManagerBySource: Record<
+    DependencySource,
+    Record<PackageManager, [string, string[]]>
+  > = {
+    npm: {
+      pnpm: ["pnpm", ["add", SDK_PACKAGE]],
+      npm: ["npm", ["install", SDK_PACKAGE]],
+      yarn: ["yarn", ["add", SDK_PACKAGE]],
+    },
+    workspace: {
+      pnpm: ["pnpm", ["add", ...WORKSPACE_SDK_PACKAGES]],
+      npm: ["npm", ["install", SDK_PACKAGE]],
+      yarn: ["yarn", ["add", SDK_PACKAGE]],
+    },
   };
-  const [command, args] = commandByManager[packageManager];
+  const [command, args] = commandByManagerBySource[source][packageManager];
 
   if (dryRun) {
     logger.log(
@@ -358,6 +409,11 @@ function installSdkDependency(
     env: process.env,
   });
   if (result.status !== 0) {
+    if (source === "workspace") {
+      throw new Error(
+        "Failed to install workspace-linked SDK dependencies. Ensure the target app is part of the same pnpm workspace, or use --source npm.",
+      );
+    }
     throw new Error(
       `Failed to install ${SDK_PACKAGE} with ${packageManager}. If you're testing before publish, rerun with --skip-install and install local tarballs for @zitadel/zitadel-js, @zitadel/react, and @zitadel/nextjs.`,
     );
@@ -370,7 +426,11 @@ export async function runAddCommand(
   const logger = options.logger ?? console;
   const dryRun = Boolean(options.dryRun);
   const skipInstall = Boolean(options.skipInstall);
+  const dependencySource = options.source ?? "npm";
   const authMode = options.auth ?? "oidc";
+  if (dependencySource !== "npm" && dependencySource !== "workspace") {
+    throw new Error("Invalid source mode. Expected one of: npm, workspace.");
+  }
   if (authMode !== "oidc" && authMode !== "session") {
     throw new Error("Invalid auth mode. Expected one of: oidc, session.");
   }
@@ -437,7 +497,13 @@ export async function runAddCommand(
   }
 
   if (!skipInstall) {
-    installSdkDependency(packageManager, projectRoot, dryRun, logger);
+    installSdkDependency(
+      packageManager,
+      projectRoot,
+      dependencySource,
+      dryRun,
+      logger,
+    );
   }
 
   return {
@@ -447,6 +513,7 @@ export async function runAddCommand(
     authMode,
     withApi,
     withWebhook,
+    dependencySource,
     createdFiles,
     skippedFiles,
     envUpdated,

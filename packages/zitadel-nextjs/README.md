@@ -22,7 +22,7 @@ You can be explicit about scaffolds:
 npx @zitadel/nextjs add --auth session --with-api --with-webhook
 ```
 
-Use `--dry-run` to preview changes, `--cwd <path>` to target a specific app, and `--skip-install` to avoid dependency installation.
+Use `--dry-run` to preview changes, `--cwd <path>` to target a specific app, `--source workspace` to install workspace-linked SDK dependencies, and `--skip-install` to avoid dependency installation.
 
 For OIDC redirect testing, set these in `.env.local`:
 
@@ -37,11 +37,26 @@ ZITADEL_POST_LOGOUT_URL=/auth
 
 Then start your app and open `/auth`.
 
-For local testing before publishing:
+For fast local SDK iteration in this monorepo (recommended):
+
+```sh
+pnpm install
+pnpm nx run @zitadel/nextjs-sdk-playground:dev-with-sdk
+```
+
+This starts watch builds for `@zitadel/zitadel-js`, `@zitadel/react`, and `@zitadel/nextjs` plus the Next.js playground at `tests/nextjs-sdk-playground`.
+
+If you scaffold an app that already lives inside a pnpm workspace, you can link workspace dependencies directly:
+
+```sh
+npx @zitadel/nextjs add --source workspace
+```
+
+For local testing before publishing (external non-workspace app fallback):
 
 ```sh
 pnpm nx run @zitadel/nextjs:build
-node packages/zitadel-nextjs/dist/cli.cjs add --cwd /path/to/app --skip-install
+node packages/zitadel-nextjs/dist/cli.cjs add --cwd /path/to/app --source npm --skip-install
 
 # in the SDK repo, pack local tarballs
 pnpm --filter @zitadel/zitadel-js pack --pack-destination /tmp

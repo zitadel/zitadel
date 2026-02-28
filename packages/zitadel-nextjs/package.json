@@ -24,6 +24,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "dev": "tsup --watch",
     "lint-check-eslint": "eslint 'src/**/*.ts*'",
     "lint-check-knip": "knip",
     "test-unit": "vitest --run",

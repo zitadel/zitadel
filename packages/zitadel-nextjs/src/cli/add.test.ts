@@ -58,6 +58,29 @@ describe("add command helpers", () => {
     expect(detectPackageManager(dir)).toBe("pnpm");
   });
 
+  test("detectPackageManager resolves lockfile from parent directories", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "zitadel-nextjs-add-parent-"));
+    cleanupDirs.push(root);
+    const projectDir = path.join(root, "apps", "web");
+    await mkdir(path.join(projectDir, "app"), { recursive: true });
+    await writeFile(
+      path.join(projectDir, "package.json"),
+      JSON.stringify(
+        {
+          name: "test-app",
+          private: true,
+          dependencies: { next: "15.0.0" },
+        },
+        null,
+        2,
+      ),
+      "utf8",
+    );
+    await writeFile(path.join(root, "pnpm-lock.yaml"), "lockfile", "utf8");
+
+    expect(detectPackageManager(projectDir)).toBe("pnpm");
+  });
+
   test("mergeEnvExample is idempotent", () => {
     const once = mergeEnvExample("FOO=bar\n");
     const twice = mergeEnvExample(once);
@@ -81,6 +104,7 @@ describe("runAddCommand", () => {
     });
 
     expect(result.authMode).toBe("oidc");
+    expect(result.dependencySource).toBe("npm");
     expect(result.withApi).toBe(false);
     expect(result.withWebhook).toBe(false);
     expect(result.createdFiles).toHaveLength(4);
@@ -176,6 +200,7 @@ describe("runAddCommand", () => {
     });
 
     expect(result.authMode).toBe("session");
+    expect(result.dependencySource).toBe("npm");
     expect(result.withApi).toBe(true);
     expect(result.withWebhook).toBe(true);
     expect(result.createdFiles).toEqual(
@@ -196,5 +221,31 @@ describe("runAddCommand", () => {
     await expect(readFile(path.join(dir, ".env.example"), "utf8")).resolves.not.toContain(
       "ZITADEL_ISSUER_URL=",
     );
+  });
+
+  test("supports workspace dependency source", async () => {
+    const dir = await createTempProject();
+    cleanupDirs.push(dir);
+    await writeFile(path.join(dir, "pnpm-lock.yaml"), "lockfile", "utf8");
+    await writeFile(path.join(dir, "pnpm-workspace.yaml"), "packages:\n  - .\n", "utf8");
+    const logs: string[] = [];
+
+    const result = await runAddCommand({
+      cwd: dir,
+      source: "workspace",
+      dryRun: true,
+      logger: { log: (msg) => logs.push(msg), warn: () => {} },
+    });
+
+    expect(result.dependencySource).toBe("workspace");
+    expect(logs.some((line) => line.includes("@zitadel/nextjs@workspace:*"))).toBe(
+      true,
+    );
+    expect(logs.some((line) => line.includes("@zitadel/react@workspace:*"))).toBe(
+      true,
+    );
+    expect(
+      logs.some((line) => line.includes("@zitadel/zitadel-js@workspace:*")),
+    ).toBe(true);
   });
 });

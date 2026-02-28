@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { type AuthMode, runAddCommand } from "./add.js";
+import { type AuthMode, type DependencySource, runAddCommand } from "./add.js";
 
 function printHelp() {
   console.log(`zitadel-nextjs <command>
@@ -15,6 +15,7 @@ Options:
   --with-events       Alias for --with-webhook
   --cwd <path>        Project path (defaults to current working directory)
   --dry-run           Print planned changes without writing files
+  --source <mode>     Dependency source: npm (default) or workspace
   --skip-install      Do not run package manager install command
   --yes               Reserved for non-interactive mode compatibility
   -h, --help          Show this help message
@@ -26,6 +27,7 @@ function parseAddArgs(args: string[]) {
     cwd?: string;
     dryRun?: boolean;
     skipInstall?: boolean;
+    source?: DependencySource;
     auth?: AuthMode;
     withApi?: boolean;
     withWebhook?: boolean;
@@ -44,6 +46,18 @@ function parseAddArgs(args: string[]) {
     }
     if (arg === "--dry-run") {
       options.dryRun = true;
+      continue;
+    }
+    if (arg === "--source") {
+      const nextValue = args[i + 1];
+      if (!nextValue || nextValue.startsWith("-")) {
+        throw new Error("Missing value for --source");
+      }
+      if (nextValue !== "npm" && nextValue !== "workspace") {
+        throw new Error("Invalid --source value. Expected: npm or workspace.");
+      }
+      options.source = nextValue;
+      i++;
       continue;
     }
     if (arg === "--auth") {
@@ -102,6 +116,7 @@ async function main() {
   console.log(`Project: ${result.projectRoot}`);
   console.log(`App dir: ${result.appDirectory}`);
   console.log(`Package manager: ${result.packageManager}`);
+  console.log(`Dependency source: ${result.dependencySource}`);
   console.log(`Auth scaffold: ${result.authMode}`);
   console.log(`Include API sample: ${result.withApi ? "yes" : "no"}`);
   console.log(`Include webhook sample: ${result.withWebhook ? "yes" : "no"}`);

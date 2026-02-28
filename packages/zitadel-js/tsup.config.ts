@@ -6,7 +6,7 @@ export default defineConfig((options: Options) => ({
   dts: true,
   splitting: false,
   sourcemap: true,
-  clean: true,
+  clean: !options.watch,
   treeshake: true,
   ...options,
 }));

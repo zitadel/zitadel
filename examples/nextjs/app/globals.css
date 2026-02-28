@@ -1,0 +1,247 @@
+:root {
+  color-scheme: dark;
+  --ztdl-bg: #0f0f11;
+  --ztdl-surface: #252528;
+  --ztdl-border: #484a57;
+  --ztdl-text: #f4f4f6;
+  --ztdl-muted: #bfbfcf;
+  --ztdl-primary: #f25543;
+  --ztdl-primary-hover: #bd2514;
+  --ztdl-input-bg: #0f0f11;
+  --ztdl-input-hover-border: #686883;
+  --ztdl-code-bg: #0f0f11;
+  --ztdl-code-border: #252528;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--ztdl-bg);
+  color: var(--ztdl-text);
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--ztdl-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--ztdl-primary-hover);
+  text-decoration: underline;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--ztdl-primary);
+  outline-offset: 2px;
+}
+
+.ztdl-page {
+  margin: 0 auto;
+  max-width: 72rem;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.ztdl-eyebrow {
+  color: var(--ztdl-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.ztdl-title {
+  font-size: clamp(1.75rem, 2vw + 1rem, 2.6rem);
+  line-height: 1.15;
+  margin: 0;
+}
+
+.ztdl-subtitle {
+  color: var(--ztdl-muted);
+  margin: 0.75rem 0 0;
+  max-width: 56rem;
+}
+
+.ztdl-nav {
+  margin: 1rem 0 1.5rem;
+}
+
+.ztdl-nav-list,
+.ztdl-card-grid {
+  display: grid;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ztdl-nav-list {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.ztdl-nav-link {
+  background: var(--ztdl-surface);
+  border: 1px solid var(--ztdl-border);
+  border-radius: 0.65rem;
+  color: var(--ztdl-text);
+  display: block;
+  font-weight: 600;
+  padding: 0.65rem 0.75rem;
+}
+
+.ztdl-nav-link:hover,
+.ztdl-nav-link:focus-visible {
+  border-color: var(--ztdl-primary);
+  color: var(--ztdl-primary);
+  text-decoration: none;
+}
+
+.ztdl-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  margin-top: 1.5rem;
+}
+
+.ztdl-card {
+  background: var(--ztdl-surface);
+  border: 1px solid var(--ztdl-border);
+  border-radius: 0.85rem;
+  height: 100%;
+  padding: 1rem;
+}
+
+.ztdl-card h3 {
+  margin: 0;
+}
+
+.ztdl-card p {
+  color: var(--ztdl-muted);
+  margin: 0.5rem 0 0;
+}
+
+.ztdl-lane {
+  background: var(--ztdl-surface);
+  border: 1px solid var(--ztdl-border);
+  border-radius: 0.85rem;
+  margin-top: 1rem;
+  padding: 1.25rem;
+}
+
+.ztdl-lane h2 {
+  margin-top: 0;
+}
+
+.ztdl-lane h3,
+.ztdl-lane h4 {
+  margin-bottom: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.ztdl-lane p {
+  margin: 0.6rem 0;
+}
+
+.ztdl-lane ul,
+.ztdl-lane ol {
+  margin: 0.7rem 0;
+  padding-left: 1.4rem;
+}
+
+.ztdl-lane li {
+  margin: 0.35rem 0;
+}
+
+.ztdl-lane form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.ztdl-lane label {
+  color: var(--ztdl-muted);
+  display: grid;
+  font-size: 0.9rem;
+  font-weight: 500;
+  gap: 0.35rem;
+}
+
+.ztdl-lane input {
+  background: var(--ztdl-input-bg);
+  border: 1px solid var(--ztdl-border);
+  border-radius: 0.6rem;
+  color: var(--ztdl-text);
+  font: inherit;
+  outline: none;
+  padding: 0.6rem 0.7rem;
+}
+
+.ztdl-lane input:hover {
+  border-color: var(--ztdl-input-hover-border);
+}
+
+.ztdl-lane input:focus {
+  border-color: var(--ztdl-primary);
+  box-shadow: 0 0 0 1px var(--ztdl-primary);
+}
+
+.ztdl-lane button {
+  align-items: center;
+  background: var(--ztdl-primary);
+  border: 1px solid var(--ztdl-primary);
+  border-radius: 0.6rem;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 600;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0.55rem 0.9rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  width: fit-content;
+}
+
+.ztdl-lane button:hover {
+  background: var(--ztdl-primary-hover);
+  border-color: var(--ztdl-primary-hover);
+}
+
+.ztdl-lane button:focus-visible {
+  outline: 2px solid var(--ztdl-primary);
+  outline-offset: 2px;
+}
+
+.ztdl-lane button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.ztdl-lane pre {
+  background: var(--ztdl-code-bg);
+  border: 1px solid var(--ztdl-code-border);
+  border-radius: 0.65rem;
+  font-size: 0.85rem;
+  line-height: 1.25rem;
+  margin: 0.55rem 0 0.85rem;
+  overflow-x: auto;
+  padding: 0.8rem 0.9rem;
+}
+
+.ztdl-lane code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
+
+.ztdl-status-error {
+  color: #f25543;
+  font-weight: 600;
+}

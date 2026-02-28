@@ -11,6 +11,21 @@ To achieve your goals as fast as possible, we provide you with SDKs, Example Rep
 
 The SDKs and integration depend on the framework and language you are using.
 
+## Choose an integration lane
+
+For most new integrations, follow this route first:
+
+1. Start with [OIDC](/guides/integrate/login/oidc) for standards-based user login.
+2. Add the [Session API](/guides/integrate/login-ui) when you need embedded or fully custom login UX.
+3. Stage [SAML](/guides/integrate/login/saml) and [federation management](/guides/integrate/identity-providers/introduction) only when enterprise requirements demand them.
+
+| Lane | Use it for | Start here | Suggested stage |
+| :--- | :--- | :--- | :--- |
+| OIDC + Session-first (recommended) | Most web/mobile apps, hosted login, and custom embedded login | [Authentication options](/guides/integrate/login/login-users), [OIDC](/guides/integrate/login/oidc), [Login UI / Session API](/guides/integrate/login-ui) | Stage 1 |
+| SAML protocol integration | Existing enterprise SAML service providers and SSO migrations | [SAML guide](/guides/integrate/login/saml) | Stage 2 |
+| Federation management | Connecting external IdPs (B2B/B2E) and managing social/enterprise federation | [Identity providers](/guides/integrate/identity-providers/introduction) | Stage 2-3 |
+| Admin and events APIs | Provisioning, automation, operations, and audit/event export | [Access ZITADEL APIs](/guides/integrate/zitadel-apis/access-zitadel-apis), [Event API](/guides/integrate/zitadel-apis/event-api) | Stage 2-3 |
+
 <Callout>
 In addition to our officially maintained examples, we also list community-contributed implementations.
 These examples are provided by external developers and are not maintained by us.

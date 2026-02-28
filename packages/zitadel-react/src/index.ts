@@ -5,3 +5,5 @@ export { useUser } from "./hooks/useUser.js";
 export { useToken } from "./hooks/useToken.js";
 export { SignedIn } from "./components/SignedIn.js";
 export { SignedOut } from "./components/SignedOut.js";
+export { UsernamePasswordForm } from "./components/UsernamePasswordForm.js";
+export type { UsernamePasswordFormProps } from "./components/UsernamePasswordForm.js";
