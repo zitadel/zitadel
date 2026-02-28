@@ -1261,6 +1261,22 @@ func (p *relationalTablesProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanInviteCheckFailedType,
 					Reduce: p.reduceInviteCheckFailed,
 				},
+				{
+					Event:  user.HumanRecoveryCodesAddedType,
+					Reduce: p.reduceRecoveryCodesAdded,
+				},
+				{
+					Event:  user.HumanRecoveryCodesRemovedType,
+					Reduce: p.reduceRecoveryCodesRemoved,
+				},
+				{
+					Event:  user.HumanRecoveryCodeCheckSucceededType,
+					Reduce: p.reduceRecoveryCodeCheckSucceeded,
+				},
+				{
+					Event:  user.HumanRecoveryCodeCheckFailedType,
+					Reduce: p.reduceRecoveryCodeCheckFailed,
+				},
 			},
 		},
 		{

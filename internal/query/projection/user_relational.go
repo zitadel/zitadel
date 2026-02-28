@@ -1758,6 +1758,87 @@ func (p *relationalTablesProjection) reduceInviteCheckFailed(event eventstore.Ev
 	}), nil
 }
 
+func (p *relationalTablesProjection) reduceRecoveryCodesAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*user.HumanRecoveryCodesAddedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-oqwfuV", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.AddRecoveryCodes(e.Codes),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *relationalTablesProjection) reduceRecoveryCodesRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*user.HumanRecoveryCodesRemovedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZueNKs", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.RemoveAllRecoveryCodes(),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *relationalTablesProjection) reduceRecoveryCodeCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*user.HumanRecoveryCodeCheckSucceededEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-wr8WuW", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.RemoveRecoveryCode(e.CodeChecked),
+			repo.SetLastSuccessfulRecoveryCodeCheck(e.CreatedAt()),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *relationalTablesProjection) reduceRecoveryCodeCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*user.HumanRecoveryCodeCheckFailedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-mWuV7a", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.IncrementRecoveryCodeFailedAttempts(),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
 func mapHumanGender(gender old_domain.Gender) domain.HumanGender {
 	switch gender {
 	case old_domain.GenderFemale:
