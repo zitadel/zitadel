@@ -181,6 +181,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/solution-scenarios/saas",
           "guides/solution-scenarios/b2c",
           "guides/solution-scenarios/frontend-calling-backend-API",
+          "guides/solution-scenarios/guest-auth",
           {
             type: "category",
             label: "Machine-to-Machine (M2M)",
