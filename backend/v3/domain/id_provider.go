@@ -40,7 +40,7 @@ const (
 type IDPAutoLinkingField uint8
 
 const (
-	IDPAutoLinkingFieldUserName IDPAutoLinkingField = iota + 1
+	IDPAutoLinkingFieldUsername IDPAutoLinkingField = iota + 1
 	IDPAutoLinkingFieldEmail
 )
 
@@ -275,7 +275,6 @@ type idProviderColumns interface {
 	NameColumn() database.Column
 	TypeColumn() database.Column
 	AllowCreationColumn() database.Column
-	AutoRegisterColumn() database.Column
 	AllowAutoCreationColumn() database.Column
 	AllowAutoUpdateColumn() database.Column
 	AllowLinkingColumn() database.Column

@@ -50,6 +50,8 @@ func (p *relationalTablesProjection) reduceIDPAdded(event eventstore.Event) (*ha
 			AllowAutoCreation: idpEvent.AutoRegister,
 			AllowLinking:      true,
 			AllowCreation:     true,
+			CreatedAt:         event.CreatedAt(),
+			UpdatedAt:         event.CreatedAt(),
 		})
 
 	}), nil
@@ -74,7 +76,16 @@ func mapAutoLinkingField(option internal_domain.AutoLinkingOption) *domain.IDPAu
 	if option == internal_domain.AutoLinkingOptionUnspecified {
 		return nil
 	}
-	return gu.Ptr(domain.IDPAutoLinkingField(option))
+	switch option {
+	case internal_domain.AutoLinkingOptionEmail:
+		return gu.Ptr(domain.IDPAutoLinkingFieldEmail)
+	case internal_domain.AutoLinkingOptionUsername:
+		return gu.Ptr(domain.IDPAutoLinkingFieldUsername)
+	case internal_domain.AutoLinkingOptionUnspecified:
+		fallthrough
+	default:
+		return nil
+	}
 }
 
 func idpScopedCondition(repo domain.IDProviderRepository, instanceID, id string, orgID *string) database.Condition {
@@ -191,10 +202,10 @@ func (p *relationalTablesProjection) reduceIDPRemoved(event eventstore.Event) (*
 	case *instance.IDPRemovedEvent:
 		idpID = e.ID
 	case *org.IDPConfigRemovedEvent:
-		idpID = e.ID
+		idpID = e.ConfigID
 		orgID = gu.Ptr(e.IDPConfigRemovedEvent.Aggregate().ResourceOwner)
 	case *instance.IDPConfigRemovedEvent:
-		idpID = e.ID
+		idpID = e.ConfigID
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ybcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType, org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
@@ -289,10 +300,10 @@ func (p *relationalTablesProjection) reduceOIDCConfigChanged(event eventstore.Ev
 			oidc.Scopes = idpEvent.Scopes
 		}
 		if idpEvent.IDPDisplayNameMapping != nil {
-			oidc.IDPDisplayNameMapping = domain.OIDCMappingField(*idpEvent.IDPDisplayNameMapping)
+			oidc.IDPDisplayNameMapping = mapOIDCMappingField(*idpEvent.IDPDisplayNameMapping)
 		}
 		if idpEvent.UserNameMapping != nil {
-			oidc.UserNameMapping = domain.OIDCMappingField(*idpEvent.UserNameMapping)
+			oidc.UserNameMapping = mapOIDCMappingField(*idpEvent.UserNameMapping)
 		}
 
 		payloadJSON, err := json.Marshal(oidc.OIDC)
@@ -307,6 +318,19 @@ func (p *relationalTablesProjection) reduceOIDCConfigChanged(event eventstore.Ev
 		)
 		return err
 	}), nil
+}
+
+func mapOIDCMappingField(field internal_domain.OIDCMappingField) domain.OIDCMappingField {
+	switch field {
+	case internal_domain.OIDCMappingFieldEmail:
+		return domain.OIDCMappingFieldEmail
+	case internal_domain.OIDCMappingFieldPreferredLoginName:
+		return domain.OIDCMappingFieldPreferredLoginName
+	case internal_domain.OIDCMappingFieldUnspecified:
+		fallthrough
+	default:
+		return domain.OIDCMappingFieldUnspecified
+	}
 }
 
 func (p *relationalTablesProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.Statement, error) {

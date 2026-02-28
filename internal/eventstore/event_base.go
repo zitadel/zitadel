@@ -20,7 +20,7 @@ var (
 
 // BaseEvent represents the minimum metadata of an event
 type BaseEvent struct {
-	ID        string
+	EventID   string
 	EventType EventType `json:"-"`
 
 	Agg *Aggregate `json:"-"`

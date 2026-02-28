@@ -17,7 +17,7 @@ func IDProviderRepository() domain.IDProviderRepository {
 	return new(idProvider)
 }
 
-const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, auto_register, allow_creation, allow_auto_creation,` +
+const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation,` +
 	` allow_auto_update, allow_linking, auto_linking_field, payload, created_at, updated_at` +
 	` FROM zitadel.identity_providers`
 
@@ -54,7 +54,7 @@ func (i *idProvider) List(ctx context.Context, client database.QueryExecutor, op
 const (
 	createIDProviderStmtStart = `INSERT INTO zitadel.identity_providers` +
 		` (instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation,` +
-		` allow_auto_update, allow_linking, payload, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, `
+		` allow_auto_update, allow_linking, auto_linking_field, payload, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, `
 	createIDProviderStmtEnd = `) RETURNING created_at, updated_at`
 )
 
@@ -70,6 +70,7 @@ func (i *idProvider) Create(ctx context.Context, client database.QueryExecutor, 
 		idp.AllowAutoCreation,
 		idp.AllowAutoUpdate,
 		idp.AllowLinking,
+		idp.AutoLinkingField,
 		idp.Payload,
 	)
 	var createdAt any = database.NowInstruction
@@ -325,10 +326,6 @@ func (idProvider) TypeColumn() database.Column {
 	return database.NewColumn("identity_providers", "type")
 }
 
-func (idProvider) AutoRegisterColumn() database.Column {
-	return database.NewColumn("identity_providers", "auto_register")
-}
-
 func (idProvider) AllowCreationColumn() database.Column {
 	return database.NewColumn("identity_providers", "allow_creation")
 }
@@ -413,10 +410,6 @@ func (i idProvider) SetState(state domain.IDPState) database.Change {
 
 func (i idProvider) SetAllowCreation(allow bool) database.Change {
 	return database.NewChange(i.AllowCreationColumn(), allow)
-}
-
-func (i idProvider) SetAutoRegister(allow bool) database.Change {
-	return database.NewChange(i.AutoRegisterColumn(), allow)
 }
 
 func (i idProvider) SetAllowAutoCreation(allow bool) database.Change {

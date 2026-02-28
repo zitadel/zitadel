@@ -299,7 +299,7 @@ func (u *userNotifierLegacy) reducePasswordCodeAdded(event eventstore.Event) (*h
 		generatorInfo := new(senders.CodeGeneratorInfo)
 		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type())
 		if e.NotificationType == domain.NotificationTypeSms {
-			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e.Type(), e.Aggregate().InstanceID, e.ID, generatorInfo)
+			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e.Type(), e.Aggregate().InstanceID, e.EventID, generatorInfo)
 		}
 		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
@@ -757,7 +757,7 @@ func (u *userNotifierLegacy) reducePhoneCodeAdded(event eventstore.Event) (*hand
 			return err
 		}
 		generatorInfo := new(senders.CodeGeneratorInfo)
-		if err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e.Type(), e.Aggregate().InstanceID, e.ID, generatorInfo).
+		if err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e.Type(), e.Aggregate().InstanceID, e.EventID, generatorInfo).
 			SendPhoneVerificationCode(ctx, code); err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
 				// if the notification was canceled, we don't want to return the error, so there is no retry

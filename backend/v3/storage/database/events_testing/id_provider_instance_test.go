@@ -13,7 +13,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
-	repositorypkg "github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	zitadel_internal_domain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -145,11 +145,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		before := time.Now()
-		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDReq(name, true))
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDPReq(name, true))
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -174,7 +174,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 	t.Run("test instance idp update reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
-		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDReq(name, true))
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDPReq(name, true))
 		require.NoError(t, err)
 
 		name = "new_" + name
@@ -189,7 +189,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -206,7 +206,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 	t.Run("test instance idp deactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
-		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDReq(name, true))
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDPReq(name, true))
 		require.NoError(t, err)
 
 		// deactivate idp
@@ -217,7 +217,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -234,10 +234,10 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 	t.Run("test instance idp config reactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
-		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDReq(name, true))
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDPReq(name, true))
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// deactivate idp
 		_, err = AdminClient.DeactivateIDP(IAMCTX, &admin.DeactivateIDPRequest{
@@ -278,10 +278,16 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
-		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDReq(name, true))
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDPReq(name, true))
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := idpRepo.Get(IAMCTX, pool, database.WithCondition(database.And(idpRepo.InstanceIDCondition(instanceID), idpRepo.OrgIDCondition(nil), idpRepo.IDCondition(addOIDC.IdpId))))
+
+			require.NoError(t, err)
+		}, retryDuration, tick)
 
 		// remove idp
 		_, err = AdminClient.RemoveIDP(IAMCTX, &admin.RemoveIDPRequest{
@@ -289,7 +295,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := idpRepo.Get(IAMCTX, pool, database.WithCondition(database.And(idpRepo.InstanceIDCondition(instanceID), idpRepo.OrgIDCondition(nil), idpRepo.IDCondition(addOIDC.IdpId))))
 
@@ -302,10 +308,10 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
-		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDReq(name, false))
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDPReq(name, false))
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -333,12 +339,12 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
-		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDReq(name, true))
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDPReq(name, true))
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
-		// check original values for OCID
+		// ensure oidc is added before updating
 		var oidc *domain.IDPOIDC
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -365,7 +371,6 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			updateOIDC, err := idpRepo.GetOIDC(IAMCTX, pool, database.WithCondition(database.And(idpRepo.InstanceIDCondition(instanceID), idpRepo.OrgIDCondition(nil), idpRepo.IDCondition(addOIDC.IdpId))))
 			require.NoError(t, err)
 
-			// event org.idp.oidc.config.changed
 			// idp
 			assert.Equal(t, instanceID, oidc.InstanceID)
 			assert.Nil(t, oidc.OrgID)
@@ -402,7 +407,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -440,7 +445,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		before := time.Now()
 		_, err = AdminClient.UpdateIDPJWTConfig(IAMCTX, &admin.UpdateIDPJWTConfigRequest{
@@ -498,7 +503,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for oauth
 		var oauth *domain.IDPOAuth
@@ -557,7 +562,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for oauth
 		var oauth *domain.IDPOAuth
@@ -607,7 +612,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateOauth.AllowLinking)
 			assert.Equal(t, true, updateOauth.AllowCreation)
 			assert.Equal(t, true, updateOauth.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*updateOauth.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*updateOauth.AutoLinkingField))
 			assert.Equal(t, true, updateOauth.UsePKCE)
 			assert.WithinRange(t, updateOauth.UpdatedAt, before, after)
 
@@ -645,7 +650,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for oidc
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -678,7 +683,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instanceidp oidc changed reduces", func(t *testing.T) {
+	t.Run("test instance idp oidc changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		addOIDC, err := AdminClient.AddGenericOIDCProvider(IAMCTX, &admin.AddGenericOIDCProviderRequest{
@@ -699,7 +704,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for oidc
 		var oidc *domain.IDPOIDC
@@ -746,7 +751,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateOIDC.AllowLinking)
 			assert.Equal(t, true, updateOIDC.AllowCreation)
 			assert.Equal(t, true, updateOIDC.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*updateOIDC.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*updateOIDC.AutoLinkingField))
 			assert.WithinRange(t, updateOIDC.UpdatedAt, before, after)
 
 			// oidc
@@ -781,7 +786,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var oidc *domain.IDPOIDC
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -835,7 +840,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, azure.AllowLinking)
 			assert.Equal(t, true, azure.AllowCreation)
 			assert.Equal(t, true, azure.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*azure.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*azure.AutoLinkingField))
 			assert.WithinRange(t, azure.UpdatedAt, before, after)
 
 			// oidc
@@ -869,7 +874,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var oidc *domain.IDPOIDC
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -917,7 +922,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, google.AllowLinking)
 			assert.Equal(t, true, google.AllowCreation)
 			assert.Equal(t, true, google.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*google.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*google.AutoLinkingField))
 			assert.WithinRange(t, google.UpdatedAt, before, after)
 
 			// oidc
@@ -949,7 +954,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for jwt
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1020,7 +1025,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for jwt
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1038,7 +1043,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, jwt.AllowLinking)
 			assert.Equal(t, true, jwt.AllowCreation)
 			assert.Equal(t, true, jwt.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*jwt.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*jwt.AutoLinkingField))
 			assert.WithinRange(t, jwt.UpdatedAt, before, after)
 
 			// jwt
@@ -1076,7 +1081,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for azure
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1094,7 +1099,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, azure.AllowLinking)
 			assert.Equal(t, true, azure.AllowCreation)
 			assert.Equal(t, true, azure.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*azure.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*azure.AutoLinkingField))
 			assert.WithinRange(t, azure.UpdatedAt, before, after)
 
 			// azure
@@ -1131,7 +1136,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var azure *domain.IDPAzureAD
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1216,7 +1221,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for github
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1234,7 +1239,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, github.AllowLinking)
 			assert.Equal(t, false, github.AllowCreation)
 			assert.Equal(t, false, github.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*github.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*github.AutoLinkingField))
 			assert.WithinRange(t, github.UpdatedAt, before, after)
 
 			assert.Equal(t, "clientId", github.ClientID)
@@ -1262,7 +1267,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var github *domain.IDPGithub
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1308,7 +1313,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateGithub.AllowLinking)
 			assert.Equal(t, true, updateGithub.AllowCreation)
 			assert.Equal(t, true, updateGithub.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*updateGithub.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*updateGithub.AutoLinkingField))
 			assert.WithinRange(t, updateGithub.UpdatedAt, before, after)
 
 			// github
@@ -1342,7 +1347,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for github enterprise
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1396,7 +1401,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var githubEnterprise *domain.IDPGithubEnterprise
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1479,7 +1484,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for gitlab
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1527,7 +1532,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var githlab *domain.IDPGitlab
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1572,7 +1577,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateGitlab.AllowLinking)
 			assert.Equal(t, true, updateGitlab.AllowCreation)
 			assert.Equal(t, true, updateGitlab.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*updateGitlab.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*updateGitlab.AutoLinkingField))
 			assert.WithinRange(t, updateGitlab.UpdatedAt, before, after)
 
 			// gitlab
@@ -1605,7 +1610,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for gitlab self hosted
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1655,7 +1660,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var githlabSelfHosted *domain.IDPGitlabSelfHosted
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1702,7 +1707,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateGitlabSelfHosted.AllowLinking)
 			assert.Equal(t, true, updateGitlabSelfHosted.AllowCreation)
 			assert.Equal(t, true, updateGitlabSelfHosted.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*updateGitlabSelfHosted.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*updateGitlabSelfHosted.AutoLinkingField))
 			assert.WithinRange(t, updateGitlabSelfHosted.UpdatedAt, before, after)
 
 			// gitlab self hosted
@@ -1734,7 +1739,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for google
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1782,7 +1787,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var google *domain.IDPGoogle
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1828,7 +1833,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateGoogle.AllowLinking)
 			assert.Equal(t, true, updateGoogle.AllowCreation)
 			assert.Equal(t, true, updateGoogle.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*updateGoogle.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*updateGoogle.AutoLinkingField))
 			assert.WithinRange(t, updateGoogle.UpdatedAt, before, after)
 
 			// google
@@ -1847,7 +1852,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1901,7 +1906,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		addLdap, err := AdminClient.AddLDAPProvider(IAMCTX, defaultInstanceLDAPRequest(name))
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var ldap *domain.IDPLDAP
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1968,7 +1973,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateLdap.AllowLinking)
 			assert.Equal(t, true, updateLdap.AllowCreation)
 			assert.Equal(t, true, updateLdap.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*updateLdap.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*updateLdap.AutoLinkingField))
 			assert.WithinRange(t, updateLdap.UpdatedAt, before, after)
 
 			// ldap
@@ -2020,7 +2025,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -2071,7 +2076,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var apple *domain.IDPApple
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -2119,7 +2124,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateApple.AllowLinking)
 			assert.Equal(t, true, updateApple.AllowCreation)
 			assert.Equal(t, true, updateApple.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*updateApple.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*updateApple.AutoLinkingField))
 			assert.WithinRange(t, updateApple.UpdatedAt, before, after)
 
 			// apple
@@ -2141,7 +2146,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -2183,7 +2188,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		addSAML, err := AdminClient.AddSAMLProvider(IAMCTX, defaultInstanceSAMLRequest(name, &federatedLogoutEnabled))
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var saml *domain.IDPSAML
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -2236,7 +2241,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateSAML.AllowLinking)
 			assert.Equal(t, true, updateSAML.AllowCreation)
 			assert.Equal(t, true, updateSAML.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingFieldUserName, domain.IDPAutoLinkingField(*updateSAML.AutoLinkingField))
+			assert.Equal(t, domain.IDPAutoLinkingFieldUsername, domain.IDPAutoLinkingField(*updateSAML.AutoLinkingField))
 			assert.WithinRange(t, updateSAML.UpdatedAt, before, after)
 
 			// saml
@@ -2257,10 +2262,10 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
-		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDReq(name, true))
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDPReq(name, true))
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check idp exists
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -2306,7 +2311,7 @@ func defaultInstanceSAMLRequest(name string, federatedLogoutEnable *bool) *admin
 	}
 }
 
-func defaultOIDCIDReq(name string, autoRegister bool) *admin.AddOIDCIDPRequest {
+func defaultOIDCIDPReq(name string, autoRegister bool) *admin.AddOIDCIDPRequest {
 	return &admin.AddOIDCIDPRequest{
 		Name:               name,
 		StylingType:        idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
