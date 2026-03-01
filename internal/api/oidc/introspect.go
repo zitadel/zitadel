@@ -103,7 +103,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		client.clientID,
 		client.projectRoleAssertion,
 		true,
-		true,
+		false,
 	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
 	if err != nil {
 		return nil, err
