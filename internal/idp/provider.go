@@ -49,3 +49,8 @@ func (p UserAgentID) setValue() {}
 type LoginHintParam string
 
 func (p LoginHintParam) setValue() {}
+
+// HasPromptParam indicates that the auth request already has a prompt parameter
+type HasPromptParam bool
+
+func (p HasPromptParam) setValue() {}
