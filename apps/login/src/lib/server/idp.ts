@@ -216,6 +216,8 @@ type createNewSessionForLDAPCommand = {
   password: string;
   idpId: string;
   link: boolean;
+  requestId?: string;
+  organization?: string;
 };
 
 export async function createNewSessionForLDAP(command: createNewSessionForLDAPCommand) {
@@ -248,6 +250,14 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
 
   if (command.link) {
     params.set("link", "true");
+  }
+
+  if (command.requestId) {
+    params.set("requestId", command.requestId);
+  }
+
+  if (command.organization) {
+    params.set("organization", command.organization);
   }
 
   return {
