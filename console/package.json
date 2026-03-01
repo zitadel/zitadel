@@ -17,7 +17,7 @@
     "@angular/cdk": "^20.2.14",
     "@angular/common": "^20.3.16",
     "@angular/compiler": "^20.3.16",
-    "@angular/core": "^20.3.16",
+    "@angular/core": "^20.3.17",
     "@angular/forms": "^20.3.16",
     "@angular/material": "^20.2.14",
     "@angular/material-moment-adapter": "^20.2.14",
