@@ -14,10 +14,7 @@
  * const user = await api.userService.getUser({ userId: "123" });
  * ```
  */
-import {
-  createGrpcTransport,
-  createAuthorizationBearerInterceptor,
-} from "@zitadel/zitadel-js";
+import { createBearerTokenTransport } from "@zitadel/zitadel-js/api/bearer-token";
 import { newSystemToken } from "@zitadel/zitadel-js/node";
 import {
   createUserServiceClient,
@@ -170,10 +167,10 @@ export async function createZitadelApiClient(
   const token = await resolveAccessToken(apiUrl, options);
 
   // Create a gRPC transport with the bearer token interceptor
-  const transport = createGrpcTransport({
+  const transport = createBearerTokenTransport({
     baseUrl: apiUrl,
     httpVersion: "2",
-    interceptors: [createAuthorizationBearerInterceptor(token)],
+    token,
   });
 
   return {

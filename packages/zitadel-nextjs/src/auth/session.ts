@@ -1,7 +1,4 @@
-import {
-  createAuthorizationBearerInterceptor,
-  createGrpcTransport,
-} from "@zitadel/zitadel-js";
+import { createBearerTokenTransport } from "@zitadel/zitadel-js/api/bearer-token";
 import {
   createOIDCServiceClient,
   createSessionServiceClient,
@@ -112,10 +109,10 @@ function normalizeAuthRequestId(authRequestId: string): string {
 async function getClients(options?: SessionAuthOptions) {
   const apiUrl = resolveApiUrl(options?.apiUrl);
   const token = await resolveAccessToken(options);
-  const transport = createGrpcTransport({
+  const transport = createBearerTokenTransport({
     baseUrl: apiUrl,
     httpVersion: "2",
-    interceptors: [createAuthorizationBearerInterceptor(token)],
+    token,
   });
 
   return {

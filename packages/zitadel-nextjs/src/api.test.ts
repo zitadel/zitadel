@@ -1,15 +1,11 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const createGrpcTransportMock = vi.fn(() => ({}));
-const createAuthorizationBearerInterceptorMock = vi.fn(
-  () => (next: unknown) => next,
-);
+const createBearerTokenTransportMock = vi.fn(() => ({}));
 const newSystemTokenMock = vi.fn();
 const getSessionMock = vi.fn();
 
-vi.mock("@zitadel/zitadel-js", () => ({
-  createGrpcTransport: createGrpcTransportMock,
-  createAuthorizationBearerInterceptor: createAuthorizationBearerInterceptorMock,
+vi.mock("@zitadel/zitadel-js/api/bearer-token", () => ({
+  createBearerTokenTransport: createBearerTokenTransportMock,
 }));
 
 vi.mock("@zitadel/zitadel-js/node", () => ({
@@ -52,9 +48,11 @@ describe("createZitadelApiClient", () => {
       accessToken: "explicit-token",
     });
 
-    expect(createAuthorizationBearerInterceptorMock).toHaveBeenCalledWith(
-      "explicit-token",
-    );
+    expect(createBearerTokenTransportMock).toHaveBeenCalledWith({
+      baseUrl: "https://api.example.com",
+      httpVersion: "2",
+      token: "explicit-token",
+    });
     expect(getSessionMock).not.toHaveBeenCalled();
     expect(newSystemTokenMock).not.toHaveBeenCalled();
   });
@@ -67,9 +65,11 @@ describe("createZitadelApiClient", () => {
       apiUrl: "https://api.example.com",
     });
 
-    expect(createAuthorizationBearerInterceptorMock).toHaveBeenCalledWith(
-      "service-token",
-    );
+    expect(createBearerTokenTransportMock).toHaveBeenCalledWith({
+      baseUrl: "https://api.example.com",
+      httpVersion: "2",
+      token: "service-token",
+    });
     expect(getSessionMock).not.toHaveBeenCalled();
   });
 
@@ -92,9 +92,11 @@ describe("createZitadelApiClient", () => {
       audience: "https://api.example.com",
       expiresInSeconds: 120,
     });
-    expect(createAuthorizationBearerInterceptorMock).toHaveBeenCalledWith(
-      "jwt-token",
-    );
+    expect(createBearerTokenTransportMock).toHaveBeenCalledWith({
+      baseUrl: "https://api.example.com",
+      httpVersion: "2",
+      token: "jwt-token",
+    });
     expect(getSessionMock).not.toHaveBeenCalled();
   });
 
@@ -109,9 +111,11 @@ describe("createZitadelApiClient", () => {
       apiUrl: "https://api.example.com",
     });
 
-    expect(createAuthorizationBearerInterceptorMock).toHaveBeenCalledWith(
-      "session-token",
-    );
+    expect(createBearerTokenTransportMock).toHaveBeenCalledWith({
+      baseUrl: "https://api.example.com",
+      httpVersion: "2",
+      token: "session-token",
+    });
   });
 
   test("throws on partial private key JWT configuration", async () => {

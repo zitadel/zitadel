@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { isSessionValid } from "@zitadel/zitadel-js";
+import { isSessionValid } from "@zitadel/zitadel-js/auth/session";
 import { decrypt } from "./crypto.js";
 
 export interface SessionData {

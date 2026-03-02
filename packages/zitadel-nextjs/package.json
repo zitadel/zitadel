@@ -20,6 +20,7 @@
     "./middleware": { "types": "./dist/middleware.d.ts", "import": "./dist/middleware.js", "require": "./dist/middleware.cjs" },
     "./server-action": { "types": "./dist/server-action.d.ts", "import": "./dist/server-action.js", "require": "./dist/server-action.cjs" },
     "./api": { "types": "./dist/api.d.ts", "import": "./dist/api.js", "require": "./dist/api.cjs" },
+    "./api/bearer-token": { "types": "./dist/api/bearer-token.d.ts", "import": "./dist/api/bearer-token.js", "require": "./dist/api/bearer-token.cjs" },
     "./webhook": { "types": "./dist/webhook.d.ts", "import": "./dist/webhook.js", "require": "./dist/webhook.cjs" }
   },
   "scripts": {

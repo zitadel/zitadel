@@ -20,7 +20,7 @@ import {
   exchangeOIDCAuthorizationCode,
   generatePKCE,
   generateState,
-} from "@zitadel/zitadel-js";
+} from "@zitadel/zitadel-js/auth/oidc";
 import { encrypt, decrypt } from "../crypto.js";
 
 // ---------------------------------------------------------------------------

@@ -11,6 +11,9 @@
   "files": ["dist/**"],
   "exports": {
     ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js", "require": "./dist/index.cjs" },
+    "./auth/oidc": { "types": "./dist/auth/oidc.d.ts", "import": "./dist/auth/oidc.js", "require": "./dist/auth/oidc.cjs" },
+    "./auth/session": { "types": "./dist/auth/session.d.ts", "import": "./dist/auth/session.js", "require": "./dist/auth/session.cjs" },
+    "./api/bearer-token": { "types": "./dist/api/bearer-token.d.ts", "import": "./dist/api/bearer-token.js", "require": "./dist/api/bearer-token.cjs" },
     "./node": { "types": "./dist/token.d.ts", "import": "./dist/token.js", "require": "./dist/token.cjs" },
     "./webhooks": { "types": "./dist/webhooks.d.ts", "import": "./dist/webhooks.js", "require": "./dist/webhooks.cjs" },
     "./v2": { "types": "./dist/v2.d.ts", "import": "./dist/v2.js", "require": "./dist/v2.cjs" }

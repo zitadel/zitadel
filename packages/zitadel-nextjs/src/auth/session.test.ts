@@ -7,9 +7,8 @@ const deleteSessionRpc = vi.fn();
 const createCallbackRpc = vi.fn();
 const getOIDCSessionMock = vi.fn();
 
-vi.mock("@zitadel/zitadel-js", () => ({
-  createAuthorizationBearerInterceptor: vi.fn(() => (next: unknown) => next),
-  createGrpcTransport: vi.fn(() => ({})),
+vi.mock("@zitadel/zitadel-js/api/bearer-token", () => ({
+  createBearerTokenTransport: vi.fn(() => ({})),
 }));
 
 vi.mock("@zitadel/zitadel-js/v2", () => ({
