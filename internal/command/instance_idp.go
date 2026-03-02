@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -1668,7 +1669,7 @@ func (c *Commands) prepareAddInstanceAppleProvider(a *instance.Aggregate, writeM
 		if len(provider.PrivateKey) == 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing")
 		}
-		if _, err := crypto.BytesToPrivateKeyPKCS8(provider.PrivateKey); err != nil {
+		if _, err := apple.BytesToPrivateKey(provider.PrivateKey); err != nil {
 			return nil, zerrors.ThrowInvalidArgument(err, "INST-Fk38d", "Errors.IDP.InvalidPrivateKey")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -1717,7 +1718,7 @@ func (c *Commands) prepareUpdateInstanceAppleProvider(a *instance.Aggregate, wri
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing")
 		}
 		if len(provider.PrivateKey) > 0 {
-			if _, err := crypto.BytesToPrivateKeyPKCS8(provider.PrivateKey); err != nil {
+			if _, err := apple.BytesToPrivateKey(provider.PrivateKey); err != nil {
 				return nil, zerrors.ThrowInvalidArgument(err, "INST-eWSDf", "Errors.IDP.InvalidPrivateKey")
 			}
 		}

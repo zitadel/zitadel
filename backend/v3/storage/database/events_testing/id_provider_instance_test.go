@@ -3,8 +3,9 @@
 package events_test
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
-	"crypto/rsa"
 	"testing"
 	"time"
 
@@ -2065,7 +2066,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			ClientId:   "clientID",
 			TeamId:     "teamIDteam",
 			KeyId:      "keyIDKeyId",
-			PrivateKey: generatePrivateKeyPKCS8(),
+			PrivateKey: generatePrivateKeyPKCS8(t),
 			Scopes:     []string{"scope"},
 			ProviderOptions: &idp_grpc.Options{
 				IsLinkingAllowed:  false,
@@ -2117,7 +2118,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			ClientId:   "clientID",
 			TeamId:     "teamIDteam",
 			KeyId:      "keyIDKeyId",
-			PrivateKey: generatePrivateKeyPKCS8(),
+			PrivateKey: generatePrivateKeyPKCS8(t),
 			Scopes:     []string{"scope"},
 			ProviderOptions: &idp_grpc.Options{
 				IsLinkingAllowed:  false,
@@ -2148,7 +2149,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			ClientId:   "new_clientID",
 			TeamId:     "new_teamID",
 			KeyId:      "new_kKeyId",
-			PrivateKey: generatePrivateKeyPKCS8(),
+			PrivateKey: generatePrivateKeyPKCS8(t),
 			Scopes:     []string{"new_scope"},
 			ProviderOptions: &idp_grpc.Options{
 				IsLinkingAllowed:  true,
@@ -2423,8 +2424,10 @@ func defaultInstanceLDAPRequest(name string) *admin.AddLDAPProviderRequest {
 	}
 }
 
-func generatePrivateKeyPKCS8() []byte {
-	privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
-	data, _ := crypto.PrivateKeyToBytesPKCS8(privateKey)
+func generatePrivateKeyPKCS8(t *testing.T) []byte {
+	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	require.NoError(t, err)
+	data, err := crypto.PrivateKeyToBytesPKCS8(privateKey)
+	require.NoError(t, err)
 	return data
 }

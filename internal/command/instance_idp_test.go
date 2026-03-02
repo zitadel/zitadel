@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
-	"crypto/rsa"
 	"errors"
 	"testing"
 	"time"
@@ -4897,7 +4898,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 
 var (
 	privateKeyPKCS8 = func() []byte {
-		privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+		privateKey, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 		data, _ := crypto.PrivateKeyToBytesPKCS8(privateKey)
 		return data
 	}()

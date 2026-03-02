@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"math/big"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func GenerateKeyPair(bits int) (*rsa.PrivateKey, *rsa.PublicKey, error) {
@@ -129,14 +131,14 @@ func PrivateKeyToBytes(priv *rsa.PrivateKey) []byte {
 	)
 }
 
-func PrivateKeyToBytesPKCS8(priv *rsa.PrivateKey) ([]byte, error) {
+func PrivateKeyToBytesPKCS8(priv crypto.PrivateKey) ([]byte, error) {
 	der, err := x509.MarshalPKCS8PrivateKey(priv)
 	if err != nil {
 		return nil, err
 	}
 	return pem.EncodeToMemory(
 		&pem.Block{
-			Type:  "RSA PRIVATE KEY",
+			Type:  "PRIVATE KEY",
 			Bytes: der,
 		},
 	), nil
@@ -174,19 +176,23 @@ func BytesToPrivateKey(priv []byte) (*rsa.PrivateKey, error) {
 	return key, nil
 }
 
-func BytesToPrivateKeyPKCS8(priv []byte) (crypto.PrivateKey, error) {
+func BytesToPrivateKeyPKCS8[T crypto.PrivateKey](priv []byte) (T, error) {
+	var zero T
 	if len(priv) == 0 {
-		return nil, ErrEmpty
+		return zero, ErrEmpty
 	}
 	block, _ := pem.Decode(priv)
 	if block == nil {
-		return nil, ErrEmpty
+		return zero, ErrEmpty
 	}
 	key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
-		return nil, err
+		return zero, err
 	}
-	return key, nil
+	if k, ok := key.(T); ok {
+		return k, nil
+	}
+	return zero, zerrors.ThrowInvalidArgumentf(nil, "CRYP-9n2s3", "wrong type: expected %T, got %T", zero, key)
 }
 
 var ErrEmpty = errors.New("cannot decode, empty data")

@@ -1,6 +1,7 @@
 package apple
 
 import (
+	"crypto/ecdsa"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
@@ -41,7 +42,7 @@ func New(clientID, teamID, keyID, callbackURL string, key []byte, scopes []strin
 
 // clientSecretFromPrivateKey uses the private key to create and sign a JWT, which has to be used as client_secret at Apple.
 func clientSecretFromPrivateKey(key []byte, teamID, clientID, keyID string) (string, error) {
-	pk, err := zcrypto.BytesToPrivateKeyPKCS8(key)
+	pk, err := BytesToPrivateKey(key)
 	if err != nil {
 		return "", err
 	}
@@ -62,4 +63,8 @@ func clientSecretFromPrivateKey(key []byte, teamID, clientID, keyID string) (str
 		ExpiresAt: openid.FromTime(exp),
 		IssuedAt:  openid.FromTime(iat),
 	}, signer)
+}
+
+func BytesToPrivateKey(key []byte) (*ecdsa.PrivateKey, error) {
+	return zcrypto.BytesToPrivateKeyPKCS8[*ecdsa.PrivateKey](key)
 }

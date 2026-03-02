@@ -606,9 +606,9 @@ Errors:
     NotFound: "Веб-клучот не е пронајден"
   IDP:
     InvalidSearchQuery: "Невалидно пребарување"
-    ClientID Missing: "ClientID недостасува"
+    ClientIDMissing: "ClientID недостасува"
     TeamIDMissing: "TeamID недостасува"
-    Клучен ID Недостасува: "Недостасува ID на клуч"
+    KeyIDMissing: "Недостасува ID на клуч"
     PrivateKeyMissing: "Недостасува приватен клуч"
     InvalidPrivateKey: "Невалиден формат на приватен клуч"
 
