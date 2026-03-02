@@ -33,7 +33,6 @@ import { PasswordComplexityValidatorFactoryService } from 'src/app/services/pass
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { NewOrganizationService } from '../../../../services/new-organization.service';
 
 type PwdForm = ReturnType<UserCreateV2Component['buildPwdForm']>;
 type AuthenticationFactor =
@@ -56,7 +55,6 @@ export class UserCreateV2Component implements OnInit {
   private readonly passwordComplexityPolicy$: Observable<PasswordComplexityPolicy>;
   protected readonly authenticationFactor$: Observable<AuthenticationFactor>;
   private readonly useLoginV2$: Observable<LoginV2FeatureFlag | undefined>;
-  private orgId = this.organizationService.getOrgId();
 
   constructor(
     private readonly router: Router,
@@ -70,7 +68,6 @@ export class UserCreateV2Component implements OnInit {
     private readonly route: ActivatedRoute,
     protected readonly location: Location,
     private readonly authService: GrpcAuthService,
-    private readonly organizationService: NewOrganizationService,
   ) {
     this.userForm = this.buildUserForm();
 
@@ -100,9 +97,9 @@ export class UserCreateV2Component implements OnInit {
 
     return this.fb.group({
       email: new FormControl('', { nonNullable: true, validators: [requiredValidator, emailValidator] }),
-      username: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
-      givenName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
-      familyName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      userName: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
+      firstName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      lastName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
       emailVerified: new FormControl(false, { nonNullable: true }),
       authenticationFactor: new FormControl<AuthenticationFactor['factor']>(authenticationFactor, {
         nonNullable: true,
@@ -186,15 +183,19 @@ export class UserCreateV2Component implements OnInit {
   private async createUserV2Try(authenticationFactor: AuthenticationFactor) {
     this.loading.set(true);
 
-    this.organizationService.getOrgId();
+    const activeOrg = await this.authService.getActiveOrg();
+    if (!activeOrg) {
+      console.log('No active organization found. Cannot create user.');
+      return;
+    }
     const userValues = this.userForm.getRawValue();
 
     const humanReq: MessageInitShape<typeof AddHumanUserRequestSchema> = {
-      organization: { org: { case: 'orgId', value: this.orgId() } },
-      username: userValues.username,
+      organization: { org: { case: 'orgId', value: activeOrg.id } },
+      username: userValues.userName,
       profile: {
-        givenName: userValues.givenName,
-        familyName: userValues.familyName,
+        givenName: userValues.firstName,
+        familyName: userValues.lastName,
       },
       email: {
         email: userValues.email,

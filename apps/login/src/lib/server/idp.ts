@@ -8,15 +8,20 @@ import {
   startLDAPIdentityProviderFlow,
   ServiceConfig,
 } from "@/lib/zitadel";
+import crypto from "crypto";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { completeFlowOrGetUrl } from "../client";
+import { getSessionCookieById } from "../cookies";
+import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
 
-export type RedirectToIdpState = { error?: string | null } | undefined;
+export type RedirectToIdpState =
+  | { error?: string | null; samlData?: { url: string; fields: Record<string, string> } }
+  | undefined;
 
 export async function redirectToIdp(prevState: RedirectToIdpState, formData: FormData): Promise<RedirectToIdpState> {
   const _headers = await headers();
@@ -25,14 +30,33 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
 
   const params = new URLSearchParams();
 
-  const linkOnly = formData.get("linkOnly") === "true";
+  const sessionId = formData.get("sessionId") as string;
   const requestId = formData.get("requestId") as string;
   const organization = formData.get("organization") as string;
   const idpId = formData.get("id") as string;
   const provider = formData.get("provider") as string;
   const postErrorRedirectUrl = formData.get("postErrorRedirectUrl") as string;
 
-  if (linkOnly) params.set("link", "true");
+  if (sessionId) {
+    try {
+      // Validate that the requestor owns the session they are trying to link
+      await getSessionCookieById({ sessionId });
+
+      // Get fingerprint (ensure it exists)
+      const fingerprintId = await getOrSetFingerprintId();
+
+      // Create hash to verify intent upon return
+      const linkFingerprint = crypto
+        .createHash("sha256")
+        .update(sessionId + fingerprintId)
+        .digest("hex");
+
+      params.set("linkToSessionId", sessionId);
+      params.set("linkFingerprint", linkFingerprint);
+    } catch {
+      return { error: "Invalid session for linking" };
+    }
+  }
   if (requestId) params.set("requestId", requestId);
   if (organization) params.set("organization", organization);
   if (postErrorRedirectUrl) params.set("postErrorRedirectUrl", postErrorRedirectUrl);
@@ -55,8 +79,16 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
     return { error: "Could not start IDP flow" };
   }
 
+  if (response && "error" in response && response?.error) {
+    return { error: response.error };
+  }
+
   if (response && "redirect" in response && response?.redirect) {
     redirect(response.redirect);
+  }
+
+  if (response && "samlData" in response && response?.samlData) {
+    return { samlData: response.samlData };
   }
 
   return { error: "Unexpected response from IDP flow" };
@@ -73,7 +105,7 @@ export type StartIDPFlowCommand = {
 async function startIDPFlow(command: StartIDPFlowCommand) {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-  const url = await startIdentityProviderFlow({
+  const response = await startIdentityProviderFlow({
     serviceConfig: command.serviceConfig,
     idpId: command.idpId,
     urls: {
@@ -82,11 +114,15 @@ async function startIDPFlow(command: StartIDPFlowCommand) {
     },
   });
 
-  if (!url) {
+  if (!response || !response.url) {
     return { error: "Could not start IDP flow" };
   }
 
-  return { redirect: url };
+  if (response.fields) {
+    return { samlData: { url: response.url, fields: response.fields } };
+  }
+
+  return { redirect: response.url };
 }
 
 export type CreateNewSessionCommand = {

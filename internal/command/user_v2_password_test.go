@@ -338,13 +338,13 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 		},
 	}
 	type fields struct {
-		checkPermission               domain.PermissionCheck
-		eventstore                    func(t *testing.T) *eventstore.Eventstore
-		userEncryption                crypto.EncryptionAlgorithm
-		newCode                       encrypedCodeFunc
-		newEncryptedCodeWithDefault   encryptedCodeWithDefaultFunc
-		defaultSecretGenerators       *SecretGenerators
-		defaultPasswordSetURLTemplate func(ctx context.Context) string
+		checkPermission             domain.PermissionCheck
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		userEncryption              crypto.EncryptionAlgorithm
+		newCode                     encrypedCodeFunc
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		defaultSecretGenerators     *SecretGenerators
+		loginPaths                  func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx              context.Context
@@ -368,6 +368,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 			name: "missing userID",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -383,6 +384,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -408,6 +410,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -430,6 +433,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -466,9 +470,9 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 						),
 					),
 				),
-				checkPermission:               newMockPermissionCheckAllowed(),
-				newCode:                       mockEncryptedCode("code", 10*time.Minute),
-				defaultPasswordSetURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/password/{{.code}}" },
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockEncryptedCode("code", 10*time.Minute),
+				loginPaths:      expectLoginPathsDefaultPasswordSetURLTemplate("http://example.com/{{.user}}/password/{{.code}}"),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -510,6 +514,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				newCode:         mockEncryptedCode("code", 10*time.Minute),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:     context.Background(),
@@ -583,6 +588,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				defaultSecretGenerators:     defaultGenerators,
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", 10*time.Minute),
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:              context.Background(),
@@ -652,6 +658,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				checkPermission:         newMockPermissionCheckAllowed(),
 				newCode:                 mockEncryptedCode("code", 10*time.Minute),
 				defaultSecretGenerators: defaultGenerators,
+				loginPaths:              expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:              context.Background(),
@@ -693,9 +700,9 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 						),
 					),
 				),
-				checkPermission:               newMockPermissionCheckAllowed(),
-				newCode:                       mockEncryptedCode("code", 10*time.Minute),
-				defaultPasswordSetURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/password/{{.code}}" },
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockEncryptedCode("code", 10*time.Minute),
+				loginPaths:      expectLoginPathsDefaultPasswordSetURLTemplate("http://example.com/{{.user}}/password/{{.code}}"),
 			},
 			args: args{
 				ctx:        context.Background(),
@@ -713,13 +720,13 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				checkPermission:               tt.fields.checkPermission,
-				eventstore:                    tt.fields.eventstore(t),
-				userEncryption:                tt.fields.userEncryption,
-				newEncryptedCode:              tt.fields.newCode,
-				newEncryptedCodeWithDefault:   tt.fields.newEncryptedCodeWithDefault,
-				defaultSecretGenerators:       tt.fields.defaultSecretGenerators,
-				defaultPasswordSetURLTemplate: tt.fields.defaultPasswordSetURLTemplate,
+				checkPermission:             tt.fields.checkPermission,
+				eventstore:                  tt.fields.eventstore(t),
+				userEncryption:              tt.fields.userEncryption,
+				newEncryptedCode:            tt.fields.newCode,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				loginPaths:                  tt.fields.loginPaths(t),
 			}
 
 			got, gotPlainCode, err := c.requestPasswordReset(tt.args.ctx, tt.args.userID, tt.args.returnCode, tt.args.urlTmpl, tt.args.notificationType)

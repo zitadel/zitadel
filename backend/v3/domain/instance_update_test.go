@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -24,24 +25,25 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 	permissionErr := errors.New("permission error")
 
 	tt := []struct {
-		testName          string
-		instanceRepo      func(ctrl *gomock.Controller) domain.InstanceRepository
-		permissionChecker func(ctrl *gomock.Controller) domain.PermissionChecker
-		inputInstanceID   string
-		inputInstanceName string
-		expectedError     error
+		testName           string
+		instanceRepo       func(ctrl *gomock.Controller) domain.InstanceRepository
+		permissionChecker  func(ctrl *gomock.Controller) domain.PermissionChecker
+		inputInstanceID    string
+		inputInstanceName  string
+		expectedError      error
+		expectedUpdateSkip bool
 	}{
 		{
 			testName:          "when no ID should return invalid argument error",
 			inputInstanceID:   "",
 			inputInstanceName: "test-name",
-			expectedError:     zerrors.ThrowInvalidArgument(nil, "DOM-wSs6kG", "invalid instance ID"),
+			expectedError:     zerrors.ThrowInvalidArgument(nil, "DOM-wSs6kG", "Errors.Instance.ID"),
 		},
 		{
 			testName:          "when no name shuld return invalid argument error",
 			inputInstanceID:   "test-id",
 			inputInstanceName: "",
-			expectedError:     zerrors.ThrowInvalidArgument(nil, "DOM-FPJcLC", "invalid instance name"),
+			expectedError:     zerrors.ThrowInvalidArgument(nil, "DOM-FPJcLC", "Errors.Instance.Name"),
 		},
 		{
 			testName: "when user is missing permission should return permission denied",
@@ -57,7 +59,7 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID:   "instance-1",
 			inputInstanceName: "test instance update",
-			expectedError:     zerrors.ThrowPermissionDenied(permissionErr, "DOM-M5ObLP", "permission denied"),
+			expectedError:     zerrors.ThrowPermissionDenied(permissionErr, "DOM-M5ObLP", "Errors.PermissionDenied"),
 		},
 		{
 			testName: "when retrieving instance fails should return error",
@@ -85,7 +87,7 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID:   "instance-1",
 			inputInstanceName: "test instance update",
-			expectedError:     getErr,
+			expectedError:     zerrors.ThrowInternal(getErr, "DOM-j05Hdo", "Errors.Instance.Get"),
 		},
 		{
 			testName: "when instance name is not changed should return name not changed error",
@@ -112,9 +114,9 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			inputInstanceID:   "instance-1",
-			inputInstanceName: "test instance update",
-			expectedError:     zerrors.ThrowPreconditionFailed(nil, "DOM-5MrT21", "Errors.Instance.NotChanged"),
+			inputInstanceID:    "instance-1",
+			inputInstanceName:  "test instance update",
+			expectedUpdateSkip: true,
 		},
 		{
 			testName: "when instance name is changed should validate successfully and return no error",
@@ -167,6 +169,7 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 
 			err := cmd.Validate(ctx, opts)
 			assert.Equal(t, tc.expectedError, err)
+			assert.Equal(t, tc.expectedUpdateSkip, cmd.ShouldSkipUpdate)
 		})
 	}
 }
@@ -181,11 +184,16 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 
 		instanceRepo func(ctrl *gomock.Controller) domain.InstanceRepository
 
-		inputID   string
-		inputName string
+		inputID          string
+		inputName        string
+		shouldSkipUpdate bool
 
 		expectedError error
 	}{
+		{
+			testName:         "when ShouldSkipUpdate is true should return nil",
+			shouldSkipUpdate: true,
+		},
 		{
 			testName: "when instance update fails should return error",
 			instanceRepo: func(ctrl *gomock.Controller) domain.InstanceRepository {
@@ -201,7 +209,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 			},
 			inputID:       "instance-1",
 			inputName:     "test instance update",
-			expectedError: updateErr,
+			expectedError: zerrors.ThrowInternal(updateErr, "DOM-PkVMNR", "Errors.Instance.Update"),
 		},
 		{
 			testName:  "when instance update returns 0 rows updated should return not found error",
@@ -235,7 +243,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 			},
 			inputID:       "instance-1",
 			inputName:     "test instance update",
-			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-HlrNmD", "unexpected number of rows updated"),
+			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-HlrNmD", "Errors.Instance.UpdateMismatch"),
 		},
 		{
 			testName: "when instance update returns 1 row updated should return no error and set non-primary verified domain",
@@ -263,6 +271,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
 			cmd := domain.NewUpdateInstanceCommand(tc.inputID, tc.inputName)
+			cmd.ShouldSkipUpdate = tc.shouldSkipUpdate
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
@@ -283,18 +292,46 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 func TestUpdateInstanceCommand_Events(t *testing.T) {
 	t.Parallel()
 
-	// Given
-	ctx := authz.NewMockContext("instance-1", "", "")
-	cmd := domain.NewUpdateInstanceCommand("instance-1", "test-name")
+	tt := []struct {
+		testName         string
+		inputName        string
+		inputInstanceID  string
+		shouldSkipUpdate bool
+		expectedEvent    eventstore.Command
+	}{
+		{
+			testName: "when ShouldSkipUpdate is true should return no event and no error",
+		},
+		{
+			testName:        "when ShouldSkipUpdate is true should return expected event",
+			inputName:       "test-name",
+			inputInstanceID: "instance-1",
+			expectedEvent: instance.NewInstanceChangedEvent(
+				t.Context(),
+				&instance.NewAggregate("instance-1").Aggregate,
+				"test-name",
+			),
+		},
+	}
 
-	// Test
-	events, err := cmd.Events(ctx, &domain.InvokeOpts{})
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			// Given
+			ctx := authz.NewMockContext(tc.inputInstanceID, "", "")
+			cmd := domain.NewUpdateInstanceCommand(tc.inputInstanceID, tc.inputName)
 
-	// Verify
-	assert.NoError(t, err)
-	require.Len(t, events, 1)
+			// Test
+			events, err := cmd.Events(ctx, &domain.InvokeOpts{})
 
-	event := events[0].(*instance.InstanceChangedEvent)
-	assert.Equal(t, "instance-1", event.Aggregate().ID)
-	assert.Equal(t, "test-name", event.Name)
+			// Verify
+			assert.NoError(t, err)
+			if tc.expectedEvent != nil {
+				require.Len(t, events, 1)
+
+				event := events[0].(*instance.InstanceChangedEvent)
+				assert.Equal(t, tc.inputInstanceID, event.Aggregate().ID)
+				assert.Equal(t, tc.inputName, event.Name)
+			}
+		})
+	}
 }

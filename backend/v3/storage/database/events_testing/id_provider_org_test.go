@@ -25,7 +25,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 	instanceID := Instance.ID()
 	orgID := Instance.DefaultOrg.Id
 
-	t.Run("test iam idp add reduces", func(t *testing.T) {
+	t.Run("test instance idp add reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		before := time.Now()
@@ -50,7 +50,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			idp, err := idpRepo.Get(IAMCTX, pool,
 				database.WithCondition(idpRepo.NameCondition(name)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -71,7 +71,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test iam idp update reduces", func(t *testing.T) {
+	// t.Run("test instance idp update reduces", func(t *testing.T) {
 	// 	name := gofakeit.Name()
 
 	// 	addOIDC, err := MgmtClient.AddOrgOIDCIDP(IAMCTX, &management.AddOrgOIDCIDPRequest{
@@ -119,7 +119,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 	// 	}, retryDuration, tick)
 	// })
 
-	t.Run("test iam idp deactivate reduces", func(t *testing.T) {
+	t.Run("test instance idp deactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		addOIDC, err := MgmtClient.AddOrgOIDCIDP(IAMCTX, &management.AddOrgOIDCIDPRequest{
@@ -150,7 +150,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			idp, err := idpRepo.Get(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.IdpId)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -161,7 +161,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp reactivate reduces", func(t *testing.T) {
+	t.Run("test instance idp reactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		addOIDC, err := MgmtClient.AddOrgOIDCIDP(IAMCTX, &management.AddOrgOIDCIDPRequest{
@@ -190,7 +190,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			idp, err := idpRepo.Get(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.IdpId)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -211,7 +211,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			idp, err := idpRepo.Get(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.IdpId)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -222,7 +222,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp remove reduces", func(t *testing.T) {
+	t.Run("test instance idp remove reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
@@ -252,7 +252,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			_, err := idpRepo.Get(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.IdpId)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 
 			// event org.idp.config.remove
@@ -260,7 +260,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp oidc added reduces", func(t *testing.T) {
+	t.Run("test instance idp oidc added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
@@ -284,7 +284,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			oidc, err := idpRepo.GetOIDC(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.IdpId)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -307,7 +307,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp oidc changed reduces", func(t *testing.T) {
+	t.Run("test instance idp oidc changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
@@ -333,7 +333,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			oidc, err = idpRepo.GetOIDC(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.IdpId)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, addOIDC.IdpId, oidc.ID)
@@ -357,7 +357,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateOIDC, err := idpRepo.GetOIDC(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.IdpId)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -383,7 +383,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp jwt added reduces", func(t *testing.T) {
+	t.Run("test instance idp jwt added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
@@ -405,7 +405,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			jwt, err := idpRepo.GetJWT(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addJWT.IdpId)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -426,7 +426,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test iam idp jwt changed reduces", func(t *testing.T) {
+	t.Run("test instance idp jwt changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
@@ -459,7 +459,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateJWT, err := idpRepo.GetJWT(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addJWT.IdpId)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -513,7 +513,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			oauth, err = idpRepo.GetOAuth(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOAuth.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -576,7 +576,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			oauth, err = idpRepo.GetOAuth(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOAuth.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, addOAuth.Id, oauth.ID)
@@ -611,7 +611,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateOauth, err := idpRepo.GetOAuth(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOAuth.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -671,7 +671,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			oidc, err := idpRepo.GetOIDC(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -730,7 +730,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			oidc, err = idpRepo.GetOIDC(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 		}, retryDuration, tick)
@@ -762,7 +762,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateOIDC, err := idpRepo.GetOIDC(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -818,7 +818,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			oidc, err = idpRepo.GetOIDC(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, domain.IDPTypeOIDC, domain.IDPType(*oidc.Type))
@@ -857,7 +857,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			azure, err := idpRepo.GetAzureAD(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -914,7 +914,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			oidc, err = idpRepo.GetOIDC(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, domain.IDPTypeOIDC, domain.IDPType(*oidc.Type))
@@ -947,7 +947,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			google, err := idpRepo.GetGoogle(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1002,7 +1002,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			jwt, err := idpRepo.GetJWT(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addJWT.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1077,7 +1077,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateJwt, err := idpRepo.GetJWT(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addJWT.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1137,7 +1137,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			azure, err := idpRepo.GetAzureAD(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addAzure.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1196,7 +1196,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			azure, err = idpRepo.GetAzureAD(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addAzure.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, addAzure.Id, azure.ID)
@@ -1234,7 +1234,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateAzure, err := idpRepo.GetAzureAD(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addAzure.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1289,7 +1289,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			github, err := idpRepo.GetGithub(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGithub.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1339,7 +1339,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			github, err = idpRepo.GetGithub(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGithub.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, addGithub.Id, github.ID)
@@ -1371,7 +1371,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateGithub, err := idpRepo.GetGithub(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGithub.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1427,7 +1427,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			githubEnterprise, err := idpRepo.GetGithubEnterprise(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGithubEnterprise.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1485,7 +1485,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			githubEnterprise, err = idpRepo.GetGithubEnterprise(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGithubEnterprise.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, addGithubEnterprise.Id, githubEnterprise.ID)
@@ -1520,7 +1520,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateGithubEnterprise, err := idpRepo.GetGithubEnterprise(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGithubEnterprise.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1576,7 +1576,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			gitlab, err := idpRepo.GetGitlab(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGithub.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1628,7 +1628,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			gitlab, err = idpRepo.GetGitlab(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGitlab.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, addGitlab.Id, gitlab.ID)
@@ -1660,7 +1660,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateGitlab, err := idpRepo.GetGitlab(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGitlab.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1714,7 +1714,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			gitlabSelfHosted, err := idpRepo.GetGitlabSelfHosting(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGitlabSelfHosted.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1768,7 +1768,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			githlabSelfHosted, err = idpRepo.GetGitlabSelfHosting(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGitlabSelfHosted.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, addGitlabSelfHosted.Id, githlabSelfHosted.ID)
@@ -1801,7 +1801,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateGitlabSelfHosted, err := idpRepo.GetGitlabSelfHosting(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGitlabSelfHosted.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1855,7 +1855,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			google, err := idpRepo.GetGoogle(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGoogle.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1907,7 +1907,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			google, err = idpRepo.GetGoogle(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGoogle.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, addGoogle.Id, google.ID)
@@ -1939,7 +1939,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateGoogle, err := idpRepo.GetGoogle(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addGoogle.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -1968,40 +1968,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add ldap
 		before := time.Now()
-		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, &management.AddLDAPProviderRequest{
-			Name:              name,
-			Servers:           []string{"servers"},
-			StartTls:          true,
-			BaseDn:            "baseDN",
-			BindDn:            "bindND",
-			BindPassword:      "bindPassword",
-			UserBase:          "userBase",
-			UserObjectClasses: []string{"userOhjectClasses"},
-			UserFilters:       []string{"userFilters"},
-			Timeout:           durationpb.New(time.Minute),
-			Attributes: &idp_grpc.LDAPAttributes{
-				IdAttribute:                "idAttribute",
-				FirstNameAttribute:         "firstNameAttribute",
-				LastNameAttribute:          "lastNameAttribute",
-				DisplayNameAttribute:       "displayNameAttribute",
-				NickNameAttribute:          "nickNameAttribute",
-				PreferredUsernameAttribute: "preferredUsernameAttribute",
-				EmailAttribute:             "emailAttribute",
-				EmailVerifiedAttribute:     "emailVerifiedAttribute",
-				PhoneAttribute:             "phoneAttribute",
-				PhoneVerifiedAttribute:     "phoneVerifiedAttribute",
-				PreferredLanguageAttribute: "preferredLanguageAttribute",
-				AvatarUrlAttribute:         "avatarUrlAttribute",
-				ProfileAttribute:           "profileAttribute",
-			},
-			ProviderOptions: &idp_grpc.Options{
-				IsLinkingAllowed:  false,
-				IsCreationAllowed: false,
-				IsAutoCreation:    false,
-				IsAutoUpdate:      false,
-				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
-			},
-		})
+		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, defaultOrganizationLDAPRequest(name))
 		after := time.Now()
 		require.NoError(t, err)
 
@@ -2012,7 +1979,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			ldap, err := idpRepo.GetLDAP(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addLdap.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -2060,40 +2027,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add ldap
-		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, &management.AddLDAPProviderRequest{
-			Name:              name,
-			Servers:           []string{"servers"},
-			StartTls:          true,
-			BaseDn:            "baseDN",
-			BindDn:            "bindND",
-			BindPassword:      "bindPassword",
-			UserBase:          "userBase",
-			UserObjectClasses: []string{"userOhjectClasses"},
-			UserFilters:       []string{"userFilters"},
-			Timeout:           durationpb.New(time.Minute),
-			Attributes: &idp_grpc.LDAPAttributes{
-				IdAttribute:                "idAttribute",
-				FirstNameAttribute:         "firstNameAttribute",
-				LastNameAttribute:          "lastNameAttribute",
-				DisplayNameAttribute:       "displayNameAttribute",
-				NickNameAttribute:          "nickNameAttribute",
-				PreferredUsernameAttribute: "preferredUsernameAttribute",
-				EmailAttribute:             "emailAttribute",
-				EmailVerifiedAttribute:     "emailVerifiedAttribute",
-				PhoneAttribute:             "phoneAttribute",
-				PhoneVerifiedAttribute:     "phoneVerifiedAttribute",
-				PreferredLanguageAttribute: "preferredLanguageAttribute",
-				AvatarUrlAttribute:         "avatarUrlAttribute",
-				ProfileAttribute:           "profileAttribute",
-			},
-			ProviderOptions: &idp_grpc.Options{
-				IsLinkingAllowed:  false,
-				IsCreationAllowed: false,
-				IsAutoCreation:    false,
-				IsAutoUpdate:      false,
-				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
-			},
-		})
+		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, defaultOrganizationLDAPRequest(name))
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -2104,7 +2038,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			ldap, err = idpRepo.GetLDAP(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addLdap.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, addLdap.Id, ldap.ID)
@@ -2157,7 +2091,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateLdap, err := idpRepo.GetLDAP(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addLdap.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -2230,7 +2164,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			apple, err := idpRepo.GetApple(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addApple.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -2286,7 +2220,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			apple, err = idpRepo.GetApple(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addApple.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, addApple.Id, apple.ID)
@@ -2320,7 +2254,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateApple, err := idpRepo.GetApple(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addApple.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -2381,7 +2315,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			saml, err := idpRepo.GetSAML(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addSAML.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -2446,7 +2380,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			saml, err = idpRepo.GetSAML(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addSAML.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, addSAML.Id, saml.ID)
@@ -2485,7 +2419,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateSAML, err := idpRepo.GetSAML(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addSAML.Id)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 
@@ -2516,7 +2450,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test org iam remove reduces", func(t *testing.T) {
+	t.Run("test org instance remove reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
@@ -2541,7 +2475,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			_, err := idpRepo.Get(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.IdpId)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.NoError(t, err)
 		}, retryDuration, tick)
@@ -2558,9 +2492,46 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			_, err := idpRepo.Get(IAMCTX, pool,
 				database.WithCondition(idpRepo.IDCondition(addOIDC.IdpId)),
 				database.WithCondition(idpRepo.InstanceIDCondition(instanceID)),
-				database.WithCondition(idpRepo.OrgIDCondition(&orgID)),
+				database.WithCondition(idpRepo.OrganizationIDCondition(&orgID)),
 			)
 			require.ErrorIs(t, &database.NoRowFoundError{}, err)
 		}, retryDuration, tick)
 	})
+}
+
+func defaultOrganizationLDAPRequest(providerName string) *management.AddLDAPProviderRequest {
+	return &management.AddLDAPProviderRequest{
+		Name:              providerName,
+		Servers:           []string{"servers"},
+		StartTls:          true,
+		BaseDn:            "baseDN",
+		BindDn:            "bindND",
+		BindPassword:      "bindPassword",
+		UserBase:          "userBase",
+		UserObjectClasses: []string{"userOhjectClasses"},
+		UserFilters:       []string{"userFilters"},
+		Timeout:           durationpb.New(time.Minute),
+		Attributes: &idp_grpc.LDAPAttributes{
+			IdAttribute:                "idAttribute",
+			FirstNameAttribute:         "firstNameAttribute",
+			LastNameAttribute:          "lastNameAttribute",
+			DisplayNameAttribute:       "displayNameAttribute",
+			NickNameAttribute:          "nickNameAttribute",
+			PreferredUsernameAttribute: "preferredUsernameAttribute",
+			EmailAttribute:             "emailAttribute",
+			EmailVerifiedAttribute:     "emailVerifiedAttribute",
+			PhoneAttribute:             "phoneAttribute",
+			PhoneVerifiedAttribute:     "phoneVerifiedAttribute",
+			PreferredLanguageAttribute: "preferredLanguageAttribute",
+			AvatarUrlAttribute:         "avatarUrlAttribute",
+			ProfileAttribute:           "profileAttribute",
+		},
+		ProviderOptions: &idp_grpc.Options{
+			IsLinkingAllowed:  false,
+			IsCreationAllowed: false,
+			IsAutoCreation:    false,
+			IsAutoUpdate:      false,
+			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+		},
+	}
 }

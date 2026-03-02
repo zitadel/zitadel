@@ -181,7 +181,7 @@ func Test_writeOperation(t *testing.T) {
 		{
 			name: "number less than or equal",
 			write: func(builder *StatementBuilder) {
-				writeNumberOperation[int](builder, NewColumn("table", "column"), NumberOperationAtLeast, 123)
+				writeNumberOperation[int](builder, NewColumn("table", "column"), NumberOperationLessThanOrEqual, 123)
 			},
 			want: want{
 				stmt: "table.column <= $1",
@@ -201,7 +201,7 @@ func Test_writeOperation(t *testing.T) {
 		{
 			name: "number greater than or equal",
 			write: func(builder *StatementBuilder) {
-				writeNumberOperation[int](builder, NewColumn("table", "column"), NumberOperationAtMost, 123)
+				writeNumberOperation[int](builder, NewColumn("table", "column"), NumberOperationGreaterThanOrEqual, 123)
 			},
 			want: want{
 				stmt: "table.column >= $1",

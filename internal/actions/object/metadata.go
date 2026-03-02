@@ -85,6 +85,7 @@ func GetOrganizationMetadata(ctx context.Context, queries *query.Queries, c *act
 		organizationID,
 		&query.OrgMetadataSearchQueries{},
 		false,
+		false,
 	)
 	if err != nil {
 		logging.WithError(err).Info("unable to get org metadata in action")

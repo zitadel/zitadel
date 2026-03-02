@@ -885,7 +885,7 @@ func importOrgDomains(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 			Verified: domainR.IsVerified,
 			Primary:  domainR.IsPrimary,
 		}
-		_, err := s.command.AddOrgDomain(ctx, org.GetOrgId(), domainR.DomainName, []string{})
+		_, err := s.command.AddOrgDomain(ctx, org.GetOrgId(), domainR.DomainName, []string{}, nil)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {

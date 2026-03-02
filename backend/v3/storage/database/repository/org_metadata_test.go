@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -24,39 +23,16 @@ func TestGetOrganizationMetadata(t *testing.T) {
 		}
 	}()
 
-	instanceRepo := repository.InstanceRepository()
-	orgRepo := repository.OrganizationRepository()
 	metadataRepo := repository.OrganizationMetadataRepository()
 
-	// create instance
-	instanceID := gofakeit.UUID()
-	instance := domain.Instance{
-		ID:                   instanceID,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleClient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
-	}
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
-
-	// create organization
-	orgA := domain.Organization{
-		ID:         "1",
-		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
-	}
-	err = orgRepo.Create(t.Context(), tx, &orgA)
-	require.NoError(t, err)
+	instanceID := createInstance(t, tx)
+	orgA := createOrganization(t, tx, instanceID)
 
 	err = metadataRepo.Set(
 		t.Context(),
 		tx,
 		&domain.OrganizationMetadata{
-			OrganizationID: orgA.ID,
+			OrganizationID: orgA,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key",
@@ -64,7 +40,7 @@ func TestGetOrganizationMetadata(t *testing.T) {
 			},
 		},
 		&domain.OrganizationMetadata{
-			OrganizationID: orgA.ID,
+			OrganizationID: orgA,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key2",
@@ -74,19 +50,11 @@ func TestGetOrganizationMetadata(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	orgB := domain.Organization{
-		ID:         "2",
-		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
-	}
-	err = orgRepo.Create(t.Context(), tx, &orgB)
-	require.NoError(t, err)
-
+	orgB := createOrganization(t, tx, instanceID)
 	err = metadataRepo.Set(
 		t.Context(), tx,
 		&domain.OrganizationMetadata{
-			OrganizationID: orgB.ID,
+			OrganizationID: orgB,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key",
@@ -94,7 +62,7 @@ func TestGetOrganizationMetadata(t *testing.T) {
 			},
 		},
 		&domain.OrganizationMetadata{
-			OrganizationID: orgB.ID,
+			OrganizationID: orgB,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key2",
@@ -107,7 +75,7 @@ func TestGetOrganizationMetadata(t *testing.T) {
 	t.Run("metadata without instance condition", func(t *testing.T) {
 		metadata, err := metadataRepo.Get(
 			t.Context(), tx,
-			database.WithCondition(metadataRepo.OrganizationIDCondition(orgA.ID)),
+			database.WithCondition(metadataRepo.OrganizationIDCondition(orgA)),
 		)
 		assert.ErrorIs(t, err, new(database.MissingConditionError))
 		assert.Nil(t, metadata)
@@ -137,7 +105,7 @@ func TestGetOrganizationMetadata(t *testing.T) {
 			database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
-					metadataRepo.OrganizationIDCondition(orgA.ID),
+					metadataRepo.OrganizationIDCondition(orgA),
 					metadataRepo.KeyCondition(database.TextOperationEqual, "urn:zitadel:key2"),
 				),
 			),
@@ -154,7 +122,7 @@ func TestGetOrganizationMetadata(t *testing.T) {
 			database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
-					metadataRepo.OrganizationIDCondition(orgA.ID),
+					metadataRepo.OrganizationIDCondition(orgA),
 					metadataRepo.ValueCondition(database.BytesOperationEqual, []byte("asdf")),
 				),
 			),
@@ -175,38 +143,18 @@ func TestListOrganizationMetadata(t *testing.T) {
 		}
 	}()
 
-	instanceRepo := repository.InstanceRepository()
-	orgRepo := repository.OrganizationRepository()
 	metadataRepo := repository.OrganizationMetadataRepository()
 
 	// create instance
-	instanceID := gofakeit.UUID()
-	instance := domain.Instance{
-		ID:                   instanceID,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleClient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
-	}
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceID := createInstance(t, tx)
 
 	// create organization
-	orgA := domain.Organization{
-		ID:         "1",
-		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
-	}
-	err = orgRepo.Create(t.Context(), tx, &orgA)
-	require.NoError(t, err)
+	orgA := createOrganization(t, tx, instanceID)
 
 	err = metadataRepo.Set(
 		t.Context(), tx,
 		&domain.OrganizationMetadata{
-			OrganizationID: orgA.ID,
+			OrganizationID: orgA,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key",
@@ -214,7 +162,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 			},
 		},
 		&domain.OrganizationMetadata{
-			OrganizationID: orgA.ID,
+			OrganizationID: orgA,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key2",
@@ -228,26 +176,19 @@ func TestListOrganizationMetadata(t *testing.T) {
 		t.Context(), tx,
 		database.WithCondition(
 			database.And(
-				metadataRepo.OrganizationIDCondition(orgA.ID),
+				metadataRepo.OrganizationIDCondition(orgA),
 				metadataRepo.InstanceIDCondition(instanceID),
 			),
 		),
 	)
 	require.NoError(t, err)
 
-	orgB := domain.Organization{
-		ID:         "2",
-		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
-	}
-	err = orgRepo.Create(t.Context(), tx, &orgB)
-	require.NoError(t, err)
+	orgB := createOrganization(t, tx, instanceID)
 
 	err = metadataRepo.Set(
 		t.Context(), tx,
 		&domain.OrganizationMetadata{
-			OrganizationID: orgB.ID,
+			OrganizationID: orgB,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key",
@@ -255,7 +196,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 			},
 		},
 		&domain.OrganizationMetadata{
-			OrganizationID: orgB.ID,
+			OrganizationID: orgB,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key2",
@@ -269,7 +210,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 		t.Context(), tx,
 		database.WithCondition(
 			database.And(
-				metadataRepo.OrganizationIDCondition(orgB.ID),
+				metadataRepo.OrganizationIDCondition(orgB),
 				metadataRepo.InstanceIDCondition(instanceID),
 			),
 		),
@@ -279,7 +220,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 	t.Run("metadata without instance condition", func(t *testing.T) {
 		metadata, err := metadataRepo.List(
 			t.Context(), tx,
-			database.WithCondition(metadataRepo.OrganizationIDCondition(orgA.ID)),
+			database.WithCondition(metadataRepo.OrganizationIDCondition(orgA)),
 		)
 		assert.ErrorIs(t, err, new(database.MissingConditionError))
 		assert.Nil(t, metadata)
@@ -309,7 +250,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 			database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
-					metadataRepo.OrganizationIDCondition(orgA.ID),
+					metadataRepo.OrganizationIDCondition(orgA),
 				),
 			),
 		)
@@ -330,8 +271,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 		)
 		require.NoError(t, err)
 		require.Len(t, metadata, 2)
-		assert.Equal(t, []byte("asdf"), metadata[0].Value)
-		assert.Equal(t, []byte(`"asdf"`), metadata[1].Value)
+		assert.Contains(t, [][]byte{[]byte("asdf"), []byte(`"asdf"`)}, metadata[0].Value)
 	})
 
 	t.Run("metadata by value", func(t *testing.T) {
@@ -348,43 +288,23 @@ func TestListOrganizationMetadata(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, metadata, 1)
 		assert.Equal(t, "urn:zitadel:key2", metadata[0].Key)
-		assert.Equal(t, "1", metadata[0].OrganizationID)
+		assert.Contains(t, []string{orgA, orgB}, metadata[0].OrganizationID)
 	})
 }
 
 func TestSetOrganizationMetadata_UpdatedAt(t *testing.T) {
 	instanceRepo := repository.InstanceRepository()
-	orgRepo := repository.OrganizationRepository()
 	metadataRepo := repository.OrganizationMetadataRepository()
 
 	// create instance
-	instanceID := gofakeit.UUID()
-	instance := domain.Instance{
-		ID:                   instanceID,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleClient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
-	}
-	err := instanceRepo.Create(t.Context(), pool, &instance)
-	require.NoError(t, err)
+	instanceID := createInstance(t, pool)
 	t.Cleanup(func() {
 		_, err := instanceRepo.Delete(context.Background(), pool, instanceRepo.PrimaryKeyCondition(instanceID))
 		require.NoError(t, err)
 	})
 
 	// create organization
-	orgID := gofakeit.UUID()
-	organization := domain.Organization{
-		ID:         orgID,
-		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
-	}
-	err = orgRepo.Create(t.Context(), pool, &organization)
-	require.NoError(t, err)
+	orgID := createOrganization(t, pool, instanceID)
 
 	metadata := &domain.OrganizationMetadata{
 		OrganizationID: orgID,
@@ -396,7 +316,7 @@ func TestSetOrganizationMetadata_UpdatedAt(t *testing.T) {
 	}
 
 	beforeCreate := time.Now()
-	err = metadataRepo.Set(t.Context(), pool, metadata)
+	err := metadataRepo.Set(t.Context(), pool, metadata)
 	require.NoError(t, err)
 	afterCreate := time.Now()
 
@@ -427,34 +347,10 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		}
 	}()
 
-	instanceRepo := repository.InstanceRepository()
-	orgRepo := repository.OrganizationRepository()
 	metadataRepo := repository.OrganizationMetadataRepository()
 
-	// create instance
-	instanceID := gofakeit.UUID()
-	instance := domain.Instance{
-		ID:                   instanceID,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleClient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
-	}
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
-
-	// create organization
-	orgID := gofakeit.UUID()
-	organization := domain.Organization{
-		ID:         orgID,
-		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
-	}
-	err = orgRepo.Create(t.Context(), tx, &organization)
-	require.NoError(t, err)
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
 
 	t.Run("check fields all fields scanned", func(t *testing.T) {
 		tx, err := tx.Begin(t.Context())
@@ -817,38 +713,18 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 		}
 	}()
 
-	instanceRepo := repository.InstanceRepository()
-	orgRepo := repository.OrganizationRepository()
 	metadataRepo := repository.OrganizationMetadataRepository()
 
 	// create instance
-	instanceID := gofakeit.UUID()
-	instance := domain.Instance{
-		ID:                   instanceID,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleClient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
-	}
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceID := createInstance(t, tx)
 
 	// create organization
-	orgA := domain.Organization{
-		ID:         "1",
-		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
-	}
-	err = orgRepo.Create(t.Context(), tx, &orgA)
-	require.NoError(t, err)
+	orgA := createOrganization(t, tx, instanceID)
 
 	err = metadataRepo.Set(
 		t.Context(), tx,
 		&domain.OrganizationMetadata{
-			OrganizationID: orgA.ID,
+			OrganizationID: orgA,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key",
@@ -856,7 +732,7 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 			},
 		},
 		&domain.OrganizationMetadata{
-			OrganizationID: orgA.ID,
+			OrganizationID: orgA,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key2",
@@ -866,19 +742,11 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	orgB := domain.Organization{
-		ID:         "2",
-		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
-	}
-	err = orgRepo.Create(t.Context(), tx, &orgB)
-	require.NoError(t, err)
-
+	orgB := createOrganization(t, tx, instanceID)
 	err = metadataRepo.Set(
 		t.Context(), tx,
 		&domain.OrganizationMetadata{
-			OrganizationID: orgB.ID,
+			OrganizationID: orgB,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key",
@@ -886,7 +754,7 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 			},
 		},
 		&domain.OrganizationMetadata{
-			OrganizationID: orgB.ID,
+			OrganizationID: orgB,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "urn:zitadel:key2",
@@ -899,7 +767,7 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 	t.Run("without instance condition", func(t *testing.T) {
 		affected, err := metadataRepo.Remove(
 			t.Context(), tx,
-			metadataRepo.OrganizationIDCondition(orgA.ID),
+			metadataRepo.OrganizationIDCondition(orgA),
 		)
 		assert.ErrorIs(t, err, new(database.MissingConditionError))
 		assert.Equal(t, int64(0), affected)
@@ -924,7 +792,7 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 			t.Context(), tx,
 			database.And(
 				metadataRepo.InstanceIDCondition(instanceID),
-				metadataRepo.OrganizationIDCondition(orgA.ID),
+				metadataRepo.OrganizationIDCondition(orgA),
 				metadataRepo.KeyCondition(database.TextOperationStartsWith, "urn:zitadel:key"),
 			),
 		)

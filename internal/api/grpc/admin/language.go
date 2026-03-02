@@ -33,11 +33,7 @@ func (s *Server) GetDefaultLanguage(ctx context.Context, _ *admin_pb.GetDefaultL
 }
 
 func (s *Server) GetAllowedLanguages(ctx context.Context, _ *admin_pb.GetAllowedLanguagesRequest) (*admin_pb.GetAllowedLanguagesResponse, error) {
-	restrictions, err := s.query.GetInstanceRestrictions(ctx)
-	if err != nil {
-		return nil, err
-	}
-	allowed := restrictions.AllowedLanguages
+	allowed := authz.GetInstance(ctx).AllowedLanguages()
 	if len(allowed) == 0 {
 		allowed = i18n.SupportedLanguages()
 	}

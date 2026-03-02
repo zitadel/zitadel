@@ -67,7 +67,7 @@ func (o orgDomain) Update(ctx context.Context, client database.QueryExecutor, co
 
 // Remove implements [domain.OrganizationDomainRepository].
 func (o orgDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if err := checkRestrictingColumns(condition, o.InstanceIDColumn(), o.OrgIDColumn()); err != nil {
+	if err := checkRestrictingColumns(condition, o.InstanceIDColumn(), o.OrganizationIDColumn()); err != nil {
 		return 0, err
 	}
 	return delete(ctx, client, o, condition)
@@ -104,7 +104,7 @@ func (o orgDomain) SetUpdatedAt(updatedAt time.Time) database.Change {
 func (o orgDomain) PrimaryKeyCondition(instanceID, orgID, domain string) database.Condition {
 	return database.And(
 		o.InstanceIDCondition(instanceID),
-		o.OrgIDCondition(orgID),
+		o.OrganizationIDCondition(orgID),
 		o.DomainCondition(database.TextOperationEqual, domain),
 	)
 }
@@ -130,9 +130,9 @@ func (o orgDomain) IsVerifiedCondition(isVerified bool) database.Condition {
 	return database.NewBooleanCondition(o.IsVerifiedColumn(), isVerified)
 }
 
-// OrgIDCondition implements [domain.OrganizationDomainRepository].
-func (o orgDomain) OrgIDCondition(orgID string) database.Condition {
-	return database.NewTextCondition(o.OrgIDColumn(), database.TextOperationEqual, orgID)
+// OrganizationIDCondition implements [domain.OrganizationDomainRepository].
+func (o orgDomain) OrganizationIDCondition(orgID string) database.Condition {
+	return database.NewTextCondition(o.OrganizationIDColumn(), database.TextOperationEqual, orgID)
 }
 
 // -------------------------------------------------------------
@@ -143,7 +143,7 @@ func (o orgDomain) OrgIDCondition(orgID string) database.Condition {
 func (o orgDomain) PrimaryKeyColumns() []database.Column {
 	return []database.Column{
 		o.InstanceIDColumn(),
-		o.OrgIDColumn(),
+		o.OrganizationIDColumn(),
 		o.DomainColumn(),
 	}
 }
@@ -174,8 +174,8 @@ func (o orgDomain) IsVerifiedColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "is_verified")
 }
 
-// OrgIDColumn implements [domain.OrganizationDomainRepository].
-func (o orgDomain) OrgIDColumn() database.Column {
+// OrganizationIDColumn implements [domain.OrganizationDomainRepository].
+func (o orgDomain) OrganizationIDColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "organization_id")
 }
 

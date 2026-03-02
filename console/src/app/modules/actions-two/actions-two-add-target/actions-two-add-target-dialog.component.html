@@ -32,6 +32,18 @@
     </cnsl-form-field>
 
     <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.PAYLOAD_TYPE' | translate }}</cnsl-label>
+      <mat-select [formControl]="targetForm.controls.payloadType" name="payloadType">
+        <mat-option *ngFor="let type of payloadTypes" [value]="type">
+          {{ 'ACTIONSTWO.TARGET.CREATE.PAYLOAD_TYPES.' + type | translate }}
+        </mat-option>
+      </mat-select>
+      <span class="name-hint cnsl-secondary-text types-description">
+        {{ 'ACTIONSTWO.TARGET.CREATE.PAYLOAD_TYPE_DESCRIPTION' | translate }}
+      </span>
+    </cnsl-form-field>
+
+    <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.TIMEOUT' | translate }}</cnsl-label>
       <input cnslInput type="number" placeholder="10" [formControl]="targetForm.controls.timeout" />
       <span class="name-hint cnsl-secondary-text" cnslHint>{{

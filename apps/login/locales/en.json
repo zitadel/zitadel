@@ -24,7 +24,7 @@
   },
   "loginname": {
     "title": "Welcome back!",
-    "description": "Enter your login data.",
+    "description": "Enter your login details.",
     "register": "Register new user",
     "submit": "Continue",
     "labels": {
@@ -47,7 +47,7 @@
       "userNotFound": "User not found in the system",
       "couldNotCreateSession": "Could not create session for user",
       "initialUserNotSupported": "Initial User not supported",
-      "usernamePasswordNotAllowed": "Username Password not allowed! Contact your administrator for more information.",
+      "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information.",
       "passkeysNotAllowed": "Passkeys not allowed! Contact your administrator for more information.",
       "couldNotFindIdentityProvider": "Could not find identity provider.",
       "userNotActive": "User is not active. Contact your administrator for more information."
@@ -108,14 +108,17 @@
       "description": "Set the password for your account",
       "submit": "Continue",
       "labels": {
+        "currentPassword": "Current Password",
         "newPassword": "New Password",
         "confirmPassword": "Confirm Password"
       },
       "required": {
+        "currentPassword": "You have to provide your current password!",
         "newPassword": "You have to provide a new password!",
         "confirmPassword": "This field is required"
       },
       "errors": {
+        "currentPasswordInvalid": "Current password is incorrect.",
         "couldNotChangePassword": "Could not change password",
         "couldNotVerifyPassword": "Could not verify password",
         "unknownError": "Unknown error"
@@ -147,7 +150,9 @@
       "couldNotLoadSession": "Could not load session",
       "couldNotLoadAuthMethods": "Could not load auth methods",
       "failedPrecondition": "Failed precondition",
-      "sessionNotValid": "Session is not valid"
+      "sessionNotValid": "Session is not valid",
+      "passwordVerificationMissing": "Password verification is missing.",
+      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
     }
   },
   "idp": {
@@ -282,7 +287,7 @@
       "description": "Your device will ask for your fingerprint, face, or screen lock",
       "info": {
         "description": "A passkey is an authentication method on a device like your fingerprint, Apple FaceID or similar. ",
-        "link": "Passwordless Authentication"
+        "link": "Passkey Authentication"
       },
       "skip": "Skip",
       "submit": "Continue"
@@ -313,7 +318,7 @@
       "description": "Provide email, first and last name to register."
     },
     "title": "Register",
-    "description": "Create your ZITADEL account.",
+    "description": "Create your Zitadel account.",
     "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
     "selectMethod": "Select the method you would like to authenticate",
     "agreeTo": "To register you must agree to the terms and conditions",
@@ -406,7 +411,8 @@
       "userAlreadyVerified": "User is already verified!",
       "couldNotResendInvite": "Could not resend invite",
       "inviteSendFailed": "Failed to send invitation email",
-      "emailSendFailed": "Failed to send verification email"
+      "emailSendFailed": "Failed to send verification email",
+      "contextMissing": "An error occurred. Please try again."
     }
   },
   "authenticator": {

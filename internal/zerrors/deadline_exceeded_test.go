@@ -9,25 +9,54 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestDeadlineExceededError(t *testing.T) {
-	var err interface{} = new(zerrors.DeadlineExceededError)
-	_, ok := err.(zerrors.DeadlineExceeded)
-	assert.True(t, ok)
-}
+func TestDeadlineExceeded(t *testing.T) {
+	parentErr := errors.New("parent error")
+	id := "test_id"
+	message := "test message"
 
-func TestThrowDeadlineExceededf(t *testing.T) {
-	err := zerrors.ThrowDeadlineExceededf(nil, "id", "msg")
-	//nolint:errorlint
-	_, ok := err.(*zerrors.DeadlineExceededError)
-	assert.True(t, ok)
-}
+	t.Run("ThrowDeadlineExceeded", func(t *testing.T) {
+		err := zerrors.ThrowDeadlineExceeded(parentErr, id, message)
+		assert.NotNil(t, err)
 
-func TestIsDeadlineExceeded(t *testing.T) {
-	err := zerrors.ThrowDeadlineExceeded(nil, "id", "msg")
-	ok := zerrors.IsDeadlineExceeded(err)
-	assert.True(t, ok)
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindDeadlineExceeded, zitadelErr.Kind)
 
-	err = errors.New("I am found!")
-	ok = zerrors.IsDeadlineExceeded(err)
-	assert.False(t, ok)
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, message, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("ThrowDeadlineExceededf", func(t *testing.T) {
+		format := "formatted %s"
+		arg := "message"
+		expectedMessage := "formatted message"
+
+		err := zerrors.ThrowDeadlineExceededf(parentErr, id, format, arg)
+		assert.NotNil(t, err)
+
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindDeadlineExceeded, zitadelErr.Kind)
+
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, expectedMessage, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("IsDeadlineExceeded", func(t *testing.T) {
+		err := zerrors.ThrowDeadlineExceeded(parentErr, id, message)
+		isDeadlineExceeded := zerrors.IsDeadlineExceeded(err)
+		assert.True(t, isDeadlineExceeded)
+	})
 }

@@ -29,7 +29,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 	organizationAdmin2 := createOrganizationAdministrator(iamOwnerCtx, instanceQuery, organizationResp.GetOrganizationId(), organizationName, t)
 	organizationAdmin3 := createOrganizationAdministrator(iamOwnerCtx, instanceQuery, organizationResp.GetOrganizationId(), organizationName, t)
 
-	// Additionally, a machine user as a project grant owner to test permissions
+	// Additionally, a service account as a project grant owner to test permissions
 	userOrganizationResp := instanceQuery.CreateMachineUser(iamOwnerCtx)
 	instanceQuery.CreateOrgMembership(t, iamOwnerCtx, organizationResp.GetOrganizationId(), userOrganizationResp.GetUserId())
 	patOrganizationResp := instanceQuery.CreatePersonalAccessToken(iamOwnerCtx, userOrganizationResp.GetUserId())
@@ -42,7 +42,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 	projectAdministrator2 := createProjectAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
 	projectAdministrator3 := createProjectAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
 
-	// Additionally, a machine user as a project owner to test permissions
+	// Additionally, a service account as a project owner to test permissions
 	userProjectResp := instanceQuery.CreateMachineUser(iamOwnerCtx)
 	instanceQuery.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userProjectResp.GetUserId())
 	patProjectResp := instanceQuery.CreatePersonalAccessToken(iamOwnerCtx, userProjectResp.GetUserId())
@@ -56,7 +56,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 	projectGrantAdministrator2 := createProjectGrantAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
 	projectGrantAdministrator3 := createProjectGrantAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
 
-	// Additionally, a machine user as a project grant owner to test permissions
+	// Additionally, a service account as a project grant owner to test permissions
 	userProjectGrantResp := instanceQuery.CreateMachineUser(iamOwnerCtx)
 	instanceQuery.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), grantedOrganizationResp.GetOrganizationId(), userProjectGrantResp.GetUserId())
 	patProjectGrantResp := instanceQuery.CreatePersonalAccessToken(iamOwnerCtx, userProjectGrantResp.GetUserId())
@@ -584,6 +584,117 @@ func TestServer_ListAdministrators(t *testing.T) {
 				Administrators: []*internal_permission.Administrator{projectGrantAdministrator1, projectGrantAdministrator2},
 			},
 		},
+		{
+			name: "list, role filter",
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &internal_permission.ListAdministratorsRequest{
+					Filters: []*internal_permission.AdministratorSearchFilter{
+						{
+							Filter: &internal_permission.AdministratorSearchFilter_Role{
+								Role: &internal_permission.RoleFilter{
+									RoleKey: "PROJECT_OWNER",
+								},
+							},
+						},
+					},
+					Pagination: &filter.PaginationRequest{Asc: true, Limit: 2},
+				},
+			},
+			want: &internal_permission.ListAdministratorsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  4, // 3 project admins with PROJECT_OWNER role and the project creator
+					AppliedLimit: 2,
+				},
+				Administrators: []*internal_permission.Administrator{projectAdministrator1, projectAdministrator2},
+			},
+		},
+		{
+			name: "list, and with not filter",
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &internal_permission.ListAdministratorsRequest{
+					Filters: []*internal_permission.AdministratorSearchFilter{
+						{
+							Filter: &internal_permission.AdministratorSearchFilter_And{
+								And: &internal_permission.AndFilter{
+									Queries: []*internal_permission.AdministratorSearchFilter{
+										{
+											Filter: &internal_permission.AdministratorSearchFilter_Role{
+												Role: &internal_permission.RoleFilter{
+													RoleKey: "PROJECT_OWNER",
+												},
+											},
+										},
+										{
+											Filter: &internal_permission.AdministratorSearchFilter_Not{
+												Not: &internal_permission.NotFilter{
+													Query: &internal_permission.AdministratorSearchFilter{
+														Filter: &internal_permission.AdministratorSearchFilter_InUserIdsFilter{
+															InUserIdsFilter: &filter.InIDsFilter{
+																Ids: []string{projectAdministrator1.GetUser().GetId(), projectAdministrator2.GetUser().GetId()},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					Pagination: &filter.PaginationRequest{Asc: true, Limit: 1},
+				},
+			},
+			want: &internal_permission.ListAdministratorsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2, // 1 project admin and the project creator
+					AppliedLimit: 1,
+				},
+				Administrators: []*internal_permission.Administrator{projectAdministrator3},
+			},
+		},
+		{
+			name: "list, or filter",
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &internal_permission.ListAdministratorsRequest{
+					Filters: []*internal_permission.AdministratorSearchFilter{
+						{
+							Filter: &internal_permission.AdministratorSearchFilter_Or{
+								Or: &internal_permission.OrFilter{
+									Queries: []*internal_permission.AdministratorSearchFilter{
+										{
+											Filter: &internal_permission.AdministratorSearchFilter_InUserIdsFilter{
+												InUserIdsFilter: &filter.InIDsFilter{
+													Ids: []string{projectGrantAdministrator1.GetUser().GetId()},
+												},
+											},
+										},
+										{
+											Filter: &internal_permission.AdministratorSearchFilter_Role{
+												Role: &internal_permission.RoleFilter{
+													RoleKey: "PROJECT_OWNER",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					Pagination: &filter.PaginationRequest{Asc: true, Limit: 2},
+				},
+			},
+			want: &internal_permission.ListAdministratorsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  5, // 3 project grant admins, the project creator and the project grant admin
+					AppliedLimit: 2,
+				},
+				Administrators: []*internal_permission.Administrator{projectAdministrator1, projectAdministrator2},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -734,7 +845,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 	organizationAdmin2 := createOrganizationAdministrator(iamOwnerCtx, instancePermissionV2, organizationResp.GetOrganizationId(), organizationName, t)
 	organizationAdmin3 := createOrganizationAdministrator(iamOwnerCtx, instancePermissionV2, organizationResp.GetOrganizationId(), organizationName, t)
 
-	// Additionally, a machine user as a project grant owner to test permissions
+	// Additionally, a service account as a project grant owner to test permissions
 	userOrganizationResp := instancePermissionV2.CreateMachineUser(iamOwnerCtx)
 	instancePermissionV2.CreateOrgMembership(t, iamOwnerCtx, organizationResp.GetOrganizationId(), userOrganizationResp.GetUserId())
 	patOrganizationResp := instancePermissionV2.CreatePersonalAccessToken(iamOwnerCtx, userOrganizationResp.GetUserId())
@@ -747,7 +858,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 	projectAdministrator2 := createProjectAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
 	projectAdministrator3 := createProjectAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
 
-	// Additionally, a machine user as a project owner to test permissions
+	// Additionally, a service account as a project owner to test permissions
 	userProjectResp := instancePermissionV2.CreateMachineUser(iamOwnerCtx)
 	instancePermissionV2.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userProjectResp.GetUserId())
 	patProjectResp := instancePermissionV2.CreatePersonalAccessToken(iamOwnerCtx, userProjectResp.GetUserId())
@@ -761,12 +872,11 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 	projectGrantAdministrator2 := createProjectGrantAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
 	projectGrantAdministrator3 := createProjectGrantAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
 
-	// Additionally, a machine user as a project grant owner to test permissions
+	// Additionally, a service account as a project grant owner to test permissions
 	userProjectGrantResp := instancePermissionV2.CreateMachineUser(iamOwnerCtx)
 	instancePermissionV2.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), grantedOrganizationResp.GetOrganizationId(), userProjectGrantResp.GetUserId())
 	patProjectGrantResp := instancePermissionV2.CreatePersonalAccessToken(iamOwnerCtx, userProjectGrantResp.GetUserId())
 	projectGrantOwnerCtx := integration.WithAuthorizationToken(CTX, patProjectGrantResp.Token)
-
 	type args struct {
 		ctx context.Context
 		dep func(*internal_permission.ListAdministratorsRequest, *internal_permission.ListAdministratorsResponse)

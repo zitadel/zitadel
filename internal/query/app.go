@@ -670,6 +670,22 @@ func NewAppProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnProjectID, id, TextEquals)
 }
 
+func NewAppClientIDSearchQuery(clientID string) (SearchQuery, error) {
+	oidcClientIDQuery, err := NewTextQuery(AppOIDCConfigColumnClientID, clientID, TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	apiClientIDQuery, err := NewTextQuery(AppAPIConfigColumnClientID, clientID, TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	return NewOrQuery(oidcClientIDQuery, apiClientIDQuery)
+}
+
+func NewAppSAMLEntityIDSearchQuery(entityID string) (SearchQuery, error) {
+	return NewTextQuery(AppSAMLConfigColumnEntityID, entityID, TextEquals)
+}
+
 func prepareAppQuery(activeOnly bool) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 	query := sq.Select(
 		AppColumnID.identifier(),

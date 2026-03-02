@@ -83,22 +83,58 @@ func update[Target updatable](ctx context.Context, client database.QueryExecutor
 	if !database.Changes(changes).IsOnColumn(target.UpdatedAtColumn()) {
 		changes = append(changes, database.NewChange(target.UpdatedAtColumn(), database.NullInstruction))
 	}
-	builder := database.NewStatementBuilder(`UPDATE ` + target.qualifiedTableName() + ` SET `)
-	database.Changes(changes).Write(builder)
+	builder := database.NewStatementBuilder("UPDATE ")
+	builder.WriteString(target.qualifiedTableName())
+	builder.WriteString(" SET ")
+	if err := database.Changes(changes).Write(builder); err != nil {
+		return 0, err
+	}
+	writeCondition(builder, condition)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func updateOne[Target updatable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition, changes ...database.Change) (int64, error) {
+	if len(changes) == 0 {
+		return 0, database.ErrNoChanges
+	}
+	if err := checkPKCondition(target, condition); err != nil {
+		return 0, err
+	}
+	if !database.Changes(changes).IsOnColumn(target.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(target.UpdatedAtColumn(), database.NullInstruction))
+	}
+	builder := database.NewStatementBuilder("UPDATE ")
+	builder.WriteString(target.qualifiedTableName())
+	builder.WriteString(" SET ")
+	if err := database.Changes(changes).Write(builder); err != nil {
+		return 0, err
+	}
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 type deletable interface {
+	PrimaryKeyColumns() []database.Column
 	qualifiedTableName() string
 }
 
 func delete[Target deletable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition) (int64, error) {
-	builder := database.NewStatementBuilder(`DELETE FROM ` + target.qualifiedTableName() + ` `)
+	builder := database.NewStatementBuilder("DELETE FROM ")
+	builder.WriteString(target.qualifiedTableName())
+	builder.WriteRune(' ')
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func deleteOne[Target deletable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition) (int64, error) {
+	if err := checkPKCondition(target, condition); err != nil {
+		return 0, err
+	}
+
+	return delete(ctx, client, target, condition)
 }
 
 func defaultValue(value any) any {

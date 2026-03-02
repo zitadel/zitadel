@@ -68,7 +68,7 @@ func (i instance) Create(ctx context.Context, client database.QueryExecutor, ins
 	builder := database.NewStatementBuilder(`INSERT INTO `)
 	builder.WriteString(i.qualifiedTableName())
 	builder.WriteString(` (id, name, default_organization_id, iam_project_id, console_client_id, console_application_id, default_language, created_at, updated_at) VALUES (`)
-	builder.WriteArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleApplicationID, instance.DefaultLanguage, defaultTimestamp(instance.CreatedAt), defaultTimestamp(instance.UpdatedAt))
+	builder.WriteArgs(instance.ID, instance.Name, instance.DefaultOrganizationID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleApplicationID, instance.DefaultLanguage, defaultTimestamp(instance.CreatedAt), defaultTimestamp(instance.UpdatedAt))
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&instance.CreatedAt, &instance.UpdatedAt)
@@ -81,7 +81,7 @@ func (i instance) Update(ctx context.Context, client database.QueryExecutor, con
 
 // Delete implements [domain.InstanceRepository].
 func (i instance) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return delete(ctx, client, i, condition)
+	return deleteOne(ctx, client, i, condition)
 }
 
 // -------------------------------------------------------------
@@ -98,30 +98,36 @@ func (i instance) SetUpdatedAt(time time.Time) database.Change {
 	return database.NewChange(i.UpdatedAtColumn(), time)
 }
 
+// SetIAMProject implements [domain.instanceChanges].
 func (i instance) SetIAMProject(id string) database.Change {
 	return database.NewChange(i.IAMProjectIDColumn(), id)
 }
 
-func (i instance) SetDefaultOrg(id string) database.Change {
-	return database.NewChange(i.DefaultOrgIDColumn(), id)
+// SetDefaultOrganization implements [domain.instanceChanges].
+func (i instance) SetDefaultOrganization(id string) database.Change {
+	return database.NewChange(i.DefaultOrganizationIDColumn(), id)
 }
 
+// SetDefaultLanguage implements [domain.instanceChanges].
 func (i instance) SetDefaultLanguage(lang language.Tag) database.Change {
 	return database.NewChange(i.DefaultLanguageColumn(), lang.String())
 }
 
-func (i instance) SetConsoleClientID(id string) database.Change {
-	return database.NewChange(i.ConsoleClientIDColumn(), id)
+// SetManagementConsoleClientID implements [domain.instanceChanges].
+func (i instance) SetManagementConsoleClientID(id string) database.Change {
+	return database.NewChange(i.ManagementConsoleClientIDColumn(), id)
 }
 
-func (i instance) SetConsoleAppID(id string) database.Change {
-	return database.NewChange(i.ConsoleAppIDColumn(), id)
+// SetManagementConsoleApplicationID implements [domain.instanceChanges].
+func (i instance) SetManagementConsoleApplicationID(id string) database.Change {
+	return database.NewChange(i.ManagementConsoleApplicationIDColumn(), id)
 }
 
 // -------------------------------------------------------------
 // conditions
 // -------------------------------------------------------------
 
+// PrimaryKeyCondition implements [domain.Repository].
 func (i instance) PrimaryKeyCondition(instanceID string) database.Condition {
 	return i.IDCondition(instanceID)
 }
@@ -183,8 +189,8 @@ func (i instance) CreatedAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "created_at")
 }
 
-// DefaultOrgIdColumn implements [domain.instanceColumns].
-func (i instance) DefaultOrgIDColumn() database.Column {
+// DefaultOrganizationIDColumn implements [domain.instanceColumns].
+func (i instance) DefaultOrganizationIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "default_organization_id")
 }
 
@@ -193,13 +199,13 @@ func (i instance) IAMProjectIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "iam_project_id")
 }
 
-// ConsoleClientIDColumn implements [domain.instanceColumns].
-func (i instance) ConsoleClientIDColumn() database.Column {
+// ManagementConsoleClientIDColumn implements [domain.instanceColumns].
+func (i instance) ManagementConsoleClientIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "console_client_id")
 }
 
-// ConsoleAppIDColumn implements [domain.instanceColumns].
-func (i instance) ConsoleAppIDColumn() database.Column {
+// ManagementConsoleApplicationIDColumn implements [domain.instanceColumns].
+func (i instance) ManagementConsoleApplicationIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "console_application_id")
 }
 

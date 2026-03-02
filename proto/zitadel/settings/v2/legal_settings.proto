@@ -12,21 +12,21 @@ message LegalAndSupportSettings {
   // Link to the Terms of Service. Can be a relative or absolute URL.
   string tos_link = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
+      example: "\"https://zitadel.com/docs/manage/legal/terms-of-service\"";
     }
   ];
 
   // Link to the Privacy Policy. Can be a relative or absolute URL.
   string privacy_policy_link = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
+      example: "\"https://zitadel.com/docs/manage/legal/policies/privacy-policy\"";
     }
   ];
 
   // Link to a help page. Can be a relative or absolute URL.
   string help_link = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"https://zitadel.com/docs/manuals/introduction\"";
+      example: "\"https://zitadel.com/docs/manage/console-overview\"";
     }
   ];
 
@@ -42,21 +42,21 @@ message LegalAndSupportSettings {
   // fell back on the instance settings.
   ResourceOwnerType resource_owner_type = 5;
 
-  // Link to documentation to be shown in the console.
+  // Link to documentation to be shown in the management console.
   string docs_link = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example: "\"https://zitadel.com/docs\"";
     }
   ];
 
-  // Link to an external resource that will be available to users in the console.
+  // Link to an external resource that will be available to users in the management console.
   string custom_link = 7 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example: "\"https://external.link\"";
     }
   ];
 
-  // The button text that would be shown in console pointing to custom link.
+  // The button text that would be shown in the management console pointing to custom link.
   string custom_link_text = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example: "\"External\"";

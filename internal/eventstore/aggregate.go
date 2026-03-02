@@ -77,7 +77,7 @@ func AggregateFromWriteModelCtx(
 
 // Aggregate is the basic implementation of Aggregater
 type Aggregate struct {
-	// ID is the unique identitfier of this aggregate
+	// ID is the unique identifier of this aggregate
 	ID string `json:"id"`
 	// Type is the name of the aggregate.
 	Type AggregateType `json:"type"`

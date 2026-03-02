@@ -7,9 +7,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
+	internal_net "github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -22,20 +24,25 @@ type AddTarget struct {
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
+	PayloadType      target_domain.PayloadType
 
 	SigningKey string
 }
 
-func (a *AddTarget) IsValid() error {
+func (a *AddTarget) isValid(inputDenyList []denylist.AddressChecker, lookupFunc internal_net.IPLookupFunc) error {
 	if a.Name == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-ddqbm9us5p", "Errors.Target.Invalid")
 	}
 	if a.Timeout == 0 {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-39f35d8uri", "Errors.Target.NoTimeout")
 	}
-	_, err := url.Parse(a.Endpoint)
+	parsedURL, err := url.Parse(a.Endpoint)
 	if err != nil || a.Endpoint == "" {
 		return zerrors.ThrowInvalidArgument(err, "COMMAND-1r2k6qo6wg", "Errors.Target.InvalidURL")
+	}
+
+	if err := denylist.IsHostBlocked(inputDenyList, parsedURL, lookupFunc); err != nil {
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-NcJUKo", "Errors.Target.DeniedURL")
 	}
 
 	return nil
@@ -46,7 +53,7 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 		return time.Time{}, zerrors.ThrowInvalidArgument(nil, "COMMAND-brml926e2d", "Errors.IDMissing")
 	}
 
-	if err := add.IsValid(); err != nil {
+	if err := add.isValid(c.ActionsV2DenyList, c.IPLookupFunction); err != nil {
 		return time.Time{}, err
 	}
 
@@ -77,6 +84,7 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 		add.Timeout,
 		add.InterruptOnError,
 		code.Crypted,
+		add.PayloadType,
 	))
 	if err != nil {
 		return time.Time{}, err
@@ -95,12 +103,13 @@ type ChangeTarget struct {
 	Endpoint         *string
 	Timeout          *time.Duration
 	InterruptOnError *bool
+	PayloadType      target_domain.PayloadType
 
 	ExpirationSigningKey bool
 	SigningKey           *string
 }
 
-func (a *ChangeTarget) IsValid() error {
+func (a *ChangeTarget) isValid(inputDenyList []denylist.AddressChecker, lookupFunc internal_net.IPLookupFunc) error {
 	if a.AggregateID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-1l6ympeagp", "Errors.IDMissing")
 	}
@@ -111,11 +120,15 @@ func (a *ChangeTarget) IsValid() error {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-08b39vdi57", "Errors.Target.NoTimeout")
 	}
 	if a.Endpoint != nil {
-		_, err := url.Parse(*a.Endpoint)
+		parsedURL, err := url.Parse(*a.Endpoint)
 		if err != nil || *a.Endpoint == "" {
 			return zerrors.ThrowInvalidArgument(err, "COMMAND-jsbaera7b6", "Errors.Target.InvalidURL")
 		}
+		if err := denylist.IsHostBlocked(inputDenyList, parsedURL, lookupFunc); err != nil {
+			return zerrors.ThrowInvalidArgument(err, "COMMAND-jKbbu2", "Errors.Target.DeniedURL")
+		}
 	}
+
 	return nil
 }
 
@@ -123,7 +136,7 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 	if resourceOwner == "" {
 		return time.Time{}, zerrors.ThrowInvalidArgument(nil, "COMMAND-zqibgg0wwh", "Errors.IDMissing")
 	}
-	if err := change.IsValid(); err != nil {
+	if err := change.isValid(c.ActionsV2DenyList, c.IPLookupFunction); err != nil {
 		return time.Time{}, err
 	}
 	existing, err := c.getTargetWriteModelByID(ctx, change.AggregateID, resourceOwner)
@@ -153,6 +166,7 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 		change.Timeout,
 		change.InterruptOnError,
 		changedSigningKey,
+		change.PayloadType,
 	)
 	if changedEvent == nil {
 		return existing.WriteModel.ChangeDate, nil

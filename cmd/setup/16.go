@@ -4,8 +4,7 @@ import (
 	"context"
 	_ "embed"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -25,7 +24,7 @@ func (mig *UniqueConstraintToLower) Execute(ctx context.Context, _ eventstore.Ev
 		return err
 	}
 	count, err := res.RowsAffected()
-	logging.WithFields("count", count).Info("unique constraints updated")
+	logging.Info(ctx, "unique constraints updated", "count", count)
 	return err
 }
 

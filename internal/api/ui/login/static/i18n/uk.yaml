@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-факторна перевірка
   DescriptionPhone: Створіть вашу 2-факторну автентифікацію. Введіть ваш номер телефону для підтвердження.
   DescriptionCode: Створіть вашу 2-факторну автентифікацію. Введіть отриманий код для підтвердження вашого номера телефону.
+  CountryCodeLabel: Країна
   PhoneLabel: Телефон
   CodeLabel: Код
   EditButtonText: Редагувати
@@ -268,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Стать
   Female: Жіноча
   Male: Чоловіча
@@ -314,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Умови та положення
   TosConfirm: Я приймаю
   TosLinkText: умови використання
@@ -394,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 
 DeviceAuth:
   Title: Авторизація пристрою

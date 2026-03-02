@@ -110,3 +110,27 @@ enum ExecutionFieldName {
   EXECUTION_FIELD_NAME_CREATED_DATE = 2;
   EXECUTION_FIELD_NAME_CHANGED_DATE = 3;
 }
+
+enum PublicKeyFieldName {
+  // Unspecified field name.
+  PUBLIC_KEY_FIELD_NAME_UNSPECIFIED = 0;
+  // Sort by creation date.
+  PUBLIC_KEY_FIELD_NAME_CREATION_DATE = 1;
+  // Sort by change date.
+  PUBLIC_KEY_FIELD_NAME_CHANGE_DATE = 2;
+  // Sort by expiration date.
+  PUBLIC_KEY_FIELD_NAME_EXPIRATION_DATE = 3;
+}
+
+message PublicKeySearchFilter {
+  oneof filter {
+    // Filter the keys by one or multiple ids.
+    filter.v2.InIDsFilter key_ids_filter = 1;
+
+    // Filter the keys by their active status.
+    bool active_filter = 2;
+
+    // Filter the keys by their expiration status.
+    filter.v2.TimestampFilter expiration_date_filter = 3;
+  }
+}

@@ -37,8 +37,8 @@ type AddOrganizationDomain struct {
 
 type organizationDomainColumns interface {
 	domainColumns
-	// OrgIDColumn returns the column for the org id field.
-	OrgIDColumn() database.Column
+	// OrganizationIDColumn returns the column for the organization id field.
+	OrganizationIDColumn() database.Column
 	// IsVerifiedColumn returns the column for the is verified field.
 	IsVerifiedColumn() database.Column
 	// ValidationTypeColumn returns the column for the verification type field.
@@ -49,9 +49,9 @@ type organizationDomainConditions interface {
 	domainConditions
 
 	// PrimaryKeyCondition returns a filter on the primary key fields.
-	PrimaryKeyCondition(instanceID, orgID, domain string) database.Condition
-	// OrgIDCondition returns a filter on the org id field.
-	OrgIDCondition(orgID string) database.Condition
+	PrimaryKeyCondition(instanceID, organizationID, domain string) database.Condition
+	// OrganizationIDCondition returns a filter on the organization id field.
+	OrganizationIDCondition(organizationID string) database.Condition
 	// IsVerifiedCondition returns a filter on the is verified field.
 	IsVerifiedCondition(isVerified bool) database.Condition
 }

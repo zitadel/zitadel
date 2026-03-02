@@ -1,4 +1,4 @@
-package execution
+package execution_test
 
 import (
 	"context"
@@ -15,6 +15,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
@@ -23,26 +24,44 @@ import (
 )
 
 type fieldsWorker struct {
-	now nowFunc
+	now execution.NowFunc
 }
 type argsWorker struct {
 	job *river.Job[*exec_repo.Request]
 }
 type wantWorker struct {
-	targets        []target_domain.Target
+	targets        []target
 	sendStatusCode int
 	err            assert.ErrorAssertionFunc
 }
 
-func newExecutionWorker(f fieldsWorker) *Worker {
-	return &Worker{
-		config: WorkerConfig{
+type target target_domain.Target
+
+func (t *target) validate(expectedBody []byte) func(*testing.T, []byte) bool {
+	switch t.PayloadType {
+	case target_domain.PayloadTypeUnspecified,
+		target_domain.PayloadTypeJSON:
+		return validateJSONPayload(expectedBody)
+	case target_domain.PayloadTypeJWT:
+		return validateJWTPayload(expectedBody)
+	case target_domain.PayloadTypeJWE:
+		return validateJWEPayload(expectedBody)
+	default:
+		return validateJSONPayload(expectedBody)
+	}
+}
+
+func newExecutionWorker(f fieldsWorker) *execution.Worker {
+	return execution.NewWorker(
+		execution.WorkerConfig{
 			Workers:             1,
 			TransactionDuration: 5 * time.Second,
 			MaxTtl:              5 * time.Minute,
 		},
-		now: f.now,
-	}
+		nil,
+		mockGetActiveSigningWebKey,
+		f.now,
+	)
 }
 
 const (
@@ -85,7 +104,7 @@ func Test_handleEventExecution(t *testing.T) {
 						},
 					},
 					wantWorker{
-						targets:        mockTargets(1),
+						targets:        mockTargets(target_domain.PayloadTypeJSON),
 						sendStatusCode: http.StatusOK,
 						err: func(tt assert.TestingT, err error, i ...interface{}) bool {
 							return errors.Is(err, new(river.JobCancelError))
@@ -153,7 +172,7 @@ func Test_handleEventExecution(t *testing.T) {
 						},
 					},
 					wantWorker{
-						targets:        mockTargets(1),
+						targets:        mockTargets(target_domain.PayloadTypeJSON),
 						sendStatusCode: http.StatusOK,
 						err:            nil,
 					}
@@ -187,7 +206,7 @@ func Test_handleEventExecution(t *testing.T) {
 						},
 					},
 					wantWorker{
-						targets:        mockTargets(1),
+						targets:        mockTargets(target_domain.PayloadTypeJSON),
 						sendStatusCode: http.StatusBadRequest,
 						err: func(tt assert.TestingT, err error, i ...interface{}) bool {
 							return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
@@ -223,7 +242,7 @@ func Test_handleEventExecution(t *testing.T) {
 						},
 					},
 					wantWorker{
-						targets:        mockTargets(3),
+						targets:        mockTargets(target_domain.PayloadTypeJSON, target_domain.PayloadTypeJWT, target_domain.PayloadTypeJWE),
 						sendStatusCode: http.StatusOK,
 						err:            nil,
 					}
@@ -234,15 +253,19 @@ func Test_handleEventExecution(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f, a, w := tt.test()
 
+			body, err := json.Marshal(exec_repo.ContextInfoFromRequest(a.job.Args))
+			require.NoError(t, err)
+
 			closeFuncs := make([]func(), len(w.targets))
 			calledFuncs := make([]func() bool, len(w.targets))
 			for i := range w.targets {
-				url, closeF, calledF := testServerCall(
-					exec_repo.ContextInfoFromRequest(a.job.Args),
-					time.Second,
-					w.sendStatusCode,
-					nil,
-				)
+				url, closeF, calledF := listen(t, &callTestServer{
+					method:      http.MethodPost,
+					expectBody:  w.targets[i].validate(body),
+					timeout:     time.Second,
+					statusCode:  w.sendStatusCode,
+					respondBody: nil,
+				})
 				w.targets[i].Endpoint = url
 				closeFuncs[i] = closeF
 				calledFuncs[i] = calledF
@@ -273,24 +296,24 @@ func Test_handleEventExecution(t *testing.T) {
 	}
 }
 
-func mockTarget() target_domain.Target {
-	return target_domain.Target{
+func mockTarget(payloadType target_domain.PayloadType) target {
+	return target{
 		ExecutionID:      "executionID",
 		TargetID:         "targetID",
 		TargetType:       target_domain.TargetTypeWebhook,
 		Endpoint:         "endpoint",
 		Timeout:          time.Minute,
 		InterruptOnError: true,
+		PayloadType:      payloadType,
+		EncryptionKey:    encryptionKey,
+		EncryptionKeyID:  encryptionKeyID,
 	}
 }
 
-func mockTargets(count int) []target_domain.Target {
-	var targets []target_domain.Target
-	if count > 0 {
-		targets = make([]target_domain.Target, count)
-		for i := range targets {
-			targets[i] = mockTarget()
-		}
+func mockTargets(payloadTypes ...target_domain.PayloadType) []target {
+	targets := make([]target, len(payloadTypes))
+	for i, payloadType := range payloadTypes {
+		targets[i] = mockTarget(payloadType)
 	}
 	return targets
 }

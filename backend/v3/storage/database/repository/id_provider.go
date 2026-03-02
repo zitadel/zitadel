@@ -73,7 +73,7 @@ func (i idProvider) Update(ctx context.Context, client database.QueryExecutor, c
 }
 
 func (i idProvider) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if err := checkRestrictingColumns(condition, i.InstanceIDColumn(), i.OrgIDColumn()); err != nil {
+	if err := checkRestrictingColumns(condition, i.InstanceIDColumn(), i.OrganizationIDColumn()); err != nil {
 		return 0, err
 	}
 	return delete(ctx, client, i, condition)
@@ -160,7 +160,7 @@ func (i idProvider) InstanceIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "instance_id")
 }
 
-func (i idProvider) OrgIDColumn() database.Column {
+func (i idProvider) OrganizationIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "organization_id")
 }
 
@@ -235,11 +235,11 @@ func (i idProvider) InstanceIDCondition(id string) database.Condition {
 	return database.NewTextCondition(i.InstanceIDColumn(), database.TextOperationEqual, id)
 }
 
-func (i idProvider) OrgIDCondition(id *string) database.Condition {
+func (i idProvider) OrganizationIDCondition(id *string) database.Condition {
 	if id == nil {
-		return database.IsNull(i.OrgIDColumn())
+		return database.IsNull(i.OrganizationIDColumn())
 	}
-	return database.NewTextCondition(i.OrgIDColumn(), database.TextOperationEqual, *id)
+	return database.NewTextCondition(i.OrganizationIDColumn(), database.TextOperationEqual, *id)
 }
 
 func (i idProvider) IDCondition(id string) database.Condition {

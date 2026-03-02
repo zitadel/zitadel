@@ -12,6 +12,10 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
+vi.mock("@/lib/cookies", () => ({
+  getSessionCookieById: vi.fn(),
+}));
+
 vi.mock("../service-url", () => ({
   getServiceConfig: vi.fn(),
 }));
@@ -23,6 +27,11 @@ vi.mock("./host", () => ({
 
 vi.mock("../zitadel", () => ({
   startIdentityProviderFlow: vi.fn(),
+}));
+
+vi.mock("../fingerprint", () => ({
+  getFingerprintIdCookie: vi.fn(),
+  getOrSetFingerprintId: vi.fn(),
 }));
 
 describe("redirectToIdp", () => {
@@ -40,6 +49,8 @@ describe("redirectToIdp", () => {
     const { getServiceConfig } = await import("../service-url");
     const { getInstanceHost, getPublicHost } = await import("./host");
     const { startIdentityProviderFlow } = await import("../zitadel");
+    const { getFingerprintIdCookie, getOrSetFingerprintId } = await import("../fingerprint");
+    const { getSessionCookieById } = await import("@/lib/cookies");
 
     // Setup mocks
     mockHeaders = vi.mocked(headers);
@@ -47,8 +58,14 @@ describe("redirectToIdp", () => {
     mockGetInstanceHost = vi.mocked(getInstanceHost);
     mockGetPublicHost = vi.mocked(getPublicHost);
     mockStartIdentityProviderFlow = vi.mocked(startIdentityProviderFlow);
+    const mockGetFingerprintIdCookie = vi.mocked(getFingerprintIdCookie);
+    const mockGetOrSetFingerprintId = vi.mocked(getOrSetFingerprintId);
+    const mockGetSessionCookieById = vi.mocked(getSessionCookieById);
 
     // Default mock implementations
+    mockGetFingerprintIdCookie.mockResolvedValue({ name: "fingerprintId", value: "fp123" });
+    mockGetOrSetFingerprintId.mockResolvedValue("fp123");
+    mockGetSessionCookieById.mockResolvedValue({} as any);
     mockHeaders.mockResolvedValue({} as any);
     mockGetServiceUrlFromHeaders.mockReturnValue({
       serviceConfig: { baseUrl: "https://api.example.com" },
@@ -109,7 +126,7 @@ describe("redirectToIdp", () => {
       formData.append("requestId", "req123");
       formData.append("organization", "org123");
 
-      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
       try {
         await redirectToIdp(undefined, formData);
@@ -138,7 +155,7 @@ describe("redirectToIdp", () => {
       formData.append("provider", "google");
       formData.append("postErrorRedirectUrl", "");
 
-      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
       try {
         await redirectToIdp(undefined, formData);
@@ -177,7 +194,7 @@ describe("redirectToIdp", () => {
       formData.append("provider", "google");
       formData.append("postErrorRedirectUrl", "https://app.example.com/error?code=123&message=test");
 
-      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
       try {
         await redirectToIdp(undefined, formData);
@@ -203,10 +220,10 @@ describe("redirectToIdp", () => {
       const formData = new FormData();
       formData.append("id", "idp123");
       formData.append("provider", "google");
-      formData.append("linkOnly", "true");
+      formData.append("sessionId", "session123");
       formData.append("postErrorRedirectUrl", "/custom-error");
 
-      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
       try {
         await redirectToIdp(undefined, formData);
@@ -220,9 +237,14 @@ describe("redirectToIdp", () => {
       const failureUrl = callArgs.urls.failureUrl;
 
       // Both parameters should be present
-      expect(successUrl).toContain("link=true");
+      // Both parameters should be present
+      expect(successUrl).toContain("linkToSessionId=session123");
+      // We can't easily predict the exact fingerprint hash without mocking crypto in this test,
+      // but we can check if the parameter key exists
+      expect(successUrl).toContain("linkFingerprint=");
       expect(successUrl).toContain("postErrorRedirectUrl=%2Fcustom-error");
-      expect(failureUrl).toContain("link=true");
+      expect(failureUrl).toContain("linkToSessionId=session123");
+      expect(failureUrl).toContain("linkFingerprint=");
       expect(failureUrl).toContain("postErrorRedirectUrl=%2Fcustom-error");
     });
 
@@ -232,7 +254,7 @@ describe("redirectToIdp", () => {
       formData.append("provider", "github");
       formData.append("postErrorRedirectUrl", "/loginname");
 
-      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
       try {
         await redirectToIdp(undefined, formData);
@@ -257,7 +279,7 @@ describe("redirectToIdp", () => {
 
       const result = await redirectToIdp(undefined, formData);
 
-      expect(result).toEqual({ error: "Unexpected response from IDP flow" });
+      expect(result).toEqual({ error: "Could not start IDP flow" });
     });
 
     test("should redirect when IDP flow returns a valid URL", async () => {
@@ -265,7 +287,7 @@ describe("redirectToIdp", () => {
       formData.append("id", "idp123");
       formData.append("provider", "google");
 
-      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
       try {
         await redirectToIdp(undefined, formData);

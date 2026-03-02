@@ -29,10 +29,10 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getTranslations } from "next-intl/server";
+import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getUserAgent } from "./fingerprint";
-import { setSAMLFormCookie } from "./saml";
+
 import { createServiceForHost } from "./service";
 
 const useCache = process.env.DEBUG !== "true";
@@ -159,10 +159,15 @@ export async function registerTOTP({ serviceConfig, userId }: WithServiceConfig<
   return userService.registerTOTP({ userId }, {});
 }
 
-export async function getGeneralSettings({ serviceConfig }: WithServiceConfig) {
+export async function getAllowedLanguages({ serviceConfig }: WithServiceConfig) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-  const callback = settingsService.getGeneralSettings({}, {}).then((resp) => resp.supportedLanguages);
+  const callback = settingsService.getGeneralSettings({}, {}).then((resp) => {
+    return {
+      allowedLanguages: resp.allowedLanguages,
+      defaultLanguage: resp.defaultLanguage,
+    };
+  });
 
   return useCache ? cacheWrapper(callback) : callback;
 }
@@ -197,19 +202,21 @@ export async function getPasswordComplexitySettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function createSessionFromChecks({
+export async function createSessionFromChecksAndChallenges({
   serviceConfig,
   checks,
+  challenges,
   lifetime,
 }: WithServiceConfig<{
   checks: Checks;
+  challenges?: RequestChallenges;
   lifetime: Duration;
 }>) {
   const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceConfig);
 
   const userAgent = await getUserAgent();
 
-  return sessionService.createSession({ checks, lifetime, userAgent }, {});
+  return sessionService.createSession({ ...{ checks, lifetime, userAgent }, ...(challenges ? { challenges } : {}) }, {});
 }
 
 export async function createSessionForUserIdAndIdpIntent({
@@ -225,7 +232,6 @@ export async function createSessionForUserIdAndIdpIntent({
   };
   lifetime: Duration;
 }>) {
-  console.log("Creating session for userId and IDP intent", { userId, idpIntent, lifetime });
   const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceConfig);
 
   const userAgent = await getUserAgent();
@@ -773,9 +779,12 @@ export async function startIdentityProviderFlow({
 }: WithServiceConfig<{
   idpId: string;
   urls: RedirectURLsJson;
-}>): Promise<string | null> {
-    // Use empty publicHost to avoid issues with redirect URIs pointing to the login UI instead of the zitadel API
-    const userService: Client<typeof UserService> = await createServiceForHost(UserService, {...serviceConfig, publicHost: ''});
+}>): Promise<{ url: string; fields?: Record<string, string> } | null> {
+  // Use empty publicHost to avoid issues with redirect URIs pointing to the login UI instead of the zitadel API
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, {
+    ...serviceConfig,
+    publicHost: "",
+  });
 
   return userService
     .startIdentityProviderIntent({
@@ -787,40 +796,11 @@ export async function startIdentityProviderFlow({
     })
     .then(async (resp) => {
       if (resp.nextStep.case === "authUrl" && resp.nextStep.value) {
-        return resp.nextStep.value;
+        return { url: resp.nextStep.value };
       } else if (resp.nextStep.case === "formData" && resp.nextStep.value) {
         const formData: FormData = resp.nextStep.value;
-        const redirectUrl = "/saml-post";
 
-        try {
-          // Log the attempt with structure inspection
-          console.log("Attempting to stringify formData.fields:", {
-            fields: formData.fields,
-            fieldsType: typeof formData.fields,
-            fieldsKeys: Object.keys(formData.fields || {}),
-            fieldsEntries: Object.entries(formData.fields || {}),
-          });
-
-          const stringifiedFields = JSON.stringify(formData.fields);
-          console.log("Successfully stringified formData.fields, length:", stringifiedFields.length);
-
-          // Check cookie size limits (typical limit is 4KB)
-          if (stringifiedFields.length > 4000) {
-            console.warn(
-              `SAML form cookie value is large (${stringifiedFields.length} characters), may exceed browser limits`,
-            );
-          }
-
-          const dataId = await setSAMLFormCookie(stringifiedFields);
-          const params = new URLSearchParams({ url: formData.url, id: dataId });
-
-          return `${redirectUrl}?${params.toString()}`;
-        } catch (stringifyError) {
-          console.error("JSON serialization failed:", stringifyError);
-          throw new Error(
-            `Failed to serialize SAML form data: ${stringifyError instanceof Error ? stringifyError.message : String(stringifyError)}`,
-          );
-        }
+        return { url: formData.url, fields: formData.fields };
       } else {
         return null;
       }
@@ -1279,7 +1259,13 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
                   process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
                     const kv = header.indexOf(":");
                     if (kv > 0) {
-                      req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
+                      const key = header.slice(0, kv).trim();
+                      const value = header.slice(kv + 1).trim();
+                      if (value) {
+                        req.header.set(key, value);
+                      } else {
+                        req.header.delete(key);
+                      }
                     } else {
                       console.warn(`Skipping malformed header: ${header}`);
                     }

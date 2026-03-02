@@ -65,6 +65,10 @@ var (
 		name:  projection.TargetSigningKey,
 		table: targetTable,
 	}
+	TargetColumnPayloadType = Column{
+		name:  projection.TargetPayloadType,
+		table: targetTable,
+	}
 )
 
 type Targets struct {
@@ -86,6 +90,7 @@ type Target struct {
 	InterruptOnError bool
 	signingKey       *crypto.CryptoValue
 	SigningKey       string
+	PayloadType      target_domain.PayloadType
 }
 
 func (t *Target) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
@@ -166,6 +171,7 @@ func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, er
 			TargetColumnURL.identifier(),
 			TargetColumnInterruptOnError.identifier(),
 			TargetColumnSigningKey.identifier(),
+			TargetColumnPayloadType.identifier(),
 			countColumn.identifier(),
 		).From(targetTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
@@ -185,6 +191,7 @@ func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, er
 					&target.Endpoint,
 					&target.InterruptOnError,
 					&target.signingKey,
+					&target.PayloadType,
 					&count,
 				)
 				if err != nil {
@@ -218,6 +225,7 @@ func prepareTargetQuery() (sq.SelectBuilder, func(row *sql.Row) (*Target, error)
 			TargetColumnURL.identifier(),
 			TargetColumnInterruptOnError.identifier(),
 			TargetColumnSigningKey.identifier(),
+			TargetColumnPayloadType.identifier(),
 		).From(targetTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Target, error) {
@@ -233,6 +241,7 @@ func prepareTargetQuery() (sq.SelectBuilder, func(row *sql.Row) (*Target, error)
 				&target.Endpoint,
 				&target.InterruptOnError,
 				&target.signingKey,
+				&target.PayloadType,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {

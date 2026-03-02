@@ -10,10 +10,10 @@ import (
 	"github.com/riverqueue/river/rivertype"
 	"github.com/riverqueue/rivercontrib/otelriver"
 	"github.com/robfig/cron/v3"
-	"github.com/zitadel/logging"
+	"go.opentelemetry.io/otel"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 // Queue abstracts the underlying queuing library
@@ -31,10 +31,13 @@ type Config struct {
 }
 
 func NewQueue(config *Config) (_ *Queue, err error) {
-	middleware := []rivertype.Middleware{otelriver.NewMiddleware(&otelriver.MiddlewareConfig{
-		MeterProvider: metrics.GetMetricsProvider(),
-		DurationUnit:  "ms",
-	})}
+	middleware := []rivertype.Middleware{
+		otelriver.NewMiddleware(&otelriver.MiddlewareConfig{
+			MeterProvider: otel.GetMeterProvider(),
+			DurationUnit:  "ms",
+		}),
+		newLogMiddleware(),
+	}
 	return &Queue{
 		driver: riverdatabasesql.New(config.Client.DB),
 		config: &river.Config{
@@ -67,9 +70,9 @@ func (q *Queue) Start(ctx context.Context) (err error) {
 	return q.client.Start(ctx)
 }
 
-func (q *Queue) AddWorkers(w ...Worker) {
+func (q *Queue) AddWorkers(ctx context.Context, w ...Worker) {
 	if q == nil {
-		logging.Info("skip adding workers because queue is not set")
+		logging.Info(ctx, "skip adding workers because queue is not set")
 		return
 	}
 	for _, worker := range w {
@@ -77,9 +80,9 @@ func (q *Queue) AddWorkers(w ...Worker) {
 	}
 }
 
-func (q *Queue) AddPeriodicJob(schedule cron.Schedule, jobArgs river.JobArgs, opts ...InsertOpt) (handle rivertype.PeriodicJobHandle) {
+func (q *Queue) AddPeriodicJob(ctx context.Context, schedule cron.Schedule, jobArgs river.JobArgs, opts ...InsertOpt) (handle rivertype.PeriodicJobHandle) {
 	if q == nil {
-		logging.Info("skip adding periodic job because queue is not set")
+		logging.Info(ctx, "skip adding periodic job because queue is not set")
 		return
 	}
 	options := new(river.InsertOpts)

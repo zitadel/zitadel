@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
@@ -18,19 +19,20 @@ import (
 var _ orgconnect.OrganizationServiceHandler = (*Server)(nil)
 
 type Server struct {
+	systemDefaults  systemdefaults.SystemDefaults
 	command         *command.Commands
 	query           *query.Queries
 	checkPermission domain.PermissionCheck
 }
 
-type Config struct{}
-
 func CreateServer(
+	systemDefaults systemdefaults.SystemDefaults,
 	command *command.Commands,
 	query *query.Queries,
 	checkPermission domain.PermissionCheck,
 ) *Server {
 	return &Server{
+		systemDefaults:  systemDefaults,
 		command:         command,
 		query:           query,
 		checkPermission: checkPermission,

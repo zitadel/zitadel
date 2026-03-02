@@ -1,12 +1,12 @@
 package start
 
 import (
-	"context"
+	"errors"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/setup"
 	"github.com/zitadel/zitadel/cmd/tls"
@@ -24,27 +24,50 @@ Requirements:
 - database
 - database is initialized
 `,
-		Run: func(cmd *cobra.Command, args []string) {
-			err := tls.ModeFromFlag(cmd)
-			logging.OnError(err).Fatal("invalid tlsMode")
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).Error("zitadel start-from-setup command failed")
+			}()
+
+			err = tls.ModeFromFlag(cmd)
+			if err != nil {
+				return err
+			}
 
 			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Panic("No master key provided")
+			if err != nil {
+				return err
+			}
 
 			err = setup.BindInitProjections(cmd)
-			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
+			if err != nil {
+				return err
+			}
 
-			setupConfig := setup.MustNewConfig(viper.GetViper())
-			setupSteps := setup.MustNewSteps(viper.New())
+			setupConfig, shutdown, err := setup.NewConfig(cmd, viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 
-			setupCtx, cancel := context.WithCancel(cmd.Context())
-			setup.Setup(setupCtx, setupConfig, setupSteps, masterKey)
-			cancel()
+			setupSteps, err := setup.NewSteps(cmd.Context(), viper.New())
+			if err != nil {
+				return err
+			}
 
-			startConfig := MustNewConfig(viper.GetViper())
+			err = setup.Setup(cmd.Context(), setupConfig, setupSteps, masterKey)
+			if err != nil {
+				return err
+			}
 
-			err = startZitadel(cmd.Context(), startConfig, masterKey, server)
-			logging.OnError(err).Fatal("unable to start zitadel")
+			startConfig, _, err := NewConfig(cmd, viper.GetViper())
+			if err != nil {
+				return err
+			}
+
+			return startZitadel(cmd.Context(), startConfig, masterKey, server)
 		},
 	}
 

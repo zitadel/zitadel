@@ -11,8 +11,9 @@ import (
 )
 
 type UpdateInstanceCommand struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID               string `json:"id"`
+	Name             string `json:"name"`
+	ShouldSkipUpdate bool   `json:"should_skip_update"`
 }
 
 // RequiresTransaction implements [Transactional].
@@ -20,6 +21,10 @@ func (u *UpdateInstanceCommand) RequiresTransaction() {}
 
 // Events implements Commander.
 func (u *UpdateInstanceCommand) Events(ctx context.Context, _ *InvokeOpts) ([]eventstore.Command, error) {
+	if u.ShouldSkipUpdate {
+		return nil, nil
+	}
+
 	return []eventstore.Command{
 		instance.NewInstanceChangedEvent(ctx, &instance.NewAggregate(u.ID).Aggregate, u.Name),
 	}, nil
@@ -39,6 +44,10 @@ func NewUpdateInstanceCommand(id, name string) *UpdateInstanceCommand {
 
 // Execute implements [Commander]
 func (u *UpdateInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
+	if u.ShouldSkipUpdate {
+		return
+	}
+
 	instanceRepo := opts.instanceRepo
 
 	updateCount, err := instanceRepo.Update(
@@ -48,16 +57,14 @@ func (u *UpdateInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 		database.NewChange(instanceRepo.NameColumn(), u.Name),
 	)
 	if err != nil {
-		return err
+		return zerrors.ThrowInternal(err, "DOM-PkVMNR", "Errors.Instance.Update")
 	}
 
 	if updateCount == 0 {
-		err = zerrors.ThrowNotFound(nil, "DOM-ghfov1", "Errors.Instance.NotFound")
-		return err
+		return zerrors.ThrowNotFound(nil, "DOM-ghfov1", "Errors.Instance.NotFound")
 	}
 	if updateCount > 1 {
-		err = zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-HlrNmD", "unexpected number of rows updated")
-		return err
+		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-HlrNmD", "Errors.Instance.UpdateMismatch")
 	}
 
 	return err
@@ -71,26 +78,24 @@ func (u *UpdateInstanceCommand) String() string {
 // Validate implements [Commander]
 func (u *UpdateInstanceCommand) Validate(ctx context.Context, opts *InvokeOpts) error {
 	if u.ID = strings.TrimSpace(u.ID); u.ID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "DOM-wSs6kG", "invalid instance ID")
+		return zerrors.ThrowInvalidArgument(nil, "DOM-wSs6kG", "Errors.Instance.ID")
 	}
 	if u.Name = strings.TrimSpace(u.Name); u.Name == "" {
-		return zerrors.ThrowInvalidArgument(nil, "DOM-FPJcLC", "invalid instance name")
+		return zerrors.ThrowInvalidArgument(nil, "DOM-FPJcLC", "Errors.Instance.Name")
 	}
 
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceWritePermission); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-M5ObLP", "permission denied")
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-M5ObLP", "Errors.PermissionDenied")
 	}
 
 	instanceRepo := opts.instanceRepo
 
 	instance, err := instanceRepo.Get(ctx, opts.DB(), database.WithCondition(instanceRepo.IDCondition(u.ID)))
 	if err != nil {
-		return err
+		return zerrors.ThrowInternal(err, "DOM-j05Hdo", "Errors.Instance.Get")
 	}
 
-	if instance.Name == u.Name {
-		err = zerrors.ThrowPreconditionFailed(nil, "DOM-5MrT21", "Errors.Instance.NotChanged")
-		return err
-	}
+	u.ShouldSkipUpdate = instance.Name == u.Name
+
 	return nil
 }

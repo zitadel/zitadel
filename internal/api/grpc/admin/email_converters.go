@@ -75,7 +75,7 @@ func httpToPb(http *query.HTTP) *settings_pb.EmailProvider_Http {
 }
 
 func smtpToPb(config *query.SMTP) *settings_pb.EmailProvider_Smtp {
-	return &settings_pb.EmailProvider_Smtp{
+	ret := &settings_pb.EmailProvider_Smtp{
 		Smtp: &settings_pb.EmailProviderSMTP{
 			Tls:            config.TLS,
 			Host:           config.Host,
@@ -85,10 +85,40 @@ func smtpToPb(config *query.SMTP) *settings_pb.EmailProvider_Smtp {
 			ReplyToAddress: config.ReplyToAddress,
 		},
 	}
+
+	if config.PlainAuth != nil {
+		ret.Smtp.Auth = &settings_pb.EmailProviderSMTP_Plain{
+			Plain: &settings_pb.SMTPPlainAuth{},
+		}
+	}
+	if config.XOAuth2Auth != nil {
+		xoauth2 := &settings_pb.EmailProviderSMTP_Xoauth2{
+			Xoauth2: &settings_pb.SMTPXOAuth2Auth{
+				TokenEndpoint: config.XOAuth2Auth.TokenEndpoint,
+				Scopes:        config.XOAuth2Auth.Scopes,
+			},
+		}
+		if config.XOAuth2Auth.ClientCredentials != nil {
+			xoauth2.Xoauth2.OAuth2Type = &settings_pb.SMTPXOAuth2Auth_ClientCredentials_{
+				ClientCredentials: &settings_pb.SMTPXOAuth2Auth_ClientCredentials{
+					ClientId: config.XOAuth2Auth.ClientCredentials.ClientId,
+				},
+			}
+		}
+		ret.Smtp.Auth = xoauth2
+	}
+
+	if config.XOAuth2Auth == nil && config.PlainAuth == nil {
+		ret.Smtp.Auth = &settings_pb.EmailProviderSMTP_None{
+			None: &settings_pb.SMTPNoAuth{},
+		}
+	}
+
+	return ret
 }
 
 func addEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.AddEmailProviderSMTPRequest) *command.AddSMTPConfig {
-	return &command.AddSMTPConfig{
+	cmd := &command.AddSMTPConfig{
 		ResourceOwner:  authz.GetInstance(ctx).InstanceID(),
 		Description:    req.Description,
 		Tls:            req.Tls,
@@ -97,12 +127,41 @@ func addEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.AddEmailPro
 		ReplyToAddress: req.ReplyToAddress,
 		Host:           req.Host,
 		User:           req.User,
-		Password:       req.Password,
 	}
+
+	switch v := req.Auth.(type) {
+	case *admin_pb.AddEmailProviderSMTPRequest_None:
+		// Nothing to do, no auth is required
+	case *admin_pb.AddEmailProviderSMTPRequest_Plain:
+		cmd.PlainAuth = &command.PlainAuth{
+			Password: v.Plain.Password,
+		}
+	case *admin_pb.AddEmailProviderSMTPRequest_Xoauth2:
+		if xoauth2, ok := v.Xoauth2.OAuth2Type.(*admin_pb.SMTPXOAuth2Auth_ClientCredentials_); ok {
+			cmd.XOAuth2Auth = &command.XOAuth2Auth{
+				TokenEndpoint: v.Xoauth2.TokenEndpoint,
+				Scopes:        v.Xoauth2.Scopes,
+				ClientCredentialsAuth: &command.OAuth2ClientCredentials{
+					ClientId:     xoauth2.ClientCredentials.ClientId,
+					ClientSecret: xoauth2.ClientCredentials.ClientSecret,
+				},
+			}
+		}
+	default:
+		// ensure backwards compatibility
+		//nolint:staticcheck
+		if req.User != "" || req.Password != "" {
+			cmd.PlainAuth = &command.PlainAuth{
+				Password: req.Password,
+			}
+		}
+	}
+
+	return cmd
 }
 
 func updateEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.UpdateEmailProviderSMTPRequest) *command.ChangeSMTPConfig {
-	return &command.ChangeSMTPConfig{
+	cmd := &command.ChangeSMTPConfig{
 		ResourceOwner:  authz.GetInstance(ctx).InstanceID(),
 		ID:             req.Id,
 		Description:    req.Description,
@@ -112,8 +171,41 @@ func updateEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.UpdateEm
 		ReplyToAddress: req.ReplyToAddress,
 		Host:           req.Host,
 		User:           req.User,
-		Password:       req.Password,
 	}
+
+	switch v := req.Auth.(type) {
+	case *admin_pb.UpdateEmailProviderSMTPRequest_None:
+		// Nothing to do, no auth is required
+	case *admin_pb.UpdateEmailProviderSMTPRequest_Plain:
+		cmd.PlainAuth = &command.PlainAuth{
+			Password: v.Plain.Password,
+		}
+	case *admin_pb.UpdateEmailProviderSMTPRequest_Xoauth2:
+		cmd.XOAuth2Auth = xoauth2ToCmd(v)
+	default:
+		// ensure backwards compatibility
+		if req.User != "" || req.Password != "" {
+			cmd.PlainAuth = &command.PlainAuth{
+				Password: req.Password,
+			}
+		}
+	}
+
+	return cmd
+}
+
+func xoauth2ToCmd(xoauth2 *admin_pb.UpdateEmailProviderSMTPRequest_Xoauth2) *command.XOAuth2Auth {
+	cmd := &command.XOAuth2Auth{
+		TokenEndpoint: xoauth2.Xoauth2.TokenEndpoint,
+		Scopes:        xoauth2.Xoauth2.Scopes,
+	}
+	if v, ok := xoauth2.Xoauth2.OAuth2Type.(*admin_pb.SMTPXOAuth2Auth_ClientCredentials_); ok {
+		cmd.ClientCredentialsAuth = &command.OAuth2ClientCredentials{
+			ClientId:     v.ClientCredentials.ClientId,
+			ClientSecret: v.ClientCredentials.ClientSecret,
+		}
+	}
+	return cmd
 }
 
 func addEmailProviderHTTPToConfig(ctx context.Context, req *admin_pb.AddEmailProviderHTTPRequest) *command.AddSMTPConfigHTTP {
@@ -137,14 +229,49 @@ func updateEmailProviderHTTPToConfig(ctx context.Context, req *admin_pb.UpdateEm
 }
 
 func testEmailProviderSMTPToConfig(req *admin_pb.TestEmailProviderSMTPRequest) *smtp.Config {
-	return &smtp.Config{
+	cfg := &smtp.Config{
 		Tls:      req.Tls,
 		From:     req.SenderAddress,
 		FromName: req.SenderName,
 		SMTP: smtp.SMTP{
-			Host:     req.Host,
-			User:     req.User,
-			Password: req.Password,
+			Host: req.Host,
 		},
 	}
+
+	switch v := req.Auth.(type) {
+	case *admin_pb.TestEmailProviderSMTPRequest_None:
+		// Nothing to do, no auth is required
+	case *admin_pb.TestEmailProviderSMTPRequest_Plain:
+		cfg.SMTP.PlainAuth = &smtp.PlainAuthConfig{
+			User:     req.User,
+			Password: v.Plain.Password,
+		}
+	case *admin_pb.TestEmailProviderSMTPRequest_Xoauth2:
+		cfg.SMTP.XOAuth2Auth = xoauth2ToSmtp(v, req.User)
+	default:
+		// ensure backwards compatibility
+		if req.User != "" || req.Password != "" {
+			cfg.SMTP.PlainAuth = &smtp.PlainAuthConfig{
+				User:     req.User,
+				Password: req.Password,
+			}
+		}
+	}
+
+	return cfg
+}
+
+func xoauth2ToSmtp(xoauth2 *admin_pb.TestEmailProviderSMTPRequest_Xoauth2, user string) *smtp.XOAuth2AuthConfig {
+	cfg := &smtp.XOAuth2AuthConfig{
+		User:          user,
+		TokenEndpoint: xoauth2.Xoauth2.TokenEndpoint,
+		Scopes:        xoauth2.Xoauth2.Scopes,
+	}
+	if v, ok := xoauth2.Xoauth2.OAuth2Type.(*admin_pb.SMTPXOAuth2Auth_ClientCredentials_); ok {
+		cfg.ClientCredentialsAuth = &smtp.OAuth2ClientCredentials{
+			ClientId:     v.ClientCredentials.ClientId,
+			ClientSecret: v.ClientCredentials.ClientSecret,
+		}
+	}
+	return cfg
 }

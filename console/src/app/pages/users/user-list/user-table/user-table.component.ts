@@ -22,6 +22,7 @@ import {
   delay,
   distinctUntilChanged,
   EMPTY,
+  from,
   Observable,
   of,
   ReplaySubject,
@@ -35,7 +36,7 @@ import { PaginatorComponent } from 'src/app/modules/paginator/paginator.componen
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { ToastService } from 'src/app/services/toast.service';
 import { UserService } from 'src/app/services/user.service';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { SearchQuery as UserSearchQuery } from 'src/app/proto/generated/zitadel/user_pb';
 import { Type, UserFieldName } from '@zitadel/proto/zitadel/user/v2/query_pb';
 import { UserState, User } from '@zitadel/proto/zitadel/user/v2/user_pb';
@@ -43,6 +44,8 @@ import { MessageInitShape } from '@bufbuild/protobuf';
 import { ListUsersRequestSchema, ListUsersResponse } from '@zitadel/proto/zitadel/user/v2/user_service_pb';
 import { UserState as UserStateV1 } from 'src/app/proto/generated/zitadel/user_pb';
 import { NewOrganizationService } from 'src/app/services/new-organization.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 type ListUsersRequest = MessageInitShape<typeof ListUsersRequestSchema>;
 type QueriesArray = NonNullable<ListUsersRequest['queries']>;
@@ -124,6 +127,8 @@ export class UserTableComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly destroyRef: DestroyRef,
     private readonly newOrganizationService: NewOrganizationService,
+    private readonly authenticationService: AuthenticationService,
+    private readonly authService: GrpcAuthService,
   ) {
     this.type$ = this.getType$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.users$ = this.getUsers(this.type$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
@@ -229,7 +234,7 @@ export class UserTableComponent implements OnInit {
   }
 
   private getQueries(type$: Observable<Type>): Observable<Query[]> {
-    const orgId$ = toObservable(this.newOrganizationService.orgId).pipe(filter(Boolean));
+    const orgId$ = this.getActiveOrgId().pipe(filter(Boolean));
     return this.searchQueries$.pipe(
       startWith([]),
       combineLatestWith(type$, orgId$),
@@ -473,5 +478,21 @@ export class UserTableComponent implements OnInit {
   public get multipleDeactivatePossible(): boolean {
     const selected = this.selection.selected;
     return selected ? selected.findIndex((user) => user.state !== UserState.INACTIVE) > -1 : false;
+  }
+
+  private getActiveOrgId() {
+    return this.authenticationService.authenticationChanged.pipe(
+      startWith(true),
+      filter(Boolean),
+      switchMap(() =>
+        from(this.authService.getActiveOrg()).pipe(
+          catchError((err) => {
+            this.toast.showError(err);
+            return of(undefined);
+          }),
+        ),
+      ),
+      map((org) => org?.id),
+    );
   }
 }

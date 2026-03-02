@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: Tvåfaktor verifiering
   DescriptionPhone: Verifiera med en andra faktor. Ange ditt mobilnummer.
   DescriptionCode: Verifiera med en andra faktor. Ange koden du fått på SMS för att bekräfta ditt mobilnr.
+  CountryCodeLabel: Land
   PhoneLabel: Mobilnr
   CodeLabel: Kod
   EditButtonText: Ändra
@@ -268,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Kön
   Female: Man
   Male: Kvinna
@@ -314,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Användarvillkor
   TosConfirm: Jag accepterar
   TosLinkText: Användarvillkoren
@@ -394,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Tillgång från hårdvaruenhet
   UserCode:
@@ -445,8 +449,8 @@ Errors:
       NotFound: Profilen finns inte
       NotChanged: Profilen har inte ändrats
       Empty: Profilen saknar innehåll
-      FirstNameEmpty: Förnamnet i profilen är tomt
-      LastNameEmpty: Efternamnet i profilen är tomt
+      FirstNameEmpty: Förnamn i profilen är tomt
+      LastNameEmpty: Efternamn i profilen är tomt
       IDMissing: Profile ID saknas
     E-Post:
       NotFound: E-Post finns inte

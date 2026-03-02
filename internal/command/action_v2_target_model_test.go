@@ -27,6 +27,7 @@ func targetAddEvent(aggID, resourceOwner string) *target.AddedEvent {
 			KeyID:      "id",
 			Crypted:    []byte("12345678"),
 		},
+		target_domain.PayloadTypeJSON,
 	)
 }
 

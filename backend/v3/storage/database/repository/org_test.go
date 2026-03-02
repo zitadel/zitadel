@@ -25,21 +25,9 @@ func TestCreateOrganization(t *testing.T) {
 		}
 	}()
 
-	instanceRepo := repository.InstanceRepository()
 	organizationRepo := repository.OrganizationRepository()
 	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:                   instanceId,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleCLient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
-	}
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceId := createInstance(t, tx)
 
 	tests := []struct {
 		name         string
@@ -135,19 +123,7 @@ func TestCreateOrganization(t *testing.T) {
 			}{
 				name: "adding org with same name, different instance",
 				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Organization {
-					// create instance
-					instId := gofakeit.Name()
-					instance := domain.Instance{
-						ID:                   instId,
-						Name:                 gofakeit.Name(),
-						DefaultOrgID:         "defaultOrgId",
-						IAMProjectID:         "iamProject",
-						ConsoleClientID:      "consoleCLient",
-						ConsoleApplicationID: "consoleApp",
-						DefaultLanguage:      "defaultLanguage",
-					}
-					err := instanceRepo.Create(t.Context(), tx, &instance)
-					assert.Nil(t, err)
+					instId := createInstance(t, tx)
 
 					org := domain.Organization{
 						ID:         gofakeit.Name(),
@@ -176,10 +152,8 @@ func TestCreateOrganization(t *testing.T) {
 		{
 			name: "adding organization with no id",
 			organization: func() domain.Organization {
-				// organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
 				organization := domain.Organization{
-					// ID:              organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
 					State:      domain.OrgStateActive,
@@ -272,22 +246,9 @@ func TestUpdateOrganization(t *testing.T) {
 		}
 	}()
 
-	instanceRepo := repository.InstanceRepository()
 	organizationRepo := repository.OrganizationRepository()
 
-	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:                   instanceId,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleCLient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
-	}
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceId := createInstance(t, tx)
 
 	tests := []struct {
 		name         string
@@ -427,24 +388,11 @@ func TestGetOrganization(t *testing.T) {
 		}
 	}()
 
-	instanceRepo := repository.InstanceRepository()
 	orgRepo := repository.OrganizationRepository()
 	orgDomainRepo := repository.OrganizationDomainRepository()
 
 	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:                   instanceId,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleCLient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
-	}
-
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceId := createInstance(t, tx)
 
 	// create organization
 	// this org is created as an additional org which should NOT
@@ -611,22 +559,10 @@ func TestListOrganization(t *testing.T) {
 		}
 	}()
 
-	instanceRepo := repository.InstanceRepository()
 	organizationRepo := repository.OrganizationRepository()
 
 	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:                   instanceId,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleCLient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
-	}
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceId := createInstance(t, tx)
 
 	type test struct {
 		name                   string
@@ -767,23 +703,12 @@ func TestListOrganization(t *testing.T) {
 			},
 		},
 		func() test {
-			instanceId_2 := gofakeit.Name()
+			instanceId_2 := createInstance(t, tx)
 			return test{
 				name: "multiple organization filter on instance",
 				testFunc: func(t *testing.T, tx database.QueryExecutor) []*domain.Organization {
 					// create instance 1
-					instanceId_1 := gofakeit.Name()
-					instance := domain.Instance{
-						ID:                   instanceId_1,
-						Name:                 gofakeit.Name(),
-						DefaultOrgID:         "defaultOrgId",
-						IAMProjectID:         "iamProject",
-						ConsoleClientID:      "consoleCLient",
-						ConsoleApplicationID: "consoleApp",
-						DefaultLanguage:      "defaultLanguage",
-					}
-					err = instanceRepo.Create(t.Context(), tx, &instance)
-					assert.Nil(t, err)
+					instanceId_1 := createInstance(t, tx)
 
 					// create organization
 					// this org is created as an additional org which should NOT
@@ -798,18 +723,6 @@ func TestListOrganization(t *testing.T) {
 					require.NoError(t, err)
 
 					// create instance 2
-					instance_2 := domain.Instance{
-						ID:                   instanceId_2,
-						Name:                 gofakeit.Name(),
-						DefaultOrgID:         "defaultOrgId",
-						IAMProjectID:         "iamProject",
-						ConsoleClientID:      "consoleCLient",
-						ConsoleApplicationID: "consoleApp",
-						DefaultLanguage:      "defaultLanguage",
-					}
-					err = instanceRepo.Create(t.Context(), tx, &instance_2)
-					assert.Nil(t, err)
-
 					noOfOrganizations := 5
 					organizations := make([]*domain.Organization, noOfOrganizations)
 					for i := range noOfOrganizations {
@@ -880,22 +793,10 @@ func TestDeleteOrganization(t *testing.T) {
 		_ = tx.Rollback(t.Context())
 	})
 
-	instanceRepo := repository.InstanceRepository()
 	organizationRepo := repository.OrganizationRepository()
 
 	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:                   instanceId,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleCLient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
-	}
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+	instanceId := createInstance(t, tx)
 
 	type test struct {
 		name                   string
@@ -1029,21 +930,10 @@ func TestGetOrganizationWithSubResources(t *testing.T) {
 		_ = tx.Rollback(t.Context())
 	})
 
-	instanceRepo := repository.InstanceRepository()
 	orgRepo := repository.OrganizationRepository()
 
 	// create instance
-	instanceId := gofakeit.Name()
-	err = instanceRepo.Create(t.Context(), tx, &domain.Instance{
-		ID:                   instanceId,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleCLient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
-	})
-	require.NoError(t, err)
+	instanceId := createInstance(t, tx)
 
 	// create organization
 	org := domain.Organization{

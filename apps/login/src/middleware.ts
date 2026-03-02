@@ -2,7 +2,7 @@ import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_se
 
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { DEFAULT_CSP } from "../constants/csp";
+import { buildCSP } from "./lib/csp";
 import { getServiceConfig } from "./lib/service-url";
 export const config = {
   matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
@@ -66,12 +66,15 @@ export async function middleware(request: NextRequest) {
 
   const securitySettings = await loadSecuritySettings(request);
 
-  if (securitySettings?.embeddedIframe?.enabled) {
-    responseHeaders.set(
-      "Content-Security-Policy",
-      `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
-    );
-    responseHeaders.delete("X-Frame-Options");
+  const iframeOrigins =
+    securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
+      ? securitySettings.embeddedIframe.allowedOrigins
+      : undefined;
+
+  responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }));
+
+  if (!iframeOrigins) {
+    responseHeaders.set("X-Frame-Options", "deny");
   }
 
   request.nextUrl.href = `${serviceConfig.baseUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;

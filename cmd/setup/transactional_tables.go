@@ -19,7 +19,6 @@ func (mig *TransactionalTables) Execute(ctx context.Context, _ eventstore.Event)
 	if err != nil {
 		return err
 	}
-
 	return pool.Migrate(ctx)
 }
 

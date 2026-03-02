@@ -193,16 +193,8 @@ export class SMTPTableComponent implements OnInit {
     this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
 
-  public get createRouterLink(): RouterLink | any {
-    return ['/instance', 'idp', 'create'];
-  }
-
   public routerLinkForRow(row: SMTPConfig.AsObject): any {
     return ['/instance', 'smtpprovider', row.id];
-  }
-
-  public get displayedColumnsWithActions(): string[] {
-    return ['actions', ...this.displayedColumns];
   }
 
   public navigateToProvider(row: SMTPConfig.AsObject) {

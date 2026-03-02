@@ -67,6 +67,10 @@ export async function verifyU2F(command: VerifyU2FCommand) {
     sessionId: command.sessionId,
   });
 
+  if (!sessionCookie) {
+    return { error: "Could not get session cookie" };
+  }
+
   const session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
 
   const userId = session?.session?.factors?.user?.id;

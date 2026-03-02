@@ -158,7 +158,7 @@ func (o org) ExistsDomain(cond database.Condition) database.Condition {
 		o.domainRepo.qualifiedTableName(),
 		database.And(
 			database.NewColumnCondition(o.InstanceIDColumn(), o.domainRepo.InstanceIDColumn()),
-			database.NewColumnCondition(o.IDColumn(), o.domainRepo.OrgIDColumn()),
+			database.NewColumnCondition(o.IDColumn(), o.domainRepo.OrganizationIDColumn()),
 			cond,
 		),
 	)
@@ -282,13 +282,13 @@ func (o org) joinDomains() database.QueryOption {
 	columns := make([]database.Condition, 0, 3)
 	columns = append(columns,
 		database.NewColumnCondition(o.InstanceIDColumn(), o.domainRepo.InstanceIDColumn()),
-		database.NewColumnCondition(o.IDColumn(), o.domainRepo.OrgIDColumn()),
+		database.NewColumnCondition(o.IDColumn(), o.domainRepo.OrganizationIDColumn()),
 	)
 
 	// If domains should not be joined, we make sure to return null for the domain columns
 	// the query optimizer of the dialect should optimize this away if no domains are requested
 	if !o.shouldLoadDomains {
-		columns = append(columns, database.IsNull(o.domainRepo.OrgIDColumn()))
+		columns = append(columns, database.IsNull(o.domainRepo.OrganizationIDColumn()))
 	}
 
 	return database.WithLeftJoin(

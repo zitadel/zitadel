@@ -8,23 +8,19 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 )
 
 func TestNewProjectionMetrics(t *testing.T) {
 	mockMetrics := metrics.NewMockMetrics()
-	metrics.M = mockMetrics
-
-	metrics := NewProjectionMetrics()
+	metrics := newProjectionMetrics(t.Context(), mockMetrics)
 	require.NotNil(t, metrics)
 	assert.NotNil(t, metrics.provider)
 }
 
 func TestProjectionMetrics_ProjectionUpdateTiming(t *testing.T) {
-
 	mockMetrics := metrics.NewMockMetrics()
-	metrics.M = mockMetrics
-	projectionMetrics := NewProjectionMetrics()
+	projectionMetrics := newProjectionMetrics(t.Context(), mockMetrics)
 
 	ctx := context.Background()
 	projection := "test_projection"
@@ -42,10 +38,8 @@ func TestProjectionMetrics_ProjectionUpdateTiming(t *testing.T) {
 }
 
 func TestProjectionMetrics_ProjectionEventsProcessed(t *testing.T) {
-
 	mockMetrics := metrics.NewMockMetrics()
-	metrics.M = mockMetrics
-	projectionMetrics := NewProjectionMetrics()
+	projectionMetrics := newProjectionMetrics(t.Context(), mockMetrics)
 
 	ctx := context.Background()
 	projection := "test_projection"
@@ -64,10 +58,8 @@ func TestProjectionMetrics_ProjectionEventsProcessed(t *testing.T) {
 }
 
 func TestProjectionMetrics_ProjectionStateLatency(t *testing.T) {
-
 	mockMetrics := metrics.NewMockMetrics()
-	metrics.M = mockMetrics
-	projectionMetrics := NewProjectionMetrics()
+	projectionMetrics := newProjectionMetrics(t.Context(), mockMetrics)
 
 	ctx := context.Background()
 	projection := "test_projection"
@@ -85,10 +77,8 @@ func TestProjectionMetrics_ProjectionStateLatency(t *testing.T) {
 }
 
 func TestProjectionMetrics_Integration(t *testing.T) {
-
 	mockMetrics := metrics.NewMockMetrics()
-	metrics.M = mockMetrics
-	projectionMetrics := NewProjectionMetrics()
+	projectionMetrics := newProjectionMetrics(t.Context(), mockMetrics)
 
 	ctx := context.Background()
 	projection := "test_projection"

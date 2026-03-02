@@ -1,6 +1,6 @@
 create schema if not exists cache;
 
-create unlogged table if not exists cache.objects (
+create table if not exists cache.objects (
 	cache_name varchar not null,
     id uuid not null default gen_random_uuid(),
     created_at timestamptz not null default now(),
@@ -11,7 +11,10 @@ create unlogged table if not exists cache.objects (
 )
 partition by list (cache_name);
 
-create unlogged table if not exists cache.string_keys(
+create unlogged table if not exists cache.objects_default 
+    PARTITION OF cache.objects DEFAULT;
+
+create table if not exists cache.string_keys(
     cache_name varchar not null check (cache_name <> ''),
     index_id integer not null check (index_id > 0),
     index_key varchar not null check (index_key <> ''),
@@ -27,3 +30,6 @@ partition by list (cache_name);
 
 create index if not exists string_keys_object_id_idx
     on cache.string_keys (cache_name, object_id); -- for delete cascade
+
+create unlogged table if not exists cache.string_keys_default 
+    PARTITION OF cache.string_keys DEFAULT;

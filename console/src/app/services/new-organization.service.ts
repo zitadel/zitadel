@@ -1,17 +1,23 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import { injectQuery, mutationOptions, QueryClient, queryOptions, skipToken } from '@tanstack/angular-query-experimental';
-import { MessageInitShape } from '@bufbuild/protobuf';
-import { ListOrganizationsRequestSchema, ListOrganizationsResponse } from '@zitadel/proto/zitadel/org/v2/org_service_pb';
+import { create, DescMessage, MessageInitShape, toBinary } from '@bufbuild/protobuf';
+import {
+  ListOrganizationsRequestSchema,
+  ListOrganizationsResponse,
+  OrganizationService,
+} from '@zitadel/proto/zitadel/org/v2/org_service_pb';
 import { NewMgmtService } from './new-mgmt.service';
 import { OrgInterceptorProvider } from './interceptors/org.interceptor';
 import { NewAdminService } from './new-admin.service';
 import { SetUpOrgRequestSchema } from '@zitadel/proto/zitadel/admin_pb';
-import { TranslateService } from '@ngx-translate/core';
-import { lastValueFrom } from 'rxjs';
-import { first } from 'rxjs/operators';
-import { StorageKey, StorageLocation, StorageService } from './storage.service';
 import { UserService } from './user.service';
+import { GrpcAuthService } from './grpc-auth.service';
+import { concatWith, defer, map } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Buffer } from 'buffer';
+import { AuthService, ListMyProjectOrgsRequestSchema } from '@zitadel/proto/zitadel/auth_pb';
 
 @Injectable({
   providedIn: 'root',
@@ -19,43 +25,13 @@ import { UserService } from './user.service';
 export class NewOrganizationService {
   constructor(
     private readonly grpcService: GrpcService,
+    private readonly authService: GrpcAuthService,
     private readonly newMgtmService: NewMgmtService,
     private readonly newAdminService: NewAdminService,
     private readonly orgInterceptorProvider: OrgInterceptorProvider,
     private readonly queryClient: QueryClient,
-    private readonly translate: TranslateService,
-    private readonly storage: StorageService,
     private readonly userService: UserService,
   ) {}
-
-  private readonly orgIdSignal = signal<string | undefined>(
-    this.storage.getItem(StorageKey.organizationId, StorageLocation.session) ??
-      this.storage.getItem(StorageKey.organizationId, StorageLocation.local) ??
-      undefined,
-  );
-  public readonly orgId = this.orgIdSignal.asReadonly();
-
-  public getOrgId() {
-    return computed(() => {
-      const orgId = this.orgIdSignal();
-      if (orgId === undefined) {
-        throw new Error('No organization ID set');
-      }
-      return orgId;
-    });
-  }
-
-  public async setOrgId(orgId?: string) {
-    const organization = await this.queryClient.fetchQuery(this.organizationByIdQueryOptions(orgId ?? this.getOrgId()()));
-    if (organization) {
-      this.storage.setItem(StorageKey.organizationId, orgId, StorageLocation.session);
-      this.storage.setItem(StorageKey.organizationId, orgId, StorageLocation.local);
-      this.orgIdSignal.set(orgId);
-    } else {
-      throw new Error('request organization not found');
-    }
-    return organization;
-  }
 
   public organizationByIdQueryOptions(organizationId?: string) {
     const req = {
@@ -74,62 +50,82 @@ export class NewOrganizationService {
       ],
     };
 
+    const { queryFn, ...listOrganizationsQueryOptions } = this.listOrganizationsQueryOptions(req);
+
     return queryOptions({
-      queryKey: [this.userService.userId(), 'organization', 'listOrganizations', req],
-      queryFn: organizationId
-        ? () => this.listOrganizations(req).then((resp) => resp.result.find(Boolean) ?? null)
-        : skipToken,
+      ...listOrganizationsQueryOptions,
+      queryFn: organizationId ? queryFn : skipToken,
+      select: (data) => data.result.find(Boolean) ?? null,
     });
   }
 
   public activeOrganizationQuery() {
-    return injectQuery(() => this.organizationByIdQueryOptions(this.orgId()));
-  }
+    const activeOrg$ = defer(() => this.authService.getActiveOrg()).pipe(
+      concatWith(this.authService.activeOrgChanged),
+      filter(Boolean),
+      map((org) => org.id),
+    );
 
-  public listOrganizationsQueryOptions(req?: MessageInitShape<typeof ListOrganizationsRequestSchema>) {
-    return queryOptions({
-      queryKey: this.listOrganizationsQueryKey(req),
-      queryFn: () => this.listOrganizations(req ?? {}),
+    const activeOrg = toSignal(activeOrg$);
+
+    const req = computed(
+      () =>
+        ({
+          query: {
+            limit: 1,
+          },
+          queries: [
+            {
+              query: {
+                case: 'idQuery' as const,
+                value: {
+                  id: activeOrg(),
+                },
+              },
+            },
+          ],
+        }) satisfies MessageInitShape<typeof ListMyProjectOrgsRequestSchema>,
+    );
+
+    return injectQuery(() => {
+      const { queryFn, ...listMyProjectOrgsQueryOptions } = this.listMyProjectOrgsQueryOptions(req());
+
+      return queryOptions({
+        ...listMyProjectOrgsQueryOptions,
+        queryFn: activeOrg() ? queryFn : skipToken,
+        select: (data) => data.result.find(Boolean) ?? null,
+      });
     });
   }
 
-  public listOrganizationsQueryKey(req?: MessageInitShape<typeof ListOrganizationsRequestSchema>) {
-    if (!req) {
-      return [this.userService.userId(), 'organization', 'listOrganizations'];
-    }
-
-    // needed because angular query isn't able to serialize a bigint key
-    const query = req.query ? { ...req.query, offset: req.query.offset ? Number(req.query.offset) : undefined } : undefined;
-    const queryKey = {
-      ...req,
-      ...(query ? { query } : {}),
-    };
-
-    return [this.userService.userId(), 'organization', 'listOrganizations', queryKey];
+  public listOrganizationsQueryOptions(req?: MessageInitShape<typeof ListOrganizationsRequestSchema>) {
+    const queryKeyHashFn = tanstackQueryKeyHashFn(ListOrganizationsRequestSchema);
+    return queryOptions({
+      queryKey: [
+        this.userService.userId(),
+        OrganizationService.name,
+        OrganizationService.method.listOrganizations.name,
+        req,
+      ] as const,
+      queryKeyHashFn: (key) => queryKeyHashFn(...key),
+      queryFn: ({ signal }) => this.listOrganizations(req ?? {}, signal),
+    });
   }
 
-  public listOrganizations(
+  private listOrganizations(
     req: MessageInitShape<typeof ListOrganizationsRequestSchema>,
     signal?: AbortSignal,
   ): Promise<ListOrganizationsResponse> {
     return this.grpcService.organizationNew.listOrganizations(req, { signal });
   }
 
-  private async getDefaultOrganization() {
-    let resp = await this.listOrganizations({
-      query: {
-        limit: 1,
-      },
-      queries: [
-        {
-          query: {
-            case: 'defaultQuery',
-            value: {},
-          },
-        },
-      ],
+  private listMyProjectOrgsQueryOptions(req?: MessageInitShape<typeof ListMyProjectOrgsRequestSchema>) {
+    const queryKeyHashFn = tanstackQueryKeyHashFn(ListMyProjectOrgsRequestSchema);
+    return queryOptions({
+      queryKey: [this.userService.userId(), AuthService.name, AuthService.method.listMyProjectOrgs.name, req] as const,
+      queryKeyHashFn: (key) => queryKeyHashFn(...key),
+      queryFn: ({ signal }) => this.grpcService.authNew.listMyProjectOrgs(req ?? {}, { signal }),
     });
-    return resp.result.find(Boolean) ?? null;
   }
 
   private invalidateAllOrganizationQueries() {
@@ -149,20 +145,11 @@ export class NewOrganizationService {
     mutationOptions({
       mutationKey: ['deleteOrg'],
       mutationFn: async () => {
-        // Before we remove the org we get the current default org
-        // we have to query before the current org is removed
-        const defaultOrg = await this.getDefaultOrganization();
-        if (!defaultOrg) {
-          const error$ = this.translate.get('ORG.TOAST.DEFAULTORGOTFOUND').pipe(first());
-          throw { message: await lastValueFrom(error$) };
-        }
-
         const resp = await this.newMgtmService.removeOrg();
-        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // We change active org to default org as
         // current org was deleted to avoid Organization doesn't exist
-        await this.setOrgId(defaultOrg.id);
+        await this.authService.getActiveOrg();
 
         return resp;
       },
@@ -209,4 +196,17 @@ export class NewOrganizationService {
         await this.invalidateAllOrganizationQueries();
       },
     });
+}
+
+function tanstackQueryKeyHashFn<T extends DescMessage>(schema: T) {
+  return (userId: string | undefined, serviceName: string, methodName: string, req?: MessageInitShape<T>) => {
+    if (!req) {
+      return JSON.stringify([userId, serviceName, methodName]);
+    }
+
+    const serializedReq = toBinary(schema, create(schema, req));
+    const serializedReqAsString = Buffer.from(serializedReq).toString('base64');
+
+    return JSON.stringify([userId, serviceName, methodName, serializedReqAsString]);
+  };
 }

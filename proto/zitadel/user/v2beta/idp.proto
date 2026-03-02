@@ -49,6 +49,14 @@ message RedirectURLs {
       example: "\"https://custom.com/login/idp/fail\"";
     }
   ];
+  string login_hint = 3 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "login_hint hints to the login page which user wants to log in."
+      max_length: 200;
+      example: "\"someone@example.com\"";
+    }
+  ];
 }
 
 message IDPIntent {
@@ -70,7 +78,7 @@ message IDPIntent {
   ];
   string user_id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the ZITADEL user if external user already linked"
+      description: "ID of the Zitadel user if external user already linked"
       max_length: 200;
       example: "\"163840776835432345\"";
     }
@@ -121,8 +129,24 @@ message IDPInformation{
 }
 
 message IDPOAuthAccessInformation{
-  string access_token = 1;
-  optional string id_token = 2;
+  // The access token returned by the external identity provider.
+  string access_token = 1[
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Access token returned by the external identity provider"
+    }
+  ];
+  // The ID token is only set when it is returned by the external identity provider.
+  optional string id_token = 2[
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID token returned by the external identity provider. Only set if the external identity provider returns an ID token."
+    }
+  ];
+  // The refresh token is only set when it is returned by the external identity provider.
+  optional string refresh_token = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Refresh token returned by the external identity provider. Only set if the external identity provider returns a refresh token."
+    }
+  ];
 }
 
 message IDPLDAPAccessInformation{

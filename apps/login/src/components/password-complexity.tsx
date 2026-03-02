@@ -91,33 +91,39 @@ export function PasswordComplexity({
             />
           </span>
         </div>
-      ) : (
-        <span />
+      ) : null}
+      {passwordComplexitySettings.requiresSymbol && (
+        <div className="flex flex-row items-center" data-testid="symbol-check">
+          {renderIcon(hasSymbol, t)}
+          <span className={desc}>
+            <Translated i18nKey="complexity.hasSymbol" namespace="password" />
+          </span>
+        </div>
       )}
-      <div className="flex flex-row items-center" data-testid="symbol-check">
-        {renderIcon(hasSymbol, t)}
-        <span className={desc}>
-          <Translated i18nKey="complexity.hasSymbol" namespace="password" />
-        </span>
-      </div>
-      <div className="flex flex-row items-center" data-testid="number-check">
-        {renderIcon(hasNumber, t)}
-        <span className={desc}>
-          <Translated i18nKey="complexity.hasNumber" namespace="password" />
-        </span>
-      </div>
-      <div className="flex flex-row items-center" data-testid="uppercase-check">
-        {renderIcon(hasUppercase, t)}
-        <span className={desc}>
-          <Translated i18nKey="complexity.hasUppercase" namespace="password" />
-        </span>
-      </div>
-      <div className="flex flex-row items-center" data-testid="lowercase-check">
-        {renderIcon(hasLowercase, t)}
-        <span className={desc}>
-          <Translated i18nKey="complexity.hasLowercase" namespace="password" />
-        </span>
-      </div>
+      {passwordComplexitySettings.requiresNumber && (
+        <div className="flex flex-row items-center" data-testid="number-check">
+          {renderIcon(hasNumber, t)}
+          <span className={desc}>
+            <Translated i18nKey="complexity.hasNumber" namespace="password" />
+          </span>
+        </div>
+      )}
+      {passwordComplexitySettings.requiresUppercase && (
+        <div className="flex flex-row items-center" data-testid="uppercase-check">
+          {renderIcon(hasUppercase, t)}
+          <span className={desc}>
+            <Translated i18nKey="complexity.hasUppercase" namespace="password" />
+          </span>
+        </div>
+      )}
+      {passwordComplexitySettings.requiresLowercase && (
+        <div className="flex flex-row items-center" data-testid="lowercase-check">
+          {renderIcon(hasLowercase, t)}
+          <span className={desc}>
+            <Translated i18nKey="complexity.hasLowercase" namespace="password" />
+          </span>
+        </div>
+      )}
       <div className="flex flex-row items-center" data-testid="equal-check">
         {renderIcon(equals, t)}
         <span className={desc}>

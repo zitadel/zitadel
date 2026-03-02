@@ -24,7 +24,7 @@ type Props = {
 
 export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const t = useTranslations("ldap");
@@ -68,6 +68,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
       <TextInput
         type="text"
         autoComplete="username"
+        autoFocus
         {...register("loginName", { required: t("required.username") })}
         label={t("labels.username")}
         data-testid="username-text-input"

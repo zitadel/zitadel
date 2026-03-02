@@ -1,4 +1,9 @@
+"use server";
+
+import { headers } from "next/headers";
 import { completeAuthFlow } from "./server/auth-flow";
+import { getPublicHostWithProtocol } from "./server/host";
+import { isSafeRedirectUri } from "./client-utils";
 
 type FinishFlowCommand =
   | {
@@ -43,7 +48,7 @@ function goToSignedInPage(
 export async function completeFlowOrGetUrl(
   command: FinishFlowCommand & { organization?: string },
   defaultRedirectUri?: string,
-): Promise<{ redirect: string } | { error: string }> {
+): Promise<{ redirect: string } | { error: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   console.log("completeFlowOrGetUrl called with:", command, "defaultRedirectUri:", defaultRedirectUri);
 
   // Complete OIDC/SAML flows directly with server action
@@ -58,16 +63,16 @@ export async function completeFlowOrGetUrl(
       sessionId: command.sessionId,
       requestId: command.requestId,
     });
-    console.log("completeFlowOrGetUrl: OIDC/SAML flow result:", result);
+    console.log("completeFlowOrGetUrl: got OIDC/SAML flow result");
     return result;
   }
 
   console.log("completeFlowOrGetUrl: Regular flow, getting next URL");
   // For all other cases, return URL for navigation
   const url = await getNextUrl(command, defaultRedirectUri);
-  console.log("completeFlowOrGetUrl: Next URL:", url);
+  console.log("completeFlowOrGetUrl: got Next URL:", url);
   const result = { redirect: url };
-  console.log("completeFlowOrGetUrl: Final result:", result);
+  console.log("completeFlowOrGetUrl: got final result");
   return result;
 }
 
@@ -93,19 +98,59 @@ export async function getNextUrl(
       ...command,
       organization: command.organization,
     });
-    console.log("getNextUrl: Device flow result:", result);
+    console.log("getNextUrl: Got Device flow result");
     return result;
   }
 
   // OIDC/SAML flows are now handled by completeAuthFlowAction() server action
   // This function only handles device flows and fallback navigation
 
-  if (defaultRedirectUri) {
-    console.log("getNextUrl: Using defaultRedirectUri:", defaultRedirectUri);
-    return defaultRedirectUri;
-  }
-
-  const result = goToSignedInPage(command);
-  console.log("getNextUrl: Using goToSignedInPage result:", result);
+  const result = await resolveRedirectUri(command, defaultRedirectUri);
+  console.log("getNextUrl: Resolved redirect URI:", result);
   return result;
 }
+
+/**
+ * Resolves the redirect URI based on the following priority:
+ * 1. DEFAULT_REDIRECT_URI environment variable
+ * 2. defaultRedirectUri from organization settings
+ * 3. Relative signed-in page fallback
+ * 4. Reserved for future extensions
+ */
+export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedirectUri?: string): Promise<string> {
+  // 1. Environment variable override
+  const envOverride = process.env.DEFAULT_REDIRECT_URI;
+  if (envOverride) {
+    if (envOverride.startsWith("/")) {
+      // Special state: trigger absolute host-based redirect with provided path
+      try {
+        const _headers = await headers();
+        const host = getPublicHostWithProtocol(_headers);
+        const result = `${host}${envOverride}`;
+        console.log("resolveRedirectUri: Using host-based redirect from override:", result);
+        return result;
+      } catch (error) {
+        console.warn("resolveRedirectUri: Could not determine host for override, falling back", error);
+      }
+    } else {
+      console.log("resolveRedirectUri: Using DEFAULT_REDIRECT_URI override:", envOverride);
+      return envOverride;
+    }
+  }
+
+  // 2. Default redirect URI from settings
+  if (defaultRedirectUri) {
+    if (isSafeRedirectUri(defaultRedirectUri)) {
+      console.log("resolveRedirectUri: Using defaultRedirectUri from settings:", defaultRedirectUri);
+      return defaultRedirectUri;
+    } else {
+      console.warn("resolveRedirectUri: Unsafe defaultRedirectUri prevented:", defaultRedirectUri);
+    }
+  }
+
+  // 3. Default signed-in page (relative)
+  const result = goToSignedInPage(command);
+  console.log("resolveRedirectUri: Using relative goToSignedInPage result:", result);
+  return result;
+}
+

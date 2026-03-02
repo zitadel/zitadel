@@ -89,14 +89,6 @@ export async function checkMFAFactors(
   organization?: string,
   requestId?: string,
 ) {
-  console.log("checkMFAFactors called with session:", {
-    sessionId: session.id,
-    userId: session.factors?.user?.id,
-    loginName: session.factors?.user?.loginName,
-    hasIntentFactor: !!session.factors?.intent?.verifiedAt,
-    hasPasswordFactor: !!session.factors?.password?.verifiedAt,
-    hasWebAuthNFactor: !!session.factors?.webAuthN?.verifiedAt,
-  });
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
       m === AuthenticationMethodType.TOTP ||
@@ -127,7 +119,7 @@ export async function checkMFAFactors(
     }
 
     const factor = availableMultiFactors[0];
-    // if passwordless is other method, but user selected password as alternative, perform a login
+    // if passkey is other method, but user selected password as alternative, perform a login
     if (factor === AuthenticationMethodType.TOTP) {
       return { redirect: `/otp/time-based?` + params };
     } else if (factor === AuthenticationMethodType.OTP_SMS) {

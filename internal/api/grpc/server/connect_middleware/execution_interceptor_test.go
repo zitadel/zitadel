@@ -1,23 +1,42 @@
 package connect_middleware
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
+)
+
+var (
+	privateKey = func() *rsa.PrivateKey {
+		privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+		return privateKey
+	}()
+	encryptionKey = func() []byte {
+		data, _ := crypto.PublicKeyToBytes(&privateKey.PublicKey)
+		return data
+	}()
+	encryptionKeyID  = "encryption-key-id"
+	signingAlgorithm = jose.RS256
 )
 
 func newMockContentRequest(content string) *connect.Request[structpb.Struct] {
@@ -56,22 +75,29 @@ func newMockContextInfoResponse(fullMethod, request, response string) *ContextIn
 }
 
 func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
+	deniedLocalhost, err := denylist.NewHostChecker("127.0.0.1")
+	require.NoError(t, err)
+	deniedIPs := []denylist.AddressChecker{deniedLocalhost}
+
 	type target struct {
-		reqBody    execution.ContextInfo
-		sleep      time.Duration
-		statusCode int
-		respBody   connect.AnyResponse
+		reqBody             execution.ContextInfo
+		sleep               time.Duration
+		statusCode          int
+		respBody            connect.AnyResponse
+		requestVerification func(*testing.T) func([]byte, []byte) bool
 	}
 	type args struct {
 		ctx context.Context
 
-		executionTargets []target_domain.Target
-		targets          []target
-		fullMethod       string
-		req              connect.AnyRequest
+		executionTargets       []target_domain.Target
+		targets                []target
+		fullMethod             string
+		req                    connect.AnyRequest
+		getActiveSigningWebKey execution.GetActiveSigningWebKey
+		deniedIPs              []denylist.AddressChecker
 	}
 	type res struct {
-		want    interface{}
+		want    any
 		wantErr bool
 	}
 	tests := []struct {
@@ -139,10 +165,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentResponse("content1"),
-						sleep:      0,
-						statusCode: http.StatusBadRequest,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               0,
+						statusCode:          http.StatusBadRequest,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -168,10 +195,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentResponse("content1"),
-						sleep:      0,
-						statusCode: http.StatusBadRequest,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               0,
+						statusCode:          http.StatusBadRequest,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -196,10 +224,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentResponse("content1"),
-						sleep:      5 * time.Second,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               5 * time.Second,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -223,7 +252,10 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					},
 				},
 				targets: []target{
-					{reqBody: newMockContextInfoRequest("/service/method", "wrong")},
+					{
+						reqBody:             newMockContextInfoRequest("/service/method", "wrong"),
+						requestVerification: validateJSONPayload,
+					},
 				},
 				req: newMockContentRequest("content"),
 			},
@@ -247,16 +279,48 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentResponse("content1"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
 			},
 			res{
 				want: newMockContentRequest("content1"),
+			},
+		},
+		{
+			"when target endpoint is in deny list should return error",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       target_domain.TargetTypeCall,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
+						Endpoint:         "127.0.0.1",
+					},
+				},
+				targets: []target{
+					{
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
+					},
+				},
+				req:       newMockContentRequest("content"),
+				deniedIPs: deniedIPs,
+			},
+			res{
+				wantErr: true,
 			},
 		},
 		{
@@ -274,10 +338,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentResponse("content1"),
-						sleep:      5 * time.Second,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               5 * time.Second,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -301,10 +366,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentResponse("content1"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -329,9 +395,10 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						sleep:      0,
-						statusCode: http.StatusInternalServerError,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						sleep:               0,
+						statusCode:          http.StatusInternalServerError,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -356,10 +423,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentResponse("content1"),
-						sleep:      5 * time.Second,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               5 * time.Second,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -384,10 +452,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentResponse("content1"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -427,22 +496,25 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentResponse("content1"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content1"),
-						respBody:   newMockContentResponse("content2"),
-						sleep:      0,
-						statusCode: http.StatusBadRequest,
+						reqBody:             newMockContextInfoRequest("/service/method", "content1"),
+						respBody:            newMockContentResponse("content2"),
+						sleep:               0,
+						statusCode:          http.StatusBadRequest,
+						requestVerification: validateJSONPayload,
 					},
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content2"),
-						respBody:   newMockContentResponse("content3"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content2"),
+						respBody:            newMockContentResponse("content3"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -481,28 +553,95 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentResponse("content1"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content1"),
-						respBody:   newMockContentResponse("content2"),
-						sleep:      5 * time.Second,
-						statusCode: http.StatusBadRequest,
+						reqBody:             newMockContextInfoRequest("/service/method", "content1"),
+						respBody:            newMockContentResponse("content2"),
+						sleep:               5 * time.Second,
+						statusCode:          http.StatusBadRequest,
+						requestVerification: validateJSONPayload,
 					},
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content2"),
-						respBody:   newMockContentResponse("content3"),
-						sleep:      5 * time.Second,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content2"),
+						respBody:            newMockContentResponse("content3"),
+						sleep:               5 * time.Second,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
 			},
 			res{
 				wantErr: true,
+			},
+		},
+		{
+			"payload JWT, ok",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       target_domain.TargetTypeWebhook,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
+						PayloadType:      target_domain.PayloadTypeJWT,
+					},
+				},
+				targets: []target{
+					{
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJWTPayload,
+					},
+				},
+				req:                    newMockContentRequest("content"),
+				getActiveSigningWebKey: mockGetActiveSigningWebKey(),
+			},
+			res{
+				want: newMockContentRequest("content"),
+			},
+		},
+		{
+			"payload JWE, ok",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       target_domain.TargetTypeWebhook,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
+						PayloadType:      target_domain.PayloadTypeJWE,
+						EncryptionKey:    encryptionKey,
+						EncryptionKeyID:  encryptionKeyID,
+					},
+				},
+				targets: []target{
+					{
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJWEPayload,
+					},
+				},
+				req:                    newMockContentRequest("content"),
+				getActiveSigningWebKey: mockGetActiveSigningWebKey(),
+			},
+			res{
+				want: newMockContentRequest("content"),
 			},
 		},
 	}
@@ -515,6 +654,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					target.sleep,
 					target.statusCode,
 					target.respBody,
+					target.requestVerification(t),
 				)
 
 				tt.args.executionTargets[i].Endpoint = url
@@ -527,6 +667,8 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				tt.args.fullMethod,
 				tt.args.req,
 				nil,
+				tt.args.getActiveSigningWebKey,
+				tt.args.deniedIPs,
 			)
 
 			if tt.res.wantErr {
@@ -548,6 +690,7 @@ func testServerCall(
 	sleep time.Duration,
 	statusCode int,
 	respBody connect.AnyResponse,
+	requestVerification func(expected, sent []byte) bool,
 ) (string, func()) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data, err := json.Marshal(reqBody)
@@ -562,7 +705,7 @@ func testServerCall(
 			return
 		}
 
-		if !reflect.DeepEqual(data, sentBody) {
+		if !requestVerification(data, sentBody) {
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
@@ -591,7 +734,49 @@ func testServerCall(
 	return server.URL, server.Close
 }
 
+func mockGetActiveSigningWebKey() func(ctx context.Context) (*jose.JSONWebKey, error) {
+	return func(ctx context.Context) (*jose.JSONWebKey, error) {
+		return &jose.JSONWebKey{
+			Key:       privateKey,
+			Algorithm: string(signingAlgorithm),
+			Use:       "sig",
+		}, nil
+	}
+}
+
+func validateJSONPayload(t *testing.T) func(expected, sent []byte) bool {
+	return bytes.Equal
+}
+
+func validateJWTPayload(t *testing.T) func(expected, sent []byte) bool {
+	return func(expected, sent []byte) bool {
+		jws, err := jose.ParseSigned(string(sent), []jose.SignatureAlgorithm{jose.RS256})
+		require.NoError(t, err)
+		payload, err := jws.Verify(privateKey.Public())
+		require.NoError(t, err)
+		return bytes.Equal(expected, payload)
+	}
+}
+
+func validateJWEPayload(t *testing.T) func(expected, sent []byte) bool {
+	return func(expected, sent []byte) bool {
+		parsedJWE, err := jose.ParseEncrypted(string(sent), []jose.KeyAlgorithm{jose.RSA_OAEP_256, jose.ECDH_ES_A256KW}, []jose.ContentEncryption{jose.A256GCM})
+		if err != nil {
+			return false
+		}
+		require.Equal(t, encryptionKeyID, parsedJWE.Header.KeyID)
+		require.Equal(t, "JWT", parsedJWE.Header.ExtraHeaders[jose.HeaderContentType].(string))
+
+		decryptedJWS, err := parsedJWE.Decrypt(privateKey)
+		require.NoError(t, err)
+		return validateJWTPayload(t)(expected, decryptedJWS)
+	}
+}
+
 func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
+	deniedLocalhost, err := denylist.NewHostChecker("127.0.0.1")
+	require.NoError(t, err)
+	deniedIPs := []denylist.AddressChecker{deniedLocalhost}
 	type target struct {
 		reqBody    execution.ContextInfo
 		sleep      time.Duration
@@ -606,6 +791,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 		fullMethod       string
 		req              connect.AnyRequest
 		resp             connect.AnyResponse
+		deniedIPs        []denylist.AddressChecker
 	}
 	type res struct {
 		want    interface{}
@@ -700,6 +886,37 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				want: newMockContentResponse("response1"),
 			},
 		},
+		{
+			"when target endpoint is in deny list should return error",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "response./zitadel.session.v2.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       target_domain.TargetTypeCall,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
+						Endpoint:         "127.0.0.1",
+					},
+				},
+				targets: []target{
+					{
+						reqBody:    newMockContextInfoResponse("/service/method", "request", "response"),
+						respBody:   newMockContentResponse("response1"),
+						sleep:      0,
+						statusCode: http.StatusOK,
+					},
+				},
+				req:       newMockContentRequest("request"),
+				resp:      newMockContentResponse("response"),
+				deniedIPs: deniedIPs,
+			},
+			res{
+				wantErr: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -710,6 +927,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 					target.sleep,
 					target.statusCode,
 					target.respBody,
+					validateJSONPayload(t),
 				)
 
 				tt.args.executionTargets[i].Endpoint = url
@@ -723,6 +941,8 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				tt.args.req,
 				tt.args.resp,
 				nil,
+				mockGetActiveSigningWebKey(),
+				tt.args.deniedIPs,
 			)
 
 			if tt.res.wantErr {

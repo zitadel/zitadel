@@ -15,8 +15,8 @@ import (
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
-	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 )
 
 func TestListInstancesCommand_Sorting(t *testing.T) {
@@ -31,7 +31,7 @@ func TestListInstancesCommand_Sorting(t *testing.T) {
 		{
 			name: "sort by creation date DESC",
 			request: &instance.ListInstancesRequest{
-				SortingColumn: instance.FieldName_FIELD_NAME_CREATION_DATE.Enum(),
+				SortingColumn: instance.FieldName_FIELD_NAME_CREATION_DATE,
 			},
 
 			expectedSortingDirection: database.OrderDirectionDesc,
@@ -40,7 +40,7 @@ func TestListInstancesCommand_Sorting(t *testing.T) {
 		{
 			name: "sort by creation date ASC",
 			request: &instance.ListInstancesRequest{
-				SortingColumn: instance.FieldName_FIELD_NAME_CREATION_DATE.Enum(),
+				SortingColumn: instance.FieldName_FIELD_NAME_CREATION_DATE,
 				Pagination:    &filter.PaginationRequest{Asc: true},
 			},
 
@@ -50,7 +50,7 @@ func TestListInstancesCommand_Sorting(t *testing.T) {
 		{
 			name: "sort by id DESC",
 			request: &instance.ListInstancesRequest{
-				SortingColumn: instance.FieldName_FIELD_NAME_ID.Enum(),
+				SortingColumn: instance.FieldName_FIELD_NAME_ID,
 			},
 			expectedSortingDirection: database.OrderDirectionDesc,
 			expectedOrderBy:          database.Columns{database.NewColumn("instances", "id")},
@@ -58,7 +58,7 @@ func TestListInstancesCommand_Sorting(t *testing.T) {
 		{
 			name: "sort by id ASC",
 			request: &instance.ListInstancesRequest{
-				SortingColumn: instance.FieldName_FIELD_NAME_ID.Enum(),
+				SortingColumn: instance.FieldName_FIELD_NAME_ID,
 				Pagination:    &filter.PaginationRequest{Asc: true},
 			},
 			expectedSortingDirection: database.OrderDirectionAsc,
@@ -67,7 +67,7 @@ func TestListInstancesCommand_Sorting(t *testing.T) {
 		{
 			name: "unspecified field",
 			request: &instance.ListInstancesRequest{
-				SortingColumn: instance.FieldName_FIELD_NAME_UNSPECIFIED.Enum(),
+				SortingColumn: instance.FieldName_FIELD_NAME_UNSPECIFIED,
 			},
 			expectedSortingDirection: database.OrderDirectionAsc,
 		},
@@ -151,17 +151,17 @@ func TestListInstancesCommand_Execute(t *testing.T) {
 			},
 			inputRequest: &instance.ListInstancesRequest{
 				Pagination:    &filter.PaginationRequest{Limit: 2, Offset: 1, Asc: false},
-				SortingColumn: instance.FieldName_FIELD_NAME_NAME.Enum(),
-				Queries: []*instance.Query{
-					{Query: &instance.Query_IdQuery{IdQuery: &instance.IdsQuery{
+				SortingColumn: instance.FieldName_FIELD_NAME_NAME,
+				Filters: []*instance.Filter{
+					{Filter: &instance.Filter_InIdsFilter{InIdsFilter: &filter.InIDsFilter{
 						Ids: []string{"instance-1", "instance-2"},
 					}}},
-					{Query: &instance.Query_DomainQuery{DomainQuery: &instance.DomainsQuery{
+					{Filter: &instance.Filter_CustomDomainsFilter{CustomDomainsFilter: &instance.CustomDomainsFilter{
 						Domains: []string{"domain1.example.com", "domain2.example.com"},
 					}}},
 				},
 			},
-			expectedError: listErr,
+			expectedError: zerrors.ThrowInternal(listErr, "DOM-AIRPxN", "Errors.Instance.List"),
 		},
 		{
 			testName: "when listing instances succeeds should save into result and return nil",
@@ -216,12 +216,12 @@ func TestListInstancesCommand_Execute(t *testing.T) {
 			},
 			inputRequest: &instance.ListInstancesRequest{
 				Pagination:    &filter.PaginationRequest{Limit: 2, Offset: 1, Asc: false},
-				SortingColumn: instance.FieldName_FIELD_NAME_NAME.Enum(),
-				Queries: []*instance.Query{
-					{Query: &instance.Query_IdQuery{IdQuery: &instance.IdsQuery{
+				SortingColumn: instance.FieldName_FIELD_NAME_NAME,
+				Filters: []*instance.Filter{
+					{Filter: &instance.Filter_InIdsFilter{InIdsFilter: &filter.InIDsFilter{
 						Ids: []string{"instance-1", "instance-2"},
 					}}},
-					{Query: &instance.Query_DomainQuery{DomainQuery: &instance.DomainsQuery{
+					{Filter: &instance.Filter_CustomDomainsFilter{CustomDomainsFilter: &instance.CustomDomainsFilter{
 						Domains: []string{"domain1.example.com", "domain2.example.com"},
 					}}},
 				},
@@ -288,7 +288,7 @@ func TestListInstancesCommand_Validate(t *testing.T) {
 
 				return permChecker
 			},
-			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-cuT6Ws", "permission denied"),
+			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-cuT6Ws", "Errors.PermissionDenied"),
 		},
 		{
 			name: "when valid permission should return no error",

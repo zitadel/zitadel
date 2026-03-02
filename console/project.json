@@ -1,56 +1,71 @@
 {
-    "$schema": "../node_modules/nx/schemas/project-schema.json",
-    "targets": {
-        "lint": {
-            "description": "Runs all linters",
-            "dependsOn": [
-                "lint-check-*"
-            ]
-        },
-        "lint-check-prettier": {
-            "description": "Checks code formatting with Prettier",
-            "cache": true,
-            "inputs": [
-                "default"
-            ]
-        },
-        "lint-check-ng": {
-            "description": "Runs Angular specific lint checks",
-            "cache": true,
-            "inputs": [
-                "default"
-            ]
-        },
-        "generate": {
-            "description": "Generates code from protobuf definitions for API v1 endpoints",
-            "inputs": [
-                "{workspaceRoot}/proto/**/*",
-                "{projectRoot}/buf.gen.yaml",
-                "{projectRoot}/package.json",
-                "{workspaceRoot}/pnpm-lock.yaml"
-            ],
-            "outputs": [
-                "{projectRoot}/src/app/proto/generated"
-            ]
-        },
-        "build": {
-            "description": "Builds the Console for production",
-            "inputs": [
-                "default",
-                "{workspaceRoot}/pnpm-lock.yaml",
-                "{workspaceRoot}/docs/frameworks.json"
-            ],
-            "outputs": [
-                "{projectRoot}/dist"
-            ]
-        },
-        "dev": {
-            "description": "Runs the Console in development mode with hot-reloading",
-            "continuous": true,
-            "dependsOn": [
-                "generate",
-                "^build"
-            ]
-        }
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "lint": {
+      "description": "Runs all linters",
+      "dependsOn": ["lint-check-*"]
+    },
+    "lint-check-prettier": {
+      "description": "Checks code formatting with Prettier",
+      "cache": true,
+      "inputs": ["default"]
+    },
+    "lint-check-ng": {
+      "description": "Runs Angular specific lint checks",
+      "cache": true,
+      "inputs": ["default"]
+    },
+    "generate": {
+      "description": "Generates code from protobuf definitions for API v1 endpoints",
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash -c 'PATH=\"${PWD}/../.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" pnpm exec buf generate ../proto --include-imports --include-wkt'",
+        "cwd": "console"
+      },
+      "dependsOn": ["install-proto-plugins"],
+      "inputs": [
+        "{workspaceRoot}/proto/**/*",
+        "{projectRoot}/buf.gen.yaml",
+        "{projectRoot}/package.json",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        { "dependentTasksOutputFiles": ".artifacts/bin/*/*/protoc-gen-js" },
+        { "dependentTasksOutputFiles": ".artifacts/bin/*/*/protoc-gen-grpc-web" },
+        { "dependentTasksOutputFiles": ".artifacts/bin/*/*/protoc-gen-openapiv2" }
+      ],
+      "outputs": ["{projectRoot}/src/app/proto/generated"]
+    },
+    "install-proto-plugins": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash ./console/scripts/install-proto-plugins.sh"
+      },
+      "cache": true,
+      "inputs": [
+        { "runtime": "uname -s" },
+        { "runtime": "uname -m" },
+        "{projectRoot}/scripts/install-proto-plugins.sh"
+      ],
+      "outputs": [
+        "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-grpc-web",
+        "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-js",
+        "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-openapiv2"
+      ]
+    },
+    "build": {
+      "description": "Builds the Management Console for production",
+      "inputs": [
+        "{projectRoot}/**/*",
+        "!{projectRoot}/dist/**/*",
+        "!{projectRoot}/.angular/**/*",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "{workspaceRoot}/docs/frameworks.json"
+      ],
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "dev": {
+      "description": "Runs the Management Console in development mode with hot-reloading",
+      "continuous": true,
+      "dependsOn": ["generate", "^build"]
     }
+  }
 }

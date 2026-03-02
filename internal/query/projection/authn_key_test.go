@@ -1,6 +1,7 @@
 package projection
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -9,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -40,7 +42,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.authn_keys2 (id, creation_date, change_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO projections.authn_keys2 (id, creation_date, change_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type, fingerprint, enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"keyId",
 								anyArg{},
@@ -54,6 +56,8 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 								"clientId",
 								[]byte("publicKey"),
 								domain.AuthNKeyTypeJSON,
+								sql.NullString{}, // fingerprint is not set for apps
+								true,             // apps keys are enabled by default
 							},
 						},
 					},
@@ -77,7 +81,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.authn_keys2 (id, creation_date, change_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO projections.authn_keys2 (id, creation_date, change_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type, fingerprint, enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"keyId",
 								anyArg{},
@@ -91,6 +95,47 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 								"agg-id",
 								[]byte("publicKey"),
 								domain.AuthNKeyTypeJSON,
+								sql.NullString{}, // fingerprint is not set for users
+								true,             // user keys are enabled by default
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAuthNKeyAdded target",
+			args: args{
+				event: getEvent(
+					testEvent(
+						target.KeyAddedEventType,
+						target.AggregateType,
+						[]byte(`{"keyId": "keyId", "expirationDate": "2021-11-30T15:00:00Z", "publicKey": "cHVibGljS2V5", "fingerprint": "fingerprint"}`),
+					), eventstore.GenericEventMapper[target.KeyAddedEvent]),
+			},
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyAdded,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("target"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.authn_keys2 (id, creation_date, change_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type, fingerprint, enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedArgs: []interface{}{
+								"keyId",
+								anyArg{},
+								anyArg{},
+								"ro-id",
+								"instance-id",
+								"agg-id",
+								uint64(15),
+								"agg-id",
+								anyArg{},
+								"agg-id",
+								[]byte("publicKey"),
+								domain.AuthNKeyTypeNONE,
+								sql.NullString{String: "fingerprint", Valid: true},
+								false, // target keys are disabled by default
 							},
 						},
 					},
@@ -471,6 +516,60 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "reduceAuthNKeyRemoved target key removed",
+			args: args{
+				event: getEvent(
+					testEvent(
+						target.KeyRemovedEventType,
+						target.AggregateType,
+						[]byte(`{"keyId": "keyId"}`),
+					), eventstore.GenericEventMapper[target.KeyRemovedEvent]),
+			},
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("target"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.authn_keys2 WHERE (id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"keyId",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAuthNKeyRemoved target removed",
+			args: args{
+				event: getEvent(
+					testEvent(
+						target.RemovedEventType,
+						target.AggregateType,
+						[]byte(`{"keyId": "keyId"}`),
+					), eventstore.GenericEventMapper[target.RemovedEvent]),
+			},
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("target"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.authn_keys2 WHERE (aggregate_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reduceOwnerRemoved",
 			args: args{
 				event: getEvent(
@@ -491,6 +590,77 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceTargetKeyActivated",
+			args: args{
+				event: getEvent(
+					testEvent(
+						target.KeyActivatedEventType,
+						target.AggregateType,
+						[]byte(`{"keyId": "keyId"}`),
+					), eventstore.GenericEventMapper[target.KeyActivatedEvent]),
+			},
+			reduce: (&authNKeyProjection{}).reduceTargetKeyActivated,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("target"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.authn_keys2 SET (enabled, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (aggregate_id = $5) AND (enabled = $6)",
+							expectedArgs: []interface{}{
+								false,
+								anyArg{},
+								uint64(15),
+								"instance-id",
+								"agg-id",
+								true,
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.authn_keys2 SET (enabled, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"keyId",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceTargetKeyDeactivated",
+			args: args{
+				event: getEvent(
+					testEvent(
+						target.KeyDeactivatedEventType,
+						target.AggregateType,
+						[]byte(`{"keyId": "keyId"}`),
+					), eventstore.GenericEventMapper[target.KeyDeactivatedEvent]),
+			},
+			reduce: (&authNKeyProjection{}).reduceTargetKeyDeactivated,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("target"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.authn_keys2 SET (enabled, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								false,
+								anyArg{},
+								uint64(15),
+								"keyId",
+								"instance-id",
 							},
 						},
 					},

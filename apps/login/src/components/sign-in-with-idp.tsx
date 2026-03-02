@@ -13,13 +13,14 @@ import { SignInWithGithub } from "./idps/sign-in-with-github";
 import { SignInWithGitlab } from "./idps/sign-in-with-gitlab";
 import { SignInWithGoogle } from "./idps/sign-in-with-google";
 import { Translated } from "./translated";
+import { AutoSubmitForm } from "./auto-submit-form";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
   identityProviders: IdentityProvider[];
   requestId?: string;
   organization?: string;
-  linkOnly?: boolean;
+  sessionId?: string;
   postErrorRedirectUrl?: string;
   showLabel?: boolean;
 }
@@ -28,7 +29,7 @@ export function SignInWithIdp({
   identityProviders,
   requestId,
   organization,
-  linkOnly,
+  sessionId,
   postErrorRedirectUrl,
   showLabel = true,
 }: Readonly<SignInWithIDPProps>) {
@@ -59,7 +60,7 @@ export function SignInWithIdp({
         <input type="hidden" name="provider" value={idpTypeToSlug(type)} />
         <input type="hidden" name="requestId" value={requestId} />
         <input type="hidden" name="organization" value={organization} />
-        <input type="hidden" name="linkOnly" value={linkOnly ? "true" : "false"} />
+        {sessionId && <input type="hidden" name="sessionId" value={sessionId} />}
         {postErrorRedirectUrl && <input type="hidden" name="postErrorRedirectUrl" value={postErrorRedirectUrl} />}
         <Component key={id} name={name} />
       </form>
@@ -68,6 +69,7 @@ export function SignInWithIdp({
 
   return (
     <div className="flex w-full flex-col space-y-2 text-sm">
+      {state?.samlData && <AutoSubmitForm url={state.samlData.url} fields={state.samlData.fields} />}
       {showLabel && (
         <p className="ztdl-p text-center">
           <Translated i18nKey="orSignInWith" namespace="idp" />

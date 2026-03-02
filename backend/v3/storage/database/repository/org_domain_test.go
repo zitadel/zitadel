@@ -26,13 +26,13 @@ func TestAddOrganizationDomain(t *testing.T) {
 	// create instance
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:                   instanceID,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleClient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
+		ID:                    instanceID,
+		Name:                  gofakeit.Name(),
+		DefaultOrganizationID: "defaultOrgId",
+		IAMProjectID:          "iamProject",
+		ConsoleClientID:       "managementConsoleClient",
+		ConsoleApplicationID:  "managementConsoleApp",
+		DefaultLanguage:       "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
 	orgRepo := repository.OrganizationRepository()
@@ -226,13 +226,13 @@ func TestGetOrganizationDomain(t *testing.T) {
 	// create instance
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:                   instanceID,
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleClient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
+		ID:                    instanceID,
+		Name:                  gofakeit.Name(),
+		DefaultOrganizationID: "defaultOrgId",
+		IAMProjectID:          "iamProject",
+		ConsoleClientID:       "managementConsoleClient",
+		ConsoleApplicationID:  "managementConsoleApp",
+		DefaultLanguage:       "defaultLanguage",
 	}
 
 	// create organization
@@ -319,7 +319,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
 					domainRepo.InstanceIDCondition(instanceID),
-					domainRepo.OrgIDCondition(orgID),
+					domainRepo.OrganizationIDCondition(orgID),
 					domainRepo.IsPrimaryCondition(true),
 				)),
 			},
@@ -398,13 +398,13 @@ func TestListOrganizationDomains(t *testing.T) {
 
 	// create instance
 	instance := domain.Instance{
-		ID:                   gofakeit.UUID(),
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleClient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
+		ID:                    gofakeit.UUID(),
+		Name:                  gofakeit.Name(),
+		DefaultOrganizationID: "defaultOrgId",
+		IAMProjectID:          "iamProject",
+		ConsoleClientID:       "managementConsoleClient",
+		ConsoleApplicationID:  "managementConsoleApp",
+		DefaultLanguage:       "defaultLanguage",
 	}
 
 	// create organization
@@ -491,7 +491,7 @@ func TestListOrganizationDomains(t *testing.T) {
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
 					domainRepo.InstanceIDCondition(instance.ID),
-					domainRepo.OrgIDCondition(organization.ID),
+					domainRepo.OrganizationIDCondition(organization.ID),
 				)),
 			},
 			expectedCount: 3,
@@ -511,7 +511,7 @@ func TestListOrganizationDomains(t *testing.T) {
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
 					domainRepo.InstanceIDCondition(instance.ID),
-					domainRepo.OrgIDCondition("non-existent"),
+					domainRepo.OrganizationIDCondition("non-existent"),
 				)),
 			},
 			expectedCount: 0,
@@ -553,13 +553,13 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 
 	// create instance
 	instance := domain.Instance{
-		ID:                   gofakeit.UUID(),
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleClient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
+		ID:                    gofakeit.UUID(),
+		Name:                  gofakeit.Name(),
+		DefaultOrganizationID: "defaultOrgId",
+		IAMProjectID:          "iamProject",
+		ConsoleClientID:       "managementConsoleClient",
+		ConsoleApplicationID:  "managementConsoleApp",
+		DefaultLanguage:       "defaultLanguage",
 	}
 
 	// create organization
@@ -600,7 +600,7 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 			name: "set verified",
 			condition: database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
 			),
 			changes:  []database.Change{domainRepo.SetVerified()},
@@ -610,7 +610,7 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 			name: "set primary",
 			condition: database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
 			),
 			changes:  []database.Change{domainRepo.SetPrimary()},
@@ -620,7 +620,7 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 			name: "set validation type",
 			condition: database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
 			),
 			changes:  []database.Change{domainRepo.SetValidationType(domain.DomainValidationTypeHTTP)},
@@ -630,7 +630,7 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 			name: "multiple changes",
 			condition: database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
 			),
 			changes: []database.Change{
@@ -644,7 +644,7 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 			name: "update by org ID and domain",
 			condition: database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
 			),
 			changes:  []database.Change{domainRepo.SetVerified()},
@@ -654,7 +654,7 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 			name: "update non-existent domain",
 			condition: database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 				domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
 			),
 			changes:  []database.Change{domainRepo.SetVerified()},
@@ -664,7 +664,7 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 			name: "no changes",
 			condition: database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
 			),
 			changes:  []database.Change{},
@@ -714,13 +714,13 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 
 	// create instance
 	instance := domain.Instance{
-		ID:                   gofakeit.UUID(),
-		Name:                 gofakeit.Name(),
-		DefaultOrgID:         "defaultOrgId",
-		IAMProjectID:         "iamProject",
-		ConsoleClientID:      "consoleClient",
-		ConsoleApplicationID: "consoleApp",
-		DefaultLanguage:      "defaultLanguage",
+		ID:                    gofakeit.UUID(),
+		Name:                  gofakeit.Name(),
+		DefaultOrganizationID: "defaultOrgId",
+		IAMProjectID:          "iamProject",
+		ConsoleClientID:       "managementConsoleClient",
+		ConsoleApplicationID:  "managementConsoleApp",
+		DefaultLanguage:       "defaultLanguage",
 	}
 
 	// create organization
@@ -769,7 +769,7 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 			name: "remove by domain name",
 			condition: database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 				domainRepo.DomainCondition(database.TextOperationEqual, domain1.Domain),
 			),
 			expected: 1,
@@ -778,7 +778,7 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 			name: "remove by primary condition",
 			condition: database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 				domainRepo.IsPrimaryCondition(false),
 			),
 			expected: 1, // domain2 should still exist and be non-primary
@@ -787,7 +787,7 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 			name: "remove by org ID and domain",
 			condition: database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 				domainRepo.DomainCondition(database.TextOperationEqual, domain2.Domain),
 			),
 			expected: 1,
@@ -796,7 +796,7 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 			name: "remove non-existent domain",
 			condition: database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 				domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
 			),
 			expected: 0,
@@ -817,7 +817,7 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 			// count before removal
 			beforeCount, err := domainRepo.List(t.Context(), snapshot, database.WithCondition(database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 			)))
 			require.NoError(t, err)
 
@@ -828,7 +828,7 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 			// verify removal
 			afterCount, err := domainRepo.List(t.Context(), snapshot, database.WithCondition(database.And(
 				domainRepo.InstanceIDCondition(instance.ID),
-				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.OrganizationIDCondition(organization.ID),
 			)))
 			require.NoError(t, err)
 			assert.Equal(t, len(beforeCount)-int(test.expected), len(afterCount))
@@ -861,7 +861,7 @@ func TestOrganizationDomainConditions(t *testing.T) {
 		},
 		{
 			name:      "org id condition",
-			condition: domainRepo.OrgIDCondition("org-123"),
+			condition: domainRepo.OrganizationIDCondition("org-123"),
 			expected:  "org_domains.organization_id = $1",
 		},
 		{
@@ -958,13 +958,13 @@ func TestOrganizationDomainColumns(t *testing.T) {
 		},
 		{
 			name:      "org id column qualified",
-			column:    domainRepo.OrgIDColumn(),
+			column:    domainRepo.OrganizationIDColumn(),
 			qualified: true,
 			expected:  "org_domains.organization_id",
 		},
 		{
 			name:      "org id column unqualified",
-			column:    domainRepo.OrgIDColumn(),
+			column:    domainRepo.OrganizationIDColumn(),
 			qualified: false,
 			expected:  "organization_id",
 		},

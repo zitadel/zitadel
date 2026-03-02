@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
@@ -85,6 +86,7 @@ func Test_emailProvidersToPb(t *testing.T) {
 							ReplyToAddress: "address",
 							Host:           "host",
 							User:           "user",
+							PlainAuth:      &query.PlainAuth{},
 						},
 						HTTPConfig: nil,
 						State:      1,
@@ -125,6 +127,9 @@ func Test_emailProvidersToPb(t *testing.T) {
 							Host:           "host",
 							User:           "user",
 							ReplyToAddress: "address",
+							Auth: &settings_pb.EmailProviderSMTP_Plain{
+								Plain: &settings_pb.SMTPPlainAuth{},
+							},
 						},
 					},
 				},
@@ -184,6 +189,7 @@ func Test_emailProviderToProviderPb(t *testing.T) {
 						ReplyToAddress: "address",
 						Host:           "host",
 						User:           "user",
+						PlainAuth:      &query.PlainAuth{},
 					},
 					HTTPConfig: &query.HTTP{
 						Endpoint:   "endpoint",
@@ -210,6 +216,9 @@ func Test_emailProviderToProviderPb(t *testing.T) {
 						Host:           "host",
 						User:           "user",
 						ReplyToAddress: "address",
+						Auth: &settings_pb.EmailProviderSMTP_Plain{
+							Plain: &settings_pb.SMTPPlainAuth{},
+						},
 					},
 				},
 			},
@@ -254,7 +263,7 @@ func Test_emailProviderToProviderPb(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := emailProviderToProviderPb(tt.args.req)
-			assert.Equal(t, tt.res, got)
+			assert.EqualValues(t, tt.res, got)
 		})
 	}
 }
@@ -363,6 +372,7 @@ func Test_smtpToPb(t *testing.T) {
 					TLS:            true,
 					Host:           "host",
 					User:           "user",
+					PlainAuth:      &query.PlainAuth{},
 					ReplyToAddress: "address",
 				},
 			},
@@ -374,6 +384,87 @@ func Test_smtpToPb(t *testing.T) {
 					Host:           "host",
 					User:           "user",
 					ReplyToAddress: "address",
+					Auth: &settings_pb.EmailProviderSMTP_Plain{
+						Plain: &settings_pb.SMTPPlainAuth{},
+					},
+				},
+			},
+		},
+		{
+			name: "legacy auth must still be supported",
+			args: args{
+				req: &query.SMTP{
+					User:      "user",
+					PlainAuth: &query.PlainAuth{},
+				},
+			},
+			res: &settings_pb.EmailProvider_Smtp{
+				Smtp: &settings_pb.EmailProviderSMTP{
+					User: "user",
+					Auth: &settings_pb.EmailProviderSMTP_Plain{
+						Plain: &settings_pb.SMTPPlainAuth{},
+					},
+				},
+			},
+		},
+		{
+			name: "no auth must map to none",
+			args: args{
+				req: &query.SMTP{},
+			},
+			res: &settings_pb.EmailProvider_Smtp{
+				Smtp: &settings_pb.EmailProviderSMTP{
+					Auth: &settings_pb.EmailProviderSMTP_None{
+						None: &settings_pb.SMTPNoAuth{},
+					},
+				},
+			},
+		},
+		{
+			name: "plain auth must map to plain",
+			args: args{
+				req: &query.SMTP{
+					User:      "plain-user",
+					PlainAuth: &query.PlainAuth{},
+				},
+			},
+			res: &settings_pb.EmailProvider_Smtp{
+				Smtp: &settings_pb.EmailProviderSMTP{
+					User: "plain-user",
+					Auth: &settings_pb.EmailProviderSMTP_Plain{
+						Plain: &settings_pb.SMTPPlainAuth{},
+					},
+				},
+			},
+		},
+		{
+			name: "xoauth2 auth must map to xoauth2",
+			args: args{
+				req: &query.SMTP{
+					User: "xoauth2-user",
+					XOAuth2Auth: &query.XOAuth2Auth{
+						TokenEndpoint: "auth.example.com/token",
+						Scopes:        []string{"scopes"},
+						ClientCredentials: &query.XOAuthClientCredentials{
+							ClientId: "my-client",
+						},
+					},
+				},
+			},
+			res: &settings_pb.EmailProvider_Smtp{
+				Smtp: &settings_pb.EmailProviderSMTP{
+					User: "xoauth2-user",
+					Auth: &settings_pb.EmailProviderSMTP_Xoauth2{
+						Xoauth2: &settings_pb.SMTPXOAuth2Auth{
+							TokenEndpoint: "auth.example.com/token",
+							Scopes:        []string{"scopes"},
+							OAuth2Type: &settings_pb.SMTPXOAuth2Auth_ClientCredentials_{
+								ClientCredentials: &settings_pb.SMTPXOAuth2Auth_ClientCredentials{
+									ClientId: "my-client",
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -412,15 +503,88 @@ func Test_addEmailProviderSMTPToConfig(t *testing.T) {
 				},
 			},
 			res: &command.AddSMTPConfig{
-				ResourceOwner:  "instance",
-				Description:    "description",
-				Host:           "host",
-				User:           "user",
-				Password:       "password",
+				ResourceOwner: "instance",
+				Description:   "description",
+				Host:          "host",
+				User:          "user",
+				PlainAuth: &command.PlainAuth{
+					Password: "password",
+				},
 				Tls:            true,
 				From:           "sender",
 				FromName:       "sendername",
 				ReplyToAddress: "address",
+			},
+		},
+		{
+			name: "legacy auth (username password) should map to plain",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.AddEmailProviderSMTPRequest{
+					User:     "user",
+					Password: "password",
+				},
+			},
+			res: &command.AddSMTPConfig{
+				ResourceOwner: "instance",
+				User:          "user",
+				PlainAuth: &command.PlainAuth{
+					Password: "password",
+				},
+			},
+		},
+		{
+			name: "plain auth should map to plain",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.AddEmailProviderSMTPRequest{
+					User: "plain-user",
+					Auth: &admin_pb.AddEmailProviderSMTPRequest_Plain{
+						Plain: &admin_pb.SMTPPlainAuth{
+							Password: "other_password",
+						},
+					},
+				},
+			},
+			res: &command.AddSMTPConfig{
+				ResourceOwner: "instance",
+				User:          "plain-user",
+				PlainAuth: &command.PlainAuth{
+					Password: "other_password",
+				},
+			},
+		},
+		{
+			name: "xoauth2 auth should map to xoauth2",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.AddEmailProviderSMTPRequest{
+					User: "xoauth2-user",
+					Auth: &admin_pb.AddEmailProviderSMTPRequest_Xoauth2{
+						Xoauth2: &admin_pb.SMTPXOAuth2Auth{
+							TokenEndpoint: "auth.example.com/token",
+							Scopes:        []string{"scopes"},
+							OAuth2Type: &admin_pb.SMTPXOAuth2Auth_ClientCredentials_{
+								ClientCredentials: &admin_pb.SMTPXOAuth2Auth_ClientCredentials{
+									ClientId:     "my-client",
+									ClientSecret: "some-secret",
+								},
+							},
+						},
+					},
+				},
+			},
+			res: &command.AddSMTPConfig{
+				ResourceOwner: "instance",
+				User:          "xoauth2-user",
+				XOAuth2Auth: &command.XOAuth2Auth{
+					TokenEndpoint: "auth.example.com/token",
+					Scopes:        []string{"scopes"},
+					ClientCredentialsAuth: &command.OAuth2ClientCredentials{
+						ClientId:     "my-client",
+						ClientSecret: "some-secret",
+					},
+				},
 			},
 		},
 	}
@@ -459,16 +623,95 @@ func Test_updateEmailProviderSMTPToConfig(t *testing.T) {
 				},
 			},
 			res: &command.ChangeSMTPConfig{
-				ResourceOwner:  "instance",
-				ID:             "id",
-				Description:    "description",
-				Host:           "host",
-				User:           "user",
-				Password:       "password",
+				ResourceOwner: "instance",
+				ID:            "id",
+				Description:   "description",
+				Host:          "host",
+				User:          "user",
+				PlainAuth: &command.PlainAuth{
+					Password: "password",
+				},
 				Tls:            true,
 				From:           "sender",
 				FromName:       "sendername",
 				ReplyToAddress: "address",
+			},
+		},
+		{
+			name: "legacy auth (username password) should map to plain",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.UpdateEmailProviderSMTPRequest{
+					User:     "user",
+					Password: "password",
+					Id:       "id",
+				},
+			},
+			res: &command.ChangeSMTPConfig{
+				ResourceOwner: "instance",
+				ID:            "id",
+				User:          "user",
+				PlainAuth: &command.PlainAuth{
+					Password: "password",
+				},
+			},
+		},
+		{
+			name: "plain auth should map to plain",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.UpdateEmailProviderSMTPRequest{
+					Id:   "id",
+					User: "plain-user",
+					Auth: &admin_pb.UpdateEmailProviderSMTPRequest_Plain{
+						Plain: &admin_pb.SMTPPlainAuth{
+							Password: "other_password",
+						},
+					},
+				},
+			},
+			res: &command.ChangeSMTPConfig{
+				ResourceOwner: "instance",
+				ID:            "id",
+				User:          "plain-user",
+				PlainAuth: &command.PlainAuth{
+					Password: "other_password",
+				},
+			},
+		},
+		{
+			name: "xoauth2 auth should map to xoauth2",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.UpdateEmailProviderSMTPRequest{
+					Id:   "id",
+					User: "xoauth2-user",
+					Auth: &admin_pb.UpdateEmailProviderSMTPRequest_Xoauth2{
+						Xoauth2: &admin_pb.SMTPXOAuth2Auth{
+							TokenEndpoint: "auth.example.com/token",
+							Scopes:        []string{"scopes"},
+							OAuth2Type: &admin_pb.SMTPXOAuth2Auth_ClientCredentials_{
+								ClientCredentials: &admin_pb.SMTPXOAuth2Auth_ClientCredentials{
+									ClientId:     "my-client",
+									ClientSecret: "some-secret",
+								},
+							},
+						},
+					},
+				},
+			},
+			res: &command.ChangeSMTPConfig{
+				ResourceOwner: "instance",
+				ID:            "id",
+				User:          "xoauth2-user",
+				XOAuth2Auth: &command.XOAuth2Auth{
+					TokenEndpoint: "auth.example.com/token",
+					Scopes:        []string{"scopes"},
+					ClientCredentialsAuth: &command.OAuth2ClientCredentials{
+						ClientId:     "my-client",
+						ClientSecret: "some-secret",
+					},
+				},
 			},
 		},
 	}
@@ -548,6 +791,125 @@ func Test_updateEmailProviderHTTPToConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := updateEmailProviderHTTPToConfig(tt.args.ctx, tt.args.req)
+			assert.Equal(t, tt.res, got)
+		})
+	}
+}
+
+func Test_testEmailProviderSMTPToConfig(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		req *admin_pb.TestEmailProviderSMTPRequest
+	}
+	tests := []struct {
+		name string
+		args args
+		res  *smtp.Config
+	}{
+		{
+			name: "all fields filled",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.TestEmailProviderSMTPRequest{
+					SenderAddress: "sender",
+					SenderName:    "sendername",
+					Tls:           true,
+					Host:          "host",
+					User:          "user",
+					Password:      "password",
+				},
+			},
+			res: &smtp.Config{
+				Tls:      true,
+				From:     "sender",
+				FromName: "sendername",
+				SMTP: smtp.SMTP{
+					Host: "host",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "user",
+						Password: "password",
+					},
+				},
+			},
+		},
+		{
+			name: "legacy auth (username password) should map to plain",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.TestEmailProviderSMTPRequest{
+					User:     "user",
+					Password: "password",
+				},
+			},
+			res: &smtp.Config{
+				SMTP: smtp.SMTP{
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "user",
+						Password: "password",
+					},
+				},
+			},
+		},
+		{
+			name: "plain auth should map to plain",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.TestEmailProviderSMTPRequest{
+					User: "plain-user",
+					Auth: &admin_pb.TestEmailProviderSMTPRequest_Plain{
+						Plain: &admin_pb.SMTPPlainAuth{
+							Password: "other_password",
+						},
+					},
+				},
+			},
+			res: &smtp.Config{
+				SMTP: smtp.SMTP{
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "plain-user",
+						Password: "other_password",
+					},
+				},
+			},
+		},
+		{
+			name: "xoauth2 auth should map to xoauth2",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.TestEmailProviderSMTPRequest{
+					User: "xoauth2-user",
+					Auth: &admin_pb.TestEmailProviderSMTPRequest_Xoauth2{
+						Xoauth2: &admin_pb.SMTPXOAuth2Auth{
+							TokenEndpoint: "auth.example.com/token",
+							Scopes:        []string{"scopes"},
+							OAuth2Type: &admin_pb.SMTPXOAuth2Auth_ClientCredentials_{
+								ClientCredentials: &admin_pb.SMTPXOAuth2Auth_ClientCredentials{
+									ClientId:     "my-client",
+									ClientSecret: "some-secret",
+								},
+							},
+						},
+					},
+				},
+			},
+			res: &smtp.Config{
+				SMTP: smtp.SMTP{
+					XOAuth2Auth: &smtp.XOAuth2AuthConfig{
+						User:          "xoauth2-user",
+						TokenEndpoint: "auth.example.com/token",
+						Scopes:        []string{"scopes"},
+						ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+							ClientId:     "my-client",
+							ClientSecret: "some-secret",
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := testEmailProviderSMTPToConfig(tt.args.req)
 			assert.Equal(t, tt.res, got)
 		})
 	}

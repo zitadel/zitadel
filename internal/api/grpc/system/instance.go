@@ -83,7 +83,7 @@ func (s *Server) CreateInstance(ctx context.Context, req *system_pb.CreateInstan
 }
 
 func (s *Server) RemoveInstance(ctx context.Context, req *system_pb.RemoveInstanceRequest) (*system_pb.RemoveInstanceResponse, error) {
-	details, err := s.command.RemoveInstance(ctx, req.InstanceId)
+	details, err := s.command.RemoveInstance(ctx, req.InstanceId, true)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func (s *Server) AddDomain(ctx context.Context, req *system_pb.AddDomainRequest)
 }
 
 func (s *Server) RemoveDomain(ctx context.Context, req *system_pb.RemoveDomainRequest) (*system_pb.RemoveDomainResponse, error) {
-	details, err := s.command.RemoveInstanceDomain(ctx, req.Domain)
+	details, err := s.command.RemoveInstanceDomain(ctx, req.Domain, true)
 	if err != nil {
 		return nil, err
 	}

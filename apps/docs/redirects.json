@@ -1,0 +1,3217 @@
+[
+  {
+    "source": "/apis/resources/action_service_v2",
+    "destination": "/reference/api/action",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/action_service_v2/action-service-create-target",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.CreateTarget",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/action_service_v2/action-service-delete-target",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.DeleteTarget",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/action_service_v2/action-service-get-target",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.GetTarget",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/action_service_v2/action-service-list-execution-functions",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.ListExecutionFunctions",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/action_service_v2/action-service-list-execution-methods",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.ListExecutionMethods",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/action_service_v2/action-service-list-execution-services",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.ListExecutionServices",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/action_service_v2/action-service-list-executions",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.ListExecutions",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/action_service_v2/action-service-list-targets",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.ListTargets",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/action_service_v2/action-service-set-execution",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.SetExecution",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/action_service_v2/action-service-update-target",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.UpdateTarget",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin",
+    "destination": "/reference/api/admin",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-activate-email-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ActivateEmailProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-activate-feature-login-default-org",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ActivateFeatureLoginDefaultOrg",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-activate-label-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ActivateLabelPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-apple-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddAppleProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-custom-domain-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddCustomDomainPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-email-provider-http",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddEmailProviderHTTP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-email-provider-smtp",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddEmailProviderSMTP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-git-hub-enterprise-server-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddGitHubEnterpriseServerProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-git-hub-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddGitHubProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-git-lab-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddGitLabProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-git-lab-self-hosted-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddGitLabSelfHostedProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-google-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddGoogleProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-instance-trusted-domain",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-jwtidp",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddJWTIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-multi-factor-to-login-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddMultiFactorToLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-notification-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddNotificationPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-oidcidp",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddOIDCIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-add-second-factor-to-login-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddSecondFactorToLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-deactivate-email-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.DeactivateEmailProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-deactivate-idp",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.DeactivateIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-delete-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.DeleteProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-export-data",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ExportData",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-allowed-languages",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetAllowedLanguages",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-custom-domain-claimed-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetCustomDomainClaimedMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-custom-domain-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetCustomDomainPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-custom-init-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetCustomInitMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-custom-invite-user-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetCustomInviteUserMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-custom-login-texts",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetCustomLoginTexts",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-custom-password-change-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetCustomPasswordChangeMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-custom-password-reset-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetCustomPasswordResetMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-custom-passwordless-registration-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetCustomPasswordlessRegistrationMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-custom-verify-email-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetCustomVerifyEmailMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-custom-verify-phone-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetCustomVerifyPhoneMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-default-domain-claimed-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDefaultDomainClaimedMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-default-init-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDefaultInitMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-default-invite-user-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDefaultInviteUserMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-default-language",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDefaultLanguage",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-default-login-texts",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDefaultLoginTexts",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-default-org",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDefaultOrg",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-default-password-change-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDefaultPasswordChangeMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-default-password-reset-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDefaultPasswordResetMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-default-passwordless-registration-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDefaultPasswordlessRegistrationMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-default-verify-email-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDefaultVerifyEmailMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-default-verify-phone-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDefaultVerifyPhoneMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-domain-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetDomainPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-email-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetEmailProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-email-provider-by-id",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetEmailProviderById",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-file-system-notification-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetFileSystemNotificationProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-label-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetLabelPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-lockout-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetLockoutPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-log-notification-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetLogNotificationProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-login-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-my-instance",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetMyInstance",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-notification-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetNotificationPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-org-by-id",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetOrgByID",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-password-age-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetPasswordAgePolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-password-complexity-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetPasswordComplexityPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-preview-label-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetPreviewLabelPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-privacy-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetPrivacyPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-provider-by-id",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetProviderByID",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-restrictions",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetRestrictions",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-secret-generator",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetSecretGenerator",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-security-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetSecurityPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-get-supported-languages",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetSupportedLanguages",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-healthz",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.Healthz",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-import-data",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ImportData",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-is-org-unique",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.IsOrgUnique",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-aggregate-types",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListAggregateTypes",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-email-providers",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListEmailProviders",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-event-types",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListEventTypes",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-events",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListEvents",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-failed-events",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListFailedEvents",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-instance-domains",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListInstanceDomains",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-instance-trusted-domains",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListInstanceTrustedDomains",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-login-policy-multi-factors",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListLoginPolicyMultiFactors",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-login-policy-second-factors",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListLoginPolicySecondFactors",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-milestones",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListMilestones",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-orgs",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListOrgs",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-providers",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListProviders",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-secret-generators",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListSecretGenerators",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-list-views",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListViews",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-reactivate-idp",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ReactivateIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-email-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveEmailProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-failed-event",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveFailedEvent",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-idp",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-instance-trusted-domain",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveInstanceTrustedDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-label-policy-font",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveLabelPolicyFont",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-label-policy-icon",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveLabelPolicyIcon",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-label-policy-icon-dark",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveLabelPolicyIconDark",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-label-policy-logo",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveLabelPolicyLogo",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-label-policy-logo-dark",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveLabelPolicyLogoDark",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-multi-factor-from-login-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveMultiFactorFromLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-org",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveOrg",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-remove-second-factor-from-login-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.RemoveSecondFactorFromLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-reset-custom-domain-claimed-message-text-to-default",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ResetCustomDomainClaimedMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-reset-custom-domain-policy-to-default",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ResetCustomDomainPolicyToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-reset-custom-init-message-text-to-default",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ResetCustomInitMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-reset-custom-invite-user-message-text-to-default",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ResetCustomInviteUserMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-reset-custom-login-text-to-default",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ResetCustomLoginTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-reset-custom-password-change-message-text-to-default",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ResetCustomPasswordChangeMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-reset-custom-password-reset-message-text-to-default",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ResetCustomPasswordResetMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-reset-custom-passwordless-registration-message-text-to-default",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ResetCustomPasswordlessRegistrationMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-reset-custom-verify-email-message-text-to-default",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ResetCustomVerifyEmailMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-reset-custom-verify-phone-message-text-to-default",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ResetCustomVerifyPhoneMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-custom-login-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetCustomLoginText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-default-domain-claimed-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetDefaultDomainClaimedMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-default-init-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetDefaultInitMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-default-invite-user-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetDefaultInviteUserMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-default-language",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetDefaultLanguage",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-default-org",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetDefaultOrg",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-default-password-change-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetDefaultPasswordChangeMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-default-password-reset-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetDefaultPasswordResetMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-default-passwordless-registration-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetDefaultPasswordlessRegistrationMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-default-verify-email-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetDefaultVerifyEmailMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-default-verify-phone-message-text",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetDefaultVerifyPhoneMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-restrictions",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetRestrictions",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-security-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetSecurityPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-set-up-org",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetUpOrg",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-test-email-provider-smtp",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.TestEmailProviderSMTP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-apple-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateAppleProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-custom-domain-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateCustomDomainPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-domain-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateDomainPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-email-provider-http",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateEmailProviderHTTP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-email-provider-smtp",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateEmailProviderSMTP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-git-hub-enterprise-server-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateGitHubEnterpriseServerProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-git-hub-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateGitHubProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-git-lab-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateGitLabProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-git-lab-self-hosted-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateGitLabSelfHostedProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-google-provider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateGoogleProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-idp",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-label-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateLabelPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-lockout-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateLockoutPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-login-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-notification-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateNotificationPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-password-age-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdatePasswordAgePolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-password-complexity-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdatePasswordComplexityPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-privacy-policy",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdatePrivacyPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/admin/admin-service-update-secret-generator",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateSecretGenerator",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2",
+    "destination": "/reference/api/application",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-create-application",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplication",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-create-application-key",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplicationKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-deactivate-application",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.DeactivateApplication",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-delete-application",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplication",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-delete-application-key",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplicationKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-generate-client-secret",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-get-application",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.GetApplication",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-get-application-key",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.GetApplicationKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-list-application-keys",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.ListApplicationKeys",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-list-applications",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.ListApplications",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-reactivate-application",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.ReactivateApplication",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/application_service_v2/zitadel-application-v-2-application-service-update-application",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.UpdateApplication",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth",
+    "destination": "/reference/api/auth",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-add-my-auth-factor-otp",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.AddMyAuthFactorOTP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-add-my-auth-factor-otpsms",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.AddMyAuthFactorOTPSMS",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-add-my-passwordless",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.AddMyPasswordless",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-add-my-passwordless-link",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.AddMyPasswordlessLink",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-get-my-email",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.GetMyEmail",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-get-my-label-policy",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.GetMyLabelPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-get-my-login-policy",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.GetMyLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-get-my-metadata",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.GetMyMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-get-my-password-complexity-policy",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.GetMyPasswordComplexityPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-get-my-phone",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.GetMyPhone",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-get-my-privacy-policy",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.GetMyPrivacyPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-get-my-profile",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.GetMyProfile",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-get-my-user",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.GetMyUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-get-supported-languages",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.GetSupportedLanguages",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-healthz",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.Healthz",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-list-my-auth-factors",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyAuthFactors",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-list-my-memberships",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyMemberships",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-list-my-metadata",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-list-my-passwordless",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyPasswordless",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-list-my-project-orgs",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyProjectOrgs",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-list-my-project-permissions",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyProjectPermissions",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-list-my-refresh-tokens",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyRefreshTokens",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-list-my-user-changes",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyUserChanges",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-list-my-user-grants",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyUserGrants",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-list-my-user-sessions",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyUserSessions",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-list-my-zitadel-permissions",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyZitadelPermissions",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-remove-my-auth-factor-otp",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.RemoveMyAuthFactorOTP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-remove-my-auth-factor-otpsms",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.RemoveMyAuthFactorOTPSMS",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-remove-my-avatar",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.RemoveMyAvatar",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-remove-my-linked-idp",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.RemoveMyLinkedIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-remove-my-passwordless",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.RemoveMyPasswordless",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-remove-my-phone",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.RemoveMyPhone",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-remove-my-user",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.RemoveMyUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-resend-my-email-verification",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ResendMyEmailVerification",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-resend-my-phone-verification",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ResendMyPhoneVerification",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-revoke-all-my-refresh-tokens",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.RevokeAllMyRefreshTokens",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-revoke-my-refresh-token",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.RevokeMyRefreshToken",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-send-my-passwordless-link",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.SendMyPasswordlessLink",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-set-my-email",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.SetMyEmail",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-set-my-phone",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.SetMyPhone",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-update-my-password",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.UpdateMyPassword",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-update-my-profile",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.UpdateMyProfile",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-update-my-user-name",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.UpdateMyUserName",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-verify-my-auth-factor-otp",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.VerifyMyAuthFactorOTP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-verify-my-email",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.VerifyMyEmail",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-verify-my-passwordless",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.VerifyMyPasswordless",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/auth/auth-service-verify-my-phone",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.VerifyMyPhone",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/authorization_service_v2",
+    "destination": "/reference/api/authorization",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-activate-authorization",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ActivateAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-create-authorization",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.CreateAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-deactivate-authorization",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.DeactivateAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-delete-authorization",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.DeleteAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-list-authorizations",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-update-authorization",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.UpdateAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2",
+    "destination": "/reference/api/feature",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-get-instance-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.GetInstanceFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-get-organization-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.GetOrganizationFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-get-system-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.GetSystemFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-get-user-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.GetUserFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-reset-instance-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.ResetInstanceFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-reset-organization-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.ResetOrganizationFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-reset-system-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.ResetSystemFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-reset-user-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.ResetUserFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-set-instance-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-set-organization-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.SetOrganizationFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-set-system-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.SetSystemFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/feature_service_v2/feature-service-set-user-features",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.SetUserFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/idp_service_v2",
+    "destination": "/reference/api/idp",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/instance_service_v2",
+    "destination": "/reference/api/instance",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-add-custom-domain",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.AddCustomDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-add-trusted-domain",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.AddTrustedDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-delete-instance",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.DeleteInstance",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-get-instance",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.GetInstance",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-list-custom-domains",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.ListCustomDomains",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-list-instances",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.ListInstances",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-list-trusted-domains",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.ListTrustedDomains",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-remove-custom-domain",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.RemoveCustomDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-remove-trusted-domain",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.RemoveTrustedDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-update-instance",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.UpdateInstance",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/internal_permission_service_v2",
+    "destination": "/reference/api/internal_permission",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-create-administrator",
+    "destination": "/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-delete-administrator",
+    "destination": "/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.DeleteAdministrator",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-list-administrators",
+    "destination": "/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-update-administrator",
+    "destination": "/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.UpdateAdministrator",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt",
+    "destination": "/reference/api/management",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-activate-custom-label-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ActivateCustomLabelPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-app-key",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddAppKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-apple-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddAppleProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-custom-label-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddCustomLabelPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-custom-lockout-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddCustomLockoutPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-custom-login-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddCustomLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-custom-notification-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddCustomNotificationPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-custom-password-age-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddCustomPasswordAgePolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-custom-password-complexity-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddCustomPasswordComplexityPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-custom-privacy-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddCustomPrivacyPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-git-hub-enterprise-server-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddGitHubEnterpriseServerProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-git-hub-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddGitHubProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-git-lab-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddGitLabProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-git-lab-self-hosted-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddGitLabSelfHostedProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-google-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddGoogleProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-human-user",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddHumanUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-machine-key",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddMachineKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-machine-user",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddMachineUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-multi-factor-to-login-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddMultiFactorToLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-org",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddOrg",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-org-domain",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddOrgDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-org-jwtidp",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddOrgJWTIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-org-member",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddOrgMember",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-org-oidcidp",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddOrgOIDCIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-passwordless-registration",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddPasswordlessRegistration",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-personal-access-token",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddPersonalAccessToken",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-project",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddProject",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-project-grant",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-project-grant-member",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddProjectGrantMember",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-project-member",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddProjectMember",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-project-role",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddProjectRole",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-second-factor-to-login-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddSecondFactorToLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-add-user-grant",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddUserGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-bulk-add-project-roles",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.BulkAddProjectRoles",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-bulk-remove-org-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.BulkRemoveOrgMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-bulk-remove-user-grant",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.BulkRemoveUserGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-bulk-remove-user-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.BulkRemoveUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-bulk-set-org-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.BulkSetOrgMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-bulk-set-user-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.BulkSetUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-clear-flow",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ClearFlow",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-create-action",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.CreateAction",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-deactivate-action",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.DeactivateAction",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-deactivate-app",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.DeactivateApp",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-deactivate-org",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.DeactivateOrg",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-deactivate-org-idp",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.DeactivateOrgIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-deactivate-project",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.DeactivateProject",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-deactivate-project-grant",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.DeactivateProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-deactivate-user",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.DeactivateUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-deactivate-user-grant",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.DeactivateUserGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-delete-action",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.DeleteAction",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-delete-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.DeleteProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-generate-machine-secret",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GenerateMachineSecret",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-generate-org-domain-validation",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GenerateOrgDomainValidation",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-action",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetAction",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-app-by-id",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetAppByID",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-app-key",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetAppKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-custom-domain-claimed-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetCustomDomainClaimedMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-custom-init-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetCustomInitMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-custom-invite-user-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetCustomInviteUserMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-custom-login-texts",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetCustomLoginTexts",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-custom-password-change-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetCustomPasswordChangeMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-custom-password-reset-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetCustomPasswordResetMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-custom-passwordless-registration-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetCustomPasswordlessRegistrationMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-custom-verify-email-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetCustomVerifyEmailMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-custom-verify-phone-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetCustomVerifyPhoneMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-domain-claimed-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultDomainClaimedMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-init-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultInitMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-invite-user-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultInviteUserMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-label-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultLabelPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-lockout-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultLockoutPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-login-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-login-texts",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultLoginTexts",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-notification-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultNotificationPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-password-age-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultPasswordAgePolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-password-change-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultPasswordChangeMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-password-complexity-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultPasswordComplexityPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-password-reset-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultPasswordResetMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-passwordless-registration-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultPasswordlessRegistrationMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-privacy-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultPrivacyPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-verify-email-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultVerifyEmailMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-default-verify-phone-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDefaultVerifyPhoneMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-domain-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetDomainPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-flow",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetFlow",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-granted-project-by-id",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetGrantedProjectByID",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-human-email",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetHumanEmail",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-human-phone",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetHumanPhone",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-human-profile",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetHumanProfile",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-iam",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetIAM",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-label-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetLabelPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-lockout-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetLockoutPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-login-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-my-org",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetMyOrg",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-notification-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetNotificationPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-org-by-domain-global",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetOrgByDomainGlobal",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-org-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetOrgMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-password-age-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetPasswordAgePolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-password-complexity-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetPasswordComplexityPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-preview-label-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetPreviewLabelPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-privacy-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetPrivacyPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-project-by-id",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetProjectByID",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-project-grant-by-id",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetProjectGrantByID",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-provider-by-id",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetProviderByID",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-supported-languages",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetSupportedLanguages",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-user-by-id",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetUserByID",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-user-by-login-name-global",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetUserByLoginNameGlobal",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-user-grant-by-id",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetUserGrantByID",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-get-user-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-healthz",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.Healthz",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-import-human-user",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ImportHumanUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-is-user-unique",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.IsUserUnique",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-actions",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListActions",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-all-project-grants",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListAllProjectGrants",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-app-changes",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListAppChanges",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-app-keys",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListAppKeys",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-apps",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListApps",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-flow-trigger-types",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListFlowTriggerTypes",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-flow-types",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListFlowTypes",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-granted-project-roles",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListGrantedProjectRoles",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-granted-projects",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListGrantedProjects",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-human-auth-factors",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListHumanAuthFactors",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-human-passwordless",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListHumanPasswordless",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-login-policy-multi-factors",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListLoginPolicyMultiFactors",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-login-policy-second-factors",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListLoginPolicySecondFactors",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-machine-keys",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListMachineKeys",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-org-changes",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListOrgChanges",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-org-domains",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListOrgDomains",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-org-member-roles",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListOrgMemberRoles",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-org-members",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListOrgMembers",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-org-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListOrgMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-personal-access-tokens",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListPersonalAccessTokens",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-project-changes",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProjectChanges",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-project-grant-changes",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProjectGrantChanges",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-project-grant-member-roles",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProjectGrantMemberRoles",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-project-grant-members",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProjectGrantMembers",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-project-grants",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProjectGrants",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-project-member-roles",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProjectMemberRoles",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-project-members",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProjectMembers",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-project-roles",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProjectRoles",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-projects",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProjects",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-providers",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProviders",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-user-changes",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListUserChanges",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-user-grants",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListUserGrants",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-user-memberships",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListUserMemberships",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-user-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-list-users",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListUsers",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-lock-user",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.LockUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reactivate-action",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ReactivateAction",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reactivate-app",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ReactivateApp",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reactivate-org",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ReactivateOrg",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reactivate-org-idp",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ReactivateOrgIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reactivate-project",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ReactivateProject",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reactivate-project-grant",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ReactivateProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reactivate-user",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ReactivateUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reactivate-user-grant",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ReactivateUserGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-app",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveApp",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-app-key",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveAppKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-custom-label-policy-font",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveCustomLabelPolicyFont",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-custom-label-policy-icon",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveCustomLabelPolicyIcon",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-custom-label-policy-icon-dark",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveCustomLabelPolicyIconDark",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-custom-label-policy-logo",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveCustomLabelPolicyLogo",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-custom-label-policy-logo-dark",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveCustomLabelPolicyLogoDark",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-human-auth-factor-otp",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveHumanAuthFactorOTP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-human-auth-factor-otpsms",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveHumanAuthFactorOTPSMS",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-human-avatar",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveHumanAvatar",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-human-linked-idp",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveHumanLinkedIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-human-passwordless",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveHumanPasswordless",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-human-phone",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveHumanPhone",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-machine-key",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveMachineKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-machine-secret",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveMachineSecret",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-multi-factor-from-login-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveMultiFactorFromLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-org",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveOrg",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-org-domain",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveOrgDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-org-idp",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveOrgIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-org-member",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveOrgMember",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-org-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveOrgMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-personal-access-token",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemovePersonalAccessToken",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-project",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveProject",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-project-grant",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-project-grant-member",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveProjectGrantMember",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-project-member",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveProjectMember",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-project-role",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveProjectRole",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-second-factor-from-login-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveSecondFactorFromLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-user",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-user-grant",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveUserGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-remove-user-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.RemoveUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-resend-human-email-verification",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResendHumanEmailVerification",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-resend-human-initialization",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResendHumanInitialization",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-resend-human-phone-verification",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResendHumanPhoneVerification",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-custom-domain-claimed-message-text-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetCustomDomainClaimedMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-custom-init-message-text-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetCustomInitMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-custom-invite-user-message-text-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetCustomInviteUserMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-custom-login-text-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetCustomLoginTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-custom-password-change-message-text-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetCustomPasswordChangeMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-custom-password-reset-message-text-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetCustomPasswordResetMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-custom-passwordless-registration-message-text-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetCustomPasswordlessRegistrationMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-custom-verify-email-message-text-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetCustomVerifyEmailMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-custom-verify-phone-message-text-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetCustomVerifyPhoneMessageTextToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-label-policy-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetLabelPolicyToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-lockout-policy-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetLockoutPolicyToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-login-policy-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetLoginPolicyToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-notification-policy-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetNotificationPolicyToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-password-age-policy-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetPasswordAgePolicyToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-password-complexity-policy-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetPasswordComplexityPolicyToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-reset-privacy-policy-to-default",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ResetPrivacyPolicyToDefault",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-send-human-reset-password-notification",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SendHumanResetPasswordNotification",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-send-passwordless-registration",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SendPasswordlessRegistration",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-custom-domain-claimed-message-custom-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetCustomDomainClaimedMessageCustomText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-custom-init-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetCustomInitMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-custom-invite-user-message-custom-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetCustomInviteUserMessageCustomText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-custom-login-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetCustomLoginText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-custom-password-change-message-custom-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetCustomPasswordChangeMessageCustomText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-custom-password-reset-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetCustomPasswordResetMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-custom-passwordless-registration-message-custom-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetCustomPasswordlessRegistrationMessageCustomText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-custom-verify-email-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetCustomVerifyEmailMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-custom-verify-phone-message-text",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetCustomVerifyPhoneMessageText",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-human-initial-password",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetHumanInitialPassword",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-human-password",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetHumanPassword",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-org-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetOrgMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-primary-org-domain",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetPrimaryOrgDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-trigger-actions",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetTriggerActions",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-set-user-metadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-unlock-user",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UnlockUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-action",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateAction",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-app",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateApp",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-apple-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateAppleProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-custom-label-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateCustomLabelPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-custom-lockout-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateCustomLockoutPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-custom-login-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateCustomLoginPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-custom-notification-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateCustomNotificationPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-custom-password-age-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateCustomPasswordAgePolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-custom-password-complexity-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateCustomPasswordComplexityPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-custom-privacy-policy",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateCustomPrivacyPolicy",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-git-hub-enterprise-server-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateGitHubEnterpriseServerProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-git-hub-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateGitHubProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-git-lab-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateGitLabProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-git-lab-self-hosted-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateGitLabSelfHostedProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-google-provider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateGoogleProvider",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-human-email",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateHumanEmail",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-human-phone",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateHumanPhone",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-human-profile",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateHumanProfile",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-machine",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateMachine",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-org",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateOrg",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-org-idp",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateOrgIDP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-org-member",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateOrgMember",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-project",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateProject",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-project-grant",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-project-grant-member",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateProjectGrantMember",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-project-member",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateProjectMember",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-project-role",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateProjectRole",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-user-grant",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateUserGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-update-user-name",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateUserName",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/mgmt/management-service-validate-org-domain",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ValidateOrgDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/oidc_service_v2",
+    "destination": "/reference/api/oidc",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/oidc_service_v2/oidc-service-authorize-or-deny-device-authorization",
+    "destination": "/reference/api/oidc/zitadel.oidc.v2.OIDCService.AuthorizeOrDenyDeviceAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/oidc_service_v2/oidc-service-create-callback",
+    "destination": "/reference/api/oidc/zitadel.oidc.v2.OIDCService.CreateCallback",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/oidc_service_v2/oidc-service-get-auth-request",
+    "destination": "/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetAuthRequest",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/oidc_service_v2/oidc-service-get-device-authorization-request",
+    "destination": "/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetDeviceAuthorizationRequest",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/org_service_v2/zitadel-org-v-2-organization-service-add-organization",
+    "destination": "/reference/api/org/zitadel.org.v2.OrganizationService.AddOrganization",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/org_service_v2/zitadel-org-v-2-organization-service-list-organizations",
+    "destination": "/reference/api/org/zitadel.org.v2.OrganizationService.ListOrganizations",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2",
+    "destination": "/reference/api/project",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-activate-project",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.ActivateProject",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-activate-project-grant",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.ActivateProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-add-project-role",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.AddProjectRole",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-create-project",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.CreateProject",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-create-project-grant",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.CreateProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-deactivate-project",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.DeactivateProject",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-deactivate-project-grant",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.DeactivateProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-delete-project",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.DeleteProject",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-delete-project-grant",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.DeleteProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-get-project",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.GetProject",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-list-project-grants",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.ListProjectGrants",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-list-project-roles",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.ListProjectRoles",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-list-projects",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.ListProjects",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-remove-project-role",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.RemoveProjectRole",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-update-project",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.UpdateProject",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-update-project-grant",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.UpdateProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/project_service_v2/zitadel-project-v-2-project-service-update-project-role",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.UpdateProjectRole",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/saml_service_v2",
+    "destination": "/reference/api/saml",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/saml_service_v2/saml-service-create-response",
+    "destination": "/reference/api/saml/zitadel.saml.v2.SAMLService.CreateResponse",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/session_service_v2",
+    "destination": "/reference/api/session",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/session_service_v2/session-service-create-session",
+    "destination": "/reference/api/session/zitadel.session.v2.SessionService.CreateSession",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/session_service_v2/session-service-delete-session",
+    "destination": "/reference/api/session/zitadel.session.v2.SessionService.DeleteSession",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/session_service_v2/session-service-get-session",
+    "destination": "/reference/api/session/zitadel.session.v2.SessionService.GetSession",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/session_service_v2/session-service-list-sessions",
+    "destination": "/reference/api/session/zitadel.session.v2.SessionService.ListSessions",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/session_service_v2/session-service-set-session",
+    "destination": "/reference/api/session/zitadel.session.v2.SessionService.SetSession",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2",
+    "destination": "/reference/api/settings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-delete-organization-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.DeleteOrganizationSettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-get-active-identity-providers",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetActiveIdentityProviders",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-get-branding-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetBrandingSettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-get-domain-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetDomainSettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-get-general-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetGeneralSettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-get-hosted-login-translation",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetHostedLoginTranslation",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-get-legal-and-support-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetLegalAndSupportSettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-get-lockout-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetLockoutSettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-get-login-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetLoginSettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-get-password-complexity-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetPasswordComplexitySettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-get-password-expiry-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetPasswordExpirySettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-get-security-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetSecuritySettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-list-organization-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.ListOrganizationSettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-set-hosted-login-translation",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.SetHostedLoginTranslation",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-set-organization-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.SetOrganizationSettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/settings_service_v2/settings-service-set-security-settings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.SetSecuritySettings",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system",
+    "destination": "/reference/api/system",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-add-domain",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.AddDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-add-instance",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.AddInstance",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-add-quota",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.AddQuota",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-bulk-set-limits",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.BulkSetLimits",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-clear-view",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.ClearView",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-create-instance",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.CreateInstance",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-exists-domain",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.ExistsDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-get-instance",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.GetInstance",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-healthz",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.Healthz",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-list-domains",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.ListDomains",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-list-failed-events",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.ListFailedEvents",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-list-instances",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.ListInstances",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-list-views",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.ListViews",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-remove-domain",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.RemoveDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-remove-failed-event",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.RemoveFailedEvent",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-remove-instance",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.RemoveInstance",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-remove-quota",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.RemoveQuota",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-reset-limits",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.ResetLimits",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-set-instance-feature",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.SetInstanceFeature",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-set-limits",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.SetLimits",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-set-primary-domain",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.SetPrimaryDomain",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-set-quota",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.SetQuota",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/system/system-service-update-instance",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.UpdateInstance",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2",
+    "destination": "/reference/api/user",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-add-human-user",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddHumanUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-add-key",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-add-otpsms",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddOTPSMS",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-add-personal-access-token",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddPersonalAccessToken",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-add-secret",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddSecret",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-create-invite-code",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.CreateInviteCode",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-create-passkey-registration-link",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.CreatePasskeyRegistrationLink",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-create-user",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddHumanUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-deactivate-user",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.DeactivateUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-delete-user",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.DeleteUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-delete-user-metadata",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.DeleteUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-generate-recovery-codes",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.GenerateRecoveryCodes",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-get-user-by-id",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.GetUserByID",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-list-authentication-factors",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListAuthenticationFactors",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-list-authentication-method-types",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListAuthenticationMethodTypes",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-list-keys",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListKeys",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-list-passkeys",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListPasskeys",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-list-personal-access-tokens",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListPersonalAccessTokens",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-list-user-metadata",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-list-users",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListUsers",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-lock-user",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.LockUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-password-reset",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.PasswordReset",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-reactivate-user",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ReactivateUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-register-passkey",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RegisterPasskey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-register-totp",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RegisterTOTP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-remove-key",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-remove-otpsms",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveOTPSMS",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-remove-passkey",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemovePasskey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-remove-personal-access-token",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemovePersonalAccessToken",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-remove-phone",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemovePhone",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-remove-recovery-codes",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveRecoveryCodes",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-remove-secret",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveSecret",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-remove-totp",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveTOTP",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-resend-email-code",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ResendEmailCode",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-resend-invite-code",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ResendInviteCode",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-resend-phone-code",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ResendPhoneCode",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-retrieve-identity-provider-intent",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RetrieveIdentityProviderIntent",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-send-email-code",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.SendEmailCode",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-set-email",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.SetEmail",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-set-password",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.SetPassword",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-set-phone",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.SetPhone",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-set-user-metadata",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.SetUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-start-identity-provider-intent",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.StartIdentityProviderIntent",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-unlock-user",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.UnlockUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-update-human-user",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.UpdateHumanUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-update-user",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.UpdateHumanUser",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-verify-email",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.VerifyEmail",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-verify-invite-code",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.VerifyInviteCode",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-verify-passkey-registration",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.VerifyPasskeyRegistration",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/user_service_v2/user-service-verify-phone",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.VerifyPhone",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/webkey_service_v2",
+    "destination": "/reference/api/webkey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-activate-web-key",
+    "destination": "/reference/api/webkey/zitadel.webkey.v2.WebKeyService.ActivateWebKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-create-web-key",
+    "destination": "/reference/api/webkey/zitadel.webkey.v2.WebKeyService.CreateWebKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-delete-web-key",
+    "destination": "/reference/api/webkey/zitadel.webkey.v2.WebKeyService.DeleteWebKey",
+    "permanent": true
+  },
+  {
+    "source": "/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-list-web-keys",
+    "destination": "/reference/api/webkey/zitadel.webkey.v2.WebKeyService.ListWebKeys",
+    "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/actions",
+    "destination": "/guides/manage/console/actions-overview",
+    "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/applications",
+    "destination": "/guides/manage/console/applications-overview",
+    "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/organizations",
+    "destination": "/guides/manage/console/organizations-overview",
+    "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/projects",
+    "destination": "/guides/manage/console/projects-overview",
+    "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/users",
+    "destination": "/guides/manage/console/users-overview",
+    "permanent": true
+  },
+  {
+    "source": "/apis/actions/introduction",
+    "destination": "/guides/manage/console/actions-overview",
+    "permanent": true
+  },
+  {
+    "source": "/concepts/structure/applications",
+    "destination": "/guides/manage/console/applications-overview",
+    "permanent": true
+  },
+  {
+    "source": "/concepts/structure/organizations",
+    "destination": "/guides/manage/console/organizations-overview",
+    "permanent": true
+  },
+  {
+    "source": "/concepts/structure/projects",
+    "destination": "/guides/manage/console/projects-overview",
+    "permanent": true
+  },
+  {
+    "source": "/concepts/structure/users",
+    "destination": "/guides/manage/console/users-overview",
+    "permanent": true
+  },
+  {
+    "source": "/concepts/features/console",
+    "destination": "/guides/manage/console/console-overview",
+    "permanent": true
+  },
+  {
+    "source": "/guides/manage/console/overview",
+    "destination": "/guides/manage/console/console-overview",
+    "permanent": true
+  }
+]

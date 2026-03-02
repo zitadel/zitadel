@@ -15,29 +15,25 @@ import (
 type InstanceFeatures struct {
 	LoginDefaultOrg                *bool
 	UserSchema                     *bool
-	TokenExchange                  *bool
 	ImprovedPerformance            []feature.ImprovedPerformanceType
 	DebugOIDCParentError           *bool
 	OIDCSingleV1SessionTermination *bool
-	EnableBackChannelLogout        *bool
 	LoginV2                        *feature.LoginV2
 	PermissionCheckV2              *bool
-	ConsoleUseV2UserApi            *bool
+	ManagementConsoleUseV2UserApi  *bool
 	EnableRelationalTables         *bool
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
 	return m == nil || (m.LoginDefaultOrg == nil &&
 		m.UserSchema == nil &&
-		m.TokenExchange == nil &&
 		// nil check to allow unset improvements
 		m.ImprovedPerformance == nil &&
 		m.DebugOIDCParentError == nil &&
 		m.OIDCSingleV1SessionTermination == nil &&
-		m.EnableBackChannelLogout == nil &&
 		m.LoginV2 == nil &&
 		m.PermissionCheckV2 == nil &&
-		m.ConsoleUseV2UserApi == nil &&
+		m.ManagementConsoleUseV2UserApi == nil &&
 		m.EnableRelationalTables == nil)
 }
 
@@ -60,16 +56,11 @@ func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures)
 	return pushedEventsToObjectDetails(events), nil
 }
 
-func prepareSetFeatures(instanceID string, f *InstanceSetupFeatures) preparation.Validation {
+func prepareSetFeatures(instanceID string, f *InstanceFeatures) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		features, err := f.ToInstanceFeatures()
-		if err != nil {
-			return nil, err
-		}
-
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			wm := NewInstanceFeaturesWriteModel(instanceID)
-			return wm.setCommands(ctx, features), nil
+			return wm.setCommands(ctx, f), nil
 		}, nil
 	}
 }

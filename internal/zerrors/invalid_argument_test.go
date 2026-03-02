@@ -9,25 +9,54 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestInvalidArgumentError(t *testing.T) {
-	var invalidArgumentError interface{} = new(zerrors.InvalidArgumentError)
-	_, ok := invalidArgumentError.(zerrors.InvalidArgument)
-	assert.True(t, ok)
-}
+func TestInvalidArgument(t *testing.T) {
+	parentErr := errors.New("parent error")
+	id := "test_id"
+	message := "test message"
 
-func TestThrowInvalidArgumentf(t *testing.T) {
-	err := zerrors.ThrowInvalidArgumentf(nil, "id", "msg")
-	//nolint:errorlint
-	_, ok := err.(*zerrors.InvalidArgumentError)
-	assert.True(t, ok)
-}
+	t.Run("ThrowInvalidArgument", func(t *testing.T) {
+		err := zerrors.ThrowInvalidArgument(parentErr, id, message)
+		assert.NotNil(t, err)
 
-func TestIsErrorInvalidArgument(t *testing.T) {
-	err := zerrors.ThrowInvalidArgument(nil, "id", "msg")
-	ok := zerrors.IsErrorInvalidArgument(err)
-	assert.True(t, ok)
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindInvalidArgument, zitadelErr.Kind)
 
-	err = errors.New("I am invalid!")
-	ok = zerrors.IsErrorInvalidArgument(err)
-	assert.False(t, ok)
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, message, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("ThrowInvalidArgumentf", func(t *testing.T) {
+		format := "formatted %s"
+		arg := "message"
+		expectedMessage := "formatted message"
+
+		err := zerrors.ThrowInvalidArgumentf(parentErr, id, format, arg)
+		assert.NotNil(t, err)
+
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindInvalidArgument, zitadelErr.Kind)
+
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, expectedMessage, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("IsInvalidArgument", func(t *testing.T) {
+		err := zerrors.ThrowInvalidArgument(parentErr, id, message)
+		isInvalidArgument := zerrors.IsErrorInvalidArgument(err)
+		assert.True(t, isInvalidArgument)
+	})
 }

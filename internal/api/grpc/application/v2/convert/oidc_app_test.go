@@ -21,6 +21,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 	tt := []struct {
 		testName  string
 		projectID string
+		appID     string
 		req       *application.CreateOIDCApplicationRequest
 
 		expectedModel *domain.OIDCApp
@@ -29,6 +30,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 		{
 			testName:  "unparsable login version 2 URL",
 			projectID: "pid",
+			appID:     "aid",
 			req: &application.CreateOIDCApplicationRequest{
 				LoginVersion: &application.LoginVersion{Version: &application.LoginVersion_LoginV2{
 					LoginV2: &application.LoginV2{BaseUri: gu.Ptr("%+o")}},
@@ -44,6 +46,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 		{
 			testName:  "all fields set",
 			projectID: "project1",
+			appID:     "app1",
 			req: &application.CreateOIDCApplicationRequest{
 				RedirectUris:             []string{"https://redirect"},
 				ResponseTypes:            []application.OIDCResponseType{application.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
@@ -67,6 +70,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 			expectedModel: &domain.OIDCApp{
 				ObjectRoot:               models.ObjectRoot{AggregateID: "project1"},
 				AppName:                  "all fields set",
+				AppID:                    "app1",
 				OIDCVersion:              gu.Ptr(domain.OIDCVersionV1),
 				RedirectUris:             []string{"https://redirect"},
 				ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
@@ -94,7 +98,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 			t.Parallel()
 
 			// When
-			res, err := CreateOIDCAppRequestToDomain(tc.testName, tc.projectID, tc.req)
+			res, err := CreateOIDCAppRequestToDomain(tc.testName, tc.appID, tc.projectID, tc.req)
 
 			// Then
 			assert.Equal(t, tc.expectedError, err)

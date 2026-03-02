@@ -1,6 +1,7 @@
 "use client";
 
 import { processIDPCallback } from "@/lib/server/idp-intent";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -14,6 +15,8 @@ type Props = {
   requestId?: string;
   organization?: string;
   link?: string;
+  sessionId?: string;
+  linkFingerprint?: string;
   postErrorRedirectUrl?: string;
 };
 
@@ -21,10 +24,21 @@ type Props = {
  * Client component that handles IDP callback processing.
  * Must be client-side to allow cookie modifications via server actions.
  */
-export function IdpProcessHandler({ provider, id, token, requestId, organization, link, postErrorRedirectUrl }: Props) {
+export function IdpProcessHandler({
+  provider,
+  id,
+  token,
+  requestId,
+  organization,
+  link,
+  sessionId,
+  linkFingerprint,
+  postErrorRedirectUrl,
+}: Props) {
   const t = useTranslations("idp");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   const executedRef = useRef(false);
   const router = useRouter();
 
@@ -44,7 +58,8 @@ export function IdpProcessHandler({ provider, id, token, requestId, organization
       token,
       requestId,
       organization,
-      link,
+      sessionId,
+      linkFingerprint,
       postErrorRedirectUrl,
     })
       .then((result) => {
@@ -61,6 +76,13 @@ export function IdpProcessHandler({ provider, id, token, requestId, organization
           return;
         }
 
+        if (result.samlData) {
+          console.log("[IDP Process Handler] Received samlData, rendering AutoSubmitForm");
+          setSamlData(result.samlData);
+          setLoading(false);
+          return;
+        }
+
         setError(t("processing.noRedirect"));
         setLoading(false);
       })
@@ -69,10 +91,11 @@ export function IdpProcessHandler({ provider, id, token, requestId, organization
         setError(err instanceof Error ? err.message : t("processing.unexpectedError"));
         setLoading(false);
       });
-  }, [provider, id, token, requestId, organization, link, postErrorRedirectUrl, router]);
+  }, [provider, id, token, requestId, organization, link, sessionId, postErrorRedirectUrl, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       {loading && (
         <div className="flex flex-col items-center space-y-4">
           <Spinner className="h-8 w-8" />

@@ -1,6 +1,7 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import { processIDPCallback } from "./idp-intent";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
+import crypto from "crypto";
 
 // Mock all the dependencies
 vi.mock("next/headers", () => ({
@@ -9,6 +10,16 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@zitadel/client", () => ({
   create: vi.fn((schema: any, data: any) => data),
+  ConnectError: class extends Error {
+    code: any;
+    constructor(message: string, code: any) {
+      super(message);
+      this.code = code;
+    }
+  },
+  Code: {
+    AlreadyExists: 6,
+  },
 }));
 
 vi.mock("../service-url", () => ({
@@ -27,14 +38,23 @@ vi.mock("../zitadel", () => ({
   getActiveIdentityProviders: vi.fn(),
   getUserByID: vi.fn(),
   getDefaultOrg: vi.fn(),
+  getSession: vi.fn(),
 }));
 
 vi.mock("./idp", () => ({
   createNewSessionFromIdpIntent: vi.fn(),
 }));
 
+vi.mock("@/lib/cookies", () => ({
+  getSessionCookieById: vi.fn(),
+}));
+
 vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(() => (key: string) => key),
+}));
+
+vi.mock("../fingerprint", () => ({
+  getFingerprintIdCookie: vi.fn(),
 }));
 
 describe("processIDPCallback", () => {
@@ -52,7 +72,10 @@ describe("processIDPCallback", () => {
   let mockGetActiveIdentityProviders: any;
   let mockGetUserByID: any;
   let mockGetDefaultOrg: any;
+  let mockGetSession: any;
   let mockCreateNewSessionFromIdpIntent: any;
+  let mockGetSessionCookieById: any;
+  let mockGetFingerprintIdCookie: any;
 
   const defaultParams = {
     provider: "google",
@@ -124,8 +147,11 @@ describe("processIDPCallback", () => {
       getActiveIdentityProviders,
       getUserByID,
       getDefaultOrg,
+      getSession,
     } = await import("../zitadel");
     const { createNewSessionFromIdpIntent } = await import("./idp");
+    const { getSessionCookieById } = await import("@/lib/cookies");
+    const { getFingerprintIdCookie } = await import("../fingerprint");
 
     // Setup mocks
     mockHeaders = vi.mocked(headers);
@@ -141,7 +167,11 @@ describe("processIDPCallback", () => {
     mockGetActiveIdentityProviders = vi.mocked(getActiveIdentityProviders);
     mockGetUserByID = vi.mocked(getUserByID);
     mockGetDefaultOrg = vi.mocked(getDefaultOrg);
+    mockGetSession = vi.mocked(getSession);
+
     mockCreateNewSessionFromIdpIntent = vi.mocked(createNewSessionFromIdpIntent);
+    mockGetSessionCookieById = vi.mocked(getSessionCookieById);
+    mockGetFingerprintIdCookie = vi.mocked(getFingerprintIdCookie);
 
     // Default mock implementations
     mockHeaders.mockResolvedValue({} as any);
@@ -334,10 +364,36 @@ describe("processIDPCallback", () => {
   });
 
   describe("CASE 2: Link IDP to existing user", () => {
+    const sessionId = "session123";
+    const fingerprintValue = "fp123";
+    const linkFingerprint = crypto
+      .createHash("sha256")
+      .update(sessionId + fingerprintValue)
+      .digest("hex");
+
     const linkParams = {
       ...defaultParams,
-      link: "true",
+      sessionId,
+      linkFingerprint,
     };
+
+    beforeEach(() => {
+      mockGetFingerprintIdCookie.mockResolvedValue({ name: "fingerprintId", value: fingerprintValue });
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+      });
+      mockGetSessionCookieById.mockResolvedValue({ id: sessionId, token: "token123" });
+      mockGetSession.mockResolvedValue({
+        session: {
+          factors: {
+            user: {
+              id: "user123",
+            },
+          },
+        },
+      });
+    });
 
     test("should link IDP and create session when linking is allowed", async () => {
       mockGetIDPByID.mockResolvedValue({
@@ -351,6 +407,8 @@ describe("processIDPCallback", () => {
       });
 
       const result = await processIDPCallback(linkParams);
+
+      expect(mockGetSessionCookieById).toHaveBeenCalledWith({ sessionId: "session123" });
 
       expect(mockAddIDPLink).toHaveBeenCalledWith({
         serviceConfig: { baseUrl: "https://api.example.com" },

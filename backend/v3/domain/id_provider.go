@@ -271,7 +271,7 @@ type IDPSAML struct {
 
 type idProviderColumns interface {
 	InstanceIDColumn() database.Column
-	OrgIDColumn() database.Column
+	OrganizationIDColumn() database.Column
 	IDColumn() database.Column
 	StateColumn() database.Column
 	NameColumn() database.Column
@@ -292,7 +292,7 @@ type idProviderConditions interface {
 	// PrimaryKeyCondition returns a filter on the primary key fields.
 	PrimaryKeyCondition(instanceID, idpID string) database.Condition
 	InstanceIDCondition(id string) database.Condition
-	OrgIDCondition(id *string) database.Condition
+	OrganizationIDCondition(id *string) database.Condition
 	IDCondition(id string) database.Condition
 	StateCondition(state IDPState) database.Condition
 	NameCondition(name string) database.Condition

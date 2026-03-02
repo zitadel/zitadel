@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"context"
 	"errors"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -15,7 +16,7 @@ import (
 // When err is already of the correct type is passed as-is.
 // If the err is a Zitadel error, it is transformed with a proper HTTP status code.
 // Unknown errors are treated as internal server errors.
-func oidcError(err error) error {
+func oidcError(ctx context.Context, err error) error {
 	if err == nil {
 		return nil
 	}
@@ -37,7 +38,7 @@ func oidcError(err error) error {
 		errors.As(err, &zError)
 	}
 
-	statusCode, _ := http_util.ZitadelErrorToHTTPStatusCode(err)
+	statusCode, _ := http_util.ZitadelErrorToHTTPStatusCode(ctx, err)
 	newOidcErr := oidc.ErrServerError
 	if statusCode < 500 {
 		newOidcErr = oidc.ErrInvalidRequest

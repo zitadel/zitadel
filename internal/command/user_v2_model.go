@@ -409,7 +409,7 @@ func (wm *UserV2WriteModel) SetPasswordCodeSent(e *user.HumanPasswordCodeSentEve
 
 func (wm *UserV2WriteModel) Query() *eventstore.SearchQueryBuilder {
 	// remove events are always processed
-	// and username is based for machine and human
+	// and username is based for service account and user (human)
 	eventTypes := []eventstore.EventType{
 		user.UserRemovedType,
 		user.UserUserNameChangedType,

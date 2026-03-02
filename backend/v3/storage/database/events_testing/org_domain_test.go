@@ -74,7 +74,7 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgDomainRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgDomainRepo.OrgIDCondition(org.Id),
+						orgDomainRepo.OrganizationIDCondition(org.Id),
 						orgDomainRepo.DomainCondition(database.TextOperationEqual, domainName),
 					),
 				),

@@ -24,19 +24,24 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const { loginName, organization, requestId } = searchParams;
 
   // also allow no session to be found (ignoreUnkownUsername)
-  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: {
+  const sessionFactors = await loadMostRecentSession({
+    serviceConfig,
+    sessionParams: {
       loginName,
       organization,
     },
   });
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization });
+
+  const passwordComplexity = await getPasswordComplexitySettings({
+    serviceConfig,
+    organization: sessionFactors?.factors?.user?.organizationId,
   });
 
-  const passwordComplexity = await getPasswordComplexitySettings({ serviceConfig, organization: sessionFactors?.factors?.user?.organizationId,
-  });
-
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: sessionFactors?.factors?.user?.organizationId,
+  const loginSettings = await getLoginSettings({
+    serviceConfig,
+    organization: sessionFactors?.factors?.user?.organizationId,
   });
 
   return (
@@ -58,14 +63,16 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           </div>
         )}
 
-        {sessionFactors && (
+        {sessionFactors ? (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
-        )}
+        ) : loginName ? (
+          <UserAvatar loginName={loginName} displayName={loginName} showDropdown searchParams={searchParams}></UserAvatar>
+        ) : null}
       </div>
 
       <div className="w-full">

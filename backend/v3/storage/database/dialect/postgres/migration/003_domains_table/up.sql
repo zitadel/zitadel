@@ -63,7 +63,7 @@ CREATE TRIGGER trg_set_updated_at_org_domains
   WHEN (OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
   EXECUTE FUNCTION zitadel.set_updated_at();
 
--- Function to check for already verified org domains
+-- Function to check for already verified Organization Domains 
 CREATE OR REPLACE FUNCTION zitadel.check_verified_org_domain()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -113,7 +113,7 @@ CREATE TRIGGER trg_ensure_single_primary_instance_domain
   WHEN (NEW.is_primary IS TRUE)
   EXECUTE FUNCTION zitadel.ensure_single_primary_instance_domain();
 
--- Function to ensure only one primary domain per organization in org_domains
+-- Function to ensure only one Organization Domain per organization in org_domains
 CREATE OR REPLACE FUNCTION zitadel.ensure_single_primary_org_domain()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -129,7 +129,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger to enforce single primary domain constraint on org_domains
+-- Trigger to enforce single Organization Domain constraint on org_domains
 CREATE TRIGGER trg_ensure_single_primary_org_domain
   BEFORE INSERT OR UPDATE ON zitadel.org_domains
   FOR EACH ROW

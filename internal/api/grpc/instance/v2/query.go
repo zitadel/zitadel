@@ -5,12 +5,17 @@ import (
 
 	"connectrpc.com/connect"
 
+	instancev2 "github.com/zitadel/zitadel/backend/v3/api/instance/v2"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 )
 
-func (s *Server) GetInstance(ctx context.Context, _ *connect.Request[instance.GetInstanceRequest]) (*connect.Response[instance.GetInstanceResponse], error) {
+func (s *Server) GetInstance(ctx context.Context, req *connect.Request[instance.GetInstanceRequest]) (*connect.Response[instance.GetInstanceResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.GetInstance(ctx, req)
+	}
 	if err := s.checkPermission(ctx, domain.PermissionSystemInstanceRead, domain.PermissionInstanceRead); err != nil {
 		return nil, err
 	}
@@ -25,6 +30,10 @@ func (s *Server) GetInstance(ctx context.Context, _ *connect.Request[instance.Ge
 }
 
 func (s *Server) ListInstances(ctx context.Context, req *connect.Request[instance.ListInstancesRequest]) (*connect.Response[instance.ListInstancesResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.ListInstances(ctx, req)
+	}
+
 	// List instances is currently only allowed with system permissions,
 	// so we directly check for them in the auth interceptor and do not check here again.
 	queries, err := ListInstancesRequestToModel(req.Msg, s.systemDefaults)
@@ -44,6 +53,10 @@ func (s *Server) ListInstances(ctx context.Context, req *connect.Request[instanc
 }
 
 func (s *Server) ListCustomDomains(ctx context.Context, req *connect.Request[instance.ListCustomDomainsRequest]) (*connect.Response[instance.ListCustomDomainsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.ListCustomDomains(ctx, req)
+	}
+
 	if err := s.checkPermission(ctx, domain.PermissionSystemInstanceRead, domain.PermissionInstanceRead); err != nil {
 		return nil, err
 	}
@@ -64,6 +77,10 @@ func (s *Server) ListCustomDomains(ctx context.Context, req *connect.Request[ins
 }
 
 func (s *Server) ListTrustedDomains(ctx context.Context, req *connect.Request[instance.ListTrustedDomainsRequest]) (*connect.Response[instance.ListTrustedDomainsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.ListTrustedDomains(ctx, req)
+	}
+
 	if err := s.checkPermission(ctx, domain.PermissionSystemInstanceRead, domain.PermissionInstanceRead); err != nil {
 		return nil, err
 	}

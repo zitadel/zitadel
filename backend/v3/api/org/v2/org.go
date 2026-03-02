@@ -17,39 +17,11 @@ import (
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
-// import (
-// 	"context"
+// =================
+// v2Beta endpoints
+// =================
 
-// 	"github.com/zitadel/zitadel/backend/v3/domain"
-// 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
-// )
-
-// func CreateOrg(ctx context.Context, req *org.AddOrganizationRequest) (resp *org.AddOrganizationResponse, err error) {
-// 	cmd := domain.NewAddOrgCommand(
-// 		req.GetName(),
-// 		addOrgAdminToCommand(req.GetAdmins()...)...,
-// 	)
-// 	err = domain.Invoke(ctx, cmd)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &org.AddOrganizationResponse{
-// 		OrganizationId: cmd.ID,
-// 	}, nil
-// }
-
-// func addOrgAdminToCommand(admins ...*org.AddOrganizationRequest_Admin) []*domain.AddMemberCommand {
-// 	cmds := make([]*domain.AddMemberCommand, len(admins))
-// 	for i, admin := range admins {
-// 		cmds[i] = &domain.AddMemberCommand{
-// 			UserID: admin.GetUserId(),
-// 			Roles:  admin.GetRoles(),
-// 		}
-// 	}
-// 	return cmds
-// }
-
-func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org.UpdateOrganizationRequest]) (*connect.Response[v2beta_org.UpdateOrganizationResponse], error) {
+func UpdateOrganizationBeta(ctx context.Context, request *connect.Request[v2beta_org.UpdateOrganizationRequest]) (*connect.Response[v2beta_org.UpdateOrganizationResponse], error) {
 	orgUpdateCmd := domain.NewUpdateOrgCommand(request.Msg.GetId(), request.Msg.GetName())
 
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
@@ -69,30 +41,6 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
 			// returns the timestamp. See https://github.com/zitadel/zitadel/issues/10881
 			ChangeDate: timestamppb.Now(),
-		},
-	}, nil
-}
-
-func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.ListOrganizationsRequest]) (*connect.Response[v2_org.ListOrganizationsResponse], error) {
-	orgListQuery := domain.NewListOrgsQuery(request.Msg)
-
-	err := domain.Invoke(ctx, orgListQuery,
-		domain.WithOrganizationRepo(repository.OrganizationRepository()),
-		domain.WithOrganizationDomainRepo(repository.OrganizationDomainRepository()),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	orgs := convert.DomainOrganizationListModelToGRPCResponse(orgListQuery.Result())
-	return &connect.Response[v2_org.ListOrganizationsResponse]{
-		Msg: &v2_org.ListOrganizationsResponse{
-			Result: orgs,
-			Details: &object.ListDetails{
-				// TODO(IAM-Marco): Return correct result once permissions are in place
-				TotalResult: uint64(len(orgs)),
-			},
-			SortingColumn: request.Msg.GetSortingColumn(),
 		},
 	}, nil
 }
@@ -121,7 +69,7 @@ func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_
 	}, nil
 }
 
-func DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org.DeleteOrganizationRequest]) (*connect.Response[v2beta_org.DeleteOrganizationResponse], error) {
+func DeleteOrganizationBeta(ctx context.Context, request *connect.Request[v2beta_org.DeleteOrganizationRequest]) (*connect.Response[v2beta_org.DeleteOrganizationResponse], error) {
 	orgDeleteCmd := domain.NewDeleteOrgCommand(request.Msg.GetId())
 
 	err := domain.Invoke(ctx, orgDeleteCmd,
@@ -145,7 +93,7 @@ func DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	}, nil
 }
 
-func DeactivateOrganization(ctx context.Context, request *connect.Request[v2beta_org.DeactivateOrganizationRequest]) (*connect.Response[v2beta_org.DeactivateOrganizationResponse], error) {
+func DeactivateOrganizationBeta(ctx context.Context, request *connect.Request[v2beta_org.DeactivateOrganizationRequest]) (*connect.Response[v2beta_org.DeactivateOrganizationResponse], error) {
 	orgDeactivateCmd := domain.NewDeactivateOrgCommand(request.Msg.GetId())
 
 	err := domain.Invoke(ctx, orgDeactivateCmd,
@@ -164,7 +112,7 @@ func DeactivateOrganization(ctx context.Context, request *connect.Request[v2beta
 	}, nil
 }
 
-func ActivateOrganization(ctx context.Context, request *connect.Request[v2beta_org.ActivateOrganizationRequest]) (*connect.Response[v2beta_org.ActivateOrganizationResponse], error) {
+func ActivateOrganizationBeta(ctx context.Context, request *connect.Request[v2beta_org.ActivateOrganizationRequest]) (*connect.Response[v2beta_org.ActivateOrganizationResponse], error) {
 	orgActivateCmd := domain.NewActivateOrgCommand(request.Msg.GetId())
 
 	err := domain.Invoke(ctx, orgActivateCmd,
@@ -179,6 +127,34 @@ func ActivateOrganization(ctx context.Context, request *connect.Request[v2beta_o
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
 			// returns the timestamp. See https://github.com/zitadel/zitadel/issues/10881
 			ChangeDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
+// =================
+// v2 endpoints
+// =================
+
+func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.ListOrganizationsRequest]) (*connect.Response[v2_org.ListOrganizationsResponse], error) {
+	orgListQuery := domain.NewListOrgsQuery(request.Msg)
+
+	err := domain.Invoke(ctx, orgListQuery,
+		domain.WithOrganizationRepo(repository.OrganizationRepository()),
+		domain.WithOrganizationDomainRepo(repository.OrganizationDomainRepository()),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	orgs := convert.DomainOrganizationListModelToGRPCResponse(orgListQuery.Result())
+	return &connect.Response[v2_org.ListOrganizationsResponse]{
+		Msg: &v2_org.ListOrganizationsResponse{
+			Result: orgs,
+			Details: &object.ListDetails{
+				// TODO(IAM-Marco): Return correct result once permissions are in place
+				TotalResult: uint64(len(orgs)),
+			},
+			SortingColumn: request.Msg.GetSortingColumn(),
 		},
 	}, nil
 }

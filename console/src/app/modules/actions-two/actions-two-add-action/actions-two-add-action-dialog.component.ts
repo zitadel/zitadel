@@ -10,9 +10,9 @@ import {
 } from './actions-two-add-action-condition/actions-two-add-action-condition.component';
 import { ActionsTwoAddActionTargetComponent } from './actions-two-add-action-target/actions-two-add-action-target.component';
 import { CommonModule } from '@angular/common';
-import { Condition, Execution } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { Condition, Execution } from '@zitadel/proto/zitadel/action/v2/execution_pb';
 import { Subject } from 'rxjs';
-import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
 
 enum Page {
   Type,

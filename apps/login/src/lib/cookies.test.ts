@@ -454,13 +454,14 @@ describe("cookies", () => {
 
       const result = await getMostRecentSessionCookie();
 
-      expect(result.id).toBe("session-2");
+      expect(result).toBeDefined();
+      expect(result?.id).toBe("session-2");
     });
 
-    it("should reject when no session cookie exists", async () => {
+    it("should return undefined when no session cookie exists", async () => {
       mockCookies.get.mockReturnValue(undefined);
 
-      await expect(getMostRecentSessionCookie()).rejects.toBe("no session cookie found");
+      await expect(getMostRecentSessionCookie()).resolves.toBeUndefined();
     });
 
     it("should handle single session", async () => {
@@ -479,7 +480,8 @@ describe("cookies", () => {
 
       const result = await getMostRecentSessionCookie();
 
-      expect(result.id).toBe("session-1");
+      expect(result).toBeDefined();
+      expect(result?.id).toBe("session-1");
     });
   });
 
@@ -511,8 +513,9 @@ describe("cookies", () => {
 
       const result = await getSessionCookieById({ sessionId: "session-1" });
 
-      expect(result.id).toBe("session-1");
-      expect(result.loginName).toBe("user1@example.com");
+      expect(result).toBeDefined();
+      expect(result?.id).toBe("session-1");
+      expect(result?.loginName).toBe("user1@example.com");
     });
 
     it("should filter by organization when provided", async () => {
@@ -525,19 +528,20 @@ describe("cookies", () => {
         organization: "org-2",
       });
 
-      expect(result.id).toBe("session-2");
-      expect(result.organization).toBe("org-2");
+      expect(result).toBeDefined();
+      expect(result?.id).toBe("session-2");
+      expect(result?.organization).toBe("org-2");
     });
 
-    it("should reject if session not found", async () => {
+    it("should return undefined if session not found", async () => {
       mockCookies.get.mockReturnValue({
         value: JSON.stringify([session1]),
       });
 
-      await expect(getSessionCookieById({ sessionId: "non-existent" })).rejects.toBeTypeOf("undefined");
+      await expect(getSessionCookieById({ sessionId: "non-existent" })).resolves.toBeUndefined();
     });
 
-    it("should reject if organization doesn't match", async () => {
+    it("should return undefined if organization doesn't match", async () => {
       mockCookies.get.mockReturnValue({
         value: JSON.stringify([session1]),
       });
@@ -547,13 +551,13 @@ describe("cookies", () => {
           sessionId: "session-1",
           organization: "wrong-org",
         }),
-      ).rejects.toBeTypeOf("undefined");
+      ).resolves.toBeUndefined();
     });
 
-    it("should reject when no session cookie exists", async () => {
+    it("should return undefined when no session cookie exists", async () => {
       mockCookies.get.mockReturnValue(undefined);
 
-      await expect(getSessionCookieById({ sessionId: "session-1" })).rejects.toBeTypeOf("undefined");
+      await expect(getSessionCookieById({ sessionId: "session-1" })).resolves.toBeUndefined();
     });
   });
 
@@ -587,8 +591,9 @@ describe("cookies", () => {
         loginName: "user1@example.com",
       });
 
-      expect(result.id).toBe("session-1");
-      expect(result.loginName).toBe("user1@example.com");
+      expect(result).toBeDefined();
+      expect(result?.id).toBe("session-1");
+      expect(result?.loginName).toBe("user1@example.com");
     });
 
     it("should filter by organization when provided", async () => {
@@ -601,24 +606,23 @@ describe("cookies", () => {
         organization: "org-2",
       });
 
-      expect(result.id).toBe("session-2");
-      expect(result.organization).toBe("org-2");
+      expect(result).toBeDefined();
+      expect(result?.id).toBe("session-2");
+      expect(result?.organization).toBe("org-2");
     });
 
-    it("should reject if session not found", async () => {
+    it("should return undefined if session not found", async () => {
       mockCookies.get.mockReturnValue({
         value: JSON.stringify([session1]),
       });
 
-      await expect(getSessionCookieByLoginName({ loginName: "nonexistent@example.com" })).rejects.toBe(
-        "no cookie found with loginName: nonexistent@example.com",
-      );
+      await expect(getSessionCookieByLoginName({ loginName: "nonexistent@example.com" })).resolves.toBeUndefined();
     });
 
-    it("should reject when no session cookie exists", async () => {
+    it("should return undefined when no session cookie exists", async () => {
       mockCookies.get.mockReturnValue(undefined);
 
-      await expect(getSessionCookieByLoginName({ loginName: "user@example.com" })).rejects.toBe("no session cookie found");
+      await expect(getSessionCookieByLoginName({ loginName: "user@example.com" })).resolves.toBeUndefined();
     });
   });
 
@@ -801,6 +805,36 @@ describe("cookies", () => {
       expect(result.id).toBe("session-2");
     });
 
+    it("should return undefined when no matching session found", async () => {
+      const session1: Cookie = {
+        id: "session-1",
+        token: "token-1",
+        loginName: "user@example.com",
+        creationTs: "1700000000000",
+        expirationTs: "1800000000000",
+        changeTs: "1700000000000",
+      };
+
+      const session2: Cookie = {
+        id: "session-2",
+        token: "token-2",
+        loginName: "user@example.com",
+        creationTs: "1700000001000",
+        expirationTs: "1800000001000",
+        changeTs: "1700000005000",
+      };
+
+      mockCookies.get.mockReturnValue({
+        value: JSON.stringify([session1, session2]),
+      });
+
+      await expect(
+        getMostRecentCookieWithLoginname({
+          loginName: "other@example.com",
+        }),
+      ).resolves.toBeUndefined();
+    });
+
     it("should filter by organization when provided", async () => {
       const session1: Cookie = {
         id: "session-1",
@@ -863,31 +897,14 @@ describe("cookies", () => {
       expect(result.id).toBe("session-2");
     });
 
-    it("should reject when no matching session found", async () => {
-      const session: Cookie = {
-        id: "session-1",
-        token: "token-1",
-        loginName: "other@example.com",
-        creationTs: "1700000000000",
-        expirationTs: "1800000000000",
-        changeTs: "1700000000000",
-      };
-
-      mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session]),
-      });
-
-      await expect(getMostRecentCookieWithLoginname({ loginName: "user@example.com" })).rejects.toBe(
-        "Could not get the context or retrieve a session",
-      );
-    });
-
-    it("should reject when no session cookie exists", async () => {
+    it("should return undefined when no session cookie exists", async () => {
       mockCookies.get.mockReturnValue(undefined);
 
-      await expect(getMostRecentCookieWithLoginname({ loginName: "user@example.com" })).rejects.toBe(
-        "Could not read session cookie",
-      );
+      await expect(
+        getMostRecentCookieWithLoginname({
+          loginName: "user@example.com",
+        }),
+      ).resolves.toBeUndefined();
     });
   });
 });

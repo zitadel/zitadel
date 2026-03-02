@@ -22,7 +22,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
     version: "3.0-alpha";
-    description: "This API is intended to manage users with your own data schema in a ZITADEL instance. This project is in preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
+    description: "This API is intended to manage users with your own data schema in a Zitadel instance. This project is in preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -45,7 +45,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -58,8 +58,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -719,7 +719,7 @@ service ZITADELUsers {
 
   // Start a TOTP registration
   //
-  // Start the registration of a new time-based one-time password (TOTP) generator for a user.
+  // Start the registration of a new TOTP generator for a user.
   // As a response a secret is returned, which is used to initialize a TOTP app or device.
   rpc StartTOTPRegistration (StartTOTPRegistrationRequest) returns (StartTOTPRegistrationResponse) {
     option (google.api.http) = {
@@ -743,7 +743,7 @@ service ZITADELUsers {
 
   // Verify a TOTP registration
   //
-  // Verify the time-based one-time password (TOTP) registration with the generated code.
+  // Verify the TOTP registration with the generated code.
   rpc VerifyTOTPRegistration (VerifyTOTPRegistrationRequest) returns (VerifyTOTPRegistrationResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/users/{id}/totp/{totp_id}/_verify"
@@ -767,7 +767,7 @@ service ZITADELUsers {
 
   // Remove a TOTP authenticator
   //
-  // Remove an existing time-based one-time password (TOTP) authenticator from a user, so it cannot be used for authentication anymore.
+  // Remove an existing TOTP authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveTOTPAuthenticator (RemoveTOTPAuthenticatorRequest) returns (RemoveTOTPAuthenticatorResponse) {
     option (google.api.http) = {
       delete: "/resources/v3alpha/users/{id}/totp/{totp_id}"
@@ -790,7 +790,7 @@ service ZITADELUsers {
 
   // Add a OTP SMS authenticator
   //
-  // Add a new one-time password (OTP) SMS authenticator to a user.
+  // Add a new OTP SMS authenticator to a user.
   // If the phone is not passed as verified, a verification code will be generated,
   // which can be either returned or will be sent to the user by SMS.
   rpc AddOTPSMSAuthenticator (AddOTPSMSAuthenticatorRequest) returns (AddOTPSMSAuthenticatorResponse) {
@@ -841,7 +841,7 @@ service ZITADELUsers {
 
   // Remove a OTP SMS authenticator
   //
-  // Remove an existing one-time password (OTP) SMS authenticator from a user, so it cannot be used for authentication anymore.
+  // Remove an existing OTP SMS authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveOTPSMSAuthenticator (RemoveOTPSMSAuthenticatorRequest) returns (RemoveOTPSMSAuthenticatorResponse) {
     option (google.api.http) = {
       delete: "/resources/v3alpha/users/{id}/otp_sms/{otp_sms_id}"
@@ -864,7 +864,7 @@ service ZITADELUsers {
 
   // Add a OTP Email authenticator
   //
-  // Add a new one-time password (OTP) Email authenticator to a user.
+  // Add a new OTP Email authenticator to a user.
   // If the email is not passed as verified, a verification code will be generated,
   // which can be either returned or will be sent to the user by email.
   rpc AddOTPEmailAuthenticator (AddOTPEmailAuthenticatorRequest) returns (AddOTPEmailAuthenticatorResponse) {
@@ -915,7 +915,7 @@ service ZITADELUsers {
 
   // Remove a OTP Email authenticator
   //
-  // Remove an existing one-time password (OTP) Email authenticator from a user, so it cannot be used for authentication anymore.
+  // Remove an existing OTP Email authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveOTPEmailAuthenticator (RemoveOTPEmailAuthenticatorRequest) returns (RemoveOTPEmailAuthenticatorResponse) {
     option (google.api.http) = {
       delete: "/resources/v3alpha/users/{id}/otp_email/{otp_email_id}"
@@ -1354,7 +1354,7 @@ message ResendContactEmailCodeRequest {
   ];
   // if no verification is specified, an email is sent
   oneof verification {
-    // Let ZITADEL send the link to the user via email.
+    // Let Zitadel send the link to the user via email.
     SendEmailVerificationCode send_code = 4;
     // Get the code back to provide it to the user in your preferred mechanism.
     ReturnEmailVerificationCode return_code = 5;
@@ -1453,7 +1453,7 @@ message ResendContactPhoneCodeRequest {
   ];
   // if no verification is specified, a SMS is sent
   oneof verification {
-    // Let ZITADEL send the link to the user via SMS.
+    // Let Zitadel send the link to the user via SMS.
     SendPhoneVerificationCode send_code = 4;
     // Get the code back to provide it to the user in your preferred mechanism.
     ReturnPhoneVerificationCode return_code = 5;
@@ -1578,9 +1578,9 @@ message RequestPasswordResetRequest {
   ];
   // If no medium is specified, an email is sent with the default url.
   oneof medium {
-    // Let ZITADEL send the link to the user via email.
+    // Let Zitadel send the link to the user via email.
     SendPasswordResetEmail send_email = 4;
-    // Let ZITADEL send the link to the user via SMS.
+    // Let Zitadel send the link to the user via SMS.
     SendPasswordResetSMS send_sms = 5;
     // Get the code back to provide it to the user in your preferred mechanism.
     ReturnPasswordResetCode return_code = 6;
@@ -1691,7 +1691,7 @@ message CreateWebAuthNRegistrationLinkRequest {
   ];
   // if no medium is specified, an email is sent with the default url.
   oneof medium {
-    // Let ZITADEL send the link to the user via email.
+    // Let Zitadel send the link to the user via email.
     SendWebAuthNRegistrationLink send_link = 4;
     // Get the code back to provide it to the user in your preferred mechanism.
     ReturnWebAuthNRegistrationCode return_code = 5;
@@ -2169,7 +2169,7 @@ message GetIdentityProviderIntentResponse {
   // Information returned by the identity provider (IDP) such as the identification of the user
   // and detailed / profile information.
   IDPInformation idp_information = 2;
-  // If the user was already federated and linked to a ZITADEL user, it's id will be returned.
+  // If the user was already federated and linked to a Zitadel user, it's id will be returned.
   optional string id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432345\"";

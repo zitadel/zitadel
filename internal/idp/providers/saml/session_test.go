@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/crewjam/saml"
+	dsig "github.com/russellhaering/goxmldsig"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -377,6 +378,7 @@ func TestSession_FetchUser(t *testing.T) {
 
 			// set to time of response for validation
 			saml.TimeNow = tt.fields.timeNow
+			saml.Clock = dsig.NewFakeClockAt(tt.fields.timeNow())
 
 			user, err := session.FetchUser(context.Background())
 			if tt.want.err != nil && !errors.Is(err, tt.want.err) {

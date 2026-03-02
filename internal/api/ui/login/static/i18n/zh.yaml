@@ -2,7 +2,7 @@ Login:
   Title: 欢迎回来！
   Description: 输入您的登录数据。
   TitleLinking: 登录以进行用户链接
-  DescriptionLinking: 输入您的登录数据以将您的外部用户与 ZITADEL 用户关联。
+  DescriptionLinking: 输入您的登录数据以将您的外部用户与 Zitadel 用户关联。
   LoginNameLabel: 登录名
   UsernamePlaceHolder: 用户名
   LoginnamePlaceHolder: username@domain
@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: 选择账户
-  Description: 使用您的 ZITADEL 帐户
+  Description: 使用您的 Zitadel 帐户
   TitleLinking: 选择用于用户链接的帐户
   DescriptionLinking: 选择您的帐户以与您的外部用户关联。
   OtherUser: 其他用户
@@ -109,20 +109,21 @@ InitMFAOTP:
   Title: 双因素验证
   Description: 创建你的双因素。如果你还没有，请下载一个认证器应用程序。
   OTPDescription: 使用您的身份验证器应用程序（例如 Google Authenticator）扫描代码或复制密码并在下方插入生成的代码。
+  SecretLabel: 秘钥
+  CodeLabel: 验证码
+  NextButtonText: 继续
+  CancelButtonText: 取消
+
+InitMFAOTPSMS:
+  Title: 双因素验证
+  DescriptionPhone: 创建双因素身份验证。输入您的电话号码进行验证。
+  DescriptionCode: 创建双因素身份验证。输入收到的代码以验证您的电话号码。
+  CountryCodeLabel: 国家
   PhoneLabel: 电话号码
   CodeLabel: 验证码
   EditButtonText: 编辑
   ResendButtonText: 重发代码
   NextButtonText: 继续
-
-InitMFASMS:
-  Title: 双因素验证
-  DescriptionPhone: 创建双因素身份验证。输入您的电话号码进行验证。
-  DescriptionCode: 创建双因素身份验证。输入收到的代码以验证您的电话号码。
-  SecretLabel: 秘钥
-  CodeLabel: 验证码
-  NextButtonText: 继续
-  CancelButtonText: 取消
 
 InitMFAU2F:
   Title: 添加安全密钥
@@ -268,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -314,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -394,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: 设备授权
   UserCode:
@@ -445,8 +449,8 @@ Errors:
       NotFound: 未找到个人资料
       NotChanged: 个人资料未更改
       Empty: 简介是空的
-      FirstNameEmpty: 简介中的名字是空的
-      LastNameEmpty: 简介中的姓氏是空的
+      FirstNameEmpty: 个人资料中的名字为空
+      LastNameEmpty: 个人资料中的姓氏为空
       IDMissing: 简介ID丢失
     Email:
       NotFound: 电子邮件没有找到
