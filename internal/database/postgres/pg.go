@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -29,10 +28,6 @@ const (
 	sslAllowMode    = "allow"
 	sslPreferMode   = "prefer"
 )
-
-var ErrDSNWithAdminConnect = errors.New(
-	"admin connection is not supported when using DSN; " +
-		"provide a DSN pointing to an admin user for the init step, or use individual connection fields")
 
 type Config struct {
 	// DSN is a full PostgreSQL connection URL. When set, individual connection
@@ -94,10 +89,6 @@ func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
-	if c.DSN != "" && useAdmin {
-		return nil, nil, ErrDSNWithAdminConnect
-	}
-
 	connConfig := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns)
 
 	var config *pgxpool.Config

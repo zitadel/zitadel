@@ -63,12 +63,6 @@ func TestConfig_Password(t *testing.T) {
 	})
 }
 
-func TestConfig_Connect_DSN_with_useAdmin_errors(t *testing.T) {
-	c := parseDSN(t, "postgresql://u:p@h:5432/db?sslmode=disable")
-	_, _, err := c.Connect(true)
-	assert.ErrorIs(t, err, ErrDSNWithAdminConnect)
-}
-
 func TestConfig_String(t *testing.T) {
 	t.Run("returns DSN when set", func(t *testing.T) {
 		dsn := "postgresql://u:p@h:5432/db?sslmode=disable"
