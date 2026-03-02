@@ -235,12 +235,6 @@ Errors:
       AlreadyExists: "Domeniul există deja"
       InvalidCharacter: "Numai caractere alfanumerice, . și - sunt permise pentru un domeniu"
       EmptyString: "Caracterele non-numerice și alfabetice invalide au fost înlocuite cu spații goale și domeniul rezultat este un șir gol"
-    IDP:
-      InvalidSearchQuery: "Interogare de căutare invalidă"
-      ClientIDMissing: "ClientID lipsă"
-      TeamIDMissing: "TeamID lipsă"
-      KeyIDMissing: "KeyID lipsă"
-      PrivateKeyMissing: "Cheie Privată lipsă"
     LoginPolicy:
       NotFound: "Politica de conectare nu a fost găsită"
       Invalid: "Politica de conectare este invalidă"
@@ -607,6 +601,13 @@ Errors:
         Duplicate: "ID-ul cheii web nu este unic"
         NoActive: "Nu a fost găsită nicio cheie web activă"
         NotFound: "Cheia web nu a fost găsită"
+  IDP:
+    InvalidSearchQuery: "Interogare de căutare invalidă"
+    ClientIDMissing: "ClientID lipsă"
+    TeamIDMissing: "TeamID lipsă"
+    KeyIDMissing: "KeyID lipsă"
+    PrivateKeyMissing: "Cheie Privată lipsă"
+    InvalidPrivateKey: "Format de cheie privată nevalid"
 
     AggregateTypes:
       action: "Acțiune"

@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"bytes"
+	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -128,6 +129,19 @@ func PrivateKeyToBytes(priv *rsa.PrivateKey) []byte {
 	)
 }
 
+func PrivateKeyToBytesPKCS8(priv *rsa.PrivateKey) ([]byte, error) {
+	der, err := x509.MarshalPKCS8PrivateKey(priv)
+	if err != nil {
+		return nil, err
+	}
+	return pem.EncodeToMemory(
+		&pem.Block{
+			Type:  "RSA PRIVATE KEY",
+			Bytes: der,
+		},
+	), nil
+}
+
 func PublicKeyToBytes(pub *rsa.PublicKey) ([]byte, error) {
 	pubASN1, err := x509.MarshalPKIXPublicKey(pub)
 	if err != nil {
@@ -154,6 +168,21 @@ func BytesToPrivateKey(priv []byte) (*rsa.PrivateKey, error) {
 		}
 	}
 	key, err := x509.ParsePKCS1PrivateKey(b)
+	if err != nil {
+		return nil, err
+	}
+	return key, nil
+}
+
+func BytesToPrivateKeyPKCS8(priv []byte) (crypto.PrivateKey, error) {
+	if len(priv) == 0 {
+		return nil, ErrEmpty
+	}
+	block, _ := pem.Decode(priv)
+	if block == nil {
+		return nil, ErrEmpty
+	}
+	key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		return nil, err
 	}

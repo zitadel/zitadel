@@ -234,12 +234,6 @@ Errors:
       AlreadyExists: "Doména již existuje"
       InvalidCharacter: "Pro doménu jsou povoleny pouze alfanumerické znaky, . a -"
       EmptyString: "Neplatné nečíselné a nealfabetické znaky byly nahrazeny prázdnými místy a výsledná doména je prázdný řetězec"
-    IDP:
-      InvalidSearchQuery: "Neplatný vyhledávací dotaz"
-      ClientIDMissing: "Chybí ClientID"
-      TeamIDMissing: "Chybí TeamID"
-      KeyIDMissing: "Chybí KeyID"
-      PrivateKeyMissing: "Chybí privátní klíč"
     LoginPolicy:
       NotFound: "Přihlašovací politika nenalezena"
       Invalid: "Přihlašovací politika je neplatná"
@@ -609,6 +603,13 @@ Errors:
     Duplicate: "ID webového klíče není jedinečné"
     NoActive: "Nebyl nalezen žádný aktivní webový klíč"
     NotFound: "Webový klíč nebyl nalezen"
+  IDP:
+    InvalidSearchQuery: "Neplatný vyhledávací dotaz"
+    ClientIDMissing: "Chybí ClientID"
+    TeamIDMissing: "Chybí TeamID"
+    KeyIDMissing: "Chybí KeyID"
+    PrivateKeyMissing: "Chybí privátní klíč"
+    InvalidPrivateKey: "Neplatný formát privátního klíče"
 
 AggregateTypes:
   action: "Akce"

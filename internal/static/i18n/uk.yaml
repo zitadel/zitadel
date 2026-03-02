@@ -229,12 +229,6 @@ Errors:
       AlreadyExists: "Домен вже існує"
       InvalidCharacter: "Для домену дозволені лише буквено-цифрові символи, . та -"
       EmptyString: "Недійсні не цифрові та не алфавітні символи були замінені порожніми пробілами і результуючий домен є порожнім рядком"
-    IDP:
-      InvalidSearchQuery: "Недійсний пошуковий запит"
-      ClientIDMissing: "Відсутній ClientID"
-      TeamIDMissing: "Відсутній TeamID"
-      KeyIDMissing: "Відсутній KeyID"
-      PrivateKeyMissing: "Відсутній приватний ключ"
     LoginPolicy:
       NotFound: "Політика входу не знайдена"
       Invalid: "Політика входу недійсна"
@@ -606,6 +600,13 @@ Errors:
     Duplicate: "Ідентифікатор веб-ключа не унікальний"
     NoActive: "Активний веб-ключ не знайдено"
     NotFound: "Веб-ключ не знайдено"
+  IDP:
+    InvalidSearchQuery: "Недійсний пошуковий запит"
+    ClientIDMissing: "Відсутній ClientID"
+    TeamIDMissing: "Відсутній TeamID"
+    KeyIDMissing: "Відсутній KeyID"
+    PrivateKeyMissing: "Відсутній приватний ключ"
+    InvalidPrivateKey: "Невірний формат приватного ключа"
 
 AggregateTypes:
   action: "Дія"

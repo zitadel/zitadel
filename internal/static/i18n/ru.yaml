@@ -228,12 +228,6 @@ Errors:
     Domain:
       AlreadyExists: "Домен уже существует"
       InvalidCharacter: "Только буквенно-цифровые символы, . и - разрешены для домена"
-    IDP:
-      InvalidSearchQuery: "Неверный поисковый запрос"
-      ClientIDMissing: "ClientID отсутствует"
-      TeamIDMissing: "TeamID отсутствует"
-      KeyIDMissing: "KeyID отсутствует"
-      PrivateKeyMissing: "Закрытый ключ отсутствует"
     LoginPolicy:
       NotFound: "Политика входа в систему не найдена"
       Invalid: "Политика входа в систему недействительна"
@@ -600,6 +594,13 @@ Errors:
     Duplicate: "Идентификатор веб-ключа не уникален"
     NoActive: "Активный веб-ключ не найден"
     NotFound: "Веб-ключ не найден"
+  IDP:
+    InvalidSearchQuery: "Неверный поисковый запрос"
+    ClientIDMissing: "ClientID отсутствует"
+    TeamIDMissing: "TeamID отсутствует"
+    KeyIDMissing: "KeyID отсутствует"
+    PrivateKeyMissing: "Закрытый ключ отсутствует"
+    InvalidPrivateKey: "Неверный формат приватного ключа"
 
 AggregateTypes:
   action: "Действие"

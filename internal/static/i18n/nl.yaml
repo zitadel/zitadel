@@ -234,12 +234,6 @@ Errors:
       AlreadyExists: "Domein bestaat al"
       InvalidCharacter: "Alleen alfanumerieke tekens, . en - zijn toegestaan voor een domein"
       EmptyString: "Ongeldige niet-numerieke en alfabetische tekens zijn vervangen door lege spaties en het resulterende domein is een lege string"
-    IDP:
-      InvalidSearchQuery: "Ongeldige zoekopdracht"
-      ClientIDMissing: "ClientID ontbreekt"
-      TeamIDMissing: "TeamID ontbreekt"
-      KeyIDMissing: "KeyID ontbreekt"
-      PrivateKeyMissing: "Privésleutel ontbreekt"
     LoginPolicy:
       NotFound: "Login Beleid niet gevonden"
       Invalid: "Login Beleid is ongeldig"
@@ -611,6 +605,13 @@ Errors:
     Duplicate: "Websleutel-ID niet uniek"
     NoActive: "Geen actieve websleutel gevonden"
     NotFound: "Websleutel niet gevonden"
+  IDP:
+    InvalidSearchQuery: "Ongeldige zoekopdracht"
+    ClientIDMissing: "ClientID ontbreekt"
+    TeamIDMissing: "TeamID ontbreekt"
+    KeyIDMissing: "KeyID ontbreekt"
+    PrivateKeyMissing: "Privésleutel ontbreekt"
+    InvalidPrivateKey: "Ongeldig formaat van privésleutel"
 
 AggregateTypes:
   action: "Actie"

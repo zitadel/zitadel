@@ -234,12 +234,6 @@ Errors:
       AlreadyExists: "A domain már létezik"
       InvalidCharacter: "Csak alfanumerikus karakterek, . és - engedélyezettek a domain számára"
       EmptyString: "Érvénytelen nem numerikus és alfabetikus karaktereket üres helyekre cseréltük és az eredményül kapott domain egy üres string"
-    IDP:
-      InvalidSearchQuery: "Érvénytelen keresési lekérdezés"
-      ClientIDMissing: "ClientID hiányzik"
-      TeamIDMissing: "TeamID hiányzik"
-      KeyIDMissing: "KeyID hiányzik"
-      PrivateKeyMissing: "Privát kulcs hiányzik"
     LoginPolicy:
       NotFound: "Bejelentkezési politika nem található"
       Invalid: "Bejelentkezési politika érvénytelen"
@@ -611,6 +605,13 @@ Errors:
     Duplicate: "A webkulcs azonosító nem egyedi"
     NoActive: "Aktív web kulcs nem található"
     NotFound: "Web kulcs nem található"
+  IDP:
+    InvalidSearchQuery: "Érvénytelen keresési lekérdezés"
+    ClientIDMissing: "ClientID hiányzik"
+    TeamIDMissing: "TeamID hiányzik"
+    KeyIDMissing: "KeyID hiányzik"
+    PrivateKeyMissing: "Privát kulcs hiányzik"
+    InvalidPrivateKey: "Érvénytelen titkos kulcs formátum"
 
 AggregateTypes:
   action: "Művelet"

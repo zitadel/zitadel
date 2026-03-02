@@ -234,12 +234,6 @@ Errors:
       AlreadyExists: "El dominio ya existe"
       InvalidCharacter: "Solo caracteres alfanuméricos, . y - se permiten para un dominio"
       EmptyString: "Los caracteres alfabéticos y no numéricos no válidos se reemplazaron con espacios vacíos y el dominio resultante es una cadena vacía"
-    IDP:
-      InvalidSearchQuery: "Consulta de búsqueda no válida"
-      ClientIDMissing: "Falta ClientID"
-      TeamIDMissing: "Falta TeamID"
-      KeyIDMissing: "Falta KeyID"
-      PrivateKeyMissing: "Falta la clave privada"
     LoginPolicy:
       NotFound: "Política de inicio de sesión no encontrada"
       Invalid: "Política de inicio de sesión no es válida"
@@ -611,6 +605,13 @@ Errors:
     Duplicate: "ID de clave web no único"
     NoActive: "No se encontró ninguna clave web activa"
     NotFound: "Clave web no encontrada"
+  IDP:
+    InvalidSearchQuery: "Consulta de búsqueda no válida"
+    ClientIDMissing: "Falta ClientID"
+    TeamIDMissing: "Falta TeamID"
+    KeyIDMissing: "Falta KeyID"
+    PrivateKeyMissing: "Falta la clave privada"
+    InvalidPrivateKey: "Formato de clave privada inválido"
 
 AggregateTypes:
   action: "Acción"

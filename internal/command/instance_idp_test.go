@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"errors"
 	"testing"
 	"time"
@@ -4893,6 +4895,14 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 	}
 }
 
+var (
+	privateKeyPKCS8 = func() []byte {
+		privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+		data, _ := crypto.PrivateKeyToBytesPKCS8(privateKey)
+		return data
+	}()
+)
+
 func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
@@ -4906,7 +4916,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 	type res struct {
 		id   string
 		want *domain.ObjectDetails
-		err  func(error) bool
+		err  error
 	}
 	tests := []struct {
 		name   string
@@ -4925,9 +4935,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				provider: AppleProvider{},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.IDP.ClientIDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.IDP.ClientIDMissing"),
 			},
 		},
 		{
@@ -4943,9 +4951,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.IDP.TeamIDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.IDP.TeamIDMissing"),
 			},
 		},
 		{
@@ -4962,13 +4968,11 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.IDP.KeyIDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.IDP.KeyIDMissing"),
 			},
 		},
 		{
-			"invalid privateKey",
+			"no privateKey",
 			fields{
 				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4982,9 +4986,26 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing"))
+				err: zerrors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing"),
+			},
+		},
+		{
+			"invalid privateKey",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AppleProvider{
+					ClientID:   "clientID",
+					TeamID:     "teamID",
+					KeyID:      "keyID",
+					PrivateKey: []byte("invalid"),
 				},
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(crypto.ErrEmpty, "INST-Fk38d", "Errors.IDP.InvalidPrivateKey"),
 			},
 		},
 		{
@@ -5003,7 +5024,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
 								KeyID:      "id",
-								Crypted:    []byte("privateKey"),
+								Crypted:    privateKeyPKCS8,
 							},
 							nil,
 							idp.Options{},
@@ -5019,7 +5040,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 					ClientID:   "clientID",
 					TeamID:     "teamID",
 					KeyID:      "keyID",
-					PrivateKey: []byte("privateKey"),
+					PrivateKey: privateKeyPKCS8,
 				},
 			},
 			res: res{
@@ -5043,7 +5064,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
 								KeyID:      "id",
-								Crypted:    []byte("privateKey"),
+								Crypted:    privateKeyPKCS8,
 							},
 							[]string{"name", "email"},
 							idp.Options{
@@ -5064,7 +5085,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 					ClientID:   "clientID",
 					TeamID:     "teamID",
 					KeyID:      "keyID",
-					PrivateKey: []byte("privateKey"),
+					PrivateKey: privateKeyPKCS8,
 					Scopes:     []string{"name", "email"},
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
@@ -5088,12 +5109,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			id, got, err := c.AddInstanceAppleProvider(tt.args.ctx, tt.args.provider)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
+			assert.ErrorIs(t, err, tt.res.err)
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
 				assertObjectDetails(t, tt.res.want, got)
@@ -5114,7 +5130,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 	}
 	type res struct {
 		want *domain.ObjectDetails
-		err  func(error) bool
+		err  error
 	}
 	tests := []struct {
 		name   string
@@ -5132,9 +5148,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				provider: AppleProvider{},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.IDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.IDMissing"),
 			},
 		},
 		{
@@ -5148,9 +5162,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				provider: AppleProvider{},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.IDP.ClientIDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.IDP.ClientIDMissing"),
 			},
 		},
 		{
@@ -5166,9 +5178,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.IDP.TeamIDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.IDP.TeamIDMissing"),
 			},
 		},
 		{
@@ -5185,9 +5195,26 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing"))
+				err: zerrors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing"),
+			},
+		},
+		{
+			"invalid key",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AppleProvider{
+					ClientID:   "clientID",
+					TeamID:     "teamID",
+					KeyID:      "keyID",
+					PrivateKey: []byte("invalid"),
 				},
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(nil, "INST-eWSDf", "Errors.IDP.InvalidPrivateKey"),
 			},
 		},
 		{
@@ -5207,7 +5234,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zerrors.IsNotFound,
+				err: zerrors.ThrowNotFound(nil, "INST-SG3bh", "Errors.IDPConfig.NotExisting"),
 			},
 		},
 		{
@@ -5282,7 +5309,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
-										Crypted:    []byte("newPrivateKey"),
+										Crypted:    privateKeyPKCS8,
 									}),
 									idp.ChangeAppleScopes([]string{"name", "email"}),
 									idp.ChangeAppleOptions(idp.OptionChanges{
@@ -5306,7 +5333,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 					ClientID:   "clientID2",
 					TeamID:     "teamID2",
 					KeyID:      "keyID2",
-					PrivateKey: []byte("newPrivateKey"),
+					PrivateKey: privateKeyPKCS8,
 					Scopes:     []string{"name", "email"},
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
@@ -5328,12 +5355,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateInstanceAppleProvider(tt.args.ctx, tt.args.id, tt.args.provider)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
+			assert.ErrorIs(t, err, tt.res.err)
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.want, got)
 			}

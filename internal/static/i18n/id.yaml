@@ -234,12 +234,6 @@ Errors:
       AlreadyExists: "Domain sudah ada"
       InvalidCharacter: "Hanya karakter alfanumerik, . "
       EmptyString: "Karakter non numerik dan alfabet yang tidak valid diganti dengan spasi kosong dan domain yang dihasilkan berupa string kosong"
-    IDP:
-      InvalidSearchQuery: "Kueri penelusuran tidak valid"
-      ClientIDMissing: "ID Klien tidak ada"
-      TeamIDMissing: "ID Tim hilang"
-      KeyIDMissing: "ID Kunci hilang"
-      PrivateKeyMissing: "Kunci Pribadi hilang"
     LoginPolicy:
       NotFound: "Kebijakan Login tidak ditemukan"
       Invalid: "Kebijakan Masuk tidak valid"
@@ -606,6 +600,13 @@ Errors:
     Duplicate: "ID kunci web tidak unik"
     NoActive: "Tidak ditemukan kunci web aktif"
     NotFound: "Kunci web tidak ditemukan"
+  IDP:
+    InvalidSearchQuery: "Kueri penelusuran tidak valid"
+    ClientIDMissing: "ID Klien tidak ada"
+    TeamIDMissing: "ID Tim hilang"
+    KeyIDMissing: "ID Kunci hilang"
+    PrivateKeyMissing: "Kunci Pribadi hilang"
+    InvalidPrivateKey: "Format kunci pribadi tidak valid"
 
 AggregateTypes:
   action: "Tindakan"

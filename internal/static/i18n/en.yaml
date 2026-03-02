@@ -236,12 +236,6 @@ Errors:
       AlreadyExists: "Domain already exists"
       InvalidCharacter: "Only alphanumeric characters, . and - are allowed for a domain"
       EmptyString: "Invalid non numeric and alphabetical characters were replaced with empty spaces and resulting domain is an empty string"
-    IDP:
-      InvalidSearchQuery: "Invalid search query"
-      ClientIDMissing: "ClientID missing"
-      TeamIDMissing: "TeamID missing"
-      KeyIDMissing: "KeyID missing"
-      PrivateKeyMissing: "Private Key missing"
     LoginPolicy:
       NotFound: "Login Policy not found"
       Invalid: "Login Policy is invalid"
@@ -613,6 +607,13 @@ Errors:
     Duplicate: "Web key ID not unique"
     NoActive: "No active web key found"
     NotFound: "Web key not found"
+  IDP:
+    InvalidSearchQuery: "Invalid search query"
+    ClientIDMissing: "ClientID missing"
+    TeamIDMissing: "TeamID missing"
+    KeyIDMissing: "KeyID missing"
+    PrivateKeyMissing: "Private Key missing"
+    InvalidPrivateKey: "Invalid Private Key format"
 
 AggregateTypes:
   action: "Action"
