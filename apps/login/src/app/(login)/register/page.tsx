@@ -55,7 +55,23 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     });
   });
 
-  if (!loginSettings?.allowRegister) {
+  if (!loginSettings) {
+    return (
+      <DynamicTheme branding={branding}>
+        <div className="flex flex-col space-y-4">
+          <h1>
+            <Translated i18nKey="title" namespace="register" />
+          </h1>
+          <Alert>
+            <Translated i18nKey="unknownContext" namespace="error" />
+          </Alert>
+        </div>
+        <div className="w-full"></div>
+      </DynamicTheme>
+    );
+  }
+
+  if (!loginSettings?.allowRegister && identityProviders.length === 0) {
     return (
       <DynamicTheme branding={branding}>
         <div className="flex flex-col space-y-4">
