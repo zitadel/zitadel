@@ -106,6 +106,64 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			},
 		},
 		{
+			name: "add machine with invalid metadata key, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Description: "description",
+					Name:        "name",
+					Username:    "username",
+					Metadata: []*AddMetadataEntry{
+						{
+							Key:   "",
+							Value: []byte("value1"),
+						},
+					},
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "add machine with invalid metadata value, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Description: "description",
+					Name:        "name",
+					Username:    "username",
+					Metadata: []*AddMetadataEntry{
+						{
+							Key:   "key1",
+							Value: []byte(""),
+						},
+					},
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "add machine, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(

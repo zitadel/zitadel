@@ -41,11 +41,9 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 		if a.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-p0p2mi", "Errors.User.UserIDMissing")
 		}
-		if machine.Name == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-bs9Ds", "Errors.User.Invalid")
-		}
-		if machine.Username == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
+		err = machine.Validate()
+		if err != nil {
+			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			ctx, span := tracing.NewSpan(ctx)
@@ -223,4 +221,19 @@ func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, fil
 		}
 	}
 	return writeModel, err
+}
+
+func (m *Machine) Validate() (err error) {
+	if m.Name == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-bs9Ds", "Errors.User.Invalid")
+	}
+	if m.Username == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
+	}
+	for _, metadataEntry := range m.Metadata {
+		if err := metadataEntry.Valid(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
