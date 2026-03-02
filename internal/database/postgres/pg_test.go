@@ -17,7 +17,7 @@ func parseDSN(t *testing.T, dsn string) Config {
 	return Config{DSN: dsn, parsedDSN: parsed}
 }
 
-func TestConfig_Decode_parsesDSN(t *testing.T) {
+func TestConfig_parseDSN_parsesDSN(t *testing.T) {
 	c := parseDSN(t, "postgresql://myuser:mypass@dbhost:5433/mydb?sslmode=require")
 	require.NotNil(t, c.parsedDSN)
 	assert.Equal(t, "dbhost", c.parsedDSN.ConnConfig.Host)
