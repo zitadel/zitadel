@@ -21,6 +21,7 @@ import (
 type MockExecutor struct {
 	ctrl     *gomock.Controller
 	recorder *MockExecutorMockRecorder
+	isgomock struct{}
 }
 
 // MockExecutorMockRecorder is the mock recorder for MockExecutor.
@@ -41,17 +42,17 @@ func (m *MockExecutor) EXPECT() *MockExecutorMockRecorder {
 }
 
 // Execute mocks base method.
-func (m *MockExecutor) Execute(arg0 context.Context, arg1 *domain.InvokeOpts) error {
+func (m *MockExecutor) Execute(ctx context.Context, opts *domain.InvokeOpts) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Execute", arg0, arg1)
+	ret := m.ctrl.Call(m, "Execute", ctx, opts)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Execute indicates an expected call of Execute.
-func (mr *MockExecutorMockRecorder) Execute(arg0, arg1 any) *MockExecutorExecuteCall {
+func (mr *MockExecutorMockRecorder) Execute(ctx, opts any) *MockExecutorExecuteCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockExecutor)(nil).Execute), arg0, arg1)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockExecutor)(nil).Execute), ctx, opts)
 	return &MockExecutorExecuteCall{Call: call}
 }
 
@@ -61,8 +62,8 @@ type MockExecutorExecuteCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockExecutorExecuteCall) Return(arg0 error) *MockExecutorExecuteCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockExecutorExecuteCall) Return(err error) *MockExecutorExecuteCall {
+	c.Call = c.Call.Return(err)
 	return c
 }
 

@@ -24,6 +24,7 @@ import (
 type MockInstanceRepository struct {
 	ctrl     *gomock.Controller
 	recorder *MockInstanceRepositoryMockRecorder
+	isgomock struct{}
 }
 
 // MockInstanceRepositoryMockRecorder is the mock recorder for MockInstanceRepository.
@@ -44,17 +45,17 @@ func (m *MockInstanceRepository) EXPECT() *MockInstanceRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockInstanceRepository) Create(arg0 context.Context, arg1 database.QueryExecutor, arg2 *domain.Instance) error {
+func (m *MockInstanceRepository) Create(ctx context.Context, client database.QueryExecutor, instance *domain.Instance) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Create", ctx, client, instance)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockInstanceRepositoryMockRecorder) Create(arg0, arg1, arg2 any) *MockInstanceRepositoryCreateCall {
+func (mr *MockInstanceRepositoryMockRecorder) Create(ctx, client, instance any) *MockInstanceRepositoryCreateCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockInstanceRepository)(nil).Create), arg0, arg1, arg2)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockInstanceRepository)(nil).Create), ctx, client, instance)
 	return &MockInstanceRepositoryCreateCall{Call: call}
 }
 
@@ -157,57 +158,57 @@ func (c *MockInstanceRepositoryDefaultLanguageColumnCall) DoAndReturn(f func() d
 	return c
 }
 
-// DefaultOrgIDColumn mocks base method.
-func (m *MockInstanceRepository) DefaultOrgIDColumn() database.Column {
+// DefaultOrganizationIDColumn mocks base method.
+func (m *MockInstanceRepository) DefaultOrganizationIDColumn() database.Column {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DefaultOrgIDColumn")
+	ret := m.ctrl.Call(m, "DefaultOrganizationIDColumn")
 	ret0, _ := ret[0].(database.Column)
 	return ret0
 }
 
-// DefaultOrgIDColumn indicates an expected call of DefaultOrgIDColumn.
-func (mr *MockInstanceRepositoryMockRecorder) DefaultOrgIDColumn() *MockInstanceRepositoryDefaultOrgIDColumnCall {
+// DefaultOrganizationIDColumn indicates an expected call of DefaultOrganizationIDColumn.
+func (mr *MockInstanceRepositoryMockRecorder) DefaultOrganizationIDColumn() *MockInstanceRepositoryDefaultOrganizationIDColumnCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DefaultOrgIDColumn", reflect.TypeOf((*MockInstanceRepository)(nil).DefaultOrgIDColumn))
-	return &MockInstanceRepositoryDefaultOrgIDColumnCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DefaultOrganizationIDColumn", reflect.TypeOf((*MockInstanceRepository)(nil).DefaultOrganizationIDColumn))
+	return &MockInstanceRepositoryDefaultOrganizationIDColumnCall{Call: call}
 }
 
-// MockInstanceRepositoryDefaultOrgIDColumnCall wrap *gomock.Call
-type MockInstanceRepositoryDefaultOrgIDColumnCall struct {
+// MockInstanceRepositoryDefaultOrganizationIDColumnCall wrap *gomock.Call
+type MockInstanceRepositoryDefaultOrganizationIDColumnCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockInstanceRepositoryDefaultOrgIDColumnCall) Return(arg0 database.Column) *MockInstanceRepositoryDefaultOrgIDColumnCall {
+func (c *MockInstanceRepositoryDefaultOrganizationIDColumnCall) Return(arg0 database.Column) *MockInstanceRepositoryDefaultOrganizationIDColumnCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockInstanceRepositoryDefaultOrgIDColumnCall) Do(f func() database.Column) *MockInstanceRepositoryDefaultOrgIDColumnCall {
+func (c *MockInstanceRepositoryDefaultOrganizationIDColumnCall) Do(f func() database.Column) *MockInstanceRepositoryDefaultOrganizationIDColumnCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockInstanceRepositoryDefaultOrgIDColumnCall) DoAndReturn(f func() database.Column) *MockInstanceRepositoryDefaultOrgIDColumnCall {
+func (c *MockInstanceRepositoryDefaultOrganizationIDColumnCall) DoAndReturn(f func() database.Column) *MockInstanceRepositoryDefaultOrganizationIDColumnCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Delete mocks base method.
-func (m *MockInstanceRepository) Delete(arg0 context.Context, arg1 database.QueryExecutor, arg2 database.Condition) (int64, error) {
+func (m *MockInstanceRepository) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Delete", ctx, client, condition)
 	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockInstanceRepositoryMockRecorder) Delete(arg0, arg1, arg2 any) *MockInstanceRepositoryDeleteCall {
+func (mr *MockInstanceRepositoryMockRecorder) Delete(ctx, client, condition any) *MockInstanceRepositoryDeleteCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockInstanceRepository)(nil).Delete), arg0, arg1, arg2)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockInstanceRepository)(nil).Delete), ctx, client, condition)
 	return &MockInstanceRepositoryDeleteCall{Call: call}
 }
 
@@ -235,17 +236,17 @@ func (c *MockInstanceRepositoryDeleteCall) DoAndReturn(f func(context.Context, d
 }
 
 // ExistsDomain mocks base method.
-func (m *MockInstanceRepository) ExistsDomain(arg0 database.Condition) database.Condition {
+func (m *MockInstanceRepository) ExistsDomain(cond database.Condition) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ExistsDomain", arg0)
+	ret := m.ctrl.Call(m, "ExistsDomain", cond)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // ExistsDomain indicates an expected call of ExistsDomain.
-func (mr *MockInstanceRepositoryMockRecorder) ExistsDomain(arg0 any) *MockInstanceRepositoryExistsDomainCall {
+func (mr *MockInstanceRepositoryMockRecorder) ExistsDomain(cond any) *MockInstanceRepositoryExistsDomainCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsDomain", reflect.TypeOf((*MockInstanceRepository)(nil).ExistsDomain), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsDomain", reflect.TypeOf((*MockInstanceRepository)(nil).ExistsDomain), cond)
 	return &MockInstanceRepositoryExistsDomainCall{Call: call}
 }
 
@@ -273,10 +274,10 @@ func (c *MockInstanceRepositoryExistsDomainCall) DoAndReturn(f func(database.Con
 }
 
 // Get mocks base method.
-func (m *MockInstanceRepository) Get(arg0 context.Context, arg1 database.QueryExecutor, arg2 ...database.QueryOption) (*domain.Instance, error) {
+func (m *MockInstanceRepository) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Instance, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, client}
+	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Get", varargs...)
@@ -286,9 +287,9 @@ func (m *MockInstanceRepository) Get(arg0 context.Context, arg1 database.QueryEx
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockInstanceRepositoryMockRecorder) Get(arg0, arg1 any, arg2 ...any) *MockInstanceRepositoryGetCall {
+func (mr *MockInstanceRepositoryMockRecorder) Get(ctx, client any, opts ...any) *MockInstanceRepositoryGetCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, client}, opts...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockInstanceRepository)(nil).Get), varargs...)
 	return &MockInstanceRepositoryGetCall{Call: call}
 }
@@ -393,17 +394,17 @@ func (c *MockInstanceRepositoryIDColumnCall) DoAndReturn(f func() database.Colum
 }
 
 // IDCondition mocks base method.
-func (m *MockInstanceRepository) IDCondition(arg0 string) database.Condition {
+func (m *MockInstanceRepository) IDCondition(instanceID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IDCondition", arg0)
+	ret := m.ctrl.Call(m, "IDCondition", instanceID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // IDCondition indicates an expected call of IDCondition.
-func (mr *MockInstanceRepositoryMockRecorder) IDCondition(arg0 any) *MockInstanceRepositoryIDConditionCall {
+func (mr *MockInstanceRepositoryMockRecorder) IDCondition(instanceID any) *MockInstanceRepositoryIDConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDCondition", reflect.TypeOf((*MockInstanceRepository)(nil).IDCondition), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDCondition", reflect.TypeOf((*MockInstanceRepository)(nil).IDCondition), instanceID)
 	return &MockInstanceRepositoryIDConditionCall{Call: call}
 }
 
@@ -431,10 +432,10 @@ func (c *MockInstanceRepositoryIDConditionCall) DoAndReturn(f func(string) datab
 }
 
 // List mocks base method.
-func (m *MockInstanceRepository) List(arg0 context.Context, arg1 database.QueryExecutor, arg2 ...database.QueryOption) ([]*domain.Instance, error) {
+func (m *MockInstanceRepository) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Instance, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, client}
+	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "List", varargs...)
@@ -444,9 +445,9 @@ func (m *MockInstanceRepository) List(arg0 context.Context, arg1 database.QueryE
 }
 
 // List indicates an expected call of List.
-func (mr *MockInstanceRepositoryMockRecorder) List(arg0, arg1 any, arg2 ...any) *MockInstanceRepositoryListCall {
+func (mr *MockInstanceRepositoryMockRecorder) List(ctx, client any, opts ...any) *MockInstanceRepositoryListCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, client}, opts...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockInstanceRepository)(nil).List), varargs...)
 	return &MockInstanceRepositoryListCall{Call: call}
 }
@@ -512,40 +513,40 @@ func (c *MockInstanceRepositoryLoadDomainsCall) DoAndReturn(f func() domain.Inst
 	return c
 }
 
-// ManagementConsoleAppIDColumn mocks base method.
-func (m *MockInstanceRepository) ManagementConsoleAppIDColumn() database.Column {
+// ManagementConsoleApplicationIDColumn mocks base method.
+func (m *MockInstanceRepository) ManagementConsoleApplicationIDColumn() database.Column {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ManagementConsoleAppIDColumn")
+	ret := m.ctrl.Call(m, "ManagementConsoleApplicationIDColumn")
 	ret0, _ := ret[0].(database.Column)
 	return ret0
 }
 
-// ManagementConsoleAppIDColumn indicates an expected call of ManagementConsoleAppIDColumn.
-func (mr *MockInstanceRepositoryMockRecorder) ManagementConsoleAppIDColumn() *MockInstanceRepositoryManagementConsoleAppIDColumnCall {
+// ManagementConsoleApplicationIDColumn indicates an expected call of ManagementConsoleApplicationIDColumn.
+func (mr *MockInstanceRepositoryMockRecorder) ManagementConsoleApplicationIDColumn() *MockInstanceRepositoryManagementConsoleApplicationIDColumnCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ManagementConsoleAppIDColumn", reflect.TypeOf((*MockInstanceRepository)(nil).ManagementConsoleAppIDColumn))
-	return &MockInstanceRepositoryManagementConsoleAppIDColumnCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ManagementConsoleApplicationIDColumn", reflect.TypeOf((*MockInstanceRepository)(nil).ManagementConsoleApplicationIDColumn))
+	return &MockInstanceRepositoryManagementConsoleApplicationIDColumnCall{Call: call}
 }
 
-// MockInstanceRepositoryManagementConsoleAppIDColumnCall wrap *gomock.Call
-type MockInstanceRepositoryManagementConsoleAppIDColumnCall struct {
+// MockInstanceRepositoryManagementConsoleApplicationIDColumnCall wrap *gomock.Call
+type MockInstanceRepositoryManagementConsoleApplicationIDColumnCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockInstanceRepositoryManagementConsoleAppIDColumnCall) Return(arg0 database.Column) *MockInstanceRepositoryManagementConsoleAppIDColumnCall {
+func (c *MockInstanceRepositoryManagementConsoleApplicationIDColumnCall) Return(arg0 database.Column) *MockInstanceRepositoryManagementConsoleApplicationIDColumnCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockInstanceRepositoryManagementConsoleAppIDColumnCall) Do(f func() database.Column) *MockInstanceRepositoryManagementConsoleAppIDColumnCall {
+func (c *MockInstanceRepositoryManagementConsoleApplicationIDColumnCall) Do(f func() database.Column) *MockInstanceRepositoryManagementConsoleApplicationIDColumnCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockInstanceRepositoryManagementConsoleAppIDColumnCall) DoAndReturn(f func() database.Column) *MockInstanceRepositoryManagementConsoleAppIDColumnCall {
+func (c *MockInstanceRepositoryManagementConsoleApplicationIDColumnCall) DoAndReturn(f func() database.Column) *MockInstanceRepositoryManagementConsoleApplicationIDColumnCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -627,17 +628,17 @@ func (c *MockInstanceRepositoryNameColumnCall) DoAndReturn(f func() database.Col
 }
 
 // NameCondition mocks base method.
-func (m *MockInstanceRepository) NameCondition(arg0 database.TextOperation, arg1 string) database.Condition {
+func (m *MockInstanceRepository) NameCondition(op database.TextOperation, name string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NameCondition", arg0, arg1)
+	ret := m.ctrl.Call(m, "NameCondition", op, name)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // NameCondition indicates an expected call of NameCondition.
-func (mr *MockInstanceRepositoryMockRecorder) NameCondition(arg0, arg1 any) *MockInstanceRepositoryNameConditionCall {
+func (mr *MockInstanceRepositoryMockRecorder) NameCondition(op, name any) *MockInstanceRepositoryNameConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NameCondition", reflect.TypeOf((*MockInstanceRepository)(nil).NameCondition), arg0, arg1)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NameCondition", reflect.TypeOf((*MockInstanceRepository)(nil).NameCondition), op, name)
 	return &MockInstanceRepositoryNameConditionCall{Call: call}
 }
 
@@ -703,17 +704,17 @@ func (c *MockInstanceRepositoryPrimaryKeyColumnsCall) DoAndReturn(f func() []dat
 }
 
 // PrimaryKeyCondition mocks base method.
-func (m *MockInstanceRepository) PrimaryKeyCondition(arg0 string) database.Condition {
+func (m *MockInstanceRepository) PrimaryKeyCondition(instanceID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PrimaryKeyCondition", arg0)
+	ret := m.ctrl.Call(m, "PrimaryKeyCondition", instanceID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // PrimaryKeyCondition indicates an expected call of PrimaryKeyCondition.
-func (mr *MockInstanceRepositoryMockRecorder) PrimaryKeyCondition(arg0 any) *MockInstanceRepositoryPrimaryKeyConditionCall {
+func (mr *MockInstanceRepositoryMockRecorder) PrimaryKeyCondition(instanceID any) *MockInstanceRepositoryPrimaryKeyConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrimaryKeyCondition", reflect.TypeOf((*MockInstanceRepository)(nil).PrimaryKeyCondition), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrimaryKeyCondition", reflect.TypeOf((*MockInstanceRepository)(nil).PrimaryKeyCondition), instanceID)
 	return &MockInstanceRepositoryPrimaryKeyConditionCall{Call: call}
 }
 
@@ -778,56 +779,56 @@ func (c *MockInstanceRepositorySetDefaultLanguageCall) DoAndReturn(f func(langua
 	return c
 }
 
-// SetDefaultOrg mocks base method.
-func (m *MockInstanceRepository) SetDefaultOrg(arg0 string) database.Change {
+// SetDefaultOrganization mocks base method.
+func (m *MockInstanceRepository) SetDefaultOrganization(id string) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetDefaultOrg", arg0)
+	ret := m.ctrl.Call(m, "SetDefaultOrganization", id)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
-// SetDefaultOrg indicates an expected call of SetDefaultOrg.
-func (mr *MockInstanceRepositoryMockRecorder) SetDefaultOrg(arg0 any) *MockInstanceRepositorySetDefaultOrgCall {
+// SetDefaultOrganization indicates an expected call of SetDefaultOrganization.
+func (mr *MockInstanceRepositoryMockRecorder) SetDefaultOrganization(id any) *MockInstanceRepositorySetDefaultOrganizationCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetDefaultOrg", reflect.TypeOf((*MockInstanceRepository)(nil).SetDefaultOrg), arg0)
-	return &MockInstanceRepositorySetDefaultOrgCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetDefaultOrganization", reflect.TypeOf((*MockInstanceRepository)(nil).SetDefaultOrganization), id)
+	return &MockInstanceRepositorySetDefaultOrganizationCall{Call: call}
 }
 
-// MockInstanceRepositorySetDefaultOrgCall wrap *gomock.Call
-type MockInstanceRepositorySetDefaultOrgCall struct {
+// MockInstanceRepositorySetDefaultOrganizationCall wrap *gomock.Call
+type MockInstanceRepositorySetDefaultOrganizationCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockInstanceRepositorySetDefaultOrgCall) Return(arg0 database.Change) *MockInstanceRepositorySetDefaultOrgCall {
+func (c *MockInstanceRepositorySetDefaultOrganizationCall) Return(arg0 database.Change) *MockInstanceRepositorySetDefaultOrganizationCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockInstanceRepositorySetDefaultOrgCall) Do(f func(string) database.Change) *MockInstanceRepositorySetDefaultOrgCall {
+func (c *MockInstanceRepositorySetDefaultOrganizationCall) Do(f func(string) database.Change) *MockInstanceRepositorySetDefaultOrganizationCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockInstanceRepositorySetDefaultOrgCall) DoAndReturn(f func(string) database.Change) *MockInstanceRepositorySetDefaultOrgCall {
+func (c *MockInstanceRepositorySetDefaultOrganizationCall) DoAndReturn(f func(string) database.Change) *MockInstanceRepositorySetDefaultOrganizationCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // SetIAMProject mocks base method.
-func (m *MockInstanceRepository) SetIAMProject(arg0 string) database.Change {
+func (m *MockInstanceRepository) SetIAMProject(id string) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetIAMProject", arg0)
+	ret := m.ctrl.Call(m, "SetIAMProject", id)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetIAMProject indicates an expected call of SetIAMProject.
-func (mr *MockInstanceRepositoryMockRecorder) SetIAMProject(arg0 any) *MockInstanceRepositorySetIAMProjectCall {
+func (mr *MockInstanceRepositoryMockRecorder) SetIAMProject(id any) *MockInstanceRepositorySetIAMProjectCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetIAMProject", reflect.TypeOf((*MockInstanceRepository)(nil).SetIAMProject), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetIAMProject", reflect.TypeOf((*MockInstanceRepository)(nil).SetIAMProject), id)
 	return &MockInstanceRepositorySetIAMProjectCall{Call: call}
 }
 
@@ -854,40 +855,40 @@ func (c *MockInstanceRepositorySetIAMProjectCall) DoAndReturn(f func(string) dat
 	return c
 }
 
-// SetManagementConsoleAppID mocks base method.
-func (m *MockInstanceRepository) SetManagementConsoleAppID(id string) database.Change {
+// SetManagementConsoleApplicationID mocks base method.
+func (m *MockInstanceRepository) SetManagementConsoleApplicationID(id string) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetManagementConsoleAppID", id)
+	ret := m.ctrl.Call(m, "SetManagementConsoleApplicationID", id)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
-// SetManagementConsoleAppID indicates an expected call of SetManagementConsoleAppID.
-func (mr *MockInstanceRepositoryMockRecorder) SetManagementConsoleAppID(id any) *MockInstanceRepositorySetManagementConsoleAppIDCall {
+// SetManagementConsoleApplicationID indicates an expected call of SetManagementConsoleApplicationID.
+func (mr *MockInstanceRepositoryMockRecorder) SetManagementConsoleApplicationID(id any) *MockInstanceRepositorySetManagementConsoleApplicationIDCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetManagementConsoleAppID", reflect.TypeOf((*MockInstanceRepository)(nil).SetManagementConsoleAppID), id)
-	return &MockInstanceRepositorySetManagementConsoleAppIDCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetManagementConsoleApplicationID", reflect.TypeOf((*MockInstanceRepository)(nil).SetManagementConsoleApplicationID), id)
+	return &MockInstanceRepositorySetManagementConsoleApplicationIDCall{Call: call}
 }
 
-// MockInstanceRepositorySetManagementConsoleAppIDCall wrap *gomock.Call
-type MockInstanceRepositorySetManagementConsoleAppIDCall struct {
+// MockInstanceRepositorySetManagementConsoleApplicationIDCall wrap *gomock.Call
+type MockInstanceRepositorySetManagementConsoleApplicationIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockInstanceRepositorySetManagementConsoleAppIDCall) Return(arg0 database.Change) *MockInstanceRepositorySetManagementConsoleAppIDCall {
+func (c *MockInstanceRepositorySetManagementConsoleApplicationIDCall) Return(arg0 database.Change) *MockInstanceRepositorySetManagementConsoleApplicationIDCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockInstanceRepositorySetManagementConsoleAppIDCall) Do(f func(string) database.Change) *MockInstanceRepositorySetManagementConsoleAppIDCall {
+func (c *MockInstanceRepositorySetManagementConsoleApplicationIDCall) Do(f func(string) database.Change) *MockInstanceRepositorySetManagementConsoleApplicationIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockInstanceRepositorySetManagementConsoleAppIDCall) DoAndReturn(f func(string) database.Change) *MockInstanceRepositorySetManagementConsoleAppIDCall {
+func (c *MockInstanceRepositorySetManagementConsoleApplicationIDCall) DoAndReturn(f func(string) database.Change) *MockInstanceRepositorySetManagementConsoleApplicationIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -931,17 +932,17 @@ func (c *MockInstanceRepositorySetManagementConsoleClientIDCall) DoAndReturn(f f
 }
 
 // SetName mocks base method.
-func (m *MockInstanceRepository) SetName(arg0 string) database.Change {
+func (m *MockInstanceRepository) SetName(name string) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetName", arg0)
+	ret := m.ctrl.Call(m, "SetName", name)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetName indicates an expected call of SetName.
-func (mr *MockInstanceRepositoryMockRecorder) SetName(arg0 any) *MockInstanceRepositorySetNameCall {
+func (mr *MockInstanceRepositoryMockRecorder) SetName(name any) *MockInstanceRepositorySetNameCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetName", reflect.TypeOf((*MockInstanceRepository)(nil).SetName), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetName", reflect.TypeOf((*MockInstanceRepository)(nil).SetName), name)
 	return &MockInstanceRepositorySetNameCall{Call: call}
 }
 
@@ -1007,10 +1008,10 @@ func (c *MockInstanceRepositorySetUpdatedAtCall) DoAndReturn(f func(time.Time) d
 }
 
 // Update mocks base method.
-func (m *MockInstanceRepository) Update(arg0 context.Context, arg1 database.QueryExecutor, arg2 database.Condition, arg3 ...database.Change) (int64, error) {
+func (m *MockInstanceRepository) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1, arg2}
-	for _, a := range arg3 {
+	varargs := []any{ctx, client, condition}
+	for _, a := range changes {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Update", varargs...)
@@ -1020,9 +1021,9 @@ func (m *MockInstanceRepository) Update(arg0 context.Context, arg1 database.Quer
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockInstanceRepositoryMockRecorder) Update(arg0, arg1, arg2 any, arg3 ...any) *MockInstanceRepositoryUpdateCall {
+func (mr *MockInstanceRepositoryMockRecorder) Update(ctx, client, condition any, changes ...any) *MockInstanceRepositoryUpdateCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1, arg2}, arg3...)
+	varargs := append([]any{ctx, client, condition}, changes...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockInstanceRepository)(nil).Update), varargs...)
 	return &MockInstanceRepositoryUpdateCall{Call: call}
 }
