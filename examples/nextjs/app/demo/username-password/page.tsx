@@ -132,7 +132,7 @@ export default function UsernamePasswordDemoPage() {
   }
 
   return (
-    <section className="ztdl-lane">
+    <section className="ztdl-lane ztdl-noise">
       <h2>Username/password demo lane</h2>
       <p>Creates a verified session from username/password and optionally builds an OIDC callback URL.</p>
 

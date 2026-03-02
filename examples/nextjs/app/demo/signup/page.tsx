@@ -94,7 +94,7 @@ export default function SignupDemoPage() {
   );
 
   return (
-    <section className="ztdl-lane">
+    <section className="ztdl-lane ztdl-noise">
       <h2>Signup demo lane</h2>
       <p>
         Live demo for password signup via <code>POST /api/demo/signup/password</code>.

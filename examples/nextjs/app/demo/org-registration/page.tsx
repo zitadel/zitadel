@@ -77,7 +77,7 @@ export default function OrgRegistrationDemoPage() {
   };
 
   return (
-    <section className="ztdl-lane">
+    <section className="ztdl-lane ztdl-noise">
       <h2>Organization registration demo lane</h2>
       <p>
         This calls the v2 Organization API (<code>organizationService.addOrganization</code>) via{" "}

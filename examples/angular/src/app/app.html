@@ -1,0 +1,46 @@
+<main class="layout">
+  <header class="header">
+    <h1>Angular SPA + ZITADEL BFF</h1>
+    <p>
+      This Angular example uses the same server boundary model as the React
+      example: callback and token exchange happen on the BFF.
+    </p>
+  </header>
+
+  <section class="card">
+    <h2>Session state</h2>
+    <p>Authenticated: {{ session.authenticated ? 'yes' : 'no' }}</p>
+    <p>Session expires: {{ sessionExpiresText }}</p>
+    <p>Refresh token available: {{ session.hasRefreshToken ? 'yes' : 'no' }}</p>
+
+    <div class="actions">
+      <button type="button" (click)="signIn()">Sign in with ZITADEL</button>
+      <button type="button" (click)="refreshSession()" [disabled]="loading">
+        Refresh session
+      </button>
+      <button
+        type="button"
+        (click)="loadUserInfo()"
+        [disabled]="loading || !session.authenticated"
+      >
+        Load userinfo via BFF
+      </button>
+      <button
+        type="button"
+        (click)="logout()"
+        [disabled]="loading || !session.authenticated"
+      >
+        Logout
+      </button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>User info</h2>
+    <pre>{{ userInfo ? (userInfo | json) : '{ "message": "No user info loaded" }' }}</pre>
+  </section>
+
+  @if (error) {
+    <p class="error">{{ error }}</p>
+  }
+</main>

@@ -23,7 +23,7 @@ const lanes = [
 
 export default function HomePage() {
   return (
-    <main className="ztdl-page">
+    <main className="ztdl-page ztdl-noise">
       <p className="ztdl-eyebrow">ZITADEL SDK demo</p>
       <h1 className="ztdl-title">Next.js reference lanes</h1>
       <p className="ztdl-subtitle">
@@ -31,7 +31,7 @@ export default function HomePage() {
       </p>
       <ul className="ztdl-card-grid">
         {lanes.map((lane) => (
-          <li key={lane.href} className="ztdl-card">
+          <li key={lane.href} className="ztdl-card ztdl-noise">
             <h3>
               <a href={lane.href}>{lane.label}</a>
             </h3>

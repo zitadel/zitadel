@@ -58,6 +58,32 @@ A shared `.env.example` lives at `packages/.env.example` with three sections:
 
 All SDK modules auto-read these env vars as fallbacks when options are not passed explicitly.
 
+## Package Ownership + Runtime Boundary Matrix
+
+Use this matrix when deciding where a feature belongs and which runtime should execute it.
+
+| Package | Primary role | Browser runtime | Server runtime |
+| --- | --- | --- | --- |
+| `@zitadel/zitadel-js` | Framework-agnostic core primitives (`oidc`, `session`, transport, shared helpers). | Yes (OIDC discovery/auth URL helpers, PKCE/state generation, token exchange without client secret). | Yes (`/node` token/JWT helpers, webhook verification, API transport factories). |
+| `@zitadel/react` | React composition layer (context/hooks/components) over SDK primitives. | Yes (UI state and rendering helpers). | No direct server-only abstractions. |
+| `@zitadel/nextjs` | Next.js App Router adapter (`auth/oidc`, `auth/session`, `api`, `webhook`, middleware). | Minimal browser surface (route entry points). | Yes (cookie/session handling, callback/token exchange, API clients, webhook routes). |
+| `@zitadel/angular` | Angular adapter surface (provider/guard/interceptor patterns). | Target runtime is browser app integration. | Server helpers are limited; server-boundary handling should remain in dedicated BFF/server routes. |
+
+### SPA server-boundary defaults
+
+For SPA integrations (React/Angular/Vue/etc.), use these default ownership rules:
+
+| Capability | Default owner |
+| --- | --- |
+| UI state, route guards, login button rendering, user-facing navigation | Browser app (`@zitadel/react` / framework app code). |
+| Authorization callback endpoint, code exchange side effects, session cookie writes | Server/BFF route. |
+| Service-user credentials, private key JWT generation, introspection credentials | Server/BFF only. |
+| Webhook signature/JWT/JWE verification | Server-only (`@zitadel/zitadel-js/webhooks` or framework server adapters). |
+| Access to management/system/event APIs with confidential credentials | Server-only (`api/*` lanes). |
+| Calls to userinfo/resource endpoints using browser session state | Prefer server proxy in SPA+BFF architecture. |
+
+Boundary rule for SPAs: if code needs confidential material (secret/private key/system token) or writes trusted session state, it belongs on the server/BFF side.
+
 ## Canonical Cross-SDK Capability Model
 Use these capability lanes as the shared model for all SDKs (JS/Next.js today, Go and others as they are added).
 Each public SDK surface should map to exactly one primary lane.

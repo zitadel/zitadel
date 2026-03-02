@@ -1,0 +1,17 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "build": {
+      "description": "Builds the Angular SPA example",
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["default", "{workspaceRoot}/pnpm-lock.yaml"],
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "dev": {
+      "description": "Runs the Angular SPA example",
+      "continuous": true,
+      "dependsOn": ["^build"]
+    }
+  }
+}

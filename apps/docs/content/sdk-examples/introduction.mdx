@@ -44,10 +44,24 @@ We provide this list for informational purposes and to foster community engageme
 
 ## Official JavaScript SDK packages
 
-For JavaScript/TypeScript integrations, ZITADEL provides official SDK packages that cover common frontend and Next.js server use cases:
+For JavaScript/TypeScript integrations, ZITADEL provides official SDK packages that cover frontend frameworks and server adapters:
 
-- `@zitadel/zitadel-js`: framework-agnostic core helpers (transport/client factories, v2 client factories, token helpers, webhook verification)
-- `@zitadel/nextjs`: Next.js App Router helpers for OIDC login (`auth/oidc`), custom Login UI/session flows (`auth/session`), v2 API access (`api`), and Actions v2 webhooks (`webhook`)
+- `@zitadel/zitadel-js`: framework-agnostic core helpers (OIDC/PKCE primitives, transport/client factories, token helpers, webhook verification).
+- `@zitadel/react`: React context/hooks/components for auth state composition in browser apps.
+- `@zitadel/nextjs`: Next.js App Router helpers for OIDC login (`auth/oidc`), custom Login UI/session flows (`auth/session`), v2 API access (`api`), and Actions v2 webhooks (`webhook`).
+- `@zitadel/angular`: Angular provider/guard/interceptor-oriented SDK surface for browser integrations.
+
+### SPA boundary guidance (React/Angular/Vue/etc.)
+
+For SPAs, keep UI concerns in the browser and move sensitive auth/API steps to a server or BFF:
+
+- **Browser app:** route guards, login button UX, non-sensitive session display.
+- **Server/BFF:** callback handling, authorization code exchange side effects, confidential credentials, token introspection, webhook verification, and management API calls.
+
+Reference examples in this repository:
+
+- React Router + Vite SPA + shared BFF: `examples/react-router` + `examples/spa-bff`
+- Angular SPA + shared BFF: `examples/angular` + `examples/spa-bff`
 
 Use-case guides:
 

@@ -91,7 +91,7 @@ export default async function OidcDemoPage(props: {
       };
 
   return (
-    <section className="ztdl-lane">
+    <section className="ztdl-lane ztdl-noise">
       <h2>OIDC demo lane</h2>
       <p>Use this page to validate sign in, callback handling, and sign out redirects.</p>
       <ol>

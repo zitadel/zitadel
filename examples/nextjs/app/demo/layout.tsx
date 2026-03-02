@@ -9,7 +9,7 @@ const demoLinks = [
 
 export default function DemoLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <main className="ztdl-page">
+    <main className="ztdl-page ztdl-noise">
       <p className="ztdl-eyebrow">ZITADEL SDK demo</p>
       <h1 className="ztdl-title">Demo lanes</h1>
       <p className="ztdl-subtitle">

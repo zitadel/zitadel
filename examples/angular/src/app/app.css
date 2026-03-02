@@ -1,0 +1,68 @@
+:host {
+  display: block;
+}
+
+.layout {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+  color: #f4f4f6;
+  font-family: Inter, Arimo, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.header p {
+  color: #b5b5bc;
+}
+
+.card {
+  background: #18181c;
+  border: 1px solid #2c2c31;
+  border-radius: 0.9rem;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+button {
+  border: 1px solid #3a3a3f;
+  background: #252528;
+  color: #f4f4f6;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+button:hover:enabled {
+  border-color: #f25543;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+pre {
+  margin-top: 0.75rem;
+  overflow: auto;
+  border-radius: 0.6rem;
+  border: 1px solid #2c2c31;
+  background: #0f0f11;
+  padding: 0.9rem;
+}
+
+.error {
+  margin-top: 1rem;
+  color: #f25543;
+}
