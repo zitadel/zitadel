@@ -3,6 +3,8 @@
 package events_test
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
 	"testing"
 	"time"
 
@@ -14,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	"github.com/zitadel/zitadel/internal/crypto"
 	zitadel_internal_domain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -2062,7 +2065,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			ClientId:   "clientID",
 			TeamId:     "teamIDteam",
 			KeyId:      "keyIDKeyId",
-			PrivateKey: []byte("privateKey"),
+			PrivateKey: generatePrivateKeyPKCS8(),
 			Scopes:     []string{"scope"},
 			ProviderOptions: &idp_grpc.Options{
 				IsLinkingAllowed:  false,
@@ -2114,7 +2117,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			ClientId:   "clientID",
 			TeamId:     "teamIDteam",
 			KeyId:      "keyIDKeyId",
-			PrivateKey: []byte("privateKey"),
+			PrivateKey: generatePrivateKeyPKCS8(),
 			Scopes:     []string{"scope"},
 			ProviderOptions: &idp_grpc.Options{
 				IsLinkingAllowed:  false,
@@ -2145,7 +2148,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			ClientId:   "new_clientID",
 			TeamId:     "new_teamID",
 			KeyId:      "new_kKeyId",
-			PrivateKey: []byte("new_privateKey"),
+			PrivateKey: generatePrivateKeyPKCS8(),
 			Scopes:     []string{"new_scope"},
 			ProviderOptions: &idp_grpc.Options{
 				IsLinkingAllowed:  true,
@@ -2418,4 +2421,10 @@ func defaultInstanceLDAPRequest(name string) *admin.AddLDAPProviderRequest {
 			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 		},
 	}
+}
+
+func generatePrivateKeyPKCS8() []byte {
+	privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+	data, _ := crypto.PrivateKeyToBytesPKCS8(privateKey)
+	return data
 }
