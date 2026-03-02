@@ -28,7 +28,7 @@ const SMOCKER_ADMIN_PORT = 8081;
  * from inside the container - this verifies TLS at the transport layer without
  * needing gRPC/HTTP2 support.
  */
-const LOGIN_IMAGE_TAG = `zitadel-login-ca-test:${Date.now()}`;
+const LOGIN_IMAGE_TAG = `zitadel-login-test:${process.env.GITHUB_SHA || "local"}`;
 
 async function testTlsConnection(
   container: StartedTestContainer,

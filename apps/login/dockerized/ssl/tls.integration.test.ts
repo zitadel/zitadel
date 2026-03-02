@@ -10,6 +10,7 @@ const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = path.join(TEST_DIR, "output");
 const CERTS_DIR = path.join(OUTPUT_DIR, "certs");
 const LOGIN_APP_DIR = path.join(TEST_DIR, "../..");
+const LOGIN_IMAGE_TAG = `zitadel-login-test:${process.env.GITHUB_SHA || "local"}`;
 
 /**
  * Integration tests for TLS support in the login application.
@@ -44,7 +45,8 @@ describe("Login Container TLS Support", () => {
     fs.writeFileSync(path.join(CERTS_DIR, "server.crt"), certs.server.cert);
     fs.writeFileSync(path.join(CERTS_DIR, "server.key"), certs.server.key);
 
-    loginImage = await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build();
+    await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+    loginImage = new GenericContainer(LOGIN_IMAGE_TAG);
   });
 
   describe("when TLS is not enabled", () => {
@@ -54,9 +56,6 @@ describe("Login Container TLS Support", () => {
     beforeAll(async () => {
       container = await loginImage
         .withExposedPorts(3000)
-        .withEnvironment({
-          OTEL_SDK_DISABLED: "true",
-        })
         .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
         .start();
 
@@ -84,7 +83,6 @@ describe("Login Container TLS Support", () => {
           ZITADEL_TLS_ENABLED: "true",
           ZITADEL_TLS_CERTPATH: "/certs/server.crt",
           ZITADEL_TLS_KEYPATH: "/certs/server.key",
-          OTEL_SDK_DISABLED: "true",
         })
         .withCopyFilesToContainer([
           {

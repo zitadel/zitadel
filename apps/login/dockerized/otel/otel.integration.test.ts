@@ -11,7 +11,7 @@ const LOGIN_APP_DIR = path.join(TEST_DIR, "../..");
 const DOCKER_TIMEOUT = 180000;
 const TEST_TIMEOUT = 30000;
 
-const LOGIN_IMAGE_TAG = `zitadel-login-otel-test:${Date.now()}`;
+const LOGIN_IMAGE_TAG = `zitadel-login-test:${process.env.GITHUB_SHA || "local"}`;
 
 function readTraces(): string {
   try {
