@@ -2087,7 +2087,7 @@ message CreateUserRequest{
     ];
 
     // Deprecated: Use the metadata field in the user object instead.
-    // If both metadata fields are set, the the validation will fail.
+    // If both metadata fields are set, the validation will fail.
     //
     // Metadata to be set. The values have to be base64 encoded.
     repeated Metadata metadata = 9 [

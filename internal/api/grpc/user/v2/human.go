@@ -16,11 +16,11 @@ import (
 )
 
 func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUserRequest_Human, orgId string, userName, userId *string, metadata []*user.Metadata) (*connect.Response[user.CreateUserResponse], error) {
-	if len(metadata) > 0 && len(humanPb.Metadata) > 0 {
-		return nil, zerrors.ThrowInvalidArgument(nil, "", "metadata set both on the user level and the human level")
+	if len(metadata) > 0 && len(humanPb.Metadata) > 0 { //nolint:staticcheck
+		return nil, zerrors.ThrowInvalidArgument(nil, "USERv2-j0z7uy", "Errors.User.Metadata.Conflicting")
 	}
-	if len(metadata) == 0 && len(humanPb.Metadata) > 0 {
-		metadata = humanPb.Metadata
+	if len(metadata) == 0 && len(humanPb.Metadata) > 0 { //nolint:staticcheck
+		metadata = humanPb.Metadata //nolint:staticcheck
 	}
 	metadataEntries := setMetadataEntries(metadata)
 	addHumanPb := &user.AddHumanUserRequest{
