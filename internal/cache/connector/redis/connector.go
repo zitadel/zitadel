@@ -198,7 +198,7 @@ func optionsFromURL(c Config) (*redis.Options, error) {
 		opts.ConnMaxLifetime = c.ConnMaxLifetime
 	}
 
-	opts.DisableIndentity = c.DisableIndentity
+	opts.DisableIdentity = c.DisableIndentity
 	if c.IdentitySuffix != "" {
 		opts.IdentitySuffix = c.IdentitySuffix
 	}
