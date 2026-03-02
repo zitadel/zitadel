@@ -133,7 +133,7 @@ Errors:
     PAT:
       NotFound: "Personal Access Token not found"
     Metadata:
-      Conflicting: "Metadata fields set both on the user level and the human level"
+      Conflicting: "Metadata must not be set on both the user and human fields"
     NotHuman: "The User must be personal"
     NotMachine: "The User must be technical"
     WrongType: "Not allowed for this user type"
