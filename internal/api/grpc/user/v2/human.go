@@ -19,10 +19,10 @@ func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUs
 	if len(metadata) > 0 && len(humanPb.Metadata) > 0 {
 		return nil, zerrors.ThrowInvalidArgument(nil, "", "metadata set both on the user level and the human level")
 	}
-	if len(metadata) > 0 {
-		humanPb.Metadata = metadata
+	if len(metadata) == 0 && len(humanPb.Metadata) > 0 {
+		metadata = humanPb.Metadata
 	}
-	metadataEntries := setMetadataEntries(humanPb.Metadata)
+	metadataEntries := setMetadataEntries(metadata)
 	addHumanPb := &user.AddHumanUserRequest{
 		Username: userName,
 		UserId:   userId,
