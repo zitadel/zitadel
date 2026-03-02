@@ -2087,9 +2087,9 @@ message CreateUserRequest{
     ];
 
     // Deprecated: Use the metadata field in the user object instead.
-    // If the metadata field in the user object is set, the values in this field will be ignored.
+    // If both metadata fields are set, the the validation will fail.
     //
-    // Metadata to bet set. The values have to be base64 encoded.
+    // Metadata to be set. The values have to be base64 encoded.
     repeated Metadata metadata = 9 [
       deprecated = true,
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
