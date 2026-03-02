@@ -15,9 +15,9 @@ var _ domain.OrganizationRepository = (*org)(nil)
 
 type org struct {
 	shouldLoadDomains  bool
-	domainRepo         orgDomain
+	domainRepo         organizationDomain
 	shouldLoadMetadata bool
-	metadataRepo       orgMetadata
+	metadataRepo       organizationMetadata
 }
 
 func (o org) qualifiedTableName() string {
@@ -140,7 +140,7 @@ func (o org) StateCondition(state domain.OrgState) database.Condition {
 	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state.String())
 }
 
-// ExistsDomain creates a correlated [database.Exists] condition on org_domains.
+// ExistsDomain creates a correlated [database.Exists] condition on organization_domains.
 // Use this filter to make sure the organization returned contains a specific domain.
 // Example usage:
 //
@@ -328,7 +328,7 @@ func (o org) joinMetadata() database.QueryOption {
 // -------------------------------------------------------------
 
 const queryOrganizationStmt = `SELECT organizations.id, organizations.name, organizations.instance_id, organizations.state, organizations.created_at, organizations.updated_at` +
-	` , jsonb_agg(json_build_object('instanceId', org_domains.instance_id, 'orgId', org_domains.organization_id, 'domain', org_domains.domain, 'isVerified', org_domains.is_verified, 'isPrimary', org_domains.is_primary, 'validationType', org_domains.validation_type, 'createdAt', org_domains.created_at, 'updatedAt', org_domains.updated_at)) FILTER (WHERE org_domains.organization_id IS NOT NULL) AS domains` +
+	` , jsonb_agg(json_build_object('instanceId', organization_domains.instance_id, 'orgId', organization_domains.organization_id, 'domain', organization_domains.domain, 'isVerified', organization_domains.is_verified, 'isPrimary', organization_domains.is_primary, 'validationType', organization_domains.validation_type, 'createdAt', organization_domains.created_at, 'updatedAt', organization_domains.updated_at)) FILTER (WHERE organization_domains.organization_id IS NOT NULL) AS domains` +
 	` , jsonb_agg(json_build_object('instanceId', organization_metadata.instance_id, 'orgId', organization_metadata.organization_id, 'key', organization_metadata.key, 'value', encode(organization_metadata.value, 'base64'), 'createdAt', organization_metadata.created_at, 'updatedAt', organization_metadata.updated_at)) FILTER (WHERE organization_metadata.organization_id IS NOT NULL) AS metadata` +
 	` FROM `
 

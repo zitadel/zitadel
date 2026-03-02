@@ -8,20 +8,20 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-var _ domain.OrganizationDomainRepository = (*orgDomain)(nil)
+var _ domain.OrganizationDomainRepository = (*organizationDomain)(nil)
 
-type orgDomain struct{}
+type organizationDomain struct{}
 
 func OrganizationDomainRepository() domain.OrganizationDomainRepository {
-	return new(orgDomain)
+	return new(organizationDomain)
 }
 
-func (o orgDomain) qualifiedTableName() string {
+func (o organizationDomain) qualifiedTableName() string {
 	return "zitadel." + o.unqualifiedTableName()
 }
 
-func (orgDomain) unqualifiedTableName() string {
-	return "org_domains"
+func (organizationDomain) unqualifiedTableName() string {
+	return "organization_domains"
 }
 
 // -------------------------------------------------------------
@@ -29,8 +29,7 @@ func (orgDomain) unqualifiedTableName() string {
 // -------------------------------------------------------------
 
 // Get implements [domain.OrganizationDomainRepository].
-// Subtle: this method shadows the method ([domain.OrganizationRepository]).Get of orgDomain.org.
-func (o orgDomain) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
+func (o organizationDomain) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
 	builder, err := o.prepareQuery(opts)
 	if err != nil {
 		return nil, err
@@ -39,8 +38,7 @@ func (o orgDomain) Get(ctx context.Context, client database.QueryExecutor, opts 
 }
 
 // List implements [domain.OrganizationDomainRepository].
-// Subtle: this method shadows the method ([domain.OrganizationRepository]).List of orgDomain.org.
-func (o orgDomain) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationDomain, error) {
+func (o organizationDomain) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationDomain, error) {
 	builder, err := o.prepareQuery(opts)
 	if err != nil {
 		return nil, err
@@ -49,7 +47,7 @@ func (o orgDomain) List(ctx context.Context, client database.QueryExecutor, opts
 }
 
 // Add implements [domain.OrganizationDomainRepository].
-func (o orgDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddOrganizationDomain) error {
+func (o organizationDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddOrganizationDomain) error {
 	builder := database.NewStatementBuilder(`INSERT INTO `)
 	builder.WriteString(o.qualifiedTableName())
 	builder.WriteString(` (instance_id, organization_id, domain, is_verified, is_primary, validation_type, created_at, updated_at) VALUES (`)
@@ -60,13 +58,12 @@ func (o orgDomain) Add(ctx context.Context, client database.QueryExecutor, domai
 }
 
 // Update implements [domain.OrganizationDomainRepository].
-// Subtle: this method shadows the method ([domain.OrganizationRepository]).Update of orgDomain.org.
-func (o orgDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+func (o organizationDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	return update(ctx, client, o, condition, changes...)
 }
 
 // Remove implements [domain.OrganizationDomainRepository].
-func (o orgDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (o organizationDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	if err := checkRestrictingColumns(condition, o.InstanceIDColumn(), o.OrganizationIDColumn()); err != nil {
 		return 0, err
 	}
@@ -78,22 +75,22 @@ func (o orgDomain) Remove(ctx context.Context, client database.QueryExecutor, co
 // -------------------------------------------------------------
 
 // SetPrimary implements [domain.OrganizationDomainRepository].
-func (o orgDomain) SetPrimary() database.Change {
+func (o organizationDomain) SetPrimary() database.Change {
 	return database.NewChange(o.IsPrimaryColumn(), true)
 }
 
 // SetValidationType implements [domain.OrganizationDomainRepository].
-func (o orgDomain) SetValidationType(verificationType domain.DomainValidationType) database.Change {
+func (o organizationDomain) SetValidationType(verificationType domain.DomainValidationType) database.Change {
 	return database.NewChange(o.ValidationTypeColumn(), verificationType)
 }
 
 // SetVerified implements [domain.OrganizationDomainRepository].
-func (o orgDomain) SetVerified() database.Change {
+func (o organizationDomain) SetVerified() database.Change {
 	return database.NewChange(o.IsVerifiedColumn(), true)
 }
 
 // SetUpdatedAt implements [domain.OrganizationDomainRepository].
-func (o orgDomain) SetUpdatedAt(updatedAt time.Time) database.Change {
+func (o organizationDomain) SetUpdatedAt(updatedAt time.Time) database.Change {
 	return database.NewChange(o.UpdatedAtColumn(), updatedAt)
 }
 
@@ -101,7 +98,7 @@ func (o orgDomain) SetUpdatedAt(updatedAt time.Time) database.Change {
 // conditions
 // -------------------------------------------------------------
 
-func (o orgDomain) PrimaryKeyCondition(instanceID, orgID, domain string) database.Condition {
+func (o organizationDomain) PrimaryKeyCondition(instanceID, orgID, domain string) database.Condition {
 	return database.And(
 		o.InstanceIDCondition(instanceID),
 		o.OrganizationIDCondition(orgID),
@@ -110,28 +107,28 @@ func (o orgDomain) PrimaryKeyCondition(instanceID, orgID, domain string) databas
 }
 
 // DomainCondition implements [domain.OrganizationDomainRepository].
-func (o orgDomain) DomainCondition(op database.TextOperation, domain string) database.Condition {
+func (o organizationDomain) DomainCondition(op database.TextOperation, domain string) database.Condition {
 	return database.NewTextCondition(o.DomainColumn(), op, domain)
 }
 
 // InstanceIDCondition implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).InstanceIDCondition of orgDomain.org.
-func (o orgDomain) InstanceIDCondition(instanceID string) database.Condition {
+func (o organizationDomain) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(o.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
 // IsPrimaryCondition implements [domain.OrganizationDomainRepository].
-func (o orgDomain) IsPrimaryCondition(isPrimary bool) database.Condition {
+func (o organizationDomain) IsPrimaryCondition(isPrimary bool) database.Condition {
 	return database.NewBooleanCondition(o.IsPrimaryColumn(), isPrimary)
 }
 
 // IsVerifiedCondition implements [domain.OrganizationDomainRepository].
-func (o orgDomain) IsVerifiedCondition(isVerified bool) database.Condition {
+func (o organizationDomain) IsVerifiedCondition(isVerified bool) database.Condition {
 	return database.NewBooleanCondition(o.IsVerifiedColumn(), isVerified)
 }
 
 // OrganizationIDCondition implements [domain.OrganizationDomainRepository].
-func (o orgDomain) OrganizationIDCondition(orgID string) database.Condition {
+func (o organizationDomain) OrganizationIDCondition(orgID string) database.Condition {
 	return database.NewTextCondition(o.OrganizationIDColumn(), database.TextOperationEqual, orgID)
 }
 
@@ -140,7 +137,7 @@ func (o orgDomain) OrganizationIDCondition(orgID string) database.Condition {
 // -------------------------------------------------------------
 
 // PrimaryKeyColumns implements [domain.Repository].
-func (o orgDomain) PrimaryKeyColumns() []database.Column {
+func (o organizationDomain) PrimaryKeyColumns() []database.Column {
 	return []database.Column{
 		o.InstanceIDColumn(),
 		o.OrganizationIDColumn(),
@@ -150,42 +147,42 @@ func (o orgDomain) PrimaryKeyColumns() []database.Column {
 
 // CreatedAtColumn implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).CreatedAtColumn of orgDomain.org.
-func (o orgDomain) CreatedAtColumn() database.Column {
+func (o organizationDomain) CreatedAtColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "created_at")
 }
 
 // DomainColumn implements [domain.OrganizationDomainRepository].
-func (o orgDomain) DomainColumn() database.Column {
+func (o organizationDomain) DomainColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "domain")
 }
 
 // InstanceIDColumn implements [domain.OrganizationDomainRepository].
-func (o orgDomain) InstanceIDColumn() database.Column {
+func (o organizationDomain) InstanceIDColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "instance_id")
 }
 
 // IsPrimaryColumn implements [domain.OrganizationDomainRepository].
-func (o orgDomain) IsPrimaryColumn() database.Column {
+func (o organizationDomain) IsPrimaryColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "is_primary")
 }
 
 // IsVerifiedColumn implements [domain.OrganizationDomainRepository].
-func (o orgDomain) IsVerifiedColumn() database.Column {
+func (o organizationDomain) IsVerifiedColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "is_verified")
 }
 
 // OrganizationIDColumn implements [domain.OrganizationDomainRepository].
-func (o orgDomain) OrganizationIDColumn() database.Column {
+func (o organizationDomain) OrganizationIDColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "organization_id")
 }
 
 // UpdatedAtColumn implements [domain.OrganizationDomainRepository].
-func (o orgDomain) UpdatedAtColumn() database.Column {
+func (o organizationDomain) UpdatedAtColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "updated_at")
 }
 
 // ValidationTypeColumn implements [domain.OrganizationDomainRepository].
-func (o orgDomain) ValidationTypeColumn() database.Column {
+func (o organizationDomain) ValidationTypeColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "validation_type")
 }
 
@@ -196,7 +193,7 @@ func (o orgDomain) ValidationTypeColumn() database.Column {
 const queryOrganizationDomainStmt = `SELECT instance_id, organization_id, domain, is_verified, is_primary, validation_type, created_at, updated_at ` +
 	`FROM `
 
-func (o orgDomain) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
+func (o organizationDomain) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)

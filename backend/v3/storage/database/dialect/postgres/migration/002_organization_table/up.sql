@@ -14,7 +14,7 @@ CREATE TABLE zitadel.organizations(
   PRIMARY KEY (instance_id, id)
 );
 
-CREATE UNIQUE INDEX org_unique_instance_id_name_idx
+CREATE UNIQUE INDEX organization_unique_instance_id_name_idx
   ON zitadel.organizations (instance_id, name);
 
 CREATE TRIGGER trigger_set_updated_at

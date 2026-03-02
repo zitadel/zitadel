@@ -1,4 +1,4 @@
-CREATE TYPE zitadel.idp_state AS ENUM (
+CREATE TYPE zitadel.identity_provider_state AS ENUM (
     'active',
     'inactive'
 );
@@ -7,7 +7,7 @@ CREATE TABLE zitadel.identity_providers (
     instance_id TEXT NOT NULL
     , organization_id TEXT
     , id TEXT NOT NULL CHECK (id <> '')
-    , state zitadel.idp_state NOT NULL DEFAULT 'active'
+    , state zitadel.identity_provider_state NOT NULL DEFAULT 'active'
     , name TEXT NOT NULL CHECK (name <> '')
     , type SMALLINT DEFAULT NULL
     , auto_register BOOLEAN NOT NULL DEFAULT TRUE

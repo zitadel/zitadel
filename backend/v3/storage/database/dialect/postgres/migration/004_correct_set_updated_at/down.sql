@@ -16,8 +16,8 @@ CREATE OR REPLACE TRIGGER trg_set_updated_at_instance_domains
   WHEN (OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
   EXECUTE FUNCTION zitadel.set_updated_at();
 
-CREATE OR REPLACE TRIGGER trg_set_updated_at_org_domains
-  BEFORE UPDATE ON zitadel.org_domains
+CREATE OR REPLACE TRIGGER trg_set_updated_at_organization_domains
+  BEFORE UPDATE ON zitadel.organization_domains
   FOR EACH ROW
   WHEN (OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
   EXECUTE FUNCTION zitadel.set_updated_at();

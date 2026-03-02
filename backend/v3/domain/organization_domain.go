@@ -65,7 +65,7 @@ type organizationDomainChanges interface {
 	SetValidationType(verificationType DomainValidationType) database.Change
 }
 
-//go:generate mockgen -typed -package domainmock -destination ./mock/org_domain.mock.go . OrganizationDomainRepository
+//go:generate mockgen -typed -package domainmock -destination ./mock/organization_domain.mock.go . OrganizationDomainRepository
 
 type OrganizationDomainRepository interface {
 	Repository
