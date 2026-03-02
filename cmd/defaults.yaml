@@ -234,6 +234,10 @@ Database:
     # DSN is a full PostgreSQL connection URL. When set, individual connection
     # fields (Host, Port, Database, User, Admin, Options) are ignored.
     # Format: postgresql://user:password@host:port/dbname?sslmode=disable
+    # Note: In DSN mode, zitadel init cannot use the Admin connection to create
+    # a separate target database/user. The DB and user from the DSN must already
+    # exist and have sufficient privileges, or the DSN must directly point to
+    # the final ZITADEL database.
     DSN: "" # ZITADEL_DATABASE_POSTGRES_DSN
     Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
     Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
