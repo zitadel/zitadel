@@ -104,6 +104,12 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 	var err error
 	if c.parsedDSN != nil {
 		config = c.parsedDSN.Copy()
+		if config.ConnConfig.RuntimeParams == nil {
+			config.ConnConfig.RuntimeParams = map[string]string{}
+		}
+		if _, ok := config.ConnConfig.RuntimeParams["application_name"]; !ok {
+			config.ConnConfig.RuntimeParams["application_name"] = dialect.DefaultAppName
+		}
 	} else {
 		config, err = pgxpool.ParseConfig(c.String(useAdmin))
 		if err != nil {
