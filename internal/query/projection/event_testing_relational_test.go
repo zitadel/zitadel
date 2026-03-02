@@ -31,11 +31,13 @@ func runTests(m *testing.M) int {
 	pool, stop, err = newEmbeddedDB(ctx)
 	if err != nil {
 		log.Printf("error with embedded postgres database: %v", err)
-		os.Exit(1)
+		return 1
 	}
 	defer stop()
 
 	rawDB = pool.RawDB()
+	defer rawDB.Close()
+	defer pool.Close(ctx)
 
 	return m.Run()
 }
@@ -48,13 +50,17 @@ func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), er
 
 	dummyPool, err := connector.Connect(ctx)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to connect to embedded postgres: %w", err)
+		return nil, stop, fmt.Errorf("unable to connect to embedded postgres: %w", err)
 	}
 
-	pool = dummyPool.(database.PoolTest)
+	pool, ok := dummyPool.(database.PoolTest)
+	if !ok {
+		return nil, stop, fmt.Errorf("expecting database.PoolTest, got %T", dummyPool)
+	}
+
 	err = pool.MigrateTest(ctx)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to migrate database: %w", err)
+		return nil, stop, fmt.Errorf("unable to migrate database: %w", err)
 	}
 
 	return pool, stop, err
