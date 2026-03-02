@@ -1971,6 +1971,24 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	userIDWithRecoveryCodes := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	_, err = Client.GenerateRecoveryCodes(OrgCTX, &user.GenerateRecoveryCodesRequest{
+		UserId: userIDWithRecoveryCodes,
+		Count:  5,
+	})
+	require.NoError(t, err)
+
+	userIDWithRemovedRecoveryCodes := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	_, err = Client.GenerateRecoveryCodes(OrgCTX, &user.GenerateRecoveryCodesRequest{
+		UserId: userIDWithRemovedRecoveryCodes,
+		Count:  5,
+	})
+	require.NoError(t, err)
+	_, err = Client.RemoveRecoveryCodes(OrgCTX, &user.RemoveRecoveryCodesRequest{
+		UserId: userIDWithRemovedRecoveryCodes,
+	})
+	require.NoError(t, err)
+
 	_, userLegacyID := ctxFromNewUserWithVerifiedPasswordlessLegacy(t)
 	require.NoError(t, err)
 
@@ -2145,6 +2163,37 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 				},
 				AuthMethodTypes: []user.AuthenticationMethodType{
 					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+				},
+			},
+		},
+		{
+			name: "with auth (recovery codes)",
+			args: args{
+				OrgCTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithRecoveryCodes,
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_RECOVERY_CODE,
+				},
+			},
+		},
+		{
+			name: "with removed recovery codes",
+			args: args{
+				OrgCTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithRemovedRecoveryCodes,
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
 				},
 			},
 		},
