@@ -14,7 +14,9 @@ type Config struct {
 	// URL is a full Redis connection URL. When set, individual connection
 	// fields (Addr, Username, Password, Network, EnableTLS) are ignored.
 	// Pool, timeout, retry, and circuit breaker settings can still be used as overlays.
-	// Format: redis://user:password@host:port/db or rediss://... for TLS
+	// Format: redis://user:password@host:port[/db] or rediss://... for TLS.
+	// Note: the DB number in the URL path is ignored for cache DB selection.
+	// ZITADEL derives the actual DB from DBOffset + purpose; use /0 or omit the /db path.
 	URL string
 
 	// The network type, either tcp or unix.
