@@ -67,7 +67,7 @@ var (
 		"user_id",
 		"username",
 		"type",
-		"resource_owner", //user resource owner
+		"resource_owner", //user Organization ID
 		"name",
 		"primary_domain",
 		"first_name",
@@ -76,12 +76,12 @@ var (
 		"display_name",
 		"avatar_key",
 		"login_name",
-		"resource_owner", //user_grant resource owner
+		"resource_owner", //user_grant Organization ID
 		"name",           //org name
 		"primary_domain",
 		"project_id",
 		"name",           // project name
-		"resource_owner", // project_grant resource owner
+		"resource_owner", // project_grant Organization ID
 		"id",             // granted org id
 		"name",           // granted org name
 		"primary_domain", // granted org domain
