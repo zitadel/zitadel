@@ -11,38 +11,11 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
-func TestInstanceDomainReducersExist(t *testing.T) {
-	t.Parallel()
-
-	// Given
-	handler := instanceDomainRelationalProjection{}
-	expectations := map[eventstore.AggregateType][]eventstore.EventType{
-		instance.AggregateType: {
-			instance.InstanceDomainAddedEventType,
-			instance.InstanceDomainPrimarySetEventType,
-			instance.InstanceDomainRemovedEventType,
-			instance.TrustedDomainAddedEventType,
-			instance.TrustedDomainRemovedEventType,
-		},
-	}
-
-	// Test + Verify
-	for _, reducersByAggregateType := range handler.Reducers() {
-		reducerList, ok := expectations[reducersByAggregateType.Aggregate]
-		require.True(t, ok)
-		for _, reducer := range reducersByAggregateType.EventReducers {
-			assert.Contains(t, reducerList, reducer.Event)
-			require.NotNil(t, reducer.Reduce)
-		}
-	}
-}
-
 func TestInstanceDomainReducers(t *testing.T) {
-	handler := instanceDomainRelationalProjection{}
+	handler := &instanceDomainRelationalProjection{}
 	rawTx, tx := getTransactions(t)
 
 	t.Cleanup(func() {
@@ -70,11 +43,9 @@ func TestInstanceDomainReducers(t *testing.T) {
 		domainName := "test-domain.com"
 		domainAddedEvt := instance.NewDomainAddedEvent(ctx, &instance.NewAggregate("123").Aggregate, domainName, false)
 
-		callback, err := handler.reduceCustomDomainAdded(domainAddedEvt)
-		require.NoError(t, err)
-
 		// Test
-		err = callback.Execute(ctx, rawTx, "")
+		res := callReduce(t, ctx, rawTx, handler, domainAddedEvt)
+		require.True(t, res)
 
 		// Verify
 		require.NoError(t, err)
@@ -115,11 +86,9 @@ func TestInstanceDomainReducers(t *testing.T) {
 
 		domainPrimarySetEvt := instance.NewDomainPrimarySetEvent(ctx, &instance.NewAggregate("123").Aggregate, domainName)
 
-		callback, err := handler.reduceDomainPrimarySet(domainPrimarySetEvt)
-		require.NoError(t, err)
-
 		// Test
-		err = callback.Execute(ctx, rawTx, "")
+		res := callReduce(t, ctx, rawTx, handler, domainPrimarySetEvt)
+		require.True(t, res)
 
 		// Verify
 		require.NoError(t, err)
@@ -161,11 +130,9 @@ func TestInstanceDomainReducers(t *testing.T) {
 
 		domainRemovedEvt := instance.NewDomainRemovedEvent(ctx, &instance.NewAggregate("123").Aggregate, domainName)
 
-		callback, err := handler.reduceCustomDomainRemoved(domainRemovedEvt)
-		require.NoError(t, err)
-
 		// Test
-		err = callback.Execute(ctx, rawTx, "")
+		res := callReduce(t, ctx, rawTx, handler, domainRemovedEvt)
+		require.True(t, res)
 
 		// Verify
 		require.NoError(t, err)
@@ -188,11 +155,9 @@ func TestInstanceDomainReducers(t *testing.T) {
 		domainName := "trusted-test-domain.com"
 		trustedDomainAddedEvt := instance.NewTrustedDomainAddedEvent(ctx, &instance.NewAggregate("123").Aggregate, domainName)
 
-		callback, err := handler.reduceTrustedDomainAdded(trustedDomainAddedEvt)
-		require.NoError(t, err)
-
 		// Test
-		err = callback.Execute(ctx, rawTx, "")
+		res := callReduce(t, ctx, rawTx, handler, trustedDomainAddedEvt)
+		require.True(t, res)
 
 		// Verify
 		require.NoError(t, err)
@@ -227,11 +192,9 @@ func TestInstanceDomainReducers(t *testing.T) {
 
 		trustedDomainRemovedEvt := instance.NewTrustedDomainRemovedEvent(ctx, &instance.NewAggregate("123").Aggregate, domainName)
 
-		callback, err := handler.reduceTrustedDomainRemoved(trustedDomainRemovedEvt)
-		require.NoError(t, err)
-
 		// Test
-		err = callback.Execute(ctx, rawTx, "")
+		res := callReduce(t, ctx, rawTx, handler, trustedDomainRemovedEvt)
+		require.True(t, res)
 
 		// Verify
 		require.NoError(t, err)
