@@ -31,8 +31,12 @@ const (
 
 type Config struct {
 	// DSN is a full PostgreSQL connection URL. When set, individual connection
-	// fields (Host, Port, Database, User, Admin, Options) are ignored.
+	// fields (Host, Port, Database, User, Admin, Options) are ignored, and the
+	// database name and user are taken exclusively from the DSN.
 	// Format: postgresql://user:password@host:port/dbname?sslmode=disable
+	// Note: In DSN mode, ZITADEL will not create the target database or user.
+	// The referenced database/user must already exist, and admin-creation
+	// semantics used in non-DSN mode (e.g. via useAdmin) do not apply.
 	DSN       string
 	parsedDSN *pgxpool.Config `mapstructure:"-"`
 
