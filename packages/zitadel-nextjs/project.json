@@ -8,6 +8,9 @@
       "outputs": ["{projectRoot}/dist"],
       "dependsOn": ["^build"]
     },
+    "test-unit": {
+      "dependsOn": ["^build"]
+    },
     "test": { "dependsOn": ["test-unit"] }
   }
 }
