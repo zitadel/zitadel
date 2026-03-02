@@ -103,8 +103,7 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *system_pb.ListIAMMembe
 	}
 	return &system_pb.ListIAMMembersResponse{
 		Details: object.ToListDetails(res.Count, res.Sequence, res.LastRun),
-		//TODO: Organization ID of user of the member instead of the membership Organization ID
-		Result: member.MembersToPb("", res.Members),
+		Result:  member.MembersToPb("", res.Members),
 	}, nil
 }
 
