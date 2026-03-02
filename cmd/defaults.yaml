@@ -297,7 +297,9 @@ Caches:
       # URL is a full Redis connection URL. When set, individual connection
       # fields (Addr, Username, Password, Network, EnableTLS) are ignored.
       # Pool, timeout, retry, and circuit breaker settings can still be used as overlays.
-      # Format: redis://user:password@host:port/db or rediss://... for TLS
+      # Format: redis://user:password@host:port/db or rediss://... for TLS.
+      # Note: ZITADEL ignores the `/db` path when selecting Redis databases; DBs are chosen
+      # internally via DBOffset + purpose. Use `/0` in the URL to avoid confusion.
       URL: "" # ZITADEL_CACHES_CONNECTORS_REDIS_URL
       # The network type, either tcp or unix.
       # Default is tcp.
