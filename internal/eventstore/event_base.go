@@ -63,12 +63,12 @@ func (e *BaseEvent) Type() EventType {
 	return e.EventType
 }
 
-// Sequence is an upcounting unique number of the event
+// Sequence is an increasing number unique for the event
 func (e *BaseEvent) Sequence() uint64 {
 	return e.Seq
 }
 
-// CreationDate is the the time, the event is inserted into the eventstore
+// CreationDate is the time, the event is inserted into the eventstore
 func (e *BaseEvent) CreationDate() time.Time {
 	return e.Creation
 }
@@ -83,7 +83,7 @@ func (e *BaseEvent) Aggregate() *Aggregate {
 	return e.Agg
 }
 
-// Data returns the payload of the event. It represent the changed fields by the event
+// DataAsBytes returns the payload of the event. It represents the changed fields by the event
 func (e *BaseEvent) DataAsBytes() []byte {
 	return e.Data
 }
@@ -119,9 +119,9 @@ func BaseEventFromRepo(event Event) *BaseEvent {
 	}
 }
 
-// NewBaseEventForPush is the constructor for event's which will be pushed into the eventstore
-// the resource owner of the aggregate is only used if it's the first event of this aggregate type
-// afterwards the resource owner of the first previous events is taken
+// NewBaseEventForPush is the constructor for events which will be pushed into the eventstore.
+// The resource owner of the aggregate is only used if it's the first event of this aggregate type.
+// Afterward, the resource owner of the first previous events is taken.
 func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventType) *BaseEvent {
 	return &BaseEvent{
 		Agg:       aggregate,

@@ -195,10 +195,6 @@ Errors:
     RefreshToken:
       Invalid: "Obnovovací token je neplatný"
       NotFound: "Obnovovací token nenalezen"
-  Instance:
-    NotFound: "Instance nenalezena"
-    AlreadyExists: "Instance již existuje"
-    NotChanged: "Instance nezměněna"
   Org:
     AlreadyExists: "Името или идентификационният номер на организацията вече е зает"
     Invalid: "Organizace je neplatná"
@@ -222,7 +218,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Soubor obsahující výzvu nebyl nalezen na očekávané URL. Zkontrolujte, zda jste soubor nahráli na správné místo s právy ke čtení"
     DomainVerificationHTTPNoMatch: "Soubor obsahující výzvu byl nalezen na očekávané URL, ale neobsahuje správný token. Zkontrolujte jeho obsah"
     DomainVerificationTimeout: "Při dotazování DNS serveru došlo k timeoutu"
-    PrimaryDomainNotDeletable: "Primární doména nesmí být smazána"
+    PrimaryDomainNotDeletable: "Doména organizace nesmí být smazána"
     DomainNotFound: "Doména nenalezena"
     MemberIDMissing: "Chybí ID člena"
     MemberNotFound: "Člen organizace nenalezen"
@@ -283,10 +279,6 @@ Errors:
       Empty: "Politika stáří hesla je prázdná"
       NotExisting: "Politika stáří hesla neexistuje"
       AlreadyExists: "Politika stáří hesla již existuje"
-    OrgIAMPolicy:
-      Empty: "Politika IAM organizace je prázdná"
-      NotExisting: "Politika IAM organizace neexistuje"
-      AlreadyExists: "Politika IAM organizace již existuje"
     NotificationPolicy:
       NotFound: "Politika oznámení nenalezena"
       NotChanged: "Politika oznámení nezměněna"
@@ -348,7 +340,9 @@ Errors:
       HasNotExistingRole: "Jedna z rolí v projektu neexistuje"
       NotActive: "Grant projektu není aktivní"
       NotInactive: "Grant projektu není neaktivní"
-  IAM:
+  Instance:
+    AlreadyExists: "Instance již existuje"
+    NotChanged: "Instance nezměněna"
     NotFound: "Instance nebyla nalezena. Ujistěte se, že jste získali správnou doménu. Podívejte se na https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Role nebyly změněny"
@@ -356,8 +350,6 @@ Errors:
     MemberAlreadyExisting: "Člen již existuje"
     MemberNotExisting: "Člen neexistuje"
     IDMissing: "Chybí Id"
-    IAMProjectIDMissing: "Chybí Id IAM projektu"
-    IamProjectAlreadySet: "Id IAM projektu bylo již nastaveno"
     IdpInvalid: "Konfigurace IDP je neplatná"
     IdpNotExisting: "Konfigurace IDP neexistuje"
     OIDCConfigInvalid: "Konfigurace OIDC IDP je neplatná"
@@ -901,7 +893,7 @@ EventTypes:
       verified: "Doména ověřena"
       removed: "Doména odstraněna"
       primary:
-        set: "Hlavní doména nastavena"
+        set: "Doména organizace nastavena"
       reserved: "Doména rezervována"
       released: "Doména uvolněna"
     name:

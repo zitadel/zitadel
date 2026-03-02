@@ -1,6 +1,6 @@
 # Zitadel Management Console
 
-The Management Console is Zitadels management UI.
+The Management Console is Zitadel's management UI.
 
 It is built using [Angular](https://angular.dev/) and part of the Zitadel monorepo.
 
@@ -38,7 +38,7 @@ pnpm nx @zitadel/console:lint-fix
 - `src/app/proto/generated/` - Generated proto files (Angular-specific format)
 - `buf.gen.yaml` - Local proto generation configuration
 - `project.json` - Nx orchestration and caching for builds and tests
-- `prebuild.development.js` - Development environment configuration script
+- `prebuild.development.js` - Development environment settings script
 
 ### Dependency Chain
 

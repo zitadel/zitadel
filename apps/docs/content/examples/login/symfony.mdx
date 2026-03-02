@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Symfony PHP
+description: "Integrate ZITADEL into Symfony PHP applications for user login and profile management using OIDC."
 sidebar_label: Symfony
 ---
 
@@ -14,7 +15,7 @@ This documentation references our [example](https://github.com/zitadel/example-s
 
 ## ZITADEL setup
 
-Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
+Before we can start building our application, we have to do a few setup steps in ZITADEL Console.
 
 ### Project roles
 
@@ -38,9 +39,9 @@ A `user` role is not required. This role is assumed by default for any authentic
 
 ![Project roles in management console](../../../public/img/symfony/project-roles.png)
 
-Finally, we can assign the roles to users in the project's authorizations tab.
+Finally, we can assign the roles to users in the project's "Role Assignments" section.
 
-![Project authorizations in management console](../../../public/img/symfony/project-authorizations.png)
+![Project role assignments in management console](../../../public/img/symfony/project-authorizations.png)
 
 ### Set up application and obtain secrets
 
@@ -279,7 +280,7 @@ You can customize the User Info that is obtained and stored by adjusting the `SC
 
 ### Controllers and templates
 
-We need to create couple of Controllers and templates to define the app.
+We need to create a couple of Controllers and templates to define the app.
 
 #### Index
 

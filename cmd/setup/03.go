@@ -9,12 +9,14 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	crypto_db "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -27,6 +29,7 @@ type FirstInstance struct {
 	PatPath            string
 	LoginClientPatPath string
 	Features           *command.InstanceFeatures
+	TrustedDomains     []string
 
 	Skip bool
 
@@ -43,6 +46,7 @@ type FirstInstance struct {
 	externalSecure    bool
 	externalPort      uint16
 	domain            string
+	defaultPaths      *login.DefaultPaths
 }
 
 func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error {
@@ -92,8 +96,8 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 		0,
 		0,
 		nil,
-		nil,
-		nil,
+		mig.defaultPaths,
+		[]denylist.AddressChecker{},
 	)
 	if err != nil {
 		return err
@@ -101,6 +105,7 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 
 	mig.instanceSetup.InstanceName = mig.InstanceName
 	mig.instanceSetup.CustomDomain = mig.externalDomain
+	mig.instanceSetup.TrustedDomains = mig.TrustedDomains
 	mig.instanceSetup.DefaultLanguage = mig.DefaultLanguage
 	mig.instanceSetup.Org = mig.Org
 	// check if username is email style or else append @<orgname>.<custom-domain>

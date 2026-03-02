@@ -1,6 +1,6 @@
 import { Injectable, Injector, Type } from '@angular/core';
-import { BehaviorSubject, combineLatestWith, defer, from, Observable, of, shareReplay, switchMap, take } from 'rxjs';
-import { catchError, filter, map, timeout } from 'rxjs/operators';
+import { BehaviorSubject, combineLatestWith, from, Observable, of, shareReplay, switchMap, take } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import { EnvironmentService } from 'src/app/services/environment.service';
 import { CopyUrl } from './provider-next.component';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -10,36 +10,17 @@ import { ToastService } from 'src/app/services/toast.service';
 import { Data, ParamMap } from '@angular/router';
 import { LoginPolicyService } from 'src/app/services/login-policy.service';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { NewFeatureService } from 'src/app/services/new-feature.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProviderNextService {
-  private readonly loginV2BaseUri$: Observable<string | undefined>;
   constructor(
     private readonly env: EnvironmentService,
     private readonly toast: ToastService,
     private readonly loginPolicySvc: LoginPolicyService,
     private readonly injector: Injector,
-    private readonly featureService: NewFeatureService,
-  ) {
-    this.loginV2BaseUri$ = this.getLoginV2BaseUri();
-  }
-
-  private getLoginV2BaseUri(): Observable<string | undefined> {
-    return defer(() => this.featureService.getInstanceFeatures()).pipe(
-      timeout(1000),
-      // we try to load the features if this fails or takes too long we just assume loginV2 is not available
-      catchError(() => of({ loginV2: undefined })),
-      map((features) => features?.loginV2?.baseUri),
-      // we only try this once as the backup plan is not too bad
-      // and in most cases this will work
-      shareReplay({ refCount: false, bufferSize: 1 }),
-      takeUntilDestroyed(),
-    );
-  }
+  ) {}
 
   service(routeData: Observable<Data>): Observable<ManagementService | AdminService> {
     return routeData.pipe(
@@ -101,17 +82,14 @@ export class ProviderNextService {
 
   callbackUrls(): Observable<CopyUrl[]> {
     return this.env.env.pipe(
-      combineLatestWith(this.loginV2BaseUri$),
-      map(([env, loginV2BaseUri]) => [
+      map((env) => [
         {
           label: 'Login V1 Callback URL',
           url: `${env.issuer}/ui/login/login/externalidp/callback`,
         },
         {
           label: 'Login V2 Callback URL',
-          // if we don't have a loginV2BaseUri we provide a placeholder url so the user knows what to fill in
-          // this is not ideal but better than nothing
-          url: loginV2BaseUri ? `${loginV2BaseUri}idps/callback` : '{LOGIN V2 Hostname}/idps/callback',
+          url: `${env.issuer}/idps/callback`,
         },
       ]),
     );

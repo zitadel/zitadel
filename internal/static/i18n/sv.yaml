@@ -195,10 +195,6 @@ Errors:
     RefreshToken:
       Invalid: "Uppdateringstoken är ogiltigt"
       NotFound: "Uppdateringstoken hittades inte"
-  Instance:
-    NotFound: "Instans hittades inte"
-    AlreadyExists: "Instans finns redan"
-    NotChanged: "Instans ändrades inte"
   Org:
     AlreadyExists: "Organisationens namn eller ID är redan upptaget"
     Invalid: "Organisationen är ogiltigt"
@@ -222,7 +218,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Filen som innehåller utmaningen hittades inte på den förväntade URL:en. Kontrollera att du har laddat upp filen på rätt plats med läsbehörigheter"
     DomainVerificationHTTPNoMatch: "Filen som innehåller utmaningen har hittats på den förväntade URL:en men den innehåller inte rätt token-text. Kontrollera dess innehåll"
     DomainVerificationTimeout: "Det uppstod en timeout vid förfrågan till DNS-servern"
-    PrimaryDomainNotDeletable: "Primär domän får inte raderas"
+    PrimaryDomainNotDeletable: "Organisationsdomän får inte raderas"
     DomainNotFound: "Domän hittades inte"
     MemberIDMissing: "Medlems-ID saknas"
     MemberNotFound: "Organisationsmedlem hittades inte"
@@ -283,10 +279,6 @@ Errors:
       Empty: "Lösenordsålderpolicy är tom"
       NotExisting: "Lösenordsålderpolicy finns inte"
       AlreadyExists: "Lösenordsålderpolicy finns redan"
-    OrgIAMPolicy:
-      Empty: "Org IAM-policy är tom"
-      NotExisting: "Org IAM-policy finns inte"
-      AlreadyExists: "Org IAM-policy finns redan"
     NotificationPolicy:
       NotFound: "Notifikationspolicy hittades inte"
       NotChanged: "Notifikationspolicy har inte ändrats"
@@ -348,7 +340,9 @@ Errors:
       HasNotExistingRole: "En roll existerar inte i projektet"
       NotActive: "Projektets medgivande är inte aktivt"
       NotInactive: "Projektets medgivande är inte inaktivt"
-  IAM:
+  Instance:
+    AlreadyExists: "Instans finns redan"
+    NotChanged: "Instans ändrades inte"
     NotFound: "Instansen hittades inte. Se till att du har rätt domän. Kolla https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roller har inte ändrats"
@@ -356,8 +350,6 @@ Errors:
     MemberAlreadyExisting: "Medlemmen finns redan"
     MemberNotExisting: "Medlemmen existerar inte"
     IDMissing: "Id saknas"
-    IAMProjectIDMissing: "IAM-projekt-id saknas"
-    IamProjectAlreadySet: "IAM-projekt-id har redan satts"
     IdpInvalid: "IDP-konfigurationen är ogiltig"
     IdpNotExisting: "IDP-konfigurationen existerar inte"
     OIDCConfigInvalid: "OIDC IDP-konfigurationen är ogiltig"
@@ -902,7 +894,7 @@ EventTypes:
       verified: "Domän verifierad"
       removed: "Domän borttagen"
       primary:
-        set: "Primär domän inställd"
+        set: "Organisationsdomän inställd"
       reserved: "Domän reserverad"
       released: "Domän släppt"
     name:

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"net/url"
 	"time"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -89,7 +90,7 @@ const (
 
 type userNotifier struct {
 	queries      *NotificationQueries
-	otpEmailTmpl string
+	otpEmailTmpl func(origin *url.URL) string
 
 	queue       Queue
 	maxAttempts uint8
@@ -101,7 +102,7 @@ func NewUserNotifier(
 	commands Commands,
 	queries *NotificationQueries,
 	channels types.ChannelChains,
-	otpEmailTmpl string,
+	otpEmailTmpl func(origin *url.URL) string,
 	workerConfig WorkerConfig,
 	queue Queue,
 ) *handler.Handler {
@@ -530,7 +531,7 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 		if err != nil {
 			return err
 		}
-		origin := http_util.DomainContext(ctx).Origin()
+		origin := http_util.DomainContext(ctx).OriginURL()
 
 		args := otpArgs(ctx, e.Expiry)
 		args.SessionID = e.Aggregate().ID
@@ -539,7 +540,7 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 				Aggregate:         e.Aggregate(),
 				UserID:            s.UserFactor.UserID,
 				UserResourceOwner: s.UserFactor.ResourceOwner,
-				TriggeredAtOrigin: origin,
+				TriggeredAtOrigin: origin.String(),
 				EventType:         e.EventType,
 				NotificationType:  domain.NotificationTypeEmail,
 				MessageType:       domain.VerifyEmailOTPMessageType,
@@ -555,11 +556,11 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 	}), nil
 }
 
-func (u *userNotifier) otpEmailTemplate(origin string, e *session.OTPEmailChallengedEvent) string {
+func (u *userNotifier) otpEmailTemplate(origin *url.URL, e *session.OTPEmailChallengedEvent) string {
 	if e.URLTmpl != "" {
 		return e.URLTmpl
 	}
-	return origin + u.otpEmailTmpl
+	return u.otpEmailTmpl(origin)
 }
 
 func otpArgs(ctx context.Context, expiry time.Duration) *domain.NotificationArguments {

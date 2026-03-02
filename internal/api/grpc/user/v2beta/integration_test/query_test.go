@@ -393,7 +393,7 @@ func TestServer_ListUsers(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "list user by id, no permission machine user",
+			name: "list user by id, no permission service account",
 			args: args{
 				UserCTX,
 				&user_v2beta.ListUsersRequest{},

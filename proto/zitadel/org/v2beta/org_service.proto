@@ -823,7 +823,7 @@ message DeleteOrganizationDomainRequest {
 }
 
 message DeleteOrganizationDomainResponse {
-  // The timestamp of the deletion of the organization domain.
+  // The timestamp of the deletion of the Organization Domain.
   google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -894,7 +894,7 @@ message VerifyOrganizationDomainRequest {
 }
 
 message VerifyOrganizationDomainResponse {
-  // The timestamp of the verification of the organization domain.
+  // The timestamp of the verification of the Organization Domain.
   google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";

@@ -9,7 +9,7 @@
         "DESCRIPTION": "Voltooi de volgende stappen om je applicatie te beveiligen.",
         "CREATE_PROJECT": {
           "TITLE": "Maak een project",
-          "DESCRIPTION": "Voeg een project toe en definieer de rollen en autorisaties."
+          "DESCRIPTION": "Voeg projecten toe en definieer rollen en roltoewijzingen."
         }
       },
       "MORE_SHORTCUTS": {
@@ -41,7 +41,7 @@
       },
       "GRANTED": {
         "TITLE": "Toegekende Projecten",
-        "DESCRIPTION": "Dit zijn de projecten die door andere organisaties aan jou zijn toegekend. Met toegekende projecten kun je je gebruikers toegang geven tot applicaties van andere organisaties."
+        "DESCRIPTION": "Dit zijn de projecten die andere organisaties aan u hebben toegewezen. Met toegewezen projecten kunt u uw gebruikers toegang geven tot applicaties van andere organisaties."
       }
     },
     "USERS": {
@@ -53,17 +53,17 @@
         "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals de afdeling. Je kunt deze informatie gebruiken in je acties."
       },
       "MACHINES": {
-        "TITLE": "Servicegebruikers",
-        "DESCRIPTION": "Servicegebruikers authenticeren niet-interactief met behulp van een JWT-bearertoken ondertekend met een privésleutel. Ze kunnen ook een persoonlijk toegangstoken gebruiken.",
-        "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals het authenticatiesysteem. Je kunt deze informatie gebruiken in je acties."
+        "TITLE": "Serviceaccounts",
+        "DESCRIPTION": "Serviceaccounts authenticeren niet-interactief met behulp van een JWT-bearertoken ondertekend met een privésleutel. Ze kunnen ook een persoonlijk toegangstoken gebruiken.",
+        "METADATA": "Voeg aangepaste attributen toe aan het account zoals het authenticatiesysteem. Je kunt deze informatie gebruiken in je acties."
       },
       "SELF": {
         "METADATA": "Voeg aangepaste attributen toe aan je gebruiker zoals je afdeling. Je kunt deze informatie gebruiken in de acties van je organisatie."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Autorisaties",
-      "DESCRIPTION": "Autorisaties bepalen de toegangsrechten van een gebruiker tot een project. Je kunt een gebruiker toegang verlenen tot een project en de rollen van de gebruikers binnen dat project definiëren."
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Roltoewijzingen",
+      "DESCRIPTION": "Roltoewijzingen definiëren de toegangsrechten van gebruikers tot projecten. U kunt gebruikers toegang verlenen tot projecten en hun rollen binnen die projecten definiëren."
     },
     "ACTIONS": {
       "TITLE": "Acties",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Maak een project aan",
-        "description": "Voeg een project toe en definieer de rollen en machtigingen.",
+        "description": "Voeg projecten toe en definieer rollen en roltoewijzingen.",
         "action": "Project aanmaken"
       },
       "APPLICATION_CREATED": {
@@ -424,12 +424,12 @@
     "ROLES": "Rollen",
     "GRANTEDPROJECT": "Verleende projecten",
     "HUMANUSERS": "Gebruikers",
-    "MACHINEUSERS": "Servicegebruikers",
+    "MACHINEUSERS": "Serviceaccounts",
     "LOGOUT": "Alle gebruikers uitloggen",
     "NEWORG": "Nieuwe organisatie",
-    "IAMADMIN": "U bent een IAM-beheerder. Let op: u heeft uitgebreide rechten.",
+    "IAMADMIN": "U bent een instantie-beheerder. Let op: u heeft uitgebreide rechten.",
     "SHOWORGS": "Toon alle organisaties",
-    "GRANTS": "Machtigingen",
+    "GRANTS": "Roltoewijzingen",
     "ACTIONS": "Acties",
     "PRIVACY": "Privacy",
     "TOS": "Algemene voorwaarden",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
     "ORG_OWNER_VIEWER": "Heeft toestemming om de hele organisatie te bekijken",
     "ORG_SETTINGS_MANAGER": "Heeft toestemming om de instellingen van de organisatie te beheren",
-    "ORG_USER_PERMISSION_EDITOR": "Heeft toestemming om gebruikerstoegang te beheren",
+    "ORG_USER_PERMISSION_EDITOR": "Heeft toestemming om roltoewijzingen te beheren",
     "ORG_PROJECT_PERMISSION_EDITOR": "Heeft toestemming om projecttoegang te beheren",
     "ORG_PROJECT_CREATOR": "Heeft toestemming om zijn eigen projecten en onderliggende instellingen aan te maken",
     "ORG_ADMIN_IMPERSONATOR": "Heeft toestemming om de beheerder en eindgebruikers van de organisatie na te bootsen",
@@ -702,7 +702,7 @@
     "USERNAME": "Gebruikersnaam",
     "ORGNAME": "Organisatienaam",
     "ORGID": "Organisatie ID",
-    "PRIMARYDOMAIN": "Primair domein",
+    "PRIMARYDOMAIN": "Organisatie Domein",
     "PROJECTNAME": "Projectnaam",
     "RESOURCEOWNER": "Eigenaar van de bron",
     "METHODS": {
@@ -724,7 +724,7 @@
       "ME": "Ga naar eigen profiel",
       "PROJECTS": "<strong>G</strong>a naar <strong>P</strong>rojecten",
       "USERS": "<strong>G</strong>a naar <strong>U</strong>sers",
-      "USERGRANTS": "<strong>G</strong>a naar <strong>A</strong>uthorizations",
+      "ROLEASSIGNMENTS": "<strong>G</strong>a naar <strong>R</strong>ole Assignments",
       "ACTIONS": "<strong>G</strong>a naar Acties en <strong>F</strong>lows",
       "DOMAINS": "<strong>G</strong>a naar <strong>D</strong>omeinen"
     }
@@ -765,8 +765,8 @@
       "SECURITY": "Wachtwoord en beveiliging",
       "KEYS": "Sleutels",
       "PAT": "Persoonlijke toegangstokens",
-      "USERGRANTS": "Machtigingen",
-      "MEMBERSHIPS": "Lidmaatschappen",
+      "ROLEASSIGNMENTS": "Roltoewijzingen",
+      "MEMBERSHIPS": "Beheerdersrollen",
       "METADATA": "Metadata"
     },
     "TITLE": "Persoonlijke informatie",
@@ -990,8 +990,8 @@
       "COUNTRY": "Land"
     },
     "MACHINE": {
-      "TITLE": "Details Servicegebruiker",
-      "USERNAME": "Gebruikersnaam",
+      "TITLE": "Details Serviceaccount",
+      "USERNAME": "Accountnaam",
       "NAME": "Naam",
       "DESCRIPTION": "Beschrijving",
       "KEYSTITLE": "Sleutels",
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Moet minstens {{value}} tekens lang zijn.",
       "MAXLENGTHERROR": "Moet minder dan {{value}} tekens bevatten"
     },
-    "ID": "ID",
+    "ID": "Gebruikers-ID",
     "EMAIL": "E-mail",
     "PHONE": "Telefoonnummer",
     "PHONEEMPTY": "Geen telefoonnummer gedefinieerd",
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "Verifieer code"
     },
     "GRANTS": {
-      "TITLE": "Gebruikerstoegang",
+      "TITLE": "Roltoewijzingen",
       "DESCRIPTION": "Verleen deze gebruiker toegang tot bepaalde projecten",
       "CREATE": {
-        "TITLE": "Creëer gebruikerstoegang",
+        "TITLE": "Rol toewijzing aanmaken",
         "DESCRIPTION": "Zoek naar de organisatie, het project en de bijbehorende projectrollen."
       },
       "PROJECTNAME": "Projectnaam",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "Geselecteerde gebruikers gedeactiveerd.",
       "SELECTEDKEYSDELETED": "Geselecteerde sleutels verwijderd.",
       "KEYADDED": "Sleutel toegevoegd!",
-      "MACHINEADDED": "Servicegebruiker aangemaakt!",
+      "MACHINEADDED": "Serviceaccount aangemaakt!",
       "DELETED": "Gebruiker succesvol verwijderd!",
       "UNLOCKED": "Gebruiker succesvol ontgrendeld!",
       "PASSWORDLESSREGISTRATIONSENT": "Registratielink succesvol verzonden.",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel Beheerdersrollen",
-      "DESCRIPTION": "Dit zijn alle lidmaatschapstoewijzingen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of IAM.",
+      "DESCRIPTION": "Dit zijn alle toewijzingen van beheerdersrollen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of instantie.",
       "ORGCONTEXT": "U ziet alle organisaties en projecten die gerelateerd zijn aan de momenteel geselecteerde organisatie.",
       "USERCONTEXT": "U ziet alle organisaties en projecten waarvoor u gemachtigd bent. Inclusief andere organisaties.",
       "CREATIONDATE": "Aanmaakdatum",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Verwijderen",
       "TYPE": "Type",
       "ORGID": "Organisatie ID",
-      "UPDATED": "Het lidmaatschap is bijgewerkt.",
+      "UPDATED": "Beheerdersrol bijgewerkt.",
       "NOPERMISSIONTOEDIT": "U mist de benodigde rechten om rollen te bewerken!",
       "TYPES": {
         "UNKNOWN": "Onbekend",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Beheer uw wereldwijde beleid en beheer toegangsinstellingen."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Opslagbeheer",
+      "TITLE": "Instantie Opslagbeheer",
       "DESCRIPTION": "Beheer uw Zitadel-weergaven en mislukte evenementen."
     },
     "MEMBER": {
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Naam",
-      "ID": "ID",
+      "ID": "Organisatie-ID",
       "CREATIONDATE": "Aanmaakdatum",
       "DATECHANGED": "Gewijzigd",
       "FILTER": "Filter",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Download bestand",
       "SELECTORGTOOLTIP": "Selecteer deze organisatie.",
-      "PRIMARYDOMAIN": "Primaire Domein",
+      "PRIMARYDOMAIN": "Organisatie Domein",
       "STATE": "Status",
       "USEPASSWORD": "Stel Initieel Wachtwoord in",
       "USEPASSWORDDESC": "De gebruiker hoeft het wachtwoord niet in te stellen tijdens de initialisatie."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Domein toevoegen",
-      "TITLE": "Geverifieerde domeinen",
+      "TITLE": "Organisatie Domein",
       "DESCRIPTION": "Configureer uw organisatiedomeinen. Dit domein kan worden gebruikt voor domeinontdekking en gebruikersnaamsuffixering.",
-      "SETPRIMARY": "Stel in als Primair",
+      "SETPRIMARY": "Organisatie Domein",
       "DELETE": {
         "TITLE": "Verwijder Domein",
         "DESCRIPTION": "U staat op het punt een van uw domeinen te verwijderen."
@@ -1450,7 +1450,7 @@
     },
     "MEMBER": {
       "TITLE": "Organisatie Beheerders",
-      "DESCRIPTION": "Definieer de gebruikers die de voorkeuren van uw organisaties kunnen wijzigen."
+      "DESCRIPTION": "Definieer de beheerders die de voorkeuren van uw organisaties kunnen wijzigen."
     },
     "TOAST": {
       "UPDATED": "Organisatie succesvol bijgewerkt.",
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Beheerder toegevoegd.",
       "MEMBERREMOVED": "Beheerder verwijderd.",
       "MEMBERCHANGED": "Beheerder gewijzigd.",
-      "SETPRIMARY": "Primaire domein ingesteld.",
+      "SETPRIMARY": "Organisatiedomein is succesvol ingesteld.",
       "DELETED": "Organisatie succesvol verwijderd",
       "DEFAULTORGNOTFOUND": "De standaardorganisatie is niet gevonden",
       "ORG_WAS_DELETED": "Organisatie is verwijderd."
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTP en SMS Instellingen",
       "MESSAGETEXTS": "Bericht Teksten",
       "IDP": "Identiteitsproviders",
-      "VERIFIED_DOMAINS": "Geverifieerde domeinen",
+      "VERIFIED_DOMAINS": "Organisatie Domein",
       "DOMAIN": "Domein instellingen",
       "LOGINTEXTS": "Login Interface Teksten",
       "BRANDING": "Branding",
@@ -1942,14 +1942,14 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Leden",
+      "TITLE": "Beheerders",
       "USERNAME": "Gebruikersnaam",
       "DISPLAYNAME": "Weergavenaam",
       "LOGINNAME": "Login Naam",
       "EMAIL": "E-mail",
       "ROLES": "Rollen",
-      "ADD": "Lid toevoegen",
-      "ADDDESCRIPTION": "Voer de namen van de gebruikers in die moeten worden toegevoegd."
+      "ADD": "Beheerder toevoegen",
+      "ADDDESCRIPTION": "Voer de namen van de beheerders in die moeten worden toegevoegd."
     },
     "TABLE": {
       "TOTAL": "Totaal aantal",
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "Weet u zeker dat u uw project wilt verwijderen?",
           "TYPENAME": "Typ de naam van het project om het permanent te verwijderen."
         }
-      }
+      },
+      "ID": "Project-ID"
     },
     "SETTINGS": {
       "TITLE": "Instellingen",
@@ -2039,9 +2040,9 @@
       "NAME": "Nieuwe naam"
     },
     "MEMBER": {
-      "TITLE": "Managers",
-      "TITLEDESC": "Managers kunnen wijzigingen aanbrengen in dit project op basis van hun rol.",
-      "DESCRIPTION": "Deze managers kunnen mogelijk uw project bewerken.",
+      "TITLE": "Beheerders",
+      "TITLEDESC": "Beheerders kunnen wijzigingen aanbrengen in dit project op basis van hun rol.",
+      "DESCRIPTION": "Deze beheerders kunnen mogelijk uw project bewerken.",
       "USERNAME": "Gebruikersnaam",
       "DISPLAYNAME": "Weergavenaam",
       "LOGINNAME": "Loginnaam",
@@ -2069,9 +2070,9 @@
       },
       "DETAIL": {
         "TITLE": "Projectverlening",
-        "DESC": "U kunt selecteren welke rollen kunnen worden gebruikt door de gespecificeerde organisatie, en managers kiezen",
-        "MEMBERTITLE": "Managers",
-        "MEMBERDESC": "Dit zijn de managers van de verleende organisatie. Voeg hier gebruikers toe die toegang moeten krijgen om de gegevens van het project te bewerken.",
+        "DESC": "U kunt selecteren welke rollen kunnen worden gebruikt door de gespecificeerde organisatie, en beheerders kiezen",
+        "MEMBERTITLE": "Beheerders",
+        "MEMBERDESC": "Dit zijn de beheerders van de verleende organisatie. Voeg hier beheerders toe die toegang moeten krijgen om de gegevens van het project te bewerken.",
         "PROJECTNAME": "Projectnaam",
         "GRANTEDORG": "Verleende Organisatie",
         "RESOURCEOWNER": "Resource Eigenaar"
@@ -2084,7 +2085,7 @@
       "ALL": "Alles",
       "SHOWDETAIL": "Toon details",
       "USER": "Gebruiker",
-      "MEMBERS": "Managers",
+      "MEMBERS": "Beheerders",
       "ORG": "Organisatie",
       "PROJECTNAME": "Projectnaam",
       "GRANTEDORG": "Verleende Organisatie",
@@ -2102,9 +2103,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Projectverlening gecreëerd.",
         "PROJECTGRANTADDED": "Projectverlening gecreëerd.",
         "PROJECTGRANTCHANGED": "Projectverlening gewijzigd.",
-        "PROJECTGRANTMEMBERADDED": "Verlening Manager toegevoegd.",
-        "PROJECTGRANTMEMBERCHANGED": "Verlening Manager gewijzigd.",
-        "PROJECTGRANTMEMBERREMOVED": "Verlening Manager verwijderd.",
+        "PROJECTGRANTMEMBERADDED": "Verlening Beheerder toegevoegd.",
+        "PROJECTGRANTMEMBERCHANGED": "Verlening Beheerder gewijzigd.",
+        "PROJECTGRANTMEMBERREMOVED": "Verlening Beheerder verwijderd.",
         "PROJECTGRANTUPDATED": "Projectverlening bijgewerkt"
       },
       "DIALOG": {
@@ -2167,10 +2168,10 @@
       "EMPTY": "Geen project gevonden"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager verwijderd.",
-      "MEMBERSADDED": "Managers toegevoegd.",
-      "MEMBERADDED": "Manager toegevoegd.",
-      "MEMBERCHANGED": "Manager gewijzigd.",
+      "MEMBERREMOVED": "Beheerder verwijderd.",
+      "MEMBERSADDED": "Beheerders toegevoegd.",
+      "MEMBERADDED": "Beheerder toegevoegd.",
+      "MEMBERCHANGED": "Beheerder gewijzigd.",
       "ROLESCREATED": "Rollen gecreëerd.",
       "ROLEREMOVED": "Rol verwijderd.",
       "ROLECHANGED": "Rol gewijzigd.",
@@ -2296,7 +2297,7 @@
     "ADD": "Voeg Identiteitsprovider toe",
     "TYPE": "Type",
     "OWNER": "Eigenaar",
-    "ID": "ID",
+    "ID": "ID van identiteitsprovider",
     "NAME": "Naam",
     "AUTHORIZATIONENDPOINT": "Autorisatie Eindpunt",
     "TOKENENDPOINT": "Token Eindpunt",
@@ -2514,7 +2515,7 @@
     "TOKEN": "Token-instellingen",
     "PAGES": {
       "TITLE": "Toepassing",
-      "ID": "ID",
+      "ID": "Applicatie-ID",
       "DESCRIPTION": "Hier kunt u uw toepassingsgegevens en de configuratie bewerken.",
       "CREATE": "Creëer toepassing",
       "CREATE_SELECT_PROJECT": "Selecteer eerst uw project",
@@ -2526,7 +2527,7 @@
       "DATECHANGED": "Gewijzigd",
       "URLS": "URL's",
       "DELETE": "Verwijder App",
-      "JUMPTOPROJECT": "Om rollen, autorisaties en meer te configureren, navigeert u naar het project.",
+      "JUMPTOPROJECT": "Ga naar het project om rollen, roltoewijzingen en meer te configureren.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {
@@ -2785,10 +2786,10 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "Voeg een Manager toe",
+    "ADD": "Voeg een Beheerder toe",
     "CREATIONTYPE": "Creatietype",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instantie",
       "2": "Organisatie",
       "0": "Eigendom Project",
       "1": "Verleend Project",
@@ -2797,49 +2798,49 @@
     "EDITROLE": "Bewerk rollen",
     "EDITFOR": "Bewerk de rollen voor de gebruiker: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Verwijder Manager",
-      "DELETE_DESCRIPTION": "U staat op het punt om een manager te verwijderen. Weet u het zeker?"
+      "DELETE_TITLE": "Verwijder Beheerder",
+      "DELETE_DESCRIPTION": "U staat op het punt om een beheerder te verwijderen. Weet u het zeker?"
     },
     "SHOWDETAILS": "Klik om details te tonen."
   },
   "ROLESLABEL": "Rollen",
   "GRANTS": {
-    "TITLE": "Autorisaties",
-    "DESC": "Dit zijn alle autorisaties op uw organisatie.",
-    "DELETE": "Verwijder Autorisatie",
-    "EMPTY": "Geen autorisatie gevonden",
-    "ADD": "Creëer Autorisatie",
+    "TITLE": "Roltoewijzingen",
+    "DESC": "Dit zijn alle roltoewijzingen binnen uw organisatie.",
+    "DELETE": "Een roltoewijzing verwijderen",
+    "EMPTY": "Geen roltoewijzing gevonden",
+    "ADD": "Creëer Roltoewijzingen",
     "ADD_BTN": "Nieuw",
     "PROJECT": {
-      "TITLE": "Autorisatie",
-      "DESCRIPTION": "Definieer autorisaties voor het gespecificeerde project. Let op, u kunt alleen entries van projecten en gebruikers zien waarvoor u de rechten heeft."
+      "TITLE": "Roltoewijzing",
+      "DESCRIPTION": "Definieer roltoewijzingen voor het gespecificeerde project. Let op, u kunt alleen entries van projecten en gebruikers zien waarvoor u de rechten heeft."
     },
     "USER": {
-      "TITLE": "Autorisatie",
-      "DESCRIPTION": "Definieer autorisaties voor de gespecificeerde gebruiker. Let op, u kunt alleen entries van projecten en gebruikers zien waarvoor u de rechten heeft."
+      "TITLE": "Roltoewijzing",
+      "DESCRIPTION": "Definieer roltoewijzingen voor de gespecificeerde gebruiker. Let op, u kunt alleen entries van projecten en gebruikers zien waarvoor u de rechten heeft."
     },
     "CREATE": {
-      "TITLE": "Creëer autorisatie",
+      "TITLE": "Een roltoewijzing maken",
       "DESCRIPTION": "Zoek naar de organisatie, het project en de bijbehorende rollen."
     },
     "EDIT": {
-      "TITLE": "Wijzig autorisatie"
+      "TITLE": "Roltoewijzing wijzigen"
     },
     "DETAIL": {
       "TITLE": "Autorisatie Detail",
       "DESCRIPTION": "Hier kunt u alle details van de autorisatie zien."
     },
     "TOAST": {
-      "UPDATED": "Autorisatie bijgewerkt.",
-      "REMOVED": "Autorisatie verwijderd",
-      "BULKREMOVED": "Autorisaties verwijderd.",
+      "UPDATED": "Roltoewijzing bijgewerkt",
+      "REMOVED": "Roltoewijzing verwijderd",
+      "BULKREMOVED": "Roltoewijzingen verwijderd.",
       "CANTSHOWINFO": "U kunt het profiel van deze gebruiker niet bezoeken omdat u geen lid bent van de organisatie waartoe deze gebruiker behoort"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Verwijder autorisatie",
-      "DELETE_DESCRIPTION": "U staat op het punt om een autorisatie te verwijderen. Wilt u doorgaan?",
-      "BULK_DELETE_TITLE": "Verwijder autorisaties",
-      "BULK_DELETE_DESCRIPTION": "U staat op het punt om meerdere autorisaties te verwijderen. Wilt u doorgaan?"
+      "DELETE_TITLE": "Verwijder roltoewijzing",
+      "DELETE_DESCRIPTION": "U staat op het punt om een roltoewijzing te verwijderen. Wilt u doorgaan?",
+      "BULK_DELETE_TITLE": "Verwijder roltoewijzingen",
+      "BULK_DELETE_DESCRIPTION": "U staat op het punt om meerdere roltoewijzingen te verwijderen. Wilt u doorgaan?"
     }
   },
   "CHANGES": {
@@ -2858,5 +2859,6 @@
       "TITLE": "Activiteit",
       "DESCRIPTION": "Hier kunt u de laatste gebeurtenissen zien die een gebruikersverandering hebben gegenereerd."
     }
-  }
+  },
+  "INSTANCEID": "Instance-ID"
 }

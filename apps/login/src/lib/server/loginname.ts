@@ -100,6 +100,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       return { redirect: "/password?" + paramsPasswordDefault };
     }
+
     return { error: t("errors.userNotFound") };
   };
 
@@ -143,7 +144,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-        const url = await startIdentityProviderFlow({
+        const response = await startIdentityProviderFlow({
           serviceConfig,
           idpId: activeIdps[0].id,
           urls: {
@@ -156,11 +157,15 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           },
         });
 
-        if (!url) {
+        if (!response || !response.url) {
           return { error: t("errors.couldNotStartIDPFlow") };
         }
 
-        return { redirect: url };
+        if (response.fields) {
+          return { samlData: { url: response.url, fields: response.fields } };
+        }
+
+        return { redirect: response.url };
       }
     }
 
@@ -198,7 +203,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-      const url = await startIdentityProviderFlow({
+      const response = await startIdentityProviderFlow({
         serviceConfig,
         idpId: idp.id,
         urls: {
@@ -211,11 +216,15 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         },
       });
 
-      if (!url) {
+      if (!response || !response.url) {
         return { error: t("errors.couldNotStartIDPFlow") };
       }
 
-      return { redirect: url };
+      if (response.fields) {
+        return { samlData: { url: response.url, fields: response.fields } };
+      }
+
+      return { redirect: response.url };
     }
   };
 
@@ -242,11 +251,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         return preventUserEnumeration(command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
-      if (user.preferredLoginName !== concatLoginname || humanUser?.phone?.phone !== command.loginName) {
+      if (user.preferredLoginName !== concatLoginname && humanUser?.phone?.phone !== command.loginName) {
         return preventUserEnumeration(command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
-      if (user.preferredLoginName !== concatLoginname || humanUser?.email?.email !== command.loginName) {
+      if (user.preferredLoginName !== concatLoginname && humanUser?.email?.email !== command.loginName) {
         return preventUserEnumeration(command.organization);
       }
     }
@@ -312,8 +321,16 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       userId: session?.factors?.user?.id ?? userId,
     });
 
-    // always resend invite if user has no auth method set
-    if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
+    const hasPrimaryMethod =
+      methods.authMethodTypes?.some(
+        (m: AuthenticationMethodType) =>
+          m === AuthenticationMethodType.PASSWORD ||
+          m === AuthenticationMethodType.PASSKEY ||
+          m === AuthenticationMethodType.IDP,
+      ) ?? false;
+
+    // always resend invite or setup email if user has no primary auth method set
+    if (!hasPrimaryMethod) {
       console.log("humanUser.email?.isVerified", humanUser?.email?.isVerified);
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
@@ -482,7 +499,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
     const suffix = matched?.[1] ?? "";
 
-    // this just returns orgs where the suffix is set as primary domain
+    // this just returns orgs where the suffix is set as the Organization Domain 
     const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix });
 
     const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;

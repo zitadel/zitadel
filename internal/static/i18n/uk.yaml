@@ -190,10 +190,6 @@ Errors:
     RefreshToken:
       Invalid: "Токен оновлення недійсний"
       NotFound: "Токен оновлення не знайдено"
-  Instance:
-    NotFound: "Інстанс не знайдено"
-    AlreadyExists: "Інстанс вже існує"
-    NotChanged: "Інстанс не змінено"
   Org:
     AlreadyExists: "Назва або ідентифікатор організації вже зайняті"
     Invalid: "Організація недійсна"
@@ -217,7 +213,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Файл з викликом не знайдено за очікуваним URL. Переконайтеся, що ви завантажили файл у правильне місце з правами читання"
     DomainVerificationHTTPNoMatch: "Файл з викликом знайдено за очікуваним URL, але він не містить правильний текст токену. Перевірте його вміст"
     DomainVerificationTimeout: "Сталася помилка часу очікування при запиті до DNS сервера"
-    PrimaryDomainNotDeletable: "Основний домен не може бути видалений"
+    PrimaryDomainNotDeletable: "Домен організації не може бути видалений"
     DomainNotFound: "Домен не знайдено"
     MemberIDMissing: "Відсутній ідентифікатор члена"
     MemberNotFound: "Член організації не знайдений"
@@ -278,10 +274,6 @@ Errors:
       Empty: "Політика віку паролів порожня"
       NotExisting: "Політика віку паролів не існує"
       AlreadyExists: "Політика віку паролів вже існує"
-    OrgIAMPolicy:
-      Empty: "Політика Org IAM порожня"
-      NotExisting: "Політика Org IAM не існує"
-      AlreadyExists: "Політика Org IAM вже існує"
     NotificationPolicy:
       NotFound: "Політика сповіщень не знайдена"
       NotChanged: "Політика сповіщень не змінена"
@@ -343,7 +335,9 @@ Errors:
       HasNotExistingRole: "Одна роль не існує в проекті"
       NotActive: "Грант проекту не активний"
       NotInactive: "Грант проекту не неактивний"
-  IAM:
+  Instance:
+    AlreadyExists: "Інстанс вже існує"
+    NotChanged: "Інстанс не змінено"
     NotFound: "Інстанс не знайдено. Переконайтеся, що домен правильний. Перегляньте https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Ролі не були змінені"
@@ -351,8 +345,6 @@ Errors:
     MemberAlreadyExisting: "Член вже існує"
     MemberNotExisting: "Член не існує"
     IDMissing: "Відсутній ідентифікатор"
-    IAMProjectIDMissing: "Відсутній ідентифікатор проекту IAM"
-    IamProjectAlreadySet: "Ідентифікатор проекту IAM вже встановлений"
     IdpInvalid: "Конфігурація IDP недійсна"
     IdpNotExisting: "Конфігурація IDP не існує"
     OIDCConfigInvalid: "Конфігурація OIDC IDP недійсна"
@@ -897,7 +889,7 @@ EventTypes:
       verified: "Домен верифіковано"
       removed: "Домен видалений"
       primary:
-        set: "Основний домен встановлено"
+        set: "Домен організації встановлено"
       reserved: "Домен зарезервовано"
       released: "Домен звільнено"
     name:

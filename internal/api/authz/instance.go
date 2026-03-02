@@ -11,7 +11,10 @@ import (
 	"github.com/zitadel/zitadel/internal/feature"
 )
 
-var emptyInstance = &instance{}
+var (
+	emptyInstance          = &instance{}
+	_             Instance = (*instance)(nil)
+)
 
 type Instance interface {
 	InstanceID() string
@@ -19,6 +22,7 @@ type Instance interface {
 	ManagementConsoleClientID() string
 	ManagementConsoleApplicationID() string
 	DefaultLanguage() language.Tag
+	AllowedLanguages() []language.Tag
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
 	EnableImpersonation() bool
@@ -43,6 +47,7 @@ type instance struct {
 	clientID         string
 	orgID            string
 	defaultLanguage  language.Tag
+	allowedLanguages []language.Tag
 	features         feature.Features
 	executionTargets target.Router
 }
@@ -73,6 +78,10 @@ func (i *instance) ManagementConsoleApplicationID() string {
 
 func (i *instance) DefaultLanguage() language.Tag {
 	return i.defaultLanguage
+}
+
+func (i *instance) AllowedLanguages() []language.Tag {
+	return i.allowedLanguages
 }
 
 func (i *instance) DefaultOrganisationID() string {

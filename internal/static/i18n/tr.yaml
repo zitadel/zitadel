@@ -196,10 +196,6 @@ Errors:
     RefreshToken:
       Invalid: "Yenileme Token'ı geçersiz"
       NotFound: "Yenileme Token'ı bulunamadı"
-  Instance:
-    NotFound: "Instance bulunamadı"
-    AlreadyExists: "Instance zaten mevcut"
-    NotChanged: "Instance değişmedi"
   Org:
     AlreadyExists: "Organizasyon adı zaten alınmış"
     Invalid: "Organizasyon geçersiz"
@@ -223,7 +219,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Challenge içeren dosya beklenen URL'de bulunamadı. Dosyayı okuma izinleriyle doğru yere yüklediğinizden emin olun"
     DomainVerificationHTTPNoMatch: "Challenge içeren dosya beklenen URL'de bulundu ancak doğru token metnini içermiyor. İçeriğini kontrol edin"
     DomainVerificationTimeout: "DNS sunucusunu sorgularken zaman aşımı oluştu"
-    PrimaryDomainNotDeletable: "Birincil domain silinmemeli"
+    PrimaryDomainNotDeletable: "Organizasyon alan adı silinmemeli"
     DomainNotFound: "Domain bulunamadı"
     MemberIDMissing: "Üye ID eksik"
     MemberNotFound: "Organizasyon üyesi bulunamadı"
@@ -284,10 +280,6 @@ Errors:
       Empty: "Şifre Yaş Politikası boş"
       NotExisting: "Şifre Yaş Politikası mevcut değil"
       AlreadyExists: "Şifre Yaş Politikası zaten mevcut"
-    OrgIAMPolicy:
-      Empty: "Org IAM Politikası boş"
-      NotExisting: "Org IAM Politikası mevcut değil"
-      AlreadyExists: "Org IAM Politikası zaten mevcut"
     NotificationPolicy:
       NotFound: "Bildirim Politikası bulunamadı"
       NotChanged: "Bildirim Politikası değişmedi"
@@ -349,7 +341,9 @@ Errors:
       HasNotExistingRole: "Projede bulunmayan bir rol var"
       NotActive: "Proje yetkisi aktif değil"
       NotInactive: "Proje yetkisi pasif değil"
-  IAM:
+  Instance:
+    AlreadyExists: "Instance zaten mevcut"
+    NotChanged: "Instance değişmedi"
     NotFound: "Instance bulunamadı. Domain'in doğru olduğundan emin olun. Kontrol edin https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roller değişmedi"
@@ -357,8 +351,6 @@ Errors:
     MemberAlreadyExisting: "Üye zaten mevcut"
     MemberNotExisting: "Üye mevcut değil"
     IDMissing: "Id eksik"
-    IAMProjectIDMissing: "IAM proje id eksik"
-    IamProjectAlreadySet: "IAM proje id zaten ayarlanmış"
     IdpInvalid: "IDP yapılandırması geçersiz"
     IdpNotExisting: "IDP yapılandırması mevcut değil"
     OIDCConfigInvalid: "OIDC IDP yapılandırması geçersiz"
@@ -903,7 +895,7 @@ EventTypes:
       verified: "Domain doğrulandı"
       removed: "Domain kaldırıldı"
       primary:
-        set: "Birincil domain ayarlandı"
+        set: "Organizasyon alan adı ayarlandı"
       reserved: "Domain rezerve edildi"
       released: "Domain serbest bırakıldı"
     name:

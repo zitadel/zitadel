@@ -196,10 +196,6 @@ Errors:
     RefreshToken:
       Invalid: "Token-ul de reîmprospătare este invalid"
       NotFound: "Token-ul de reîmprospătare nu a fost găsit"
-  Instance:
-    NotFound: "Instanța nu a fost găsită"
-    AlreadyExists: "Instanța există deja"
-    NotChanged: "Instanța nu a fost schimbată"
   Org:
     AlreadyExists: "Numele sau ID-ul organizației este deja utilizat"
     Invalid: "Organizația este invalidă"
@@ -223,7 +219,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Fișierul care conține provocarea nu a fost găsit în URL-ul așteptat. Verificați dacă ați încărcat fișierul în locul potrivit cu permisiuni de citire"
     DomainVerificationHTTPNoMatch: "Fișierul care conține provocarea a fost găsit în URL-ul așteptat, dar nu conține textul corect al token-ului. Verificați conținutul acestuia"
     DomainVerificationTimeout: "A existat o depășire a timpului de așteptare la interogarea serverului DNS"
-    PrimaryDomainNotDeletable: "Domeniul principal nu trebuie să fie șters"
+    PrimaryDomainNotDeletable: "Domeniul organizației nu trebuie să fie șters"
     DomainNotFound: "Domeniul nu a fost găsit"
     MemberIDMissing: "ID-ul membrului lipsește"
     MemberNotFound: "Membrul organizației nu a fost găsit"
@@ -284,10 +280,6 @@ Errors:
       Empty: "Politica de vârstă a parolei este goală"
       NotExisting: "Politica de vârstă a parolei nu există"
       AlreadyExists: "Politica de vârstă a parolei există deja"
-    OrgIAMPolicy:
-      Empty: "Politica IAM a organizației este goală"
-      NotExisting: "Politica IAM a organizației nu există"
-      AlreadyExists: "Politica IAM a organizației există deja"
     NotificationPolicy:
       NotFound: "Politica de notificare nu a fost găsită"
       NotChanged: "Politica de notificare nu a fost schimbată"
@@ -349,7 +341,9 @@ Errors:
       HasNotExistingRole: "Un rol nu există în proiect"
       NotActive: "Acordarea proiectului nu este activă"
       NotInactive: "Acordarea proiectului nu este inactivă"
-  IAM:
+  Instance:
+    AlreadyExists: "Instanța există deja"
+    NotChanged: "Instanța nu a fost schimbată"
     NotFound: "Instanța nu a fost găsită. Asigurați-vă că aveți domeniul corect. Consultați https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Rolurile nu au fost schimbate"
@@ -357,8 +351,6 @@ Errors:
     MemberAlreadyExisting: "Membrul există deja"
     MemberNotExisting: "Membrul nu există"
     IDMissing: "Id lipsă"
-    IAMProjectIDMissing: "ID-ul proiectului IAM lipsește"
-    IamProjectAlreadySet: "ID-ul proiectului IAM a fost deja setat"
     IdpInvalid: "Configurația IDP este invalidă"
     IdpNotExisting: "Configurația IDP nu există"
     OIDCConfigInvalid: "Configurația OIDC IDP este invalidă"
@@ -898,7 +890,7 @@ Errors:
           verified: "Domeniu verificat"
           removed: "Domeniu șters"
           primary:
-            set: "Domeniu principal setat"
+            set: "Domeniu organizației setat"
           reserved: "Domeniu rezervat"
           released: "Domeniu eliberat"
         name:

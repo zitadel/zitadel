@@ -288,8 +288,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
-		config.Login.DefaultEmailCodeURLTemplate,
-		config.Login.DefaultPasswordSetURLTemplate,
+		config.Login.DefaultPaths,
+		config.Executions.DenyList,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -329,7 +329,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		commands,
 		queries,
 		eventstoreClient,
-		config.Login.DefaultPaths.OTPEmailPath,
+		config.Login.DefaultPaths.DefaultOTPEmailURLTemplate,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,
@@ -479,6 +479,7 @@ func startAPIs(
 		keys.Target,
 		translator,
 		config.Instrumentation.Trace.TrustRemoteSpans,
+		config.Executions.DenyList,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)

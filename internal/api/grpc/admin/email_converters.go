@@ -108,6 +108,12 @@ func smtpToPb(config *query.SMTP) *settings_pb.EmailProvider_Smtp {
 		ret.Smtp.Auth = xoauth2
 	}
 
+	if config.XOAuth2Auth == nil && config.PlainAuth == nil {
+		ret.Smtp.Auth = &settings_pb.EmailProviderSMTP_None{
+			None: &settings_pb.SMTPNoAuth{},
+		}
+	}
+
 	return ret
 }
 

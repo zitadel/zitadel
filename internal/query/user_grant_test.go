@@ -236,7 +236,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareUserGrantQuery machine user found",
+			name:    "prepareUserGrantQuery service account found",
 			prepare: prepareUserGrantQuery,
 			want: want{
 				sqlExpectations: mockQuery(
@@ -634,7 +634,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareUserGrantsQuery one grant (machine user)",
+			name:    "prepareUserGrantsQuery one grant (service account)",
 			prepare: prepareUserGrantsQuery,
 			want: want{
 				sqlExpectations: mockQueries(

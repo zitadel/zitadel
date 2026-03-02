@@ -8,12 +8,12 @@
   },
   "private": true,
   "devDependencies": {
-    "@types/node": "^22.19.3",
+    "@types/node": "^22.19.7",
     "cypress": "^14.5.4",
     "cypress-wait-until": "^3.0.2",
     "jsonwebtoken": "^9.0.3",
     "mochawesome": "^7.1.4",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "uuid": "^10.0.0"
   }

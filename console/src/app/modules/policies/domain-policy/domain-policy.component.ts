@@ -75,6 +75,10 @@ export class DomainPolicyComponent implements OnInit {
 
   public async savePolicy(): Promise<void> {
     const org = await this.authService.getActiveOrg();
+    if (!org) {
+      console.log('No active organization found. Cannot save domain policy.');
+      return;
+    }
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.domainData as OrgIAMPolicy.AsObject).isDefault) {
@@ -150,6 +154,10 @@ export class DomainPolicyComponent implements OnInit {
 
           try {
             const org = await this.authService.getActiveOrg();
+            if (!org) {
+              console.log('No active organization found. Cannot reset domain policy.');
+              return;
+            }
             await this.adminService.resetCustomDomainPolicyToDefault(org.id);
             this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
             await new Promise((res) => setTimeout(res, 1000));

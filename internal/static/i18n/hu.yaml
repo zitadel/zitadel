@@ -195,10 +195,6 @@ Errors:
     RefreshToken:
       Invalid: "A frissítő token érvénytelen"
       NotFound: "A frissítő token nem található"
-  Instance:
-    NotFound: "Az instance nem található"
-    AlreadyExists: "Az instance már létezik"
-    NotChanged: "Az instance nem változott"
   Org:
     AlreadyExists: "A szervezet neve vagy azonosítója már foglalt"
     Invalid: "A szervezet érvénytelen"
@@ -222,7 +218,7 @@ Errors:
     DomainVerificationHTTPNotFound: "A kihívást tartalmazó fájl nem található a várt URL-en. Ellenőrizd, hogy feltöltötted-e a fájlt a megfelelő helyre olvasási jogosultsággal"
     DomainVerificationHTTPNoMatch: "A kihívást tartalmazó fájl megtalálható a várt URL-en, de nem tartalmazza a megfelelő token szöveget. Ellenőrizd a tartalmát"
     DomainVerificationTimeout: "Időtúllépés történt a DNS szerver lekérdezésekor"
-    PrimaryDomainNotDeletable: "Az elsődleges domain nem törölhető"
+    PrimaryDomainNotDeletable: "A szervezeti domain nem törölhető"
     DomainNotFound: "A domain nem található"
     MemberIDMissing: "A tagazonosító hiányzik"
     MemberNotFound: "A szervezeti tag nem található"
@@ -283,10 +279,6 @@ Errors:
       Empty: "A jelszó korhatár szabályzat üres"
       NotExisting: "A jelszó korhatár szabályzat nem létezik"
       AlreadyExists: "A jelszó korhatár szabályzat már létezik"
-    OrgIAMPolicy:
-      Empty: "Az Org IAM Policy üres"
-      NotExisting: "Az Org IAM Policy nem létezik"
-      AlreadyExists: "Az Org IAM Policy már létezik"
     NotificationPolicy:
       NotFound: "A Notification Policy nem található"
       NotChanged: "A Notification Policy nem változott"
@@ -348,7 +340,9 @@ Errors:
       HasNotExistingRole: "Egy szerepkör nem létezik a projektben"
       NotActive: "A projekt engedélye nem aktív"
       NotInactive: "A projekt engedélye nem inaktív"
-  IAM:
+  Instance:
+    AlreadyExists: "Az instance már létezik"
+    NotChanged: "Az instance nem változott"
     NotFound: "Instance nem található. Győződj meg róla, hogy a domain helyes. Nézd meg itt: https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "A szerepkörök nem változtak"
@@ -356,8 +350,6 @@ Errors:
     MemberAlreadyExisting: "Tag már létezik"
     MemberNotExisting: "A tag nem létezik"
     IDMissing: "Az azonosító hiányzik"
-    IAMProjectIDMissing: "Az IAM projekt azonosító hiányzik"
-    IamProjectAlreadySet: "Az IAM projekt azonosító már be van állítva"
     IdpInvalid: "Az IDP konfiguráció érvénytelen"
     IdpNotExisting: "Az IDP konfiguráció nem létezik"
     OIDCConfigInvalid: "Az OIDC IDP konfiguráció érvénytelen"
@@ -902,7 +894,7 @@ EventTypes:
       verified: "Domain ellenőrizve"
       removed: "Domain eltávolítva"
       primary:
-        set: "Elsődleges domain beállítva"
+        set: "Szervezeti domain beállítva"
       reserved: "Domain lefoglalva"
       released: "Domain feloldva"
     name:

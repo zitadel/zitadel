@@ -27,7 +27,9 @@ export type RegisterUserResponse = {
   sessionId: string;
   factors: Factors | undefined;
 };
-export async function registerUser(command: RegisterUserCommand) {
+export async function registerUser(
+  command: RegisterUserCommand,
+): Promise<{ error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   const t = await getTranslations("register");
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -153,7 +155,9 @@ export type registerUserAndLinkToIDPResponse = {
   sessionId: string;
   factors: Factors | undefined;
 };
-export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDPommand) {
+export async function registerUserAndLinkToIDP(
+  command: RegisterUserAndLinkToIDPommand,
+): Promise<{ error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   const t = await getTranslations("register");
 
   const _headers = await headers();

@@ -196,10 +196,6 @@ Errors:
     RefreshToken:
       Invalid: "리프레시 토큰이 잘못되었습니다"
       NotFound: "리프레시 토큰을 찾을 수 없습니다"
-  Instance:
-    NotFound: "인스턴스를 찾을 수 없습니다"
-    AlreadyExists: "인스턴스가 이미 존재합니다"
-    NotChanged: "인스턴스가 변경되지 않았습니다"
   Org:
     AlreadyExists: "조직 이름 또는 ID가 이미 사용 중입니다"
     Invalid: "조직이 유효하지 않습니다"
@@ -223,7 +219,7 @@ Errors:
     DomainVerificationHTTPNotFound: "예상되는 URL에 챌린지를 포함하는 파일을 찾을 수 없습니다. 파일이 올바른 위치에 읽기 권한으로 업로드되었는지 확인하세요"
     DomainVerificationHTTPNoMatch: "예상되는 URL에 챌린지 파일이 있지만 올바른 토큰 텍스트가 포함되어 있지 않습니다. 파일의 내용을 확인하세요"
     DomainVerificationTimeout: "DNS 서버에 대한 쿼리에서 시간 초과가 발생했습니다"
-    PrimaryDomainNotDeletable: "기본 도메인은 삭제할 수 없습니다"
+    PrimaryDomainNotDeletable: "조직 도메인은 삭제할 수 없습니다"
     DomainNotFound: "도메인을 찾을 수 없습니다"
     MemberIDMissing: "구성원 ID가 누락되었습니다"
     MemberNotFound: "조직 구성원을 찾을 수 없습니다"
@@ -284,10 +280,6 @@ Errors:
       Empty: "비밀번호 만료 정책이 비어 있습니다"
       NotExisting: "비밀번호 만료 정책이 존재하지 않습니다"
       AlreadyExists: "비밀번호 만료 정책이 이미 존재합니다"
-    OrgIAMPolicy:
-      Empty: "조직 IAM 정책이 비어 있습니다"
-      NotExisting: "조직 IAM 정책이 존재하지 않습니다"
-      AlreadyExists: "조직 IAM 정책이 이미 존재합니다"
     NotificationPolicy:
       NotFound: "알림 정책을 찾을 수 없습니다"
       NotChanged: "알림 정책이 변경되지 않았습니다"
@@ -349,7 +341,9 @@ Errors:
       HasNotExistingRole: "프로젝트에 존재하지 않는 역할이 있습니다"
       NotActive: "프로젝트 권한이 활성 상태가 아닙니다"
       NotInactive: "프로젝트 권한이 비활성 상태가 아닙니다"
-  IAM:
+  Instance:
+    AlreadyExists: "인스턴스가 이미 존재합니다"
+    NotChanged: "인스턴스가 변경되지 않았습니다"
     NotFound: "인스턴스를 찾을 수 없습니다. 도메인이 올바른지 확인하십시오. https://zitadel.com/docs/apis/introduction#domains 를 참조하세요"
     Member:
       RolesNotChanged: "역할이 변경되지 않았습니다"
@@ -357,8 +351,6 @@ Errors:
     MemberAlreadyExisting: "구성원이 이미 존재합니다"
     MemberNotExisting: "구성원이 존재하지 않습니다"
     IDMissing: "ID가 누락되었습니다"
-    IAMProjectIDMissing: "IAM 프로젝트 ID가 누락되었습니다"
-    IamProjectAlreadySet: "IAM 프로젝트 ID가 이미 설정되었습니다"
     IdpInvalid: "IDP 설정이 유효하지 않습니다"
     IdpNotExisting: "IDP 설정이 존재하지 않습니다"
     OIDCConfigInvalid: "OIDC IDP 설정이 유효하지 않습니다"
@@ -416,11 +408,11 @@ Errors:
       Empty: "기본 비밀번호 잠금 정책이 비어 있습니다"
       NotChanged: "기본 비밀번호 잠금 정책이 변경되지 않았습니다"
     DomainPolicy:
-      NotFound: "조직 IAM 정책을 찾을 수 없습니다"
-      Empty: "조직 IAM 정책이 비어 있습니다"
-      NotExisting: "조직 IAM 정책이 존재하지 않습니다"
-      AlreadyExists: "조직 IAM 정책이 이미 존재합니다"
-      NotChanged: "조직 IAM 정책이 변경되지 않았습니다"
+      NotFound: "조직 도메인 정책을 찾을 수 없습니다"
+      Empty: "조직 도메인 정책이 비어 있습니다"
+      NotExisting: "조직 도메인 정책이 존재하지 않습니다"
+      AlreadyExists: "조직 도메인 정책이 이미 존재합니다"
+      NotChanged: "조직 도메인 정책이 변경되지 않았습니다"
     NotificationPolicy:
       NotFound: "기본 알림 정책을 찾을 수 없습니다"
       NotChanged: "기본 알림 정책이 변경되지 않았습니다"
@@ -903,7 +895,7 @@ EventTypes:
       verified: "도메인 인증됨"
       removed: "도메인 삭제됨"
       primary:
-        set: "기본 도메인 설정됨"
+        set: "조직 도메인 설정됨"
       reserved: "도메인 예약됨"
       released: "도메인 해제됨"
     name:

@@ -195,10 +195,6 @@ Errors:
     RefreshToken:
       Invalid: "Le jeton de rafraîchissement n'est pas valide"
       NotFound: "Jeton de rafraîchissement non trouvé"
-  Instance:
-    NotFound: "Instance non trouvée"
-    AlreadyExists: "L'instance existe déjà"
-    NotChanged: "L'instance n'a pas changé"
   Org:
     AlreadyExists: "Le nom de l'organisation ou l'identifiant est déjà pris"
     Invalid: "L'organisation n'est pas valide"
@@ -222,7 +218,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Le fichier contenant le défi n'a pas été trouvé dans l'URL attendue. Vérifiez que vous avez téléchargé le fichier au bon endroit avec les autorisations de lecture"
     DomainVerificationHTTPNoMatch: "Le fichier contenant le défi a été trouvé dans l'URL attendue mais il ne contient pas le bon texte de token. Vérifiez son contenu"
     DomainVerificationTimeout: "Il y a eu un délai d'attente lors de l'interrogation du serveur DNS"
-    PrimaryDomainNotDeletable: "Le domaine primaire ne doit pas être supprimé"
+    PrimaryDomainNotDeletable: "Le domaine de l'organisation ne doit pas être supprimé"
     DomainNotFound: "Domaine non trouvé"
     MemberIDMissing: "ID du membre manquant"
     MemberNotFound: "Membre de l'organisation non trouvé"
@@ -283,10 +279,6 @@ Errors:
       Empty: "La politique d'âge du mot de passe est vide"
       NotExisting: "La politique d'âge des mots de passe n'existe pas"
       AlreadyExists: "La politique relative à l'âge du mot de passe existe déjà"
-    OrgIAMPolicy:
-      Empty: "La politique IAM d'Org est vide"
-      NotExisting: "La politique Org IAM n'existe pas"
-      AlreadyExists: "La politique IAM d'Org existe déjà"
     NotificationPolicy:
       NotFound: "La politique notification n'a pas été trouvée"
       NotChanged: "La politique notification n'a pas été modifiée"
@@ -348,16 +340,16 @@ Errors:
       HasNotExistingRole: "Un rôle n'existe pas sur le projet"
       NotActive: "La concession du projet n'est pas active"
       NotInactive: "La concession du projet n'est pas inactive"
-  IAM:
-    NotFound: "IAM non trouvé. Assurez-vous que vous avez la bonne organisation. Vérifiez https://zitadel.com/docs/apis/introduction#organizations"
+  Instance:
+    AlreadyExists: "L'instance existe déjà"
+    NotChanged: "L'instance n'a pas changé"
+    NotFound: "Instance non trouvé. Assurez-vous que vous avez la bonne organisation. Vérifiez https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Les rôles n'ont pas été modifiés"
     MemberInvalid: "Le membre n'est pas valide"
     MemberAlreadyExisting: "Le membre existe déjà"
     MemberNotExisting: "Le membre n'existe pas"
     IDMissing: "Id manquant"
-    IAMProjectIDMissing: "Id de projet IAM manquant"
-    IamProjectAlreadySet: "L'identifiant du projet IAM a déjà été défini"
     IdpInvalid: "La configuration IDP n'est pas valide"
     IdpNotExisting: "La configuration IDP n'existe pas"
     OIDCConfigInvalid: "La configuration IDP de l'OIDC n'est pas valide"
@@ -415,11 +407,11 @@ Errors:
       Empty: "Politique de verrouillage par mot de passe par défaut vide"
       NotChanged: "La politique de verrouillage par mot de passe par défaut n'a pas été modifiée."
     DomainPolicy:
-      NotFound: "Politique IAM Org non trouvée"
-      Empty: "La politique Org IAM est vide"
-      NotExisting: "La politique IAM d'Org n'existe pas"
-      AlreadyExists: "La politique IAM d'Org existe déjà"
-      NotChanged: "La politique IAM d'Org n'a pas été modifiée"
+      NotFound: "Politique de domaine de l'organisation non trouvée"
+      Empty: "La politique de domaine de l'organisation est vide"
+      NotExisting: "La politique de domaine de l'organisation n'existe pas"
+      AlreadyExists: "La politique de domaine de l'organisation existe déjà"
+      NotChanged: "La politique de domaine de l'organisation n'a pas été modifiée"
     NotificationPolicy:
       NotFound: "La politique de notification par défaut n'a pas été trouvée"
       NotChanged: "La politique de notification par défaut n'a pas été modifiée"
@@ -898,7 +890,7 @@ EventTypes:
       verified: "Domaine vérifié"
       removed: "Domaine supprimé"
       primary:
-        set: "Domaine primaire défini"
+        set: "Domaine de l'organisation modifié"
       reserved: "Domaine réservé"
       released: "Domaine libéré"
     name:

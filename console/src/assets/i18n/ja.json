@@ -9,7 +9,7 @@
         "DESCRIPTION": "アプリケーションを保護するために、以下のステップを完了してください。",
         "CREATE_PROJECT": {
           "TITLE": "プロジェクトを作成する",
-          "DESCRIPTION": "プロジェクトを追加し、その役割と権限を定義してください。"
+          "DESCRIPTION": "プロジェクトを追加し、その役割とロール割り当てを定義してください。"
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "プロジェクトは、ユーザーを認証するために使用できる1つ以上のアプリケーションをホストします。例えば、Webフロントエンド、モバイルアプリケーション、バックエンド用にそれぞれ1つずつ、合計3つのアプリケーションを持つ単一のプロジェクトを持つことができます。また、プロジェクトでユーザーに権限を与えることもできます。他の組織のユーザーがあなたのアプリケーションにログインできるようにするには、プロジェクトへのアクセスを許可してください。<br/><br/>プロジェクトが見つからない場合は、プロジェクトの所有者または対応する権利を持つ人に連絡してアクセスを取得してください。",
       "OWNED": {
         "TITLE": "所有しているプロジェクト",
-        "DESCRIPTION": "これらはあなたが所有しているプロジェクトです。これらのプロジェクトの設定、権限、アプリケーションを管理できます。"
+        "DESCRIPTION": "これらはあなたが所有しているプロジェクトです。これらのプロジェクトの設定、ロール割り当て、アプリケーションを管理できます。"
       },
       "GRANTED": {
         "TITLE": "付与されたプロジェクト",
@@ -53,17 +53,17 @@
         "METADATA": "部門のようなユーザーにカスタム属性を追加してください。この情報をあなたのアクションで使用できます。"
       },
       "MACHINES": {
-        "TITLE": "サービス利用者",
-        "DESCRIPTION": "サービス ユーザーは、秘密キーで署名された JWT ベアラー トークンを使用して非対話的に認証されます。個人のアクセス トークンを使用することもできます。",
-        "METADATA": "認証システムのようなユーザーにカスタム属性を追加してください。この情報をあなたのアクションで使用できます。"
+        "TITLE": "サービスアカウント",
+        "DESCRIPTION": "サービスアカウントは、秘密キーで署名された JWT ベアラー トークンを使用して非対話的に認証されます。個人のアクセス トークンを使用することもできます。",
+        "METADATA": "認証システムのようなアカウントにカスタム属性を追加してください。この情報をあなたのアクションで使用できます。"
       },
       "SELF": {
         "METADATA": "あなたの部門のようなあなたのユーザーにカスタム属性を追加してください。この情報をあなたの組織のアクションで使用できます。"
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "権限",
-      "DESCRIPTION": "権限はユーザーがプロジェクトに対するアクセス権を定義します。プロジェクトへのアクセスをユーザーに許可し、そのプロジェクト内でのユーザーの役割を定義できます。"
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "ロール割り当て",
+      "DESCRIPTION": "ロール割り当ては、ユーザーがプロジェクトに対するアクセス権を定義します。プロジェクトへのアクセスをユーザーに許可し、そのプロジェクト内でのユーザーの役割を定義できます。"
     },
     "ACTIONS": {
       "TITLE": "アクション",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "最初のプロジェクトを作成する",
-        "description": "最初のプロジェクトを追加し、ロールと認証を定義します。",
+        "description": "最初のプロジェクトを追加し、ロールとロール割り当てを定義します。",
         "action": "プロジェクトを作成"
       },
       "APPLICATION_CREATED": {
@@ -401,9 +401,9 @@
         "action": "ユーザーを作成"
       },
       "user.grant.added": {
-        "title": "ユーザーにグラントする",
-        "description": "ユーザーがアプリケーションにアクセスし、ロールをセットアップできるようにします。",
-        "action": "承認の作成"
+        "title": "ロールを割り当てる",
+        "description": "ユーザーがアプリケーションにアクセスし、ロールを設定できるようにします。",
+        "action": "ロール割り当てを作成"
       }
     }
   },
@@ -424,12 +424,12 @@
     "ROLES": "ロール",
     "GRANTEDPROJECT": "グラントされたプロジェクト",
     "HUMANUSERS": "ユーザー",
-    "MACHINEUSERS": "サービスユーザー",
+    "MACHINEUSERS": "サービスアカウント",
     "LOGOUT": "すべてのユーザーをログアウトする",
     "NEWORG": "新しい組織",
-    "IAMADMIN": "あなたはIAM管理者です。広範囲の権限があることに注意してください。",
+    "IAMADMIN": "あなたはインスタンス管理者です。広範囲の権限があることに注意してください。",
     "SHOWORGS": "すべての組織を表示する",
-    "GRANTS": "認可",
+    "GRANTS": "ロール割り当て",
     "ACTIONS": "アクション",
     "PRIVACY": "プライバシー",
     "TOS": "利用規約",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "組織のユーザーを作成および管理する権限を持ちます",
     "ORG_OWNER_VIEWER": "組織全体を閲覧する権限を持ちます",
     "ORG_SETTINGS_MANAGER": "組織の設定を管理する権限を持ちます",
-    "ORG_USER_PERMISSION_EDITOR": "ユーザーグラントを管理する権限を持ちます",
+    "ORG_USER_PERMISSION_EDITOR": "ロール割り当てを管理する権限を持ちます",
     "ORG_PROJECT_PERMISSION_EDITOR": "プロジェクトグラントを管理する権限を持ちます",
     "ORG_PROJECT_CREATOR": "所有するプロジェクトと配下の設定を作成する権限を持ちます",
     "ORG_ADMIN_IMPERSONATOR": "組織の管理者およびエンドユーザーになりすます権限がある",
@@ -702,7 +702,7 @@
     "USERNAME": "ユーザー名",
     "ORGNAME": "組織名",
     "ORGID": "組織ID",
-    "PRIMARYDOMAIN": "プライマリドメイン",
+    "PRIMARYDOMAIN": "組織ドメイン",
     "PROJECTNAME": "プロジェクト名",
     "RESOURCEOWNER": "リソース所有者",
     "METHODS": {
@@ -724,7 +724,7 @@
       "ME": "自分のプロフィールに移動する",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
       "USERS": "<strong>G</strong>o to <strong>U</strong>sers",
-      "USERGRANTS": "<strong>G</strong>o to <strong>A</strong>uthorizations",
+      "ROLEASSIGNMENTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments",
       "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows",
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
     }
@@ -765,8 +765,8 @@
       "SECURITY": "パスワードとセキュリティ",
       "KEYS": "キー",
       "PAT": "個人用アクセス トークン",
-      "USERGRANTS": "認可",
-      "MEMBERSHIPS": "メンバーシップ",
+      "ROLEASSIGNMENTS": "ロール割り当て",
+      "MEMBERSHIPS": "管理者ロール",
       "METADATA": "メタデータ"
     },
     "TITLE": "個人情報",
@@ -990,8 +990,8 @@
       "COUNTRY": "国"
     },
     "MACHINE": {
-      "TITLE": "サービスユーザーの詳細",
-      "USERNAME": "ユーザー名",
+      "TITLE": "サービスアカウントの詳細",
+      "USERNAME": "アカウント名",
       "NAME": "名前",
       "DESCRIPTION": "概要",
       "KEYSTITLE": "キー",
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "最小で{{value}}文字の長さが必要です。",
       "MAXLENGTHERROR": "{{value}}文字以下でなければなりません"
     },
-    "ID": "id",
+    "ID": "ユーザーID",
     "EMAIL": "Eメール",
     "PHONE": "電話番号",
     "PHONEEMPTY": "電話番号は定義されていません",
@@ -1119,8 +1119,8 @@
       "ADDITIONAL-EXTERNAL": "ログインネーム（外部の組織）"
     },
     "TARGET": {
-      "SELF": "他の組織のユーザーに権限をグラントしたい場合",
-      "EXTERNAL": "組織のユーザーに権限をグラントする",
+      "SELF": "他の組織のユーザーにロールを割り当てたい場合",
+      "EXTERNAL": "組織のユーザーにロールを割り当てる",
       "CLICKHERE": "ここをクリック"
     },
     "SIGNEDOUT": "サインアウトされています。[サインイン]ボタンをクリックして、再度サインインする。",
@@ -1152,7 +1152,7 @@
       "SELECTEDDEACTIVATED": "選択されたユーザー非アクティブになりました。",
       "SELECTEDKEYSDELETED": "選択したキーが削除されました。",
       "KEYADDED": "キーが追加されました！",
-      "MACHINEADDED": "サービスユーザーが作成されました！",
+      "MACHINEADDED": "サービスアカウントが作成されました！",
       "DELETED": "ユーザーが正常に削除されました！",
       "UNLOCKED": "ユーザーのロックが正常に解除されました！",
       "PASSWORDLESSREGISTRATIONSENT": "登録リンクが正常に送信されました。",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Zitadel管理者ロール",
-      "DESCRIPTION": "ユーザーのメンバーグラント一覧です。組織、プロジェクト、IAMの詳細ページでも変更することができます。",
+      "DESCRIPTION": "ユーザーのメンバーグラント一覧です。組織、プロジェクト、インスタンスの詳細ページでも変更することができます。",
       "ORGCONTEXT": "現在選択されている組織に関連するすべての組織とプロジェクトが表示されます。",
       "USERCONTEXT": "自分が権限を持つすべての組織やプロジェクトが表示されます。他の組織も含みます。",
       "CREATIONDATE": "作成日",
@@ -1170,7 +1170,7 @@
       "REMOVE": "削除",
       "TYPE": "タイプ",
       "ORGID": "組織ID",
-      "UPDATED": "メンバーシップが更新されました。",
+      "UPDATED": "管理者ロールが更新されました。",
       "NOPERMISSIONTOEDIT": "ロールを編集するために必要な権限がありません！",
       "TYPES": {
         "UNKNOWN": "不明",
@@ -1267,12 +1267,12 @@
       "DESCRIPTION": "グローバルポリシーと管理アクセス設定を管理します。"
     },
     "EVENTSTORE": {
-      "TITLE": "IAMストレージ管理",
+      "TITLE": "インスタンスストレージ管理",
       "DESCRIPTION": "Zitadelのビューと失敗したイベントを管理します。"
     },
     "MEMBER": {
-      "TITLE": "マネージャー",
-      "DESCRIPTION": "これらのマネージャーは、インスタンスで変更を加えることができます。"
+      "TITLE": "管理者",
+      "DESCRIPTION": "これらの管理者は、インスタンスで変更を加えることができます。"
     },
     "PAGES": {
       "STATE": "ステータス",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "マネージャーが削除されました。",
-      "MEMBERSADDED": "マネージャーが追加されました。",
-      "MEMBERADDED": "マネージャーが追加されました。",
-      "MEMBERCHANGED": "マネージャーが変更されました。",
+      "MEMBERREMOVED": "管理者が削除されました。",
+      "MEMBERSADDED": "管理者が追加されました。",
+      "MEMBERADDED": "管理者が追加されました。",
+      "MEMBERCHANGED": "管理者が変更されました。",
       "ROLEREMOVED": "ロールが削除されました。",
       "ROLECHANGED": "ロールが変更されました。",
       "REACTIVATED": "アクティブになりました。",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "名前",
-      "ID": "ID",
+      "ID": "組織ID",
       "CREATIONDATE": "作成日",
       "DATECHANGED": "変更",
       "FILTER": "絞り込み",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "ファイルをダウンロード",
       "SELECTORGTOOLTIP": "この組織を選択",
-      "PRIMARYDOMAIN": "プライマリドメイン",
+      "PRIMARYDOMAIN": "組織ドメイン",
       "STATE": "ステート",
       "USEPASSWORD": "初期パスワードを設定する",
       "USEPASSWORDDESC": "ユーザーは、初期セットアップ中にパスワードを設定する必要はありません。"
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "ドメインを追加する",
-      "TITLE": "検証済みドメイン",
+      "TITLE": "組織ドメイン",
       "DESCRIPTION": "ドメインを設定します。このドメインは、ユーザーのログインで使用できます。",
-      "SETPRIMARY": "プライマリとして設定する",
+      "SETPRIMARY": "組織ドメイン",
       "DELETE": {
         "TITLE": "ドメインの削除",
         "DESCRIPTION": "ドメインの1つを削除しようとしています。ユーザーはログインにこのドメインを使用できなくなることに注意してください。"
@@ -1449,7 +1449,7 @@
       "2": "非アクティブ"
     },
     "MEMBER": {
-      "TITLE": "組織マネージャー",
+      "TITLE": "組織管理者",
       "DESCRIPTION": "組織の設定を変更できるユーザーを定義します。"
     },
     "TOAST": {
@@ -1458,10 +1458,10 @@
       "REACTIVATED": "組織がアクティブになりました。",
       "DOMAINADDED": "ドメインを追加しました。",
       "DOMAINREMOVED": "ドメインを削除しました。",
-      "MEMBERADDED": "マネージャーが追加されました。",
-      "MEMBERREMOVED": "マネージャーが削除されました。",
-      "MEMBERCHANGED": "マネージャーが変更されました。",
-      "SETPRIMARY": "プライマリドメインが設定されました。",
+      "MEMBERADDED": "管理者が追加されました。",
+      "MEMBERREMOVED": "管理者が削除されました。",
+      "MEMBERCHANGED": "管理者が変更されました。",
+      "SETPRIMARY": "組織ドメインが正常に設定されました。",
       "DELETED": "組織が正常に削除されました。",
       "DEFAULTORGNOTFOUND": "デフォルトの組織が見つかりませんでした",
       "ORG_WAS_DELETED": "組織が削除されました。"
@@ -1499,7 +1499,7 @@
       "NOTIFICATIONS_DESC": "SMTPおよびSMS設定",
       "MESSAGETEXTS": "メッセージテキスト",
       "IDP": "IDプロバイダー",
-      "VERIFIED_DOMAINS": "検証済みドメイン",
+      "VERIFIED_DOMAINS": "組織ドメイン",
       "DOMAIN": "ドメイン設定",
       "LOGINTEXTS": "ログイン画面のテキスト",
       "BRANDING": "ブランディング",
@@ -1942,13 +1942,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "メンバー",
+      "TITLE": "管理者",
       "USERNAME": "ユーザー名",
       "DISPLAYNAME": "表示名",
       "LOGINNAME": "ログイン名",
       "EMAIL": "Eメール",
       "ROLES": "ロール",
-      "ADD": "メンバーを追加する",
+      "ADD": "管理者を追加する",
       "ADDDESCRIPTION": "追加するユーザーの名前を入力します。"
     },
     "TABLE": {
@@ -2014,7 +2014,8 @@
           "DESCRIPTION": "本当にプロジェクトを完全に削除してよろしいですか？",
           "TYPENAME": "プロジェクトの名前を入力して、完全に削除する。"
         }
-      }
+      },
+      "ID": "プロジェクトID"
     },
     "SETTINGS": {
       "TITLE": "設定",
@@ -2039,9 +2040,9 @@
       "NAME": "新しいプロジェクト名"
     },
     "MEMBER": {
-      "TITLE": "マネージャー",
-      "TITLEDESC": "マネージャーは、自分のロールに基づいてこのプロジェクトに変更を加えることができます。",
-      "DESCRIPTION": "これらのマネージャーは、プロジェクトを編集できます。",
+      "TITLE": "管理者",
+      "TITLEDESC": "管理者は、自分のロールに基づいてこのプロジェクトに変更を加えることができます。",
+      "DESCRIPTION": "これらの管理者は、プロジェクトを編集できます。",
       "USERNAME": "ユーザー名",
       "DISPLAYNAME": "表示名",
       "LOGINNAME": "ログイン名",
@@ -2069,9 +2070,9 @@
       },
       "DETAIL": {
         "TITLE": "プロジェクトグラント",
-        "DESC": "指定された組織で使用できるロールを選択し、マネージャーを選出します。",
-        "MEMBERTITLE": "マネージャー",
-        "MEMBERDESC": "これらは、グラントされた組織のマネージャーです。プロジェクトの設定を編集するためにアクセスできるユーザーをここに追加します。",
+        "DESC": "指定された組織で使用できるロールを選択し、管理者を選出します。",
+        "MEMBERTITLE": "管理者",
+        "MEMBERDESC": "これらは、グラントされた組織の管理者です。プロジェクトの設定を編集するためにアクセスできるユーザーをここに追加します。",
         "PROJECTNAME": "プロジェクト名",
         "GRANTEDORG": "グラントされた組織",
         "RESOURCEOWNER": "リソース所有者"
@@ -2084,7 +2085,7 @@
       "ALL": "全て",
       "SHOWDETAIL": "詳細を表示",
       "USER": "ユーザー",
-      "MEMBERS": "マネージャー",
+      "MEMBERS": "管理者",
       "ORG": "組織",
       "PROJECTNAME": "プロジェクト名",
       "GRANTEDORG": "グラントされた組織",
@@ -2102,9 +2103,9 @@
         "PROJECTGRANTUSERGRANTADDED": "プロジェクトグラントが作成されました。",
         "PROJECTGRANTADDED": "プロジェクトグラントが作成されました。",
         "PROJECTGRANTCHANGED": "プロジェクトグラントが変更されました。",
-        "PROJECTGRANTMEMBERADDED": "グラントマネージャーが追加されました。",
-        "PROJECTGRANTMEMBERCHANGED": "グラントマネージャーが変更されました。",
-        "PROJECTGRANTMEMBERREMOVED": "グラントマネージャーが削除されました。",
+        "PROJECTGRANTMEMBERADDED": "グラント管理者が追加されました。",
+        "PROJECTGRANTMEMBERCHANGED": "グラント管理者が変更されました。",
+        "PROJECTGRANTMEMBERREMOVED": "グラント管理者が削除されました。",
         "PROJECTGRANTUPDATED": "プロジェクトグラントが更新されました。"
       },
       "DIALOG": {
@@ -2167,10 +2168,10 @@
       "EMPTY": "プロジェクトは見つかりません"
     },
     "TOAST": {
-      "MEMBERREMOVED": "マネージャーが削除されました。",
-      "MEMBERSADDED": "マネージャーが追加されました。",
-      "MEMBERADDED": "マネージャーが追加されました。",
-      "MEMBERCHANGED": "マネージャーが変更されました。",
+      "MEMBERREMOVED": "管理者が削除されました。",
+      "MEMBERSADDED": "管理者が追加されました。",
+      "MEMBERADDED": "管理者が追加されました。",
+      "MEMBERCHANGED": "管理者が変更されました。",
       "ROLESCREATED": "ロールが作成されました。",
       "ROLEREMOVED": "ロールが削除されました。",
       "ROLECHANGED": "ロールが変更されました。",
@@ -2296,7 +2297,7 @@
     "ADD": "IDプロバイダーを追加する",
     "TYPE": "タイプ",
     "OWNER": "オーナー",
-    "ID": "ID",
+    "ID": "アイデンティティプロバイダーID",
     "NAME": "名前",
     "AUTHORIZATIONENDPOINT": "認可エンドポイント",
     "TOKENENDPOINT": "トークンエンドポイント",
@@ -2521,7 +2522,7 @@
     "TOKEN": "トークン設定",
     "PAGES": {
       "TITLE": "アプリケーション",
-      "ID": "id",
+      "ID": "アプリケーションID",
       "DESCRIPTION": "ここでは、アプリケーション情報とその構成を編集できます。",
       "CREATE": "アプリケーションを作成する",
       "CREATE_SELECT_PROJECT": "最初にプロジェクトを選択する",
@@ -2792,61 +2793,61 @@
     "ar": "العربية"
   },
   "MEMBER": {
-    "ADD": "マネージャーを追加する",
+    "ADD": "管理者を追加する",
     "CREATIONTYPE": "作成タイプ",
     "CREATIONTYPES": {
       "0": "所有プロジェクト",
       "1": "グラントされたプロジェクト",
       "2": "組織",
-      "3": "IAM",
+      "3": "インスタンス",
       "4": "プロジェクト"
     },
     "EDITROLE": "ロールを編集する",
     "EDITFOR": "ユーザーのロールを編集する：{{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "マネージャーの削除",
-      "DELETE_DESCRIPTION": "マネージャーを削除しようとしています。本当によろしいですか？"
+      "DELETE_TITLE": "管理者の削除",
+      "DELETE_DESCRIPTION": "管理者を削除しようとしています。本当によろしいですか？"
     },
     "SHOWDETAILS": "クリックして詳細を表示します。"
   },
   "ROLESLABEL": "ロール",
   "GRANTS": {
-    "TITLE": "認可",
-    "DESC": "この組織のすべての認可です。",
-    "DELETE": "認可を削除する",
-    "EMPTY": "認可は見つかりません",
-    "ADD": "認可を作成する",
+    "TITLE": "ロール割り当て",
+    "DESC": "この組織のすべてのロール割り当てです。",
+    "DELETE": "ロール割り当てを削除する",
+    "EMPTY": "ロール割り当ては見つかりません",
+    "ADD": "ロール割り当てを作成する",
     "ADD_BTN": "新規",
     "PROJECT": {
-      "TITLE": "認可",
-      "DESCRIPTION": "指定したプロジェクトの認可を定義します。自分が権限を持つプロジェクトとユーザーのエントリしか表示されないことに注意してください。"
+      "TITLE": "ロール割り当て",
+      "DESCRIPTION": "指定したプロジェクトのロール割り当てを定義します。自分が権限を持つプロジェクトとユーザーのエントリしか表示されないことに注意してください。"
     },
     "USER": {
-      "TITLE": "認可",
-      "DESCRIPTION": "指定したユーザーの認可を定義します。自分が権限を持つプロジェクトとユーザーのエントリしか表示されないことに注意してください。"
+      "TITLE": "ロール割り当て",
+      "DESCRIPTION": "指定したユーザーのロール割り当てを定義します。自分が権限を持つプロジェクトとユーザーのエントリしか表示されないことに注意してください。"
     },
     "CREATE": {
-      "TITLE": "認可の作成",
+      "TITLE": "ロール割り当ての作成",
       "DESCRIPTION": "組織、プロジェクト、および対応するロールを検索する。"
     },
     "EDIT": {
-      "TITLE": "認可の変更"
+      "TITLE": "ロール割り当ての変更"
     },
     "DETAIL": {
-      "TITLE": "認可の詳細",
-      "DESCRIPTION": "ここでは、認可のすべての詳細を確認できます。"
+      "TITLE": "ロール割り当ての詳細",
+      "DESCRIPTION": "ここでは、ロール割り当てのすべての詳細を確認できます。"
     },
     "TOAST": {
-      "UPDATED": "認可が更新されました。",
-      "REMOVED": "認可が削除されました",
-      "BULKREMOVED": "認可が削除されました。",
-      "CANTSHOWINFO": "このユーザーが所属する組織のメンバーではないため、このユーザーのプロフィールにアクセスできません"
+      "UPDATED": "ロール割り当てが更新されました。",
+      "REMOVED": "ロール割り当てが削除されました",
+      "BULKREMOVED": "ロール割り当てが削除されました。",
+      "CANTSHOWINFO": "このユーザーが所属する組織の管理者ではないため、このユーザーのプロフィールにアクセスできません"
     },
     "DIALOG": {
-      "DELETE_TITLE": "認可の削除",
-      "DELETE_DESCRIPTION": "認可を削除しようとしています。本当によろしいですか？",
-      "BULK_DELETE_TITLE": "認可の削除",
-      "BULK_DELETE_DESCRIPTION": "複数の認可を削除しようとしています。本当によろしいですか？"
+      "DELETE_TITLE": "ロール割り当ての削除",
+      "DELETE_DESCRIPTION": "ロール割り当てを削除しようとしています。本当によろしいですか？",
+      "BULK_DELETE_TITLE": "ロール割り当ての削除",
+      "BULK_DELETE_DESCRIPTION": "複数のロール割り当てを削除しようとしています。本当によろしいですか？"
     }
   },
   "CHANGES": {
@@ -2865,5 +2866,6 @@
       "TITLE": "アクティビティ",
       "DESCRIPTION": "ここでは、ユーザーの変更が発生した最新のイベントを見ることができます。"
     }
-  }
+  },
+  "INSTANCEID": "インスタンスID"
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { completeFlowOrGetUrl } from "@/lib/client";
 import { verifyTOTP } from "@/lib/server/verify";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import Link from "next/link";
@@ -15,6 +14,9 @@ import { CopyToClipboard } from "./copy-to-clipboard";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { AutoSubmitForm } from "./auto-submit-form";
+import { handleServerActionResponse } from "@/lib/client-utils";
+import { completeFlowOrGetUrl } from "@/lib/client";
 
 type Inputs = {
   code: string;
@@ -33,6 +35,7 @@ type Props = {
 export function TotpRegister({ uri, loginName, sessionId, requestId, organization, checkAfter, loginSettings }: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -74,14 +77,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
               loginSettings?.defaultRedirectUri,
             );
 
-            if ("error" in callbackResponse) {
-              setError(callbackResponse.error);
-              return;
-            }
-
-            if ("redirect" in callbackResponse) {
-              return router.push(callbackResponse.redirect);
-            }
+            handleServerActionResponse(callbackResponse, router, setSamlData, setError);
           } else if (loginName) {
             const callbackResponse = await completeFlowOrGetUrl(
               {
@@ -91,14 +87,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
               loginSettings?.defaultRedirectUri,
             );
 
-            if ("error" in callbackResponse) {
-              setError(callbackResponse.error);
-              return;
-            }
-
-            if ("redirect" in callbackResponse) {
-              return router.push(callbackResponse.redirect);
-            }
+            handleServerActionResponse(callbackResponse, router, setSamlData, setError);
           }
         }
       })
@@ -113,6 +102,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
 
   return (
     <div className="flex flex-col items-center">
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       {uri && (
         <>
           <QRCodeSVG className="my-4 h-40 w-40 rounded-md bg-white p-2" value={uri} />
@@ -127,6 +117,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
             <div className="">
               <TextInput
                 type="text"
+                autoFocus
                 {...register("code", { required: t("set.required.code") })}
                 label={t("set.labels.code")}
                 data-testid="code-text-input"

@@ -372,6 +372,7 @@ type DomainClaimedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName          string `json:"userName"`
+	URLTemplate       string `json:"urlTemplate,omitempty"`
 	TriggeredAtOrigin string `json:"triggerOrigin,omitempty"`
 	oldUserName       string
 	orgScopedUsername bool
@@ -398,6 +399,7 @@ func NewDomainClaimedEvent(
 	userName,
 	oldUserName string,
 	orgScopedUsername bool,
+	urlTemplate string,
 ) *DomainClaimedEvent {
 	return &DomainClaimedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -406,6 +408,7 @@ func NewDomainClaimedEvent(
 			UserDomainClaimedType,
 		),
 		UserName:          userName,
+		URLTemplate:       urlTemplate,
 		oldUserName:       oldUserName,
 		orgScopedUsername: orgScopedUsername,
 		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),

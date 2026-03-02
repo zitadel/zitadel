@@ -195,10 +195,6 @@ Errors:
     RefreshToken:
       Invalid: "Refresh Token jest nieprawidłowy"
       NotFound: "Refresh Token nie znaleziony"
-  Instance:
-    NotFound: "Instancja nie znaleziona"
-    AlreadyExists: "Instancja już istnieje"
-    NotChanged: "Instancja nie zmieniona"
   Org:
     AlreadyExists: "Nazwa lub identyfikator organizacji jest już zajęty"
     Invalid: "Organizacja jest nieprawidłowa"
@@ -222,7 +218,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Pod oczekiwanym adresem URL nie znaleziono pliku zawierającego wyzwanie. Sprawdź, czy przesłałeś plik we właściwe miejsce z uprawnieniami do odczytu"
     DomainVerificationHTTPNoMatch: "Znaleziono plik zawierający wyzwanie pod oczekiwanym adresem URL, ale nie zawiera on prawidłowego tekstu tokena. Sprawdź jego zawartość"
     DomainVerificationTimeout: "Upłynął limit czasu podczas wysyłania zapytania do serwera DNS"
-    PrimaryDomainNotDeletable: "Domena główna nie może być usunięta"
+    PrimaryDomainNotDeletable: "Domena organizacji nie może być usunięta"
     DomainNotFound: "Domena nie znaleziona"
     MemberIDMissing: "Brak identyfikatora członka"
     MemberNotFound: "Członek organizacji nie znaleziony"
@@ -283,10 +279,6 @@ Errors:
       Empty: "Polityka wieku hasła jest pusta"
       NotExisting: "Polityka wieku hasła nie istnieje"
       AlreadyExists: "Polityka wieku hasła już istnieje"
-    OrgIAMPolicy:
-      Empty: "Polityka IAM organizacji jest pusta"
-      NotExisting: "Polityka IAM organizacji nie istnieje"
-      AlreadyExists: "Polityka IAM organizacji już istnieje"
     NotificationPolicy:
       NotFound: "Polityka powiadomień nie znaleziona"
       NotChanged: "Polityka powiadomień nie zmieniona"
@@ -348,16 +340,16 @@ Errors:
       HasNotExistingRole: "Jedna rola nie istnieje w projekcie"
       NotActive: "Grant projektu jest nieaktywny"
       NotInactive: "Grant projektu nie jest nieaktywny"
-  IAM:
-    NotFound: "IAM nie znaleziony. Upewnij się, że masz poprawną domenę. Sprawdź https://zitadel.com/docs/apis/introduction#domains"
+  Instance:
+    AlreadyExists: "Instancja już istnieje"
+    NotChanged: "Instancja nie zmieniona"
+    NotFound: "Instancja nie znaleziona. Upewnij się, że masz poprawną domenę. Sprawdź https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Role nie zmienione"
     MemberInvalid: "Członek jest nieprawidłowy"
     MemberAlreadyExisting: "Członek już istnieje"
     MemberNotExisting: "Członek nie istnieje"
     IDMissing: "Id brakuje"
-    IAMProjectIDMissing: "Brak identyfikatora projektu IAM"
-    IamProjectAlreadySet: "Identyfikator projektu IAM został już ustawiony"
     IdpInvalid: "Konfiguracja IDP jest nieprawidłowa"
     IdpNotExisting: "Konfiguracja IDP nie istnieje"
     OIDCConfigInvalid: "Konfiguracja OIDC IDP jest nieprawidłowa"
@@ -415,11 +407,11 @@ Errors:
       Empty: "Domyślna polityka blokowania hasła jest pusta"
       NotChanged: "Domyślna polityka blokowania hasła nie została zmieniona"
     DomainPolicy:
-      NotFound: "Polityka IAM organizacji nie znaleziona"
-      Empty: "Polityka IAM organizacji jest pusta"
-      NotExisting: "Polityka IAM organizacji nie istnieje"
-      AlreadyExists: "Polityka IAM organizacji już istnieje"
-      NotChanged: "Polityka IAM organizacji nie została zmieniona"
+      NotFound: "Polityka domen organizacji nie znaleziona"
+      Empty: "Polityka domen organizacji jest pusta"
+      NotExisting: "Polityka domen organizacji nie istnieje"
+      AlreadyExists: "Polityka domen organizacji już istnieje"
+      NotChanged: "Polityka domen organizacji nie została zmieniona"
     NotificationPolicy:
       NotFound: "Domyślna polityka powiadomień nie znaleziona"
       NotChanged: "Domyślna polityka powiadomień nie zmieniona"
@@ -903,7 +895,7 @@ EventTypes:
       verified: "Domena zweryfikowana"
       removed: "Usunięto domenę"
       primary:
-        set: "Ustawiono domenę główną"
+        set: "Ustawiono domenę organizacji"
       reserved: "Zarezerwowano domenę"
       released: "Zwolniono domenę"
     name:
