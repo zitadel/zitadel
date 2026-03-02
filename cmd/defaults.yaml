@@ -231,6 +231,10 @@ WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 Database:
   # Postgres is the default database of ZITADEL
   postgres:
+    # DSN is a full PostgreSQL connection URL. When set, individual connection
+    # fields (Host, Port, Database, User, Admin, Options) are ignored.
+    # Format: postgresql://user:password@host:port/dbname?sslmode=disable
+    DSN: "" # ZITADEL_DATABASE_POSTGRES_DSN
     Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
     Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
     Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
@@ -286,6 +290,11 @@ Caches:
         TimeOut: 30s
     Redis:
       Enabled: false
+      # URL is a full Redis connection URL. When set, individual connection
+      # fields (Addr, Username, Password, Network, EnableTLS) are ignored.
+      # Pool, timeout, retry, and circuit breaker settings can still be used as overlays.
+      # Format: redis://user:password@host:port/db or rediss://... for TLS
+      URL: "" # ZITADEL_CACHES_CONNECTORS_REDIS_URL
       # The network type, either tcp or unix.
       # Default is tcp.
       # Network string

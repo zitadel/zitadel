@@ -2,6 +2,7 @@ package redis
 
 import (
 	"crypto/tls"
+	"fmt"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -9,6 +10,12 @@ import (
 
 type Config struct {
 	Enabled bool
+
+	// URL is a full Redis connection URL. When set, individual connection
+	// fields (Addr, Username, Password, Network, EnableTLS) are ignored.
+	// Pool, timeout, retry, and circuit breaker settings can still be used as overlays.
+	// Format: redis://user:password@host:port/db or rediss://... for TLS
+	URL string
 
 	// The network type, either tcp or unix.
 	// Default is tcp.
@@ -114,14 +121,91 @@ type Connector struct {
 	Config Config
 }
 
-func NewConnector(config Config) *Connector {
+func NewConnector(config Config) (*Connector, error) {
 	if !config.Enabled {
-		return nil
+		return nil, nil
 	}
+
+	var opts *redis.Options
+	if config.URL != "" {
+		var err error
+		opts, err = optionsFromURL(config)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		opts = optionsFromConfig(config)
+	}
+
 	return &Connector{
-		Client: redis.NewClient(optionsFromConfig(config)),
+		Client: redis.NewClient(opts),
 		Config: config,
+	}, nil
+}
+
+func optionsFromURL(c Config) (*redis.Options, error) {
+	opts, err := redis.ParseURL(c.URL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Redis URL: %w", err)
 	}
+
+	opts.Protocol = 3
+	opts.ContextTimeoutEnabled = true
+
+	if c.ClientName != "" {
+		opts.ClientName = c.ClientName
+	}
+	if c.MaxRetries != 0 {
+		opts.MaxRetries = c.MaxRetries
+	}
+	if c.MinRetryBackoff != 0 {
+		opts.MinRetryBackoff = c.MinRetryBackoff
+	}
+	if c.MaxRetryBackoff != 0 {
+		opts.MaxRetryBackoff = c.MaxRetryBackoff
+	}
+	if c.DialTimeout != 0 {
+		opts.DialTimeout = c.DialTimeout
+	}
+	if c.ReadTimeout != 0 {
+		opts.ReadTimeout = c.ReadTimeout
+	}
+	if c.WriteTimeout != 0 {
+		opts.WriteTimeout = c.WriteTimeout
+	}
+	if c.PoolFIFO {
+		opts.PoolFIFO = c.PoolFIFO
+	}
+	if c.PoolSize != 0 {
+		opts.PoolSize = c.PoolSize
+	}
+	if c.PoolTimeout != 0 {
+		opts.PoolTimeout = c.PoolTimeout
+	}
+	if c.MinIdleConns != 0 {
+		opts.MinIdleConns = c.MinIdleConns
+	}
+	if c.MaxIdleConns != 0 {
+		opts.MaxIdleConns = c.MaxIdleConns
+	}
+	if c.MaxActiveConns != 0 {
+		opts.MaxActiveConns = c.MaxActiveConns
+	}
+	if c.ConnMaxIdleTime != 0 {
+		opts.ConnMaxIdleTime = c.ConnMaxIdleTime
+	}
+	if c.ConnMaxLifetime != 0 {
+		opts.ConnMaxLifetime = c.ConnMaxLifetime
+	}
+
+	opts.DisableIndentity = c.DisableIndentity
+	if c.IdentitySuffix != "" {
+		opts.IdentitySuffix = c.IdentitySuffix
+	}
+
+	opts.Limiter = newLimiter(c.CircuitBreaker, c.MaxActiveConns)
+
+	return opts, nil
 }
 
 func optionsFromConfig(c Config) *redis.Options {
@@ -140,6 +224,7 @@ func optionsFromConfig(c Config) *redis.Options {
 		WriteTimeout:          c.WriteTimeout,
 		ContextTimeoutEnabled: true,
 		PoolFIFO:              c.PoolFIFO,
+		PoolSize:              c.PoolSize,
 		PoolTimeout:           c.PoolTimeout,
 		MinIdleConns:          c.MinIdleConns,
 		MaxIdleConns:          c.MaxIdleConns,

@@ -3,6 +3,8 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -28,7 +30,17 @@ const (
 	sslPreferMode   = "prefer"
 )
 
+var ErrDSNWithAdminConnect = errors.New(
+	"admin connection is not supported when using DSN; " +
+		"provide a DSN pointing to an admin user for the init step, or use individual connection fields")
+
 type Config struct {
+	// DSN is a full PostgreSQL connection URL. When set, individual connection
+	// fields (Host, Port, Database, User, Admin, Options) are ignored.
+	// Format: postgresql://user:password@host:port/dbname?sslmode=disable
+	DSN       string
+	parsedDSN *pgxpool.Config `mapstructure:"-"`
+
 	Host             string
 	Port             int32
 	Database         string
@@ -70,15 +82,33 @@ func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 		}
 	}
 
+	if connector.DSN != "" {
+		parsed, err := pgxpool.ParseConfig(connector.DSN)
+		if err != nil {
+			return nil, fmt.Errorf("invalid PostgreSQL DSN: %w", err)
+		}
+		connector.parsedDSN = parsed
+	}
+
 	return connector, nil
 }
 
 func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
+	if c.DSN != "" && useAdmin {
+		return nil, nil, ErrDSNWithAdminConnect
+	}
+
 	connConfig := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns)
 
-	config, err := pgxpool.ParseConfig(c.String(useAdmin))
-	if err != nil {
-		return nil, nil, err
+	var config *pgxpool.Config
+	var err error
+	if c.parsedDSN != nil {
+		config = c.parsedDSN.Copy()
+	} else {
+		config, err = pgxpool.ParseConfig(c.String(useAdmin))
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	if len(connConfig.AfterConnect) > 0 {
@@ -147,14 +177,23 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 }
 
 func (c *Config) DatabaseName() string {
+	if c.parsedDSN != nil {
+		return c.parsedDSN.ConnConfig.Database
+	}
 	return c.Database
 }
 
 func (c *Config) Username() string {
+	if c.parsedDSN != nil {
+		return c.parsedDSN.ConnConfig.User
+	}
 	return c.User.Username
 }
 
 func (c *Config) Password() string {
+	if c.parsedDSN != nil {
+		return c.parsedDSN.ConnConfig.Password
+	}
 	return c.User.Password
 }
 
@@ -205,6 +244,9 @@ func (s *Config) checkSSL(user User) {
 }
 
 func (c Config) String(useAdmin bool) string {
+	if c.DSN != "" {
+		return c.DSN
+	}
 	user := c.User
 	if useAdmin {
 		user = c.Admin.User

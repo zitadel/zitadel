@@ -705,7 +705,8 @@ func prepareCache(t *testing.T, conf cache.Config, options ...func(*Config)) (ca
 	for _, option := range options {
 		option(&connConfig)
 	}
-	connector := NewConnector(connConfig)
+	connector, err := NewConnector(connConfig)
+	require.NoError(t, err)
 	t.Cleanup(func() {
 		connector.Close()
 		server.Close()
