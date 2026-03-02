@@ -46,7 +46,7 @@ func TestRecoverHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := RecoverHandler(writeReponse)(tt.handler)
+			handler := RecoverHandler(writeResponse)(tt.handler)
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest(http.MethodGet, "/", nil)
 			handler.ServeHTTP(w, r)
@@ -84,7 +84,7 @@ func TestRecoverHandlerWithError(t *testing.T) {
 	assert.ErrorIs(t, err, zerrors.ThrowInternal(nil, zerrors.IDRecover, "Errors.Internal"))
 }
 
-func writeReponse(w http.ResponseWriter, _ *http.Request, err error) {
+func writeResponse(w http.ResponseWriter, _ *http.Request, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	io.WriteString(w, err.Error())
 }

@@ -174,7 +174,7 @@ func Test_causeExtractor(t *testing.T) {
 	cancel()
 	timedOut, cancel := context.WithTimeout(background, -1)
 	defer cancel()
-	cancledCause, cause := context.WithCancelCause(background)
+	canceledCause, cause := context.WithCancelCause(background)
 	cause(errors.New("oops"))
 
 	tests := []struct {
@@ -199,7 +199,7 @@ func Test_causeExtractor(t *testing.T) {
 		},
 		{
 			name: "canceled context with cause",
-			ctx:  cancledCause,
+			ctx:  canceledCause,
 			want: []slog.Attr{
 				slog.String("cause", "oops"),
 			},

@@ -18,20 +18,20 @@ func RecoverHandler(writeResponse func(w http.ResponseWriter, r *http.Request, e
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx, cancel := context.WithCancelCause(r.Context())
-			defer cancel(nil)
 			r = r.WithContext(ctx)
 
 			defer func() {
+				var err error
 				if rec := recover(); rec != nil {
-					err, ok := rec.(error)
+					recErr, ok := rec.(error)
 					if !ok {
-						err = fmt.Errorf("%v", rec)
+						recErr = fmt.Errorf("%v", rec)
 					}
-					err = zerrors.ThrowInternal(err, zerrors.IDRecover, "Errors.Internal")
+					err = zerrors.ThrowInternal(recErr, zerrors.IDRecover, "Errors.Internal")
 					logRecovered(ctx, err)
-					cancel(err)
 					writeResponse(w, r, err)
 				}
+				cancel(err)
 			}()
 
 			next.ServeHTTP(w, r)

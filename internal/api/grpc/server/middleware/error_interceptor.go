@@ -29,8 +29,9 @@ func toGRPCError(ctx context.Context, req interface{}, handler grpc.UnaryHandler
 				err = zerrors.ThrowInternal(recErr, zerrors.IDRecover, "Errors.Internal")
 			}
 		}
+		cause := err // avoid passing the transport error as cancel cause.
 		err = gerrors.ZITADELToGRPCError(ctx, err)
-		cancel(err)
+		cancel(cause)
 	}()
 	return handler(ctx, req)
 }

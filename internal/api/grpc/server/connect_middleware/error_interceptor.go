@@ -31,8 +31,9 @@ func toConnectError(ctx context.Context, req connect.AnyRequest, handler connect
 				err = zerrors.ThrowInternal(recErr, zerrors.IDRecover, "Errors.Internal")
 			}
 		}
+		cause := err // avoid passing the transport error as cancel cause.
 		err = gerrors.ZITADELToConnectError(ctx, err)
-		cancel(err)
+		cancel(cause)
 	}()
 	return handler(ctx, req)
 }
