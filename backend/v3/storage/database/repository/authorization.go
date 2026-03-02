@@ -93,7 +93,7 @@ func (a authorization) Get(ctx context.Context, client database.QueryExecutor, o
 	if err != nil {
 		return nil, err
 	}
-	return getOne[domain.Authorization](ctx, client, builder)
+	return get[domain.Authorization](ctx, client, builder)
 }
 
 // List implements [domain.AuthorizationRepository].
@@ -106,7 +106,7 @@ func (a authorization) List(ctx context.Context, client database.QueryExecutor, 
 	if err != nil {
 		return nil, err
 	}
-	return getMany[domain.Authorization](ctx, client, builder)
+	return list[domain.Authorization](ctx, client, builder)
 }
 
 func (a authorization) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {

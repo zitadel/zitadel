@@ -8,19 +8,19 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-var _ domain.OrganizationMetadataRepository = (*orgMetadata)(nil)
+var _ domain.OrganizationMetadataRepository = (*organizationMetadata)(nil)
 
-type orgMetadata struct{}
+type organizationMetadata struct{}
 
 func OrganizationMetadataRepository() domain.OrganizationMetadataRepository {
-	return new(orgMetadata)
+	return new(organizationMetadata)
 }
 
-func (o orgMetadata) qualifiedTableName() string {
+func (o organizationMetadata) qualifiedTableName() string {
 	return "zitadel.organization_metadata"
 }
 
-func (o orgMetadata) unqualifiedTableName() string {
+func (o organizationMetadata) unqualifiedTableName() string {
 	return "organization_metadata"
 }
 
@@ -32,7 +32,7 @@ const queryOrganizationMetadataStmt = `SELECT instance_id, organization_id, key,
 	`FROM zitadel.organization_metadata`
 
 // Get implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationMetadata, error) {
+func (o organizationMetadata) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationMetadata, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -49,7 +49,7 @@ func (o orgMetadata) Get(ctx context.Context, client database.QueryExecutor, opt
 }
 
 // List implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationMetadata, error) {
+func (o organizationMetadata) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationMetadata, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -66,7 +66,7 @@ func (o orgMetadata) List(ctx context.Context, client database.QueryExecutor, op
 }
 
 // Set implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) Set(ctx context.Context, client database.QueryExecutor, metadata ...*domain.OrganizationMetadata) error {
+func (o organizationMetadata) Set(ctx context.Context, client database.QueryExecutor, metadata ...*domain.OrganizationMetadata) error {
 	if len(metadata) == 0 {
 		return database.ErrNoChanges
 	}
@@ -113,7 +113,7 @@ func (o orgMetadata) Set(ctx context.Context, client database.QueryExecutor, met
 }
 
 // Remove implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (o organizationMetadata) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	if err := checkPKCondition(o, condition); err != nil {
 		return 0, err
 	}
@@ -130,7 +130,7 @@ func (o orgMetadata) Remove(ctx context.Context, client database.QueryExecutor, 
 // -------------------------------------------------------------
 
 // PrimaryKeyCondition implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) PrimaryKeyCondition(instanceID string, orgID string, key string) database.Condition {
+func (o organizationMetadata) PrimaryKeyCondition(instanceID string, orgID string, key string) database.Condition {
 	return database.And(
 		o.InstanceIDCondition(instanceID),
 		o.OrganizationIDCondition(orgID),
@@ -139,22 +139,22 @@ func (o orgMetadata) PrimaryKeyCondition(instanceID string, orgID string, key st
 }
 
 // InstanceIDCondition implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) InstanceIDCondition(instanceID string) database.Condition {
+func (o organizationMetadata) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(o.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
 // KeyCondition implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) KeyCondition(op database.TextOperation, key string) database.Condition {
+func (o organizationMetadata) KeyCondition(op database.TextOperation, key string) database.Condition {
 	return database.NewTextCondition(o.KeyColumn(), op, key)
 }
 
 // OrganizationIDCondition implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) OrganizationIDCondition(orgID string) database.Condition {
+func (o organizationMetadata) OrganizationIDCondition(orgID string) database.Condition {
 	return database.NewTextCondition(o.OrganizationIDColumn(), database.TextOperationEqual, orgID)
 }
 
 // ValueCondition implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) ValueCondition(op database.BytesOperation, value []byte) database.Condition {
+func (o organizationMetadata) ValueCondition(op database.BytesOperation, value []byte) database.Condition {
 	return database.NewBytesCondition[[]byte](database.SHA256Column(o.ValueColumn()), op, database.SHA256Value(value))
 }
 
@@ -163,37 +163,37 @@ func (o orgMetadata) ValueCondition(op database.BytesOperation, value []byte) da
 // -------------------------------------------------------------
 
 // PrimaryKeyColumns implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) PrimaryKeyColumns() []database.Column {
+func (o organizationMetadata) PrimaryKeyColumns() []database.Column {
 	return []database.Column{o.InstanceIDColumn(), o.OrganizationIDColumn(), o.KeyColumn()}
 }
 
 // CreatedAtColumn implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) CreatedAtColumn() database.Column {
+func (o organizationMetadata) CreatedAtColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "created_at")
 }
 
 // InstanceIDColumn implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) InstanceIDColumn() database.Column {
+func (o organizationMetadata) InstanceIDColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "instance_id")
 }
 
 // KeyColumn implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) KeyColumn() database.Column {
+func (o organizationMetadata) KeyColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "key")
 }
 
 // OrganizationIDColumn implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) OrganizationIDColumn() database.Column {
+func (o organizationMetadata) OrganizationIDColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "organization_id")
 }
 
 // UpdatedAtColumn implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) UpdatedAtColumn() database.Column {
+func (o organizationMetadata) UpdatedAtColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "updated_at")
 }
 
 // ValueColumn implements [domain.OrganizationMetadataRepository].
-func (o orgMetadata) ValueColumn() database.Column {
+func (o organizationMetadata) ValueColumn() database.Column {
 	return database.NewColumn(o.unqualifiedTableName(), "value")
 }
 

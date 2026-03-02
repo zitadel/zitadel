@@ -9,7 +9,7 @@ import (
 
 type OrganizationDomain struct {
 	InstanceID     string                `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID          string                `json:"orgId,omitempty" db:"org_id"`
+	OrganizationID string                `json:"organizationId,omitempty" db:"organization_id"`
 	Domain         string                `json:"domain,omitempty" db:"domain"`
 	IsVerified     bool                  `json:"isVerified,omitempty" db:"is_verified"`
 	IsPrimary      bool                  `json:"isPrimary,omitempty" db:"is_primary"`
@@ -21,7 +21,7 @@ type OrganizationDomain struct {
 
 type AddOrganizationDomain struct {
 	InstanceID     string                `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID          string                `json:"orgId,omitempty" db:"org_id"`
+	OrganizationID string                `json:"organizationId,omitempty" db:"organization_id"`
 	Domain         string                `json:"domain,omitempty" db:"domain"`
 	IsVerified     bool                  `json:"isVerified,omitempty" db:"is_verified"`
 	IsPrimary      bool                  `json:"isPrimary,omitempty" db:"is_primary"`
@@ -37,8 +37,8 @@ type AddOrganizationDomain struct {
 
 type organizationDomainColumns interface {
 	domainColumns
-	// OrgIDColumn returns the column for the org id field.
-	OrgIDColumn() database.Column
+	// OrganizationIDColumn returns the column for the organization id field.
+	OrganizationIDColumn() database.Column
 	// IsVerifiedColumn returns the column for the is verified field.
 	IsVerifiedColumn() database.Column
 	// ValidationTypeColumn returns the column for the verification type field.
@@ -49,9 +49,9 @@ type organizationDomainConditions interface {
 	domainConditions
 
 	// PrimaryKeyCondition returns a filter on the primary key fields.
-	PrimaryKeyCondition(instanceID, orgID, domain string) database.Condition
-	// OrgIDCondition returns a filter on the org id field.
-	OrgIDCondition(orgID string) database.Condition
+	PrimaryKeyCondition(instanceID, organizationID, domain string) database.Condition
+	// OrganizationIDCondition returns a filter on the organization id field.
+	OrganizationIDCondition(organizationID string) database.Condition
 	// IsVerifiedCondition returns a filter on the is verified field.
 	IsVerifiedCondition(isVerified bool) database.Condition
 }
@@ -65,7 +65,7 @@ type organizationDomainChanges interface {
 	SetValidationType(verificationType DomainValidationType) database.Change
 }
 
-//go:generate mockgen -typed -package domainmock -destination ./mock/org_domain.mock.go . OrganizationDomainRepository
+//go:generate mockgen -typed -package domainmock -destination ./mock/organization_domain.mock.go . OrganizationDomainRepository
 
 type OrganizationDomainRepository interface {
 	Repository

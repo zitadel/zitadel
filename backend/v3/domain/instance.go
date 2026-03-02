@@ -11,15 +11,15 @@ import (
 )
 
 type Instance struct {
-	ID              string    `json:"id,omitempty" db:"id"`
-	Name            string    `json:"name,omitempty" db:"name"`
-	DefaultOrgID    string    `json:"defaultOrgId,omitempty" db:"default_org_id"`
-	IAMProjectID    string    `json:"iamProjectId,omitempty" db:"iam_project_id"`
-	ConsoleClientID string    `json:"consoleClientId,omitempty" db:"console_client_id"`
-	ConsoleAppID    string    `json:"consoleAppId,omitempty" db:"console_app_id"`
-	DefaultLanguage string    `json:"defaultLanguage,omitempty" db:"default_language"`
-	CreatedAt       time.Time `json:"createdAt" db:"created_at"`
-	UpdatedAt       time.Time `json:"updatedAt" db:"updated_at"`
+	ID                    string    `json:"id,omitempty" db:"id"`
+	Name                  string    `json:"name,omitempty" db:"name"`
+	DefaultOrganizationID string    `json:"defaultOrgId,omitempty" db:"default_organization_id"`
+	IAMProjectID          string    `json:"iamProjectId,omitempty" db:"iam_project_id"`
+	ConsoleClientID       string    `json:"consoleClientId,omitempty" db:"console_client_id"`
+	ConsoleApplicationID  string    `json:"consoleAppId,omitempty" db:"console_application_id"`
+	DefaultLanguage       string    `json:"defaultLanguage,omitempty" db:"default_language"`
+	CreatedAt             time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt             time.Time `json:"updatedAt" db:"updated_at"`
 
 	Domains []*InstanceDomain `json:"domains,omitempty" db:"-"`
 }
@@ -47,14 +47,14 @@ type instanceColumns interface {
 	IDColumn() database.Column
 	// NameColumn returns the column for the name field.
 	NameColumn() database.Column
-	// DefaultOrgIDColumn returns the column for the default org id field
-	DefaultOrgIDColumn() database.Column
+	// DefaultOrganizationIDColumn returns the column for the default org id field
+	DefaultOrganizationIDColumn() database.Column
 	// IAMProjectIDColumn returns the column for the default IAM org id field
 	IAMProjectIDColumn() database.Column
 	// ManagementConsoleClientIDColumn returns the column for the default management console client id field
 	ManagementConsoleClientIDColumn() database.Column
-	// ManagementConsoleAppIDColumn returns the column for the management console client id field
-	ManagementConsoleAppIDColumn() database.Column
+	// ManagementConsoleApplicationIDColumn returns the column for the management console application id field
+	ManagementConsoleApplicationIDColumn() database.Column
 	// DefaultLanguageColumn returns the column for the default language field
 	DefaultLanguageColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
@@ -83,14 +83,14 @@ type instanceChanges interface {
 	SetUpdatedAt(time time.Time) database.Change
 	// SetIAMProject sets the iam project column.
 	SetIAMProject(id string) database.Change
-	// SetDefaultOrg sets the default org column.
-	SetDefaultOrg(id string) database.Change
+	// SetDefaultOrganization sets the default organization column.
+	SetDefaultOrganization(id string) database.Change
 	// SetDefaultLanguage sets the default language column.
 	SetDefaultLanguage(language language.Tag) database.Change
 	// SetManagementConsoleClientID sets the management console client id column.
 	SetManagementConsoleClientID(id string) database.Change
-	// SetManagementConsoleAppID sets the management console app id column.
-	SetManagementConsoleAppID(id string) database.Change
+	// SetManagementConsoleApplicationID sets the management console application id column.
+	SetManagementConsoleApplicationID(id string) database.Change
 }
 
 // InstanceRepository is the interface for the instance repository.
@@ -111,8 +111,8 @@ type InstanceRepository interface {
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Instance, error)
 
 	Create(ctx context.Context, client database.QueryExecutor, instance *Instance) error
-	Update(ctx context.Context, client database.QueryExecutor, id string, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, client database.QueryExecutor, id string) (int64, error)
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
 	// LoadDomains loads the domains of the given instance.
 	// If it is called the [Instance].Domains field will be set on future calls to Get or List.

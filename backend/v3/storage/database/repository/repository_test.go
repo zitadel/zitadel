@@ -103,13 +103,13 @@ func savepointForRollback(t *testing.T, tx database.Transaction) (savepoint data
 func createInstance(t *testing.T, tx database.QueryExecutor) (instanceID string) {
 	t.Helper()
 	instance := domain.Instance{
-		ID:              gofakeit.UUID(),
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "managementConsoleClient",
-		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                    gofakeit.UUID(),
+		Name:                  gofakeit.Name(),
+		DefaultOrganizationID: "defaultOrgId",
+		IAMProjectID:          "iamProject",
+		ConsoleClientID:       "managementConsoleClient",
+		ConsoleApplicationID:  "managementConsoleApp",
+		DefaultLanguage:       "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
 	err := instanceRepo.Create(t.Context(), tx, &instance)
@@ -168,14 +168,14 @@ func createProjectRole(t *testing.T, tx database.QueryExecutor, instanceID, orgI
 	return projectRole.Key
 }
 
-func createProjectGrant(t *testing.T, tx database.Transaction, instanceID, grantingOrgID, grantedOrgID, projectID string, roleKeys []string) string {
+func createProjectGrant(t *testing.T, tx database.Transaction, instanceID, grantingOrganizationID, grantedOrganizationID, projectID string, roleKeys []string) string {
 	t.Helper()
 	projectGrant := domain.ProjectGrant{
 		InstanceID:             instanceID,
 		ID:                     gofakeit.UUID(),
 		ProjectID:              projectID,
-		GrantingOrganizationID: grantingOrgID,
-		GrantedOrganizationID:  grantedOrgID,
+		GrantingOrganizationID: grantingOrganizationID,
+		GrantedOrganizationID:  grantedOrganizationID,
 		State:                  domain.ProjectGrantStateActive,
 		RoleKeys:               roleKeys,
 	}
@@ -190,7 +190,7 @@ func createIdentityProvider(t *testing.T, tx database.Transaction, instanceID, o
 	t.Helper()
 	idp := domain.IdentityProvider{
 		InstanceID:        instanceID,
-		OrgID:             &orgID,
+		OrganizationID:    &orgID,
 		ID:                gofakeit.UUID(),
 		State:             domain.IDPStateActive,
 		Name:              gofakeit.Name(),

@@ -537,12 +537,12 @@ func Test_user_ListConditions(t *testing.T) {
 	humanRepo := repository.HumanUserRepository()
 
 	instanceID1 := createInstance(t, tx)
-	instance1OrgID1 := createOrganization(t, tx, instanceID1)
-	instance1OrgID2 := createOrganization(t, tx, instanceID1)
-	idpID := createIdentityProvider(t, tx, instanceID1, instance1OrgID1)
+	instance1OrganizationID1 := createOrganization(t, tx, instanceID1)
+	instance1OrganizationID2 := createOrganization(t, tx, instanceID1)
+	idpID := createIdentityProvider(t, tx, instanceID1, instance1OrganizationID1)
 
 	instanceID2 := createInstance(t, tx)
-	instance2OrgID1 := createOrganization(t, tx, instanceID2)
+	instance2OrganizationID1 := createOrganization(t, tx, instanceID2)
 
 	now := time.Now().Round(time.Millisecond)
 
@@ -550,7 +550,7 @@ func Test_user_ListConditions(t *testing.T) {
 		{
 			ID:             "h1",
 			InstanceID:     instanceID1,
-			OrganizationID: instance1OrgID1,
+			OrganizationID: instance1OrganizationID1,
 			Username:       "human-user-1",
 			State:          domain.UserStateActive,
 			Human: &domain.HumanUser{
@@ -570,7 +570,7 @@ func Test_user_ListConditions(t *testing.T) {
 		{
 			ID:             "h2",
 			InstanceID:     instanceID1,
-			OrganizationID: instance1OrgID2,
+			OrganizationID: instance1OrganizationID2,
 			Username:       "human-user-2",
 			State:          domain.UserStateActive,
 			Human: &domain.HumanUser{
@@ -588,7 +588,7 @@ func Test_user_ListConditions(t *testing.T) {
 		{
 			ID:             "h3",
 			InstanceID:     instanceID2,
-			OrganizationID: instance2OrgID1,
+			OrganizationID: instance2OrganizationID1,
 			Username:       "human-user-3",
 			State:          domain.UserStateActive,
 			Human: &domain.HumanUser{
@@ -603,7 +603,7 @@ func Test_user_ListConditions(t *testing.T) {
 		{
 			ID:             "m1",
 			InstanceID:     instanceID1,
-			OrganizationID: instance1OrgID1,
+			OrganizationID: instance1OrganizationID1,
 			Username:       "machine-user-1",
 			State:          domain.UserStateActive,
 			Machine: &domain.MachineUser{
@@ -614,7 +614,7 @@ func Test_user_ListConditions(t *testing.T) {
 		{
 			ID:             "m2",
 			InstanceID:     instanceID1,
-			OrganizationID: instance1OrgID2,
+			OrganizationID: instance1OrganizationID2,
 			Username:       "machine-user-2",
 			State:          domain.UserStateActive,
 			Machine: &domain.MachineUser{
@@ -624,7 +624,7 @@ func Test_user_ListConditions(t *testing.T) {
 		{
 			ID:             "m3",
 			InstanceID:     instanceID2,
-			OrganizationID: instance2OrgID1,
+			OrganizationID: instance2OrganizationID1,
 			Username:       "machine-user-3",
 			State:          domain.UserStateActive,
 			Machine: &domain.MachineUser{
@@ -674,7 +674,7 @@ func Test_user_ListConditions(t *testing.T) {
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
 					userRepo.InstanceIDCondition(instanceID1),
-					userRepo.OrganizationIDCondition(instance1OrgID1),
+					userRepo.OrganizationIDCondition(instance1OrganizationID1),
 				)),
 			},
 			want: want{
@@ -3102,12 +3102,12 @@ func Test_user_Update(t *testing.T) {
 			name: "set human add identity provider link",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				return repository.IDProviderRepository().Create(t.Context(), tx, &domain.IdentityProvider{
-					InstanceID: instanceID,
-					OrgID:      &orgID1,
-					ID:         "provider-id",
-					Name:       "idp",
-					State:      domain.IDPStateActive,
-					Payload:    json.RawMessage("{}"),
+					InstanceID:     instanceID,
+					OrganizationID: &orgID1,
+					ID:             "provider-id",
+					Name:           "idp",
+					State:          domain.IDPStateActive,
+					Payload:        json.RawMessage("{}"),
 				})
 			},
 			args: args{
@@ -3143,12 +3143,12 @@ func Test_user_Update(t *testing.T) {
 			name: "set human update identity provider link",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				err := repository.IDProviderRepository().Create(t.Context(), tx, &domain.IdentityProvider{
-					InstanceID: instanceID,
-					OrgID:      &orgID1,
-					ID:         "provider-id",
-					Name:       "idp",
-					State:      domain.IDPStateActive,
-					Payload:    json.RawMessage("{}"),
+					InstanceID:     instanceID,
+					OrganizationID: &orgID1,
+					ID:             "provider-id",
+					Name:           "idp",
+					State:          domain.IDPStateActive,
+					Payload:        json.RawMessage("{}"),
 				})
 				if err != nil {
 					return err
@@ -3197,12 +3197,12 @@ func Test_user_Update(t *testing.T) {
 			name: "set human remove identity provider link",
 			setup: func(t *testing.T, tx database.QueryExecutor) error {
 				err := repository.IDProviderRepository().Create(t.Context(), tx, &domain.IdentityProvider{
-					InstanceID: instanceID,
-					OrgID:      &orgID1,
-					ID:         "provider-id",
-					Name:       "idp",
-					State:      domain.IDPStateActive,
-					Payload:    json.RawMessage("{}"),
+					InstanceID:     instanceID,
+					OrganizationID: &orgID1,
+					ID:             "provider-id",
+					Name:           "idp",
+					State:          domain.IDPStateActive,
+					Payload:        json.RawMessage("{}"),
 				})
 				if err != nil {
 					return err

@@ -53,11 +53,11 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			// event instance.added
 			assert.Equal(t, instanceName, instance.Name)
 			// event instance.default.org.set
-			assert.NotNil(t, instance.DefaultOrgID)
+			assert.NotNil(t, instance.DefaultOrganizationID)
 			// event instance.iam.project.set
 			assert.NotNil(t, instance.IAMProjectID)
 			// event instance.iam.console.set
-			assert.NotNil(t, instance.ConsoleAppID)
+			assert.NotNil(t, instance.ConsoleApplicationID)
 			// event instance.default.language.set
 			assert.NotNil(t, instance.DefaultLanguage)
 			// event instance.added

@@ -17,7 +17,7 @@ CREATE TABLE zitadel.users(
     , id TEXT NOT NULL CHECK (id <> '')
 
     , username TEXT NOT NULL CHECK (username <> '')
-    , username_org_unique BOOLEAN DEFAULT FALSE NOT NULL -- this field MUST be filled if the username must be unique on organization level
+    , username_organization_unique BOOLEAN DEFAULT FALSE NOT NULL -- this field MUST be filled if the username must be unique on organization level
     , state zitadel.user_state NOT NULL DEFAULT 'active'
     , type zitadel.user_type NOT NULL
 
@@ -90,8 +90,8 @@ ALTER TABLE zitadel.sessions ADD CONSTRAINT fk_session_user FOREIGN KEY (instanc
 ALTER TABLE zitadel.authorizations ADD CONSTRAINT fk_authorization_user FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users (instance_id, id) ON DELETE CASCADE;
 
 -- user
-CREATE UNIQUE INDEX ON zitadel.users(instance_id, organization_id, username) WHERE username_org_unique IS TRUE; --TODO(adlerhurst): does that work if a username is already present on a user without org unique?
-CREATE UNIQUE INDEX ON zitadel.users(instance_id, username) WHERE username_org_unique IS FALSE;
+CREATE UNIQUE INDEX ON zitadel.users(instance_id, organization_id, username) WHERE username_organization_unique IS TRUE;
+CREATE UNIQUE INDEX ON zitadel.users(instance_id, username) WHERE username_organization_unique IS FALSE;
 CREATE INDEX idx_user_username ON zitadel.users (username);
 CREATE INDEX idx_user_username_lower ON zitadel.users (lower(username));
 CREATE INDEX idx_machine_name ON zitadel.users (name);

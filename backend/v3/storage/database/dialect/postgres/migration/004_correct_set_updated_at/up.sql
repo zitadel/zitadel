@@ -16,8 +16,8 @@ CREATE OR REPLACE TRIGGER trg_set_updated_at_instance_domains
   WHEN (NEW.updated_at IS NULL)
   EXECUTE FUNCTION zitadel.set_updated_at();
 
-CREATE OR REPLACE TRIGGER trg_set_updated_at_org_domains
-  BEFORE UPDATE ON zitadel.org_domains
+CREATE OR REPLACE TRIGGER trg_set_updated_at_organization_domains
+  BEFORE UPDATE ON zitadel.organization_domains
   FOR EACH ROW
   WHEN (NEW.updated_at IS NULL)
   EXECUTE FUNCTION zitadel.set_updated_at();

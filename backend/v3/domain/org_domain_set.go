@@ -8,22 +8,22 @@ import (
 )
 
 type SetPrimaryOrgDomainCommand struct {
-	OrgID string `json:"org_id"`
-	Name  string `json:"name"`
+	OrganizationID string `json:"organizationId"`
+	Name           string `json:"name"`
 }
 
 // Events implements Commander.
 func (a *SetPrimaryOrgDomainCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
 	return []eventstore.Command{
-		org.NewDomainPrimarySetEvent(ctx, &org.NewAggregate(a.OrgID).Aggregate, a.Name),
+		org.NewDomainPrimarySetEvent(ctx, &org.NewAggregate(a.OrganizationID).Aggregate, a.Name),
 	}, nil
 }
 
 func NewSetPrimaryOrgDomainCommand(orgID, domainName string) *SetPrimaryOrgDomainCommand {
 	return &SetPrimaryOrgDomainCommand{
-		OrgID: orgID,
-		Name:  domainName,
+		OrganizationID: orgID,
+		Name:           domainName,
 	}
 }
 

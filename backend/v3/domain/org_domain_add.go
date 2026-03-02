@@ -8,8 +8,8 @@ import (
 )
 
 type AddOrgDomainCommand struct {
-	OrgID string `json:"org_id"`
-	Name  string `json:"name"`
+	OrganizationID string `json:"organizationId"`
+	Name           string `json:"name"`
 	// ClaimedUserIDs []string `json:"claimed_user_ids"`
 }
 
@@ -17,15 +17,15 @@ type AddOrgDomainCommand struct {
 func (a *AddOrgDomainCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
 	return []eventstore.Command{
-		org.NewDomainAddedEvent(ctx, &org.NewAggregate(a.OrgID).Aggregate, a.Name),
-		org.NewDomainVerifiedEvent(ctx, &org.NewAggregate(a.OrgID).Aggregate, a.Name),
+		org.NewDomainAddedEvent(ctx, &org.NewAggregate(a.OrganizationID).Aggregate, a.Name),
+		org.NewDomainVerifiedEvent(ctx, &org.NewAggregate(a.OrganizationID).Aggregate, a.Name),
 	}, nil
 }
 
 func NewAddOrgDomainCommand(orgID, domainName string) *AddOrgDomainCommand {
 	return &AddOrgDomainCommand{
-		OrgID: orgID,
-		Name:  domainName,
+		OrganizationID: orgID,
+		Name:           domainName,
 	}
 }
 

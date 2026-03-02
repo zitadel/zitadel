@@ -8,7 +8,7 @@ import (
 
 type OrganizationMetadata struct {
 	Metadata
-	OrganizationID string `json:"orgId,omitempty" db:"organization_id"`
+	OrganizationID string `json:"organizationId,omitempty" db:"organization_id"`
 }
 
 type organizationMetadataColumns interface {

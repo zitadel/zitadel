@@ -65,11 +65,11 @@ func (p *orgDomainRelationalProjection) reduceAdded(event eventstore.Event) (*ha
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
 		}
 		return repository.OrganizationDomainRepository().Add(ctx, v3_sql.SQLTx(tx), &domain.AddOrganizationDomain{
-			InstanceID: e.Aggregate().InstanceID,
-			OrgID:      e.Aggregate().ResourceOwner,
-			Domain:     e.Domain,
-			CreatedAt:  e.CreationDate(),
-			UpdatedAt:  e.CreationDate(),
+			InstanceID:     e.Aggregate().InstanceID,
+			OrganizationID: e.Aggregate().ResourceOwner,
+			Domain:         e.Domain,
+			CreatedAt:      e.CreationDate(),
+			UpdatedAt:      e.CreationDate(),
 		})
 	}), nil
 }
