@@ -48,8 +48,6 @@ func TestInstanceDomainReducers(t *testing.T) {
 		require.True(t, res)
 
 		// Verify
-		require.NoError(t, err)
-
 		domain, err := instanceDomainRepo.Get(ctx, tx,
 			database.WithCondition(
 				database.And(
@@ -91,8 +89,6 @@ func TestInstanceDomainReducers(t *testing.T) {
 		require.True(t, res)
 
 		// Verify
-		require.NoError(t, err)
-
 		domain, err := instanceDomainRepo.Get(ctx, tx,
 			database.WithCondition(
 				database.And(
@@ -135,8 +131,6 @@ func TestInstanceDomainReducers(t *testing.T) {
 		require.True(t, res)
 
 		// Verify
-		require.NoError(t, err)
-
 		_, err = instanceDomainRepo.Get(ctx, tx,
 			database.WithCondition(
 				database.And(
@@ -160,8 +154,6 @@ func TestInstanceDomainReducers(t *testing.T) {
 		require.True(t, res)
 
 		// Verify
-		require.NoError(t, err)
-
 		domain, err := instanceDomainRepo.Get(ctx, tx,
 			database.WithCondition(
 				database.And(
@@ -197,8 +189,6 @@ func TestInstanceDomainReducers(t *testing.T) {
 		require.True(t, res)
 
 		// Verify
-		require.NoError(t, err)
-
 		_, err = instanceDomainRepo.Get(ctx, tx,
 			database.WithCondition(
 				database.And(

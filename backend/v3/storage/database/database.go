@@ -22,7 +22,7 @@ type PoolTest interface {
 	// MigrateTest is the same as [Migrator] but executes the migrations multiple times instead of only once.
 	MigrateTest(ctx context.Context) error
 	// RawDB returns an *[sql.DB] handle backed by the same database as the [PoolTest].
-	// The returned handle is intended for use in tests and is owned by the [PoolTest].
+	// The returned handle is intended for use in tests, and the caller is responsible for closing it when done.
 	RawDB() *sql.DB
 }
 
