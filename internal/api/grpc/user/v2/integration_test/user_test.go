@@ -3585,11 +3585,10 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 					},
 					assert: func(t *testing.T, _ *user.CreateUserResponse, getResponse *user.GetUserByIDResponse, getMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
+						metadataByKey := getMetadataMap(getMetadataResponse)
 						assert.Len(t, getMetadataResponse.GetMetadata(), 2)
-						assert.Equal(t, getMetadataResponse.GetMetadata()[0].Key, "key1")
-						assert.Equal(t, getMetadataResponse.GetMetadata()[0].Value, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))))
-						assert.Equal(t, getMetadataResponse.GetMetadata()[1].Key, "key2")
-						assert.Equal(t, getMetadataResponse.GetMetadata()[1].Value, []byte(base64.StdEncoding.EncodeToString([]byte("value2"))))
+						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
+						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value2"))), metadataByKey["key2"])
 					},
 				}
 			},
@@ -3623,9 +3622,9 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 					},
 					assert: func(t *testing.T, _ *user.CreateUserResponse, getResponse *user.GetUserByIDResponse, getMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
+						metadataByKey := getMetadataMap(getMetadataResponse)
 						assert.Len(t, getMetadataResponse.GetMetadata(), 1)
-						assert.Equal(t, getMetadataResponse.GetMetadata()[0].Key, "key1")
-						assert.Equal(t, getMetadataResponse.GetMetadata()[0].Value, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))))
+						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
 					},
 				}
 			},
@@ -3705,11 +3704,10 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 					},
 					assert: func(t *testing.T, _ *user.CreateUserResponse, getResponse *user.GetUserByIDResponse, getMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
+						metadataByKey := getMetadataMap(getMetadataResponse)
 						assert.Len(t, getMetadataResponse.GetMetadata(), 2)
-						assert.Equal(t, getMetadataResponse.GetMetadata()[0].Key, "key1")
-						assert.Equal(t, getMetadataResponse.GetMetadata()[0].Value, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))))
-						assert.Equal(t, getMetadataResponse.GetMetadata()[1].Key, "key2")
-						assert.Equal(t, getMetadataResponse.GetMetadata()[1].Value, []byte(base64.StdEncoding.EncodeToString([]byte("value2"))))
+						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
+						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value2"))), metadataByKey["key2"])
 					},
 				}
 			},
@@ -3800,6 +3798,14 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 			test.assert(t, createResponse, getResponse, gotMetadataResponse)
 		})
 	}
+}
+
+func getMetadataMap(getMetadataResponse *user.ListUserMetadataResponse) map[string][]byte {
+	metadataByKey := make(map[string][]byte, len(getMetadataResponse.GetMetadata()))
+	for _, md := range getMetadataResponse.GetMetadata() {
+		metadataByKey[md.Key] = md.Value
+	}
+	return metadataByKey
 }
 
 func TestServer_CreateUser_Permission(t *testing.T) {

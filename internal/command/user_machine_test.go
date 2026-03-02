@@ -131,6 +131,11 @@ func TestCommandSide_AddMachine(t *testing.T) {
 							true,
 							domain.OIDCTokenTypeBearer,
 						),
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key1",
+							[]byte("value1"),
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -144,6 +149,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 					Description: "description",
 					Name:        "name",
 					Username:    "username",
+					Metadata: []*AddMetadataEntry{
+						{
+							Key:   "key1",
+							Value: []byte("value1"),
+						},
+					},
 				},
 			},
 			res: res{

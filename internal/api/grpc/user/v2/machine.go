@@ -13,9 +13,8 @@ import (
 )
 
 func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.CreateUserRequest_Machine, orgId, userName, userId string, reqMetadata []*user.Metadata) (*connect.Response[user.CreateUserResponse], error) {
-	metadataEntries := setMetadataEntries(reqMetadata)
-	metadata := make([]*command.AddMetadataEntry, len(metadataEntries))
-	for i, metadataEntry := range metadataEntries {
+	metadata := make([]*command.AddMetadataEntry, len(reqMetadata))
+	for i, metadataEntry := range reqMetadata {
 		metadata[i] = &command.AddMetadataEntry{
 			Key:   metadataEntry.GetKey(),
 			Value: metadataEntry.GetValue(),

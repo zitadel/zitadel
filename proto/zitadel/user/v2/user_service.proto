@@ -2182,7 +2182,7 @@ message CreateUserRequest{
     Machine machine = 5;
   }
 
-  // Metadata to bet set. The values have to be base64 encoded.
+  // Metadata to be set. The values have to be base64 encoded.
   repeated Metadata metadata = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
