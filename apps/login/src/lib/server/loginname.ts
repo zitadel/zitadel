@@ -334,7 +334,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     // always resend invite or setup email if user has no primary auth method set
     if (!hasPrimaryMethod) {
-      logger.debug("humanUser.email?.isVerified", humanUser?.email?.isVerified);
+      logger.debug("humanUser.email?.isVerified", {
+        isVerified: humanUser?.email?.isVerified,
+      });
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
         send: "true", // set this to true to request a new code immediately
