@@ -57,6 +57,7 @@
 		"docsLink": "/docs/guides/start/quickstart?framework=flutter"
 	},
 	{
+		"id": "go",
 		"title": "Go",
 		"imgSrcDark": "/docs/img/tech/golang.svg",
 		"docsLink": "/docs/guides/start/quickstart?framework=go",
@@ -75,6 +76,7 @@
 		"docsLink": "/docs/sdk-examples/laravel"
 	},
 	{
+		"id": "nestjs",
 		"title": "NestJS",
 		"imgSrcDark": "/docs/img/tech/nestjs.svg",
 		"docsLink": "/docs/guides/start/quickstart?framework=nestjs"
