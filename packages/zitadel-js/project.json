@@ -19,6 +19,9 @@
       "outputs": ["{projectRoot}/dist"],
       "dependsOn": ["generate"]
     },
+    "test-unit": {
+      "dependsOn": ["generate"]
+    },
     "test": { "dependsOn": ["test-unit"] }
   }
 }
