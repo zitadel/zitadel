@@ -221,7 +221,7 @@
                 ]
             }
         },
-        "test-integration": {
+        "test-integration-run-tests": {
             "description": "Runs the integration tests sequentially with coverage and race condition detection. Go test caching is disabled, because the tests run against an out-of-process API.",
             "dependsOn": [
                 "test-integration-run-db",
@@ -236,8 +236,34 @@
                 "commands": [
                     "wait-on --verbose --interval 2000 --simultaneous 1 --timeout 30m \"${ZITADEL_API_URL}/debug/ready\"",
                     "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")'",
-                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov",
                     "nx run @zitadel/api:test-integration-stop"
+                ]
+            },
+            "inputs": [
+                {
+                    "runtime": "go env GOOS"
+                },
+                {
+                    "runtime": "go env GOARCH"
+                },
+                "sources",
+                "{workspaceRoot}/internal/integration/**",
+                "{workspaceRoot}/go*"
+            ]
+        },
+        "test-integration": {
+            "description": "Runs the integration tests and generates the coverage profile. This is a wrapper around test-integration-run-tests that adds the coverage report generation after the tests are run.",
+            "dependsOn": [
+                "test-integration-run-tests"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "env": {
+                    "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage"
+                },
+                "commands": [
+                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov"
                 ]
             },
             "inputs": [
