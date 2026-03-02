@@ -195,10 +195,6 @@ Errors:
     RefreshToken:
       Invalid: "Le jeton de rafraîchissement n'est pas valide"
       NotFound: "Jeton de rafraîchissement non trouvé"
-  Instance:
-    NotFound: "Instance non trouvée"
-    AlreadyExists: "L'instance existe déjà"
-    NotChanged: "L'instance n'a pas changé"
   Org:
     AlreadyExists: "Le nom de l'organisation ou l'identifiant est déjà pris"
     Invalid: "L'organisation n'est pas valide"
@@ -345,7 +341,9 @@ Errors:
       NotActive: "La concession du projet n'est pas active"
       NotInactive: "La concession du projet n'est pas inactive"
   Instance:
-    NotFound: "IAM non trouvé. Assurez-vous que vous avez la bonne organisation. Vérifiez https://zitadel.com/docs/apis/introduction#organizations"
+    AlreadyExists: "L'instance existe déjà"
+    NotChanged: "L'instance n'a pas changé"
+    NotFound: "Instance non trouvé. Assurez-vous que vous avez la bonne organisation. Vérifiez https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Les rôles n'ont pas été modifiés"
     MemberInvalid: "Le membre n'est pas valide"
