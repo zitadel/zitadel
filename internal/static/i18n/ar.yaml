@@ -196,10 +196,6 @@ Errors:
     RefreshToken:
       Invalid: "رمز التحديث غير صالح"
       NotFound: "رمز التحديث غير موجود"
-  Instance:
-    NotFound: "المثيل غير موجود"
-    AlreadyExists: "المثيل موجود بالفعل"
-    NotChanged: "المثيل لم يتغير"
   Org:
     AlreadyExists: "اسم المنظمة أو معرفها مأخوذ بالفعل"
     Invalid: "المنظمة غير صالحة"
@@ -223,7 +219,7 @@ Errors:
     DomainVerificationHTTPNotFound: "لم يتم العثور على الملف الذي يحتوي على التحدي في الرابط المتوقع. تحقق من أنك قمت بتحميل الملف في المكان الصحيح مع أذونات القراءة"
     DomainVerificationHTTPNoMatch: "تم العثور على الملف الذي يحتوي على التحدي في الرابط المتوقع ولكنه لا يحتوي على نص الرمز المميز الصحيح. تحقق من محتواه"
     DomainVerificationTimeout: "انتهت مهلة الاستعلام من خادم DNS"
-    PrimaryDomainNotDeletable: "لا يجب حذف النطاق الأساسي"
+    PrimaryDomainNotDeletable: "لا يجب حذف نطاق المؤسسة"
     DomainNotFound: "النطاق غير موجود"
     MemberIDMissing: "معرف العضو مفقود"
     MemberNotFound: "عضو المنظمة غير موجود"
@@ -346,6 +342,8 @@ Errors:
       NotActive: "منحة المشروع غير نشطة"
       NotInactive: "منحة المشروع غير معطلة"
   Instance:
+    AlreadyExists: "المثيل موجود بالفعل"
+    NotChanged: "المثيل لم يتغير"
     NotFound: "المثيل غير موجود. تأكد من أن النطاق صحيح. تحقق من https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "الأدوار لم تتغير"
@@ -892,7 +890,7 @@ EventTypes:
       verified: "تم التحقق من النطاق"
       removed: "تمت إزالة النطاق"
       primary:
-        set: "تم تعيين النطاق الأساسي"
+        set: "تم تعيين نطاق المؤسسة"
       reserved: "تم حجز النطاق"
       released: "تم تحرير النطاق"
     name:

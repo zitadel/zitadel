@@ -32,7 +32,7 @@ message Organization {
     }
   ];
 
-  // Primary domain used in the organization.
+  // Organization Domain used in the organization.
   string primary_domain = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"zitadel.cloud\"";
@@ -75,7 +75,7 @@ message Domain {
   // IsVerified is a boolean flag indicating if the domain has been verified.
   bool is_verified = 3;
 
-  // IsPrimary is a boolean flag indicating if the domain is the primary domain of the organization.
+  // IsPrimary is a boolean flag indicating if the domain is the Organization Domain of the organization.
   bool is_primary = 4;
 
   // ValidationType indicates the protocol used to validate the domain ownership.

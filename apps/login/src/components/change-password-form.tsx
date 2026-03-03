@@ -16,7 +16,7 @@ import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
-import { handleServerActionResponse } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs =
@@ -129,6 +129,7 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
           <TextInput
             type="password"
             autoComplete="current-password"
+            autoFocus
             required
             {...register("currentPassword", {
               required: t("change.required.currentPassword"),

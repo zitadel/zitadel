@@ -195,10 +195,6 @@ Errors:
     RefreshToken:
       Invalid: "Токен обновления недействителен"
       NotFound: "Токен обновления не найден"
-  Instance:
-    NotFound: "Экземпляр не найден"
-    AlreadyExists: "Экземпляр уже существует"
-    NotChanged: "Экземпляр не изменён"
   Org:
     AlreadyExists: "Название организации или идентификатор уже занят"
     Invalid: "Организация недействительна"
@@ -217,7 +213,7 @@ Errors:
     DomainVerificationTypeInvalid: "Недопустимый тип подтверждения домена"
     DomainVerificationMissing: "Подтверждение домена ещё не началось"
     DomainVerificationFailed: "Ошибка подтверждения домена"
-    PrimaryDomainNotDeletable: "Невозможно удалить основной домен"
+    PrimaryDomainNotDeletable: "Невозможно удалить домен организации"
     DomainNotFound: "Домен не найден"
     MemberIDMissing: "ID участника отсутствует"
     MemberNotFound: "Участник организации не найден"
@@ -339,6 +335,8 @@ Errors:
       NotActive: "Допуск проекта неактивен"
       NotInactive: "Допуск проекта не является неактивным"
   Instance:
+    AlreadyExists: "Экземпляр уже существует"
+    NotChanged: "Экземпляр не изменён"
     NotFound: "Экземпляр не найден. Убедитесь, что у вас правильный домен. Проверьте https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Роли не изменены"
@@ -886,7 +884,7 @@ EventTypes:
       verified: "Домен проверен"
       removed: "Домен удалён"
       primary:
-        set: "Основной домен установлен"
+        set: "Домен организации установлен"
       reserved: "Домен зарезервирован"
       released: "Домен опубликован"
     name:

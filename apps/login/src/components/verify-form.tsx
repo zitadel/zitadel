@@ -2,7 +2,7 @@
 
 import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
-import { handleServerActionResponse } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -138,6 +138,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
           <TextInput
             type="text"
             autoComplete="one-time-code"
+            autoFocus
             {...register("code", { required: t("verify.required.code") })}
             label={t("verify.labels.code")}
             data-testid="code-text-input"
