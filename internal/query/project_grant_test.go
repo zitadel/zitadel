@@ -243,7 +243,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareProjectGrantsQuery no resource owner",
+			name:    "prepareProjectGrantsQuery no Organization ID",
 			prepare: prepareProjectGrantsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
@@ -476,7 +476,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareProjectGrantQuery no resource owner",
+			name:    "prepareProjectGrantQuery no Organization ID",
 			prepare: prepareProjectGrantQuery,
 			want: want{
 				sqlExpectations: mockQuery(
