@@ -108,7 +108,7 @@
       <ng-container matColumnDef="org">
         <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.ORG' | translate }}</th>
         <td mat-cell *cnslCellDef="let grant; dataSource: dataSource">
-          {{ "grantedOrgName" in grant ? grant.grantedOrgName : grant.orgName }}
+          {{ 'grantedOrgName' in grant ? grant.grantedOrgName : grant.orgName }}
         </td>
       </ng-container>
 
