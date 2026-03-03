@@ -194,10 +194,6 @@ Errors:
     RefreshToken:
       Invalid: "Refresh Token inválido"
       NotFound: "Refresh Token não encontrado"
-  Instance:
-    NotFound: "Instância não encontrada"
-    AlreadyExists: "Instância já existe"
-    NotChanged: "Instância não alterada"
   Org:
     AlreadyExists: "O nome ou ID da organização já está em uso"
     Invalid: "Organização é inválida"
@@ -344,6 +340,8 @@ Errors:
       NotActive: "A concessão do projeto não está ativa"
       NotInactive: "A concessão do projeto não está inativa"
   Instance:
+    AlreadyExists: "Instância já existe"
+    NotChanged: "Instância não alterada"
     NotFound: "Instância não encontrada. Verifique se você tem o domínio correto. Consulte https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "As funções não foram alteradas"

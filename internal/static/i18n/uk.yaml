@@ -190,10 +190,6 @@ Errors:
     RefreshToken:
       Invalid: "Токен оновлення недійсний"
       NotFound: "Токен оновлення не знайдено"
-  Instance:
-    NotFound: "Інстанс не знайдено"
-    AlreadyExists: "Інстанс вже існує"
-    NotChanged: "Інстанс не змінено"
   Org:
     AlreadyExists: "Назва або ідентифікатор організації вже зайняті"
     Invalid: "Організація недійсна"
@@ -340,6 +336,8 @@ Errors:
       NotActive: "Грант проекту не активний"
       NotInactive: "Грант проекту не неактивний"
   Instance:
+    AlreadyExists: "Інстанс вже існує"
+    NotChanged: "Інстанс не змінено"
     NotFound: "Інстанс не знайдено. Переконайтеся, що домен правильний. Перегляньте https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Ролі не були змінені"

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"slices"
+	"strconv"
 	"testing"
 	"time"
 
@@ -3709,6 +3710,184 @@ func Test_user_Update(t *testing.T) {
 				}(),
 			},
 		},
+		{
+			name: "human user - add new recovery codes",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes: []string{"code1", "code2"},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - append recovery codes",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.AddRecoveryCodes([]string{"code3", "code4"}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes: []string{"code1", "code2", "code3", "code4"},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - append recovery codes with duplicates",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.AddRecoveryCodes([]string{"code2", "code3", "code3", "code4"}),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes: []string{"code1", "code2", "code3", "code4"},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - remove recovery code",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.RemoveRecoveryCode("code2"),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes: []string{"code1"},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - remove all recovery codes",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2", "code3"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.RemoveAllRecoveryCodes(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes: []string{},
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - set recovery code failed attempts",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+					humanRepo.IncrementRecoveryCodeFailedAttempts(),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.IncrementRecoveryCodeFailedAttempts(),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes:          []string{"code1", "code2"},
+						FailedAttempts: 2,
+					}
+					return u
+				}(),
+			},
+		},
+		{
+			name: "human user - set recovery code last successfully checked at",
+			setup: func(t *testing.T, tx database.QueryExecutor) error {
+				_, err := humanRepo.Update(t.Context(), tx, humanCondition,
+					humanRepo.AddRecoveryCodes([]string{"code1", "code2"}),
+				)
+				require.NoError(t, err)
+				return err
+			},
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					humanRepo.SetLastSuccessfulRecoveryCodeCheck(now),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u, err := userRepo.Get(t.Context(), tx, database.WithCondition(humanCondition))
+					require.NoError(t, err)
+					u.Human.RecoveryCodes = &domain.HumanRecoveryCodes{
+						Codes:                     []string{"code1", "code2"},
+						LastSuccessfullyCheckedAt: &now,
+					}
+					return u
+				}(),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -3895,6 +4074,305 @@ func Test_user_Delete(t *testing.T) {
 	}
 }
 
+func Test_user_usernameUniqueness(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	t.Cleanup(rollback)
+
+	userRepo := repository.UserRepository()
+	settingsRepo := repository.OrganizationSettingsRepository()
+
+	instanceID := createInstance(t, tx)
+	// org 1 has no [domain.OrganizationSettings]
+	org1ID := createOrganization(t, tx, instanceID)
+
+	// org 2 has [domain.OrganizationSettings] and organization scoped usernames not enforced
+	org2ID := createOrganization(t, tx, instanceID)
+	err := settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: &org2ID,
+			Type:           domain.SettingTypeOrganization,
+			State:          domain.SettingStateActive,
+		},
+		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+			OrganizationScopedUsernames: gu.Ptr(false),
+		},
+	})
+	require.NoError(t, err)
+
+	// org 3 has [domain.OrganizationSettings] and organization scoped usernames enforced
+	org3ID := createOrganization(t, tx, instanceID)
+	err = settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: &org3ID,
+			Type:           domain.SettingTypeOrganization,
+			State:          domain.SettingStateActive,
+		},
+		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+			OrganizationScopedUsernames: gu.Ptr(true),
+		},
+	})
+	require.NoError(t, err)
+
+	// org 4 has [domain.OrganizationSettings] and organization scoped usernames enforced
+	org4ID := createOrganization(t, tx, instanceID)
+	err = settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: &org4ID,
+			Type:           domain.SettingTypeOrganization,
+			State:          domain.SettingStateActive,
+		},
+		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+			OrganizationScopedUsernames: gu.Ptr(true),
+		},
+	})
+	require.NoError(t, err)
+
+	for name, test := range map[string]func(t *testing.T, tx database.QueryExecutor){
+		"different usernames on all organizations": func(t *testing.T, tx database.QueryExecutor) {
+			for _, orgID := range []string{org1ID, org2ID, org3ID, org4ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             gofakeit.UUID(),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user@" + orgID,
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+		},
+		"same username on orgs with uniqueness": func(t *testing.T, tx database.QueryExecutor) {
+			for _, orgID := range []string{org3ID, org4ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             gofakeit.UUID(),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user",
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+		},
+		"same username on orgs without uniqueness": func(t *testing.T, tx database.QueryExecutor) {
+			err := userRepo.Create(t.Context(), tx, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org1ID,
+				Username:       "user",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org1ID,
+				},
+			})
+			assert.NoError(t, err)
+
+			err = userRepo.Create(t.Context(), tx, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org2ID,
+				Username:       "user",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org2ID,
+				},
+			})
+			assert.Error(t, err)
+		},
+		"same username on orgs with uniqueness and 1 org without": func(t *testing.T, tx database.QueryExecutor) {
+			for _, orgID := range []string{org2ID, org3ID, org4ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             gofakeit.UUID(),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user",
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+		},
+		"same username on orgs with uniqueness and orgs without": func(t *testing.T, tx database.QueryExecutor) {
+			for _, orgID := range []string{org2ID, org3ID, org4ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             gofakeit.UUID(),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user",
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+			err := userRepo.Create(t.Context(), tx, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org1ID,
+				Username:       "user",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org1ID,
+				},
+			})
+			assert.Error(t, err)
+		},
+		"try update username to clash": func(t *testing.T, tx database.QueryExecutor) {
+			for i, orgID := range []string{org1ID, org2ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             strconv.Itoa(i),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user" + strconv.Itoa(i),
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+			_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID, "0"), userRepo.SetUsername("user1"))
+			assert.Error(t, err)
+		},
+		"try update username successful": func(t *testing.T, tx database.QueryExecutor) {
+			for i, orgID := range []string{org3ID, org4ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             strconv.Itoa(i),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user" + strconv.Itoa(i),
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+			_, err := userRepo.Update(t.Context(), tx, userRepo.PrimaryKeyCondition(instanceID, "0"), userRepo.SetUsername("user1"))
+			assert.NoError(t, err)
+		},
+		"disable organization scoped usernames setting that causes no username clash": func(t *testing.T, tx database.QueryExecutor) {
+			for i, orgID := range []string{org1ID, org3ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             strconv.Itoa(i),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "user" + strconv.Itoa(i),
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+			err := settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: &org3ID,
+				},
+				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+					OrganizationScopedUsernames: gu.Ptr(false),
+				},
+			})
+			assert.NoError(t, err)
+		},
+		"disable organization scoped usernames setting that causes username clash": func(t *testing.T, tx database.QueryExecutor) {
+			for i, orgID := range []string{org1ID, org3ID} {
+				err := userRepo.Create(t.Context(), tx, &domain.User{
+					ID:             strconv.Itoa(i),
+					InstanceID:     instanceID,
+					OrganizationID: orgID,
+					Username:       "username",
+					State:          domain.UserStateActive,
+					Machine: &domain.MachineUser{
+						Name: "machine" + orgID,
+					},
+				})
+				assert.NoError(t, err)
+			}
+			err := settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: &org3ID,
+				},
+				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+					OrganizationScopedUsernames: gu.Ptr(false),
+				},
+			})
+			assert.Error(t, err)
+		},
+		"add organization scoped usernames setting and add new user with same username": func(t *testing.T, tx database.QueryExecutor) {
+			err := userRepo.Create(t.Context(), tx, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org1ID,
+				Username:       "username",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org1ID,
+				},
+			})
+			assert.NoError(t, err)
+
+			sp, err := tx.(database.Transaction).Begin(t.Context())
+			require.NoError(t, err)
+
+			err = userRepo.Create(t.Context(), sp, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org2ID,
+				Username:       "username",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org2ID,
+				},
+			})
+			assert.Error(t, err)
+			require.NoError(t, sp.Rollback(t.Context()))
+
+			err = settingsRepo.Set(t.Context(), tx, &domain.OrganizationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: &org1ID,
+				},
+				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+					OrganizationScopedUsernames: gu.Ptr(true),
+				},
+			})
+			assert.NoError(t, err)
+
+			err = userRepo.Create(t.Context(), tx, &domain.User{
+				ID:             gofakeit.UUID(),
+				InstanceID:     instanceID,
+				OrganizationID: org2ID,
+				Username:       "username",
+				State:          domain.UserStateActive,
+				Machine: &domain.MachineUser{
+					Name: "machine" + org2ID,
+				},
+			})
+			assert.NoError(t, err)
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			t.Cleanup(rollback)
+
+			test(t, savepoint)
+		})
+	}
+
+}
 func assertUsers(t *testing.T, expected, actual []*domain.User) {
 	t.Helper()
 	require.Len(t, actual, len(expected))
@@ -3963,6 +4441,7 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 
 	assertIdentityProviderLinks(t, expected.IdentityProviderLinks, actual.IdentityProviderLinks)
 	assertVerifications(t, expected.Verifications, actual.Verifications)
+	assertRecoveryCodes(t, expected.RecoveryCodes, actual.RecoveryCodes)
 }
 
 func assertHumanTOTP(t *testing.T, expected, actual *domain.HumanTOTP) {
@@ -4184,4 +4663,21 @@ func assertIdentityProviderLinks(t *testing.T, expected, actual []*domain.Identi
 		assert.True(t, expectedLink.CreatedAt.Equal(actual[i].CreatedAt), "identity provider link[%d] created at", i)
 		assert.True(t, expectedLink.UpdatedAt.Equal(actual[i].UpdatedAt), "identity provider link[%d] updated at", i)
 	}
+}
+
+func assertRecoveryCodes(t *testing.T, expected, actual *domain.HumanRecoveryCodes) {
+	t.Helper()
+
+	require.Equal(t, expected == nil, actual == nil, "human recovery codes nil check")
+	if expected == nil {
+		return
+	}
+	assert.ElementsMatch(t, expected.Codes, actual.Codes)
+	if expected.LastSuccessfullyCheckedAt != nil {
+		require.NotNil(t, actual.LastSuccessfullyCheckedAt, "human recovery codes last successfully checked at not nil")
+		assert.True(t, expected.LastSuccessfullyCheckedAt.Equal(*actual.LastSuccessfullyCheckedAt), "human recovery codes last successfully checked at")
+	} else {
+		assert.Nil(t, actual.LastSuccessfullyCheckedAt, "human recovery codes last successfully checked at nil")
+	}
+	assert.Equal(t, expected.FailedAttempts, actual.FailedAttempts, "human recovery codes failed attempts")
 }
