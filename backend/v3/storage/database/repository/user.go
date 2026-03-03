@@ -30,6 +30,7 @@ type user struct {
 	userMetadata
 	userPasskey
 	userIdentityProviderLink
+	userLoginName
 }
 
 func (u user) HumanRepository() domain.HumanUserRepository {
@@ -71,6 +72,8 @@ var queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, 
 	", users.state, users.created_at, users.updated_at" +
 	// metadata
 	`, jsonb_agg(DISTINCT jsonb_build_object('instanceId', user_metadata.instance_id, 'key', user_metadata.key, 'value', encode(user_metadata.value, 'base64'), 'createdAt', user_metadata.created_at, 'updatedAt', user_metadata.updated_at)) FILTER (WHERE user_metadata.user_id IS NOT NULL) AS metadata` +
+	// login names
+	`, jsonb_agg(DISTINCT jsonb_build_object('loginName', login_names.login_name, 'isPreferred', login_names.is_preferred)) FILTER (WHERE login_names.user_id IS NOT NULL) AS login_names` +
 	// machine
 	`, CASE WHEN users.type = 'machine' THEN jsonb_build_object('name', users.name` +
 	`, 'description', users.description, 'secret', users.secret` +
@@ -147,6 +150,7 @@ func (u user) appendQueryOpts(opts []database.QueryOption) []database.QueryOptio
 		u.joinVerifications(),
 		u.joinPasskeys(),
 		u.joinIdentityProviderLinks(),
+		u.joinLoginNames(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),
 	)
 }
@@ -226,11 +230,6 @@ func (u user) IDCondition(userID string) database.Condition {
 // InstanceIDCondition implements [domain.UserRepository].
 func (u user) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(u.InstanceIDColumn(), database.TextOperationEqual, instanceID)
-}
-
-// LoginNameCondition implements [domain.UserRepository].
-func (u user) LoginNameCondition(op database.TextOperation, loginName string) database.Condition {
-	panic("unimplemented")
 }
 
 // OrganizationIDCondition implements [domain.UserRepository].
@@ -475,6 +474,16 @@ func (u user) joinIdentityProviderLinks() database.QueryOption {
 		database.And(
 			database.NewColumnCondition(u.InstanceIDColumn(), u.userIdentityProviderLink.instanceIDColumn()),
 			database.NewColumnCondition(u.IDColumn(), u.userIdentityProviderLink.userIDColumn()),
+		),
+	)
+}
+
+func (u user) joinLoginNames() database.QueryOption {
+	return database.WithLeftJoin(
+		u.userLoginName.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(u.InstanceIDColumn(), u.userLoginName.instanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.userLoginName.userIDColumn()),
 		),
 	)
 }
