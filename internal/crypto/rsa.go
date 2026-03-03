@@ -136,12 +136,17 @@ func PrivateKeyToBytesPKCS8(priv crypto.PrivateKey) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return pem.EncodeToMemory(
+	buffer := bytes.NewBuffer(nil)
+	err = pem.Encode(buffer,
 		&pem.Block{
 			Type:  "PRIVATE KEY",
 			Bytes: der,
 		},
-	), nil
+	)
+	if err != nil {
+		return nil, err
+	}
+	return buffer.Bytes(), nil
 }
 
 func PublicKeyToBytes(pub *rsa.PublicKey) ([]byte, error) {
@@ -150,12 +155,16 @@ func PublicKeyToBytes(pub *rsa.PublicKey) ([]byte, error) {
 		return nil, err
 	}
 
-	pubBytes := pem.EncodeToMemory(&pem.Block{
+	buffer := bytes.NewBuffer(nil)
+	err = pem.Encode(buffer, &pem.Block{
 		Type:  "RSA PUBLIC KEY",
 		Bytes: pubASN1,
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	return pubBytes, nil
+	return buffer.Bytes(), nil
 }
 
 func BytesToPrivateKey(priv []byte) (*rsa.PrivateKey, error) {
