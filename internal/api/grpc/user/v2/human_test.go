@@ -20,6 +20,7 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 		userId   string
 		userName *string
 		human    *user.UpdateUserRequest_Human
+		metadata []*user.UpdateMetadata
 	}
 	tests := []struct {
 		name    string
@@ -81,6 +82,16 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 					},
 				},
 			},
+			metadata: []*user.UpdateMetadata{
+				{
+					Key:   "key1",
+					Value: []byte("value1"),
+				},
+				{
+					Key:   "key2",
+					Value: nil,
+				},
+			},
 		},
 		want: &command.ChangeHuman{
 			ID:       "userId",
@@ -105,6 +116,16 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 				OldPassword:    "currentPassword",
 				Password:       "newPassword",
 				ChangeRequired: true,
+			},
+			Metadata: []*domain.Metadata{
+				{
+					Key:   "key1",
+					Value: []byte("value1"),
+				},
+				{
+					Key:   "key2",
+					Value: nil,
+				},
 			},
 		},
 		wantErr: assert.NoError,
@@ -242,7 +263,7 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := updateHumanUserToCommand(tt.args.userId, tt.args.userName, tt.args.human)
+			got, err := updateHumanUserToCommand(tt.args.userId, tt.args.userName, tt.args.human, tt.args.metadata)
 			if !tt.wantErr(t, err, fmt.Sprintf("patchHumanUserToCommand(%v, %v, %v)", tt.args.userId, tt.args.userName, tt.args.human)) {
 				return
 			}

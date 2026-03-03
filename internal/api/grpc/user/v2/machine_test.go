@@ -18,6 +18,7 @@ func Test_patchMachineUserToCommand(t *testing.T) {
 		userId   string
 		userName *string
 		machine  *user.UpdateUserRequest_Machine
+		metadata []*user.UpdateMetadata
 	}
 	tests := []struct {
 		name string
@@ -45,6 +46,16 @@ func Test_patchMachineUserToCommand(t *testing.T) {
 				Description:     gu.Ptr("description"),
 				AccessTokenType: gu.Ptr(user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT),
 			},
+			metadata: []*user.UpdateMetadata{
+				{
+					Key:   "key1",
+					Value: []byte("value1"),
+				},
+				{
+					Key:   "key2",
+					Value: nil,
+				},
+			},
 		},
 		want: &command.ChangeMachine{
 			ID:              "userId",
@@ -52,11 +63,21 @@ func Test_patchMachineUserToCommand(t *testing.T) {
 			Name:            gu.Ptr("name"),
 			Description:     gu.Ptr("description"),
 			AccessTokenType: gu.Ptr(domain.OIDCTokenTypeJWT),
+			Metadata: []*domain.Metadata{
+				{
+					Key:   "key1",
+					Value: []byte("value1"),
+				},
+				{
+					Key:   "key2",
+					Value: nil,
+				},
+			},
 		},
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := updateMachineUserToCommand(tt.args.userId, tt.args.userName, tt.args.machine)
+			got := updateMachineUserToCommand(tt.args.userId, tt.args.userName, tt.args.machine, tt.args.metadata)
 			if diff := cmp.Diff(tt.want, got, cmpopts.EquateComparable(language.Tag{})); diff != "" {
 				t.Errorf("patchMachineUserToCommand() mismatch (-want +got):\n%s", diff)
 			}
