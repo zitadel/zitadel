@@ -1,11 +1,11 @@
-import { createBearerTokenTransport } from "@zitadel/zitadel-js/api/bearer-token";
+import { createBearerTokenTransport } from "@zitadel/zitadel-js/auth/bearer-token";
 import {
   createOIDCServiceClient,
   createSessionServiceClient,
   type Checks,
   type RequestChallenges,
   type UserAgent,
-} from "@zitadel/zitadel-js/v2";
+} from "@zitadel/zitadel-js/api/v2";
 import { getSession as getOIDCSession } from "../session.js";
 
 export interface SessionLifetime {

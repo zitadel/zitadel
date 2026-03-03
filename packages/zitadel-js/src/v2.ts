@@ -5,7 +5,7 @@
  *
  * @example
  * ```ts
- * import { createUserServiceClient } from "@zitadel/zitadel-js/v2";
+ * import { createUserServiceClient } from "@zitadel/zitadel-js/api/v2";
  * import { createGrpcTransport } from "@zitadel/zitadel-js";
  *
  * const transport = createGrpcTransport({ baseUrl: "https://my.zitadel.cloud" });

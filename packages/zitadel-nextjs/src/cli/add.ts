@@ -134,7 +134,7 @@ export async function GET(request: Request) {
 };
 
 const WEBHOOK_ROUTE_TEMPLATES: Record<string, string> = {
-  "api/zitadel/events/route": `import { createZitadelWebhookHandler } from "@zitadel/nextjs/webhook";
+  "api/zitadel/events/route": `import { createZitadelWebhookHandler } from "@zitadel/nextjs/actions/webhook";
 
 export const POST = createZitadelWebhookHandler({
   payloadType: "json",

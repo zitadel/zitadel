@@ -4,7 +4,7 @@ const createBearerTokenTransportMock = vi.fn(() => ({}));
 const newSystemTokenMock = vi.fn();
 const getSessionMock = vi.fn();
 
-vi.mock("@zitadel/zitadel-js/api/bearer-token", () => ({
+vi.mock("@zitadel/zitadel-js/auth/bearer-token", () => ({
   createBearerTokenTransport: createBearerTokenTransportMock,
 }));
 
@@ -12,7 +12,7 @@ vi.mock("@zitadel/zitadel-js/node", () => ({
   newSystemToken: newSystemTokenMock,
 }));
 
-vi.mock("@zitadel/zitadel-js/v2", () => ({
+vi.mock("@zitadel/zitadel-js/api/v2", () => ({
   createUserServiceClient: vi.fn(() => ({})),
   createSettingsServiceClient: vi.fn(() => ({})),
   createSessionServiceClient: vi.fn(() => ({})),

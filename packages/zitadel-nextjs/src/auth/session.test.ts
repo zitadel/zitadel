@@ -7,11 +7,11 @@ const deleteSessionRpc = vi.fn();
 const createCallbackRpc = vi.fn();
 const getOIDCSessionMock = vi.fn();
 
-vi.mock("@zitadel/zitadel-js/api/bearer-token", () => ({
+vi.mock("@zitadel/zitadel-js/auth/bearer-token", () => ({
   createBearerTokenTransport: vi.fn(() => ({})),
 }));
 
-vi.mock("@zitadel/zitadel-js/v2", () => ({
+vi.mock("@zitadel/zitadel-js/api/v2", () => ({
   createSessionServiceClient: vi.fn(() => ({
     createSession: createSessionRpc,
     setSession: setSessionRpc,

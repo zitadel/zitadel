@@ -17,13 +17,11 @@
     "./auth": { "types": "./dist/auth/index.d.ts", "import": "./dist/auth/index.js", "require": "./dist/auth/index.cjs" },
     "./auth/oidc": { "types": "./dist/auth/oidc.d.ts", "import": "./dist/auth/oidc.js", "require": "./dist/auth/oidc.cjs" },
     "./auth/session": { "types": "./dist/auth/session.d.ts", "import": "./dist/auth/session.js", "require": "./dist/auth/session.cjs" },
-    "./auth/bearer-token": { "types": "./dist/api/bearer-token.d.ts", "import": "./dist/api/bearer-token.js", "require": "./dist/api/bearer-token.cjs" },
+    "./auth/bearer-token": { "types": "./dist/auth/bearer-token.d.ts", "import": "./dist/auth/bearer-token.js", "require": "./dist/auth/bearer-token.cjs" },
     "./middleware": { "types": "./dist/middleware.d.ts", "import": "./dist/middleware.js", "require": "./dist/middleware.cjs" },
     "./server-action": { "types": "./dist/server-action.d.ts", "import": "./dist/server-action.js", "require": "./dist/server-action.cjs" },
     "./api": { "types": "./dist/api.d.ts", "import": "./dist/api.js", "require": "./dist/api.cjs" },
-    "./api/bearer-token": { "types": "./dist/api/bearer-token.d.ts", "import": "./dist/api/bearer-token.js", "require": "./dist/api/bearer-token.cjs" },
-    "./actions/webhook": { "types": "./dist/webhook.d.ts", "import": "./dist/webhook.js", "require": "./dist/webhook.cjs" },
-    "./webhook": { "types": "./dist/webhook.d.ts", "import": "./dist/webhook.js", "require": "./dist/webhook.cjs" }
+    "./actions/webhook": { "types": "./dist/actions/webhook.d.ts", "import": "./dist/actions/webhook.js", "require": "./dist/actions/webhook.cjs" }
   },
   "scripts": {
     "build": "tsup",

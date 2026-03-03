@@ -3,8 +3,7 @@ import {
   validateBearerToken,
   type BearerTokenHeaderSource,
   type ValidateBearerTokenOptions,
-} from "@zitadel/zitadel-js/api/bearer-token";
-
+} from "@zitadel/zitadel-js/auth/bearer-token";
 type ValidatedBearerTokenPayload<T> = Awaited<
   ReturnType<typeof validateBearerToken<T>>
 >;

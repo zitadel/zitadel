@@ -11,7 +11,7 @@ const { extractBearerTokenFromHeadersMock, validateBearerTokenMock } = vi.hoiste
   }),
 );
 
-vi.mock("@zitadel/zitadel-js/api/bearer-token", () => ({
+vi.mock("@zitadel/zitadel-js/auth/bearer-token", () => ({
   extractBearerTokenFromHeaders: extractBearerTokenFromHeadersMock,
   validateBearerToken: validateBearerTokenMock,
 }));

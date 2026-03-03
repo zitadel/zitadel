@@ -14,7 +14,7 @@
  * const user = await api.userService.getUser({ userId: "123" });
  * ```
  */
-import { createBearerTokenTransport } from "@zitadel/zitadel-js/api/bearer-token";
+import { createBearerTokenTransport } from "@zitadel/zitadel-js/auth/bearer-token";
 import { newSystemToken } from "@zitadel/zitadel-js/node";
 import {
   createUserServiceClient,

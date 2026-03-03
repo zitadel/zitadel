@@ -25,10 +25,11 @@ For detailed documentation and API references, please visit the [ZITADEL documen
 Root imports remain for shared transport/client primitives:
 `createClientFor`, `createConnectTransport`, `createGrpcTransport`.
 
-For API discoverability, use `@zitadel/zitadel-js/api/v1` (legacy API) and `@zitadel/zitadel-js/api/v2` (current API). `@zitadel/zitadel-js/v2` remains available as a compatibility alias.
+For API discoverability, use `@zitadel/zitadel-js/api/v1` (legacy API) and `@zitadel/zitadel-js/api/v2` (current API).
 
 Canonical taxonomy is lane-first: `auth/*`, `api/*`, and `actions/*`, plus root/core transport primitives.
 
-For migration compatibility, `@zitadel/zitadel-js/api/bearer-token` remains an alias to `@zitadel/zitadel-js/auth/bearer-token`, and `@zitadel/zitadel-js/webhooks` remains an alias to `@zitadel/zitadel-js/actions/webhook`.
+Use canonical module imports for bearer-token and webhook helpers:
+`@zitadel/zitadel-js/auth/bearer-token` and `@zitadel/zitadel-js/actions/webhook`.
 
 `@zitadel/client` and `@zitadel/proto` are not replaced in the current iteration; consolidation remains staged and will include explicit deprecation guidance before package lifecycle changes.

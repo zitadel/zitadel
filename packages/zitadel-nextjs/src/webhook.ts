@@ -2,7 +2,7 @@ import {
   createWebhookHandler,
   type PayloadType,
   type WebhookHandlerOptions as CoreWebhookHandlerOptions,
-} from "@zitadel/zitadel-js/webhooks";
+} from "@zitadel/zitadel-js/actions/webhook";
 
 export interface WebhookHandlerOptions {
   /**

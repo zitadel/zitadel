@@ -72,8 +72,8 @@ npm install /tmp/zitadel-zitadel-js-0.1.0.tgz /tmp/zitadel-react-0.1.0.tgz /tmp/
 - `@zitadel/nextjs/auth/oidc`: OIDC redirect flow helpers (`signIn`, `handleCallback`, `signOut`)
 - `@zitadel/nextjs/auth/session`: Session API helpers for custom login UIs (`createSession`, `setSession`, `getSession`, `deleteSession`, `createCallback`)
 - `@zitadel/nextjs/api`: authenticated v2 API client factory
-- `@zitadel/nextjs/auth/bearer-token`: canonical bearer token extraction/validation helpers for API route handlers (`@zitadel/nextjs/api/bearer-token` is a temporary compatibility alias)
-- `@zitadel/nextjs/actions/webhook`: canonical Actions v2 webhook route handler (`@zitadel/nextjs/webhook` is a temporary compatibility alias)
+- `@zitadel/nextjs/auth/bearer-token`: canonical bearer token extraction/validation helpers for API route handlers
+- `@zitadel/nextjs/actions/webhook`: canonical Actions v2 webhook route handler
 
 ## Migration notes: prefer lane entrypoints
 
@@ -84,8 +84,8 @@ Use lane-specific imports to keep UI and API concerns separated:
 | OIDC redirect login | `@zitadel/nextjs/auth/oidc` |
 | Custom login UI via Session API | `@zitadel/nextjs/auth/session` |
 | Authenticated management/system API client | `@zitadel/nextjs/api` |
-| Bearer token validation in API routes | `@zitadel/nextjs/auth/bearer-token` (`@zitadel/nextjs/api/bearer-token` alias) |
-| Actions v2 webhook handling | `@zitadel/nextjs/actions/webhook` (`@zitadel/nextjs/webhook` alias) |
+| Bearer token validation in API routes | `@zitadel/nextjs/auth/bearer-token` |
+| Actions v2 webhook handling | `@zitadel/nextjs/actions/webhook` |
 
 ## Documentation
 

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 const handlerMock = vi.fn(async () => ({ status: 200, body: "OK" }));
 const createWebhookHandlerMock = vi.fn(() => handlerMock);
 
-vi.mock("@zitadel/zitadel-js/webhooks", () => ({
+vi.mock("@zitadel/zitadel-js/actions/webhook", () => ({
   createWebhookHandler: createWebhookHandlerMock,
 }));
 

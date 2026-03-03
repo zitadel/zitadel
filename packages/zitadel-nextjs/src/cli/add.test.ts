@@ -215,6 +215,9 @@ describe("runAddCommand", () => {
     await expect(readFile(path.join(dir, ".env.example"), "utf8")).resolves.toContain(
       "ZITADEL_WEBHOOK_SECRET=",
     );
+    await expect(
+      readFile(path.join(dir, "app/api/zitadel/events/route.ts"), "utf8"),
+    ).resolves.toContain('from "@zitadel/nextjs/actions/webhook"');
     await expect(readFile(path.join(dir, ".env.example"), "utf8")).resolves.toContain(
       "ZITADEL_API_URL=",
     );
