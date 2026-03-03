@@ -197,3 +197,4 @@ Security policy: [SECURITY.md](./SECURITY.md)
 ## License
 
 [AGPL-3.0](./LICENSE) — see [LICENSING.md](./LICENSING.md) for the full licensing policy, including Apache 2.0 and MIT exceptions for specific directories.
+
