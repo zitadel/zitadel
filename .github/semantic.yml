@@ -56,6 +56,10 @@ scopes:
   - build
   - ci
   - deps
+  - deps-go
+  - deps-npm
+  - deps-docker
+  - deps-actions
   - i18n
   - integration
   - perf

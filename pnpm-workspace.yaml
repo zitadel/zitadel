@@ -1,5 +1,6 @@
 packages:
   - console
+  - benchmark
   - tests/*
   - packages/*
   - apps/*
