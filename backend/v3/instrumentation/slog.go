@@ -191,10 +191,17 @@ func SetInstance(ctx context.Context, instance Instance) context.Context {
 	return context.WithValue(ctx, ctxKeyInstance, instance)
 }
 
-// SetRequest generates a new [xid.ID] based on the passed request timestamp
+// NewRequestID generates a new [xid.ID] based on the passed request timestamp
 // and adds it to the context.
-func SetRequestID(ctx context.Context, ts time.Time) context.Context {
-	return context.WithValue(ctx, ctxKeyRequestID, xid.NewWithTime(ts))
+func NewRequestID(ctx context.Context, ts time.Time) (context.Context, xid.ID) {
+	id := xid.NewWithTime(ts)
+	return context.WithValue(ctx, ctxKeyRequestID, id), id
+}
+
+// GetRequestID retrieves the request ID from the context.
+func GetRequestID(ctx context.Context) (xid.ID, bool) {
+	id, ok := ctx.Value(ctxKeyRequestID).(xid.ID)
+	return id, ok
 }
 
 type ctxKeyType int
@@ -216,7 +223,7 @@ func instanceExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string)
 
 // requestIDExtractor sets the request XID to a log entry.
 func requestIDExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
-	if r, ok := ctx.Value(ctxKeyRequestID).(xid.ID); ok {
+	if r, ok := GetRequestID(ctx); ok {
 		return []slog.Attr{
 			slog.String("request_id", r.String()),
 		}

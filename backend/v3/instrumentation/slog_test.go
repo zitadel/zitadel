@@ -1,9 +1,12 @@
 package instrumentation
 
 import (
+	"context"
 	"log/slog"
 	"testing"
+	"time"
 
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 	"github.com/zitadel/sloggcp"
@@ -161,6 +164,36 @@ func TestLogConfig_replacer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.c.replacer()(tt.args.groups, tt.args.a)
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestGetRequestID(t *testing.T) {
+	reqCtx, id := NewRequestID(context.Background(), time.Now())
+	tests := []struct {
+		name   string // description of this test case
+		ctx    context.Context
+		wantID xid.ID
+		wantOk bool
+	}{
+		{
+			name:   "no request ID in context",
+			ctx:    context.Background(),
+			wantID: xid.NilID(),
+			wantOk: false,
+		},
+		{
+			name:   "request ID in context",
+			ctx:    reqCtx,
+			wantID: id,
+			wantOk: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, ok := GetRequestID(tt.ctx)
+			assert.Equal(t, tt.wantOk, ok)
+			assert.Equal(t, tt.wantID, got)
 		})
 	}
 }
