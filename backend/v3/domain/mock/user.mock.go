@@ -43,48 +43,6 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 	return m.recorder
 }
 
-// AddMetadata mocks base method.
-func (m *MockUserRepository) AddMetadata(metadata ...*domain.Metadata) database.Change {
-	m.ctrl.T.Helper()
-	varargs := []any{}
-	for _, a := range metadata {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "AddMetadata", varargs...)
-	ret0, _ := ret[0].(database.Change)
-	return ret0
-}
-
-// AddMetadata indicates an expected call of AddMetadata.
-func (mr *MockUserRepositoryMockRecorder) AddMetadata(metadata ...any) *MockUserRepositoryAddMetadataCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMetadata", reflect.TypeOf((*MockUserRepository)(nil).AddMetadata), metadata...)
-	return &MockUserRepositoryAddMetadataCall{Call: call}
-}
-
-// MockUserRepositoryAddMetadataCall wrap *gomock.Call
-type MockUserRepositoryAddMetadataCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockUserRepositoryAddMetadataCall) Return(arg0 database.Change) *MockUserRepositoryAddMetadataCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockUserRepositoryAddMetadataCall) Do(f func(...*domain.Metadata) database.Change) *MockUserRepositoryAddMetadataCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockUserRepositoryAddMetadataCall) DoAndReturn(f func(...*domain.Metadata) database.Change) *MockUserRepositoryAddMetadataCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // Create mocks base method.
 func (m *MockUserRepository) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
 	m.ctrl.T.Helper()
@@ -778,6 +736,48 @@ func (c *MockUserRepositoryRemoveMetadataCall) Do(f func(database.Condition) dat
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockUserRepositoryRemoveMetadataCall) DoAndReturn(f func(database.Condition) database.Change) *MockUserRepositoryRemoveMetadataCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetMetadata mocks base method.
+func (m *MockUserRepository) SetMetadata(metadata ...*domain.Metadata) database.Change {
+	m.ctrl.T.Helper()
+	varargs := []any{}
+	for _, a := range metadata {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SetMetadata", varargs...)
+	ret0, _ := ret[0].(database.Change)
+	return ret0
+}
+
+// SetMetadata indicates an expected call of SetMetadata.
+func (mr *MockUserRepositoryMockRecorder) SetMetadata(metadata ...any) *MockUserRepositorySetMetadataCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMetadata", reflect.TypeOf((*MockUserRepository)(nil).SetMetadata), metadata...)
+	return &MockUserRepositorySetMetadataCall{Call: call}
+}
+
+// MockUserRepositorySetMetadataCall wrap *gomock.Call
+type MockUserRepositorySetMetadataCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockUserRepositorySetMetadataCall) Return(arg0 database.Change) *MockUserRepositorySetMetadataCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockUserRepositorySetMetadataCall) Do(f func(...*domain.Metadata) database.Change) *MockUserRepositorySetMetadataCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockUserRepositorySetMetadataCall) DoAndReturn(f func(...*domain.Metadata) database.Change) *MockUserRepositorySetMetadataCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
