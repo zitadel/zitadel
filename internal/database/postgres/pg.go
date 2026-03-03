@@ -99,8 +99,8 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 
 	var config *pgxpool.Config
 	var err error
-	if c.parsedDSN != nil {
-		config = c.parsedDSN.Copy()
+	if parsed := c.ensureParsedDSN(); parsed != nil {
+		config = parsed.Copy()
 		if config.ConnConfig.RuntimeParams == nil {
 			config.ConnConfig.RuntimeParams = map[string]string{}
 		}
