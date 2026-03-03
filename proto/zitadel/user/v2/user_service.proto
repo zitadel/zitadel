@@ -2607,6 +2607,14 @@ message UpdateUserRequest{
     Human human = 3;
     Machine machine = 4;
   }
+
+  // Metadata to be set. The values have to be base64 encoded.
+  repeated UpdateMetadata metadata = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
+    }
+  ];
+
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     example: "{\"username\":\"minnie-mouse\",\"human\":{\"profile\":{\"givenName\":\"Minnie\",\"familyName\":\"Mouse\",\"displayName\":\"Minnie Mouse\"},\"email\":{\"email\":\"mini@mouse.com\",\"returnCode\":{}},\"phone\":{\"phone\":\"+41791234567\",\"isVerified\":true},\"password\":{\"password\":{\"password\":\"Secr3tP4ssw0rd!\",\"changeRequired\":true},\"verificationCode\":\"SKJd342k\"},\"totpSecret\":\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"}}";
   };
@@ -3738,6 +3746,15 @@ message Metadata {
   string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   // Value in the metadata key/value pair.
   bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+// todo: review
+message UpdateMetadata {
+  // Key in the metadata key/value pair.
+  string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Value in the metadata key/value pair.
+  // If the value is empty, the metadata with the corresponding key will be deleted.
+  bytes value = 2 [(validate.rules).bytes = {max_len: 500000}];
 }
 
 message SetUserMetadataRequest{
