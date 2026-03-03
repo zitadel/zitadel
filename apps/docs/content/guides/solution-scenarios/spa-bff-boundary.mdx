@@ -27,15 +27,14 @@ A BFF lets you keep high-trust responsibilities out of browser code:
 | Displaying minimal current-session state | ✅ (from BFF `/session`) | ✅ |
 | Webhook verification | ❌ | ✅ |
 
-## Example in this repository
+## Example code
 
-The JavaScript SDK examples use one shared BFF contract:
+Use this split as a reference architecture for your own SPA + BFF implementation:
 
-- BFF: `examples/spa-bff`
-- React Router + Vite SPA: `examples/react-router`
-- Angular SPA: `examples/angular`
+- Browser SPA for route/auth UX
+- Server/BFF for callback handling, token exchange side effects, and confidential operations
 
-This keeps framework-specific UI code separate from reusable server trust boundaries.
+For the currently maintained in-repo JavaScript SDK example path, use `examples/nextjs`.
 
 ## Minimal endpoint contract
 

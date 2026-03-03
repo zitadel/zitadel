@@ -26,7 +26,7 @@ import {
   createFeatureServiceClient,
   createIdpServiceClient,
   createActionServiceClient,
-} from "@zitadel/zitadel-js/v2";
+} from "@zitadel/zitadel-js/api/v2";
 import { getSession } from "./session.js";
 
 export interface ApiClientOptions {

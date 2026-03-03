@@ -5,6 +5,8 @@ export default defineConfig((options: Options) => ({
     index: "src/index.ts",
     "auth/oidc": "src/auth/oidc.ts",
     "auth/session": "src/auth/session.ts",
+    "api/v1": "src/api/v1.ts",
+    "api/v2": "src/api/v2.ts",
     "api/bearer-token": "src/api/bearer-token.ts",
     token: "src/token.ts",
     webhooks: "src/webhooks.ts",
