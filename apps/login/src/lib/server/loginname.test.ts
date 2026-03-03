@@ -503,6 +503,7 @@ describe("sendLoginname", () => {
     test("should redirect to password when ignoreUnknownUsernames is true", async () => {
       mockGetLoginSettings.mockResolvedValue({
         ignoreUnknownUsernames: true,
+        allowLocalAuthentication: true,
       });
 
       const result = await sendLoginname({
