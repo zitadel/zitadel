@@ -173,12 +173,15 @@
             "dependsOn": [
                 "generate"
             ],
-            "command": "go test -count 1 -tags integration -timeout 60m -v ./tests/integration/...",
+            "command": "go test -coverprofile=profile.api.test-integration.cov -count 1 -tags integration -timeout 60m -v ./tests/integration/...",
             "inputs": [
                 "sources",
                 "{workspaceRoot}/internal/integration/**",
                 "{workspaceRoot}/tests/integration/**",
                 "{workspaceRoot}/go*"
+            ],
+            "outputs": [
+                "{workspaceRoot}/profile.api.test-integration.cov"
             ]
         },
         "test-integration-race": {
@@ -186,7 +189,7 @@
             "dependsOn": [
                 "generate"
             ],
-            "command": "go test -race -count 1 -tags integration -timeout 60m -v ./tests/integration/...",
+            "command": "GORACE=log_path=profile.api.test-integration-race.log go test -race -count 1 -tags integration -timeout 60m -v ./tests/integration/...",
             "inputs": [
                 "sources",
                 "{workspaceRoot}/internal/integration/**",

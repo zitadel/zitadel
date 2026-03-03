@@ -95,7 +95,7 @@ jobs:
         with:
           name: api-integration-test-race-logs
           path: |
-           .artifacts/api-test-integration/race.log.*
+            profile.api.test-integration-race.log.*
       - name: Upload Functional UI Test Artifacts
         uses: actions/upload-artifact@v4
         if: failure() || cancelled()

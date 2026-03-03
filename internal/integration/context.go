@@ -10,7 +10,7 @@ func WaitForAndTickWithMaxDuration(ctx context.Context, max time.Duration) (time
 	// interval which is used to retry the test
 	tick := 50 * time.Millisecond
 	// tolerance which is used to stop the test for the timeout
-	tolerance := tick * 20 // 5s absolute tolerance
+	tolerance := tick * 100 // 5s absolute tolerance
 	// default of the WaitFor is always a defined duration, shortened if the context would time out before
 	waitFor := max
 

@@ -33,7 +33,7 @@ var (
 // Intended for use by test orchestrators that need to initialise viper
 // without depending on the file being present on disk.
 func DefaultConfig() []byte {
-	return defaultConfig
+	return append([]byte(nil), defaultConfig...)
 }
 
 func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server) *cobra.Command {

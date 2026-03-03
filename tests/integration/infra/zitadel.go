@@ -139,13 +139,18 @@ func WaitForHealthy(ctx context.Context, baseURL string) error {
 	endpoint := strings.TrimRight(baseURL, "/") + "/debug/ready"
 	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
+	client := &http.Client{Timeout: 5 * time.Second}
 
 	for {
 		select {
 		case <-ctx.Done():
 			return fmt.Errorf("health check timed out: %w", ctx.Err())
 		case <-ticker.C:
-			resp, err := http.Get(endpoint) //nolint:gosec
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
+			if err != nil {
+				return fmt.Errorf("create health check request: %w", err)
+			}
+			resp, err := client.Do(req) //nolint:gosec
 			if err != nil {
 				continue
 			}
