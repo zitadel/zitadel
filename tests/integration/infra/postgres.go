@@ -60,6 +60,7 @@ func StartPostgres(ctx context.Context, logw io.Writer) (*postgres.PostgresConta
 			},
 		}),
 	}
+	// Opt-in only for local runs where faster startup is preferred over strict isolation.
 	if os.Getenv("INTEGRATION_REUSE_CONTAINERS") == "true" {
 		options = append(options, testcontainers.WithReuseByName("zitadel-integration-postgres"))
 	}

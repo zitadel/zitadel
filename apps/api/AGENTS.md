@@ -18,6 +18,7 @@ The **API App** (`apps/api`) is the Nx application target for building and runni
 - **Test (unit)**: `pnpm nx run @zitadel/api:test-unit`
 - **Test (integration)**: `pnpm nx run @zitadel/api:test-integration` — starts Postgres and Redis via testcontainers-go, boots ZITADEL in-process, and runs all integration test packages (reliability-first defaults for local runs). Requires Docker.
 - **Test (integration, race)**: `pnpm nx run @zitadel/api:test-integration-race` — same flow with `-race` enabled (slower, higher resource usage).
+  - Optional local speed-up: set `INTEGRATION_REUSE_CONTAINERS=true` to allow Postgres testcontainer reuse between runs.
 - **Build Linux**: `pnpm nx run @zitadel/api:build-linux` — cross-compiles a Linux binary for Docker packaging
 - **Pack (Docker)**: `pnpm nx run @zitadel/api:pack` — builds a local Docker image `zitadel/zitadel:local`. Requires Docker daemon.
 

@@ -148,7 +148,7 @@ func WaitForHealthy(ctx context.Context, baseURL string) error {
 		case <-ticker.C:
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 			if err != nil {
-				continue
+				return fmt.Errorf("create health check request: %w", err)
 			}
 			resp, err := client.Do(req) //nolint:gosec
 			if err != nil {
