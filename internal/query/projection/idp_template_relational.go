@@ -21,338 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const (
-	IDPRelationalTable                = "zitadel.identity_providers"
-	IDPRelationalOrgIdCol             = "org_id"
-	IDPRelationalAutoRegisterCol      = "auto_register"
-	IDPRelationalPayloadCol           = "payload"
-	IDPRelationalOrgId                = "org_id"
-	IDPRelationalAllowCreationCol     = "allow_creation"
-	IDPRelationalAllowLinkingCol      = "allow_linking"
-	IDPRelationalAllowAutoCreationCol = "allow_auto_creation"
-	IDPRelationalAllowAutoUpdateCol   = "allow_auto_update"
-	IDPRelationalAllowAutoLinkingCol  = "auto_linking_field"
-)
-
-type idpTemplateRelationalProjection struct {
-	idpRepo domain.IDProviderRepository
-}
-
-func newIDPTemplateRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	idpRepo := repository.IDProviderRepository()
-	return handler.NewHandler(ctx, &config, &idpTemplateRelationalProjection{
-		idpRepo: idpRepo,
-	})
-}
-
-func (*idpTemplateRelationalProjection) Name() string {
-	return IDPRelationalTable
-}
-
-func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: instance.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  instance.IDPConfigAddedEventType,
-					Reduce: p.reduceIDPAdded,
-				},
-				{
-					Event:  instance.IDPConfigChangedEventType,
-					Reduce: p.reduceIDPChanged,
-				},
-				{
-					Event:  instance.IDPConfigDeactivatedEventType,
-					Reduce: p.reduceIDPDeactivated,
-				},
-				{
-					Event:  instance.IDPConfigReactivatedEventType,
-					Reduce: p.reduceIDPReactivated,
-				},
-				{
-					Event:  instance.IDPConfigRemovedEventType,
-					Reduce: p.reduceIDPRemoved,
-				},
-				{
-					Event:  instance.IDPOIDCConfigAddedEventType,
-					Reduce: p.reduceOIDCConfigAdded,
-				},
-				{
-					Event:  instance.IDPOIDCConfigChangedEventType,
-					Reduce: p.reduceOIDCConfigChanged,
-				},
-				{
-					Event:  instance.IDPJWTConfigAddedEventType,
-					Reduce: p.reduceJWTConfigAdded,
-				},
-				{
-					Event:  instance.IDPJWTConfigChangedEventType,
-					Reduce: p.reduceJWTConfigChanged,
-				},
-				{
-					Event:  instance.OAuthIDPAddedEventType,
-					Reduce: p.reduceOAuthIDPAdded,
-				},
-				{
-					Event:  instance.OAuthIDPChangedEventType,
-					Reduce: p.reduceOAuthIDPChanged,
-				},
-				{
-					Event:  instance.OIDCIDPAddedEventType,
-					Reduce: p.reduceOIDCIDPAdded,
-				},
-				{
-					Event:  instance.OIDCIDPChangedEventType,
-					Reduce: p.reduceOIDCIDPChanged,
-				},
-				{
-					Event:  instance.OIDCIDPMigratedAzureADEventType,
-					Reduce: p.reduceOIDCIDPMigratedAzureAD,
-				},
-				{
-					Event:  instance.OIDCIDPMigratedGoogleEventType,
-					Reduce: p.reduceOIDCIDPMigratedGoogle,
-				},
-				{
-					Event:  instance.JWTIDPAddedEventType,
-					Reduce: p.reduceJWTIDPAdded,
-				},
-				{
-					Event:  instance.JWTIDPChangedEventType,
-					Reduce: p.reduceJWTIDPChanged,
-				},
-				{
-					Event:  instance.AzureADIDPAddedEventType,
-					Reduce: p.reduceAzureADIDPAdded,
-				},
-				{
-					Event:  instance.AzureADIDPChangedEventType,
-					Reduce: p.reduceAzureADIDPChanged,
-				},
-				{
-					Event:  instance.GitHubIDPAddedEventType,
-					Reduce: p.reduceGitHubIDPAdded,
-				},
-				{
-					Event:  instance.GitHubIDPChangedEventType,
-					Reduce: p.reduceGitHubIDPChanged,
-				},
-				{
-					Event:  instance.GitHubEnterpriseIDPAddedEventType,
-					Reduce: p.reduceGitHubEnterpriseIDPAdded,
-				},
-				{
-					Event:  instance.GitHubEnterpriseIDPChangedEventType,
-					Reduce: p.reduceGitHubEnterpriseIDPChanged,
-				},
-				{
-					Event:  instance.GitLabIDPAddedEventType,
-					Reduce: p.reduceGitLabIDPAdded,
-				},
-				{
-					Event:  instance.GitLabIDPChangedEventType,
-					Reduce: p.reduceGitLabIDPChanged,
-				},
-				{
-					Event:  instance.GitLabSelfHostedIDPAddedEventType,
-					Reduce: p.reduceGitLabSelfHostedIDPAdded,
-				},
-				{
-					Event:  instance.GitLabSelfHostedIDPChangedEventType,
-					Reduce: p.reduceGitLabSelfHostedIDPChanged,
-				},
-				{
-					Event:  instance.GoogleIDPAddedEventType,
-					Reduce: p.reduceGoogleIDPAdded,
-				},
-				{
-					Event:  instance.GoogleIDPChangedEventType,
-					Reduce: p.reduceGoogleIDPChanged,
-				},
-				{
-					Event:  instance.LDAPIDPAddedEventType,
-					Reduce: p.reduceLDAPIDPAdded,
-				},
-				{
-					Event:  instance.LDAPIDPChangedEventType,
-					Reduce: p.reduceLDAPIDPChanged,
-				},
-				{
-					Event:  instance.AppleIDPAddedEventType,
-					Reduce: p.reduceAppleIDPAdded,
-				},
-				{
-					Event:  instance.AppleIDPChangedEventType,
-					Reduce: p.reduceAppleIDPChanged,
-				},
-				{
-					Event:  instance.SAMLIDPAddedEventType,
-					Reduce: p.reduceSAMLIDPAdded,
-				},
-				{
-					Event:  instance.SAMLIDPChangedEventType,
-					Reduce: p.reduceSAMLIDPChanged,
-				},
-				{
-					Event:  instance.IDPRemovedEventType,
-					Reduce: p.reduceIDPRemoved,
-				},
-			},
-		},
-		{
-			Aggregate: org.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  org.IDPConfigAddedEventType,
-					Reduce: p.reduceIDPAdded,
-				},
-				{
-					Event:  org.IDPConfigChangedEventType,
-					Reduce: p.reduceIDPChanged,
-				},
-				{
-					Event:  org.IDPConfigDeactivatedEventType,
-					Reduce: p.reduceIDPDeactivated,
-				},
-				{
-					Event:  org.IDPConfigReactivatedEventType,
-					Reduce: p.reduceIDPReactivated,
-				},
-				{
-					Event:  org.IDPConfigRemovedEventType,
-					Reduce: p.reduceIDPRemoved,
-				},
-				{
-					Event:  org.IDPOIDCConfigAddedEventType,
-					Reduce: p.reduceOIDCConfigAdded,
-				},
-				{
-					Event:  org.IDPOIDCConfigChangedEventType,
-					Reduce: p.reduceOIDCConfigChanged,
-				},
-				{
-					Event:  org.IDPJWTConfigAddedEventType,
-					Reduce: p.reduceJWTConfigAdded,
-				},
-				{
-					Event:  org.IDPJWTConfigChangedEventType,
-					Reduce: p.reduceJWTConfigChanged,
-				},
-				{
-					Event:  org.OAuthIDPAddedEventType,
-					Reduce: p.reduceOAuthIDPAdded,
-				},
-				{
-					Event:  org.OAuthIDPChangedEventType,
-					Reduce: p.reduceOAuthIDPChanged,
-				},
-				{
-					Event:  org.OIDCIDPAddedEventType,
-					Reduce: p.reduceOIDCIDPAdded,
-				},
-				{
-					Event:  org.OIDCIDPChangedEventType,
-					Reduce: p.reduceOIDCIDPChanged,
-				},
-				{
-					Event:  org.OIDCIDPMigratedAzureADEventType,
-					Reduce: p.reduceOIDCIDPMigratedAzureAD,
-				},
-				{
-					Event:  org.OIDCIDPMigratedGoogleEventType,
-					Reduce: p.reduceOIDCIDPMigratedGoogle,
-				},
-				{
-					Event:  org.JWTIDPAddedEventType,
-					Reduce: p.reduceJWTIDPAdded,
-				},
-				{
-					Event:  org.JWTIDPChangedEventType,
-					Reduce: p.reduceJWTIDPChanged,
-				},
-				{
-					Event:  org.AzureADIDPAddedEventType,
-					Reduce: p.reduceAzureADIDPAdded,
-				},
-				{
-					Event:  org.AzureADIDPChangedEventType,
-					Reduce: p.reduceAzureADIDPChanged,
-				},
-				{
-					Event:  org.GitHubIDPAddedEventType,
-					Reduce: p.reduceGitHubIDPAdded,
-				},
-				{
-					Event:  org.GitHubIDPChangedEventType,
-					Reduce: p.reduceGitHubIDPChanged,
-				},
-				{
-					Event:  org.GitHubEnterpriseIDPAddedEventType,
-					Reduce: p.reduceGitHubEnterpriseIDPAdded,
-				},
-				{
-					Event:  org.GitHubEnterpriseIDPChangedEventType,
-					Reduce: p.reduceGitHubEnterpriseIDPChanged,
-				},
-				{
-					Event:  org.GitLabIDPAddedEventType,
-					Reduce: p.reduceGitLabIDPAdded,
-				},
-				{
-					Event:  org.GitLabIDPChangedEventType,
-					Reduce: p.reduceGitLabIDPChanged,
-				},
-				{
-					Event:  org.GitLabSelfHostedIDPAddedEventType,
-					Reduce: p.reduceGitLabSelfHostedIDPAdded,
-				},
-				{
-					Event:  org.GitLabSelfHostedIDPChangedEventType,
-					Reduce: p.reduceGitLabSelfHostedIDPChanged,
-				},
-				{
-					Event:  org.GoogleIDPAddedEventType,
-					Reduce: p.reduceGoogleIDPAdded,
-				},
-				{
-					Event:  org.GoogleIDPChangedEventType,
-					Reduce: p.reduceGoogleIDPChanged,
-				},
-				{
-					Event:  org.LDAPIDPAddedEventType,
-					Reduce: p.reduceLDAPIDPAdded,
-				},
-				{
-					Event:  org.LDAPIDPChangedEventType,
-					Reduce: p.reduceLDAPIDPChanged,
-				},
-				{
-					Event:  org.AppleIDPAddedEventType,
-					Reduce: p.reduceAppleIDPAdded,
-				},
-				{
-					Event:  org.AppleIDPChangedEventType,
-					Reduce: p.reduceAppleIDPChanged,
-				},
-				{
-					Event:  org.SAMLIDPAddedEventType,
-					Reduce: p.reduceSAMLIDPAdded,
-				},
-				{
-					Event:  org.SAMLIDPChangedEventType,
-					Reduce: p.reduceSAMLIDPChanged,
-				},
-				{
-					Event:  org.IDPRemovedEventType,
-					Reduce: p.reduceIDPRemoved,
-				},
-			},
-		},
-	}
-}
-
-func (p *idpTemplateRelationalProjection) reduceIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idpconfig.IDPConfigAddedEvent
 	switch e := event.(type) {
@@ -426,7 +95,7 @@ func idpScopedCondition(repo domain.IDProviderRepository, instanceID, id string,
 	)
 }
 
-func (p *idpTemplateRelationalProjection) reduceIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgID *string
 	var idpEvent idpconfig.IDPConfigChangedEvent
 	switch e := event.(type) {
@@ -464,7 +133,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPChanged(event eventstore.Even
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceIDPDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	var orgID *string
 	var idpEvent idpconfig.IDPConfigDeactivatedEvent
 	switch e := event.(type) {
@@ -493,7 +162,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPDeactivated(event eventstore.
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceIDPReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPReactivated(event eventstore.Event) (*handler.Statement, error) {
 	var orgID *string
 	var idpEvent idpconfig.IDPConfigReactivatedEvent
 	switch e := event.(type) {
@@ -521,7 +190,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPReactivated(event eventstore.
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var (
 		orgID *string
 		idpID string
@@ -553,7 +222,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Even
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgID *string
 	var idpEvent idpconfig.OIDCConfigAddedEvent
 	switch e := event.(type) {
@@ -587,7 +256,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCConfigAdded(event eventstore
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idpconfig.OIDCConfigChangedEvent
 	switch e := event.(type) {
@@ -664,7 +333,7 @@ func mapOIDCMappingField(field internal_domain.OIDCMappingField) domain.OIDCMapp
 	}
 }
 
-func (p *idpTemplateRelationalProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgID *string
 	var idpEvent idpconfig.JWTConfigAddedEvent
 	switch e := event.(type) {
@@ -698,7 +367,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTConfigAdded(event eventstore.
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idpconfig.JWTConfigChangedEvent
 	switch e := event.(type) {
@@ -750,7 +419,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTConfigChanged(event eventstor
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceOAuthIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOAuthIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.OAuthIDPAddedEvent
 	switch e := event.(type) {
@@ -805,7 +474,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPAdded(event eventstore.E
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceOAuthIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOAuthIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.OAuthIDPChangedEvent
 	switch e := event.(type) {
@@ -848,7 +517,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPChanged(event eventstore
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceOIDCIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOIDCIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.OIDCIDPAddedEvent
 	switch e := event.(type) {
@@ -892,7 +561,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPAdded(event eventstore.Ev
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceOIDCIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOIDCIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.OIDCIDPChangedEvent
 	switch e := event.(type) {
@@ -934,7 +603,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPChanged(event eventstore.
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
 	var orgID *string
 	var idpEvent idp.OIDCIDPMigratedAzureADEvent
 	switch e := event.(type) {
@@ -989,7 +658,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPMigratedAzureAD(event eve
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Event) (*handler.Statement, error) {
 	var orgID *string
 	var idpEvent idp.OIDCIDPMigratedGoogleEvent
 	switch e := event.(type) {
@@ -1037,7 +706,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPMigratedGoogle(event even
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceJWTIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceJWTIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.JWTIDPAddedEvent
 	switch e := event.(type) {
@@ -1088,7 +757,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPAdded(event eventstore.Eve
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceJWTIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceJWTIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.JWTIDPChangedEvent
 	switch e := event.(type) {
@@ -1130,7 +799,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPChanged(event eventstore.E
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceAzureADIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceAzureADIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.AzureADIDPAddedEvent
 	switch e := event.(type) {
@@ -1187,7 +856,7 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPAdded(event eventstore
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceAzureADIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceAzureADIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.AzureADIDPChangedEvent
 	switch e := event.(type) {
@@ -1234,7 +903,7 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPChanged(event eventsto
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitHubIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceGitHubIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.GitHubIDPAddedEvent
 	switch e := event.(type) {
@@ -1284,7 +953,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPAdded(event eventstore.
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitHubIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceGitHubIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.GitHubIDPChangedEvent
 	switch e := event.(type) {
@@ -1327,7 +996,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPChanged(event eventstor
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceGitHubEnterpriseIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.GitHubEnterpriseIDPAddedEvent
 	switch e := event.(type) {
@@ -1380,7 +1049,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPAdded(event e
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceGitHubEnterpriseIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.GitHubEnterpriseIDPChangedEvent
 	switch e := event.(type) {
@@ -1423,7 +1092,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPChanged(event
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitLabIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceGitLabIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.GitLabIDPAddedEvent
 	switch e := event.(type) {
@@ -1473,7 +1142,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPAdded(event eventstore.
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitLabIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceGitLabIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.GitLabIDPChangedEvent
 	switch e := event.(type) {
@@ -1516,7 +1185,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPChanged(event eventstor
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceGitLabSelfHostedIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.GitLabSelfHostedIDPAddedEvent
 	switch e := event.(type) {
@@ -1567,7 +1236,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPAdded(event e
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceGitLabSelfHostedIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.GitLabSelfHostedIDPChangedEvent
 	switch e := event.(type) {
@@ -1610,7 +1279,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPChanged(event
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceGoogleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceGoogleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.GoogleIDPAddedEvent
 	switch e := event.(type) {
@@ -1660,7 +1329,7 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPAdded(event eventstore.
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceGoogleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceGoogleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.GoogleIDPChangedEvent
 	switch e := event.(type) {
@@ -1703,7 +1372,7 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPChanged(event eventstor
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLDAPIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.LDAPIDPAddedEvent
 	switch e := event.(type) {
@@ -1774,7 +1443,7 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceLDAPIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.LDAPIDPChangedEvent
 	switch e := event.(type) {
@@ -1817,7 +1486,7 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceAppleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.AppleIDPAddedEvent
 	switch e := event.(type) {
@@ -1869,7 +1538,7 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.E
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceAppleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.AppleIDPChangedEvent
 	switch e := event.(type) {
@@ -1912,7 +1581,7 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceSAMLIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.SAMLIDPAddedEvent
 	switch e := event.(type) {
@@ -1967,7 +1636,7 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceSAMLIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.SAMLIDPChangedEvent
 	switch e := event.(type) {
@@ -2010,7 +1679,7 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.
 	}), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceIDPChangedTemplateColumns(repo domain.IDProviderRepository, name *string, optionChanges idp.OptionChanges) database.Changes {
+func (p *relationalTablesProjection) reduceIDPChangedTemplateColumns(repo domain.IDProviderRepository, name *string, optionChanges idp.OptionChanges) database.Changes {
 	changes := make(database.Changes, 0, 8)
 	if name != nil {
 		changes = append(changes, repo.SetName(*name))
@@ -2034,7 +1703,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPChangedTemplateColumns(repo d
 	return changes
 }
 
-func (p *idpTemplateRelationalProjection) reduceOAuthIDPChangedColumns(payload *domain.OAuth, idpEvent *idp.OAuthIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceOAuthIDPChangedColumns(payload *domain.OAuth, idpEvent *idp.OAuthIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2071,7 +1740,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPChangedColumns(payload *
 	return payloadChange
 }
 
-func (p *idpTemplateRelationalProjection) reduceOIDCIDPChangedColumns(payload *domain.OIDC, idpEvent *idp.OIDCIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceOIDCIDPChangedColumns(payload *domain.OIDC, idpEvent *idp.OIDCIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2100,7 +1769,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPChangedColumns(payload *d
 	return payloadChange
 }
 
-func (p *idpTemplateRelationalProjection) reduceJWTIDPChangedColumns(payload *domain.JWT, idpEvent *idp.JWTIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceJWTIDPChangedColumns(payload *domain.JWT, idpEvent *idp.JWTIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.JWTEndpoint != nil {
 		payloadChange = true
@@ -2121,7 +1790,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPChangedColumns(payload *do
 	return payloadChange
 }
 
-func (p *idpTemplateRelationalProjection) reduceAzureADIDPChangedColumns(payload *domain.Azure, idpEvent *idp.AzureADIDPChangedEvent) (bool, error) {
+func (p *relationalTablesProjection) reduceAzureADIDPChangedColumns(payload *domain.Azure, idpEvent *idp.AzureADIDPChangedEvent) (bool, error) {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2152,7 +1821,7 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPChangedColumns(payload
 	return payloadChange, nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitHubIDPChangedColumns(payload *domain.Github, idpEvent *idp.GitHubIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceGitHubIDPChangedColumns(payload *domain.Github, idpEvent *idp.GitHubIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2169,7 +1838,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPChangedColumns(payload 
 	return payloadChange
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPChangedColumns(payload *domain.GithubEnterprise, idpEvent *idp.GitHubEnterpriseIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceGitHubEnterpriseIDPChangedColumns(payload *domain.GithubEnterprise, idpEvent *idp.GitHubEnterpriseIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2198,7 +1867,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPChangedColumn
 	return payloadChange
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitLabIDPChangedColumns(payload *domain.Gitlab, idpEvent *idp.GitLabIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceGitLabIDPChangedColumns(payload *domain.Gitlab, idpEvent *idp.GitLabIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2215,7 +1884,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPChangedColumns(payload 
 	return payloadChange
 }
 
-func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPChangedColumns(payload *domain.GitlabSelfHosted, idpEvent *idp.GitLabSelfHostedIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceGitLabSelfHostedIDPChangedColumns(payload *domain.GitlabSelfHosted, idpEvent *idp.GitLabSelfHostedIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2236,7 +1905,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPChangedColumn
 	return payloadChange
 }
 
-func (p *idpTemplateRelationalProjection) reduceGoogleIDPChangedColumns(payload *domain.Google, idpEvent *idp.GoogleIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceGoogleIDPChangedColumns(payload *domain.Google, idpEvent *idp.GoogleIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2253,7 +1922,7 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPChangedColumns(payload 
 	return payloadChange
 }
 
-func (p *idpTemplateRelationalProjection) reduceLDAPIDPChangedColumns(payload *domain.LDAP, idpEvent *idp.LDAPIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceLDAPIDPChangedColumns(payload *domain.LDAP, idpEvent *idp.LDAPIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.Servers != nil {
 		payloadChange = true
@@ -2350,7 +2019,7 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChangedColumns(payload *d
 	return payloadChange
 }
 
-func (p *idpTemplateRelationalProjection) reduceAppleIDPChangedColumns(payload *domain.Apple, idpEvent *idp.AppleIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceAppleIDPChangedColumns(payload *domain.Apple, idpEvent *idp.AppleIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2375,7 +2044,7 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPChangedColumns(payload *
 	return payloadChange
 }
 
-func (p *idpTemplateRelationalProjection) reduceSAMLIDPChangedColumns(payload *domain.SAML, idpEvent *idp.SAMLIDPChangedEvent) bool {
+func (p *relationalTablesProjection) reduceSAMLIDPChangedColumns(payload *domain.SAML, idpEvent *idp.SAMLIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.Metadata != nil {
 		payloadChange = true

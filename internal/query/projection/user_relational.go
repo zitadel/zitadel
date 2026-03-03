@@ -17,435 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const (
-	UserRelationProjectionTable = "zitadel.users"
-)
-
-type userRelationalProjection struct{}
-
-func (*userRelationalProjection) Name() string {
-	return UserRelationProjectionTable
-}
-
-func newUserRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(userRelationalProjection))
-}
-
-func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: user.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  user.UserV1AddedType,
-					Reduce: p.reduceHumanAdded,
-				},
-				{
-					Event:  user.HumanAddedType,
-					Reduce: p.reduceHumanAdded,
-				},
-				{
-					Event:  user.UserV1RegisteredType,
-					Reduce: p.reduceHumanRegistered,
-				},
-				{
-					Event:  user.HumanRegisteredType,
-					Reduce: p.reduceHumanRegistered,
-				},
-				{
-					Event:  user.UserLockedType,
-					Reduce: p.reduceUserLocked,
-				},
-				{
-					Event:  user.UserUnlockedType,
-					Reduce: p.reduceUserUnlocked,
-				},
-				{
-					Event:  user.UserDeactivatedType,
-					Reduce: p.reduceUserDeactivated,
-				},
-				{
-					Event:  user.UserReactivatedType,
-					Reduce: p.reduceUserReactivated,
-				},
-				{
-					Event:  user.UserRemovedType,
-					Reduce: p.reduceUserRemoved,
-				},
-
-				{
-					Event:  user.UserUserNameChangedType,
-					Reduce: p.reduceUsernameChanged,
-				},
-				{
-					Event:  user.UserDomainClaimedType,
-					Reduce: p.reduceDomainClaimed,
-				},
-
-				{
-					Event:  user.HumanProfileChangedType,
-					Reduce: p.reduceHumanProfileChanged,
-				},
-				{
-					Event:  user.UserV1ProfileChangedType,
-					Reduce: p.reduceHumanProfileChanged,
-				},
-
-				{
-					Event:  user.HumanEmailChangedType,
-					Reduce: p.reduceHumanEmailChanged,
-				},
-				{
-					Event:  user.UserV1EmailChangedType,
-					Reduce: p.reduceHumanEmailChanged,
-				},
-				{
-					Event:  user.HumanEmailVerifiedType,
-					Reduce: p.reduceHumanEmailVerified,
-				},
-				{
-					Event:  user.UserV1EmailVerifiedType,
-					Reduce: p.reduceHumanEmailVerified,
-				},
-				{
-					Event:  user.HumanEmailCodeAddedType,
-					Reduce: p.reduceHumanEmailCodeAdded,
-				},
-				{
-					Event:  user.UserV1EmailCodeAddedType,
-					Reduce: p.reduceHumanEmailCodeAdded,
-				},
-				{
-					Event:  user.HumanEmailVerificationFailedType,
-					Reduce: p.reduceHumanEmailVerificationFailed,
-				},
-				{
-					Event:  user.UserV1EmailVerificationFailedType,
-					Reduce: p.reduceHumanEmailVerificationFailed,
-				},
-				{
-					Event:  user.HumanPhoneChangedType,
-					Reduce: p.reduceHumanPhoneChanged,
-				},
-				{
-					Event:  user.UserV1PhoneChangedType,
-					Reduce: p.reduceHumanPhoneChanged,
-				},
-				{
-					Event:  user.HumanPhoneRemovedType,
-					Reduce: p.reduceHumanPhoneRemoved,
-				},
-				{
-					Event:  user.UserV1PhoneRemovedType,
-					Reduce: p.reduceHumanPhoneRemoved,
-				},
-				{
-					Event:  user.HumanPhoneVerifiedType,
-					Reduce: p.reduceHumanPhoneVerified,
-				},
-				{
-					Event:  user.UserV1PhoneVerifiedType,
-					Reduce: p.reduceHumanPhoneVerified,
-				},
-				{
-					Event:  user.HumanPhoneCodeAddedType,
-					Reduce: p.reduceHumanPhoneCodeAdded,
-				},
-				{
-					Event:  user.UserV1PhoneCodeAddedType,
-					Reduce: p.reduceHumanPhoneCodeAdded,
-				},
-				{
-					Event:  user.HumanPhoneVerificationFailedType,
-					Reduce: p.reduceHumanPhoneVerificationFailed,
-				},
-				{
-					Event:  user.UserV1PhoneVerificationFailedType,
-					Reduce: p.reduceHumanPhoneVerificationFailed,
-				},
-
-				{
-					Event:  user.HumanAvatarAddedType,
-					Reduce: p.reduceHumanAvatarAdded,
-				},
-				{
-					Event:  user.HumanAvatarRemovedType,
-					Reduce: p.reduceHumanAvatarRemoved,
-				},
-
-				{
-					Event:  user.HumanPasswordChangedType,
-					Reduce: p.reduceHumanPasswordChanged,
-				},
-				{
-					Event:  user.UserV1PasswordChangedType,
-					Reduce: p.reduceHumanPasswordChanged,
-				},
-				{
-					Event:  user.HumanPasswordCodeAddedType,
-					Reduce: p.reduceHumanPasswordCodeAdded,
-				},
-				{
-					Event:  user.UserV1PasswordCodeAddedType,
-					Reduce: p.reduceHumanPasswordCodeAdded,
-				},
-				{
-					Event:  user.HumanPasswordCheckSucceededType,
-					Reduce: p.reduceHumanPasswordCheckSucceeded,
-				},
-				{
-					Event:  user.UserV1PasswordCheckSucceededType,
-					Reduce: p.reduceHumanPasswordCheckSucceeded,
-				},
-				{
-					Event:  user.HumanPasswordCheckFailedType,
-					Reduce: p.reduceHumanPasswordCheckFailed,
-				},
-				{
-					Event:  user.UserV1PasswordCheckFailedType,
-					Reduce: p.reduceHumanPasswordCheckFailed,
-				},
-				{
-					Event:  user.HumanPasswordHashUpdatedType,
-					Reduce: p.reduceHumanPasswordHashUpdated,
-				},
-
-				{
-					Event:  user.MachineAddedEventType,
-					Reduce: p.reduceMachineAdded,
-				},
-				{
-					Event:  user.MachineChangedEventType,
-					Reduce: p.reduceMachineChanged,
-				},
-
-				{
-					Event:  user.MachineSecretSetType,
-					Reduce: p.reduceMachineSecretSet,
-				},
-				{
-					Event:  user.MachineSecretHashUpdatedType,
-					Reduce: p.reduceMachineSecretHashUpdated,
-				},
-				{
-					Event:  user.MachineSecretRemovedType,
-					Reduce: p.reduceMachineSecretRemoved,
-				},
-
-				{
-					Event:  user.MachineKeyAddedEventType,
-					Reduce: p.reduceMachineKeyAdded,
-				},
-				{
-					Event:  user.MachineKeyRemovedEventType,
-					Reduce: p.reduceMachineKeyRemoved,
-				},
-				{
-					Event:  user.UserV1MFAInitSkippedType,
-					Reduce: p.reduceMFAInitSkipped,
-				},
-				{
-					Event:  user.HumanMFAInitSkippedType,
-					Reduce: p.reduceMFAInitSkipped,
-				},
-
-				{
-					Event:  user.PersonalAccessTokenAddedType,
-					Reduce: p.reducePersonalAccessTokenAdded,
-				},
-				{
-					Event:  user.PersonalAccessTokenRemovedType,
-					Reduce: p.reducePersonalAccessTokenRemoved,
-				},
-
-				{
-					Event:  user.MetadataSetType,
-					Reduce: p.reduceMetadataSet,
-				},
-				{
-					Event:  user.MetadataRemovedType,
-					Reduce: p.reduceMetadataRemoved,
-				},
-				{
-					Event:  user.MetadataRemovedAllType,
-					Reduce: p.reduceMetadataRemovedAll,
-				},
-				{
-					Event:  user.HumanPasswordlessTokenAddedType,
-					Reduce: p.reducePasskeyAdded,
-				},
-				{
-					Event:  user.HumanPasswordlessTokenVerifiedType,
-					Reduce: p.reducePasskeyVerified,
-				},
-				{
-					Event:  user.HumanPasswordlessTokenSignCountChangedType,
-					Reduce: p.reducePasskeySignCountSet,
-				},
-				{
-					Event:  user.HumanPasswordlessTokenRemovedType,
-					Reduce: p.reducePasskeyRemoved,
-				},
-
-				{
-					Event:  user.HumanU2FTokenAddedType,
-					Reduce: p.reducePasskeyAdded,
-				},
-				{
-					Event:  user.HumanU2FTokenVerifiedType,
-					Reduce: p.reducePasskeyVerified,
-				},
-				{
-					Event:  user.HumanU2FTokenSignCountChangedType,
-					Reduce: p.reducePasskeySignCountSet,
-				},
-				{
-					Event:  user.HumanU2FTokenRemovedType,
-					Reduce: p.reducePasskeyRemoved,
-				},
-
-				{
-					Event:  user.HumanPasswordlessInitCodeAddedType,
-					Reduce: p.reducePasskeyInitCodeAdded,
-				},
-				{
-					Event:  user.HumanPasswordlessInitCodeCheckFailedType,
-					Reduce: p.reducePasskeyInitCodeCheckFailed,
-				},
-				{
-					Event:  user.HumanPasswordlessInitCodeCheckSucceededType,
-					Reduce: p.reducePasskeyInitCodeCheckSucceeded,
-				},
-				{
-					Event:  user.HumanPasswordlessInitCodeRequestedType,
-					Reduce: p.reducePasskeyInitCodeRequested,
-				},
-				{
-					Event:  user.UserIDPLinkAddedType,
-					Reduce: p.reduceIDPLinkAdded,
-				},
-				{
-					Event:  user.UserIDPLinkCascadeRemovedType,
-					Reduce: p.reduceIDPLinkCascadeRemoved,
-				},
-				{
-					Event:  user.UserIDPLinkRemovedType,
-					Reduce: p.reduceIDPLinkRemoved,
-				},
-				{
-					Event:  user.UserIDPExternalIDMigratedType,
-					Reduce: p.reduceIDPLinkUserIDMigrated,
-				},
-				{
-					Event:  user.UserIDPExternalUsernameChangedType,
-					Reduce: p.reduceIDPLinkUsernameChanged,
-				},
-				{
-					Event:  user.HumanMFAOTPAddedType,
-					Reduce: p.reduceTOTPAdded,
-				},
-				{
-					Event:  user.UserV1MFAOTPAddedType,
-					Reduce: p.reduceTOTPAdded,
-				},
-				{
-					Event:  user.HumanMFAOTPVerifiedType,
-					Reduce: p.reduceTOTPVerified,
-				},
-				{
-					Event:  user.UserV1MFAOTPVerifiedType,
-					Reduce: p.reduceTOTPVerified,
-				},
-				{
-					Event:  user.HumanMFAOTPRemovedType,
-					Reduce: p.reduceTOTPRemoved,
-				},
-				{
-					Event:  user.UserV1MFAOTPRemovedType,
-					Reduce: p.reduceTOTPRemoved,
-				},
-				{
-					Event:  user.HumanMFAOTPCheckSucceededType,
-					Reduce: p.reduceTOTPCheckSucceeded,
-				},
-				{
-					Event:  user.UserV1MFAOTPCheckSucceededType,
-					Reduce: p.reduceTOTPCheckSucceeded,
-				},
-				{
-					Event:  user.HumanMFAOTPCheckFailedType,
-					Reduce: p.reduceTOTPCheckFailed,
-				},
-				{
-					Event:  user.UserV1MFAOTPCheckFailedType,
-					Reduce: p.reduceTOTPCheckFailed,
-				},
-				{
-					Event:  user.HumanOTPSMSAddedType,
-					Reduce: p.reduceOTPSMSEnabled,
-				},
-				{
-					Event:  user.HumanOTPSMSRemovedType,
-					Reduce: p.reduceOTPSMSDisabled,
-				},
-				{
-					Event:  user.HumanOTPSMSCheckSucceededType,
-					Reduce: p.reduceOTPSMSCheckSucceeded,
-				},
-				{
-					Event:  user.HumanOTPSMSCheckFailedType,
-					Reduce: p.reduceOTPSMSCheckFailed,
-				},
-				{
-					Event:  user.HumanOTPEmailAddedType,
-					Reduce: p.reduceOTPEmailEnabled,
-				},
-				{
-					Event:  user.HumanOTPEmailRemovedType,
-					Reduce: p.reduceOTPEmailDisabled,
-				},
-				{
-					Event:  user.HumanOTPEmailCheckSucceededType,
-					Reduce: p.reduceOTPEmailCheckSucceeded,
-				},
-				{
-					Event:  user.HumanOTPEmailCheckFailedType,
-					Reduce: p.reduceOTPEmailCheckFailed,
-				},
-				{
-					Event:  user.HumanInviteCodeAddedType,
-					Reduce: p.reduceInviteCodeAdded,
-				},
-				{
-					Event:  user.HumanInviteCheckSucceededType,
-					Reduce: p.reduceInviteCheckSucceeded,
-				},
-				{
-					Event:  user.HumanInviteCheckFailedType,
-					Reduce: p.reduceInviteCheckFailed,
-				},
-				{
-					Event:  user.HumanRecoveryCodesAddedType,
-					Reduce: p.reduceRecoveryCodesAdded,
-				},
-				{
-					Event:  user.HumanRecoveryCodesRemovedType,
-					Reduce: p.reduceRecoveryCodesRemoved,
-				},
-				{
-					Event:  user.HumanRecoveryCodeCheckSucceededType,
-					Reduce: p.reduceRecoveryCodeCheckSucceeded,
-				},
-				{
-					Event:  user.HumanRecoveryCodeCheckFailedType,
-					Reduce: p.reduceRecoveryCodeCheckFailed,
-				},
-			},
-		},
-	}
-}
-
-func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -482,8 +54,6 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 			State:          domain.UserStateActive,
 			CreatedAt:      e.CreatedAt(),
 			UpdatedAt:      e.CreatedAt(),
-			// TODO check when to set username unique
-			// IsUsernameOrgUnique: ,
 			Human: &domain.HumanUser{
 				FirstName:         e.FirstName,
 				LastName:          e.LastName,
@@ -501,7 +71,7 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanRegistered(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanRegisteredEvent](event)
 	if err != nil {
 		return nil, err
@@ -539,8 +109,6 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 			State:          domain.UserStateActive,
 			CreatedAt:      e.CreatedAt(),
 			UpdatedAt:      e.CreatedAt(),
-			// TODO check when to set username unique
-			// IsUsernameOrgUnique: ,
 			Human: &domain.HumanUser{
 				FirstName:         e.FirstName,
 				LastName:          e.LastName,
@@ -558,30 +126,47 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceUserLocked(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceUserLocked(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UserLockedEvent](event)
 	if err != nil {
 		return nil, err
 	}
 
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
-		}
-		repo := repository.UserRepository()
-		_, err := repo.Update(
-			ctx,
-			v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
-			repo.SetState(domain.UserStateLocked),
-			repo.SetUpdatedAt(e.CreatedAt()),
-		)
-		return err
-	}), nil
+	return handler.NewMultiStatement(e,
+		handler.AddStatement(func(ctx context.Context, ex handler.Executer, projectionName string) error {
+			tx, ok := ex.(*sql.Tx)
+			if !ok {
+				return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			}
+			repo := repository.UserRepository()
+			_, err := repo.Update(
+				ctx,
+				v3_sql.SQLTx(tx),
+				repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
+				repo.SetState(domain.UserStateLocked),
+				repo.SetUpdatedAt(e.CreatedAt()),
+			)
+			return err
+		}),
+		handler.AddStatement(func(ctx context.Context, ex handler.Executer, projectionName string) error {
+			tx, ok := ex.(*sql.Tx)
+			if !ok {
+				return zerrors.ThrowInvalidArgumentf(nil, "HANDL-fcxV68", "reduce.wrong.db.pool %T", ex)
+			}
+			v3Tx := v3_sql.SQLTx(tx)
+
+			sessionRepo := repository.SessionRepository()
+			condition := database.And(
+				sessionRepo.InstanceIDCondition(event.Aggregate().InstanceID),
+				sessionRepo.UserIDCondition(event.Aggregate().ID),
+			)
+			_, err := sessionRepo.Delete(ctx, v3Tx, condition)
+			return err
+		}),
+	), nil
 }
 
-func (p *userRelationalProjection) reduceUserUnlocked(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceUserUnlocked(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UserUnlockedEvent](event)
 	if err != nil {
 		return nil, err
@@ -604,30 +189,47 @@ func (p *userRelationalProjection) reduceUserUnlocked(event eventstore.Event) (*
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceUserDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceUserDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UserDeactivatedEvent](event)
 	if err != nil {
 		return nil, err
 	}
 
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
-		}
-		repo := repository.UserRepository()
-		_, err := repo.Update(
-			ctx,
-			v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
-			repo.SetState(domain.UserStateInactive),
-			repo.SetUpdatedAt(e.CreatedAt()),
-		)
-		return err
-	}), nil
+	return handler.NewMultiStatement(event,
+		handler.AddStatement(func(ctx context.Context, ex handler.Executer, projectionName string) error {
+			tx, ok := ex.(*sql.Tx)
+			if !ok {
+				return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			}
+			repo := repository.UserRepository()
+			_, err := repo.Update(
+				ctx,
+				v3_sql.SQLTx(tx),
+				repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
+				repo.SetState(domain.UserStateInactive),
+				repo.SetUpdatedAt(e.CreatedAt()),
+			)
+			return err
+		}),
+		handler.AddStatement(func(ctx context.Context, ex handler.Executer, projectionName string) error {
+			tx, ok := ex.(*sql.Tx)
+			if !ok {
+				return zerrors.ThrowInvalidArgumentf(nil, "HANDL-fcxV68", "reduce.wrong.db.pool %T", ex)
+			}
+			v3Tx := v3_sql.SQLTx(tx)
+
+			sessionRepo := repository.SessionRepository()
+			condition := database.And(
+				sessionRepo.InstanceIDCondition(event.Aggregate().InstanceID),
+				sessionRepo.UserIDCondition(event.Aggregate().ID),
+			)
+			_, err := sessionRepo.Delete(ctx, v3Tx, condition)
+			return err
+		}),
+	), nil
 }
 
-func (p *userRelationalProjection) reduceUserReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceUserReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UserReactivatedEvent](event)
 	if err != nil {
 		return nil, err
@@ -650,7 +252,7 @@ func (p *userRelationalProjection) reduceUserReactivated(event eventstore.Event)
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UserRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -671,7 +273,7 @@ func (p *userRelationalProjection) reduceUserRemoved(event eventstore.Event) (*h
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceUsernameChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceUsernameChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UsernameChangedEvent](event)
 	if err != nil {
 		return nil, err
@@ -694,7 +296,7 @@ func (p *userRelationalProjection) reduceUsernameChanged(event eventstore.Event)
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceUserDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.DomainClaimedEvent](event)
 	if err != nil {
 		return nil, err
@@ -717,7 +319,7 @@ func (p *userRelationalProjection) reduceDomainClaimed(event eventstore.Event) (
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanProfileChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanProfileChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanProfileChangedEvent](event)
 	if err != nil {
 		return nil, err
@@ -765,7 +367,7 @@ func (p *userRelationalProjection) reduceHumanProfileChanged(event eventstore.Ev
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPhoneChangedEvent](event)
 	if err != nil {
 		return nil, err
@@ -789,7 +391,7 @@ func (p *userRelationalProjection) reduceHumanPhoneChanged(event eventstore.Even
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPhoneRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -811,7 +413,7 @@ func (p *userRelationalProjection) reduceHumanPhoneRemoved(event eventstore.Even
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanPhoneVerified(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanPhoneVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPhoneVerifiedEvent](event)
 	if err != nil {
 		return nil, err
@@ -835,7 +437,7 @@ func (p *userRelationalProjection) reduceHumanPhoneVerified(event eventstore.Eve
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanPhoneCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanPhoneCodeAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPhoneCodeAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -865,7 +467,7 @@ func (p *userRelationalProjection) reduceHumanPhoneCodeAdded(event eventstore.Ev
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanPhoneVerificationFailed(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanPhoneVerificationFailed(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPhoneVerificationFailedEvent](event)
 	if err != nil {
 		return nil, err
@@ -888,7 +490,7 @@ func (p *userRelationalProjection) reduceHumanPhoneVerificationFailed(event even
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanEmailChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanEmailChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanEmailChangedEvent](event)
 	if err != nil {
 		return nil, err
@@ -913,7 +515,7 @@ func (p *userRelationalProjection) reduceHumanEmailChanged(event eventstore.Even
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanEmailVerified(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanEmailVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanEmailVerifiedEvent](event)
 	if err != nil {
 		return nil, err
@@ -936,7 +538,7 @@ func (p *userRelationalProjection) reduceHumanEmailVerified(event eventstore.Eve
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanEmailCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanEmailCodeAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanEmailCodeAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -966,7 +568,7 @@ func (p *userRelationalProjection) reduceHumanEmailCodeAdded(event eventstore.Ev
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanEmailVerificationFailed(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanEmailVerificationFailed(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanEmailVerificationFailedEvent](event)
 	if err != nil {
 		return nil, err
@@ -989,7 +591,7 @@ func (p *userRelationalProjection) reduceHumanEmailVerificationFailed(event even
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanAvatarAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1011,7 +613,7 @@ func (p *userRelationalProjection) reduceHumanAvatarAdded(event eventstore.Event
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanAvatarRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1033,30 +635,56 @@ func (p *userRelationalProjection) reduceHumanAvatarRemoved(event eventstore.Eve
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPasswordChangedEvent](event)
 	if err != nil {
 		return nil, err
 	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
-		}
-		repo := repository.HumanUserRepository()
+	return handler.NewMultiStatement(e,
+		handler.AddStatement(func(ctx context.Context, ex handler.Executer, projectionName string) error {
+			tx, ok := ex.(*sql.Tx)
+			if !ok {
+				return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			}
+			repo := repository.HumanUserRepository()
 
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetPasswordChangeRequired(e.ChangeRequired),
-			repo.SetPassword(crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)),
-			repo.SetResetPasswordVerification(&domain.VerificationTypeSucceeded{VerifiedAt: e.CreatedAt()}),
-			repo.SetUpdatedAt(e.CreatedAt()),
-		)
-		return err
-	}), nil
+			_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+				repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+				repo.SetPasswordChangeRequired(e.ChangeRequired),
+				repo.SetPassword(crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)),
+				repo.SetResetPasswordVerification(&domain.VerificationTypeSucceeded{VerifiedAt: e.CreatedAt()}),
+				repo.SetUpdatedAt(e.CreatedAt()),
+			)
+			return err
+		}),
+		handler.AddStatement(func(ctx context.Context, ex handler.Executer, projectionName string) error {
+			tx, ok := ex.(*sql.Tx)
+			if !ok {
+				return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			}
+			v3Tx := v3_sql.SQLTx(tx)
+
+			sessionRepo := repository.SessionRepository()
+			condition := database.And(
+				sessionRepo.InstanceIDCondition(e.Aggregate().InstanceID),
+				sessionRepo.UserIDCondition(e.Aggregate().ID),
+				sessionRepo.ExistsFactor(
+					database.And(
+						sessionRepo.FactorConditions().FactorTypeCondition(domain.SessionFactorTypePassword),
+						sessionRepo.FactorConditions().LastVerifiedBeforeCondition(e.CreatedAt()),
+					),
+				),
+			)
+			_, err = sessionRepo.Update(ctx, v3Tx, condition,
+				sessionRepo.SetUpdatedAt(e.CreatedAt()),
+				sessionRepo.ClearFactor(domain.SessionFactorTypePassword),
+			)
+			return err
+		}),
+	), nil
 }
 
-func (p *userRelationalProjection) reduceHumanPasswordCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanPasswordCodeAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPasswordCodeAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1085,7 +713,7 @@ func (p *userRelationalProjection) reduceHumanPasswordCodeAdded(event eventstore
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanPasswordCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanPasswordCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPasswordCheckSucceededEvent](event)
 	if err != nil {
 		return nil, err
@@ -1105,7 +733,7 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckSucceeded(event event
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanPasswordCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanPasswordCheckFailed(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPasswordCheckFailedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1125,7 +753,7 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckFailed(event eventsto
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceHumanPasswordHashUpdated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceHumanPasswordHashUpdated(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPasswordHashUpdatedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1145,7 +773,7 @@ func (p *userRelationalProjection) reduceHumanPasswordHashUpdated(event eventsto
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceMachineSecretSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceMachineSecretSet(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.MachineSecretSetEvent](event)
 	if err != nil {
 		return nil, err
@@ -1168,7 +796,7 @@ func (p *userRelationalProjection) reduceMachineSecretSet(event eventstore.Event
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceMachineSecretHashUpdated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceMachineSecretHashUpdated(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.MachineSecretHashUpdatedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1189,7 +817,7 @@ func (p *userRelationalProjection) reduceMachineSecretHashUpdated(event eventsto
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceMachineSecretRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceMachineSecretRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.MachineSecretRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1211,7 +839,7 @@ func (p *userRelationalProjection) reduceMachineSecretRemoved(event eventstore.E
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceMachineKeyAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceMachineKeyAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.MachineKeyAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1237,7 +865,7 @@ func (p *userRelationalProjection) reduceMachineKeyAdded(event eventstore.Event)
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceMachineKeyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceMachineKeyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.MachineKeyRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1257,7 +885,7 @@ func (p *userRelationalProjection) reduceMachineKeyRemoved(event eventstore.Even
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceMachineAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.MachineAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1275,11 +903,9 @@ func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*
 				InstanceID:     e.Aggregate().InstanceID,
 				OrganizationID: e.Aggregate().ResourceOwner,
 				Username:       e.UserName,
-				// TODO check when to set username unique
-				// IsUsernameOrgUnique: ,
-				State:     domain.UserStateActive,
-				CreatedAt: e.CreatedAt(),
-				UpdatedAt: e.CreatedAt(),
+				State:          domain.UserStateActive,
+				CreatedAt:      e.CreatedAt(),
+				UpdatedAt:      e.CreatedAt(),
 				Machine: &domain.MachineUser{
 					Name:            e.Name,
 					Description:     e.Description,
@@ -1290,7 +916,7 @@ func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceMachineChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceMachineChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.MachineChangedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1326,7 +952,7 @@ func (p *userRelationalProjection) reduceMachineChanged(event eventstore.Event) 
 	}), nil
 }
 
-func (p *userRelationalProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.PersonalAccessTokenAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1350,7 +976,7 @@ func (p *userRelationalProjection) reducePersonalAccessTokenAdded(event eventsto
 	}), nil
 }
 
-func (p *userRelationalProjection) reducePersonalAccessTokenRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePersonalAccessTokenRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.PersonalAccessTokenRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1369,7 +995,7 @@ func (p *userRelationalProjection) reducePersonalAccessTokenRemoved(event events
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceUserMetadataSet(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.MetadataSetEvent](event)
 	if err != nil {
 		return nil, err
@@ -1393,7 +1019,7 @@ func (p *userRelationalProjection) reduceMetadataSet(event eventstore.Event) (*h
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceMetadataRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceUserMetadataRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.MetadataRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1412,7 +1038,7 @@ func (p *userRelationalProjection) reduceMetadataRemoved(event eventstore.Event)
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceMetadataRemovedAll(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceUserMetadataRemovedAll(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.MetadataRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1431,7 +1057,7 @@ func (p *userRelationalProjection) reduceMetadataRemovedAll(event eventstore.Eve
 	}), nil
 }
 
-func (p *userRelationalProjection) reducePasskeyAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasskeyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var (
 		e   user.HumanWebAuthNAddedEvent
 		typ domain.PasskeyType
@@ -1470,7 +1096,7 @@ func (p *userRelationalProjection) reducePasskeyAdded(event eventstore.Event) (*
 	}), nil
 }
 
-func (p *userRelationalProjection) reducePasskeyVerified(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasskeyVerified(event eventstore.Event) (*handler.Statement, error) {
 	var (
 		e user.HumanWebAuthNVerifiedEvent
 	)
@@ -1507,7 +1133,7 @@ func (p *userRelationalProjection) reducePasskeyVerified(event eventstore.Event)
 	}), nil
 }
 
-func (p *userRelationalProjection) reducePasskeySignCountSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasskeySignCountSet(event eventstore.Event) (*handler.Statement, error) {
 	var (
 		e user.HumanWebAuthNSignCountChangedEvent
 	)
@@ -1537,7 +1163,7 @@ func (p *userRelationalProjection) reducePasskeySignCountSet(event eventstore.Ev
 	}), nil
 }
 
-func (p *userRelationalProjection) reducePasskeyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasskeyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var (
 		e user.HumanWebAuthNRemovedEvent
 	)
@@ -1565,7 +1191,7 @@ func (p *userRelationalProjection) reducePasskeyRemoved(event eventstore.Event) 
 	}), nil
 }
 
-func (p *userRelationalProjection) reducePasskeyInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasskeyInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPasswordlessInitCodeAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1590,7 +1216,7 @@ func (p *userRelationalProjection) reducePasskeyInitCodeAdded(event eventstore.E
 	}), nil
 }
 
-func (p *userRelationalProjection) reducePasskeyInitCodeCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasskeyInitCodeCheckFailed(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPasswordlessInitCodeCheckFailedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1613,7 +1239,7 @@ func (p *userRelationalProjection) reducePasskeyInitCodeCheckFailed(event events
 	}), nil
 }
 
-func (p *userRelationalProjection) reducePasskeyInitCodeCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasskeyInitCodeCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPasswordlessInitCodeCheckSucceededEvent](event)
 	if err != nil {
 		return nil, err
@@ -1636,7 +1262,7 @@ func (p *userRelationalProjection) reducePasskeyInitCodeCheckSucceeded(event eve
 	}), nil
 }
 
-func (p *userRelationalProjection) reducePasskeyInitCodeRequested(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reducePasskeyInitCodeRequested(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanPasswordlessInitCodeRequestedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1661,7 +1287,7 @@ func (p *userRelationalProjection) reducePasskeyInitCodeRequested(event eventsto
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceMFAInitSkipped(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanMFAInitSkippedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1682,7 +1308,7 @@ func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) 
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceIDPLinkAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPLinkAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UserIDPLinkAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1708,7 +1334,7 @@ func (p *userRelationalProjection) reduceIDPLinkAdded(event eventstore.Event) (*
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceIDPLinkCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPLinkCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UserIDPLinkCascadeRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1728,7 +1354,7 @@ func (p *userRelationalProjection) reduceIDPLinkCascadeRemoved(event eventstore.
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceIDPLinkRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPLinkRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UserIDPLinkRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1748,7 +1374,7 @@ func (p *userRelationalProjection) reduceIDPLinkRemoved(event eventstore.Event) 
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceIDPLinkUserIDMigrated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPLinkUserIDMigrated(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UserIDPExternalIDMigratedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1771,7 +1397,7 @@ func (p *userRelationalProjection) reduceIDPLinkUserIDMigrated(event eventstore.
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPLinkUsernameChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UserIDPExternalUsernameEvent](event)
 	if err != nil {
 		return nil, err
@@ -1794,7 +1420,7 @@ func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceTOTPAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceTOTPAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1814,7 +1440,7 @@ func (p *userRelationalProjection) reduceTOTPAdded(event eventstore.Event) (*han
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceTOTPVerified(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceTOTPVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPVerifiedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1834,7 +1460,7 @@ func (p *userRelationalProjection) reduceTOTPVerified(event eventstore.Event) (*
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceTOTPRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceTOTPRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1854,7 +1480,7 @@ func (p *userRelationalProjection) reduceTOTPRemoved(event eventstore.Event) (*h
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceTOTPCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceTOTPCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPCheckSucceededEvent](event)
 	if err != nil {
 		return nil, err
@@ -1874,7 +1500,7 @@ func (p *userRelationalProjection) reduceTOTPCheckSucceeded(event eventstore.Eve
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceTOTPCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceTOTPCheckFailed(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPCheckFailedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1894,7 +1520,7 @@ func (p *userRelationalProjection) reduceTOTPCheckFailed(event eventstore.Event)
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceOTPSMSEnabled(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOTPSMSEnabled(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPSMSAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1915,7 +1541,7 @@ func (p *userRelationalProjection) reduceOTPSMSEnabled(event eventstore.Event) (
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceOTPSMSDisabled(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOTPSMSDisabled(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPSMSRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1936,7 +1562,7 @@ func (p *userRelationalProjection) reduceOTPSMSDisabled(event eventstore.Event) 
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceOTPSMSCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOTPSMSCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPSMSCheckSucceededEvent](event)
 	if err != nil {
 		return nil, err
@@ -1956,7 +1582,7 @@ func (p *userRelationalProjection) reduceOTPSMSCheckSucceeded(event eventstore.E
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceOTPSMSCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOTPSMSCheckFailed(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPSMSCheckFailedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1976,7 +1602,7 @@ func (p *userRelationalProjection) reduceOTPSMSCheckFailed(event eventstore.Even
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceOTPEmailEnabled(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOTPEmailEnabled(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPEmailAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -1996,7 +1622,7 @@ func (p *userRelationalProjection) reduceOTPEmailEnabled(event eventstore.Event)
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceOTPEmailDisabled(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOTPEmailDisabled(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPEmailRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -2016,7 +1642,7 @@ func (p *userRelationalProjection) reduceOTPEmailDisabled(event eventstore.Event
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceOTPEmailCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOTPEmailCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPEmailCheckSucceededEvent](event)
 	if err != nil {
 		return nil, err
@@ -2036,7 +1662,7 @@ func (p *userRelationalProjection) reduceOTPEmailCheckSucceeded(event eventstore
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceOTPEmailCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOTPEmailCheckFailed(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanOTPEmailCheckFailedEvent](event)
 	if err != nil {
 		return nil, err
@@ -2056,7 +1682,7 @@ func (p *userRelationalProjection) reduceOTPEmailCheckFailed(event eventstore.Ev
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceInviteCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceInviteCodeAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanInviteCodeAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -2086,7 +1712,7 @@ func (p *userRelationalProjection) reduceInviteCodeAdded(event eventstore.Event)
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceInviteCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceInviteCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanInviteCheckSucceededEvent](event)
 	if err != nil {
 		return nil, err
@@ -2109,7 +1735,7 @@ func (p *userRelationalProjection) reduceInviteCheckSucceeded(event eventstore.E
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceInviteCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceInviteCheckFailed(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanInviteCheckFailedEvent](event)
 	if err != nil {
 		return nil, err
@@ -2132,7 +1758,7 @@ func (p *userRelationalProjection) reduceInviteCheckFailed(event eventstore.Even
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceRecoveryCodesAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceRecoveryCodesAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanRecoveryCodesAddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -2152,7 +1778,7 @@ func (p *userRelationalProjection) reduceRecoveryCodesAdded(event eventstore.Eve
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceRecoveryCodesRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceRecoveryCodesRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanRecoveryCodesRemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -2172,7 +1798,7 @@ func (p *userRelationalProjection) reduceRecoveryCodesRemoved(event eventstore.E
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceRecoveryCodeCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceRecoveryCodeCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanRecoveryCodeCheckSucceededEvent](event)
 	if err != nil {
 		return nil, err
@@ -2193,7 +1819,7 @@ func (p *userRelationalProjection) reduceRecoveryCodeCheckSucceeded(event events
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceRecoveryCodeCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceRecoveryCodeCheckFailed(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.HumanRecoveryCodeCheckFailedEvent](event)
 	if err != nil {
 		return nil, err
