@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Geheim kon niet worden gegenereerd"
     PAT:
       NotFound: "Persoonlijk toegangstoken niet gevonden"
+    Metadata:
+      Conflicting: "Metadata mogen niet tegelijkertijd in de velden [user] en [human] worden ingesteld"
     NotHuman: "De gebruiker moet persoonlijk zijn"
     NotMachine: "De gebruiker moet technisch zijn"
     WrongType: "Niet toegestaan voor dit gebruikerstype"
