@@ -201,7 +201,6 @@ func optionsFromURL(c Config) (*redis.Options, error) {
 	}
 
 	opts.DisableIdentity = c.DisableIndentity
-	opts.DisableIndentity = c.DisableIndentity
 	if c.IdentitySuffix != "" {
 		opts.IdentitySuffix = c.IdentitySuffix
 	}
