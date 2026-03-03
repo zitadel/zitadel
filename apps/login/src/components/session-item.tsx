@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Avatar } from "./avatar";
 import { Translated } from "./translated";
-import { handleServerActionResponse } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { AutoSubmitForm } from "./auto-submit-form";
 
 export function isSessionValid(session: Partial<Session>): {
