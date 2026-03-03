@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -39,6 +40,7 @@ type Config struct {
 	// semantics used in non-DSN mode (e.g. via useAdmin) do not apply.
 	DSN       string
 	parsedDSN *pgxpool.Config `mapstructure:"-"`
+	parseOnce sync.Once       `mapstructure:"-"`
 
 	Host             string
 	Port             int32
@@ -177,23 +179,42 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 	return stdlib.OpenDBFromPool(pool), pool, nil
 }
 
+// ensureParsedDSN lazily parses the DSN on first access so that accessors
+// return correct values even if Decode() was not called.
+func (c *Config) ensureParsedDSN() *pgxpool.Config {
+	if c.DSN == "" {
+		return nil
+	}
+	c.parseOnce.Do(func() {
+		if c.parsedDSN == nil {
+			parsed, err := pgxpool.ParseConfig(c.DSN)
+			if err != nil {
+				logging.WithError(err).Warn("failed to parse PostgreSQL DSN")
+				return
+			}
+			c.parsedDSN = parsed
+		}
+	})
+	return c.parsedDSN
+}
+
 func (c *Config) DatabaseName() string {
-	if c.parsedDSN != nil {
-		return c.parsedDSN.ConnConfig.Database
+	if parsed := c.ensureParsedDSN(); parsed != nil {
+		return parsed.ConnConfig.Database
 	}
 	return c.Database
 }
 
 func (c *Config) Username() string {
-	if c.parsedDSN != nil {
-		return c.parsedDSN.ConnConfig.User
+	if parsed := c.ensureParsedDSN(); parsed != nil {
+		return parsed.ConnConfig.User
 	}
 	return c.User.Username
 }
 
 func (c *Config) Password() string {
-	if c.parsedDSN != nil {
-		return c.parsedDSN.ConnConfig.Password
+	if parsed := c.ensureParsedDSN(); parsed != nil {
+		return parsed.ConnConfig.Password
 	}
 	return c.User.Password
 }
