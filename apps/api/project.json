@@ -173,12 +173,15 @@
             "dependsOn": [
                 "generate"
             ],
-            "command": "go test -count 1 -tags integration -timeout 60m -v ./tests/integration/...",
+            "command": "rm -rf .artifacts/api-test-integration/coverage && mkdir -p .artifacts/api-test-integration/coverage && GOCOVERDIR=.artifacts/api-test-integration/coverage go test -cover -count 1 -tags integration -timeout 60m -v ./tests/integration/... && go tool covdata textfmt -i=.artifacts/api-test-integration/coverage -o=profile.api.test-integration.cov",
             "inputs": [
                 "sources",
                 "{workspaceRoot}/internal/integration/**",
                 "{workspaceRoot}/tests/integration/**",
                 "{workspaceRoot}/go*"
+            ],
+            "outputs": [
+                "{workspaceRoot}/profile.api.test-integration.cov"
             ]
         },
         "test-integration-race": {
@@ -186,7 +189,7 @@
             "dependsOn": [
                 "generate"
             ],
-            "command": "go test -race -count 1 -tags integration -timeout 60m -v ./tests/integration/...",
+            "command": "mkdir -p .artifacts/api-test-integration && GORACE=log_path=.artifacts/api-test-integration/race.log go test -race -count 1 -tags integration -timeout 60m -v ./tests/integration/...",
             "inputs": [
                 "sources",
                 "{workspaceRoot}/internal/integration/**",

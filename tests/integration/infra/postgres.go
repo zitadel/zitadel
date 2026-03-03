@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -25,8 +26,7 @@ func (c PostgresConfig) ConnectionString() string {
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", c.User, c.Password, c.Host, c.Port, c.Database)
 }
 
-// StartPostgres starts a Postgres 18 container with tuning matching the
-// devcontainer's db-api-integration service.
+// StartPostgres starts a Postgres 18 container with tuning used for integration tests.
 func StartPostgres(ctx context.Context, logw io.Writer) (*postgres.PostgresContainer, *PostgresConfig, error) {
 	const (
 		user     = "postgres"
@@ -34,8 +34,7 @@ func StartPostgres(ctx context.Context, logw io.Writer) (*postgres.PostgresConta
 		dbname   = "zitadel"
 	)
 
-	container, err := postgres.Run(ctx, "postgres:18",
-		testcontainers.WithReuseByName("zitadel-integration-postgres"),
+	options := []testcontainers.ContainerCustomizer{
 		testcontainers.WithLogger(log.New(logw, "[testcontainers/postgres] ", log.LstdFlags)),
 		postgres.WithDatabase(dbname),
 		postgres.WithUsername(user),
@@ -43,7 +42,7 @@ func StartPostgres(ctx context.Context, logw io.Writer) (*postgres.PostgresConta
 		testcontainers.WithEnv(map[string]string{
 			"POSTGRES_HOST_AUTH_METHOD": "trust",
 		}),
-		// Match the performance tuning from .devcontainer/docker-compose.yaml
+		// Match existing integration-test performance tuning.
 		postgres.BasicWaitStrategies(),
 		// pass postgres tuning flags; BasicWaitStrategies() above handles readiness
 		testcontainers.CustomizeRequest(testcontainers.GenericContainerRequest{
@@ -60,7 +59,11 @@ func StartPostgres(ctx context.Context, logw io.Writer) (*postgres.PostgresConta
 				},
 			},
 		}),
-	)
+	}
+	if os.Getenv("INTEGRATION_REUSE_CONTAINERS") == "true" {
+		options = append(options, testcontainers.WithReuseByName("zitadel-integration-postgres"))
+	}
+	container, err := postgres.Run(ctx, "postgres:18", options...)
 	if err != nil {
 		return nil, nil, fmt.Errorf("start postgres container: %w", err)
 	}

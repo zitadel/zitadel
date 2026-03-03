@@ -180,17 +180,7 @@ func TestIntegration(t *testing.T) {
 	cmd := exec.CommandContext(ctx, "go", args...)
 	cmd.Dir = "." // repo root
 
-	// Put the child in its own process group so we can kill the entire tree
-	// on cleanup, preventing orphaned go-test / go-build processes.
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	cmd.Cancel = func() error {
-		// Send SIGTERM to the entire process group (negative PID).
-		if cmd.Process != nil {
-			return syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM)
-		}
-		return nil
-	}
-	cmd.WaitDelay = 10 * time.Second // fallback SIGKILL after 10s
+	configureChildCommand(cmd)
 
 	// Route all test output through the single orchestrator log writer.
 	cmd.Stdout = logw
@@ -206,7 +196,7 @@ func TestIntegration(t *testing.T) {
 // discoverIntegrationPackages finds all Go packages matching the integration test pattern.
 // It returns the packages to run and the packages that were skipped (v2beta).
 func discoverIntegrationPackages() (packages []string, skipped []string, err error) {
-	cmd := exec.Command("go", "list", "-tags", "integration", "./...")
+	cmd := exec.Command("go", "list", "-tags", "integration", "./internal/...")
 	cmd.Dir = "."
 	out, err := cmd.Output()
 	if err != nil {
