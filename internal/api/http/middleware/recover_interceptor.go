@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/zitadel/sloggcp"
+
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )

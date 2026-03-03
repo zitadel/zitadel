@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/csrf"
-	old_logging "github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/build"

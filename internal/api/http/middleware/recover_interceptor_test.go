@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -22,7 +23,7 @@ func TestRecoverHandler(t *testing.T) {
 			name: "no panic",
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				io.WriteString(w, "ok")
+				io.WriteString(w, "ok") //nolint:errcheck
 			},
 			wantStatus: http.StatusOK,
 			wantBody:   "ok",
@@ -86,5 +87,5 @@ func TestRecoverHandlerWithError(t *testing.T) {
 
 func writeResponse(w http.ResponseWriter, _ *http.Request, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
-	io.WriteString(w, err.Error())
+	io.WriteString(w, err.Error()) //nolint:errcheck
 }
