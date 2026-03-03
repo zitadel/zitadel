@@ -195,10 +195,6 @@ Errors:
     RefreshToken:
       Invalid: "Токенът за опресняване е невалиден"
       NotFound: "Токенът за обновяване не е намерен"
-  Instance:
-    NotFound: "Екземплярът не е намерен"
-    AlreadyExists: "Екземплярът вече съществува"
-    NotChanged: "Екземплярът не е променен"
   Org:
     AlreadyExists: "Името или идентификационният номер на организацията вече е зает."
     Invalid: "Организацията е невалидна"
@@ -345,7 +341,9 @@ Errors:
       NotActive: "Грантът по проекта не е активен"
       NotInactive: "Грантът по проекта не е неактивен"
   Instance:
-    NotFound: "IAM не е намерен. Уверете се, че сте получили правилния домейн. Вижте https://zitadel.com/docs/apis/introduction#domains"
+    AlreadyExists: "Екземплярът вече съществува"
+    NotChanged: "Екземплярът не е променен"
+    NotFound: "Екземплярът не е намерен. Уверете се, че сте получили правилния домейн. Вижте https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Ролите не са сменени"
     MemberInvalid: "Членът е невалиден"
