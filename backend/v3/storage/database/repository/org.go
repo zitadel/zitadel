@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -81,16 +82,21 @@ func (o org) List(ctx context.Context, client database.QueryExecutor, opts ...da
 	return scanOrganizations(ctx, client, &builder)
 }
 
-const createOrganizationStmt = `INSERT INTO zitadel.organizations (id, name, instance_id, state)` +
-	` VALUES ($1, $2, $3, $4)` +
-	` RETURNING created_at, updated_at`
+const createOrganizationStmtPrefix = `INSERT INTO zitadel.organizations (id, name, instance_id, state, created_at, updated_at)` +
+	` VALUES ($1, $2, $3, $4, `
+const createOrganizationStmtSuffix = `) RETURNING created_at, updated_at`
 
 // Create implements [domain.OrganizationRepository].
 func (o org) Create(ctx context.Context, client database.QueryExecutor, organization *domain.Organization) error {
 	builder := database.StatementBuilder{}
 	builder.AppendArgs(organization.ID, organization.Name, organization.InstanceID, organization.State)
-	builder.WriteString(createOrganizationStmt)
-
+	builder.WriteString(createOrganizationStmtPrefix)
+	var createdAt any = database.DefaultInstruction
+	if !organization.CreatedAt.IsZero() {
+		createdAt = organization.CreatedAt
+	}
+	builder.WriteArgs(createdAt, createdAt)
+	builder.WriteString(createOrganizationStmtSuffix)
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
 }
 
@@ -145,6 +151,11 @@ func (o org) SetName(name string) database.Change {
 // SetState implements [domain.organizationChanges].
 func (o org) SetState(state domain.OrgState) database.Change {
 	return database.NewChange(o.StateColumn(), state)
+}
+
+// SetUpdatedAt implements [domain.organizationChanges].
+func (o org) SetUpdatedAt(updatedAt time.Time) database.Change {
+	return database.NewChange(o.UpdatedAtColumn(), updatedAt)
 }
 
 // -------------------------------------------------------------
