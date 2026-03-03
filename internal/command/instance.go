@@ -648,7 +648,7 @@ func setupAdmins(commands *Commands,
 		human.ID = humanUserID
 
 		*validations = append(*validations,
-			// We no loner send an init mail anymore if no auth method is set.
+			// We no longer send an init mail anymore even if no auth method is set.
 			// This allows us to create the initial user without a password and send them an invitation mail if needed later on,
 			// which will be a necessary step for the new onboarding flow in the customer portal.
 			// Also since login v2 is now the default, we anyway wouldn't be able to handle the init link properly anymore.
