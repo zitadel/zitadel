@@ -27,12 +27,14 @@ export function getPage(slugs: string[] | undefined) {
   return { page: source.getPage(safeSlugs), source: source };
 }
 
-export function getPageImage(page: InferPageType<typeof source>) {
+type DocsPage = InferPageType<typeof source> | InferPageType<typeof versionSource>;
+
+export function getPageImage(page: DocsPage) {
   const segments = [...page.slugs, 'image.png'];
 
   return {
     segments,
-    url: `/og/docs/${segments.join('/')}`,
+    url: `/docs/og/docs/${segments.join('/')}`,
   };
 }
 

@@ -68,15 +68,36 @@ export async function generateMetadata(
   if (!description) {
     description = `Explore ZITADEL documentation for ${page.data.title}. Learn how to integrate, manage, and secure your applications with our comprehensive identity and access management solutions.`;
   }
+  const metadataDescription =
+    description.length > 200 ? description.substring(0, 197) + '...' : description;
+  const image = getPageImage(page).url;
 
   return {
     title: page.data.title,
-    description: description.length > 200 ? description.substring(0, 197) + '...' : description,
+    description: metadataDescription,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      images: getPageImage(page).url,
+      type: 'article',
+      url: canonicalUrl,
+      title: page.data.title,
+      description: metadataDescription,
+      siteName: 'ZITADEL Docs',
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: page.data.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: page.data.title,
+      description: metadataDescription,
+      images: [image],
     },
   };
 }
