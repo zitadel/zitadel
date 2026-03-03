@@ -14,6 +14,10 @@ import (
 
 type projectRole struct{}
 
+func (projectRole) qualifiedTableName() string {
+	return "zitadel.project_roles"
+}
+
 func (p projectRole) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.ProjectRole, error) {
 	builder, err := p.prepareQuery(opts)
 	if err != nil {
@@ -30,21 +34,32 @@ func (p projectRole) List(ctx context.Context, client database.QueryExecutor, op
 	return getMany[domain.ProjectRole](ctx, client, builder)
 }
 
-const insertProjectRoleStmt = `INSERT INTO zitadel.project_roles(
-	instance_id, organization_id, project_id, key, display_name, role_group
-)
-VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING created_at, updated_at`
-
 func (p projectRole) Create(ctx context.Context, client database.QueryExecutor, role *domain.ProjectRole) error {
-	builder := database.NewStatementBuilder(insertProjectRoleStmt,
+	var (
+		builder              database.StatementBuilder
+		createdAt, updatedAt any = database.NowInstruction, database.NowInstruction
+	)
+	if !role.CreatedAt.IsZero() {
+		createdAt = role.CreatedAt
+	}
+	if !role.UpdatedAt.IsZero() {
+		updatedAt = role.UpdatedAt
+	}
+
+	builder.WriteString("INSERT INTO ")
+	builder.WriteString(p.qualifiedTableName())
+	builder.WriteString(` (instance_id, organization_id, project_id, key, display_name, role_group, created_at, updated_at) VALUES (`)
+	builder.WriteArgs(
 		role.InstanceID,
 		role.OrganizationID,
 		role.ProjectID,
 		role.Key,
 		role.DisplayName,
 		role.RoleGroup,
+		createdAt,
+		updatedAt,
 	)
+	builder.WriteString(`) RETURNING created_at, updated_at`)
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).
 		Scan(&role.CreatedAt, &role.UpdatedAt)
 }

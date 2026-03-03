@@ -48,11 +48,10 @@ func (a authorization) Create(ctx context.Context, client database.QueryExecutor
 		updatedAt = authorization.UpdatedAt
 	}
 
-	builder := database.NewStatementBuilder("WITH roles AS (INSERT INTO zitadel.authorization_roles (instance_id, authorization_id, grant_id, project_id, role_key)"+
-		" VALUES ($1, $2, $3, $4, unnest($5::text[]))) INSERT INTO zitadel.authorizations (instance_id, id, grant_id, project_id, user_id, state, created_at, updated_at) VALUES ($1, $2, $3, $4, $6, $7, ",
-		authorization.InstanceID, authorization.ID, authorization.GrantID, authorization.ProjectID, authorization.Roles, authorization.UserID, authorization.State,
+	builder := database.NewStatementBuilder("WITH roles AS (INSERT INTO zitadel.authorization_roles (instance_id, authorization_id, grant_id, project_id, role_key)" +
+		" VALUES ($1, $2, $3, $4, unnest($5::text[]))) INSERT INTO zitadel.authorizations (instance_id, id, grant_id, project_id, user_id, state, created_at, updated_at) VALUES (",
 	)
-	builder.WriteArgs(createdAt, updatedAt)
+	builder.WriteArgs(authorization.InstanceID, authorization.ID, authorization.GrantID, authorization.ProjectID, authorization.Roles, authorization.UserID, authorization.State, createdAt, updatedAt)
 	builder.WriteString(") RETURNING created_at, updated_at")
 
 	if err := client.QueryRow(
