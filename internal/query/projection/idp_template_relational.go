@@ -56,119 +56,119 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.IDPConfigAddedEventType,
-					Reduce: p.reduceIDPRelationalAdded,
+					Reduce: p.reduceIDPAdded,
 				},
 				{
 					Event:  instance.IDPConfigChangedEventType,
-					Reduce: p.reduceIDPRelationalChanged,
+					Reduce: p.reduceIDPChanged,
 				},
 				{
 					Event:  instance.IDPConfigDeactivatedEventType,
-					Reduce: p.reduceIDRelationalPDeactivated,
+					Reduce: p.reduceIDPDeactivated,
 				},
 				{
 					Event:  instance.IDPConfigReactivatedEventType,
-					Reduce: p.reduceIDPRelationalReactivated,
+					Reduce: p.reduceIDPReactivated,
 				},
 				{
 					Event:  instance.IDPConfigRemovedEventType,
-					Reduce: p.reduceIDPRelationalRemoved,
+					Reduce: p.reduceIDPRemoved,
 				},
 				{
 					Event:  instance.IDPOIDCConfigAddedEventType,
-					Reduce: p.reduceOIDCRelationalConfigAdded,
+					Reduce: p.reduceOIDCConfigAdded,
 				},
 				{
 					Event:  instance.IDPOIDCConfigChangedEventType,
-					Reduce: p.reduceOIDCRelationalConfigChanged,
+					Reduce: p.reduceOIDCConfigChanged,
 				},
 				{
 					Event:  instance.IDPJWTConfigAddedEventType,
-					Reduce: p.reduceJWTRelationalConfigAdded,
+					Reduce: p.reduceJWTConfigAdded,
 				},
 				{
 					Event:  instance.IDPJWTConfigChangedEventType,
-					Reduce: p.reduceJWTRelationalConfigChanged,
+					Reduce: p.reduceJWTConfigChanged,
 				},
 				{
 					Event:  instance.OAuthIDPAddedEventType,
-					Reduce: p.reduceOAuthIDPRelationalAdded,
+					Reduce: p.reduceOAuthIDPAdded,
 				},
 				{
 					Event:  instance.OAuthIDPChangedEventType,
-					Reduce: p.reduceOAuthIDPRelationalChanged,
+					Reduce: p.reduceOAuthIDPChanged,
 				},
 				{
 					Event:  instance.OIDCIDPAddedEventType,
-					Reduce: p.reduceOIDCIDPRelationalAdded,
+					Reduce: p.reduceOIDCIDPAdded,
 				},
 				{
 					Event:  instance.OIDCIDPChangedEventType,
-					Reduce: p.reduceOIDCIDPRelationalChanged,
+					Reduce: p.reduceOIDCIDPChanged,
 				},
 				{
 					Event:  instance.OIDCIDPMigratedAzureADEventType,
-					Reduce: p.reduceOIDCIDPRelationalMigratedAzureAD,
+					Reduce: p.reduceOIDCIDPMigratedAzureAD,
 				},
 				{
 					Event:  instance.OIDCIDPMigratedGoogleEventType,
-					Reduce: p.reduceOIDCIDPRelationalMigratedGoogle,
+					Reduce: p.reduceOIDCIDPMigratedGoogle,
 				},
 				{
 					Event:  instance.JWTIDPAddedEventType,
-					Reduce: p.reduceJWTIDPRelationalAdded,
+					Reduce: p.reduceJWTIDPAdded,
 				},
 				{
 					Event:  instance.JWTIDPChangedEventType,
-					Reduce: p.reduceJWTIDPRelationalChanged,
+					Reduce: p.reduceJWTIDPChanged,
 				},
 				{
 					Event:  instance.AzureADIDPAddedEventType,
-					Reduce: p.reduceAzureADIDPRelationalAdded,
+					Reduce: p.reduceAzureADIDPAdded,
 				},
 				{
 					Event:  instance.AzureADIDPChangedEventType,
-					Reduce: p.reduceAzureADIDPRelationalChanged,
+					Reduce: p.reduceAzureADIDPChanged,
 				},
 				{
 					Event:  instance.GitHubIDPAddedEventType,
-					Reduce: p.reduceGitHubIDPRelationalAdded,
+					Reduce: p.reduceGitHubIDPAdded,
 				},
 				{
 					Event:  instance.GitHubIDPChangedEventType,
-					Reduce: p.reduceGitHubIDPRelationalChanged,
+					Reduce: p.reduceGitHubIDPChanged,
 				},
 				{
 					Event:  instance.GitHubEnterpriseIDPAddedEventType,
-					Reduce: p.reduceGitHubEnterpriseIDPRelationalAdded,
+					Reduce: p.reduceGitHubEnterpriseIDPAdded,
 				},
 				{
 					Event:  instance.GitHubEnterpriseIDPChangedEventType,
-					Reduce: p.reduceGitHubEnterpriseIDPRelationalChanged,
+					Reduce: p.reduceGitHubEnterpriseIDPChanged,
 				},
 				{
 					Event:  instance.GitLabIDPAddedEventType,
-					Reduce: p.reduceGitLabIDPRelationalAdded,
+					Reduce: p.reduceGitLabIDPAdded,
 				},
 				{
 					Event:  instance.GitLabIDPChangedEventType,
-					Reduce: p.reduceGitLabIDPRelationalChanged,
+					Reduce: p.reduceGitLabIDPChanged,
 				},
 				{
 					Event:  instance.GitLabSelfHostedIDPAddedEventType,
-					Reduce: p.reduceGitLabSelfHostedIDPRelationalAdded,
+					Reduce: p.reduceGitLabSelfHostedIDPAdded,
 				},
 				{
 					Event:  instance.GitLabSelfHostedIDPChangedEventType,
-					Reduce: p.reduceGitLabSelfHostedIDPRelationalChanged,
+					Reduce: p.reduceGitLabSelfHostedIDPChanged,
 				},
 				{
 					Event:  instance.GoogleIDPAddedEventType,
-					Reduce: p.reduceGoogleIDPRelationalAdded,
+					Reduce: p.reduceGoogleIDPAdded,
 				},
 				{
 					Event:  instance.GoogleIDPChangedEventType,
-					Reduce: p.reduceGoogleIDPRelationalChanged,
+					Reduce: p.reduceGoogleIDPChanged,
 				},
 				{
 					Event:  instance.LDAPIDPAddedEventType,
@@ -205,119 +205,119 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.IDPConfigAddedEventType,
-					Reduce: p.reduceIDPRelationalAdded,
+					Reduce: p.reduceIDPAdded,
 				},
 				{
 					Event:  org.IDPConfigChangedEventType,
-					Reduce: p.reduceIDPRelationalChanged,
+					Reduce: p.reduceIDPChanged,
 				},
 				{
 					Event:  org.IDPConfigDeactivatedEventType,
-					Reduce: p.reduceIDRelationalPDeactivated,
+					Reduce: p.reduceIDPDeactivated,
 				},
 				{
 					Event:  org.IDPConfigReactivatedEventType,
-					Reduce: p.reduceIDPRelationalReactivated,
+					Reduce: p.reduceIDPReactivated,
 				},
 				{
 					Event:  org.IDPConfigRemovedEventType,
-					Reduce: p.reduceIDPRelationalRemoved,
+					Reduce: p.reduceIDPRemoved,
 				},
 				{
 					Event:  org.IDPOIDCConfigAddedEventType,
-					Reduce: p.reduceOIDCRelationalConfigAdded,
+					Reduce: p.reduceOIDCConfigAdded,
 				},
 				{
 					Event:  org.IDPOIDCConfigChangedEventType,
-					Reduce: p.reduceOIDCRelationalConfigChanged,
+					Reduce: p.reduceOIDCConfigChanged,
 				},
 				{
 					Event:  org.IDPJWTConfigAddedEventType,
-					Reduce: p.reduceJWTRelationalConfigAdded,
+					Reduce: p.reduceJWTConfigAdded,
 				},
 				{
 					Event:  org.IDPJWTConfigChangedEventType,
-					Reduce: p.reduceJWTRelationalConfigChanged,
+					Reduce: p.reduceJWTConfigChanged,
 				},
 				{
 					Event:  org.OAuthIDPAddedEventType,
-					Reduce: p.reduceOAuthIDPRelationalAdded,
+					Reduce: p.reduceOAuthIDPAdded,
 				},
 				{
 					Event:  org.OAuthIDPChangedEventType,
-					Reduce: p.reduceOAuthIDPRelationalChanged,
+					Reduce: p.reduceOAuthIDPChanged,
 				},
 				{
 					Event:  org.OIDCIDPAddedEventType,
-					Reduce: p.reduceOIDCIDPRelationalAdded,
+					Reduce: p.reduceOIDCIDPAdded,
 				},
 				{
 					Event:  org.OIDCIDPChangedEventType,
-					Reduce: p.reduceOIDCIDPRelationalChanged,
+					Reduce: p.reduceOIDCIDPChanged,
 				},
 				{
 					Event:  org.OIDCIDPMigratedAzureADEventType,
-					Reduce: p.reduceOIDCIDPRelationalMigratedAzureAD,
+					Reduce: p.reduceOIDCIDPMigratedAzureAD,
 				},
 				{
 					Event:  org.OIDCIDPMigratedGoogleEventType,
-					Reduce: p.reduceOIDCIDPRelationalMigratedGoogle,
+					Reduce: p.reduceOIDCIDPMigratedGoogle,
 				},
 				{
 					Event:  org.JWTIDPAddedEventType,
-					Reduce: p.reduceJWTIDPRelationalAdded,
+					Reduce: p.reduceJWTIDPAdded,
 				},
 				{
 					Event:  org.JWTIDPChangedEventType,
-					Reduce: p.reduceJWTIDPRelationalChanged,
+					Reduce: p.reduceJWTIDPChanged,
 				},
 				{
 					Event:  org.AzureADIDPAddedEventType,
-					Reduce: p.reduceAzureADIDPRelationalAdded,
+					Reduce: p.reduceAzureADIDPAdded,
 				},
 				{
 					Event:  org.AzureADIDPChangedEventType,
-					Reduce: p.reduceAzureADIDPRelationalChanged,
+					Reduce: p.reduceAzureADIDPChanged,
 				},
 				{
 					Event:  org.GitHubIDPAddedEventType,
-					Reduce: p.reduceGitHubIDPRelationalAdded,
+					Reduce: p.reduceGitHubIDPAdded,
 				},
 				{
 					Event:  org.GitHubIDPChangedEventType,
-					Reduce: p.reduceGitHubIDPRelationalChanged,
+					Reduce: p.reduceGitHubIDPChanged,
 				},
 				{
 					Event:  org.GitHubEnterpriseIDPAddedEventType,
-					Reduce: p.reduceGitHubEnterpriseIDPRelationalAdded,
+					Reduce: p.reduceGitHubEnterpriseIDPAdded,
 				},
 				{
 					Event:  org.GitHubEnterpriseIDPChangedEventType,
-					Reduce: p.reduceGitHubEnterpriseIDPRelationalChanged,
+					Reduce: p.reduceGitHubEnterpriseIDPChanged,
 				},
 				{
 					Event:  org.GitLabIDPAddedEventType,
-					Reduce: p.reduceGitLabIDPRelationalAdded,
+					Reduce: p.reduceGitLabIDPAdded,
 				},
 				{
 					Event:  org.GitLabIDPChangedEventType,
-					Reduce: p.reduceGitLabIDPRelationalChanged,
+					Reduce: p.reduceGitLabIDPChanged,
 				},
 				{
 					Event:  org.GitLabSelfHostedIDPAddedEventType,
-					Reduce: p.reduceGitLabSelfHostedIDPRelationalAdded,
+					Reduce: p.reduceGitLabSelfHostedIDPAdded,
 				},
 				{
 					Event:  org.GitLabSelfHostedIDPChangedEventType,
-					Reduce: p.reduceGitLabSelfHostedIDPRelationalChanged,
+					Reduce: p.reduceGitLabSelfHostedIDPChanged,
 				},
 				{
 					Event:  org.GoogleIDPAddedEventType,
-					Reduce: p.reduceGoogleIDPRelationalAdded,
+					Reduce: p.reduceGoogleIDPAdded,
 				},
 				{
 					Event:  org.GoogleIDPChangedEventType,
-					Reduce: p.reduceGoogleIDPRelationalChanged,
+					Reduce: p.reduceGoogleIDPChanged,
 				},
 				{
 					Event:  org.LDAPIDPAddedEventType,
@@ -352,7 +352,7 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 	}
 }
 
-func (p *idpTemplateRelationalProjection) reduceIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpTemplateRelationalProjection) reduceIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idpconfig.IDPConfigAddedEvent
 	switch e := event.(type) {
