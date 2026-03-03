@@ -53,7 +53,7 @@ func (p project) Create(ctx context.Context, client database.QueryExecutor, proj
 
 	builder.WriteString("INSERT INTO ")
 	builder.WriteString(p.qualifiedTableName())
-	builder.WriteString("(instance_id, organization_id, id, name, state, should_assert_role, is_authorization_required, is_project_access_required, used_labeling_setting_owner) VALUES (")
+	builder.WriteString("(instance_id, organization_id, id, name, state, should_assert_role, is_authorization_required, is_project_access_required, used_labeling_setting_owner, created_at, updated_at) VALUES (")
 	builder.WriteArgs(
 		project.InstanceID,
 		project.OrganizationID,
