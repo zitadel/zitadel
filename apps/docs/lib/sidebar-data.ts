@@ -181,6 +181,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/solution-scenarios/saas",
           "guides/solution-scenarios/b2c",
           "guides/solution-scenarios/frontend-calling-backend-API",
+          "guides/solution-scenarios/guest-auth",
           {
             type: "category",
             label: "Machine-to-Machine (M2M)",
@@ -773,6 +774,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
                 label: "Production & Operations",
                 collapsed: false,
                 items: [
+                  "self-hosting/manage/requirements",
                   "self-hosting/manage/production",
                   "self-hosting/manage/productionchecklist",
                   "self-hosting/manage/usage_control",
