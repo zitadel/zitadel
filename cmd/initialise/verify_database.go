@@ -58,6 +58,22 @@ func VerifyDatabase(databaseName string) func(context.Context, *database.DB) err
 			logging.Info(ctx, "database is same as config.database.postgres.admin.ExistingDatabase, skipping creation", "database", databaseName)
 			return nil
 		}
+
+		// Check if the database already exists in the catalog before attempting CREATE DATABASE.
+		// This handles the case where the database was provisioned externally and the admin
+		// credentials are the same as the service user, which lacks the CREATEDB privilege.
+		var exists bool
+		err = db.QueryRowContext(ctx, func(r *sql.Row) error {
+			return r.Scan(&exists)
+		}, "SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = $1)", databaseName)
+		if err != nil {
+			return fmt.Errorf("unable to check if database exists: %w", err)
+		}
+		if exists {
+			logging.Info(ctx, "database already exists, skipping creation", "database", databaseName)
+			return nil
+		}
+
 		logging.Info(ctx, "verify database", "database", databaseName)
 
 		return exec(ctx, db, fmt.Sprintf(databaseStmt, databaseName), []string{dbAlreadyExistsCode})
