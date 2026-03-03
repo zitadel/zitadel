@@ -57,8 +57,8 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *AddProject
 	if err != nil {
 		return nil, err
 	}
-	// TODO: change e2e tests to use correct resourceowner, wrong resource owner is corrected through aggregate
-	// error if provided resourceowner is not equal to the resourceowner of the project grant
+	// TODO: change e2e tests to use correct organization ID, wrong organization ID is corrected through aggregate
+	// error if provided organization ID is not equal to the organization ID of the project grant
 	//if projectGrantResourceOwner != addedMember.ResourceOwner {
 	//	return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-0l10S9OmZV", "Errors.Project.Grant.Invalid")
 	//}
