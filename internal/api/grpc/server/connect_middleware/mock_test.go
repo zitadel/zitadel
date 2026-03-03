@@ -24,7 +24,15 @@ func emptyMockHandler(resp connect.AnyResponse, expectedCtxData authz.CtxData) f
 func errorMockHandler() func(*testing.T) connect.UnaryFunc {
 	return func(t *testing.T) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			return nil, zerrors.ThrowInternal(nil, "test", "error")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "test", "error")
+		}
+	}
+}
+
+func panicMockHandler(payload any) func(*testing.T) connect.UnaryFunc {
+	return func(t *testing.T) connect.UnaryFunc {
+		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+			panic(payload)
 		}
 	}
 }
