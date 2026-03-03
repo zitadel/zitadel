@@ -40,7 +40,7 @@ const (
 type IDPAutoLinkingField uint8
 
 const (
-	IDPAutoLinkingFieldUserName IDPAutoLinkingField = iota + 1
+	IDPAutoLinkingFieldUsername IDPAutoLinkingField = iota + 1
 	IDPAutoLinkingFieldEmail
 )
 
@@ -64,12 +64,10 @@ type IdentityProvider struct {
 	// Type represents the type of and idp. It is a pointer because it can be nil during the migration of the events
 	Type              *IDPType             `json:"type,omitempty" db:"type"`
 	AllowCreation     bool                 `json:"allowCreation,omitempty" db:"allow_creation"`
-	AutoRegister      bool                 `json:"autoRegister,omitempty" db:"auto_register"`
 	AllowAutoCreation bool                 `json:"allowAutoCreation,omitempty" db:"allow_auto_creation"`
 	AllowAutoUpdate   bool                 `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
 	AllowLinking      bool                 `json:"allowLinking,omitempty" db:"allow_linking"`
 	AutoLinkingField  *IDPAutoLinkingField `json:"autoLinkingField,omitempty" db:"auto_linking_field"`
-	StylingType       *int16               `json:"stylingType,omitempty" db:"styling_type"`
 	Payload           json.RawMessage      `json:"payload,omitempty" db:"payload"`
 	CreatedAt         time.Time            `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt         time.Time            `json:"updatedAt,omitzero" db:"updated_at"`
@@ -191,16 +189,16 @@ type IDPGitlab struct {
 	Gitlab
 }
 
-type GitlabSelfHosting struct {
+type GitlabSelfHosted struct {
 	Issuer       string              `json:"issuer"`
 	ClientID     string              `json:"clientId,omitempty"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	Scopes       []string            `json:"scopes,omitempty"`
 }
 
-type IDPGitlabSelfHosting struct {
+type IDPGitlabSelfHosted struct {
 	*IdentityProvider
-	GitlabSelfHosting
+	GitlabSelfHosted
 }
 
 type LDAP struct {
@@ -269,13 +267,6 @@ type IDPSAML struct {
 	SAML
 }
 
-// IDPIdentifierCondition is used to help specify a single identity_provider,
-// it will either be used as the  identity_provider ID or identity_provider name,
-// as identity_provider can be identified either using (instanceID + OrgID + ID) OR (instanceID + OrgID + name)
-type IDPIdentifierCondition interface {
-	database.Condition
-}
-
 type idProviderColumns interface {
 	InstanceIDColumn() database.Column
 	OrgIDColumn() database.Column
@@ -284,12 +275,9 @@ type idProviderColumns interface {
 	NameColumn() database.Column
 	TypeColumn() database.Column
 	AllowCreationColumn() database.Column
-	AutoRegisterColumn() database.Column
 	AllowAutoCreationColumn() database.Column
 	AllowAutoUpdateColumn() database.Column
 	AllowLinkingColumn() database.Column
-	AllowAutoLinkingColumn() database.Column
-	StylingTypeColumn() database.Column
 	PayloadColumn() database.Column
 	CreatedAtColumn() database.Column
 	UpdatedAtColumn() database.Column
@@ -300,30 +288,20 @@ type idProviderConditions interface {
 	PrimaryKeyCondition(instanceID, idpID string) database.Condition
 	InstanceIDCondition(id string) database.Condition
 	OrgIDCondition(id *string) database.Condition
-	IDCondition(id string) IDPIdentifierCondition
+	IDCondition(id string) database.Condition
 	StateCondition(state IDPState) database.Condition
-	NameCondition(name string) IDPIdentifierCondition
+	NameCondition(op database.TextOperation, name string) database.Condition
 	TypeCondition(typee IDPType) database.Condition
-	AutoRegisterCondition(allow bool) database.Condition
-	AllowCreationCondition(allow bool) database.Condition
-	AllowAutoCreationCondition(allow bool) database.Condition
-	AllowAutoUpdateCondition(allow bool) database.Condition
-	AllowLinkingCondition(allow bool) database.Condition
-	AllowAutoLinkingCondition(linkingType IDPAutoLinkingField) database.Condition
-	StylingTypeCondition(style int16) database.Condition
-	PayloadCondition(payload string) database.Condition
 }
 
 type idProviderChanges interface {
 	SetName(name string) database.Change
 	SetState(state IDPState) database.Change
 	SetAllowCreation(allow bool) database.Change
-	SetAutoRegister(allow bool) database.Change
 	SetAllowAutoCreation(allow bool) database.Change
 	SetAllowAutoUpdate(allow bool) database.Change
 	SetAllowLinking(allow bool) database.Change
-	SetAutoAllowLinking(allow bool) database.Change
-	SetStylingType(stylingType int16) database.Change
+	SetLinkingField(field *IDPAutoLinkingField) database.Change
 	SetPayload(payload string) database.Change
 	SetUpdatedAt(createdAt *time.Time) database.Change
 }
@@ -335,25 +313,25 @@ type IDProviderRepository interface {
 	idProviderConditions
 	idProviderChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IdentityProvider, error)
-	List(ctx context.Context, client database.QueryExecutor, conditions ...database.Condition) ([]*IdentityProvider, error)
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IdentityProvider, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*IdentityProvider, error)
 
 	Create(ctx context.Context, client database.QueryExecutor, idp *IdentityProvider) error
-	Update(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (int64, error)
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
-	GetOIDC(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOIDC, error)
-	GetJWT(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPJWT, error)
+	GetOIDC(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPOIDC, error)
+	GetJWT(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPJWT, error)
 
-	GetOAuth(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOAuth, error)
+	GetOAuth(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPOAuth, error)
 
-	GetAzureAD(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPAzureAD, error)
-	GetGoogle(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGoogle, error)
-	GetGithub(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithub, error)
-	GetGithubEnterprise(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithubEnterprise, error)
-	GetGitlab(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlab, error)
-	GetGitlabSelfHosting(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlabSelfHosting, error)
-	GetLDAP(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPLDAP, error)
-	GetApple(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPApple, error)
-	GetSAML(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPSAML, error)
+	GetAzureAD(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPAzureAD, error)
+	GetGoogle(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPGoogle, error)
+	GetGithub(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPGithub, error)
+	GetGithubEnterprise(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPGithubEnterprise, error)
+	GetGitlab(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPGitlab, error)
+	GetGitlabSelfHosted(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPGitlabSelfHosted, error)
+	GetLDAP(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPLDAP, error)
+	GetApple(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPApple, error)
+	GetSAML(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPSAML, error)
 }
