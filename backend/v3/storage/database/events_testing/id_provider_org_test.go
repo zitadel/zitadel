@@ -13,7 +13,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
-	repositorypkg "github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	zitadel_internal_domain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -43,7 +43,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -137,7 +137,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -167,7 +167,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// deactivate idp
 		_, err = MgmtClient.DeactivateOrgIDP(IAMCTX, &management.DeactivateOrgIDPRequest{
@@ -221,7 +221,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// wait until idp is added
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -264,7 +264,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -305,7 +305,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check original values for OCID
 		var oidc *domain.IDPOIDC
@@ -371,7 +371,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -409,7 +409,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		before := time.Now()
 		_, err = MgmtClient.UpdateOrgIDPJWTConfig(IAMCTX, &management.UpdateOrgIDPJWTConfigRequest{
@@ -468,7 +468,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for oauth
 		var oauth *domain.IDPOAuth
@@ -529,7 +529,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for oauth
 		var oauth *domain.IDPOAuth
@@ -617,7 +617,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for oidc
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -671,7 +671,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for oidc
 		var oidc *domain.IDPOIDC
@@ -752,7 +752,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var oidc *domain.IDPOIDC
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -840,7 +840,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var oidc *domain.IDPOIDC
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -920,7 +920,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for jwt
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -991,7 +991,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for jwt
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1047,7 +1047,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for azure
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1102,7 +1102,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var azure *domain.IDPAzureAD
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1187,7 +1187,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for github
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1233,7 +1233,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var github *domain.IDPGithub
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1313,7 +1313,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for github enterprise
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1367,7 +1367,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var githubEnterprise *domain.IDPGithubEnterprise
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1450,7 +1450,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for gitlab
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1498,7 +1498,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var gitlab *domain.IDPGitlab
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1576,7 +1576,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for gitlab self hosted
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1626,7 +1626,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var githlabSelfHosted *domain.IDPGitlabSelfHosted
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1705,7 +1705,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check values for google
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1753,7 +1753,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var google *domain.IDPGoogle
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1818,7 +1818,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1872,7 +1872,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, defaultOrganizationLDAPRequest(name))
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var ldap *domain.IDPLDAP
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -1991,7 +1991,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -2042,7 +2042,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var apple *domain.IDPApple
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -2130,7 +2130,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		after := time.Now()
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -2190,7 +2190,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		var saml *domain.IDPSAML
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -2277,7 +2277,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		idpRepo := repositorypkg.IDProviderRepository()
+		idpRepo := repository.IDProviderRepository()
 
 		// check idp exists
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
