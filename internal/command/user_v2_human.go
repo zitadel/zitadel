@@ -337,14 +337,11 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 		}
 	}
 
-	for _, md := range human.Metadata {
-		cmd, err := c.setUserMetadata(ctx, userAgg, md)
-		if err != nil {
-			return err
-		}
-
-		cmds = append(cmds, cmd)
+	metadataCmds, err := c.updateUserMetadata(ctx, human.Metadata, userAgg)
+	if err != nil {
+		return err
 	}
+	cmds = append(cmds, metadataCmds...)
 
 	for _, mdKey := range human.MetadataKeysToRemove {
 		cmd, err := c.removeUserMetadata(ctx, userAgg, mdKey)

@@ -338,6 +338,70 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "change machine metadata, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(userAddedEvent),
+					),
+					expectPush(
+						user.NewMetadataSetEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"key1",
+							[]byte("value1"),
+						),
+						user.NewMetadataRemovedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"key2",
+						),
+						user.NewMetadataSetEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"key3",
+							[]byte("value3"),
+						),
+						user.NewMetadataRemovedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"key4",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				machine: &ChangeMachine{
+					Metadata: []*domain.Metadata{
+						{
+							Key:   "key1",
+							Value: []byte("value1"),
+						},
+						{
+							Key:   "key2",
+							Value: []byte(""),
+						},
+						{
+							Key:   "key3",
+							Value: []byte("value3"),
+						},
+						{
+							Key:   "key4",
+							Value: nil,
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -357,6 +421,73 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.want, tt.args.machine.Details)
 			}
+		})
+	}
+}
+
+func TestCommands_updateUserMetadata(t *testing.T) {
+	type args struct {
+		metadata  []*domain.Metadata
+		aggregate *eventstore.Aggregate
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []eventstore.Command
+		wantErr error
+	}{
+		{
+			name: "empty metadata, ok",
+			args: args{
+				metadata: nil,
+			},
+			want: nil,
+		},
+		{
+			name: "update metadata, ok",
+			args: args{
+				metadata: []*domain.Metadata{
+					{
+						Key:   "key1",
+						Value: []byte(""),
+					},
+					{
+						Key:   "key2",
+						Value: []byte(""),
+					},
+					{
+						Key:   "key3",
+						Value: []byte("value3"),
+					},
+					{
+						Key:   "key2",
+						Value: []byte("value2"),
+					},
+					{
+						Key:   "key4",
+						Value: nil,
+					},
+				},
+				aggregate: &eventstore.Aggregate{ID: "machine-user-1"},
+			},
+			want: []eventstore.Command{
+				user.NewMetadataRemovedEvent(context.Background(), &eventstore.Aggregate{ID: "machine-user-1"}, "key1"),
+				user.NewMetadataRemovedEvent(context.Background(), &eventstore.Aggregate{ID: "machine-user-1"}, "key2"),
+				user.NewMetadataSetEvent(context.Background(), &eventstore.Aggregate{ID: "machine-user-1"}, "key3", []byte("value3")),
+				user.NewMetadataSetEvent(context.Background(), &eventstore.Aggregate{ID: "machine-user-1"}, "key2", []byte("value2")),
+				user.NewMetadataRemovedEvent(context.Background(), &eventstore.Aggregate{ID: "machine-user-1"}, "key4"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{}
+			got, err := c.updateUserMetadata(context.Background(), tt.args.metadata, tt.args.aggregate)
+			if tt.wantErr != nil {
+				assert.EqualError(t, err, tt.wantErr.Error())
+				return
+			}
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
