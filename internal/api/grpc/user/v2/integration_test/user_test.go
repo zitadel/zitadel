@@ -3576,8 +3576,8 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 										Email: email,
 									},
 									Metadata: []*user.Metadata{
-										{Key: "key1", Value: []byte("value1")},
-										{Key: "key2", Value: []byte("value2")},
+										{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+										{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
 									},
 								},
 							},
@@ -3587,8 +3587,8 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
 						metadataByKey := getMetadataMap(getMetadataResponse)
 						assert.Len(t, getMetadataResponse.GetMetadata(), 2)
-						assert.Equal(t, []byte("value1"), metadataByKey["key1"])
-						assert.Equal(t, []byte("value2"), metadataByKey["key2"])
+						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
+						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value2"))), metadataByKey["key2"])
 					},
 				}
 			},
@@ -3616,7 +3616,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 								},
 							},
 							Metadata: []*user.Metadata{
-								{Key: "key1", Value: []byte("value1")},
+								{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 							},
 						},
 					},
@@ -3624,7 +3624,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
 						metadataByKey := getMetadataMap(getMetadataResponse)
 						assert.Len(t, getMetadataResponse.GetMetadata(), 1)
-						assert.Equal(t, []byte("value1"), metadataByKey["key1"])
+						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
 					},
 				}
 			},
@@ -3697,8 +3697,8 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 								},
 							},
 							Metadata: []*user.Metadata{
-								{Key: "key1", Value: []byte("value1")},
-								{Key: "key2", Value: []byte("value2")},
+								{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+								{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
 							},
 						},
 					},
@@ -3706,8 +3706,8 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
 						metadataByKey := getMetadataMap(getMetadataResponse)
 						assert.Len(t, getMetadataResponse.GetMetadata(), 2)
-						assert.Equal(t, []byte("value1"), metadataByKey["key1"])
-						assert.Equal(t, []byte("value2"), metadataByKey["key2"])
+						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
+						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value2"))), metadataByKey["key2"])
 					},
 				}
 			},

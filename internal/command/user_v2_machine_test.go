@@ -402,6 +402,34 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "change machine metadata, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(userAddedEvent),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				machine: &ChangeMachine{
+					Metadata: []*domain.Metadata{
+						{
+							Key:   "key1",
+							Value: []byte("value1"),
+						},
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -442,6 +470,23 @@ func TestCommands_updateUserMetadata(t *testing.T) {
 				metadata: nil,
 			},
 			want: nil,
+		},
+		{
+			name: "invalid metadata, error",
+			args: args{
+				metadata: []*domain.Metadata{
+					{
+						Key:   "key1",
+						Value: []byte(""),
+					},
+					{
+						Key:   "key2",
+						Value: []byte(""),
+					},
+					nil,
+				},
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-uAFkgS", "Errors.Metadata.Invalid"),
 		},
 		{
 			name: "update metadata, ok",

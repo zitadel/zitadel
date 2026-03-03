@@ -37,6 +37,9 @@ func (h *ChangeMachine) Changed() bool {
 	if h.AccessTokenType != nil {
 		return true
 	}
+	if len(h.Metadata) > 0 {
+		return true
+	}
 	return false
 }
 
@@ -113,6 +116,9 @@ func (c *Commands) updateUserMetadata(ctx context.Context, metadata []*domain.Me
 	}
 	cmds := make([]eventstore.Command, 0, len(metadata))
 	for _, md := range metadata {
+		if md == nil {
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-uAFkgS", "Errors.Metadata.Invalid")
+		}
 		// remove metadata if the value is empty
 		if len(md.Value) == 0 {
 			cmd, err := c.removeUserMetadata(ctx, aggregate, md.Key)
