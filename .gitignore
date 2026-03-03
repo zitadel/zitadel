@@ -106,3 +106,5 @@ CLAUDE.md
 .gemini/*
 
 docs_old
+
+.claude/worktrees/**/*
