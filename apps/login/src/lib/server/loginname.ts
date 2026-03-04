@@ -520,7 +520,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
-  // user not found, check if register is enabled on instance / organization context
+  // user not found, check if IDPs are available when local auth is not allowed
   if (!effectiveLoginSettings?.allowLocalAuthentication) {
     console.log("redirecting to IDP (register allowed, password not allowed)");
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);

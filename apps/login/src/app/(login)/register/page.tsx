@@ -71,7 +71,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     );
   }
 
-  if (!loginSettings?.allowRegister && identityProviders.length === 0) {
+  if (!loginSettings?.allowRegister && (!loginSettings.allowExternalIdp || identityProviders.length === 0)) {
     return (
       <DynamicTheme branding={branding}>
         <div className="flex flex-col space-y-4">

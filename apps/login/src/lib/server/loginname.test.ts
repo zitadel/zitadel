@@ -533,6 +533,23 @@ describe("sendLoginname", () => {
       expect(result).toEqual({ error: "errors.userNotFound" });
     });
 
+    test("should redirect to IDP when allowRegister: false, allowLocalAuthentication: false and a single active IDP exists", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: false,
+        allowLocalAuthentication: false,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC" }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
+    });
+
     test("should discover organization from domain suffix when user not found without org context", async () => {
       // Mock login settings for instance level (no org context)
       mockGetLoginSettings
