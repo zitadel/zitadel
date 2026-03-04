@@ -116,7 +116,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     // If no IDP links exist for the user (or no userId provided), try to get active IDPs from the organization
     if (identityProviders.length === 0) {
       const activeIdps = await getActiveIdentityProviders({ serviceConfig, orgId: organization }).then((resp) => {
-        return resp.identityProviders;
+        return resp.identityProviders.filter((idp) => idp.options?.isAutoCreation || idp.options?.isCreationAllowed);
       });
 
       // If exactly one active IDP exists in the organization, redirect to it
