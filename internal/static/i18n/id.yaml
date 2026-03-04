@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Rahasia tidak dapat dibuat"
     PAT:
       NotFound: "Token Akses Pribadi tidak ditemukan"
+    Metadata:
+      Conflicting: "Metadata tidak boleh diatur secara bersamaan pada field [user] dan [human]"
     NotHuman: "Pengguna harus bersifat pribadi"
     NotMachine: "Pengguna harus teknis"
     WrongType: "Tidak diizinkan untuk jenis pengguna ini"
