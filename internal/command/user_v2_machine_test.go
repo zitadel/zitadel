@@ -466,4 +466,3 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 		})
 	}
 }
-
