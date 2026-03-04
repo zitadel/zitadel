@@ -1,7 +1,7 @@
 name: Lint Test Build
 
-on: 
-  workflow_call: 
+on:
+  workflow_call:
     inputs:
       go_version:
         required: true
@@ -56,15 +56,12 @@ jobs:
           version: v2.38.2
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Install Cypress binary
-        run: pnpm cypress install
-        working-directory: apps/login
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
       - name: Lint, Test and Build
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-#          NX_NATIVE_LOGGING: "nx::native::cache,nx::native::db"
+          #          NX_NATIVE_LOGGING: "nx::native::cache,nx::native::db"
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
         run: pnpm nx affected --nxBail --targets lint test build --exclude @zitadel/docs
@@ -95,7 +92,7 @@ jobs:
         with:
           name: api-integration-test-race-logs
           path: |
-           .artifacts/api-test-integration/race.log.*
+            .artifacts/api-test-integration/race.log.*
       - name: Upload Functional UI Test Artifacts
         uses: actions/upload-artifact@v4
         if: failure() || cancelled()
