@@ -15,6 +15,7 @@ jobs:
             
               - [ ] I have reviewed my changes and would approve it
               - [ ] Documentations and examples are up-to-date
+              - [ ] Terminology updates follow issue #5888 and .github/TERMINOLOGY.md
               - [ ] Logical behavior changes are tested automatically
               - [ ] No debug or dead code
               - [ ] My code has no repetitions

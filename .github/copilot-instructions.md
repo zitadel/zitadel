@@ -21,5 +21,6 @@ You are working in the ZITADEL monorepo. This codebase uses specific conventions
 - Use verified Nx targets only; if unsure, run `pnpm nx show project <project>`.
 - For backend changes, note we are in transition: relational data is becoming the system of record, while event writes are still required for history/audit.
 - Respect terminology defined in the `Technical Glossary` section of `AGENTS.md` when generating UI text or documentation.
+- For user-facing wording updates across docs/UI/API descriptions, follow the canonical table in `.github/TERMINOLOGY.md` (issue #5888).
 - Distinguish between `apps/login` (Next.js) and `console` (Angular) when suggesting frontend code.
 - For deployment-related work, consult the directory-specific agents files (e.g., `deploy/compose/AGENTS.md`) for invariants, file conventions, and rejected alternatives.
