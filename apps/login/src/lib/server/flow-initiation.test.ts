@@ -1,5 +1,6 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
+import { handleOIDCFlowInitiation, FlowInitiationParams } from "./flow-initiation";
 
 vi.mock("@/lib/cookies", () => ({
   getLanguageCookie: vi.fn(),
@@ -44,8 +45,6 @@ vi.mock("@zitadel/client", () => ({
 vi.mock("escape-html", () => ({
   default: (s: string) => s,
 }));
-
-import { handleOIDCFlowInitiation, FlowInitiationParams } from "./flow-initiation";
 
 function makeRequest(url = "https://example.com/login?requestId=oidc_abc123"): NextRequest {
   return new NextRequest(url);
