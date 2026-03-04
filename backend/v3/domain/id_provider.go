@@ -271,7 +271,7 @@ type IDPSAML struct {
 
 // IDPIdentifierCondition is used to help specify a single identity_provider,
 // it will either be used as the  identity_provider ID or identity_provider name,
-// as identity_provider can be identified either using (instanceID + OrgID + ID) OR (instanceID + OrgID + name)
+// as identity_provider can be identified either using (instanceID + OrganizationID + ID) OR (instanceID + OrganizationID + name)
 type IDPIdentifierCondition interface {
 	database.Condition
 }
