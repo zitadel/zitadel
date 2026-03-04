@@ -7,6 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/zitadel/sloggcp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
@@ -118,6 +119,9 @@ func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
 		c, lvl = codes.Unknown, slog.LevelError
 	default:
 		c, lvl = codes.Unknown, slog.LevelError
+	}
+	if id == zerrors.IDRecover {
+		lvl = sloggcp.LevelAlert
 	}
 	return c, msg, id, lvl
 }
