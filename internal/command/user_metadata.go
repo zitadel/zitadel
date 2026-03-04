@@ -99,7 +99,7 @@ func (c *Commands) getUserMetadataSetEvents(ctx context.Context, userID string, 
 	if len(metadatas) == 0 {
 		return nil, setMetadata, nil
 	}
-	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
+	userAgg := UserAggregateFromWriteModelCtx(ctx, &setMetadata.WriteModel)
 	events, err := c.checkExistingValueAndSetMetadata(ctx, metadatas, setMetadata.metadataList, userAgg)
 	if err != nil {
 		return nil, nil, err
