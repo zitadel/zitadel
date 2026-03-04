@@ -18,16 +18,21 @@ All user-facing wording in docs, UI, and API descriptions must follow this table
 | Scope | Files |
 |-------|-------|
 | UI | Console (`console/src/assets/i18n/`) and Login UI (`apps/login/locales/`) |
+| UI dialogs | Subset of UI: modal and confirmation dialog strings |
+| UI section | Subset of UI: labels tied to a specific page section |
+| UI indicator | Subset of UI: inline status or indicator labels |
+| UI notifications | Subset of UI: toast, banner, and notification strings |
 | Docs | Documentation content (`apps/docs/content/`) |
 | API | Proto files and API description/comment text (`proto/**`) |
 | Everywhere | UI + Docs + API |
+| — | Internal only — no user-facing file scope |
 
 ## Canonical Terminology Table
 
 | Canonical term | Meaning / explanation | Search for (discouraged) | Replace with / enforce | Action | Scope |
 |---|---|---|---|---|---|
 | Customer Portal | Central hub for all customer interactions for cloud and self-hosting customers | _(none — already canonical)_ | Customer Portal | keep | Everywhere |
-| Management Console | Web interface where customers configure and manage ZITADEL resources | _(missing label, unclear app name)_ | Management Console | replace | UI — must be visible |
+| Management Console | Web interface where customers configure and manage ZITADEL resources | Console, ZITADEL Console, Admin Console, Administration Console | Management Console | replace | UI — must be visible |
 | Instance | Private, isolated top-level ZITADEL environment | IAM, System, Type IAM | Instance / Type Instance | replace | Everywhere |
 | Policies | Enforcement rules governing checks and constraints | Instance Policies, IAM Policies, Org Policies, Policies (unscoped), Instance Settings (when enforcing), Org Settings (when enforcing) | Instance Policies / Organization Policies | replace | Everywhere (enforcement context only, always scoped) |
 | Settings | Resource-specific configuration values (not rules) | Instance Settings, Org Settings, Instance Policies (when config), Org Policies (when config), IAM Policies (when config) | Instance Settings / Organization Settings | replace | Everywhere (configuration context only) |
@@ -61,12 +66,12 @@ All user-facing wording in docs, UI, and API descriptions must follow this table
 | First Name | Personal given name field | Given Name | First Name | replace | Everywhere |
 | Last Name | Personal family name field | Family Name | Last Name | replace | Everywhere |
 | Add Administrator (dialog) | Consistent wording for admin-add dialog | Add Manager, Add a Manager | Add Administrator / Add an Administrator | replace | UI dialogs |
-| Memberships (section) | Admin memberships section on user detail page | Memberships | Administrator | replace | UI section |
+| Administrator (memberships section) | UI section on the user detail page showing admin memberships — should be labeled "Administrator", not "Memberships" | Memberships | Administrator | replace | UI section |
 | Project Grants (section) | Project grant listing section | Grants | Project Grants | replace | UI section |
 | Internal / External indicator | Shows if a user belongs to the same or a different org | _(missing indicator)_ | internal / external | replace | UI indicator |
 | Password changed | Past-tense wording for password change notification | Password change | Password changed | replace | UI notifications |
 | Object descriptions | All resource descriptions must use end-user language | internal / technical wording | clear end-user language | replace | Docs + UI |
-| Complement Token | Flow type for actions executed during token creation | Compliment Token, Complement Token, CustomiseToken, CustomizeToken | UI name: Complement Token. API: `flowType = 2` (CustomiseToken). Docs must not show PreUserinfoCreation=3 for this type. | replace | UI + Docs + API |
+| Complement Token | Flow type for actions executed during token creation. In UI use "Complement Token"; in API use `flowType = 2` (CustomiseToken). Docs must not show PreUserinfoCreation=3 for this type. | Compliment Token, CustomiseToken, CustomizeToken | Complement Token | replace | UI + Docs + API |
 
 ## Governance
 
