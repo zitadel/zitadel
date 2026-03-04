@@ -56,6 +56,10 @@ export async function resetPassword(command: ResetPasswordCommand) {
     return { error: t("errors.couldNotSendResetLink") };
   }
 
+  if (loginSettings.hidePasswordReset) {
+    return { error: t("errors.passwordResetNotAllowed") };
+  }
+
   const searchResult = await searchUsers({
     serviceConfig,
     searchValue: command.loginName,
@@ -143,6 +147,20 @@ export async function sendPassword(
   let user: User | undefined;
   let loginSettingsByContext: LoginSettings | undefined;
   let loginSettingsByUser: LoginSettings | undefined;
+
+  // Perform policy check on context settings first if available, or fetch them if needed
+  if (!sessionCookie) {
+    if (!loginSettingsByContext) {
+      loginSettingsByContext = await getLoginSettings({
+        serviceConfig,
+        organization: command.organization ?? command.defaultOrganization,
+      });
+    }
+
+    if (loginSettingsByContext && !loginSettingsByContext.allowLocalAuthentication) {
+      return { error: t("errors.localAuthenticationNotAllowed") };
+    }
+  }
 
   if (sessionCookie) {
     try {
