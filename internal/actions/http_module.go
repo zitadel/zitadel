@@ -17,6 +17,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+// maxActionHTTPTimeout is the upper bound on outgoing HTTP calls from action scripts
+// when the action context carries no deadline (defensive safeguard).
+const maxActionHTTPTimeout = 30 * time.Second
+
 func WithHTTP(ctx context.Context) Option {
 	return func(c *runConfig) {
 		c.modules["zitadel/http"] = func(runtime *goja.Runtime, module *goja.Object) {
@@ -98,7 +102,17 @@ func (c *HTTP) fetch(ctx context.Context) func(call goja.FunctionCall) goja.Valu
 	return func(call goja.FunctionCall) goja.Value {
 		req := c.buildHTTPRequest(ctx, call.Arguments)
 		if deadline, ok := ctx.Deadline(); ok {
-			c.client.Timeout = time.Until(deadline)
+			remaining := time.Until(deadline)
+			if remaining <= 0 {
+				// The action's time budget is already exhausted; fail fast rather than
+				// launching an HTTP call with a zero/negative timeout (which Go's
+				// http.Client treats as "no timeout").
+				panic(context.DeadlineExceeded)
+			}
+			c.client.Timeout = remaining
+		} else {
+			// No deadline on the context — apply a hard cap as a safety net.
+			c.client.Timeout = maxActionHTTPTimeout
 		}
 
 		res, err := c.client.Do(req)

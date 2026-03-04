@@ -2,6 +2,8 @@ package oauth
 
 import (
 	"context"
+	"net/http"
+	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -9,6 +11,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/idp"
 )
+
+// defaultHTTPTimeout is the timeout applied to all outgoing HTTP calls to external
+// OAuth 2.0 identity providers (token exchange, user endpoint). It bounds how long
+// a user-facing request can block on a slow or unreachable external IdP.
+const defaultHTTPTimeout = 10 * time.Second
 
 var _ idp.Provider = (*Provider)(nil)
 
@@ -75,7 +82,12 @@ func New(config *oauth2.Config, name, userEndpoint string, user func() idp.User,
 	for _, option := range options {
 		option(provider)
 	}
-	provider.RelyingParty, err = rp.NewRelyingPartyOAuth(config, provider.options...)
+	// Prepend a default HTTP client with a bounded timeout so that calls to slow
+	// or unreachable external IdPs don't block indefinitely.  User-supplied options
+	// appended via WithRelyingPartyOption take precedence because they are applied
+	// after this default.
+	rpOpts := append([]rp.Option{rp.WithHTTPClient(&http.Client{Timeout: defaultHTTPTimeout})}, provider.options...)
+	provider.RelyingParty, err = rp.NewRelyingPartyOAuth(config, rpOpts...)
 	if err != nil {
 		return nil, err
 	}

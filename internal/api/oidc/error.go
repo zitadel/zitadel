@@ -36,6 +36,10 @@ func oidcError(ctx context.Context, err error) error {
 
 	// here we are encountering an error type that is completely unknown to us.
 	if !errors.As(err, &zError) {
+		// Log the raw Go error type so it can be correlated in Cloud Logging
+		// to identify command-layer code that returns bare errors instead of
+		// zerrors.ThrowXxx(...). These become HTTP 500 server_error responses.
+		logging.WithError(ctx, err).Warn("unrecognized non-ZitadelError in OIDC handler; treating as internal server error")
 		err = zerrors.ThrowInternal(err, "OIDC-AhX2u", "Errors.Internal")
 		errors.As(err, &zError)
 	}
