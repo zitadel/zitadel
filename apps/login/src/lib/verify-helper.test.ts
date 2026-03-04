@@ -4,6 +4,15 @@ import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
 import crypto from "crypto";
 
+import {
+  checkPasswordChangeRequired,
+  checkEmailVerified,
+  checkEmailVerification,
+  checkMFAFactors,
+  checkUserVerification,
+} from "./verify-helper";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+
 // Mock function to create timestamps - following the same pattern as session.test.ts
 function createMockTimestamp(offsetMs = 3600000): any {
   return {
@@ -323,15 +332,6 @@ describe("shouldEnforceMFA", () => {
     });
   });
 });
-
-import {
-  checkPasswordChangeRequired,
-  checkEmailVerified,
-  checkEmailVerification,
-  checkMFAFactors,
-  checkUserVerification,
-} from "./verify-helper";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 // Mock dependencies
 vi.mock("@zitadel/client", () => ({
