@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Тайната не можа да бъде генерирана"
     PAT:
       NotFound: "Личен токен за достъп не е намерен"
+    Metadata:
+      Conflicting: "Метаданните не трябва да бъдат зададени едновременно в полетата [user] и [human]"
     NotHuman: "Потребителят трябва да е личен"
     NotMachine: "Потребителят трябва да е техничен"
     WrongType: "Не е разрешено за този тип потребител"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "Токенът за опресняване е невалиден"
       NotFound: "Токенът за обновяване не е намерен"
-  Instance:
-    NotFound: "Екземплярът не е намерен"
-    AlreadyExists: "Екземплярът вече съществува"
-    NotChanged: "Екземплярът не е променен"
   Org:
     AlreadyExists: "Името или идентификационният номер на организацията вече е зает."
     Invalid: "Организацията е невалидна"
@@ -345,7 +343,9 @@ Errors:
       NotActive: "Грантът по проекта не е активен"
       NotInactive: "Грантът по проекта не е неактивен"
   Instance:
-    NotFound: "IAM не е намерен. Уверете се, че сте получили правилния домейн. Вижте https://zitadel.com/docs/apis/introduction#domains"
+    AlreadyExists: "Екземплярът вече съществува"
+    NotChanged: "Екземплярът не е променен"
+    NotFound: "Екземплярът не е намерен. Уверете се, че сте получили правилния домейн. Вижте https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Ролите не са сменени"
     MemberInvalid: "Членът е невалиден"

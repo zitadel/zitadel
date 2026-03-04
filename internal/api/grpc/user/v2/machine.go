@@ -12,7 +12,14 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.CreateUserRequest_Machine, orgId, userName, userId string) (*connect.Response[user.CreateUserResponse], error) {
+func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.CreateUserRequest_Machine, orgId, userName, userId string, reqMetadata []*user.Metadata) (*connect.Response[user.CreateUserResponse], error) {
+	metadata := make([]*command.AddMetadataEntry, len(reqMetadata))
+	for i, metadataEntry := range reqMetadata {
+		metadata[i] = &command.AddMetadataEntry{
+			Key:   metadataEntry.GetKey(),
+			Value: metadataEntry.GetValue(),
+		}
+	}
 	cmd := &command.Machine{
 		Username:        userName,
 		Name:            machinePb.Name,
@@ -22,6 +29,7 @@ func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.Crea
 			ResourceOwner: orgId,
 			AggregateID:   userId,
 		},
+		Metadata: metadata,
 	}
 	details, err := s.command.AddMachine(
 		ctx,

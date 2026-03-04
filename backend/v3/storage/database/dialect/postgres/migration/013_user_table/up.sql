@@ -70,6 +70,10 @@ CREATE TABLE zitadel.users(
     , invite_accepted_at                    TIMESTAMPTZ CHECK ((type = 'machine' AND invite_accepted_at IS NULL)                    OR (type = 'human'))
     , invite_failed_attempts                SMALLINT    CHECK ((type = 'machine' AND invite_failed_attempts IS NULL)                OR (type = 'human'))
 
+    , recovery_codes                        TEXT[]      CHECK ((type = 'machine' AND recovery_codes IS NULL)                        OR (type = 'human'))
+    , recovery_code_last_successful_check   TIMESTAMPTZ CHECK ((type = 'machine' AND recovery_code_last_successful_check IS NULL)   OR (type = 'human'))
+    , recovery_code_failed_attempts         SMALLINT    CHECK ((type = 'machine' AND recovery_code_failed_attempts IS NULL)         OR (type = 'human'))
+
     -- foreign keys for verifications are created in the verification migration
 
     -- machine
@@ -86,7 +90,7 @@ ALTER TABLE zitadel.sessions ADD CONSTRAINT fk_session_user FOREIGN KEY (instanc
 ALTER TABLE zitadel.authorizations ADD CONSTRAINT fk_authorization_user FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users (instance_id, id) ON DELETE CASCADE;
 
 -- user
-CREATE UNIQUE INDEX ON zitadel.users(instance_id, organization_id, username) WHERE username_org_unique IS TRUE; --TODO(adlerhurst): does that work if a username is already present on a user without org unique?
+CREATE UNIQUE INDEX ON zitadel.users(instance_id, organization_id, username) WHERE username_org_unique IS TRUE;
 CREATE UNIQUE INDEX ON zitadel.users(instance_id, username) WHERE username_org_unique IS FALSE;
 CREATE INDEX idx_user_username ON zitadel.users (username);
 CREATE INDEX idx_user_username_lower ON zitadel.users (lower(username));
@@ -101,7 +105,7 @@ CREATE UNIQUE INDEX ON zitadel.users(password_verification_id) WHERE password_ve
 CREATE UNIQUE INDEX ON zitadel.users(email_verification_id) WHERE email_verification_id IS NOT NULL;
 CREATE UNIQUE INDEX ON zitadel.users(phone_verification_id) WHERE phone_verification_id IS NOT NULL;
 
-CREATE TRIGGER trigger_set_updated_at
+CREATE OR REPLACE TRIGGER trigger_set_updated_at
 BEFORE UPDATE ON zitadel.users
 FOR EACH ROW
 WHEN (NEW.updated_at IS NULL)
@@ -127,7 +131,7 @@ CREATE TABLE zitadel.user_metadata (
 CREATE INDEX idx_user_metadata_key ON zitadel.user_metadata (key);
 CREATE INDEX idx_user_metadata_value ON zitadel.user_metadata (sha256(value));
 
-CREATE TRIGGER trg_set_updated_at_user_metadata
+CREATE OR REPLACE TRIGGER trg_set_updated_at_user_metadata
   BEFORE INSERT OR UPDATE ON zitadel.user_metadata
   FOR EACH ROW
   WHEN (NEW.updated_at IS NULL)
@@ -226,3 +230,94 @@ CREATE TABLE zitadel.user_identity_provider_links(
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
     , FOREIGN KEY (instance_id, identity_provider_id) REFERENCES zitadel.identity_providers(instance_id, id) ON DELETE CASCADE
 );
+
+-- ----------------------------------------------------------------
+-- organization scoped usernames
+-- ----------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION zitadel.set_username_org_unique() RETURNS TRIGGER AS $$
+BEGIN
+    SELECT setting.organization_scoped_usernames
+    INTO NEW.username_org_unique
+    FROM (
+        SELECT
+            (settings.settings->'organizationScopedUsernames' )::BOOLEAN AS organization_scoped_usernames
+        FROM zitadel.settings
+        WHERE
+            settings.type = 'organization'
+            AND settings.instance_id = NEW.instance_id
+            AND (
+                settings.organization_id IS NULL -- instance level setting
+                OR settings.organization_id = NEW.organization_id -- organization level setting
+            )
+        ORDER BY
+            settings.organization_id NULLS LAST -- organization level setting overrides instance level setting
+        LIMIT 1
+    ) AS setting;
+
+    NEW.username_org_unique = COALESCE(NEW.username_org_unique, FALSE); -- default to false if no setting is found
+
+    return NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_set_username_org_unique
+BEFORE INSERT ON zitadel.users
+FOR EACH ROW
+EXECUTE FUNCTION zitadel.set_username_org_unique();
+
+CREATE OR REPLACE FUNCTION zitadel.ensure_username_org_unique() RETURNS TRIGGER AS $$
+DECLARE
+    _instance_id TEXT;
+    _organization_id TEXT;
+    _old_organization_scoped_usernames BOOLEAN;
+    _new_organization_scoped_usernames BOOLEAN;
+BEGIN
+    CASE TG_OP
+        -- insert and delete can only happen on organization level therefore we can load the instance level setting as OLD or NEW.
+        WHEN 'DELETE' THEN
+            _instance_id := OLD.instance_id;
+            _organization_id := OLD.organization_id;
+            _old_organization_scoped_usernames := COALESCE((OLD.settings->'organizationScopedUsernames')::BOOLEAN, FALSE);
+            _new_organization_scoped_usernames := COALESCE((SELECT COALESCE((settings.settings->'organizationScopedUsernames')::BOOLEAN, FALSE) FROM zitadel.settings WHERE settings.instance_id = OLD.instance_id AND settings.type = 'organization' AND settings.organization_id IS NULL), FALSE);
+        WHEN 'INSERT' THEN
+            _instance_id := NEW.instance_id;
+            _organization_id := NEW.organization_id;
+            _old_organization_scoped_usernames := COALESCE((SELECT COALESCE((settings.settings->'organizationScopedUsernames')::BOOLEAN, FALSE) FROM zitadel.settings WHERE settings.instance_id = NEW.instance_id AND settings.type = 'organization' AND settings.organization_id IS NULL), FALSE);
+            _new_organization_scoped_usernames := COALESCE((NEW.settings->'organizationScopedUsernames')::BOOLEAN, FALSE);
+        ELSE
+            _instance_id := NEW.instance_id;
+            _organization_id := NEW.organization_id;
+            _old_organization_scoped_usernames := COALESCE((OLD.settings->'organizationScopedUsernames')::BOOLEAN, FALSE);
+            _new_organization_scoped_usernames := COALESCE((NEW.settings->'organizationScopedUsernames')::BOOLEAN, FALSE);
+    END CASE;
+
+    IF _old_organization_scoped_usernames IS NOT DISTINCT FROM _new_organization_scoped_usernames THEN
+        RETURN NULL;
+    END IF;
+
+    UPDATE zitadel.users
+    SET username_org_unique = _new_organization_scoped_usernames
+    WHERE instance_id = _instance_id
+    AND (
+        (_organization_id IS NOT NULL AND organization_id = _organization_id) -- organization level setting changed, update users of that organization
+        OR (_organization_id IS NULL AND organization_id NOT IN (
+            SELECT organization_id FROM zitadel.settings WHERE instance_id = _instance_id AND type = 'organization' AND organization_id IS NOT NULL
+        )) -- instance level setting changed, update users of organizations without an organization level setting
+    );
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_ensure_username_org_unique
+AFTER INSERT OR UPDATE ON zitadel.settings
+FOR EACH ROW
+WHEN (NEW.type = 'organization')
+EXECUTE FUNCTION zitadel.ensure_username_org_unique();
+
+CREATE OR REPLACE TRIGGER trg_ensure_username_org_unique_delete
+AFTER DELETE ON zitadel.settings
+FOR EACH ROW
+WHEN (OLD.type = 'organization')
+EXECUTE FUNCTION zitadel.ensure_username_org_unique();

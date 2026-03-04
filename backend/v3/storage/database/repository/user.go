@@ -30,6 +30,7 @@ type user struct {
 	userMetadata
 	userPasskey
 	userIdentityProviderLink
+	userLoginName
 }
 
 func (u user) HumanRepository() domain.HumanUserRepository {
@@ -71,6 +72,8 @@ var queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, 
 	", users.state, users.created_at, users.updated_at" +
 	// metadata
 	`, jsonb_agg(DISTINCT jsonb_build_object('instanceId', user_metadata.instance_id, 'key', user_metadata.key, 'value', encode(user_metadata.value, 'base64'), 'createdAt', user_metadata.created_at, 'updatedAt', user_metadata.updated_at)) FILTER (WHERE user_metadata.user_id IS NOT NULL) AS metadata` +
+	// login names
+	`, jsonb_agg(DISTINCT jsonb_build_object('loginName', login_names.login_name, 'isPreferred', login_names.is_preferred)) FILTER (WHERE login_names.user_id IS NOT NULL) AS login_names` +
 	// machine
 	`, CASE WHEN users.type = 'machine' THEN jsonb_build_object('name', users.name` +
 	`, 'description', users.description, 'secret', users.secret` +
@@ -88,6 +91,7 @@ var queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, 
 	`, 'email', jsonb_build_object('address', users.email, 'unverifiedAddress', users.unverified_email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.email_otp_last_successful_check, 'failedAttempts', users.email_otp_failed_attempts), 'pendingVerification', ` + verificationQuery(userHuman{}.emailVerificationIDColumn()) + `)` +
 	`, 'phone', CASE WHEN users.phone IS NOT NULL OR users.phone_verification_id IS NOT NULL THEN jsonb_build_object('number', users.phone, 'unverifiedNumber', users.unverified_phone, 'verifiedAt', users.phone_verified_at, 'otp', jsonb_build_object('enabledAt', users.sms_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.sms_otp_last_successful_check, 'failedAttempts', users.sms_otp_failed_attempts), 'pendingVerification', ` + verificationQuery(userHuman{}.phoneVerificationIDColumn()) + `) ELSE NULL END` +
 	`, 'totp', CASE WHEN users.totp_secret IS NOT NULL THEN jsonb_build_object('secret', encode(users.totp_secret, 'escape')::JSONB, 'verifiedAt', users.totp_verified_at, 'lastSuccessfullyCheckedAt', users.totp_last_successful_check, 'failedAttempts', users.totp_failed_attempts) ELSE NULL END` +
+	`, 'recoveryCodes', CASE WHEN users.recovery_codes IS NOT NULL THEN jsonb_build_object('codes', users.recovery_codes, 'lastSuccessfullyCheckedAt', users.recovery_code_last_successful_check, 'failedAttempts', users.recovery_code_failed_attempts) ELSE NULL END` +
 	`, 'passkeys', jsonb_agg(DISTINCT jsonb_build_object('id', user_passkeys.token_id, 'keyId', encode(user_passkeys.key_id, 'base64'), 'type', user_passkeys.type, 'name', user_passkeys.name, 'signCount', user_passkeys.sign_count, 'challenge', encode(user_passkeys.challenge, 'base64'), 'publicKey', encode(user_passkeys.public_key, 'base64'), 'attestationType', user_passkeys.attestation_type, 'aaGuid', encode(user_passkeys.authenticator_attestation_guid, 'base64'), 'rpId', user_passkeys.relying_party_id, 'createdAt', user_passkeys.created_at, 'updatedAt', user_passkeys.updated_at, 'verifiedAt', user_passkeys.verified_at)) FILTER (WHERE user_passkeys.user_id IS NOT NULL)` +
 	`, 'verifications', (SELECT jsonb_agg(jsonb_build_object('id', verifications.id, 'code', encode(verifications.code, 'escape')::JSONB, 'createdAt', verifications.created_at, 'updatedAt', verifications.updated_at, 'expiresAt', verifications.created_at+verifications.expiry, 'failedAttempts', verifications.failed_attempts)) FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.user_id = users.id AND verifications.id NOT IN (COALESCE(users.password_verification_id, ''), COALESCE(users.email_verification_id, ''), COALESCE(users.phone_verification_id, ''), COALESCE(users.invite_verification_id, '')))` +
 	`, 'identityProviderLinks', jsonb_agg(DISTINCT jsonb_build_object('providerId', user_identity_provider_links.identity_provider_id, 'providedUserId', user_identity_provider_links.provided_user_id, 'providedUsername', user_identity_provider_links.provided_username, 'createdAt', user_identity_provider_links.created_at, 'updatedAt', user_identity_provider_links.updated_at)) FILTER (WHERE user_identity_provider_links.user_id IS NOT NULL)` +
@@ -146,6 +150,7 @@ func (u user) appendQueryOpts(opts []database.QueryOption) []database.QueryOptio
 		u.joinVerifications(),
 		u.joinPasskeys(),
 		u.joinIdentityProviderLinks(),
+		u.joinLoginNames(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),
 	)
 }
@@ -225,11 +230,6 @@ func (u user) IDCondition(userID string) database.Condition {
 // InstanceIDCondition implements [domain.UserRepository].
 func (u user) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(u.InstanceIDColumn(), database.TextOperationEqual, instanceID)
-}
-
-// LoginNameCondition implements [domain.UserRepository].
-func (u user) LoginNameCondition(op database.TextOperation, loginName string) database.Condition {
-	panic("unimplemented")
 }
 
 // OrganizationIDCondition implements [domain.UserRepository].
@@ -474,6 +474,16 @@ func (u user) joinIdentityProviderLinks() database.QueryOption {
 		database.And(
 			database.NewColumnCondition(u.InstanceIDColumn(), u.userIdentityProviderLink.instanceIDColumn()),
 			database.NewColumnCondition(u.IDColumn(), u.userIdentityProviderLink.userIDColumn()),
+		),
+	)
+}
+
+func (u user) joinLoginNames() database.QueryOption {
+	return database.WithLeftJoin(
+		u.userLoginName.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(u.InstanceIDColumn(), u.userLoginName.instanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.userLoginName.userIDColumn()),
 		),
 	)
 }
