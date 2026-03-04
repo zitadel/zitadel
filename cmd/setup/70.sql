@@ -1,6 +1,22 @@
 ALTER TABLE IF EXISTS eventstore.events2 ADD COLUMN IF NOT EXISTS written_by_v3 BOOLEAN NOT NULL DEFAULT false;
 
-ALTER TYPE eventstore.command ADD ATTRIBUTE IF NOT EXISTS written_by_v3 BOOLEAN;
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_catalog.pg_attribute a
+        JOIN pg_catalog.pg_type t ON t.typrelid = a.attrelid
+        JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+        WHERE n.nspname = 'eventstore'
+            AND t.typname = 'command'
+            AND a.attname = 'written_by_v3'
+            AND a.attnum > 0
+            AND NOT a.attisdropped
+    ) THEN
+        ALTER TYPE eventstore.command ADD ATTRIBUTE written_by_v3 BOOLEAN;
+    END IF;
+END;
+$$;
 
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[])
     RETURNS SETOF eventstore.events2 

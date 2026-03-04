@@ -48,7 +48,7 @@ type event struct {
 }
 
 // TODO: remove on v3
-func commandToEventOld(sequence *latestSequence, cmd eventstore.Command, writtenByV3 bool) (_ *event, err error) {
+func commandToEventOld(sequence *latestSequence, cmd eventstore.Command) (_ *event, err error) {
 	var payload Payload
 	if cmd.Payload() != nil {
 		payload, err = json.Marshal(cmd.Payload())
@@ -67,7 +67,6 @@ func commandToEventOld(sequence *latestSequence, cmd eventstore.Command, written
 			Payload:       payload,
 			Creator:       cmd.Creator(),
 			Owner:         sequence.aggregate.ResourceOwner,
-			WrittenByV3:   writtenByV3,
 		},
 		sequence: sequence.sequence,
 	}, nil

@@ -226,7 +226,6 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 				&event.AggregateType,
 				&event.AggregateID,
 				&revision,
-				&event.IsWrittenByV3,
 			)
 			event.Version = eventstore.Version("v" + strconv.Itoa(int(revision)))
 		}
@@ -301,7 +300,7 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		if clauses != "" {
 			clauses += " AND "
 		}
-		clauses += "written_by_v3 = false"
+		clauses += "written_by_v3 IS false"
 	}
 
 	if clauses == "" {

@@ -106,7 +106,7 @@ func (es *Eventstore) writeEventsOld(ctx context.Context, tx database.Transactio
 	return events, nil
 }
 
-const argsPerCommand = 11
+const argsPerCommand = 10
 
 func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (events []eventstore.Event, placeholders []string, args []any, err error) {
 	events = make([]eventstore.Event, len(commands))
@@ -126,8 +126,7 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 		}
 		sequence.sequence++
 
-		_, isV3Command := command.(eventstore.V3Command)
-		events[i], err = commandToEventOld(sequence, command, isV3Command)
+		events[i], err = commandToEventOld(sequence, command)
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -143,7 +142,6 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			i*argsPerCommand+8,
 			i*argsPerCommand+9,
 			i*argsPerCommand+10,
-			i*argsPerCommand+11,
 		)
 
 		args = append(args,
@@ -157,7 +155,6 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			events[i].(*event).command.Payload,
 			events[i].(*event).sequence,
 			i,
-			events[i].(*event).command.WrittenByV3,
 		)
 	}
 
