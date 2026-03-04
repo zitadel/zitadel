@@ -46,11 +46,6 @@ vi.mock("escape-html", () => ({
 }));
 
 import { handleOIDCFlowInitiation, FlowInitiationParams } from "./flow-initiation";
-import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
-import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
-import { getAuthRequest } from "@/lib/zitadel";
-import { findValidSession } from "@/lib/session";
-import { constructUrl } from "@/lib/service-url";
 
 function makeRequest(url = "https://example.com/login?requestId=oidc_abc123"): NextRequest {
   return new NextRequest(url);
