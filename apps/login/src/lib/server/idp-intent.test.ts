@@ -466,6 +466,80 @@ describe("processIDPCallback", () => {
 
       expect(result.error).toBe("Session error");
     });
+
+    test("should use addHumanUser.idpLinks[0].userName as fallback when idpInformation.userName is empty", async () => {
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+        idpInformation: {
+          ...defaultIntent.idpInformation,
+          userName: "", // Empty userName (e.g. from SAML)
+        },
+        addHumanUser: {
+          ...defaultIntent.addHumanUser,
+          idpLinks: [{ idpId: "idp123", userId: "user123", userName: "saml-user@example.com" }],
+        },
+      });
+      mockGetIDPByID.mockResolvedValue({
+        ...defaultIdp,
+        config: {
+          options: {
+            ...defaultIdp.config.options,
+            isLinkingAllowed: true,
+          },
+        },
+      });
+
+      const result = await processIDPCallback(linkParams);
+
+      expect(mockAddIDPLink).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        idp: {
+          id: "idp123",
+          userId: "user123",
+          userName: "saml-user@example.com",
+        },
+        userId: "user123",
+      });
+      expect(result.redirect).toBe("https://app.example.com/success");
+    });
+
+    test("should use idpInformation.userId as fallback when both userName fields are empty", async () => {
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+        idpInformation: {
+          ...defaultIntent.idpInformation,
+          userName: "", // Empty userName
+        },
+        addHumanUser: {
+          ...defaultIntent.addHumanUser,
+          idpLinks: undefined, // No idpLinks
+        },
+      });
+      mockGetIDPByID.mockResolvedValue({
+        ...defaultIdp,
+        config: {
+          options: {
+            ...defaultIdp.config.options,
+            isLinkingAllowed: true,
+          },
+        },
+      });
+
+      const result = await processIDPCallback(linkParams);
+
+      expect(mockAddIDPLink).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        idp: {
+          id: "idp123",
+          userId: "user123",
+          userName: "user123", // Falls back to idpInformation.userId
+        },
+        userId: "user123",
+      });
+      expect(result.redirect).toBe("https://app.example.com/success");
+    });
   });
 
   describe("CASE 3: Auto-linking by email", () => {
@@ -545,6 +619,68 @@ describe("processIDPCallback", () => {
       const result = await processIDPCallback(defaultParams);
 
       expect(result.redirect).toContain("/idp/google/linking-failed");
+    });
+
+    test("should use addHumanUser.idpLinks[0].userName as fallback when idpInformation.userName is empty", async () => {
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+        idpInformation: {
+          ...defaultIntent.idpInformation,
+          userName: "", // Empty userName (e.g. from SAML)
+        },
+        addHumanUser: {
+          ...defaultIntent.addHumanUser,
+          idpLinks: [{ idpId: "idp123", userId: "user123", userName: "fallback@example.com" }],
+        },
+      });
+      mockListUsers.mockResolvedValue({
+        result: [{ userId: "found123", details: { resourceOwner: "org123" } }],
+      });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddIDPLink).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        idp: {
+          id: "idp123",
+          userId: "user123",
+          userName: "fallback@example.com",
+        },
+        userId: "found123",
+      });
+      expect(result.redirect).toBe("https://app.example.com/success");
+    });
+
+    test("should use idpInformation.userId as fallback when both userName fields are empty", async () => {
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+        idpInformation: {
+          ...defaultIntent.idpInformation,
+          userName: "", // Empty userName (e.g. from SAML without Action V2)
+        },
+        addHumanUser: {
+          ...defaultIntent.addHumanUser,
+          idpLinks: [{ idpId: "idp123", userId: "user123", userName: "" }],
+        },
+      });
+      mockListUsers.mockResolvedValue({
+        result: [{ userId: "found123", details: { resourceOwner: "org123" } }],
+      });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddIDPLink).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        idp: {
+          id: "idp123",
+          userId: "user123",
+          userName: "user123", // Falls back to idpInformation.userId
+        },
+        userId: "found123",
+      });
+      expect(result.redirect).toBe("https://app.example.com/success");
     });
   });
 

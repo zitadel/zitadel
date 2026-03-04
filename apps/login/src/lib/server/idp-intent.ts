@@ -236,7 +236,10 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
         idp: {
           id: intent.idpInformation!.idpId,
           userId: intent.idpInformation!.userId,
-          userName: intent.idpInformation!.userName,
+          userName:
+            intent.idpInformation!.userName ||
+            intent.addHumanUser?.idpLinks?.[0]?.userName ||
+            intent.idpInformation!.userId,
         },
         userId: resolvedUserId,
       });
@@ -404,7 +407,10 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
           idp: {
             id: idpInformation!.idpId,
             userId: idpInformation!.userId,
-            userName: idpInformation!.userName,
+            userName:
+              idpInformation!.userName ||
+              addHumanUser?.idpLinks?.[0]?.userName ||
+              idpInformation!.userId,
           },
           userId: foundUser.userId,
         });
