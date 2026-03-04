@@ -4589,7 +4589,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 							Metadata: []*user.Metadata{
 								{
 									Key:   "key1",
-									Value: []byte("updated_value1"), // updating key2
+									Value: []byte("updated_value1"), // updating key1
 								},
 								{
 									Key:   "key3",

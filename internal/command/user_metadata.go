@@ -94,7 +94,7 @@ func (c *Commands) getUserMetadataSetEvents(ctx context.Context, userID string, 
 	if err != nil {
 		return nil, nil, err
 	}
-	// if there is no metadata list,
+	// if no metadata entries were requested,
 	// return the current metadata write model without any events to be pushed
 	if len(metadatas) == 0 {
 		return nil, setMetadata, nil
