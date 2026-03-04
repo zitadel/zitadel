@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Secret konnte nicht generiert werden"
     PAT:
       NotFound: "Persönliches Access Token nicht gefunden"
+    Metadata:
+      Conflicting: "Metadaten dürfen nicht gleichzeitig in den Feldern [user] und [human] gesetzt sein"
     NotHuman: "Der Benutzer muss eine Person sein"
     NotMachine: "Der Benutzer muss technisch sein"
     WrongType: "Für diesen Benutzertyp nicht erlaubt"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "Refresh Token ist ungültig"
       NotFound: "Refresh Token nicht gefunden"
-  Instance:
-    NotFound: "Instanz konnte nicht gefunden werden"
-    AlreadyExists: "Instanz exisitiert bereits"
-    NotChanged: "Instanz wurde nicht verändert"
   Org:
     AlreadyExists: "Der Name oder die ID der Organisation ist bereits vorhanden"
     Invalid: "Organisation ist ungültig"
@@ -222,7 +220,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Das File der Challenge wurde unter der erwarteten URL nicht gefunden. Überprüfen Sie, ob Sie die Datei mit Leseberechtigungen an der richtigen Stelle hochgeladen haben"
     DomainVerificationHTTPNoMatch: "Das File der Challenge wurde in der erwarteten URL gefunden, enthält jedoch nicht den richtigen Token-Text. Überprüfen Sie den Inhalt"
     DomainVerificationTimeout: "There was a timeout querying the DNS server."
-    PrimaryDomainNotDeletable: "Primäre Domäne kann nicht gelöscht werden"
+    PrimaryDomainNotDeletable: "Die Organisationsdomäne kann nicht gelöscht werden"
     DomainNotFound: "Domäne konnte nicht gefunden werden"
     MemberIDMissing: "Member ID fehlt"
     MemberNotFound: "Organisations Member konnte nicht gefunden werden"
@@ -345,6 +343,8 @@ Errors:
       NotActive: "Projekt Grant ist nicht aktiv"
       NotInactive: "Projekt Grant ist nicht inaktiv"
   Instance:
+    AlreadyExists: "Instanz exisitiert bereits"
+    NotChanged: "Instanz wurde nicht verändert"
     NotFound: "Instanz nicht gefunden. Stelle sicher, dass Du die richtige Domain hast. Schau unter https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Rollen wurden nicht verändert"
@@ -897,7 +897,7 @@ EventTypes:
       verified: "Domäne verifiziert"
       removed: "Domäne entfernt"
       primary:
-        set: "Primäre Domäne gesetzt"
+        set: "Organisationsdomäne gesetzt"
       reserved: "Domäne reserviert"
       released: "Domäne freigegeben"
     name:

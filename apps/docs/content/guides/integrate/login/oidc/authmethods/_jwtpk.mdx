@@ -60,7 +60,7 @@ Depending on your authentication method you'll need additional headers and param
 Send a JWT in the `client_assertion` and set the `client_assertion_type` to `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
 for us to validate the signature against the registered public key:
 
-```curl
+```bash
 curl --request POST \
 --url ${CUSTOM_DOMAIN}/oauth/v2/token \
 --header 'Content-Type: application/x-www-form-urlencoded' \

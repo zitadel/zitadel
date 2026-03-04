@@ -1,5 +1,6 @@
 ---
 title: Configuration
+description: "Configure ZITADEL Helm chart settings for Kubernetes deployments including global, ZITADEL, and scaling options"
 sidebar_label: Configuration
 ---
 
@@ -80,11 +81,11 @@ zitadel:
     ExternalSecure: true
 ```
 
-| Setting | Description |
-|---------|-------------|
+| Setting          | Description                                  |
+|------------------|----------------------------------------------|
 | `ExternalDomain` | The public domain name (no protocol or port) |
-| `ExternalPort` | The public port (443 for HTTPS, 80 for HTTP) |
-| `ExternalSecure` | Whether the external connection uses HTTPS |
+| `ExternalPort`   | The public port (443 for HTTPS, 80 for HTTP) |
+| `ExternalSecure` | Whether the external connection uses HTTPS   |
 
 ### TLS
 
@@ -115,7 +116,7 @@ zitadel:
           PasswordChangeRequired: false
 ```
 
-#### Machine User for System API
+#### Service Account for System API
 
 For programmatic access, configure a system user with RSA keys:
 

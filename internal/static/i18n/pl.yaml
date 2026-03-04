@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Sekret nie mógł zostać wygenerowany"
     PAT:
       NotFound: "Osobisty token dostępu nie znaleziony"
+    Metadata:
+      Conflicting: "Metadane nie mogą być ustawione jednocześnie w polach [user] i [human]"
     NotHuman: "Użytkownik musi być osobą"
     NotMachine: "Użytkownik musi być techniczny"
     WrongType: "Niedozwolone dla tego typu użytkownika"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "Refresh Token jest nieprawidłowy"
       NotFound: "Refresh Token nie znaleziony"
-  Instance:
-    NotFound: "Instancja nie znaleziona"
-    AlreadyExists: "Instancja już istnieje"
-    NotChanged: "Instancja nie zmieniona"
   Org:
     AlreadyExists: "Nazwa lub identyfikator organizacji jest już zajęty"
     Invalid: "Organizacja jest nieprawidłowa"
@@ -222,7 +220,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Pod oczekiwanym adresem URL nie znaleziono pliku zawierającego wyzwanie. Sprawdź, czy przesłałeś plik we właściwe miejsce z uprawnieniami do odczytu"
     DomainVerificationHTTPNoMatch: "Znaleziono plik zawierający wyzwanie pod oczekiwanym adresem URL, ale nie zawiera on prawidłowego tekstu tokena. Sprawdź jego zawartość"
     DomainVerificationTimeout: "Upłynął limit czasu podczas wysyłania zapytania do serwera DNS"
-    PrimaryDomainNotDeletable: "Domena główna nie może być usunięta"
+    PrimaryDomainNotDeletable: "Domena organizacji nie może być usunięta"
     DomainNotFound: "Domena nie znaleziona"
     MemberIDMissing: "Brak identyfikatora członka"
     MemberNotFound: "Członek organizacji nie znaleziony"
@@ -345,6 +343,8 @@ Errors:
       NotActive: "Grant projektu jest nieaktywny"
       NotInactive: "Grant projektu nie jest nieaktywny"
   Instance:
+    AlreadyExists: "Instancja już istnieje"
+    NotChanged: "Instancja nie zmieniona"
     NotFound: "Instancja nie znaleziona. Upewnij się, że masz poprawną domenę. Sprawdź https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Role nie zmienione"
@@ -897,7 +897,7 @@ EventTypes:
       verified: "Domena zweryfikowana"
       removed: "Usunięto domenę"
       primary:
-        set: "Ustawiono domenę główną"
+        set: "Ustawiono domenę organizacji"
       reserved: "Zarezerwowano domenę"
       released: "Zwolniono domenę"
     name:

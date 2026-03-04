@@ -629,7 +629,7 @@ message CreateOrganizationResponse{
 }
 
 message UpdateOrganizationRequest {
-  // Organization Id for the Organization to be updated
+  // Organization ID for the Organization to be updated
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -680,7 +680,7 @@ message ListOrganizationsResponse {
 
 message DeleteOrganizationRequest {
 
-  // Organization Id for the Organization to be deleted
+  // Organization ID for the Organization to be deleted
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -702,7 +702,7 @@ message DeleteOrganizationResponse {
 }
 
 message DeactivateOrganizationRequest {
-  // Organization Id for the Organization to be deactivated
+  // Organization ID for the Organization to be deactivated
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -723,7 +723,7 @@ message DeactivateOrganizationResponse {
 }
 
 message ActivateOrganizationRequest {
-  // Organization Id for the Organization to be activated
+  // Organization ID for the Organization to be activated
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -744,7 +744,7 @@ message ActivateOrganizationResponse {
 }
 
 message AddOrganizationDomainRequest {
-  // Organization Id for the Organization for which the domain is to be added to.
+  // Organization ID for the Organization for which the domain is to be added to.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -776,7 +776,7 @@ message AddOrganizationDomainResponse {
 }
 
 message ListOrganizationDomainsRequest {
-  // Organization Id for the Organization which domains are to be listed.
+  // Organization ID for the Organization which domains are to be listed.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -801,7 +801,7 @@ message ListOrganizationDomainsResponse {
 }
 
 message DeleteOrganizationDomainRequest {
-  // Organization Id for the Organization which domain is to be deleted.
+  // Organization ID for the Organization which domain is to be deleted.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -823,7 +823,7 @@ message DeleteOrganizationDomainRequest {
 }
 
 message DeleteOrganizationDomainResponse {
-  // The timestamp of the deletion of the organization domain.
+  // The timestamp of the deletion of the Organization Domain.
   google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -832,7 +832,7 @@ message DeleteOrganizationDomainResponse {
 }
 
 message GenerateOrganizationDomainValidationRequest {
-  // Organization Id for the Organization which doman to be validated.
+  // Organization ID for the Organization which domain to be validated.
   string organization_id = 1 [
 
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -872,7 +872,7 @@ message GenerateOrganizationDomainValidationResponse {
 }
 
 message VerifyOrganizationDomainRequest {
-  // Organization Id for the Organization doman to be verified.
+  // Organization ID for the Organization domain to be verified.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -882,7 +882,7 @@ message VerifyOrganizationDomainRequest {
       example: "\"69629012906488334\"";
     }
   ];
-  // Organization Id for the Organization doman to be verified.
+  // The domain to be verified.
   string domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -894,7 +894,7 @@ message VerifyOrganizationDomainRequest {
 }
 
 message VerifyOrganizationDomainResponse {
-  // The timestamp of the verification of the organization domain.
+  // The timestamp of the verification of the Organization Domain.
   google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -909,7 +909,6 @@ message Metadata {
   bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
 }
 message SetOrganizationMetadataRequest{
-  // Organization Id for the Organization doman to be verified.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,

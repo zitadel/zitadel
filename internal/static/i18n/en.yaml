@@ -132,6 +132,8 @@ Errors:
         CouldNotGenerate: "Secret could not be generated"
     PAT:
       NotFound: "Personal Access Token not found"
+    Metadata:
+      Conflicting: "Metadata must not be set on both the user and human fields"
     NotHuman: "The User must be personal"
     NotMachine: "The User must be technical"
     WrongType: "Not allowed for this user type"
@@ -180,6 +182,7 @@ Errors:
       Passwordless:
         NotExisting: "Passkey does not exist"
       RecoveryCodes:
+        Empty: "Recovery code is empty"
         InvalidCode: "Invalid recovery code provided"
         MaxCountExceeded: "Maximum number of recovery codes exceeded"
         NotReady: "Recovery codes are not ready for use"
@@ -196,10 +199,6 @@ Errors:
     RefreshToken:
       Invalid: "Refresh Token is invalid"
       NotFound: "Refresh Token not found"
-  Instance:
-    NotFound: "Instance not found"
-    AlreadyExists: "Instance already exists"
-    NotChanged: "Instance not changed"
   Org:
     AlreadyExists: "Organisation's name or id already taken"
     Invalid: "Organisation is invalid"
@@ -223,7 +222,7 @@ Errors:
     DomainVerificationHTTPNotFound: "The file containing the challenge was not found in the expected URL. Check that you've uploaded the file in the right place with read permissions"
     DomainVerificationHTTPNoMatch: "The file containing the challenge has been found in the expected URL but it doesn't contain the right token text. Check its content"
     DomainVerificationTimeout: "There was a timeout querying the DNS server"
-    PrimaryDomainNotDeletable: "Primary domain must not be deleted"
+    PrimaryDomainNotDeletable: "Organization Domain must not be deleted"
     DomainNotFound: "Domain not found"
     MemberIDMissing: "Member ID missing"
     MemberNotFound: "Organisation member not found"
@@ -346,6 +345,8 @@ Errors:
       NotActive: "Project Grant is not active"
       NotInactive: "Project Grant is not inactive"
   Instance:
+    AlreadyExists: "Instance already exists"
+    NotChanged: "Instance not changed"
     NotFound: "Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roles have not been changed"
@@ -897,7 +898,7 @@ EventTypes:
       verified: "Domain verified"
       removed: "Domain removed"
       primary:
-        set: "Primary domain set"
+        set: "Organization Domain set"
       reserved: "Domain reserved"
       released: "Domain released"
     name:

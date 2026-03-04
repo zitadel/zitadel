@@ -701,6 +701,8 @@ message GetGeneralSettingsResponse {
   ];
 
   // The list of supported languages.
+  // Note that the instance might restrict the languages further
+  // only allowing a subset of these languages to be used.
   // The format is a BCP 47 language tag (e.g. "en", "de", "fr-CH").
   repeated string supported_languages = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -711,6 +713,16 @@ message GetGeneralSettingsResponse {
   // The unique identifier of the default organization.
   // The default organization is used to assign new users to an organization if no other organization is specified.
   string default_organization_id = 4;
+
+  // The list of allowed languages for the instance.
+  // This is a subset of the supported languages to be used in the instance
+  // e.g. for user selection during registration or language detection in the UI.
+  // The format is a BCP 47 language tag (e.g. "en", "de", "fr-CH").
+  repeated string allowed_languages = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"en\", \"de\", \"it\"]"
+    }
+  ];
 }
 
 message GetSecuritySettingsRequest{}

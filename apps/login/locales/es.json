@@ -108,14 +108,17 @@
       "description": "Establece la contraseña para tu cuenta",
       "submit": "Continuar",
       "labels": {
+        "currentPassword": "Contraseña actual",
         "newPassword": "Nueva contraseña",
         "confirmPassword": "Confirmar contraseña"
       },
       "required": {
+        "currentPassword": "¡Debes proporcionar tu contraseña actual!",
         "newPassword": "¡Debes proporcionar una nueva contraseña!",
         "confirmPassword": "Este campo es obligatorio"
       },
       "errors": {
+        "currentPasswordInvalid": "La contraseña actual es incorrecta.",
         "couldNotChangePassword": "No se pudo cambiar la contraseña",
         "couldNotVerifyPassword": "No se pudo verificar la contraseña",
         "unknownError": "Error desconocido"

@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "El secreto no pudo generarse"
     PAT:
       NotFound: "Token de acceso personal no encontrado"
+    Metadata:
+      Conflicting: "Los metadatos no deben definirse simultáneamente en los campos [user] y [human]"
     NotHuman: "El usuario debe ser personal"
     NotMachine: "El usuario debe ser técnico"
     WrongType: "Tipo de usuario no permitido"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "El token de refresco no es válido"
       NotFound: "No se encontró el token de refresco"
-  Instance:
-    NotFound: "Instancia no encontrada"
-    AlreadyExists: "La instancia ya existe"
-    NotChanged: "La instancia no ha cambiado"
   Org:
     AlreadyExists: "El nombre o id de la organización ya está tomado"
     Invalid: "El nombre de la organización no es válido"
@@ -222,7 +220,7 @@ Errors:
     DomainVerificationHTTPNotFound: "El archivo que contiene el desafío no se encontró en la URL esperada. Comprueba que has subido el archivo en el lugar correcto con permisos de lectura."
     DomainVerificationHTTPNoMatch: "El archivo que contiene el desafío se encontró en la URL esperada, pero no contiene el texto del token correcto. Consulta su contenido"
     DomainVerificationTimeout: "Se superó el tiempo de espera al consultar el servidor DNS."
-    PrimaryDomainNotDeletable: "El dominio primario no debe borrarse"
+    PrimaryDomainNotDeletable: "El dominio de la organización no debe borrarse"
     DomainNotFound: "Dominio no encontrado"
     MemberIDMissing: "Falta el ID del miembro"
     MemberNotFound: "Miembro de la organización no encontrado"
@@ -345,6 +343,8 @@ Errors:
       NotActive: "La concesión del proyecto no está activa"
       NotInactive: "La concesión del proyecto no está inactiva"
   Instance:
+    AlreadyExists: "La instancia ya existe"
+    NotChanged: "La instancia no ha cambiado"
     NotFound: "Instancia no encontrada. Asegúrate de que tienes el dominio correcto. Consulta https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Los roles no han cambiado"
@@ -897,7 +897,7 @@ EventTypes:
       verified: "Dominio verificado"
       removed: "Dominio eliminado"
       primary:
-        set: "Dominio primario establecido"
+        set: "Dominio de la organización establecido"
       reserved: "Dominio reservado"
       released: "Dominio liberado"
     name:

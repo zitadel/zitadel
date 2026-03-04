@@ -184,6 +184,10 @@ export class UserCreateV2Component implements OnInit {
     this.loading.set(true);
 
     const activeOrg = await this.authService.getActiveOrg();
+    if (!activeOrg) {
+      console.log('No active organization found. Cannot create user.');
+      return;
+    }
     const userValues = this.userForm.getRawValue();
 
     const humanReq: MessageInitShape<typeof AddHumanUserRequestSchema> = {

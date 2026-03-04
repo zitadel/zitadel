@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Hemlig kod kunde inte genereras"
     PAT:
       NotFound: "Personlig åtkomst-token hittades inte"
+    Metadata:
+      Conflicting: "Metadata får inte anges samtidigt i fälten [user] och [human]"
     NotHuman: "Användaren måste vara en person"
     NotMachine: "Användaren måste vara en maskin"
     WrongType: "Inte tillåtet för denna användartyp"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "Uppdateringstoken är ogiltigt"
       NotFound: "Uppdateringstoken hittades inte"
-  Instance:
-    NotFound: "Instans hittades inte"
-    AlreadyExists: "Instans finns redan"
-    NotChanged: "Instans ändrades inte"
   Org:
     AlreadyExists: "Organisationens namn eller ID är redan upptaget"
     Invalid: "Organisationen är ogiltigt"
@@ -222,7 +220,7 @@ Errors:
     DomainVerificationHTTPNotFound: "Filen som innehåller utmaningen hittades inte på den förväntade URL:en. Kontrollera att du har laddat upp filen på rätt plats med läsbehörigheter"
     DomainVerificationHTTPNoMatch: "Filen som innehåller utmaningen har hittats på den förväntade URL:en men den innehåller inte rätt token-text. Kontrollera dess innehåll"
     DomainVerificationTimeout: "Det uppstod en timeout vid förfrågan till DNS-servern"
-    PrimaryDomainNotDeletable: "Primär domän får inte raderas"
+    PrimaryDomainNotDeletable: "Organisationsdomän får inte raderas"
     DomainNotFound: "Domän hittades inte"
     MemberIDMissing: "Medlems-ID saknas"
     MemberNotFound: "Organisationsmedlem hittades inte"
@@ -345,6 +343,8 @@ Errors:
       NotActive: "Projektets medgivande är inte aktivt"
       NotInactive: "Projektets medgivande är inte inaktivt"
   Instance:
+    AlreadyExists: "Instans finns redan"
+    NotChanged: "Instans ändrades inte"
     NotFound: "Instansen hittades inte. Se till att du har rätt domän. Kolla https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roller har inte ändrats"
@@ -896,7 +896,7 @@ EventTypes:
       verified: "Domän verifierad"
       removed: "Domän borttagen"
       primary:
-        set: "Primär domän inställd"
+        set: "Organisationsdomän inställd"
       reserved: "Domän reserverad"
       released: "Domän släppt"
     name:

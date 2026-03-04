@@ -35,7 +35,7 @@ type Subscription struct {
 // handler, after Subscribe has returned.
 // Multiple subscription may be active on a single channel.
 // Each request is always forwarded to each Subscription.
-// Close must be called to cleanup up the Subscription's channel and go routine.
+// Close must be called to clean up the Subscription's channel and go routine.
 func Subscribe(ctx context.Context, ch Channel) *Subscription {
 	u := url.URL{
 		Scheme: "ws",
