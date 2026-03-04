@@ -2,7 +2,7 @@
 applyTo: '{apps/docs/content/**/*.mdx,apps/docs/content/**/*.md,console/src/assets/i18n/*.json,apps/login/locales/*.json,internal/static/i18n/*.yaml,internal/static/i18n/*.yml,proto/**/*.proto}'
 ---
 
-When reviewing user-facing naming changes, enforce the canonical terminology table in `.github/TERMINOLOGY.md`.
+When reviewing user-facing naming changes, enforce the canonical terminology table in `TERMINOLOGY.md`.
 
 ### How to apply
 - Cross-reference every changed user-facing string against the **Search for (discouraged)** column.
@@ -13,4 +13,4 @@ When reviewing user-facing naming changes, enforce the canonical terminology tab
   - `Docs` → `apps/docs/content/`
   - `API` → `proto/**`, API description text
   - `Everywhere` → all of the above
-- If a PR introduces a new policy, setting, or resource term not yet in the table, request that the contributor adds it to `.github/TERMINOLOGY.md`.
+- If a PR introduces a new policy, setting, or resource term not yet in the table, request that the contributor adds it to `TERMINOLOGY.md`.
