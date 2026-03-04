@@ -17,6 +17,14 @@ func IDProviderRepository() domain.IDProviderRepository {
 	return new(idProvider)
 }
 
+func (idProvider) unqualifiedTableName() string {
+	return "identity_providers"
+}
+
+func (idProvider) qualifiedTableName() string {
+	return "zitadel.identity_providers"
+}
+
 const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation,` +
 	` allow_auto_update, allow_linking, auto_linking_field, payload, created_at, updated_at` +
 	` FROM zitadel.identity_providers`
@@ -37,10 +45,11 @@ func (i *idProvider) Get(ctx context.Context, client database.QueryExecutor, opt
 }
 
 func (i *idProvider) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.IdentityProvider, error) {
-	var options database.QueryOpts
+	options := new(database.QueryOpts)
 	for _, opt := range opts {
-		opt(&options)
+		opt(options)
 	}
+
 	if err := checkRestrictingColumns(options.Condition, i.InstanceIDColumn()); err != nil {
 		return nil, err
 	}
@@ -110,7 +119,8 @@ func (i *idProvider) Delete(ctx context.Context, client database.QueryExecutor, 
 		return 0, err
 	}
 
-	builder := database.NewStatementBuilder(`DELETE FROM zitadel.identity_providers`)
+	builder := database.NewStatementBuilder(`DELETE FROM `)
+	builder.WriteString(i.qualifiedTableName())
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
@@ -124,7 +134,7 @@ func (i *idProvider) GetOIDC(ctx context.Context, client database.QueryExecutor,
 
 	return &domain.IDPOIDC{
 		IdentityProvider: idp,
-		OIDC:             *typ,
+		OIDC:             typ,
 	}, nil
 }
 
@@ -136,7 +146,7 @@ func (i *idProvider) GetJWT(ctx context.Context, client database.QueryExecutor, 
 
 	return &domain.IDPJWT{
 		IdentityProvider: idp,
-		JWT:              *typ,
+		JWT:              typ,
 	}, nil
 }
 
@@ -148,7 +158,7 @@ func (i *idProvider) GetOAuth(ctx context.Context, client database.QueryExecutor
 
 	return &domain.IDPOAuth{
 		IdentityProvider: idp,
-		OAuth:            *typ,
+		OAuth:            typ,
 	}, nil
 }
 
@@ -160,7 +170,7 @@ func (i *idProvider) GetAzureAD(ctx context.Context, client database.QueryExecut
 
 	return &domain.IDPAzureAD{
 		IdentityProvider: idp,
-		Azure:            *typ,
+		Azure:            typ,
 	}, nil
 }
 
@@ -172,7 +182,7 @@ func (i *idProvider) GetGoogle(ctx context.Context, client database.QueryExecuto
 
 	return &domain.IDPGoogle{
 		IdentityProvider: idp,
-		Google:           *typ,
+		Google:           typ,
 	}, nil
 }
 
@@ -184,7 +194,7 @@ func (i *idProvider) GetGithub(ctx context.Context, client database.QueryExecuto
 
 	return &domain.IDPGithub{
 		IdentityProvider: idp,
-		Github:           *typ,
+		Github:           typ,
 	}, nil
 }
 
@@ -196,7 +206,7 @@ func (i *idProvider) GetGithubEnterprise(ctx context.Context, client database.Qu
 
 	return &domain.IDPGithubEnterprise{
 		IdentityProvider: idp,
-		GithubEnterprise: *typ,
+		GithubEnterprise: typ,
 	}, nil
 }
 
@@ -208,7 +218,7 @@ func (i *idProvider) GetGitlab(ctx context.Context, client database.QueryExecuto
 
 	return &domain.IDPGitlab{
 		IdentityProvider: idp,
-		Gitlab:           *typ,
+		Gitlab:           typ,
 	}, nil
 }
 
@@ -220,7 +230,7 @@ func (i *idProvider) GetGitlabSelfHosted(ctx context.Context, client database.Qu
 
 	return &domain.IDPGitlabSelfHosted{
 		IdentityProvider: idp,
-		GitlabSelfHosted: *typ,
+		GitlabSelfHosted: typ,
 	}, nil
 }
 
@@ -232,7 +242,7 @@ func (i *idProvider) GetLDAP(ctx context.Context, client database.QueryExecutor,
 
 	return &domain.IDPLDAP{
 		IdentityProvider: idp,
-		LDAP:             *typ,
+		LDAP:             typ,
 	}, nil
 }
 
@@ -244,7 +254,7 @@ func (i *idProvider) GetApple(ctx context.Context, client database.QueryExecutor
 
 	return &domain.IDPApple{
 		IdentityProvider: idp,
-		Apple:            *typ,
+		Apple:            typ,
 	}, nil
 }
 
@@ -256,7 +266,7 @@ func (i *idProvider) GetSAML(ctx context.Context, client database.QueryExecutor,
 
 	return &domain.IDPSAML{
 		IdentityProvider: idp,
-		SAML:             *typ,
+		SAML:             typ,
 	}, nil
 }
 
@@ -266,10 +276,12 @@ type idpType interface {
 		domain.LDAP | domain.Apple | domain.SAML
 }
 
-func getIDP[T idpType](ctx context.Context, client database.QueryExecutor, repo *idProvider, expectedType domain.IDPType, opts ...database.QueryOption) (*domain.IdentityProvider, *T, error) {
+func getIDP[T idpType](ctx context.Context, client database.QueryExecutor, repo *idProvider, expectedType domain.IDPType, opts ...database.QueryOption) (*domain.IdentityProvider, T, error) {
+	var zero T
 	idp, err := repo.Get(ctx, client, opts...)
 	if err != nil {
-		return nil, nil, err
+
+		return nil, zero, err
 	}
 
 	var idpType domain.IDPType
@@ -278,16 +290,16 @@ func getIDP[T idpType](ctx context.Context, client database.QueryExecutor, repo 
 	}
 
 	if idpType != expectedType {
-		return nil, nil, domain.NewIDPWrongTypeError(expectedType, idpType)
+		return nil, zero, domain.NewIDPWrongTypeError(expectedType, idpType)
 	}
 
 	var specificIDP T
 	err = json.Unmarshal(idp.Payload, &specificIDP)
 	if err != nil {
-		return nil, nil, err
+		return nil, zero, err
 	}
 
-	return idp, &specificIDP, nil
+	return idp, specificIDP, nil
 }
 
 // -------------------------------------------------------------
@@ -424,7 +436,7 @@ func (i idProvider) SetAllowLinking(allow bool) database.Change {
 	return database.NewChange(i.AllowLinkingColumn(), allow)
 }
 
-func (i idProvider) SetLinkingField(field *domain.IDPAutoLinkingField) database.Change {
+func (i idProvider) SetAutoLinkingField(field *domain.IDPAutoLinkingField) database.Change {
 	return database.NewChangePtr(i.AutoLinkingFieldColumn(), field)
 }
 
@@ -434,6 +446,10 @@ func (i idProvider) SetPayload(payload string) database.Change {
 
 func (i idProvider) SetUpdatedAt(updatedAt *time.Time) database.Change {
 	return database.NewChangePtr(i.UpdatedAtColumn(), updatedAt)
+}
+
+func (i idProvider) SetType(typee domain.IDPType) database.Change {
+	return database.NewChange(i.TypeColumn(), typee)
 }
 
 func scanIDProvider(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.IdentityProvider, error) {

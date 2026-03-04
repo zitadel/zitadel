@@ -382,135 +382,21 @@ func TestUpdateIDProvider(t *testing.T) {
 				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				idp.Name = "new_name"
-				return &idp
-			},
-			update:       []database.Change{idpRepo.SetName("new_name")},
-			rowsAffected: 1,
-		},
-		{
-			name: "happy path update state",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateActive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					Payload:           []byte("{}"),
-				}
-
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
 				idp.State = domain.IDPStateInactive
-				return &idp
-			},
-			update:       []database.Change{idpRepo.SetState(domain.IDPStateInactive)},
-			rowsAffected: 1,
-		},
-		{
-			name: "happy path update AllowCreation",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateActive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					Payload:           []byte("{}"),
-				}
-
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
 				idp.AllowCreation = false
-				return &idp
-			},
-			update:       []database.Change{idpRepo.SetAllowCreation(false)},
-			rowsAffected: 1,
-		},
-		{
-			name: "happy path update AllowAutoCreation",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateActive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					Payload:           []byte("{}"),
-				}
-
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
 				idp.AllowAutoCreation = false
-				return &idp
-			},
-			update:       []database.Change{idpRepo.SetAllowAutoCreation(false)},
-			rowsAffected: 1,
-		},
-		{
-			name: "happy path update AllowLinking",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateActive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					Payload:           []byte("{}"),
-				}
-
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
 				idp.AllowLinking = false
-				return &idp
-			},
-			update:       []database.Change{idpRepo.SetAllowLinking(false)},
-			rowsAffected: 1,
-		},
-		{
-			name: "happy path update Payload",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
-				idp := domain.IdentityProvider{
-					InstanceID:        instanceId,
-					OrgID:             &orgId,
-					ID:                gofakeit.Name(),
-					State:             domain.IDPStateActive,
-					Name:              gofakeit.Name(),
-					Type:              gu.Ptr(domain.IDPTypeOIDC),
-					AllowCreation:     true,
-					AllowAutoCreation: true,
-					AllowAutoUpdate:   true,
-					AllowLinking:      true,
-					Payload:           []byte("{}"),
-				}
-
-				err := idpRepo.Create(t.Context(), tx, &idp)
-				require.NoError(t, err)
 				idp.Payload = []byte(`{"json": {}}`)
 				return &idp
 			},
-			// update:       []database.Change{idpRepo.SetPayload("{{}}")},
-			update:       []database.Change{idpRepo.SetPayload(`{"json": {}}`)},
+			update: []database.Change{
+				idpRepo.SetName("new_name"),
+				idpRepo.SetState(domain.IDPStateInactive),
+				idpRepo.SetAllowCreation(false),
+				idpRepo.SetAllowAutoCreation(false),
+				idpRepo.SetAllowLinking(false),
+				idpRepo.SetPayload(`{"json": {}}`),
+			},
 			rowsAffected: 1,
 		},
 	}
@@ -524,7 +410,6 @@ func TestUpdateIDProvider(t *testing.T) {
 					t.Errorf("error rolling back savepoint: %v", err)
 				}
 			}()
-			// organizationRepo := repository.OrganizationRepository()
 			idpRepo := repository.IDProviderRepository()
 
 			createdIDP := tt.testFunc(t, tx)
@@ -682,7 +567,7 @@ func TestGetIDProvider(t *testing.T) {
 // gocognit linting fails due to number of test cases
 // and the fact that each test case has a testFunc()
 //
-//nolint:gocognit
+
 func TestListIDProvider(t *testing.T) {
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)

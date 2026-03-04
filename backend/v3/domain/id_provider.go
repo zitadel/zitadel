@@ -301,9 +301,11 @@ type idProviderChanges interface {
 	SetAllowAutoCreation(allow bool) database.Change
 	SetAllowAutoUpdate(allow bool) database.Change
 	SetAllowLinking(allow bool) database.Change
-	SetLinkingField(field *IDPAutoLinkingField) database.Change
+	SetAutoLinkingField(field *IDPAutoLinkingField) database.Change
 	SetPayload(payload string) database.Change
-	SetUpdatedAt(createdAt *time.Time) database.Change
+	SetUpdatedAt(updatedAt *time.Time) database.Change
+	// SetType is used for migrating generic idps to specific types.
+	SetType(typee IDPType) database.Change
 }
 
 type IDProviderRepository interface {
