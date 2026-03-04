@@ -1,5 +1,7 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
+import { recordAuthAttempt, recordAuthSuccess, recordAuthFailure } from "@/lib/metrics";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   getLockoutSettings,
@@ -30,6 +32,8 @@ import {
   checkUserVerification,
 } from "../verify-helper";
 import { getPublicHostWithProtocol } from "./host";
+
+const logger = createLogger("password");
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -134,6 +138,8 @@ export async function sendPassword(
   const { serviceConfig } = getServiceConfig(_headers);
   const t = await getTranslations("password");
 
+  recordAuthAttempt("password", command.organization);
+
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
     organization: command.organization,
@@ -152,7 +158,7 @@ export async function sendPassword(
         let lifetime = loginSettingsByUser.passwordCheckLifetime;
 
         if (!lifetime || !lifetime.seconds) {
-          console.warn("No password lifetime provided, defaulting to 24 hours");
+          logger.warn("No password lifetime provided, defaulting to 24 hours");
           lifetime = {
             seconds: BigInt(60 * 60 * 24), // default to 24 hours
             nanos: 0,
@@ -170,7 +176,7 @@ export async function sendPassword(
         throw new Error("Could not load login settings");
       }
     } catch {
-      console.warn("[Password] Could not update session");
+      logger.warn("[Password] Could not update session");
       // If the session was terminated or any other error occurred during update,
       // we fall back to creating a new session.
       sessionCookie = undefined;
@@ -189,6 +195,7 @@ export async function sendPassword(
     // Force fallback if settings can't be loaded
     if (!loginSettingsByContext) {
       // this is a fake error message to hide that the user does not even exist
+      recordAuthFailure("password", "settings_unavailable", command.organization);
       return { error: t("errors.couldNotVerifyPassword") };
     }
 
@@ -215,6 +222,7 @@ export async function sendPassword(
       if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
         if (user.preferredLoginName !== command.loginName) {
           // emulate user not found to prevent enumeration (use context settings not user settings)
+          recordAuthFailure("password", "login_name_mismatch", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
@@ -222,6 +230,7 @@ export async function sendPassword(
         }
       } else if (userLoginSettings?.disableLoginWithEmail) {
         if (user.preferredLoginName !== command.loginName && humanUser?.phone?.phone !== command.loginName) {
+          recordAuthFailure("password", "login_name_mismatch", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
@@ -229,6 +238,7 @@ export async function sendPassword(
         }
       } else if (userLoginSettings?.disableLoginWithPhone) {
         if (user.preferredLoginName !== command.loginName && humanUser?.email?.email !== command.loginName) {
+          recordAuthFailure("password", "login_name_mismatch", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
@@ -251,6 +261,7 @@ export async function sendPassword(
         sessionCookie = result.sessionCookie;
       } catch (error: any) {
         if ("failedAttempts" in error && error.failedAttempts) {
+          recordAuthFailure("password", "invalid_password", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
@@ -269,6 +280,7 @@ export async function sendPassword(
             }),
           };
         }
+        recordAuthFailure("password", "session_creation_failed", command.organization);
         if (loginSettingsByContext?.ignoreUnknownUsernames) {
           return { error: t("errors.failedToAuthenticateNoLimit") };
         }
@@ -276,6 +288,7 @@ export async function sendPassword(
       }
     } else {
       // this is a fake error message to hide that the user does not even exist
+      recordAuthFailure("password", "user_not_found", command.organization);
       if (loginSettingsByContext?.ignoreUnknownUsernames) {
         return { error: t("errors.failedToAuthenticateNoLimit") };
       }
@@ -284,6 +297,7 @@ export async function sendPassword(
   }
 
   if (!session?.factors?.user?.id) {
+    recordAuthFailure("password", "session_invalid", command.organization);
     if (loginSettingsByContext?.ignoreUnknownUsernames) {
       return { error: t("errors.failedToAuthenticateNoLimit") };
     }
@@ -293,12 +307,14 @@ export async function sendPassword(
   if (!user) {
     const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id });
     if (!userResponse.user) {
+      recordAuthFailure("password", "user_not_found", command.organization);
       return { error: t("errors.userNotFound") };
     }
     user = userResponse.user;
   }
 
   if (!session?.factors?.user?.id || !sessionCookie) {
+    recordAuthFailure("password", "session_invalid", command.organization);
     if (loginSettingsByContext?.ignoreUnknownUsernames) {
       return { error: t("errors.failedToAuthenticateNoLimit") };
     }
@@ -334,6 +350,7 @@ export async function sendPassword(
 
   // throw error if user is in initial state here and do not continue
   if (user.state === UserState.INITIAL) {
+    recordAuthFailure("password", "user_initial_state", command.organization);
     return { error: t("errors.initialUserNotSupported") };
   }
 
@@ -354,6 +371,7 @@ export async function sendPassword(
   }
 
   if (!authMethods) {
+    recordAuthFailure("password", "no_auth_methods", command.organization);
     return { error: t("errors.couldNotVerifyPassword") };
   }
 
@@ -371,10 +389,10 @@ export async function sendPassword(
   }
 
   let result: Awaited<ReturnType<typeof completeFlowOrGetUrl>>;
-  
+
   if (command.requestId && session.id) {
     // OIDC/SAML flow
-    console.log("Password auth: OIDC/SAML flow with requestId:", command.requestId, "sessionId:", session.id);
+    logger.info("Password auth: OIDC/SAML flow with requestId:", { requestId: command.requestId, sessionId: session.id });
     result = await completeFlowOrGetUrl(
       {
         sessionId: session.id,
@@ -385,7 +403,7 @@ export async function sendPassword(
     );
   } else {
     // Regular flow (no requestId)
-    console.log("Password auth: Regular flow with loginName:", session.factors.user.loginName);
+    logger.info("Password auth: Regular flow with loginName:", { loginName: session.factors.user.loginName });
     result = await completeFlowOrGetUrl(
       {
         loginName: session.factors.user.loginName,
@@ -396,9 +414,15 @@ export async function sendPassword(
   }
 
   if (result && typeof result === "object") {
+    if ("redirect" in result) {
+      recordAuthSuccess("password", command.organization);
+    } else if ("error" in result) {
+      recordAuthFailure("password", "flow_error", command.organization);
+    }
     return result;
   }
 
+  recordAuthFailure("password", "navigation_failed", command.organization);
   return { error: "Authentication completed but navigation failed" };
 }
 
@@ -476,7 +500,7 @@ export async function checkSessionAndSetPassword({
     });
     session = sessionResponse.session;
   } catch (error) {
-    console.error("Error getting session:", error);
+    logger.error("Error getting session:", { error });
     return { error: "Could not load session" };
   }
 
