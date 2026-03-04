@@ -1,5 +1,5 @@
 import { newSystemToken } from "@zitadel/client/node";
-import { readFile } from 'fs/promises'
+import { readFile } from "fs/promises";
 import { getLoginSystemUserId } from "./deployment";
 
 
@@ -11,11 +11,11 @@ async function getTokenFromFile(): Promise<string> {
   keyToken ??= readFile(process.env.SYSTEM_USER_PRIVATE_KEY_FILE, "binary");
 
   try {
-    return await keyToken
+    return await keyToken;
   } catch (error) {
     // if the file doesn't exist, don't cache it
-    keyToken = undefined
-    throw error
+    keyToken = undefined;
+    throw error;
   }
 }
 
