@@ -17,10 +17,6 @@ func IDProviderRepository() domain.IDProviderRepository {
 	return new(idProvider)
 }
 
-func (idProvider) unqualifiedTableName() string {
-	return "identity_providers"
-}
-
 func (idProvider) qualifiedTableName() string {
 	return "zitadel.identity_providers"
 }
