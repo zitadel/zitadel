@@ -26,7 +26,7 @@ func init() {
 
 var (
 	// pushPlaceholderFmt defines how data are inserted into the events table
-	pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $%d)"
+	pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $%d, $%d)"
 	// uniqueConstraintPlaceholderFmt defines the format of the unique constraint error returned from the database
 	uniqueConstraintPlaceholderFmt = "(%s, %s, %s)"
 
@@ -89,6 +89,14 @@ var (
 				{
 					Name: "owner",
 					Type: textType,
+				},
+				{
+					Name: "written_by_v3",
+					Type: &pgtype.Type{
+						Name:  "bool",
+						OID:   pgtype.BoolOID,
+						Codec: pgtype.BoolCodec{},
+					},
 				},
 			},
 		},

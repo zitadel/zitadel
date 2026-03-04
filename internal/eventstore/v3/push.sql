@@ -13,6 +13,7 @@ INSERT INTO eventstore.events2 (
 
     , "position"
     , in_tx_order
+    , written_by_v3
 ) VALUES
     %s
 RETURNING created_at, "position";

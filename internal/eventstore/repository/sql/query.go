@@ -226,6 +226,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 				&event.AggregateType,
 				&event.AggregateID,
 				&revision,
+				&event.IsWrittenByV3,
 			)
 			event.Version = eventstore.Version("v" + strconv.Itoa(int(revision)))
 		}
@@ -294,6 +295,13 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
 		}
 		args = append(args, excludeAggregateIDsArgs...)
+	}
+
+	if query.ExcludeV3Events && !useV1 {
+		if clauses != "" {
+			clauses += " AND "
+		}
+		clauses += "written_by_v3 = false"
 	}
 
 	if clauses == "" {
