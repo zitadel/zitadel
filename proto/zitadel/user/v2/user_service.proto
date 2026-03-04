@@ -2609,7 +2609,7 @@ message UpdateUserRequest{
   }
 
   // Metadata to be set. The values have to be base64 encoded.
-  repeated UpdateMetadata metadata = 5 [
+  repeated Metadata metadata = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
     }
@@ -3746,15 +3746,6 @@ message Metadata {
   string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   // Value in the metadata key/value pair.
   bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
-}
-
-// todo: review
-message UpdateMetadata {
-  // Key in the metadata key/value pair.
-  string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Value in the metadata key/value pair.
-  // If the value is empty, the metadata with the corresponding key will be deleted.
-  bytes value = 2 [(validate.rules).bytes = {max_len: 500000}];
 }
 
 message SetUserMetadataRequest{

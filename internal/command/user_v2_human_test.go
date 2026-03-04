@@ -3928,6 +3928,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						user.NewMetadataSetEvent(
 							context.Background(),
@@ -3935,20 +3936,51 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							"key1",
 							[]byte("value1"),
 						),
-						user.NewMetadataRemovedEvent(
-							context.Background(),
-							&userAgg.Aggregate,
-							"key2"),
 						user.NewMetadataSetEvent(context.Background(),
 							&userAgg.Aggregate,
 							"key3",
 							[]byte("value3"),
 						),
-						user.NewMetadataRemovedEvent(
-							context.Background(),
-							&userAgg.Aggregate,
-							"key4"),
 					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Metadata: []*domain.Metadata{
+						{
+							Key:   "key1",
+							Value: []byte("value1"),
+						},
+						{
+							Key:   "key3",
+							Value: []byte("value3"),
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change human metadata, invalid value, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),
@@ -3967,22 +3999,12 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							Key:   "key2",
 							Value: []byte(""),
 						},
-						{
-							Key:   "key3",
-							Value: []byte("value3"),
-						},
-						{
-							Key:   "key4",
-							Value: nil,
-						},
 					},
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{
-					Sequence:      0,
-					EventDate:     time.Time{},
-					ResourceOwner: "org1",
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "META-2m00f", "Errors.Metadata.Invalid"))
 				},
 			},
 		},

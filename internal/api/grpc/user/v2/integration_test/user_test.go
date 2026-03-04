@@ -4586,22 +4586,14 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 							UserType: &user.UpdateUserRequest_Human_{
 								Human: &user.UpdateUserRequest_Human{},
 							},
-							Metadata: []*user.UpdateMetadata{
+							Metadata: []*user.Metadata{
 								{
 									Key:   "key1",
-									Value: nil, // deleting key1
-								},
-								{
-									Key:   "key2",
-									Value: []byte("updated_value2"), // updating key2
+									Value: []byte("updated_value1"), // updating key2
 								},
 								{
 									Key:   "key3",
 									Value: []byte("value3"), // adding key3
-								},
-								{
-									Key:   "key4",
-									Value: []byte(""), // deleting non-existent key4
 								},
 							},
 						},
@@ -4609,10 +4601,9 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
 						metadataByKey := getMetadataMap(listMetadataResponse)
-						assert.Len(t, listMetadataResponse.GetMetadata(), 2)
-						assert.Nil(t, metadataByKey["key1"])
-						assert.Nil(t, metadataByKey["key4"])
-						assert.Equal(t, []byte("updated_value2"), metadataByKey["key2"])
+						assert.Len(t, listMetadataResponse.GetMetadata(), 3)
+						assert.Equal(t, []byte("updated_value1"), metadataByKey["key1"])
+						assert.Equal(t, []byte("value2"), metadataByKey["key2"])
 						assert.Equal(t, []byte("value3"), metadataByKey["key3"])
 					},
 				}
@@ -4651,22 +4642,14 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 							UserType: &user.UpdateUserRequest_Machine_{
 								Machine: &user.UpdateUserRequest_Machine{},
 							},
-							Metadata: []*user.UpdateMetadata{
+							Metadata: []*user.Metadata{
 								{
 									Key:   "key1",
-									Value: nil, // deleting key1
-								},
-								{
-									Key:   "key2",
-									Value: []byte("updated_value2"), // updating key2
+									Value: []byte("updated_value1"), // updating key1
 								},
 								{
 									Key:   "key3",
 									Value: []byte("value3"), // adding key3
-								},
-								{
-									Key:   "key4",
-									Value: []byte(""), // deleting non-existent key4
 								},
 							},
 						},
@@ -4674,10 +4657,9 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
 						metadataByKey := getMetadataMap(listMetadataResponse)
-						assert.Len(t, listMetadataResponse.GetMetadata(), 2)
-						assert.Nil(t, metadataByKey["key1"])
-						assert.Nil(t, metadataByKey["key4"])
-						assert.Equal(t, []byte("updated_value2"), metadataByKey["key2"])
+						assert.Len(t, listMetadataResponse.GetMetadata(), 3)
+						assert.Equal(t, []byte("updated_value1"), metadataByKey["key1"])
+						assert.Equal(t, []byte("value2"), metadataByKey["key2"])
 						assert.Equal(t, []byte("value3"), metadataByKey["key3"])
 					},
 				}

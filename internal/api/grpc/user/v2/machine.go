@@ -47,7 +47,7 @@ func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.Crea
 	}), nil
 }
 
-func (s *Server) updateUserTypeMachine(ctx context.Context, machinePb *user.UpdateUserRequest_Machine, userId string, userName *string, reqMetadata []*user.UpdateMetadata) (*connect.Response[user.UpdateUserResponse], error) {
+func (s *Server) updateUserTypeMachine(ctx context.Context, machinePb *user.UpdateUserRequest_Machine, userId string, userName *string, reqMetadata []*user.Metadata) (*connect.Response[user.UpdateUserResponse], error) {
 	cmd := updateMachineUserToCommand(userId, userName, machinePb, reqMetadata)
 	err := s.command.ChangeUserMachine(ctx, cmd)
 	if err != nil {
@@ -58,7 +58,7 @@ func (s *Server) updateUserTypeMachine(ctx context.Context, machinePb *user.Upda
 	}), nil
 }
 
-func updateMachineUserToCommand(userId string, userName *string, machine *user.UpdateUserRequest_Machine, reqMetadata []*user.UpdateMetadata) *command.ChangeMachine {
+func updateMachineUserToCommand(userId string, userName *string, machine *user.UpdateUserRequest_Machine, reqMetadata []*user.Metadata) *command.ChangeMachine {
 	var accessTokenType *domain.OIDCTokenType
 	if machine.AccessTokenType != nil {
 		tokenType := accessTokenTypeToDomain(*machine.AccessTokenType)

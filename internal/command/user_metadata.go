@@ -67,22 +67,9 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 		}
 	}
 
-	events := make([]eventstore.Command, 0)
-	setMetadata, err := c.getUserMetadataListModelByID(ctx, userID, userResourceOwner)
+	events, setMetadata, err := c.getUserMetadataSetEvents(ctx, userID, userResourceOwner, metadatas)
 	if err != nil {
 		return nil, err
-	}
-	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
-	for _, data := range metadatas {
-		// if no change to metadata no event has to be pushed
-		if existingValue, ok := setMetadata.metadataList[data.Key]; ok && bytes.Equal(existingValue, data.Value) {
-			continue
-		}
-		event, err := c.setUserMetadata(ctx, userAgg, data)
-		if err != nil {
-			return nil, err
-		}
-		events = append(events, event)
 	}
 	// no changes for the metadata
 	if len(events) == 0 {
@@ -99,6 +86,34 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 		return nil, err
 	}
 	return writeModelToObjectDetails(&setMetadata.WriteModel), nil
+}
+
+func (c *Commands) getUserMetadataSetEvents(ctx context.Context, userID string, userResourceOwner string, metadatas []*domain.Metadata) ([]eventstore.Command, *UserMetadataListWriteModel, error) {
+	// get the current metadata list
+	setMetadata, err := c.getUserMetadataListModelByID(ctx, userID, userResourceOwner)
+	if err != nil {
+		return nil, nil, err
+	}
+	// if there is no metadata list,
+	// return the current metadata write model without any events to be pushed
+	if len(metadatas) == 0 {
+		return nil, setMetadata, nil
+	}
+
+	events := make([]eventstore.Command, 0)
+	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
+	for _, data := range metadatas {
+		// if no change to metadata no event has to be pushed
+		if existingValue, ok := setMetadata.metadataList[data.Key]; ok && bytes.Equal(existingValue, data.Value) {
+			continue
+		}
+		event, err := c.setUserMetadata(ctx, userAgg, data)
+		if err != nil {
+			return nil, nil, err
+		}
+		events = append(events, event)
+	}
+	return events, setMetadata, nil
 }
 
 func (c *Commands) setUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metadata *domain.Metadata) (command eventstore.Command, err error) {

@@ -18,7 +18,7 @@ func Test_patchMachineUserToCommand(t *testing.T) {
 		userId   string
 		userName *string
 		machine  *user.UpdateUserRequest_Machine
-		metadata []*user.UpdateMetadata
+		metadata []*user.Metadata
 	}
 	tests := []struct {
 		name string
@@ -46,7 +46,7 @@ func Test_patchMachineUserToCommand(t *testing.T) {
 				Description:     gu.Ptr("description"),
 				AccessTokenType: gu.Ptr(user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT),
 			},
-			metadata: []*user.UpdateMetadata{
+			metadata: []*user.Metadata{
 				{
 					Key:   "key1",
 					Value: []byte("value1"),

@@ -80,7 +80,7 @@ func setMetadataEntries(metadata []*user.Metadata) []*user.SetMetadataEntry {
 	return metadataEntries
 }
 
-func (s *Server) updateUserTypeHuman(ctx context.Context, humanPb *user.UpdateUserRequest_Human, userId string, userName *string, reqMetadata []*user.UpdateMetadata) (*connect.Response[user.UpdateUserResponse], error) {
+func (s *Server) updateUserTypeHuman(ctx context.Context, humanPb *user.UpdateUserRequest_Human, userId string, userName *string, reqMetadata []*user.Metadata) (*connect.Response[user.UpdateUserResponse], error) {
 	cmd, err := updateHumanUserToCommand(userId, userName, humanPb, reqMetadata)
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (s *Server) updateUserTypeHuman(ctx context.Context, humanPb *user.UpdateUs
 	}), nil
 }
 
-func updateHumanUserToCommand(userId string, userName *string, human *user.UpdateUserRequest_Human, reqMetadata []*user.UpdateMetadata) (*command.ChangeHuman, error) {
+func updateHumanUserToCommand(userId string, userName *string, human *user.UpdateUserRequest_Human, reqMetadata []*user.Metadata) (*command.ChangeHuman, error) {
 	phone := human.GetPhone()
 	if phone != nil && phone.Phone == "" && phone.GetVerification() != nil {
 		return nil, zerrors.ThrowInvalidArgument(nil, "USERv2-4f3d6", "Errors.User.Phone.VerifyingRemovalIsNotSupported")

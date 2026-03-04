@@ -58,10 +58,7 @@ func (s *Server) SetUserMetadata(ctx context.Context, req *connect.Request[user.
 	}), nil
 }
 
-func setUserMetadataToDomain[T interface {
-	GetKey() string
-	GetValue() []byte
-}](reqMetadata []T) []*domain.Metadata {
+func setUserMetadataToDomain(reqMetadata []*user.Metadata) []*domain.Metadata {
 	if len(reqMetadata) == 0 {
 		return nil
 	}

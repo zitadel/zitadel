@@ -79,11 +79,14 @@ func (c *Commands) ChangeUserMachine(ctx context.Context, machine *ChangeMachine
 	if len(machineChanges) > 0 {
 		cmds = append(cmds, user.NewMachineChangedEvent(ctx, &existingMachine.Aggregate().Aggregate, machineChanges))
 	}
-	metadataCmds, err := c.updateUserMetadata(ctx, machine.Metadata, &existingMachine.Aggregate().Aggregate)
-	if err != nil {
-		return err
+	if len(machine.Metadata) > 0 {
+		metadataCmds, _, err := c.getUserMetadataSetEvents(ctx, existingMachine.AggregateID, existingMachine.ResourceOwner, machine.Metadata)
+		if err != nil {
+			return err
+		}
+		cmds = append(cmds, metadataCmds...)
 	}
-	cmds = append(cmds, metadataCmds...)
+
 	if len(cmds) == 0 {
 		machine.Details = writeModelToObjectDetails(&existingMachine.WriteModel)
 		return nil
@@ -108,32 +111,4 @@ func (c *Commands) UserMachineWriteModel(ctx context.Context, userID, resourceOw
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ugjs0upun6", "Errors.User.NotFound")
 	}
 	return writeModel, nil
-}
-
-func (c *Commands) updateUserMetadata(ctx context.Context, metadata []*domain.Metadata, aggregate *eventstore.Aggregate) ([]eventstore.Command, error) {
-	if len(metadata) == 0 {
-		return nil, nil
-	}
-	cmds := make([]eventstore.Command, 0, len(metadata))
-	for _, md := range metadata {
-		if md == nil {
-			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-uAFkgS", "Errors.Metadata.Invalid")
-		}
-		// remove metadata if the value is empty
-		if len(md.Value) == 0 {
-			cmd, err := c.removeUserMetadata(ctx, aggregate, md.Key)
-			if err != nil {
-				return nil, err
-			}
-			cmds = append(cmds, cmd)
-			continue
-		}
-
-		cmd, err := c.setUserMetadata(ctx, aggregate, md)
-		if err != nil {
-			return nil, err
-		}
-		cmds = append(cmds, cmd)
-	}
-	return cmds, nil
 }

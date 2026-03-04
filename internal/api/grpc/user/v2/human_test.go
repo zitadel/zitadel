@@ -20,7 +20,7 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 		userId   string
 		userName *string
 		human    *user.UpdateUserRequest_Human
-		metadata []*user.UpdateMetadata
+		metadata []*user.Metadata
 	}
 	tests := []struct {
 		name    string
@@ -82,7 +82,7 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 					},
 				},
 			},
-			metadata: []*user.UpdateMetadata{
+			metadata: []*user.Metadata{
 				{
 					Key:   "key1",
 					Value: []byte("value1"),
