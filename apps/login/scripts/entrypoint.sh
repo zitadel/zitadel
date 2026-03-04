@@ -15,4 +15,9 @@ if [ -n "${ZITADEL_SERVICE_USER_TOKEN_FILE}" ]; then
     export ZITADEL_SERVICE_USER_TOKEN=$(cat "${ZITADEL_SERVICE_USER_TOKEN_FILE}")
 fi
 
+# Log OTEL configuration on startup (if enabled)
+if [ -n "${OTEL_EXPORTER_OTLP_ENDPOINT}" ]; then
+    echo "OTEL enabled: service=${OTEL_SERVICE_NAME:-zitadel-login}, endpoint=${OTEL_EXPORTER_OTLP_ENDPOINT}"
+fi
+
 exec $@

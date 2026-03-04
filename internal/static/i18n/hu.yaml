@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "A titkot nem sikerült generálni"
     PAT:
       NotFound: "A személyes hozzáférési token nem található"
+    Metadata:
+      Conflicting: "A metaadatok nem lehetnek egyszerre beállítva a [user] és a [human] mezőkben"
     NotHuman: "A felhasználónak személyesnek kell lennie"
     NotMachine: "A felhasználónak technikai jellegűnek kell lennie"
     WrongType: "Ez a felhasználótípus számára nem engedélyezett"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "A frissítő token érvénytelen"
       NotFound: "A frissítő token nem található"
-  Instance:
-    NotFound: "Az instance nem található"
-    AlreadyExists: "Az instance már létezik"
-    NotChanged: "Az instance nem változott"
   Org:
     AlreadyExists: "A szervezet neve vagy azonosítója már foglalt"
     Invalid: "A szervezet érvénytelen"
@@ -345,6 +343,8 @@ Errors:
       NotActive: "A projekt engedélye nem aktív"
       NotInactive: "A projekt engedélye nem inaktív"
   Instance:
+    AlreadyExists: "Az instance már létezik"
+    NotChanged: "Az instance nem változott"
     NotFound: "Instance nem található. Győződj meg róla, hogy a domain helyes. Nézd meg itt: https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "A szerepkörök nem változtak"

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/zitadel/zitadel/internal/api/http/middleware"
 )
 
 const (
@@ -71,6 +72,7 @@ var (
 func CreateRouter(login *Login, interceptors ...mux.MiddlewareFunc) *mux.Router {
 	router := mux.NewRouter()
 	router.Use(interceptors...)
+	router.Use(middleware.RecoverHandler(login.writeRecoverError))
 	router.HandleFunc(EndpointRoot, login.handleLogin).Methods(http.MethodGet)
 	router.HandleFunc(EndpointHealthz, login.handleHealthz).Methods(http.MethodGet)
 	router.HandleFunc(EndpointReadiness, login.handleReadiness).Methods(http.MethodGet)
@@ -130,4 +132,8 @@ func CreateRouter(login *Login, interceptors ...mux.MiddlewareFunc) *mux.Router 
 	router.HandleFunc(EndpointDeviceAuth, login.handleDeviceAuthUserCode).Methods(http.MethodGet, http.MethodPost)
 	router.HandleFunc(EndpointDeviceAuthAction, login.handleDeviceAuthAction).Methods(http.MethodGet, http.MethodPost)
 	return router
+}
+
+func (l *Login) writeRecoverError(w http.ResponseWriter, r *http.Request, err error) {
+	l.renderError(w, r, nil, err)
 }

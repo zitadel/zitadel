@@ -660,7 +660,7 @@ func TestCommands_HumanCheckRecoveryCode(t *testing.T) {
 				code:          "",
 				resourceOwner: "org1",
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-u0b6c", "Errors.User.UserIDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-u0b6c", "Errors.User.MFA.RecoveryCodes.Empty"),
 		},
 		{
 			name: "missing userID, error",
@@ -933,7 +933,7 @@ func TestCommands_checkRecoveryCode(t *testing.T) {
 				secretHasher:  hasher,
 			},
 			wantCommands: 0,
-			wantErr:      zerrors.ThrowInvalidArgument(nil, "COMMAND-u0b6c", "Errors.User.UserIDMissing"),
+			wantErr:      zerrors.ThrowInvalidArgument(nil, "COMMAND-u0b6c", "Errors.User.MFA.RecoveryCodes.Empty"),
 		},
 		{
 			name: "missing userID, error",

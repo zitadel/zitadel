@@ -65,7 +65,9 @@ func (v verification) update(update *domain.VerificationTypeUpdate, existingTabl
 		builder.WriteString(v.qualifiedTableName())
 		builder.WriteString(" SET ")
 		err := changes.Write(builder)
-		logging.New(logging.StreamRuntime).Debug("write changes in cte failed", "error", err)
+		if err != nil {
+			logging.New(logging.StreamRuntime).Debug("write changes in cte failed", "error", err)
+		}
 		builder.WriteString(" FROM ")
 		builder.WriteString(existingTableName)
 		writeCondition(builder, database.And(
@@ -128,7 +130,9 @@ func (v verification) failed(existingTableName string, instanceID, verificationI
 		builder.WriteString(v.qualifiedTableName())
 		builder.WriteString(" SET ")
 		err := database.NewIncrementColumnChange(v.failedAttemptsColumn(), database.Coalesce(v.failedAttemptsColumn(), 0)).Write(builder)
-		logging.New(logging.StreamRuntime).Debug("write cte failed", "error", err)
+		if err != nil {
+			logging.New(logging.StreamRuntime).Debug("write cte failed", "error", err)
+		}
 		builder.WriteString(" FROM ")
 		builder.WriteString(existingTableName)
 		writeCondition(builder, database.And(
