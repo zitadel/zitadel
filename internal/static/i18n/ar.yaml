@@ -132,6 +132,8 @@ Errors:
         CouldNotGenerate: "تعذر توليد السر"
     PAT:
       NotFound: "رمز الوصول الشخصي غير موجود"
+    Metadata:
+      Conflicting: "يجب عدم تعيين البيانات الوصفية في كلٍ من حقول [user] و[human] في الوقت نفسه"
     NotHuman: "يجب أن يكون المستخدم شخصياً"
     NotMachine: "يجب أن يكون المستخدم تقنياً"
     WrongType: "غير مسموح لنوع المستخدم هذا"

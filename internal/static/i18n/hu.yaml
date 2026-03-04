@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "A titkot nem sikerült generálni"
     PAT:
       NotFound: "A személyes hozzáférési token nem található"
+    Metadata:
+      Conflicting: "A metaadatok nem lehetnek egyszerre beállítva a [user] és a [human] mezőkben"
     NotHuman: "A felhasználónak személyesnek kell lennie"
     NotMachine: "A felhasználónak technikai jellegűnek kell lennie"
     WrongType: "Ez a felhasználótípus számára nem engedélyezett"
