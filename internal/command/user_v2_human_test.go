@@ -3928,7 +3928,6 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 					),
-					expectFilter(),
 					expectPush(
 						user.NewMetadataSetEvent(
 							context.Background(),
@@ -3980,7 +3979,6 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 					),
-					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				tarpit:          expectTarpit(0),

@@ -99,21 +99,29 @@ func (c *Commands) getUserMetadataSetEvents(ctx context.Context, userID string, 
 	if len(metadatas) == 0 {
 		return nil, setMetadata, nil
 	}
-
-	events := make([]eventstore.Command, 0)
 	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
-	for _, data := range metadatas {
+	events, err := c.checkExistingValueAndSetMetadata(ctx, metadatas, setMetadata.metadataList, userAgg)
+	if err != nil {
+		return nil, nil, err
+	}
+	return events, setMetadata, nil
+}
+
+// checkExistingValueAndSetMetadata compares the existing metadata key-value pair before adding a `user.metadata.set` event
+func (c *Commands) checkExistingValueAndSetMetadata(ctx context.Context, reqMetadata []*domain.Metadata, currentMetadataMap map[string][]byte, userAgg *eventstore.Aggregate) ([]eventstore.Command, error) {
+	events := make([]eventstore.Command, 0)
+	for _, data := range reqMetadata {
 		// if no change to metadata no event has to be pushed
-		if existingValue, ok := setMetadata.metadataList[data.Key]; ok && bytes.Equal(existingValue, data.Value) {
+		if existingValue, ok := currentMetadataMap[data.Key]; ok && bytes.Equal(existingValue, data.Value) {
 			continue
 		}
 		event, err := c.setUserMetadata(ctx, userAgg, data)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		events = append(events, event)
 	}
-	return events, setMetadata, nil
+	return events, nil
 }
 
 func (c *Commands) setUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metadata *domain.Metadata) (command eventstore.Command, err error) {

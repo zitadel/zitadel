@@ -345,7 +345,6 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(userAddedEvent),
 					),
-					expectFilter(),
 					expectPush(
 						user.NewMetadataSetEvent(
 							context.Background(),
@@ -392,7 +391,6 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(userAddedEvent),
 					),
-					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
