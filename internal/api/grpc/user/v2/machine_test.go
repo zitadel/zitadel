@@ -53,7 +53,7 @@ func Test_patchMachineUserToCommand(t *testing.T) {
 				},
 				{
 					Key:   "key2",
-					Value: nil,
+					Value: []byte("value2"),
 				},
 			},
 		},
@@ -70,7 +70,7 @@ func Test_patchMachineUserToCommand(t *testing.T) {
 				},
 				{
 					Key:   "key2",
-					Value: nil,
+					Value: []byte("value2"),
 				},
 			},
 		},

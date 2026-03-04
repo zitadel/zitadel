@@ -89,7 +89,7 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 				},
 				{
 					Key:   "key2",
-					Value: nil,
+					Value: []byte("value2"),
 				},
 			},
 		},
@@ -124,7 +124,7 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 				},
 				{
 					Key:   "key2",
-					Value: nil,
+					Value: []byte("value2"),
 				},
 			},
 		},
