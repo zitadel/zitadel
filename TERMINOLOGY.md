@@ -11,6 +11,7 @@ All user-facing wording in docs, UI, and API descriptions must follow this table
 | replace | Discouraged term found — use the canonical term instead |
 | remove | Term must be removed entirely |
 | internal | Internal use only — must not appear in user-facing text |
+| proposed | Under discussion — agents should flag but not block |
 
 ## Scope values
 
