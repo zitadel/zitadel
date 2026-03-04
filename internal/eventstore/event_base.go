@@ -36,9 +36,6 @@ type BaseEvent struct {
 	//Service which created the event
 	Service string `json:"-"`
 	Data    []byte `json:"-"`
-
-	// IsWrittenByV3 indicates if this event was written through the v3 storage adapter
-	IsWrittenByV3 bool `json:"-"`
 }
 
 // Position implements Event.
@@ -108,14 +105,9 @@ func (e *BaseEvent) Unmarshal(ptr any) error {
 
 const defaultService = "zitadel"
 
-// v3Checker is an interface to check if an event was written through the v3 storage adapter
-type v3Checker interface {
-	WrittenByV3() bool
-}
-
 // BaseEventFromRepo maps a stored event to a BaseEvent
 func BaseEventFromRepo(event Event) *BaseEvent {
-	base := &BaseEvent{
+	return &BaseEvent{
 		Agg:       event.Aggregate(),
 		EventType: event.Type(),
 		Creation:  event.CreatedAt(),
@@ -125,10 +117,6 @@ func BaseEventFromRepo(event Event) *BaseEvent {
 		Data:      event.DataAsBytes(),
 		Pos:       event.Position(),
 	}
-	if checker, ok := event.(v3Checker); ok {
-		base.IsWrittenByV3 = checker.WrittenByV3()
-	}
-	return base
 }
 
 // NewBaseEventForPush is the constructor for events which will be pushed into the eventstore.
@@ -145,9 +133,4 @@ func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventTyp
 
 func (*BaseEvent) Fields() []*FieldOperation {
 	return nil
-}
-
-// WrittenByV3 returns true if this event was written through the v3 storage adapter
-func (e *BaseEvent) WrittenByV3() bool {
-	return e.IsWrittenByV3
 }

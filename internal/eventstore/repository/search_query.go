@@ -31,7 +31,6 @@ type SearchQuery struct {
 	CreatedAfter        *Filter
 	CreatedBefore       *Filter
 	ExcludeAggregateIDs []*Filter
-	ExcludeV3Events     bool
 }
 
 // Filter represents all fields needed to compare a field of an event with a value
@@ -133,7 +132,6 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		Tx:                    builder.GetTx(),
 		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
 		SubQueries:            make([][]*Filter, len(builder.GetQueries())),
-		ExcludeV3Events:       builder.GetExcludeV3Events(),
 	}
 
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter{

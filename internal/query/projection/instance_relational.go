@@ -26,8 +26,6 @@ func (*instanceRelationalProjection) Name() string {
 	return InstanceRelationalProjectionTable
 }
 
-func (*instanceRelationalProjection) SkipV3ReducedEvents() {}
-
 func (p *instanceRelationalProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{

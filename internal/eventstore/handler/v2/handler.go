@@ -64,7 +64,6 @@ type Handler struct {
 	txDuration       time.Duration
 	now              nowFunc
 	queryGlobal      bool
-	skipV3Events     bool
 
 	triggeredInstancesSync sync.Map
 
@@ -156,13 +155,6 @@ type GlobalProjection interface {
 	FilterGlobalEvents()
 }
 
-// RelationalProjection is a marker interface for projections that store data relationally
-// and should skip events already reduced by the v3 storage adapter.
-type RelationalProjection interface {
-	Projection
-	SkipV3ReducedEvents()
-}
-
 func NewHandler(
 	ctx context.Context,
 	config *Config,
@@ -208,10 +200,6 @@ func NewHandler(
 
 	if _, ok := projection.(GlobalProjection); ok {
 		handler.queryGlobal = true
-	}
-
-	if _, ok := projection.(RelationalProjection); ok {
-		handler.skipV3Events = true
 	}
 
 	return handler
@@ -767,10 +755,6 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		if currentState.offset > 0 {
 			builder = builder.Offset(currentState.offset)
 		}
-	}
-
-	if h.skipV3Events {
-		builder = builder.ExcludeV3Events()
 	}
 
 	if h.queryGlobal {

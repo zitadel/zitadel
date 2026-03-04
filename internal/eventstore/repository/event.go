@@ -62,9 +62,6 @@ type Event struct {
 	InstanceID string
 
 	Constraints []*eventstore.UniqueConstraint
-
-	// IsWrittenByV3 indicates if this event was written through the v3 storage adapter
-	IsWrittenByV3 bool
 }
 
 // Aggregate implements [eventstore.Event]
@@ -133,9 +130,4 @@ func (e *Event) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 func (e *Event) Fields() []*eventstore.FieldOperation {
 	return nil
-}
-
-// WrittenByV3 returns true if this event was written through the v3 storage adapter
-func (e *Event) WrittenByV3() bool {
-	return e.IsWrittenByV3
 }

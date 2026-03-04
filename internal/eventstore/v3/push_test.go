@@ -75,7 +75,7 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10, $11)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10)",
 				},
 				args: []any{
 					"instance",
@@ -88,7 +88,6 @@ func Test_mapCommands(t *testing.T) {
 					Payload(nil),
 					uint64(1),
 					0,
-					false,
 				},
 				err: func(t *testing.T, err error) {},
 			},
@@ -125,8 +124,8 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10, $11)",
-					"($12, $13, $14, $15, $16, $17, $18, $19, $20, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $21, $22)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10)",
+					"($11, $12, $13, $14, $15, $16, $17, $18, $19, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $20)",
 				},
 				args: []any{
 					// first event
@@ -140,7 +139,6 @@ func Test_mapCommands(t *testing.T) {
 					Payload(nil),
 					uint64(6),
 					0,
-					false,
 					// second event
 					"instance",
 					"ro",
@@ -152,7 +150,6 @@ func Test_mapCommands(t *testing.T) {
 					Payload(nil),
 					uint64(7),
 					1,
-					false,
 				},
 				err: func(t *testing.T, err error) {},
 			},
@@ -193,8 +190,8 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10, $11)",
-					"($12, $13, $14, $15, $16, $17, $18, $19, $20, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $21, $22)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10)",
+					"($11, $12, $13, $14, $15, $16, $17, $18, $19, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $20)",
 				},
 				args: []any{
 					// first event
@@ -208,7 +205,6 @@ func Test_mapCommands(t *testing.T) {
 					Payload(nil),
 					uint64(6),
 					0,
-					false,
 					// second event
 					"instance",
 					"ro",
@@ -220,7 +216,6 @@ func Test_mapCommands(t *testing.T) {
 					Payload(nil),
 					uint64(1),
 					1,
-					false,
 				},
 				err: func(t *testing.T, err error) {},
 			},

@@ -9,7 +9,6 @@ DO $$ BEGIN
         , payload JSONB
         , creator TEXT
         , owner TEXT
-        , written_by_v3 BOOLEAN
     );
 EXCEPTION
     WHEN duplicate_object THEN null;

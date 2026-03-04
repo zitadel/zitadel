@@ -37,8 +37,6 @@ func (*idpTemplateRelationalProjection) Name() string {
 	return "zitadel.identity_providers"
 }
 
-func (*idpTemplateRelationalProjection) SkipV3ReducedEvents() {}
-
 func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
@@ -2243,7 +2241,6 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPChangedColumns(payload 
 	return payloadChanged
 }
 
-//nolint:gocognit as the struct has many fields we need many if statements to check which one changed
 func (p *idpTemplateRelationalProjection) reduceLDAPIDPChangedColumns(payload *domain.LDAP, idpEvent *idp.LDAPIDPChangedEvent) bool {
 	payloadChanged := false
 	if idpEvent.Servers != nil && !slices.Equal(idpEvent.Servers, payload.Servers) {

@@ -20,8 +20,6 @@ func (*projectRelationalProjection) Name() string {
 	return "zitadel.projects"
 }
 
-func (*projectRelationalProjection) SkipV3ReducedEvents() {}
-
 func newProjectRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
 	return handler.NewHandler(ctx, &config, new(projectRelationalProjection))
 }

@@ -24,8 +24,6 @@ func (*orgDomainRelationalProjection) Name() string {
 	return "zitadel.org_domains"
 }
 
-func (*orgDomainRelationalProjection) SkipV3ReducedEvents() {}
-
 func (p *orgDomainRelationalProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
