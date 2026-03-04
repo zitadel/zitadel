@@ -2241,6 +2241,7 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPChangedColumns(payload 
 	return payloadChanged
 }
 
+// nolint: gocognit
 func (p *idpTemplateRelationalProjection) reduceLDAPIDPChangedColumns(payload *domain.LDAP, idpEvent *idp.LDAPIDPChangedEvent) bool {
 	payloadChanged := false
 	if idpEvent.Servers != nil && !slices.Equal(idpEvent.Servers, payload.Servers) {
