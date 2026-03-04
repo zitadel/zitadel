@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"slices"
 
 	"github.com/muhlemmer/gu"
 
@@ -21,19 +22,6 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const (
-	IDPRelationalTable                = "zitadel.identity_providers"
-	IDPRelationalOrgIdCol             = "org_id"
-	IDPRelationalAutoRegisterCol      = "auto_register"
-	IDPRelationalPayloadCol           = "payload"
-	IDPRelationalOrgId                = "org_id"
-	IDPRelationalAllowCreationCol     = "allow_creation"
-	IDPRelationalAllowLinkingCol      = "allow_linking"
-	IDPRelationalAllowAutoCreationCol = "allow_auto_creation"
-	IDPRelationalAllowAutoUpdateCol   = "allow_auto_update"
-	IDPRelationalAllowAutoLinkingCol  = "auto_linking_field"
-)
-
 type idpTemplateRelationalProjection struct {
 	idpRepo domain.IDProviderRepository
 }
@@ -46,7 +34,7 @@ func newIDPTemplateRelationalProjection(ctx context.Context, config handler.Conf
 }
 
 func (*idpTemplateRelationalProjection) Name() string {
-	return IDPRelationalTable
+	return "zitadel.identity_providers"
 }
 
 func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer {
@@ -365,7 +353,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPAdded(event eventstore.Event)
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YcUdQ", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
@@ -397,7 +385,7 @@ func mapIDPConfigType(typ internal_domain.IDPConfigType) *domain.IDPType {
 	case internal_domain.IDPConfigTypeJWT:
 		return gu.Ptr(domain.IDPTypeJWT)
 	case internal_domain.IDPConfigTypeUnspecified:
-		return nil
+		fallthrough
 	default:
 		return nil
 	}
@@ -453,7 +441,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPChanged(event eventstore.Even
 	}
 	changes = append(changes, repo.SetUpdatedAt(gu.Ptr(event.CreatedAt())))
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-9sX8h", "reduce.wrong.db.pool %T", ex)
@@ -477,7 +465,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPDeactivated(event eventstore.
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y4O5l", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigDeactivatedEventType, instance.IDPConfigDeactivatedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-9sX8h", "reduce.wrong.db.pool %T", ex)
@@ -506,7 +494,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPReactivated(event eventstore.
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y8QyS", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigReactivatedEventType, instance.IDPConfigReactivatedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-2Db9P", "reduce.wrong.db.pool %T", ex)
@@ -541,7 +529,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Even
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ybcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType, org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-PSj7F", "reduce.wrong.db.pool %T", ex)
@@ -571,7 +559,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCConfigAdded(event eventstore
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5cvzY", "reduce.wrong.db.pool %T", ex)
@@ -580,7 +568,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCConfigAdded(event eventstore
 		repo := repository.IDProviderRepository()
 		_, err = repo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(repo, idpEvent.Aggregate().InstanceID, idpEvent.IDPConfigID, orgID),
 			repo.SetPayload(string(payloadJSON)),
-			database.NewChange(repo.TypeColumn(), domain.IDPTypeOIDC),
+			repo.SetType(domain.IDPTypeOIDC),
 			repo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
 		)
 		return err
@@ -600,7 +588,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCConfigChanged(event eventsto
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigChangedEventType, instance.IDPOIDCConfigChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-sh6Lp", "unable to cast to tx executer")
@@ -612,22 +600,22 @@ func (p *idpTemplateRelationalProjection) reduceOIDCConfigChanged(event eventsto
 			return err
 		}
 
-		if idpEvent.ClientID != nil {
+		if idpEvent.ClientID != nil && *idpEvent.ClientID != oidc.ClientID {
 			oidc.ClientID = *idpEvent.ClientID
 		}
 		if idpEvent.ClientSecret != nil {
 			oidc.ClientSecret = idpEvent.ClientSecret
 		}
-		if idpEvent.Issuer != nil {
+		if idpEvent.Issuer != nil && *idpEvent.Issuer != oidc.Issuer {
 			oidc.Issuer = *idpEvent.Issuer
 		}
-		if idpEvent.AuthorizationEndpoint != nil {
+		if idpEvent.AuthorizationEndpoint != nil && *idpEvent.AuthorizationEndpoint != oidc.AuthorizationEndpoint {
 			oidc.AuthorizationEndpoint = *idpEvent.AuthorizationEndpoint
 		}
-		if idpEvent.TokenEndpoint != nil {
+		if idpEvent.TokenEndpoint != nil && *idpEvent.TokenEndpoint != oidc.TokenEndpoint {
 			oidc.TokenEndpoint = *idpEvent.TokenEndpoint
 		}
-		if idpEvent.Scopes != nil {
+		if idpEvent.Scopes != nil && !slices.Equal(idpEvent.Scopes, oidc.Scopes) {
 			oidc.Scopes = idpEvent.Scopes
 		}
 		if idpEvent.IDPDisplayNameMapping != nil {
@@ -644,7 +632,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCConfigChanged(event eventsto
 
 		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.IDPConfigID, orgId),
 			idpRepo.SetPayload(string(payloadJSON)),
-			database.NewChange(idpRepo.TypeColumn(), domain.IDPTypeOIDC),
+			idpRepo.SetType(domain.IDPTypeOIDC),
 			idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
 		)
 		return err
@@ -682,7 +670,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTConfigAdded(event eventstore.
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-tJQ8V", "reduce.wrong.db.pool %T", ex)
@@ -691,7 +679,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTConfigAdded(event eventstore.
 		repo := repository.IDProviderRepository()
 		_, err = repo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(repo, idpEvent.Aggregate().InstanceID, idpEvent.IDPConfigID, orgID),
 			repo.SetPayload(string(payloadJSON)),
-			database.NewChange(repo.TypeColumn(), domain.IDPTypeJWT),
+			repo.SetType(domain.IDPTypeJWT),
 			repo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
 		)
 		return err
@@ -711,7 +699,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTConfigChanged(event eventstor
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigChangedEventType, instance.IDPJWTConfigChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-sh6Lp", "unable to cast to tx executer")
@@ -723,16 +711,16 @@ func (p *idpTemplateRelationalProjection) reduceJWTConfigChanged(event eventstor
 			return err
 		}
 
-		if idpEvent.JWTEndpoint != nil {
+		if idpEvent.JWTEndpoint != nil && *idpEvent.JWTEndpoint != jwt.JWTEndpoint {
 			jwt.JWTEndpoint = *idpEvent.JWTEndpoint
 		}
-		if idpEvent.Issuer != nil {
+		if idpEvent.Issuer != nil && *idpEvent.Issuer != jwt.Issuer {
 			jwt.Issuer = *idpEvent.Issuer
 		}
-		if idpEvent.KeysEndpoint != nil {
+		if idpEvent.KeysEndpoint != nil && *idpEvent.KeysEndpoint != jwt.KeysEndpoint {
 			jwt.KeysEndpoint = *idpEvent.KeysEndpoint
 		}
-		if idpEvent.HeaderName != nil {
+		if idpEvent.HeaderName != nil && *idpEvent.HeaderName != jwt.HeaderName {
 			jwt.HeaderName = *idpEvent.HeaderName
 		}
 
@@ -743,7 +731,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTConfigChanged(event eventstor
 
 		_, err = idpRepo.Update(ctx, v3_sql.SQLTx(tx), idpScopedCondition(idpRepo, idpEvent.Aggregate().InstanceID, idpEvent.IDPConfigID, orgId),
 			idpRepo.SetPayload(string(payloadJSON)),
-			database.NewChange(idpRepo.TypeColumn(), domain.IDPTypeJWT),
+			idpRepo.SetType(domain.IDPTypeJWT),
 			idpRepo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
 		)
 		return err
@@ -779,7 +767,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPAdded(event eventstore.E
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-mB2hq", "reduce.wrong.db.pool %T", ex)
@@ -818,7 +806,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPChanged(event eventstore
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-K1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
@@ -866,7 +854,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPAdded(event eventstore.Ev
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-C9ju3", "reduce.wrong.db.pool %T", ex)
@@ -905,7 +893,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPChanged(event eventstore.
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1K82ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-L8CQt", "unable to cast to tx executer")
@@ -965,7 +953,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPMigratedAzureAD(event eve
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-mj7LQ", "reduce.wrong.db.pool %T", ex)
@@ -974,12 +962,12 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPMigratedAzureAD(event eve
 		repo := repository.IDProviderRepository()
 		changes := database.Changes{
 			repo.SetName(idpEvent.Name),
-			database.NewChange(repo.TypeColumn(), domain.IDPTypeAzure),
+			repo.SetType(domain.IDPTypeAzure),
 			repo.SetAllowCreation(idpEvent.IsCreationAllowed),
 			repo.SetAllowLinking(idpEvent.IsLinkingAllowed),
 			repo.SetAllowAutoCreation(idpEvent.IsAutoCreation),
 			repo.SetAllowAutoUpdate(idpEvent.IsAutoUpdate),
-			repo.SetLinkingField(mapAutoLinkingField(idpEvent.AutoLinkingOption)),
+			repo.SetAutoLinkingField(mapAutoLinkingField(idpEvent.AutoLinkingOption)),
 			repo.SetPayload(string(payloadJSON)),
 			repo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
 		}
@@ -1013,7 +1001,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPMigratedGoogle(event even
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-HDqk9", "reduce.wrong.db.pool %T", ex)
@@ -1022,12 +1010,12 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPMigratedGoogle(event even
 		repo := repository.IDProviderRepository()
 		changes := database.Changes{
 			repo.SetName(idpEvent.Name),
-			database.NewChange(repo.TypeColumn(), domain.IDPTypeGoogle),
+			repo.SetType(domain.IDPTypeGoogle),
 			repo.SetAllowCreation(idpEvent.IsCreationAllowed),
 			repo.SetAllowLinking(idpEvent.IsLinkingAllowed),
 			repo.SetAllowAutoCreation(idpEvent.IsAutoCreation),
 			repo.SetAllowAutoUpdate(idpEvent.IsAutoUpdate),
-			repo.SetLinkingField(mapAutoLinkingField(idpEvent.AutoLinkingOption)),
+			repo.SetAutoLinkingField(mapAutoLinkingField(idpEvent.AutoLinkingOption)),
 			repo.SetPayload(string(payloadJSON)),
 			repo.SetUpdatedAt(gu.Ptr(event.CreatedAt())),
 		}
@@ -1062,7 +1050,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPAdded(event eventstore.Eve
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZYYyQ", "reduce.wrong.db.pool %T", ex)
@@ -1101,7 +1089,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPChanged(event eventstore.E
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-H15j2il", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
@@ -1161,7 +1149,7 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPAdded(event eventstore
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-GJ4Kb", "reduce.wrong.db.pool %T", ex)
@@ -1200,7 +1188,7 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPChanged(event eventsto
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YZ5x25s", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
@@ -1258,7 +1246,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPAdded(event eventstore.
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-HNpgd", "reduce.wrong.db.pool %T", ex)
@@ -1297,7 +1285,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPChanged(event eventstor
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-L1U89ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
@@ -1354,7 +1342,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPAdded(event e
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-Kv4Fu", "reduce.wrong.db.pool %T", ex)
@@ -1393,7 +1381,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPChanged(event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
@@ -1447,7 +1435,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPAdded(event eventstore.
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kN8Qx", "reduce.wrong.db.pool %T", ex)
@@ -1486,7 +1474,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPChanged(event eventstor
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-mT5827b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
@@ -1541,7 +1529,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPAdded(event e
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-FQrtw", "reduce.wrong.db.pool %T", ex)
@@ -1580,7 +1568,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPChanged(event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
@@ -1634,7 +1622,7 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPAdded(event eventstore.
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-B9SPm", "reduce.wrong.db.pool %T", ex)
@@ -1673,7 +1661,7 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPChanged(event eventstor
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YN58hml", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
@@ -1748,7 +1736,7 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-XCJ8w", "reduce.wrong.db.pool %T", ex)
@@ -1787,7 +1775,7 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
@@ -1843,7 +1831,7 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.E
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ku2YB", "reduce.wrong.db.pool %T", ex)
@@ -1882,7 +1870,7 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
@@ -1941,7 +1929,7 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 		return nil, err
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ksJ3N", "reduce.wrong.db.pool %T", ex)
@@ -1980,7 +1968,7 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
@@ -2028,115 +2016,115 @@ func (p *idpTemplateRelationalProjection) reduceIDPChangedTemplateColumns(repo d
 		changes = append(changes, repo.SetAllowAutoUpdate(*optionChanges.IsAutoUpdate))
 	}
 	if optionChanges.AutoLinkingOption != nil {
-		changes = append(changes, repo.SetLinkingField(mapAutoLinkingField(*optionChanges.AutoLinkingOption)))
+		changes = append(changes, repo.SetAutoLinkingField(mapAutoLinkingField(*optionChanges.AutoLinkingOption)))
 	}
 
 	return changes
 }
 
 func (p *idpTemplateRelationalProjection) reduceOAuthIDPChangedColumns(payload *domain.OAuth, idpEvent *idp.OAuthIDPChangedEvent) bool {
-	payloadChange := false
-	if idpEvent.ClientID != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
+		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
 	}
 	if idpEvent.ClientSecret != nil {
-		payloadChange = true
+		payloadChanged = true
 		payload.ClientSecret = idpEvent.ClientSecret
 	}
-	if idpEvent.AuthorizationEndpoint != nil {
-		payloadChange = true
+	if idpEvent.AuthorizationEndpoint != nil && *idpEvent.AuthorizationEndpoint != payload.AuthorizationEndpoint {
+		payloadChanged = true
 		payload.AuthorizationEndpoint = *idpEvent.AuthorizationEndpoint
 	}
-	if idpEvent.TokenEndpoint != nil {
-		payloadChange = true
+	if idpEvent.TokenEndpoint != nil && *idpEvent.TokenEndpoint != payload.TokenEndpoint {
+		payloadChanged = true
 		payload.TokenEndpoint = *idpEvent.TokenEndpoint
 	}
-	if idpEvent.UserEndpoint != nil {
-		payloadChange = true
+	if idpEvent.UserEndpoint != nil && *idpEvent.UserEndpoint != payload.UserEndpoint {
+		payloadChanged = true
 		payload.UserEndpoint = *idpEvent.UserEndpoint
 	}
-	if idpEvent.Scopes != nil {
-		payloadChange = true
+	if idpEvent.Scopes != nil && !slices.Equal(idpEvent.Scopes, payload.Scopes) {
+		payloadChanged = true
 		payload.Scopes = idpEvent.Scopes
 	}
-	if idpEvent.IDAttribute != nil {
-		payloadChange = true
+	if idpEvent.IDAttribute != nil && *idpEvent.IDAttribute != payload.IDAttribute {
+		payloadChanged = true
 		payload.IDAttribute = *idpEvent.IDAttribute
 	}
-	if idpEvent.UsePKCE != nil {
-		payloadChange = true
+	if idpEvent.UsePKCE != nil && *idpEvent.UsePKCE != payload.UsePKCE {
+		payloadChanged = true
 		payload.UsePKCE = *idpEvent.UsePKCE
 	}
-	return payloadChange
+	return payloadChanged
 }
 
 func (p *idpTemplateRelationalProjection) reduceOIDCIDPChangedColumns(payload *domain.OIDC, idpEvent *idp.OIDCIDPChangedEvent) bool {
-	payloadChange := false
-	if idpEvent.ClientID != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
+		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
 	}
 	if idpEvent.ClientSecret != nil {
-		payloadChange = true
+		payloadChanged = true
 		payload.ClientSecret = idpEvent.ClientSecret
 	}
-	if idpEvent.Issuer != nil {
-		payloadChange = true
+	if idpEvent.Issuer != nil && *idpEvent.Issuer != payload.Issuer {
+		payloadChanged = true
 		payload.Issuer = *idpEvent.Issuer
 	}
-	if idpEvent.Scopes != nil {
-		payloadChange = true
+	if idpEvent.Scopes != nil && !slices.Equal(idpEvent.Scopes, payload.Scopes) {
+		payloadChanged = true
 		payload.Scopes = idpEvent.Scopes
 	}
-	if idpEvent.IsIDTokenMapping != nil {
-		payloadChange = true
+	if idpEvent.IsIDTokenMapping != nil && *idpEvent.IsIDTokenMapping != payload.IsIDTokenMapping {
+		payloadChanged = true
 		payload.IsIDTokenMapping = *idpEvent.IsIDTokenMapping
 	}
-	if idpEvent.UsePKCE != nil {
-		payloadChange = true
+	if idpEvent.UsePKCE != nil && *idpEvent.UsePKCE != payload.UsePKCE {
+		payloadChanged = true
 		payload.UsePKCE = *idpEvent.UsePKCE
 	}
-	return payloadChange
+	return payloadChanged
 }
 
 func (p *idpTemplateRelationalProjection) reduceJWTIDPChangedColumns(payload *domain.JWT, idpEvent *idp.JWTIDPChangedEvent) bool {
-	payloadChange := false
-	if idpEvent.JWTEndpoint != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.JWTEndpoint != nil && *idpEvent.JWTEndpoint != payload.JWTEndpoint {
+		payloadChanged = true
 		payload.JWTEndpoint = *idpEvent.JWTEndpoint
 	}
-	if idpEvent.KeysEndpoint != nil {
-		payloadChange = true
+	if idpEvent.KeysEndpoint != nil && *idpEvent.KeysEndpoint != payload.KeysEndpoint {
+		payloadChanged = true
 		payload.KeysEndpoint = *idpEvent.KeysEndpoint
 	}
-	if idpEvent.HeaderName != nil {
-		payloadChange = true
+	if idpEvent.HeaderName != nil && *idpEvent.HeaderName != payload.HeaderName {
+		payloadChanged = true
 		payload.HeaderName = *idpEvent.HeaderName
 	}
-	if idpEvent.Issuer != nil {
-		payloadChange = true
+	if idpEvent.Issuer != nil && *idpEvent.Issuer != payload.Issuer {
+		payloadChanged = true
 		payload.Issuer = *idpEvent.Issuer
 	}
-	return payloadChange
+	return payloadChanged
 }
 
 func (p *idpTemplateRelationalProjection) reduceAzureADIDPChangedColumns(payload *domain.Azure, idpEvent *idp.AzureADIDPChangedEvent) (bool, error) {
-	payloadChange := false
-	if idpEvent.ClientID != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
+		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
 	}
 	if idpEvent.ClientSecret != nil {
-		payloadChange = true
+		payloadChanged = true
 		payload.ClientSecret = idpEvent.ClientSecret
 	}
-	if idpEvent.Scopes != nil {
-		payloadChange = true
+	if idpEvent.Scopes != nil && !slices.Equal(idpEvent.Scopes, payload.Scopes) {
+		payloadChanged = true
 		payload.Scopes = idpEvent.Scopes
 	}
-	if idpEvent.Tenant != nil {
-		payloadChange = true
+	if idpEvent.Tenant != nil && *idpEvent.Tenant != payload.Tenant.String() {
+		payloadChanged = true
 
 		azureTenant, err := domain.AzureTenantTypeString(*idpEvent.Tenant)
 		if err != nil {
@@ -2145,273 +2133,273 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPChangedColumns(payload
 
 		payload.Tenant = azureTenant
 	}
-	if idpEvent.IsEmailVerified != nil {
-		payloadChange = true
+	if idpEvent.IsEmailVerified != nil && *idpEvent.IsEmailVerified != payload.IsEmailVerified {
+		payloadChanged = true
 		payload.IsEmailVerified = *idpEvent.IsEmailVerified
 	}
-	return payloadChange, nil
+	return payloadChanged, nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitHubIDPChangedColumns(payload *domain.Github, idpEvent *idp.GitHubIDPChangedEvent) bool {
-	payloadChange := false
-	if idpEvent.ClientID != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
+		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
 	}
 	if idpEvent.ClientSecret != nil {
-		payloadChange = true
+		payloadChanged = true
 		payload.ClientSecret = idpEvent.ClientSecret
 	}
-	if idpEvent.Scopes != nil {
-		payloadChange = true
+	if idpEvent.Scopes != nil && !slices.Equal(idpEvent.Scopes, payload.Scopes) {
+		payloadChanged = true
 		payload.Scopes = idpEvent.Scopes
 	}
-	return payloadChange
+	return payloadChanged
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPChangedColumns(payload *domain.GithubEnterprise, idpEvent *idp.GitHubEnterpriseIDPChangedEvent) bool {
-	payloadChange := false
-	if idpEvent.ClientID != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
+		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
 	}
 	if idpEvent.ClientSecret != nil {
-		payloadChange = true
+		payloadChanged = true
 		payload.ClientSecret = idpEvent.ClientSecret
 	}
-	if idpEvent.AuthorizationEndpoint != nil {
-		payloadChange = true
+	if idpEvent.AuthorizationEndpoint != nil && *idpEvent.AuthorizationEndpoint != payload.AuthorizationEndpoint {
+		payloadChanged = true
 		payload.AuthorizationEndpoint = *idpEvent.AuthorizationEndpoint
 	}
-	if idpEvent.TokenEndpoint != nil {
-		payloadChange = true
+	if idpEvent.TokenEndpoint != nil && *idpEvent.TokenEndpoint != payload.TokenEndpoint {
+		payloadChanged = true
 		payload.TokenEndpoint = *idpEvent.TokenEndpoint
 	}
-	if idpEvent.UserEndpoint != nil {
-		payloadChange = true
+	if idpEvent.UserEndpoint != nil && *idpEvent.UserEndpoint != payload.UserEndpoint {
+		payloadChanged = true
 		payload.UserEndpoint = *idpEvent.UserEndpoint
 	}
-	if idpEvent.Scopes != nil {
-		payloadChange = true
+	if idpEvent.Scopes != nil && !slices.Equal(idpEvent.Scopes, payload.Scopes) {
+		payloadChanged = true
 		payload.Scopes = idpEvent.Scopes
 	}
-	return payloadChange
+	return payloadChanged
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitLabIDPChangedColumns(payload *domain.Gitlab, idpEvent *idp.GitLabIDPChangedEvent) bool {
-	payloadChange := false
-	if idpEvent.ClientID != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
+		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
 	}
 	if idpEvent.ClientSecret != nil {
-		payloadChange = true
+		payloadChanged = true
 		payload.ClientSecret = idpEvent.ClientSecret
 	}
-	if idpEvent.Scopes != nil {
-		payloadChange = true
+	if idpEvent.Scopes != nil && !slices.Equal(idpEvent.Scopes, payload.Scopes) {
+		payloadChanged = true
 		payload.Scopes = idpEvent.Scopes
 	}
-	return payloadChange
+	return payloadChanged
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPChangedColumns(payload *domain.GitlabSelfHosted, idpEvent *idp.GitLabSelfHostedIDPChangedEvent) bool {
-	payloadChange := false
-	if idpEvent.ClientID != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
+		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
 	}
 	if idpEvent.ClientSecret != nil {
-		payloadChange = true
+		payloadChanged = true
 		payload.ClientSecret = idpEvent.ClientSecret
 	}
-	if idpEvent.Issuer != nil {
-		payloadChange = true
+	if idpEvent.Issuer != nil && *idpEvent.Issuer != payload.Issuer {
+		payloadChanged = true
 		payload.Issuer = *idpEvent.Issuer
 	}
-	if idpEvent.Scopes != nil {
-		payloadChange = true
+	if idpEvent.Scopes != nil && !slices.Equal(idpEvent.Scopes, payload.Scopes) {
+		payloadChanged = true
 		payload.Scopes = idpEvent.Scopes
 	}
-	return payloadChange
+	return payloadChanged
 }
 
 func (p *idpTemplateRelationalProjection) reduceGoogleIDPChangedColumns(payload *domain.Google, idpEvent *idp.GoogleIDPChangedEvent) bool {
-	payloadChange := false
-	if idpEvent.ClientID != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
+		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
 	}
 	if idpEvent.ClientSecret != nil {
-		payloadChange = true
+		payloadChanged = true
 		payload.ClientSecret = idpEvent.ClientSecret
 	}
-	if idpEvent.Scopes != nil {
-		payloadChange = true
+	if idpEvent.Scopes != nil && !slices.Equal(idpEvent.Scopes, payload.Scopes) {
+		payloadChanged = true
 		payload.Scopes = idpEvent.Scopes
 	}
-	return payloadChange
+	return payloadChanged
 }
 
 func (p *idpTemplateRelationalProjection) reduceLDAPIDPChangedColumns(payload *domain.LDAP, idpEvent *idp.LDAPIDPChangedEvent) bool {
-	payloadChange := false
-	if idpEvent.Servers != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.Servers != nil && !slices.Equal(idpEvent.Servers, payload.Servers) {
+		payloadChanged = true
 		payload.Servers = idpEvent.Servers
 	}
-	if idpEvent.StartTLS != nil {
-		payloadChange = true
+	if idpEvent.StartTLS != nil && *idpEvent.StartTLS != payload.StartTLS {
+		payloadChanged = true
 		payload.StartTLS = *idpEvent.StartTLS
 	}
-	if idpEvent.BaseDN != nil {
-		payloadChange = true
+	if idpEvent.BaseDN != nil && *idpEvent.BaseDN != payload.BaseDN {
+		payloadChanged = true
 		payload.BaseDN = *idpEvent.BaseDN
 	}
-	if idpEvent.BindDN != nil {
-		payloadChange = true
+	if idpEvent.BindDN != nil && *idpEvent.BindDN != payload.BindDN {
+		payloadChanged = true
 		payload.BindDN = *idpEvent.BindDN
 	}
 	if idpEvent.BindPassword != nil {
-		payloadChange = true
+		payloadChanged = true
 		payload.BindPassword = idpEvent.BindPassword
 	}
-	if idpEvent.UserBase != nil {
-		payloadChange = true
+	if idpEvent.UserBase != nil && *idpEvent.UserBase != payload.UserBase {
+		payloadChanged = true
 		payload.UserBase = *idpEvent.UserBase
 	}
-	if idpEvent.UserObjectClasses != nil {
-		payloadChange = true
+	if idpEvent.UserObjectClasses != nil && !slices.Equal(idpEvent.UserObjectClasses, payload.UserObjectClasses) {
+		payloadChanged = true
 		payload.UserObjectClasses = idpEvent.UserObjectClasses
 	}
-	if idpEvent.UserFilters != nil {
-		payloadChange = true
+	if idpEvent.UserFilters != nil && !slices.Equal(idpEvent.UserFilters, payload.UserFilters) {
+		payloadChanged = true
 		payload.UserFilters = idpEvent.UserFilters
 	}
-	if idpEvent.Timeout != nil {
-		payloadChange = true
+	if idpEvent.Timeout != nil && *idpEvent.Timeout != payload.Timeout {
+		payloadChanged = true
 		payload.Timeout = *idpEvent.Timeout
 	}
-	if idpEvent.RootCA != nil {
-		payloadChange = true
+	if idpEvent.RootCA != nil && !slices.Equal(idpEvent.RootCA, payload.RootCA) {
+		payloadChanged = true
 		payload.RootCA = idpEvent.RootCA
 	}
-	if idpEvent.IDAttribute != nil {
-		payloadChange = true
+	if idpEvent.IDAttribute != nil && *idpEvent.IDAttribute != payload.IDAttribute {
+		payloadChanged = true
 		payload.IDAttribute = *idpEvent.IDAttribute
 	}
-	if idpEvent.FirstNameAttribute != nil {
-		payloadChange = true
+	if idpEvent.FirstNameAttribute != nil && *idpEvent.FirstNameAttribute != payload.FirstNameAttribute {
+		payloadChanged = true
 		payload.FirstNameAttribute = *idpEvent.FirstNameAttribute
 	}
-	if idpEvent.LastNameAttribute != nil {
-		payloadChange = true
+	if idpEvent.LastNameAttribute != nil && *idpEvent.LastNameAttribute != payload.LastNameAttribute {
+		payloadChanged = true
 		payload.LastNameAttribute = *idpEvent.LastNameAttribute
 	}
-	if idpEvent.DisplayNameAttribute != nil {
-		payloadChange = true
+	if idpEvent.DisplayNameAttribute != nil && *idpEvent.DisplayNameAttribute != payload.DisplayNameAttribute {
+		payloadChanged = true
 		payload.DisplayNameAttribute = *idpEvent.DisplayNameAttribute
 	}
-	if idpEvent.NickNameAttribute != nil {
-		payloadChange = true
+	if idpEvent.NickNameAttribute != nil && *idpEvent.NickNameAttribute != payload.NickNameAttribute {
+		payloadChanged = true
 		payload.NickNameAttribute = *idpEvent.NickNameAttribute
 	}
-	if idpEvent.PreferredUsernameAttribute != nil {
-		payloadChange = true
+	if idpEvent.PreferredUsernameAttribute != nil && *idpEvent.PreferredUsernameAttribute != payload.PreferredUsernameAttribute {
+		payloadChanged = true
 		payload.PreferredUsernameAttribute = *idpEvent.PreferredUsernameAttribute
 	}
-	if idpEvent.EmailAttribute != nil {
-		payloadChange = true
+	if idpEvent.EmailAttribute != nil && *idpEvent.EmailAttribute != payload.EmailAttribute {
+		payloadChanged = true
 		payload.EmailAttribute = *idpEvent.EmailAttribute
 	}
-	if idpEvent.EmailVerifiedAttribute != nil {
-		payloadChange = true
+	if idpEvent.EmailVerifiedAttribute != nil && *idpEvent.EmailVerifiedAttribute != payload.EmailVerifiedAttribute {
+		payloadChanged = true
 		payload.EmailVerifiedAttribute = *idpEvent.EmailVerifiedAttribute
 	}
-	if idpEvent.PhoneAttribute != nil {
-		payloadChange = true
+	if idpEvent.PhoneAttribute != nil && *idpEvent.PhoneAttribute != payload.PhoneAttribute {
+		payloadChanged = true
 		payload.PhoneAttribute = *idpEvent.PhoneAttribute
 	}
-	if idpEvent.PhoneVerifiedAttribute != nil {
-		payloadChange = true
+	if idpEvent.PhoneVerifiedAttribute != nil && *idpEvent.PhoneVerifiedAttribute != payload.PhoneVerifiedAttribute {
+		payloadChanged = true
 		payload.PhoneVerifiedAttribute = *idpEvent.PhoneVerifiedAttribute
 	}
-	if idpEvent.PreferredLanguageAttribute != nil {
-		payloadChange = true
+	if idpEvent.PreferredLanguageAttribute != nil && *idpEvent.PreferredLanguageAttribute != payload.PreferredLanguageAttribute {
+		payloadChanged = true
 		payload.PreferredLanguageAttribute = *idpEvent.PreferredLanguageAttribute
 	}
-	if idpEvent.AvatarURLAttribute != nil {
-		payloadChange = true
+	if idpEvent.AvatarURLAttribute != nil && *idpEvent.AvatarURLAttribute != payload.AvatarURLAttribute {
+		payloadChanged = true
 		payload.AvatarURLAttribute = *idpEvent.AvatarURLAttribute
 	}
-	if idpEvent.ProfileAttribute != nil {
-		payloadChange = true
+	if idpEvent.ProfileAttribute != nil && *idpEvent.ProfileAttribute != payload.ProfileAttribute {
+		payloadChanged = true
 		payload.ProfileAttribute = *idpEvent.ProfileAttribute
 	}
-	return payloadChange
+	return payloadChanged
 }
 
 func (p *idpTemplateRelationalProjection) reduceAppleIDPChangedColumns(payload *domain.Apple, idpEvent *idp.AppleIDPChangedEvent) bool {
-	payloadChange := false
-	if idpEvent.ClientID != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
+		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
 	}
-	if idpEvent.TeamID != nil {
-		payloadChange = true
+	if idpEvent.TeamID != nil && *idpEvent.TeamID != payload.TeamID {
+		payloadChanged = true
 		payload.TeamID = *idpEvent.TeamID
 	}
-	if idpEvent.KeyID != nil {
-		payloadChange = true
+	if idpEvent.KeyID != nil && *idpEvent.KeyID != payload.KeyID {
+		payloadChanged = true
 		payload.KeyID = *idpEvent.KeyID
 	}
 	if idpEvent.PrivateKey != nil {
-		payloadChange = true
+		payloadChanged = true
 		payload.PrivateKey = idpEvent.PrivateKey
 	}
-	if idpEvent.Scopes != nil {
-		payloadChange = true
+	if idpEvent.Scopes != nil && !slices.Equal(idpEvent.Scopes, payload.Scopes) {
+		payloadChanged = true
 		payload.Scopes = idpEvent.Scopes
 	}
-	return payloadChange
+	return payloadChanged
 }
 
 func (p *idpTemplateRelationalProjection) reduceSAMLIDPChangedColumns(payload *domain.SAML, idpEvent *idp.SAMLIDPChangedEvent) bool {
-	payloadChange := false
-	if idpEvent.Metadata != nil {
-		payloadChange = true
+	payloadChanged := false
+	if idpEvent.Metadata != nil && !slices.Equal(idpEvent.Metadata, payload.Metadata) {
+		payloadChanged = true
 		payload.Metadata = idpEvent.Metadata
 	}
 	if idpEvent.Key != nil {
-		payloadChange = true
+		payloadChanged = true
 		payload.Key = idpEvent.Key
 	}
-	if idpEvent.Certificate != nil {
-		payloadChange = true
+	if idpEvent.Certificate != nil && !slices.Equal(idpEvent.Certificate, payload.Certificate) {
+		payloadChanged = true
 		payload.Certificate = idpEvent.Certificate
 	}
-	if idpEvent.Binding != nil {
-		payloadChange = true
+	if idpEvent.Binding != nil && *idpEvent.Binding != payload.Binding {
+		payloadChanged = true
 		payload.Binding = *idpEvent.Binding
 	}
-	if idpEvent.WithSignedRequest != nil {
-		payloadChange = true
+	if idpEvent.WithSignedRequest != nil && *idpEvent.WithSignedRequest != payload.WithSignedRequest {
+		payloadChanged = true
 		payload.WithSignedRequest = *idpEvent.WithSignedRequest
 	}
-	if idpEvent.NameIDFormat != nil {
-		payloadChange = true
+	if idpEvent.NameIDFormat != nil && (payload.NameIDFormat == nil || *idpEvent.NameIDFormat != *payload.NameIDFormat) {
+		payloadChanged = true
 		payload.NameIDFormat = idpEvent.NameIDFormat
 	}
-	if idpEvent.TransientMappingAttributeName != nil {
-		payloadChange = true
+	if idpEvent.TransientMappingAttributeName != nil && *idpEvent.TransientMappingAttributeName != payload.TransientMappingAttributeName {
+		payloadChanged = true
 		payload.TransientMappingAttributeName = *idpEvent.TransientMappingAttributeName
 	}
-	if idpEvent.FederatedLogoutEnabled != nil {
-		payloadChange = true
+	if idpEvent.FederatedLogoutEnabled != nil && *idpEvent.FederatedLogoutEnabled != payload.FederatedLogoutEnabled {
+		payloadChanged = true
 		payload.FederatedLogoutEnabled = *idpEvent.FederatedLogoutEnabled
 	}
-	if idpEvent.SignatureAlgorithm != nil {
-		payloadChange = true
+	if idpEvent.SignatureAlgorithm != nil && *idpEvent.SignatureAlgorithm != payload.SignatureAlgorithm {
+		payloadChanged = true
 		payload.SignatureAlgorithm = *idpEvent.SignatureAlgorithm
 	}
-	return payloadChange
+	return payloadChanged
 }
