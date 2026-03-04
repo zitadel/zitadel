@@ -58,6 +58,12 @@ export async function setLanguageCookie(language: string) {
   });
 }
 
+export async function getLanguageCookie(): Promise<string | undefined> {
+  const cookiesList = await cookies();
+  const languageCookie = cookiesList.get(LANGUAGE_COOKIE_NAME);
+  return languageCookie?.value;
+}
+
 export async function addSessionToCookie<T>({
   session,
   cleanup,
