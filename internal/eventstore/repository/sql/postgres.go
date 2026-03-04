@@ -123,6 +123,7 @@ func (db *Postgres) eventQuery(useV1 bool) string {
 		", aggregate_type" +
 		", aggregate_id" +
 		", revision" +
+		", written_by_v3" +
 		" FROM eventstore.events2"
 }
 

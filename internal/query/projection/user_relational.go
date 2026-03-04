@@ -27,6 +27,8 @@ func (*userRelationalProjection) Name() string {
 	return UserRelationProjectionTable
 }
 
+func (*userRelationalProjection) SkipV3ReducedEvents() {}
+
 func newUserRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
 	return handler.NewHandler(ctx, &config, new(userRelationalProjection))
 }

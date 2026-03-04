@@ -25,6 +25,8 @@ func (*authorizationRelationalProjection) Name() string {
 	return AuthorizationRelationalProjectionTable
 }
 
+func (*authorizationRelationalProjection) SkipV3ReducedEvents() {}
+
 func newAuthorizationRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
 	return handler.NewHandler(ctx, &config, new(authorizationRelationalProjection))
 }

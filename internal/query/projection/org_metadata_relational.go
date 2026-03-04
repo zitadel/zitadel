@@ -24,6 +24,8 @@ func (*orgMetadataRelationalProjection) Name() string {
 	return "zitadel.org_metadata"
 }
 
+func (*orgMetadataRelationalProjection) SkipV3ReducedEvents() {}
+
 func (p *orgMetadataRelationalProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{

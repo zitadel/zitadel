@@ -43,6 +43,7 @@ BEGIN
             , COALESCE(current_owner, c.owner) -- AS owner
             , EXTRACT(EPOCH FROM created_at) -- AS position
             , c.ordinality::%s -- AS in_tx_order
+            , COALESCE(c.written_by_v3, false) -- AS written_by_v3
         FROM
             UNNEST(commands) WITH ORDINALITY AS c
         WHERE

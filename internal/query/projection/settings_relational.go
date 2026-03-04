@@ -35,6 +35,8 @@ func (*settingsRelationalProjection) Name() string {
 	return SettingsRelationalProjectionTable
 }
 
+func (*settingsRelationalProjection) SkipV3ReducedEvents() {}
+
 func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{

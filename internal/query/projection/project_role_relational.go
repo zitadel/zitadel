@@ -27,6 +27,8 @@ func (*projectRoleRelationalProjection) Name() string {
 	return ProjectRoleRelationalTable
 }
 
+func (*projectRoleRelationalProjection) SkipV3ReducedEvents() {}
+
 func newProjectRoleRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
 	return handler.NewHandler(ctx, &config, new(projectRoleRelationalProjection))
 }

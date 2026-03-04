@@ -27,6 +27,7 @@ type command struct {
 	Payload       Payload
 	Creator       string
 	Owner         string
+	WrittenByV3   bool
 }
 
 func (c *command) Aggregate() *eventstore.Aggregate {
@@ -47,7 +48,7 @@ type event struct {
 }
 
 // TODO: remove on v3
-func commandToEventOld(sequence *latestSequence, cmd eventstore.Command) (_ *event, err error) {
+func commandToEventOld(sequence *latestSequence, cmd eventstore.Command, writtenByV3 bool) (_ *event, err error) {
 	var payload Payload
 	if cmd.Payload() != nil {
 		payload, err = json.Marshal(cmd.Payload())
@@ -66,6 +67,7 @@ func commandToEventOld(sequence *latestSequence, cmd eventstore.Command) (_ *eve
 			Payload:       payload,
 			Creator:       cmd.Creator(),
 			Owner:         sequence.aggregate.ResourceOwner,
+			WrittenByV3:   writtenByV3,
 		},
 		sequence: sequence.sequence,
 	}, nil
@@ -78,7 +80,8 @@ func commandsToEvents(ctx context.Context, cmds []eventstore.Command) (_ []event
 		if cmd.Aggregate().InstanceID == "" {
 			cmd.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
 		}
-		events[i], err = commandToEvent(cmd)
+		_, isV3Command := cmd.(eventstore.V3Command)
+		events[i], err = commandToEvent(cmd, isV3Command)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -87,7 +90,7 @@ func commandsToEvents(ctx context.Context, cmds []eventstore.Command) (_ []event
 	return events, commands, nil
 }
 
-func commandToEvent(cmd eventstore.Command) (_ eventstore.Event, err error) {
+func commandToEvent(cmd eventstore.Command, writtenByV3 bool) (_ eventstore.Event, err error) {
 	var payload Payload
 	if cmd.Payload() != nil {
 		payload, err = json.Marshal(cmd.Payload())
@@ -106,6 +109,7 @@ func commandToEvent(cmd eventstore.Command) (_ eventstore.Event, err error) {
 		Payload:       payload,
 		Creator:       cmd.Creator(),
 		Owner:         cmd.Aggregate().ResourceOwner,
+		WrittenByV3:   writtenByV3,
 	}
 
 	return &event{

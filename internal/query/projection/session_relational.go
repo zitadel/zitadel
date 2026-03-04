@@ -26,6 +26,8 @@ func (*sessionRelationalProjection) Name() string {
 	return SessionsRelationalProjectionTable
 }
 
+func (*sessionRelationalProjection) SkipV3ReducedEvents() {}
+
 func newSessionRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
 	return handler.NewHandler(ctx, &config, new(sessionRelationalProjection))
 }

@@ -21,6 +21,8 @@ func (*orgRelationalProjection) Name() string {
 	return OrgRelationProjectionTable
 }
 
+func (*orgRelationalProjection) SkipV3ReducedEvents() {}
+
 func newOrgRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
 	return handler.NewHandler(ctx, &config, new(orgRelationalProjection))
 }

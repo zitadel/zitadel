@@ -40,6 +40,13 @@ type Command interface {
 	Fields() []*FieldOperation
 }
 
+// V3Command is a marker interface for commands created through the v3 storage adapter.
+// Events created from these commands will have WrittenByV3 set to true.
+type V3Command interface {
+	Command
+	IsV3Command()
+}
+
 // Event is a stored activity
 type Event interface {
 	action

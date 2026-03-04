@@ -1,34 +1,6 @@
-CREATE OR REPLACE FUNCTION eventstore.latest_aggregate_state(
-    instance_id TEXT
-    , aggregate_type TEXT
-    , aggregate_id TEXT
-    
-    , sequence OUT BIGINT
-    , owner OUT TEXT
-)
-    LANGUAGE 'plpgsql'
-    STABLE PARALLEL SAFE
-AS $$
-    BEGIN
-        SELECT
-            COALESCE(e.sequence, 0) AS sequence
-            , e.owner
-        INTO
-            sequence
-            , owner
-        FROM
-            eventstore.events2 e
-        WHERE
-            e.instance_id = $1
-            AND e.aggregate_type = $2
-            AND e.aggregate_id = $3
-        ORDER BY 
-            e.sequence DESC
-        LIMIT 1;
+ALTER TABLE IF EXISTS eventstore.events2 ADD COLUMN IF NOT EXISTS written_by_v3 BOOLEAN NOT NULL DEFAULT false;
 
-        RETURN;
-    END;
-$$;
+ALTER TYPE eventstore.command ADD ATTRIBUTE IF NOT EXISTS written_by_v3 BOOLEAN;
 
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[])
     RETURNS SETOF eventstore.events2 
@@ -74,7 +46,7 @@ BEGIN
             , c.creator
             , COALESCE(current_owner, c.owner) -- AS owner
             , EXTRACT(EPOCH FROM created_at) -- AS position
-            , c.ordinality::{{ .InTxOrderType }} -- AS in_tx_order
+            , c.ordinality::INTEGER -- AS in_tx_order
             , COALESCE(c.written_by_v3, false) -- AS written_by_v3
         FROM
             UNNEST(commands) WITH ORDINALITY AS c

@@ -25,6 +25,8 @@ func (*idpIntentRelationalProjection) Name() string {
 	return IDPIntentRelationalProjectionTable
 }
 
+func (*idpIntentRelationalProjection) SkipV3ReducedEvents() {}
+
 func newIDPIntentRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
 	return handler.NewHandler(ctx, &config, new(idpIntentRelationalProjection))
 }

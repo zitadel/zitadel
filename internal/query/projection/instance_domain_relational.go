@@ -26,6 +26,8 @@ func (*instanceDomainRelationalProjection) Name() string {
 	return "zitadel.instance_domains"
 }
 
+func (*instanceDomainRelationalProjection) SkipV3ReducedEvents() {}
+
 func (p *instanceDomainRelationalProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
