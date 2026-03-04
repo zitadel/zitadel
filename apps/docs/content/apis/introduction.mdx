@@ -9,13 +9,12 @@ import Column from "@/components/column";
 
 ZITADEL exposes all features via different gRPC and REST APIs and provides SDKs for popular languages and frameworks.
 
-The [OpenID Connect & OAuth endpoints](/apis/openidoauth/endpoints) and [SAML 2.0 endpoints](/apis/saml/endpoints) are implemented and exposed according to the specific standards. Managing resources such as users, organizations, instances, or settings must be done with the different [ZITADEL APIs](#zitadel-apis-resource-based).
+The [OpenID Connect & OAuth endpoints](/apis/openidoauth/endpoints) and [SAML 2.0 endpoints](/apis/saml/endpoints) are implemented and exposed according to the specific standards. Managing resources such as users, organizations, instances, or settings must be done with the different [ZITADEL APIs](#zitadel-apis).
 
 [Actions](/guides/manage/console/actions-overview) allow extending ZITADEL with custom code to change default behaviors or calling external systems.
 
 ## Authentication & Authorization
 
-In this section, “authorization” refers to protocol- and API-level authorization (for example OAuth scopes and claims, OIDC, SAML assertions, and API access) and is distinct from the “authorization” term used in ZITADEL role-assignment APIs.
 ### Authentication for users (interactive)
 
 ZITADEL implements industry standards such as OpenID Connect, OAuth 2.0, or SAML for authentication.
@@ -30,7 +29,7 @@ Additionally, you can use the [session API](/reference/api/session) to authentic
 Service accounts allow for machine-to-machine (M2M) communication.
 Follow the guides to learn how to [authenticate service accounts](/guides/integrate/service-accounts/authenticate-service-accounts).
 
-Accessing the ZITADEL APIs through a service account might require additional steps, please follow the guide on how to [access ZITADEL APIs](../guides/integrate/zitadel-apis/access-zitadel-apis) to include the correct audience scope in your requests.
+Accessing the ZITADEL APIs through a service account might require additional steps, please follow the guide on how to [access ZITADEL APIs](/guides/integrate/zitadel-apis/access-zitadel-apis) to include the correct audience scope in your requests.
 
 ### OpenID Connect & OAuth
 
@@ -45,35 +44,52 @@ The [OIDC Playground](https://zitadel.com/playgrounds/oidc) is for testing OpenI
 - [SAML 2.0 endpoints](/apis/saml/endpoints) definition
 - [Custom attributes](https://github.com/zitadel/actions/blob/main/examples/set_custom_attribute.js) can be added with an action
 
-### Custom
+### Session-based and custom login
 
-ZITADEL allows authenticating users by creating a session with the [Session API](/reference/api/session/zitadel.session.v2.SessionService.CreateSession), get OIDC authentication request details with the [OIDC service API](/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetAuthRequest) or get SAML request details with the [SAML service API](/reference/api/saml/zitadel.saml.v2.SAMLService.GetSAMLRequest).
+For building a custom login flow, you have access to purpose-built v2 APIs:
+
+- [Create or update a session](/reference/api/session/zitadel.session.v2.SessionService.CreateSession) to authenticate users step by step
+- [Get OIDC auth request details](/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetAuthRequest) when acting as an OIDC provider
+- [Get SAML request details](/reference/api/saml/zitadel.saml.v2.SAMLService.GetSAMLRequest) when acting as a SAML provider
+
 User role assignments can be [retrieved as roles from our APIs](/guides/integrate/retrieve-user-roles).
 
 Refer to our guide to learn how to [build your own login UI](/guides/integrate/login-ui)
 
-## ZITADEL APIs (resource-based)
+## ZITADEL APIs
 
-ZITADEL provides APIs for each [core resource](/apis/v2):
+**Use the [v2 APIs](/apis/v2) for all new integrations.** They are the recommended, resource-based API surface for ZITADEL and where all new development is happening.
+The v1 APIs are legacy: fully supported and still required in some places, but not being extended.
 
-- [User](/reference/api/user)
-- [Session](/reference/api/session)
-- [Settings](/reference/api/settings)
+If the resource you need is not yet available in v2, use the corresponding legacy v1 API for that operation and check the [migration guide](/apis/migration_v1_to_v2) to plan your transition.
 
-<Callout>
-We are migrating to a resource-based API approach.
-You might need to use the existing [service-based](#zitadel-apis-service-based) APIs for now to manage Organizations, Instances, Assets etc.
-</Callout>
+## APIs v2 (resource-based)
 
-## ZITADEL APIs (service-based)
+ZITADEL provides v2 APIs for the following resources:
 
-<Callout title="Prefer resource-based API">
-ZITADEL APIs were organized by UseCase/Context, such as Auth API for authenticated users and Management API for organization administrators.
-This led to confusion about which API to use, particularly for requests that could be useful across multiple APIs but with different filters.
-For instance, SearchUsers on an Instance Level or on an Organization Level.
+- [User](/reference/api/user) — manage users and their authentication methods
+- [Session](/reference/api/session) — create and manage user sessions
+- [Organization](/reference/api/org) — manage organizations
+- [Instance](/reference/api/instance) — manage your ZITADEL instance
+- [Project](/reference/api/project) — manage projects and granted projects
+- [Application](/reference/api/application) — manage OIDC, SAML, and API applications
+- [IDP](/reference/api/idp) — manage identity providers
+- [Group](/reference/api/group) — manage user groups
+- [Settings](/reference/api/settings) — read login and instance settings
+- [Feature](/reference/api/feature) — manage feature flags
+- [Authorization](/reference/api/authorization) — check and manage user permissions
+- [Action](/reference/api/action) — manage execution targets and action flows
+- [WebKey](/reference/api/webkey) — manage signing keys
+- [OIDC](/reference/api/oidc) — handle OIDC authorization flows (used when building a custom login UI)
+- [SAML](/reference/api/saml) — handle SAML authorization flows (used when building a custom login UI)
 
-To address this issue, ZITADEL is migrating to a [resource-based API](#zitadel-apis-resource-based).
-</Callout>
+Not finding a resource here? It has not yet been migrated to v2 — use the legacy v1 APIs below for that operation.
+
+## Legacy v1 APIs
+
+The following APIs predate the v2 resource-based design. They are still fully supported and required for capabilities not yet covered by v2, but they are no longer being extended. If you are building something new, check the v2 section above first.
+
+Looking to move an existing integration off v1? See the [v1 to v2 migration guide](/apis/migration_v1_to_v2).
 
 <ApiCard title="Authentication" type="AUTH">
 <Column>
@@ -81,7 +97,9 @@ To address this issue, ZITADEL is migrating to a [resource-based API](#zitadel-a
 
 ### Authentication
 
-The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.
+The Auth API covers operations on the currently authenticated user. The user is identified from the `sub` claim in the access token.
+
+For new integrations, prefer the [User v2 API](/reference/api/user) and [Session v2 API](/reference/api/session) which provide the same capabilities in a resource-based design.
 
 </div>
 <div className="apicard-right">
@@ -113,8 +131,9 @@ API Reference:
 
 ### Management
 
-The management API is as the name states the interface where systems can mutate instance objects like, organizations, projects, applications, users and so on if they have the necessary access rights.
-To identify the current organization you can send a header `x-zitadel-orgid` or if no header is set, the organization of the authenticated user is set.
+The Management API lets systems read and mutate resources within an organization — users, projects, applications, roles, and more. The target organization is determined by the `x-zitadel-orgid` request header, or falls back to the organization of the authenticated user.
+
+For new integrations, prefer the [User v2 API](/reference/api/user) for user management, which handles both instance-level and organization-level access automatically based on caller permissions.
 
 </div>
 <div className="apicard-right">
@@ -170,7 +189,7 @@ API Reference:
 </Column>
 </ApiCard>
 
-<ApiCard title="Administration" type="SYSTEM">
+<ApiCard title="System" type="SYSTEM">
 <Column>
 <div>
 
@@ -220,61 +239,22 @@ Endpoint:
 `${CUSTOM_DOMAIN}/assets/v1/`
 
 Definition:
-[Assets](./assets/assets)
+[Assets](/apis/assets/assets)
 
 </div>
 </Column>
 </ApiCard>
 
-## API definitions
+## Client libraries & schemas
 
-Each service's proto definition is located in the source control on GitHub.
-As we generate the REST services and Swagger file out of the proto definition we recommend that you rely on the proto file.
-We annotate the corresponding REST methods on each possible call as well as the AuthN and AuthZ requirements.
-The last API (assets) is only a REST API because ZITADEL uses multipart form data for certain elements.
-
-### SDKs
-
-ZITADEL provides some [official and community supported SDKs](/sdk-examples/introduction) for multiple languages and frameworks.
-Most languages allow you to build a client from proto definitions, which allows you to build your own client in case an SDK is missing.
-
-### Proto
-
-All of our APIs are generated by proto definitions. You can find all the proto definitions in the [Proto API Definitions](https://github.com/zitadel/zitadel/tree/main/proto/zitadel).
-
-> More about [Protocol Buffer](https://developers.google.com/protocol-buffers)
-
-### Example
-
-See below for an example with the call **GetMyUser**.
-
-```go
-  //User
-  rpc GetMyUser(google.protobuf.Empty) returns (UserView) {
-    option (google.api.http) = {
-      get: "/users/me"
-    };
-
-    option (zitadel.v1.auth_option) = {
-      permission: "authenticated"
-    };
-  }
-```
-
-As you can see the `GetMyUser` function is also available as a REST service under the path `/users/me`.
-
-In the table below you can see the URI of those calls.
-
-| Service | URI                                                   |
-| :------ | :---------------------------------------------------- |
-| REST    | `${CUSTOM_DOMAIN}/auth/v1/users/me`                      |
-| GRPC    | `${CUSTOM_DOMAIN}/zitadel.auth.v1.AuthService/GetMyUser` |
+ZITADEL publishes [official and community-supported SDKs](/sdk-examples/introduction) for multiple languages and frameworks.
+All API services are defined as [proto definitions on GitHub](https://github.com/zitadel/zitadel/tree/main/proto/zitadel) — most languages let you generate a type-safe client directly from them.
 
 ## Domains
 
 ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or your Custom Domain `${CUSTOM_DOMAIN}`
 
-The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Management Console UI, which you'll find under `${CUSTOM_DOMAIN}/ui/console/`.
+The domain is used as the OIDC issuer and as the base URL for the gRPC and REST APIs, the Management Console (`${CUSTOM_DOMAIN}/ui/console/`), and the hosted Login UI (`${CUSTOM_DOMAIN}/ui/v2/login`).
 
 Are you self-hosting and having troubles with _Instance not found_ errors? [Check out this page](/self-hosting/manage/custom-domain).
 
@@ -283,7 +263,31 @@ Are you self-hosting and having troubles with _Instance not found_ errors? [Chec
 If you run ZITADEL on a Custom Domain, you may want to reuse that domain for other applications.
 For easy copying to your reverse proxy configuration, here is the list of URL path prefixes, ZITADEL uses.
 
-```yaml
+```
+# v2 APIs (recommended for new integrations)
+# REST (HTTP/JSON transcoding):
+/v2/
+# gRPC + Connect protocol (binary or JSON via connectRPC):
+/zitadel.action.v2.ActionService/
+/zitadel.application.v2.ApplicationService/
+/zitadel.authorization.v2.AuthorizationService/
+/zitadel.feature.v2.FeatureService/
+/zitadel.group.v2.GroupService/
+/zitadel.idp.v2.IdentityProviderService/
+/zitadel.instance.v2.InstanceService/
+/zitadel.oidc.v2.OIDCService/
+/zitadel.org.v2.OrganizationService/
+/zitadel.project.v2.ProjectService/
+/zitadel.saml.v2.SAMLService/
+/zitadel.session.v2.SessionService/
+/zitadel.settings.v2.SettingsService/
+/zitadel.user.v2.UserService/
+/zitadel.webkey.v2.WebKeyService/
+
+# v2beta — kept for backward compatibility, use /v2/ for new work
+/v2beta/
+
+# Legacy v1 APIs
 /zitadel.admin.v1.AdminService/
 /admin/v1/
 /zitadel.auth.v1.AuthService/
@@ -293,7 +297,8 @@ For easy copying to your reverse proxy configuration, here is the list of URL pa
 /zitadel.system.v1.SystemService/
 /system/v1/
 /assets/v1/
-/ui/
+
+# OpenID Connect, OAuth 2.0, SAML 2.0 & standards
 /oidc/v1/
 /saml/v2/
 /oauth/v2/
@@ -301,18 +306,11 @@ For easy copying to your reverse proxy configuration, here is the list of URL pa
 /.well-known/openid-configuration
 /openapi/
 /idps/callback
-/v2beta/
-/zitadel.user.v2beta.UserService/
-/zitadel.session.v2beta.SessionService/
-/zitadel.settings.v2beta.SettingsService/
-/zitadel.oidc.v2beta.OIDCService/
-/zitadel.org.v2beta.OrganizationService/
-/v2/
-/zitadel.user.v2.UserService/
-/zitadel.session.v2.SessionService/
-/zitadel.settings.v2.SettingsService/
-/zitadel.oidc.v2.OIDCService/
-/zitadel.org.v2.OrganizationService/
+
+# UIs
+/ui/console/  # Management Console (Angular admin UI)
+/ui/v2/login  # Login UI v2 (Next.js; routes to a separate container in self-hosted deployments)
+/ui/login/    # Login UI v1 (legacy, built into the ZITADEL binary)
 ```
 ## Postman Collection (Beta)
 
