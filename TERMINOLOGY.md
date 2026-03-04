@@ -18,6 +18,7 @@ All user-facing wording in docs, UI, and API descriptions must follow this table
 | Scope | Files |
 |-------|-------|
 | UI | Console (`console/src/assets/i18n/`) and Login UI (`apps/login/locales/`) |
+| UI + Docs | UI files plus documentation content (`apps/docs/content/`) |
 | UI dialogs | Subset of UI: modal and confirmation dialog strings |
 | UI section | Subset of UI: labels tied to a specific page section |
 | UI indicator | Subset of UI: inline status or indicator labels |
@@ -32,20 +33,20 @@ All user-facing wording in docs, UI, and API descriptions must follow this table
 | Canonical term | Meaning / explanation | Search for (discouraged) | Replace with / enforce | Action | Scope |
 |---|---|---|---|---|---|
 | Customer Portal | Central hub for all customer interactions for cloud and self-hosting customers | _(none — already canonical)_ | Customer Portal | keep | Everywhere |
-| Management Console | Web interface where customers configure and manage ZITADEL resources | Console, ZITADEL Console, Admin Console, Administration Console | Management Console | replace | UI — must be visible |
+| Management Console | Web interface where customers configure and manage ZITADEL resources. Must be visible as the UI app name. | Console, ZITADEL Console, Admin Console, Administration Console | Management Console | replace | UI |
 | Instance | Private, isolated top-level ZITADEL environment | IAM, System, Type IAM | Instance / Type Instance | replace | Everywhere |
-| Policies | Enforcement rules governing checks and constraints | Instance Policies, IAM Policies, Org Policies, Policies (unscoped), Instance Settings (when enforcing), Org Settings (when enforcing) | Instance Policies / Organization Policies | replace | Everywhere (enforcement context only, always scoped) |
-| Settings | Resource-specific configuration values (not rules) | Instance Settings, Org Settings, Instance Policies (when config), Org Policies (when config), IAM Policies (when config) | Instance Settings / Organization Settings | replace | Everywhere (configuration context only) |
+| Policies | Enforcement rules governing checks and constraints. Use only in enforcement contexts, always scoped (Instance / Organization). | Instance Policies, IAM Policies, Org Policies, Policies (unscoped), Instance Settings (when enforcing), Org Settings (when enforcing) | Instance Policies / Organization Policies | replace | Everywhere |
+| Settings | Resource-specific configuration values (not rules). Use only in configuration contexts, always scoped (Instance / Organization). | Instance Settings, Org Settings, Instance Policies (when config), Org Policies (when config), IAM Policies (when config) | Instance Settings / Organization Settings | replace | Everywhere |
 | Organization | Group of users within an instance | _(none — already canonical)_ | Organization | keep | Everywhere |
 | Organization Domain | Domain giving context where a user belongs | Primary Domain, Verified Domains, Org domains, verify your domain | Organization Domain | replace | UI + Docs |
 | User (Human) | User with interactive authentication flows | Human, Human User, User: Type Human | User (Human) | replace | UI + Docs |
 | Service Account | User with non-interactive authentication flows | Machine User, machine user, Service User, Machine Account, Technical Account, User: Type Machine | Service Account | replace | UI + Docs |
-| User | UI display label for user identity | Display Name | User | replace | UI only |
+| User | UI display label for user identity | Display Name | User | replace | UI |
 | Project | Container for applications sharing a role context | _(none — already canonical)_ | Project | keep | Everywhere |
 | Project Grant | Delegation of project access to another organization | Grant, Grants, Organization Grant, Delegated Access | Project Grant / Project Grants | replace | UI + Docs |
 | Application | Software or service secured using ZITADEL | _(none — already canonical)_ | Application | keep | Everywhere |
 | Role Assignment | What a user is allowed to do (roles + org + user) | Authorization, internal authorization, external authorization, User Grant, Roles and Authorizations | Role Assignment | replace | Everywhere |
-| Administrator | Role granting administrative privileges | Manager, Add Manager, Add a Manager, Membership, Member grants | Administrator / Add Administrator / Add an Administrator | replace | UI + Docs (role context only) |
+| Administrator | Role granting administrative privileges (role context only, not as a person label) | Manager, Add Manager, Add a Manager, Membership, Member grants | Administrator / Add Administrator / Add an Administrator | replace | UI + Docs |
 | Organization Administrators | Org-level admin role holders | ZITADEL Organization Managers | Organization Administrators | replace | UI + Docs |
 | Project Administrators | Project-level admin role holders | Project A Managers | Project Administrators | replace | UI + Docs |
 | Administrator Roles | Set of admin roles | Manager Roles | Administrator Roles | replace | UI + Docs |
@@ -59,10 +60,10 @@ All user-facing wording in docs, UI, and API descriptions must follow this table
 | U2F | Legacy hardware authentication (deprecated) | U2F | _(remove)_ | remove | Everywhere |
 | OTP Email | One-time password delivered via email | Email OTP | OTP Email | replace | UI + Docs |
 | OTP SMS | One-time password delivered via SMS | SMS OTP | OTP SMS | replace | UI + Docs |
-| Organization ID | Explicit organization identifier | Resource Owner, OrgID, OrganizationID | `organization_id` | replace | API only |
-| Explicit object IDs | Explicit identifier per resource type | Resource ID, ResourceID | `user_id` / `project_id` / `application_id` / `instance_id` / `organization_id` | replace | API only |
-| Instance ID | Instance identifier label in UI | Resource Id (Instance) | Instance ID | replace | UI only |
-| ID | Generic identifier label in UI | Resource Id | ID | replace | UI only |
+| Organization ID | Explicit organization identifier | Resource Owner, OrgID, OrganizationID | `organization_id` | replace | API |
+| Explicit object IDs | Explicit identifier per resource type | Resource ID, ResourceID | `user_id` / `project_id` / `application_id` / `instance_id` / `organization_id` | replace | API |
+| Instance ID | Instance identifier label in UI | Resource Id (Instance) | Instance ID | replace | UI |
+| ID | Generic identifier label in UI | Resource Id | ID | replace | UI |
 | First Name | Personal given name field | Given Name | First Name | replace | Everywhere |
 | Last Name | Personal family name field | Family Name | Last Name | replace | Everywhere |
 | Add Administrator (dialog) | Consistent wording for admin-add dialog | Add Manager, Add a Manager | Add Administrator / Add an Administrator | replace | UI dialogs |
@@ -70,8 +71,8 @@ All user-facing wording in docs, UI, and API descriptions must follow this table
 | Project Grants (section) | Project grant listing section | Grants | Project Grants | replace | UI section |
 | Internal / External indicator | Shows if a user belongs to the same or a different org | _(missing indicator)_ | internal / external | replace | UI indicator |
 | Password changed | Past-tense wording for password change notification | Password change | Password changed | replace | UI notifications |
-| Object descriptions | All resource descriptions must use end-user language | internal / technical wording | clear end-user language | replace | Docs + UI |
-| Complement Token | Flow type for actions executed during token creation. In UI use "Complement Token"; in API use `flowType = 2` (CustomiseToken). Docs must not show PreUserinfoCreation=3 for this type. | Compliment Token, CustomiseToken, CustomizeToken | Complement Token | replace | UI + Docs + API |
+| Object descriptions | All resource descriptions must use end-user language | internal / technical wording | clear end-user language | replace | UI + Docs |
+| Complement Token | Flow type for actions executed during token creation. In UI use "Complement Token"; in API use `flowType = 2` (CustomiseToken). Docs must not show PreUserinfoCreation=3 for this type. | Compliment Token, CustomiseToken, CustomizeToken | Complement Token | replace | Everywhere |
 
 ## Governance
 
