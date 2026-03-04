@@ -2024,6 +2024,10 @@ func (p *idpTemplateRelationalProjection) reduceIDPChangedTemplateColumns(repo d
 
 func (p *idpTemplateRelationalProjection) reduceOAuthIDPChangedColumns(payload *domain.OAuth, idpEvent *idp.OAuthIDPChangedEvent) bool {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged
+	}
+
 	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
 		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
@@ -2061,6 +2065,10 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPChangedColumns(payload *
 
 func (p *idpTemplateRelationalProjection) reduceOIDCIDPChangedColumns(payload *domain.OIDC, idpEvent *idp.OIDCIDPChangedEvent) bool {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged
+	}
+
 	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
 		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
@@ -2090,6 +2098,10 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPChangedColumns(payload *d
 
 func (p *idpTemplateRelationalProjection) reduceJWTIDPChangedColumns(payload *domain.JWT, idpEvent *idp.JWTIDPChangedEvent) bool {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged
+	}
+
 	if idpEvent.JWTEndpoint != nil && *idpEvent.JWTEndpoint != payload.JWTEndpoint {
 		payloadChanged = true
 		payload.JWTEndpoint = *idpEvent.JWTEndpoint
@@ -2111,6 +2123,10 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPChangedColumns(payload *do
 
 func (p *idpTemplateRelationalProjection) reduceAzureADIDPChangedColumns(payload *domain.Azure, idpEvent *idp.AzureADIDPChangedEvent) (bool, error) {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged, nil
+	}
+
 	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
 		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
@@ -2142,6 +2158,10 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPChangedColumns(payload
 
 func (p *idpTemplateRelationalProjection) reduceGitHubIDPChangedColumns(payload *domain.Github, idpEvent *idp.GitHubIDPChangedEvent) bool {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged
+	}
+
 	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
 		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
@@ -2159,6 +2179,10 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPChangedColumns(payload 
 
 func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPChangedColumns(payload *domain.GithubEnterprise, idpEvent *idp.GitHubEnterpriseIDPChangedEvent) bool {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged
+	}
+
 	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
 		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
@@ -2188,6 +2212,10 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPChangedColumn
 
 func (p *idpTemplateRelationalProjection) reduceGitLabIDPChangedColumns(payload *domain.Gitlab, idpEvent *idp.GitLabIDPChangedEvent) bool {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged
+	}
+
 	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
 		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
@@ -2205,6 +2233,10 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPChangedColumns(payload 
 
 func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPChangedColumns(payload *domain.GitlabSelfHosted, idpEvent *idp.GitLabSelfHostedIDPChangedEvent) bool {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged
+	}
+
 	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
 		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
@@ -2226,6 +2258,10 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPChangedColumn
 
 func (p *idpTemplateRelationalProjection) reduceGoogleIDPChangedColumns(payload *domain.Google, idpEvent *idp.GoogleIDPChangedEvent) bool {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged
+	}
+
 	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
 		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
@@ -2244,6 +2280,10 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPChangedColumns(payload 
 //nolint:gocognit
 func (p *idpTemplateRelationalProjection) reduceLDAPIDPChangedColumns(payload *domain.LDAP, idpEvent *idp.LDAPIDPChangedEvent) bool {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged
+	}
+
 	if idpEvent.Servers != nil && !slices.Equal(idpEvent.Servers, payload.Servers) {
 		payloadChanged = true
 		payload.Servers = idpEvent.Servers
@@ -2341,6 +2381,10 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChangedColumns(payload *d
 
 func (p *idpTemplateRelationalProjection) reduceAppleIDPChangedColumns(payload *domain.Apple, idpEvent *idp.AppleIDPChangedEvent) bool {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged
+	}
+
 	if idpEvent.ClientID != nil && *idpEvent.ClientID != payload.ClientID {
 		payloadChanged = true
 		payload.ClientID = *idpEvent.ClientID
@@ -2366,6 +2410,10 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPChangedColumns(payload *
 
 func (p *idpTemplateRelationalProjection) reduceSAMLIDPChangedColumns(payload *domain.SAML, idpEvent *idp.SAMLIDPChangedEvent) bool {
 	payloadChanged := false
+	if payload == nil || idpEvent == nil {
+		return payloadChanged
+	}
+
 	if idpEvent.Metadata != nil && !slices.Equal(idpEvent.Metadata, payload.Metadata) {
 		payloadChanged = true
 		payload.Metadata = idpEvent.Metadata
