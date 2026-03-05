@@ -99,7 +99,7 @@ export class UserDetailComponent implements OnInit {
 
   public currentSetting$ = signal<SidenavSetting>(GENERAL);
   public settingsList$: Observable<SidenavSetting[]>;
-  public hasLinkedIDPs$: Observable<boolean>;
+  public disableEmailEdit$: Observable<boolean>;
   public metadata$: Observable<MetadataQuery>;
   public loginPolicy$: Observable<LoginPolicy>;
   public refreshMetadata$ = new Subject<true>();
@@ -127,7 +127,7 @@ export class UserDetailComponent implements OnInit {
 
     this.user$ = this.getUser$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.settingsList$ = this.getSettingsList$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.hasLinkedIDPs$ = this.getHasLinkedIDPs$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.disableEmailEdit$ = this.getDisableEmailEdit$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.metadata$ = this.getMetadata$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
     this.loginPolicy$ = defer(() => this.newMgmtService.getLoginPolicy()).pipe(
@@ -176,28 +176,23 @@ export class UserDetailComponent implements OnInit {
     );
   }
 
-  private getHasLinkedIDPs$(user$: Observable<UserQuery>): Observable<boolean> {
+  private getDisableEmailEdit$(user$: Observable<UserQuery>): Observable<boolean> {
     return user$.pipe(
       switchMap((user) => {
-        if (user.state !== 'success' && user.state !== 'loading') {
-          return of(false);
-        }
-
-        if (!user.value) {
+        if (user.state !== 'success') {
           return of(true);
         }
 
-        const humanUserId = user.value.type.case === 'human' ? user.value.userId : undefined;
-        if (!humanUserId) {
-          return of(false);
+        if (user.value.type.case !== 'human' || !user.value.userId) {
+          return of(true);
         }
 
-        return defer(() => this.mgmtService.listHumanLinkedIDPs(humanUserId, 1, 0)).pipe(
+        return defer(() => this.mgmtService.listHumanLinkedIDPs(user.value.userId, 1, 0)).pipe(
           map((resp) => resp.resultList.length > 0),
-          catchError(() => of(false)),
+          catchError(() => of(true)),
+          startWith(true),
         );
       }),
-      startWith(false),
     );
   }
 
