@@ -293,7 +293,8 @@
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/envoyproxy/protoc-gen-validate@v1.1.0",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-authoption",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadel"
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadel",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadelcli"
                 ]
             },
             "cache": true,
@@ -305,7 +306,8 @@
                     "runtime": "go env GOARCH"
                 },
                 "{workspaceRoot}/internal/protoc/protoc-gen-authoption/**/*",
-                "{workspaceRoot}/internal/protoc/protoc-gen-zitadel/**/*"
+                "{workspaceRoot}/internal/protoc/protoc-gen-zitadel/**/*",
+                "{workspaceRoot}/internal/protoc/protoc-gen-zitadelcli/**/*"
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/bin/*/*/enumer",
@@ -320,7 +322,8 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-validate",
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-connect-go",
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-authoption",
-                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-zitadel"
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-zitadel",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-zitadelcli"
             ]
         },
         "generate-stubs": {
