@@ -25,15 +25,15 @@ func (i IDPAutoLinkingField) String() string {
 // Re-run the stringer command to generate them again.
 func _IDPAutoLinkingFieldNoOp() {
 	var x [1]struct{}
-	_ = x[IDPAutoLinkingFieldUserName-(1)]
+	_ = x[IDPAutoLinkingFieldUsername-(1)]
 	_ = x[IDPAutoLinkingFieldEmail-(2)]
 }
 
-var _IDPAutoLinkingFieldValues = []IDPAutoLinkingField{IDPAutoLinkingFieldUserName, IDPAutoLinkingFieldEmail}
+var _IDPAutoLinkingFieldValues = []IDPAutoLinkingField{IDPAutoLinkingFieldUsername, IDPAutoLinkingFieldEmail}
 
 var _IDPAutoLinkingFieldNameToValueMap = map[string]IDPAutoLinkingField{
-	_IDPAutoLinkingFieldName[0:8]:       IDPAutoLinkingFieldUserName,
-	_IDPAutoLinkingFieldLowerName[0:8]:  IDPAutoLinkingFieldUserName,
+	_IDPAutoLinkingFieldName[0:8]:       IDPAutoLinkingFieldUsername,
+	_IDPAutoLinkingFieldLowerName[0:8]:  IDPAutoLinkingFieldUsername,
 	_IDPAutoLinkingFieldName[8:13]:      IDPAutoLinkingFieldEmail,
 	_IDPAutoLinkingFieldLowerName[8:13]: IDPAutoLinkingFieldEmail,
 }

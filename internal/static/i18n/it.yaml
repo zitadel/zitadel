@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Non è stato possibile generare il Secret"
     PAT:
       NotFound: "Personal Access Token non trovato"
+    Metadata:
+      Conflicting: "I metadati non devono essere impostati contemporaneamente nei campi [user] e [human]"
     NotHuman: "L'utente deve essere personale"
     NotMachine: "L'utente deve essere tecnico"
     WrongType: "Non consentito per questo tipo di utente"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "Refresh Token non è valido"
       NotFound: "Refresh Token non trovato"
-  Instance:
-    NotFound: "Istanza non trovata"
-    AlreadyExists: "L'istanza esiste già"
-    NotChanged: "Istanza non modificata"
   Org:
     AlreadyExists: "Nome o ID dell'organizzazione già utilizzato"
     Invalid: "L'organizzazione non è valida"
@@ -345,6 +343,8 @@ Errors:
       NotActive: "Il permesso di progetto non è attivo"
       NotInactive: "Il permesso di progetto non è disattivato"
   Instance:
+    AlreadyExists: "L'istanza esiste già"
+    NotChanged: "Istanza non modificata"
     NotFound: "Istanza non trovata. Assicurati di avere il dominio corretto. Guarda su https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "I ruoli non sono stati cambiati"

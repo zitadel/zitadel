@@ -2,6 +2,7 @@ package instrumentation
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"os"
 	"slices"
@@ -159,6 +160,7 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 			Prependers: []slogctx.AttrExtractor{
 				instanceExtractor,
 				requestIDExtractor,
+				causeExtractor,
 				slogotel.ExtractTraceSpanID,
 				slogctx.ExtractPrepended,
 			},
@@ -219,6 +221,17 @@ func requestIDExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string
 	if r, ok := ctx.Value(ctxKeyRequestID).(xid.ID); ok {
 		return []slog.Attr{
 			slog.String("request_id", r.String()),
+		}
+	}
+	return nil
+}
+
+// causeExtractor sets the cause of a canceled context to a log entry.
+func causeExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
+	err := context.Cause(ctx)
+	if err != nil && !errors.Is(err, context.Canceled) && !errors.Is(err, context.DeadlineExceeded) {
+		return []slog.Attr{
+			slog.String("cause", err.Error()),
 		}
 	}
 	return nil
