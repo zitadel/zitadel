@@ -33,7 +33,6 @@ DO $$ BEGIN
         , payload JSONB
         , creator TEXT
         , owner TEXT
-        , written_by_v3 BOOLEAN
     );
 EXCEPTION
     WHEN duplicate_object THEN null;
@@ -53,7 +52,6 @@ SELECT
     , cs.owner
     , EXTRACT(EPOCH FROM NOW()) AS position
     , c.in_tx_order
-    , COALESCE(c.written_by_v3, false) AS written_by_v3
 FROM (
     SELECT
         c.instance_id
@@ -64,7 +62,6 @@ FROM (
         , c.payload
         , c.creator
         , c.owner
-        , c.written_by_v3
         , ROW_NUMBER() OVER () AS in_tx_order
     FROM
         UNNEST(commands) AS c

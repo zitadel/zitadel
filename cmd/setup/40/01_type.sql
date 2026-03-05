@@ -1,6 +1,6 @@
 -- represents an event to be created.
 DO $$ BEGIN
-    CREATE TYPE eventstore.command AS (
+    CREATE TYPE eventstore.command2 AS (
         instance_id TEXT
         , aggregate_type TEXT
         , aggregate_id TEXT

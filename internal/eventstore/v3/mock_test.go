@@ -52,15 +52,17 @@ func mockEvent(aggregate *eventstore.Aggregate, sequence uint64, payload Payload
 
 func mockEventType(aggregate *eventstore.Aggregate, sequence uint64, payload Payload, typ string) eventstore.Event {
 	return &event{
-		command: &command{
-			InstanceID:    aggregate.InstanceID,
-			AggregateType: string(aggregate.Type),
-			AggregateID:   aggregate.ID,
-			Owner:         aggregate.ResourceOwner,
-			Creator:       "creator",
-			Revision:      1,
-			CommandType:   typ,
-			Payload:       payload,
+		command: &command2{
+			command: command{
+				InstanceID:    aggregate.InstanceID,
+				AggregateType: string(aggregate.Type),
+				AggregateID:   aggregate.ID,
+				Owner:         aggregate.ResourceOwner,
+				Creator:       "creator",
+				Revision:      1,
+				CommandType:   typ,
+				Payload:       payload,
+			},
 		},
 		sequence: sequence,
 	}

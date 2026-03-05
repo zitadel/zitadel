@@ -104,7 +104,7 @@ func Test_commandToEvent(t *testing.T) {
 			}
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := commandToEvent(tt.args.command)
+			got, err := commandToEvent(tt.args.command, false)
 
 			tt.want.err(t, err)
 			if tt.want.event == nil {
@@ -250,7 +250,7 @@ func Test_commandsToEvents(t *testing.T) {
 	}
 	type want struct {
 		events   []eventstore.Event
-		commands []*command
+		commands []*command2
 		err      func(t *testing.T, err error)
 	}
 	tests := []struct {
@@ -266,7 +266,7 @@ func Test_commandsToEvents(t *testing.T) {
 			},
 			want: want{
 				events:   []eventstore.Event{},
-				commands: []*command{},
+				commands: []*command2{},
 				err: func(t *testing.T, err error) {
 					require.NoError(t, err)
 				},
@@ -291,7 +291,7 @@ func Test_commandsToEvents(t *testing.T) {
 						nil,
 					),
 				},
-				commands: []*command{
+				commands: []*command2{
 					{
 						InstanceID:    "instance",
 						AggregateType: "type",
@@ -327,7 +327,7 @@ func Test_commandsToEvents(t *testing.T) {
 						nil,
 					),
 				},
-				commands: []*command{
+				commands: []*command2{
 					{
 						InstanceID:    "instance from ctx",
 						AggregateType: "type",
@@ -363,7 +363,7 @@ func Test_commandsToEvents(t *testing.T) {
 						payloadMarshalled,
 					),
 				},
-				commands: []*command{
+				commands: []*command2{
 					{
 						InstanceID:    "instance",
 						AggregateType: "type",
@@ -408,7 +408,7 @@ func Test_commandsToEvents(t *testing.T) {
 						nil,
 					),
 				},
-				commands: []*command{
+				commands: []*command2{
 					{
 						InstanceID:    "instance",
 						AggregateType: "type",
@@ -469,7 +469,7 @@ func Test_commandsToEvents(t *testing.T) {
 	}
 }
 
-func assertCommand(t *testing.T, want, got *command) {
+func assertCommand(t *testing.T, want, got *command2) {
 	t.Helper()
 	assert.Equal(t, want.CommandType, got.CommandType)
 	assert.Equal(t, want.Payload, got.Payload)
