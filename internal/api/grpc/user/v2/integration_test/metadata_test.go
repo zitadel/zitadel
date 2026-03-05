@@ -25,7 +25,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 		ctx     context.Context
 		dep     func(request *user.SetUserMetadataRequest)
 		req     *user.SetUserMetadataRequest
-		assert  func(t *testing.T, setResponse *user.SetUserMetadataResponse, creationDate time.Time, getResponse *user.ListUserMetadataResponse)
+		assert  func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse)
 		wantErr bool
 	}{
 		{
@@ -48,8 +48,8 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))}},
 			},
-			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, creationDate time.Time, getResponse *user.ListUserMetadataResponse) {
-				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), creationDate, time.Now().UTC())
+			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
+				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
 
 				metadataByKey := getMetadataMap(getResponse)
 				assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
@@ -68,8 +68,8 @@ func TestServer_SetUserMetadata(t *testing.T) {
 					{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
 				},
 			},
-			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, creationDate time.Time, getResponse *user.ListUserMetadataResponse) {
-				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), creationDate, time.Now().UTC())
+			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
+				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
 				assert.Len(t, getResponse.GetMetadata(), 3)
 				metadataByKey := getMetadataMap(getResponse)
 				assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
@@ -96,8 +96,8 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))}},
 			},
-			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, creationDate time.Time, getResponse *user.ListUserMetadataResponse) {
-				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), creationDate, time.Now().UTC())
+			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
+				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
 				metadataByKey := getMetadataMap(getResponse)
 				assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value2"))), metadataByKey["key1"])
 			},
@@ -112,9 +112,9 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))}},
 			},
-			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, creationDate time.Time, getResponse *user.ListUserMetadataResponse) {
-				// TODO: should not be within the range
-				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), creationDate, time.Now().UTC())
+			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
+				// assert that the set date is not updated, i.e., it is before testStartTime, because no change to the metadata should be made
+				assert.True(t, setResponse.GetSetDate().AsTime().Before(testStartTime))
 				metadataByKey := getMetadataMap(getResponse)
 				assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
 			},
@@ -129,8 +129,8 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: nil}},
 			},
-			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, creationDate time.Time, getResponse *user.ListUserMetadataResponse) {
-				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), creationDate, time.Now().UTC())
+			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
+				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
 
 				assert.Len(t, getResponse.GetMetadata(), 0)
 			},
@@ -149,8 +149,8 @@ func TestServer_SetUserMetadata(t *testing.T) {
 					{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated")))},
 				},
 			},
-			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, creationDate time.Time, getResponse *user.ListUserMetadataResponse) {
-				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), creationDate, time.Now().UTC())
+			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
+				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
 
 				assert.Len(t, getResponse.GetMetadata(), 1)
 				metadataByKey := getMetadataMap(getResponse)
@@ -160,10 +160,10 @@ func TestServer_SetUserMetadata(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			creationDate := time.Now().UTC()
 			if tt.dep != nil {
 				tt.dep(tt.req)
 			}
+			testStartTime := time.Now().UTC()
 			got, err := Client.SetUserMetadata(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -178,7 +178,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			tt.assert(t, got, creationDate, gotMetadataResponse)
+			tt.assert(t, got, testStartTime, gotMetadataResponse)
 		})
 	}
 }
@@ -225,10 +225,10 @@ func TestServer_ListUserMetadata(t *testing.T) {
 					metadataResp := Instance.SetUserMetadata(iamOwnerCTX, userID, "key1", "value1")
 
 					response.Metadata[0] = &metadata.Metadata{
-						CreationDate: metadataResp.GetSetDate(),
-						ChangeDate:   metadataResp.GetSetDate(),
-						Key:          "key1",
-						Value:        []byte(base64.StdEncoding.EncodeToString([]byte("value1"))),
+						testStartTime: metadataResp.GetSetDate(),
+						ChangeDate:    metadataResp.GetSetDate(),
+						Key:           "key1",
+						Value:         []byte(base64.StdEncoding.EncodeToString([]byte("value1"))),
 					}
 				},
 				req: &user.ListUserMetadataRequest{},
@@ -360,10 +360,10 @@ func TestServer_ListUserMetadata_WithPermissionV2(t *testing.T) {
 					metadataResp := InstancePermissionV2.SetUserMetadata(iamOwnerCTX, userID, "key1", "value1")
 
 					response.Metadata[0] = &metadata.Metadata{
-						CreationDate: metadataResp.GetSetDate(),
-						ChangeDate:   metadataResp.GetSetDate(),
-						Key:          "key1",
-						Value:        []byte(base64.StdEncoding.EncodeToString([]byte("value1"))),
+						testStartTime: metadataResp.GetSetDate(),
+						ChangeDate:    metadataResp.GetSetDate(),
+						Key:           "key1",
+						Value:         []byte(base64.StdEncoding.EncodeToString([]byte("value1"))),
 					}
 				},
 				req: &user.ListUserMetadataRequest{},
@@ -455,10 +455,10 @@ func TestServer_ListUserMetadata_WithPermissionV2(t *testing.T) {
 func setUserMetadata(ctx context.Context, instance *integration.Instance, userID, key, value string) *metadata.Metadata {
 	metadataResp := instance.SetUserMetadata(ctx, userID, key, value)
 	return &metadata.Metadata{
-		CreationDate: metadataResp.GetSetDate(),
-		ChangeDate:   metadataResp.GetSetDate(),
-		Key:          key,
-		Value:        []byte(base64.StdEncoding.EncodeToString([]byte(value))),
+		testStartTime: metadataResp.GetSetDate(),
+		ChangeDate:    metadataResp.GetSetDate(),
+		Key:           key,
+		Value:         []byte(base64.StdEncoding.EncodeToString([]byte(value))),
 	}
 }
 
@@ -498,13 +498,13 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 			name: "delete",
 			ctx:  iamOwnerCTX,
 			prepare: func(request *user.DeleteUserMetadataRequest) (time.Time, time.Time) {
-				creationDate := time.Now().UTC()
+				testStartTime := time.Now().UTC()
 				userID := Instance.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
 				request.UserId = userID
 				key := "key1"
 				Instance.SetUserMetadata(iamOwnerCTX, userID, key, "value1")
 				request.Keys = []string{key}
-				return creationDate, time.Time{}
+				return testStartTime, time.Time{}
 			},
 			req:              &user.DeleteUserMetadataRequest{},
 			wantDeletionDate: true,
@@ -513,13 +513,13 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 			name: "delete, empty list",
 			ctx:  iamOwnerCTX,
 			prepare: func(request *user.DeleteUserMetadataRequest) (time.Time, time.Time) {
-				creationDate := time.Now().UTC()
+				testStartTime := time.Now().UTC()
 				userID := Instance.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
 				request.UserId = userID
 				key := "key1"
 				Instance.SetUserMetadata(iamOwnerCTX, userID, key, "value1")
 				Instance.DeleteUserMetadata(iamOwnerCTX, userID, key)
-				return creationDate, time.Now().UTC()
+				return testStartTime, time.Now().UTC()
 			},
 			req:     &user.DeleteUserMetadataRequest{},
 			wantErr: true,
@@ -528,14 +528,14 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 			name: "delete, already removed",
 			ctx:  iamOwnerCTX,
 			prepare: func(request *user.DeleteUserMetadataRequest) (time.Time, time.Time) {
-				creationDate := time.Now().UTC()
+				testStartTime := time.Now().UTC()
 				userID := Instance.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
 				request.UserId = userID
 				key := "key1"
 				Instance.SetUserMetadata(iamOwnerCTX, userID, key, "value1")
 				Instance.DeleteUserMetadata(iamOwnerCTX, userID, key)
 				request.Keys = []string{key}
-				return creationDate, time.Now().UTC()
+				return testStartTime, time.Now().UTC()
 			},
 			req:     &user.DeleteUserMetadataRequest{},
 			wantErr: true,
@@ -544,7 +544,7 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 			name: "delete, multiple",
 			ctx:  iamOwnerCTX,
 			prepare: func(request *user.DeleteUserMetadataRequest) (time.Time, time.Time) {
-				creationDate := time.Now().UTC()
+				testStartTime := time.Now().UTC()
 				userID := Instance.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
 				request.UserId = userID
 				key1 := "key1"
@@ -554,7 +554,7 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 				key3 := "key3"
 				Instance.SetUserMetadata(iamOwnerCTX, userID, key3, "value1")
 				request.Keys = []string{key1, key2, key3}
-				return creationDate, time.Time{}
+				return testStartTime, time.Time{}
 			},
 			req:              &user.DeleteUserMetadataRequest{},
 			wantDeletionDate: true,
@@ -562,9 +562,9 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var creationDate, deletionDate time.Time
+			var testStartTime, deletionDate time.Time
 			if tt.prepare != nil {
-				creationDate, deletionDate = tt.prepare(tt.req)
+				testStartTime, deletionDate = tt.prepare(tt.req)
 			}
 			got, err := Instance.Client.UserV2.DeleteUserMetadata(tt.ctx, tt.req)
 			if tt.wantErr {
@@ -572,17 +572,17 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assertDeleteProjectResponse(t, creationDate, deletionDate, tt.wantDeletionDate, got)
+			assertDeleteProjectResponse(t, testStartTime, deletionDate, tt.wantDeletionDate, got)
 		})
 	}
 }
 
-func assertDeleteProjectResponse(t *testing.T, creationDate, deletionDate time.Time, expectedDeletionDate bool, actualResp *user.DeleteUserMetadataResponse) {
+func assertDeleteProjectResponse(t *testing.T, testStartTime, deletionDate time.Time, expectedDeletionDate bool, actualResp *user.DeleteUserMetadataResponse) {
 	if expectedDeletionDate {
 		if !deletionDate.IsZero() {
-			assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), creationDate, deletionDate)
+			assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), testStartTime, deletionDate)
 		} else {
-			assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), creationDate, time.Now().UTC())
+			assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), testStartTime, time.Now().UTC())
 		}
 	} else {
 		assert.Nil(t, actualResp.DeletionDate)
