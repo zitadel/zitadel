@@ -127,14 +127,19 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
         const _headers = await headers();
         const host = getPublicHostWithProtocol(_headers);
         const result = `${host}${envOverride}`;
-        console.log("resolveRedirectUri: Using host-based redirect from override:", result);
-        return result;
+        if (isSafeRedirectUri(result)) {
+          console.log("resolveRedirectUri: Using host-based redirect from override:", result);
+          return result;
+        }
+        console.warn("resolveRedirectUri: Unsafe host-based redirect prevented:", result);
       } catch (error) {
         console.warn("resolveRedirectUri: Could not determine host for override, falling back", error);
       }
-    } else {
+    } else if (isSafeRedirectUri(envOverride)) {
       console.log("resolveRedirectUri: Using DEFAULT_REDIRECT_URI override:", envOverride);
       return envOverride;
+    } else {
+      console.warn("resolveRedirectUri: Unsafe DEFAULT_REDIRECT_URI prevented:", envOverride);
     }
   }
 

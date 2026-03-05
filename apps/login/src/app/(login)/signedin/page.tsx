@@ -4,6 +4,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { resolveRedirectUri } from "@/lib/client";
+import { isSafeRedirectUri } from "@/lib/client-utils";
 import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/cookies";
 import { completeDeviceAuthorization } from "@/lib/server/device";
 import { getServiceConfig } from "@/lib/service-url";
@@ -84,14 +85,15 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     loginSettings = await getLoginSettings({ serviceConfig, organization });
   }
 
-  const redirectUri = await resolveRedirectUri(
+  const rawRedirectUri = await resolveRedirectUri(
     requestId && sessionId
       ? { sessionId, requestId }
       : { loginName: loginName ?? sessionFactors?.factors?.user?.loginName },
     loginSettings?.defaultRedirectUri,
   );
 
-  const isSamePage = redirectUri?.startsWith("/signedin") ?? false;
+  const safeRedirectUri = rawRedirectUri && isSafeRedirectUri(rawRedirectUri) ? rawRedirectUri : undefined;
+  const isSamePage = safeRedirectUri?.startsWith("/signedin") ?? false;
 
   return (
     <DynamicTheme branding={branding}>
@@ -118,11 +120,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </Alert>
         )}
 
-        {redirectUri && !isSamePage && (
+        {safeRedirectUri && !isSamePage && (
           <div className="mt-8 flex w-full flex-row items-center">
             <span className="flex-grow"></span>
 
-            <Link href={redirectUri}>
+            <Link href={safeRedirectUri}>
               <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
                 <Translated i18nKey="continue" namespace="signedin" />
               </Button>
