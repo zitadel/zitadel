@@ -51,6 +51,12 @@ func WithUserRepo(repo UserRepository) InvokeOpt {
 	}
 }
 
+func WithPermissionChecker(checker PermissionChecker) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.Permissions = checker
+	}
+}
+
 // WithQueryExecutor sets the database client to be used by the command.
 // If not set, the default pool will be used.
 // This is mainly used for testing.

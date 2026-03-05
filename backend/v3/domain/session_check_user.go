@@ -117,8 +117,13 @@ func (u *UserCheckCommand) String() string {
 // Validate implements [Commander].
 func (u *UserCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	if u.CheckUser == nil {
-		return
+		return nil
 	}
+
+	if authZErr := opts.Permissions.CheckSessionPermission(ctx, SessionWritePermission, u.SessionID); authZErr != nil {
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-4qz3mt", "Errors.PermissionDenied")
+	}
+
 	var usrQueryOpt database.QueryOption
 	userRepo := opts.userRepo
 

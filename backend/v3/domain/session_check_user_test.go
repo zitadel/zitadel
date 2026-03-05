@@ -24,13 +24,15 @@ import (
 func TestUserCheckCommand_Validate(t *testing.T) {
 	t.Parallel()
 	getErr := errors.New("get error")
+	permissionErr := errors.New("permission denied")
 	notFoundErr := database.NewNoRowFoundError(nil)
 
 	tt := []struct {
-		testName      string
-		userRepo      func(ctrl *gomock.Controller) domain.UserRepository
-		checkUser     *session_grpc.CheckUser
-		expectedError error
+		testName          string
+		userRepo          func(ctrl *gomock.Controller) domain.UserRepository
+		permissionChecker func(ctrl *gomock.Controller) domain.PermissionRepository
+		checkUser         *session_grpc.CheckUser
+		expectedError     error
 	}{
 		{
 			testName:      "when CheckUser is nil should return no error",
@@ -38,11 +40,40 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			testName: "when permission check fails should return permission denied error",
+			checkUser: &session_grpc.CheckUser{
+				Search: &session_grpc.CheckUser_UserId{
+					UserId: "user-123",
+				},
+			},
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
+				repo := domainmock.NewMockPermissionChecker(ctrl)
+
+				repo.EXPECT().
+					CheckSessionPermission(gomock.Any(), domain.SessionWritePermission, "session-1").
+					Times(1).
+					Return(permissionErr)
+
+				return repo
+			},
+			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-4qz3mt", "Errors.PermissionDenied"),
+		},
+		{
 			testName: "when search type is UserId should fetch user by ID",
 			checkUser: &session_grpc.CheckUser{
 				Search: &session_grpc.CheckUser_UserId{
 					UserId: "user-123",
 				},
+			},
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
+				repo := domainmock.NewMockPermissionChecker(ctrl)
+
+				repo.EXPECT().
+					CheckSessionPermission(gomock.Any(), domain.SessionWritePermission, "session-1").
+					Times(1).
+					Return(nil)
+
+				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewUserRepo(ctrl)
@@ -104,6 +135,16 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					UserId: "user-123",
 				},
 			},
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
+				repo := domainmock.NewMockPermissionChecker(ctrl)
+
+				repo.EXPECT().
+					CheckSessionPermission(gomock.Any(), domain.SessionWritePermission, "session-1").
+					Times(1).
+					Return(nil)
+
+				return repo
+			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewUserRepo(ctrl)
 				repo.EXPECT().
@@ -124,6 +165,16 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				Search: &session_grpc.CheckUser_UserId{
 					UserId: "user-123",
 				},
+			},
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
+				repo := domainmock.NewMockPermissionChecker(ctrl)
+
+				repo.EXPECT().
+					CheckSessionPermission(gomock.Any(), domain.SessionWritePermission, "session-1").
+					Times(1).
+					Return(nil)
+
+				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewUserRepo(ctrl)
@@ -146,6 +197,16 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					LoginName: "user@example.com",
 				},
 			},
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
+				repo := domainmock.NewMockPermissionChecker(ctrl)
+
+				repo.EXPECT().
+					CheckSessionPermission(gomock.Any(), domain.SessionWritePermission, "session-1").
+					Times(1).
+					Return(nil)
+
+				return repo
+			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewUserRepo(ctrl)
 				repo.EXPECT().
@@ -167,6 +228,16 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when search type is unknown should return invalid argument error",
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
+				repo := domainmock.NewMockPermissionChecker(ctrl)
+
+				repo.EXPECT().
+					CheckSessionPermission(gomock.Any(), domain.SessionWritePermission, "session-1").
+					Times(1).
+					Return(nil)
+
+				return repo
+			},
 			checkUser: &session_grpc.CheckUser{
 				Search: nil,
 			},
@@ -192,6 +263,9 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			if tc.userRepo != nil {
 				domain.WithUserRepo(tc.userRepo(ctrl))(opts)
+			}
+			if tc.permissionChecker != nil {
+				domain.WithPermissionChecker(tc.permissionChecker(ctrl))(opts)
 			}
 
 			// Test
