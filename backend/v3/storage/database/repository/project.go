@@ -42,7 +42,7 @@ func (p project) List(ctx context.Context, client database.QueryExecutor, opts .
 func (p project) Create(ctx context.Context, client database.QueryExecutor, project *domain.Project) error {
 	var (
 		builder              database.StatementBuilder
-		createdAt, updatedAt any = database.NowInstruction, database.NowInstruction
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
 	)
 	if !project.CreatedAt.IsZero() {
 		createdAt = project.CreatedAt

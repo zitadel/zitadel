@@ -92,6 +92,14 @@ func (o org) Create(ctx context.Context, client database.QueryExecutor, organiza
 		builder              database.StatementBuilder
 		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
 	)
+
+	if !organization.CreatedAt.IsZero() {
+		createdAt = organization.CreatedAt
+	}
+	if !organization.UpdatedAt.IsZero() {
+		updatedAt = organization.UpdatedAt
+	}
+
 	builder.WriteString("INSERT INTO ")
 	builder.WriteString(o.qualifiedTableName())
 	builder.WriteString(" (id, name, instance_id, state, created_at, updated_at) VALUES (")

@@ -37,7 +37,7 @@ func (p projectRole) List(ctx context.Context, client database.QueryExecutor, op
 func (p projectRole) Create(ctx context.Context, client database.QueryExecutor, role *domain.ProjectRole) error {
 	var (
 		builder              database.StatementBuilder
-		createdAt, updatedAt any = database.NowInstruction, database.NowInstruction
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
 	)
 	if !role.CreatedAt.IsZero() {
 		createdAt = role.CreatedAt
