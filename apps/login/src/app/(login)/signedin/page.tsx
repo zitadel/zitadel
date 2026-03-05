@@ -7,7 +7,6 @@ import { resolveRedirectUri } from "@/lib/client";
 import { sanitizeRedirectUri } from "@/lib/client-utils";
 import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/cookies";
 import { completeDeviceAuthorization } from "@/lib/server/device";
-import { getPublicHostWithProtocol } from "@/lib/server/host";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings, getSession, ServiceConfig } from "@/lib/zitadel";
@@ -93,7 +92,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     loginSettings?.defaultRedirectUri,
   );
 
-  const currentOrigin = getPublicHostWithProtocol(_headers);
   // Defense-in-depth: reconstruct from parsed components to break the taint chain.
   // Origin enforcement is already handled by resolveRedirectUri; we use trustOrigin: true
   // here so cross-origin values approved upstream (e.g., DEFAULT_REDIRECT_URI) are not dropped.
