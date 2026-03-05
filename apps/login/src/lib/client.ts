@@ -144,7 +144,8 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
         return sanitized;
       }
     } else {
-      const sanitized = sanitizeRedirectUri(envOverride, currentOrigin);
+      // Absolute env var: admin-controlled, trust the origin
+      const sanitized = sanitizeRedirectUri(envOverride, undefined, true);
       if (sanitized) {
         return sanitized;
       }

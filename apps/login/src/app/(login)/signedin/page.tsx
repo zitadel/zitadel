@@ -96,16 +96,21 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const currentOrigin = getPublicHostWithProtocol(_headers);
   const safeRedirectUri = rawRedirectUri ? sanitizeRedirectUri(rawRedirectUri, currentOrigin) : undefined;
 
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  const isSignedInPath = (pathname: string) => {
+    if (pathname.startsWith("/signedin")) return true;
+    if (basePath && pathname.startsWith(basePath + "/signedin")) return true;
+    return false;
+  };
+
   let isSamePage = false;
   if (safeRedirectUri) {
-    if (safeRedirectUri.startsWith("/signedin")) {
-      isSamePage = true;
+    if (safeRedirectUri.startsWith("/")) {
+      isSamePage = isSignedInPath(safeRedirectUri);
     } else if (safeRedirectUri.startsWith("http://") || safeRedirectUri.startsWith("https://")) {
       try {
         const url = new URL(safeRedirectUri);
-        if (url.pathname.startsWith("/signedin")) {
-          isSamePage = true;
-        }
+        isSamePage = isSignedInPath(url.pathname);
       } catch {
         // ignore invalid URLs and keep isSamePage as false
       }

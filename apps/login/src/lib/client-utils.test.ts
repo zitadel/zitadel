@@ -77,6 +77,23 @@ describe("sanitizeRedirectUri", () => {
     expect(sanitizeRedirectUri("https://evil.com/path", "https://my-host.com")).toBeUndefined();
   });
 
+  test("should reject URLs with embedded credentials (userinfo)", () => {
+    expect(sanitizeRedirectUri("https://user:pass@example.com/path", "https://example.com")).toBeUndefined();
+    expect(sanitizeRedirectUri("https://user@example.com", "https://example.com")).toBeUndefined();
+    expect(sanitizeRedirectUri("https://user:pass@example.com", undefined, true)).toBeUndefined();
+  });
+
+  test("should allow any http(s) URL when trustOrigin is true", () => {
+    expect(sanitizeRedirectUri("https://external.com/callback", undefined, true)).toBe("https://external.com/callback");
+    expect(sanitizeRedirectUri("https://other.com/path?q=1", undefined, true)).toBe("https://other.com/path?q=1");
+    expect(sanitizeRedirectUri("http://dev.local:8080/", undefined, true)).toBe("http://dev.local:8080/");
+  });
+
+  test("should reject non-http protocols even when trustOrigin is true", () => {
+    expect(sanitizeRedirectUri("javascript:alert(1)", undefined, true)).toBeUndefined();
+    expect(sanitizeRedirectUri("data:text/html,test", undefined, true)).toBeUndefined();
+  });
+
   test("should return undefined for non-http(s) protocols", () => {
     expect(sanitizeRedirectUri("javascript:alert(1)")).toBeUndefined();
     expect(sanitizeRedirectUri("data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==")).toBeUndefined();

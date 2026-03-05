@@ -63,16 +63,16 @@ describe("getNextUrl", () => {
     expect(result).toBe("/console");
   });
 
-  test("should reject cross-origin DEFAULT_REDIRECT_URI and fall back", async () => {
+  test("should allow cross-origin DEFAULT_REDIRECT_URI (admin-controlled env var)", async () => {
     const { headers } = await import("next/headers");
     const { getPublicHostWithProtocol } = await import("./server/host");
 
-    process.env.DEFAULT_REDIRECT_URI = "https://external.com";
+    process.env.DEFAULT_REDIRECT_URI = "https://external.com/callback";
     vi.mocked(headers).mockResolvedValue({} as any);
     vi.mocked(getPublicHostWithProtocol).mockReturnValue("https://my-host.com");
 
     const result = await getNextUrl(command);
-    expect(result).toBe("/signedin?loginName=test-user");
+    expect(result).toBe("https://external.com/callback");
   });
 
   test("should reject cross-origin defaultRedirectUri and fall back", async () => {

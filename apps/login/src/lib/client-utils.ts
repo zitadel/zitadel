@@ -71,10 +71,11 @@ export function isSafeRedirectUri(uri: string): boolean {
  * - Always allow relative paths starting with a single "/".
  * - For absolute URLs:
  *   - Only allow http/https protocols.
- *   - In a browser environment, only allow URLs that are same-origin as the current page.
- *   - On the server, only allow same-origin if allowedOrigin is provided; otherwise reject.
+ *   - Reject URLs with embedded credentials (userinfo).
+ *   - When trustOrigin is true, allow any http/https URL (for admin-controlled env vars).
+ *   - Otherwise, enforce same-origin using allowedOrigin or window.location.origin.
  */
-export function sanitizeRedirectUri(uri: string, allowedOrigin?: string): string | undefined {
+export function sanitizeRedirectUri(uri: string, allowedOrigin?: string, trustOrigin = false): string | undefined {
   if (!uri) return undefined;
 
   // Relative paths: reconstruct from parsed components to break taint chain
@@ -94,6 +95,19 @@ export function sanitizeRedirectUri(uri: string, allowedOrigin?: string): string
       return undefined;
     }
 
+    // Reject URLs with embedded credentials
+    if (parsed.username || parsed.password) {
+      return undefined;
+    }
+
+    // Reconstruct from components to break taint chain
+    const reconstructed = parsed.origin + parsed.pathname + parsed.search + parsed.hash;
+
+    // Admin-controlled origins (e.g., DEFAULT_REDIRECT_URI env var) are trusted
+    if (trustOrigin) {
+      return reconstructed;
+    }
+
     // Determine the trusted origin: prefer explicit allowedOrigin, fall back to browser origin
     let trustedOrigin: string | undefined;
     if (allowedOrigin) {
@@ -107,7 +121,7 @@ export function sanitizeRedirectUri(uri: string, allowedOrigin?: string): string
     }
 
     if (trustedOrigin && parsed.origin === trustedOrigin) {
-      return parsed.href;
+      return reconstructed;
     }
 
     return undefined;
