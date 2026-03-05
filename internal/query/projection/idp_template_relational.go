@@ -392,9 +392,6 @@ func mapIDPConfigType(typ internal_domain.IDPConfigType) *domain.IDPType {
 }
 
 func mapAutoLinkingField(option internal_domain.AutoLinkingOption) *domain.IDPAutoLinkingField {
-	if option == internal_domain.AutoLinkingOptionUnspecified {
-		return nil
-	}
 	switch option {
 	case internal_domain.AutoLinkingOptionEmail:
 		return gu.Ptr(domain.IDPAutoLinkingFieldEmail)
