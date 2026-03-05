@@ -11,6 +11,11 @@ vi.mock("./server/host", () => ({
   getPublicHostWithProtocol: vi.fn(),
 }));
 
+// Mock auth-flow to prevent transitive winston import via logger.ts
+vi.mock("./server/auth-flow", () => ({
+  completeAuthFlow: vi.fn(),
+}));
+
 describe("getNextUrl", () => {
   const command = { loginName: "test-user" };
 
