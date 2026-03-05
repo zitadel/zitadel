@@ -154,8 +154,10 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
   }
 
   // 2. Default redirect URI from settings
+  // Org admins configure this (e.g., multi-domain setups), so cross-origin is allowed.
+  // Protocol and userinfo validation still apply (trustOrigin skips origin check only).
   if (defaultRedirectUri) {
-    const sanitized = sanitizeRedirectUri(defaultRedirectUri, currentOrigin);
+    const sanitized = sanitizeRedirectUri(defaultRedirectUri, undefined, true);
     if (sanitized) {
       return sanitized;
     }

@@ -80,7 +80,7 @@ describe("getNextUrl", () => {
     expect(result).toBe("https://external.com/callback");
   });
 
-  test("should reject cross-origin defaultRedirectUri and fall back", async () => {
+  test("should allow cross-origin defaultRedirectUri (org admin-controlled setting)", async () => {
     const { headers } = await import("next/headers");
     const { getPublicHostWithProtocol } = await import("./server/host");
 
@@ -88,7 +88,7 @@ describe("getNextUrl", () => {
     vi.mocked(getPublicHostWithProtocol).mockReturnValue("https://my-host.com");
 
     const result = await getNextUrl(command, "https://external.com/path");
-    expect(result).toBe("/signedin?loginName=test-user");
+    expect(result).toBe("https://external.com/path");
   });
 
   test("should fallback to relative signedin page if everything else fails", async () => {

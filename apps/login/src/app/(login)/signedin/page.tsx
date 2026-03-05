@@ -94,7 +94,10 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   );
 
   const currentOrigin = getPublicHostWithProtocol(_headers);
-  const safeRedirectUri = rawRedirectUri ? sanitizeRedirectUri(rawRedirectUri, currentOrigin) : undefined;
+  // Defense-in-depth: reconstruct from parsed components to break the taint chain.
+  // Origin enforcement is already handled by resolveRedirectUri; we use trustOrigin: true
+  // here so cross-origin values approved upstream (e.g., DEFAULT_REDIRECT_URI) are not dropped.
+  const safeRedirectUri = rawRedirectUri ? sanitizeRedirectUri(rawRedirectUri, undefined, true) : undefined;
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   const isSignedInPath = (pathname: string) => {
