@@ -37,7 +37,7 @@ All user-facing wording in docs, UI, and API descriptions must follow this table
 | Instance | Private, isolated top-level ZITADEL environment | IAM, System, Type IAM | Instance / Type Instance | replace | Everywhere |
 | Policies | Enforcement rules governing checks and constraints. Use only in enforcement contexts, always scoped (Instance / Organization). | Instance Policies, IAM Policies, Org Policies, Policies (unscoped), Instance Settings (when enforcing), Org Settings (when enforcing) | Instance Policies / Organization Policies | replace | Everywhere |
 | Settings | Resource-specific configuration values (not rules). Use only in configuration contexts, always scoped (Instance / Organization). | Instance Settings, Org Settings, Instance Policies (when config), Org Policies (when config), IAM Policies (when config) | Instance Settings / Organization Settings | replace | Everywhere |
-| Organization | Group of users within an instance | _(none — already canonical)_ | Organization | keep | Everywhere |
+| Organization | Group of users within an instance | Organisation | Organization | replace | Everywhere |
 | Organization Domain | Domain giving context where a user belongs | Primary Domain, Verified Domains, Org domains, verify your domain | Organization Domain | replace | UI + Docs |
 | User (Human) | User with interactive authentication flows | Human, Human User, User: Type Human | User (Human) | replace | UI + Docs |
 | Service Account | User with non-interactive authentication flows | Machine User, machine user, Service User, Machine Account, Technical Account, User: Type Machine | Service Account | replace | UI + Docs |
