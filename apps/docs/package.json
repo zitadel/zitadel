@@ -59,7 +59,7 @@
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.56.0",
     "@typescript-eslint/parser": "^8.56.0",
-    "eslint": "^10.0.0",
+    "eslint": "^9.26.0",
     "eslint-config-next": "16.1.6",
     "eslint-plugin-mdx": "^3.6.2",
     "glob": "^13.0.5",
