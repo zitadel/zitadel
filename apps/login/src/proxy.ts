@@ -29,7 +29,7 @@ async function loadSecuritySettings(request: NextRequest): Promise<SecuritySetti
   return response.settings;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Add the original URL as a header to all requests
   const requestHeaders = new Headers(request.headers);
 
