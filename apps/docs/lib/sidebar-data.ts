@@ -754,7 +754,6 @@ export const guidesSidebar: readonly SidebarItem[] = [
               id: "self-hosting/deploy/kubernetes/index",
             },
             items: [
-              "self-hosting/deploy/kubernetes/installation",
               "self-hosting/deploy/kubernetes/configuration",
               "self-hosting/deploy/kubernetes/ingress",
               "self-hosting/deploy/kubernetes/database",
