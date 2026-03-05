@@ -11,6 +11,7 @@ import {
   getAllSessions,
   getMostRecentCookieWithLoginname,
   setLanguageCookie,
+  getLanguageCookie,
 } from "./cookies";
 
 import { cookies } from "next/headers";
@@ -64,6 +65,33 @@ describe("cookies", () => {
         httpOnly: true,
         path: "/",
       });
+    });
+  });
+
+  describe("getLanguageCookie", () => {
+    it("should return the language cookie value when set", async () => {
+      mockCookies.get.mockReturnValue({ value: "de" });
+
+      const result = await getLanguageCookie();
+
+      expect(result).toBe("de");
+      expect(mockCookies.get).toHaveBeenCalledWith("NEXT_LOCALE");
+    });
+
+    it("should return undefined when no language cookie exists", async () => {
+      mockCookies.get.mockReturnValue(undefined);
+
+      const result = await getLanguageCookie();
+
+      expect(result).toBeUndefined();
+    });
+
+    it("should return undefined when cookie has no value", async () => {
+      mockCookies.get.mockReturnValue({ value: undefined });
+
+      const result = await getLanguageCookie();
+
+      expect(result).toBeUndefined();
     });
   });
 
