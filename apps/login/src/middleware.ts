@@ -6,8 +6,6 @@ import { buildCSP } from "./lib/csp";
 import { createLogger } from "./lib/logger";
 import { getServiceConfig } from "./lib/service-url";
 
-export const runtime = "nodejs";
-
 const logger = createLogger("middleware");
 export const config = {
   matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
