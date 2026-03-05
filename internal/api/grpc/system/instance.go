@@ -103,8 +103,7 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *system_pb.ListIAMMembe
 	}
 	return &system_pb.ListIAMMembersResponse{
 		Details: object.ToListDetails(res.Count, res.Sequence, res.LastRun),
-		//TODO: resource owner of user of the member instead of the membership resource owner
-		Result: member.MembersToPb("", res.Members),
+		Result:  member.MembersToPb("", res.Members),
 	}, nil
 }
 

@@ -84,7 +84,7 @@ BEGIN
                 LANGUAGE 'plpgsql'
                 STABLE PARALLEL SAFE
                 ROWS 10
-            AS $$
+            AS $ctoe$
             DECLARE
                 "aggregate" RECORD;
                 current_sequence BIGINT;
@@ -134,7 +134,7 @@ BEGIN
                 END LOOP;
                 RETURN;
             END;
-            $$;
+            $ctoe$;
         $f$;
     END IF;
 END;
