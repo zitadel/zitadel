@@ -278,6 +278,7 @@ type idProviderColumns interface {
 	AllowAutoCreationColumn() database.Column
 	AllowAutoUpdateColumn() database.Column
 	AllowLinkingColumn() database.Column
+	AutoLinkingFieldColumn() database.Column
 	PayloadColumn() database.Column
 	CreatedAtColumn() database.Column
 	UpdatedAtColumn() database.Column

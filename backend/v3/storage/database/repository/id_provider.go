@@ -26,9 +26,9 @@ const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, 
 	` FROM zitadel.identity_providers`
 
 func (i *idProvider) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IdentityProvider, error) {
-	var options database.QueryOpts
+	options := new(database.QueryOpts)
 	for _, opt := range opts {
-		opt(&options)
+		opt(options)
 	}
 	if err := checkRestrictingColumns(options.Condition, i.InstanceIDColumn()); err != nil {
 		return nil, err
