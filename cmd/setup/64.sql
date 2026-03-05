@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[])
+CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command2[])
     RETURNS SETOF eventstore.events2 
     LANGUAGE 'plpgsql'
     STABLE PARALLEL SAFE
@@ -43,6 +43,7 @@ BEGIN
             , COALESCE(current_owner, c.owner) -- AS owner
             , EXTRACT(EPOCH FROM created_at) -- AS position
             , c.ordinality::%s -- AS in_tx_order
+            , COALESCE(c.written_by_v3, false) -- AS written_by_v3
         FROM
             UNNEST(commands) WITH ORDINALITY AS c
         WHERE

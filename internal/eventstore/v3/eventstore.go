@@ -98,6 +98,69 @@ var (
 			ElementType: commandType,
 		},
 	}
+
+	command2Type = &pgtype.Type{
+		Codec: &pgtype.CompositeCodec{
+			Fields: []pgtype.CompositeCodecField{
+				{
+					Name: "instance_id",
+					Type: textType,
+				},
+				{
+					Name: "aggregate_type",
+					Type: textType,
+				},
+				{
+					Name: "aggregate_id",
+					Type: textType,
+				},
+				{
+					Name: "command_type",
+					Type: textType,
+				},
+				{
+					Name: "revision",
+					Type: &pgtype.Type{
+						Name:  "int2",
+						OID:   pgtype.Int2OID,
+						Codec: pgtype.Int2Codec{},
+					},
+				},
+				{
+					Name: "payload",
+					Type: &pgtype.Type{
+						Name: "jsonb",
+						OID:  pgtype.JSONBOID,
+						Codec: &pgtype.JSONBCodec{
+							Marshal:   json.Marshal,
+							Unmarshal: json.Unmarshal,
+						},
+					},
+				},
+				{
+					Name: "creator",
+					Type: textType,
+				},
+				{
+					Name: "owner",
+					Type: textType,
+				},
+				{
+					Name: "written_by_v3",
+					Type: &pgtype.Type{
+						Name:  "bool",
+						OID:   pgtype.BoolOID,
+						Codec: pgtype.BoolCodec{},
+					},
+				},
+			},
+		},
+	}
+	command2ArrayCodec = &pgtype.Type{
+		Codec: &pgtype.ArrayCodec{
+			ElementType: command2Type,
+		},
+	}
 )
 
 var typeMu sync.Mutex
@@ -107,52 +170,51 @@ func RegisterEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
 	typeMu.Lock()
 	defer typeMu.Unlock()
 
-	m := conn.TypeMap()
-
-	var cmd *command
-	if _, ok := m.TypeForValue(cmd); ok {
-		return nil
-	}
-
-	if commandType.OID == 0 || commandArrayCodec.OID == 0 {
-		err := conn.QueryRow(ctx, "select oid, typarray from pg_type where typname = $1 and typnamespace = (select oid from pg_namespace where nspname = $2)", "command", "eventstore").
-			Scan(&commandType.OID, &commandArrayCodec.OID)
-		if err != nil {
-			logging.WithError(err).Debug("failed to get oid for command type")
-			return nil
-		}
-		if commandType.OID == 0 || commandArrayCodec.OID == 0 {
-			logging.Debug("oid for command type not found")
-			return nil
-		}
-	}
-
-	m.RegisterTypes([]*pgtype.Type{
-		{
-			Name:  "eventstore.command",
-			Codec: commandType.Codec,
-			OID:   commandType.OID,
-		},
-		{
-			Name:  "command",
-			Codec: commandType.Codec,
-			OID:   commandType.OID,
-		},
-		{
-			Name:  "eventstore._command",
-			Codec: commandArrayCodec.Codec,
-			OID:   commandArrayCodec.OID,
-		},
-		{
-			Name:  "_command",
-			Codec: commandArrayCodec.Codec,
-			OID:   commandArrayCodec.OID,
-		},
-	})
-	dialect.RegisterDefaultPgTypeVariants[command](m, "eventstore.command", "eventstore._command")
-	dialect.RegisterDefaultPgTypeVariants[command](m, "command", "_command")
+	registerCommandType[command](ctx, conn, commandType, commandArrayCodec, "command")
+	registerCommandType[command2](ctx, conn, command2Type, command2ArrayCodec, "command2")
 
 	return nil
+}
+
+func registerCommandType[T interface{ command | command2 }](ctx context.Context, conn *pgx.Conn, typeCodec, arrayCodec *pgtype.Type, name string) {
+	if typeCodec.OID == 0 || arrayCodec.OID == 0 {
+		err := conn.QueryRow(ctx, "select oid, typarray from pg_type where typname = $1 and typnamespace = (select oid from pg_namespace where nspname = $2)", name, "eventstore").
+			Scan(&typeCodec.OID, &arrayCodec.OID)
+		if err != nil {
+			logging.WithError(err).Debug("failed to get oid for command type")
+			return
+		}
+		if typeCodec.OID == 0 || arrayCodec.OID == 0 {
+			logging.Debug("oid for command type not found")
+			return
+		}
+	}
+
+	conn.TypeMap().RegisterTypes([]*pgtype.Type{
+		{
+			Name:  "eventstore." + name,
+			Codec: typeCodec.Codec,
+			OID:   typeCodec.OID,
+		},
+		{
+			Name:  name,
+			Codec: typeCodec.Codec,
+			OID:   typeCodec.OID,
+		},
+		{
+			Name:  "eventstore._" + name,
+			Codec: arrayCodec.Codec,
+			OID:   arrayCodec.OID,
+		},
+		{
+			Name:  "_" + name,
+			Codec: arrayCodec.Codec,
+			OID:   arrayCodec.OID,
+		},
+	})
+
+	dialect.RegisterDefaultPgTypeVariants[T](conn.TypeMap(), "eventstore."+name, "eventstore._"+name)
+	dialect.RegisterDefaultPgTypeVariants[T](conn.TypeMap(), name, "_"+name)
 }
 
 func NewEventstore(client *database.DB, opts ...EventstoreOption) *Eventstore {

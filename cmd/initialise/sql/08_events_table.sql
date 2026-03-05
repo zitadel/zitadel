@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS eventstore.events2 (
     
     , "position" DECIMAL NOT NULL
     , in_tx_order INTEGER NOT NULL
+    , written_by_v3 BOOLEAN NOT NULL DEFAULT false
 
     , PRIMARY KEY (instance_id, aggregate_type, aggregate_id, "sequence")
 );
@@ -23,7 +24,7 @@ CREATE INDEX IF NOT EXISTS es_projection ON eventstore.events2 (instance_id, agg
 
 -- represents an event to be created.
 DO $$ BEGIN
-    CREATE TYPE eventstore.command AS (
+    CREATE TYPE eventstore.command2 AS (
         instance_id TEXT
         , aggregate_type TEXT
         , aggregate_id TEXT
@@ -32,12 +33,13 @@ DO $$ BEGIN
         , payload JSONB
         , creator TEXT
         , owner TEXT
+        , written_by_v3 BOOLEAN
     );
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
-CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
+CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command2[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
 SELECT
     c.instance_id
     , c.aggregate_type
@@ -51,6 +53,7 @@ SELECT
     , cs.owner
     , EXTRACT(EPOCH FROM NOW()) AS position
     , c.in_tx_order
+    , c.written_by_v3
 FROM (
     SELECT
         c.instance_id
@@ -62,6 +65,7 @@ FROM (
         , c.creator
         , c.owner
         , ROW_NUMBER() OVER () AS in_tx_order
+        , COALESCE(c.written_by_v3, false) AS written_by_v3
     FROM
         UNNEST(commands) AS c
 ) AS c
@@ -114,7 +118,7 @@ ORDER BY
     in_tx_order;
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
+CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command2[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
 INSERT INTO eventstore.events2
 SELECT * FROM eventstore.commands_to_events(commands)
 RETURNING *

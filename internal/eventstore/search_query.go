@@ -30,6 +30,7 @@ type SearchQueryBuilder struct {
 	creationDateAfter     time.Time
 	creationDateBefore    time.Time
 	eventSequenceGreater  uint64
+	excludeV3Events       bool
 }
 
 func (b *SearchQueryBuilder) GetColumns() Columns {
@@ -94,6 +95,10 @@ func (q SearchQueryBuilder) GetCreationDateAfter() time.Time {
 
 func (q SearchQueryBuilder) GetCreationDateBefore() time.Time {
 	return q.creationDateBefore
+}
+
+func (q SearchQueryBuilder) GetExcludeV3Events() bool {
+	return q.excludeV3Events
 }
 
 // ensureInstanceID makes sure that the instance id is always set
@@ -289,6 +294,12 @@ func (builder *SearchQueryBuilder) PositionAtLeast(position decimal.Decimal) *Se
 // AwaitOpenTransactions filters for events which are older than the oldest transaction of the database
 func (builder *SearchQueryBuilder) AwaitOpenTransactions() *SearchQueryBuilder {
 	builder.awaitOpenTransactions = true
+	return builder
+}
+
+// ExcludeV3Events filters out events that were written through the v3 storage adapter
+func (builder *SearchQueryBuilder) ExcludeV3Events() *SearchQueryBuilder {
+	builder.excludeV3Events = true
 	return builder
 }
 

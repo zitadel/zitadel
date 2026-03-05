@@ -16,6 +16,9 @@ import (
 
 type relationalTablesProjection struct{}
 
+// SkipV3ReducedEvents implements [handler.RelationalProjection]
+func (relationalTablesProjection) SkipV3ReducedEvents() {}
+
 func newRelationalTablesProjection(ctx context.Context, config handler.Config) *handler.Handler {
 	return handler.NewHandler(ctx, &config, new(relationalTablesProjection))
 }

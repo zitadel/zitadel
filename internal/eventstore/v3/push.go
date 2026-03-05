@@ -80,7 +80,12 @@ func writeEvents(ctx context.Context, tx database.Transaction, commands []events
 		return nil, err
 	}
 
-	rows, err := tx.Query(ctx, `select owner, created_at, "sequence", position from eventstore.push($1::eventstore.command[])`, cmds)
+	var rows database.Rows
+	if command2Type.OID != 0 {
+		rows, err = tx.Query(ctx, `select owner, created_at, "sequence", position from eventstore.push($1::eventstore.command2[])`, cmds)
+	} else {
+		rows, err = tx.Query(ctx, `select owner, created_at, "sequence", position from eventstore.push($1::eventstore.command[])`, commands2ToCommands(cmds))
+	}
 	if err != nil {
 		return nil, err
 	}

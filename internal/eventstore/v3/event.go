@@ -18,6 +18,18 @@ var (
 	_ eventstore.Event = (*event)(nil)
 )
 
+type command2 struct {
+	InstanceID    string
+	AggregateType string
+	AggregateID   string
+	CommandType   string
+	Revision      uint16
+	Payload       Payload
+	Creator       string
+	Owner         string
+	WrittenByV3   bool
+}
+
 type command struct {
 	InstanceID    string
 	AggregateType string
@@ -29,7 +41,7 @@ type command struct {
 	Owner         string
 }
 
-func (c *command) Aggregate() *eventstore.Aggregate {
+func (c *command2) Aggregate() *eventstore.Aggregate {
 	return &eventstore.Aggregate{
 		ID:            c.AggregateID,
 		Type:          eventstore.AggregateType(c.AggregateType),
@@ -40,7 +52,7 @@ func (c *command) Aggregate() *eventstore.Aggregate {
 }
 
 type event struct {
-	command   *command
+	command   *command2
 	createdAt time.Time
 	sequence  uint64
 	position  decimal.Decimal
@@ -57,7 +69,7 @@ func commandToEventOld(sequence *latestSequence, cmd eventstore.Command) (_ *eve
 		}
 	}
 	return &event{
-		command: &command{
+		command: &command2{
 			InstanceID:    sequence.aggregate.InstanceID,
 			AggregateType: string(sequence.aggregate.Type),
 			AggregateID:   sequence.aggregate.ID,
@@ -71,14 +83,15 @@ func commandToEventOld(sequence *latestSequence, cmd eventstore.Command) (_ *eve
 	}, nil
 }
 
-func commandsToEvents(ctx context.Context, cmds []eventstore.Command) (_ []eventstore.Event, _ []*command, err error) {
+func commandsToEvents(ctx context.Context, cmds []eventstore.Command) (_ []eventstore.Event, _ []*command2, err error) {
 	events := make([]eventstore.Event, len(cmds))
-	commands := make([]*command, len(cmds))
+	commands := make([]*command2, len(cmds))
 	for i, cmd := range cmds {
 		if cmd.Aggregate().InstanceID == "" {
 			cmd.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
 		}
-		events[i], err = commandToEvent(cmd)
+		_, isV3Command := cmd.(eventstore.V3Command)
+		events[i], err = commandToEvent(cmd, isV3Command)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -87,7 +100,24 @@ func commandsToEvents(ctx context.Context, cmds []eventstore.Command) (_ []event
 	return events, commands, nil
 }
 
-func commandToEvent(cmd eventstore.Command) (_ eventstore.Event, err error) {
+func commands2ToCommands(cmds []*command2) []*command {
+	commands := make([]*command, len(cmds))
+	for i, cmd := range cmds {
+		commands[i] = &command{
+			InstanceID:    cmd.InstanceID,
+			AggregateType: cmd.AggregateType,
+			AggregateID:   cmd.AggregateID,
+			CommandType:   cmd.CommandType,
+			Revision:      cmd.Revision,
+			Payload:       cmd.Payload,
+			Creator:       cmd.Creator,
+			Owner:         cmd.Owner,
+		}
+	}
+	return commands
+}
+
+func commandToEvent(cmd eventstore.Command, writtenByV3 bool) (_ eventstore.Event, err error) {
 	var payload Payload
 	if cmd.Payload() != nil {
 		payload, err = json.Marshal(cmd.Payload())
@@ -97,7 +127,7 @@ func commandToEvent(cmd eventstore.Command) (_ eventstore.Event, err error) {
 		}
 	}
 
-	command := &command{
+	command := &command2{
 		InstanceID:    cmd.Aggregate().InstanceID,
 		AggregateType: string(cmd.Aggregate().Type),
 		AggregateID:   cmd.Aggregate().ID,
@@ -106,6 +136,7 @@ func commandToEvent(cmd eventstore.Command) (_ eventstore.Event, err error) {
 		Payload:       payload,
 		Creator:       cmd.Creator(),
 		Owner:         cmd.Aggregate().ResourceOwner,
+		WrittenByV3:   writtenByV3,
 	}
 
 	return &event{
