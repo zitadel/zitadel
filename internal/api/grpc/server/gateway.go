@@ -43,17 +43,22 @@ var (
 
 	httpErrorHandler = runtime.RoutingErrorHandlerFunc(
 		func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, httpStatus int) {
-			if httpStatus != http.StatusMethodNotAllowed {
+			var (
+				code codes.Code
+			)
+			switch httpStatus {
+			case http.StatusMethodNotAllowed:
+				code = codes.Unimplemented
+			case http.StatusNotFound:
+				code = codes.NotFound
+			default:
 				runtime.DefaultRoutingErrorHandler(ctx, mux, marshaler, w, r, httpStatus)
 				return
 			}
-
-			// Use HTTPStatusError to customize the DefaultHTTPErrorHandler status code
 			err := &runtime.HTTPStatusError{
 				HTTPStatus: httpStatus,
-				Err:        status.Error(codes.Unimplemented, http.StatusText(httpStatus)),
+				Err:        status.Error(code, http.StatusText(httpStatus)),
 			}
-
 			runtime.DefaultHTTPErrorHandler(ctx, mux, marshaler, w, r, err)
 		},
 	)
@@ -180,7 +185,11 @@ func RegisterGateway(ctx context.Context, gateway *Gateway, server WithGateway) 
 }
 
 func dial(ctx context.Context, port uint16, opts []grpc.DialOption) (*grpc.ClientConn, error) {
-	endpoint := fmt.Sprintf("localhost:%d", port)
+	// Use 127.0.0.1 with the passthrough resolver instead of "localhost" to
+	// avoid DNS resolution. The scratch container image has no /etc/hosts or
+	// /etc/resolv.conf, causing Go's pure-Go DNS resolver to query 127.0.0.1:53
+	// (no DNS server) and wait for the default 5-second timeout before failing.
+	endpoint := fmt.Sprintf("passthrough:///127.0.0.1:%d", port)
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return nil, err

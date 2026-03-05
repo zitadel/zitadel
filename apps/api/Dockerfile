@@ -28,6 +28,7 @@ FROM scratch AS final
 
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
+COPY --from=builder /etc/hosts /etc/hosts
 COPY --from=builder /app/zitadel /app/zitadel
 
 HEALTHCHECK NONE
