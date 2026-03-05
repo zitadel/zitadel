@@ -491,7 +491,7 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid metadata, pre condition error",
+			name: "empty metadata value, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -523,7 +523,9 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zerrors.IsErrorInvalidArgument,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
@@ -584,17 +586,34 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key1",
+								[]byte("value1"),
+							)),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key2",
+								[]byte("value2"),
+							)),
+					),
 					expectPush(
-						user.NewMetadataSetEvent(context.Background(),
+						user.NewMetadataRemovedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
-							"key",
-							[]byte("value"),
+							"key1",
 						),
 						user.NewMetadataSetEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
-							"key1",
-							[]byte("value1"),
+							"key2",
+							[]byte("update"),
+						),
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key3",
+							[]byte("add"),
 						),
 					),
 				),
@@ -604,8 +623,10 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 				orgID:  "org1",
 				userID: "user1",
 				metadataList: []*domain.Metadata{
-					{Key: "key", Value: []byte("value")},
-					{Key: "key1", Value: []byte("value1")},
+					{Key: "key1"}, // delete
+					{Key: "key2", Value: []byte("update")},
+					{Key: "key3", Value: []byte("add")},
+					{Key: "key4"}, // ignore
 				},
 			},
 			res: res{
