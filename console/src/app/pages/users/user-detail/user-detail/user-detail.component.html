@@ -109,6 +109,7 @@
                   </button>
                   <cnsl-contact
                     [disablePhoneCode]="true"
+                    [disableEmailEdit]="(hasLinkedIDPs$ | async) ?? true"
                     [username]="user.preferredLoginName"
                     [canWrite]="['user.write:' + user.userId, 'user.write$'] | hasRole | async"
                     [human]="user.type.value"
