@@ -11,7 +11,7 @@ import (
 )
 
 // ExamplePermissionClause_org shows how to use the PermissionClause function to filter
-// permitted records based on the resource owner and the user's instance or organization membership.
+// permitted records based on the Organization ID and the user's instance or organization membership.
 func ExamplePermissionClause_org() {
 	// These variables are typically set in the middleware of Zitadel.
 	// They do not influence the generation of the clause, just what
@@ -23,7 +23,7 @@ func ExamplePermissionClause_org() {
 
 	join, args := PermissionClause(
 		ctx,
-		UserResourceOwnerCol, // match the resource owner column
+		UserResourceOwnerCol, // match the Organization ID column
 		domain.PermissionUserRead,
 		SingleOrgPermissionOption([]SearchQuery{
 			mustSearchQuery(NewUserDisplayNameSearchQuery("zitadel", TextContains)),
@@ -44,7 +44,7 @@ func ExamplePermissionClause_org() {
 }
 
 // ExamplePermissionClause_project shows how to use the PermissionClause function to filter
-// permitted records based on the resource owner and the user's instance or organization membership.
+// permitted records based on the Organization ID and the user's instance or organization membership.
 // Additionally, it allows returning records based on the project ID and project membership.
 func ExamplePermissionClause_project() {
 	// These variables are typically set in the middleware of Zitadel.
@@ -57,7 +57,7 @@ func ExamplePermissionClause_project() {
 
 	join, args := PermissionClause(
 		ctx,
-		ProjectColumnResourceOwner, // match the resource owner column
+		ProjectColumnResourceOwner, // match the Organization ID column
 		"project.read",
 		WithProjectsPermissionOption(ProjectColumnID),
 		SingleOrgPermissionOption([]SearchQuery{
