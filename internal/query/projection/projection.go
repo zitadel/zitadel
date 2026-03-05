@@ -207,7 +207,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
 	GroupUsersProjection = newGroupUsersProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_users"]))
 
-	RelationalTablesProjection = newRelationalTablesProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
+	RelationalTablesProjection = newRelationalTablesProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["relational_tables"]))
 
 	newProjectionsList()
 	newFieldsList()
