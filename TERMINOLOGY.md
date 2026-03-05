@@ -45,12 +45,12 @@ All user-facing wording in docs, UI, and API descriptions must follow this table
 | Project | Container for applications sharing a role context | _(none — already canonical)_ | Project | keep | Everywhere |
 | Project Grant | Delegation of project access to another organization | Grant, Grants, Organization Grant, Delegated Access | Project Grant / Project Grants | replace | UI + Docs |
 | Application | Software or service secured using ZITADEL | _(none — already canonical)_ | Application | keep | Everywhere |
-| Role Assignment | What a user is allowed to do (roles + org + user) | Authorization, internal authorization, external authorization, User Grant, Roles and Authorizations | Role Assignment | replace | Everywhere |
-| Administrator | Role granting administrative privileges (role context only, not as a person label) | Manager, Add Manager, Add a Manager, Membership, Member grants | Administrator / Add Administrator / Add an Administrator | replace | UI + Docs |
+| Role Assignment | What a user is allowed to do (roles + org + user) | Authorization, external authorization, User Grant, Roles and Authorizations | Role Assignment | replace | Everywhere |
+| Administrator | Role granting administrative privileges (role context only, not as a person label) | Manager, Add Manager, Add a Manager, Membership, Member, Member grants | Administrator / Add Administrator / Add an Administrator | replace | UI + Docs |
 | Organization Administrators | Org-level admin role holders | ZITADEL Organization Managers | Organization Administrators | replace | UI + Docs |
 | Project Administrators | Project-level admin role holders | Project A Managers | Project Administrators | replace | UI + Docs |
-| Administrator Roles | Set of admin roles | Manager Roles | Administrator Roles | replace | UI + Docs |
-| ZITADEL Administrator Roles | ZITADEL-specific admin role set | ZITADEL Manager Roles, Zitadel Manager Roles | ZITADEL Administrator Roles | replace | UI + Docs |
+| Administrator Roles | Set of admin roles | Manager Roles, Membership Roles | Administrator Roles | replace | UI + Docs |
+| ZITADEL Administrator Roles | ZITADEL-specific admin role set | ZITADEL Manager Roles, Zitadel Manager Roles, Zitadel Membership Roles, ZITADEL Membership Roles | ZITADEL Administrator Roles | replace | UI + Docs |
 | Permission | Internal permission backing admin roles | _(internal term)_ | _(do not surface in user-facing text)_ | internal | — |
 | Metadata | Key-value custom data attached to resources | Meta Data | Metadata | replace | Everywhere |
 | Custom Domain | Domain identifying a ZITADEL instance (globally unique) | Custom domain, Installed domains, Instance Domains, Zitadel Domain, your_domain, your-domain | Custom Domain | replace | UI + Docs |
