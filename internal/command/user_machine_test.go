@@ -18,7 +18,7 @@ import (
 
 func TestCommandSide_AddMachine(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
@@ -32,6 +32,9 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		want *domain.ObjectDetails
 		err  func(error) bool
 	}
+
+	orgAgg := org.NewAggregate("org1")
+
 	tests := []struct {
 		name   string
 		fields fields
@@ -41,8 +44,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "user invalid, invalid argument error name",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
@@ -62,8 +69,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "user invalid, invalid argument error username",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
@@ -83,8 +94,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "org policy not found, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -166,8 +181,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "add machine, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -224,8 +243,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "add machine, orgScopedUsername, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -271,8 +294,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "add machine - custom id, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -319,8 +346,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			name: "with username fallback to given username",
 			fields: fields{
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "aggregateID"),
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -370,8 +401,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			name: "with username fallback to generated id",
 			fields: fields{
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "aggregateID"),
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -419,8 +454,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "with username fallback to given id",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -469,8 +508,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "with succeeding permission check, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -519,9 +562,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "with failing permission check, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
@@ -545,8 +586,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "add machine, ok + deactive state",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -599,8 +644,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "add machine, ok + locked state",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -654,7 +703,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
 				idGenerator:     tt.fields.idGenerator,
 				checkPermission: newMockPermissionCheckAllowed(),
 			}
