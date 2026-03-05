@@ -225,10 +225,10 @@ func TestServer_ListUserMetadata(t *testing.T) {
 					metadataResp := Instance.SetUserMetadata(iamOwnerCTX, userID, "key1", "value1")
 
 					response.Metadata[0] = &metadata.Metadata{
-						testStartTime: metadataResp.GetSetDate(),
-						ChangeDate:    metadataResp.GetSetDate(),
-						Key:           "key1",
-						Value:         []byte(base64.StdEncoding.EncodeToString([]byte("value1"))),
+						CreationDate: metadataResp.GetSetDate(),
+						ChangeDate:   metadataResp.GetSetDate(),
+						Key:          "key1",
+						Value:        []byte(base64.StdEncoding.EncodeToString([]byte("value1"))),
 					}
 				},
 				req: &user.ListUserMetadataRequest{},
@@ -360,10 +360,10 @@ func TestServer_ListUserMetadata_WithPermissionV2(t *testing.T) {
 					metadataResp := InstancePermissionV2.SetUserMetadata(iamOwnerCTX, userID, "key1", "value1")
 
 					response.Metadata[0] = &metadata.Metadata{
-						testStartTime: metadataResp.GetSetDate(),
-						ChangeDate:    metadataResp.GetSetDate(),
-						Key:           "key1",
-						Value:         []byte(base64.StdEncoding.EncodeToString([]byte("value1"))),
+						CreationDate: metadataResp.GetSetDate(),
+						ChangeDate:   metadataResp.GetSetDate(),
+						Key:          "key1",
+						Value:        []byte(base64.StdEncoding.EncodeToString([]byte("value1"))),
 					}
 				},
 				req: &user.ListUserMetadataRequest{},
@@ -455,10 +455,10 @@ func TestServer_ListUserMetadata_WithPermissionV2(t *testing.T) {
 func setUserMetadata(ctx context.Context, instance *integration.Instance, userID, key, value string) *metadata.Metadata {
 	metadataResp := instance.SetUserMetadata(ctx, userID, key, value)
 	return &metadata.Metadata{
-		testStartTime: metadataResp.GetSetDate(),
-		ChangeDate:    metadataResp.GetSetDate(),
-		Key:           key,
-		Value:         []byte(base64.StdEncoding.EncodeToString([]byte(value))),
+		CreationDate: metadataResp.GetSetDate(),
+		ChangeDate:   metadataResp.GetSetDate(),
+		Key:          key,
+		Value:        []byte(base64.StdEncoding.EncodeToString([]byte(value))),
 	}
 }
 
