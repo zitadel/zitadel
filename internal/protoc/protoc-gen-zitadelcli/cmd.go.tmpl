@@ -2,10 +2,14 @@
 package gen
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 
 	"connectrpc.com/connect"
 	"github.com/spf13/cobra"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/zitadel/zitadel/apps/cli/internal/auth"
 	"github.com/zitadel/zitadel/apps/cli/internal/client"
@@ -17,6 +21,29 @@ import (
 
 func init() {
 	Register(New{{.ServiceName}}Cmd)
+{{- range .Methods}}
+	RegisterMeta(CommandMeta{
+		Group:          "{{$.ResourceName}}",
+		Name:           "{{.Use}}",
+		Short:          {{quote .Short}},
+		FullMethodName: "{{.FullMethodName}}",
+		RequestType:    "{{.RequestType}}",
+		ResponseType:   "{{.ResponseType}}",
+{{- if .IDArg}}
+		PositionalArgs: []ArgMeta{ {{`{`}}Name: "{{.IDArg}}", Required: true{{`}`}} },
+{{- end}}
+		Flags: []FlagMeta{
+{{- range .Flags}}
+{{- if .IsOneofSelector}}
+			{Name: "{{.Name}}", Type: "string", Required: false, Help: {{quote .Help}}, EnumValues: []string{ {{- range .EnumValues}}{{quote .}}, {{end -}} }},
+			{Name: "{{.Name}}-data", Type: "string", Required: false, Help: "JSON for the selected {{.Name}} variant's fields"},
+{{- else}}
+			{Name: "{{.Name}}", Type: "{{.FlagType}}", Required: {{.Required}}, Help: {{quote .Help}}{{if .IsEnum}}, EnumValues: []string{ {{- range .EnumValues}}{{quote .}}, {{end -}} }{{end}}},
+{{- end}}
+{{- end}}
+		},
+	})
+{{- end}}
 }
 
 // New{{.ServiceName}}Cmd creates the "{{.ResourceName}}" command group with all sub-commands.
@@ -34,13 +61,125 @@ func New{{.ServiceName}}Cmd(getCfg func() *config.Config, getOutput func() strin
 {{range $m := .Methods}}
 func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOutput func() string) *cobra.Command {
 {{- range $m.Flags}}
+{{- if .IsOneofSelector}}
+	var flag_{{$m.RPCName}}_{{.GoName}} string
+	var flag_{{$m.RPCName}}_{{.GoName}}_Data string
+{{- else}}
 	var flag_{{$m.RPCName}}_{{.GoName}} {{.FlagType}}
+{{- end}}
 {{- end}}
 
 	cmd := &cobra.Command{
 		Use:   "{{$m.Use}}",
 		Short: "{{$m.Short}}",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			req := &{{$.GoImportAlias}}.{{$m.RequestType}}{}
+
+			// Check for JSON input via --json flag
+			useJSON, _ := cmd.Flags().GetBool("json")
+			if useJSON {
+				data, err := io.ReadAll(os.Stdin)
+				if err != nil {
+					return fmt.Errorf("reading stdin: %w", err)
+				}
+				if err := protojson.Unmarshal(data, req); err != nil {
+					return fmt.Errorf("parsing JSON input: %w", err)
+				}
+			}
+
+{{- if $m.IDArg}}
+			// Positional ID argument (overrides JSON body if both provided)
+{{- if $m.IDArgIsOptional}}
+			if len(args) > 0 {
+				req.{{$m.IDArgGoName}} = &args[0]
+			} else if req.{{$m.IDArgGoName}} == nil || *req.{{$m.IDArgGoName}} == "" {
+				return fmt.Errorf("{{$m.IDArg}} argument is required")
+			}
+{{- else}}
+			if len(args) > 0 {
+				req.{{$m.IDArgGoName}} = args[0]
+			} else if req.{{$m.IDArgGoName}} == "" {
+				return fmt.Errorf("{{$m.IDArg}} argument is required")
+			}
+{{- end}}
+{{- end}}
+
+			if !useJSON {
+{{- range $m.Flags}}
+{{- if .IsOneofSelector}}{{- $f := .}}
+				if flag_{{$m.RPCName}}_{{$f.GoName}} != "" {
+					switch flag_{{$m.RPCName}}_{{$f.GoName}} {
+{{- range $f.OneofVariants}}
+					case "{{.VariantName}}":
+						oneofMsg := &{{$.GoImportAlias}}.{{.GoMsgType}}{}
+						if flag_{{$m.RPCName}}_{{$f.GoName}}_Data != "" {
+							if err := protojson.Unmarshal([]byte(flag_{{$m.RPCName}}_{{$f.GoName}}_Data), oneofMsg); err != nil {
+								return fmt.Errorf("parsing --{{$f.Name}}-data: %w", err)
+							}
+						}
+						req.{{$f.GoOneofName}} = &{{$.GoImportAlias}}.{{.GoWrapperType}}{{`{`}}{{.GoFieldName}}: oneofMsg{{`}`}}
+{{- end}}
+					default:
+						return fmt.Errorf("invalid --{{$f.Name}}: %q (valid: {{range $f.OneofVariants}}{{.VariantName}} {{end}})", flag_{{$m.RPCName}}_{{$f.GoName}})
+					}
+				}
+{{- else if and .IsEnum .IsOptionalScalar}}
+				if flag_{{$m.RPCName}}_{{.GoName}} != "" {
+					enumVal, ok := {{$.GoImportAlias}}.{{.EnumGoType}}_value[flag_{{$m.RPCName}}_{{.GoName}}]
+					if !ok {
+						return fmt.Errorf("invalid value %q for --{{.Name}}", flag_{{$m.RPCName}}_{{.GoName}})
+					}
+					ev := {{$.GoImportAlias}}.{{.EnumGoType}}(enumVal)
+					req.{{.GoName}} = &ev
+				}
+{{- else if .IsEnum}}
+				if flag_{{$m.RPCName}}_{{.GoName}} != "" {
+					enumVal, ok := {{$.GoImportAlias}}.{{.EnumGoType}}_value[flag_{{$m.RPCName}}_{{.GoName}}]
+					if !ok {
+						return fmt.Errorf("invalid value %q for --{{.Name}}", flag_{{$m.RPCName}}_{{.GoName}})
+					}
+					req.{{.GoName}} = {{$.GoImportAlias}}.{{.EnumGoType}}(enumVal)
+				}
+{{- else if and (eq .FlagType "string") .IsOptionalScalar}}
+				if flag_{{$m.RPCName}}_{{.GoName}} != "" {
+					req.{{.GoName}} = &flag_{{$m.RPCName}}_{{.GoName}}
+				}
+{{- else if and (eq .FlagType "bool") .IsOptionalScalar}}
+				if cmd.Flags().Changed("{{.Name}}") {
+					req.{{.GoName}} = &flag_{{$m.RPCName}}_{{.GoName}}
+				}
+{{- else if eq .FlagType "string"}}
+				if flag_{{$m.RPCName}}_{{.GoName}} != "" {
+					req.{{.GoName}} = flag_{{$m.RPCName}}_{{.GoName}}
+				}
+{{- else if eq .FlagType "bool"}}
+				req.{{.GoName}} = flag_{{$m.RPCName}}_{{.GoName}}
+{{- else if eq .FlagType "[]string"}}
+				// Repeated string fields not yet wired
+{{- else}}
+				if flag_{{$m.RPCName}}_{{.GoName}} != 0 {
+					req.{{.GoName}} = flag_{{$m.RPCName}}_{{.GoName}}
+				}
+{{- end}}
+{{- end}}
+			}
+
+			// Dry-run: print request and exit without calling the API
+			dryRun, _ := cmd.Flags().GetBool("dry-run")
+			if dryRun {
+				reqJSON, err := protojson.MarshalOptions{Indent: "  "}.Marshal(req)
+				if err != nil {
+					return fmt.Errorf("marshalling request: %w", err)
+				}
+				envelope := map[string]json.RawMessage{
+					"method":  json.RawMessage(fmt.Sprintf("%q", "{{$m.FullMethodName}}")),
+					"request": json.RawMessage(reqJSON),
+				}
+				out, _ := json.MarshalIndent(envelope, "", "  ")
+				fmt.Println(string(out))
+				return nil
+			}
+
 			cfg := getCfg()
 			actx, _, err := config.ActiveCtx(cfg)
 			if err != nil {
@@ -53,54 +192,6 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 			httpClient := client.New(tokenSource)
 			baseURL := client.InstanceURL(actx.Instance)
 			svcClient := {{$.ConnectImportAlias}}.{{$.ConnectClientConstructor}}(httpClient, baseURL)
-
-			req := &{{$.GoImportAlias}}.{{$m.RequestType}}{}
-{{- if $m.IDArg}}
-			if len(args) < 1 {
-				return fmt.Errorf("{{$m.IDArg}} argument is required")
-			}
-			req.{{$m.IDArgGoName}} = args[0]
-{{- end}}
-{{- range $m.Flags}}
-{{- if and .IsEnum .IsOptionalScalar}}
-			if flag_{{$m.RPCName}}_{{.GoName}} != "" {
-				enumVal, ok := {{$.GoImportAlias}}.{{.EnumGoType}}_value[flag_{{$m.RPCName}}_{{.GoName}}]
-				if !ok {
-					return fmt.Errorf("invalid value %q for --{{.Name}}", flag_{{$m.RPCName}}_{{.GoName}})
-				}
-				ev := {{$.GoImportAlias}}.{{.EnumGoType}}(enumVal)
-				req.{{.GoName}} = &ev
-			}
-{{- else if .IsEnum}}
-			if flag_{{$m.RPCName}}_{{.GoName}} != "" {
-				enumVal, ok := {{$.GoImportAlias}}.{{.EnumGoType}}_value[flag_{{$m.RPCName}}_{{.GoName}}]
-				if !ok {
-					return fmt.Errorf("invalid value %q for --{{.Name}}", flag_{{$m.RPCName}}_{{.GoName}})
-				}
-				req.{{.GoName}} = {{$.GoImportAlias}}.{{.EnumGoType}}(enumVal)
-			}
-{{- else if and (eq .FlagType "string") .IsOptionalScalar}}
-			if flag_{{$m.RPCName}}_{{.GoName}} != "" {
-				req.{{.GoName}} = &flag_{{$m.RPCName}}_{{.GoName}}
-			}
-{{- else if and (eq .FlagType "bool") .IsOptionalScalar}}
-			if cmd.Flags().Changed("{{.Name}}") {
-				req.{{.GoName}} = &flag_{{$m.RPCName}}_{{.GoName}}
-			}
-{{- else if eq .FlagType "string"}}
-			if flag_{{$m.RPCName}}_{{.GoName}} != "" {
-				req.{{.GoName}} = flag_{{$m.RPCName}}_{{.GoName}}
-			}
-{{- else if eq .FlagType "bool"}}
-			req.{{.GoName}} = flag_{{$m.RPCName}}_{{.GoName}}
-{{- else if eq .FlagType "[]string"}}
-			// Repeated string fields not yet wired
-{{- else}}
-			if flag_{{$m.RPCName}}_{{.GoName}} != 0 {
-				req.{{.GoName}} = flag_{{$m.RPCName}}_{{.GoName}}
-			}
-{{- end}}
-{{- end}}
 
 			resp, err := svcClient.{{$m.RPCName}}(cmd.Context(), connect.NewRequest(req))
 			if err != nil {
@@ -149,9 +240,14 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 		},
 	}
 {{range $m.Flags}}
+{{- if .IsOneofSelector}}
+	cmd.Flags().StringVar(&flag_{{$m.RPCName}}_{{.GoName}}, "{{.Name}}", "", {{quote .Help}})
+	cmd.Flags().StringVar(&flag_{{$m.RPCName}}_{{.GoName}}_Data, "{{.Name}}-data", "", "JSON for the selected {{.Name}} variant's fields")
+{{- else}}
 	cmd.Flags().{{.FlagFunc}}(&flag_{{$m.RPCName}}_{{.GoName}}, "{{.Name}}", {{if eq .FlagType "[]string"}}nil{{else if eq .FlagType "string"}}""{{else if eq .FlagType "bool"}}false{{else}}0{{end}}, {{quote .Help}})
 {{- if .Required}}
 	cmd.MarkFlagRequired("{{.Name}}")
+{{- end}}
 {{- end}}
 {{- end}}
 

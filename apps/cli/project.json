@@ -3,10 +3,28 @@
   "name": "@zitadel/cli",
   "projectType": "application",
   "targets": {
+    "generate": {
+      "description": "Regenerates CLI commands from proto definitions via protoc-gen-zitadelcli.",
+      "command": "bash -c 'go install ./internal/protoc/protoc-gen-zitadelcli/ && rm -f apps/cli/gen/cmd_*.go && PATH=\"$(go env GOPATH)/bin:.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/buf generate --path proto/zitadel/user/v2/user_service.proto --path proto/zitadel/org/v2/org_service.proto --path proto/zitadel/project/v2/project_service.proto --path proto/zitadel/app/v2/app_service.proto'",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/internal/protoc/protoc-gen-zitadelcli/main.go",
+        "{workspaceRoot}/internal/protoc/protoc-gen-zitadelcli/cmd.go.tmpl",
+        "{workspaceRoot}/internal/protoc/protoc-gen-zitadelcli/register.go.tmpl",
+        "{workspaceRoot}/go.mod",
+        "{workspaceRoot}/go.sum",
+        "{workspaceRoot}/proto/zitadel/**/*.proto",
+        "{workspaceRoot}/apps/cli/buf.gen.yaml"
+      ],
+      "outputs": [
+        "{projectRoot}/gen/cmd_*.go"
+      ]
+    },
     "build": {
       "description": "Builds the ZITADEL CLI binary.",
       "command": "bash -c 'cd apps/cli && go build -ldflags \"-X github.com/zitadel/zitadel/cmd/build.version=$(git describe --tags --always 2>/dev/null || echo dev) -X github.com/zitadel/zitadel/cmd/build.date=$(date -u +%Y-%m-%dT%H:%M:%SZ)\" -o ../../.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel-cli .'",
       "cache": true,
+      "dependsOn": ["generate"],
       "inputs": [
         "{projectRoot}/**/*.go",
         "{projectRoot}/go.mod",
@@ -21,6 +39,7 @@
       "description": "Runs go vet on the CLI.",
       "command": "cd apps/cli && go vet ./...",
       "cache": true,
+      "dependsOn": ["generate"],
       "inputs": [
         "{projectRoot}/**/*.go",
         "{projectRoot}/go.mod",
@@ -32,6 +51,7 @@
       "description": "Runs CLI unit tests.",
       "command": "cd apps/cli && go test ./...",
       "cache": true,
+      "dependsOn": ["generate"],
       "inputs": [
         "{projectRoot}/**/*.go",
         "{projectRoot}/go.mod",

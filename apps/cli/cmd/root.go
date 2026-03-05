@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 
@@ -14,6 +15,8 @@ var (
 	version    = "dev"
 	flagCtx    string
 	flagOutput string
+	flagJSON   bool
+	flagDryRun bool
 	cfg        *config.Config
 )
 
@@ -29,14 +32,27 @@ func NewRootCmd() *cobra.Command {
 		Short:   "ZITADEL CLI — manage your ZITADEL instances from the command line",
 		Version: version,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			// Skip config loading for completion commands
-			if cmd.Name() == "completion" || cmd.Name() == "help" {
+			// Skip config loading for completion and describe commands
+			if cmd.Name() == "completion" || cmd.Name() == "help" || cmd.Name() == "describe" {
 				return nil
 			}
+
+			// Auto-detect output format: JSON when stdout is not a TTY
+			if !cmd.Flags().Changed("output") {
+				if fi, err := os.Stdout.Stat(); err == nil && fi.Mode()&os.ModeCharDevice == 0 {
+					flagOutput = "json"
+				}
+			}
+
+			// Skip config loading for dry-run if no config exists
 			var err error
 			cfg, err = config.Load()
 			if err != nil {
-				return fmt.Errorf("loading config: %w", err)
+				if flagDryRun {
+					cfg = &config.Config{Contexts: make(map[string]config.Context)}
+				} else {
+					return fmt.Errorf("loading config: %w", err)
+				}
 			}
 			// Override active context if --context flag is set
 			if flagCtx != "" {
@@ -44,19 +60,29 @@ func NewRootCmd() *cobra.Command {
 			}
 			return nil
 		},
-		SilenceUsage: true,
+		SilenceUsage:  true,
+		SilenceErrors: true,
 	}
 
 	root.PersistentFlags().StringVar(&flagCtx, "context", "", "override the active context")
-	root.PersistentFlags().StringVarP(&flagOutput, "output", "o", "table", "output format: table or json")
+	root.PersistentFlags().StringVarP(&flagOutput, "output", "o", "table", "output format: table or json (auto-detected from TTY)")
+	root.PersistentFlags().BoolVar(&flagJSON, "json", false, "read request body as JSON from stdin")
+	root.PersistentFlags().BoolVar(&flagDryRun, "dry-run", false, "print the request as JSON without calling the API")
 
 	root.AddCommand(newLoginCmd())
 	root.AddCommand(newLogoutCmd())
 	root.AddCommand(ctxcmd.NewCmd())
+	root.AddCommand(newDescribeCmd())
 	gen.RegisterAll(root, func() *config.Config { return cfg }, func() string { return flagOutput })
 
 	return root
 }
+
+// FlagJSON returns whether the --json flag was set.
+func FlagJSON() bool { return flagJSON }
+
+// FlagDryRun returns whether the --dry-run flag was set.
+func FlagDryRun() bool { return flagDryRun }
 
 // activeContext resolves the current context from loaded config.
 func activeContext() (*config.Context, string, error) {

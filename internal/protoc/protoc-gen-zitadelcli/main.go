@@ -58,12 +58,16 @@ type methodData struct {
 	RequestType string
 	// ResponseType is the Go type name for the response.
 	ResponseType string
+	// FullMethodName is the fully-qualified gRPC method name (e.g. "zitadel.user.v2.UserService/GetUserByID").
+	FullMethodName string
 	// Flags is the list of flags derived from request fields.
 	Flags []flagDef
 	// IDArg is non-empty if the method takes a positional ID argument (the proto field name).
 	IDArg string
 	// IDArgGoName is the Go getter name for the ID field.
 	IDArgGoName string
+	// IDArgIsOptional is true when the ID field is a proto3 optional (Go *string).
+	IDArgIsOptional bool
 	// ResponseColumns defines table columns for rendering responses.
 	ResponseColumns []columnDef
 	// IsListMethod is true if this is a List* method with repeated results.
@@ -100,6 +104,25 @@ type flagDef struct {
 	EnumGoType string
 	// EnumValues lists the valid enum value names.
 	EnumValues []string
+	// IsOneofSelector is true when this flag selects a oneof variant by name.
+	// Two flags are generated: --<Name> (enum) and --<Name>-data (optional JSON for the variant's fields).
+	IsOneofSelector bool
+	// GoOneofName is the Go field name for the oneof interface on the request (e.g. "UserType").
+	GoOneofName string
+	// OneofVariants lists all message variants in the oneof group.
+	OneofVariants []oneofVariant
+}
+
+// oneofVariant describes one message variant within a proto oneof.
+type oneofVariant struct {
+	// VariantName is the proto field name used as the flag value (e.g. "human", "machine").
+	VariantName string
+	// GoMsgType is the Go message type (e.g. "CreateUserRequest_Human").
+	GoMsgType string
+	// GoWrapperType is the Go oneof wrapper type (e.g. "CreateUserRequest_Human_").
+	GoWrapperType string
+	// GoFieldName is the field name on the wrapper struct (e.g. "Human").
+	GoFieldName string
 }
 
 // columnDef describes a table column for rendering responses.
@@ -249,18 +272,19 @@ func buildMethodData(method *protogen.Method, service *protogen.Service) *method
 	}
 
 	md := &methodData{
-		RPCName:      rpcName,
-		Verb:         cliUse,
-		Short:        humanizeRPCName(rpcName, resourceSingular),
-		RequestType:  method.Input.GoIdent.GoName,
-		ResponseType: method.Output.GoIdent.GoName,
+		RPCName:        rpcName,
+		Verb:           cliUse,
+		Short:          humanizeRPCName(rpcName, resourceSingular),
+		RequestType:    method.Input.GoIdent.GoName,
+		ResponseType:   method.Output.GoIdent.GoName,
+		FullMethodName: string(service.Desc.ParentFile().Package()) + "." + string(service.Desc.Name()) + "/" + rpcName,
 	}
 
 	// Extract flags from request message fields.
 	md.Flags = extractFlags(method.Input)
 
 	// Determine if there's a positional ID argument.
-	md.IDArg, md.IDArgGoName = findIDField(method.Input, verb)
+	md.IDArg, md.IDArgGoName, md.IDArgIsOptional = findIDField(method.Input, verb, suffix)
 	if md.IDArg != "" {
 		md.Use = cliUse + " <" + md.IDArg + ">"
 		// Remove the ID field from flags since it's positional.
@@ -283,14 +307,73 @@ func buildMethodData(method *protogen.Method, service *protogen.Service) *method
 
 func extractFlags(msg *protogen.Message) []flagDef {
 	var flags []flagDef
+	processedOneofs := map[string]bool{}
 	for _, field := range msg.Fields {
+		// Non-optional oneof groups: emit one selector flagDef for the whole group.
+		if field.Oneof != nil && !field.Desc.HasOptionalKeyword() {
+			key := field.Oneof.GoName
+			if processedOneofs[key] {
+				continue
+			}
+			processedOneofs[key] = true
+			fd := buildOneofSelectorFlag(field.Oneof, msg)
+			if fd != nil {
+				flags = append(flags, *fd)
+			}
+			continue
+		}
 		fd := fieldToFlag(field, "")
 		if fd == nil {
 			continue
 		}
 		flags = append(flags, *fd)
 	}
+
 	return flags
+}
+
+// buildOneofSelectorFlag generates a single IsOneofSelector flagDef for all message
+// variants in a oneof group. The caller is responsible for deduplication.
+func buildOneofSelectorFlag(oneof *protogen.Oneof, msg *protogen.Message) *flagDef {
+	var variants []oneofVariant
+	for _, field := range oneof.Fields {
+		if field.Desc.Kind() != protoreflect.MessageKind {
+			continue // skip rare scalar oneof alternatives
+		}
+		parentGoName := string(msg.GoIdent.GoName)
+		wrapperType := parentGoName + "_" + field.GoName
+		// Go protoc adds a trailing _ when wrapper base name equals the message type name.
+		if field.Message.GoIdent.GoName == wrapperType {
+			wrapperType += "_"
+		}
+		variants = append(variants, oneofVariant{
+			VariantName:   string(field.Desc.Name()),
+			GoMsgType:     field.Message.GoIdent.GoName,
+			GoWrapperType: wrapperType,
+			GoFieldName:   field.GoName,
+		})
+	}
+	if len(variants) == 0 {
+		return nil
+	}
+
+	var variantNames []string
+	for _, v := range variants {
+		variantNames = append(variantNames, v.VariantName)
+	}
+	kebabName := toKebab(string(oneof.Desc.Name()))
+	return &flagDef{
+		Name:            kebabName,
+		GoName:          oneof.GoName,
+		FlagType:        "string",
+		FlagFunc:        "StringVar",
+		DefaultValue:    `""`,
+		Help:            "Select " + kebabName + ": " + strings.Join(variantNames, " or ") + " (use --" + kebabName + "-data for type-specific fields as JSON)",
+		IsOneofSelector: true,
+		GoOneofName:     oneof.GoName,
+		OneofVariants:   variants,
+		EnumValues:      variantNames,
+	}
 }
 
 func fieldToFlag(field *protogen.Field, prefix string) *flagDef {
@@ -309,7 +392,7 @@ func fieldToFlag(field *protogen.Field, prefix string) *flagDef {
 		return nil
 	}
 
-	// Skip oneof fields — they require variant construction, not suitable for simple CLI flags.
+	// Non-optional oneof fields are handled by buildOneofSelectorFlag in extractFlags.
 	if field.Oneof != nil && !field.Desc.HasOptionalKeyword() {
 		return nil
 	}
@@ -382,7 +465,7 @@ func fieldToFlag(field *protogen.Field, prefix string) *flagDef {
 			fd.EnumValues = append(fd.EnumValues, string(val.Name()))
 		}
 	case desc.Kind() == protoreflect.MessageKind:
-		// Skip complex nested messages (queries, details, etc.) — not suitable for CLI flags.
+		// Skip complex nested messages — use --json for those.
 		return nil
 	default:
 		return nil
@@ -568,21 +651,22 @@ func humanizeRPCName(rpcName, resource string) string {
 	return result
 }
 
-// findIDField looks for a field that should be a positional argument (e.g. organization_id for get/update/delete).
-func findIDField(msg *protogen.Message, verb string) (protoName, goName string) {
-	if verb == "list" || verb == "create" {
-		return "", ""
+// findIDField looks for a field that should be a positional argument.
+// For get/update/delete: the first *_id field is always positional.
+// For scoped list/create (suffix != ""): the first *_id field is positional
+// (e.g. list-passkeys <user_id>, create-idp-link <user_id>).
+// For top-level list/create (suffix == ""): no positional ID.
+func findIDField(msg *protogen.Message, verb, suffix string) (protoName, goName string, isOptional bool) {
+	if (verb == "list" || verb == "create") && suffix == "" {
+		return "", "", false
 	}
-	// Look for fields ending in _id that are required or the first string field.
 	for _, field := range msg.Fields {
 		name := string(field.Desc.Name())
 		if field.Desc.Kind() == protoreflect.StringKind && strings.HasSuffix(name, "_id") {
-			// For get/delete, the first *_id field is the positional arg.
-			return name, field.GoName
-
+			return name, field.GoName, field.Desc.HasOptionalKeyword()
 		}
 	}
-	return "", ""
+	return "", "", false
 }
 
 func isRequired(field *protogen.Field) bool {
