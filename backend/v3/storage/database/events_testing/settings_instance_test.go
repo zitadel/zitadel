@@ -476,7 +476,9 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.logo.removed
-			assert.Equal(collect, url.URL{}, *setting.LogoURLLight)
+			if assert.NotNil(collect, setting.LogoURLLight) {
+				assert.Equal(collect, url.URL{}, *setting.LogoURLLight)
+			}
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -522,7 +524,9 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.logo.dark.removed
-			assert.Equal(collect, url.URL{}, *setting.LogoURLDark)
+			if assert.NotNil(collect, setting.LogoURLDark) {
+				assert.Equal(collect, url.URL{}, *setting.LogoURLDark)
+			}
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -591,7 +595,9 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.icon.removed
-			assert.Equal(collect, url.URL{}, *setting.IconURLLight)
+			if assert.NotNil(collect, setting.IconURLLight) {
+				assert.Equal(collect, url.URL{}, *setting.IconURLLight)
+			}
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -615,7 +621,9 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.icon.dark.removed
-			assert.Equal(collect, url.URL{}, *setting.IconURLDark)
+			if assert.NotNil(collect, setting.IconURLDark) {
+				assert.Equal(collect, url.URL{}, *setting.IconURLDark)
+			}
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -662,7 +670,9 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.font.removed
-			assert.Equal(collect, url.URL{}, *setting.FontURL)
+			if assert.NotNil(collect, setting.FontURL) {
+				assert.Equal(collect, url.URL{}, *setting.FontURL)
+			}
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)

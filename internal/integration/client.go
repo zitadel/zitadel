@@ -7,6 +7,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"math/big"
 	"sync"
@@ -110,9 +111,22 @@ func NewDefaultClient(ctx context.Context) (*Client, error) {
 }
 
 func newClient(ctx context.Context, target string) (*Client, error) {
-	cc, err := grpc.NewClient(target,
+	// Always dial the real server address.  Custom instance domains
+	// (e.g. "abc.integration.localhost:8082") are not resolvable via DNS
+	// outside the devcontainer, so dialling them directly causes pollHealth
+	// to silently retry for up to 15 minutes before the context expires.
+	// ZITADEL routes requests to the correct instance via the gRPC
+	// :authority pseudo-header, so we only need the domain as the authority
+	// value – the physical TCP connection always goes to the server address.
+	serverAddr := loadedConfig.Host()
+	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+	}
+	if target != serverAddr {
+		opts = append(opts, grpc.WithAuthority(target))
+	}
+
+	cc, err := grpc.NewClient(serverAddr, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +155,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		IDPv2:                    idp_pb.NewIdentityProviderServiceClient(cc),
 		UserV3Alpha:              user_v3alpha.NewZITADELUsersClient(cc),
 		SAMLv2:                   saml_pb.NewSAMLServiceClient(cc),
-		SCIM:                     scim.NewScimClient(target),
+		SCIM:                     scim.NewScimClient(target, serverAddr),
 		Projectv2Beta:            project_v2beta.NewProjectServiceClient(cc),
 		ProjectV2:                project_v2.NewProjectServiceClient(cc),
 		InstanceV2Beta:           instance_v2beta.NewInstanceServiceClient(cc),
@@ -500,7 +514,7 @@ func (i *Instance) CreateMachineUser(ctx context.Context) *mgmt.AddMachineUserRe
 }
 
 func (i *Instance) CreateUserIDPlink(ctx context.Context, userID, externalID, idpID, username string) (*user_v2.AddIDPLinkResponse, error) {
-	return i.Client.UserV2.AddIDPLink(
+	resp, err := i.Client.UserV2.AddIDPLink(
 		ctx,
 		&user_v2.AddIDPLinkRequest{
 			UserId: userID,
@@ -511,6 +525,25 @@ func (i *Instance) CreateUserIDPlink(ctx context.Context, userID, externalID, id
 			},
 		},
 	)
+	if err != nil {
+		return resp, err
+	}
+	// Wait for the idp_user_links projection to catch up: the SAML/OIDC ACS
+	// flow queries that table immediately after the link is written, and can
+	// get a "not linked" result if the projection worker is behind.
+	mustAwait(func() error {
+		links, err := i.Client.UserV2.ListIDPLinks(ctx, &user_v2.ListIDPLinksRequest{UserId: userID})
+		if err != nil {
+			return err
+		}
+		for _, l := range links.GetResult() {
+			if l.GetIdpId() == idpID && l.GetUserId() == externalID {
+				return nil
+			}
+		}
+		return errors.New("idp_user_links projection not yet ready")
+	})
+	return resp, nil
 }
 
 func (i *Instance) RegisterUserPasskey(ctx context.Context, userID string) string {
@@ -1188,6 +1221,42 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 		Name:        name,
 		Endpoint:    endpoint,
 		Timeout:     durationpb.New(5 * time.Second),
+		PayloadType: payloadType,
+	}
+	switch ty {
+	case target_domain.TargetTypeWebhook:
+		req.TargetType = &action.CreateTargetRequest_RestWebhook{
+			RestWebhook: &action.RESTWebhook{
+				InterruptOnError: interrupt,
+			},
+		}
+	case target_domain.TargetTypeCall:
+		req.TargetType = &action.CreateTargetRequest_RestCall{
+			RestCall: &action.RESTCall{
+				InterruptOnError: interrupt,
+			},
+		}
+	case target_domain.TargetTypeAsync:
+		req.TargetType = &action.CreateTargetRequest_RestAsync{
+			RestAsync: &action.RESTAsync{},
+		}
+	}
+	target, err := i.Client.ActionV2.CreateTarget(ctx, req)
+	require.NoError(t, err)
+	return target
+}
+
+// CreateTargetWithTimeout is like CreateTarget but accepts a custom target timeout.
+// Use this when testing behaviour that depends on the relationship between the
+// server response time and the configured target timeout.
+func (i *Instance) CreateTargetWithTimeout(ctx context.Context, t *testing.T, name, endpoint string, ty target_domain.TargetType, interrupt bool, payloadType action.PayloadType, targetTimeout time.Duration) *action.CreateTargetResponse {
+	if name == "" {
+		name = TargetName()
+	}
+	req := &action.CreateTargetRequest{
+		Name:        name,
+		Endpoint:    endpoint,
+		Timeout:     durationpb.New(targetTimeout),
 		PayloadType: payloadType,
 	}
 	switch ty {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -302,12 +303,33 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 
 	provider, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), clientID, clientSecret, redirectURI, scope)
 	require.NoError(t, err)
-	tokens, err := rp.ClientCredentials(CTX, provider, nil)
-	require.NoError(t, err)
 
-	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, user.GetUserId(), provider)
-	require.NoError(t, err)
-	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, []string{roleFoo}, []string{Instance.DefaultOrg.Id})
+	// Retry ClientCredentials until the machine app secret projection is ready.
+	var tokens *oauth2.Token
+	{
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		require.EventuallyWithT(t, func(tt *assert.CollectT) {
+			var e error
+			tokens, e = rp.ClientCredentials(CTX, provider, nil)
+			assert.NoError(tt, e)
+		}, retryDuration, tick)
+	}
+
+	// Retry until the user-grant projection is reflected in userinfo.
+	roleClaimKey := fmt.Sprintf(oidc_api.ClaimProjectRolesFormat, projectID)
+	var latestUserinfo *oidc.UserInfo
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		ui, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, user.GetUserId(), provider)
+		if !assert.NoError(tt, err) {
+			return
+		}
+		_, ok := ui.Claims[roleClaimKey].(map[string]any)
+		if assert.True(tt, ok, "waiting for role claim %s", roleClaimKey) {
+			latestUserinfo = ui
+		}
+	}, retryDuration, tick)
+	assertProjectRoleClaims(t, projectID, latestUserinfo.Claims, false, []string{roleFoo}, []string{Instance.DefaultOrg.Id})
 }
 
 func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...string) {

@@ -23,7 +23,7 @@ import (
 func TestServer_JWTProfile(t *testing.T) {
 	user, name, keyData, err := Instance.CreateOIDCJWTProfileClient(CTX, time.Hour)
 	require.NoError(t, err)
-	_, _, keyDataExpired, err := Instance.CreateOIDCJWTProfileClient(CTX, 10*time.Second)
+	_, _, keyDataExpired, err := Instance.CreateOIDCJWTProfileClient(CTX, 500*time.Millisecond)
 	require.NoError(t, err)
 
 	type claims struct {
@@ -119,6 +119,7 @@ func TestServer_JWTProfile(t *testing.T) {
 			require.NoError(t, err)
 
 			var tokens *oauth2.Token
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 			require.EventuallyWithT(
 				t, func(collect *assert.CollectT) {
 					tokens, err = tokenSource.TokenCtx(CTX)
@@ -129,7 +130,7 @@ func TestServer_JWTProfile(t *testing.T) {
 					assert.NoError(collect, err)
 					assert.NotNil(collect, tokens)
 				},
-				time.Minute, time.Second,
+				retryDuration, tick,
 			)
 			if tt.wantErr {
 				return

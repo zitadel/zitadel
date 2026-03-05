@@ -205,9 +205,14 @@ func publicAPIBlockingTest(domain string) *test {
 	return &test{
 		name: "public API",
 		testGrpc: func(tt assert.TestingT, expectBlocked bool) {
-			conn, err := grpc.DialContext(CTX, net.JoinHostPort(domain, "8082"),
+			// Dial the physical server address and set the virtual-host authority
+			// so ZITADEL routes to the correct instance. This is required when
+			// *.integration.localhost is not DNS-resolvable (e.g. testcontainers).
+			authority := net.JoinHostPort(domain, "8082")
+			conn, err := grpc.DialContext(CTX, integration.ServerAddr(),
 				grpc.WithBlock(),
 				grpc.WithTransportCredentials(insecure.NewCredentials()),
+				grpc.WithAuthority(authority),
 			)
 			assert.NoError(tt, err)
 			_, err = admin.NewAdminServiceClient(conn).Healthz(CTX, &admin.HealthzRequest{})
