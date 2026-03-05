@@ -66,25 +66,51 @@ export function isSafeRedirectUri(uri: string): boolean {
 /**
  * Sanitizes a redirect URI by parsing and reconstructing it.
  * Returns the reconstructed URI if safe, or undefined if unsafe.
- * Unlike isSafeRedirectUri (which returns a boolean), this returns a new string
- * constructed from parsed URL components, which breaks data-flow taint chains.
+ *
+ * Security policy:
+ * - Always allow relative paths starting with a single "/".
+ * - For absolute URLs:
+ *   - Only allow http/https protocols.
+ *   - In a browser environment, only allow URLs that are same-origin as the current page.
+ *   - On the server, only allow same-origin if allowedOrigin is provided; otherwise reject.
  */
-export function sanitizeRedirectUri(uri: string): string | undefined {
+export function sanitizeRedirectUri(uri: string, allowedOrigin?: string): string | undefined {
   if (!uri) return undefined;
 
-  // Relative paths: safe as-is
+  // Relative paths: reconstruct from parsed components to break taint chain
   if (uri.startsWith("/") && !uri.startsWith("//")) {
-    return uri;
+    try {
+      const parsed = new URL(uri, "http://n");
+      return parsed.pathname + parsed.search + parsed.hash;
+    } catch {
+      return undefined;
+    }
   }
 
-  // Absolute URLs: parse and reconstruct to break taint chain
+  // Absolute URLs: parse and validate
   try {
     const parsed = new URL(uri);
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
       return undefined;
     }
-    // Return the reconstructed href from the URL parser
-    return parsed.href;
+
+    // Determine the trusted origin: prefer explicit allowedOrigin, fall back to browser origin
+    let trustedOrigin: string | undefined;
+    if (allowedOrigin) {
+      try {
+        trustedOrigin = new URL(allowedOrigin).origin;
+      } catch {
+        // Invalid allowedOrigin, ignore
+      }
+    } else if (typeof window !== "undefined" && window.location?.origin && window.location.origin !== "null") {
+      trustedOrigin = window.location.origin;
+    }
+
+    if (trustedOrigin && parsed.origin === trustedOrigin) {
+      return parsed.href;
+    }
+
+    return undefined;
   } catch {
     return undefined;
   }

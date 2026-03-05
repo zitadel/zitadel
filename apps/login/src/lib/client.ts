@@ -118,46 +118,50 @@ export async function getNextUrl(
  * 4. Reserved for future extensions
  */
 export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedirectUri?: string): Promise<string> {
+  // Determine current origin for same-origin validation of redirect URIs
+  let currentOrigin: string | undefined;
+  try {
+    const _headers = await headers();
+    currentOrigin = getPublicHostWithProtocol(_headers);
+  } catch {
+    // Origin unavailable; only relative paths will be accepted
+  }
+
   // 1. Environment variable override
   const envOverride = process.env.DEFAULT_REDIRECT_URI;
   if (envOverride) {
-    if (envOverride.startsWith("/")) {
-      // Special state: trigger absolute host-based redirect with provided path
-      try {
-        const _headers = await headers();
-        const host = getPublicHostWithProtocol(_headers);
-        const sanitized = sanitizeRedirectUri(`${host}${envOverride}`);
+    if (envOverride.startsWith("/") && !envOverride.startsWith("//")) {
+      // Relative path: construct absolute URL for proper host-based redirect (bypasses Next.js base path)
+      if (currentOrigin) {
+        const sanitized = sanitizeRedirectUri(`${currentOrigin}${envOverride}`, currentOrigin);
         if (sanitized) {
-          console.log("resolveRedirectUri: Using host-based redirect from override:", sanitized);
           return sanitized;
         }
-        console.warn("resolveRedirectUri: Unsafe host-based redirect prevented:", `${host}${envOverride}`);
-      } catch (error) {
-        console.warn("resolveRedirectUri: Could not determine host for override, falling back", error);
       }
-    } else {
+      // Fall back to relative path if origin unavailable
       const sanitized = sanitizeRedirectUri(envOverride);
       if (sanitized) {
-        console.log("resolveRedirectUri: Using DEFAULT_REDIRECT_URI override:", sanitized);
         return sanitized;
       }
-      console.warn("resolveRedirectUri: Unsafe DEFAULT_REDIRECT_URI prevented:", envOverride);
+    } else {
+      const sanitized = sanitizeRedirectUri(envOverride, currentOrigin);
+      if (sanitized) {
+        return sanitized;
+      }
     }
+    console.warn("resolveRedirectUri: Invalid DEFAULT_REDIRECT_URI:", envOverride);
   }
 
   // 2. Default redirect URI from settings
   if (defaultRedirectUri) {
-    const sanitized = sanitizeRedirectUri(defaultRedirectUri);
+    const sanitized = sanitizeRedirectUri(defaultRedirectUri, currentOrigin);
     if (sanitized) {
-      console.log("resolveRedirectUri: Using defaultRedirectUri from settings:", sanitized);
       return sanitized;
     }
-    console.warn("resolveRedirectUri: Unsafe defaultRedirectUri prevented:", defaultRedirectUri);
+    console.warn("resolveRedirectUri: Invalid defaultRedirectUri:", defaultRedirectUri);
   }
 
   // 3. Default signed-in page (relative)
-  const result = goToSignedInPage(command);
-  console.log("resolveRedirectUri: Using relative goToSignedInPage result:", result);
-  return result;
+  return goToSignedInPage(command);
 }
 

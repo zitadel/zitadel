@@ -49,21 +49,32 @@ describe("sanitizeRedirectUri", () => {
     expect(sanitizeRedirectUri(undefined as unknown as string)).toBeUndefined();
   });
 
-  test("should return relative paths as-is", () => {
+  test("should reconstruct relative paths", () => {
     expect(sanitizeRedirectUri("/dashboard")).toBe("/dashboard");
     expect(sanitizeRedirectUri("/ui/console")).toBe("/ui/console");
     expect(sanitizeRedirectUri("/")).toBe("/");
     expect(sanitizeRedirectUri("/signedin?loginName=foo")).toBe("/signedin?loginName=foo");
+    expect(sanitizeRedirectUri("/path?a=1#hash")).toBe("/path?a=1#hash");
   });
 
   test("should reject protocol-relative paths", () => {
     expect(sanitizeRedirectUri("//evil.com")).toBeUndefined();
   });
 
-  test("should return reconstructed href for safe absolute URLs", () => {
-    expect(sanitizeRedirectUri("https://my-zitadel.com/console")).toBe("https://my-zitadel.com/console");
-    expect(sanitizeRedirectUri("http://localhost:8080/dashboard")).toBe("http://localhost:8080/dashboard");
-    expect(sanitizeRedirectUri("https://example.com/path?q=1#frag")).toBe("https://example.com/path?q=1#frag");
+  test("should reject absolute URLs without allowedOrigin on server", () => {
+    expect(sanitizeRedirectUri("https://example.com")).toBeUndefined();
+    expect(sanitizeRedirectUri("https://example.com/path")).toBeUndefined();
+  });
+
+  test("should allow same-origin absolute URLs with allowedOrigin", () => {
+    expect(sanitizeRedirectUri("https://my-host.com/dashboard", "https://my-host.com")).toBe("https://my-host.com/dashboard");
+    expect(sanitizeRedirectUri("https://my-host.com/", "https://my-host.com")).toBe("https://my-host.com/");
+    expect(sanitizeRedirectUri("https://my-host.com/path?q=1#frag", "https://my-host.com")).toBe("https://my-host.com/path?q=1#frag");
+  });
+
+  test("should reject cross-origin absolute URLs even with allowedOrigin", () => {
+    expect(sanitizeRedirectUri("https://evil.com", "https://my-host.com")).toBeUndefined();
+    expect(sanitizeRedirectUri("https://evil.com/path", "https://my-host.com")).toBeUndefined();
   });
 
   test("should return undefined for non-http(s) protocols", () => {

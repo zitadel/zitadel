@@ -7,6 +7,7 @@ import { resolveRedirectUri } from "@/lib/client";
 import { sanitizeRedirectUri } from "@/lib/client-utils";
 import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/cookies";
 import { completeDeviceAuthorization } from "@/lib/server/device";
+import { getPublicHostWithProtocol } from "@/lib/server/host";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings, getSession, ServiceConfig } from "@/lib/zitadel";
@@ -92,7 +93,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     loginSettings?.defaultRedirectUri,
   );
 
-  const safeRedirectUri = rawRedirectUri ? sanitizeRedirectUri(rawRedirectUri) : undefined;
+  const currentOrigin = getPublicHostWithProtocol(_headers);
+  const safeRedirectUri = rawRedirectUri ? sanitizeRedirectUri(rawRedirectUri, currentOrigin) : undefined;
 
   let isSamePage = false;
   if (safeRedirectUri) {
