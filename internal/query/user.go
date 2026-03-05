@@ -146,6 +146,26 @@ type UserSearchQueries struct {
 	Queries []SearchQuery
 }
 
+func (q *UserSearchQueries) hasMetadataFilter() bool {
+	for _, query := range q.Queries {
+		col := query.Col()
+		if col.table.name == userMetadataTable.name {
+			return true
+		}
+	}
+	return false
+}
+
+func (q *UserSearchQueries) hasLoginNamesFilter() bool {
+	for _, query := range q.Queries {
+		col := query.Col()
+		if col.table.alias == userLoginNamesTable.alias {
+			return true
+		}
+	}
+	return false
+}
+
 var (
 	userTable = table{
 		name:          projection.UserTable,
@@ -623,6 +643,20 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	countQuery, countScan := queries.prepareUsersCountQuery(ctx, permissionCheckV2)
+	countStmt, countArgs, err := countQuery.ToSql()
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-Cnt01", "Errors.Query.SQLStatement")
+	}
+	var count uint64
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		count, err = countScan(rows)
+		return err
+	}, countStmt, countArgs...)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-Cnt02", "Errors.Internal")
+	}
+
 	query, scan := queries.prepareUsersQuery(ctx, permissionCheckV2)
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
@@ -636,6 +670,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
 	}
+	users.Count = count
 	users.State, err = q.latestState(ctx, userTable)
 	return users, err
 }
@@ -1249,15 +1284,16 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 }
 
 // prepareUsersQuery creates the select query for searching users and returns a matching scan function.
-// Permissions, filters and sorting are applied in a `SELECT FROM` distinct sub-select.
-// The count over window function and limit are applied in the outer query.
-// It is not possible to pass more filters to the returned query, as they need to be applied in the sub-select.
+// The metadata JOIN and DISTINCT are only applied when a metadata filter is present.
+// Count is handled by a separate lightweight query (prepareUsersCountQuery).
+// Limit and offset are applied directly, allowing PostgreSQL to stop early.
 func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 	if q.SortingColumn.isZero() {
 		q.SortingColumn = UserIDCol
 	}
 
-	// start building the sub-select
+	needsMetadataJoin := q.hasMetadataFilter()
+
 	query := sq.Select(
 		UserIDCol.identifier(),
 		UserCreationDateCol.identifier(),
@@ -1290,35 +1326,27 @@ func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionChe
 		MachineSecretCol.identifier(),
 		MachineAccessTokenTypeCol.identifier(),
 		q.SortingColumn.orderBy()).
-		Distinct().
 		From(userTable.identifier()).
 		LeftJoin(join(HumanUserIDCol, UserIDCol)).
 		LeftJoin(join(MachineUserIDCol, UserIDCol)).
-		LeftJoin(join(UserMetadataUserIDCol, UserIDCol)).
 		JoinClause(joinLoginNames).
 		Where(sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()})
 
+	if needsMetadataJoin {
+		query = query.Distinct().
+			LeftJoin(join(UserMetadataUserIDCol, UserIDCol))
+	}
+
 	query = userPermissionCheckV2(ctx, query, permissionCheckV2, q.Queries)
-	// apply requested filters
 	for _, q := range q.Queries {
 		query = q.toQuery(query)
 	}
-	// apply sorting in the sub-select,because the identifier is fully qualified.
 	query = q.consumeSorting(query)
-
-	// set the sub-select as source for the outer query
-	query = sq.Select(
-		"*",
-		countColumn.identifier(),
-	).FromSelect(query, "results")
-
-	// apply limit and offset in the outer query
 	query = q.toQuery(query)
 	query = query.PlaceholderFormat(sq.Dollar)
 
 	return query, func(rows *sql.Rows) (*Users, error) {
 		users := make([]*User, 0)
-		var count uint64
 		for rows.Next() {
 			u := new(User)
 			loginNames := database.TextArray[string]{}
@@ -1362,7 +1390,6 @@ func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionChe
 				&machine.accessTokenType,
 
 				&orderByValue,
-				&count,
 			)
 			if err != nil {
 				return nil, err
@@ -1408,10 +1435,47 @@ func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionChe
 
 		return &Users{
 			Users: users,
-			SearchResponse: SearchResponse{
-				Count: count,
-			},
 		}, nil
+	}
+}
+
+// prepareUsersCountQuery builds a lightweight count query without expensive JOINs
+// (login_names LATERAL, metadata) unless required by filters.
+func (q *UserSearchQueries) prepareUsersCountQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
+	needsMetadataJoin := q.hasMetadataFilter()
+
+	var countExpr string
+	if needsMetadataJoin {
+		countExpr = "COUNT(DISTINCT " + UserIDCol.identifier() + ")"
+	} else {
+		countExpr = "COUNT(*)"
+	}
+
+	query := sq.Select(countExpr).
+		From(userTable.identifier()).
+		LeftJoin(join(HumanUserIDCol, UserIDCol)).
+		LeftJoin(join(MachineUserIDCol, UserIDCol)).
+		Where(sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()})
+
+	if needsMetadataJoin {
+		query = query.LeftJoin(join(UserMetadataUserIDCol, UserIDCol))
+	}
+	if q.hasLoginNamesFilter() {
+		query = query.JoinClause(joinLoginNames)
+	}
+
+	query = userPermissionCheckV2(ctx, query, permissionCheckV2, q.Queries)
+	for _, qry := range q.Queries {
+		query = qry.toQuery(query)
+	}
+	query = query.PlaceholderFormat(sq.Dollar)
+
+	return query, func(rows *sql.Rows) (count uint64, err error) {
+		if !rows.Next() {
+			return 0, nil
+		}
+		err = rows.Scan(&count)
+		return
 	}
 }
 
