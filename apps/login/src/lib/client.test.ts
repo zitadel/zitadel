@@ -51,6 +51,23 @@ describe("getNextUrl", () => {
     const result = await getNextUrl(command);
     expect(result).toBe("/signedin?loginName=test-user");
   });
+
+  test("should reject unsafe DEFAULT_REDIRECT_URI with javascript: protocol and fall back to defaultRedirectUri", async () => {
+    process.env.DEFAULT_REDIRECT_URI = "javascript:alert(1)";
+    const result = await getNextUrl(command, "https://safe-fallback.com");
+    expect(result).toBe("https://safe-fallback.com/");
+  });
+
+  test("should reject unsafe DEFAULT_REDIRECT_URI with data: protocol and fall back to signedin page", async () => {
+    process.env.DEFAULT_REDIRECT_URI = "data:text/html,<script>alert(1)</script>";
+    const result = await getNextUrl(command);
+    expect(result).toBe("/signedin?loginName=test-user");
+  });
+
+  test("should reject unsafe defaultRedirectUri and fall back to signedin page", async () => {
+    const result = await getNextUrl(command, "javascript:alert(1)");
+    expect(result).toBe("/signedin?loginName=test-user");
+  });
 });
 
 

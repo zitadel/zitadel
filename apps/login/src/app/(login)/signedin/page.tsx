@@ -4,7 +4,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { resolveRedirectUri } from "@/lib/client";
-import { isSafeRedirectUri } from "@/lib/client-utils";
+import { sanitizeRedirectUri } from "@/lib/client-utils";
 import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/cookies";
 import { completeDeviceAuthorization } from "@/lib/server/device";
 import { getServiceConfig } from "@/lib/service-url";
@@ -92,8 +92,23 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     loginSettings?.defaultRedirectUri,
   );
 
-  const safeRedirectUri = rawRedirectUri && isSafeRedirectUri(rawRedirectUri) ? rawRedirectUri : undefined;
-  const isSamePage = safeRedirectUri?.startsWith("/signedin") ?? false;
+  const safeRedirectUri = rawRedirectUri ? sanitizeRedirectUri(rawRedirectUri) : undefined;
+
+  let isSamePage = false;
+  if (safeRedirectUri) {
+    if (safeRedirectUri.startsWith("/signedin")) {
+      isSamePage = true;
+    } else if (safeRedirectUri.startsWith("http://") || safeRedirectUri.startsWith("https://")) {
+      try {
+        const url = new URL(safeRedirectUri);
+        if (url.pathname.startsWith("/signedin")) {
+          isSamePage = true;
+        }
+      } catch {
+        // ignore invalid URLs and keep isSamePage as false
+      }
+    }
+  }
 
   return (
     <DynamicTheme branding={branding}>

@@ -62,3 +62,30 @@ export function isSafeRedirectUri(uri: string): boolean {
     return false;
   }
 }
+
+/**
+ * Sanitizes a redirect URI by parsing and reconstructing it.
+ * Returns the reconstructed URI if safe, or undefined if unsafe.
+ * Unlike isSafeRedirectUri (which returns a boolean), this returns a new string
+ * constructed from parsed URL components, which breaks data-flow taint chains.
+ */
+export function sanitizeRedirectUri(uri: string): string | undefined {
+  if (!uri) return undefined;
+
+  // Relative paths: safe as-is
+  if (uri.startsWith("/") && !uri.startsWith("//")) {
+    return uri;
+  }
+
+  // Absolute URLs: parse and reconstruct to break taint chain
+  try {
+    const parsed = new URL(uri);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return undefined;
+    }
+    // Return the reconstructed href from the URL parser
+    return parsed.href;
+  } catch {
+    return undefined;
+  }
+}

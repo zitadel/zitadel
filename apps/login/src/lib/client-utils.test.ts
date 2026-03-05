@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
-import { isSafeRedirectUri } from "./client-utils";
+import { isSafeRedirectUri, sanitizeRedirectUri } from "./client-utils";
 
 describe("isSafeRedirectUri", () => {
   beforeEach(() => {
@@ -40,5 +40,40 @@ describe("isSafeRedirectUri", () => {
   test("should gracefully reject invalid, unparsable URLs that aren't relative", async () => {
     expect(await isSafeRedirectUri("not-a-valid-url")).toBe(false);
     expect(await isSafeRedirectUri("http://%")).toBe(false);
+  });
+});
+
+describe("sanitizeRedirectUri", () => {
+  test("should return undefined for empty or falsy uri", () => {
+    expect(sanitizeRedirectUri("")).toBeUndefined();
+    expect(sanitizeRedirectUri(undefined as unknown as string)).toBeUndefined();
+  });
+
+  test("should return relative paths as-is", () => {
+    expect(sanitizeRedirectUri("/dashboard")).toBe("/dashboard");
+    expect(sanitizeRedirectUri("/ui/console")).toBe("/ui/console");
+    expect(sanitizeRedirectUri("/")).toBe("/");
+    expect(sanitizeRedirectUri("/signedin?loginName=foo")).toBe("/signedin?loginName=foo");
+  });
+
+  test("should reject protocol-relative paths", () => {
+    expect(sanitizeRedirectUri("//evil.com")).toBeUndefined();
+  });
+
+  test("should return reconstructed href for safe absolute URLs", () => {
+    expect(sanitizeRedirectUri("https://my-zitadel.com/console")).toBe("https://my-zitadel.com/console");
+    expect(sanitizeRedirectUri("http://localhost:8080/dashboard")).toBe("http://localhost:8080/dashboard");
+    expect(sanitizeRedirectUri("https://example.com/path?q=1#frag")).toBe("https://example.com/path?q=1#frag");
+  });
+
+  test("should return undefined for non-http(s) protocols", () => {
+    expect(sanitizeRedirectUri("javascript:alert(1)")).toBeUndefined();
+    expect(sanitizeRedirectUri("data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==")).toBeUndefined();
+    expect(sanitizeRedirectUri("file:///etc/passwd")).toBeUndefined();
+  });
+
+  test("should return undefined for invalid, unparsable URLs", () => {
+    expect(sanitizeRedirectUri("not-a-valid-url")).toBeUndefined();
+    expect(sanitizeRedirectUri("http://%")).toBeUndefined();
   });
 });

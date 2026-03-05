@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { completeAuthFlow } from "./server/auth-flow";
 import { getPublicHostWithProtocol } from "./server/host";
-import { isSafeRedirectUri } from "./client-utils";
+import { sanitizeRedirectUri } from "./client-utils";
 
 type FinishFlowCommand =
   | {
@@ -126,31 +126,33 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
       try {
         const _headers = await headers();
         const host = getPublicHostWithProtocol(_headers);
-        const result = `${host}${envOverride}`;
-        if (isSafeRedirectUri(result)) {
-          console.log("resolveRedirectUri: Using host-based redirect from override:", result);
-          return result;
+        const sanitized = sanitizeRedirectUri(`${host}${envOverride}`);
+        if (sanitized) {
+          console.log("resolveRedirectUri: Using host-based redirect from override:", sanitized);
+          return sanitized;
         }
-        console.warn("resolveRedirectUri: Unsafe host-based redirect prevented:", result);
+        console.warn("resolveRedirectUri: Unsafe host-based redirect prevented:", `${host}${envOverride}`);
       } catch (error) {
         console.warn("resolveRedirectUri: Could not determine host for override, falling back", error);
       }
-    } else if (isSafeRedirectUri(envOverride)) {
-      console.log("resolveRedirectUri: Using DEFAULT_REDIRECT_URI override:", envOverride);
-      return envOverride;
     } else {
+      const sanitized = sanitizeRedirectUri(envOverride);
+      if (sanitized) {
+        console.log("resolveRedirectUri: Using DEFAULT_REDIRECT_URI override:", sanitized);
+        return sanitized;
+      }
       console.warn("resolveRedirectUri: Unsafe DEFAULT_REDIRECT_URI prevented:", envOverride);
     }
   }
 
   // 2. Default redirect URI from settings
   if (defaultRedirectUri) {
-    if (isSafeRedirectUri(defaultRedirectUri)) {
-      console.log("resolveRedirectUri: Using defaultRedirectUri from settings:", defaultRedirectUri);
-      return defaultRedirectUri;
-    } else {
-      console.warn("resolveRedirectUri: Unsafe defaultRedirectUri prevented:", defaultRedirectUri);
+    const sanitized = sanitizeRedirectUri(defaultRedirectUri);
+    if (sanitized) {
+      console.log("resolveRedirectUri: Using defaultRedirectUri from settings:", sanitized);
+      return sanitized;
     }
+    console.warn("resolveRedirectUri: Unsafe defaultRedirectUri prevented:", defaultRedirectUri);
   }
 
   // 3. Default signed-in page (relative)
