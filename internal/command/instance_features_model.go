@@ -107,7 +107,7 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyPermissionCheckV2:
 		v := value.(bool)
 		features.PermissionCheckV2 = &v
-	case feature.KeyManagementConsoleUseV2UserApi:
+	case feature.KeyConsoleUseV2UserApi:
 		v := value.(bool)
 		features.ManagementConsoleUseV2UserApi = &v
 	case feature.KeyEnableRelationalTables:

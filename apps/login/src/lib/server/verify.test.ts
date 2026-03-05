@@ -1,6 +1,11 @@
 import { vi, describe, expect, test, beforeEach } from "vitest";
 import { sendVerification } from "./verify";
 
+import { verifyEmail, getUserByID, getSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
+import { getSessionCookieByLoginName } from "../cookies";
+import { createSessionAndUpdateCookie } from "./cookie";
+import { cookies } from "next/headers";
+
 // Mock dependencies
 vi.mock("@/lib/zitadel", () => ({
   verifyEmail: vi.fn(),
@@ -35,11 +40,6 @@ vi.mock("../fingerprint", () => ({
 vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(() => (key: string) => key),
 }));
-
-import { verifyEmail, getUserByID, getSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
-import { getSessionCookieByLoginName } from "../cookies";
-import { createSessionAndUpdateCookie } from "./cookie";
-import { cookies } from "next/headers";
 
 describe("sendVerification", () => {
   let mockVerifyEmail: any;
