@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -22,6 +23,10 @@ type org struct {
 
 func (o org) unqualifiedTableName() string {
 	return "organizations"
+}
+
+func (o org) qualifiedTableName() string {
+	return "zitadel.organizations"
 }
 
 func OrganizationRepository() domain.OrganizationRepository {
@@ -81,16 +86,25 @@ func (o org) List(ctx context.Context, client database.QueryExecutor, opts ...da
 	return scanOrganizations(ctx, client, &builder)
 }
 
-const createOrganizationStmt = `INSERT INTO zitadel.organizations (id, name, instance_id, state)` +
-	` VALUES ($1, $2, $3, $4)` +
-	` RETURNING created_at, updated_at`
-
 // Create implements [domain.OrganizationRepository].
 func (o org) Create(ctx context.Context, client database.QueryExecutor, organization *domain.Organization) error {
-	builder := database.StatementBuilder{}
-	builder.AppendArgs(organization.ID, organization.Name, organization.InstanceID, organization.State)
-	builder.WriteString(createOrganizationStmt)
+	var (
+		builder              database.StatementBuilder
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
+	)
 
+	if !organization.CreatedAt.IsZero() {
+		createdAt = organization.CreatedAt
+	}
+	if !organization.UpdatedAt.IsZero() {
+		updatedAt = organization.UpdatedAt
+	}
+
+	builder.WriteString("INSERT INTO ")
+	builder.WriteString(o.qualifiedTableName())
+	builder.WriteString(" (id, name, instance_id, state, created_at, updated_at) VALUES (")
+	builder.WriteArgs(organization.ID, organization.Name, organization.InstanceID, organization.State, createdAt, updatedAt)
+	builder.WriteString(") RETURNING created_at, updated_at")
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
 }
 
@@ -107,7 +121,9 @@ func (o org) Update(ctx context.Context, client database.QueryExecutor, conditio
 	}
 
 	var builder database.StatementBuilder
-	builder.WriteString(`UPDATE zitadel.organizations SET `)
+	builder.WriteString(`UPDATE `)
+	builder.WriteString(o.qualifiedTableName())
+	builder.WriteString(` SET `)
 	err := database.Changes(changes).Write(&builder)
 	if err != nil {
 		return 0, err
@@ -127,7 +143,8 @@ func (o org) Delete(ctx context.Context, client database.QueryExecutor, conditio
 	}
 
 	var builder database.StatementBuilder
-	builder.WriteString(`DELETE FROM zitadel.organizations`)
+	builder.WriteString(`DELETE FROM `)
+	builder.WriteString(o.qualifiedTableName())
 	writeCondition(&builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
@@ -145,6 +162,11 @@ func (o org) SetName(name string) database.Change {
 // SetState implements [domain.organizationChanges].
 func (o org) SetState(state domain.OrgState) database.Change {
 	return database.NewChange(o.StateColumn(), state)
+}
+
+// SetUpdatedAt implements [domain.organizationChanges].
+func (o org) SetUpdatedAt(updatedAt time.Time) database.Change {
+	return database.NewChange(o.UpdatedAtColumn(), updatedAt)
 }
 
 // -------------------------------------------------------------
