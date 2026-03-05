@@ -51,8 +51,10 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
 				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
 
-				metadataByKey := getMetadataMap(getResponse)
-				assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
+				expectedMetadata := []*metadata.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+				}
+				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
 			},
 		},
 		{
@@ -70,11 +72,13 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			},
 			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
 				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
-				assert.Len(t, getResponse.GetMetadata(), 3)
-				metadataByKey := getMetadataMap(getResponse)
-				assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
-				assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value2"))), metadataByKey["key2"])
-				assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value3"))), metadataByKey["key3"])
+
+				expectedMetadata := []*metadata.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+					{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
+					{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
+				}
+				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
 			},
 		},
 		{
@@ -98,8 +102,11 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			},
 			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
 				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
-				metadataByKey := getMetadataMap(getResponse)
-				assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value2"))), metadataByKey["key1"])
+
+				expectedMetadata := []*metadata.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
+				}
+				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
 			},
 		},
 		{
@@ -115,8 +122,11 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
 				// assert that the set date is not updated, i.e., it is before testStartTime, because no change to the metadata should be made
 				assert.True(t, setResponse.GetSetDate().AsTime().Before(testStartTime))
-				metadataByKey := getMetadataMap(getResponse)
-				assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
+
+				expectedMetadata := []*metadata.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+				}
+				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
 			},
 		},
 		{
@@ -152,9 +162,10 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
 				assert.WithinRange(t, setResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
 
-				assert.Len(t, getResponse.GetMetadata(), 1)
-				metadataByKey := getMetadataMap(getResponse)
-				assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("updated"))), metadataByKey["key2"])
+				expectedMetadata := []*metadata.Metadata{
+					{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated")))},
+				}
+				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
 			},
 		},
 	}

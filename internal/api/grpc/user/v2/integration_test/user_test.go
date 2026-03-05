@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
+	metadata "github.com/zitadel/zitadel/pkg/grpc/metadata/v2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -3585,10 +3586,11 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 					},
 					assert: func(t *testing.T, _ *user.CreateUserResponse, getResponse *user.GetUserByIDResponse, getMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
-						metadataByKey := getMetadataMap(getMetadataResponse)
-						assert.Len(t, getMetadataResponse.GetMetadata(), 2)
-						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
-						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value2"))), metadataByKey["key2"])
+						expectedMetadata := []*metadata.Metadata{
+							{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+							{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
+						}
+						assertMetadataEquals(t, expectedMetadata, getMetadataResponse.GetMetadata())
 					},
 				}
 			},
@@ -3622,9 +3624,10 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 					},
 					assert: func(t *testing.T, _ *user.CreateUserResponse, getResponse *user.GetUserByIDResponse, getMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
-						metadataByKey := getMetadataMap(getMetadataResponse)
-						assert.Len(t, getMetadataResponse.GetMetadata(), 1)
-						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
+						expectedMetadata := []*metadata.Metadata{
+							{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+						}
+						assertMetadataEquals(t, expectedMetadata, getMetadataResponse.GetMetadata())
 					},
 				}
 			},
@@ -3704,10 +3707,12 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 					},
 					assert: func(t *testing.T, _ *user.CreateUserResponse, getResponse *user.GetUserByIDResponse, getMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
-						metadataByKey := getMetadataMap(getMetadataResponse)
-						assert.Len(t, getMetadataResponse.GetMetadata(), 2)
-						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value1"))), metadataByKey["key1"])
-						assert.Equal(t, []byte(base64.StdEncoding.EncodeToString([]byte("value2"))), metadataByKey["key2"])
+
+						expectedMetadata := []*metadata.Metadata{
+							{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+							{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
+						}
+						assertMetadataEquals(t, expectedMetadata, getMetadataResponse.GetMetadata())
 					},
 				}
 			},
@@ -3800,12 +3805,16 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 	}
 }
 
-func getMetadataMap(getMetadataResponse *user.ListUserMetadataResponse) map[string][]byte {
-	metadataByKey := make(map[string][]byte, len(getMetadataResponse.GetMetadata()))
-	for _, md := range getMetadataResponse.GetMetadata() {
+func getMetadataMap(metadata []*metadata.Metadata) map[string][]byte {
+	metadataByKey := make(map[string][]byte, len(metadata))
+	for _, md := range metadata {
 		metadataByKey[md.Key] = md.Value
 	}
 	return metadataByKey
+}
+
+func assertMetadataEquals(t *testing.T, expected []*metadata.Metadata, actual []*metadata.Metadata) {
+	assert.Equal(t, getMetadataMap(expected), getMetadataMap(actual))
 }
 
 func TestServer_CreateUser_Permission(t *testing.T) {

@@ -1912,8 +1912,7 @@ service UserService {
   }
   // Set User Metadata
   //
-  // Sets a list of key value pairs. Existing metadata entries with matching keys are overwritten. Existing metadata entries without matching keys are untouched. To remove metadata entries, use [DeleteUserMetadata](/docs/reference/api/user/zitadel.user.v2.UserService.DeleteUserMetadata). For HTTP requests, make sure the bytes array value is base64 encoded.
-  // TODO: document new behaviour
+  // Sets a list of key value pairs. Existing metadata entries with matching keys are overwritten. Existing metadata entries without matching keys are untouched. To remove metadata entries, pass an empty metadata value or use [DeleteUserMetadata](/docs/reference/api/user/zitadel.user.v2.UserService.DeleteUserMetadata). For HTTP requests, make sure the bytes array value is base64 encoded.
   //
   // Required permission:
   //  - `user.write`
@@ -3737,7 +3736,7 @@ message ListPersonalAccessTokensResponse {
 message Metadata {
   // Key in the metadata key/value pair.
   string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Value in the metadata key/value pair. On updates, an empty value will delete the entry. TODO
+  // Value in the metadata key/value pair. On updates, an empty value will delete the metadata entry.
   bytes value = 2 [(validate.rules).bytes = {max_len: 500000}];
 }
 
