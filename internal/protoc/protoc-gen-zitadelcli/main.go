@@ -10,6 +10,7 @@ import (
 	"text/template"
 	"unicode"
 
+	openapiv2 "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
 	annotations "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
@@ -96,6 +97,8 @@ type methodData struct {
 	JSONTemplate string
 	// FilterConvenience holds convenience flags for common filter patterns (e.g., --user-id for IDFilter).
 	FilterConvenience []filterConvenienceFlag
+	// Deprecated is true when the RPC is marked deprecated in its OpenAPI annotation.
+	Deprecated bool
 }
 
 // filterConvenienceFlag describes a convenience flag that maps to a search filter.
@@ -140,6 +143,11 @@ type inlinedVariant struct {
 	IsScalarBoolVariant bool
 	// ScalarGoFieldName is the Go field name set to true on the request for scalar bool variants.
 	ScalarGoFieldName string
+	// IsScalarStringVariant is true when the oneof field is a plain string.
+	// The subcommand takes the string as a single positional argument.
+	IsScalarStringVariant bool
+	// ScalarStringGoFieldName is the Go wrapper field name set on the request for string variants.
+	ScalarStringGoFieldName string
 	// JSONTemplate is a JSON template for this specific variant (filtered by the oneof choice).
 	JSONTemplate string
 	// NestedOneofs holds metadata about nested oneof fields expanded within this variant.
@@ -255,21 +263,65 @@ type oneofVariantColumn struct {
 
 // v2ServiceFilter is the list of v2 proto packages we want to generate CLI commands for.
 var v2ServiceFilter = map[string]serviceConfig{
+	"zitadel.action.v2": {
+		resourceName: "actions",
+		resourceDesc: "actions and executions",
+	},
+	"zitadel.application.v2": {
+		resourceName: "apps",
+		resourceDesc: "applications",
+	},
+	"zitadel.authorization.v2": {
+		resourceName: "authorizations",
+		resourceDesc: "user authorizations",
+	},
+	"zitadel.feature.v2": {
+		resourceName: "features",
+		resourceDesc: "instance and organization features",
+	},
+	"zitadel.group.v2": {
+		resourceName: "groups",
+		resourceDesc: "user groups",
+	},
+	"zitadel.idp.v2": {
+		resourceName: "idps",
+		resourceDesc: "identity providers",
+	},
+	"zitadel.instance.v2": {
+		resourceName: "instances",
+		resourceDesc: "ZITADEL instances",
+	},
+	"zitadel.oidc.v2": {
+		resourceName: "oidc",
+		resourceDesc: "OIDC introspection and token exchange",
+	},
 	"zitadel.org.v2": {
 		resourceName: "orgs",
 		resourceDesc: "organizations",
-	},
-	"zitadel.user.v2": {
-		resourceName: "users",
-		resourceDesc: "users",
 	},
 	"zitadel.project.v2": {
 		resourceName: "projects",
 		resourceDesc: "projects",
 	},
-	"zitadel.application.v2": {
-		resourceName: "apps",
-		resourceDesc: "applications",
+	"zitadel.saml.v2": {
+		resourceName: "saml",
+		resourceDesc: "SAML service provider metadata",
+	},
+	"zitadel.session.v2": {
+		resourceName: "sessions",
+		resourceDesc: "user sessions",
+	},
+	"zitadel.settings.v2": {
+		resourceName: "settings",
+		resourceDesc: "instance and organization settings",
+	},
+	"zitadel.user.v2": {
+		resourceName: "users",
+		resourceDesc: "users",
+	},
+	"zitadel.webkey.v2": {
+		resourceName: "webkeys",
+		resourceDesc: "web keys for OIDC/SAML signing",
 	},
 }
 
@@ -375,16 +427,31 @@ func buildServiceData(service *protogen.Service, file *protogen.File, cfg servic
 	return sd
 }
 
+// isMethodDeprecatedOpenAPI returns true when the RPC has deprecated:true in its
+// grpc-gateway openapiv2_operation annotation (ZITADEL's deprecation convention).
+func isMethodDeprecatedOpenAPI(method *protogen.Method) bool {
+	opts := method.Desc.Options()
+	if opts == nil {
+		return false
+	}
+	ext := proto.GetExtension(opts, openapiv2.E_Openapiv2Operation)
+	op, ok := ext.(*openapiv2.Operation)
+	return ok && op != nil && op.Deprecated
+}
+
 func buildMethodData(method *protogen.Method, service *protogen.Service, goImportPath string) (*methodData, []extraImport) {
 	rpcName := string(method.Desc.Name())
 
-	// Skip deprecated methods.
+	// Skip methods deprecated via the standard proto deprecated option.
 	if method.Desc.Options() != nil {
 		opts, ok := method.Desc.Options().(*descriptorpb.MethodOptions)
 		if ok && opts != nil && opts.GetDeprecated() {
 			return nil, nil
 		}
 	}
+
+	// Detect OpenAPI-level deprecation (used by ZITADEL instead of standard proto deprecated).
+	deprecated := isMethodDeprecatedOpenAPI(method)
 
 	verb, suffix := rpcNameToVerbAndSuffix(rpcName, string(service.Desc.Name()))
 	if verb == "" {
@@ -406,6 +473,10 @@ func buildMethodData(method *protogen.Method, service *protogen.Service, goImpor
 		RequestType:    method.Input.GoIdent.GoName,
 		ResponseType:   method.Output.GoIdent.GoName,
 		FullMethodName: string(service.Desc.ParentFile().Package()) + "." + string(service.Desc.Name()) + "/" + rpcName,
+		Deprecated:     deprecated,
+	}
+	if deprecated {
+		md.Short = "[DEPRECATED] " + md.Short
 	}
 
 	// Populate Long from proto RPC comments.
@@ -621,8 +692,26 @@ func buildOneofInlinedGroup(oneof *protogen.Oneof, msg *protogen.Message) *inlin
 			g.Variants = append(g.Variants, v)
 			continue
 		}
+		if field.Desc.Kind() == protoreflect.StringKind {
+			// Scalar string oneof field → single-arg subcommand.
+			// Invoking "organization-id <value>" sets the string field.
+			parentGoName := string(msg.GoIdent.GoName)
+			wrapperType := parentGoName + "_" + field.GoName
+			variantName := toKebab(string(field.Desc.Name()))
+			v := inlinedVariant{
+				VariantName:             variantName,
+				VarPrefix:               field.GoName,
+				GoWrapperType:           wrapperType,
+				GoFieldName:             oneof.GoName,
+				IsScalarStringVariant:   true,
+				ScalarStringGoFieldName: field.GoName,
+			}
+			v.JSONTemplate = buildJSONTemplateFiltered(msg, 0, oneof.Desc.Name(), field.Desc.Name())
+			g.Variants = append(g.Variants, v)
+			continue
+		}
 		if field.Desc.Kind() != protoreflect.MessageKind {
-			continue // skip other scalar oneofs (string, int, etc.)
+			continue // skip other scalar oneofs (int, bytes, etc.)
 		}
 
 		parentGoName := string(msg.GoIdent.GoName)
@@ -667,7 +756,12 @@ func buildOneofInlinedGroup(oneof *protogen.Oneof, msg *protogen.Message) *inlin
 			switch varField.Desc.Kind() {
 			case protoreflect.MessageKind:
 				// Depth-1: expand scalar/enum children of this sub-message.
+				// Skip well-known google.protobuf.* types — they cannot be expanded to simple flags;
+				// users should use --request-json for these (e.g. google.protobuf.Duration).
 				subMsg := varField.Message
+				if isWellKnownProtoType(subMsg) {
+					continue
+				}
 				parentFieldGoName := varField.GoName  // e.g. "Profile"
 				parentGoType := subMsg.GoIdent.GoName // e.g. "HumanProfile"
 
@@ -893,6 +987,12 @@ func fieldToFlag(field *protogen.Field, prefix string) *flagDef {
 			val := desc.Enum().Values().Get(i)
 			fd.EnumValues = append(fd.EnumValues, string(val.Name()))
 		}
+		// Append short valid values to help text so users know what to pass
+		// even without tab-completion. Strip the common prefix (e.g., "USER_FIELD_NAME_")
+		// and exclude the UNSPECIFIED sentinel.
+		if shortVals := enumShortValues(fd.EnumValues); len(shortVals) > 0 {
+			fd.Help += " (one of: " + strings.Join(shortVals, ", ") + ")"
+		}
 	case desc.Kind() == protoreflect.MessageKind:
 		// Skip complex nested messages — use --json for those.
 		return nil
@@ -901,6 +1001,36 @@ func fieldToFlag(field *protogen.Field, prefix string) *flagDef {
 	}
 
 	return fd
+}
+
+// enumShortValues strips the longest common prefix from enum values and excludes
+// the UNSPECIFIED sentinel, returning human-readable choices for help text.
+// E.g. ["USER_FIELD_NAME_UNSPECIFIED","USER_FIELD_NAME_USER_NAME","USER_FIELD_NAME_EMAIL"]
+// → ["USER_NAME","EMAIL"]
+func enumShortValues(values []string) []string {
+	if len(values) == 0 {
+		return nil
+	}
+	// Find longest common prefix (up to a trailing underscore).
+	prefix := values[0]
+	for _, v := range values[1:] {
+		for prefix != "" && !strings.HasPrefix(v, prefix) {
+			if idx := strings.LastIndex(prefix[:len(prefix)-1], "_"); idx >= 0 {
+				prefix = prefix[:idx+1]
+			} else {
+				prefix = ""
+			}
+		}
+	}
+	var out []string
+	for _, v := range values {
+		short := strings.TrimPrefix(v, prefix)
+		if strings.HasSuffix(short, "UNSPECIFIED") {
+			continue
+		}
+		out = append(out, short)
+	}
+	return out
 }
 
 func extractResponseColumns(msg *protogen.Message, verb string) (isList bool, listFieldGoName string, cols []columnDef) {
@@ -937,22 +1067,52 @@ func extractResponseColumns(msg *protogen.Message, verb string) (isList bool, li
 }
 
 func extractMessageColumns(msg *protogen.Message) []columnDef {
-	// Collect columns in a logical order: ID fields first, then ORGANIZATION ID
-	// (from details.resource_owner), then everything else.
-	var idCols, detailsCols, otherCols []columnDef
+	// "Primary ID" header: the resource's own ID field, e.g. "PROJECT ID" for Project,
+	// "USER ID" for User. We rename it to plain "ID" since context (listing projects/users)
+	// makes the resource type obvious.
+	primaryIDHeader := strings.ToUpper(strings.ReplaceAll(toKebab(msg.GoIdent.GoName), "-", " ")) + " ID"
+
+	var (
+		primaryIdCol    *columnDef  // resource's own ID — shown as "ID"
+		hasBareID       bool        // true when the field was literally named "id" (e.g., Organization)
+		orgIdCols       []columnDef // ORGANIZATION ID (from details.resource_owner or direct field)
+		orgIdFromDetail bool        // whether orgIdCols came from details (may be suppressed)
+		otherIdCols     []columnDef // other foreign " ID" fields (user_id, granted_organization_id, …)
+		semanticCols    []columnDef // names, states, booleans, enums
+		timestampCols   []columnDef // timestamps — shown last as metadata
+	)
+
 	for _, field := range msg.Fields {
 		col := fieldToColumn(field)
 		if col == nil {
 			continue
 		}
 		switch {
-		case col.Header == "ID" || (strings.HasSuffix(col.Header, " ID") && col.Header != "ORGANIZATION ID"):
-			idCols = append(idCols, *col)
+		case col.Header == "ID":
+			// Bare "id" field — the resource is its own top-level entity (e.g., Organization).
+			hasBareID = true
+			primaryIdCol = col
+		case col.Header == primaryIDHeader:
+			// e.g., "PROJECT ID" for Project, "USER ID" for User — rename to plain "ID".
+			col.Header = "ID"
+			primaryIdCol = col
 		case col.Header == "ORGANIZATION ID":
-			detailsCols = append(detailsCols, *col)
+			fromDetails := strings.HasPrefix(col.GoAccessor, "GetDetails()")
+			orgIdFromDetail = fromDetails
+			orgIdCols = append(orgIdCols, *col)
+		case strings.HasSuffix(col.Header, " ID"):
+			otherIdCols = append(otherIdCols, *col)
+		case col.IsTimestamp:
+			timestampCols = append(timestampCols, *col)
 		default:
-			otherCols = append(otherCols, *col)
+			semanticCols = append(semanticCols, *col)
 		}
+	}
+
+	// When the resource IS the organization itself (bare "id", e.g., Organization message),
+	// details.resource_owner == id — suppress the redundant ORGANIZATION ID column.
+	if hasBareID && orgIdFromDetail {
+		orgIdCols = nil
 	}
 
 	// Detect oneof fields and add a TYPE column showing which variant is set.
@@ -980,31 +1140,57 @@ func extractMessageColumns(msg *protogen.Message) []columnDef {
 				DisplayName:   displayName,
 			})
 		}
-		col := columnDef{
+		semanticCols = append(semanticCols, columnDef{
 			Header:        header,
 			GoAccessor:    accessor,
 			IsOneofType:   true,
 			OneofVariants: variants,
-		}
-		otherCols = append(otherCols, col)
+		})
 	}
 
-	cols := make([]columnDef, 0, len(idCols)+len(detailsCols)+len(otherCols))
-	cols = append(cols, idCols...)
-	cols = append(cols, detailsCols...)
-	cols = append(cols, otherCols...)
+	// Final column order:
+	//   1. Primary ID ("ID") — the resource's own key
+	//   2. ORGANIZATION ID — ownership context
+	//   3. Other foreign IDs (user_id, granted_organization_id, …)
+	//   4. Semantic fields (name, state, booleans, enums)
+	//   5. Timestamps (creation_date, change_date, …) — metadata, last
+	var cols []columnDef
+	if primaryIdCol != nil {
+		cols = append(cols, *primaryIdCol)
+	}
+	cols = append(cols, orgIdCols...)
+	cols = append(cols, otherIdCols...)
+	cols = append(cols, semanticCols...)
+	cols = append(cols, timestampCols...)
 	return cols
 }
 
 func extractTopLevelColumns(msg *protogen.Message) []columnDef {
 	var cols []columnDef
+	var detailsField *protogen.Field
 	for _, field := range msg.Fields {
 		if string(field.Desc.Name()) == "details" {
-			continue // Skip details in mutation responses
+			detailsField = field
+			continue // try other fields first
 		}
 		col := fieldToColumn(field)
 		if col != nil {
 			cols = append(cols, *col)
+		}
+	}
+	// When the response has no other columns (only Details), show change_date from
+	// Details as a confirmation timestamp — consistent with commands like org delete
+	// that have an explicit deletion_date timestamp.
+	if len(cols) == 0 && detailsField != nil && detailsField.Message != nil {
+		for _, sub := range detailsField.Message.Fields {
+			if string(sub.Desc.Name()) == "change_date" {
+				cols = append(cols, columnDef{
+					Header:      "CHANGE DATE",
+					GoAccessor:  "GetDetails().GetChangeDate()",
+					IsTimestamp: true,
+				})
+				break
+			}
 		}
 	}
 	return cols
@@ -1140,6 +1326,13 @@ func humanizeRPCName(rpcName, resource string) string {
 	return result
 }
 
+// isWellKnownProtoType returns true for google.protobuf.* messages that cannot
+// be meaningfully expanded into individual CLI flags (Duration, Timestamp, Any, etc.).
+// Users should pass these via --request-json instead.
+func isWellKnownProtoType(msg *protogen.Message) bool {
+	return strings.HasPrefix(string(msg.Desc.FullName()), "google.protobuf.")
+}
+
 // findIDField looks for a field that should be a positional argument.
 // For get/update/delete: the first *_id field is always positional.
 // For scoped list/create (suffix != ""): the first *_id field is positional
@@ -1150,6 +1343,10 @@ func findIDField(msg *protogen.Message, verb, suffix string) (protoName, goName 
 		return "", "", false
 	}
 	for _, field := range msg.Fields {
+		// Skip fields inside a real oneof — they're variant discriminators, not standalone IDs.
+		if field.Oneof != nil && !field.Desc.HasOptionalKeyword() {
+			continue
+		}
 		name := string(field.Desc.Name())
 		if field.Desc.Kind() == protoreflect.StringKind && strings.HasSuffix(name, "_id") {
 			return name, field.GoName, field.Desc.HasOptionalKeyword()

@@ -151,7 +151,7 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 		var varflag_{{$m.RPCName}}_{{$f.GoVarSuffix}} {{$f.FlagType}}
 {{- end}}
 		vc := &cobra.Command{
-			Use:   "{{$v.VariantName}}{{if $m.IDArg}} <{{$m.IDArg}}>{{end}}",
+			Use:   "{{$v.VariantName}}{{if $v.IsScalarStringVariant}} <{{$v.VariantName}}>{{else if $m.IDArg}} <{{$m.IDArg}}>{{end}}",
 			Short: "{{$m.Short}} ({{$v.VariantName}})",
 			RunE: func(cmd *cobra.Command, args []string) error {
 				req := &{{$.GoImportAlias}}.{{$m.RequestType}}{}
@@ -191,6 +191,13 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 					return fmt.Errorf("missing required argument <{{$m.IDArg}}>\n\nUsage: %s <{{$m.IDArg}}>", cmd.CommandPath())
 				}
 {{- end}}
+{{- end}}
+{{- if $v.IsScalarStringVariant}}
+				if len(args) > 0 {
+					req.{{$g.GoName}} = &{{$.GoImportAlias}}.{{$v.GoWrapperType}}{{`{`}}{{$v.ScalarStringGoFieldName}}: args[0]{{`}`}}
+				} else if !useJSON {
+					return fmt.Errorf("missing required argument <{{$v.VariantName}}>\n\nUsage: %s <{{$v.VariantName}}>", cmd.CommandPath())
+				}
 {{- end}}
 
 				if !useJSON {
@@ -268,6 +275,8 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 {{- end}}
 {{- if $v.IsScalarBoolVariant}}
 					req.{{$g.GoName}} = &{{$.GoImportAlias}}.{{$v.GoWrapperType}}{{`{`}}{{$v.ScalarGoFieldName}}: true{{`}`}}
+{{- else if $v.IsScalarStringVariant}}
+				{{- /* Already set above via positional arg */}}
 {{- else}}
 					{
 						_varMsg := &{{$.GoImportAlias}}.{{$v.GoMsgType}}{}
@@ -407,6 +416,9 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 }
 
 func do{{$.ServiceName}}_{{$m.RPCName}}(getCfg func() *config.Config, getOutput func() string, cmd *cobra.Command, req *{{$.GoImportAlias}}.{{$m.RequestType}}) error {
+{{- if $m.Deprecated}}
+	fmt.Fprintln(os.Stderr, "Warning: this command is deprecated and may be removed in a future release.")
+{{- end}}
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	if dryRun {
 		reqJSON, err := protojson.MarshalOptions{Indent: "  "}.Marshal(req)
