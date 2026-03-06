@@ -67,7 +67,8 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 		}
 	}
 
-	events, setMetadata, err := c.getUserMetadataSetEvents(ctx, userID, userResourceOwner, metadatas)
+	events := make([]eventstore.Command, 0)
+	setMetadata, err := c.getUserMetadataListModelByID(ctx, userID, userResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -112,25 +113,6 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 		return nil, err
 	}
 	return writeModelToObjectDetails(&setMetadata.WriteModel), nil
-}
-
-func (c *Commands) getUserMetadataSetEvents(ctx context.Context, userID string, userResourceOwner string, metadatas []*domain.Metadata) ([]eventstore.Command, *UserMetadataListWriteModel, error) {
-	// get the current metadata list
-	setMetadata, err := c.getUserMetadataListModelByID(ctx, userID, userResourceOwner)
-	if err != nil {
-		return nil, nil, err
-	}
-	// if no metadata entries were requested,
-	// return the current metadata write model without any events to be pushed
-	if len(metadatas) == 0 {
-		return nil, setMetadata, nil
-	}
-	userAgg := UserAggregateFromWriteModelCtx(ctx, &setMetadata.WriteModel)
-	events, err := c.checkExistingValueAndSetMetadata(ctx, metadatas, setMetadata.metadataList, userAgg)
-	if err != nil {
-		return nil, nil, err
-	}
-	return events, setMetadata, nil
 }
 
 // checkExistingValueAndSetMetadata compares the existing metadata key-value pair before adding a `user.metadata.set` event

@@ -4610,7 +4610,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 					},
 					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
-						metadataByKey := getMetadataMap(listMetadataResponse)
+						metadataByKey := getMetadataMap(listMetadataResponse.GetMetadata())
 						assert.Len(t, listMetadataResponse.GetMetadata(), 3)
 						assert.Equal(t, []byte("updated_value1"), metadataByKey["key1"])
 						assert.Equal(t, []byte("value2"), metadataByKey["key2"])
@@ -4666,7 +4666,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 					},
 					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
-						metadataByKey := getMetadataMap(listMetadataResponse)
+						metadataByKey := getMetadataMap(listMetadataResponse.GetMetadata())
 						assert.Len(t, listMetadataResponse.GetMetadata(), 3)
 						assert.Equal(t, []byte("updated_value1"), metadataByKey["key1"])
 						assert.Equal(t, []byte("value2"), metadataByKey["key2"])
