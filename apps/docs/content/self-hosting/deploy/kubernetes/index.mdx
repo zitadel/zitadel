@@ -38,7 +38,7 @@ helm repo add zitadel https://charts.zitadel.com &&
 helm repo add bitnami https://charts.bitnami.com/bitnami &&
 helm repo add traefik https://traefik.github.io/charts &&
 helm repo update &&
-helm install zitadel zitadel/zitadel --values quickstart-values.yaml --wait
+helm upgrade --install zitadel zitadel/zitadel --values quickstart-values.yaml --wait
 ```
 
 That's it. Visit [http://localhost/ui/console](http://localhost/ui/console) to open the console (use `http://localhost:8080/ui/console` if using k3d).
