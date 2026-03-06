@@ -21,9 +21,9 @@ The ZITADEL chart ships with optional subcharts for PostgreSQL and Traefik, so a
 <Callout type="info">
 No cluster yet? [k3d](https://k3d.io/) is a quick way to spin one up locally — it runs k3s in Docker:
 ```bash
-k3d cluster create zitadel --port "8080:80@loadbalancer"
+k3d cluster create zitadel --port "80:80@loadbalancer"
 ```
-The default values already use `ExternalPort: 8080` so it works with k3d out of the box.
+The default values work with k3d out of the box.
 </Callout>
 
 ### Install the full stack
@@ -41,7 +41,7 @@ helm repo update &&
 helm upgrade --install zitadel zitadel/zitadel --values quickstart-values.yaml --wait
 ```
 
-That's it. Visit [http://localhost:8080/ui/console](http://localhost:8080/ui/console) to open the console.
+That's it. Visit [http://localhost/ui/console](http://localhost/ui/console) to open the console.
 
 <DefaultUser components={props.components} />
 
