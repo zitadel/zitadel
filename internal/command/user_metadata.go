@@ -71,6 +71,32 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 	if err != nil {
 		return nil, err
 	}
+	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
+	for _, data := range metadatas {
+		existingValue, keyExists := setMetadata.metadataList[data.Key]
+
+		// if value is empty, a metadata remove event has to be pushed
+		if len(data.Value) == 0 {
+			// Ignore deletion if key does not exist
+			if !keyExists {
+				continue
+			}
+
+			event := user.NewMetadataRemovedEvent(ctx, userAgg, data.Key)
+			events = append(events, event)
+			continue
+		}
+
+		// if no change to metadata no event has to be pushed
+		if keyExists && bytes.Equal(existingValue, data.Value) {
+			continue
+		}
+		event, err := c.setUserMetadata(ctx, userAgg, data)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
 	// no changes for the metadata
 	if len(events) == 0 {
 		return writeModelToObjectDetails(&setMetadata.WriteModel), nil
