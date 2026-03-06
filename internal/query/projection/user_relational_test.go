@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
-	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -202,13 +201,13 @@ func createUser(t *testing.T,
 		InstanceID:     instanceID,
 		OrganizationID: orgID,
 		ID:             userID,
-		Username:       integration.Username(),
+		Username:       userID + gofakeit.Username(),
 		State:          domain.UserStateActive,
 		Human: &domain.HumanUser{
 			FirstName: gofakeit.FirstName(),
 			LastName:  gofakeit.LastName(),
 			Email: domain.HumanEmail{
-				Address:    integration.Email(),
+				Address:    gofakeit.Email(),
 				VerifiedAt: time.Now(),
 			},
 		},
