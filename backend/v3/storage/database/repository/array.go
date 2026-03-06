@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-type JSONArray[T any] []*T
+type JSONArray[T any] []T
 
 var ErrScanSource = errors.New("unsupported scan source")
 

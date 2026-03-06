@@ -108,7 +108,7 @@ func TestJSONArray_Scan(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var a repository.JSONArray[testObject]
+			var a repository.JSONArray[*testObject]
 			gotErr := a.Scan(tt.src)
 			require.ErrorIs(t, gotErr, tt.want.err)
 			require.Len(t, a, len(tt.want.res))
