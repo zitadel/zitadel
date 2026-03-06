@@ -1978,7 +1978,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			ClientId:   "clientID",
 			TeamId:     "teamIDteam",
 			KeyId:      "keyIDKeyId",
-			PrivateKey: []byte("privateKey"),
+			PrivateKey: generatePrivateKeyPKCS8(t),
 			Scopes:     []string{"scope"},
 			ProviderOptions: &idp_grpc.Options{
 				IsLinkingAllowed:  false,
@@ -2030,7 +2030,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			ClientId:   "clientID",
 			TeamId:     "teamIDteam",
 			KeyId:      "keyIDKeyId",
-			PrivateKey: []byte("privateKey"),
+			PrivateKey: generatePrivateKeyPKCS8(t),
 			Scopes:     []string{"scope"},
 			ProviderOptions: &idp_grpc.Options{
 				IsLinkingAllowed:  false,
@@ -2061,7 +2061,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			ClientId:   "new_clientID",
 			TeamId:     "new_teamID",
 			KeyId:      "new_kKeyId",
-			PrivateKey: []byte("new_privateKey"),
+			PrivateKey: generatePrivateKeyPKCS8(t),
 			Scopes:     []string{"new_scope"},
 			ProviderOptions: &idp_grpc.Options{
 				IsLinkingAllowed:  true,

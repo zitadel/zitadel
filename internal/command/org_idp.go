@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -1642,6 +1643,9 @@ func (c *Commands) prepareAddOrgAppleProvider(a *org.Aggregate, writeModel *OrgA
 		if len(provider.PrivateKey) == 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-GVD4n", "Errors.IDP.PrivateKeyMissing")
 		}
+		if _, err := apple.BytesToPrivateKey(provider.PrivateKey); err != nil {
+			return nil, zerrors.ThrowInvalidArgument(err, "ORG-Fk38d", "Errors.IDP.InvalidPrivateKey")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1686,6 +1690,11 @@ func (c *Commands) prepareUpdateOrgAppleProvider(a *org.Aggregate, writeModel *O
 		}
 		if provider.KeyID = strings.TrimSpace(provider.KeyID); provider.KeyID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-Gh4z2", "Errors.IDP.KeyIDMissing")
+		}
+		if len(provider.PrivateKey) > 0 {
+			if _, err := apple.BytesToPrivateKey(provider.PrivateKey); err != nil {
+				return nil, zerrors.ThrowInvalidArgument(err, "ORG-eWSDf", "Errors.IDP.InvalidPrivateKey")
+			}
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())

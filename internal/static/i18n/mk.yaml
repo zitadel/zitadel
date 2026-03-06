@@ -235,12 +235,6 @@ Errors:
       AlreadyExists: "Доменот веќе постои"
       InvalidCharacter: "Дозволени се само алфанумерички знаци, . и - се дозволени за домен"
       EmptyString: "Неважечките ненумерички и азбучни знаци се заменети со празни места и добиениот домен е празна низа"
-    IDP:
-      InvalidSearchQuery: "Невалидно пребарување"
-      ClientID Missing: "ClientID недостасува"
-      TeamIDMissing: "TeamID недостасува"
-      Клучен ID Недостасува: "Недостасува ID на клуч"
-      PrivateKeyMissing: "Недостасува приватен клуч"
     LoginPolicy:
       NotFound: "Политиката за најавување не е пронајдена"
       Invalid: "Политиката за најавување е невалидна"
@@ -612,6 +606,13 @@ Errors:
     Duplicate: "ID на веб-клучот не е единствен"
     NoActive: "Не е пронајден активен веб-клуч"
     NotFound: "Веб-клучот не е пронајден"
+  IDP:
+    InvalidSearchQuery: "Невалидно пребарување"
+    ClientIDMissing: "ClientID недостасува"
+    TeamIDMissing: "TeamID недостасува"
+    KeyIDMissing: "Недостасува ID на клуч"
+    PrivateKeyMissing: "Недостасува приватен клуч"
+    InvalidPrivateKey: "Невалиден формат на приватен клуч"
 
 AggregateTypes:
   action: "Акција"

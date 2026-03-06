@@ -237,12 +237,6 @@ Errors:
       AlreadyExists: "域名已存在"
       InvalidCharacter: "只有字母数字字符，.和 - 允许用于域名中"
       EmptyString: "无效的非数字和字母字符被替换为空格，结果域是空字符串"
-    IDP:
-      InvalidSearchQuery: "无效的搜索查询"
-      ClientIDMissing: "客户端 ID 丢失"
-      TeamIDMissing: "团队 ID 丢失"
-      KeyIDMissing: "密钥 ID 丢失"
-      PrivateKeyMissing: "私钥丢失"
     LoginPolicy:
       NotFound: "未找到登录策略"
       Invalid: "登录策略无效"
@@ -614,6 +608,13 @@ Errors:
     Duplicate: "Web 密钥 ID 不唯一"
     NoActive: "未找到活动 Web 密钥"
     NotFound: "未找到 Web 密钥"
+  IDP:
+    InvalidSearchQuery: "无效的搜索查询"
+    ClientIDMissing: "客户端 ID 丢失"
+    TeamIDMissing: "团队 ID 丢失"
+    KeyIDMissing: "密钥 ID 丢失"
+    PrivateKeyMissing: "私钥丢失"
+    InvalidPrivateKey: "无效的私钥格式"
 
 AggregateTypes:
   action: "动作"

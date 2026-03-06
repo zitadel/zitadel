@@ -237,12 +237,6 @@ Errors:
       AlreadyExists: "Domain zaten mevcut"
       InvalidCharacter: "Domain için sadece alfanümerik karakterler, . ve - kullanılabilir"
       EmptyString: "Geçersiz sayısal olmayan ve alfabetik olmayan karakterler boş alanlarla değiştirildi ve sonuçta domain boş bir dize oldu"
-    IDP:
-      InvalidSearchQuery: "Geçersiz arama sorgusu"
-      ClientIDMissing: "ClientID eksik"
-      TeamIDMissing: "TeamID eksik"
-      KeyIDMissing: "KeyID eksik"
-      PrivateKeyMissing: "Özel Anahtar eksik"
     LoginPolicy:
       NotFound: "Giriş Politikası bulunamadı"
       Invalid: "Giriş Politikası geçersiz"
@@ -614,6 +608,13 @@ Errors:
     Duplicate: "Web anahtarı ID benzersiz değil"
     NoActive: "Aktif web anahtarı bulunamadı"
     NotFound: "Web anahtarı bulunamadı"
+  IDP:
+    InvalidSearchQuery: "Geçersiz arama sorgusu"
+    ClientIDMissing: "ClientID eksik"
+    TeamIDMissing: "TeamID eksik"
+    KeyIDMissing: "KeyID eksik"
+    PrivateKeyMissing: "Özel Anahtar eksik"
+    InvalidPrivateKey: "Geçersiz özel anahtar biçimi"
 
 AggregateTypes:
   action: "Eylem"

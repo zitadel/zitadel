@@ -38,7 +38,10 @@ func AppConfigToPb(app *query.App) app_pb.AppConfig {
 	if app.SAMLConfig != nil {
 		return AppSAMLConfigToPb(app.SAMLConfig)
 	}
-	return AppAPIConfigToPb(app.APIConfig)
+	if app.APIConfig != nil {
+		return AppAPIConfigToPb(app.APIConfig)
+	}
+	return nil
 }
 
 func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {

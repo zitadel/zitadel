@@ -237,12 +237,6 @@ Errors:
       AlreadyExists: "النطاق موجود بالفعل"
       InvalidCharacter: "يسمح فقط بالأحرف الأبجدية الرقمية و . و - للنطاق"
       EmptyString: "تم استبدال الأحرف غير الرقمية والأبجدية غير الصالحة بمساحات فارغة والنطاق الناتج هو سلسلة فارغة"
-    IDP:
-      InvalidSearchQuery: "استعلام بحث غير صالح"
-      ClientIDMissing: "معرف العميل مفقود"
-      TeamIDMissing: "معرف الفريق مفقود"
-      KeyIDMissing: "معرف المفتاح مفقود"
-      PrivateKeyMissing: "المفتاح الخاص مفقود"
     LoginPolicy:
       NotFound: "سياسة تسجيل الدخول غير موجودة"
       Invalid: "سياسة تسجيل الدخول غير صالحة"
@@ -609,6 +603,13 @@ Errors:
     Duplicate: "معرف مفتاح الويب ليس فريداً"
     NoActive: "لم يتم العثور على مفتاح ويب نشط"
     NotFound: "مفتاح الويب غير موجود"
+  IDP:
+    InvalidSearchQuery: "استعلام بحث غير صالح"
+    ClientIDMissing: "معرف العميل مفقود"
+    TeamIDMissing: "معرف الفريق مفقود"
+    KeyIDMissing: "معرف المفتاح مفقود"
+    PrivateKeyMissing: "المفتاح الخاص مفقود"
+    InvalidPrivateKey: "تنسيق مفتاح خاص غير صالح"
 
 AggregateTypes:
   action: "إجراء"

@@ -236,12 +236,6 @@ Errors:
       AlreadyExists: "Domena już istnieje"
       InvalidCharacter: "Tylko znaki alfanumeryczne, . i - są dozwolone dla domeny"
       EmptyString: "Nieprawidłowe znaki inne niż numeryczne i alfabetyczne zostały zastąpione pustymi spacjami, a wynikowa domena jest pustym ciągiem znaków"
-    IDP:
-      InvalidSearchQuery: "Nieprawidłowe zapytanie wyszukiwania"
-      ClientIDMissing: "Brak ClientID"
-      TeamIDMissing: "Brak TeamID"
-      KeyIDMissing: "Brak KeyID"
-      PrivateKeyMissing: "Brak klucza prywatnego"
     LoginPolicy:
       NotFound: "Polityka logowania nie znaleziona"
       Invalid: "Polityka logowania jest nieprawidłowa"
@@ -613,6 +607,13 @@ Errors:
     Duplicate: "Identyfikator klucza internetowego nie jest unikalny"
     NoActive: "Nie znaleziono aktywnego klucza internetowego"
     NotFound: "Nie znaleziono klucza internetowego"
+  IDP:
+    InvalidSearchQuery: "Nieprawidłowe zapytanie wyszukiwania"
+    ClientIDMissing: "Brak ClientID"
+    TeamIDMissing: "Brak TeamID"
+    KeyIDMissing: "Brak KeyID"
+    PrivateKeyMissing: "Brak klucza prywatnego"
+    InvalidPrivateKey: "Nieprawidłowy format klucza prywatnego"
 
 AggregateTypes:
   action: "Działanie"
