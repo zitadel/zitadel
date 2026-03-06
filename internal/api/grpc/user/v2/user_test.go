@@ -400,6 +400,11 @@ func Test_authMethodTypeToPb(t *testing.T) {
 			domain.UserAuthMethodTypeOTPEmail,
 			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_EMAIL,
 		},
+		{
+			"recovery code",
+			domain.UserAuthMethodTypeRecoveryCode,
+			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_RECOVERY_CODE,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

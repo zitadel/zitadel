@@ -540,7 +540,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					}`),
 					), eventstore.GenericEventMapper[user.HumanRecoveryCodesAddedEvent]),
 			},
-			reduce: (&userAuthMethodProjection{}).reduceInitAuthMethod,
+			reduce: (&userAuthMethodProjection{}).reduceAddRecoveryCodes,
 			want: wantReduce{
 				aggregateType: user.AggregateType,
 				sequence:      15,
@@ -556,7 +556,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 								"instance-id",
 								"agg-id",
 								uint64(15),
-								domain.MFAStateNotReady,
+								domain.MFAStateReady,
 								domain.UserAuthMethodTypeRecoveryCode,
 								"",
 							},
