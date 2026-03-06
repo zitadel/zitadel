@@ -21,6 +21,7 @@ Replace this example text with a concise list of additional changes that this PR
 For example:
 - The docs explicitly describe that the property XY is mandatory
 - Adds missing translations for validations.
+- Terminology updates follow issue #5888 and `TERMINOLOGY.md` (including catalog updates for newly introduced terms).
 
 # Additional Context
 

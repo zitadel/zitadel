@@ -13,6 +13,7 @@ The **Docs App** (`apps/docs`) hosts the ZITADEL documentation. It has recently 
 - **Links**: Use absolute paths or standard MDX linking.
 - **Components**: Use only MDX components that are documented in the official Fumadocs MDX component reference and any project-specific MDX component documentation in this repo; do not introduce or rely on undocumented components.
 - **API Docs**: Changes in `proto/` or API response schemas often require regeneration via docs generation targets.
+- **Terminology**: For user-facing naming changes in docs/UI/API descriptions, follow `TERMINOLOGY.md` (issue #5888 source). Copilot code review will flag discouraged terms automatically on PRs touching these paths.
 
 ## Verified Nx Targets
 - **Dev Server**: `pnpm nx run @zitadel/docs:dev`
