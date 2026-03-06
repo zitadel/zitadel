@@ -10,7 +10,7 @@ This guide takes you from zero to a running ZITADEL instance on Kubernetes and t
 
 ## Stage 1 — Local Quickstart (~5 minutes)
 
-This stage uses [k3d](https://k3d.io/) — a lightweight Kubernetes distribution (k3s) that runs in Docker and bundles Traefik as its ingress controller. No TLS required.
+This stage uses [k3d](https://k3d.io/) — a lightweight Kubernetes distribution (k3s) that runs in Docker and bundles Traefik as its ingress controller. The ZITADEL chart ships with an optional in-cluster PostgreSQL, so a single `helm install` deploys the full stack.
 
 ### Prerequisites
 
@@ -27,60 +27,49 @@ The `--port` flag maps port 8080 on your machine to the cluster's HTTP load bala
 k3d cluster create zitadel --port "8080:80@loadbalancer"
 ```
 
-### Install PostgreSQL
+### Install the full stack
 
 ```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo update
+helm repo add zitadel https://charts.zitadel.com
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
 
-helm install db bitnami/postgresql \
-  --set auth.postgresPassword=zitadel \
-  --set auth.username=zitadel \
-  --set auth.password=zitadel \
-  --set auth.database=zitadel \
+helm install zitadel zitadel/zitadel \
+  --set postgresql.enabled=true \
+  --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
+  --set zitadel.configmapConfig.ExternalDomain=localhost \
+  --set zitadel.configmapConfig.ExternalPort=8080 \
+  --set zitadel.configmapConfig.ExternalSecure=false \
+  --set zitadel.configmapConfig.TLS.Enabled=false \
+  --set ingress.enabled=true \
+  --set ingress.className=traefik \
+  --set login.ingress.enabled=true \
+  --set login.ingress.className=traefik \
   --wait
 ```
 
-### Create the masterkey
-
-<Callout type="warn">
-The masterkey [encrypts sensitive data at rest](/concepts/architecture/secrets). Once ZITADEL has been initialized with a masterkey, it **cannot be changed** without losing access to encrypted data. Generate it **before first start** and store it safely.
-</Callout>
-
-```bash
-kubectl create secret generic zitadel-masterkey \
-  --from-literal=masterkey="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
-```
-
-### Configure and install
-
-Save the following as `quickstart-values.yaml`:
+Or save the following as `quickstart-values.yaml` and run `helm install zitadel zitadel/zitadel --values quickstart-values.yaml --wait`:
 
 ```yaml
-replicaCount: 1
+postgresql:
+  enabled: true
+  auth:
+    database: zitadel
+    username: zitadel
+    password: zitadel
+    postgresPassword: zitadel
+  primary:
+    persistence:
+      enabled: false
 
 zitadel:
-  masterkeySecretName: zitadel-masterkey
+  masterkey: "MasterkeyNeedsToHave32Characters"
   configmapConfig:
     ExternalDomain: localhost
     ExternalPort: 8080
     ExternalSecure: false
     TLS:
       Enabled: false
-    Database:
-      Postgres:
-        Host: db-postgresql
-        Port: 5432
-        Database: zitadel
-        User:
-          Username: zitadel
-          Password: zitadel
-          SSL:
-            Mode: disable
-        Admin:
-          Username: postgres
-          Password: zitadel
-          SSL:
-            Mode: disable
     FirstInstance:
       Org:
         Human:
@@ -109,22 +98,32 @@ login:
             pathType: Prefix
 ```
 
-Install ZITADEL:
-
-```bash
-helm repo add zitadel https://charts.zitadel.com && helm repo update
-
-helm install zitadel zitadel/zitadel --values quickstart-values.yaml --wait
-```
-
 That's it. Visit [http://localhost:8080/ui/console](http://localhost:8080/ui/console) to open the console.
 
 <DefaultUser components={props.components} />
+
+<Callout type="warn">
+The masterkey [encrypts sensitive data at rest](/concepts/architecture/secrets). The value above is a **dev placeholder** — generate a real one before any non-local deployment:
+```bash
+tr -dc A-Za-z0-9 </dev/urandom | head -c 32
+```
+Once ZITADEL has been initialized with a masterkey, it **cannot be changed** without losing access to encrypted data.
+</Callout>
 
 <Callout type="info">
 The stack runs: **Traefik** ([reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)) → **ZITADEL API** (Go) + **ZITADEL Login** (Next.js) → **PostgreSQL**.
 [gRPC over HTTP/2](/self-hosting/manage/http2) is handled automatically by Traefik — no extra configuration needed.
 </Callout>
+
+### Swap out components
+
+The bundled PostgreSQL (`postgresql.enabled=true`) is for local use only. Once you're ready to move forward, you can replace individual components:
+
+| Component | How to replace |
+|-----------|---------------|
+| **Database** | Set `postgresql.enabled=false` and configure `zitadel.configmapConfig.Database` pointing to your own PostgreSQL |
+| **Reverse proxy** | Set `ingress.className` to `nginx`, `alb`, or your controller of choice |
+| **Caching** | Add Redis by configuring `zitadel.configmapConfig.Caches` (see [Caching](/self-hosting/deploy/kubernetes/caching)) |
 
 ## Stage 2 — Production Cluster
 
