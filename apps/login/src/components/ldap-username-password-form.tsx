@@ -80,7 +80,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
       <div className={`${error && "transform-gpu animate-shake"}`}>
         <TextInput
           type="password"
-          autoComplete="password"
+          autoComplete="current-password"
           {...register("password", { required: t("required.password") })}
           label={t("labels.password")}
           data-testid="password-text-input"
