@@ -144,6 +144,7 @@
               *ngIf="currentSetting$().id === 'idp' && user.type.case === 'human' && user.userId"
               [userId]="user.userId"
               [service]="mgmtService"
+              (linkedIdpsChanged)="refreshLinkedIdps()"
             />
 
             <cnsl-card

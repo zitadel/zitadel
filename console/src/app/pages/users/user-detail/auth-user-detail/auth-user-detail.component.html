@@ -91,7 +91,11 @@
         </ng-container>
 
         <ng-container *ngIf="currentSetting$().id === 'idp'">
-          <cnsl-external-idps [userId]="user.userId" [service]="grpcAuthService"></cnsl-external-idps>
+          <cnsl-external-idps
+            [userId]="user.userId"
+            [service]="grpcAuthService"
+            (linkedIdpsChanged)="refreshLinkedIdps()"
+          ></cnsl-external-idps>
         </ng-container>
 
         <ng-container *ngIf="currentSetting$().id === 'security'">

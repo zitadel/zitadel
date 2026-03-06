@@ -198,6 +198,10 @@ export class AuthUserDetailComponent implements OnInit {
     });
   }
 
+  protected refreshLinkedIdps(): void {
+    this.invalidateUser().then();
+  }
+
   protected changeUsername(user: User): void {
     const data = {
       confirmKey: 'ACTIONS.CHANGE' as const,

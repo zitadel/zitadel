@@ -254,6 +254,10 @@ export class UserDetailComponent implements OnInit {
       .subscribe((setting) => this.currentSetting$.set(setting));
   }
 
+  public refreshLinkedIdps(): void {
+    this.refreshChanges$.emit();
+  }
+
   public changeUsername(user: UserV2): void {
     const dialogRef = this.dialog.open(EditDialogComponent, {
       data: {
