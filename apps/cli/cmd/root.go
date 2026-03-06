@@ -29,13 +29,25 @@ func SetVersion(v string) {
 // NewRootCmd creates the top-level cobra command.
 func NewRootCmd() *cobra.Command {
 	root := &cobra.Command{
-		Use:     "zitadel-cli",
-		Short:   "ZITADEL CLI — manage your ZITADEL instances from the command line",
+		Use:   "zitadel-cli",
+		Short: "ZITADEL CLI — manage your ZITADEL instances from the command line",
+		Long: `zitadel-cli — ZITADEL Management CLI
+
+⚠️  EXPERIMENTAL: This CLI is under active development. Commands, flags, and
+    output formats may change without notice between releases. Do not use in
+    production scripts without pinning to a specific version.
+
+    Feedback and bug reports: https://github.com/zitadel/zitadel/issues`,
 		Version: version,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// Skip config loading for completion and describe commands
 			if cmd.Name() == "completion" || cmd.Name() == "help" || cmd.Name() == "describe" {
 				return nil
+			}
+
+			// Print experimental warning to stderr unless suppressed.
+			if os.Getenv("ZITADEL_CLI_NO_WARN") == "" {
+				fmt.Fprintln(os.Stderr, "⚠️  zitadel-cli is EXPERIMENTAL — commands and output may change without notice. Set ZITADEL_CLI_NO_WARN=1 to suppress.")
 			}
 
 			// Auto-detect output format: describe for TTY, JSON for pipes/redirects.
