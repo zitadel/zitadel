@@ -127,6 +127,7 @@ func NewHandler(
 	router := mux.NewRouter()
 	router.Use(instanceInterceptor)
 	router.HandleFunc(callbackPath, h.handleCallback)
+	router.HandleFunc(callbackPath+"/form", h.handleCallback)
 	router.HandleFunc(metadataPath, h.handleMetadata)
 	router.HandleFunc(certificatePath, h.handleCertificate)
 	router.HandleFunc(acsPath, h.handleACS)

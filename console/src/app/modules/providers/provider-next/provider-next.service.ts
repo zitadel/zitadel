@@ -80,16 +80,16 @@ export class ProviderNextService {
     );
   }
 
-  callbackUrls(): Observable<CopyUrl[]> {
+  callbackUrls(suffix: string = ""): Observable<CopyUrl[]> {
     return this.env.env.pipe(
       map((env) => [
         {
           label: 'Login V1 Callback URL',
-          url: `${env.issuer}/ui/login/login/externalidp/callback`,
+          url: `${env.issuer}/ui/login/login/externalidp/callback${suffix}`,
         },
         {
           label: 'Login V2 Callback URL',
-          url: `${env.issuer}/idps/callback`,
+          url: `${env.issuer}/idps/callback${suffix}`,
         },
       ]),
     );
