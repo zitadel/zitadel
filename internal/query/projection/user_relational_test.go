@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -26,10 +27,10 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 	ctx := t.Context()
 
 	// create instance
-	instanceReop := repository.InstanceRepository()
+	instanceRepo := repository.InstanceRepository()
 	instanceID := gofakeit.UUID()
 	orgID := gofakeit.UUID()
-	err := instanceReop.Create(ctx, tx, &domain.Instance{
+	err := instanceRepo.Create(ctx, tx, &domain.Instance{
 		ID:           instanceID,
 		Name:         "test-instance",
 		DefaultOrgID: orgID,
@@ -201,13 +202,13 @@ func createUser(t *testing.T,
 		InstanceID:     instanceID,
 		OrganizationID: orgID,
 		ID:             userID,
-		Username:       gofakeit.Username(),
+		Username:       integration.Username(),
 		State:          domain.UserStateActive,
 		Human: &domain.HumanUser{
 			FirstName: gofakeit.FirstName(),
 			LastName:  gofakeit.LastName(),
 			Email: domain.HumanEmail{
-				Address:    gofakeit.Email(),
+				Address:    integration.Email(),
 				VerifiedAt: time.Now(),
 			},
 		},
