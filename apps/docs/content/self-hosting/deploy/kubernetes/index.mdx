@@ -23,7 +23,7 @@ No cluster yet? [k3d](https://k3d.io/) is a quick way to spin one up locally —
 ```bash
 k3d cluster create zitadel --port "8080:80@loadbalancer"
 ```
-With k3d, set `ExternalPort: 8080` in the values below.
+With k3d, edit `ExternalPort: 80` → `ExternalPort: 8080` in the downloaded `quickstart-values.yaml`, then use `http://localhost:8080/ui/console`.
 </Callout>
 
 ### Install the full stack
@@ -41,7 +41,7 @@ helm repo update &&
 helm upgrade --install zitadel zitadel/zitadel --values quickstart-values.yaml --wait
 ```
 
-That's it. Visit [http://localhost/ui/console](http://localhost/ui/console) to open the console (use `http://localhost:8080/ui/console` if using k3d).
+That's it. Visit [http://localhost/ui/console](http://localhost/ui/console) to open the console.
 
 <DefaultUser components={props.components} />
 
