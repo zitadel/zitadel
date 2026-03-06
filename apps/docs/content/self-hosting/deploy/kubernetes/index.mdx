@@ -10,19 +10,20 @@ This guide takes you from zero to a running ZITADEL instance on Kubernetes and t
 
 ## Stage 1 — Quickstart
 
-The ZITADEL chart ships with an optional in-cluster PostgreSQL subchart, so a single `helm install` deploys the full stack — no separate database install, no manual secret wiring.
+The ZITADEL chart ships with optional subcharts for PostgreSQL and Traefik, so a single `helm install` deploys the entire stack — no pre-installed ingress controller required.
 
 ### Prerequisites
 
-- A Kubernetes cluster (1.30+) with an ingress controller
+- A Kubernetes cluster (1.30+)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [Helm](https://helm.sh/docs/intro/install/) 3.x or 4.x
 
 <Callout type="info">
-No cluster yet? [k3d](https://k3d.io/) is a quick way to spin one up locally — it runs k3s in Docker and includes Traefik as the ingress controller:
+No cluster yet? [k3d](https://k3d.io/) is a quick way to spin one up locally — it runs k3s in Docker:
 ```bash
 k3d cluster create zitadel --port "8080:80@loadbalancer"
 ```
+With k3d, set `ExternalPort: 8080` in the values below.
 </Callout>
 
 ### Install the full stack
@@ -30,6 +31,7 @@ k3d cluster create zitadel --port "8080:80@loadbalancer"
 Save the following as `quickstart-values.yaml` and run `helm install zitadel zitadel/zitadel --values quickstart-values.yaml --wait`:
 
 ```yaml
+# bundled PostgreSQL — auto-wires DB connection to ZITADEL
 postgresql:
   enabled: true
   auth:
@@ -41,11 +43,18 @@ postgresql:
     persistence:
       enabled: false
 
+# bundled Traefik — auto-sets ingress.className to "traefik"
+# isDefaultClass: false prevents conflicts with existing ingress controllers
+traefik:
+  enabled: true
+  ingressClass:
+    isDefaultClass: false
+
 zitadel:
   masterkey: "MasterkeyNeedsToHave32Characters"
   configmapConfig:
-    ExternalDomain: localhost   # replace with your domain or IP
-    ExternalPort: 8080          # the port users will access
+    ExternalDomain: localhost   # replace with your domain/IP
+    ExternalPort: 80            # use 8080 with k3d port mapping
     ExternalSecure: false
     TLS:
       Enabled: false
@@ -57,9 +66,9 @@ zitadel:
           Password: "Password1!"
           PasswordChangeRequired: false
 
+# ingress.className is auto-set to "traefik" when traefik.enabled=true
 ingress:
   enabled: true
-  className: traefik   # replace with your ingress controller (nginx, alb, …)
   hosts:
     - host: localhost
       paths:
@@ -69,7 +78,6 @@ ingress:
 login:
   ingress:
     enabled: true
-    className: traefik   # must match ingress.className above
     hosts:
       - host: localhost
         paths:
@@ -80,12 +88,13 @@ login:
 ```bash
 helm repo add zitadel https://charts.zitadel.com
 helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo add traefik https://traefik.github.io/charts
 helm repo update
 
 helm install zitadel zitadel/zitadel --values quickstart-values.yaml --wait
 ```
 
-That's it. Visit [http://localhost:8080/ui/console](http://localhost:8080/ui/console) (adjust the host/port to match your `ExternalDomain` and `ExternalPort`) to open the console.
+That's it. Visit [http://localhost/ui/console](http://localhost/ui/console) to open the console (use `http://localhost:8080/ui/console` if using k3d).
 
 <DefaultUser components={props.components} />
 
@@ -98,18 +107,18 @@ Once ZITADEL has been initialized with a masterkey, it **cannot be changed** wit
 </Callout>
 
 <Callout type="info">
-The stack runs: **your ingress controller** ([reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)) → **ZITADEL API** (Go) + **ZITADEL Login** (Next.js) → **PostgreSQL**.
-ZITADEL's API uses [gRPC over HTTP/2](/self-hosting/manage/http2) — make sure your ingress controller forwards h2c traffic to ZITADEL pods.
+The stack runs: **Traefik** ([reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)) → **ZITADEL API** (Go) + **ZITADEL Login** (Next.js) → **PostgreSQL**.
+The bundled Traefik uses `isDefaultClass: false` so it only handles ZITADEL's Ingresses and does not conflict with existing ingress controllers. [gRPC over HTTP/2](/self-hosting/manage/http2) is handled automatically by Traefik.
 </Callout>
 
 ### Swap out components
 
-The bundled PostgreSQL (`postgresql.enabled=true`) is for local use only. Once you're ready to move forward, you can replace individual components:
+The bundled subcharts are for quickstart use only. You can replace any component independently:
 
 | Component | How to replace |
 |-----------|---------------|
-| **Database** | Set `postgresql.enabled=false` and configure `zitadel.configmapConfig.Database` pointing to your own PostgreSQL |
-| **Reverse proxy** | Set `ingress.className` to `nginx`, `alb`, or your controller of choice |
+| **Database** | Set `postgresql.enabled: false` and configure `zitadel.configmapConfig.Database` pointing to your own PostgreSQL |
+| **Ingress controller** | Set `traefik.enabled: false` and set `ingress.className` to your controller (e.g., `nginx`) |
 | **Caching** | Add Redis by configuring `zitadel.configmapConfig.Caches` (see [Caching](/self-hosting/deploy/kubernetes/caching)) |
 
 ## Stage 2 — Production Cluster
