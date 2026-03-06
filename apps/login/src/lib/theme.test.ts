@@ -78,6 +78,12 @@ describe("Theme Configuration", () => {
 
   describe("getThemeConfig", () => {
     it("should return default theme when no environment variables are set", () => {
+      delete process.env.NEXT_PUBLIC_THEME_ROUNDNESS;
+      delete process.env.NEXT_PUBLIC_THEME_LAYOUT;
+      delete process.env.NEXT_PUBLIC_THEME_APPEARANCE;
+      delete process.env.NEXT_PUBLIC_THEME_SPACING;
+      delete process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE;
+
       const config = getThemeConfig();
 
       expect(config.roundness).toBe(DEFAULT_THEME.roundness);

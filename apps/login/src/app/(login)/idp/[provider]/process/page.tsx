@@ -1,4 +1,9 @@
+import { DynamicTheme } from "@/components/dynamic-theme";
 import { IdpProcessHandler } from "@/components/idp-process-handler";
+import { getServiceConfig } from "@/lib/service-url";
+import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { headers } from "next/headers";
 
 /**
  * This page handles the initial IDP callback with the single-use token.
@@ -20,17 +25,32 @@ export default async function ProcessPage(props: {
     throw new Error("Missing required IDP callback parameters");
   }
 
+  const _headers = await headers();
+  const { serviceConfig } = getServiceConfig(_headers);
+
+  let defaultOrganization;
+  if (!organization) {
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
+    if (org) {
+      defaultOrganization = org.id;
+    }
+  }
+
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
+  
   return (
-    <IdpProcessHandler
-      provider={provider}
-      id={id}
-      token={token}
-      requestId={requestId}
-      organization={organization}
-      link={link}
-      sessionId={linkToSessionId}
-      linkFingerprint={linkFingerprint}
-      postErrorRedirectUrl={postErrorRedirectUrl}
-    />
+    <DynamicTheme branding={branding}>
+      <IdpProcessHandler
+        provider={provider}
+        id={id}
+        token={token}
+        requestId={requestId}
+        organization={organization}
+        link={link}
+        sessionId={linkToSessionId}
+        linkFingerprint={linkFingerprint}
+        postErrorRedirectUrl={postErrorRedirectUrl}
+      /> 
+    </DynamicTheme>
   );
 }
