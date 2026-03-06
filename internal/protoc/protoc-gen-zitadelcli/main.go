@@ -1073,13 +1073,11 @@ func extractMessageColumns(msg *protogen.Message) []columnDef {
 	primaryIDHeader := strings.ToUpper(strings.ReplaceAll(toKebab(msg.GoIdent.GoName), "-", " ")) + " ID"
 
 	var (
-		primaryIdCol    *columnDef  // resource's own ID — shown as "ID"
-		hasBareID       bool        // true when the field was literally named "id" (e.g., Organization)
-		orgIdCols       []columnDef // ORGANIZATION ID (from details.resource_owner or direct field)
-		orgIdFromDetail bool        // whether orgIdCols came from details (may be suppressed)
-		otherIdCols     []columnDef // other foreign " ID" fields (user_id, granted_organization_id, …)
-		semanticCols    []columnDef // names, states, booleans, enums
-		timestampCols   []columnDef // timestamps — shown last as metadata
+		primaryIdCol  *columnDef  // resource's own ID — shown as "ID"
+		orgIdCols     []columnDef // ORGANIZATION ID (from details.resource_owner or direct field)
+		otherIdCols   []columnDef // other foreign " ID" fields (user_id, granted_organization_id, …)
+		semanticCols  []columnDef // names, states, booleans, enums
+		timestampCols []columnDef // timestamps — shown last as metadata
 	)
 
 	for _, field := range msg.Fields {
@@ -1089,17 +1087,16 @@ func extractMessageColumns(msg *protogen.Message) []columnDef {
 		}
 		switch {
 		case col.Header == "ID":
-			// Bare "id" field — the resource is its own top-level entity (e.g., Organization).
-			hasBareID = true
+			// Bare "id" field — the resource is its own top-level entity (e.g., Organization, IDP).
 			primaryIdCol = col
+		case col.Header == "ORGANIZATION ID":
+			// Must be checked before primaryIDHeader — for Organization, primaryIDHeader is also
+			// "ORGANIZATION ID" and details.resource_owner must go to orgIdCols, not primaryIdCol.
+			orgIdCols = append(orgIdCols, *col)
 		case col.Header == primaryIDHeader:
 			// e.g., "PROJECT ID" for Project, "USER ID" for User — rename to plain "ID".
 			col.Header = "ID"
 			primaryIdCol = col
-		case col.Header == "ORGANIZATION ID":
-			fromDetails := strings.HasPrefix(col.GoAccessor, "GetDetails()")
-			orgIdFromDetail = fromDetails
-			orgIdCols = append(orgIdCols, *col)
 		case strings.HasSuffix(col.Header, " ID"):
 			otherIdCols = append(otherIdCols, *col)
 		case col.IsTimestamp:
@@ -1107,12 +1104,6 @@ func extractMessageColumns(msg *protogen.Message) []columnDef {
 		default:
 			semanticCols = append(semanticCols, *col)
 		}
-	}
-
-	// When the resource IS the organization itself (bare "id", e.g., Organization message),
-	// details.resource_owner == id — suppress the redundant ORGANIZATION ID column.
-	if hasBareID && orgIdFromDetail {
-		orgIdCols = nil
 	}
 
 	// Detect oneof fields and add a TYPE column showing which variant is set.

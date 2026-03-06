@@ -559,10 +559,11 @@ func newOrganizationService_ListOrganizationsCmd(getCfg func() *config.Config, g
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "STATE", "NAME", "PRIMARY DOMAIN"}
+			header := []string{"ID", "ORGANIZATION ID", "STATE", "NAME", "PRIMARY DOMAIN"}
 			var rows [][]string
 			for _, item := range resp.Msg.GetResult() {
 				rows = append(rows, []string{
+					fmt.Sprint(item.GetId()),
 					fmt.Sprint(item.GetDetails().GetResourceOwner()),
 					fmt.Sprint(item.GetState().String()),
 					fmt.Sprint(item.GetName()),
