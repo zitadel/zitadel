@@ -265,18 +265,22 @@ func newInstanceService_DeleteInstanceCmd(getCfg func() *config.Config, getOutpu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -362,28 +366,32 @@ func newInstanceService_GetInstanceCmd(getCfg func() *config.Config, getOutput f
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "STATE", "NAME", "VERSION", "CHANGE DATE", "CREATION DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetInstance().GetId()),
-					fmt.Sprint(resp.Msg.GetInstance().GetState().String()),
-					fmt.Sprint(resp.Msg.GetInstance().GetName()),
-					fmt.Sprint(resp.Msg.GetInstance().GetVersion()),
-					func() string {
-						if t := resp.Msg.GetInstance().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-					func() string {
-						if t := resp.Msg.GetInstance().GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"ID", "STATE", "NAME", "VERSION", "CHANGE DATE", "CREATION DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetInstance().GetId()),
+						fmt.Sprint(resp.Msg.GetInstance().GetState().String()),
+						fmt.Sprint(resp.Msg.GetInstance().GetName()),
+						fmt.Sprint(resp.Msg.GetInstance().GetVersion()),
+						func() string {
+							if t := resp.Msg.GetInstance().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+						func() string {
+							if t := resp.Msg.GetInstance().GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -477,18 +485,22 @@ func newInstanceService_UpdateInstanceCmd(getCfg func() *config.Config, getOutpu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -700,18 +712,22 @@ func newInstanceService_AddCustomDomainCmd(getCfg func() *config.Config, getOutp
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CREATION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CREATION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -807,18 +823,22 @@ func newInstanceService_RemoveCustomDomainCmd(getCfg func() *config.Config, getO
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1030,18 +1050,22 @@ func newInstanceService_AddTrustedDomainCmd(getCfg func() *config.Config, getOut
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CREATION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CREATION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1137,18 +1161,22 @@ func newInstanceService_RemoveTrustedDomainCmd(getCfg func() *config.Config, get
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}

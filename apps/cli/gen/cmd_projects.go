@@ -415,19 +415,23 @@ func newProjectService_CreateProjectCmd(getCfg func() *config.Config, getOutput 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"PROJECT ID", "CREATION DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetProjectId()),
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"PROJECT ID", "CREATION DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetProjectId()),
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -550,18 +554,22 @@ func newProjectService_UpdateProjectCmd(getCfg func() *config.Config, getOutput 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -656,18 +664,22 @@ func newProjectService_DeleteProjectCmd(getCfg func() *config.Config, getOutput 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -753,35 +765,39 @@ func newProjectService_GetProjectCmd(getCfg func() *config.Config, getOutput fun
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "ORGANIZATION ID", "GRANTED ORGANIZATION ID", "NAME", "STATE", "PROJECT ROLE ASSERTION", "AUTHORIZATION REQUIRED", "PROJECT ACCESS REQUIRED", "PRIVATE LABELING SETTING", "GRANTED ORGANIZATION NAME", "GRANTED STATE", "CREATION DATE", "CHANGE DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetProject().GetProjectId()),
-					fmt.Sprint(resp.Msg.GetProject().GetOrganizationId()),
-					fmt.Sprint(resp.Msg.GetProject().GetGrantedOrganizationId()),
-					fmt.Sprint(resp.Msg.GetProject().GetName()),
-					fmt.Sprint(resp.Msg.GetProject().GetState().String()),
-					fmt.Sprint(resp.Msg.GetProject().GetProjectRoleAssertion()),
-					fmt.Sprint(resp.Msg.GetProject().GetAuthorizationRequired()),
-					fmt.Sprint(resp.Msg.GetProject().GetProjectAccessRequired()),
-					fmt.Sprint(resp.Msg.GetProject().GetPrivateLabelingSetting().String()),
-					fmt.Sprint(resp.Msg.GetProject().GetGrantedOrganizationName()),
-					fmt.Sprint(resp.Msg.GetProject().GetGrantedState().String()),
-					func() string {
-						if t := resp.Msg.GetProject().GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-					func() string {
-						if t := resp.Msg.GetProject().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"ID", "ORGANIZATION ID", "GRANTED ORGANIZATION ID", "NAME", "STATE", "PROJECT ROLE ASSERTION", "AUTHORIZATION REQUIRED", "PROJECT ACCESS REQUIRED", "PRIVATE LABELING SETTING", "GRANTED ORGANIZATION NAME", "GRANTED STATE", "CREATION DATE", "CHANGE DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetProject().GetProjectId()),
+						fmt.Sprint(resp.Msg.GetProject().GetOrganizationId()),
+						fmt.Sprint(resp.Msg.GetProject().GetGrantedOrganizationId()),
+						fmt.Sprint(resp.Msg.GetProject().GetName()),
+						fmt.Sprint(resp.Msg.GetProject().GetState().String()),
+						fmt.Sprint(resp.Msg.GetProject().GetProjectRoleAssertion()),
+						fmt.Sprint(resp.Msg.GetProject().GetAuthorizationRequired()),
+						fmt.Sprint(resp.Msg.GetProject().GetProjectAccessRequired()),
+						fmt.Sprint(resp.Msg.GetProject().GetPrivateLabelingSetting().String()),
+						fmt.Sprint(resp.Msg.GetProject().GetGrantedOrganizationName()),
+						fmt.Sprint(resp.Msg.GetProject().GetGrantedState().String()),
+						func() string {
+							if t := resp.Msg.GetProject().GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+						func() string {
+							if t := resp.Msg.GetProject().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -991,18 +1007,22 @@ func newProjectService_DeactivateProjectCmd(getCfg func() *config.Config, getOut
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1088,18 +1108,22 @@ func newProjectService_ActivateProjectCmd(getCfg func() *config.Config, getOutpu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1204,18 +1228,22 @@ func newProjectService_AddProjectRoleCmd(getCfg func() *config.Config, getOutput
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CREATION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CREATION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1324,18 +1352,22 @@ func newProjectService_UpdateProjectRoleCmd(getCfg func() *config.Config, getOut
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1433,18 +1465,22 @@ func newProjectService_RemoveProjectRoleCmd(getCfg func() *config.Config, getOut
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"REMOVAL DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetRemovalDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"REMOVAL DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetRemovalDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1665,18 +1701,22 @@ func newProjectService_CreateProjectGrantCmd(getCfg func() *config.Config, getOu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CREATION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CREATION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1775,18 +1815,22 @@ func newProjectService_UpdateProjectGrantCmd(getCfg func() *config.Config, getOu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1883,18 +1927,22 @@ func newProjectService_DeleteProjectGrantCmd(getCfg func() *config.Config, getOu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1990,18 +2038,22 @@ func newProjectService_DeactivateProjectGrantCmd(getCfg func() *config.Config, g
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -2097,18 +2149,22 @@ func newProjectService_ActivateProjectGrantCmd(getCfg func() *config.Config, get
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}

@@ -126,17 +126,21 @@ func newIdentityProviderService_GetIDPByIDCmd(getCfg func() *config.Config, getO
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "ORGANIZATION ID", "STATE", "NAME", "TYPE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetIdp().GetId()),
-					fmt.Sprint(resp.Msg.GetIdp().GetDetails().GetResourceOwner()),
-					fmt.Sprint(resp.Msg.GetIdp().GetState().String()),
-					fmt.Sprint(resp.Msg.GetIdp().GetName()),
-					fmt.Sprint(resp.Msg.GetIdp().GetType().String()),
-				},
+			if getOutput() == "table" {
+				header := []string{"ID", "ORGANIZATION ID", "STATE", "NAME", "TYPE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetIdp().GetId()),
+						fmt.Sprint(resp.Msg.GetIdp().GetDetails().GetResourceOwner()),
+						fmt.Sprint(resp.Msg.GetIdp().GetState().String()),
+						fmt.Sprint(resp.Msg.GetIdp().GetName()),
+						fmt.Sprint(resp.Msg.GetIdp().GetType().String()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}

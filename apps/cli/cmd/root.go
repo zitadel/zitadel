@@ -38,10 +38,12 @@ func NewRootCmd() *cobra.Command {
 				return nil
 			}
 
-			// Auto-detect output format: JSON when stdout is not a TTY
+			// Auto-detect output format: describe for TTY, JSON for pipes/redirects.
 			if !cmd.Flags().Changed("output") {
 				if fi, err := os.Stdout.Stat(); err == nil && fi.Mode()&os.ModeCharDevice == 0 {
 					flagOutput = "json"
+				} else {
+					flagOutput = "describe"
 				}
 			}
 
@@ -66,7 +68,7 @@ func NewRootCmd() *cobra.Command {
 	}
 
 	root.PersistentFlags().StringVar(&flagCtx, "context", "", "override the active context")
-	root.PersistentFlags().StringVarP(&flagOutput, "output", "o", "table", "output format: table or json (auto-detected from TTY)")
+	root.PersistentFlags().StringVarP(&flagOutput, "output", "o", "table", "output format: table, json, or describe (default: describe for TTY, json for pipes)")
 	root.PersistentFlags().BoolVar(&flagFromJSON, "from-json", false, "read request body as JSON from stdin")
 	root.PersistentFlags().StringVar(&flagRequestJSON, "request-json", "", "provide request body as inline JSON string (alternative to --from-json with stdin)")
 	root.PersistentFlags().BoolVar(&flagDryRun, "dry-run", false, "print the request as JSON without calling the API")

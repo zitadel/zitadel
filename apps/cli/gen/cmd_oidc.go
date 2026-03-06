@@ -170,23 +170,27 @@ func newOIDCService_GetAuthRequestCmd(getCfg func() *config.Config, getOutput fu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "CLIENT ID", "HINT USER ID", "REDIRECT URI", "LOGIN HINT", "CREATION DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetAuthRequest().GetId()),
-					fmt.Sprint(resp.Msg.GetAuthRequest().GetClientId()),
-					fmt.Sprint(resp.Msg.GetAuthRequest().GetHintUserId()),
-					fmt.Sprint(resp.Msg.GetAuthRequest().GetRedirectUri()),
-					fmt.Sprint(resp.Msg.GetAuthRequest().GetLoginHint()),
-					func() string {
-						if t := resp.Msg.GetAuthRequest().GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"ID", "CLIENT ID", "HINT USER ID", "REDIRECT URI", "LOGIN HINT", "CREATION DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetAuthRequest().GetId()),
+						fmt.Sprint(resp.Msg.GetAuthRequest().GetClientId()),
+						fmt.Sprint(resp.Msg.GetAuthRequest().GetHintUserId()),
+						fmt.Sprint(resp.Msg.GetAuthRequest().GetRedirectUri()),
+						fmt.Sprint(resp.Msg.GetAuthRequest().GetLoginHint()),
+						func() string {
+							if t := resp.Msg.GetAuthRequest().GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -416,13 +420,17 @@ func doOIDCService_CreateCallback(getCfg func() *config.Config, getOutput func()
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"CALLBACK URL"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetCallbackUrl()),
-		},
+	if getOutput() == "table" {
+		header := []string{"CALLBACK URL"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetCallbackUrl()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -506,16 +514,20 @@ func newOIDCService_GetDeviceAuthorizationRequestCmd(getCfg func() *config.Confi
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "CLIENT ID", "APP NAME", "PROJECT NAME"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetDeviceAuthorizationRequest().GetId()),
-					fmt.Sprint(resp.Msg.GetDeviceAuthorizationRequest().GetClientId()),
-					fmt.Sprint(resp.Msg.GetDeviceAuthorizationRequest().GetAppName()),
-					fmt.Sprint(resp.Msg.GetDeviceAuthorizationRequest().GetProjectName()),
-				},
+			if getOutput() == "table" {
+				header := []string{"ID", "CLIENT ID", "APP NAME", "PROJECT NAME"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetDeviceAuthorizationRequest().GetId()),
+						fmt.Sprint(resp.Msg.GetDeviceAuthorizationRequest().GetClientId()),
+						fmt.Sprint(resp.Msg.GetDeviceAuthorizationRequest().GetAppName()),
+						fmt.Sprint(resp.Msg.GetDeviceAuthorizationRequest().GetProjectName()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}

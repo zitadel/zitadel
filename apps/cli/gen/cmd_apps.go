@@ -652,19 +652,23 @@ func doApplicationService_CreateApplication(getCfg func() *config.Config, getOut
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"APPLICATION ID", "CREATION DATE"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetApplicationId()),
-			func() string {
-				if t := resp.Msg.GetCreationDate(); t != nil {
-					return t.AsTime().Format("2006-01-02T15:04:05Z")
-				}
-				return ""
-			}(),
-		},
+	if getOutput() == "table" {
+		header := []string{"APPLICATION ID", "CREATION DATE"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetApplicationId()),
+				func() string {
+					if t := resp.Msg.GetCreationDate(); t != nil {
+						return t.AsTime().Format("2006-01-02T15:04:05Z")
+					}
+					return ""
+				}(),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -1024,18 +1028,22 @@ func doApplicationService_UpdateApplication(getCfg func() *config.Config, getOut
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"CHANGE DATE"}
-	rows := [][]string{
-		{
-			func() string {
-				if t := resp.Msg.GetChangeDate(); t != nil {
-					return t.AsTime().Format("2006-01-02T15:04:05Z")
-				}
-				return ""
-			}(),
-		},
+	if getOutput() == "table" {
+		header := []string{"CHANGE DATE"}
+		rows := [][]string{
+			{
+				func() string {
+					if t := resp.Msg.GetChangeDate(); t != nil {
+						return t.AsTime().Format("2006-01-02T15:04:05Z")
+					}
+					return ""
+				}(),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -1117,40 +1125,44 @@ func newApplicationService_GetApplicationCmd(getCfg func() *config.Config, getOu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "PROJECT ID", "STATE", "NAME", "CONFIGURATION", "CREATION DATE", "CHANGE DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetApplication().GetApplicationId()),
-					fmt.Sprint(resp.Msg.GetApplication().GetProjectId()),
-					fmt.Sprint(resp.Msg.GetApplication().GetState().String()),
-					fmt.Sprint(resp.Msg.GetApplication().GetName()),
-					func() string {
-						switch resp.Msg.GetApplication().GetConfiguration().(type) {
-						case *applicationpb.Application_OidcConfiguration:
-							return "oidc-configuration"
-						case *applicationpb.Application_ApiConfiguration:
-							return "api-configuration"
-						case *applicationpb.Application_SamlConfiguration:
-							return "saml-configuration"
-						default:
+			if getOutput() == "table" {
+				header := []string{"ID", "PROJECT ID", "STATE", "NAME", "CONFIGURATION", "CREATION DATE", "CHANGE DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetApplication().GetApplicationId()),
+						fmt.Sprint(resp.Msg.GetApplication().GetProjectId()),
+						fmt.Sprint(resp.Msg.GetApplication().GetState().String()),
+						fmt.Sprint(resp.Msg.GetApplication().GetName()),
+						func() string {
+							switch resp.Msg.GetApplication().GetConfiguration().(type) {
+							case *applicationpb.Application_OidcConfiguration:
+								return "oidc-configuration"
+							case *applicationpb.Application_ApiConfiguration:
+								return "api-configuration"
+							case *applicationpb.Application_SamlConfiguration:
+								return "saml-configuration"
+							default:
+								return ""
+							}
+						}(),
+						func() string {
+							if t := resp.Msg.GetApplication().GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
 							return ""
-						}
-					}(),
-					func() string {
-						if t := resp.Msg.GetApplication().GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-					func() string {
-						if t := resp.Msg.GetApplication().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+						}(),
+						func() string {
+							if t := resp.Msg.GetApplication().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1244,18 +1256,22 @@ func newApplicationService_DeleteApplicationCmd(getCfg func() *config.Config, ge
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1351,18 +1367,22 @@ func newApplicationService_DeactivateApplicationCmd(getCfg func() *config.Config
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DEACTIVATION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeactivationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DEACTIVATION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeactivationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1458,18 +1478,22 @@ func newApplicationService_ReactivateApplicationCmd(getCfg func() *config.Config
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"REACTIVATION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetReactivationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"REACTIVATION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetReactivationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1565,19 +1589,23 @@ func newApplicationService_GenerateClientSecretCmd(getCfg func() *config.Config,
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CLIENT SECRET", "CREATION DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetClientSecret()),
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CLIENT SECRET", "CREATION DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetClientSecret()),
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1801,19 +1829,23 @@ func newApplicationService_CreateApplicationKeyCmd(getCfg func() *config.Config,
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"KEY ID", "CREATION DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetKeyId()),
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"KEY ID", "CREATION DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetKeyId()),
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1916,18 +1948,22 @@ func newApplicationService_DeleteApplicationKeyCmd(getCfg func() *config.Config,
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -2016,25 +2052,29 @@ func newApplicationService_GetApplicationKeyCmd(getCfg func() *config.Config, ge
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"KEY ID", "CREATION DATE", "EXPIRATION DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetKeyId()),
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-					func() string {
-						if t := resp.Msg.GetExpirationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"KEY ID", "CREATION DATE", "EXPIRATION DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetKeyId()),
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+						func() string {
+							if t := resp.Msg.GetExpirationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}

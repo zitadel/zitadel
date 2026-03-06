@@ -246,18 +246,22 @@ func newFeatureService_SetSystemFeaturesCmd(getCfg func() *config.Config, getOut
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -343,14 +347,18 @@ func newFeatureService_GetSystemFeaturesCmd(getCfg func() *config.Config, getOut
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ENABLED", "SOURCE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetEnabled()),
-					fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetSource().String()),
-				},
+			if getOutput() == "table" {
+				header := []string{"ENABLED", "SOURCE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetEnabled()),
+						fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetSource().String()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -458,18 +466,22 @@ func newFeatureService_SetInstanceFeaturesCmd(getCfg func() *config.Config, getO
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -559,14 +571,18 @@ func newFeatureService_GetInstanceFeaturesCmd(getCfg func() *config.Config, getO
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ENABLED", "SOURCE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetEnabled()),
-					fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetSource().String()),
-				},
+			if getOutput() == "table" {
+				header := []string{"ENABLED", "SOURCE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetEnabled()),
+						fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetSource().String()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -654,18 +670,22 @@ func newFeatureService_SetOrganizationFeaturesCmd(getCfg func() *config.Config, 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -753,18 +773,22 @@ func newFeatureService_GetOrganizationFeaturesCmd(getCfg func() *config.Config, 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -852,18 +876,22 @@ func newFeatureService_SetUserFeaturesCmd(getCfg func() *config.Config, getOutpu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -951,18 +979,22 @@ func newFeatureService_GetUserFeaturesCmd(getCfg func() *config.Config, getOutpu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}

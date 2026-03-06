@@ -1247,21 +1247,25 @@ func doUserService_CreateUser(getCfg func() *config.Config, getOutput func() str
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"ID", "CREATION DATE", "EMAIL CODE", "PHONE CODE"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetId()),
-			func() string {
-				if t := resp.Msg.GetCreationDate(); t != nil {
-					return t.AsTime().Format("2006-01-02T15:04:05Z")
-				}
-				return ""
-			}(),
-			fmt.Sprint(resp.Msg.GetEmailCode()),
-			fmt.Sprint(resp.Msg.GetPhoneCode()),
-		},
+	if getOutput() == "table" {
+		header := []string{"ID", "CREATION DATE", "EMAIL CODE", "PHONE CODE"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetId()),
+				func() string {
+					if t := resp.Msg.GetCreationDate(); t != nil {
+						return t.AsTime().Format("2006-01-02T15:04:05Z")
+					}
+					return ""
+				}(),
+				fmt.Sprint(resp.Msg.GetEmailCode()),
+				fmt.Sprint(resp.Msg.GetPhoneCode()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -1492,15 +1496,19 @@ func doUserService_AddHumanUser(getCfg func() *config.Config, getOutput func() s
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"USER ID", "EMAIL CODE", "PHONE CODE"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetUserId()),
-			fmt.Sprint(resp.Msg.GetEmailCode()),
-			fmt.Sprint(resp.Msg.GetPhoneCode()),
-		},
+	if getOutput() == "table" {
+		header := []string{"USER ID", "EMAIL CODE", "PHONE CODE"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetUserId()),
+				fmt.Sprint(resp.Msg.GetEmailCode()),
+				fmt.Sprint(resp.Msg.GetPhoneCode()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -1582,27 +1590,31 @@ func newUserService_GetUserByIDCmd(getCfg func() *config.Config, getOutput func(
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "ORGANIZATION ID", "STATE", "USERNAME", "PREFERRED LOGIN NAME", "TYPE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetUser().GetUserId()),
-					fmt.Sprint(resp.Msg.GetUser().GetDetails().GetResourceOwner()),
-					fmt.Sprint(resp.Msg.GetUser().GetState().String()),
-					fmt.Sprint(resp.Msg.GetUser().GetUsername()),
-					fmt.Sprint(resp.Msg.GetUser().GetPreferredLoginName()),
-					func() string {
-						switch resp.Msg.GetUser().GetType().(type) {
-						case *userpb.User_Human:
-							return "human"
-						case *userpb.User_Machine:
-							return "machine"
-						default:
-							return ""
-						}
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"ID", "ORGANIZATION ID", "STATE", "USERNAME", "PREFERRED LOGIN NAME", "TYPE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetUser().GetUserId()),
+						fmt.Sprint(resp.Msg.GetUser().GetDetails().GetResourceOwner()),
+						fmt.Sprint(resp.Msg.GetUser().GetState().String()),
+						fmt.Sprint(resp.Msg.GetUser().GetUsername()),
+						fmt.Sprint(resp.Msg.GetUser().GetPreferredLoginName()),
+						func() string {
+							switch resp.Msg.GetUser().GetType().(type) {
+							case *userpb.User_Human:
+								return "human"
+							case *userpb.User_Machine:
+								return "machine"
+							default:
+								return ""
+							}
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -2003,13 +2015,17 @@ func doUserService_SetEmail(getCfg func() *config.Config, getOutput func() strin
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"VERIFICATION CODE"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetVerificationCode()),
-		},
+	if getOutput() == "table" {
+		header := []string{"VERIFICATION CODE"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetVerificationCode()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -2099,18 +2115,22 @@ func newUserService_VerifyEmailCmd(getCfg func() *config.Config, getOutput func(
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -2369,13 +2389,17 @@ func doUserService_SetPhone(getCfg func() *config.Config, getOutput func() strin
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"VERIFICATION CODE"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetVerificationCode()),
-		},
+	if getOutput() == "table" {
+		header := []string{"VERIFICATION CODE"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetVerificationCode()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -2457,18 +2481,22 @@ func newUserService_RemovePhoneCmd(getCfg func() *config.Config, getOutput func(
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -2562,18 +2590,22 @@ func newUserService_VerifyPhoneCmd(getCfg func() *config.Config, getOutput func(
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -2873,20 +2905,24 @@ func doUserService_UpdateUser(getCfg func() *config.Config, getOutput func() str
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"CHANGE DATE", "EMAIL CODE", "PHONE CODE"}
-	rows := [][]string{
-		{
-			func() string {
-				if t := resp.Msg.GetChangeDate(); t != nil {
-					return t.AsTime().Format("2006-01-02T15:04:05Z")
-				}
-				return ""
-			}(),
-			fmt.Sprint(resp.Msg.GetEmailCode()),
-			fmt.Sprint(resp.Msg.GetPhoneCode()),
-		},
+	if getOutput() == "table" {
+		header := []string{"CHANGE DATE", "EMAIL CODE", "PHONE CODE"}
+		rows := [][]string{
+			{
+				func() string {
+					if t := resp.Msg.GetChangeDate(); t != nil {
+						return t.AsTime().Format("2006-01-02T15:04:05Z")
+					}
+					return ""
+				}(),
+				fmt.Sprint(resp.Msg.GetEmailCode()),
+				fmt.Sprint(resp.Msg.GetPhoneCode()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -2973,14 +3009,18 @@ func newUserService_UpdateHumanUserCmd(getCfg func() *config.Config, getOutput f
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"EMAIL CODE", "PHONE CODE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetEmailCode()),
-					fmt.Sprint(resp.Msg.GetPhoneCode()),
-				},
+			if getOutput() == "table" {
+				header := []string{"EMAIL CODE", "PHONE CODE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetEmailCode()),
+						fmt.Sprint(resp.Msg.GetPhoneCode()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -3068,18 +3108,22 @@ func newUserService_DeactivateUserCmd(getCfg func() *config.Config, getOutput fu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -3165,18 +3209,22 @@ func newUserService_ReactivateUserCmd(getCfg func() *config.Config, getOutput fu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -3262,18 +3310,22 @@ func newUserService_DeleteUserCmd(getCfg func() *config.Config, getOutput func()
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -3374,18 +3426,22 @@ func newUserService_VerifyPasskeyRegistrationCmd(getCfg func() *config.Config, g
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -3585,14 +3641,18 @@ func doUserService_CreatePasskeyRegistrationLink(getCfg func() *config.Config, g
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"ID", "CODE"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetCode().GetId()),
-			fmt.Sprint(resp.Msg.GetCode().GetCode()),
-		},
+	if getOutput() == "table" {
+		header := []string{"ID", "CODE"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetCode().GetId()),
+				fmt.Sprint(resp.Msg.GetCode().GetCode()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -3777,18 +3837,22 @@ func newUserService_RemovePasskeyCmd(getCfg func() *config.Config, getOutput fun
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -3891,18 +3955,22 @@ func newUserService_VerifyU2FRegistrationCmd(getCfg func() *config.Config, getOu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -3999,18 +4067,22 @@ func newUserService_RemoveU2FCmd(getCfg func() *config.Config, getOutput func() 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -4106,18 +4178,22 @@ func newUserService_VerifyTOTPRegistrationCmd(getCfg func() *config.Config, getO
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -4205,18 +4281,22 @@ func newUserService_RemoveTOTPCmd(getCfg func() *config.Config, getOutput func()
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -4302,18 +4382,22 @@ func newUserService_AddOTPSMSCmd(getCfg func() *config.Config, getOutput func() 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -4399,18 +4483,22 @@ func newUserService_RemoveOTPSMSCmd(getCfg func() *config.Config, getOutput func
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -4501,18 +4589,22 @@ func newUserService_GenerateRecoveryCodesCmd(getCfg func() *config.Config, getOu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -4600,18 +4692,22 @@ func newUserService_RemoveRecoveryCodesCmd(getCfg func() *config.Config, getOutp
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -4697,18 +4793,22 @@ func newUserService_AddOTPEmailCmd(getCfg func() *config.Config, getOutput func(
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -4794,18 +4894,22 @@ func newUserService_RemoveOTPEmailCmd(getCfg func() *config.Config, getOutput fu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -4891,18 +4995,22 @@ func newUserService_AddIDPLinkCmd(getCfg func() *config.Config, getOutput func()
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -5124,18 +5232,22 @@ func newUserService_RemoveIDPLinkCmd(getCfg func() *config.Config, getOutput fun
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -5333,18 +5445,22 @@ func doUserService_SetPassword(getCfg func() *config.Config, getOutput func() st
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"CHANGE DATE"}
-	rows := [][]string{
-		{
-			func() string {
-				if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-					return t.AsTime().Format("2006-01-02T15:04:05Z")
-				}
-				return ""
-			}(),
-		},
+	if getOutput() == "table" {
+		header := []string{"CHANGE DATE"}
+		rows := [][]string{
+			{
+				func() string {
+					if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+						return t.AsTime().Format("2006-01-02T15:04:05Z")
+					}
+					return ""
+				}(),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -5426,19 +5542,23 @@ func newUserService_AddSecretCmd(getCfg func() *config.Config, getOutput func() 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CREATION DATE", "CLIENT SECRET"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-					fmt.Sprint(resp.Msg.GetClientSecret()),
-				},
+			if getOutput() == "table" {
+				header := []string{"CREATION DATE", "CLIENT SECRET"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+						fmt.Sprint(resp.Msg.GetClientSecret()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -5524,18 +5644,22 @@ func newUserService_RemoveSecretCmd(getCfg func() *config.Config, getOutput func
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -5621,19 +5745,23 @@ func newUserService_AddKeyCmd(getCfg func() *config.Config, getOutput func() str
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CREATION DATE", "KEY ID"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-					fmt.Sprint(resp.Msg.GetKeyId()),
-				},
+			if getOutput() == "table" {
+				header := []string{"CREATION DATE", "KEY ID"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+						fmt.Sprint(resp.Msg.GetKeyId()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -5724,18 +5852,22 @@ func newUserService_RemoveKeyCmd(getCfg func() *config.Config, getOutput func() 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -5978,20 +6110,24 @@ func newUserService_AddPersonalAccessTokenCmd(getCfg func() *config.Config, getO
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CREATION DATE", "TOKEN ID", "TOKEN"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-					fmt.Sprint(resp.Msg.GetTokenId()),
-					fmt.Sprint(resp.Msg.GetToken()),
-				},
+			if getOutput() == "table" {
+				header := []string{"CREATION DATE", "TOKEN ID", "TOKEN"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+						fmt.Sprint(resp.Msg.GetTokenId()),
+						fmt.Sprint(resp.Msg.GetToken()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -6082,18 +6218,22 @@ func newUserService_RemovePersonalAccessTokenCmd(getCfg func() *config.Config, g
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -6335,7 +6475,7 @@ func newUserService_ListAuthenticationMethodTypesCmd(getCfg func() *config.Confi
 			if getOutput() == "json" {
 				return output.JSON(resp.Msg)
 			}
-			fmt.Println("OK")
+			output.Describe(resp.Msg)
 			_ = resp
 			return nil
 		},
@@ -6644,13 +6784,17 @@ func doUserService_CreateInviteCode(getCfg func() *config.Config, getOutput func
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"INVITE CODE"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetInviteCode()),
-		},
+	if getOutput() == "table" {
+		header := []string{"INVITE CODE"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetInviteCode()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -6740,18 +6884,22 @@ func newUserService_VerifyInviteCodeCmd(getCfg func() *config.Config, getOutput 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -6839,18 +6987,22 @@ func newUserService_SetUserMetadataCmd(getCfg func() *config.Config, getOutput f
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"SET DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetSetDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"SET DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetSetDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -7043,18 +7195,22 @@ func newUserService_DeleteUserMetadataCmd(getCfg func() *config.Config, getOutpu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}

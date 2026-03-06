@@ -487,21 +487,25 @@ func do{{$.ServiceName}}_{{$m.RPCName}}(getCfg func() *config.Config, getOutput 
 	output.Table(header, rows)
 {{- else}}{{if $m.ResponseColumns}}
 
-	header := []string{ {{- range $m.ResponseColumns}}{{quote .Header}}, {{end -}} }
-	rows := [][]string{
-		{
+	if getOutput() == "table" {
+		header := []string{ {{- range $m.ResponseColumns}}{{quote .Header}}, {{end -}} }
+		rows := [][]string{
+			{
 {{- range $m.ResponseColumns}}
 {{- if .IsTimestamp}}
-			func() string { if t := resp.Msg.{{.GoAccessor}}; t != nil { return t.AsTime().Format("2006-01-02T15:04:05Z") }; return "" }(),
+				func() string { if t := resp.Msg.{{.GoAccessor}}; t != nil { return t.AsTime().Format("2006-01-02T15:04:05Z") }; return "" }(),
 {{- else}}
-			fmt.Sprint(resp.Msg.{{.GoAccessor}}),
+				fmt.Sprint(resp.Msg.{{.GoAccessor}}),
 {{- end}}
 {{- end}}
-		},
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 {{- else}}
-	fmt.Println("OK")
+	output.Describe(resp.Msg)
 	_ = resp
 {{- end}}{{end}}
 	return nil
@@ -709,30 +713,34 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 			output.Table(header, rows)
 {{- else}}{{if $m.ResponseColumns}}
 
-			header := []string{ {{- range $m.ResponseColumns}}{{quote .Header}}, {{end -}} }
-			rows := [][]string{
-				{
+			if getOutput() == "table" {
+				header := []string{ {{- range $m.ResponseColumns}}{{quote .Header}}, {{end -}} }
+				rows := [][]string{
+					{
 {{- range $m.ResponseColumns}}
 {{- if .IsTimestamp}}
-					func() string { if t := resp.Msg.{{.GoAccessor}}; t != nil { return t.AsTime().Format("2006-01-02T15:04:05Z") }; return "" }(),
+						func() string { if t := resp.Msg.{{.GoAccessor}}; t != nil { return t.AsTime().Format("2006-01-02T15:04:05Z") }; return "" }(),
 {{- else if .IsOneofType}}
-					func() string {
-						switch resp.Msg.{{.GoAccessor}}.(type) {
+						func() string {
+							switch resp.Msg.{{.GoAccessor}}.(type) {
 {{- range .OneofVariants}}
-						case *{{$.GoImportAlias}}.{{.GoWrapperType}}: return "{{.DisplayName}}"
+							case *{{$.GoImportAlias}}.{{.GoWrapperType}}: return "{{.DisplayName}}"
 {{- end}}
-						default: return ""
-						}
-					}(),
+							default: return ""
+							}
+						}(),
 {{- else}}
-					fmt.Sprint(resp.Msg.{{.GoAccessor}}),
+						fmt.Sprint(resp.Msg.{{.GoAccessor}}),
 {{- end}}
 {{- end}}
-				},
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 {{- else}}
-			fmt.Println("OK")
+			output.Describe(resp.Msg)
 			_ = resp
 {{- end}}{{end}}
 			return nil

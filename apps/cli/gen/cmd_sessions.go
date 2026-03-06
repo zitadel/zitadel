@@ -337,32 +337,36 @@ func newSessionService_GetSessionCmd(getCfg func() *config.Config, getOutput fun
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "SEQUENCE", "CREATION DATE", "CHANGE DATE", "EXPIRATION DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSession().GetId()),
-					fmt.Sprint(resp.Msg.GetSession().GetSequence()),
-					func() string {
-						if t := resp.Msg.GetSession().GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-					func() string {
-						if t := resp.Msg.GetSession().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-					func() string {
-						if t := resp.Msg.GetSession().GetExpirationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"ID", "SEQUENCE", "CREATION DATE", "CHANGE DATE", "EXPIRATION DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSession().GetId()),
+						fmt.Sprint(resp.Msg.GetSession().GetSequence()),
+						func() string {
+							if t := resp.Msg.GetSession().GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+						func() string {
+							if t := resp.Msg.GetSession().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+						func() string {
+							if t := resp.Msg.GetSession().GetExpirationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -444,14 +448,18 @@ func newSessionService_CreateSessionCmd(getCfg func() *config.Config, getOutput 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"SESSION ID", "SESSION TOKEN"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSessionId()),
-					fmt.Sprint(resp.Msg.GetSessionToken()),
-				},
+			if getOutput() == "table" {
+				header := []string{"SESSION ID", "SESSION TOKEN"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSessionId()),
+						fmt.Sprint(resp.Msg.GetSessionToken()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -537,13 +545,17 @@ func newSessionService_SetSessionCmd(getCfg func() *config.Config, getOutput fun
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"SESSION TOKEN"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSessionToken()),
-				},
+			if getOutput() == "table" {
+				header := []string{"SESSION TOKEN"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSessionToken()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -634,18 +646,22 @@ func newSessionService_DeleteSessionCmd(getCfg func() *config.Config, getOutput 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}

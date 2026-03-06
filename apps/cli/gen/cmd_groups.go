@@ -258,19 +258,23 @@ func newGroupService_CreateGroupCmd(getCfg func() *config.Config, getOutput func
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "CREATION DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetId()),
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"ID", "CREATION DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetId()),
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -363,28 +367,32 @@ func newGroupService_GetGroupCmd(getCfg func() *config.Config, getOutput func() 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "ORGANIZATION ID", "NAME", "DESCRIPTION", "CHANGE DATE", "CREATION DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetGroup().GetId()),
-					fmt.Sprint(resp.Msg.GetGroup().GetOrganizationId()),
-					fmt.Sprint(resp.Msg.GetGroup().GetName()),
-					fmt.Sprint(resp.Msg.GetGroup().GetDescription()),
-					func() string {
-						if t := resp.Msg.GetGroup().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-					func() string {
-						if t := resp.Msg.GetGroup().GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"ID", "ORGANIZATION ID", "NAME", "DESCRIPTION", "CHANGE DATE", "CREATION DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetGroup().GetId()),
+						fmt.Sprint(resp.Msg.GetGroup().GetOrganizationId()),
+						fmt.Sprint(resp.Msg.GetGroup().GetName()),
+						fmt.Sprint(resp.Msg.GetGroup().GetDescription()),
+						func() string {
+							if t := resp.Msg.GetGroup().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+						func() string {
+							if t := resp.Msg.GetGroup().GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -610,18 +618,22 @@ func newGroupService_UpdateGroupCmd(getCfg func() *config.Config, getOutput func
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -713,18 +725,22 @@ func newGroupService_DeleteGroupCmd(getCfg func() *config.Config, getOutput func
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -816,18 +832,22 @@ func newGroupService_AddUsersToGroupCmd(getCfg func() *config.Config, getOutput 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -920,18 +940,22 @@ func newGroupService_RemoveUsersFromGroupCmd(getCfg func() *config.Config, getOu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}

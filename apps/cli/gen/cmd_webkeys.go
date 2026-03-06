@@ -364,19 +364,23 @@ func doWebKeyService_CreateWebKey(getCfg func() *config.Config, getOutput func()
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"ID", "CREATION DATE"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetId()),
-			func() string {
-				if t := resp.Msg.GetCreationDate(); t != nil {
-					return t.AsTime().Format("2006-01-02T15:04:05Z")
-				}
-				return ""
-			}(),
-		},
+	if getOutput() == "table" {
+		header := []string{"ID", "CREATION DATE"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetId()),
+				func() string {
+					if t := resp.Msg.GetCreationDate(); t != nil {
+						return t.AsTime().Format("2006-01-02T15:04:05Z")
+					}
+					return ""
+				}(),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -460,18 +464,22 @@ func newWebKeyService_ActivateWebKeyCmd(getCfg func() *config.Config, getOutput 
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -561,18 +569,22 @@ func newWebKeyService_DeleteWebKeyCmd(getCfg func() *config.Config, getOutput fu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}

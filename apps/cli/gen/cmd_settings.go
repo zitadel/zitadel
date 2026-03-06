@@ -353,15 +353,19 @@ func newSettingsService_GetGeneralSettingsCmd(getCfg func() *config.Config, getO
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DEFAULT ORG ID", "DEFAULT LANGUAGE", "DEFAULT ORGANIZATION ID"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetDefaultOrgId()),
-					fmt.Sprint(resp.Msg.GetDefaultLanguage()),
-					fmt.Sprint(resp.Msg.GetDefaultOrganizationId()),
-				},
+			if getOutput() == "table" {
+				header := []string{"DEFAULT ORG ID", "DEFAULT LANGUAGE", "DEFAULT ORGANIZATION ID"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetDefaultOrgId()),
+						fmt.Sprint(resp.Msg.GetDefaultLanguage()),
+						fmt.Sprint(resp.Msg.GetDefaultOrganizationId()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -441,26 +445,30 @@ func newSettingsService_GetLoginSettingsCmd(getCfg func() *config.Config, getOut
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ALLOW USERNAME PASSWORD", "ALLOW LOCAL AUTHENTICATION", "ALLOW REGISTER", "ALLOW EXTERNAL IDP", "FORCE MFA", "PASSKEYS TYPE", "HIDE PASSWORD RESET", "IGNORE UNKNOWN USERNAMES", "DEFAULT REDIRECT URI", "ALLOW DOMAIN DISCOVERY", "DISABLE LOGIN WITH EMAIL", "DISABLE LOGIN WITH PHONE", "RESOURCE OWNER TYPE", "FORCE MFA LOCAL ONLY"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSettings().GetAllowUsernamePassword()),
-					fmt.Sprint(resp.Msg.GetSettings().GetAllowLocalAuthentication()),
-					fmt.Sprint(resp.Msg.GetSettings().GetAllowRegister()),
-					fmt.Sprint(resp.Msg.GetSettings().GetAllowExternalIdp()),
-					fmt.Sprint(resp.Msg.GetSettings().GetForceMfa()),
-					fmt.Sprint(resp.Msg.GetSettings().GetPasskeysType().String()),
-					fmt.Sprint(resp.Msg.GetSettings().GetHidePasswordReset()),
-					fmt.Sprint(resp.Msg.GetSettings().GetIgnoreUnknownUsernames()),
-					fmt.Sprint(resp.Msg.GetSettings().GetDefaultRedirectUri()),
-					fmt.Sprint(resp.Msg.GetSettings().GetAllowDomainDiscovery()),
-					fmt.Sprint(resp.Msg.GetSettings().GetDisableLoginWithEmail()),
-					fmt.Sprint(resp.Msg.GetSettings().GetDisableLoginWithPhone()),
-					fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
-					fmt.Sprint(resp.Msg.GetSettings().GetForceMfaLocalOnly()),
-				},
+			if getOutput() == "table" {
+				header := []string{"ALLOW USERNAME PASSWORD", "ALLOW LOCAL AUTHENTICATION", "ALLOW REGISTER", "ALLOW EXTERNAL IDP", "FORCE MFA", "PASSKEYS TYPE", "HIDE PASSWORD RESET", "IGNORE UNKNOWN USERNAMES", "DEFAULT REDIRECT URI", "ALLOW DOMAIN DISCOVERY", "DISABLE LOGIN WITH EMAIL", "DISABLE LOGIN WITH PHONE", "RESOURCE OWNER TYPE", "FORCE MFA LOCAL ONLY"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSettings().GetAllowUsernamePassword()),
+						fmt.Sprint(resp.Msg.GetSettings().GetAllowLocalAuthentication()),
+						fmt.Sprint(resp.Msg.GetSettings().GetAllowRegister()),
+						fmt.Sprint(resp.Msg.GetSettings().GetAllowExternalIdp()),
+						fmt.Sprint(resp.Msg.GetSettings().GetForceMfa()),
+						fmt.Sprint(resp.Msg.GetSettings().GetPasskeysType().String()),
+						fmt.Sprint(resp.Msg.GetSettings().GetHidePasswordReset()),
+						fmt.Sprint(resp.Msg.GetSettings().GetIgnoreUnknownUsernames()),
+						fmt.Sprint(resp.Msg.GetSettings().GetDefaultRedirectUri()),
+						fmt.Sprint(resp.Msg.GetSettings().GetAllowDomainDiscovery()),
+						fmt.Sprint(resp.Msg.GetSettings().GetDisableLoginWithEmail()),
+						fmt.Sprint(resp.Msg.GetSettings().GetDisableLoginWithPhone()),
+						fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
+						fmt.Sprint(resp.Msg.GetSettings().GetForceMfaLocalOnly()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -650,18 +658,22 @@ func newSettingsService_GetPasswordComplexitySettingsCmd(getCfg func() *config.C
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"MIN LENGTH", "REQUIRES UPPERCASE", "REQUIRES LOWERCASE", "REQUIRES NUMBER", "REQUIRES SYMBOL", "RESOURCE OWNER TYPE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSettings().GetMinLength()),
-					fmt.Sprint(resp.Msg.GetSettings().GetRequiresUppercase()),
-					fmt.Sprint(resp.Msg.GetSettings().GetRequiresLowercase()),
-					fmt.Sprint(resp.Msg.GetSettings().GetRequiresNumber()),
-					fmt.Sprint(resp.Msg.GetSettings().GetRequiresSymbol()),
-					fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
-				},
+			if getOutput() == "table" {
+				header := []string{"MIN LENGTH", "REQUIRES UPPERCASE", "REQUIRES LOWERCASE", "REQUIRES NUMBER", "REQUIRES SYMBOL", "RESOURCE OWNER TYPE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSettings().GetMinLength()),
+						fmt.Sprint(resp.Msg.GetSettings().GetRequiresUppercase()),
+						fmt.Sprint(resp.Msg.GetSettings().GetRequiresLowercase()),
+						fmt.Sprint(resp.Msg.GetSettings().GetRequiresNumber()),
+						fmt.Sprint(resp.Msg.GetSettings().GetRequiresSymbol()),
+						fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -741,15 +753,19 @@ func newSettingsService_GetPasswordExpirySettingsCmd(getCfg func() *config.Confi
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"MAX AGE DAYS", "EXPIRE WARN DAYS", "RESOURCE OWNER TYPE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSettings().GetMaxAgeDays()),
-					fmt.Sprint(resp.Msg.GetSettings().GetExpireWarnDays()),
-					fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
-				},
+			if getOutput() == "table" {
+				header := []string{"MAX AGE DAYS", "EXPIRE WARN DAYS", "RESOURCE OWNER TYPE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSettings().GetMaxAgeDays()),
+						fmt.Sprint(resp.Msg.GetSettings().GetExpireWarnDays()),
+						fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -829,17 +845,21 @@ func newSettingsService_GetBrandingSettingsCmd(getCfg func() *config.Config, get
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"FONT URL", "HIDE LOGIN NAME SUFFIX", "DISABLE WATERMARK", "RESOURCE OWNER TYPE", "THEME MODE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSettings().GetFontUrl()),
-					fmt.Sprint(resp.Msg.GetSettings().GetHideLoginNameSuffix()),
-					fmt.Sprint(resp.Msg.GetSettings().GetDisableWatermark()),
-					fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
-					fmt.Sprint(resp.Msg.GetSettings().GetThemeMode().String()),
-				},
+			if getOutput() == "table" {
+				header := []string{"FONT URL", "HIDE LOGIN NAME SUFFIX", "DISABLE WATERMARK", "RESOURCE OWNER TYPE", "THEME MODE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSettings().GetFontUrl()),
+						fmt.Sprint(resp.Msg.GetSettings().GetHideLoginNameSuffix()),
+						fmt.Sprint(resp.Msg.GetSettings().GetDisableWatermark()),
+						fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
+						fmt.Sprint(resp.Msg.GetSettings().GetThemeMode().String()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -919,16 +939,20 @@ func newSettingsService_GetDomainSettingsCmd(getCfg func() *config.Config, getOu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"LOGIN NAME INCLUDES DOMAIN", "REQUIRE ORG DOMAIN VERIFICATION", "SMTP SENDER ADDRESS MATCHES INSTANCE DOMAIN", "RESOURCE OWNER TYPE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSettings().GetLoginNameIncludesDomain()),
-					fmt.Sprint(resp.Msg.GetSettings().GetRequireOrgDomainVerification()),
-					fmt.Sprint(resp.Msg.GetSettings().GetSmtpSenderAddressMatchesInstanceDomain()),
-					fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
-				},
+			if getOutput() == "table" {
+				header := []string{"LOGIN NAME INCLUDES DOMAIN", "REQUIRE ORG DOMAIN VERIFICATION", "SMTP SENDER ADDRESS MATCHES INSTANCE DOMAIN", "RESOURCE OWNER TYPE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSettings().GetLoginNameIncludesDomain()),
+						fmt.Sprint(resp.Msg.GetSettings().GetRequireOrgDomainVerification()),
+						fmt.Sprint(resp.Msg.GetSettings().GetSmtpSenderAddressMatchesInstanceDomain()),
+						fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1008,20 +1032,24 @@ func newSettingsService_GetLegalAndSupportSettingsCmd(getCfg func() *config.Conf
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"TOS LINK", "PRIVACY POLICY LINK", "HELP LINK", "SUPPORT EMAIL", "RESOURCE OWNER TYPE", "DOCS LINK", "CUSTOM LINK", "CUSTOM LINK TEXT"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSettings().GetTosLink()),
-					fmt.Sprint(resp.Msg.GetSettings().GetPrivacyPolicyLink()),
-					fmt.Sprint(resp.Msg.GetSettings().GetHelpLink()),
-					fmt.Sprint(resp.Msg.GetSettings().GetSupportEmail()),
-					fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
-					fmt.Sprint(resp.Msg.GetSettings().GetDocsLink()),
-					fmt.Sprint(resp.Msg.GetSettings().GetCustomLink()),
-					fmt.Sprint(resp.Msg.GetSettings().GetCustomLinkText()),
-				},
+			if getOutput() == "table" {
+				header := []string{"TOS LINK", "PRIVACY POLICY LINK", "HELP LINK", "SUPPORT EMAIL", "RESOURCE OWNER TYPE", "DOCS LINK", "CUSTOM LINK", "CUSTOM LINK TEXT"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSettings().GetTosLink()),
+						fmt.Sprint(resp.Msg.GetSettings().GetPrivacyPolicyLink()),
+						fmt.Sprint(resp.Msg.GetSettings().GetHelpLink()),
+						fmt.Sprint(resp.Msg.GetSettings().GetSupportEmail()),
+						fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
+						fmt.Sprint(resp.Msg.GetSettings().GetDocsLink()),
+						fmt.Sprint(resp.Msg.GetSettings().GetCustomLink()),
+						fmt.Sprint(resp.Msg.GetSettings().GetCustomLinkText()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1101,15 +1129,19 @@ func newSettingsService_GetLockoutSettingsCmd(getCfg func() *config.Config, getO
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"MAX PASSWORD ATTEMPTS", "RESOURCE OWNER TYPE", "MAX OTP ATTEMPTS"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSettings().GetMaxPasswordAttempts()),
-					fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
-					fmt.Sprint(resp.Msg.GetSettings().GetMaxOtpAttempts()),
-				},
+			if getOutput() == "table" {
+				header := []string{"MAX PASSWORD ATTEMPTS", "RESOURCE OWNER TYPE", "MAX OTP ATTEMPTS"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSettings().GetMaxPasswordAttempts()),
+						fmt.Sprint(resp.Msg.GetSettings().GetResourceOwnerType().String()),
+						fmt.Sprint(resp.Msg.GetSettings().GetMaxOtpAttempts()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1189,13 +1221,17 @@ func newSettingsService_GetSecuritySettingsCmd(getCfg func() *config.Config, get
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ENABLE IMPERSONATION"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSettings().GetEnableImpersonation()),
-				},
+			if getOutput() == "table" {
+				header := []string{"ENABLE IMPERSONATION"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSettings().GetEnableImpersonation()),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1277,18 +1313,22 @@ func newSettingsService_SetSecuritySettingsCmd(getCfg func() *config.Config, get
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1380,18 +1420,22 @@ func newSettingsService_SetOrganizationSettingsCmd(getCfg func() *config.Config,
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"SET DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetSetDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"SET DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetSetDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1479,18 +1523,22 @@ func newSettingsService_DeleteOrganizationSettingsCmd(getCfg func() *config.Conf
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1840,13 +1888,17 @@ func doSettingsService_GetHostedLoginTranslation(getCfg func() *config.Config, g
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"ETAG"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetEtag()),
-		},
+	if getOutput() == "table" {
+		header := []string{"ETAG"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetEtag()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -2030,12 +2082,16 @@ func doSettingsService_SetHostedLoginTranslation(getCfg func() *config.Config, g
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"ETAG"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetEtag()),
-		},
+	if getOutput() == "table" {
+		header := []string{"ETAG"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetEtag()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }

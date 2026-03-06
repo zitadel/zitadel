@@ -606,20 +606,24 @@ func doActionService_CreateTarget(getCfg func() *config.Config, getOutput func()
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"ID", "CREATION DATE", "SIGNING KEY"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetId()),
-			func() string {
-				if t := resp.Msg.GetCreationDate(); t != nil {
-					return t.AsTime().Format("2006-01-02T15:04:05Z")
-				}
-				return ""
-			}(),
-			fmt.Sprint(resp.Msg.GetSigningKey()),
-		},
+	if getOutput() == "table" {
+		header := []string{"ID", "CREATION DATE", "SIGNING KEY"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetId()),
+				func() string {
+					if t := resp.Msg.GetCreationDate(); t != nil {
+						return t.AsTime().Format("2006-01-02T15:04:05Z")
+					}
+					return ""
+				}(),
+				fmt.Sprint(resp.Msg.GetSigningKey()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -917,19 +921,23 @@ func doActionService_UpdateTarget(getCfg func() *config.Config, getOutput func()
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"CHANGE DATE", "SIGNING KEY"}
-	rows := [][]string{
-		{
-			func() string {
-				if t := resp.Msg.GetChangeDate(); t != nil {
-					return t.AsTime().Format("2006-01-02T15:04:05Z")
-				}
-				return ""
-			}(),
-			fmt.Sprint(resp.Msg.GetSigningKey()),
-		},
+	if getOutput() == "table" {
+		header := []string{"CHANGE DATE", "SIGNING KEY"}
+		rows := [][]string{
+			{
+				func() string {
+					if t := resp.Msg.GetChangeDate(); t != nil {
+						return t.AsTime().Format("2006-01-02T15:04:05Z")
+					}
+					return ""
+				}(),
+				fmt.Sprint(resp.Msg.GetSigningKey()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
 
@@ -1013,18 +1021,22 @@ func newActionService_DeleteTargetCmd(getCfg func() *config.Config, getOutput fu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1114,41 +1126,45 @@ func newActionService_GetTargetCmd(getCfg func() *config.Config, getOutput func(
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "NAME", "ENDPOINT", "SIGNING KEY", "PAYLOAD TYPE", "TARGET TYPE", "CREATION DATE", "CHANGE DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetTarget().GetId()),
-					fmt.Sprint(resp.Msg.GetTarget().GetName()),
-					fmt.Sprint(resp.Msg.GetTarget().GetEndpoint()),
-					fmt.Sprint(resp.Msg.GetTarget().GetSigningKey()),
-					fmt.Sprint(resp.Msg.GetTarget().GetPayloadType().String()),
-					func() string {
-						switch resp.Msg.GetTarget().GetTargetType().(type) {
-						case *actionpb.Target_RestWebhook:
-							return "rest-webhook"
-						case *actionpb.Target_RestCall:
-							return "rest-call"
-						case *actionpb.Target_RestAsync:
-							return "rest-async"
-						default:
+			if getOutput() == "table" {
+				header := []string{"ID", "NAME", "ENDPOINT", "SIGNING KEY", "PAYLOAD TYPE", "TARGET TYPE", "CREATION DATE", "CHANGE DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetTarget().GetId()),
+						fmt.Sprint(resp.Msg.GetTarget().GetName()),
+						fmt.Sprint(resp.Msg.GetTarget().GetEndpoint()),
+						fmt.Sprint(resp.Msg.GetTarget().GetSigningKey()),
+						fmt.Sprint(resp.Msg.GetTarget().GetPayloadType().String()),
+						func() string {
+							switch resp.Msg.GetTarget().GetTargetType().(type) {
+							case *actionpb.Target_RestWebhook:
+								return "rest-webhook"
+							case *actionpb.Target_RestCall:
+								return "rest-call"
+							case *actionpb.Target_RestAsync:
+								return "rest-async"
+							default:
+								return ""
+							}
+						}(),
+						func() string {
+							if t := resp.Msg.GetTarget().GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
 							return ""
-						}
-					}(),
-					func() string {
-						if t := resp.Msg.GetTarget().GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-					func() string {
-						if t := resp.Msg.GetTarget().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+						}(),
+						func() string {
+							if t := resp.Msg.GetTarget().GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1366,19 +1382,23 @@ func newActionService_AddPublicKeyCmd(getCfg func() *config.Config, getOutput fu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"KEY ID", "CREATION DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetKeyId()),
-					func() string {
-						if t := resp.Msg.GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"KEY ID", "CREATION DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetKeyId()),
+						func() string {
+							if t := resp.Msg.GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1472,18 +1492,22 @@ func newActionService_ActivatePublicKeyCmd(getCfg func() *config.Config, getOutp
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1579,18 +1603,22 @@ func newActionService_DeactivatePublicKeyCmd(getCfg func() *config.Config, getOu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"CHANGE DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetChangeDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1686,18 +1714,22 @@ func newActionService_RemovePublicKeyCmd(getCfg func() *config.Config, getOutput
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"DELETION DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetDeletionDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"DELETION DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetDeletionDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -1908,18 +1940,22 @@ func newActionService_SetExecutionCmd(getCfg func() *config.Config, getOutput fu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"SET DATE"}
-			rows := [][]string{
-				{
-					func() string {
-						if t := resp.Msg.GetSetDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"SET DATE"}
+				rows := [][]string{
+					{
+						func() string {
+							if t := resp.Msg.GetSetDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -2113,7 +2149,7 @@ func newActionService_ListExecutionFunctionsCmd(getCfg func() *config.Config, ge
 			if getOutput() == "json" {
 				return output.JSON(resp.Msg)
 			}
-			fmt.Println("OK")
+			output.Describe(resp.Msg)
 			_ = resp
 			return nil
 		},
@@ -2193,7 +2229,7 @@ func newActionService_ListExecutionMethodsCmd(getCfg func() *config.Config, getO
 			if getOutput() == "json" {
 				return output.JSON(resp.Msg)
 			}
-			fmt.Println("OK")
+			output.Describe(resp.Msg)
 			_ = resp
 			return nil
 		},
@@ -2273,7 +2309,7 @@ func newActionService_ListExecutionServicesCmd(getCfg func() *config.Config, get
 			if getOutput() == "json" {
 				return output.JSON(resp.Msg)
 			}
-			fmt.Println("OK")
+			output.Describe(resp.Msg)
 			_ = resp
 			return nil
 		},

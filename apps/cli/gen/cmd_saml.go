@@ -154,23 +154,27 @@ func newSAMLService_GetSAMLRequestCmd(getCfg func() *config.Config, getOutput fu
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"ID", "ISSUER", "ASSERTION CONSUMER SERVICE", "RELAY STATE", "BINDING", "CREATION DATE"}
-			rows := [][]string{
-				{
-					fmt.Sprint(resp.Msg.GetSamlRequest().GetId()),
-					fmt.Sprint(resp.Msg.GetSamlRequest().GetIssuer()),
-					fmt.Sprint(resp.Msg.GetSamlRequest().GetAssertionConsumerService()),
-					fmt.Sprint(resp.Msg.GetSamlRequest().GetRelayState()),
-					fmt.Sprint(resp.Msg.GetSamlRequest().GetBinding()),
-					func() string {
-						if t := resp.Msg.GetSamlRequest().GetCreationDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
-				},
+			if getOutput() == "table" {
+				header := []string{"ID", "ISSUER", "ASSERTION CONSUMER SERVICE", "RELAY STATE", "BINDING", "CREATION DATE"}
+				rows := [][]string{
+					{
+						fmt.Sprint(resp.Msg.GetSamlRequest().GetId()),
+						fmt.Sprint(resp.Msg.GetSamlRequest().GetIssuer()),
+						fmt.Sprint(resp.Msg.GetSamlRequest().GetAssertionConsumerService()),
+						fmt.Sprint(resp.Msg.GetSamlRequest().GetRelayState()),
+						fmt.Sprint(resp.Msg.GetSamlRequest().GetBinding()),
+						func() string {
+							if t := resp.Msg.GetSamlRequest().GetCreationDate(); t != nil {
+								return t.AsTime().Format("2006-01-02T15:04:05Z")
+							}
+							return ""
+						}(),
+					},
+				}
+				output.Table(header, rows)
+			} else {
+				output.Describe(resp.Msg)
 			}
-			output.Table(header, rows)
 			return nil
 		},
 	}
@@ -395,12 +399,16 @@ func doSAMLService_CreateResponse(getCfg func() *config.Config, getOutput func()
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"URL"}
-	rows := [][]string{
-		{
-			fmt.Sprint(resp.Msg.GetUrl()),
-		},
+	if getOutput() == "table" {
+		header := []string{"URL"}
+		rows := [][]string{
+			{
+				fmt.Sprint(resp.Msg.GetUrl()),
+			},
+		}
+		output.Table(header, rows)
+	} else {
+		output.Describe(resp.Msg)
 	}
-	output.Table(header, rows)
 	return nil
 }
