@@ -1,10 +1,23 @@
 # ZITADEL Management CLI
 
+> **Not the server binary.** The `zitadel` binary starts and configures the ZITADEL IAM server (for self-hosters). This tool, `zitadel-cli`, is a **management client** — it communicates with a running ZITADEL instance (cloud or self-hosted) via the v2 APIs. Install `zitadel-cli` if you want to manage users, organizations, projects, and other resources.
+
 A command-line interface for managing ZITADEL resources via the v2 APIs. Designed for both humans and AI agents — every command supports JSON input/output, machine-readable discovery via `describe`, and structured error codes.
 
 ## Installation
 
-Build from the repository root (recommended):
+### Download a pre-built binary
+
+Pre-built binaries for Linux, macOS, and Windows are attached to every [GitHub Release](https://github.com/zitadel/zitadel/releases) as `zitadel-cli-<os>-<arch>.tar.gz`.
+
+```bash
+# Example: Linux AMD64
+curl -L https://github.com/zitadel/zitadel/releases/latest/download/zitadel-cli-linux-amd64.tar.gz \
+  | tar xz
+./zitadel-cli --help
+```
+
+### Build from source
 
 ```bash
 pnpm nx run @zitadel/cli:build

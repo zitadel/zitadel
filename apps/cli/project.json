@@ -2,6 +2,18 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "@zitadel/cli",
   "projectType": "application",
+  "namedInputs": {
+    "sources": [
+      "{projectRoot}/**/*.go",
+      "{projectRoot}/go.mod",
+      "{projectRoot}/go.sum",
+      "{workspaceRoot}/pkg/grpc/**/*.go"
+    ],
+    "pack": [
+      "sources",
+      { "env": "ZITADEL_VERSION" }
+    ]
+  },
   "targets": {
     "generate": {
       "description": "Regenerates CLI commands from proto definitions via protoc-gen-zitadelcli.",
@@ -24,10 +36,7 @@
       "cache": true,
       "dependsOn": ["generate"],
       "inputs": [
-        "{projectRoot}/**/*.go",
-        "{projectRoot}/go.mod",
-        "{projectRoot}/go.sum",
-        "{workspaceRoot}/pkg/grpc/**/*.go",
+        "sources",
         { "runtime": "git describe --tags --always 2>/dev/null || echo dev" }
       ],
       "outputs": [
@@ -40,10 +49,7 @@
       "cache": true,
       "dependsOn": ["generate"],
       "inputs": [
-        "{projectRoot}/**/*.go",
-        "{projectRoot}/go.mod",
-        "{projectRoot}/go.sum",
-        "{workspaceRoot}/pkg/grpc/**/*.go"
+        "sources"
       ]
     },
     "test": {
@@ -52,10 +58,97 @@
       "cache": true,
       "dependsOn": ["generate"],
       "inputs": [
-        "{projectRoot}/**/*.go",
-        "{projectRoot}/go.mod",
-        "{projectRoot}/go.sum",
-        "{workspaceRoot}/pkg/grpc/**/*.go"
+        "sources"
+      ]
+    },
+    "pack-platform": {
+      "description": "Cross-compiles zitadel-cli and packages it for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_VERSION environment variable.",
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "commands": [
+          "mkdir -p .artifacts/pack .artifacts/bin/$GOOS/$GOARCH",
+          "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building zitadel-cli for $GOOS-$GOARCH...\"; cd apps/cli && CGO_ENABLED=0 go build -o ../../.artifacts/bin/$GOOS/$GOARCH/zitadel-cli$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\" .'",
+          "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-cli-$GOOS-$GOARCH\"; mkdir -p \".artifacts/pack/$FOLDER\"; cp apps/cli/README.md LICENSE \".artifacts/bin/$GOOS/$GOARCH/zitadel-cli$EXT\" \".artifacts/pack/$FOLDER/\"; tar -czvf \".artifacts/pack/$FOLDER.tar.gz\" -C .artifacts/pack \"$FOLDER\"; rm -rf \".artifacts/pack/$FOLDER\"'"
+        ]
+      }
+    },
+    "pack-darwin-amd64": {
+      "description": "Packages zitadel-cli for Darwin AMD64 (Intel)",
+      "dependsOn": ["generate"],
+      "command": "GOOS=darwin GOARCH=amd64 nx run @zitadel/cli:pack-platform",
+      "cache": true,
+      "inputs": [
+        "pack"
+      ],
+      "outputs": [
+        "{workspaceRoot}/.artifacts/pack/zitadel-cli-darwin-amd64.tar.gz",
+        "{workspaceRoot}/.artifacts/bin/darwin/amd64/zitadel-cli"
+      ]
+    },
+    "pack-darwin-arm64": {
+      "description": "Packages zitadel-cli for Darwin ARM64 (Apple Silicon)",
+      "dependsOn": ["generate"],
+      "command": "GOOS=darwin GOARCH=arm64 nx run @zitadel/cli:pack-platform",
+      "cache": true,
+      "inputs": [
+        "pack"
+      ],
+      "outputs": [
+        "{workspaceRoot}/.artifacts/pack/zitadel-cli-darwin-arm64.tar.gz",
+        "{workspaceRoot}/.artifacts/bin/darwin/arm64/zitadel-cli"
+      ]
+    },
+    "pack-linux-amd64": {
+      "description": "Packages zitadel-cli for Linux AMD64",
+      "dependsOn": ["generate"],
+      "command": "GOOS=linux GOARCH=amd64 nx run @zitadel/cli:pack-platform",
+      "cache": true,
+      "inputs": [
+        "pack"
+      ],
+      "outputs": [
+        "{workspaceRoot}/.artifacts/pack/zitadel-cli-linux-amd64.tar.gz",
+        "{workspaceRoot}/.artifacts/bin/linux/amd64/zitadel-cli"
+      ]
+    },
+    "pack-linux-arm64": {
+      "description": "Packages zitadel-cli for Linux ARM64",
+      "dependsOn": ["generate"],
+      "command": "GOOS=linux GOARCH=arm64 nx run @zitadel/cli:pack-platform",
+      "cache": true,
+      "inputs": [
+        "pack"
+      ],
+      "outputs": [
+        "{workspaceRoot}/.artifacts/pack/zitadel-cli-linux-arm64.tar.gz",
+        "{workspaceRoot}/.artifacts/bin/linux/arm64/zitadel-cli"
+      ]
+    },
+    "pack-windows-amd64": {
+      "description": "Packages zitadel-cli for Windows AMD64",
+      "dependsOn": ["generate"],
+      "command": "GOOS=windows GOARCH=amd64 nx run @zitadel/cli:pack-platform",
+      "cache": true,
+      "inputs": [
+        "pack"
+      ],
+      "outputs": [
+        "{workspaceRoot}/.artifacts/pack/zitadel-cli-windows-amd64.tar.gz",
+        "{workspaceRoot}/.artifacts/bin/windows/amd64/zitadel-cli.exe"
+      ]
+    },
+    "pack-windows-arm64": {
+      "description": "Packages zitadel-cli for Windows ARM64",
+      "dependsOn": ["generate"],
+      "command": "GOOS=windows GOARCH=arm64 nx run @zitadel/cli:pack-platform",
+      "cache": true,
+      "inputs": [
+        "pack"
+      ],
+      "outputs": [
+        "{workspaceRoot}/.artifacts/pack/zitadel-cli-windows-arm64.tar.gz",
+        "{workspaceRoot}/.artifacts/bin/windows/arm64/zitadel-cli.exe"
       ]
     }
   }

@@ -41,6 +41,30 @@ module.exports = {
             label: "zitadel-login.tar.gz",
           },
           {
+            path: ".artifacts/pack/zitadel-cli-linux-amd64.tar.gz",
+            label: "zitadel-cli-linux-amd64.tar.gz",
+          },
+          {
+            path: ".artifacts/pack/zitadel-cli-linux-arm64.tar.gz",
+            label: "zitadel-cli-linux-arm64.tar.gz",
+          },
+          {
+            path: ".artifacts/pack/zitadel-cli-windows-amd64.tar.gz",
+            label: "zitadel-cli-windows-amd64.tar.gz",
+          },
+          {
+            path: ".artifacts/pack/zitadel-cli-windows-arm64.tar.gz",
+            label: "zitadel-cli-windows-arm64.tar.gz",
+          },
+          {
+            path: ".artifacts/pack/zitadel-cli-darwin-amd64.tar.gz",
+            label: "zitadel-cli-darwin-amd64.tar.gz",
+          },
+          {
+            path: ".artifacts/pack/zitadel-cli-darwin-arm64.tar.gz",
+            label: "zitadel-cli-darwin-arm64.tar.gz",
+          },
+          {
             path: ".artifacts/pack/checksums.txt",
             label: "checksums.txt",
           }

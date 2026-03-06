@@ -34,6 +34,8 @@ The generator runs at `pnpm nx run @zitadel/cli:generate`:
 - **Build**: `pnpm nx run @zitadel/cli:build` — produces `.artifacts/bin/<GOOS>/<GOARCH>/zitadel-cli`
 - **Lint**: `pnpm nx run @zitadel/cli:lint`
 - **Test**: `pnpm nx run @zitadel/cli:test`
+- **Pack (single platform)**: `GOOS=linux GOARCH=amd64 pnpm nx run @zitadel/cli:pack-platform` — cross-compiles and tars into `.artifacts/pack/zitadel-cli-linux-amd64.tar.gz`
+- **Pack (all platforms)**: `pnpm nx run @zitadel/cli:pack-linux-amd64` etc. (6 targets); all are included in the root `pack` target
 
 ## Adding a New v2 Service
 

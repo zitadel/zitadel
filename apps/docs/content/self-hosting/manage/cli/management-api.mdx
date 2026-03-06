@@ -6,7 +6,11 @@ description: Use the ZITADEL Management CLI to manage users, organizations, proj
 
 # ZITADEL Management CLI
 
-The **Management CLI** (`zitadel-cli`) is a standalone command-line tool for managing ZITADEL resources through the v2 APIs. It is different from the built-in [server CLI](/docs/self-hosting/manage/cli/overview) (`zitadel init`/`setup`/`start`), which manages the ZITADEL process itself.
+:::info What is `zitadel-cli`?
+`zitadel-cli` is a **management client** for ZITADEL. It connects to a running ZITADEL instance — on [ZITADEL Cloud](https://zitadel.cloud) or self-hosted — and manages resources via the v2 APIs.
+
+This is **not** the `zitadel` server binary. The `zitadel` binary is for self-hosters who need to start, configure, or run database migrations for the ZITADEL IAM server itself. Install `zitadel-cli` if you want to manage users, organizations, projects, and other resources.
+:::
 
 Use `zitadel-cli` to:
 
@@ -16,13 +20,23 @@ Use `zitadel-cli` to:
 
 ## Installation
 
-Build from source using the Nx target in the ZITADEL monorepo:
+### Download a pre-built binary (recommended)
+
+Pre-built binaries for Linux, macOS, and Windows are attached to every [GitHub Release](https://github.com/zitadel/zitadel/releases) as `zitadel-cli-<os>-<arch>.tar.gz`.
+
+```bash
+# Example: Linux AMD64
+curl -L https://github.com/zitadel/zitadel/releases/latest/download/zitadel-cli-linux-amd64.tar.gz \
+  | tar xz
+./zitadel-cli --help
+```
+
+### Build from source
 
 ```bash
 pnpm nx run @zitadel/cli:build
+# Binary is placed at .artifacts/bin/<GOOS>/<GOARCH>/zitadel-cli
 ```
-
-The binary is placed at `.artifacts/bin/<GOOS>/<GOARCH>/zitadel-cli`.
 
 ## Authentication
 
