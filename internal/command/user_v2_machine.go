@@ -44,6 +44,7 @@ func (h *ChangeMachine) Changed() bool {
 }
 
 func (c *Commands) ChangeUserMachine(ctx context.Context, machine *ChangeMachine) (err error) {
+	// get the existing user
 	existingMachine, err := c.UserMachineWriteModel(
 		ctx,
 		machine.ID,
@@ -53,12 +54,18 @@ func (c *Commands) ChangeUserMachine(ctx context.Context, machine *ChangeMachine
 	if err != nil {
 		return err
 	}
-	if machine.Changed() {
-		if err := c.checkPermissionUpdateUser(ctx, existingMachine.ResourceOwner, existingMachine.AggregateID, true); err != nil {
-			return err
-		}
+	// check whether the user has permissions to make this change
+	if err := c.checkPermissionUpdateUser(ctx, existingMachine.ResourceOwner, existingMachine.AggregateID, true); err != nil {
+		return err
 	}
 
+	// if there are no changes, return the existing object details
+	if !machine.Changed() {
+		machine.Details = writeModelToObjectDetails(&existingMachine.WriteModel)
+		return nil
+	}
+
+	// create the events for the change
 	cmds := make([]eventstore.Command, 0)
 	if machine.Username != nil {
 		cmds, err = c.changeUsername(ctx, cmds, existingMachine, *machine.Username)

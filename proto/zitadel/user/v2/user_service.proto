@@ -2608,7 +2608,8 @@ message UpdateUserRequest{
     Machine machine = 4;
   }
 
-  // Metadata to be set. The values have to be base64 encoded.
+  // Metadata to be set.
+  // Metadata is expected as key-value pairs, and the value has to be base64 encoded.
   repeated Metadata metadata = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
