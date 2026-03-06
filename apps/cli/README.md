@@ -32,7 +32,7 @@ Create a **Native** application in your ZITADEL project, then:
 zitadel login --instance mycompany.zitadel.cloud --client-id <native-app-client-id>
 ```
 
-This opens your browser for authentication, exchanges an authorization code using PKCE, and stores the token locally.
+This opens your browser for authentication, exchanges an authorization code using PKCE, and stores the token locally. Refresh tokens are saved automatically — the CLI will transparently refresh expired access tokens without re-prompting.
 
 ## Multiple Contexts
 
@@ -72,6 +72,86 @@ zitadel users list
 | `context current`  | Show the active context                        |
 | `users list`       | List users in the current instance             |
 | `orgs current`     | Show the current organization                  |
+
+## Agent-friendly workflows
+
+The CLI supports machine-driven discovery and request composition:
+
+```bash
+# Discover all command groups, commands, and global flags
+zitadel describe
+
+# List all commands in a group with full metadata
+zitadel describe users
+
+# Inspect one command (flags, types, enum values, and JSON template)
+zitadel describe users create human
+```
+
+The top-level `describe` output includes a `global_flags` array with `--from-json`, `--request-json`, `--dry-run`, `--output`, and `--context` — these are available on every command.
+
+### JSON template
+
+Every command's describe output includes a `json_template` field showing the full request shape with zero/placeholder values. This reveals nested fields (like `password`, `email.sendCode`) that aren't available as individual CLI flags:
+
+```bash
+zitadel describe users create human | jq .json_template
+```
+
+For variant commands (e.g., `set-email send-code`), the template is filtered to show **only the chosen variant's fields** — no noise from sibling branches:
+
+```bash
+# Only shows sendCode, not returnCode or isVerified:
+zitadel describe users set-email send-code | jq .json_template
+```
+
+### Nested oneof flags
+
+When a variant contains a small inner oneof (like `password_type`), its fields are promoted to CLI flags so you don't need `--request-json` for common operations:
+
+```bash
+# Set a plaintext password:
+zitadel users create human --given-name Alice --family-name Doe \
+  --email alice@example.com --password s3cret!
+
+# Or use a pre-hashed password:
+zitadel users create human --given-name Alice --family-name Doe \
+  --email alice@example.com --hashed-password-hash '$2a$12$...'
+```
+
+These flags are mutually exclusive — you can't combine `--password` with `--hashed-password-hash`.
+
+### Providing JSON payloads
+
+Two options for complex requests:
+
+**Inline JSON** (recommended for agents — no stdin piping needed):
+
+```bash
+zitadel users create human --request-json '{"username":"alice","human":{"profile":{"givenName":"Alice","familyName":"Doe"}}}' --dry-run
+```
+
+**Stdin JSON**:
+
+```bash
+cat request.json | zitadel users create human --from-json --dry-run
+```
+
+When `--from-json` or `--request-json` is set, required request fields can be supplied from JSON instead of individual command flags.
+
+### Pagination
+
+List commands expose `--offset`, `--limit`, and `--asc` flags:
+
+```bash
+zitadel users list --limit 10 --offset 0 --asc
+```
+
+### Dry-run and structured output
+
+`--dry-run` prints the normalized request envelope without calling the API, which is useful for validating generated payloads.
+
+When stdout is piped (non-TTY), output automatically switches to JSON and errors are emitted as structured JSON on stderr with machine-readable error codes.
 
 ## Configuration
 

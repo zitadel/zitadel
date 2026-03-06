@@ -12,12 +12,13 @@ import (
 )
 
 var (
-	version      = "dev"
-	flagCtx      string
-	flagOutput   string
-	flagFromJSON bool
-	flagDryRun   bool
-	cfg          *config.Config
+	version        = "dev"
+	flagCtx        string
+	flagOutput     string
+	flagFromJSON   bool
+	flagDryRun     bool
+	flagRequestJSON string
+	cfg            *config.Config
 )
 
 // SetVersion sets the version string displayed by --version.
@@ -67,6 +68,7 @@ func NewRootCmd() *cobra.Command {
 	root.PersistentFlags().StringVar(&flagCtx, "context", "", "override the active context")
 	root.PersistentFlags().StringVarP(&flagOutput, "output", "o", "table", "output format: table or json (auto-detected from TTY)")
 	root.PersistentFlags().BoolVar(&flagFromJSON, "from-json", false, "read request body as JSON from stdin")
+	root.PersistentFlags().StringVar(&flagRequestJSON, "request-json", "", "provide request body as inline JSON string (alternative to --from-json with stdin)")
 	root.PersistentFlags().BoolVar(&flagDryRun, "dry-run", false, "print the request as JSON without calling the API")
 
 	root.AddCommand(newLoginCmd())

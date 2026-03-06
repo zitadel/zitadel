@@ -48,6 +48,12 @@ func newLoginCmd() *cobra.Command {
 				ClientID:   clientID,
 				Token:      token.AccessToken,
 			}
+			if token.RefreshToken != "" {
+				ctx.RefreshToken = token.RefreshToken
+			}
+			if !token.Expiry.IsZero() {
+				ctx.TokenExpiry = token.Expiry.Format("2006-01-02T15:04:05Z07:00")
+			}
 			cfg.Contexts[ctxName] = ctx
 			cfg.ActiveContext = ctxName
 

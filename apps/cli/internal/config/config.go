@@ -17,11 +17,13 @@ type Config struct {
 
 // Context represents one configured ZITADEL instance.
 type Context struct {
-	Instance   string `toml:"instance"    mapstructure:"instance"`
-	AuthMethod string `toml:"auth-method" mapstructure:"auth-method"`
-	PAT        string `toml:"pat"         mapstructure:"pat"`
-	ClientID   string `toml:"client-id"   mapstructure:"client-id"`
-	Token      string `toml:"token"       mapstructure:"token"`
+	Instance     string `toml:"instance"      mapstructure:"instance"`
+	AuthMethod   string `toml:"auth-method"   mapstructure:"auth-method"`
+	PAT          string `toml:"pat"           mapstructure:"pat"`
+	ClientID     string `toml:"client-id"     mapstructure:"client-id"`
+	Token        string `toml:"token"         mapstructure:"token"`
+	RefreshToken string `toml:"refresh-token" mapstructure:"refresh-token"`
+	TokenExpiry  string `toml:"token-expiry"  mapstructure:"token-expiry"`
 }
 
 // Path returns the config file path, respecting XDG_CONFIG_HOME.

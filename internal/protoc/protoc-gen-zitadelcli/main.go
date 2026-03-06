@@ -43,6 +43,14 @@ type serviceData struct {
 	ConnectClientConstructor string
 	// Methods is the list of RPC methods to generate commands for.
 	Methods []methodData
+	// ExtraImports holds additional Go imports needed by generated code (e.g., filter types).
+	ExtraImports []extraImport
+}
+
+// extraImport represents an additional Go import for the generated file.
+type extraImport struct {
+	Alias string
+	Path  string
 }
 
 // methodData holds data for generating a single CLI command from an RPC method.
@@ -84,6 +92,22 @@ type methodData struct {
 	IsListMethod bool
 	// ListFieldGoName is the Go name of the repeated field in the response (e.g. "Result", "Users", "Projects").
 	ListFieldGoName string
+	// JSONTemplate is a JSON template string showing all fields of the request.
+	JSONTemplate string
+	// FilterConvenience holds convenience flags for common filter patterns (e.g., --user-id for IDFilter).
+	FilterConvenience []filterConvenienceFlag
+}
+
+// filterConvenienceFlag describes a convenience flag that maps to a search filter.
+type filterConvenienceFlag struct {
+	FlagName            string
+	Help                string
+	OneofFieldName      string
+	FilterListField     string
+	FilterMsgType       string
+	WrapperType         string
+	IDFilterImportAlias string
+	IDFilterType        string
 }
 
 // inlinedOneofGroup represents a proto oneof field whose variants have been expanded into
@@ -116,6 +140,16 @@ type inlinedVariant struct {
 	IsScalarBoolVariant bool
 	// ScalarGoFieldName is the Go field name set to true on the request for scalar bool variants.
 	ScalarGoFieldName string
+	// JSONTemplate is a JSON template for this specific variant (filtered by the oneof choice).
+	JSONTemplate string
+	// NestedOneofs holds metadata about nested oneof fields expanded within this variant.
+	NestedOneofs []nestedOneofMeta
+}
+
+// nestedOneofMeta describes a nested oneof within a variant that has been expanded to flags.
+type nestedOneofMeta struct {
+	GoName   string
+	Variants []string
 }
 
 // variantFlagDef describes one flag on a variant subcommand.
@@ -153,6 +187,14 @@ type variantFlagDef struct {
 	EnumValues []string
 	// Required is true when the field has (google.api.field_behavior) = REQUIRED.
 	Required bool
+	// NestedOneofGroup is the Go name of the nested oneof this flag belongs to (empty for normal flags).
+	NestedOneofGroup string
+	// NestedOneofVariant is the Go field name of the chosen variant within the nested oneof.
+	NestedOneofVariant string
+	// NestedOneofWrapperType is the Go oneof wrapper type for the nested oneof variant.
+	NestedOneofWrapperType string
+	// NestedOneofMsgType is the Go message type inside the wrapper (empty for scalar variants).
+	NestedOneofMsgType string
 }
 
 // flagDef describes a CLI flag derived from a top-level (non-oneof) proto field.
@@ -183,6 +225,10 @@ type flagDef struct {
 	EnumGoType string
 	// EnumValues lists the valid enum value names.
 	EnumValues []string
+	// ParentGoField is non-empty for expanded message fields; the parent Go field name.
+	ParentGoField string
+	// ParentGoType is the Go type for lazy-init of the parent message.
+	ParentGoType string
 }
 
 // columnDef describes a table column for rendering responses.
@@ -195,6 +241,16 @@ type columnDef struct {
 	IsTimestamp bool
 	// IsEnum is true for enum columns.
 	IsEnum bool
+	// IsOneofType is true for oneof discriminator columns that show which variant is set.
+	IsOneofType bool
+	// OneofVariants maps Go wrapper type names to human-readable variant names (e.g. "AuthFactor_Otp" → "otp").
+	OneofVariants []oneofVariantColumn
+}
+
+// oneofVariantColumn maps a Go oneof wrapper type to a display name for table output.
+type oneofVariantColumn struct {
+	GoWrapperType string // e.g. "*userpb.AuthFactor_Otp"
+	DisplayName   string // e.g. "otp"
 }
 
 // v2ServiceFilter is the list of v2 proto packages we want to generate CLI commands for.
@@ -292,36 +348,47 @@ func buildServiceData(service *protogen.Service, file *protogen.File, cfg servic
 		ConnectClientConstructor: "New" + service.GoName + "Client",
 	}
 
+	var allExtraImports []extraImport
 	for _, method := range service.Methods {
 		if method.Desc.IsStreamingClient() || method.Desc.IsStreamingServer() {
 			continue // Skip streaming methods.
 		}
 
-		md := buildMethodData(method, service)
+		md, methodImports := buildMethodData(method, service, goImportPath)
 		if md == nil {
 			continue
 		}
 		md.Example = buildExample(cfg.resourceName, md)
 		sd.Methods = append(sd.Methods, *md)
+		allExtraImports = append(allExtraImports, methodImports...)
+	}
+
+	// Deduplicate extra imports
+	importSet := map[string]extraImport{}
+	for _, ei := range allExtraImports {
+		importSet[ei.Path] = ei
+	}
+	for _, ei := range importSet {
+		sd.ExtraImports = append(sd.ExtraImports, ei)
 	}
 
 	return sd
 }
 
-func buildMethodData(method *protogen.Method, service *protogen.Service) *methodData {
+func buildMethodData(method *protogen.Method, service *protogen.Service, goImportPath string) (*methodData, []extraImport) {
 	rpcName := string(method.Desc.Name())
 
 	// Skip deprecated methods.
 	if method.Desc.Options() != nil {
 		opts, ok := method.Desc.Options().(*descriptorpb.MethodOptions)
 		if ok && opts != nil && opts.GetDeprecated() {
-			return nil
+			return nil, nil
 		}
 	}
 
 	verb, suffix := rpcNameToVerbAndSuffix(rpcName, string(service.Desc.Name()))
 	if verb == "" {
-		return nil // Unknown method pattern — skip.
+		return nil, nil // Unknown method pattern — skip.
 	}
 
 	serviceName := string(service.Desc.Name())
@@ -395,10 +462,29 @@ func buildMethodData(method *protogen.Method, service *protogen.Service) *method
 		md.Use = cliUse
 	}
 
+	// Expand well-known message fields (e.g., ListQuery → offset, limit, asc flags)
+	var extraImports []extraImport
+	for _, field := range method.Input.Fields {
+		if field.Oneof != nil && !field.Desc.HasOptionalKeyword() {
+			continue
+		}
+		if field.Desc.Kind() == protoreflect.MessageKind && !field.Desc.IsList() && !field.Desc.IsMap() {
+			expandMessageField(field, &md.Flags, goImportPath, &extraImports)
+		}
+	}
+
+	// Build JSON template
+	md.JSONTemplate = buildJSONTemplate(method.Input, 0)
+
+	// Extract filter convenience flags
+	filterFlags, filterImports := extractFilterConvenienceFlags(method.Input, goImportPath)
+	md.FilterConvenience = filterFlags
+	extraImports = append(extraImports, filterImports...)
+
 	// Extract response columns.
 	md.IsListMethod, md.ListFieldGoName, md.ResponseColumns = extractResponseColumns(method.Output, verb)
 
-	return md
+	return md, extraImports
 }
 
 // buildExample constructs a representative example invocation string for a command.
@@ -531,6 +617,7 @@ func buildOneofInlinedGroup(oneof *protogen.Oneof, msg *protogen.Message) *inlin
 				IsScalarBoolVariant: true,
 				ScalarGoFieldName:   field.GoName,
 			}
+			v.JSONTemplate = buildJSONTemplateFiltered(msg, 0, oneof.Desc.Name(), field.Desc.Name())
 			g.Variants = append(g.Variants, v)
 			continue
 		}
@@ -557,6 +644,7 @@ func buildOneofInlinedGroup(oneof *protogen.Oneof, msg *protogen.Message) *inlin
 
 		// Track used leaf names to detect collisions.
 		leafNames := map[string]bool{}
+		processedNestedOneofs := map[string]bool{}
 
 		for _, varField := range field.Message.Fields {
 			if isFieldDeprecated(varField) {
@@ -565,8 +653,14 @@ func buildOneofInlinedGroup(oneof *protogen.Oneof, msg *protogen.Message) *inlin
 			if varField.Desc.IsMap() || varField.Desc.IsList() {
 				continue
 			}
-			// Skip non-optional oneof fields within the variant (too complex).
+			// Skip non-optional oneof fields within the variant (too complex),
+			// unless they can be expanded to flags.
 			if varField.Oneof != nil && !varField.Desc.HasOptionalKeyword() {
+				neoKey := varField.Oneof.GoName
+				if !processedNestedOneofs[neoKey] && isExpandableOneof(varField.Oneof) {
+					processedNestedOneofs[neoKey] = true
+					expandNestedOneof(varField.Oneof, &v, variantName, field.Message)
+				}
 				continue
 			}
 
@@ -627,6 +721,7 @@ func buildOneofInlinedGroup(oneof *protogen.Oneof, msg *protogen.Message) *inlin
 			}
 		}
 
+		v.JSONTemplate = buildJSONTemplateFiltered(msg, 0, oneof.Desc.Name(), field.Desc.Name())
 		g.Variants = append(g.Variants, v)
 	}
 
@@ -842,19 +937,71 @@ func extractResponseColumns(msg *protogen.Message, verb string) (isList bool, li
 }
 
 func extractMessageColumns(msg *protogen.Message) []columnDef {
-	var cols []columnDef
+	// Collect columns in a logical order: ID fields first, then ORGANIZATION ID
+	// (from details.resource_owner), then everything else.
+	var idCols, detailsCols, otherCols []columnDef
 	for _, field := range msg.Fields {
 		col := fieldToColumn(field)
-		if col != nil {
-			cols = append(cols, *col)
+		if col == nil {
+			continue
+		}
+		switch {
+		case col.Header == "ID" || (strings.HasSuffix(col.Header, " ID") && col.Header != "ORGANIZATION ID"):
+			idCols = append(idCols, *col)
+		case col.Header == "ORGANIZATION ID":
+			detailsCols = append(detailsCols, *col)
+		default:
+			otherCols = append(otherCols, *col)
 		}
 	}
+
+	// Detect oneof fields and add a TYPE column showing which variant is set.
+	processed := map[string]bool{}
+	for _, field := range msg.Fields {
+		if field.Oneof == nil || field.Desc.HasOptionalKeyword() {
+			continue
+		}
+		oneofName := field.Oneof.GoName
+		if processed[oneofName] {
+			continue
+		}
+		processed[oneofName] = true
+
+		header := strings.ToUpper(toKebab(oneofName))
+		header = strings.ReplaceAll(header, "-", " ")
+		accessor := "Get" + oneofName + "()"
+
+		var variants []oneofVariantColumn
+		for _, of := range field.Oneof.Fields {
+			wrapperType := msg.GoIdent.GoName + "_" + of.GoName
+			displayName := toKebab(string(of.Desc.Name()))
+			variants = append(variants, oneofVariantColumn{
+				GoWrapperType: wrapperType,
+				DisplayName:   displayName,
+			})
+		}
+		col := columnDef{
+			Header:        header,
+			GoAccessor:    accessor,
+			IsOneofType:   true,
+			OneofVariants: variants,
+		}
+		otherCols = append(otherCols, col)
+	}
+
+	cols := make([]columnDef, 0, len(idCols)+len(detailsCols)+len(otherCols))
+	cols = append(cols, idCols...)
+	cols = append(cols, detailsCols...)
+	cols = append(cols, otherCols...)
 	return cols
 }
 
 func extractTopLevelColumns(msg *protogen.Message) []columnDef {
 	var cols []columnDef
 	for _, field := range msg.Fields {
+		if string(field.Desc.Name()) == "details" {
+			continue // Skip details in mutation responses
+		}
 		col := fieldToColumn(field)
 		if col != nil {
 			cols = append(cols, *col)
@@ -888,9 +1035,17 @@ func fieldToColumn(field *protogen.Field) *columnDef {
 		if fullName == "google.protobuf.Timestamp" {
 			return &columnDef{Header: header, GoAccessor: accessor, IsTimestamp: true}
 		}
-		// For nested Details, extract ID if present.
+		// For nested Details, extract resource_owner.
 		if string(desc.Name()) == "details" {
-			return nil // Skip details metadata in table output.
+			for _, subField := range field.Message.Fields {
+				if string(subField.Desc.Name()) == "resource_owner" {
+					return &columnDef{
+						Header:     "ORGANIZATION ID",
+						GoAccessor: accessor + ".GetResourceOwner()",
+					}
+				}
+			}
+			return nil
 		}
 		return nil
 	default:
@@ -1072,4 +1227,335 @@ func loadTemplate(name string, data []byte) *template.Template {
 		"repeat": strings.Repeat,
 	}
 	return template.Must(template.New(name).Funcs(funcMap).Parse(string(data)))
+}
+
+// jsonFieldName returns the JSON field name for a proto field.
+func jsonFieldName(field *protogen.Field) string {
+	return string(field.Desc.JSONName())
+}
+
+// buildJSONTemplate builds a JSON template showing all fields of a request message.
+func buildJSONTemplate(msg *protogen.Message, depth int) string {
+	if depth > 3 {
+		return "{}"
+	}
+	var parts []string
+	for _, field := range msg.Fields {
+		name := jsonFieldName(field)
+		switch {
+		case field.Desc.IsMap():
+			continue
+		case field.Desc.IsList() && field.Desc.Kind() == protoreflect.MessageKind:
+			parts = append(parts, fmt.Sprintf("%q: [%s]", name, buildJSONTemplate(field.Message, depth+1)))
+		case field.Desc.IsList():
+			parts = append(parts, fmt.Sprintf("%q: []", name))
+		case field.Desc.Kind() == protoreflect.MessageKind:
+			fullName := field.Desc.Message().FullName()
+			if fullName == "google.protobuf.Timestamp" {
+				parts = append(parts, fmt.Sprintf("%q: %q", name, "2006-01-02T15:04:05Z"))
+			} else if fullName == "google.protobuf.Duration" {
+				parts = append(parts, fmt.Sprintf("%q: %q", name, "3600s"))
+			} else {
+				parts = append(parts, fmt.Sprintf("%q: %s", name, buildJSONTemplate(field.Message, depth+1)))
+			}
+		case field.Desc.Kind() == protoreflect.BoolKind:
+			parts = append(parts, fmt.Sprintf("%q: false", name))
+		case field.Desc.Kind() == protoreflect.EnumKind:
+			if field.Desc.Enum().Values().Len() > 0 {
+				parts = append(parts, fmt.Sprintf("%q: %q", name, field.Desc.Enum().Values().Get(0).Name()))
+			}
+		case field.Desc.Kind() == protoreflect.StringKind:
+			parts = append(parts, fmt.Sprintf("%q: %q", name, ""))
+		default:
+			parts = append(parts, fmt.Sprintf("%q: 0", name))
+		}
+	}
+	return "{" + strings.Join(parts, ", ") + "}"
+}
+
+// buildJSONTemplateFiltered is like buildJSONTemplate but filters oneof fields at depth 0.
+func buildJSONTemplateFiltered(msg *protogen.Message, depth int, oneofFilter, chosenField protoreflect.Name) string {
+	if depth > 3 {
+		return "{}"
+	}
+	var parts []string
+	for _, field := range msg.Fields {
+		// At depth 0, filter oneof fields
+		if depth == 0 && oneofFilter != "" && field.Oneof != nil && !field.Desc.HasOptionalKeyword() {
+			if field.Oneof.Desc.Name() != oneofFilter {
+				continue
+			}
+			if field.Desc.Name() != chosenField {
+				continue
+			}
+		}
+		name := jsonFieldName(field)
+		switch {
+		case field.Desc.IsMap():
+			continue
+		case field.Desc.IsList() && field.Desc.Kind() == protoreflect.MessageKind:
+			parts = append(parts, fmt.Sprintf("%q: [%s]", name, buildJSONTemplate(field.Message, depth+1)))
+		case field.Desc.IsList():
+			parts = append(parts, fmt.Sprintf("%q: []", name))
+		case field.Desc.Kind() == protoreflect.MessageKind:
+			fullName := field.Desc.Message().FullName()
+			if fullName == "google.protobuf.Timestamp" {
+				parts = append(parts, fmt.Sprintf("%q: %q", name, "2006-01-02T15:04:05Z"))
+			} else if fullName == "google.protobuf.Duration" {
+				parts = append(parts, fmt.Sprintf("%q: %q", name, "3600s"))
+			} else {
+				parts = append(parts, fmt.Sprintf("%q: %s", name, buildJSONTemplate(field.Message, depth+1)))
+			}
+		case field.Desc.Kind() == protoreflect.BoolKind:
+			parts = append(parts, fmt.Sprintf("%q: false", name))
+		case field.Desc.Kind() == protoreflect.EnumKind:
+			if field.Desc.Enum().Values().Len() > 0 {
+				parts = append(parts, fmt.Sprintf("%q: %q", name, field.Desc.Enum().Values().Get(0).Name()))
+			}
+		case field.Desc.Kind() == protoreflect.StringKind:
+			parts = append(parts, fmt.Sprintf("%q: %q", name, ""))
+		default:
+			parts = append(parts, fmt.Sprintf("%q: 0", name))
+		}
+	}
+	return "{" + strings.Join(parts, ", ") + "}"
+}
+
+// expandableMessages lists well-known message types that should be expanded into flat flags.
+var expandableMessages = map[protoreflect.FullName]bool{
+	"zitadel.object.v2.ListQuery": true,
+}
+
+// expandMessageField expands well-known message types (e.g., ListQuery) into flat flags.
+func expandMessageField(field *protogen.Field, flags *[]flagDef, goImportPath string, extraImports *[]extraImport) {
+	if field.Desc.Kind() != protoreflect.MessageKind {
+		return
+	}
+	fullName := field.Desc.Message().FullName()
+	if !expandableMessages[fullName] {
+		return
+	}
+	subMsg := field.Message
+	parentGoField := field.GoName
+	parentGoType := subMsg.GoIdent.GoName
+
+	// Add import for the message's package if different from the service package
+	msgImportPath := string(subMsg.GoIdent.GoImportPath)
+	if msgImportPath != goImportPath {
+		alias := importAlias(msgImportPath)
+		parentGoType = alias + "." + parentGoType
+		// Check if already added
+		found := false
+		for _, ei := range *extraImports {
+			if ei.Path == msgImportPath {
+				found = true
+				break
+			}
+		}
+		if !found {
+			*extraImports = append(*extraImports, extraImport{Alias: alias, Path: msgImportPath})
+		}
+	}
+
+	for _, subField := range subMsg.Fields {
+		if isFieldDeprecated(subField) {
+			continue
+		}
+		if subField.Desc.Kind() == protoreflect.MessageKind {
+			continue
+		}
+		if subField.Oneof != nil && !subField.Desc.HasOptionalKeyword() {
+			continue
+		}
+		fd := fieldToFlag(subField, "")
+		if fd == nil {
+			continue
+		}
+		fd.ParentGoField = parentGoField
+		fd.ParentGoType = parentGoType
+		*flags = append(*flags, *fd)
+	}
+}
+
+// importAlias derives an import alias from a Go import path.
+func importAlias(path string) string {
+	parts := strings.Split(path, "/")
+	if len(parts) >= 2 {
+		return parts[len(parts)-2] + parts[len(parts)-1]
+	}
+	return parts[len(parts)-1]
+}
+
+// isExpandableOneof checks if a nested oneof can be expanded to flags.
+func isExpandableOneof(oneof *protogen.Oneof) bool {
+	for _, field := range oneof.Fields {
+		if field.Desc.Kind() == protoreflect.BoolKind || field.Desc.Kind() == protoreflect.StringKind {
+			continue // scalar variants are fine
+		}
+		if field.Desc.Kind() != protoreflect.MessageKind {
+			return false // complex scalar type
+		}
+		// Message variant: check all its fields are scalar/enum with <=3 children
+		msg := field.Message
+		count := 0
+		for _, subField := range msg.Fields {
+			if isFieldDeprecated(subField) {
+				continue
+			}
+			if subField.Desc.Kind() == protoreflect.MessageKind {
+				return false // nested message → too complex
+			}
+			if subField.Desc.IsMap() || subField.Desc.IsList() {
+				return false
+			}
+			count++
+		}
+		if count > 3 {
+			return false
+		}
+	}
+	return true
+}
+
+// expandNestedOneof expands a nested oneof within a variant into flags.
+func expandNestedOneof(oneof *protogen.Oneof, v *inlinedVariant, variantName string, msg *protogen.Message) {
+	neo := nestedOneofMeta{
+		GoName: oneof.GoName,
+	}
+
+	for _, field := range oneof.Fields {
+		oneofVariantName := toKebab(string(field.Desc.Name()))
+		neo.Variants = append(neo.Variants, oneofVariantName)
+
+		parentGoName := string(msg.GoIdent.GoName)
+		wrapperType := parentGoName + "_" + field.GoName
+
+		if field.Desc.Kind() == protoreflect.BoolKind || field.Desc.Kind() == protoreflect.StringKind {
+			// Scalar oneof variant
+			flagName := oneofVariantName
+			goVarSuffix := "Neo_" + field.GoName
+			fd := buildVariantFlag(field, flagName, goVarSuffix, variantName, "", "")
+			if fd != nil {
+				fd.Required = false
+				fd.NestedOneofGroup = oneof.GoName
+				fd.NestedOneofVariant = field.GoName
+				fd.NestedOneofWrapperType = wrapperType
+				fd.NestedOneofMsgType = ""
+				v.Flags = append(v.Flags, *fd)
+			}
+			continue
+		}
+
+		if field.Desc.Kind() != protoreflect.MessageKind {
+			continue
+		}
+
+		subMsg := field.Message
+		for _, subField := range subMsg.Fields {
+			if isFieldDeprecated(subField) {
+				continue
+			}
+			if subField.Desc.Kind() == protoreflect.MessageKind {
+				continue
+			}
+
+			childKebab := toKebab(string(subField.Desc.Name()))
+			flagName := oneofVariantName + "-" + childKebab
+			if oneofVariantName == childKebab {
+				flagName = oneofVariantName
+			}
+			goVarSuffix := "Neo_" + field.GoName + "_" + subField.GoName
+
+			fd := buildVariantFlag(subField, flagName, goVarSuffix, variantName, "", "")
+			if fd != nil {
+				fd.Required = false
+				fd.NestedOneofGroup = oneof.GoName
+				fd.NestedOneofVariant = field.GoName
+				fd.NestedOneofWrapperType = wrapperType
+				fd.NestedOneofMsgType = subMsg.GoIdent.GoName
+				v.Flags = append(v.Flags, *fd)
+			}
+		}
+	}
+
+	v.NestedOneofs = append(v.NestedOneofs, neo)
+}
+
+// extractFilterConvenienceFlags detects repeated search filter fields with IDFilter oneof variants.
+func extractFilterConvenienceFlags(msg *protogen.Message, goImportPath string) ([]filterConvenienceFlag, []extraImport) {
+	var flags []filterConvenienceFlag
+	var imports []extraImport
+
+	for _, field := range msg.Fields {
+		if !field.Desc.IsList() || field.Desc.Kind() != protoreflect.MessageKind {
+			continue
+		}
+		// Look for repeated *SearchFilter fields
+		filterMsg := field.Message
+		if !strings.HasSuffix(filterMsg.GoIdent.GoName, "SearchFilter") {
+			continue
+		}
+
+		// Check for a "filter" oneof
+		for _, filterField := range filterMsg.Fields {
+			if filterField.Oneof == nil || filterField.Desc.HasOptionalKeyword() {
+				continue
+			}
+
+			// Look for IDFilter variants
+			if filterField.Desc.Kind() != protoreflect.MessageKind {
+				continue
+			}
+
+			// Check if this is an IDFilter type (zitadel.filter.v2.IDFilter)
+			idFilterFullName := filterField.Desc.Message().FullName()
+			if idFilterFullName != "zitadel.filter.v2.IDFilter" {
+				continue
+			}
+
+			oneofFieldName := filterField.GoName
+			flagName := toKebab(string(filterField.Desc.Name()))
+			flagName = strings.TrimSuffix(flagName, "-filter")
+
+			// Build the wrapper type name: FilterMsg_OneofFieldName
+			wrapperType := filterMsg.GoIdent.GoName + "_" + oneofFieldName
+
+			// IDFilter import
+			idFilterMsg := filterField.Message
+			idFilterImportPath := string(idFilterMsg.GoIdent.GoImportPath)
+			idFilterType := idFilterMsg.GoIdent.GoName
+			idFilterAlias := importAlias(idFilterImportPath)
+
+			if idFilterImportPath != goImportPath {
+				found := false
+				for _, ei := range imports {
+					if ei.Path == idFilterImportPath {
+						found = true
+						break
+					}
+				}
+				if !found {
+					imports = append(imports, extraImport{Alias: idFilterAlias, Path: idFilterImportPath})
+				}
+			} else {
+				idFilterAlias = ""
+			}
+
+			help := fmt.Sprintf("Filter by %s", strings.ReplaceAll(flagName, "-", " "))
+
+			cf := filterConvenienceFlag{
+				FlagName:            flagName,
+				Help:                help,
+				OneofFieldName:      oneofFieldName,
+				FilterListField:     field.GoName,
+				FilterMsgType:       filterMsg.GoIdent.GoName,
+				WrapperType:         wrapperType,
+				IDFilterImportAlias: idFilterAlias,
+				IDFilterType:        idFilterType,
+			}
+			flags = append(flags, cf)
+		}
+	}
+
+	return flags, imports
 }

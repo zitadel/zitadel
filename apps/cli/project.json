@@ -8,9 +8,7 @@
       "command": "bash -c 'go install ./internal/protoc/protoc-gen-zitadelcli/ && rm -f apps/cli/gen/cmd_*.go && PATH=\"$(go env GOPATH)/bin:.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/buf generate --path proto/zitadel/user/v2/user_service.proto --path proto/zitadel/org/v2/org_service.proto --path proto/zitadel/project/v2/project_service.proto --path proto/zitadel/app/v2/app_service.proto'",
       "cache": true,
       "inputs": [
-        "{workspaceRoot}/internal/protoc/protoc-gen-zitadelcli/main.go",
-        "{workspaceRoot}/internal/protoc/protoc-gen-zitadelcli/cmd.go.tmpl",
-        "{workspaceRoot}/internal/protoc/protoc-gen-zitadelcli/register.go.tmpl",
+        "{workspaceRoot}/internal/protoc/protoc-gen-zitadelcli/**",
         "{workspaceRoot}/go.mod",
         "{workspaceRoot}/go.sum",
         "{workspaceRoot}/proto/zitadel/**/*.proto",
@@ -29,7 +27,8 @@
         "{projectRoot}/**/*.go",
         "{projectRoot}/go.mod",
         "{projectRoot}/go.sum",
-        "{workspaceRoot}/pkg/grpc/**/*.go"
+        "{workspaceRoot}/pkg/grpc/**/*.go",
+        { "runtime": "git describe --tags --always 2>/dev/null || echo dev" }
       ],
       "outputs": [
         "{workspaceRoot}/.artifacts/bin/*/*/zitadel-cli"

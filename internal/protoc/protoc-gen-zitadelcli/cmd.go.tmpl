@@ -17,6 +17,9 @@ import (
 	"github.com/zitadel/zitadel/apps/cli/internal/output"
 	{{.GoImportAlias}} "{{.GoImportPath}}"
 	"{{.ConnectImportPath}}"
+{{- range .ExtraImports}}
+	{{.Alias}} "{{.Path}}"
+{{- end}}
 )
 
 func init() {
@@ -29,10 +32,7 @@ func init() {
 	RegisterMeta(CommandMeta{
 		Group:          "{{$.ResourceName}}",
 		Name:           "{{$m.Use}} {{$v.VariantName}}{{if $m.IDArg}} <{{$m.IDArg}}>{{end}}",
-		Short:          {{quote $m.Short}},
-{{- if $m.Long}}
-		Long:           {{quote $m.Long}},
-{{- end}}
+		Short:          {{quote $m.Short}} + " ({{$v.VariantName}})",
 		FullMethodName: "{{$m.FullMethodName}}",
 		RequestType:    "{{$m.RequestType}}",
 		ResponseType:   "{{$m.ResponseType}}",
@@ -44,9 +44,10 @@ func init() {
 			{Name: "{{.Name}}", Type: "{{.FlagType}}", Required: {{.Required}}, Help: {{quote .Help}}{{if .IsEnum}}, EnumValues: []string{ {{- range .EnumValues}}{{quote .}}, {{end -}} }{{end}}},
 {{- end}}
 {{- range $f := $v.Flags}}
-			{Name: {{quote $f.FlagKebabName}}, Type: "{{$f.FlagType}}", Help: {{quote $f.Help}}{{if $f.IsEnum}}, EnumValues: []string{ {{- range $f.EnumValues}}{{quote .}}, {{end -}} }{{end}}},
+			{Name: {{quote $f.FlagKebabName}}, Type: "{{$f.FlagType}}", Help: {{quote $f.Help}}, Group: "{{$v.VariantName}}"{{if $f.IsEnum}}, EnumValues: []string{ {{- range $f.EnumValues}}{{quote .}}, {{end -}} }{{end}}},
 {{- end}}
 		},
+		JSONTemplate: json.RawMessage({{quote $v.JSONTemplate}}),
 	})
 {{- end}}
 {{- end}}
@@ -71,7 +72,11 @@ func init() {
 {{- range .Flags}}
 			{Name: "{{.Name}}", Type: "{{.FlagType}}", Required: {{.Required}}, Help: {{quote .Help}}{{if .IsEnum}}, EnumValues: []string{ {{- range .EnumValues}}{{quote .}}, {{end -}} }{{end}}},
 {{- end}}
+{{- range .FilterConvenience}}
+			{Name: "{{.FlagName}}", Type: "string", Help: {{quote .Help}}},
+{{- end}}
 		},
+		JSONTemplate: json.RawMessage({{quote .JSONTemplate}}),
 	})
 {{- end}}
 {{- end}}
@@ -108,13 +113,23 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 {{- end}}
 		RunE: func(cmd *cobra.Command, args []string) error {
 			useJSON, _ := cmd.Flags().GetBool("from-json")
+			requestJSON, _ := cmd.Flags().GetString("request-json")
+			if requestJSON != "" {
+				useJSON = true
+			}
 			if !useJSON {
 				return cmd.Help()
 			}
 			req := &{{$.GoImportAlias}}.{{$m.RequestType}}{}
-			data, err := io.ReadAll(os.Stdin)
-			if err != nil {
-				return fmt.Errorf("reading stdin: %w", err)
+			var data []byte
+			if requestJSON != "" {
+				data = []byte(requestJSON)
+			} else {
+				var err error
+				data, err = io.ReadAll(os.Stdin)
+				if err != nil {
+					return fmt.Errorf("reading stdin: %w", err)
+				}
 			}
 			if err := protojson.Unmarshal(data, req); err != nil {
 				return fmt.Errorf("parsing JSON input: %w", err)
@@ -124,9 +139,6 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 	}
 {{range $m.Flags}}
 	parent.PersistentFlags().{{.FlagFunc}}(&commonflag_{{$m.RPCName}}_{{.GoName}}, "{{.Name}}", {{if eq .FlagType "[]string"}}nil{{else if eq .FlagType "string"}}""{{else if eq .FlagType "bool"}}false{{else}}0{{end}}, {{quote .Help}})
-{{- if .Required}}
-	parent.MarkPersistentFlagRequired("{{.Name}}")
-{{- end}}
 {{- if .IsEnum}}
 	_ = parent.RegisterFlagCompletionFunc("{{.Name}}", func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 		return []string{ {{- range .EnumValues}}{{quote .}}, {{end -}} }, cobra.ShellCompDirectiveNoFileComp
@@ -145,10 +157,20 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 				req := &{{$.GoImportAlias}}.{{$m.RequestType}}{}
 
 				useJSON, _ := cmd.Flags().GetBool("from-json")
+				requestJSON, _ := cmd.Flags().GetString("request-json")
+				if requestJSON != "" {
+					useJSON = true
+				}
 				if useJSON {
-					data, err := io.ReadAll(os.Stdin)
-					if err != nil {
-						return fmt.Errorf("reading stdin: %w", err)
+					var data []byte
+					if requestJSON != "" {
+						data = []byte(requestJSON)
+					} else {
+						var err error
+						data, err = io.ReadAll(os.Stdin)
+						if err != nil {
+							return fmt.Errorf("reading stdin: %w", err)
+						}
 					}
 					if err := protojson.Unmarshal(data, req); err != nil {
 						return fmt.Errorf("parsing JSON input: %w", err)
@@ -160,20 +182,52 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 				if len(args) > 0 {
 					req.{{$m.IDArgGoName}} = &args[0]
 				} else if req.{{$m.IDArgGoName}} == nil || *req.{{$m.IDArgGoName}} == "" {
-					return fmt.Errorf("{{$m.IDArg}} argument is required")
+					return fmt.Errorf("missing required argument <{{$m.IDArg}}>\n\nUsage: %s <{{$m.IDArg}}>", cmd.CommandPath())
 				}
 {{- else}}
 				if len(args) > 0 {
 					req.{{$m.IDArgGoName}} = args[0]
 				} else if req.{{$m.IDArgGoName}} == "" {
-					return fmt.Errorf("{{$m.IDArg}} argument is required")
+					return fmt.Errorf("missing required argument <{{$m.IDArg}}>\n\nUsage: %s <{{$m.IDArg}}>", cmd.CommandPath())
 				}
 {{- end}}
 {{- end}}
 
 				if !useJSON {
+{{- range $m.Flags}}
+{{- if .Required}}
+					if !cmd.Flags().Changed("{{.Name}}") {
+						return fmt.Errorf("missing required flag --{{.Name}} (or provide it via --from-json)")
+					}
+{{- end}}
+{{- end}}
+{{- range $f := $v.Flags}}
+{{- if and $f.Required (not $f.NestedOneofGroup)}}
+					if !cmd.Flags().Changed({{quote $f.FlagKebabName}}) {
+						return fmt.Errorf("missing required flag --{{$f.FlagKebabName}} (or provide it via --from-json)")
+					}
+{{- end}}
+{{- end}}
 {{range $m.Flags}}
-{{- if and .IsEnum .IsOptionalScalar}}
+{{- if .ParentGoField}}
+{{- if eq .FlagType "bool"}}
+					if cmd.Flags().Changed("{{.Name}}") {
+						if req.{{.ParentGoField}} == nil {
+							req.{{.ParentGoField}} = &{{.ParentGoType}}{}
+						}
+						req.{{.ParentGoField}}.{{.GoName}} = commonflag_{{$m.RPCName}}_{{.GoName}}
+					}
+{{- else if eq .FlagType "[]string"}}
+					// Repeated string fields in nested messages not yet wired
+{{- else}}
+					if commonflag_{{$m.RPCName}}_{{.GoName}} != {{if eq .FlagType "string"}}""{{else}}0{{end}} {
+						if req.{{.ParentGoField}} == nil {
+							req.{{.ParentGoField}} = &{{.ParentGoType}}{}
+						}
+						req.{{.ParentGoField}}.{{.GoName}} = commonflag_{{$m.RPCName}}_{{.GoName}}
+					}
+{{- end}}
+{{- else if and .IsEnum .IsOptionalScalar}}
 					if commonflag_{{$m.RPCName}}_{{.GoName}} != "" {
 						enumVal, ok := {{$.GoImportAlias}}.{{.EnumGoType}}_value[commonflag_{{$m.RPCName}}_{{.GoName}}]
 						if !ok {
@@ -218,6 +272,9 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 					{
 						_varMsg := &{{$.GoImportAlias}}.{{$v.GoMsgType}}{}
 {{- range $f := $v.Flags}}
+{{- if $f.NestedOneofGroup}}
+{{- /* Nested oneof flags are handled in the block below */}}
+{{- else}}
 {{- if $f.NeedChanged}}
 						if cmd.Flags().Changed({{quote $f.FlagKebabName}}) {
 {{- else if eq $f.FlagType "bool"}}
@@ -268,7 +325,64 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 {{- end}}
 {{- end}}
 						}
+{{- end}}{{/* end if not NestedOneofGroup */}}
+{{- end}}{{/* end range Flags */}}
+{{- range $neo := $v.NestedOneofs}}
+						{
+							// Mutual exclusion check for nested oneof {{$neo.GoName}}.
+							_nestedSet := []string{}
+{{- range $f := $v.Flags}}
+{{- if eq $f.NestedOneofGroup $neo.GoName}}
+{{- if $f.NeedChanged}}
+							if cmd.Flags().Changed({{quote $f.FlagKebabName}}) {
+								_nestedSet = append(_nestedSet, {{quote $f.NestedOneofVariant}})
+							}
+{{- else if eq $f.FlagType "bool"}}
+							if cmd.Flags().Changed({{quote $f.FlagKebabName}}) {
+								_nestedSet = append(_nestedSet, {{quote $f.NestedOneofVariant}})
+							}
+{{- else}}
+							if varflag_{{$m.RPCName}}_{{$f.GoVarSuffix}} != {{$f.DefaultValue}} {
+								_nestedSet = append(_nestedSet, {{quote $f.NestedOneofVariant}})
+							}
 {{- end}}
+{{- end}}
+{{- end}}
+							// Deduplicate (multiple flags may target same variant).
+							_nestedUniq := map[string]bool{}
+							for _, s := range _nestedSet { _nestedUniq[s] = true }
+							if len(_nestedUniq) > 1 {
+								return fmt.Errorf("conflicting flags: choose only one of {{range $i, $vn := $neo.Variants}}{{if $i}}, {{end}}--{{$vn}}-*{{end}}")
+							}
+						}
+{{- range $f := $v.Flags}}
+{{- if eq $f.NestedOneofGroup $neo.GoName}}
+{{- if $f.NeedChanged}}
+						if cmd.Flags().Changed({{quote $f.FlagKebabName}}) {
+{{- else if eq $f.FlagType "bool"}}
+						if cmd.Flags().Changed({{quote $f.FlagKebabName}}) {
+{{- else}}
+						if varflag_{{$m.RPCName}}_{{$f.GoVarSuffix}} != {{$f.DefaultValue}} {
+{{- end}}
+{{- if $f.NestedOneofMsgType}}
+							_neoMsg_{{$f.NestedOneofVariant}}, _ := _varMsg.{{$neo.GoName}}.(*{{$.GoImportAlias}}.{{$f.NestedOneofWrapperType}})
+							if _neoMsg_{{$f.NestedOneofVariant}} == nil {
+								_neoMsg_{{$f.NestedOneofVariant}} = &{{$.GoImportAlias}}.{{$f.NestedOneofWrapperType}}{{`{`}}{{$f.NestedOneofVariant}}: &{{$.GoImportAlias}}.{{$f.NestedOneofMsgType}}{}{{`}`}}
+								_varMsg.{{$neo.GoName}} = _neoMsg_{{$f.NestedOneofVariant}}
+							}
+{{- if $f.IsOptionalScalar}}
+							_neoMsg_{{$f.NestedOneofVariant}}.{{$f.NestedOneofVariant}}.{{$f.ChildGoField}} = &varflag_{{$m.RPCName}}_{{$f.GoVarSuffix}}
+{{- else}}
+							_neoMsg_{{$f.NestedOneofVariant}}.{{$f.NestedOneofVariant}}.{{$f.ChildGoField}} = varflag_{{$m.RPCName}}_{{$f.GoVarSuffix}}
+{{- end}}
+{{- else}}
+{{- /* Scalar oneof variant (e.g., string current_password) */}}
+							_varMsg.{{$neo.GoName}} = &{{$.GoImportAlias}}.{{$f.NestedOneofWrapperType}}{{`{`}}{{$f.NestedOneofVariant}}: varflag_{{$m.RPCName}}_{{$f.GoVarSuffix}}{{`}`}}
+{{- end}}
+						}
+{{- end}}
+{{- end}}
+{{- end}}{{/* end range NestedOneofs */}}
 						req.{{$g.GoName}} = &{{$.GoImportAlias}}.{{$v.GoWrapperType}}{{`{`}}{{$v.GoFieldName}}: _varMsg{{`}`}}
 					}
 {{- end}}
@@ -283,9 +397,6 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 		_ = vc.RegisterFlagCompletionFunc({{quote $f.FlagKebabName}}, func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 			return []string{ {{- range $f.EnumValues}}{{quote .}}, {{end -}} }, cobra.ShellCompDirectiveNoFileComp
 		})
-{{- end}}
-{{- if $f.Required}}
-		vc.MarkFlagRequired({{quote $f.FlagKebabName}})
 {{- end}}
 {{- end}}
 		parent.AddCommand(vc)
@@ -326,7 +437,7 @@ func do{{$.ServiceName}}_{{$m.RPCName}}(getCfg func() *config.Config, getOutput 
 
 	resp, err := svcClient.{{$m.RPCName}}(cmd.Context(), connect.NewRequest(req))
 	if err != nil {
-		return err
+		return FormatConnectError(err)
 	}
 
 	if getOutput() == "json" {
@@ -374,6 +485,9 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 {{- range $m.Flags}}
 	var flag_{{$m.RPCName}}_{{.GoName}} {{.FlagType}}
 {{- end}}
+{{- range $m.FilterConvenience}}
+	var convFilter_{{$m.RPCName}}_{{.OneofFieldName}} string
+{{- end}}
 
 	cmd := &cobra.Command{
 		Use:   "{{$m.Use}}",
@@ -387,12 +501,22 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 		RunE: func(cmd *cobra.Command, args []string) error {
 			req := &{{$.GoImportAlias}}.{{$m.RequestType}}{}
 
-			// Check for JSON input via --from-json flag
+			// Check for JSON input via --from-json or --request-json flags
 			useJSON, _ := cmd.Flags().GetBool("from-json")
+			requestJSON, _ := cmd.Flags().GetString("request-json")
+			if requestJSON != "" {
+				useJSON = true
+			}
 			if useJSON {
-				data, err := io.ReadAll(os.Stdin)
-				if err != nil {
-					return fmt.Errorf("reading stdin: %w", err)
+				var data []byte
+				if requestJSON != "" {
+					data = []byte(requestJSON)
+				} else {
+					var err error
+					data, err = io.ReadAll(os.Stdin)
+					if err != nil {
+						return fmt.Errorf("reading stdin: %w", err)
+					}
 				}
 				if err := protojson.Unmarshal(data, req); err != nil {
 					return fmt.Errorf("parsing JSON input: %w", err)
@@ -405,20 +529,45 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 			if len(args) > 0 {
 				req.{{$m.IDArgGoName}} = &args[0]
 			} else if req.{{$m.IDArgGoName}} == nil || *req.{{$m.IDArgGoName}} == "" {
-				return fmt.Errorf("{{$m.IDArg}} argument is required")
+				return fmt.Errorf("missing required argument <{{$m.IDArg}}>\n\nUsage: %s <{{$m.IDArg}}>", cmd.CommandPath())
 			}
 {{- else}}
 			if len(args) > 0 {
 				req.{{$m.IDArgGoName}} = args[0]
 			} else if req.{{$m.IDArgGoName}} == "" {
-				return fmt.Errorf("{{$m.IDArg}} argument is required")
+				return fmt.Errorf("missing required argument <{{$m.IDArg}}>\n\nUsage: %s <{{$m.IDArg}}>", cmd.CommandPath())
 			}
 {{- end}}
 {{- end}}
 
 			if !useJSON {
 {{- range $m.Flags}}
-{{- if and .IsEnum .IsOptionalScalar}}
+{{- if .Required}}
+				if !cmd.Flags().Changed("{{.Name}}") {
+					return fmt.Errorf("missing required flag --{{.Name}} (or provide it via --from-json)")
+				}
+{{- end}}
+{{- end}}
+{{- range $m.Flags}}
+{{- if .ParentGoField}}
+{{- if eq .FlagType "bool"}}
+				if cmd.Flags().Changed("{{.Name}}") {
+					if req.{{.ParentGoField}} == nil {
+						req.{{.ParentGoField}} = &{{.ParentGoType}}{}
+					}
+					req.{{.ParentGoField}}.{{.GoName}} = flag_{{$m.RPCName}}_{{.GoName}}
+				}
+{{- else if eq .FlagType "[]string"}}
+				// Repeated string fields in nested messages not yet wired
+{{- else}}
+				if flag_{{$m.RPCName}}_{{.GoName}} != {{if eq .FlagType "string"}}""{{else}}0{{end}} {
+					if req.{{.ParentGoField}} == nil {
+						req.{{.ParentGoField}} = &{{.ParentGoType}}{}
+					}
+					req.{{.ParentGoField}}.{{.GoName}} = flag_{{$m.RPCName}}_{{.GoName}}
+				}
+{{- end}}
+{{- else if and .IsEnum .IsOptionalScalar}}
 				if flag_{{$m.RPCName}}_{{.GoName}} != "" {
 					enumVal, ok := {{$.GoImportAlias}}.{{.EnumGoType}}_value[flag_{{$m.RPCName}}_{{.GoName}}]
 					if !ok {
@@ -458,6 +607,17 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 {{- end}}
 {{- end}}
 			}
+{{- range $m.FilterConvenience}}
+
+			// Convenience filter: --{{.FlagName}} → {{.OneofFieldName}} in {{.FilterListField}}
+			if convFilter_{{$m.RPCName}}_{{.OneofFieldName}} != "" {
+				req.{{.FilterListField}} = append(req.{{.FilterListField}}, &{{$.GoImportAlias}}.{{.FilterMsgType}}{
+					Filter: &{{$.GoImportAlias}}.{{.WrapperType}}{
+						{{.OneofFieldName}}: &{{.IDFilterImportAlias}}.{{.IDFilterType}}{Id: convFilter_{{$m.RPCName}}_{{.OneofFieldName}}},
+					},
+				})
+			}
+{{- end}}
 
 			// Dry-run: print request and exit without calling the API
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -490,7 +650,7 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 
 			resp, err := svcClient.{{$m.RPCName}}(cmd.Context(), connect.NewRequest(req))
 			if err != nil {
-				return err
+				return FormatConnectError(err)
 			}
 
 			if getOutput() == "json" {
@@ -505,6 +665,15 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 {{- range $m.ResponseColumns}}
 {{- if .IsTimestamp}}
 					func() string { if t := item.{{.GoAccessor}}; t != nil { return t.AsTime().Format("2006-01-02T15:04:05Z") }; return "" }(),
+{{- else if .IsOneofType}}
+					func() string {
+						switch item.{{.GoAccessor}}.(type) {
+{{- range .OneofVariants}}
+						case *{{$.GoImportAlias}}.{{.GoWrapperType}}: return "{{.DisplayName}}"
+{{- end}}
+						default: return ""
+						}
+					}(),
 {{- else}}
 					fmt.Sprint(item.{{.GoAccessor}}),
 {{- end}}
@@ -520,6 +689,15 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 {{- range $m.ResponseColumns}}
 {{- if .IsTimestamp}}
 					func() string { if t := resp.Msg.{{.GoAccessor}}; t != nil { return t.AsTime().Format("2006-01-02T15:04:05Z") }; return "" }(),
+{{- else if .IsOneofType}}
+					func() string {
+						switch resp.Msg.{{.GoAccessor}}.(type) {
+{{- range .OneofVariants}}
+						case *{{$.GoImportAlias}}.{{.GoWrapperType}}: return "{{.DisplayName}}"
+{{- end}}
+						default: return ""
+						}
+					}(),
 {{- else}}
 					fmt.Sprint(resp.Msg.{{.GoAccessor}}),
 {{- end}}
@@ -536,14 +714,14 @@ func new{{$.ServiceName}}_{{$m.RPCName}}Cmd(getCfg func() *config.Config, getOut
 	}
 {{range $m.Flags}}
 	cmd.Flags().{{.FlagFunc}}(&flag_{{$m.RPCName}}_{{.GoName}}, "{{.Name}}", {{if eq .FlagType "[]string"}}nil{{else if eq .FlagType "string"}}""{{else if eq .FlagType "bool"}}false{{else}}0{{end}}, {{quote .Help}})
-{{- if .Required}}
-	cmd.MarkFlagRequired("{{.Name}}")
-{{- end}}
 {{- if .IsEnum}}
 	_ = cmd.RegisterFlagCompletionFunc("{{.Name}}", func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 		return []string{ {{- range .EnumValues}}{{quote .}}, {{end -}} }, cobra.ShellCompDirectiveNoFileComp
 	})
 {{- end}}
+{{- end}}
+{{- range $m.FilterConvenience}}
+	cmd.Flags().StringVar(&convFilter_{{$m.RPCName}}_{{.OneofFieldName}}, "{{.FlagName}}", "", {{quote .Help}})
 {{- end}}
 
 	return cmd

@@ -42,6 +42,7 @@ func Login(ctx context.Context, instance, clientID string) (*oauth2.Token, error
 		oidc.ScopeOpenID,
 		oidc.ScopeProfile,
 		oidc.ScopeEmail,
+		oidc.ScopeOfflineAccess,
 		"urn:zitadel:iam:org:project:id:zitadel:aud",
 	}
 
