@@ -316,3 +316,34 @@ func TestListKeysUserIdDryRun(t *testing.T) {
 		t.Fatalf("expected userIdFilter in dry-run output, got: %s", stdout)
 	}
 }
+
+func TestDescribeOrgsListExists(t *testing.T) {
+	stdout, _, err := executeRoot(t, "", "describe", "orgs", "list")
+	if err != nil {
+		t.Fatalf("expected success, got error: %v", err)
+	}
+	if !strings.Contains(stdout, `"method": "zitadel.org.v2.OrganizationService/ListOrganizations"`) {
+		t.Fatalf("expected ListOrganizations method in describe output, got: %s", stdout)
+	}
+}
+
+func TestDescribeIDPsListExists(t *testing.T) {
+	stdout, _, err := executeRoot(t, "", "describe", "idps", "get-idp-by-id")
+	if err != nil {
+		t.Fatalf("expected success, got error: %v", err)
+	}
+	if !strings.Contains(stdout, `"group": "idps"`) {
+		t.Fatalf("expected idps group in describe output, got: %s", stdout)
+	}
+}
+
+func TestDescribeAppsListExists(t *testing.T) {
+	stdout, _, err := executeRoot(t, "", "describe", "apps", "list")
+	if err != nil {
+		t.Fatalf("expected success, got error: %v", err)
+	}
+	if !strings.Contains(stdout, `"method": "zitadel.application.v2.ApplicationService/ListApplications"`) {
+		t.Fatalf("expected ListApplications method in describe output, got: %s", stdout)
+	}
+}
+
