@@ -186,7 +186,14 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 	})
 }
 
-func createUser(t *testing.T, ctx context.Context, tx *sql.Transaction, userRepo domain.UserRepository, instanceID, orgID, userID string) *user.Aggregate {
+func createUser(t *testing.T,
+	ctx context.Context,
+	tx *sql.Transaction,
+	userRepo domain.UserRepository,
+	instanceID,
+	orgID,
+	userID string,
+) *user.Aggregate {
 	userAgg := user.NewAggregate(userID, orgID)
 	userAgg.InstanceID = instanceID
 
