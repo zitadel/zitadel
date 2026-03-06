@@ -1,63 +1,220 @@
 ---
-title: Kubernetes
+title: Deploy ZITADEL on Kubernetes
 sidebar_label: Overview
-description: Deploy ZITADEL on Kubernetes using Helm charts for scalable identity management
+description: Deploy ZITADEL on Kubernetes using Helm — from a local 5-minute quickstart to a hardened production cluster.
 ---
 
+import DefaultUser from '../_defaultuser.mdx'
 
+This guide takes you from zero to a running ZITADEL instance on Kubernetes and then shows you how to harden it for production.
 
-Deploy Zitadel, the open-source identity and access management platform, on Kubernetes using Helm.
+## Stage 1 — Quickstart
 
-## What's in the Chart
+The ZITADEL chart ships with optional subcharts for PostgreSQL and Traefik, so a single `helm install` deploys the entire stack — no pre-installed ingress controller required.
 
-By default, this chart installs a highly available Zitadel deployment. The chart deploys:
+### Prerequisites
 
-- A Zitadel **init job** that prepares the database schema
-- A Zitadel **setup job** that bootstraps the first instance and admin user
-- A Zitadel **deployment** with configurable replicas for high availability
+- A Kubernetes cluster (1.30+)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [Helm](https://helm.sh/docs/intro/install/) 3.x or 4.x
 
-The execution order is orchestrated using Helm hooks on installations and upgrades.
+<Callout type="info">
+No cluster yet? [k3d](https://k3d.io/) is a quick way to spin one up locally — it runs k3s in Docker:
+```bash
+k3d cluster create zitadel --port "8080:80@loadbalancer"
+```
+The default values work with k3d out of the box.
+</Callout>
 
-## Architecture Overview
+### Install the full stack
 
-Zitadel is deployed as two separate containers within your Kubernetes cluster. The main Zitadel container handles all API traffic, the console UI, and OIDC endpoints, while the Login container serves the login UI at the `/ui/v2/login` path. Both containers are stateless and can be scaled horizontally to handle increased load.
+```bash
+mkdir zitadel-helm && cd zitadel-helm &&
+curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel-charts/main/examples/0-quickstart/quickstart-values.yaml
+```
 
-Traffic enters the cluster through an ingress controller such as Traefik or NGINX. The chart creates two separate Ingress resources, one for each container, both typically sharing the same domain and TLS certificate.
+```bash
+helm repo add zitadel https://charts.zitadel.com &&
+helm repo add bitnami https://charts.bitnami.com/bitnami &&
+helm repo add traefik https://traefik.github.io/charts &&
+helm repo update &&
+helm upgrade --install zitadel zitadel/zitadel --values quickstart-values.yaml --wait
+```
 
-TLS termination happens at the ingress controller, which forwards unencrypted HTTP/2 traffic to the pods. cert-manager or the ingress controller's built-in ACME support can be used to automatically obtain and renew TLS certificates from Let's Encrypt.
+That's it. Visit [http://localhost:8080/ui/console](http://localhost:8080/ui/console) to open the console.
 
-Zitadel stores all persistent data in PostgreSQL. The database holds user accounts, organizations, projects, applications, sessions, and all other identity data. Zitadel uses two database connections: an admin connection for schema migrations during startup and an application connection for normal operations. Both connections should use TLS in production environments.
+<DefaultUser components={props.components} />
 
-For observability, Zitadel pushes traces to an OpenTelemetry Collector using the OTLP protocol over gRPC. Prometheus scrapes metrics from the `/debug/metrics` endpoint on the Zitadel pods. Both containers write structured logs to stdout, which must be collected by a log collector such as Fluent Bit or Vector. The Login container does not support tracing or metrics, only log collection. All observability data can be forwarded to a unified backend such as Grafana, OpenObserve, or your preferred monitoring stack.
+<Callout type="warn">
+The masterkey [encrypts sensitive data at rest](/concepts/architecture/secrets). The value above is a **dev placeholder** — generate a real one before any non-local deployment:
+```bash
+tr -dc A-Za-z0-9 </dev/urandom | head -c 32
+```
+Once ZITADEL has been initialized with a masterkey, it **cannot be changed** without losing access to encrypted data.
+</Callout>
 
-## Prerequisites at a Glance
+<Callout type="info">
+The stack runs: **Traefik** ([reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)) → **ZITADEL API** (Go) + **ZITADEL Login** (Next.js) → **PostgreSQL**.
+The bundled Traefik uses `isDefaultClass: false` so it only handles ZITADEL's Ingresses and does not conflict with existing ingress controllers. [gRPC over HTTP/2](/self-hosting/manage/http2) is handled automatically by Traefik.
+</Callout>
 
-| Requirement | Minimum Version |
-|-------------|-----------------|
-| Kubernetes | 1.30+ |
-| Helm | 3.x or 4.x |
-| kubectl | 1.30+ |
-| PostgreSQL | 14+ |
+### Swap out components
 
-You also need:
+The bundled subcharts are for quickstart use only. You can replace any component independently:
+
+| Component | How to replace |
+|-----------|---------------|
+| **Database** | Set `postgresql.enabled: false` and configure `zitadel.configmapConfig.Database` pointing to your own PostgreSQL |
+| **Ingress controller** | Set `traefik.enabled: false` and set `ingress.className` to your controller (e.g., `nginx`) |
+| **Caching** | Add Redis by configuring `zitadel.configmapConfig.Caches` (see [Caching](/self-hosting/deploy/kubernetes/caching)) |
+
+## Stage 2 — Production Cluster
+
+For production you need:
+
+- A Kubernetes cluster (1.30+)
 - An ingress controller (Traefik, NGINX, or cloud-native)
 - A domain with DNS configured
-- TLS certificates (via cert-manager, ACME, or manual)
+- TLS certificates (via cert-manager, ACME, or manually)
+- PostgreSQL 14+ (managed service or in-cluster)
+- Helm 3.x+
 
-## Quick Links
+<Callout type="warn">
+The ZITADEL management console [requires end-to-end HTTP/2 support](/self-hosting/manage/http2). Ensure your ingress controller is configured to forward HTTP/2 (h2c) traffic to ZITADEL pods.
+</Callout>
 
-| Resource | Link |
-|----------|------|
-| Helm Chart Repository | [charts.zitadel.com](https://charts.zitadel.com) |
-| Source Code | [github.com/zitadel/zitadel-charts](https://github.com/zitadel/zitadel-charts) |
-| Zitadel Documentation | [zitadel.com/docs](https://zitadel.com/docs) |
-| Artifact Hub | [artifacthub.io/packages/helm/zitadel/zitadel](https://artifacthub.io/packages/helm/zitadel/zitadel) |
+### Create secrets
 
-## Next Steps
+```bash
+# Masterkey — generate once, store safely, cannot be changed after first run
+kubectl create secret generic zitadel-masterkey \
+  --from-literal=masterkey="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
 
-- [Installation](/self-hosting/deploy/kubernetes/installation) — Get Zitadel running
-- [Configuration](/self-hosting/deploy/kubernetes/configuration) — Customize your deployment
-- [Configuring the Ingress](/self-hosting/deploy/kubernetes/ingress) — Set up ingress for Zitadel and Login containers
-- [Configuring the Database](/self-hosting/deploy/kubernetes/database) — Connect to PostgreSQL
-- [Operations](/self-hosting/deploy/kubernetes/operations) — Upgrades and scaling
-- [Uninstalling](/self-hosting/deploy/kubernetes/uninstalling) — Remove Zitadel from your cluster
+# Database credentials
+kubectl create secret generic zitadel-db-credentials \
+  --from-literal=config.yaml="
+Database:
+  Postgres:
+    User:
+      Password: your-secure-app-password
+    Admin:
+      Password: your-secure-admin-password
+"
+```
+
+### Configure values
+
+Save the following as `values.yaml`. Replace `zitadel.example.com` with your domain:
+
+```yaml
+replicaCount: 2
+
+zitadel:
+  masterkeySecretName: zitadel-masterkey
+  configSecretName: zitadel-db-credentials
+  configmapConfig:
+    ExternalDomain: "zitadel.example.com"
+    ExternalSecure: true
+    ExternalPort: 443
+    TLS:
+      Enabled: false
+    Database:
+      Postgres:
+        Host: "postgres.database.svc.cluster.local"
+        Port: 5432
+        Database: "zitadel"
+        User:
+          Username: "zitadel"
+          SSL:
+            Mode: "verify-full"
+        Admin:
+          Username: "postgres"
+          SSL:
+            Mode: "verify-full"
+    FirstInstance:
+      Org:
+        Human:
+          UserName: "admin"
+          Email: "admin@example.com"
+          Password: "YourSecurePassword123!"
+          PasswordChangeRequired: true
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+  hosts:
+    - host: zitadel.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: zitadel-tls
+      hosts:
+        - zitadel.example.com
+
+login:
+  ingress:
+    enabled: true
+    className: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    hosts:
+      - host: zitadel.example.com
+        paths:
+          - path: /ui/v2/login
+            pathType: Prefix
+    tls:
+      - secretName: zitadel-tls
+        hosts:
+          - zitadel.example.com
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+```
+
+### Install
+
+```bash
+helm repo add zitadel https://charts.zitadel.com && helm repo update
+
+helm install zitadel zitadel/zitadel --values values.yaml --wait
+```
+
+### Verify
+
+Watch the pods come up:
+
+```bash
+kubectl get pods --watch
+```
+
+You should see the `zitadel-init` and `zitadel-setup` jobs complete, followed by the `zitadel` deployment pods becoming Ready.
+
+Check the Helm release status:
+
+```bash
+helm status zitadel
+```
+
+Access the console at `https://zitadel.example.com/ui/console`.
+
+## What's next
+
+Review the [Production Checklist](/self-hosting/manage/productionchecklist) before going live, then use the detailed guides for each concern:
+
+| Guide | Description |
+|-------|-------------|
+| [Configuration](/self-hosting/deploy/kubernetes/configuration) | All configmap and secret options, autoscaling, security contexts |
+| [Ingress](/self-hosting/deploy/kubernetes/ingress) | Traefik, NGINX, and cloud-native ingress setup |
+| [Database](/self-hosting/deploy/kubernetes/database) | PostgreSQL TLS modes, credentials, and connection pooling |
+| [Operations](/self-hosting/deploy/kubernetes/operations) | Upgrades, manual and automatic scaling, resource limits |
+| [Caching](/self-hosting/deploy/kubernetes/caching) | Redis/Valkey caching configuration |
+| [Observability](/self-hosting/deploy/kubernetes/observability) | Traces (OTLP), Prometheus metrics, and log collection |
+| [Uninstalling](/self-hosting/deploy/kubernetes/uninstalling) | Remove ZITADEL from your cluster |
