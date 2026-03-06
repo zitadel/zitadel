@@ -28,69 +28,17 @@ With k3d, set `ExternalPort: 8080` in the values below.
 
 ### Install the full stack
 
-Save the following as `quickstart-values.yaml` and run `helm install zitadel zitadel/zitadel --values quickstart-values.yaml --wait`:
-
-```yaml
-# bundled PostgreSQL — auto-wires DB connection to ZITADEL
-postgresql:
-  enabled: true
-  auth:
-    database: zitadel
-    username: zitadel
-    password: zitadel
-    postgresPassword: zitadel
-  primary:
-    persistence:
-      enabled: false
-
-# bundled Traefik — auto-sets ingress.className to "traefik"
-# isDefaultClass: false prevents conflicts with existing ingress controllers
-traefik:
-  enabled: true
-  ingressClass:
-    isDefaultClass: false
-
-zitadel:
-  masterkey: "MasterkeyNeedsToHave32Characters"
-  configmapConfig:
-    ExternalDomain: localhost   # replace with your domain/IP
-    ExternalPort: 80            # use 8080 with k3d port mapping
-    ExternalSecure: false
-    TLS:
-      Enabled: false
-    FirstInstance:
-      Org:
-        Human:
-          UserName: zitadel-admin
-          Email: zitadel-admin@zitadel.localhost
-          Password: "Password1!"
-          PasswordChangeRequired: false
-
-# ingress.className is auto-set to "traefik" when traefik.enabled=true
-ingress:
-  enabled: true
-  hosts:
-    - host: localhost
-      paths:
-        - path: /
-          pathType: Prefix
-
-login:
-  ingress:
-    enabled: true
-    hosts:
-      - host: localhost
-        paths:
-          - path: /ui/v2/login
-            pathType: Prefix
+```bash
+curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel-charts/main/examples/0-quickstart/quickstart-values.yaml
 ```
 
-```bash
-helm repo add zitadel https://charts.zitadel.com
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo add traefik https://traefik.github.io/charts
-helm repo update
+Then add the Helm repos and install in one go:
 
+```bash
+helm repo add zitadel https://charts.zitadel.com &&
+helm repo add bitnami https://charts.bitnami.com/bitnami &&
+helm repo add traefik https://traefik.github.io/charts &&
+helm repo update &&
 helm install zitadel zitadel/zitadel --values quickstart-values.yaml --wait
 ```
 
