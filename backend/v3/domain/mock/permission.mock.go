@@ -191,3 +191,41 @@ func (c *MockPermissionCheckerCheckProjectPermissionCall) DoAndReturn(f func(con
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
+
+// CheckSessionPermission mocks base method.
+func (m *MockPermissionChecker) CheckSessionPermission(ctx context.Context, permission, sessionID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckSessionPermission", ctx, permission, sessionID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CheckSessionPermission indicates an expected call of CheckSessionPermission.
+func (mr *MockPermissionCheckerMockRecorder) CheckSessionPermission(ctx, permission, sessionID any) *MockPermissionCheckerCheckSessionPermissionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckSessionPermission", reflect.TypeOf((*MockPermissionChecker)(nil).CheckSessionPermission), ctx, permission, sessionID)
+	return &MockPermissionCheckerCheckSessionPermissionCall{Call: call}
+}
+
+// MockPermissionCheckerCheckSessionPermissionCall wrap *gomock.Call
+type MockPermissionCheckerCheckSessionPermissionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockPermissionCheckerCheckSessionPermissionCall) Return(arg0 error) *MockPermissionCheckerCheckSessionPermissionCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockPermissionCheckerCheckSessionPermissionCall) Do(f func(context.Context, string, string) error) *MockPermissionCheckerCheckSessionPermissionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockPermissionCheckerCheckSessionPermissionCall) DoAndReturn(f func(context.Context, string, string) error) *MockPermissionCheckerCheckSessionPermissionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
