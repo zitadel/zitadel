@@ -121,7 +121,7 @@ func TestListInstanceTrustedDomainsQuery_Validate(t *testing.T) {
 
 			if tc.expectedError != nil {
 				assert.Error(t, err)
-				assert.Equal(t, tc.expectedError, err)
+				assert.ErrorIs(t, err, tc.expectedError)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -253,7 +253,7 @@ func TestListInstanceTrustedDomainsQuery_Execute(t *testing.T) {
 
 			if tc.expectedError != nil {
 				assert.Error(t, err)
-				assert.Equal(t, tc.expectedError, err)
+				assert.ErrorIs(t, err, tc.expectedError)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.expectedDomains, query.Result())

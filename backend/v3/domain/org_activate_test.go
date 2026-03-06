@@ -144,7 +144,7 @@ func TestActivateOrgCommand_Validate(t *testing.T) {
 			err := cmd.Validate(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }
@@ -264,7 +264,7 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 			err := opts.Invoke(ctx, cmd)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }
