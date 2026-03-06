@@ -198,7 +198,7 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 			err := cmd.Validate(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }
@@ -529,7 +529,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			err := cmd.Execute(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			if tc.expectedError == nil && tc.checkUser != nil {
 				assert.NotZero(t, cmd.UserCheckedAt)
 				assert.Equal(t, tc.expectedPreferredLanguage, cmd.PreferredUserLanguage)
