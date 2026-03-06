@@ -26,12 +26,12 @@ export default async function Layout(props: { children: ReactNode; params: Promi
     }
   });
 
-  let tree = source.pageTree;
+  let tree = buildCustomTree(source.pageTree, { labels: labelsMap });
   if (currentVersion !== 'latest') {
     // Hoist the version folder to root to flatten sidebar
     // versionSource.pageTree -> [ v4.10 folder, v4.9 folder ... ]
     // We want the children of the specific version folder.
-     
+
     const children = (versionSource.pageTree as any).children || [];
 
     const versionFolder = children.find((node: any) => {
@@ -53,7 +53,7 @@ export default async function Layout(props: { children: ReactNode; params: Promi
       // Apply custom sidebar structure (from local sidebar-data.ts)
       // We strip the prefix '/v4.10' so the lookup matches generic keys 'guides/...'
       // The logs showed the URLs start with /[version] not /docs/[version]
-      const prefix = currentVersion === 'latest' ? '/docs' : `/${currentVersion}`;
+      const prefix = `/${currentVersion}`;
       tree = buildCustomTree(hoistedTree, {
         stripPrefix: prefix,
         labels: labelsMap
@@ -61,8 +61,6 @@ export default async function Layout(props: { children: ReactNode; params: Promi
     } else {
       tree = buildCustomTree(versionSource.pageTree, { labels: labelsMap });
     }
-  } else {
-    tree = buildCustomTree(source.pageTree, { labels: labelsMap });
   }
 
   return (

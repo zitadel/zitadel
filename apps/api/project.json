@@ -4,6 +4,7 @@
     "projectType": "application",
     "namedInputs": {
         "sources": [
+            "goGlobals",
             "{workspaceRoot}/cmd/**/*.go",
             "{workspaceRoot}/internal/**/*.go",
             "{workspaceRoot}/backend/**/*.go",
@@ -62,6 +63,7 @@
         },
         "build": {
             "description": "Compiles the Go-based API backend into an executable binary.",
+            "cache": true,
             "dependsOn": [
                 "generate",
                 "build-console"
@@ -160,6 +162,7 @@
         },
         "test-unit": {
             "description": "Runs the unit tests with coverage",
+            "cache": true,
             "dependsOn": [
                 "generate"
             ],
@@ -217,12 +220,13 @@
                 "commands": [
                     "rm -rf .artifacts/api-test-integration",
                     "mkdir -p ${GOCOVERDIR}",
-                    "nx run @zitadel/api:prod:test-integration-api --excludeTaskDependencies"
+                    "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test start-from-init --config apps/api/test-integration-api.yaml --steps apps/api/test-integration-api.yaml --masterkey MasterkeyNeedsToHave32Characters'"
                 ]
             }
         },
         "test-integration": {
             "description": "Runs the integration tests sequentially with coverage and race condition detection. Go test caching is disabled, because the tests run against an out-of-process API.",
+            "cache": true,
             "dependsOn": [
                 "test-integration-run-db",
                 "test-integration-run-api"
@@ -342,7 +346,8 @@
             "inputs": [
                 "{workspaceRoot}/proto/**/*",
                 "{workspaceRoot}/buf.gen.yaml",
-                "{workspaceRoot}/buf.yaml"
+                "{workspaceRoot}/buf.yaml",
+                "{workspaceRoot}/buf.work.yaml"
             ],
             "outputs": [
                 "{workspaceRoot}/pkg/grpc/**/*",

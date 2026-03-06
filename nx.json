@@ -4,12 +4,36 @@
   "workspaceLayout": {
     "libsDir": "packages"
   },
+  "parallel": 1,
   "tui": {
     "enabled": true
   },
+  "maxCacheSize": "0",
   "namedInputs": {
+    "sharedGlobals": [
+      "{workspaceRoot}/nx.json"
+    ],
+    "goGlobals": [
+      "sharedGlobals",
+      "{workspaceRoot}/go.mod",
+      "{workspaceRoot}/go.sum"
+    ],
+    "jsGlobals": [
+      "sharedGlobals",
+      "{workspaceRoot}/pnpm-lock.yaml"
+    ],
     "default": [
-      "{projectRoot}/**/*"
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/*.spec.*",
+      "!{projectRoot}/**/*.test.*",
+      "!{projectRoot}/**/*_test.go",
+      "!{projectRoot}/**/integration_test/**/*",
+      "!{projectRoot}/**/cypress/**/*",
+      "!{projectRoot}/**/__tests__/**/*"
     ]
   },
   "targetDefaults": {
@@ -30,7 +54,7 @@
     "build": {
       "cache": true,
       "inputs": [
-        "default"
+        "production"
       ],
       "dependsOn": [
         "^build",
@@ -39,7 +63,7 @@
     },
     "lint": {
       "inputs": [
-        "default"
+        "production"
       ],
       "cache": true
     },

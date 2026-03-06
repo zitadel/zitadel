@@ -1,6 +1,22 @@
 {
   "name": "@zitadel/docs",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "jsGlobals"
+    ],
+    "sources": [
+      "{projectRoot}/app/**/*",
+      "{projectRoot}/components/**/*",
+      "{projectRoot}/lib/**/*",
+      "{projectRoot}/css/**/*",
+      "{projectRoot}/utils/**/*",
+      "{projectRoot}/src/**/*",
+      "{projectRoot}/*.{ts,tsx,mjs,json}",
+      "jsGlobals"
+    ]
+  },
   "targets": {
     "build": {
       "executor": "nx:run-commands",
@@ -9,14 +25,15 @@
         "cwd": "apps/docs"
       },
       "outputs": [
-        "{projectRoot}/.next"
+        "{projectRoot}/.next",
+        "!{projectRoot}/.next/cache"
       ],
       "dependsOn": [
         "^build",
         "check-links"
       ],
       "inputs": [
-        "default",
+        "sources",
         "^production"
       ],
       "cache": true
@@ -131,12 +148,16 @@
       "dependsOn": [
         "generate-api-reference"
       ],
-      "cache": false,
+      "cache": true,
       "inputs": [
-        "default",
+        "{projectRoot}/scripts/generate-api-reference.mts",
         {
           "dependentTasksOutputFiles": "apps/docs/content/reference/api/**"
         }
+      ],
+      "outputs": [
+        "{projectRoot}/content/reference/api",
+        "{projectRoot}/content/v*/reference/api"
       ]
     },
     "generate-index-pages": {

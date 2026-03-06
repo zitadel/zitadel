@@ -16,10 +16,68 @@ on:
         required: true
 
 jobs:
+  dte-agents:
+    name: DTE Agent ${{ matrix.agent }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
+    strategy:
+      matrix:
+        agent: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    env:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+      NX_VERBOSE_LOGGING: "true"
+      NX_CLOUD_NO_TIMEOUTS: "true"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go_version }}
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+        with:
+          version: v28.3.2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: v0.28.0
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v1
+        with:
+          version: v2.38.2
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Cypress binary
+        run: pnpm cypress install
+        working-directory: apps/login
+      - name: Start DTE Agent
+        run: pnpm exec nx-cloud start-agent
+        env:
+          NX_AGENT_NAME: ${{ matrix.agent }}
+
   lint_test_build:
     name: Lint, Test and Build
-    runs-on: depot-ubuntu-22.04-16
+    runs-on: ubuntu-latest
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
+    env:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+      NX_VERBOSE_LOGGING: "true"
+      NX_CLOUD_NO_TIMEOUTS: "true"
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -61,19 +119,18 @@ jobs:
         working-directory: apps/login
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
-      - name: Lint, Test and Build
+      - name: Start DTE CI Run
+        run: pnpm exec nx-cloud start-ci-run --distribute-on="manual" --stop-agents-after="generate,build,lint,test-unit"
+      - name: Generate, Lint, Test and Build
+        run: pnpm nx affected --nxBail --targets generate,lint,test-unit,build
+      - name: Run integration tests (locally, not distributed)
+        run: pnpm nx affected --nxBail --targets test-integration
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-#          NX_NATIVE_LOGGING: "nx::native::cache,nx::native::db"
-          NX_DAEMON: "false"
-          NX_DISABLE_DB: "true"
-        run: pnpm nx affected --nxBail --targets lint test build --exclude @zitadel/docs
+          NX_CLOUD_DISTRIBUTED_EXECUTION: "false"
       - name: Check for uncommitted changes (Codegen mismatch)
         run: git diff --exit-code
       - name: Suggest Pipeline Fix By Nx Cloud AI
         if: failure() || cancelled()
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx fix-ci
       - name: Publish API Unit Test Coverage
         uses: codecov/codecov-action@v4.3.0

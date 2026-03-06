@@ -4,6 +4,7 @@
     "targets": {
         "build": {
             "description": "Builds the API mock server",
+            "cache": true,
             "command": "nx run @zitadel/devcontainer:compose build login-api-mock"
         },
         "serve": {

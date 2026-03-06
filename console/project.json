@@ -1,5 +1,18 @@
 {
   "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "jsGlobals"
+    ],
+    "sources": [
+      "{projectRoot}/src/**/*",
+      "{projectRoot}/angular.json",
+      "{projectRoot}/tsconfig*.json",
+      "{projectRoot}/package.json",
+      "jsGlobals"
+    ]
+  },
   "targets": {
     "lint": {
       "description": "Runs all linters",
@@ -17,6 +30,7 @@
     },
     "generate": {
       "description": "Generates code from protobuf definitions for API v1 endpoints",
+      "cache": true,
       "executor": "nx:run-commands",
       "options": {
         "command": "bash -c 'PATH=\"${PWD}/../.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" pnpm exec buf generate ../proto --include-imports --include-wkt'",
@@ -53,11 +67,11 @@
     },
     "build": {
       "description": "Builds the Management Console for production",
+      "dependsOn": ["^build", "generate"],
       "inputs": [
-        "{projectRoot}/**/*",
+        "sources",
         "!{projectRoot}/dist/**/*",
         "!{projectRoot}/.angular/**/*",
-        "{workspaceRoot}/pnpm-lock.yaml",
         "{workspaceRoot}/docs/frameworks.json"
       ],
       "outputs": ["{projectRoot}/dist"]
