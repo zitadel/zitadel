@@ -4409,146 +4409,405 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 	}
 	type testCase struct {
 		args   args
-		assert func(t *testing.T, getResponse *user.GetUserByIDResponse)
+		assert func(
+			t *testing.T,
+			getResponse *user.GetUserByIDResponse,
+			getMetadataResponse *user.ListUserMetadataResponse,
+		)
 	}
 	tests := []struct {
 		name     string
 		testCase func(runId string) testCase
-	}{{
-		name: "human remove phone",
-		testCase: func(runId string) testCase {
-			username := fmt.Sprintf("donald.duck+%s", runId)
-			email := username + "@example.com"
-			return testCase{
-				args: args{
-					ctx: OrgCTX,
-					create: &user.CreateUserRequest{
-						OrganizationId: Instance.DefaultOrg.Id,
-						UserId:         &runId,
-						UserType: &user.CreateUserRequest_Human_{
-							Human: &user.CreateUserRequest_Human{
-								Profile: &user.SetHumanProfile{
-									GivenName:  "Donald",
-									FamilyName: "Duck",
+	}{
+		{
+			name: "human remove phone",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						ctx: OrgCTX,
+						create: &user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserId:         &runId,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+									Phone: &user.SetHumanPhone{
+										Phone: "+1234567890",
+									},
 								},
-								Email: &user.SetHumanEmail{
-									Email: email,
-								},
-								Phone: &user.SetHumanPhone{
-									Phone: "+1234567890",
+							},
+						},
+						update: &user.UpdateUserRequest{
+							UserId: runId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Phone: &user.SetHumanPhone{},
 								},
 							},
 						},
 					},
-					update: &user.UpdateUserRequest{
-						UserId: runId,
-						UserType: &user.UpdateUserRequest_Human_{
-							Human: &user.UpdateUserRequest_Human{
-								Phone: &user.SetHumanPhone{},
-							},
-						},
+					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, _ *user.ListUserMetadataResponse) {
+						assert.Empty(t, getResponse.GetUser().GetHuman().GetPhone().GetPhone(), "phone is not empty")
 					},
-				},
-				assert: func(t *testing.T, getResponse *user.GetUserByIDResponse) {
-					assert.Empty(t, getResponse.GetUser().GetHuman().GetPhone().GetPhone(), "phone is not empty")
-				},
-			}
+				}
+			},
 		},
-	}, {
-		name: "human username",
-		testCase: func(runId string) testCase {
-			username := fmt.Sprintf("donald.duck+%s", runId)
-			email := username + "@example.com"
-			return testCase{
-				args: args{
-					ctx: OrgCTX,
-					create: &user.CreateUserRequest{
-						OrganizationId: Instance.DefaultOrg.Id,
-						UserId:         &runId,
-						UserType: &user.CreateUserRequest_Human_{
-							Human: &user.CreateUserRequest_Human{
-								Profile: &user.SetHumanProfile{
-									GivenName:  "Donald",
-									FamilyName: "Duck",
+		{
+			name: "human username",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						ctx: OrgCTX,
+						create: &user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserId:         &runId,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
 								},
-								Email: &user.SetHumanEmail{
-									Email: email,
+							},
+						},
+						update: &user.UpdateUserRequest{
+							UserId:   runId,
+							Username: &username,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{},
+							},
+						},
+					},
+					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, _ *user.ListUserMetadataResponse) {
+						assert.Equal(t, username, getResponse.GetUser().GetUsername())
+					},
+				}
+			},
+		},
+		{
+			name: "service accountname",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						ctx: OrgCTX,
+						create: &user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserId:         &runId,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: "Donald",
+								},
+							},
+						},
+						update: &user.UpdateUserRequest{
+							UserId:   runId,
+							Username: &username,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{},
+							},
+						},
+					},
+					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, _ *user.ListUserMetadataResponse) {
+						assert.Equal(t, username, getResponse.GetUser().GetUsername())
+					},
+				}
+			},
+		},
+		{
+			name: "machine accessTokenType",
+			testCase: func(runId string) testCase {
+				return testCase{
+					args: args{
+						ctx: OrgCTX,
+						create: &user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserId:         &runId,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: "Donald",
+								},
+							},
+						},
+						update: &user.UpdateUserRequest{
+							UserId: runId,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									AccessTokenType: gu.Ptr(user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT),
 								},
 							},
 						},
 					},
-					update: &user.UpdateUserRequest{
-						UserId:   runId,
-						Username: &username,
-						UserType: &user.UpdateUserRequest_Human_{
-							Human: &user.UpdateUserRequest_Human{},
-						},
+					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, _ *user.ListUserMetadataResponse) {
+						assert.Equal(t, user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT, getResponse.GetUser().GetMachine().GetAccessTokenType())
 					},
-				},
-				assert: func(t *testing.T, getResponse *user.GetUserByIDResponse) {
-					assert.Equal(t, username, getResponse.GetUser().GetUsername())
-				},
-			}
+				}
+			},
 		},
-	}, {
-		name: "service accountname",
-		testCase: func(runId string) testCase {
-			username := fmt.Sprintf("donald.duck+%s", runId)
-			return testCase{
-				args: args{
-					ctx: OrgCTX,
-					create: &user.CreateUserRequest{
-						OrganizationId: Instance.DefaultOrg.Id,
-						UserId:         &runId,
-						UserType: &user.CreateUserRequest_Machine_{
-							Machine: &user.CreateUserRequest_Machine{
-								Name: "Donald",
+		{
+			name: "human metadata",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						ctx: OrgCTX,
+						create: &user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserId:         &runId,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+								},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("value1"),
+								},
+								{
+									Key:   "key2",
+									Value: []byte("value2"),
+								},
+							},
+						},
+						update: &user.UpdateUserRequest{
+							UserId:   runId,
+							Username: &username,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("updated_value1"), // updating key1
+								},
+								{
+									Key:   "key3",
+									Value: []byte("value3"), // adding key3
+								},
 							},
 						},
 					},
-					update: &user.UpdateUserRequest{
-						UserId:   runId,
-						Username: &username,
-						UserType: &user.UpdateUserRequest_Machine_{
-							Machine: &user.UpdateUserRequest_Machine{},
-						},
+					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
+						assert.Equal(t, username, getResponse.GetUser().GetUsername())
+						expectedMetadata := []*metadata.Metadata{
+							{Key: "key1", Value: []byte("updated_value1")},
+							{Key: "key2", Value: []byte("value2")},
+							{Key: "key3", Value: []byte("value3")},
+						}
+						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
 					},
-				},
-				assert: func(t *testing.T, getResponse *user.GetUserByIDResponse) {
-					assert.Equal(t, username, getResponse.GetUser().GetUsername())
-				},
-			}
+				}
+			},
 		},
-	}, {
-		name: "machine accessTokenType",
-		testCase: func(runId string) testCase {
-			return testCase{
-				args: args{
-					ctx: OrgCTX,
-					create: &user.CreateUserRequest{
-						OrganizationId: Instance.DefaultOrg.Id,
-						UserId:         &runId,
-						UserType: &user.CreateUserRequest_Machine_{
-							Machine: &user.CreateUserRequest_Machine{
-								Name: "Donald",
+		{
+			name: "human metadata - update and delete, ok",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						ctx: OrgCTX,
+						create: &user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserId:         &runId,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+								},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("value1"),
+								},
+								{
+									Key:   "key2",
+									Value: []byte("value2"),
+								},
+							},
+						},
+						update: &user.UpdateUserRequest{
+							UserId:   runId,
+							Username: &username,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("updated_value1"), // updating key1
+								},
+								{
+									Key: "key2", // removing key2
+								},
+								{
+									Key: "key3", // removing a non-existing key
+								},
+								{
+									Key:   "key4", // adding a new key
+									Value: []byte("value4"),
+								},
 							},
 						},
 					},
-					update: &user.UpdateUserRequest{
-						UserId: runId,
-						UserType: &user.UpdateUserRequest_Machine_{
-							Machine: &user.UpdateUserRequest_Machine{
-								AccessTokenType: gu.Ptr(user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT),
+					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
+						assert.Equal(t, username, getResponse.GetUser().GetUsername())
+						expectedMetadata := []*metadata.Metadata{
+							{Key: "key1", Value: []byte("updated_value1")},
+							{Key: "key4", Value: []byte("value4")},
+						}
+						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+					},
+				}
+			},
+		},
+		{
+			name: "service account metadata",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("service.account+%s", runId)
+				return testCase{
+					args: args{
+						ctx: OrgCTX,
+						create: &user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserId:         &runId,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name:            "service_account",
+									AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+								},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("value1"),
+								},
+								{
+									Key:   "key2",
+									Value: []byte("value2"),
+								},
+							},
+						},
+						update: &user.UpdateUserRequest{
+							UserId:   runId,
+							Username: &username,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("updated_value1"), // updating key1
+								},
+								{
+									Key:   "key3",
+									Value: []byte("value3"), // adding key3
+								},
 							},
 						},
 					},
-				},
-				assert: func(t *testing.T, getResponse *user.GetUserByIDResponse) {
-					assert.Equal(t, user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT, getResponse.GetUser().GetMachine().GetAccessTokenType())
-				},
-			}
+					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
+						assert.Equal(t, username, getResponse.GetUser().GetUsername())
+						expectedMetadata := []*metadata.Metadata{
+							{Key: "key1", Value: []byte("updated_value1")},
+							{Key: "key2", Value: []byte("value2")},
+							{Key: "key3", Value: []byte("value3")},
+						}
+						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+					},
+				}
+			},
 		},
-	}}
+		{
+			name: "service account metadata - update and delete, ok",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("service.account+%s", runId)
+				return testCase{
+					args: args{
+						ctx: OrgCTX,
+						create: &user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserId:         &runId,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name:            "service_account",
+									AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+								},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("value1"),
+								},
+								{
+									Key:   "key2",
+									Value: []byte("value2"),
+								},
+							},
+						},
+						update: &user.UpdateUserRequest{
+							UserId:   runId,
+							Username: &username,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("updated_value1"), // updating key1
+								},
+								{
+									Key: "key2", // removing key2
+								},
+								{
+									Key: "key3", // removing a non-existing key
+								},
+								{
+									Key:   "key4", // adding a new key
+									Value: []byte("value4"),
+								},
+							},
+						},
+					},
+					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
+						assert.Equal(t, username, getResponse.GetUser().GetUsername())
+						expectedMetadata := []*metadata.Metadata{
+							{Key: "key1", Value: []byte("updated_value1")},
+							{Key: "key4", Value: []byte("value4")},
+						}
+						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+					},
+				}
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
@@ -4563,7 +4822,11 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 				UserId: createResponse.GetId(),
 			})
 			require.NoError(t, err)
-			test.assert(t, getResponse)
+			gotMetadataResponse, err := Client.ListUserMetadata(test.args.ctx, &user.ListUserMetadataRequest{
+				UserId: createResponse.GetId(),
+			})
+			require.NoError(t, err)
+			test.assert(t, getResponse, gotMetadataResponse)
 		})
 	}
 }

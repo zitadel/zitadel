@@ -338,6 +338,112 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "change machine metadata, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(userAddedEvent),
+					),
+					expectPush(
+						user.NewMetadataSetEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"key1",
+							[]byte("value1"),
+						),
+						user.NewMetadataSetEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"key3",
+							[]byte("value3"),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				machine: &ChangeMachine{
+					Metadata: []*domain.Metadata{
+						{
+							Key:   "key1",
+							Value: []byte("value1"),
+						},
+						{
+							Key:   "key3",
+							Value: []byte("value3"),
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change machine metadata, invalid metadata, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(userAddedEvent),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				machine: &ChangeMachine{
+					Metadata: []*domain.Metadata{
+						{
+							Key:   "key1",
+							Value: []byte("value1"),
+						},
+						{
+							Key:   "key3",
+							Value: []byte(""),
+						},
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "META-2m00f", "Errors.Metadata.Invalid"))
+				},
+			},
+		},
+		{
+			name: "change machine metadata, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(userAddedEvent),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				machine: &ChangeMachine{
+					Metadata: []*domain.Metadata{
+						{
+							Key:   "key1",
+							Value: []byte("value1"),
+						},
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
