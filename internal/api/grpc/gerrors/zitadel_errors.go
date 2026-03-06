@@ -23,6 +23,11 @@ func ZITADELToGRPCError(ctx context.Context, err error) error {
 	if err == nil {
 		return nil
 	}
+	if grpcStatus, ok := status.FromError(err); ok {
+		// Native gRPC status errors are already transport-safe and may carry details.
+		logging.Log(ctx, grpcStatusLevel(grpcStatus.Code()), grpcStatus.Message(), "err", err, "code", grpcStatus.Code())
+		return err
+	}
 
 	code, key, id, lvl := extractError(err)
 	msg := key
@@ -78,6 +83,9 @@ func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
 	if ok := errors.As(err, &connErr); ok {
 		return codes.Internal, "db connection error", "", slog.LevelError
 	}
+	if grpcStatus, ok := status.FromError(err); ok {
+		return grpcStatus.Code(), grpcStatus.Message(), "", grpcStatusLevel(grpcStatus.Code())
+	}
 	zitadelErr, ok := zerrors.AsZitadelError(err)
 	if !ok {
 		return codes.Unknown, err.Error(), "", slog.LevelError
@@ -124,6 +132,24 @@ func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
 		lvl = sloggcp.LevelAlert
 	}
 	return c, msg, id, lvl
+}
+
+func grpcStatusLevel(code codes.Code) slog.Level {
+	switch code {
+	case codes.AlreadyExists,
+		codes.Canceled,
+		codes.FailedPrecondition,
+		codes.InvalidArgument,
+		codes.NotFound,
+		codes.OutOfRange,
+		codes.PermissionDenied,
+		codes.Unauthenticated:
+		return slog.LevelWarn
+	case codes.Unimplemented:
+		return slog.LevelInfo
+	default:
+		return slog.LevelError
+	}
 }
 
 func getErrorInfo(id, key string, err error) protoadapt.MessageV1 {
