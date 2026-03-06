@@ -153,9 +153,14 @@ func New(
 	api.registerHealthServer()
 
 	api.RegisterHandlerOnPrefix("/debug", api.healthHandler())
-	api.router.Handle("/", http.RedirectHandler(login.HandlerPrefix, http.StatusFound))
+	registerDefaultRoutes(api.router)
 
 	return api, nil
+}
+
+func registerDefaultRoutes(router *mux.Router) {
+	router.Handle("/favicon.ico", http.NotFoundHandler())
+	router.Handle("/", http.RedirectHandler(login.HandlerPrefix, http.StatusFound))
 }
 
 func (a *API) serverReflection() {
@@ -271,21 +276,35 @@ func (a *API) RouteGRPC() {
 	// since all services are now registered, we can build the grpc server reflection and register the handler
 	a.serverReflection()
 
-	http2Route := a.router.
+	a.router.
+		NewRoute().
 		MatcherFunc(func(r *http.Request, _ *mux.RouteMatch) bool {
-			return r.ProtoMajor == 2
+			return isGRPCRequest(r)
 		}).
-		Subrouter().
+		Handler(a.grpcServer).
 		Name("grpc")
-	http2Route.
-		Methods(http.MethodPost).
-		HeadersRegexp(http_util.ContentType, `^application\/grpc(\+proto|\+json)?$`).
-		Handler(a.grpcServer)
 
 	a.routeGRPCWeb()
 	a.router.NewRoute().
 		Handler(a.grpcGateway.Handler()).
 		Name("grpc-gateway")
+}
+
+func isGRPCRequest(r *http.Request) bool {
+	if r.Method != http.MethodPost {
+		return false
+	}
+	return isGRPCContentType(r.Header.Get(http_util.ContentType))
+}
+
+func isGRPCContentType(contentType string) bool {
+	mediaType, _, _ := strings.Cut(contentType, ";")
+	switch strings.TrimSpace(strings.ToLower(mediaType)) {
+	case "application/grpc", "application/grpc+proto", "application/grpc+json":
+		return true
+	default:
+		return false
+	}
 }
 
 func (a *API) routeGRPCWeb() {
