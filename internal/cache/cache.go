@@ -19,6 +19,8 @@ const (
 	PurposeOrganization
 	PurposeIdPFormCallback
 	PurposeFederatedLogout
+	PurposeWebkeyActiveSigningKey
+	PurposeWebkeyPublicKeys
 )
 
 // Cache stores objects with a value of type `V`.
