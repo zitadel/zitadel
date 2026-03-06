@@ -81,5 +81,11 @@ declare namespace NodeJS {
      * which is safer for environments with enterprise email link scanners.
      */
     NEXT_PUBLIC_AUTO_SUBMIT_CODE?: string;
+    /**
+     * Optional: Disable OpenTelemetry instrumentation.
+     * Set to "true" to bypass OTEL initialization.
+     * In local development (NODE_ENV=development), it is disabled by default unless explicitly set to "false".
+     */
+    OTEL_SDK_DISABLED?: string;
   }
 }
