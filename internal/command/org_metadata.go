@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -46,15 +47,42 @@ func (c *Commands) BulkSetOrgMetadata(ctx context.Context, orgID string, permiss
 		return nil, err
 	}
 
-	events := make([]eventstore.Command, len(metadatas))
-	setMetadata := NewOrgMetadataListWriteModel(orgID)
+	events := make([]eventstore.Command, 0)
+	setMetadata, err := c.getOrgMetadataListModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
 	orgAgg := OrgAggregateFromWriteModel(&setMetadata.WriteModel)
-	for i, data := range metadatas {
+	for _, data := range metadatas {
+		existingValue, keyExists := setMetadata.metadataList[data.Key]
+
+		// if value is empty, a metadata remove event has to be pushed
+		if len(data.Value) == 0 {
+			// Ignore deletion if key does not exist
+			if !keyExists {
+				continue
+			}
+
+			event := org.NewMetadataRemovedEvent(ctx, orgAgg, data.Key)
+			events = append(events, event)
+			continue
+		}
+
+		// if no change to metadata no event has to be pushed
+		if keyExists && bytes.Equal(existingValue, data.Value) {
+			continue
+		}
+
 		event, err := c.setOrgMetadata(ctx, orgAgg, data)
 		if err != nil {
 			return nil, err
 		}
-		events[i] = event
+		events = append(events, event)
+	}
+
+	// no changes for the metadata
+	if len(events) == 0 {
+		return writeModelToObjectDetails(&setMetadata.WriteModel), nil
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, events...)

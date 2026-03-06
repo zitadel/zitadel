@@ -4,6 +4,7 @@ package org_test
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"os"
 	"slices"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	metadata "github.com/zitadel/zitadel/pkg/grpc/metadata/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
@@ -1029,128 +1031,175 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 }
 
 func TestServer_SetOrganizationMetadata(t *testing.T) {
-	orgs, _, _ := createOrgs(CTX, t, Client, 1)
-	orgId := orgs[0].OrganizationId
-
 	tests := []struct {
 		name      string
 		ctx       context.Context
-		setupFunc func()
-		orgId     string
-		key       string
-		value     string
+		setupFunc func(ctx context.Context, orgID string, req *org.SetOrganizationMetadataRequest)
+		req       *org.SetOrganizationMetadataRequest
+		assert    func(t *testing.T, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse)
 		err       error
 	}{
 		{
-			name:  "no permission",
-			ctx:   Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
-			orgId: orgId,
-			key:   "key1",
-			value: "value1",
-			err:   errors.New("membership not found"),
+			name: "no permission",
+			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			setupFunc: func(ctx context.Context, orgID string, req *org.SetOrganizationMetadataRequest) {
+				req.OrganizationId = orgID
+			},
+			req: &org.SetOrganizationMetadataRequest{
+				Metadata: []*org.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+				},
+			},
+			err: errors.New("membership not found"),
 		},
 		{
-			name:  "set org metadata",
-			ctx:   Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			orgId: orgId,
-			key:   "key1",
-			value: "value1",
+			name: "set org metadata",
+			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+			setupFunc: func(ctx context.Context, orgID string, req *org.SetOrganizationMetadataRequest) {
+				req.OrganizationId = orgID
+			},
+			req: &org.SetOrganizationMetadataRequest{
+				Metadata: []*org.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+				},
+			},
+			assert: func(t *testing.T, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
+				assert.WithinRange(t, setMetadataResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
+
+				expectedMetadata := []*metadata.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+				}
+				assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+			},
 		},
 		{
-			name:  "set org metadata on non existant org",
-			ctx:   Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			orgId: "non existant orgid",
-			key:   "key2",
-			value: "value2",
-			err:   errors.New("Organisation not found"),
+			name: "set org metadata on non existant org",
+			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+			setupFunc: func(ctx context.Context, _ string, req *org.SetOrganizationMetadataRequest) {
+				req.OrganizationId = "wrong-org-id"
+			},
+			req: &org.SetOrganizationMetadataRequest{
+				Metadata: []*org.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated-value1")))},
+				},
+			},
+			err: errors.New("Organisation not found"),
 		},
 		{
 			name: "update org metadata",
 			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			setupFunc: func() {
-				_, err := Client.SetOrganizationMetadata(CTX, &org.SetOrganizationMetadataRequest{
-					OrganizationId: orgId,
-					Metadata: []*org.Metadata{
-						{
-							Key:   "key3",
-							Value: []byte("value3"),
-						},
-					},
-				})
-				require.NoError(t, err)
+			setupFunc: func(ctx context.Context, orgID string, req *org.SetOrganizationMetadataRequest) {
+				req.OrganizationId = orgID
+				Instance.SetOrganizationMetadata(ctx, orgID, "key1", "value1")
 			},
-			orgId: orgId,
-			key:   "key4",
-			value: "value4",
+			req: &org.SetOrganizationMetadataRequest{
+				Metadata: []*org.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated-value1")))},
+				},
+			},
+			assert: func(t *testing.T, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
+				assert.WithinRange(t, setMetadataResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
+
+				expectedMetadata := []*metadata.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated-value1")))},
+				}
+				assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+			},
 		},
 		{
 			name: "update org metadata with same value",
 			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			setupFunc: func() {
-				_, err := Client.SetOrganizationMetadata(CTX, &org.SetOrganizationMetadataRequest{
-					OrganizationId: orgId,
-					Metadata: []*org.Metadata{
-						{
-							Key:   "key5",
-							Value: []byte("value5"),
-						},
-					},
-				})
-				require.NoError(t, err)
+			setupFunc: func(ctx context.Context, orgID string, req *org.SetOrganizationMetadataRequest) {
+				req.OrganizationId = orgID
+				Instance.SetOrganizationMetadata(ctx, orgID, "key1", "value1")
 			},
-			orgId: orgId,
-			key:   "key5",
-			value: "value5",
+			req: &org.SetOrganizationMetadataRequest{
+				Metadata: []*org.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+				},
+			},
+			assert: func(t *testing.T, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
+				assert.True(t, setMetadataResponse.GetSetDate().AsTime().Before(testStartTime))
+
+				expectedMetadata := []*metadata.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+				}
+				assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+			},
+		},
+		{
+			name: "delete and update org metadata",
+			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+			setupFunc: func(ctx context.Context, orgID string, req *org.SetOrganizationMetadataRequest) {
+				req.OrganizationId = orgID
+				Instance.SetOrganizationMetadata(ctx, orgID, "key1", "value1")
+				Instance.SetOrganizationMetadata(ctx, orgID, "key2", "value2")
+			},
+			req: &org.SetOrganizationMetadataRequest{
+				Metadata: []*org.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated-value1")))}, // updating
+					{Key: "key2"}, // deleting
+					{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))}, // adding
+					{Key: "key4"}, // deleting non-existent
+				},
+			},
+			assert: func(t *testing.T, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
+				assert.WithinRange(t, setMetadataResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
+
+				expectedMetadata := []*metadata.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated-value1")))},
+					{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
+				}
+				assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			orgResponse := Instance.CreateOrganization(
+				CTX,
+				integration.OrganizationName(),
+				integration.Email(),
+			)
+
 			if tt.setupFunc != nil {
-				tt.setupFunc()
+				tt.setupFunc(tt.ctx, orgResponse.OrganizationId, tt.req)
 			}
-			got, err := Client.SetOrganizationMetadata(tt.ctx, &org.SetOrganizationMetadataRequest{
-				OrganizationId: tt.orgId,
-				Metadata: []*org.Metadata{
-					{
-						Key:   tt.key,
-						Value: []byte(tt.value),
-					},
-				},
-			})
+
+			testStartTime := time.Now().UTC()
+			got, err := Client.SetOrganizationMetadata(tt.ctx, tt.req)
 			if tt.err != nil {
 				require.Contains(t, err.Error(), tt.err.Error())
 				return
 			}
 			require.NoError(t, err)
 
-			// check details
-			gotCD := got.GetSetDate().AsTime()
-			now := time.Now()
-			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// check metadata
 				listMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &org.ListOrganizationMetadataRequest{
-					OrganizationId: orgId,
+					OrganizationId: orgResponse.OrganizationId,
 				})
 				require.NoError(ttt, err)
-				foundMetadata := false
-				foundMetadataKeyCount := 0
-				for _, res := range listMetadataRes.Metadata {
-					if res.Key == tt.key {
-						foundMetadataKeyCount += 1
-					}
-					if res.Key == tt.key &&
-						string(res.Value) == tt.value {
-						foundMetadata = true
-					}
-				}
-				require.True(ttt, foundMetadata, "unable to find added metadata")
-				require.Equal(ttt, 1, foundMetadataKeyCount, "same metadata key found multiple times")
+				tt.assert(t, got, testStartTime, listMetadataRes)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
+}
+
+func getMetadataMap(metadata []*metadata.Metadata) map[string][]byte {
+	metadataByKey := make(map[string][]byte, len(metadata))
+	for _, md := range metadata {
+		metadataByKey[md.Key] = md.Value
+	}
+	return metadataByKey
+}
+
+func assertMetadataEquals(t *testing.T, expected []*metadata.Metadata, actual []*metadata.Metadata) {
+	assert.Equal(t, len(expected), len(actual))
+	assert.Equal(t, getMetadataMap(expected), getMetadataMap(actual))
 }
 
 func TestServer_DeleteOrganizationMetadata(t *testing.T) {

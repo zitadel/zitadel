@@ -263,7 +263,7 @@ service OrganizationService {
 
   // Set Organization Metadata
   //
-  // Adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
+  // Sets a list of key value pairs. Existing metadata entries with matching keys are overwritten. Existing metadata entries without matching keys are untouched. To remove existing metadata entries, pass an empty metadata value or use [DeleteOrganizationMetadata](/docs/reference/api/org/zitadel.org.v2.OrganizationService.DeleteOrganizationMetadata). If no metadata entry exists for a given key, passing an empty value for that key has no effect (no-op). For HTTP requests, make sure the bytes array value is base64 encoded.
   //
   // Required permission:
   //  - `org.write`
@@ -914,8 +914,8 @@ message Metadata {
   // Key is identifier of the metadata entry.
   string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-  // Value is the values of the metadata entry.
-  bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+  // Value in the metadata key/value pair. On updates, an empty value will delete the metadata entry.
+  bytes value = 2 [(validate.rules).bytes = {max_len: 500000}];
 }
 message SetOrganizationMetadataRequest{
   // Organization ID is the unique identifier of the organization whose metadata is to be set.
