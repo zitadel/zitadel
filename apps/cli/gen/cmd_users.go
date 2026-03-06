@@ -1582,14 +1582,23 @@ func newUserService_GetUserByIDCmd(getCfg func() *config.Config, getOutput func(
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
+			header := []string{"ID", "ORGANIZATION ID", "STATE", "USERNAME", "PREFERRED LOGIN NAME", "TYPE"}
 			rows := [][]string{
 				{
+					fmt.Sprint(resp.Msg.GetUser().GetUserId()),
+					fmt.Sprint(resp.Msg.GetUser().GetDetails().GetResourceOwner()),
+					fmt.Sprint(resp.Msg.GetUser().GetState().String()),
+					fmt.Sprint(resp.Msg.GetUser().GetUsername()),
+					fmt.Sprint(resp.Msg.GetUser().GetPreferredLoginName()),
 					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
+						switch resp.Msg.GetUser().GetType().(type) {
+						case *userpb.User_Human:
+							return "human"
+						case *userpb.User_Machine:
+							return "machine"
+						default:
+							return ""
 						}
-						return ""
 					}(),
 				},
 			}
@@ -3576,15 +3585,11 @@ func doUserService_CreatePasskeyRegistrationLink(getCfg func() *config.Config, g
 		return output.JSON(resp.Msg)
 	}
 
-	header := []string{"CHANGE DATE"}
+	header := []string{"ID", "CODE"}
 	rows := [][]string{
 		{
-			func() string {
-				if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-					return t.AsTime().Format("2006-01-02T15:04:05Z")
-				}
-				return ""
-			}(),
+			fmt.Sprint(resp.Msg.GetCode().GetId()),
+			fmt.Sprint(resp.Msg.GetCode().GetCode()),
 		},
 	}
 	output.Table(header, rows)

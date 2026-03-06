@@ -1159,6 +1159,7 @@ func extractMessageColumns(msg *protogen.Message) []columnDef {
 func extractTopLevelColumns(msg *protogen.Message) []columnDef {
 	var cols []columnDef
 	var detailsField *protogen.Field
+	hasNestedMessage := false
 	for _, field := range msg.Fields {
 		if string(field.Desc.Name()) == "details" {
 			detailsField = field
@@ -1167,12 +1168,17 @@ func extractTopLevelColumns(msg *protogen.Message) []columnDef {
 		col := fieldToColumn(field)
 		if col != nil {
 			cols = append(cols, *col)
+		} else if field.Desc.Kind() == protoreflect.MessageKind && !field.Desc.IsList() {
+			// fieldToColumn couldn't handle this nested message; let extractResponseColumns unwrap it.
+			hasNestedMessage = true
 		}
 	}
-	// When the response has no other columns (only Details), show change_date from
-	// Details as a confirmation timestamp — consistent with commands like org delete
-	// that have an explicit deletion_date timestamp.
-	if len(cols) == 0 && detailsField != nil && detailsField.Message != nil {
+	// When the response has no scalar columns AND no unwrappable nested message field,
+	// show change_date from Details as a confirmation timestamp. This covers simple
+	// "action" responses (e.g. delete, verify) that only return Details.
+	// If there IS a nested message (e.g. GetUserByIDResponse.user), skip this so that
+	// extractResponseColumns can unwrap it into full column definitions instead.
+	if len(cols) == 0 && !hasNestedMessage && detailsField != nil && detailsField.Message != nil {
 		for _, sub := range detailsField.Message.Fields {
 			if string(sub.Desc.Name()) == "change_date" {
 				cols = append(cols, columnDef{

@@ -386,3 +386,97 @@ func TestRPCNameToVerbAndSuffix(t *testing.T) {
 		})
 	}
 }
+
+// ---- Tests for extractTopLevelColumns and extractResponseColumns ----
+
+// TestExtractTopLevelColumns_NestedResourceUnwrapped verifies that a response wrapping
+// a nested resource message (like GetUserByIDResponse) returns the resource's columns,
+// not just a fallback "CHANGE DATE".  This is the regression test for the get-by-id bug
+// where only "CHANGE DATE" was shown instead of the full resource fields.
+func TestExtractTopLevelColumns_NestedResourceUnwrapped(t *testing.T) {
+resource := &descriptorpb.DescriptorProto{
+Name: proto.String("Resource"),
+Field: []*descriptorpb.FieldDescriptorProto{
+stringField("id", 1),
+stringField("name", 2),
+},
+}
+response := &descriptorpb.DescriptorProto{
+Name: proto.String("GetResourceByIDResponse"),
+Field: []*descriptorpb.FieldDescriptorProto{
+messageField("details", 1, ".Details"),
+messageField("resource", 2, ".Resource"),
+},
+}
+fd := &descriptorpb.FileDescriptorProto{
+Name:        proto.String("test.proto"),
+Syntax:      proto.String("proto3"),
+MessageType: []*descriptorpb.DescriptorProto{detailsDescriptor(), resource, response},
+}
+plugin := buildPlugin(t, fd)
+msg := findMessage(t, plugin, "GetResourceByIDResponse")
+
+// extractTopLevelColumns should return empty (nested message → hasNestedMessage)
+topLevel := extractTopLevelColumns(msg)
+if len(topLevel) != 0 {
+t.Errorf("extractTopLevelColumns: want empty (nested message present), got %v", columnHeaders(topLevel))
+}
+
+// extractResponseColumns should unwrap the nested resource → ID + NAME columns
+_, _, cols := extractResponseColumns(msg, "get")
+headers := columnHeaders(cols)
+if !slices.Contains(headers, "ID") {
+t.Errorf("extractResponseColumns: expected ID column in %v", headers)
+}
+if !slices.Contains(headers, "NAME") {
+t.Errorf("extractResponseColumns: expected NAME column in %v", headers)
+}
+if len(headers) == 1 && headers[0] == "CHANGE DATE" {
+t.Errorf("extractResponseColumns: got only CHANGE DATE, expected full resource columns")
+}
+}
+
+// TestExtractTopLevelColumns_ActionResponseChangeDateFallback verifies that a simple
+// "action" response (only a details field with no nested resource message) still shows
+// CHANGE DATE as a confirmation that the operation completed.
+func TestExtractTopLevelColumns_ActionResponseChangeDateFallback(t *testing.T) {
+details := &descriptorpb.DescriptorProto{
+Name: proto.String("Details"),
+Field: []*descriptorpb.FieldDescriptorProto{
+{
+Name:     proto.String("change_date"),
+Number:   proto.Int32(1),
+Type:     descriptorpb.FieldDescriptorProto_TYPE_MESSAGE.Enum(),
+Label:    descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum(),
+TypeName: proto.String(".Timestamp"),
+JsonName: proto.String("changeDate"),
+},
+},
+}
+// Minimal Timestamp message (stands in for google.protobuf.Timestamp in the
+// synthetic descriptor — full-name check won't match, but the fallback path
+// does not require that; it just checks the field name "change_date").
+timestamp := &descriptorpb.DescriptorProto{
+Name:  proto.String("Timestamp"),
+Field: []*descriptorpb.FieldDescriptorProto{},
+}
+response := &descriptorpb.DescriptorProto{
+Name: proto.String("DeleteResourceResponse"),
+Field: []*descriptorpb.FieldDescriptorProto{
+messageField("details", 1, ".Details"),
+},
+}
+fd := &descriptorpb.FileDescriptorProto{
+Name:        proto.String("test.proto"),
+Syntax:      proto.String("proto3"),
+MessageType: []*descriptorpb.DescriptorProto{details, timestamp, response},
+}
+plugin := buildPlugin(t, fd)
+msg := findMessage(t, plugin, "DeleteResourceResponse")
+
+cols := extractTopLevelColumns(msg)
+headers := columnHeaders(cols)
+if !slices.Contains(headers, "CHANGE DATE") {
+t.Errorf("extractTopLevelColumns: want CHANGE DATE fallback for action response, got %v", headers)
+}
+}

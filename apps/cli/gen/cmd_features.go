@@ -343,15 +343,11 @@ func newFeatureService_GetSystemFeaturesCmd(getCfg func() *config.Config, getOut
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
+			header := []string{"ENABLED", "SOURCE"}
 			rows := [][]string{
 				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
+					fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetEnabled()),
+					fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetSource().String()),
 				},
 			}
 			output.Table(header, rows)
@@ -563,15 +559,11 @@ func newFeatureService_GetInstanceFeaturesCmd(getCfg func() *config.Config, getO
 				return output.JSON(resp.Msg)
 			}
 
-			header := []string{"CHANGE DATE"}
+			header := []string{"ENABLED", "SOURCE"}
 			rows := [][]string{
 				{
-					func() string {
-						if t := resp.Msg.GetDetails().GetChangeDate(); t != nil {
-							return t.AsTime().Format("2006-01-02T15:04:05Z")
-						}
-						return ""
-					}(),
+					fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetEnabled()),
+					fmt.Sprint(resp.Msg.GetLoginDefaultOrg().GetSource().String()),
 				},
 			}
 			output.Table(header, rows)
