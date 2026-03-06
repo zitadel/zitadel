@@ -29,57 +29,19 @@ import type { LoggerProvider } from "@opentelemetry/api-logs";
 let _loggerProvider: LoggerProvider | null = null;
 
 export async function register(): Promise<void> {
-  if (process.env.NEXT_RUNTIME !== "nodejs") return;
+  // Only run OpenTelemetry in the Node.js environment
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    // Disable by default in local development to avoid unnecessary overhead
+    if (process.env.NODE_ENV === "development" && process.env.OTEL_SDK_DISABLED !== "false") {
+      return;
+    }
 
-  const [
-    { NodeSDK },
-    { envDetector, processDetector, hostDetector, resourceFromAttributes },
-    { containerDetector },
-    { gcpDetector },
-    { logs },
-    { getNodeAutoInstrumentations },
-  ] = await Promise.all([
-    import("@opentelemetry/sdk-node"),
-    import("@opentelemetry/resources"),
-    import("@opentelemetry/resource-detector-container"),
-    import("@opentelemetry/resource-detector-gcp"),
-    import("@opentelemetry/api-logs"),
-    import("@opentelemetry/auto-instrumentations-node"),
-  ]);
+    // Explicit check for disabled env variable
+    if (process.env.OTEL_SDK_DISABLED === "true") return;
 
-  const sdk = new NodeSDK({
-    resource: resourceFromAttributes({
-      "deployment.environment.name": process.env.NODE_ENV || "development",
-    }),
-    resourceDetectors: [
-      envDetector,
-      processDetector,
-      hostDetector,
-      containerDetector,
-      gcpDetector,
-    ],
-    instrumentations: [
-      getNodeAutoInstrumentations({
-        "@opentelemetry/instrumentation-http": {
-          ignoreIncomingRequestHook: (req) =>
-            ["/healthy", "/_next/", "/favicon.ico", "/__nextjs", "/metrics"].some((p) =>
-              req.url?.includes(p),
-            ),
-        },
-        "@opentelemetry/instrumentation-fs": { enabled: false },
-        "@opentelemetry/instrumentation-winston": { disableLogSending: false },
-      }),
-    ],
-  });
-
-  sdk.start();
-
-  _loggerProvider = logs.getLoggerProvider();
-
-  // Use console during shutdown as the logger may be unavailable
-  const shutdown = () => sdk.shutdown().catch(console.error);
-  process.once("SIGTERM", shutdown);
-  process.once("SIGINT", shutdown);
+    const { registerNode } = await import("./instrumentation.node");
+    _loggerProvider = await registerNode();
+  }
 }
 
 export function getLoggerProvider(): LoggerProvider | null {
