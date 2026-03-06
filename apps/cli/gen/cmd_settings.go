@@ -1655,6 +1655,20 @@ func newSettingsService_GetHostedLoginTranslationCmd(getCfg func() *config.Confi
 
 	parent.PersistentFlags().StringVar(&commonflag_GetHostedLoginTranslation_Locale, "locale", "", "The locale of the translations to be returned.")
 	parent.PersistentFlags().BoolVar(&commonflag_GetHostedLoginTranslation_IgnoreInheritance, "ignore-inheritance", false, "if set to true, higher levels are ignored, if false higher levels are merged into the file")
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		vc := &cobra.Command{
@@ -1876,6 +1890,20 @@ func newSettingsService_SetHostedLoginTranslationCmd(getCfg func() *config.Confi
 	}
 
 	parent.PersistentFlags().StringVar(&commonflag_SetHostedLoginTranslation_Locale, "locale", "", "The locale of the translations to be set.")
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		vc := &cobra.Command{

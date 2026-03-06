@@ -335,6 +335,20 @@ func newApplicationService_CreateApplicationCmd(getCfg func() *config.Config, ge
 	parent.PersistentFlags().StringVar(&commonflag_CreateApplication_ProjectId, "project-id", "", "The ID of the project the application will be created in.")
 	parent.PersistentFlags().StringVar(&commonflag_CreateApplication_ApplicationId, "application-id", "", "Optionally, provide the unique ID of the new application. If omitted, the system will generate one for you,")
 	parent.PersistentFlags().StringVar(&commonflag_CreateApplication_Name, "name", "", "Publicly visible name of the application. This might be presented to users if they sign in.")
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		var varflag_CreateApplication_ApplicationType string
@@ -692,6 +706,20 @@ func newApplicationService_UpdateApplicationCmd(getCfg func() *config.Config, ge
 
 	parent.PersistentFlags().StringVar(&commonflag_UpdateApplication_ProjectId, "project-id", "", "The ID of the project the application belongs to.")
 	parent.PersistentFlags().StringVar(&commonflag_UpdateApplication_Name, "name", "", "Publicly visible name of the application. This might be presented to users if they sign in.")
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		vc := &cobra.Command{

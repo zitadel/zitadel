@@ -357,6 +357,20 @@ func newActionService_CreateTargetCmd(getCfg func() *config.Config, getOutput fu
 	_ = parent.RegisterFlagCompletionFunc("payload-type", func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 		return []string{"PAYLOAD_TYPE_UNSPECIFIED", "PAYLOAD_TYPE_JSON", "PAYLOAD_TYPE_JWT", "PAYLOAD_TYPE_JWE"}, cobra.ShellCompDirectiveNoFileComp
 	})
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		var varflag_CreateTarget_InterruptOnError bool
@@ -653,6 +667,20 @@ func newActionService_UpdateTargetCmd(getCfg func() *config.Config, getOutput fu
 	parent.PersistentFlags().StringVar(&commonflag_UpdateTarget_PayloadType, "payload-type", "", "Payload type defines how the payload is formatted and secured. (one of: JSON, JWT, JWE)")
 	_ = parent.RegisterFlagCompletionFunc("payload-type", func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 		return []string{"PAYLOAD_TYPE_UNSPECIFIED", "PAYLOAD_TYPE_JSON", "PAYLOAD_TYPE_JWT", "PAYLOAD_TYPE_JWE"}, cobra.ShellCompDirectiveNoFileComp
+	})
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
 	})
 
 	{

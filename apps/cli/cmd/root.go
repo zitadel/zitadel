@@ -29,7 +29,7 @@ func SetVersion(v string) {
 // NewRootCmd creates the top-level cobra command.
 func NewRootCmd() *cobra.Command {
 	root := &cobra.Command{
-		Use:     "zitadel",
+		Use:     "zitadel-cli",
 		Short:   "ZITADEL CLI — manage your ZITADEL instances from the command line",
 		Version: version,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {

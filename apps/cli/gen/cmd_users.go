@@ -917,6 +917,20 @@ func newUserService_CreateUserCmd(getCfg func() *config.Config, getOutput func()
 	parent.PersistentFlags().StringVar(&commonflag_CreateUser_OrganizationId, "organization-id", "", "The unique identifier of the organization the user belongs to.")
 	parent.PersistentFlags().StringVar(&commonflag_CreateUser_UserId, "user-id", "", "The ID is a unique identifier for the user in the instance.")
 	parent.PersistentFlags().StringVar(&commonflag_CreateUser_Username, "username", "", "The username is a unique identifier for the user in the organization.")
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		var varflag_CreateUser_GivenName string
@@ -1289,6 +1303,20 @@ func newUserService_AddHumanUserCmd(getCfg func() *config.Config, getOutput func
 
 	parent.PersistentFlags().StringVar(&commonflag_AddHumanUser_Username, "username", "", "optionally set a unique username, if none is provided the email will be used.")
 	parent.PersistentFlags().StringVar(&commonflag_AddHumanUser_TotpSecret, "totp-secret", "", "An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.")
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		var varflag_AddHumanUser_Password string
@@ -1748,6 +1776,20 @@ func newUserService_SetEmailCmd(getCfg func() *config.Config, getOutput func() s
 	}
 
 	parent.PersistentFlags().StringVar(&commonflag_SetEmail_Email, "email", "", "Set email")
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		var varflag_SetEmail_UrlTemplate string
@@ -2105,6 +2147,20 @@ func newUserService_SetPhoneCmd(getCfg func() *config.Config, getOutput func() s
 	}
 
 	parent.PersistentFlags().StringVar(&commonflag_SetPhone_Phone, "phone", "", "Set phone")
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		vc := &cobra.Command{
@@ -2554,6 +2610,20 @@ func newUserService_UpdateUserCmd(getCfg func() *config.Config, getOutput func()
 	}
 
 	parent.PersistentFlags().StringVar(&commonflag_UpdateUser_Username, "username", "", "Set a new username that is unique within the instance.")
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		var varflag_UpdateUser_GivenName string
@@ -3350,6 +3420,21 @@ func newUserService_CreatePasskeyRegistrationLinkCmd(getCfg func() *config.Confi
 			return doUserService_CreatePasskeyRegistrationLink(getCfg, getOutput, cmd, req)
 		},
 	}
+
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		var varflag_CreatePasskeyRegistrationLink_UrlTemplate string
@@ -5090,6 +5175,21 @@ func newUserService_SetPasswordCmd(getCfg func() *config.Config, getOutput func(
 		},
 	}
 
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
+
 	{
 		vc := &cobra.Command{
 			Use:   "current-password <current-password>",
@@ -6378,6 +6478,21 @@ func newUserService_CreateInviteCodeCmd(getCfg func() *config.Config, getOutput 
 			return doUserService_CreateInviteCode(getCfg, getOutput, cmd, req)
 		},
 	}
+
+	// When a user passes a variant-specific flag on the parent (e.g. --given-name on "create"
+	// instead of "create human"), cobra returns an "unknown flag" error before RunE is called.
+	// Override FlagErrorFunc to surface a helpful hint about the available sub-commands.
+	parent.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		subs := cmd.Commands()
+		if len(subs) > 0 {
+			names := make([]string, 0, len(subs))
+			for _, s := range subs {
+				names = append(names, s.Name())
+			}
+			return fmt.Errorf("%w\n\nHint: '%s' requires a sub-command %v.\nExample: %s %s --help", err, cmd.Use, names, cmd.CommandPath(), names[0])
+		}
+		return err
+	})
 
 	{
 		var varflag_CreateInviteCode_UrlTemplate string
