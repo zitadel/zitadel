@@ -87,7 +87,7 @@ func (c *Commands) ChangeUserMachine(ctx context.Context, machine *ChangeMachine
 		cmds = append(cmds, user.NewMachineChangedEvent(ctx, &existingMachine.Aggregate().Aggregate, machineChanges))
 	}
 	if len(machine.Metadata) > 0 {
-		metadataCmds, err := c.checkExistingValueAndSetMetadata(ctx, machine.Metadata, existingMachine.Metadata, &existingMachine.Aggregate().Aggregate)
+		metadataCmds, err := c.createMetadataEvents(ctx, machine.Metadata, existingMachine.Metadata, &existingMachine.Aggregate().Aggregate)
 		if err != nil {
 			return err
 		}

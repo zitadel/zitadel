@@ -704,6 +704,121 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "add and delete metadata, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key1",
+								[]byte("value1"),
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key2",
+								[]byte("value2"),
+							),
+						),
+					),
+					expectPush(
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key1",
+							[]byte("updated_value1"),
+						),
+						user.NewMetadataRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key2",
+						),
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key3",
+							[]byte("value3"),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				metadataList: []*domain.Metadata{
+					{Key: "key1", Value: []byte("updated_value1")},
+					{Key: "key2"},
+					{Key: "key3", Value: []byte("value3")},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "delete non existing key, ok (ignored)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key1",
+								[]byte("value1"),
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				metadataList: []*domain.Metadata{
+					{Key: "key2"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

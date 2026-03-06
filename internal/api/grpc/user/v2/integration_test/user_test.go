@@ -4610,11 +4610,80 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 					},
 					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
-						metadataByKey := getMetadataMap(listMetadataResponse.GetMetadata())
-						assert.Len(t, listMetadataResponse.GetMetadata(), 3)
-						assert.Equal(t, []byte("updated_value1"), metadataByKey["key1"])
-						assert.Equal(t, []byte("value2"), metadataByKey["key2"])
-						assert.Equal(t, []byte("value3"), metadataByKey["key3"])
+						expectedMetadata := []*metadata.Metadata{
+							{Key: "key1", Value: []byte("updated_value1")},
+							{Key: "key2", Value: []byte("value2")},
+							{Key: "key3", Value: []byte("value3")},
+						}
+						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+					},
+				}
+			},
+		},
+		{
+			name: "human metadata - update and delete, ok",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						ctx: OrgCTX,
+						create: &user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserId:         &runId,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+								},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("value1"),
+								},
+								{
+									Key:   "key2",
+									Value: []byte("value2"),
+								},
+							},
+						},
+						update: &user.UpdateUserRequest{
+							UserId:   runId,
+							Username: &username,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("updated_value1"), // updating key1
+								},
+								{
+									Key: "key2", // removing key2
+								},
+								{
+									Key: "key3", // removing a non-existing key
+								},
+								{
+									Key:   "key4", // adding a new key
+									Value: []byte("value4"),
+								},
+							},
+						},
+					},
+					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
+						assert.Equal(t, username, getResponse.GetUser().GetUsername())
+						expectedMetadata := []*metadata.Metadata{
+							{Key: "key1", Value: []byte("updated_value1")},
+							{Key: "key4", Value: []byte("value4")},
+						}
+						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
 					},
 				}
 			},
@@ -4666,11 +4735,74 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 					},
 					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
 						assert.Equal(t, username, getResponse.GetUser().GetUsername())
-						metadataByKey := getMetadataMap(listMetadataResponse.GetMetadata())
-						assert.Len(t, listMetadataResponse.GetMetadata(), 3)
-						assert.Equal(t, []byte("updated_value1"), metadataByKey["key1"])
-						assert.Equal(t, []byte("value2"), metadataByKey["key2"])
-						assert.Equal(t, []byte("value3"), metadataByKey["key3"])
+						expectedMetadata := []*metadata.Metadata{
+							{Key: "key1", Value: []byte("updated_value1")},
+							{Key: "key2", Value: []byte("value2")},
+							{Key: "key3", Value: []byte("value3")},
+						}
+						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+					},
+				}
+			},
+		},
+		{
+			name: "service account metadata - update and delete, ok",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("service.account+%s", runId)
+				return testCase{
+					args: args{
+						ctx: OrgCTX,
+						create: &user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserId:         &runId,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name:            "service_account",
+									AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+								},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("value1"),
+								},
+								{
+									Key:   "key2",
+									Value: []byte("value2"),
+								},
+							},
+						},
+						update: &user.UpdateUserRequest{
+							UserId:   runId,
+							Username: &username,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{},
+							},
+							Metadata: []*user.Metadata{
+								{
+									Key:   "key1",
+									Value: []byte("updated_value1"), // updating key1
+								},
+								{
+									Key: "key2", // removing key2
+								},
+								{
+									Key: "key3", // removing a non-existing key
+								},
+								{
+									Key:   "key4", // adding a new key
+									Value: []byte("value4"),
+								},
+							},
+						},
+					},
+					assert: func(t *testing.T, getResponse *user.GetUserByIDResponse, listMetadataResponse *user.ListUserMetadataResponse) {
+						assert.Equal(t, username, getResponse.GetUser().GetUsername())
+						expectedMetadata := []*metadata.Metadata{
+							{Key: "key1", Value: []byte("updated_value1")},
+							{Key: "key4", Value: []byte("value4")},
+						}
+						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
 					},
 				}
 			},

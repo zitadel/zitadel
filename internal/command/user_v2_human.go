@@ -338,7 +338,7 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 	}
 
 	if len(human.Metadata) > 0 {
-		metadataCmds, err := c.checkExistingValueAndSetMetadata(ctx, human.Metadata, existingHuman.Metadata, userAgg)
+		metadataCmds, err := c.createMetadataEvents(ctx, human.Metadata, existingHuman.Metadata, userAgg)
 		if err != nil {
 			return err
 		}
