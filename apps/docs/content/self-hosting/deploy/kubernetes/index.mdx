@@ -29,10 +29,9 @@ With k3d, set `ExternalPort: 8080` in the values below.
 ### Install the full stack
 
 ```bash
+mkdir zitadel-helm && cd zitadel-helm &&
 curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel-charts/main/examples/0-quickstart/quickstart-values.yaml
 ```
-
-Then add the Helm repos and install in one go:
 
 ```bash
 helm repo add zitadel https://charts.zitadel.com &&
