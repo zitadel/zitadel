@@ -1,5 +1,16 @@
 "use server";
 
+import crypto from "crypto";
+import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
+import { Code, ConnectError, create } from "@zitadel/client";
+import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
+import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
+import {
+  AddHumanUserRequest,
+  AddHumanUserRequestSchema,
+  UpdateHumanUserRequestSchema,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getSessionCookieById } from "@/lib/cookies";
 import { createLogger } from "@/lib/logger";
 import { getServiceConfig } from "@/lib/service-url";
@@ -18,23 +29,22 @@ import {
   ServiceConfig,
   updateHuman,
 } from "@/lib/zitadel";
-import { Code, ConnectError, create } from "@zitadel/client";
-import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
-import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import {
-  AddHumanUserRequest,
-  AddHumanUserRequestSchema,
-  UpdateHumanUserRequestSchema,
-} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import crypto from "crypto";
-import { getTranslations } from "next-intl/server";
-import { headers } from "next/headers";
 import { getFingerprintIdCookie } from "../fingerprint";
 import { createNewSessionFromIdpIntent } from "./idp";
 
 const logger = createLogger("idp-intent");
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
+
+/**
+ * Gets a valid userName from IDP information.
+ * Falls back to userId if userName is empty or undefined.
+ * This ensures we always have a valid userName (1-200 characters) as required by the API.
+ */
+function getValidUserName(idpInformation: { userName?: string; userId: string }): string {
+  const userName = idpInformation.userName?.trim();
+  return userName && userName.length > 0 ? userName : idpInformation.userId;
+}
 
 async function resolveOrganizationForUser({
   organization,
@@ -236,7 +246,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
         idp: {
           id: intent.idpInformation!.idpId,
           userId: intent.idpInformation!.userId,
-          userName: intent.idpInformation!.userName,
+          userName: getValidUserName(intent.idpInformation!),
         },
         userId: resolvedUserId,
       });
@@ -404,7 +414,7 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
           idp: {
             id: idpInformation!.idpId,
             userId: idpInformation!.userId,
-            userName: idpInformation!.userName,
+            userName: getValidUserName(idpInformation!),
           },
           userId: foundUser.userId,
         });
