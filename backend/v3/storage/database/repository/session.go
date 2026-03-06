@@ -228,13 +228,37 @@ func sessionCTE(change database.Change, i, j int, builder *database.StatementBui
 }
 
 // Delete implements [domain.SessionRepository].
-func (s session) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (s session) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, error) {
 	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
 		return 0, database.NewMissingConditionError(s.InstanceIDColumn())
 	}
+	if condition.IsRestrictingColumn(s.IDColumn()) {
+		return s.deleteSingleSession(ctx, client, condition, permissionCondition)
+	}
+	// TODO: allow deletion of multiple sessions with permission check
+	return 0, database.NewMissingConditionError(s.IDColumn())
+}
+
+func (s session) deleteSingleSession(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
+	builder.WriteString("WITH sessions AS ( SELECT instance_id, id, token_id, user_id, now() as deleted_at FROM zitadel.sessions")
+	writeCondition(&builder, condition)
+	builder.WriteString(" UNION ALL SELECT instance_id, id, token_id, user_id, deleted_at FROM zitadel.sessions_deleted as sessions")
+	writeCondition(&builder, condition)
+	builder.WriteString(") ")
+	if permissionCondition != nil {
+		builder.WriteString(", delete as (")
+	}
 	builder.WriteString("DELETE FROM zitadel.sessions")
 	writeCondition(&builder, condition)
+	if permissionCondition != nil {
+		builder.WriteString(") ")
+	}
+	if permissionCondition != nil {
+		builder.WriteString(" SELECT CASE WHEN (EXISTS (SELECT 1 FROM sessions) or throw_not_permitted()) THEN CASE WHEN(")
+		permissionCondition.Write(&builder)
+		builder.WriteString(") THEN (select deleted_at from sessions) END END")
+	}
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
@@ -427,6 +451,11 @@ func (s session) UserIDCondition(userID string) database.Condition {
 	return database.NewTextCondition(s.UserIDColumn(), database.TextOperationEqual, userID)
 }
 
+// TokenIDCondition implements [domain.sessionConditions].
+func (s session) TokenIDCondition(tokenID string) database.Condition {
+	return database.NewTextCondition(s.TokenIDColumn(), database.TextOperationEqual, tokenID)
+}
+
 // CreatorIDCondition implements [domain.sessionConditions].
 func (s session) CreatorIDCondition(creatorID string) database.Condition {
 	return database.NewTextCondition(s.CreatorIDColumn(), database.TextOperationEqual, creatorID)
@@ -481,6 +510,11 @@ func (s session) MetadataConditions() domain.SessionMetadataConditions {
 	return s.metadataRepo
 }
 
+func (s session) PermissionCheckCondition(condition database.Condition) database.Condition {
+	//database.ForceRestrictingColumn()
+	return database.Or(condition)
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
@@ -520,6 +554,11 @@ func (s session) ExpirationColumn() database.Column {
 
 // UserIDColumn implements [domain.sessionColumns].
 func (s session) UserIDColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "user_id")
+}
+
+// UserOrganizationColumn implements [domain.sessionColumns].
+func (s session) UserOrganizationColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "user_id")
 }
 

@@ -9,3 +9,5 @@ func noopSessionTokenVerifier() SessionTokenVerifier {
 		return nil
 	}
 }
+
+type SessionTokenDecryptor func(ctx context.Context, sessionToken string) (sessionID, tokenID string, err error)

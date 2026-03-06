@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"errors"
 	"strings"
 	"time"
 
@@ -48,13 +47,35 @@ func (cmd *DeleteSessionCommand) Events(ctx context.Context, opts *InvokeOpts) (
 	}, nil
 }
 
+func sessionDeletePermissionCheckCondition(ctx context.Context, sessionRepo SessionRepository, id, token string, decryptor SessionTokenDecryptor) (database.Condition, error) {
+	if token != "" {
+		sessionID, tokenID, err := decryptor(ctx, token)
+		if err != nil || sessionID != id {
+			return nil, zerrors.ThrowInvalidArgumentf(err, "SESS-S3gq1", "Errors.Session.TokenInvalid")
+		}
+		return database.Or(database.Exists("sessions", sessionRepo.TokenIDCondition(tokenID)),
+			database.Permission(domain.PermissionSessionDelete, true),
+		), nil
+	}
+	return database.Or(
+		database.Exists("sessions", sessionRepo.UserIDCondition(authz.GetCtxData(ctx).UserID)),
+		database.Permission(domain.PermissionSessionDelete, true), // TODO: implement check
+	), nil
+}
+
 // Execute implements [Commander].
 func (cmd *DeleteSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	sessionRepo := opts.sessionRepo
 	instance := authz.GetInstance(ctx)
 
+	permCheck, err := sessionDeletePermissionCheckCondition(ctx, sessionRepo, cmd.ID, cmd.Token, opts.sessionTokenDecryptor)
+	if err != nil {
+		return err
+	}
+
 	deletedRows, err := sessionRepo.Delete(ctx, opts.DB(),
 		sessionRepo.PrimaryKeyCondition(instance.InstanceID(), cmd.ID),
+		permCheck,
 	)
 	if err != nil {
 		return err
@@ -98,23 +119,7 @@ func (cmd *DeleteSessionCommand) Validate(ctx context.Context, opts *InvokeOpts)
 	if cmd.ID = strings.TrimSpace(cmd.ID); cmd.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SESS-3n9fs", "Errors.IDMissing")
 	}
-	if !cmd.MustCheckPermission {
-		return nil
-	}
-	sessionRepo := opts.sessionRepo
-	instance := authz.GetInstance(ctx)
-
-	sessionToDelete, err := sessionRepo.Get(ctx, opts.DB(),
-		database.WithCondition(
-			sessionRepo.PrimaryKeyCondition(instance.InstanceID(), cmd.ID),
-		),
-	)
-	if err != nil {
-		if !errors.Is(err, &database.NoRowFoundError{}) {
-			return err
-		}
-	}
-	return cmd.checkPermission(ctx, sessionToDelete, opts)
+	return nil
 }
 
 var (

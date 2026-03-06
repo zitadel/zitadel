@@ -6,9 +6,10 @@ import (
 )
 
 var (
-	pool                 database.Pool
-	legacyEventstore     eventstore.LegacyEventstore
-	sessionTokenVerifier SessionTokenVerifier
+	pool                  database.Pool
+	legacyEventstore      eventstore.LegacyEventstore
+	sessionTokenVerifier  SessionTokenVerifier
+	sessionTokenDecryptor SessionTokenDecryptor
 )
 
 func SetPool(p database.Pool) {
@@ -21,4 +22,8 @@ func SetLegacyEventstore(es eventstore.LegacyEventstore) {
 
 func SetSessionTokenVerifier(verifier SessionTokenVerifier) {
 	sessionTokenVerifier = verifier
+}
+
+func SetSessionTokenDecryptor(decryptor SessionTokenDecryptor) {
+	sessionTokenDecryptor = decryptor
 }

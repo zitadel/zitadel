@@ -93,6 +93,7 @@ type InvokeOpts struct {
 	Invoker                Invoker
 	Permissions            PermissionChecker
 	sessionTokenVerifier   SessionTokenVerifier
+	sessionTokenDecryptor  SessionTokenDecryptor
 	organizationRepo       OrganizationRepository
 	organizationDomainRepo OrganizationDomainRepository
 	projectRepo            ProjectRepository
@@ -129,8 +130,9 @@ func DefaultOpts(invoker Invoker) *InvokeOpts {
 		invoker = &noopInvoker{}
 	}
 	return &InvokeOpts{
-		Invoker:              invoker,
-		Permissions:          &noopPermissionChecker{}, // prevent panics for now
-		sessionTokenVerifier: sessionTokenVerifier,
+		Invoker:               invoker,
+		Permissions:           &noopPermissionChecker{}, // prevent panics for now
+		sessionTokenVerifier:  sessionTokenVerifier,
+		sessionTokenDecryptor: sessionTokenDecryptor,
 	}
 }

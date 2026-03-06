@@ -898,27 +898,24 @@ func TestServer_SetSession_expired(t *testing.T) {
 }
 
 func TestServer_DeleteSession_token(t *testing.T) {
-	t.Cleanup(func() {
-		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IAMOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
-		require.NoError(t, err)
-	})
-	relTableState := integration.RelationalTablesEnableMatrix()
+	sysAuthZ := integration.WithSystemAuthorization(CTX)
 
+	relTableState := integration.RelationalTablesEnableMatrix(t, IAMOwnerCTX, sysAuthZ)
 	for _, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, IAMOwnerCTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
-		t.Run(stateCase.State, func(t *testing.T) {
-			createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
+		t.Run(stateCase.Name, func(t *testing.T) {
+			loginCTX := stateCase.Inst.WithAuthorizationToken(t.Context(), integration.UserTypeLogin)
+			createResp, err := stateCase.Inst.Client.SessionV2.CreateSession(loginCTX, &session.CreateSessionRequest{})
 			require.NoError(t, err)
 
-			_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
+			time.Sleep(3 * time.Second) //TODO: remove after create session also uses the relational tables directly
+
+			_, err = stateCase.Inst.Client.SessionV2.DeleteSession(stateCase.InstOwner, &session.DeleteSessionRequest{
 				SessionId:    createResp.GetSessionId(),
 				SessionToken: gu.Ptr("invalid"),
 			})
 			require.Error(t, err)
 
-			_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
+			_, err = stateCase.Inst.Client.SessionV2.DeleteSession(stateCase.InstOwner, &session.DeleteSessionRequest{
 				SessionId:    createResp.GetSessionId(),
 				SessionToken: gu.Ptr(createResp.GetSessionToken()),
 			})
@@ -928,72 +925,62 @@ func TestServer_DeleteSession_token(t *testing.T) {
 }
 
 func TestServer_DeleteSession_own_session(t *testing.T) {
-	//TODO: can only be tested when permission checks are implemented for relational tables
-	// t.Cleanup(func() {
-	//	_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IAMOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
-	//	require.NoError(t, err)
-	// })
-	// relTableState := integration.RelationalTablesEnableMatrix()
-	//
-	// for _, stateCase := range relTableState {
-	//	integration.EnsureInstanceFeature(t, IAMOwnerCTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-	//		assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-	//	})
-	//	t.Run(stateCase.State, func(t *testing.T) {
+	sysAuthZ := integration.WithSystemAuthorization(CTX)
 
-	// create two users for the test and a session each to get tokens for authorization
-	user1 := Instance.CreateHumanUser(CTX)
-	Instance.SetUserPassword(CTX, user1.GetUserId(), integration.UserPassword, false)
-	_, token1, _, _ := Instance.CreatePasswordSession(t, LoginCTX, user1.GetUserId(), integration.UserPassword)
-
-	user2 := Instance.CreateHumanUser(CTX)
-	Instance.SetUserPassword(CTX, user2.GetUserId(), integration.UserPassword, false)
-	_, token2, _, _ := Instance.CreatePasswordSession(t, LoginCTX, user2.GetUserId(), integration.UserPassword)
-
-	// create a new session for the first user
-	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
-		Checks: &session.Checks{
-			User: &session.CheckUser{
-				Search: &session.CheckUser_UserId{
-					UserId: user1.GetUserId(),
-				},
-			},
-		},
-	})
-	require.NoError(t, err)
-
-	// delete the new (user1) session must not be possible with user (has no permission)
-	_, err = Client.DeleteSession(integration.WithAuthorizationToken(context.Background(), token2), &session.DeleteSessionRequest{
-		SessionId: createResp.GetSessionId(),
-	})
-	require.Error(t, err)
-
-	// delete the new (user1) session by themselves
-	_, err = Client.DeleteSession(integration.WithAuthorizationToken(context.Background(), token1), &session.DeleteSessionRequest{
-		SessionId: createResp.GetSessionId(),
-	})
-	require.NoError(t, err)
-	//	})
-	// }
-}
-
-func TestServer_DeleteSession_with_permission(t *testing.T) {
-	t.Cleanup(func() {
-		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IAMOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
-		require.NoError(t, err)
-	})
-	relTableState := integration.RelationalTablesEnableMatrix()
-
+	relTableState := integration.RelationalTablesEnableMatrix(t, IAMOwnerCTX, sysAuthZ)
 	for _, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, IAMOwnerCTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
-		t.Run(stateCase.State, func(t *testing.T) {
-			createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		t.Run(stateCase.Name, func(t *testing.T) {
+			loginCTX := stateCase.Inst.WithAuthorizationToken(t.Context(), integration.UserTypeLogin)
+			// create two users for the test and a session each to get tokens for authorization
+			user1 := stateCase.Inst.CreateUserTypeHuman(stateCase.InstOwner, integration.Email())
+			stateCase.Inst.SetUserPassword(stateCase.InstOwner, user1.GetId(), integration.UserPassword, false)
+			_, token1, _, _ := stateCase.Inst.CreatePasswordSession(t, loginCTX, user1.GetId(), integration.UserPassword)
+
+			user2 := stateCase.Inst.CreateUserTypeHuman(stateCase.InstOwner, integration.Email())
+			stateCase.Inst.SetUserPassword(stateCase.InstOwner, user2.GetId(), integration.UserPassword, false)
+			_, token2, _, _ := stateCase.Inst.CreatePasswordSession(t, loginCTX, user2.GetId(), integration.UserPassword)
+
+			// create a new session for the first user
+			createResp, err := stateCase.Inst.Client.SessionV2.CreateSession(loginCTX, &session.CreateSessionRequest{
 				Checks: &session.Checks{
 					User: &session.CheckUser{
 						Search: &session.CheckUser_UserId{
-							UserId: User.GetUserId(),
+							UserId: user1.GetId(),
+						},
+					},
+				},
+			})
+			require.NoError(t, err)
+
+			// delete the new (user1) session must not be possible with user (has no permission)
+			_, err = stateCase.Inst.Client.SessionV2.DeleteSession(integration.WithAuthorizationToken(t.Context(), token2), &session.DeleteSessionRequest{
+				SessionId: createResp.GetSessionId(),
+			})
+			require.Error(t, err)
+
+			// delete the new (user1) session by themselves
+			_, err = stateCase.Inst.Client.SessionV2.DeleteSession(integration.WithAuthorizationToken(t.Context(), token1), &session.DeleteSessionRequest{
+				SessionId: createResp.GetSessionId(),
+			})
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestServer_DeleteSession_with_permission(t *testing.T) {
+	sysAuthZ := integration.WithSystemAuthorization(CTX)
+
+	relTableState := integration.RelationalTablesEnableMatrix(t, IAMOwnerCTX, sysAuthZ)
+
+	for _, stateCase := range relTableState {
+		t.Run(stateCase.Name, func(t *testing.T) {
+			loginCTX := stateCase.Inst.WithAuthorizationToken(t.Context(), integration.UserTypeLogin)
+			user1 := stateCase.Inst.CreateUserTypeHuman(stateCase.InstOwner, integration.Email())
+			createResp, err := stateCase.Inst.Client.SessionV2.CreateSession(loginCTX, &session.CreateSessionRequest{
+				Checks: &session.Checks{
+					User: &session.CheckUser{
+						Search: &session.CheckUser_UserId{
+							UserId: user1.GetId(),
 						},
 					},
 				},
@@ -1001,9 +988,12 @@ func TestServer_DeleteSession_with_permission(t *testing.T) {
 			require.NoError(t, err)
 
 			// delete the new session by ORG_OWNER
-			_, err = Client.DeleteSession(Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
-				SessionId: createResp.GetSessionId(),
-			})
+			_, err = stateCase.Inst.Client.SessionV2.DeleteSession(
+				stateCase.Inst.WithAuthorizationToken(t.Context(), integration.UserTypeOrgOwner),
+				&session.DeleteSessionRequest{
+					SessionId: createResp.GetSessionId(),
+				},
+			)
 			require.NoError(t, err)
 		})
 	}
@@ -1014,28 +1004,28 @@ func TestServer_DeleteSession_expired(t *testing.T) {
 		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IAMOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
 		require.NoError(t, err)
 	})
-	relTableState := integration.RelationalTablesEnableMatrix()
+	sysAuthZ := integration.WithSystemAuthorization(CTX)
+
+	relTableState := integration.RelationalTablesEnableMatrix(t, IAMOwnerCTX, sysAuthZ)
 
 	for _, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, IAMOwnerCTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
-		t.Run(stateCase.State, func(t *testing.T) {
-			createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		t.Run(stateCase.Name, func(t *testing.T) {
+			loginCTX := stateCase.Inst.WithAuthorizationToken(t.Context(), integration.UserTypeLogin)
+			createResp, err := stateCase.Inst.Client.SessionV2.CreateSession(loginCTX, &session.CreateSessionRequest{
 				Lifetime: durationpb.New(5 * time.Second),
 			})
 			require.NoError(t, err)
 
 			// wait until the token expires
 			time.Sleep(10 * time.Second)
-			_, err = Client.DeleteSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
+			_, err = stateCase.Inst.Client.SessionV2.DeleteSession(stateCase.Inst.WithAuthorizationToken(t.Context(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
 				SessionId:    createResp.GetSessionId(),
 				SessionToken: gu.Ptr(createResp.GetSessionToken()),
 			})
 			require.NoError(t, err)
 
 			// get session should return an error
-			sessionResp, err := Client.GetSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
+			sessionResp, err := stateCase.Inst.Client.SessionV2.GetSession(stateCase.Inst.WithAuthorizationToken(t.Context(), integration.UserTypeOrgOwner),
 				&session.GetSessionRequest{SessionId: createResp.GetSessionId()})
 			require.Error(t, err)
 			require.Nil(t, sessionResp)

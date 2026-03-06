@@ -545,7 +545,7 @@ func (p *sessionRelationalProjection) reduceSessionTerminated(event eventstore.E
 
 		sessionRepo := repository.SessionRepository()
 		condition := sessionRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID)
-		_, err := sessionRepo.Delete(ctx, v3Tx, condition)
+		_, err := sessionRepo.Delete(ctx, v3Tx, condition, nil)
 		return err
 	}), nil
 }
@@ -602,7 +602,7 @@ func (p *sessionRelationalProjection) reduceUserStateNotActive(event eventstore.
 			sessionRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 			sessionRepo.UserIDCondition(event.Aggregate().ID),
 		)
-		_, err := sessionRepo.Delete(ctx, v3Tx, condition)
+		_, err := sessionRepo.Delete(ctx, v3Tx, condition, nil)
 		return err
 	}), nil
 }

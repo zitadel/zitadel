@@ -398,7 +398,8 @@ func mockSessionVerification(err error) func(ctx context.Context, sessionToken, 
 func TestDeleteSessionCommand_Execute(t *testing.T) {
 	t.Parallel()
 
-	ctx := authz.NewMockContext("inst-1", "org-1", gofakeit.UUID())
+	userID := gofakeit.UUID()
+	ctx := authz.NewMockContext("inst-1", "org-1", userID)
 	deleteErr := errors.New("delete error")
 
 	tt := []struct {
@@ -417,9 +418,21 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
 
+				repo.EXPECT().UserIDCondition(userID).MaxTimes(2).Return(
+					database.NewTextCondition(
+						database.NewColumn("zitadel.sessions", "user_id"),
+						database.TextOperationEqual, userID,
+					),
+				)
 				repo.EXPECT().
 					Delete(gomock.Any(), gomock.Any(),
+						//database.And(
 						repo.PrimaryKeyCondition("inst-1", "session-1"),
+						//database.Or(
+						//	repo.UserIDCondition(userID),
+						//),
+						//),
+						gomock.Any(),
 					).
 					Times(1).
 					Return(int64(0), deleteErr)
@@ -437,6 +450,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 				repo.EXPECT().
 					Delete(gomock.Any(), gomock.Any(),
 						repo.PrimaryKeyCondition("inst-1", "session-1"),
+						gomock.Any(),
 					).
 					Times(1).
 					Return(int64(2), nil)
@@ -454,6 +468,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 				repo.EXPECT().
 					Delete(gomock.Any(), gomock.Any(),
 						repo.PrimaryKeyCondition("inst-1", "session-1"),
+						gomock.Any(),
 					).
 					Times(1).
 					Return(int64(0), nil)
@@ -472,6 +487,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 				repo.EXPECT().
 					Delete(gomock.Any(), gomock.Any(),
 						repo.PrimaryKeyCondition("inst-1", "session-1"),
+						gomock.Any(),
 					).
 					Times(1).
 					Return(int64(1), nil)
