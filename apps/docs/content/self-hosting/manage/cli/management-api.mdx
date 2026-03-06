@@ -1,0 +1,137 @@
+---
+title: Management CLI
+sidebar_label: Management CLI
+description: Use the ZITADEL Management CLI to manage users, organizations, projects, and all other resources via the v2 APIs — from the terminal or from AI agent workflows.
+---
+
+# ZITADEL Management CLI
+
+The **Management CLI** (`zitadel-cli`) is a standalone command-line tool for managing ZITADEL resources through the v2 APIs. It is different from the built-in [server CLI](/docs/self-hosting/manage/cli/overview) (`zitadel init`/`setup`/`start`), which manages the ZITADEL process itself.
+
+Use `zitadel-cli` to:
+
+- Create, update, and delete users, organizations, projects, and applications from the terminal
+- Script ZITADEL administration in CI/CD pipelines
+- Enable AI agents to drive ZITADEL workflows with structured JSON input and output
+
+## Installation
+
+Build from source using the Nx target in the ZITADEL monorepo:
+
+```bash
+pnpm nx run @zitadel/cli:build
+```
+
+The binary is placed at `.artifacts/bin/<GOOS>/<GOARCH>/zitadel-cli`.
+
+## Authentication
+
+### Personal Access Token (recommended for CI and agents)
+
+```bash
+export ZITADEL_INSTANCE=https://my-instance.zitadel.cloud
+export ZITADEL_TOKEN=<your-PAT>
+zitadel-cli users list
+```
+
+### Interactive login (PKCE)
+
+```bash
+zitadel-cli login --instance https://my-instance.zitadel.cloud
+zitadel-cli users list
+```
+
+Credentials are saved as a **context** in `~/.config/zitadel/config.toml`.
+
+## Contexts
+
+Contexts let you switch between multiple ZITADEL instances:
+
+```bash
+zitadel-cli context add work --instance https://work.zitadel.cloud
+zitadel-cli context add local --instance http://localhost:8080
+zitadel-cli context use work
+```
+
+Override the active context for one command with `--context`:
+
+```bash
+zitadel-cli --context local users list
+```
+
+## Commands
+
+| Group           | Description                                       |
+| --------------- | ------------------------------------------------- |
+| `actions`       | Execution targets (Actions v2)                    |
+| `apps`          | Applications within projects                      |
+| `authorizations`| User-to-role authorizations                       |
+| `features`      | Instance and organization feature flags           |
+| `groups`        | User groups                                       |
+| `idps`          | Identity providers (social login, SAML, LDAP)     |
+| `instances`     | Instance configuration and management             |
+| `oidc`          | OIDC client settings                              |
+| `orgs`          | Organizations                                     |
+| `projects`      | Projects and project grants                       |
+| `saml`          | SAML service provider metadata                    |
+| `sessions`      | User sessions                                     |
+| `settings`      | Instance and organization settings                |
+| `users`         | Users, passkeys, MFA, PATs, keys, metadata        |
+| `webkeys`       | Web keys for OIDC/SAML signing                    |
+
+Use `zitadel-cli <group> --help` for all subcommands, and `zitadel-cli <group> <command> --help` for flag details.
+
+## AI and agent workflows
+
+`zitadel-cli` includes features designed for AI agent integration.
+
+### Machine-readable introspection
+
+The `describe` command outputs the complete CLI schema as JSON — all command groups, commands, flags, enum values, and JSON request templates:
+
+```bash
+zitadel-cli describe                           # top-level schema
+zitadel-cli describe users                    # all commands in the users group
+zitadel-cli describe users create human       # one command: flags + json_template
+```
+
+The `json_template` field shows the full request shape with placeholder values, exposing every field (including nested ones) without requiring API documentation.
+
+### Providing JSON payloads
+
+For requests with many fields or nested structures, pass the request body as JSON:
+
+**Inline** (recommended for agents — no stdin management needed):
+
+```bash
+zitadel-cli users create human \
+  --request-json '{"username":"alice","human":{"profile":{"givenName":"Alice","familyName":"Doe"},"email":{"email":"alice@example.com"}}}'
+```
+
+**Stdin**:
+
+```bash
+echo '{"username":"alice","human":{"profile":{"givenName":"Alice","familyName":"Doe"}}}' \
+  | zitadel-cli users create human --from-json
+```
+
+### Dry run
+
+`--dry-run` prints the serialized request body without making an API call, letting you inspect what would be sent:
+
+```bash
+zitadel-cli users create human --given-name Alice --family-name Doe \
+  --email alice@example.com --dry-run
+```
+
+### Structured output
+
+Pass `--output json` (or pipe output) to receive machine-readable JSON instead of a table. Errors on stderr are also JSON-formatted with an `error_code` field when stdout is not a TTY.
+
+### Deprecated commands
+
+Methods deprecated in the ZITADEL API are marked `[DEPRECATED]` in the help listing and emit a warning to stderr when called. Use the API documentation to find the recommended replacement.
+
+## Transport
+
+`zitadel-cli` uses the **ConnectRPC** protocol over standard HTTPS — no gRPC toolchain or TLS termination setup required. It works through standard HTTP proxies.
