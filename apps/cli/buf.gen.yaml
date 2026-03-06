@@ -1,0 +1,12 @@
+# CLI-specific buf generation config.
+# Currently the CLI imports generated stubs from the root module (pkg/grpc/)
+# via a replace directive in go.mod. This file is provided for future use
+# if the CLI needs to generate its own stubs independently.
+#
+# Usage: PATH="../../.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH" buf generate ../../proto
+version: v1
+plugins:
+  - plugin: go
+    out: gen
+  - plugin: connect-go
+    out: gen
