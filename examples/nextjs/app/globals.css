@@ -1,0 +1,361 @@
+:root {
+  color-scheme: dark;
+  --color-background: #0f0f11;
+  --color-surface-black-primary: #0f0f11;
+  --color-surface-black-secondary: #252528;
+  --color-surface-black-tertiary: #1a1a1c;
+  --color-border-primary: #252528;
+  --color-border-secondary: #484a57;
+  --color-border-soft-primary: rgba(244, 244, 246, 0.1);
+  --color-border-default: #686883;
+  --color-text-primary: #f4f4f6;
+  --color-text-secondary: #bfbfcf;
+  --color-text-muted: #82829c;
+  --color-text-critical: #f25543;
+  --color-action-primary: #f25543;
+  --color-action-primary-hover: #bd2514;
+  --ztdl-font-body: var(--font-sans), "Arimo", var(--font-inter), Inter, system-ui, sans-serif;
+  --ztdl-font-heading: "APK Futural", "Darker Grotesque", var(--ztdl-font-body);
+  --ztdl-type-h1-size: 3.5rem;
+  --ztdl-type-h1-line-height: 4rem;
+  --ztdl-type-h2-size: 2.5rem;
+  --ztdl-type-h2-line-height: 3rem;
+  --ztdl-type-h3-size: 2rem;
+  --ztdl-type-h3-line-height: 2.5rem;
+  --ztdl-type-h4-size: 1.5rem;
+  --ztdl-type-h4-line-height: 2rem;
+  --ztdl-type-body-size: 1rem;
+  --ztdl-type-body-line-height: 1.5rem;
+  --ztdl-type-small-size: 0.875rem;
+  --ztdl-type-small-line-height: 1.25rem;
+  --ztdl-noise-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' fill='%23413e3e' fill-opacity='0.6' filter='url(%23n)'/%3E%3C/svg%3E");
+  --ztdl-bg: var(--color-background);
+  --ztdl-surface: var(--color-surface-black-secondary);
+  --ztdl-border: var(--color-border-secondary);
+  --ztdl-text: var(--color-text-primary);
+  --ztdl-muted: var(--color-text-secondary);
+  --ztdl-primary: var(--color-action-primary);
+  --ztdl-primary-hover: var(--color-action-primary-hover);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--ztdl-bg);
+  color: var(--ztdl-text);
+  font-family: var(--ztdl-font-body);
+  font-size: var(--ztdl-type-body-size);
+  line-height: var(--ztdl-type-body-line-height);
+  min-height: 100vh;
+}
+
+p,
+a,
+button,
+input,
+textarea,
+label {
+  font-family: var(--ztdl-font-body);
+  font-size: var(--ztdl-type-body-size);
+  line-height: var(--ztdl-type-body-line-height);
+}
+
+a {
+  color: var(--ztdl-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--ztdl-primary-hover);
+  text-decoration: underline;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--ztdl-primary);
+  outline-offset: 2px;
+}
+
+.ztdl-noise {
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+}
+
+.ztdl-noise::before {
+  background-image: var(--ztdl-noise-pattern);
+  background-repeat: repeat;
+  background-size: 140px 140px;
+  content: "";
+  inset: 0;
+  mix-blend-mode: overlay;
+  opacity: 0.08;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.ztdl-noise > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ztdl-page {
+  margin: 0 auto;
+  max-width: 72rem;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.ztdl-eyebrow {
+  color: var(--ztdl-primary);
+  font-size: var(--ztdl-type-small-size);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: var(--ztdl-type-small-line-height);
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.ztdl-title {
+  font-family: var(--ztdl-font-heading);
+  font-size: clamp(2.25rem, 4vw + 1rem, var(--ztdl-type-h1-size));
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: var(--ztdl-type-h1-line-height);
+  margin: 0;
+}
+
+.ztdl-subtitle {
+  color: var(--ztdl-muted);
+  margin: 0.75rem 0 0;
+  max-width: 56rem;
+}
+
+.ztdl-nav {
+  margin: 1rem 0 1.5rem;
+}
+
+.ztdl-nav-list,
+.ztdl-card-grid {
+  display: grid;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ztdl-nav-list {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.ztdl-nav-link,
+.ztdl-card,
+.ztdl-lane {
+  background:
+    linear-gradient(
+      165deg,
+      rgba(72, 74, 87, 0.2) 0%,
+      rgba(37, 37, 40, 0.96) 45%,
+      rgba(26, 26, 28, 0.96) 100%
+    );
+  border: 1px solid var(--color-border-soft-primary);
+  box-shadow: inset 0 1px 0 rgba(244, 244, 246, 0.04);
+}
+
+.ztdl-nav-link {
+  border-radius: 0.65rem;
+  color: var(--ztdl-text);
+  display: block;
+  font-weight: 600;
+  padding: 0.65rem 0.75rem;
+}
+
+.ztdl-nav-link:hover,
+.ztdl-nav-link:focus-visible {
+  border-color: var(--ztdl-primary);
+  color: var(--ztdl-primary);
+  text-decoration: none;
+}
+
+.ztdl-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  margin-top: 1.5rem;
+}
+
+.ztdl-card {
+  border-radius: 0.85rem;
+  height: 100%;
+  padding: 1rem;
+}
+
+.ztdl-card h3,
+.ztdl-lane h3 {
+  font-family: var(--ztdl-font-heading);
+  font-size: var(--ztdl-type-h3-size);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: var(--ztdl-type-h3-line-height);
+  margin: 0;
+}
+
+.ztdl-card p {
+  color: var(--ztdl-muted);
+  margin: 0.5rem 0 0;
+}
+
+.ztdl-lane {
+  border-radius: 0.85rem;
+  margin-top: 1rem;
+  padding: 1.25rem;
+}
+
+.ztdl-lane h2 {
+  font-family: var(--ztdl-font-heading);
+  font-size: var(--ztdl-type-h2-size);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: var(--ztdl-type-h2-line-height);
+  margin-top: 0;
+}
+
+.ztdl-lane h3,
+.ztdl-lane h4 {
+  margin-bottom: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.ztdl-lane h4 {
+  font-family: var(--ztdl-font-heading);
+  font-size: var(--ztdl-type-h4-size);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: var(--ztdl-type-h4-line-height);
+}
+
+.ztdl-lane p {
+  margin: 0.6rem 0;
+}
+
+.ztdl-lane ul,
+.ztdl-lane ol {
+  margin: 0.7rem 0;
+  padding-left: 1.4rem;
+}
+
+.ztdl-lane li {
+  margin: 0.35rem 0;
+}
+
+.ztdl-lane form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.ztdl-lane form p {
+  margin: 0;
+}
+
+.ztdl-lane label {
+  color: var(--ztdl-muted);
+  display: grid;
+  font-size: var(--ztdl-type-small-size);
+  font-weight: 500;
+  gap: 0.35rem;
+  line-height: var(--ztdl-type-small-line-height);
+}
+
+.ztdl-lane input {
+  background: var(--color-surface-black-primary);
+  border: 1px solid var(--ztdl-border);
+  border-radius: 0.6rem;
+  color: var(--ztdl-text);
+  font: inherit;
+  outline: none;
+  padding: 0.6rem 0.7rem;
+}
+
+.ztdl-lane input:hover {
+  border-color: var(--color-border-default);
+}
+
+.ztdl-lane input:focus {
+  border-color: var(--ztdl-primary);
+  box-shadow: 0 0 0 1px var(--ztdl-primary);
+}
+
+.ztdl-lane button {
+  align-items: center;
+  background: var(--ztdl-primary);
+  border: 1px solid var(--ztdl-primary);
+  border-radius: 0.6rem;
+  color: var(--ztdl-text);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 600;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0.55rem 0.9rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  width: fit-content;
+}
+
+.ztdl-lane button:hover {
+  background: var(--ztdl-primary-hover);
+  border-color: var(--ztdl-primary-hover);
+}
+
+.ztdl-lane button:focus-visible {
+  outline: 2px solid var(--ztdl-primary);
+  outline-offset: 2px;
+}
+
+.ztdl-lane button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.ztdl-lane pre {
+  background: var(--color-surface-black-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 0.65rem;
+  font-size: var(--ztdl-type-small-size);
+  line-height: var(--ztdl-type-small-line-height);
+  margin: 0.55rem 0 0.85rem;
+  overflow-x: auto;
+  padding: 0.8rem 0.9rem;
+}
+
+.ztdl-lane code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
+
+.ztdl-status-error {
+  color: var(--color-text-critical);
+  font-weight: 600;
+}
+
+@media (max-width: 48rem) {
+  .ztdl-title {
+    line-height: 1.15;
+  }
+
+  .ztdl-lane h2 {
+    font-size: clamp(2rem, 3vw + 1rem, var(--ztdl-type-h2-size));
+    line-height: 1.15;
+  }
+
+  .ztdl-lane h3 {
+    font-size: clamp(1.5rem, 2vw + 1rem, var(--ztdl-type-h3-size));
+    line-height: 1.2;
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "namedInputs": { "sources": ["{projectRoot}/src/**/*"] },
+  "targets": {
+    "generate": {
+      "description": "Generates Protobuf artifacts via Buf using local protoc-gen-es",
+      "command": "pnpm --filter @zitadel/zitadel-js generate",
+      "inputs": [
+        "{projectRoot}/buf.gen.yaml",
+        "{projectRoot}/package.json",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "{workspaceRoot}/proto/**/*"
+      ],
+      "outputs": ["{projectRoot}/src/generated"]
+    },
+    "build": {
+      "description": "Builds @zitadel/zitadel-js",
+      "inputs": ["default", "{workspaceRoot}/pnpm-lock.yaml"],
+      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": ["generate"]
+    },
+    "test-unit": {
+      "dependsOn": ["generate"]
+    },
+    "test": { "dependsOn": ["test-unit"] }
+  }
+}

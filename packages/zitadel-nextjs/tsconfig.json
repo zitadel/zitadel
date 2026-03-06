@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "inlineSources": false,
+    "isolatedModules": true,
+    "moduleResolution": "bundler",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "preserveWatchOutput": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "module": "esnext",
+    "target": "es2022",
+    "jsx": "react-jsx",
+    "types": ["node", "react"]
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["dist", "build", "node_modules"]
+}

@@ -1,0 +1,51 @@
+{
+  "name": "@zitadel/zitadel-js",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "ZITADEL JavaScript SDK — isomorphic core",
+  "publishConfig": { "access": "public" },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist/**"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js", "require": "./dist/index.cjs" },
+    "./auth/oidc": { "types": "./dist/auth/oidc.d.ts", "import": "./dist/auth/oidc.js", "require": "./dist/auth/oidc.cjs" },
+    "./auth/session": { "types": "./dist/auth/session.d.ts", "import": "./dist/auth/session.js", "require": "./dist/auth/session.cjs" },
+    "./auth/bearer-token": { "types": "./dist/auth/bearer-token.d.ts", "import": "./dist/auth/bearer-token.js", "require": "./dist/auth/bearer-token.cjs" },
+    "./api/v1": { "types": "./dist/api/v1.d.ts", "import": "./dist/api/v1.js", "require": "./dist/api/v1.cjs" },
+    "./api/v2": { "types": "./dist/api/v2.d.ts", "import": "./dist/api/v2.js", "require": "./dist/api/v2.cjs" },
+    "./actions/webhook": { "types": "./dist/actions/webhook.d.ts", "import": "./dist/actions/webhook.js", "require": "./dist/actions/webhook.cjs" },
+    "./node": { "types": "./dist/token.d.ts", "import": "./dist/token.js", "require": "./dist/token.cjs" }
+  },
+  "scripts": {
+    "generate": "buf generate ../../proto",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint-check-eslint": "eslint 'src/**/*.ts*'",
+    "lint-check-knip": "knip",
+    "test-unit": "vitest --run",
+    "clean": "rm -rf node_modules dist src/generated"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.11.0",
+    "@connectrpc/connect": "^2.1.1",
+    "@connectrpc/connect-node": "^2.1.1",
+    "@connectrpc/connect-web": "^2.1.1",
+    "jose": "^5.10.0",
+    "oauth4webapi": "^3.5.0"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.34.0",
+    "@bufbuild/protoc-gen-es": "^2.11.0",
+    "@types/node": "^24.10.9",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
+    "eslint": "^8.57.1",
+    "knip": "^5.82.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
+  }
+}
