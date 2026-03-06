@@ -20,9 +20,22 @@ type Inputs = {
 type Props = {
   idpId: string;
   link: boolean;
+  requestId?: string;
+  organization?: string;
+  postErrorRedirectUrl?: string;
+  linkToSessionId?: string;
+  linkFingerprint?: string;
 };
 
-export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
+export function LDAPUsernamePasswordForm({
+  idpId,
+  link,
+  requestId,
+  organization,
+  postErrorRedirectUrl,
+  linkToSessionId,
+  linkFingerprint,
+}: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onChange",
   });
@@ -44,6 +57,11 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
       username: values.loginName,
       password: values.password,
       link: link,
+      requestId,
+      organization,
+      postErrorRedirectUrl,
+      linkToSessionId,
+      linkFingerprint,
     })
       .catch(() => {
         setError("Could not start LDAP flow");

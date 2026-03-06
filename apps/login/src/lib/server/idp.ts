@@ -216,6 +216,11 @@ type createNewSessionForLDAPCommand = {
   password: string;
   idpId: string;
   link: boolean;
+  requestId?: string;
+  organization?: string;
+  postErrorRedirectUrl?: string;
+  linkToSessionId?: string;
+  linkFingerprint?: string;
 };
 
 export async function createNewSessionForLDAP(command: createNewSessionForLDAPCommand) {
@@ -249,8 +254,13 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
   if (command.link) {
     params.set("link", "true");
   }
+  if (command.requestId) params.set("requestId", command.requestId);
+  if (command.organization) params.set("organization", command.organization);
+  if (command.postErrorRedirectUrl) params.set("postErrorRedirectUrl", command.postErrorRedirectUrl);
+  if (command.linkToSessionId) params.set("linkToSessionId", command.linkToSessionId);
+  if (command.linkFingerprint) params.set("linkFingerprint", command.linkFingerprint);
 
   return {
-    redirect: `/idp/ldap/success?` + params.toString(),
+    redirect: `/idp/ldap/process?` + params.toString(),
   };
 }
