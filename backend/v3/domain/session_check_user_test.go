@@ -31,6 +31,8 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 		testName          string
 		userRepo          func(ctrl *gomock.Controller) domain.UserRepository
 		permissionChecker func(ctrl *gomock.Controller) domain.PermissionRepository
+		sessionID         string
+		instanceID        string
 		checkUser         *session_grpc.CheckUser
 		expectedError     error
 	}{
@@ -38,6 +40,25 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 			testName:      "when CheckUser is nil should return no error",
 			checkUser:     nil,
 			expectedError: nil,
+		},
+		{
+			testName: "when session ID is not set should return error",
+			checkUser: &session_grpc.CheckUser{
+				Search: &session_grpc.CheckUser_UserId{
+					UserId: "user-123",
+				},
+			},
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-00o0ys", "Errors.Missing.SessionID"),
+		},
+		{
+			testName: "when instance ID is not set should return error",
+			checkUser: &session_grpc.CheckUser{
+				Search: &session_grpc.CheckUser_UserId{
+					UserId: "user-123",
+				},
+			},
+			sessionID:     "session-1",
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-Oe1dtz", "Errors.Missing.InstanceID"),
 		},
 		{
 			testName: "when permission check fails should return permission denied error",
@@ -56,6 +77,8 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 
 				return repo
 			},
+			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-4qz3mt", "Errors.PermissionDenied"),
 		},
 		{
@@ -91,6 +114,8 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
+			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			expectedError: nil,
 		},
 		{
@@ -126,6 +151,8 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
+			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-vgDIu9", "Errors.User.NotActive"),
 		},
 		{
@@ -157,6 +184,8 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					Return(nil, getErr)
 				return repo
 			},
+			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			expectedError: zerrors.ThrowInternal(getErr, "DOM-Y846I0", "failed fetching user"),
 		},
 		{
@@ -188,6 +217,8 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					Return(nil, notFoundErr)
 				return repo
 			},
+			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-lcZeXI", "user not found"),
 		},
 		{
@@ -224,6 +255,8 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
+			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			expectedError: nil,
 		},
 		{
@@ -241,6 +274,8 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 			checkUser: &session_grpc.CheckUser{
 				Search: nil,
 			},
+			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			expectedError: zerrors.ThrowInvalidArgumentf(nil, "DOM-7B2m0b", "user search %T not implemented", nil),
 		},
 	}
@@ -249,12 +284,12 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			ctx := authz.NewMockContext("instance-1", "", "")
+			ctx := authz.NewMockContext(tc.instanceID, "", "")
 			ctrl := gomock.NewController(t)
 			cmd := &domain.UserCheckCommand{
 				CheckUser:  tc.checkUser,
-				SessionID:  "session-1",
-				InstanceID: "instance-1",
+				SessionID:  tc.sessionID,
+				InstanceID: tc.instanceID,
 			}
 
 			opts := &domain.InvokeOpts{

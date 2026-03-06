@@ -120,6 +120,13 @@ func (u *UserCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 		return nil
 	}
 
+	if u.SessionID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-00o0ys", "Errors.Missing.SessionID")
+	}
+	if u.InstanceID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-Oe1dtz", "Errors.Missing.InstanceID")
+	}
+
 	if authZErr := opts.Permissions.CheckSessionPermission(ctx, SessionWritePermission, u.SessionID); authZErr != nil {
 		return zerrors.ThrowPermissionDenied(authZErr, "DOM-4qz3mt", "Errors.PermissionDenied")
 	}
