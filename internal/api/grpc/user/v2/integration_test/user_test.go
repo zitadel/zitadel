@@ -3814,6 +3814,7 @@ func getMetadataMap(metadata []*metadata.Metadata) map[string][]byte {
 }
 
 func assertMetadataEquals(t *testing.T, expected []*metadata.Metadata, actual []*metadata.Metadata) {
+	assert.Equal(t, len(expected), len(actual))
 	assert.Equal(t, getMetadataMap(expected), getMetadataMap(actual))
 }
 

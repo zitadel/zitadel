@@ -146,6 +146,28 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			},
 		},
 		{
+			name: "delete non-existent user metadata key is noop",
+			ctx:  Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner),
+			dep: func(req *user.SetUserMetadataRequest) {
+				req.UserId = Instance.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
+				Instance.SetUserMetadata(iamOwnerCTX, req.UserId, "key1", "value1")
+			},
+			req: &user.SetUserMetadataRequest{
+				Metadata: []*user.Metadata{
+					{Key: "key2", Value: nil}, // delete non-existent key; should be a no-op
+				},
+			},
+			assert: func(t *testing.T, setResponse *user.SetUserMetadataResponse, testStartTime time.Time, getResponse *user.ListUserMetadataResponse) {
+				// assert that the set date is not updated, i.e., it is before testStartTime, because no change to the metadata should be made
+				assert.True(t, setResponse.GetSetDate().AsTime().Before(testStartTime))
+
+				expectedMetadata := []*metadata.Metadata{
+					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+				}
+				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
+			},
+		},
+		{
 			name: "update and delete user metadata",
 			ctx:  Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner),
 			dep: func(req *user.SetUserMetadataRequest) {
