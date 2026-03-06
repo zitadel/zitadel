@@ -10,6 +10,7 @@ import (
 	"text/template"
 	"unicode"
 
+	annotations "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -54,14 +55,23 @@ type methodData struct {
 	Use string
 	// Short is the short description.
 	Short string
+	// Long is the long description, populated from proto RPC comments.
+	Long string
+	// Example is a ready-to-run example invocation.
+	Example string
 	// RequestType is the Go type name for the request (e.g. "AddOrganizationRequest").
 	RequestType string
 	// ResponseType is the Go type name for the response.
 	ResponseType string
 	// FullMethodName is the fully-qualified gRPC method name (e.g. "zitadel.user.v2.UserService/GetUserByID").
 	FullMethodName string
-	// Flags is the list of flags derived from request fields.
+	// Flags is the list of flags derived from top-level request fields (no oneof groups).
 	Flags []flagDef
+	// OneofGroups holds the per-variant subcommand data for each oneof field in the request.
+	OneofGroups []inlinedOneofGroup
+	// HasOneofSubcmds is true when this method uses the subcommand pattern (len(OneofGroups)==1).
+	// When true, the parent command has no RunE except for --from-json.
+	HasOneofSubcmds bool
 	// IDArg is non-empty if the method takes a positional ID argument (the proto field name).
 	IDArg string
 	// IDArgGoName is the Go getter name for the ID field.
@@ -76,7 +86,76 @@ type methodData struct {
 	ListFieldGoName string
 }
 
-// flagDef describes a CLI flag derived from a proto field.
+// inlinedOneofGroup represents a proto oneof field whose variants have been expanded into
+// individual, variant-prefixed flags instead of a compound selector+JSON-blob pair.
+type inlinedOneofGroup struct {
+	// GoName is the Go field name for the oneof on the request (e.g. "UserType").
+	GoName string
+	// KebabName is the kebab-case version (e.g. "user-type").
+	KebabName string
+	// Variants is the list of oneof message variants.
+	Variants []inlinedVariant
+}
+
+// inlinedVariant represents one alternative within an inlinedOneofGroup.
+type inlinedVariant struct {
+	// VariantName is the proto field name, used as the subcommand name (e.g. "human", "machine").
+	VariantName string
+	// VarPrefix is the Go-style capitalized prefix for variable names (e.g. "Human", "Machine").
+	VarPrefix string
+	// GoMsgType is the Go type of the variant message (e.g. "CreateUserRequest_Human").
+	GoMsgType string
+	// GoWrapperType is the Go oneof wrapper type (e.g. "CreateUserRequest_Human_").
+	GoWrapperType string
+	// GoFieldName is the field on the wrapper struct (e.g. "Human").
+	GoFieldName string
+	// Flags are the unprefixed flags for this variant subcommand.
+	Flags []variantFlagDef
+	// IsScalarBoolVariant is true when the oneof field is a plain bool (not a message).
+	// The subcommand takes no flags; invoking it sets the bool field to true.
+	IsScalarBoolVariant bool
+	// ScalarGoFieldName is the Go field name set to true on the request for scalar bool variants.
+	ScalarGoFieldName string
+}
+
+// variantFlagDef describes one flag on a variant subcommand.
+// Flag names are unprefixed (e.g. "given-name", not "human-given-name") because
+// the subcommand itself provides the type context.
+type variantFlagDef struct {
+	// FlagKebabName is the flag name without variant prefix (e.g. "given-name").
+	FlagKebabName string
+	// GoVarSuffix is the Go variable suffix within the variant's scope (e.g. "GivenName").
+	GoVarSuffix string
+	// ChildGoField is the Go field name to set on the message (e.g. "GivenName").
+	ChildGoField string
+	// ParentGoField is non-empty for depth-1 fields; the intermediate Go field name (e.g. "Profile").
+	ParentGoField string
+	// ParentGoType is the Go type for lazy-init of the parent message (e.g. "HumanProfile").
+	ParentGoType string
+	// Help is the flag description.
+	Help string
+	// FlagType is the Go type (e.g. "string", "bool", "int32").
+	FlagType string
+	// FlagFunc is the cobra flag function (e.g. "StringVar").
+	FlagFunc string
+	// DefaultValue is the zero value as a Go literal (e.g. `""`, "false", "0").
+	DefaultValue string
+	// IsOptionalScalar is true for proto3 optional scalars (need pointer assignment).
+	IsOptionalScalar bool
+	// NeedChanged is true when we must use cmd.Flags().Changed() to detect explicit setting
+	// (required for optional bool fields where false == default).
+	NeedChanged bool
+	// IsEnum is true for proto enum fields.
+	IsEnum bool
+	// EnumGoType is the Go enum type name (e.g. "Gender").
+	EnumGoType string
+	// EnumValues is the list of valid enum value names.
+	EnumValues []string
+	// Required is true when the field has (google.api.field_behavior) = REQUIRED.
+	Required bool
+}
+
+// flagDef describes a CLI flag derived from a top-level (non-oneof) proto field.
 type flagDef struct {
 	// Name is the kebab-case flag name (e.g. "organization-id").
 	Name string
@@ -104,25 +183,6 @@ type flagDef struct {
 	EnumGoType string
 	// EnumValues lists the valid enum value names.
 	EnumValues []string
-	// IsOneofSelector is true when this flag selects a oneof variant by name.
-	// Two flags are generated: --<Name> (enum) and --<Name>-data (optional JSON for the variant's fields).
-	IsOneofSelector bool
-	// GoOneofName is the Go field name for the oneof interface on the request (e.g. "UserType").
-	GoOneofName string
-	// OneofVariants lists all message variants in the oneof group.
-	OneofVariants []oneofVariant
-}
-
-// oneofVariant describes one message variant within a proto oneof.
-type oneofVariant struct {
-	// VariantName is the proto field name used as the flag value (e.g. "human", "machine").
-	VariantName string
-	// GoMsgType is the Go message type (e.g. "CreateUserRequest_Human").
-	GoMsgType string
-	// GoWrapperType is the Go oneof wrapper type (e.g. "CreateUserRequest_Human_").
-	GoWrapperType string
-	// GoFieldName is the field name on the wrapper struct (e.g. "Human").
-	GoFieldName string
 }
 
 // columnDef describes a table column for rendering responses.
@@ -241,6 +301,7 @@ func buildServiceData(service *protogen.Service, file *protogen.File, cfg servic
 		if md == nil {
 			continue
 		}
+		md.Example = buildExample(cfg.resourceName, md)
 		sd.Methods = append(sd.Methods, *md)
 	}
 
@@ -280,14 +341,49 @@ func buildMethodData(method *protogen.Method, service *protogen.Service) *method
 		FullMethodName: string(service.Desc.ParentFile().Package()) + "." + string(service.Desc.Name()) + "/" + rpcName,
 	}
 
-	// Extract flags from request message fields.
+	// Populate Long from proto RPC comments.
+	if comment := extractComment(method.Comments); comment != "" {
+		md.Long = comment
+	}
+
+	// Extract flags from top-level (non-oneof) request fields.
 	md.Flags = extractFlags(method.Input)
+
+	// Extract inlined oneof groups.
+	md.OneofGroups = extractOneofGroups(method.Input)
+	md.HasOneofSubcmds = len(md.OneofGroups) == 1
+	if len(md.OneofGroups) > 0 {
+		var sb strings.Builder
+		if md.Long != "" {
+			sb.WriteString(md.Long)
+		}
+		for _, g := range md.OneofGroups {
+			variantNames := make([]string, len(g.Variants))
+			for i, v := range g.Variants {
+				variantNames[i] = v.VariantName
+			}
+			sb.WriteString("\n\nChoose a sub-command: " + strings.Join(variantNames, ", ") + ".")
+		}
+		sb.WriteString("\nFor complex requests, pipe JSON body via: --from-json < request.json")
+		md.Long = strings.TrimSpace(sb.String())
+	}
 
 	// Determine if there's a positional ID argument.
 	md.IDArg, md.IDArgGoName, md.IDArgIsOptional = findIDField(method.Input, verb, suffix)
-	if md.IDArg != "" {
+	if md.IDArg != "" && !md.HasOneofSubcmds {
+		// No oneofs: ID is positional on the leaf command itself.
 		md.Use = cliUse + " <" + md.IDArg + ">"
 		// Remove the ID field from flags since it's positional.
+		filtered := md.Flags[:0]
+		for _, f := range md.Flags {
+			if f.Name != toKebab(md.IDArg) {
+				filtered = append(filtered, f)
+			}
+		}
+		md.Flags = filtered
+	} else if md.IDArg != "" {
+		// Has oneofs: ID moves to each variant subcommand's Use.
+		md.Use = cliUse
 		filtered := md.Flags[:0]
 		for _, f := range md.Flags {
 			if f.Name != toKebab(md.IDArg) {
@@ -305,21 +401,78 @@ func buildMethodData(method *protogen.Method, service *protogen.Service) *method
 	return md
 }
 
-func extractFlags(msg *protogen.Message) []flagDef {
-	var flags []flagDef
-	processedOneofs := map[string]bool{}
-	for _, field := range msg.Fields {
-		// Non-optional oneof groups: emit one selector flagDef for the whole group.
-		if field.Oneof != nil && !field.Desc.HasOptionalKeyword() {
-			key := field.Oneof.GoName
-			if processedOneofs[key] {
+// buildExample constructs a representative example invocation string for a command.
+func buildExample(resourceName string, md *methodData) string {
+	baseCmd := "  " + resourceName + " " + md.Verb
+	if md.IDArg != "" {
+		baseCmd += " <" + md.IDArg + ">"
+	}
+
+	var lines []string
+
+	if len(md.OneofGroups) > 0 {
+		for _, g := range md.OneofGroups {
+			for _, v := range g.Variants {
+				baseVariantCmd := "  " + resourceName + " " + md.Verb + " " + v.VariantName
+				if md.IDArg != "" {
+					baseVariantCmd += " <" + md.IDArg + ">"
+				}
+				if v.IsScalarBoolVariant {
+					lines = append(lines, baseVariantCmd)
+					continue
+				}
+				line := baseVariantCmd
+				count := 0
+				for _, f := range v.Flags {
+					if count >= 3 {
+						break
+					}
+					if f.FlagType == "bool" {
+						// Skip bools in examples — they look confusing as defaults
+						continue
+					}
+					if f.IsEnum && len(f.EnumValues) > 0 {
+						line += " --" + f.FlagKebabName + " " + f.EnumValues[0]
+					} else {
+						line += " --" + f.FlagKebabName + " <" + f.FlagKebabName + ">"
+					}
+					count++
+				}
+				lines = append(lines, line)
+			}
+		}
+		lines = append(lines, "  "+resourceName+" "+md.Verb+" --from-json < request.json")
+	} else if len(md.Flags) > 0 {
+		line := baseCmd
+		count := 0
+		for _, f := range md.Flags {
+			if count >= 3 {
+				break
+			}
+			if f.FlagType == "bool" || f.FlagType == "[]string" {
 				continue
 			}
-			processedOneofs[key] = true
-			fd := buildOneofSelectorFlag(field.Oneof, msg)
-			if fd != nil {
-				flags = append(flags, *fd)
+			if f.IsEnum && len(f.EnumValues) > 0 {
+				line += " --" + f.Name + " " + f.EnumValues[0]
+			} else {
+				line += " --" + f.Name + " <" + f.Name + ">"
 			}
+			count++
+		}
+		if count > 0 {
+			lines = append(lines, line)
+		}
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+// extractFlags returns flags for top-level, non-oneof request fields.
+func extractFlags(msg *protogen.Message) []flagDef {
+	var flags []flagDef
+	for _, field := range msg.Fields {
+		// Non-optional oneof fields are handled by extractOneofGroups instead.
+		if field.Oneof != nil && !field.Desc.HasOptionalKeyword() {
 			continue
 		}
 		fd := fieldToFlag(field, "")
@@ -328,52 +481,233 @@ func extractFlags(msg *protogen.Message) []flagDef {
 		}
 		flags = append(flags, *fd)
 	}
-
 	return flags
 }
 
-// buildOneofSelectorFlag generates a single IsOneofSelector flagDef for all message
-// variants in a oneof group. The caller is responsible for deduplication.
-func buildOneofSelectorFlag(oneof *protogen.Oneof, msg *protogen.Message) *flagDef {
-	var variants []oneofVariant
-	for _, field := range oneof.Fields {
-		if field.Desc.Kind() != protoreflect.MessageKind {
-			continue // skip rare scalar oneof alternatives
+// extractOneofGroups finds all non-optional oneof fields in msg and returns their inlined flag groups.
+func extractOneofGroups(msg *protogen.Message) []inlinedOneofGroup {
+	var groups []inlinedOneofGroup
+	processed := map[string]bool{}
+	for _, field := range msg.Fields {
+		if field.Oneof == nil || field.Desc.HasOptionalKeyword() {
+			continue
 		}
+		key := field.Oneof.GoName
+		if processed[key] {
+			continue
+		}
+		processed[key] = true
+		g := buildOneofInlinedGroup(field.Oneof, msg)
+		if g != nil {
+			groups = append(groups, *g)
+		}
+	}
+	return groups
+}
+
+// buildOneofInlinedGroup expands a proto oneof into per-variant, prefixed flags.
+// Depth-0 scalar/enum fields on the variant message → --<variant>-<field>.
+// Depth-0 message fields → expand their scalar/enum children → --<variant>-<child>
+// (or --<variant>-<parent>-<child> if the leaf name would collide).
+func buildOneofInlinedGroup(oneof *protogen.Oneof, msg *protogen.Message) *inlinedOneofGroup {
+	g := &inlinedOneofGroup{
+		GoName:    oneof.GoName,
+		KebabName: toKebab(string(oneof.Desc.Name())),
+	}
+
+	for _, field := range oneof.Fields {
+		if field.Desc.Kind() == protoreflect.BoolKind {
+			// Scalar bool oneof field → zero-flag "presence" subcommand.
+			// Invoking "is-verified <id>" sets the bool to true with no flags needed.
+			// The Go oneof wrapper struct is e.g. SetEmailRequest_IsVerified{IsVerified: true}.
+			parentGoName := string(msg.GoIdent.GoName)
+			wrapperType := parentGoName + "_" + field.GoName
+			variantName := toKebab(string(field.Desc.Name()))
+			v := inlinedVariant{
+				VariantName:         variantName,
+				VarPrefix:           field.GoName,
+				GoWrapperType:       wrapperType,
+				GoFieldName:         oneof.GoName,
+				IsScalarBoolVariant: true,
+				ScalarGoFieldName:   field.GoName,
+			}
+			g.Variants = append(g.Variants, v)
+			continue
+		}
+		if field.Desc.Kind() != protoreflect.MessageKind {
+			continue // skip other scalar oneofs (string, int, etc.)
+		}
+
 		parentGoName := string(msg.GoIdent.GoName)
 		wrapperType := parentGoName + "_" + field.GoName
-		// Go protoc adds a trailing _ when wrapper base name equals the message type name.
 		if field.Message.GoIdent.GoName == wrapperType {
 			wrapperType += "_"
 		}
-		variants = append(variants, oneofVariant{
-			VariantName:   string(field.Desc.Name()),
+
+		variantName := toKebab(string(field.Desc.Name()))
+		varPrefix := field.GoName // e.g. "Human", "Machine"
+
+		v := inlinedVariant{
+			VariantName:   variantName,
+			VarPrefix:     varPrefix,
 			GoMsgType:     field.Message.GoIdent.GoName,
 			GoWrapperType: wrapperType,
 			GoFieldName:   field.GoName,
-		})
+		}
+
+		// Track used leaf names to detect collisions.
+		leafNames := map[string]bool{}
+
+		for _, varField := range field.Message.Fields {
+			if isFieldDeprecated(varField) {
+				continue
+			}
+			if varField.Desc.IsMap() || varField.Desc.IsList() {
+				continue
+			}
+			// Skip non-optional oneof fields within the variant (too complex).
+			if varField.Oneof != nil && !varField.Desc.HasOptionalKeyword() {
+				continue
+			}
+
+			switch varField.Desc.Kind() {
+			case protoreflect.MessageKind:
+				// Depth-1: expand scalar/enum children of this sub-message.
+				subMsg := varField.Message
+				parentFieldGoName := varField.GoName  // e.g. "Profile"
+				parentGoType := subMsg.GoIdent.GoName // e.g. "HumanProfile"
+
+				for _, subField := range subMsg.Fields {
+					if isFieldDeprecated(subField) {
+						continue
+					}
+					if subField.Desc.IsMap() || subField.Desc.IsList() {
+						continue
+					}
+					if subField.Oneof != nil && !subField.Desc.HasOptionalKeyword() {
+						continue
+					}
+					if subField.Desc.Kind() == protoreflect.MessageKind {
+						continue // stop at depth-1
+					}
+
+					leafKebab := toKebab(string(subField.Desc.Name()))
+					flagName := leafKebab
+					goVarSuffix := subField.GoName
+
+					if leafNames[leafKebab] {
+						// Collision: qualify with parent field name.
+						parentKebab := toKebab(string(varField.Desc.Name()))
+						flagName = parentKebab + "-" + leafKebab
+						goVarSuffix = varField.GoName + subField.GoName
+						leafNames[leafKebab] = true
+					}
+
+					fd := buildVariantFlag(subField, flagName, goVarSuffix, variantName, parentFieldGoName, parentGoType)
+					if fd != nil {
+						v.Flags = append(v.Flags, *fd)
+					}
+				}
+
+			default:
+				// Depth-0 scalar/enum field directly on the variant message.
+				leafKebab := toKebab(string(varField.Desc.Name()))
+				flagName := leafKebab
+				goVarSuffix := varField.GoName
+
+				if leafNames[leafKebab] {
+					continue // collision at depth 0 (rare but skip)
+				}
+				leafNames[leafKebab] = true
+
+				fd := buildVariantFlag(varField, flagName, goVarSuffix, variantName, "", "")
+				if fd != nil {
+					v.Flags = append(v.Flags, *fd)
+				}
+			}
+		}
+
+		g.Variants = append(g.Variants, v)
 	}
-	if len(variants) == 0 {
+
+	if len(g.Variants) == 0 {
+		return nil
+	}
+	return g
+}
+
+// buildVariantFlag builds a variantFlagDef for a field inside an oneof variant.
+// variantName is passed for context but no longer prefixes the help text (the
+// subcommand name already conveys the variant context).
+// parentGoField/parentGoType are non-empty for depth-1 fields.
+func buildVariantFlag(field *protogen.Field, flagName, goVarSuffix, variantName, parentGoField, parentGoType string) *variantFlagDef {
+	desc := field.Desc
+	help := extractComment(field.Comments)
+	if help == "" {
+		help = strings.ReplaceAll(toKebab(string(desc.Name())), "-", " ")
+	}
+
+	isOpt := desc.HasOptionalKeyword()
+	fd := &variantFlagDef{
+		FlagKebabName:    flagName,
+		GoVarSuffix:      goVarSuffix,
+		ChildGoField:     field.GoName,
+		ParentGoField:    parentGoField,
+		ParentGoType:     parentGoType,
+		Help:             help,
+		IsOptionalScalar: isOpt,
+		Required:         isRequired(field),
+	}
+
+	switch desc.Kind() {
+	case protoreflect.StringKind:
+		fd.FlagType = "string"
+		fd.FlagFunc = "StringVar"
+		fd.DefaultValue = `""`
+	case protoreflect.BoolKind:
+		fd.FlagType = "bool"
+		fd.FlagFunc = "BoolVar"
+		fd.DefaultValue = "false"
+		fd.NeedChanged = isOpt
+	case protoreflect.Int32Kind, protoreflect.Sint32Kind:
+		fd.FlagType = "int32"
+		fd.FlagFunc = "Int32Var"
+		fd.DefaultValue = "0"
+	case protoreflect.Uint32Kind:
+		fd.FlagType = "uint32"
+		fd.FlagFunc = "Uint32Var"
+		fd.DefaultValue = "0"
+	case protoreflect.Int64Kind, protoreflect.Sint64Kind:
+		fd.FlagType = "int64"
+		fd.FlagFunc = "Int64Var"
+		fd.DefaultValue = "0"
+	case protoreflect.Uint64Kind:
+		fd.FlagType = "uint64"
+		fd.FlagFunc = "Uint64Var"
+		fd.DefaultValue = "0"
+	case protoreflect.EnumKind:
+		fd.FlagType = "string"
+		fd.FlagFunc = "StringVar"
+		fd.DefaultValue = `""`
+		fd.IsEnum = true
+		fd.EnumGoType = string(desc.Enum().Name())
+		for i := 0; i < desc.Enum().Values().Len(); i++ {
+			fd.EnumValues = append(fd.EnumValues, string(desc.Enum().Values().Get(i).Name()))
+		}
+	default:
 		return nil
 	}
 
-	var variantNames []string
-	for _, v := range variants {
-		variantNames = append(variantNames, v.VariantName)
+	return fd
+}
+
+// isFieldDeprecated returns true when the proto field is marked deprecated.
+func isFieldDeprecated(field *protogen.Field) bool {
+	if field.Desc.Options() == nil {
+		return false
 	}
-	kebabName := toKebab(string(oneof.Desc.Name()))
-	return &flagDef{
-		Name:            kebabName,
-		GoName:          oneof.GoName,
-		FlagType:        "string",
-		FlagFunc:        "StringVar",
-		DefaultValue:    `""`,
-		Help:            "Select " + kebabName + ": " + strings.Join(variantNames, " or ") + " (use --" + kebabName + "-data for type-specific fields as JSON)",
-		IsOneofSelector: true,
-		GoOneofName:     oneof.GoName,
-		OneofVariants:   variants,
-		EnumValues:      variantNames,
-	}
+	opts, ok := field.Desc.Options().(*descriptorpb.FieldOptions)
+	return ok && opts != nil && opts.GetDeprecated()
 }
 
 func fieldToFlag(field *protogen.Field, prefix string) *flagDef {
@@ -392,7 +726,7 @@ func fieldToFlag(field *protogen.Field, prefix string) *flagDef {
 		return nil
 	}
 
-	// Non-optional oneof fields are handled by buildOneofSelectorFlag in extractFlags.
+	// Non-optional oneof fields are handled by extractOneofGroups.
 	if field.Oneof != nil && !field.Desc.HasOptionalKeyword() {
 		return nil
 	}
@@ -670,9 +1004,16 @@ func findIDField(msg *protogen.Message, verb, suffix string) (protoName, goName 
 }
 
 func isRequired(field *protogen.Field) bool {
-	// Heuristic: fields named "name" or ending in "_id" in Create/Add methods are typically required.
-	// Full annotation parsing of google.api.field_behavior would require importing the extension,
-	// which adds complexity. We rely on cobra MarkFlagRequired in the template for key fields.
+	opts := field.Desc.Options()
+	if opts == nil {
+		return false
+	}
+	behaviors := proto.GetExtension(opts, annotations.E_FieldBehavior)
+	for _, b := range behaviors.([]annotations.FieldBehavior) {
+		if b == annotations.FieldBehavior_REQUIRED {
+			return true
+		}
+	}
 	return false
 }
 
