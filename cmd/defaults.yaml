@@ -963,6 +963,54 @@ SystemDefaults:
         # and the login continues. Set to false to propagate an error (subject to the
         # service-level FailOpen policy).
         FailOpen: true # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_CIRCUITBREAKER_FAILOPEN
+    # Expression-based risk rules. When non-empty, the rule engine replaces
+    # the hardcoded failureBurst/contextDrift heuristics. Each rule defines
+    # a match expression (using expr-lang syntax against a RiskContext struct)
+    # and an engine to dispatch to when the expression is true.
+    # Engine types: block, rate_limit, llm, log
+    #
+    # Available fields in expressions: Current (Signal), LastSuccess (*Signal),
+    # LastFailure (*Signal), FailureCount, SuccessCount, TotalCount, IPChanged,
+    # UAChanged, FPChanged, DistinctIPs, DistinctFingerprints, DistinctUserAgents,
+    # TimeSinceLastSuccess, TimeSinceLastFailure, SessionSignalCount, SessionFailureCount
+    Rules: # ZITADEL_SYSTEMDEFAULTS_RISK_RULES
+      - id: failure-burst
+        description: "Block after 5+ failures from same user in history window"
+        expr: 'FailureCount >= 5'
+        engine: block
+        finding:
+          name: failure_burst
+          message: "user reached recent failure burst threshold"
+          block: true
+      - id: context-drift
+        description: "Block when both IP and user agent change simultaneously"
+        expr: 'IPChanged && UAChanged'
+        engine: block
+        finding:
+          name: context_drift
+          message: "login context changed across IP and user agent"
+          block: true
+      - id: ip-rotation
+        description: "Flag IP change without UA change — send to LLM for judgement"
+        expr: 'IPChanged && !UAChanged && LastSuccess != nil'
+        engine: llm
+        context_template: "User IP changed from {{.LastSuccess.IP}} to {{.Current.IP}} within {{.TimeSinceLastSuccess}}. Same user agent. Assess risk."
+        finding:
+          name: ip_rotation
+          message: "IP changed but user agent stayed the same"
+          block: false
+      - id: fingerprint-flood
+        description: "Rate limit when many distinct fingerprints are seen for the user"
+        expr: 'DistinctFingerprints >= 3'
+        engine: rate_limit
+        rate_limit:
+          key: "fp-flood:{{.Current.UserID}}"
+          window: 5m
+          max: 10
+        finding:
+          name: fingerprint_flood
+          message: "too many distinct device fingerprints in window"
+          block: true
   DomainVerification:
     VerificationGenerator:
       Length: 32 # ZITADEL_SYSTEMDEFAULTS_DOMAINVERIFICATION_VERIFICATIONGENERATOR_LENGTH

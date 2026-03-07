@@ -25,10 +25,11 @@ type Evaluator interface {
 var tracer = instrumentation.NewTracer("risk")
 
 type Service struct {
-	cfg   Config
-	store Store
-	llm   LLMClient
-	now   func() time.Time
+	cfg        Config
+	store      Store
+	llm        LLMClient
+	ruleEngine *RuleEngine
+	now        func() time.Time
 }
 
 func New(cfg Config, store Store, llm LLMClient) (*Service, error) {
@@ -42,7 +43,17 @@ func New(cfg Config, store Store, llm LLMClient) (*Service, error) {
 		return nil, fmt.Errorf("risk llm client required when mode is %q", cfg.LLM.Mode.Normalized())
 	}
 	llm = newLLMCircuitBreaker(cfg.LLM.CircuitBreaker, llm)
-	return &Service{cfg: cfg, store: store, llm: llm, now: time.Now}, nil
+
+	var ruleEngine *RuleEngine
+	if len(cfg.Rules) > 0 {
+		compiled, err := CompileRules(cfg.Rules)
+		if err != nil {
+			return nil, fmt.Errorf("compile risk rules: %w", err)
+		}
+		ruleEngine = NewRuleEngine(compiled, NewRateLimiter(), llm, cfg.LLM)
+	}
+
+	return &Service{cfg: cfg, store: store, llm: llm, ruleEngine: ruleEngine, now: time.Now}, nil
 }
 
 func (s *Service) Enabled() bool {
@@ -82,23 +93,36 @@ func (s *Service) Evaluate(ctx context.Context, signal Signal) (_ Decision, err 
 		return Decision{}, err
 	}
 
-	findings := make([]Finding, 0, 2)
-	if s.failureBurst(signal, snapshot) {
-		findings = append(findings, Finding{
-			Name:    "failure_burst",
-			Message: fmt.Sprintf("user reached %d recent failed session checks", s.cfg.FailureBurstThreshold),
-			Block:   true,
-		})
+	var findings []Finding
+	if s.ruleEngine != nil {
+		// Expression-based rule evaluation.
+		rc := buildRiskContext(signal, snapshot)
+		findings = s.ruleEngine.Evaluate(ctx, rc)
+	} else {
+		// Legacy hardcoded heuristics (backward-compatible fallback).
+		findings = make([]Finding, 0, 2)
+		if s.failureBurst(signal, snapshot) {
+			findings = append(findings, Finding{
+				Name:    "failure_burst",
+				Message: fmt.Sprintf("user reached %d recent failed session checks", s.cfg.FailureBurstThreshold),
+				Block:   true,
+			})
+		}
+		if finding, ok := s.contextDrift(signal, snapshot); ok {
+			findings = append(findings, finding)
+		}
 	}
-	if finding, ok := s.contextDrift(signal, snapshot); ok {
-		findings = append(findings, finding)
-	}
-	llmFinding, err := s.evaluateLLM(ctx, signal, snapshot)
-	if err != nil {
-		return Decision{}, err
-	}
-	if llmFinding != nil {
-		findings = append(findings, *llmFinding)
+
+	// LLM evaluation runs regardless of rule engine — rules with engine=llm
+	// use focused prompts, while this provides the full-context classification.
+	if s.ruleEngine == nil {
+		llmFinding, err := s.evaluateLLM(ctx, signal, snapshot)
+		if err != nil {
+			return Decision{}, err
+		}
+		if llmFinding != nil {
+			findings = append(findings, *llmFinding)
+		}
 	}
 
 	decision := Decision{Allow: true, Findings: findings}

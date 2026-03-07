@@ -63,6 +63,30 @@ type RiskConfig struct {
 	MaxSignalsPerUser     int
 	MaxSignalsPerSession  int
 	LLM                   RiskLLMConfig
+	Rules                 []RiskRuleConfig
+}
+
+// RiskRuleConfig mirrors risk.Rule for YAML configuration.
+type RiskRuleConfig struct {
+	ID              string              `yaml:"id"`
+	Description     string              `yaml:"description"`
+	Expr            string              `yaml:"expr"`
+	Engine          string              `yaml:"engine"`
+	Finding         RiskRuleFindingConfig `yaml:"finding"`
+	ContextTemplate string              `yaml:"context_template"`
+	RateLimit       RiskRuleRateLimitConfig `yaml:"rate_limit"`
+}
+
+type RiskRuleFindingConfig struct {
+	Name    string `yaml:"name"`
+	Message string `yaml:"message"`
+	Block   bool   `yaml:"block"`
+}
+
+type RiskRuleRateLimitConfig struct {
+	Key    string        `yaml:"key"`
+	Window time.Duration `yaml:"window"`
+	Max    int           `yaml:"max"`
 }
 
 type RiskLLMConfig struct {

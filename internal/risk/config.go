@@ -15,6 +15,10 @@ type Config struct {
 	MaxSignalsPerUser     int
 	MaxSignalsPerSession  int
 	LLM                   LLMConfig
+	// Rules defines expression-based risk rules. When non-empty the rule engine
+	// replaces the hardcoded failureBurst/contextDrift heuristics. When empty
+	// the legacy heuristics are used for backward compatibility.
+	Rules []Rule `yaml:"rules"`
 }
 
 type LLMMode string

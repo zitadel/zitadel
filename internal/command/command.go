@@ -258,6 +258,7 @@ func StartCommands(
 			LogPrompts:         defaults.Risk.LLM.LogPrompts,
 			CircuitBreaker:     riskCBConfig(defaults.Risk.LLM.CircuitBreaker),
 		},
+		Rules: riskRules(defaults.Risk.Rules),
 	}
 	var riskLLM risk.LLMClient
 	if riskConfig.Enabled && riskConfig.LLM.Enabled() {
@@ -435,4 +436,31 @@ func riskCBConfig(c *sd.RiskCBConfig) *risk.CBConfig {
 		MaxRetryRequests:       c.MaxRetryRequests,
 		FailOpen:               c.FailOpen,
 	}
+}
+
+func riskRules(rules []sd.RiskRuleConfig) []risk.Rule {
+	if len(rules) == 0 {
+		return nil
+	}
+	out := make([]risk.Rule, len(rules))
+	for i, r := range rules {
+		out[i] = risk.Rule{
+			ID:          r.ID,
+			Description: r.Description,
+			Expr:        r.Expr,
+			Engine:      risk.EngineType(r.Engine),
+			FindingCfg: risk.RuleFinding{
+				Name:    r.Finding.Name,
+				Message: r.Finding.Message,
+				Block:   r.Finding.Block,
+			},
+			ContextTemplate: r.ContextTemplate,
+			RateLimitCfg: risk.RuleRateLimit{
+				KeyTemplate: r.RateLimit.Key,
+				Window:      r.RateLimit.Window,
+				Max:         r.RateLimit.Max,
+			},
+		}
+	}
+	return out
 }
