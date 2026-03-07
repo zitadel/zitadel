@@ -1,6 +1,23 @@
 import { newSystemToken } from "@zitadel/client/node";
-import { readFileSync } from "fs";
+import { readFile } from "fs/promises";
 import { getLoginSystemUserId } from "./deployment";
+
+
+// The key token is only loaded once from disk per process.
+// If the file was loaded you need to restart the process to switch the key.
+let keyToken: Promise<string> | undefined;
+
+async function getTokenFromFile(): Promise<string> {
+  keyToken ??= readFile(process.env.SYSTEM_USER_PRIVATE_KEY_FILE, "binary");
+
+  try {
+    return await keyToken;
+  } catch (error) {
+    // if the file doesn't exist, don't cache it
+    keyToken = undefined;
+    throw error;
+  }
+}
 
 /**
  * Creates a signed JWT token using system user credentials from environment
@@ -12,18 +29,14 @@ import { getLoginSystemUserId } from "./deployment";
  * @throws If the underlying token signing fails.
  */
 export async function systemAPIToken() {
-  const token = {
-    audience: process.env.AUDIENCE,
-    userID: process.env.SYSTEM_USER_ID,
-    token: Buffer.from(process.env.SYSTEM_USER_PRIVATE_KEY, "base64").toString(
-      "utf-8",
-    ),
-  };
+  const key = process.env.SYSTEM_USER_PRIVATE_KEY_FILE
+    ? await getTokenFromFile()
+    : Buffer.from(process.env.SYSTEM_USER_PRIVATE_KEY, "base64").toString("utf-8");
 
   return newSystemToken({
-    audience: token.audience,
-    subject: token.userID,
-    key: token.token,
+    audience: process.env.AUDIENCE,
+    subject: process.env.SYSTEM_USER_ID,
+    key,
   });
 }
 
@@ -40,7 +53,7 @@ export async function loginServiceKeyToken() {
   const keyFile = process.env.ZITADEL_LOGIN_SERVICE_KEY_FILE!;
 
   try {
-    const key = readFileSync(keyFile, "utf-8");
+    const key = await readFile(keyFile, "utf-8");
 
     return newSystemToken({
       audience: process.env.AUDIENCE || process.env.ZITADEL_API_URL,
