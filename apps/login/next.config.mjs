@@ -31,10 +31,12 @@ const secureHeaders = [
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: process.env.NEXT_OUTPUT_MODE || undefined,
-  // Set the tracing root to this directory so that the standalone output
-  // places the server entry at the top level (server.js) rather than at
-  // a machine-dependent absolute path inside the standalone folder.
-  outputFileTracingRoot: import.meta.dirname,
+  // Set the tracing root to the monorepo workspace root so that the pnpm
+  // virtual store (.pnpm) is included in the standalone output. Without this,
+  // the standalone node_modules contain dangling symlinks that point outside
+  // the Docker image. The server entry lands at apps/login/server.js inside
+  // the standalone, which the build script and Dockerfile are adjusted for.
+  outputFileTracingRoot: new URL("../..", import.meta.url).pathname,
   reactStrictMode: true,
   experimental: {
     // Add React 19 compatibility optimizations
