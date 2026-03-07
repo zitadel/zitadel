@@ -42,7 +42,7 @@ type SessionRepository interface {
 	// The condition must include at least the instanceID of the session to update.
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	// Delete removes sessions based on the given condition.
-	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permission database.Condition) (int64, error)
 }
 
 // sessionColumns define all the columns of the session table.
@@ -77,6 +77,8 @@ type sessionConditions interface {
 	UserAgentIDCondition(userAgentID string) database.Condition
 	// UserIDCondition returns an equal filter on the user id field.
 	UserIDCondition(userID string) database.Condition
+	// TokenIDCondition returns an equal filter on the token id field.
+	TokenIDCondition(tokenID string) database.Condition
 	// CreatorIDCondition returns an equal filter on the creator id field.
 	CreatorIDCondition(creatorID string) database.Condition
 	// ExpirationCondition returns a filter on the expiration field.
