@@ -106,3 +106,4 @@ CLAUDE.md
 .gemini/*
 
 docs_old
+.copilot/

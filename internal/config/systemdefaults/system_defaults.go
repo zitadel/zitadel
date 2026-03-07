@@ -2,6 +2,7 @@ package systemdefaults
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -14,6 +15,7 @@ type SystemDefaults struct {
 	SecretHasher         crypto.HashConfig
 	Multifactors         MultifactorConfig
 	Tarpit               TarpitConfig
+	Risk                 RiskConfig
 	DomainVerification   DomainVerification
 	Notifications        Notifications
 	KeyConfig            KeyConfig
@@ -25,7 +27,10 @@ type SystemDefaults struct {
 func (s SystemDefaults) Validate() error {
 	// NB: currently we only validate the recovery codes config,
 	// but we may want to add more validations in the future or refactor
-	return s.Multifactors.RecoveryCodes.Validate()
+	if err := s.Multifactors.RecoveryCodes.Validate(); err != nil {
+		return err
+	}
+	return s.Risk.Validate()
 }
 
 type SecretGenerators struct {
@@ -47,6 +52,115 @@ type RecoveryCodesConfig struct {
 	Format     string
 	Length     int
 	WithHyphen bool
+}
+
+type RiskConfig struct {
+	Enabled               bool
+	FailOpen              bool
+	FailureBurstThreshold int
+	HistoryWindow         time.Duration
+	ContextChangeWindow   time.Duration
+	MaxSignalsPerUser     int
+	MaxSignalsPerSession  int
+	LLM                   RiskLLMConfig
+	Rules                 []RiskRuleConfig
+	GeoCountryHeader      string
+}
+
+// RiskRuleConfig mirrors risk.Rule for YAML configuration.
+type RiskRuleConfig struct {
+	ID              string              `yaml:"id"`
+	Description     string              `yaml:"description"`
+	Expr            string              `yaml:"expr"`
+	Engine          string              `yaml:"engine"`
+	Finding         RiskRuleFindingConfig `yaml:"finding"`
+	ContextTemplate string              `yaml:"context_template"`
+	RateLimit       RiskRuleRateLimitConfig `yaml:"rate_limit"`
+}
+
+type RiskRuleFindingConfig struct {
+	Name    string `yaml:"name"`
+	Message string `yaml:"message"`
+	Block   bool   `yaml:"block"`
+}
+
+type RiskRuleRateLimitConfig struct {
+	Key    string        `yaml:"key"`
+	Window time.Duration `yaml:"window"`
+	Max    int           `yaml:"max"`
+}
+
+type RiskLLMConfig struct {
+	Mode               string
+	Endpoint           string
+	Model              string
+	Timeout            time.Duration
+	MaxEvents          int
+	NumPredict         int
+	Temperature        *float64
+	TopK               int
+	TopP               float64
+	KeepAlive          string
+	HighRiskConfidence float64
+	LogPrompts         bool
+	CircuitBreaker     *RiskCBConfig
+}
+
+type RiskCBConfig struct {
+	Interval               time.Duration
+	MaxConsecutiveFailures uint32
+	MaxFailureRatio        float64
+	Timeout                time.Duration
+	MaxRetryRequests       uint32
+	FailOpen               bool
+}
+
+func (r RiskConfig) Validate() error {
+	if !r.Enabled {
+		return nil
+	}
+	if r.FailureBurstThreshold <= 0 {
+		return fmt.Errorf("Risk.FailureBurstThreshold must be greater than 0, got %d", r.FailureBurstThreshold)
+	}
+	if r.HistoryWindow <= 0 {
+		return fmt.Errorf("Risk.HistoryWindow must be greater than 0, got %s", r.HistoryWindow)
+	}
+	if r.ContextChangeWindow <= 0 {
+		return fmt.Errorf("Risk.ContextChangeWindow must be greater than 0, got %s", r.ContextChangeWindow)
+	}
+	if r.MaxSignalsPerUser <= 0 {
+		return fmt.Errorf("Risk.MaxSignalsPerUser must be greater than 0, got %d", r.MaxSignalsPerUser)
+	}
+	if r.MaxSignalsPerSession <= 0 {
+		return fmt.Errorf("Risk.MaxSignalsPerSession must be greater than 0, got %d", r.MaxSignalsPerSession)
+	}
+	return r.LLM.Validate()
+}
+
+func (r RiskLLMConfig) Validate() error {
+	switch strings.ToLower(r.Mode) {
+	case "", "disabled":
+		return nil
+	case "observe", "enforce":
+	default:
+		return fmt.Errorf("Risk.LLM.Mode must be one of 'disabled', 'observe', or 'enforce', got %q", r.Mode)
+	}
+	if r.Endpoint == "" {
+		return fmt.Errorf("Risk.LLM.Endpoint must not be empty when Risk.LLM.Mode is %q", r.Mode)
+	}
+	if r.Model == "" {
+		return fmt.Errorf("Risk.LLM.Model must not be empty when Risk.LLM.Mode is %q", r.Mode)
+	}
+	if r.Timeout <= 0 {
+		return fmt.Errorf("Risk.LLM.Timeout must be greater than 0, got %s", r.Timeout)
+	}
+	if r.MaxEvents <= 0 {
+		return fmt.Errorf("Risk.LLM.MaxEvents must be greater than 0, got %d", r.MaxEvents)
+	}
+	if r.HighRiskConfidence <= 0 || r.HighRiskConfidence > 1 {
+		return fmt.Errorf("Risk.LLM.HighRiskConfidence must be in (0,1], got %f", r.HighRiskConfidence)
+	}
+	return nil
 }
 
 func (r RecoveryCodesConfig) Validate() error {

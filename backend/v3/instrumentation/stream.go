@@ -12,6 +12,7 @@ const (
 	StreamEventPusher                // Event pushing to the database.
 	StreamEventHandler               // Event handling and processing.
 	StreamQueue                      // Queue operations and job processing.
+	StreamRisk                       // Inline risk evaluation and LLM classification.
 )
 
 var enabledStreams sync.Map

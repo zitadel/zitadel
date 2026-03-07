@@ -53,6 +53,7 @@ Instrumentation:
       - request # Logs for incoming API and HTTP requests.
       - event_handler # Logs for event handling in projections.
       - queue # Logs for the job queue processing.
+      - risk # Logs for inline risk evaluation and LLM classification.
       #- event_pusher # Logs for event pushing to the database. Warning: contains sensitive information.
     # Mask replaces sensitive information with Value in logs matched by Key
     Mask:
@@ -905,6 +906,151 @@ SystemDefaults:
     StepSize: 5 # ZITADEL_SYSTEMDEFAULTS_TARPIT_STEPSIZE
     # The maximum duration the tarpit can reach.
     MaxDuration: 10s # ZITADEL_SYSTEMDEFAULTS_TARPIT_MAXDURATION
+  Risk:
+    Enabled: false # ZITADEL_SYSTEMDEFAULTS_RISK_ENABLED
+    # When true, session authentication continues if the inline risk evaluator errors.
+    FailOpen: true # ZITADEL_SYSTEMDEFAULTS_RISK_FAILOPEN
+    # Block when this many recent failed session checks have been recorded for the same user.
+    FailureBurstThreshold: 5 # ZITADEL_SYSTEMDEFAULTS_RISK_FAILUREBURSTTHRESHOLD
+    # Window used for counting recent failed session checks.
+    HistoryWindow: 30m # ZITADEL_SYSTEMDEFAULTS_RISK_HISTORYWINDOW
+    # Window used for comparing the current login context with recent successful logins.
+    ContextChangeWindow: 10m # ZITADEL_SYSTEMDEFAULTS_RISK_CONTEXTCHANGEWINDOW
+    # Maximum number of recent risk signals kept per user in memory for the POC evaluator.
+    MaxSignalsPerUser: 50 # ZITADEL_SYSTEMDEFAULTS_RISK_MAXSIGNALSPERUSER
+    # Maximum number of recent risk signals kept per session in memory for the POC evaluator.
+    MaxSignalsPerSession: 20 # ZITADEL_SYSTEMDEFAULTS_RISK_MAXSIGNALSPERSESSION
+    LLM:
+      # disabled = never call the SLM/LLM, observe = record the model output without blocking, enforce = allow high-confidence "high risk" classifications to block login
+      Mode: disabled # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_MODE
+      # The Ollama HTTP endpoint used by the embedded risk evaluator.
+      Endpoint: http://localhost:11434 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_ENDPOINT
+      # The Ollama model used for the first bounded user-event risk classification experiment.
+      Model: qwen2.5:0.5b # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_MODEL
+      # Timeout for the synchronous model classification request.
+      Timeout: 3s # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_TIMEOUT
+      # Maximum number of recent user/session signals serialized into the model prompt.
+      MaxEvents: 8 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_MAXEVENTS
+      # Maximum number of tokens the model is allowed to generate per response.
+      # Capping this prevents verbose explanations; the classification JSON is ~80 tokens.
+      # Set to 0 to use the model's default (no cap).
+      NumPredict: 150 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_NUMPREDICT
+      # Context window size. Smaller values speed up KV-cache allocation and prefill
+      # on CPU. 512 is sufficient for short classification prompts (~100 tokens).
+      # Set to 0 to use the model's built-in default (typically 4096).
+      NumCtx: 512 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_NUMCTX
+      # Sampling temperature. 0 = greedy/deterministic (fastest for classification).
+      # Higher values increase randomness and slow down inference.
+      Temperature: 0 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_TEMPERATURE
+      # Top-K limits the number of token candidates. Lower = faster. 0 = model default.
+      TopK: 5 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_TOPK
+      # Top-P (nucleus sampling) limits cumulative probability mass. Lower = faster. 0 = model default.
+      TopP: 0.5 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_TOPP
+      # RepeatPenalty penalises recently-used tokens to suppress repetition loops.
+      # Values above 1.0 reduce looping; 1.0 = disabled (model default). Recommended: 1.3.
+      RepeatPenalty: 1.3 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_REPEATPENALTY
+      # How long Ollama keeps the model loaded in memory after a request.
+      # Prevents cold-load penalty on subsequent calls. "0" = unload immediately, "-1" = keep forever.
+      KeepAlive: "10m" # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_KEEPALIVE
+      # Minimum confidence for an "enforce" mode high-risk classification to participate in blocking.
+      HighRiskConfidence: 0.85 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_HIGHRISKCONFIDENCE
+      LogPrompts: false        # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_LOGPROMPTS
+      # CircuitBreaker protects against a slow or unavailable Ollama endpoint.
+      # Mirrors the CBConfig used for the Redis cache connector.
+      CircuitBreaker:
+        # Number of consecutive failures before the circuit opens. 0 = no threshold.
+        MaxConsecutiveFailures: 5 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_CIRCUITBREAKER_MAXCONSECUTIVEFAILURES
+        # Ratio of failed requests that opens the circuit. 0 = no threshold.
+        MaxFailureRatio: 0 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_CIRCUITBREAKER_MAXFAILURERATIO
+        # How long the circuit stays open before allowing a probe request.
+        Timeout: 2s # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_CIRCUITBREAKER_TIMEOUT
+        # Requests allowed through when the circuit is half-open.
+        MaxRetryRequests: 1 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_CIRCUITBREAKER_MAXRETRYREQUESTS
+        # When true (default), an open circuit causes the LLM check to be skipped silently
+        # and the login continues. Set to false to propagate an error (subject to the
+        # service-level FailOpen policy).
+        FailOpen: true # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_CIRCUITBREAKER_FAILOPEN
+    # Expression-based risk rules. When non-empty, the rule engine replaces
+    # the hardcoded failureBurst/contextDrift heuristics. Each rule defines
+    # a match expression (using expr-lang syntax against a RiskContext struct)
+    # and an engine to dispatch to when the expression is true.
+    # Engine types: block, rate_limit, llm, log
+    #
+    # Available fields in expressions: Current (Signal), LastSuccess (*Signal),
+    # LastFailure (*Signal), FailureCount, SuccessCount, TotalCount, IPChanged,
+    # UAChanged, FPChanged, DistinctIPs, DistinctFingerprints, DistinctUserAgents,
+    # TimeSinceLastSuccess, TimeSinceLastFailure, SessionSignalCount, SessionFailureCount,
+    # LanguageChanged, CountryChanged, NewCountry, DistinctCountries, LoginHourUTC,
+    # HoursSinceLastSuccess, LoginVelocity, ProxyHopCount
+    # GeoCountryHeader is the HTTP header name that carries the ISO 3166-1 alpha-2
+    # country code from a reverse proxy or CDN. Examples:
+    #   Cloudflare: CF-IPCountry   Vercel: X-Vercel-IP-Country   Custom: X-Country-Code
+    # Leave empty to disable country-based risk signals.
+    GeoCountryHeader: "" # ZITADEL_SYSTEMDEFAULTS_RISK_GEOCOUNTRYHEADER
+    Rules: # ZITADEL_SYSTEMDEFAULTS_RISK_RULES
+      - id: failure-burst
+        description: "Block after 5+ failures from same user in history window"
+        expr: 'FailureCount >= 5'
+        engine: block
+        finding:
+          name: failure_burst
+          message: "user reached recent failure burst threshold"
+          block: true
+      - id: context-drift
+        description: "Block when both IP and user agent change simultaneously"
+        expr: 'IPChanged && UAChanged'
+        engine: block
+        finding:
+          name: context_drift
+          message: "login context changed across IP and user agent"
+          block: true
+      - id: ip-rotation
+        description: "Flag IP change without UA change — send to LLM for judgement"
+        expr: 'IPChanged && !UAChanged && LastSuccess != nil'
+        engine: llm
+        context_template: "User IP changed from {{.LastSuccess.IP}} to {{.Current.IP}} within {{.TimeSinceLastSuccess}}. Same user agent. Assess risk."
+        finding:
+          name: ip_rotation
+          message: "IP changed but user agent stayed the same"
+          block: false
+      - id: country-change
+        description: "Flag when geo-country changes between sessions — possible impossible travel"
+        expr: 'CountryChanged && LastSuccess != nil'
+        engine: llm
+        context_template: "Country changed from {{.LastSuccess.Country}} to {{.Current.Country}} within {{.TimeSinceLastSuccess}}. IP: {{.LastSuccess.IP}} → {{.Current.IP}}. Assess impossible travel risk."
+        finding:
+          name: country_change
+          message: "login from different country than last successful session"
+          block: false
+      - id: high-velocity
+        description: "Flag unusually high login velocity — possible brute force or automation"
+        expr: 'LoginVelocity > 20'
+        engine: block
+        finding:
+          name: high_velocity
+          message: "login velocity exceeds 20 per hour"
+          block: true
+      - id: fingerprint-flood
+        description: "Rate limit when many distinct fingerprints are seen for the user"
+        expr: 'DistinctFingerprints >= 3'
+        engine: rate_limit
+        rate_limit:
+          key: "fp-flood:{{.Current.UserID}}"
+          window: 5m
+          max: 10
+        finding:
+          name: fingerprint_flood
+          message: "too many distinct device fingerprints in window"
+          block: true
+      - id: always-llm-test
+        description: "Send every session signal to the SLM for classification (testing only)"
+        expr: 'true'
+        engine: llm
+        context_template: "User {{.Current.UserID}} from IP {{.Current.IP}} country={{.Current.Country}} (UA: {{.Current.UserAgent}}, lang: {{.Current.AcceptLanguage}}) performed {{.Current.Operation}} with outcome {{.Current.Outcome}}. Failures: {{.FailureCount}}, distinct IPs: {{.DistinctIPs}}, distinct countries: {{.DistinctCountries}}, IP changed: {{.IPChanged}}, UA changed: {{.UAChanged}}, country changed: {{.CountryChanged}}, language changed: {{.LanguageChanged}}, login velocity: {{printf \"%.1f\" .LoginVelocity}}/hr, proxy hops: {{.ProxyHopCount}}."
+        finding:
+          name: llm_test
+          message: "SLM test classification"
+          block: false
   DomainVerification:
     VerificationGenerator:
       Length: 32 # ZITADEL_SYSTEMDEFAULTS_DOMAINVERIFICATION_VERIFICATIONGENERATOR_LENGTH

@@ -31,6 +31,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	internal_net "github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/risk"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
@@ -107,6 +108,8 @@ type Commands struct {
 	loginPaths        LoginPaths
 	ActionsV2DenyList []denylist.AddressChecker
 	IPLookupFunction  internal_net.IPLookupFunc
+	riskEvaluator     risk.Evaluator
+	riskGeoHeader     string // proxy header name for geo-country (e.g. "CF-IPCountry")
 }
 
 //go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
@@ -233,6 +236,41 @@ func StartCommands(
 	}
 	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
 	repo.tarpit = defaults.Tarpit.Tarpit()
+	riskConfig := risk.Config{
+		Enabled:               defaults.Risk.Enabled,
+		FailOpen:              defaults.Risk.FailOpen,
+		FailureBurstThreshold: defaults.Risk.FailureBurstThreshold,
+		HistoryWindow:         defaults.Risk.HistoryWindow,
+		ContextChangeWindow:   defaults.Risk.ContextChangeWindow,
+		MaxSignalsPerUser:     defaults.Risk.MaxSignalsPerUser,
+		MaxSignalsPerSession:  defaults.Risk.MaxSignalsPerSession,
+		LLM: risk.LLMConfig{
+			Mode:               risk.LLMMode(defaults.Risk.LLM.Mode),
+			Endpoint:           defaults.Risk.LLM.Endpoint,
+			Model:              defaults.Risk.LLM.Model,
+			Timeout:            defaults.Risk.LLM.Timeout,
+			MaxEvents:          defaults.Risk.LLM.MaxEvents,
+			NumPredict:         defaults.Risk.LLM.NumPredict,
+			Temperature:        defaults.Risk.LLM.Temperature,
+			TopK:               defaults.Risk.LLM.TopK,
+			TopP:               defaults.Risk.LLM.TopP,
+			KeepAlive:          defaults.Risk.LLM.KeepAlive,
+			HighRiskConfidence: defaults.Risk.LLM.HighRiskConfidence,
+			LogPrompts:         defaults.Risk.LLM.LogPrompts,
+			CircuitBreaker:     riskCBConfig(defaults.Risk.LLM.CircuitBreaker),
+		},
+		Rules: riskRules(defaults.Risk.Rules),
+		GeoCountryHeader: defaults.Risk.GeoCountryHeader,
+	}
+	var riskLLM risk.LLMClient
+	if riskConfig.Enabled && riskConfig.LLM.Enabled() {
+		riskLLM = risk.NewOllamaClient(riskConfig.LLM, httpClient)
+	}
+	repo.riskEvaluator, err = risk.New(riskConfig, nil, riskLLM)
+	if err != nil {
+		return nil, fmt.Errorf("risk evaluator: %w", err)
+	}
+	repo.riskGeoHeader = riskConfig.GeoCountryHeader
 	return repo, nil
 }
 
@@ -387,4 +425,45 @@ func (c *Commands) asyncPush(ctx context.Context, cmds ...eventstore.Command) {
 
 		span.EndWithError(err)
 	}()
+}
+
+func riskCBConfig(c *sd.RiskCBConfig) *risk.CBConfig {
+	if c == nil {
+		return nil
+	}
+	return &risk.CBConfig{
+		Interval:               c.Interval,
+		MaxConsecutiveFailures: c.MaxConsecutiveFailures,
+		MaxFailureRatio:        c.MaxFailureRatio,
+		Timeout:                c.Timeout,
+		MaxRetryRequests:       c.MaxRetryRequests,
+		FailOpen:               c.FailOpen,
+	}
+}
+
+func riskRules(rules []sd.RiskRuleConfig) []risk.Rule {
+	if len(rules) == 0 {
+		return nil
+	}
+	out := make([]risk.Rule, len(rules))
+	for i, r := range rules {
+		out[i] = risk.Rule{
+			ID:          r.ID,
+			Description: r.Description,
+			Expr:        r.Expr,
+			Engine:      risk.EngineType(r.Engine),
+			FindingCfg: risk.RuleFinding{
+				Name:    r.Finding.Name,
+				Message: r.Finding.Message,
+				Block:   r.Finding.Block,
+			},
+			ContextTemplate: r.ContextTemplate,
+			RateLimitCfg: risk.RuleRateLimit{
+				KeyTemplate: r.RateLimit.Key,
+				Window:      r.RateLimit.Window,
+				Max:         r.RateLimit.Max,
+			},
+		}
+	}
+	return out
 }
