@@ -168,7 +168,7 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 			}
 
 			err := cmd.Validate(ctx, opts)
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedUpdateSkip, cmd.ShouldSkipUpdate)
 		})
 	}
@@ -285,7 +285,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 			err := cmd.Execute(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }

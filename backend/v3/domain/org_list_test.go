@@ -329,7 +329,7 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 			err := opts.Invoke(ctx, cmd)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.ElementsMatch(t, tc.expectedOrganizations, cmd.Result())
 		})
 	}
