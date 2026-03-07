@@ -196,7 +196,7 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 			err := d.Validate(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }
@@ -396,7 +396,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 			err := opts.Invoke(ctx, cmd)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedOrgName, cmd.OrganizationName)
 		})
 	}
