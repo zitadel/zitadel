@@ -73,6 +73,7 @@ type OllamaClient struct {
 	endpoint    string
 	model       string
 	numPredict  int
+	numCtx      int
 	temperature *float64
 	topK        int
 	topP        float64
@@ -95,6 +96,7 @@ func NewOllamaClient(cfg LLMConfig, httpClient *http.Client) *OllamaClient {
 		endpoint:    strings.TrimRight(cfg.Endpoint, "/"),
 		model:       cfg.Model,
 		numPredict:  cfg.NumPredict,
+		numCtx:      cfg.NumCtx,
 		temperature: cfg.Temperature,
 		topK:        cfg.TopK,
 		topP:        cfg.TopP,
@@ -106,6 +108,7 @@ func NewOllamaClient(cfg LLMConfig, httpClient *http.Client) *OllamaClient {
 // ollamaOptions maps to Ollama's per-request model options.
 type ollamaOptions struct {
 	NumPredict  int      `json:"num_predict,omitempty"`
+	NumCtx      int      `json:"num_ctx,omitempty"`
 	Temperature *float64 `json:"temperature,omitempty"`
 	TopK        int      `json:"top_k,omitempty"`
 	TopP        float64  `json:"top_p,omitempty"`
@@ -134,6 +137,7 @@ func (c *OllamaClient) Classify(ctx context.Context, prompt Prompt) (Classificat
 		Format: ollamaFormat,
 		Options: ollamaOptions{
 			NumPredict:  c.numPredict,
+			NumCtx:      c.numCtx,
 			Temperature: c.temperature,
 			TopK:        c.topK,
 			TopP:        c.topP,

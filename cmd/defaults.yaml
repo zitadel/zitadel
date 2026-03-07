@@ -935,6 +935,10 @@ SystemDefaults:
       # Capping this prevents verbose explanations; the classification JSON is ~80 tokens.
       # Set to 0 to use the model's default (no cap).
       NumPredict: 150 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_NUMPREDICT
+      # Context window size. Smaller values speed up KV-cache allocation and prefill
+      # on CPU. 512 is sufficient for short classification prompts (~100 tokens).
+      # Set to 0 to use the model's built-in default (typically 4096).
+      NumCtx: 512 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_NUMCTX
       # Sampling temperature. 0 = greedy/deterministic (fastest for classification).
       # Higher values increase randomness and slow down inference.
       Temperature: 0 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_TEMPERATURE

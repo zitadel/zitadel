@@ -40,6 +40,11 @@ type LLMConfig struct {
 	// Keeping this at ~100–150 prevents verbose explanations while still leaving
 	// room for the classification JSON. 0 means use the model's default.
 	NumPredict int
+	// NumCtx sets the context window size (in tokens) for the model.
+	// Smaller values (e.g. 512) speed up KV-cache allocation and prefill on CPU.
+	// 0 means use the model's built-in default (often 4096), which is wasteful
+	// for short classification prompts. Recommended: 512.
+	NumCtx int
 	// Temperature controls randomness in sampling. 0 = greedy/deterministic,
 	// which is fastest for classification tasks. Default 0.
 	Temperature *float64

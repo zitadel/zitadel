@@ -179,6 +179,32 @@ func (e *RuleEngine) dispatchLLM(ctx context.Context, rule *CompiledRule, rc Ris
 		User:   contextStr,
 	}
 
+	// In observe mode the LLM result is never used to block the request.
+	// Run it asynchronously so it doesn't add latency to the login flow.
+	// context.WithoutCancel keeps trace/log attrs but detaches the request deadline.
+	if e.llmCfg.Mode.Normalized() == LLMModeObserve {
+		asyncCtx := context.WithoutCancel(ctx)
+		go e.runLLMAsync(asyncCtx, rule, rc, prompt)
+		return nil
+	}
+
+	return e.runLLM(ctx, rule, rc, prompt)
+}
+
+// runLLMAsync calls the LLM in the background for observe-mode rules and logs
+// the result. Any findings are discarded because observe mode never blocks.
+func (e *RuleEngine) runLLMAsync(ctx context.Context, rule *CompiledRule, rc RiskContext, prompt Prompt) {
+	// Use a fresh timeout so a slow model doesn't run forever.
+	if e.llmCfg.Timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, e.llmCfg.Timeout)
+		defer cancel()
+	}
+	e.runLLM(ctx, rule, rc, prompt)
+}
+
+// runLLM calls the LLM synchronously and returns a Finding (or nil on error).
+func (e *RuleEngine) runLLM(ctx context.Context, rule *CompiledRule, rc RiskContext, prompt Prompt) *Finding {
 	classification, err := e.llm.Classify(ctx, prompt)
 	if err != nil {
 		logging.WithError(ctx, err).Warn("risk.llm.classify_failed",
