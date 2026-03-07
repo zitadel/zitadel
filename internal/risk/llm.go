@@ -72,13 +72,14 @@ var ollamaFormat = json.RawMessage(`"json"`)
 type OllamaClient struct {
 	endpoint    string
 	model       string
-	numPredict  int
-	numCtx      int
-	temperature *float64
-	topK        int
-	topP        float64
-	keepAlive   string
-	httpClient  *http.Client
+	numPredict    int
+	numCtx        int
+	temperature   *float64
+	topK          int
+	topP          float64
+	repeatPenalty float64
+	keepAlive     string
+	httpClient    *http.Client
 }
 
 func NewOllamaClient(cfg LLMConfig, httpClient *http.Client) *OllamaClient {
@@ -93,25 +94,27 @@ func NewOllamaClient(cfg LLMConfig, httpClient *http.Client) *OllamaClient {
 		keepAlive = "10m"
 	}
 	return &OllamaClient{
-		endpoint:    strings.TrimRight(cfg.Endpoint, "/"),
-		model:       cfg.Model,
-		numPredict:  cfg.NumPredict,
-		numCtx:      cfg.NumCtx,
-		temperature: cfg.Temperature,
-		topK:        cfg.TopK,
-		topP:        cfg.TopP,
-		keepAlive:   keepAlive,
-		httpClient:  &cloned,
+		endpoint:      strings.TrimRight(cfg.Endpoint, "/"),
+		model:         cfg.Model,
+		numPredict:    cfg.NumPredict,
+		numCtx:        cfg.NumCtx,
+		temperature:   cfg.Temperature,
+		topK:          cfg.TopK,
+		topP:          cfg.TopP,
+		repeatPenalty: cfg.RepeatPenalty,
+		keepAlive:     keepAlive,
+		httpClient:    &cloned,
 	}
 }
 
 // ollamaOptions maps to Ollama's per-request model options.
 type ollamaOptions struct {
-	NumPredict  int      `json:"num_predict,omitempty"`
-	NumCtx      int      `json:"num_ctx,omitempty"`
-	Temperature *float64 `json:"temperature,omitempty"`
-	TopK        int      `json:"top_k,omitempty"`
-	TopP        float64  `json:"top_p,omitempty"`
+	NumPredict    int      `json:"num_predict,omitempty"`
+	NumCtx        int      `json:"num_ctx,omitempty"`
+	Temperature   *float64 `json:"temperature,omitempty"`
+	TopK          int      `json:"top_k,omitempty"`
+	TopP          float64  `json:"top_p,omitempty"`
+	RepeatPenalty float64  `json:"repeat_penalty,omitempty"`
 }
 
 type ollamaGenerateRequest struct {
@@ -136,12 +139,13 @@ func (c *OllamaClient) Classify(ctx context.Context, prompt Prompt) (Classificat
 		Prompt: prompt.User,
 		Format: ollamaFormat,
 		Options: ollamaOptions{
-			NumPredict:  c.numPredict,
-			NumCtx:      c.numCtx,
-			Temperature: c.temperature,
-			TopK:        c.topK,
-			TopP:        c.topP,
-		},
+				NumPredict:    c.numPredict,
+				NumCtx:        c.numCtx,
+				Temperature:   c.temperature,
+				TopK:          c.topK,
+				TopP:          c.topP,
+				RepeatPenalty: c.repeatPenalty,
+			},
 		Stream:    false,
 		KeepAlive: c.keepAlive,
 	})

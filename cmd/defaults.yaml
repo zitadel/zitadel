@@ -946,6 +946,9 @@ SystemDefaults:
       TopK: 5 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_TOPK
       # Top-P (nucleus sampling) limits cumulative probability mass. Lower = faster. 0 = model default.
       TopP: 0.5 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_TOPP
+      # RepeatPenalty penalises recently-used tokens to suppress repetition loops.
+      # Values above 1.0 reduce looping; 1.0 = disabled (model default). Recommended: 1.3.
+      RepeatPenalty: 1.3 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_REPEATPENALTY
       # How long Ollama keeps the model loaded in memory after a request.
       # Prevents cold-load penalty on subsequent calls. "0" = unload immediately, "-1" = keep forever.
       KeepAlive: "10m" # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_KEEPALIVE

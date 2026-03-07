@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 )
@@ -205,11 +206,14 @@ func (e *RuleEngine) runLLMAsync(ctx context.Context, rule *CompiledRule, rc Ris
 
 // runLLM calls the LLM synchronously and returns a Finding (or nil on error).
 func (e *RuleEngine) runLLM(ctx context.Context, rule *CompiledRule, rc RiskContext, prompt Prompt) *Finding {
+	start := time.Now()
 	classification, err := e.llm.Classify(ctx, prompt)
+	llmLatencyMs := time.Since(start).Milliseconds()
 	if err != nil {
 		logging.WithError(ctx, err).Warn("risk.llm.classify_failed",
 			slog.String("rule_id", rule.ID),
 			slog.String("risk_user_id", rc.Current.UserID),
+			slog.Int64("llm_latency_ms", llmLatencyMs),
 		)
 		return nil
 	}
@@ -226,6 +230,7 @@ func (e *RuleEngine) runLLM(ctx context.Context, rule *CompiledRule, rc RiskCont
 		slog.String("llm_classification", level),
 		slog.Float64("llm_confidence", classification.Confidence),
 		slog.String("llm_reason", classification.Reason),
+		slog.Int64("llm_latency_ms", llmLatencyMs),
 	)
 
 	finding := &Finding{
@@ -263,7 +268,6 @@ func (e *RuleEngine) dispatchLog(ctx context.Context, rule *CompiledRule, rc Ris
 }
 
 // ruleSystemPrompt is a compact system prompt for rule-triggered LLM evaluations.
-// It's shorter than the full risk prompt because the rule already identified the anomaly.
-const ruleSystemPrompt = `You are a security analyst. A risk rule flagged an anomaly. Assess whether this is suspicious.
+const ruleSystemPrompt = `You are a security risk analyzer. Review the session context and classify the risk level.
 Respond ONLY with JSON: {"classification":"low|medium|high","confidence":0.0-1.0,"reason":"max 8 words"}
-No markdown, no extra text. Keep reason under 8 words.`
+No markdown, no extra text. Reason must be 8 words or fewer.`

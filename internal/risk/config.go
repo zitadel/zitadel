@@ -54,6 +54,10 @@ type LLMConfig struct {
 	// TopP (nucleus sampling) limits the cumulative probability mass.
 	// Lower values (e.g. 0.5) speed up sampling. 0 = use model default.
 	TopP float64
+	// RepeatPenalty penalises recently-used tokens to suppress looping.
+	// Values above 1.0 reduce repetition; 1.0 = disabled (model default).
+	// Recommended: 1.3 for small models prone to repetition degeneration.
+	RepeatPenalty float64
 	// KeepAlive controls how long Ollama keeps the model loaded in memory
 	// after a request. Prevents cold-load latency on subsequent calls.
 	// Default "10m". Set to "0" to unload immediately, "-1" to keep forever.
