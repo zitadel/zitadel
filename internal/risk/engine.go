@@ -51,6 +51,19 @@ func (e *RuleEngine) Evaluate(ctx context.Context, rc RiskContext) []Finding {
 			continue
 		}
 
+		logging.Info(ctx, "risk rule matched",
+			slog.String("rule_id", rule.ID),
+			slog.String("rule_engine", string(rule.Engine)),
+			slog.String("risk_user_id", rc.Current.UserID),
+			slog.String("risk_session_id", rc.Current.SessionID),
+			slog.String("risk_ip", rc.Current.IP),
+			slog.Int("risk_failure_count", rc.FailureCount),
+			slog.Bool("risk_ip_changed", rc.IPChanged),
+			slog.Bool("risk_ua_changed", rc.UAChanged),
+			slog.Int("risk_distinct_ips", rc.DistinctIPs),
+			slog.Int("risk_distinct_fps", rc.DistinctFingerprints),
+		)
+
 		finding := e.dispatch(ctx, rule, rc)
 		if finding != nil {
 			findings = append(findings, *finding)

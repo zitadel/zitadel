@@ -1011,6 +1011,16 @@ SystemDefaults:
           name: fingerprint_flood
           message: "too many distinct device fingerprints in window"
           block: true
+      # Uncomment to always send every session to the SLM for testing:
+      # - id: always-llm-test
+      #   description: "Send every session signal to the SLM for classification (testing only)"
+      #   expr: 'true'
+      #   engine: llm
+      #   context_template: "User {{.Current.UserID}} from IP {{.Current.IP}} (UA: {{.Current.UserAgent}}) performed {{.Current.Operation}} with outcome {{.Current.Outcome}}. Failures: {{.FailureCount}}, distinct IPs: {{.DistinctIPs}}, IP changed: {{.IPChanged}}, UA changed: {{.UAChanged}}."
+      #   finding:
+      #     name: llm_test
+      #     message: "SLM test classification"
+      #     block: false
   DomainVerification:
     VerificationGenerator:
       Length: 32 # ZITADEL_SYSTEMDEFAULTS_DOMAINVERIFICATION_VERIFICATIONGENERATOR_LENGTH
