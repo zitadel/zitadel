@@ -728,6 +728,121 @@ describe("processIDPCallback", () => {
 
       expect(result.error).toBe("Session error");
     });
+
+    test("should redirect to complete registration when givenName is missing", async () => {
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+        addHumanUser: {
+          ...defaultIntent.addHumanUser,
+          profile: {
+            givenName: "",
+            familyName: "User",
+            displayName: "User",
+          },
+        },
+      });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(result.redirect).toContain("/idp/google/complete-registration");
+      expect(result.redirect).toContain("id=intent123");
+      expect(result.redirect).toContain("token=token123");
+      expect(result.redirect).toContain("organization=org123");
+      expect(result.redirect).toContain("familyName=User");
+    });
+
+    test("should redirect to complete registration when familyName is missing", async () => {
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+        addHumanUser: {
+          ...defaultIntent.addHumanUser,
+          profile: {
+            givenName: "Test",
+            familyName: "",
+            displayName: "Test",
+          },
+        },
+      });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(result.redirect).toContain("/idp/google/complete-registration");
+      expect(result.redirect).toContain("id=intent123");
+      expect(result.redirect).toContain("token=token123");
+      expect(result.redirect).toContain("organization=org123");
+      expect(result.redirect).toContain("givenName=Test");
+    });
+
+    test("should redirect to complete registration when both givenName and familyName are missing", async () => {
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+        addHumanUser: {
+          ...defaultIntent.addHumanUser,
+          profile: {
+            givenName: "",
+            familyName: "",
+            displayName: "",
+          },
+        },
+      });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(result.redirect).toContain("/idp/google/complete-registration");
+      expect(result.redirect).toContain("id=intent123");
+      expect(result.redirect).toContain("token=token123");
+      expect(result.redirect).toContain("organization=org123");
+    });
+
+    test("should redirect to complete registration when profile is undefined", async () => {
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+        addHumanUser: {
+          ...defaultIntent.addHumanUser,
+          profile: undefined,
+        },
+      });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(result.redirect).toContain("/idp/google/complete-registration");
+      expect(result.redirect).toContain("id=intent123");
+      expect(result.redirect).toContain("token=token123");
+    });
+
+    test("should use fallback organization when required fields missing and no org provided", async () => {
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+        addHumanUser: {
+          ...defaultIntent.addHumanUser,
+          profile: {
+            givenName: "",
+            familyName: "User",
+            displayName: "User",
+          },
+        },
+      });
+      mockGetDefaultOrg.mockResolvedValue({ id: "default-org" });
+
+      const result = await processIDPCallback({
+        ...defaultParams,
+        organization: undefined,
+      });
+
+      expect(mockGetDefaultOrg).toHaveBeenCalled();
+      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(result.redirect).toContain("/idp/google/complete-registration");
+      expect(result.redirect).toContain("organization=default-org");
+    });
   });
 
   describe("CASE 5: Manual user creation allowed", () => {
