@@ -38,11 +38,15 @@ func StartConnectors(conf *CachesConfig, client *database.DB) (Connectors, error
 	if conf == nil {
 		return Connectors{}, nil
 	}
+	redisConnector, err := redis.NewConnector(conf.Connectors.Redis)
+	if err != nil {
+		return Connectors{}, fmt.Errorf("start redis connector: %w", err)
+	}
 	return Connectors{
 		Config:   *conf,
 		Memory:   gomap.NewConnector(conf.Connectors.Memory),
 		Postgres: pg.NewConnector(conf.Connectors.Postgres, client),
-		Redis:    redis.NewConnector(conf.Connectors.Redis),
+		Redis:    redisConnector,
 	}, nil
 }
 
