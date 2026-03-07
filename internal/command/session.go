@@ -435,10 +435,10 @@ func (c *Commands) enforceSessionRisk(ctx context.Context, checks *SessionComman
 	if err != nil {
 		checks.riskFindings = nil
 		if c.riskEvaluator.FailOpen() {
-			risklog.WithError(ctx, err).Warn("risk evaluation failed; continuing because fail-open is enabled",
-				slog.String("user_id", signal.UserID),
-				slog.String("session_id", signal.SessionID),
-				slog.String("operation", signal.Operation),
+			risklog.WithError(ctx, err).Warn("risk.eval.failed_fail_open",
+				slog.String("risk_user_id", signal.UserID),
+				slog.String("risk_session_id", signal.SessionID),
+				slog.String("risk_operation", signal.Operation),
 			)
 			return nil
 		}
@@ -449,11 +449,11 @@ func (c *Commands) enforceSessionRisk(ctx context.Context, checks *SessionComman
 		return nil
 	}
 	c.recordSessionRisk(ctx, checks, risk.OutcomeBlocked, decision.Findings)
-	risklog.Warn(ctx, "blocked session request by inline risk evaluation",
-		slog.String("user_id", signal.UserID),
-		slog.String("session_id", signal.SessionID),
-		slog.String("operation", signal.Operation),
-		slog.Any("findings", riskFindingNames(decision.Findings)),
+	risklog.Warn(ctx, "risk.eval.blocked",
+		slog.String("risk_user_id", signal.UserID),
+		slog.String("risk_session_id", signal.SessionID),
+		slog.String("risk_operation", signal.Operation),
+		slog.Any("risk_findings", riskFindingNames(decision.Findings)),
 	)
 	return zerrors.ThrowPermissionDenied(nil, "COMMAND-RISK0", "Errors.PermissionDenied")
 }
@@ -464,10 +464,10 @@ func (c *Commands) recordSessionRisk(ctx context.Context, checks *SessionCommand
 	}
 	ctx = risklog.NewCtx(ctx, risklog.StreamRisk)
 	if err := c.riskEvaluator.Record(ctx, checks.riskSignal(outcome), findings); err != nil {
-		risklog.WithError(ctx, err).Warn("unable to record session risk signal",
-			slog.String("user_id", checks.sessionWriteModel.UserID),
-			slog.String("session_id", checks.sessionWriteModel.AggregateID),
-			slog.String("operation", checks.operation),
+		risklog.WithError(ctx, err).Warn("risk.record.failed",
+			slog.String("risk_user_id", checks.sessionWriteModel.UserID),
+			slog.String("risk_session_id", checks.sessionWriteModel.AggregateID),
+			slog.String("risk_operation", checks.operation),
 		)
 	}
 }

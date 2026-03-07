@@ -145,12 +145,13 @@ func (s *Service) Evaluate(ctx context.Context, signal Signal) (_ Decision, err 
 		attribute.Int64("risk.latency_ms", elapsed.Milliseconds()),
 	)
 
-	logging.Info(ctx, "risk evaluation complete",
+	logging.Info(ctx, "risk.eval.complete",
 		slog.String("risk_user_id", signal.UserID),
 		slog.String("risk_session_id", signal.SessionID),
 		slog.String("risk_operation", signal.Operation),
 		slog.Bool("risk_allow", decision.Allow),
 		slog.String("risk_findings", strings.Join(names, ",")),
+		slog.Int("risk_finding_count", len(findings)),
 		slog.Int64("risk_latency_ms", elapsed.Milliseconds()),
 	)
 
@@ -220,11 +221,11 @@ func (s *Service) evaluateLLM(ctx context.Context, signal Signal, snapshot Snaps
 		if s.cfg.LLM.LogPrompts {
 			level = slog.LevelInfo
 		}
-		logging.Log(ctx, level, "llm risk classification (cached)",
+		logging.Log(ctx, level, "risk.llm.classification_cached",
 			slog.String("risk_user_id", signal.UserID),
 			slog.String("risk_session_id", signal.SessionID),
-			slog.String("risk_llm_classification", fmt.Sprintf("cached:%s", cached.Name)),
-			slog.String("risk_llm_mode", string(s.cfg.LLM.Mode.Normalized())),
+			slog.String("llm_classification", cached.Name),
+			slog.String("llm_mode", string(s.cfg.LLM.Mode.Normalized())),
 		)
 		return cached, nil
 	}
@@ -238,10 +239,10 @@ func (s *Service) evaluateLLM(ctx context.Context, signal Signal, snapshot Snaps
 	if s.cfg.LLM.LogPrompts {
 		promptLevel = slog.LevelInfo
 	}
-	logging.Log(ctx, promptLevel, "llm risk prompt",
+	logging.Log(ctx, promptLevel, "risk.llm.prompt",
 		slog.String("risk_user_id", signal.UserID),
 		slog.String("risk_session_id", signal.SessionID),
-		slog.String("risk_llm_context", prompt.User),
+		slog.String("llm_context", prompt.User),
 	)
 
 	ctx, llmSpan := tracer.NewClientSpan(ctx, "risk.LLM.Classify")
@@ -258,7 +259,7 @@ func (s *Service) evaluateLLM(ctx context.Context, signal Signal, snapshot Snaps
 
 	if err != nil {
 		if errors.Is(err, ErrCircuitOpen) {
-			logging.Warn(ctx, "llm circuit open; skipping llm risk evaluation",
+			logging.Warn(ctx, "risk.llm.circuit_open",
 				slog.String("risk_user_id", signal.UserID),
 				slog.String("risk_session_id", signal.SessionID),
 			)
@@ -267,9 +268,9 @@ func (s *Service) evaluateLLM(ctx context.Context, signal Signal, snapshot Snaps
 			}
 			return nil, nil
 		}
-		logging.WithError(ctx, err).Warn("llm classify failed",
+		logging.WithError(ctx, err).Warn("risk.llm.classify_failed",
 			slog.String("risk_user_id", signal.UserID),
-			slog.Int64("risk_llm_latency_ms", llmElapsed.Milliseconds()),
+			slog.Int64("llm_latency_ms", llmElapsed.Milliseconds()),
 		)
 		return nil, err
 	}
@@ -288,14 +289,14 @@ func (s *Service) evaluateLLM(ctx context.Context, signal Signal, snapshot Snaps
 	if s.cfg.LLM.LogPrompts {
 		classLevel = slog.LevelInfo
 	}
-	logging.Log(ctx, classLevel, "llm risk classification",
+	logging.Log(ctx, classLevel, "risk.llm.classified",
 		slog.String("risk_user_id", signal.UserID),
 		slog.String("risk_session_id", signal.SessionID),
-		slog.String("risk_llm_classification", level),
-		slog.Float64("risk_llm_confidence", classification.Confidence),
-		slog.String("risk_llm_reason", classification.Reason),
-		slog.Int64("risk_llm_latency_ms", llmElapsed.Milliseconds()),
-		slog.String("risk_llm_mode", string(s.cfg.LLM.Mode.Normalized())),
+		slog.String("llm_classification", level),
+		slog.Float64("llm_confidence", classification.Confidence),
+		slog.String("llm_reason", classification.Reason),
+		slog.Int64("llm_latency_ms", llmElapsed.Milliseconds()),
+		slog.String("llm_mode", string(s.cfg.LLM.Mode.Normalized())),
 	)
 
 	finding := &Finding{

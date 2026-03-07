@@ -42,8 +42,9 @@ func (e *RuleEngine) Evaluate(ctx context.Context, rc RiskContext) []Finding {
 		rule := &e.rules[i]
 		matched, err := rule.Evaluate(rc)
 		if err != nil {
-			logging.WithError(ctx, err).Warn("rule evaluation error",
+			logging.WithError(ctx, err).Warn("risk.expr.eval_error",
 				slog.String("rule_id", rule.ID),
+				slog.String("rule_expr", rule.Expr),
 				slog.String("risk_user_id", rc.Current.UserID),
 			)
 			continue
@@ -52,11 +53,13 @@ func (e *RuleEngine) Evaluate(ctx context.Context, rc RiskContext) []Finding {
 			continue
 		}
 
-		logging.Info(ctx, "risk rule matched",
+		logging.Info(ctx, "risk.expr.rule_matched",
 			slog.String("rule_id", rule.ID),
+			slog.String("rule_expr", rule.Expr),
 			slog.String("rule_engine", string(rule.Engine)),
 			slog.String("risk_user_id", rc.Current.UserID),
 			slog.String("risk_session_id", rc.Current.SessionID),
+			slog.String("risk_operation", rc.Current.Operation),
 			slog.String("risk_ip", rc.Current.IP),
 			slog.Int("risk_failure_count", rc.FailureCount),
 			slog.Bool("risk_ip_changed", rc.IPChanged),
@@ -74,7 +77,6 @@ func (e *RuleEngine) Evaluate(ctx context.Context, rc RiskContext) []Finding {
 	return findings
 }
 
-// dispatch routes a matched rule to its configured engine and returns the finding.
 func (e *RuleEngine) dispatch(ctx context.Context, rule *CompiledRule, rc RiskContext) *Finding {
 	switch rule.Engine {
 	case EngineBlock:
@@ -86,9 +88,9 @@ func (e *RuleEngine) dispatch(ctx context.Context, rule *CompiledRule, rc RiskCo
 	case EngineLog:
 		return e.dispatchLog(ctx, rule, rc)
 	default:
-		logging.Warn(ctx, "unknown engine type in matched rule",
+		logging.Warn(ctx, "risk.expr.unknown_engine",
 			slog.String("rule_id", rule.ID),
-			slog.String("engine", string(rule.Engine)),
+			slog.String("rule_engine", string(rule.Engine)),
 		)
 		return nil
 	}
@@ -106,7 +108,7 @@ func (e *RuleEngine) dispatchBlock(rule *CompiledRule, _ RiskContext) *Finding {
 func (e *RuleEngine) dispatchRateLimit(ctx context.Context, rule *CompiledRule, rc RiskContext) *Finding {
 	key, err := rule.RenderKeyTemplate(rc)
 	if err != nil {
-		logging.WithError(ctx, err).Warn("rate limit key render failed",
+		logging.WithError(ctx, err).Warn("risk.ratelimit.key_render_failed",
 			slog.String("rule_id", rule.ID),
 		)
 		return nil
@@ -114,14 +116,22 @@ func (e *RuleEngine) dispatchRateLimit(ctx context.Context, rule *CompiledRule, 
 
 	count, allowed := e.limiter.Check(key, rule.RateLimitCfg.Window, rule.RateLimitCfg.Max, rc.Current.Timestamp)
 	if allowed {
-		logging.Debug(ctx, "rate limit check passed",
+		logging.Debug(ctx, "risk.ratelimit.within_limit",
 			slog.String("rule_id", rule.ID),
-			slog.String("key", key),
-			slog.Int("count", count),
-			slog.Int("max", rule.RateLimitCfg.Max),
+			slog.String("ratelimit_key", key),
+			slog.Int("ratelimit_count", count),
+			slog.Int("ratelimit_max", rule.RateLimitCfg.Max),
 		)
 		return nil
 	}
+
+	logging.Info(ctx, "risk.ratelimit.exceeded",
+		slog.String("rule_id", rule.ID),
+		slog.String("ratelimit_key", key),
+		slog.Int("ratelimit_count", count),
+		slog.Int("ratelimit_max", rule.RateLimitCfg.Max),
+		slog.String("risk_user_id", rc.Current.UserID),
+	)
 
 	msg := rule.FindingCfg.Message
 	if msg == "" {
@@ -137,7 +147,7 @@ func (e *RuleEngine) dispatchRateLimit(ctx context.Context, rule *CompiledRule, 
 
 func (e *RuleEngine) dispatchLLM(ctx context.Context, rule *CompiledRule, rc RiskContext) *Finding {
 	if e.llm == nil || !e.llmCfg.Enabled() {
-		logging.Debug(ctx, "llm engine skipped (disabled)",
+		logging.Debug(ctx, "risk.llm.skipped_disabled",
 			slog.String("rule_id", rule.ID),
 		)
 		return nil
@@ -146,7 +156,7 @@ func (e *RuleEngine) dispatchLLM(ctx context.Context, rule *CompiledRule, rc Ris
 	// Render a focused context for the LLM instead of sending full history.
 	contextStr, err := rule.RenderContextTemplate(rc)
 	if err != nil {
-		logging.WithError(ctx, err).Warn("llm context template render failed",
+		logging.WithError(ctx, err).Warn("risk.llm.context_render_failed",
 			slog.String("rule_id", rule.ID),
 		)
 		return nil
@@ -156,7 +166,7 @@ func (e *RuleEngine) dispatchLLM(ctx context.Context, rule *CompiledRule, rc Ris
 	if contextStr == "" {
 		b, err := json.Marshal(rc)
 		if err != nil {
-			logging.WithError(ctx, err).Warn("llm context fallback marshal failed",
+			logging.WithError(ctx, err).Warn("risk.llm.context_marshal_failed",
 				slog.String("rule_id", rule.ID),
 			)
 			return nil
@@ -171,8 +181,9 @@ func (e *RuleEngine) dispatchLLM(ctx context.Context, rule *CompiledRule, rc Ris
 
 	classification, err := e.llm.Classify(ctx, prompt)
 	if err != nil {
-		logging.WithError(ctx, err).Warn("llm classify failed for rule",
+		logging.WithError(ctx, err).Warn("risk.llm.classify_failed",
 			slog.String("rule_id", rule.ID),
+			slog.String("risk_user_id", rc.Current.UserID),
 		)
 		return nil
 	}
@@ -181,6 +192,15 @@ func (e *RuleEngine) dispatchLLM(ctx context.Context, rule *CompiledRule, rc Ris
 	if level == "" {
 		level = "unknown"
 	}
+
+	logging.Info(ctx, "risk.llm.classified",
+		slog.String("rule_id", rule.ID),
+		slog.String("risk_user_id", rc.Current.UserID),
+		slog.String("risk_session_id", rc.Current.SessionID),
+		slog.String("llm_classification", level),
+		slog.Float64("llm_confidence", classification.Confidence),
+		slog.String("llm_reason", classification.Reason),
+	)
 
 	finding := &Finding{
 		Name:       fmt.Sprintf("llm_%s_risk", level),
@@ -198,11 +218,13 @@ func (e *RuleEngine) dispatchLLM(ctx context.Context, rule *CompiledRule, rc Ris
 }
 
 func (e *RuleEngine) dispatchLog(ctx context.Context, rule *CompiledRule, rc RiskContext) *Finding {
-	logging.Info(ctx, "risk rule matched (observe)",
+	logging.Info(ctx, "risk.expr.observe",
 		slog.String("rule_id", rule.ID),
+		slog.String("rule_expr", rule.Expr),
 		slog.String("rule_description", rule.Description),
 		slog.String("risk_user_id", rc.Current.UserID),
 		slog.String("risk_session_id", rc.Current.SessionID),
+		slog.String("risk_operation", rc.Current.Operation),
 		slog.String("risk_ip", rc.Current.IP),
 	)
 	// Log-only rules produce a non-blocking finding for audit.
