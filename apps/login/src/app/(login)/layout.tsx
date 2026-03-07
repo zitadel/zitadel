@@ -1,6 +1,7 @@
 import "@/styles/globals.scss";
 
 import { BackgroundWrapper } from "@/components/background-wrapper";
+import { CustomCssWrapper } from "@/components/custom-css-wrapper";
 import { LanguageProvider } from "@/components/language-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/skeleton";
@@ -65,17 +66,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               }
             >
               <LanguageProvider>
-                <BackgroundWrapper
-                  className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
-                >
-                  <div className="relative mx-auto w-full max-w-[1100px] py-8">
-                    <div>{children}</div>
-                    <div className="flex flex-row items-center justify-end space-x-4 py-4 px-4 md:px-8 max-w-[440px] mx-auto md:max-w-full">
-                      <LanguageSwitcher languages={languages} />
-                      <ThemeSwitch />
+                <CustomCssWrapper>
+                  <BackgroundWrapper
+                    className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
+                  >
+                    <div className="relative mx-auto w-full max-w-[1100px] py-8">
+                      <div>{children}</div>
+                      <div className="flex flex-row items-center justify-end space-x-4 py-4 px-4 md:px-8 max-w-[440px] mx-auto md:max-w-full">
+                        <LanguageSwitcher languages={languages} />
+                        <ThemeSwitch />
+                      </div>
                     </div>
-                  </div>
-                </BackgroundWrapper>
+                  </BackgroundWrapper>
+                </CustomCssWrapper>
               </LanguageProvider>
             </Suspense>
           </Tooltip.Provider>

@@ -81,5 +81,13 @@ declare namespace NodeJS {
      * which is safer for environments with enterprise email link scanners.
      */
     NEXT_PUBLIC_AUTO_SUBMIT_CODE?: string;
+
+    /**
+     * Optional: Path to a custom CSS file for theming the login UI.
+     * The file must be placed in the public/ directory and referenced by its path.
+     * Allows loading custom styles without requiring a custom build.
+     * Example: /custom-theme.css (for public/custom-theme.css)
+     */
+    NEXT_PUBLIC_THEME_CSS_FILE?: string;
   }
 }

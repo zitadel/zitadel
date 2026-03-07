@@ -22,6 +22,7 @@ export interface ThemeConfig {
   backgroundImage?: string;
   appearance: ThemeAppearance;
   spacing: ThemeSpacing;
+  customCssFile?: string;
 }
 
 // Default component-specific roundness configuration
@@ -69,6 +70,7 @@ export function getThemeConfig(): ThemeConfig {
     backgroundImage: process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE || undefined,
     appearance: (process.env.NEXT_PUBLIC_THEME_APPEARANCE as ThemeAppearance) || DEFAULT_THEME.appearance,
     spacing: (process.env.NEXT_PUBLIC_THEME_SPACING as ThemeSpacing) || DEFAULT_THEME.spacing,
+    customCssFile: process.env.NEXT_PUBLIC_THEME_CSS_FILE || undefined,
   };
 }
 

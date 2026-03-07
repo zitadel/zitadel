@@ -449,5 +449,36 @@ describe("Theme Configuration", () => {
       expect(config.roundness).toBe(DEFAULT_THEME.roundness);
       expect(config.layout).toBe(DEFAULT_THEME.layout);
     });
+
+    it("should use custom CSS file from environment variable", () => {
+      const customCssFile = "/custom-theme.css";
+      process.env.NEXT_PUBLIC_THEME_CSS_FILE = customCssFile;
+
+      const config = getThemeConfig();
+
+      expect(config.customCssFile).toBe(customCssFile);
+
+      delete process.env.NEXT_PUBLIC_THEME_CSS_FILE;
+    });
+
+    it("should have undefined custom CSS file when not set", () => {
+      delete process.env.NEXT_PUBLIC_THEME_CSS_FILE;
+
+      const config = getThemeConfig();
+
+      expect(config.customCssFile).toBeUndefined();
+    });
+
+    it("should combine custom CSS file with other theme properties", () => {
+      process.env.NEXT_PUBLIC_THEME_ROUNDNESS = "full";
+      process.env.NEXT_PUBLIC_THEME_LAYOUT = "side-by-side";
+      process.env.NEXT_PUBLIC_THEME_CSS_FILE = "/themes/dark.css";
+
+      const config = getThemeConfig();
+
+      expect(config.roundness).toBe("full");
+      expect(config.layout).toBe("side-by-side");
+      expect(config.customCssFile).toBe("/themes/dark.css");
+    });
   });
 });
