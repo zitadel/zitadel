@@ -2,6 +2,7 @@ package risk
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 
@@ -149,6 +150,18 @@ func (e *RuleEngine) dispatchLLM(ctx context.Context, rule *CompiledRule, rc Ris
 			slog.String("rule_id", rule.ID),
 		)
 		return nil
+	}
+	// If no context_template is configured, fall back to a compact JSON
+	// representation of the RiskContext so the model always has a non-empty prompt.
+	if contextStr == "" {
+		b, err := json.Marshal(rc)
+		if err != nil {
+			logging.WithError(ctx, err).Warn("llm context fallback marshal failed",
+				slog.String("rule_id", rule.ID),
+			)
+			return nil
+		}
+		contextStr = string(b)
 	}
 
 	prompt := Prompt{

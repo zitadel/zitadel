@@ -143,7 +143,7 @@ func (c *OllamaClient) Classify(ctx context.Context, prompt Prompt) (Classificat
 
 	var classification Classification
 	if err := json.Unmarshal([]byte(generateResp.Response), &classification); err != nil {
-		return Classification{}, fmt.Errorf("decode ollama classification: %w", err)
+		return Classification{}, fmt.Errorf("decode ollama classification: %w (raw: %q)", err, generateResp.Response)
 	}
 	if classification.Normalized() == "" {
 		return Classification{}, fmt.Errorf("ollama classification must not be empty")
