@@ -121,4 +121,39 @@ describe("CustomCssWrapper", () => {
       expect(links.length).toBe(1);
     });
   });
+
+  it("should update href when customCssFile changes", async () => {
+    mockUseThemeConfig.mockReturnValue({
+      customCssFile: "/first.css",
+    } as any);
+
+    const { rerender } = render(
+      <CustomCssWrapper>
+        <div>Test Child</div>
+      </CustomCssWrapper>,
+    );
+
+    await waitFor(() => {
+      const link = document.querySelector('link[data-custom-css="true"]');
+      expect(link?.getAttribute("href")).toBe("/first.css");
+    });
+
+    mockUseThemeConfig.mockReturnValue({
+      customCssFile: "/second.css",
+    } as any);
+
+    rerender(
+      <CustomCssWrapper>
+        <div>Test Child</div>
+      </CustomCssWrapper>,
+    );
+
+    await waitFor(() => {
+      const link = document.querySelector('link[data-custom-css="true"]');
+      expect(link?.getAttribute("href")).toBe("/second.css");
+    });
+
+    const links = document.querySelectorAll('link[data-custom-css="true"]');
+    expect(links.length).toBe(1);
+  });
 });

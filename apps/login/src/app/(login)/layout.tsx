@@ -16,6 +16,7 @@ import { headers } from "next/headers";
 import { getServiceConfig } from "@/lib/service-url";
 import { getAllowedLanguages } from "@/lib/zitadel";
 import { LANGS, getLanguage } from "@/lib/i18n";
+import { normalizeCustomCssFile } from "@/lib/theme";
 
 const lato = Lato({
   weight: ["400", "700", "900"],
@@ -24,7 +25,14 @@ const lato = Lato({
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
-  return { title: t("title") };
+  const customCssFile = normalizeCustomCssFile(process.env.NEXT_PUBLIC_THEME_CSS_FILE);
+
+  return {
+    title: t("title"),
+    ...(customCssFile && {
+      links: [{ rel: "stylesheet", href: customCssFile }],
+    }),
+  };
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

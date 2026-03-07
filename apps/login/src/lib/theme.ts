@@ -45,6 +45,38 @@ export const DEFAULT_THEME: ThemeConfig = {
   spacing: "regular",
 };
 
+/**
+ * Validates and normalizes a custom CSS file path.
+ * Ensures the path is a local file served from the public directory.
+ * Rejects external URLs (http://, https://, //) and requires paths to start with /.
+ *
+ * @param customCssFile - The raw CSS file path from environment variable
+ * @returns Normalized path if valid, null if invalid or empty
+ */
+export function normalizeCustomCssFile(customCssFile: string | undefined | null): string | null {
+  if (!customCssFile) {
+    return null;
+  }
+
+  const trimmed = customCssFile.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  // Reject protocol-relative or absolute URLs to enforce files served from /public.
+  const lower = trimmed.toLowerCase();
+  if (lower.startsWith("http://") || lower.startsWith("https://") || trimmed.startsWith("//")) {
+    return null;
+  }
+
+  // Require paths to start with "/" (public/ assets are served from the root).
+  if (!trimmed.startsWith("/")) {
+    return null;
+  }
+
+  return trimmed;
+}
+
 // Get theme configuration from environment variables
 export function getThemeConfig(): ThemeConfig {
   const globalRoundness = process.env.NEXT_PUBLIC_THEME_ROUNDNESS as ThemeRoundness;
@@ -63,6 +95,9 @@ export function getThemeConfig(): ThemeConfig {
       }
     : DEFAULT_COMPONENT_ROUNDNESS;
 
+  // Validate custom CSS file path to ensure it's a local file
+  const validatedCustomCssFile = normalizeCustomCssFile(process.env.NEXT_PUBLIC_THEME_CSS_FILE);
+
   return {
     roundness: globalRoundness || DEFAULT_THEME.roundness,
     componentRoundness: componentRoundness,
@@ -70,7 +105,7 @@ export function getThemeConfig(): ThemeConfig {
     backgroundImage: process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE || undefined,
     appearance: (process.env.NEXT_PUBLIC_THEME_APPEARANCE as ThemeAppearance) || DEFAULT_THEME.appearance,
     spacing: (process.env.NEXT_PUBLIC_THEME_SPACING as ThemeSpacing) || DEFAULT_THEME.spacing,
-    customCssFile: process.env.NEXT_PUBLIC_THEME_CSS_FILE || undefined,
+    customCssFile: validatedCustomCssFile || undefined,
   };
 }
 
