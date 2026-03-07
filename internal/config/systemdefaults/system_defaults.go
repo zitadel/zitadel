@@ -71,7 +71,19 @@ type RiskLLMConfig struct {
 	Model              string
 	Timeout            time.Duration
 	MaxEvents          int
+	NumPredict         int
 	HighRiskConfidence float64
+	LogPrompts         bool
+	CircuitBreaker     *RiskCBConfig
+}
+
+type RiskCBConfig struct {
+	Interval               time.Duration
+	MaxConsecutiveFailures uint32
+	MaxFailureRatio        float64
+	Timeout                time.Duration
+	MaxRetryRequests       uint32
+	FailOpen               bool
 }
 
 func (r RiskConfig) Validate() error {

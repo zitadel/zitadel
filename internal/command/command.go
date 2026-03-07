@@ -249,7 +249,10 @@ func StartCommands(
 			Model:              defaults.Risk.LLM.Model,
 			Timeout:            defaults.Risk.LLM.Timeout,
 			MaxEvents:          defaults.Risk.LLM.MaxEvents,
+			NumPredict:         defaults.Risk.LLM.NumPredict,
 			HighRiskConfidence: defaults.Risk.LLM.HighRiskConfidence,
+			LogPrompts:         defaults.Risk.LLM.LogPrompts,
+			CircuitBreaker:     riskCBConfig(defaults.Risk.LLM.CircuitBreaker),
 		},
 	}
 	var riskLLM risk.LLMClient
@@ -414,4 +417,18 @@ func (c *Commands) asyncPush(ctx context.Context, cmds ...eventstore.Command) {
 
 		span.EndWithError(err)
 	}()
+}
+
+func riskCBConfig(c *sd.RiskCBConfig) *risk.CBConfig {
+	if c == nil {
+		return nil
+	}
+	return &risk.CBConfig{
+		Interval:               c.Interval,
+		MaxConsecutiveFailures: c.MaxConsecutiveFailures,
+		MaxFailureRatio:        c.MaxFailureRatio,
+		Timeout:                c.Timeout,
+		MaxRetryRequests:       c.MaxRetryRequests,
+		FailOpen:               c.FailOpen,
+	}
 }
