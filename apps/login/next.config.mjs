@@ -31,6 +31,10 @@ const secureHeaders = [
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: process.env.NEXT_OUTPUT_MODE || undefined,
+  // Set the tracing root to this directory so that the standalone output
+  // places the server entry at the top level (server.js) rather than at
+  // a machine-dependent absolute path inside the standalone folder.
+  outputFileTracingRoot: import.meta.dirname,
   reactStrictMode: true,
   experimental: {
     // Add React 19 compatibility optimizations
