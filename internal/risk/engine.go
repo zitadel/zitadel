@@ -17,7 +17,6 @@ type RuleEngine struct {
 	limiter *RateLimiter
 	llm     LLMClient
 	llmCfg  LLMConfig
-	now     func() // unused, we pass time through context
 }
 
 // NewRuleEngine creates a rule engine with compiled rules and engine backends.
@@ -195,6 +194,14 @@ func (e *RuleEngine) dispatchLLM(ctx context.Context, rule *CompiledRule, rc Ris
 // runLLMAsync calls the LLM in the background for observe-mode rules and logs
 // the result. Any findings are discarded because observe mode never blocks.
 func (e *RuleEngine) runLLMAsync(ctx context.Context, rule *CompiledRule, rc RiskContext, prompt Prompt) {
+	defer func() {
+		if r := recover(); r != nil {
+			logging.Warn(ctx, "risk.llm.async_panic",
+				slog.Any("panic", r),
+				slog.String("rule_id", rule.ID),
+			)
+		}
+	}()
 	// Use a fresh timeout so a slow model doesn't run forever.
 	if e.llmCfg.Timeout > 0 {
 		var cancel context.CancelFunc

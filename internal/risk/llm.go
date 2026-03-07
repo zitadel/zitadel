@@ -139,13 +139,13 @@ func (c *OllamaClient) Classify(ctx context.Context, prompt Prompt) (Classificat
 		Prompt: prompt.User,
 		Format: ollamaFormat,
 		Options: ollamaOptions{
-				NumPredict:    c.numPredict,
-				NumCtx:        c.numCtx,
-				Temperature:   c.temperature,
-				TopK:          c.topK,
-				TopP:          c.topP,
-				RepeatPenalty: c.repeatPenalty,
-			},
+			NumPredict:    c.numPredict,
+			NumCtx:        c.numCtx,
+			Temperature:   c.temperature,
+			TopK:          c.topK,
+			TopP:          c.topP,
+			RepeatPenalty: c.repeatPenalty,
+		},
 		Stream:    false,
 		KeepAlive: c.keepAlive,
 	})
@@ -180,30 +180,38 @@ func (c *OllamaClient) Classify(ctx context.Context, prompt Prompt) (Classificat
 		return Classification{}, fmt.Errorf("ollama generate error: %s", strings.TrimSpace(generateResp.Error))
 	}
 
+	classification, parseErr := parseClassification(generateResp.Response)
+	if parseErr != nil {
+		return Classification{}, parseErr
+	}
+	return classification, nil
+}
+
+// parseClassification unmarshals and validates the LLM response JSON.
+// It tries JSON repair when the initial parse fails (truncated by num_predict).
+func parseClassification(raw string) (Classification, error) {
 	var classification Classification
-	if err := json.Unmarshal([]byte(generateResp.Response), &classification); err != nil {
-		// Small models with low num_predict truncate JSON mid-string.
-		// Attempt to repair the truncated object before giving up.
-		if repaired, repErr := repairTruncatedJSON(generateResp.Response); repErr == nil {
-			var c2 Classification
-			if err2 := json.Unmarshal([]byte(repaired), &c2); err2 == nil {
-				classification = c2
-				goto validated
+	if err := json.Unmarshal([]byte(raw), &classification); err != nil {
+		if repaired, repErr := repairTruncatedJSON(raw); repErr == nil {
+			if err2 := json.Unmarshal([]byte(repaired), &classification); err2 == nil {
+				return validateClassification(classification)
 			}
 		}
-		return Classification{}, fmt.Errorf("decode ollama classification: %w (raw: %q)", err, generateResp.Response)
+		return Classification{}, fmt.Errorf("decode ollama classification: %w (raw: %q)", err, raw)
 	}
-validated:
-	if classification.Normalized() == "" {
+	return validateClassification(classification)
+}
+
+func validateClassification(c Classification) (Classification, error) {
+	if c.Normalized() == "" {
 		return Classification{}, fmt.Errorf("ollama classification must not be empty")
 	}
 	// Some models return confidence on a 0–100 scale instead of 0.0–1.0.
-	// Normalize anything > 1 by dividing by 100.
-	if classification.Confidence > 1 {
-		classification.Confidence /= 100
+	if c.Confidence > 1 {
+		c.Confidence /= 100
 	}
-	if classification.Confidence < 0 || classification.Confidence > 1 {
-		return Classification{}, fmt.Errorf("ollama confidence must be between 0 and 1, got %f", classification.Confidence)
+	if c.Confidence < 0 || c.Confidence > 1 {
+		return Classification{}, fmt.Errorf("ollama confidence must be between 0 and 1, got %f", c.Confidence)
 	}
-	return classification, nil
+	return c, nil
 }

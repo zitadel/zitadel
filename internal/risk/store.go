@@ -69,7 +69,7 @@ func (s *MemoryStore) Save(_ context.Context, signal Signal, findings []Finding)
 func filterSignals(signals []RecordedSignal, cutoff time.Time) []RecordedSignal {
 	filtered := make([]RecordedSignal, 0, len(signals))
 	for _, signal := range signals {
-		if signal.Timestamp.IsZero() || signal.Timestamp.Before(cutoff) {
+		if !signal.Timestamp.IsZero() && signal.Timestamp.Before(cutoff) {
 			continue
 		}
 		filtered = append(filtered, signal)

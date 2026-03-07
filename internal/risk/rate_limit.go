@@ -29,14 +29,15 @@ func NewRateLimiter() *RateLimiter {
 
 // Check increments the counter for key and returns the current count and
 // whether the request is still within the limit. The window and max are
-// per-rule and provided at check time.
+// per-rule and provided at check time. Expired counters encountered during
+// lookup are lazily evicted to bound memory growth.
 func (rl *RateLimiter) Check(key string, window time.Duration, max int, now time.Time) (count int, allowed bool) {
 	rl.mu.Lock()
 	defer rl.mu.Unlock()
 
 	wc, ok := rl.counters[key]
 	if !ok || now.Sub(wc.windowStart) >= wc.window {
-		// New window.
+		// New window — lazily evict the old entry if present.
 		rl.counters[key] = &windowCounter{
 			count:       1,
 			windowStart: now,
@@ -48,6 +49,13 @@ func (rl *RateLimiter) Check(key string, window time.Duration, max int, now time
 
 	wc.count++
 	return wc.count, wc.count <= max
+}
+
+// Len returns the number of tracked counter keys (for testing/monitoring).
+func (rl *RateLimiter) Len() int {
+	rl.mu.Lock()
+	defer rl.mu.Unlock()
+	return len(rl.counters)
 }
 
 // Prune removes expired counters. Call periodically to prevent unbounded growth.

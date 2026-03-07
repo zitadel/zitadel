@@ -42,7 +42,9 @@ func New(cfg Config, store Store, llm LLMClient) (*Service, error) {
 	if cfg.Enabled && cfg.LLM.Enabled() && llm == nil {
 		return nil, fmt.Errorf("risk llm client required when mode is %q", cfg.LLM.Mode.Normalized())
 	}
-	llm = newLLMCircuitBreaker(cfg.LLM.CircuitBreaker, llm)
+	if llm != nil {
+		llm = newLLMCircuitBreaker(cfg.LLM.CircuitBreaker, llm)
+	}
 
 	var ruleEngine *RuleEngine
 	if len(cfg.Rules) > 0 {
