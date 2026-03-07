@@ -34,8 +34,9 @@ func NewRuleEngine(rules []CompiledRule, limiter *RateLimiter, llm LLMClient, ll
 
 // Evaluate runs all rules against the given RiskContext and returns findings
 // from any that matched. Rules are evaluated in order; all rules run regardless
-// of prior matches.
-func (e *RuleEngine) Evaluate(ctx context.Context, rc RiskContext) []Finding {
+// of prior matches. sessionSignals is used to cache LLM findings across the
+// create→set session pair.
+func (e *RuleEngine) Evaluate(ctx context.Context, rc RiskContext, sessionSignals []RecordedSignal) []Finding {
 	findings := make([]Finding, 0, len(e.rules))
 
 	for i := range e.rules {
@@ -75,7 +76,7 @@ func (e *RuleEngine) Evaluate(ctx context.Context, rc RiskContext) []Finding {
 			slog.Int("risk_proxy_hops", rc.ProxyHopCount),
 		)
 
-		finding := e.dispatch(ctx, rule, rc)
+		finding := e.dispatch(ctx, rule, rc, sessionSignals)
 		if finding != nil {
 			findings = append(findings, *finding)
 		}
@@ -84,14 +85,14 @@ func (e *RuleEngine) Evaluate(ctx context.Context, rc RiskContext) []Finding {
 	return findings
 }
 
-func (e *RuleEngine) dispatch(ctx context.Context, rule *CompiledRule, rc RiskContext) *Finding {
+func (e *RuleEngine) dispatch(ctx context.Context, rule *CompiledRule, rc RiskContext, sessionSignals []RecordedSignal) *Finding {
 	switch rule.Engine {
 	case EngineBlock:
 		return e.dispatchBlock(rule, rc)
 	case EngineRateLimit:
 		return e.dispatchRateLimit(ctx, rule, rc)
 	case EngineLLM:
-		return e.dispatchLLM(ctx, rule, rc)
+		return e.dispatchLLM(ctx, rule, rc, sessionSignals)
 	case EngineLog:
 		return e.dispatchLog(ctx, rule, rc)
 	default:
@@ -152,12 +153,23 @@ func (e *RuleEngine) dispatchRateLimit(ctx context.Context, rule *CompiledRule, 
 	}
 }
 
-func (e *RuleEngine) dispatchLLM(ctx context.Context, rule *CompiledRule, rc RiskContext) *Finding {
+func (e *RuleEngine) dispatchLLM(ctx context.Context, rule *CompiledRule, rc RiskContext, sessionSignals []RecordedSignal) *Finding {
 	if e.llm == nil || !e.llmCfg.Enabled() {
 		logging.Debug(ctx, "risk.llm.skipped_disabled",
 			slog.String("rule_id", rule.ID),
 		)
 		return nil
+	}
+
+	// Reuse a cached LLM finding from an earlier evaluation in this session
+	// (e.g. create_session → set_session) to avoid a second model round-trip.
+	if cached := cachedLLMFinding(sessionSignals); cached != nil {
+		logging.Debug(ctx, "risk.llm.rule_cached",
+			slog.String("rule_id", rule.ID),
+			slog.String("risk_session_id", rc.Current.SessionID),
+			slog.String("llm_classification", cached.Name),
+		)
+		return cached
 	}
 
 	// Render a focused context for the LLM instead of sending full history.

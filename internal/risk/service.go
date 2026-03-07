@@ -30,6 +30,7 @@ type Service struct {
 	llm        LLMClient
 	ruleEngine *RuleEngine
 	now        func() time.Time
+	stopMaint  chan struct{} // closed to stop the maintenance goroutine
 }
 
 func New(cfg Config, store Store, llm LLMClient) (*Service, error) {
@@ -55,7 +56,50 @@ func New(cfg Config, store Store, llm LLMClient) (*Service, error) {
 		ruleEngine = NewRuleEngine(compiled, NewRateLimiter(), llm, cfg.LLM)
 	}
 
-	return &Service{cfg: cfg, store: store, llm: llm, ruleEngine: ruleEngine, now: time.Now}, nil
+	svc := &Service{cfg: cfg, store: store, llm: llm, ruleEngine: ruleEngine, now: time.Now, stopMaint: make(chan struct{})}
+	if cfg.Enabled {
+		go svc.maintenanceLoop()
+	}
+	return svc, nil
+}
+
+// maintenanceLoop runs periodic cleanup for the in-memory store and rate limiter.
+// It prunes expired sessions and rate limit counters every maintenance interval
+// to prevent unbounded memory growth.
+func (s *Service) maintenanceLoop() {
+	const interval = 5 * time.Minute
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-s.stopMaint:
+			return
+		case <-ticker.C:
+			now := s.now()
+			// Prune expired session entries from the in-memory store.
+			if ms, ok := s.store.(*MemoryStore); ok {
+				ms.PruneSessions(now)
+			}
+			// Prune expired rate limit counters.
+			if s.ruleEngine != nil {
+				s.ruleEngine.limiter.Prune(now)
+			}
+		}
+	}
+}
+
+// Close stops the maintenance goroutine. Safe to call multiple times.
+func (s *Service) Close() {
+	if s == nil {
+		return
+	}
+	select {
+	case <-s.stopMaint:
+		// already closed
+	default:
+		close(s.stopMaint)
+	}
 }
 
 func (s *Service) Enabled() bool {
@@ -99,7 +143,7 @@ func (s *Service) Evaluate(ctx context.Context, signal Signal) (_ Decision, err 
 	if s.ruleEngine != nil {
 		// Expression-based rule evaluation.
 		rc := buildRiskContext(signal, snapshot)
-		findings = s.ruleEngine.Evaluate(ctx, rc)
+		findings = s.ruleEngine.Evaluate(ctx, rc, snapshot.SessionSignals)
 	} else {
 		// Legacy hardcoded heuristics (backward-compatible fallback).
 		findings = make([]Finding, 0, 2)

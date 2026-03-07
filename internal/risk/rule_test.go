@@ -227,7 +227,7 @@ func TestRuleEngine_Evaluate_BlockEngine(t *testing.T) {
 	ctx := context.Background()
 
 	// Only burst matches.
-	findings := engine.Evaluate(ctx, RiskContext{FailureCount: 6})
+	findings := engine.Evaluate(ctx, RiskContext{FailureCount: 6}, nil)
 	if len(findings) != 1 {
 		t.Fatalf("len(findings) = %d, want 1", len(findings))
 	}
@@ -239,13 +239,13 @@ func TestRuleEngine_Evaluate_BlockEngine(t *testing.T) {
 	}
 
 	// Both match.
-	findings = engine.Evaluate(ctx, RiskContext{FailureCount: 5, IPChanged: true, UAChanged: true})
+	findings = engine.Evaluate(ctx, RiskContext{FailureCount: 5, IPChanged: true, UAChanged: true}, nil)
 	if len(findings) != 2 {
 		t.Fatalf("len(findings) = %d, want 2", len(findings))
 	}
 
 	// Neither matches.
-	findings = engine.Evaluate(ctx, RiskContext{FailureCount: 2})
+	findings = engine.Evaluate(ctx, RiskContext{FailureCount: 2}, nil)
 	if len(findings) != 0 {
 		t.Fatalf("len(findings) = %d, want 0", len(findings))
 	}
@@ -283,20 +283,20 @@ func TestRuleEngine_RateLimitEngine(t *testing.T) {
 	}
 
 	// First two checks should pass (count 1, 2 <= max 2).
-	findings := engine.Evaluate(ctx, rc)
+	findings := engine.Evaluate(ctx, rc, nil)
 	if len(findings) != 0 {
 		t.Fatalf("first call: len(findings) = %d, want 0 (within limit)", len(findings))
 	}
 
 	rc.Current.Timestamp = now.Add(time.Second)
-	findings = engine.Evaluate(ctx, rc)
+	findings = engine.Evaluate(ctx, rc, nil)
 	if len(findings) != 0 {
 		t.Fatalf("second call: len(findings) = %d, want 0 (within limit)", len(findings))
 	}
 
 	// Third check should exceed limit.
 	rc.Current.Timestamp = now.Add(2 * time.Second)
-	findings = engine.Evaluate(ctx, rc)
+	findings = engine.Evaluate(ctx, rc, nil)
 	if len(findings) != 1 {
 		t.Fatalf("third call: len(findings) = %d, want 1 (exceeded)", len(findings))
 	}
@@ -324,7 +324,7 @@ func TestRuleEngine_LogEngine(t *testing.T) {
 	engine := NewRuleEngine(rules, nil, nil, LLMConfig{})
 	ctx := context.Background()
 
-	findings := engine.Evaluate(ctx, RiskContext{FailureCount: 1})
+	findings := engine.Evaluate(ctx, RiskContext{FailureCount: 1}, nil)
 	if len(findings) != 1 {
 		t.Fatalf("len(findings) = %d, want 1", len(findings))
 	}

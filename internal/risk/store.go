@@ -2,6 +2,7 @@ package risk
 
 import (
 	"context"
+	"sort"
 	"sync"
 	"time"
 )
@@ -30,10 +31,7 @@ func (s *MemoryStore) Snapshot(_ context.Context, signal Signal) (Snapshot, erro
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	cutoff := signal.Timestamp.Add(-maxDuration(s.cfg.HistoryWindow, s.cfg.ContextChangeWindow))
-	if signal.Timestamp.IsZero() {
-		cutoff = time.Now().UTC().Add(-maxDuration(s.cfg.HistoryWindow, s.cfg.ContextChangeWindow))
-	}
+	cutoff := signalCutoff(signal.Timestamp, s.cfg.HistoryWindow, s.cfg.ContextChangeWindow)
 
 	var snapshot Snapshot
 	if signal.UserID != "" {
@@ -49,10 +47,7 @@ func (s *MemoryStore) Save(_ context.Context, signal Signal, findings []Finding)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	cutoff := signal.Timestamp.Add(-maxDuration(s.cfg.HistoryWindow, s.cfg.ContextChangeWindow))
-	if signal.Timestamp.IsZero() {
-		cutoff = time.Now().UTC().Add(-maxDuration(s.cfg.HistoryWindow, s.cfg.ContextChangeWindow))
-	}
+	cutoff := signalCutoff(signal.Timestamp, s.cfg.HistoryWindow, s.cfg.ContextChangeWindow)
 
 	record := RecordedSignal{Signal: signal, Findings: append([]Finding(nil), findings...)}
 	if signal.UserID != "" {
@@ -66,15 +61,48 @@ func (s *MemoryStore) Save(_ context.Context, signal Signal, findings []Finding)
 	return nil
 }
 
-func filterSignals(signals []RecordedSignal, cutoff time.Time) []RecordedSignal {
-	filtered := make([]RecordedSignal, 0, len(signals))
-	for _, signal := range signals {
-		if !signal.Timestamp.IsZero() && signal.Timestamp.Before(cutoff) {
-			continue
+// PruneSessions removes session entries whose most recent signal is older than
+// the configured history window. Call periodically to prevent unbounded growth
+// of the sessionSignals map from finished sessions.
+func (s *MemoryStore) PruneSessions(now time.Time) int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	cutoff := now.Add(-maxDuration(s.cfg.HistoryWindow, s.cfg.ContextChangeWindow))
+	pruned := 0
+	for id, signals := range s.sessionSignals {
+		if len(signals) == 0 || signals[len(signals)-1].Timestamp.Before(cutoff) {
+			delete(s.sessionSignals, id)
+			pruned++
 		}
-		filtered = append(filtered, signal)
 	}
-	return filtered
+	return pruned
+}
+
+// signalCutoff computes the cutoff time for filtering/pruning signals.
+func signalCutoff(signalTime time.Time, historyWindow, contextChangeWindow time.Duration) time.Time {
+	base := signalTime
+	if base.IsZero() {
+		base = time.Now().UTC()
+	}
+	return base.Add(-maxDuration(historyWindow, contextChangeWindow))
+}
+
+// filterSignals returns only signals at or after the cutoff time.
+// Signals are stored in chronological order, so we use binary search to find
+// the cutoff index and return a sub-slice (zero allocation for large histories).
+func filterSignals(signals []RecordedSignal, cutoff time.Time) []RecordedSignal {
+	if len(signals) == 0 {
+		return nil
+	}
+	// Binary search: find the first signal at or after cutoff.
+	idx := sort.Search(len(signals), func(i int) bool {
+		return !signals[i].Timestamp.Before(cutoff)
+	})
+	if idx >= len(signals) {
+		return nil
+	}
+	return signals[idx:]
 }
 
 func pruneSignals(signals []RecordedSignal, cutoff time.Time, max int) []RecordedSignal {

@@ -56,6 +56,7 @@ type SessionCommands struct {
 	currentUserAgent     *domain.UserAgent
 	operation            string
 	riskFindings         []risk.Finding
+	cachedRiskSignal     *risk.Signal // lazily built, reused across enforce + record
 }
 
 func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWriteModel, userAgent *domain.UserAgent, operation string) *SessionCommands {
@@ -473,18 +474,34 @@ func (c *Commands) recordSessionRisk(ctx context.Context, checks *SessionCommand
 	}
 }
 
+// riskSignal returns a Signal for the current session context with the given
+// outcome. The base signal (everything except outcome) is built once and cached
+// so that enforceSessionRisk + recordSessionRisk don't duplicate HTTP header
+// extraction and UserAgent parsing.
 func (s *SessionCommands) riskSignal(ctx context.Context, geoCountryHeader string, outcome risk.Outcome) risk.Signal {
+	if s.cachedRiskSignal == nil {
+		sig := s.buildRiskSignal(ctx, geoCountryHeader)
+		s.cachedRiskSignal = &sig
+	}
+	// Return a copy with the requested outcome.
+	sig := *s.cachedRiskSignal
+	sig.Outcome = outcome
 	timestamp := time.Now().UTC()
 	if s.now != nil {
 		timestamp = s.now().UTC()
 	}
+	sig.Timestamp = timestamp
+	return sig
+}
+
+// buildRiskSignal constructs the base signal (without outcome/timestamp) from
+// session state and HTTP context. Called once per session check.
+func (s *SessionCommands) buildRiskSignal(ctx context.Context, geoCountryHeader string) risk.Signal {
 	signal := risk.Signal{
 		InstanceID: s.sessionWriteModel.aggregate.InstanceID,
 		UserID:     s.sessionWriteModel.UserID,
 		SessionID:  s.sessionWriteModel.AggregateID,
 		Operation:  s.operation,
-		Outcome:    outcome,
-		Timestamp:  timestamp,
 	}
 	if userAgent := s.effectiveUserAgent(); userAgent != nil {
 		if userAgent.FingerprintID != nil {
