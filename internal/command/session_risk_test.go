@@ -261,7 +261,7 @@ func TestCommands_updateSession_threeSessionsSameContextAllowed(t *testing.T) {
 		assert.Equalf(t, "token-"+s.id, got.NewToken, "session %d should have a token", i+1)
 
 		// Record the successful signal so subsequent sessions see the history.
-		require.NoError(t, riskSvc.Record(ctx, checks.riskSignal(risk.OutcomeSuccess), nil))
+		require.NoError(t, riskSvc.Record(ctx, checks.riskSignal(ctx, "", risk.OutcomeSuccess), nil))
 	}
 }
 
@@ -304,7 +304,7 @@ func TestCommands_updateSession_contextDriftBlocksThirdSession(t *testing.T) {
 		require.NoErrorf(t, err, "session %d should be allowed", i+1)
 		require.NotNil(t, got)
 
-		require.NoError(t, riskSvc.Record(ctx, checks.riskSignal(risk.OutcomeSuccess), nil))
+		require.NoError(t, riskSvc.Record(ctx, checks.riskSignal(ctx, "", risk.OutcomeSuccess), nil))
 	}
 
 	// Session 3: different IP and user-agent → contextDrift must block.

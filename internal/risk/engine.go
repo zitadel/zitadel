@@ -61,11 +61,18 @@ func (e *RuleEngine) Evaluate(ctx context.Context, rc RiskContext) []Finding {
 			slog.String("risk_session_id", rc.Current.SessionID),
 			slog.String("risk_operation", rc.Current.Operation),
 			slog.String("risk_ip", rc.Current.IP),
+			slog.String("risk_country", rc.Current.Country),
 			slog.Int("risk_failure_count", rc.FailureCount),
 			slog.Bool("risk_ip_changed", rc.IPChanged),
 			slog.Bool("risk_ua_changed", rc.UAChanged),
+			slog.Bool("risk_country_changed", rc.CountryChanged),
+			slog.Bool("risk_language_changed", rc.LanguageChanged),
 			slog.Int("risk_distinct_ips", rc.DistinctIPs),
 			slog.Int("risk_distinct_fps", rc.DistinctFingerprints),
+			slog.Int("risk_distinct_countries", rc.DistinctCountries),
+			slog.Int("risk_login_hour_utc", rc.LoginHourUTC),
+			slog.Float64("risk_login_velocity", rc.LoginVelocity),
+			slog.Int("risk_proxy_hops", rc.ProxyHopCount),
 		)
 
 		finding := e.dispatch(ctx, rule, rc)

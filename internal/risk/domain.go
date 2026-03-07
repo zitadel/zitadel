@@ -27,6 +27,14 @@ type Signal struct {
 	Timestamp     time.Time
 	IP            string
 	UserAgent     string
+
+	// HTTP-derived context (Tier 1 enrichment).
+	AcceptLanguage string   // Accept-Language header value
+	Country        string   // ISO 3166-1 alpha-2 from proxy/CDN header (e.g. CF-IPCountry)
+	ForwardedChain []string // full X-Forwarded-For hop list
+	Referer        string   // Referer header
+	SecFetchSite   string   // Sec-Fetch-Site header (e.g. "same-origin", "cross-site")
+	IsHTTPS        bool     // true if X-Forwarded-Proto is "https"
 }
 
 type RecordedSignal struct {

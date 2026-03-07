@@ -20,14 +20,14 @@ type Prompt struct {
 const systemPrompt = `You are a security analyst classifying authentication risk for an identity system.
 You receive JSON with a current login event and the user's recent history.
 
-Fields: outcome ("success"/"failure"/"blocked"), operation ("create_session"/"set_session"), fingerprintId (browser identity), ip, userAgent, findings (deterministic rule hits only).
+Fields: outcome ("success"/"failure"/"blocked"), operation ("create_session"/"set_session"), fingerprintId (browser identity), ip, userAgent, country (ISO 3166-1 alpha-2 from proxy), acceptLanguage, isHttps, proxyHops (X-Forwarded-For hop count), findings (deterministic rule hits only).
 
-Normal flow: create_session then set_session with same sessionId/fingerprint/IP/UA = LOW, confidence 0.1–0.2.
+Normal flow: create_session then set_session with same sessionId/fingerprint/IP/UA/country = LOW, confidence 0.1–0.2.
 
 Rules:
-- low: consistent context, no failures, normal login pair, or first event
-- medium: new device OR single failure, no strong compromise signal
-- high: impossible travel, many failures in short window, or simultaneous IP+device+UA change
+- low: consistent context, no failures, normal login pair, same country, or first event
+- medium: new device OR single failure, minor context change (language shift, single new country), no strong compromise signal
+- high: impossible travel (different countries in minutes), many failures in short window, simultaneous IP+device+UA+country change, HTTP downgrade (isHttps false after true), excessive proxy hops (>4)
 
 Confidence: empty/short history → 0.1–0.2; one minor anomaly → 0.3–0.5; two anomalies → 0.5–0.7; multiple independent strong signals → 0.7–0.9; never 1.0; single anomaly alone is at most medium.
 
@@ -41,6 +41,10 @@ type promptSignal struct {
 	FingerprintID string   `json:"fingerprintId,omitempty"`
 	IP            string   `json:"ip,omitempty"`
 	UserAgent     string   `json:"userAgent,omitempty"`
+	Country       string   `json:"country,omitempty"`
+	AcceptLang    string   `json:"acceptLanguage,omitempty"`
+	IsHTTPS       bool     `json:"isHttps,omitempty"`
+	ProxyHops     int      `json:"proxyHops,omitempty"`
 	Findings      []string `json:"findings,omitempty"`
 }
 
@@ -80,7 +84,7 @@ func buildPrompt(signal Signal, snapshot Snapshot, maxEvents int) (Prompt, error
 }
 
 func promptSignalFromSignal(signal Signal, findings []Finding) promptSignal {
-	return promptSignal{
+	ps := promptSignal{
 		Timestamp:     signal.Timestamp.UTC().Format("2006-01-02T15:04:05Z07:00"),
 		Operation:     signal.Operation,
 		Outcome:       signal.Outcome,
@@ -88,11 +92,16 @@ func promptSignalFromSignal(signal Signal, findings []Finding) promptSignal {
 		FingerprintID: signal.FingerprintID,
 		IP:            signal.IP,
 		UserAgent:     signal.UserAgent,
+		Country:       signal.Country,
+		AcceptLang:    signal.AcceptLanguage,
+		IsHTTPS:       signal.IsHTTPS,
+		ProxyHops:     len(signal.ForwardedChain),
 		// Only include deterministic rule findings (failure_burst, context_drift).
 		// Excluding llm_* findings prevents the model from anchoring on its own
 		// previous classifications and creating a self-reinforcing escalation loop.
 		Findings: deterministicFindingNames(findings),
 	}
+	return ps
 }
 
 func deterministicFindingNames(findings []Finding) []string {

@@ -109,6 +109,7 @@ type Commands struct {
 	ActionsV2DenyList []denylist.AddressChecker
 	IPLookupFunction  internal_net.IPLookupFunc
 	riskEvaluator     risk.Evaluator
+	riskGeoHeader     string // proxy header name for geo-country (e.g. "CF-IPCountry")
 }
 
 //go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
@@ -259,6 +260,7 @@ func StartCommands(
 			CircuitBreaker:     riskCBConfig(defaults.Risk.LLM.CircuitBreaker),
 		},
 		Rules: riskRules(defaults.Risk.Rules),
+		GeoCountryHeader: defaults.Risk.GeoCountryHeader,
 	}
 	var riskLLM risk.LLMClient
 	if riskConfig.Enabled && riskConfig.LLM.Enabled() {
@@ -268,6 +270,7 @@ func StartCommands(
 	if err != nil {
 		return nil, fmt.Errorf("risk evaluator: %w", err)
 	}
+	repo.riskGeoHeader = riskConfig.GeoCountryHeader
 	return repo, nil
 }
 

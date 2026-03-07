@@ -19,6 +19,11 @@ type Config struct {
 	// replaces the hardcoded failureBurst/contextDrift heuristics. When empty
 	// the legacy heuristics are used for backward compatibility.
 	Rules []Rule `yaml:"rules"`
+	// GeoCountryHeader is the HTTP header name that carries the ISO 3166-1 alpha-2
+	// country code injected by a reverse proxy or CDN (e.g. "CF-IPCountry" for
+	// Cloudflare, "X-Vercel-IP-Country" for Vercel). When empty, country-based
+	// risk signals are not available.
+	GeoCountryHeader string
 }
 
 type LLMMode string

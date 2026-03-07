@@ -13,6 +13,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	risklog "github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -430,7 +431,7 @@ func (c *Commands) enforceSessionRisk(ctx context.Context, checks *SessionComman
 		return nil
 	}
 	ctx = risklog.NewCtx(ctx, risklog.StreamRisk)
-	signal := checks.riskSignal(risk.OutcomeSuccess)
+	signal := checks.riskSignal(ctx, c.riskGeoHeader, risk.OutcomeSuccess)
 	decision, err := c.riskEvaluator.Evaluate(ctx, signal)
 	if err != nil {
 		checks.riskFindings = nil
@@ -463,7 +464,7 @@ func (c *Commands) recordSessionRisk(ctx context.Context, checks *SessionCommand
 		return
 	}
 	ctx = risklog.NewCtx(ctx, risklog.StreamRisk)
-	if err := c.riskEvaluator.Record(ctx, checks.riskSignal(outcome), findings); err != nil {
+	if err := c.riskEvaluator.Record(ctx, checks.riskSignal(ctx, c.riskGeoHeader, outcome), findings); err != nil {
 		risklog.WithError(ctx, err).Warn("risk.record.failed",
 			slog.String("risk_user_id", checks.sessionWriteModel.UserID),
 			slog.String("risk_session_id", checks.sessionWriteModel.AggregateID),
@@ -472,7 +473,7 @@ func (c *Commands) recordSessionRisk(ctx context.Context, checks *SessionCommand
 	}
 }
 
-func (s *SessionCommands) riskSignal(outcome risk.Outcome) risk.Signal {
+func (s *SessionCommands) riskSignal(ctx context.Context, geoCountryHeader string, outcome risk.Outcome) risk.Signal {
 	timestamp := time.Now().UTC()
 	if s.now != nil {
 		timestamp = s.now().UTC()
@@ -495,6 +496,20 @@ func (s *SessionCommands) riskSignal(outcome risk.Outcome) risk.Signal {
 		if userAgent.IP != nil {
 			signal.IP = userAgent.IP.String()
 		}
+		// Extract HTTP-derived context from UserAgent.Header (set by the client).
+		if userAgent.Header != nil {
+			httpCtx := risk.ExtractHTTPContext(userAgent.Header, geoCountryHeader)
+			httpCtx.ApplyTo(&signal)
+		}
+	}
+	// Fallback: extract from gRPC gateway headers if not set by the client.
+	if ctxHeaders, ok := http_util.HeadersFromCtx(ctx); ok {
+		httpCtx := risk.ExtractHTTPContext(ctxHeaders, geoCountryHeader)
+		httpCtx.ApplyTo(&signal)
+	}
+	// IP fallback from context if not set by UserAgent.
+	if signal.IP == "" {
+		signal.IP = http_util.RemoteIPFromCtx(ctx)
 	}
 	return signal
 }

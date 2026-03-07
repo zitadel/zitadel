@@ -979,7 +979,14 @@ SystemDefaults:
     # Available fields in expressions: Current (Signal), LastSuccess (*Signal),
     # LastFailure (*Signal), FailureCount, SuccessCount, TotalCount, IPChanged,
     # UAChanged, FPChanged, DistinctIPs, DistinctFingerprints, DistinctUserAgents,
-    # TimeSinceLastSuccess, TimeSinceLastFailure, SessionSignalCount, SessionFailureCount
+    # TimeSinceLastSuccess, TimeSinceLastFailure, SessionSignalCount, SessionFailureCount,
+    # LanguageChanged, CountryChanged, NewCountry, DistinctCountries, LoginHourUTC,
+    # HoursSinceLastSuccess, LoginVelocity, ProxyHopCount
+    # GeoCountryHeader is the HTTP header name that carries the ISO 3166-1 alpha-2
+    # country code from a reverse proxy or CDN. Examples:
+    #   Cloudflare: CF-IPCountry   Vercel: X-Vercel-IP-Country   Custom: X-Country-Code
+    # Leave empty to disable country-based risk signals.
+    GeoCountryHeader: "" # ZITADEL_SYSTEMDEFAULTS_RISK_GEOCOUNTRYHEADER
     Rules: # ZITADEL_SYSTEMDEFAULTS_RISK_RULES
       - id: failure-burst
         description: "Block after 5+ failures from same user in history window"
@@ -1006,6 +1013,23 @@ SystemDefaults:
           name: ip_rotation
           message: "IP changed but user agent stayed the same"
           block: false
+      - id: country-change
+        description: "Flag when geo-country changes between sessions — possible impossible travel"
+        expr: 'CountryChanged && LastSuccess != nil'
+        engine: llm
+        context_template: "Country changed from {{.LastSuccess.Country}} to {{.Current.Country}} within {{.TimeSinceLastSuccess}}. IP: {{.LastSuccess.IP}} → {{.Current.IP}}. Assess impossible travel risk."
+        finding:
+          name: country_change
+          message: "login from different country than last successful session"
+          block: false
+      - id: high-velocity
+        description: "Flag unusually high login velocity — possible brute force or automation"
+        expr: 'LoginVelocity > 20'
+        engine: block
+        finding:
+          name: high_velocity
+          message: "login velocity exceeds 20 per hour"
+          block: true
       - id: fingerprint-flood
         description: "Rate limit when many distinct fingerprints are seen for the user"
         expr: 'DistinctFingerprints >= 3'
@@ -1022,7 +1046,7 @@ SystemDefaults:
         description: "Send every session signal to the SLM for classification (testing only)"
         expr: 'true'
         engine: llm
-        context_template: "User {{.Current.UserID}} from IP {{.Current.IP}} (UA: {{.Current.UserAgent}}) performed {{.Current.Operation}} with outcome {{.Current.Outcome}}. Failures: {{.FailureCount}}, distinct IPs: {{.DistinctIPs}}, IP changed: {{.IPChanged}}, UA changed: {{.UAChanged}}."
+        context_template: "User {{.Current.UserID}} from IP {{.Current.IP}} country={{.Current.Country}} (UA: {{.Current.UserAgent}}, lang: {{.Current.AcceptLanguage}}) performed {{.Current.Operation}} with outcome {{.Current.Outcome}}. Failures: {{.FailureCount}}, distinct IPs: {{.DistinctIPs}}, distinct countries: {{.DistinctCountries}}, IP changed: {{.IPChanged}}, UA changed: {{.UAChanged}}, country changed: {{.CountryChanged}}, language changed: {{.LanguageChanged}}, login velocity: {{printf \"%.1f\" .LoginVelocity}}/hr, proxy hops: {{.ProxyHopCount}}."
         finding:
           name: llm_test
           message: "SLM test classification"

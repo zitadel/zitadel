@@ -140,3 +140,118 @@ func TestBuildRiskContext_NoIPChange_SameIP(t *testing.T) {
 		t.Error("UAChanged should be false when UA matches")
 	}
 }
+
+func TestBuildRiskContext_HTTPEnrichment(t *testing.T) {
+	now := time.Date(2026, 3, 7, 14, 30, 0, 0, time.UTC)
+	signal := Signal{
+		UserID:         "u1",
+		IP:             "5.6.7.8",
+		UserAgent:      "Firefox",
+		Timestamp:      now,
+		AcceptLanguage: "de-DE",
+		Country:        "DE",
+		ForwardedChain: []string{"5.6.7.8", "10.0.0.1", "192.168.1.1"},
+	}
+	snapshot := Snapshot{
+		UserSignals: []RecordedSignal{
+			{Signal: Signal{
+				IP:             "1.2.3.4",
+				UserAgent:      "Chrome",
+				AcceptLanguage: "en-US",
+				Country:        "US",
+				Outcome:        OutcomeSuccess,
+				Timestamp:      now.Add(-30 * time.Minute),
+			}},
+			{Signal: Signal{
+				IP:             "9.9.9.9",
+				UserAgent:      "Safari",
+				AcceptLanguage: "en-US",
+				Country:        "CH",
+				Outcome:        OutcomeSuccess,
+				Timestamp:      now.Add(-10 * time.Minute),
+			}},
+		},
+	}
+
+	rc := buildRiskContext(signal, snapshot)
+
+	// Language changed: de-DE vs en-US (last success)
+	if !rc.LanguageChanged {
+		t.Error("LanguageChanged should be true")
+	}
+
+	// Country changed: DE vs CH (last success)
+	if !rc.CountryChanged {
+		t.Error("CountryChanged should be true")
+	}
+
+	// NewCountry: DE not in history {US, CH}
+	if !rc.NewCountry {
+		t.Error("NewCountry should be true for DE not in {US, CH}")
+	}
+
+	// DistinctCountries: {US, CH, DE} = 3
+	if rc.DistinctCountries != 3 {
+		t.Errorf("DistinctCountries = %d, want 3", rc.DistinctCountries)
+	}
+
+	// LoginHourUTC: 14
+	if rc.LoginHourUTC != 14 {
+		t.Errorf("LoginHourUTC = %d, want 14", rc.LoginHourUTC)
+	}
+
+	// HoursSinceLastSuccess: 10 minutes = ~0.167 hours
+	if rc.HoursSinceLastSuccess < 0.16 || rc.HoursSinceLastSuccess > 0.17 {
+		t.Errorf("HoursSinceLastSuccess = %f, want ~0.167", rc.HoursSinceLastSuccess)
+	}
+
+	// ProxyHopCount: 3
+	if rc.ProxyHopCount != 3 {
+		t.Errorf("ProxyHopCount = %d, want 3", rc.ProxyHopCount)
+	}
+
+	// LoginVelocity: 3 signals in 30 min window = 6/hr
+	if rc.LoginVelocity < 5.9 || rc.LoginVelocity > 6.1 {
+		t.Errorf("LoginVelocity = %f, want ~6.0", rc.LoginVelocity)
+	}
+}
+
+func TestBuildRiskContext_CountryNotNew(t *testing.T) {
+	now := time.Now()
+	signal := Signal{
+		Country:   "US",
+		Timestamp: now,
+	}
+	snapshot := Snapshot{
+		UserSignals: []RecordedSignal{
+			{Signal: Signal{Country: "US", Outcome: OutcomeSuccess, Timestamp: now.Add(-time.Hour)}},
+		},
+	}
+
+	rc := buildRiskContext(signal, snapshot)
+
+	if rc.NewCountry {
+		t.Error("NewCountry should be false when country is in history")
+	}
+	if rc.DistinctCountries != 1 {
+		t.Errorf("DistinctCountries = %d, want 1", rc.DistinctCountries)
+	}
+}
+
+func TestBuildRiskContext_NoCountry(t *testing.T) {
+	now := time.Now()
+	signal := Signal{Timestamp: now}
+	snapshot := Snapshot{}
+
+	rc := buildRiskContext(signal, snapshot)
+
+	if rc.NewCountry {
+		t.Error("NewCountry should be false when no country available")
+	}
+	if rc.CountryChanged {
+		t.Error("CountryChanged should be false when no country")
+	}
+	if rc.DistinctCountries != 0 {
+		t.Errorf("DistinctCountries = %d, want 0", rc.DistinctCountries)
+	}
+}

@@ -64,6 +64,7 @@ type RiskConfig struct {
 	MaxSignalsPerSession  int
 	LLM                   RiskLLMConfig
 	Rules                 []RiskRuleConfig
+	GeoCountryHeader      string
 }
 
 // RiskRuleConfig mirrors risk.Rule for YAML configuration.
