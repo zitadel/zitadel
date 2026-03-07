@@ -217,5 +217,5 @@ func (e *RuleEngine) dispatchLog(ctx context.Context, rule *CompiledRule, rc Ris
 // ruleSystemPrompt is a compact system prompt for rule-triggered LLM evaluations.
 // It's shorter than the full risk prompt because the rule already identified the anomaly.
 const ruleSystemPrompt = `You are a security analyst. A risk rule flagged an anomaly. Assess whether this is suspicious.
-Respond ONLY with JSON: {"classification":"low|medium|high","confidence":0.0-1.0,"reason":"brief explanation"}
-Be concise. No markdown, no extra text.`
+Respond ONLY with JSON: {"classification":"low|medium|high","confidence":0.0-1.0,"reason":"max 8 words"}
+No markdown, no extra text. Keep reason under 8 words.`

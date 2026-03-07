@@ -33,7 +33,38 @@ func (c Classification) HighRisk() bool {
 	}
 }
 
-// ollamaFormat is the legacy string format identifier for unconstrained JSON mode.
+// repairTruncatedJSON attempts to close a JSON object that was cut off by a
+// token limit. It counts unescaped quotes to detect whether the truncation
+// happened inside a string value and appends the minimum suffix to make the
+// object parseable. Returns an error only when the input is not a JSON object.
+func repairTruncatedJSON(s string) (string, error) {
+	s = strings.TrimSpace(s)
+	if !strings.HasPrefix(s, "{") {
+		return "", fmt.Errorf("not a JSON object")
+	}
+	if strings.HasSuffix(s, "}") {
+		return s, nil // already complete
+	}
+	// Walk the string to determine whether we are currently inside a quoted
+	// string value. This lets us add the correct closing characters.
+	inString := false
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c == '\\' {
+			i++ // skip next character — it is escaped
+			continue
+		}
+		if c == '"' {
+			inString = !inString
+		}
+	}
+	// Truncated inside a string: close the string, then the object.
+	// Truncated outside a string (e.g. after a comma): just close the object.
+	if inString {
+		return s + `"}`, nil
+	}
+	return s + "}", nil
+}
 // This is significantly faster than JSON Schema constrained decoding on CPU because
 // it avoids llama.cpp grammar-based token filtering.
 var ollamaFormat = json.RawMessage(`"json"`)
@@ -143,8 +174,18 @@ func (c *OllamaClient) Classify(ctx context.Context, prompt Prompt) (Classificat
 
 	var classification Classification
 	if err := json.Unmarshal([]byte(generateResp.Response), &classification); err != nil {
+		// Small models with low num_predict truncate JSON mid-string.
+		// Attempt to repair the truncated object before giving up.
+		if repaired, repErr := repairTruncatedJSON(generateResp.Response); repErr == nil {
+			var c2 Classification
+			if err2 := json.Unmarshal([]byte(repaired), &c2); err2 == nil {
+				classification = c2
+				goto validated
+			}
+		}
 		return Classification{}, fmt.Errorf("decode ollama classification: %w (raw: %q)", err, generateResp.Response)
 	}
+validated:
 	if classification.Normalized() == "" {
 		return Classification{}, fmt.Errorf("ollama classification must not be empty")
 	}
