@@ -53,6 +53,7 @@ Instrumentation:
       - request # Logs for incoming API and HTTP requests.
       - event_handler # Logs for event handling in projections.
       - queue # Logs for the job queue processing.
+      - risk # Logs for inline risk evaluation and LLM classification.
       #- event_pusher # Logs for event pushing to the database. Warning: contains sensitive information.
     # Mask replaces sensitive information with Value in logs matched by Key
     Mask:
@@ -934,6 +935,16 @@ SystemDefaults:
       # Capping this prevents verbose explanations; the classification JSON is ~80 tokens.
       # Set to 0 to use the model's default (no cap).
       NumPredict: 150 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_NUMPREDICT
+      # Sampling temperature. 0 = greedy/deterministic (fastest for classification).
+      # Higher values increase randomness and slow down inference.
+      Temperature: 0 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_TEMPERATURE
+      # Top-K limits the number of token candidates. Lower = faster. 0 = model default.
+      TopK: 5 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_TOPK
+      # Top-P (nucleus sampling) limits cumulative probability mass. Lower = faster. 0 = model default.
+      TopP: 0.5 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_TOPP
+      # How long Ollama keeps the model loaded in memory after a request.
+      # Prevents cold-load penalty on subsequent calls. "0" = unload immediately, "-1" = keep forever.
+      KeepAlive: "10m" # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_KEEPALIVE
       # Minimum confidence for an "enforce" mode high-risk classification to participate in blocking.
       HighRiskConfidence: 0.85 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_HIGHRISKCONFIDENCE
       LogPrompts: false        # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_LOGPROMPTS

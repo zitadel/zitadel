@@ -39,10 +39,14 @@ func (c Classification) HighRisk() bool {
 var ollamaFormat = json.RawMessage(`"json"`)
 
 type OllamaClient struct {
-	endpoint   string
-	model      string
-	numPredict int
-	httpClient *http.Client
+	endpoint    string
+	model       string
+	numPredict  int
+	temperature *float64
+	topK        int
+	topP        float64
+	keepAlive   string
+	httpClient  *http.Client
 }
 
 func NewOllamaClient(cfg LLMConfig, httpClient *http.Client) *OllamaClient {
@@ -52,26 +56,38 @@ func NewOllamaClient(cfg LLMConfig, httpClient *http.Client) *OllamaClient {
 	}
 	cloned := *client
 	cloned.Timeout = cfg.Timeout
+	keepAlive := cfg.KeepAlive
+	if keepAlive == "" {
+		keepAlive = "10m"
+	}
 	return &OllamaClient{
-		endpoint:   strings.TrimRight(cfg.Endpoint, "/"),
-		model:      cfg.Model,
-		numPredict: cfg.NumPredict,
-		httpClient: &cloned,
+		endpoint:    strings.TrimRight(cfg.Endpoint, "/"),
+		model:       cfg.Model,
+		numPredict:  cfg.NumPredict,
+		temperature: cfg.Temperature,
+		topK:        cfg.TopK,
+		topP:        cfg.TopP,
+		keepAlive:   keepAlive,
+		httpClient:  &cloned,
 	}
 }
 
 // ollamaOptions maps to Ollama's per-request model options.
 type ollamaOptions struct {
-	NumPredict int `json:"num_predict,omitempty"`
+	NumPredict  int      `json:"num_predict,omitempty"`
+	Temperature *float64 `json:"temperature,omitempty"`
+	TopK        int      `json:"top_k,omitempty"`
+	TopP        float64  `json:"top_p,omitempty"`
 }
 
 type ollamaGenerateRequest struct {
-	Model   string          `json:"model"`
-	System  string          `json:"system,omitempty"`
-	Prompt  string          `json:"prompt"`
-	Format  json.RawMessage `json:"format"`
-	Options ollamaOptions   `json:"options,omitempty"`
-	Stream  bool            `json:"stream"`
+	Model     string          `json:"model"`
+	System    string          `json:"system,omitempty"`
+	Prompt    string          `json:"prompt"`
+	Format    json.RawMessage `json:"format"`
+	Options   ollamaOptions   `json:"options,omitempty"`
+	Stream    bool            `json:"stream"`
+	KeepAlive string          `json:"keep_alive,omitempty"`
 }
 
 type ollamaGenerateResponse struct {
@@ -81,12 +97,18 @@ type ollamaGenerateResponse struct {
 
 func (c *OllamaClient) Classify(ctx context.Context, prompt Prompt) (Classification, error) {
 	reqBody, err := json.Marshal(ollamaGenerateRequest{
-		Model:   c.model,
-		System:  prompt.System,
-		Prompt:  prompt.User,
-		Format:  ollamaFormat,
-		Options: ollamaOptions{NumPredict: c.numPredict},
-		Stream:  false,
+		Model:  c.model,
+		System: prompt.System,
+		Prompt: prompt.User,
+		Format: ollamaFormat,
+		Options: ollamaOptions{
+			NumPredict:  c.numPredict,
+			Temperature: c.temperature,
+			TopK:        c.topK,
+			TopP:        c.topP,
+		},
+		Stream:    false,
+		KeepAlive: c.keepAlive,
 	})
 	if err != nil {
 		return Classification{}, fmt.Errorf("marshal ollama request: %w", err)

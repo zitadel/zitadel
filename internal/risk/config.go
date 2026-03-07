@@ -36,6 +36,19 @@ type LLMConfig struct {
 	// Keeping this at ~100–150 prevents verbose explanations while still leaving
 	// room for the classification JSON. 0 means use the model's default.
 	NumPredict int
+	// Temperature controls randomness in sampling. 0 = greedy/deterministic,
+	// which is fastest for classification tasks. Default 0.
+	Temperature *float64
+	// TopK limits the number of token candidates considered at each step.
+	// Lower values (e.g. 5) speed up sampling. 0 = use model default.
+	TopK int
+	// TopP (nucleus sampling) limits the cumulative probability mass.
+	// Lower values (e.g. 0.5) speed up sampling. 0 = use model default.
+	TopP float64
+	// KeepAlive controls how long Ollama keeps the model loaded in memory
+	// after a request. Prevents cold-load latency on subsequent calls.
+	// Default "10m". Set to "0" to unload immediately, "-1" to keep forever.
+	KeepAlive string
 	// LogPrompts emits the prompt context and model response at info level,
 	// independently of the global log level. Useful for tuning without enabling
 	// full debug logging across the whole API.

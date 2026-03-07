@@ -49,6 +49,7 @@ const (
 	StreamEventPusher  = instrumentation.StreamEventPusher  // Event pushing to the database.
 	StreamEventHandler = instrumentation.StreamEventHandler // Event handling and processing.
 	StreamQueue        = instrumentation.StreamQueue        // Queue operations and job processing.
+	StreamRisk         = instrumentation.StreamRisk         // Risk evaluation and LLM classification.
 )
 
 var noop = slog.New(slog.DiscardHandler)

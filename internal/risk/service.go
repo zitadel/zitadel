@@ -4,11 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
-	"github.com/zitadel/logging"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 )
 
 type Evaluator interface {
@@ -17,6 +21,8 @@ type Evaluator interface {
 	Evaluate(ctx context.Context, signal Signal) (Decision, error)
 	Record(ctx context.Context, signal Signal, findings []Finding) error
 }
+
+var tracer = instrumentation.NewTracer("risk")
 
 type Service struct {
 	cfg   Config
@@ -50,10 +56,19 @@ func (s *Service) FailOpen() bool {
 	return s.cfg.FailOpen
 }
 
-func (s *Service) Evaluate(ctx context.Context, signal Signal) (Decision, error) {
+func (s *Service) Evaluate(ctx context.Context, signal Signal) (_ Decision, err error) {
 	if !s.Enabled() {
 		return Decision{Allow: true}, nil
 	}
+
+	ctx, span := tracer.NewSpan(ctx, "risk.Evaluate")
+	defer span.EndWithError(err)
+	trace.SpanFromContext(ctx).SetAttributes(
+		attribute.String("risk.user_id", signal.UserID),
+		attribute.String("risk.session_id", signal.SessionID),
+		attribute.String("risk.operation", signal.Operation),
+	)
+
 	if signal.Timestamp.IsZero() {
 		signal.Timestamp = s.now().UTC()
 	}
@@ -99,14 +114,21 @@ func (s *Service) Evaluate(ctx context.Context, signal Signal) (Decision, error)
 	for i, f := range findings {
 		names[i] = f.Name
 	}
-	logging.WithFields(
-		"risk_user_id", signal.UserID,
-		"risk_session_id", signal.SessionID,
-		"risk_operation", signal.Operation,
-		"risk_allow", decision.Allow,
-		"risk_findings", strings.Join(names, ","),
-		"risk_latency_ms", elapsed.Milliseconds(),
-	).Info("risk evaluation complete")
+
+	trace.SpanFromContext(ctx).SetAttributes(
+		attribute.Bool("risk.allow", decision.Allow),
+		attribute.String("risk.findings", strings.Join(names, ",")),
+		attribute.Int64("risk.latency_ms", elapsed.Milliseconds()),
+	)
+
+	logging.Info(ctx, "risk evaluation complete",
+		slog.String("risk_user_id", signal.UserID),
+		slog.String("risk_session_id", signal.SessionID),
+		slog.String("risk_operation", signal.Operation),
+		slog.Bool("risk_allow", decision.Allow),
+		slog.String("risk_findings", strings.Join(names, ",")),
+		slog.Int64("risk_latency_ms", elapsed.Milliseconds()),
+	)
 
 	return decision, nil
 }
@@ -160,7 +182,7 @@ func (s *Service) contextDrift(signal Signal, snapshot Snapshot) (Finding, bool)
 	return Finding{}, false
 }
 
-func (s *Service) evaluateLLM(ctx context.Context, signal Signal, snapshot Snapshot) (*Finding, error) {
+func (s *Service) evaluateLLM(ctx context.Context, signal Signal, snapshot Snapshot) (_ *Finding, err error) {
 	if s.llm == nil || !s.cfg.LLM.Enabled() {
 		return nil, nil
 	}
@@ -170,17 +192,16 @@ func (s *Service) evaluateLLM(ctx context.Context, signal Signal, snapshot Snaps
 	// This halves round-trips for the normal create→set login pair while keeping
 	// fresh evaluations for every new session.
 	if cached := cachedLLMFinding(snapshot.SessionSignals); cached != nil {
-		classEntry := logging.WithFields(
-			"risk_user_id", signal.UserID,
-			"risk_session_id", signal.SessionID,
-			"risk_llm_classification", fmt.Sprintf("cached:%s", cached.Name),
-			"risk_llm_mode", s.cfg.LLM.Mode.Normalized(),
-		)
+		level := slog.LevelDebug
 		if s.cfg.LLM.LogPrompts {
-			classEntry.Info("llm risk classification (cached)")
-		} else {
-			classEntry.Debug("llm risk classification (cached)")
+			level = slog.LevelInfo
 		}
+		logging.Log(ctx, level, "llm risk classification (cached)",
+			slog.String("risk_user_id", signal.UserID),
+			slog.String("risk_session_id", signal.SessionID),
+			slog.String("risk_llm_classification", fmt.Sprintf("cached:%s", cached.Name)),
+			slog.String("risk_llm_mode", string(s.cfg.LLM.Mode.Normalized())),
+		)
 		return cached, nil
 	}
 
@@ -189,35 +210,43 @@ func (s *Service) evaluateLLM(ctx context.Context, signal Signal, snapshot Snaps
 		return nil, err
 	}
 
-	promptEntry := logging.WithFields(
-		"risk_user_id", signal.UserID,
-		"risk_session_id", signal.SessionID,
-		"risk_llm_context", prompt.User,
-	)
+	promptLevel := slog.LevelDebug
 	if s.cfg.LLM.LogPrompts {
-		promptEntry.Info("llm risk prompt")
-	} else {
-		promptEntry.Debug("llm risk prompt")
+		promptLevel = slog.LevelInfo
 	}
+	logging.Log(ctx, promptLevel, "llm risk prompt",
+		slog.String("risk_user_id", signal.UserID),
+		slog.String("risk_session_id", signal.SessionID),
+		slog.String("risk_llm_context", prompt.User),
+	)
+
+	ctx, llmSpan := tracer.NewClientSpan(ctx, "risk.LLM.Classify")
+	defer llmSpan.EndWithError(err)
 
 	llmStart := s.now()
 	classification, err := s.llm.Classify(ctx, prompt)
 	llmElapsed := s.now().Sub(llmStart)
+
+	trace.SpanFromContext(ctx).SetAttributes(
+		attribute.String("risk.llm.model", s.cfg.LLM.Model),
+		attribute.Int64("risk.llm.latency_ms", llmElapsed.Milliseconds()),
+	)
+
 	if err != nil {
 		if errors.Is(err, ErrCircuitOpen) {
-			logging.WithFields(
-				"risk_user_id", signal.UserID,
-				"risk_session_id", signal.SessionID,
-			).Warn("llm circuit open; skipping llm risk evaluation")
+			logging.Warn(ctx, "llm circuit open; skipping llm risk evaluation",
+				slog.String("risk_user_id", signal.UserID),
+				slog.String("risk_session_id", signal.SessionID),
+			)
 			if s.cfg.LLM.CircuitBreaker != nil && !s.cfg.LLM.CircuitBreaker.FailOpen {
 				return nil, err
 			}
 			return nil, nil
 		}
-		logging.WithError(err).WithFields(logrus.Fields{
-			"risk_user_id":        signal.UserID,
-			"risk_llm_latency_ms": llmElapsed.Milliseconds(),
-		}).Warn("llm classify failed")
+		logging.WithError(ctx, err).Warn("llm classify failed",
+			slog.String("risk_user_id", signal.UserID),
+			slog.Int64("risk_llm_latency_ms", llmElapsed.Milliseconds()),
+		)
 		return nil, err
 	}
 
@@ -226,20 +255,24 @@ func (s *Service) evaluateLLM(ctx context.Context, signal Signal, snapshot Snaps
 		level = "unknown"
 	}
 
-	classEntry := logging.WithFields(
-		"risk_user_id", signal.UserID,
-		"risk_session_id", signal.SessionID,
-		"risk_llm_classification", level,
-		"risk_llm_confidence", classification.Confidence,
-		"risk_llm_reason", classification.Reason,
-		"risk_llm_latency_ms", llmElapsed.Milliseconds(),
-		"risk_llm_mode", s.cfg.LLM.Mode.Normalized(),
+	trace.SpanFromContext(ctx).SetAttributes(
+		attribute.String("risk.llm.classification", level),
+		attribute.Float64("risk.llm.confidence", classification.Confidence),
 	)
+
+	classLevel := slog.LevelDebug
 	if s.cfg.LLM.LogPrompts {
-		classEntry.Info("llm risk classification")
-	} else {
-		classEntry.Debug("llm risk classification")
+		classLevel = slog.LevelInfo
 	}
+	logging.Log(ctx, classLevel, "llm risk classification",
+		slog.String("risk_user_id", signal.UserID),
+		slog.String("risk_session_id", signal.SessionID),
+		slog.String("risk_llm_classification", level),
+		slog.Float64("risk_llm_confidence", classification.Confidence),
+		slog.String("risk_llm_reason", classification.Reason),
+		slog.Int64("risk_llm_latency_ms", llmElapsed.Milliseconds()),
+		slog.String("risk_llm_mode", string(s.cfg.LLM.Mode.Normalized())),
+	)
 
 	finding := &Finding{
 		Name:       fmt.Sprintf("llm_%s_risk", level),

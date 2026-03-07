@@ -5,14 +5,15 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"log/slog"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	risklog "github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -428,14 +429,17 @@ func (c *Commands) enforceSessionRisk(ctx context.Context, checks *SessionComman
 	if c.riskEvaluator == nil || !c.riskEvaluator.Enabled() {
 		return nil
 	}
+	ctx = risklog.NewCtx(ctx, risklog.StreamRisk)
 	signal := checks.riskSignal(risk.OutcomeSuccess)
 	decision, err := c.riskEvaluator.Evaluate(ctx, signal)
 	if err != nil {
 		checks.riskFindings = nil
 		if c.riskEvaluator.FailOpen() {
-			logging.WithError(err).
-				WithFields(logrus.Fields{"user_id": signal.UserID, "session_id": signal.SessionID, "operation": signal.Operation}).
-				Warn("risk evaluation failed; continuing because fail-open is enabled")
+			risklog.WithError(ctx, err).Warn("risk evaluation failed; continuing because fail-open is enabled",
+				slog.String("user_id", signal.UserID),
+				slog.String("session_id", signal.SessionID),
+				slog.String("operation", signal.Operation),
+			)
 			return nil
 		}
 		return err
@@ -445,12 +449,12 @@ func (c *Commands) enforceSessionRisk(ctx context.Context, checks *SessionComman
 		return nil
 	}
 	c.recordSessionRisk(ctx, checks, risk.OutcomeBlocked, decision.Findings)
-	logging.WithFields(
-		"user_id", signal.UserID,
-		"session_id", signal.SessionID,
-		"operation", signal.Operation,
-		"findings", riskFindingNames(decision.Findings),
-	).Warn("blocked session request by inline risk evaluation")
+	risklog.Warn(ctx, "blocked session request by inline risk evaluation",
+		slog.String("user_id", signal.UserID),
+		slog.String("session_id", signal.SessionID),
+		slog.String("operation", signal.Operation),
+		slog.Any("findings", riskFindingNames(decision.Findings)),
+	)
 	return zerrors.ThrowPermissionDenied(nil, "COMMAND-RISK0", "Errors.PermissionDenied")
 }
 
@@ -458,10 +462,13 @@ func (c *Commands) recordSessionRisk(ctx context.Context, checks *SessionCommand
 	if c.riskEvaluator == nil || !c.riskEvaluator.Enabled() {
 		return
 	}
+	ctx = risklog.NewCtx(ctx, risklog.StreamRisk)
 	if err := c.riskEvaluator.Record(ctx, checks.riskSignal(outcome), findings); err != nil {
-		logging.WithError(err).
-			WithFields(logrus.Fields{"user_id": checks.sessionWriteModel.UserID, "session_id": checks.sessionWriteModel.AggregateID, "operation": checks.operation}).
-			Warn("unable to record session risk signal")
+		risklog.WithError(ctx, err).Warn("unable to record session risk signal",
+			slog.String("user_id", checks.sessionWriteModel.UserID),
+			slog.String("session_id", checks.sessionWriteModel.AggregateID),
+			slog.String("operation", checks.operation),
+		)
 	}
 }
 

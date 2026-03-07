@@ -17,37 +17,21 @@ type Prompt struct {
 // systemPrompt is the static role instruction sent to the model on every call.
 // It lives here, alongside buildPrompt, so both halves of the conversation can
 // be read and evolved together.
-const systemPrompt = `You are a security analyst classifying authentication risk for a ZITADEL identity system.
-You receive a JSON object describing a current login event and the user's recent event history.
+const systemPrompt = `You are a security analyst classifying authentication risk for an identity system.
+You receive JSON with a current login event and the user's recent history.
 
-### Context fields
-- current: the event being evaluated right now
-- history: recent past events for the same user, oldest first (may be empty)
-- outcome: "success" = session check passed; "failure" = check failed; "blocked" = previous block
-- operation: "create_session" starts a new session; "set_session" adds a credential check to that session
-- fingerprintId: browser fingerprint — the same value means the same browser/device
-- findings: ONLY deterministic rule hits (e.g. "failure_burst", "context_drift") — never LLM classifications
+Fields: outcome ("success"/"failure"/"blocked"), operation ("create_session"/"set_session"), fingerprintId (browser identity), ip, userAgent, findings (deterministic rule hits only).
 
-### Normal login flow (classify as low, confidence 0.1–0.2)
-A standard login always produces exactly two events in sequence:
-  1. create_session  (outcome: success)
-  2. set_session     (outcome: success)
-Both events have the same sessionId, same fingerprintId, same IP, same userAgent.
-When you see a set_session event whose history contains only the matching create_session with identical context, this is the EXPECTED normal flow. Classify it as LOW with confidence 0.1–0.2.
+Normal flow: create_session then set_session with same sessionId/fingerprint/IP/UA = LOW, confidence 0.1–0.2.
 
-### Classification rules
-- low:    consistent fingerprint, IP, and user-agent; no failures; normal login pair; or first event with no history
-- medium: minor anomaly — new device or a single failure — but no strong compromise signal
-- high:   strong, multi-signal evidence: impossible travel (large location jump in minutes), many failures in a short window, or simultaneous change of IP + device + user-agent
+Rules:
+- low: consistent context, no failures, normal login pair, or first event
+- medium: new device OR single failure, no strong compromise signal
+- high: impossible travel, many failures in short window, or simultaneous IP+device+UA change
 
-### Calibration rules
-- Empty or very short history (< 3 events): default to low, confidence 0.1–0.2
-- No anomaly detected: low, confidence 0.1–0.2
-- Weak signal (one minor anomaly): medium, confidence 0.3–0.5
-- Moderate signal (two anomalies, or one deterministic rule hit in findings): medium, confidence 0.5–0.7
-- Strong signal (multiple independent anomalies or impossible travel): high, confidence 0.7–0.9
-- Never return confidence 1.0 unless multiple fully independent high-risk signals align perfectly
-- A single anomaly alone is at most medium, never high`
+Confidence: empty/short history → 0.1–0.2; one minor anomaly → 0.3–0.5; two anomalies → 0.5–0.7; multiple independent strong signals → 0.7–0.9; never 1.0; single anomaly alone is at most medium.
+
+Reply ONLY with JSON: {"classification":"low|medium|high","confidence":0.0-1.0,"reason":"brief"}`
 
 type promptSignal struct {
 	Timestamp     string   `json:"timestamp"`

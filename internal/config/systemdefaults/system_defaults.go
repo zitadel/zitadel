@@ -72,6 +72,10 @@ type RiskLLMConfig struct {
 	Timeout            time.Duration
 	MaxEvents          int
 	NumPredict         int
+	Temperature        *float64
+	TopK               int
+	TopP               float64
+	KeepAlive          string
 	HighRiskConfidence float64
 	LogPrompts         bool
 	CircuitBreaker     *RiskCBConfig
