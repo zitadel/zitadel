@@ -149,7 +149,7 @@ services:
         - CMD
         - /bin/sh
         - -c
-        - node /app/healthcheck.js http://localhost:3000/ui/v2/login/healthy
+        - node /app/apps/login/healthcheck.mjs http://localhost:3000/ui/v2/login/healthy
       interval: 10s
       timeout: 30s
       retries: 12
