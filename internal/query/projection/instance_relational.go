@@ -14,57 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const InstanceRelationalProjectionTable = "zitadel.instances"
-
-type instanceRelationalProjection struct{}
-
-func newInstanceRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(instanceRelationalProjection))
-}
-
-func (*instanceRelationalProjection) Name() string {
-	return InstanceRelationalProjectionTable
-}
-
-func (p *instanceRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: instance.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  instance.InstanceAddedEventType,
-					Reduce: p.reduceInstanceAdded,
-				},
-				{
-					Event:  instance.InstanceChangedEventType,
-					Reduce: p.reduceInstanceChanged,
-				},
-				{
-					Event:  instance.InstanceRemovedEventType,
-					Reduce: p.reduceInstanceDelete,
-				},
-				{
-					Event:  instance.DefaultOrgSetEventType,
-					Reduce: p.reduceDefaultOrgSet,
-				},
-				{
-					Event:  instance.ProjectSetEventType,
-					Reduce: p.reduceIAMProjectSet,
-				},
-				{
-					Event:  instance.ManagementConsoleSetEventType,
-					Reduce: p.reduceManagementConsoleSet,
-				},
-				{
-					Event:  instance.DefaultLanguageSetEventType,
-					Reduce: p.reduceDefaultLanguageSet,
-				},
-			},
-		},
-	}
-}
-
-func (p *instanceRelationalProjection) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.InstanceAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-29nRr", "reduce.wrong.event.type %s", instance.InstanceAddedEventType)
@@ -83,7 +33,7 @@ func (p *instanceRelationalProjection) reduceInstanceAdded(event eventstore.Even
 	}), nil
 }
 
-func (p *instanceRelationalProjection) reduceInstanceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceInstanceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.InstanceChangedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-so2am1", "reduce.wrong.event.type %s", instance.InstanceChangedEventType)
@@ -98,10 +48,10 @@ func (p *instanceRelationalProjection) reduceInstanceChanged(event eventstore.Ev
 	}), nil
 }
 
-func (p *instanceRelationalProjection) reduceInstanceDelete(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceInstanceDelete(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.InstanceRemovedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-so2am1", "reduce.wrong.event.type %s", instance.InstanceChangedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-so2am1", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -113,7 +63,7 @@ func (p *instanceRelationalProjection) reduceInstanceDelete(event eventstore.Eve
 	}), nil
 }
 
-func (p *instanceRelationalProjection) reduceDefaultOrgSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceDefaultOrgSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DefaultOrgSetEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.DefaultOrgSetEventType)
@@ -129,7 +79,7 @@ func (p *instanceRelationalProjection) reduceDefaultOrgSet(event eventstore.Even
 	}), nil
 }
 
-func (p *instanceRelationalProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.ProjectSetEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.ProjectSetEventType)
@@ -145,7 +95,7 @@ func (p *instanceRelationalProjection) reduceIAMProjectSet(event eventstore.Even
 	}), nil
 }
 
-func (p *instanceRelationalProjection) reduceManagementConsoleSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceManagementConsoleSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.ManagementConsoleSetEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ManagementConsoleSetEventType)
@@ -161,7 +111,7 @@ func (p *instanceRelationalProjection) reduceManagementConsoleSet(event eventsto
 	}), nil
 }
 
-func (p *instanceRelationalProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DefaultLanguageSetEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.DefaultLanguageSetEventType)
@@ -177,7 +127,7 @@ func (p *instanceRelationalProjection) reduceDefaultLanguageSet(event eventstore
 	}), nil
 }
 
-func (p *instanceRelationalProjection) updateInstance(ctx context.Context, tx database.Transaction, event eventstore.Event, repo domain.InstanceRepository, changes ...database.Change) error {
+func (p *relationalTablesProjection) updateInstance(ctx context.Context, tx database.Transaction, event eventstore.Event, repo domain.InstanceRepository, changes ...database.Change) error {
 	_, err := repo.Update(ctx, tx, event.Aggregate().ID, changes...)
 	if err != nil {
 		return err
