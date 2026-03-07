@@ -31,6 +31,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	internal_net "github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/risk"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
@@ -107,6 +108,7 @@ type Commands struct {
 	loginPaths        LoginPaths
 	ActionsV2DenyList []denylist.AddressChecker
 	IPLookupFunction  internal_net.IPLookupFunc
+	riskEvaluator     risk.Evaluator
 }
 
 //go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
@@ -233,6 +235,31 @@ func StartCommands(
 	}
 	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
 	repo.tarpit = defaults.Tarpit.Tarpit()
+	riskConfig := risk.Config{
+		Enabled:               defaults.Risk.Enabled,
+		FailOpen:              defaults.Risk.FailOpen,
+		FailureBurstThreshold: defaults.Risk.FailureBurstThreshold,
+		HistoryWindow:         defaults.Risk.HistoryWindow,
+		ContextChangeWindow:   defaults.Risk.ContextChangeWindow,
+		MaxSignalsPerUser:     defaults.Risk.MaxSignalsPerUser,
+		MaxSignalsPerSession:  defaults.Risk.MaxSignalsPerSession,
+		LLM: risk.LLMConfig{
+			Mode:               risk.LLMMode(defaults.Risk.LLM.Mode),
+			Endpoint:           defaults.Risk.LLM.Endpoint,
+			Model:              defaults.Risk.LLM.Model,
+			Timeout:            defaults.Risk.LLM.Timeout,
+			MaxEvents:          defaults.Risk.LLM.MaxEvents,
+			HighRiskConfidence: defaults.Risk.LLM.HighRiskConfidence,
+		},
+	}
+	var riskLLM risk.LLMClient
+	if riskConfig.Enabled && riskConfig.LLM.Enabled() {
+		riskLLM = risk.NewOllamaClient(riskConfig.LLM, httpClient)
+	}
+	repo.riskEvaluator, err = risk.New(riskConfig, nil, riskLLM)
+	if err != nil {
+		return nil, fmt.Errorf("risk evaluator: %w", err)
+	}
 	return repo, nil
 }
 

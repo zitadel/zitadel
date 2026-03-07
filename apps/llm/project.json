@@ -1,0 +1,20 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@zitadel/llm",
+  "projectType": "application",
+  "namedInputs": {
+    "sources": [
+      "{projectRoot}/**/*"
+    ]
+  },
+  "targets": {
+    "test": {
+      "description": "Validates the Ollama helper scripts for the AI addon profile.",
+      "command": "bash -n apps/llm/*.sh",
+      "cache": true,
+      "inputs": [
+        "sources"
+      ]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+# Dev overlay: replaces published images with locally-built ones and enables the
+# AI risk experiment with observe mode. Designed to be used with --profile ai.
+#
+# Usage (single command via Nx):
+#   pnpm nx run @zitadel/compose:start-ai
+#
+# Or manually:
+#   docker compose --env-file .env.dev \
+#     -f docker-compose.yml -f docker-compose.dev.yml \
+#     --profile ai -p zitadel-dev up --force-recreate --wait
+
+services:
+  zitadel-api:
+    image: zitadel/zitadel:local
+    environment:
+      # Known password so you can log in immediately without extra setup steps.
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: ZitadelLocalDev1!
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: "false"
+      # Write the initial admin PAT to a volume so scripts can consume it.
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: zitadel-admin-sa
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: ZITADEL Admin SA
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: "2099-01-01T00:00:00.000000Z"
+      ZITADEL_FIRSTINSTANCE_PATPATH: /zitadel/bootstrap/admin.pat
+
+  zitadel-login:
+    image: zitadel/zitadel-login:local

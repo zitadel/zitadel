@@ -22,7 +22,7 @@
           └──────────────┘
 ```
 
-Optional services via profiles: `redis` (`cache`), `otel-collector` (`observability`).
+Optional services via profiles: `redis` (`cache`), `otel-collector` (`observability`), `ollama` + `zitadel-ml` (`ai`).
 
 ## File Conventions
 
@@ -78,6 +78,29 @@ Local NX targets for testing the compose stack:
 | `test` | Lightweight — delegates to `test-config` only. Safe for `nx affected` | No |
 | `test-full` | Full pipeline: `test-config` → `test-run` → Playwright wiring + browser tests → teardown | Yes |
 | `stop` | Tears down the `zitadel-compose-test` stack and removes volumes | Yes |
+
+## AI profile
+
+The optional `ai` profile starts:
+
+- `ollama` for local SLM/LLM inference
+- `ollama-pull-model` to pull the configured model once Ollama is healthy
+- `zitadel-ml` as the placeholder ML service for future ONNX-backed inference
+
+Suggested first-run flow:
+
+1. copy `.env.example` to `.env`
+2. change `ZITADEL_SYSTEMDEFAULTS_RISK_ENABLED=true`
+3. change `ZITADEL_SYSTEMDEFAULTS_RISK_LLM_MODE=observe`
+4. start with `docker compose --env-file .env --profile ai up -d --wait`
+
+Or use the single Nx command that builds everything and starts the stack:
+
+```
+pnpm nx run @zitadel/compose:start-ai
+```
+
+This keeps the base stack unchanged while letting the embedded API risk evaluator call Ollama directly. The default model (`qwen2.5:7b`) is Apache 2.0 and has no restrictions on automated decisions, so you can switch to `enforce` mode once you've validated its output quality.
 
 ## Rejected Alternatives
 

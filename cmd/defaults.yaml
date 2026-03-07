@@ -905,6 +905,53 @@ SystemDefaults:
     StepSize: 5 # ZITADEL_SYSTEMDEFAULTS_TARPIT_STEPSIZE
     # The maximum duration the tarpit can reach.
     MaxDuration: 10s # ZITADEL_SYSTEMDEFAULTS_TARPIT_MAXDURATION
+  Risk:
+    Enabled: false # ZITADEL_SYSTEMDEFAULTS_RISK_ENABLED
+    # When true, session authentication continues if the inline risk evaluator errors.
+    FailOpen: true # ZITADEL_SYSTEMDEFAULTS_RISK_FAILOPEN
+    # Block when this many recent failed session checks have been recorded for the same user.
+    FailureBurstThreshold: 5 # ZITADEL_SYSTEMDEFAULTS_RISK_FAILUREBURSTTHRESHOLD
+    # Window used for counting recent failed session checks.
+    HistoryWindow: 30m # ZITADEL_SYSTEMDEFAULTS_RISK_HISTORYWINDOW
+    # Window used for comparing the current login context with recent successful logins.
+    ContextChangeWindow: 10m # ZITADEL_SYSTEMDEFAULTS_RISK_CONTEXTCHANGEWINDOW
+    # Maximum number of recent risk signals kept per user in memory for the POC evaluator.
+    MaxSignalsPerUser: 50 # ZITADEL_SYSTEMDEFAULTS_RISK_MAXSIGNALSPERUSER
+    # Maximum number of recent risk signals kept per session in memory for the POC evaluator.
+    MaxSignalsPerSession: 20 # ZITADEL_SYSTEMDEFAULTS_RISK_MAXSIGNALSPERSESSION
+    LLM:
+      # disabled = never call the SLM/LLM, observe = record the model output without blocking, enforce = allow high-confidence "high risk" classifications to block login
+      Mode: disabled # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_MODE
+      # The Ollama HTTP endpoint used by the embedded risk evaluator.
+      Endpoint: http://localhost:11434 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_ENDPOINT
+      # The Ollama model used for the first bounded user-event risk classification experiment.
+      Model: qwen2.5:0.5b # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_MODEL
+      # Timeout for the synchronous model classification request.
+      Timeout: 3s # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_TIMEOUT
+      # Maximum number of recent user/session signals serialized into the model prompt.
+      MaxEvents: 8 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_MAXEVENTS
+      # Maximum number of tokens the model is allowed to generate per response.
+      # Capping this prevents verbose explanations; the classification JSON is ~80 tokens.
+      # Set to 0 to use the model's default (no cap).
+      NumPredict: 150 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_NUMPREDICT
+      # Minimum confidence for an "enforce" mode high-risk classification to participate in blocking.
+      HighRiskConfidence: 0.85 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_HIGHRISKCONFIDENCE
+      LogPrompts: false        # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_LOGPROMPTS
+      # CircuitBreaker protects against a slow or unavailable Ollama endpoint.
+      # Mirrors the CBConfig used for the Redis cache connector.
+      CircuitBreaker:
+        # Number of consecutive failures before the circuit opens. 0 = no threshold.
+        MaxConsecutiveFailures: 5 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_CIRCUITBREAKER_MAXCONSECUTIVEFAILURES
+        # Ratio of failed requests that opens the circuit. 0 = no threshold.
+        MaxFailureRatio: 0 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_CIRCUITBREAKER_MAXFAILURERATIO
+        # How long the circuit stays open before allowing a probe request.
+        Timeout: 2s # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_CIRCUITBREAKER_TIMEOUT
+        # Requests allowed through when the circuit is half-open.
+        MaxRetryRequests: 1 # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_CIRCUITBREAKER_MAXRETRYREQUESTS
+        # When true (default), an open circuit causes the LLM check to be skipped silently
+        # and the login continues. Set to false to propagate an error (subject to the
+        # service-level FailOpen policy).
+        FailOpen: true # ZITADEL_SYSTEMDEFAULTS_RISK_LLM_CIRCUITBREAKER_FAILOPEN
   DomainVerification:
     VerificationGenerator:
       Length: 32 # ZITADEL_SYSTEMDEFAULTS_DOMAINVERIFICATION_VERIFICATIONGENERATOR_LENGTH

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
@@ -20,10 +21,16 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/risk"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SessionCommand func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error)
+
+const (
+	sessionOperationCreate = "create_session"
+	sessionOperationUpdate = "set_session"
+)
 
 type SessionCommands struct {
 	sessionCommands []SessionCommand
@@ -44,9 +51,12 @@ type SessionCommands struct {
 	now                  func() time.Time
 	maxIdPIntentLifetime time.Duration
 	tarpit               func(failedAttempts uint64)
+	currentUserAgent     *domain.UserAgent
+	operation            string
+	riskFindings         []risk.Finding
 }
 
-func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWriteModel) *SessionCommands {
+func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWriteModel, userAgent *domain.UserAgent, operation string) *SessionCommands {
 	return &SessionCommands{
 		sessionCommands:      cmds,
 		sessionWriteModel:    session,
@@ -62,6 +72,8 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		now:                  time.Now,
 		maxIdPIntentLifetime: c.maxIdPIntentLifetime,
 		tarpit:               c.tarpit,
+		currentUserAgent:     userAgent,
+		operation:            operation,
 	}
 }
 
@@ -311,7 +323,7 @@ func (c *Commands) CreateSession(
 	if err = c.checkSessionWritePermission(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
-	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
+	cmd := c.NewSessionCommands(cmds, sessionWriteModel, userAgent, sessionOperationCreate)
 	cmd.Start(ctx, userAgent)
 	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
@@ -331,7 +343,7 @@ func (c *Commands) UpdateSession(
 	if err = c.checkSessionWritePermission(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
-	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
+	cmd := c.NewSessionCommands(cmds, sessionWriteModel, nil, sessionOperationUpdate)
 	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
 
@@ -380,11 +392,15 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 			_, pushErr := c.eventstore.Push(ctx, cmds...)
 			logging.OnError(pushErr).Error("unable to store check failures")
 		}
+		c.recordSessionRisk(ctx, checks, risk.OutcomeFailure, nil)
 		return nil, err
 	}
 	checks.ChangeMetadata(ctx, metadata)
 	err = checks.SetLifetime(ctx, lifetime)
 	if err != nil {
+		return nil, err
+	}
+	if err = c.enforceSessionRisk(ctx, checks); err != nil {
 		return nil, err
 	}
 	sessionToken, cmds, err := checks.commands(ctx)
@@ -402,9 +418,93 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 	if err != nil {
 		return nil, err
 	}
+	c.recordSessionRisk(ctx, checks, risk.OutcomeSuccess, checks.riskFindings)
 	changed := sessionWriteModelToSessionChanged(checks.sessionWriteModel)
 	changed.NewToken = sessionToken
 	return changed, nil
+}
+
+func (c *Commands) enforceSessionRisk(ctx context.Context, checks *SessionCommands) error {
+	if c.riskEvaluator == nil || !c.riskEvaluator.Enabled() {
+		return nil
+	}
+	signal := checks.riskSignal(risk.OutcomeSuccess)
+	decision, err := c.riskEvaluator.Evaluate(ctx, signal)
+	if err != nil {
+		checks.riskFindings = nil
+		if c.riskEvaluator.FailOpen() {
+			logging.WithError(err).
+				WithFields(logrus.Fields{"user_id": signal.UserID, "session_id": signal.SessionID, "operation": signal.Operation}).
+				Warn("risk evaluation failed; continuing because fail-open is enabled")
+			return nil
+		}
+		return err
+	}
+	checks.riskFindings = append([]risk.Finding(nil), decision.Findings...)
+	if decision.Allow {
+		return nil
+	}
+	c.recordSessionRisk(ctx, checks, risk.OutcomeBlocked, decision.Findings)
+	logging.WithFields(
+		"user_id", signal.UserID,
+		"session_id", signal.SessionID,
+		"operation", signal.Operation,
+		"findings", riskFindingNames(decision.Findings),
+	).Warn("blocked session request by inline risk evaluation")
+	return zerrors.ThrowPermissionDenied(nil, "COMMAND-RISK0", "Errors.PermissionDenied")
+}
+
+func (c *Commands) recordSessionRisk(ctx context.Context, checks *SessionCommands, outcome risk.Outcome, findings []risk.Finding) {
+	if c.riskEvaluator == nil || !c.riskEvaluator.Enabled() {
+		return
+	}
+	if err := c.riskEvaluator.Record(ctx, checks.riskSignal(outcome), findings); err != nil {
+		logging.WithError(err).
+			WithFields(logrus.Fields{"user_id": checks.sessionWriteModel.UserID, "session_id": checks.sessionWriteModel.AggregateID, "operation": checks.operation}).
+			Warn("unable to record session risk signal")
+	}
+}
+
+func (s *SessionCommands) riskSignal(outcome risk.Outcome) risk.Signal {
+	timestamp := time.Now().UTC()
+	if s.now != nil {
+		timestamp = s.now().UTC()
+	}
+	signal := risk.Signal{
+		InstanceID: s.sessionWriteModel.aggregate.InstanceID,
+		UserID:     s.sessionWriteModel.UserID,
+		SessionID:  s.sessionWriteModel.AggregateID,
+		Operation:  s.operation,
+		Outcome:    outcome,
+		Timestamp:  timestamp,
+	}
+	if userAgent := s.effectiveUserAgent(); userAgent != nil {
+		if userAgent.FingerprintID != nil {
+			signal.FingerprintID = *userAgent.FingerprintID
+		}
+		if userAgent.Description != nil {
+			signal.UserAgent = *userAgent.Description
+		}
+		if userAgent.IP != nil {
+			signal.IP = userAgent.IP.String()
+		}
+	}
+	return signal
+}
+
+func (s *SessionCommands) effectiveUserAgent() *domain.UserAgent {
+	if s.currentUserAgent != nil {
+		return s.currentUserAgent
+	}
+	return s.sessionWriteModel.UserAgent
+}
+
+func riskFindingNames(findings []risk.Finding) []string {
+	names := make([]string, 0, len(findings))
+	for _, finding := range findings {
+		names = append(names, finding.Name)
+	}
+	return names
 }
 
 // checkSessionWritePermission will check that the caller is granted the "session.write" permission on the resource owner of the authenticated user.
