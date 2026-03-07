@@ -189,6 +189,11 @@ validated:
 	if classification.Normalized() == "" {
 		return Classification{}, fmt.Errorf("ollama classification must not be empty")
 	}
+	// Some models return confidence on a 0–100 scale instead of 0.0–1.0.
+	// Normalize anything > 1 by dividing by 100.
+	if classification.Confidence > 1 {
+		classification.Confidence /= 100
+	}
 	if classification.Confidence < 0 || classification.Confidence > 1 {
 		return Classification{}, fmt.Errorf("ollama confidence must be between 0 and 1, got %f", classification.Confidence)
 	}

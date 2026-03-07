@@ -72,6 +72,33 @@ func TestOllamaClientClassify_TruncatedJSON(t *testing.T) {
 	}
 }
 
+func TestOllamaClientClassify_ConfidenceScale100(t *testing.T) {
+	t.Parallel()
+
+	// Some models return confidence on a 0-100 scale; should be normalized to 0-1.
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{"response":"{\"classification\":\"high\",\"confidence\":100,\"reason\":\"ip changed\"}"}`)
+	}))
+	defer server.Close()
+
+	client := NewOllamaClient(LLMConfig{
+		Mode:      LLMModeObserve,
+		Endpoint:  server.URL,
+		Model:     "test",
+		Timeout:   time.Second,
+		MaxEvents: 4,
+	}, server.Client())
+
+	c, err := client.Classify(context.Background(), Prompt{System: "sys", User: "ctx"})
+	if err != nil {
+		t.Fatalf("expected normalization to succeed, got: %v", err)
+	}
+	if c.Confidence != 1.0 {
+		t.Errorf("confidence = %f, want 1.0 (normalized from 100)", c.Confidence)
+	}
+}
+
 func TestRepairTruncatedJSON(t *testing.T) {
 	tests := []struct {
 		name    string
