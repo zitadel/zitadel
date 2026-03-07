@@ -8,6 +8,7 @@ import {
   DEFAULT_COMPONENT_ROUNDNESS,
   DEFAULT_THEME,
   getThemeConfig,
+  normalizeCustomCssFile,
   ROUNDNESS_CLASSES,
   getComponentRoundness,
   SPACING_STYLES,
@@ -398,6 +399,64 @@ describe("Theme Configuration", () => {
     });
   });
 
+  describe("normalizeCustomCssFile", () => {
+    it("should return null for undefined input", () => {
+      expect(normalizeCustomCssFile(undefined)).toBeNull();
+    });
+
+    it("should return null for null input", () => {
+      expect(normalizeCustomCssFile(null)).toBeNull();
+    });
+
+    it("should return null for empty string", () => {
+      expect(normalizeCustomCssFile("")).toBeNull();
+    });
+
+    it("should return null for whitespace-only string", () => {
+      expect(normalizeCustomCssFile("   ")).toBeNull();
+    });
+
+    it("should accept valid local path starting with /", () => {
+      expect(normalizeCustomCssFile("/custom-theme.css")).toBe("/custom-theme.css");
+    });
+
+    it("should accept nested local path", () => {
+      expect(normalizeCustomCssFile("/themes/dark.css")).toBe("/themes/dark.css");
+    });
+
+    it("should reject http:// URLs", () => {
+      expect(normalizeCustomCssFile("http://example.com/style.css")).toBeNull();
+    });
+
+    it("should reject https:// URLs", () => {
+      expect(normalizeCustomCssFile("https://example.com/style.css")).toBeNull();
+    });
+
+    it("should reject protocol-relative URLs", () => {
+      expect(normalizeCustomCssFile("//example.com/style.css")).toBeNull();
+    });
+
+    it("should reject paths without leading slash", () => {
+      expect(normalizeCustomCssFile("custom-theme.css")).toBeNull();
+    });
+
+    it("should reject paths with relative segments", () => {
+      expect(normalizeCustomCssFile("./custom-theme.css")).toBeNull();
+    });
+
+    it("should trim whitespace from valid paths", () => {
+      expect(normalizeCustomCssFile("  /custom-theme.css  ")).toBe("/custom-theme.css");
+    });
+
+    it("should handle uppercase HTTP protocol", () => {
+      expect(normalizeCustomCssFile("HTTP://example.com/style.css")).toBeNull();
+    });
+
+    it("should handle mixed case HTTPS protocol", () => {
+      expect(normalizeCustomCssFile("HtTpS://example.com/style.css")).toBeNull();
+    });
+  });
+
   describe("Integration Tests", () => {
     it("should work correctly when switching between different roundness levels", () => {
       // Get classes for different roundness levels
@@ -448,6 +507,67 @@ describe("Theme Configuration", () => {
 
       expect(config.roundness).toBe(DEFAULT_THEME.roundness);
       expect(config.layout).toBe(DEFAULT_THEME.layout);
+    });
+
+    it("should use custom CSS file from environment variable", () => {
+      const customCssFile = "/custom-theme.css";
+      process.env.NEXT_PUBLIC_THEME_CSS_FILE = customCssFile;
+
+      const config = getThemeConfig();
+
+      expect(config.customCssFile).toBe(customCssFile);
+
+      delete process.env.NEXT_PUBLIC_THEME_CSS_FILE;
+    });
+
+    it("should reject external URL in custom CSS file", () => {
+      process.env.NEXT_PUBLIC_THEME_CSS_FILE = "https://evil.com/style.css";
+
+      const config = getThemeConfig();
+
+      expect(config.customCssFile).toBeUndefined();
+
+      delete process.env.NEXT_PUBLIC_THEME_CSS_FILE;
+    });
+
+    it("should reject protocol-relative URL in custom CSS file", () => {
+      process.env.NEXT_PUBLIC_THEME_CSS_FILE = "//evil.com/style.css";
+
+      const config = getThemeConfig();
+
+      expect(config.customCssFile).toBeUndefined();
+
+      delete process.env.NEXT_PUBLIC_THEME_CSS_FILE;
+    });
+
+    it("should reject path without leading slash in custom CSS file", () => {
+      process.env.NEXT_PUBLIC_THEME_CSS_FILE = "custom-theme.css";
+
+      const config = getThemeConfig();
+
+      expect(config.customCssFile).toBeUndefined();
+
+      delete process.env.NEXT_PUBLIC_THEME_CSS_FILE;
+    });
+
+    it("should have undefined custom CSS file when not set", () => {
+      delete process.env.NEXT_PUBLIC_THEME_CSS_FILE;
+
+      const config = getThemeConfig();
+
+      expect(config.customCssFile).toBeUndefined();
+    });
+
+    it("should combine custom CSS file with other theme properties", () => {
+      process.env.NEXT_PUBLIC_THEME_ROUNDNESS = "full";
+      process.env.NEXT_PUBLIC_THEME_LAYOUT = "side-by-side";
+      process.env.NEXT_PUBLIC_THEME_CSS_FILE = "/themes/dark.css";
+
+      const config = getThemeConfig();
+
+      expect(config.roundness).toBe("full");
+      expect(config.layout).toBe("side-by-side");
+      expect(config.customCssFile).toBe("/themes/dark.css");
     });
   });
 });
