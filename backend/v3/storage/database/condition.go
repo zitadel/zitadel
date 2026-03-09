@@ -353,8 +353,14 @@ type existsCondition struct {
 
 // Matches implements [Condition].
 func (e *existsCondition) Matches(x any) bool {
-	// Unimplemented
-	return false
+	toMatch, ok := x.(*existsCondition)
+	if !ok {
+		return false
+	}
+	if e.table != toMatch.table {
+		return false
+	}
+	return e.condition.Matches(toMatch.condition)
 }
 
 // String implements [Condition].
