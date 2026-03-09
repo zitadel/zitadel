@@ -30,30 +30,31 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 		testName          string
 		userRepo          func(ctrl *gomock.Controller) domain.UserRepository
 		permissionChecker func(ctrl *gomock.Controller) domain.PermissionRepository
-		sessionID         string
-		instanceID        string
-		checkUser         *domain.CheckUserType
+		cmd               *domain.UserCheckCommand
 		expectedError     error
 	}{
 		{
 			testName:      "when CheckUser is nil should return no error",
-			checkUser:     nil,
+			cmd:           &domain.UserCheckCommand{},
 			expectedError: nil,
 		},
 		{
-			testName:      "when session ID is not set should return error",
-			checkUser:     &domain.CheckUserType{UserID: "user-123"},
+			testName: "when session ID is not set should return error",
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+			},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-00o0ys", "Errors.Missing.SessionID"),
 		},
 		{
-			testName:      "when instance ID is not set should return error",
-			checkUser:     &domain.CheckUserType{UserID: "user-123"},
-			sessionID:     "session-1",
+			testName: "when instance ID is not set should return error",
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+			},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-Oe1dtz", "Errors.Missing.InstanceID"),
 		},
 		{
-			testName:  "when permission check fails should return permission denied error",
-			checkUser: &domain.CheckUserType{UserID: "user-123"},
+			testName: "when permission check fails should return permission denied error",
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
 				repo := domainmock.NewMockPermissionChecker(ctrl)
 
@@ -64,13 +65,15 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 
 				return repo
 			},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+			},
 			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-4qz3mt", "Errors.PermissionDenied"),
 		},
 		{
-			testName:  "when search type is UserId should fetch user by ID",
-			checkUser: &domain.CheckUserType{UserID: "user-123"},
+			testName: "when search type is UserId should fetch user by ID",
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
 				repo := domainmock.NewMockPermissionChecker(ctrl)
 
@@ -97,13 +100,15 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+			},
 			expectedError: nil,
 		},
 		{
-			testName:  "when user not active should return precondition failed error",
-			checkUser: &domain.CheckUserType{UserID: "user-123"},
+			testName: "when user not active should return precondition failed error",
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
 				repo := domainmock.NewMockPermissionChecker(ctrl)
 
@@ -130,13 +135,15 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+			},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-vgDIu9", "Errors.User.NotActive"),
 		},
 		{
-			testName:  "when user retrieval fails should return error",
-			checkUser: &domain.CheckUserType{UserID: "user-123"},
+			testName: "when user retrieval fails should return error",
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
 				repo := domainmock.NewMockPermissionChecker(ctrl)
 
@@ -159,13 +166,15 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					Return(nil, getErr)
 				return repo
 			},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+			},
 			expectedError: zerrors.ThrowInternal(getErr, "DOM-Y846I0", "failed fetching user"),
 		},
 		{
-			testName:  "when user not found should return not found error",
-			checkUser: &domain.CheckUserType{UserID: "user-123"},
+			testName: "when user not found should return not found error",
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
 				repo := domainmock.NewMockPermissionChecker(ctrl)
 
@@ -188,13 +197,15 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					Return(nil, notFoundErr)
 				return repo
 			},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+			},
 			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-lcZeXI", "user not found"),
 		},
 		{
-			testName:  "when search type is LoginName should attempt to fetch by login name",
-			checkUser: &domain.CheckUserType{LoginName: "user@example.com"},
+			testName: "when search type is LoginName should attempt to fetch by login name",
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionRepository {
 				repo := domainmock.NewMockPermissionChecker(ctrl)
 
@@ -222,8 +233,11 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{LoginName: "user@example.com"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+			},
 			expectedError: nil,
 		},
 		{
@@ -238,9 +252,11 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 
 				return repo
 			},
-			checkUser:     &domain.CheckUserType{},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+			},
 			expectedError: zerrors.ThrowInvalidArgumentf(nil, "DOM-7B2m0b", "no valid query option"),
 		},
 	}
@@ -249,9 +265,9 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			ctx := authz.NewMockContext(tc.instanceID, "", "")
+			ctx := authz.NewMockContext(tc.cmd.InstanceID, "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewUserCheckCommand(tc.sessionID, tc.instanceID, tc.checkUser)
+			cmd := domain.NewUserCheckCommand(tc.cmd.SessionID, tc.cmd.InstanceID, tc.cmd.InputCheckUser)
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
@@ -283,26 +299,17 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 	tt := []struct {
 		testName                  string
 		sessionRepo               func(ctrl *gomock.Controller) domain.SessionRepository
-		checkUser                 *domain.CheckUserType
-		sessionID                 string
-		instanceID                string
-		fetchedUser               domain.User
+		cmd                       *domain.UserCheckCommand
 		expectedError             error
 		expectedPreferredLanguage *language.Tag
 	}{
 		{
 			testName:      "when CheckUser is nil should return no error",
-			checkUser:     nil,
+			cmd:           &domain.UserCheckCommand{},
 			expectedError: nil,
 		},
 		{
-			testName:  "when session retrieval fails should return error",
-			checkUser: &domain.CheckUserType{UserID: "user-123"},
-			fetchedUser: domain.User{
-				ID:             "user-123",
-				OrganizationID: "org-1",
-			},
-			sessionID: "session-1",
+			testName: "when session retrieval fails should return error",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
@@ -315,19 +322,18 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					Return(nil, getErr)
 				return repo
 			},
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				FetchedUser: domain.User{
+					ID:             "user-123",
+					OrganizationID: "org-1",
+				},
+			},
 			expectedError: zerrors.ThrowInternal(getErr, "DOM-To1rLz", "failed fetching session"),
 		},
 		{
-			testName:  "when session not found should return not found error",
-			checkUser: &domain.CheckUserType{UserID: "user-123"},
-			fetchedUser: domain.User{
-				ID:             "user-123",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					PreferredLanguage: language.Italian,
-				},
-			},
-			sessionID: "session-1",
+			testName: "when session not found should return not found error",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
@@ -340,17 +346,21 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					Return(nil, sessionNotFoundErr)
 				return repo
 			},
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				FetchedUser: domain.User{
+					ID:             "user-123",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{
+						PreferredLanguage: language.Italian,
+					},
+				},
+			},
 			expectedError: zerrors.ThrowNotFound(sessionNotFoundErr, "DOM-rbdCv3", "session not found"),
 		},
 		{
-			testName:   "when user change is attempted should return invalid argument error",
-			checkUser:  &domain.CheckUserType{UserID: "user-123"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-123",
-				OrganizationID: "org-1",
-			},
+			testName: "when user change is attempted should return invalid argument error",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
@@ -366,17 +376,19 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					}, nil)
 				return repo
 			},
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+				FetchedUser: domain.User{
+					ID:             "user-123",
+					OrganizationID: "org-1",
+				},
+			},
 			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-78g1TV", "user change not possible"),
 		},
 		{
-			testName:   "when session update fails should return error",
-			checkUser:  &domain.CheckUserType{UserID: "user-123"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-123",
-				OrganizationID: "org-1",
-			},
+			testName: "when session update fails should return error",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
@@ -400,17 +412,19 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					Return(int64(0), updateErr)
 				return repo
 			},
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+				FetchedUser: domain.User{
+					ID:             "user-123",
+					OrganizationID: "org-1",
+				},
+			},
 			expectedError: zerrors.ThrowInternal(updateErr, "DOM-netNam", "failed updating session"),
 		},
 		{
-			testName:   "when session update returns no rows should return not found error",
-			checkUser:  &domain.CheckUserType{UserID: "user-123"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-123",
-				OrganizationID: "org-1",
-			},
+			testName: "when session update returns no rows should return not found error",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
@@ -434,17 +448,19 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					Return(int64(0), nil)
 				return repo
 			},
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+				FetchedUser: domain.User{
+					ID:             "user-123",
+					OrganizationID: "org-1",
+				},
+			},
 			expectedError: zerrors.ThrowNotFound(nil, "DOM-FszyWS", "session not found"),
 		},
 		{
-			testName:   "when session update returns multiple rows should return internal error",
-			checkUser:  &domain.CheckUserType{UserID: "user-123"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-123",
-				OrganizationID: "org-1",
-			},
+			testName: "when session update returns multiple rows should return internal error",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
@@ -468,20 +484,19 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					Return(int64(2), nil)
 				return repo
 			},
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+				FetchedUser: domain.User{
+					ID:             "user-123",
+					OrganizationID: "org-1",
+				},
+			},
 			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-SsIwDt", "unexpected number of rows updated"),
 		},
 		{
-			testName:   "when session has no user and user is set should execute successfully",
-			checkUser:  &domain.CheckUserType{UserID: "user-123"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-123",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					PreferredLanguage: language.Albanian,
-				},
-			},
+			testName: "when session has no user and user is set should execute successfully",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
@@ -505,17 +520,22 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					Return(int64(1), nil)
 				return repo
 			},
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+				FetchedUser: domain.User{
+					ID:             "user-123",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{
+						PreferredLanguage: language.Albanian,
+					},
+				},
+			},
 			expectedPreferredLanguage: &language.Albanian,
 		},
 		{
-			testName:   "when session user matches fetched user should execute successfully",
-			checkUser:  &domain.CheckUserType{UserID: "user-123"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-123",
-				OrganizationID: "org-1",
-			},
+			testName: "when session user matches fetched user should execute successfully",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
@@ -539,6 +559,15 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					Return(int64(1), nil)
 				return repo
 			},
+			cmd: &domain.UserCheckCommand{
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+				FetchedUser: domain.User{
+					ID:             "user-123",
+					OrganizationID: "org-1",
+				},
+			},
 		},
 	}
 
@@ -548,13 +577,6 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
-			cmd := &domain.UserCheckCommand{
-				InputCheckUser: tc.checkUser,
-				SessionID:      tc.sessionID,
-				InstanceID:     tc.instanceID,
-				FetchedUser:    tc.fetchedUser,
-			}
-
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
 			}
@@ -564,13 +586,13 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			}
 
 			// Test
-			err := cmd.Execute(ctx, opts)
+			err := tc.cmd.Execute(ctx, opts)
 
 			// Verify
 			assert.ErrorIs(t, err, tc.expectedError)
-			if tc.expectedError == nil && tc.checkUser != nil {
-				assert.NotZero(t, cmd.UserCheckedAt)
-				assert.Equal(t, tc.expectedPreferredLanguage, cmd.PreferredUserLanguage)
+			if tc.expectedError == nil && tc.cmd.InputCheckUser != nil {
+				assert.NotZero(t, tc.cmd.UserCheckedAt)
+				assert.Equal(t, tc.expectedPreferredLanguage, tc.cmd.PreferredUserLanguage)
 			}
 		})
 	}
@@ -581,27 +603,25 @@ func TestUserCheckCommand_Events(t *testing.T) {
 
 	tt := []struct {
 		testName         string
-		checkUser        *domain.CheckUserType
-		sessionID        string
-		instanceID       string
-		fetchedUser      domain.User
-		userCheckedAt    time.Time
+		cmd              *domain.UserCheckCommand
 		expectedEventLen int
 		expectedError    error
 	}{
 		{
 			testName:         "when CheckUser is nil should return nil",
-			checkUser:        nil,
+			cmd:              &domain.UserCheckCommand{},
 			expectedEventLen: 0,
 			expectedError:    nil,
 		},
 		{
-			testName:         "when CheckUser is set should return user checked event",
-			checkUser:        &domain.CheckUserType{UserID: "user-123"},
-			sessionID:        "session-1",
-			instanceID:       "instance-1",
-			fetchedUser:      domain.User{ID: "user-123", OrganizationID: "org-1"},
-			userCheckedAt:    time.Now(),
+			testName: "when CheckUser is set should return user checked event",
+			cmd: &domain.UserCheckCommand{
+				SessionID:      "session-1",
+				InstanceID:     "instance-1",
+				FetchedUser:    domain.User{ID: "user-123", OrganizationID: "org-1"},
+				UserCheckedAt:  time.Now(),
+				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
+			},
 			expectedEventLen: 1,
 			expectedError:    nil,
 		},
@@ -611,21 +631,13 @@ func TestUserCheckCommand_Events(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			ctx := authz.NewMockContext(tc.instanceID, "", "")
-			cmd := &domain.UserCheckCommand{
-				InputCheckUser: tc.checkUser,
-				SessionID:      tc.sessionID,
-				InstanceID:     tc.instanceID,
-				FetchedUser:    tc.fetchedUser,
-				UserCheckedAt:  tc.userCheckedAt,
-			}
-
+			ctx := authz.NewMockContext(tc.cmd.InstanceID, "", "")
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
 			}
 
 			// Test
-			events, err := cmd.Events(ctx, opts)
+			events, err := tc.cmd.Events(ctx, opts)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)
@@ -634,8 +646,8 @@ func TestUserCheckCommand_Events(t *testing.T) {
 				usrCheckedEvent, ok := events[0].(*session.UserCheckedEvent)
 				require.True(t, ok)
 
-				assert.Equal(t, tc.fetchedUser.ID, usrCheckedEvent.UserID)
-				assert.Equal(t, tc.fetchedUser.OrganizationID, usrCheckedEvent.UserResourceOwner)
+				assert.Equal(t, tc.cmd.FetchedUser.ID, usrCheckedEvent.UserID)
+				assert.Equal(t, tc.cmd.FetchedUser.OrganizationID, usrCheckedEvent.UserResourceOwner)
 				assert.NotZero(t, usrCheckedEvent.CheckedAt)
 			}
 		})
