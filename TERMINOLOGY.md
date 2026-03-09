@@ -62,7 +62,7 @@ All user-facing wording in docs, UI, and API descriptions must follow this table
 | OTP SMS | One-time password delivered via SMS | SMS OTP | OTP SMS | replace | UI + Docs |
 | Organization ID | Explicit organization identifier | Resource Owner, OrgID, OrganizationID | `organization_id` | replace | API |
 | Explicit object IDs | Explicit identifier per resource type | Resource ID, ResourceID | `user_id` / `project_id` / `application_id` / `instance_id` / `organization_id` | replace | API |
-| Instance ID | Instance identifier label in UI | Resource Id (Instance) | Instance ID | replace | UI |
+| Instance ID | Instance identifier label in UI | Resource Id (Instance) | Instance ID | replace | UI + Docs |
 | ID | Generic identifier label in UI | Resource Id | ID | replace | UI |
 | First Name | Personal given name field | Given Name | First Name | replace | Everywhere |
 | Last Name | Personal family name field | Family Name | Last Name | replace | Everywhere |
