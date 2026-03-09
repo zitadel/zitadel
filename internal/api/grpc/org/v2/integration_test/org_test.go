@@ -1069,7 +1069,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 				}
-				assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+				integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
 			},
 		},
 		{
@@ -1103,7 +1103,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated-value1")))},
 				}
-				assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+				integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
 			},
 		},
 		{
@@ -1124,7 +1124,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 				}
-				assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+				integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
 			},
 		},
 		{
@@ -1150,7 +1150,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated-value1")))},
 					{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
 				}
-				assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+				integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
 			},
 		},
 	}
@@ -1187,19 +1187,6 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
-}
-
-func getMetadataMap(metadata []*metadata.Metadata) map[string][]byte {
-	metadataByKey := make(map[string][]byte, len(metadata))
-	for _, md := range metadata {
-		metadataByKey[md.Key] = md.Value
-	}
-	return metadataByKey
-}
-
-func assertMetadataEquals(t *testing.T, expected []*metadata.Metadata, actual []*metadata.Metadata) {
-	assert.Equal(t, len(expected), len(actual))
-	assert.Equal(t, getMetadataMap(expected), getMetadataMap(actual))
 }
 
 func TestServer_DeleteOrganizationMetadata(t *testing.T) {

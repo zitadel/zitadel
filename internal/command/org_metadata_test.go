@@ -305,6 +305,13 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 								"key1",
 								[]byte("value1"),
 							),
+						),
+						eventFromEventPusher(
+							org.NewMetadataSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"key2",
+								[]byte("value2"),
+							),
 						)),
 					expectPush(
 						org.NewMetadataSetEvent(context.Background(),
@@ -330,8 +337,9 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 				metadataList: []*domain.Metadata{
 					{Key: "key", Value: []byte("updated_value")}, // update an existing key
 					{Key: "key1"},                          // delete an existing key
-					{Key: "key2"},                          // delete a non-existing key
+					{Key: "key2", Value: []byte("value2")}, // unchanged value
 					{Key: "key3", Value: []byte("value3")}, // add a new key
+					{Key: "key4"},                          // delete a non-existing key
 				},
 			},
 			res: res{

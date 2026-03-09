@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	metadata "github.com/zitadel/zitadel/pkg/grpc/metadata/v2"
 	resources_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
@@ -175,4 +176,18 @@ func diffProto(expected, actual proto.Message) string {
 		panic(err)
 	}
 	return "\n\nDiff:\n" + diff
+}
+
+// AssertMetadataEquals verifies that two slices of proto Metadata are equal, comparing both length and content by key-value mapping.
+func AssertMetadataEquals(t *testing.T, expected []*metadata.Metadata, actual []*metadata.Metadata) {
+	assert.Equal(t, len(expected), len(actual))
+	assert.Equal(t, getMetadataMap(expected), getMetadataMap(actual))
+}
+
+func getMetadataMap(metadata []*metadata.Metadata) map[string][]byte {
+	metadataByKey := make(map[string][]byte, len(metadata))
+	for _, md := range metadata {
+		metadataByKey[md.Key] = md.Value
+	}
+	return metadataByKey
 }
