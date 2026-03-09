@@ -67,36 +67,14 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 		}
 	}
 
-	events := make([]eventstore.Command, 0)
 	setMetadata, err := c.getUserMetadataListModelByID(ctx, userID, userResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
-	for _, data := range metadatas {
-		existingValue, keyExists := setMetadata.metadataList[data.Key]
-
-		// if value is empty, a metadata remove event has to be pushed
-		if len(data.Value) == 0 {
-			// Ignore deletion if key does not exist
-			if !keyExists {
-				continue
-			}
-
-			event := user.NewMetadataRemovedEvent(ctx, userAgg, data.Key)
-			events = append(events, event)
-			continue
-		}
-
-		// if no change to metadata no event has to be pushed
-		if keyExists && bytes.Equal(existingValue, data.Value) {
-			continue
-		}
-		event, err := c.setUserMetadata(ctx, userAgg, data)
-		if err != nil {
-			return nil, err
-		}
-		events = append(events, event)
+	events, err := c.createMetadataEvents(ctx, metadatas, setMetadata.metadataList, userAgg)
+	if err != nil {
+		return nil, err
 	}
 	// no changes for the metadata
 	if len(events) == 0 {
@@ -113,6 +91,37 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 		return nil, err
 	}
 	return writeModelToObjectDetails(&setMetadata.WriteModel), nil
+}
+
+// createMetadataEvents compares the existing metadata key-value pair before creating metadata set/remove events
+func (c *Commands) createMetadataEvents(ctx context.Context, reqMetadata []*domain.Metadata, currentMetadataMap map[string][]byte, userAgg *eventstore.Aggregate) ([]eventstore.Command, error) {
+	events := make([]eventstore.Command, 0)
+	for _, data := range reqMetadata {
+		existingValue, keyExists := currentMetadataMap[data.Key]
+
+		// if the value is empty, a metadata remove event has to be pushed
+		if len(data.Value) == 0 {
+			// Ignore deletion if the key does not exist
+			if !keyExists {
+				continue
+			}
+
+			event := user.NewMetadataRemovedEvent(ctx, userAgg, data.Key)
+			events = append(events, event)
+			continue
+		}
+
+		// if no change to metadata, no event has to be pushed
+		if keyExists && bytes.Equal(existingValue, data.Value) {
+			continue
+		}
+		event, err := c.setUserMetadata(ctx, userAgg, data)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+	return events, nil
 }
 
 func (c *Commands) setUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metadata *domain.Metadata) (command eventstore.Command, err error) {
