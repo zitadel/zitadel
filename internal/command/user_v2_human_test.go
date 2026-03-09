@@ -3919,6 +3919,148 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "change human metadata, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+					expectPush(
+						user.NewMetadataSetEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"key1",
+							[]byte("value1"),
+						),
+						user.NewMetadataSetEvent(context.Background(),
+							&userAgg.Aggregate,
+							"key3",
+							[]byte("value3"),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Metadata: []*domain.Metadata{
+						{
+							Key:   "key1",
+							Value: []byte("value1"),
+						},
+						{
+							Key:   "key3",
+							Value: []byte("value3"),
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change human metadata, empty value, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher( // pre-existing metadata
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key1",
+								[]byte("value1")),
+						),
+						eventFromEventPusher( // pre-existing metadata
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key2",
+								[]byte("value2")),
+						),
+					),
+					expectPush(
+						user.NewMetadataRemovedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"key2",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Metadata: []*domain.Metadata{
+						{
+							Key:   "key1",
+							Value: []byte("value1"), // no update
+						},
+						{
+							Key:   "key2",
+							Value: []byte(""), // delete the key for an empty value
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change human metadata, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				tarpit:          expectTarpit(0),
+				loginPaths:      expectLoginPathsNoCall,
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Metadata: []*domain.Metadata{
+						{
+							Key:   "key1",
+							Value: []byte("value1"),
+						},
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
