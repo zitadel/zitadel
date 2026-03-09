@@ -11,13 +11,17 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
+type CheckUserType struct {
+	UserID    string
+	LoginName string
+}
+
 type UserCheckCommand struct {
-	CheckUser  *session_grpc.CheckUser
-	SessionID  string
-	InstanceID string
+	InputCheckUser *CheckUserType
+	SessionID      string
+	InstanceID     string
 
 	FetchedUser User
 
@@ -33,10 +37,11 @@ type UserCheckCommand struct {
 //
 // The check will update the existing session or return an error if the session
 // is not found or validation fails.
-func NewUserCheckCommand(sessionID, instanceID string) *UserCheckCommand {
+func NewUserCheckCommand(sessionID, instanceID string, checkUser *CheckUserType) *UserCheckCommand {
 	return &UserCheckCommand{
-		SessionID:  sessionID,
-		InstanceID: instanceID,
+		SessionID:      sessionID,
+		InstanceID:     instanceID,
+		InputCheckUser: checkUser,
 	}
 }
 
@@ -45,7 +50,7 @@ func (u *UserCheckCommand) RequiresTransaction() {}
 
 // Events implements [Commander].
 func (u *UserCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
-	if u.CheckUser == nil {
+	if u.InputCheckUser == nil {
 		return nil, nil
 	}
 
@@ -63,7 +68,7 @@ func (u *UserCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 
 // Execute implements [Commander].
 func (u *UserCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
-	if u.CheckUser == nil {
+	if u.InputCheckUser == nil {
 		return err
 	}
 	sessionRepo := opts.sessionRepo
@@ -116,7 +121,7 @@ func (u *UserCheckCommand) String() string {
 
 // Validate implements [Commander].
 func (u *UserCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
-	if u.CheckUser == nil {
+	if u.InputCheckUser == nil {
 		return nil
 	}
 
@@ -134,13 +139,12 @@ func (u *UserCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 	var usrQueryOpt database.QueryOption
 	userRepo := opts.userRepo
 
-	switch searchType := u.CheckUser.GetSearch().(type) {
-	case *session_grpc.CheckUser_UserId:
-		usrQueryOpt = database.WithCondition(userRepo.IDCondition(searchType.UserId))
-	case *session_grpc.CheckUser_LoginName:
-		usrQueryOpt = database.WithCondition(userRepo.LoginNameCondition(database.TextOperationEqual, searchType.LoginName))
-	default:
-		return zerrors.ThrowInvalidArgumentf(nil, "DOM-7B2m0b", "user search %T not implemented", searchType)
+	if loginName := u.InputCheckUser.LoginName; loginName != "" {
+		usrQueryOpt = database.WithCondition(userRepo.LoginNameCondition(database.TextOperationEqual, loginName))
+	} else if userID := u.InputCheckUser.UserID; userID != "" {
+		usrQueryOpt = database.WithCondition(userRepo.IDCondition(userID))
+	} else {
+		return zerrors.ThrowInvalidArgument(nil, "DOM-7B2m0b", "no valid query option")
 	}
 
 	usr, err := userRepo.Get(ctx, opts.DB(), usrQueryOpt)
