@@ -70,7 +70,7 @@ func TestTextQueryMethodToTextOperation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			got, err := TextQueryMethodToTextOperation(tc.queryOperation)
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedOperation, got)
 		})
 	}
