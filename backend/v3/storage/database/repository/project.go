@@ -39,14 +39,22 @@ func (p project) List(ctx context.Context, client database.QueryExecutor, opts .
 	return getMany[domain.Project](ctx, client, builder)
 }
 
-const insertProjectStmt = `INSERT INTO zitadel.projects(
-	instance_id, organization_id, id, name, state, should_assert_role, is_authorization_required, is_project_access_required, used_labeling_setting_owner
-)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-RETURNING created_at, updated_at`
+func (p project) Create(ctx context.Context, client database.QueryExecutor, project *domain.Project) error {
+	var (
+		builder              database.StatementBuilder
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
+	)
+	if !project.CreatedAt.IsZero() {
+		createdAt = project.CreatedAt
+	}
+	if !project.UpdatedAt.IsZero() {
+		updatedAt = project.UpdatedAt
+	}
 
-func (project) Create(ctx context.Context, client database.QueryExecutor, project *domain.Project) error {
-	builder := database.NewStatementBuilder(insertProjectStmt,
+	builder.WriteString("INSERT INTO ")
+	builder.WriteString(p.qualifiedTableName())
+	builder.WriteString("(instance_id, organization_id, id, name, state, should_assert_role, is_authorization_required, is_project_access_required, used_labeling_setting_owner, created_at, updated_at) VALUES (")
+	builder.WriteArgs(
 		project.InstanceID,
 		project.OrganizationID,
 		project.ID,
@@ -56,7 +64,11 @@ func (project) Create(ctx context.Context, client database.QueryExecutor, projec
 		project.IsAuthorizationRequired,
 		project.IsProjectAccessRequired,
 		project.UsedLabelingSettingOwner,
+		createdAt,
+		updatedAt,
 	)
+	builder.WriteString(`) RETURNING created_at, updated_at`)
+
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).
 		Scan(&project.CreatedAt, &project.UpdatedAt)
 }
@@ -141,7 +153,7 @@ func (p project) StateCondition(state domain.ProjectState) database.Condition {
 // -------------------------------------------------------------
 
 func (p project) qualifiedTableName() string {
-	return "zitadel." + p.unqualifiedTableName()
+	return "zitadel.projects"
 }
 
 func (project) unqualifiedTableName() string {

@@ -276,7 +276,7 @@ describe("sendLoginname", () => {
         });
         mockListIDPLinks.mockResolvedValue({ result: [] });
         mockGetActiveIdentityProviders.mockResolvedValue({
-          identityProviders: [{ id: "org-idp-123", type: 0 }],
+          identityProviders: [{ id: "org-idp-123", type: 0, options: { isAutoCreation: true } }],
         });
         mockIdpTypeToSlug.mockReturnValue("google");
         mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://org-idp.example.com/auth" });
@@ -469,7 +469,7 @@ describe("sendLoginname", () => {
         allowLocalAuthentication: false,
       });
       mockGetActiveIdentityProviders.mockResolvedValue({
-        identityProviders: [{ id: "idp123", type: "OIDC" }],
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
       });
       mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
@@ -503,6 +503,7 @@ describe("sendLoginname", () => {
     test("should redirect to password when ignoreUnknownUsernames is true", async () => {
       mockGetLoginSettings.mockResolvedValue({
         ignoreUnknownUsernames: true,
+        allowLocalAuthentication: true,
       });
 
       const result = await sendLoginname({
@@ -523,6 +524,39 @@ describe("sendLoginname", () => {
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: false,
         allowLocalAuthentication: true,
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).toEqual({ error: "errors.userNotFound" });
+    });
+
+    test("should redirect to IDP when allowRegister: false, allowLocalAuthentication: false and a single active IDP exists", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: false,
+        allowLocalAuthentication: false,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
+    });
+
+    test("should not redirect to IDP when single active IDP does not allow creation", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: false,
+        allowLocalAuthentication: false,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: false, isCreationAllowed: false } }],
       });
 
       const result = await sendLoginname({
@@ -592,7 +626,7 @@ describe("sendLoginname", () => {
       });
 
       mockGetActiveIdentityProviders.mockResolvedValue({
-        identityProviders: [{ id: "idp123", type: "OIDC" }],
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
       });
       mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth?org=discovered-org-456" });
 

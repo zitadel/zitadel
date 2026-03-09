@@ -199,7 +199,7 @@ func createIdentityProvider(t *testing.T, tx database.QueryExecutor, instanceID,
 		AllowAutoCreation: true,
 		AllowAutoUpdate:   true,
 		AllowLinking:      true,
-		StylingType:       &stylingType,
+		AutoLinkingField:  gu.Ptr(domain.IDPAutoLinkingFieldEmail),
 		Payload:           []byte("{}"),
 	}
 	idpRepo := repository.IDProviderRepository()

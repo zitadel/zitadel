@@ -351,8 +351,10 @@ func (u user) organizationIDColumn() database.Column {
 
 type rawUser struct {
 	domain.User
-	Machine *json.RawMessage `json:"machine,omitempty" db:"machine"`
-	Human   *json.RawMessage `json:"human,omitempty" db:"human"`
+	Machine    *json.RawMessage            `json:"machine,omitempty" db:"machine"`
+	Human      *json.RawMessage            `json:"human,omitempty" db:"human"`
+	LoginNames JSONArray[domain.LoginName] `json:"loginNames,omitempty" db:"login_names"`
+	Metadata   JSONArray[*domain.Metadata] `json:"metadata,omitempty" db:"metadata"`
 }
 
 func (u *rawUser) toDomain() (*domain.User, error) {
@@ -367,6 +369,8 @@ func (u *rawUser) toDomain() (*domain.User, error) {
 			return nil, err
 		}
 	}
+	u.User.LoginNames = u.LoginNames
+	u.User.Metadata = u.Metadata
 	return &u.User, nil
 }
 
