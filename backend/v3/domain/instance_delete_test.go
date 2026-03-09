@@ -86,7 +86,7 @@ func TestDeleteInstanceCommand_Validate(t *testing.T) {
 			err := d.Validate(context.Background(), cmdOpts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }
@@ -397,7 +397,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 			err := d.Execute(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedInstanceName, d.InstanceName)
 			assert.ElementsMatch(t, tc.expectedInstanceDomains, d.InstanceDomains)
 			assert.Equal(t, tc.expectsDeleteTime, d.DeleteTime != nil && !d.DeleteTime.IsZero())
