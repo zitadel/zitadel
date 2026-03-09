@@ -3971,12 +3971,33 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "change human metadata, invalid value, error",
+			name: "change human metadata, empty value, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher( // pre-existing metadata
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key1",
+								[]byte("value1")),
+						),
+						eventFromEventPusher( // pre-existing metadata
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key2",
+								[]byte("value2")),
+						),
+					),
+					expectPush(
+						user.NewMetadataRemovedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"key2",
 						),
 					),
 				),
@@ -3991,18 +4012,20 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					Metadata: []*domain.Metadata{
 						{
 							Key:   "key1",
-							Value: []byte("value1"),
+							Value: []byte("value1"), // no update
 						},
 						{
 							Key:   "key2",
-							Value: []byte(""),
+							Value: []byte(""), // delete the key for an empty value
 						},
 					},
 				},
 			},
 			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "META-2m00f", "Errors.Metadata.Invalid"))
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
 				},
 			},
 		},
