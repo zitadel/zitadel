@@ -8,6 +8,7 @@ import (
 var (
 	ErrNoChanges           = errors.New("update must contain a change")
 	ErrInvalidChangeTarget = errors.New("change target must not be nil")
+	ErrMissingPermission   = errors.New("caller has insufficient permission")
 )
 
 type MissingConditionError struct {

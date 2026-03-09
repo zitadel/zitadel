@@ -72,6 +72,15 @@ func WithSessionTokenVerifier(verifier SessionTokenVerifier) InvokeOpt {
 	}
 }
 
+// WithSessionTokenDecryptor sets the decryptor for session tokens used by the commands.
+// If not set, the default one will be used.
+// This is mainly used for testing
+func WithSessionTokenDecryptor(decryptor SessionTokenDecryptor) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.sessionTokenDecryptor = decryptor
+	}
+}
+
 // WithPermissionCheck sets the permission check used by the commands.
 // If not set, the default one will be used.
 // This is mainly used for testing

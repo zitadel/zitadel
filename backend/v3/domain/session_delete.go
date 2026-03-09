@@ -47,10 +47,13 @@ func (cmd *DeleteSessionCommand) Events(ctx context.Context, opts *InvokeOpts) (
 	}, nil
 }
 
-func sessionDeletePermissionCheckCondition(ctx context.Context, sessionRepo SessionRepository, id, token string, decryptor SessionTokenDecryptor) (database.Condition, error) {
-	if token != "" {
-		sessionID, tokenID, err := decryptor(ctx, token)
-		if err != nil || sessionID != id {
+func (cmd *DeleteSessionCommand) sessionDeletePermissionCheckCondition(ctx context.Context, sessionRepo SessionRepository, decryptor SessionTokenDecryptor) (database.Condition, error) {
+	if !cmd.MustCheckPermission {
+		return nil, nil
+	}
+	if cmd.Token != "" {
+		sessionID, tokenID, err := decryptor(ctx, cmd.Token)
+		if err != nil || sessionID != cmd.ID {
 			return nil, zerrors.ThrowInvalidArgumentf(err, "SESS-S3gq1", "Errors.Session.TokenInvalid")
 		}
 		return database.Or(database.Exists("sessions", sessionRepo.TokenIDCondition(tokenID)),
@@ -68,7 +71,7 @@ func (cmd *DeleteSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 	sessionRepo := opts.sessionRepo
 	instance := authz.GetInstance(ctx)
 
-	permCheck, err := sessionDeletePermissionCheckCondition(ctx, sessionRepo, cmd.ID, cmd.Token, opts.sessionTokenDecryptor)
+	permCheck, err := cmd.sessionDeletePermissionCheckCondition(ctx, sessionRepo, opts.sessionTokenDecryptor)
 	if err != nil {
 		return err
 	}

@@ -19,14 +19,15 @@ type permission struct {
 	throwError         bool
 }
 
-// TODO: ?
 func (p *permission) Matches(x any) bool {
 	toMatch, ok := x.(*permission)
 	if !ok {
 		return false
 	}
-	_ = toMatch
-	return true
+	if toMatch.requiredPermission != p.requiredPermission {
+		return false
+	}
+	return toMatch.throwError == p.throwError
 }
 
 func (p *permission) String() string {
@@ -41,10 +42,8 @@ func (p *permission) Write(builder *StatementBuilder) {
 	builder.WriteString(" true ")
 }
 
-// TODO: ?
 func (p *permission) IsRestrictingColumn(col Column) bool {
-	//TODO implement me
-	panic("implement me")
+	return false
 }
 
 func Permission(requiredPermission string, throwError bool) *permission {

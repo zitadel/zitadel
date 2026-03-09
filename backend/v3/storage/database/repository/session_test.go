@@ -985,6 +985,7 @@ func TestSession_Delete(t *testing.T) {
 			// delete session
 			deletedRows, err := sessionRepo.Delete(t.Context(), tx,
 				sessionRepo.PrimaryKeyCondition(session.InstanceID, session.ID),
+				nil,
 			)
 			require.NoError(t, err)
 			assert.Equal(t, tt.noOfDeletedRows, deletedRows)
