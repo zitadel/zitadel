@@ -97,7 +97,7 @@ func TestGetInstanceCommand_Validate(t *testing.T) {
 			err := cmd.Validate(tt.ctx, cmdOpts)
 
 			// Verify
-			assert.Equal(t, tt.expectedError, err)
+			assert.ErrorIs(t, err, tt.expectedError)
 		})
 	}
 }
@@ -232,7 +232,7 @@ func TestGetInstanceCommand_Execute(t *testing.T) {
 			err := g.Execute(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedInstance, g.Result())
 		})
 	}
