@@ -385,11 +385,32 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 			},
 		},
 		{
-			name: "change machine metadata, invalid metadata, error",
+			name: "change machine metadata, delete metadata, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(userAddedEvent),
+						eventFromEventPusher( // pre-existing metadata
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key1",
+								[]byte("value1")),
+						),
+						eventFromEventPusher( // pre-existing metadata
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key2",
+								[]byte("value2")),
+						),
+					),
+					expectPush(
+						user.NewMetadataRemovedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"key2",
+						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -404,15 +425,15 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 							Value: []byte("value1"),
 						},
 						{
-							Key:   "key3",
+							Key:   "key2",
 							Value: []byte(""),
 						},
 					},
 				},
 			},
 			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "META-2m00f", "Errors.Metadata.Invalid"))
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
