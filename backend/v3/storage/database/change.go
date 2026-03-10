@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"reflect"
 	"slices"
 
@@ -126,15 +127,15 @@ func (c Changes) Write(builder *StatementBuilder) error {
 
 // Matches implements [gomock.Matcher].
 func (c Changes) Matches(x any) bool {
-	toMatch, ok := x.(*Changes)
+	toMatch, ok := x.(Changes)
 	if !ok {
 		return false
 	}
-	if len(c) != len(*toMatch) {
+	if len(c) != len(toMatch) {
 		return false
 	}
 	for i := range c {
-		if !c[i].Matches((*toMatch)[i]) {
+		if !c[i].Matches(toMatch[i]) {
 			return false
 		}
 	}
@@ -384,7 +385,26 @@ func (c *cteChange) Matches(x any) bool {
 	if expectedCTEBuilder.String() != actualCTEBuilder.String() {
 		return false
 	}
-	return slices.Equal(expectedCTEBuilder.Args(), actualCTEBuilder.Args())
+
+	if len(expectedCTEBuilder.Args()) != len(actualCTEBuilder.Args()) {
+		return false
+	}
+
+	for i, e := range expectedCTEBuilder.Args() {
+		/*	This comparison is an oversimplification because it compares only the types. If the type
+		 *	is a struct, we would need to type assert that and come up with a custom comparator.
+		 *	In some cases, like for [domain.SessionFactorUser] it can become quite tricky because
+		 *	it includes a [time.Time] value, for which you will need to do comparisons in range rather
+		 *	than equal matches. Of course, this is just an example, but we could have much more complex
+		 *	structs that makes it very hard to forecast what kind of code we need to write here
+		 */
+		expectedType, actualType := fmt.Sprintf("%T", e), fmt.Sprintf("%T", actualCTEBuilder.Args()[i])
+		if expectedType != actualType {
+			return false
+		}
+	}
+
+	return true
 }
 
 // SetName implements [CTEChange].

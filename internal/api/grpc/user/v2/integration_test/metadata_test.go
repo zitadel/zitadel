@@ -54,7 +54,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 				}
-				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
+				integration.AssertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
 			},
 		},
 		{
@@ -78,7 +78,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 					{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
 					{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
 				}
-				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
+				integration.AssertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
 			},
 		},
 		{
@@ -106,7 +106,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
 				}
-				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
+				integration.AssertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
 			},
 		},
 		{
@@ -126,7 +126,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 				}
-				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
+				integration.AssertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
 			},
 		},
 		{
@@ -164,7 +164,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 				}
-				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
+				integration.AssertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
 			},
 		},
 		{
@@ -187,7 +187,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated")))},
 				}
-				assertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
+				integration.AssertMetadataEquals(t, expectedMetadata, getResponse.GetMetadata())
 			},
 		},
 	}

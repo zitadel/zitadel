@@ -85,9 +85,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   }
 
   const redirectUri = await resolveRedirectUri(
-    requestId && sessionId
-      ? { sessionId, requestId }
-      : { loginName: loginName ?? sessionFactors?.factors?.user?.loginName },
+    requestId && sessionId ? { sessionId, requestId } : { loginName: loginName ?? sessionFactors?.factors?.user?.loginName },
     loginSettings?.defaultRedirectUri,
   );
 
