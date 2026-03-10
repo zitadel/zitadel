@@ -549,13 +549,13 @@ func (s session) UpdatedAtColumn() database.Column {
 
 type rawSession struct {
 	*domain.Session
-	TokenID    *string                           `json:"tokenID" db:"token_id"`
-	Lifetime   *time.Duration                    `json:"lifetime" db:"lifetime"`
-	Expiration *time.Time                        `json:"expiration" db:"expiration"`
-	UserID     *string                           `json:"userID" db:"user_id"`
-	CreatorID  *string                           `json:"creatorID" db:"creator_id"`
-	Factors    JSONArray[rawFactor]              `json:"factors,omitempty" db:"factors"`
-	Metadata   JSONArray[domain.SessionMetadata] `json:"metadata,omitempty" db:"metadata"`
+	TokenID    *string                            `json:"tokenID" db:"token_id"`
+	Lifetime   *time.Duration                     `json:"lifetime" db:"lifetime"`
+	Expiration *time.Time                         `json:"expiration" db:"expiration"`
+	UserID     *string                            `json:"userID" db:"user_id"`
+	CreatorID  *string                            `json:"creatorID" db:"creator_id"`
+	Factors    JSONArray[*rawFactor]              `json:"factors,omitempty" db:"factors"`
+	Metadata   JSONArray[*domain.SessionMetadata] `json:"metadata,omitempty" db:"metadata"`
 }
 
 func scanSession(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Session, error) {

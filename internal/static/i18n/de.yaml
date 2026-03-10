@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Secret konnte nicht generiert werden"
     PAT:
       NotFound: "Persönliches Access Token nicht gefunden"
+    Metadata:
+      Conflicting: "Metadaten dürfen nicht gleichzeitig in den Feldern [user] und [human] gesetzt sein"
     NotHuman: "Der Benutzer muss eine Person sein"
     NotMachine: "Der Benutzer muss technisch sein"
     WrongType: "Für diesen Benutzertyp nicht erlaubt"

@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Hemlig kod kunde inte genereras"
     PAT:
       NotFound: "Personlig åtkomst-token hittades inte"
+    Metadata:
+      Conflicting: "Metadata får inte anges samtidigt i fälten [user] och [human]"
     NotHuman: "Användaren måste vara en person"
     NotMachine: "Användaren måste vara en maskin"
     WrongType: "Inte tillåtet för denna användartyp"

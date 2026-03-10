@@ -2,62 +2,79 @@ package middleware
 
 import (
 	"context"
-	"reflect"
+	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func Test_toGRPCError(t *testing.T) {
 	type args struct {
 		ctx     context.Context
-		req     interface{}
+		req     any
 		handler grpc.UnaryHandler
 	}
-	type res struct {
-		want    interface{}
-		wantErr bool
-	}
 	tests := []struct {
-		name string
-		args args
-		res  res
+		name     string
+		args     args
+		want     any
+		wantCode codes.Code
 	}{
 		{
-			"no error",
-			args{
+			name: "no error",
+			args: args{
 				ctx:     context.Background(),
 				req:     &mockReq{},
 				handler: emptyMockHandler,
 			},
-			res{
-				&mockReq{},
-				false,
-			},
+			want: &mockReq{},
 		},
 		{
-			"error",
-			args{
+			name: "error",
+			args: args{
 				ctx:     context.Background(),
 				req:     &mockReq{},
 				handler: errorMockHandler,
 			},
-			res{
-				nil,
-				true,
+			want:     nil,
+			wantCode: codes.FailedPrecondition,
+		},
+		{
+			name: "panic with string",
+			args: args{
+				ctx:     context.Background(),
+				req:     &mockReq{},
+				handler: panicMockHandler("test panic"),
 			},
+			want:     nil,
+			wantCode: codes.Internal,
+		},
+		{
+			name: "panic with error",
+			args: args{
+				ctx:     context.Background(),
+				req:     &mockReq{},
+				handler: panicMockHandler(errors.New("oops")),
+			},
+			want:     nil,
+			wantCode: codes.Internal,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := toGRPCError(tt.args.ctx, tt.args.req, tt.args.handler)
-			if (err != nil) != tt.res.wantErr {
-				t.Errorf("toGRPCError() error = %v, wantErr %v", err, tt.res.wantErr)
-				return
+			if tt.wantCode != 0 {
+				status, ok := status.FromError(err)
+				require.True(t, ok)
+				assert.Equal(t, tt.wantCode, status.Code())
+			} else {
+				require.NoError(t, err)
 			}
-			if !reflect.DeepEqual(got, tt.res.want) {
-				t.Errorf("toGRPCError() got = %v, want %v", got, tt.res.want)
-			}
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

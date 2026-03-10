@@ -132,6 +132,8 @@ Errors:
         CouldNotGenerate: "シークレットの生成に失敗しました"
     PAT:
       NotFound: "パーソナルアクセストークンが見つかりません"
+    Metadata:
+      Conflicting: "メタデータは [user] と [human] の両方のフィールドに同時に設定してはなりません"
     NotHuman: "ユーザーはパーソナルである必要があります"
     NotMachine: "ユーザーはテクニカルである必要があります"
     WrongType: "このユーザータイプは許可されていません"

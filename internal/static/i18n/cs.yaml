@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Tajemství nelze vygenerovat"
     PAT:
       NotFound: "Osobní přístupový token nenalezen"
+    Metadata:
+      Conflicting: "Metadata nesmí být nastavena současně v polích [user] a [human]"
     NotHuman: "Uživatel musí být fyzická osoba"
     NotMachine: "Uživatel musí být systémový uživatel / technická entita"
     WrongType: "Nepovolen pro tento typ uživatele"

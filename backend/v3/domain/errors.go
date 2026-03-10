@@ -42,6 +42,11 @@ func (err *MultipleObjectsUpdatedError) Error() string {
 	return fmt.Sprintf("Message=expecting %d row(s) updated, got %d", err.Expected, err.Actual)
 }
 
+func (err *MultipleObjectsUpdatedError) Is(target error) bool {
+	_, ok := target.(*MultipleObjectsUpdatedError)
+	return ok
+}
+
 type UnexpectedQueryTypeError[T any] struct {
 	assertedType T
 }

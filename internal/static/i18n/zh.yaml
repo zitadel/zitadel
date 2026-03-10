@@ -132,6 +132,8 @@ Errors:
         CouldNotGenerate: "无法生成秘密"
     PAT:
       NotFound: "未找到个人访问令牌"
+    Metadata:
+      Conflicting: "元数据不得同时在 [user] 和 [human] 字段中设置"
     NotHuman: "用户必须是个人"
     NotMachine: "用户必须是技术人员"
     WrongType: "此用户类型不允许"

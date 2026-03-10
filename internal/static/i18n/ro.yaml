@@ -132,6 +132,8 @@ Errors:
         CouldNotGenerate: "Secretul nu a putut fi generat"
     PAT:
       NotFound: "Token-ul de acces personal nu a fost găsit"
+    Metadata:
+      Conflicting: "Metadatele nu trebuie setate simultan în câmpurile [user] și [human]"
     NotHuman: "Utilizatorul trebuie să fie personal"
     NotMachine: "Utilizatorul trebuie să fie tehnic"
     WrongType: "Nu este permis pentru acest tip de utilizator"

@@ -132,6 +132,8 @@ Errors:
         CouldNotGenerate: "Gizli anahtar oluşturulamadı"
     PAT:
       NotFound: "Kişisel Erişim Token'ı bulunamadı"
+    Metadata:
+      Conflicting: "Meta veriler [user] ve [human] alanlarında aynı anda ayarlanmamalıdır"
     NotHuman: "Kullanıcı kişisel olmalı"
     NotMachine: "Kullanıcı teknik olmalı"
     WrongType: "Bu kullanıcı türü için izin verilmiyor"
