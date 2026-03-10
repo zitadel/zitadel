@@ -76,6 +76,7 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 	if err != nil {
 		return nil, err
 	}
+
 	// no changes for the metadata
 	if len(events) == 0 {
 		return writeModelToObjectDetails(&setMetadata.WriteModel), nil
