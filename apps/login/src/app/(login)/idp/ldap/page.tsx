@@ -11,7 +11,15 @@ export default async function Page(props: {
   params: Promise<{ provider: string }>;
 }) {
   const searchParams = await props.searchParams;
-  const { idpId, organization, link } = searchParams;
+  const {
+    idpId,
+    organization,
+    link,
+    requestId,
+    postErrorRedirectUrl,
+    linkToSessionId,
+    linkFingerprint,
+  } = searchParams;
 
   if (!idpId) {
     throw new Error("No idpId provided in searchParams");
@@ -44,7 +52,15 @@ export default async function Page(props: {
       </div>
 
       <div className="w-full">
-        <LDAPUsernamePasswordForm idpId={idpId} link={link === "true"}></LDAPUsernamePasswordForm>
+        <LDAPUsernamePasswordForm
+          idpId={idpId}
+          link={link === "true"}
+          requestId={requestId}
+          organization={organization}
+          postErrorRedirectUrl={postErrorRedirectUrl}
+          linkToSessionId={linkToSessionId}
+          linkFingerprint={linkFingerprint}
+        />
       </div>
     </DynamicTheme>
   );
