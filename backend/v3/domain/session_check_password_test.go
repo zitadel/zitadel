@@ -538,7 +538,7 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 				CheckPassword: &domain.CheckPasswordType{Password: "test"},
 				FetchedUser:   domain.User{OrganizationID: "org-1"},
 			},
-			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 0), "DOM-mmsrCt", "unexpected number of rows returned"),
+			expectedError: zerrors.ThrowInternal(domain.NewRowsReturnedMismatchError(1, 0), "DOM-mmsrCt", "unexpected number of rows returned"),
 		},
 		{
 			testName: "when check type failed and get lockout policy returns error should return error",

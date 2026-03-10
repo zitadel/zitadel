@@ -93,3 +93,25 @@ func (err *PasswordVerificationError) Is(target error) bool {
 	_, ok := target.(*PasswordVerificationError)
 	return ok
 }
+
+type RowsReturnedMismatchError struct {
+	Msg      string
+	Expected int64
+	Actual   int64
+}
+
+func NewRowsReturnedMismatchError(expected, actual int64) error {
+	return &RowsReturnedMismatchError{
+		Expected: expected,
+		Actual:   actual,
+	}
+}
+
+func (err *RowsReturnedMismatchError) Error() string {
+	return fmt.Sprintf("Message=expecting %d row(s) returned, got %d", err.Expected, err.Actual)
+}
+
+func (err *RowsReturnedMismatchError) Is(target error) bool {
+	_, ok := target.(*RowsReturnedMismatchError)
+	return ok
+}

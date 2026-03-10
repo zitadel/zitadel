@@ -116,8 +116,8 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	humanRepo := opts.userRepo.Human()
 	sessionRepo := opts.sessionRepo
 
-	updatedHash, err := p.VerifierFn(p.FetchedUser.Human.Password.Hash, p.CheckPassword.Password)
-	pswCheckType, err := p.GetPasswordCheckAndError(err)
+	updatedHash, verifyErr := p.VerifierFn(p.FetchedUser.Human.Password.Hash, p.CheckPassword.Password)
+	pswCheckType, err := p.GetPasswordCheckAndError(verifyErr)
 	changes, changesErr := p.GetPasswordCheckChanges(ctx, opts, humanRepo, updatedHash, pswCheckType)
 	if changesErr != nil {
 		return changesErr
@@ -129,7 +129,7 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 
 	tx, txErr := beginner.Begin(ctx, nil)
 	if txErr != nil {
-		return zerrors.ThrowInternal(err, "DOM-IR1vH2", "failed starting transaction")
+		return zerrors.ThrowInternal(txErr, "DOM-IR1vH2", "failed starting transaction")
 	}
 
 	defer func() {
@@ -213,7 +213,7 @@ func (p *PasswordCheckCommand) getLockoutPolicy(ctx context.Context, opts *Invok
 	}
 
 	if rowsReturned := len(settings); rowsReturned != 1 {
-		return nil, zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, int64(rowsReturned)), "DOM-mmsrCt", "unexpected number of rows returned")
+		return nil, zerrors.ThrowInternal(NewRowsReturnedMismatchError(1, int64(rowsReturned)), "DOM-mmsrCt", "unexpected number of rows returned")
 	}
 
 	return settings[0], nil

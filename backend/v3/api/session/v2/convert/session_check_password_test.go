@@ -19,8 +19,8 @@ func TestCheckPasswordGRPCToDomain(t *testing.T) {
 		{testName: "when nil input should return nil output"},
 		{
 			testName:      "when not nil input should return valid output",
-			inputCheckPsw: &session_grpc.CheckPassword{Password: "hashed pw"},
-			expected:      &domain.CheckPasswordType{Password: "hashed pw"},
+			inputCheckPsw: &session_grpc.CheckPassword{Password: "pw"},
+			expected:      &domain.CheckPasswordType{Password: "pw"},
 		},
 	}
 
