@@ -98,5 +98,12 @@ declare namespace NodeJS {
      * - `[route_name]`: Explicit overrides per specific API method (e.g., `getHostedLoginTranslation`).
      */
     API_CACHE_CONFIG?: string;
+
+    /**
+     * Optional: Disable OpenTelemetry instrumentation.
+     * Set to "true" to bypass OTEL initialization.
+     * In local development (NODE_ENV=development), it is disabled by default unless explicitly set to "false".
+     */
+    OTEL_SDK_DISABLED?: string;
   }
 }

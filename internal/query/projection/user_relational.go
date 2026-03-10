@@ -424,6 +424,7 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanInviteCheckFailedType,
 					Reduce: p.reduceInviteCheckFailed,
 				},
+				// recovery code reducers
 				{
 					Event:  user.HumanRecoveryCodesAddedType,
 					Reduce: p.reduceRecoveryCodesAdded,
