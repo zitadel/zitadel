@@ -1,9 +1,9 @@
 "use server";
 
 import { headers } from "next/headers";
+import { isSafeRedirectUri } from "./client-utils";
 import { completeAuthFlow } from "./server/auth-flow";
 import { getPublicHostWithProtocol } from "./server/host";
-import { isSafeRedirectUri } from "./client-utils";
 
 type FinishFlowCommand =
   | {
@@ -153,4 +153,3 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
   console.log("resolveRedirectUri: Using relative goToSignedInPage result:", result);
   return result;
 }
-

@@ -1,6 +1,7 @@
 *
 !constants
 !src
+!src/**
 !locales
 !scripts/healthcheck.mjs
 !scripts/server.mjs

@@ -18,9 +18,7 @@ describe("LDAPUsernamePasswordForm", () => {
   afterEach(cleanup);
 
   test("should autofocus the username input on mount", () => {
-    const { getByTestId } = render(
-      <LDAPUsernamePasswordForm idpId="idp-1" link={false} />,
-    );
+    const { getByTestId } = render(<LDAPUsernamePasswordForm idpId="idp-1" link={false} />);
     expect(getByTestId("username-text-input")).toHaveFocus();
   });
 });

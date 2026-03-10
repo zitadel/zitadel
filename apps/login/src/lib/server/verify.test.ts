@@ -1,10 +1,10 @@
-import { vi, describe, expect, test, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { sendVerification } from "./verify";
 
-import { verifyEmail, getUserByID, getSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
+import { getSession, getUserByID, listAuthenticationMethodTypes, verifyEmail } from "@/lib/zitadel";
+import { cookies } from "next/headers";
 import { getSessionCookieByLoginName } from "../cookies";
 import { createSessionAndUpdateCookie } from "./cookie";
-import { cookies } from "next/headers";
 
 // Mock dependencies
 vi.mock("@/lib/zitadel", () => ({
