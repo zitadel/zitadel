@@ -55,6 +55,12 @@ type PasswordCheckCommand struct {
 // verifyFn is a function that takes as input a target encoded password
 // and an input password to verify. It returns an updated hash and an error.
 // It defaults to [passwap.Swapper.Verify]
+//
+// The command does not implement [Transactional] due verifyFn that might take a long time to execute.
+// So the DB transaction will be started only after verifyFn has been run.
+//
+// Moreover, the command may return a functional error so manual management of the transaction is needed
+// to avoid rollbacking a transaction despite having only a functional error.
 func NewPasswordCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, verifyFn func(encoded, password string) (updated string, err error), request *CheckPasswordType) *PasswordCheckCommand {
 	tf := sysConfig.Tarpit.Tarpit()
 	if tarpitFunc != nil {
@@ -74,9 +80,6 @@ func NewPasswordCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, 
 		VerifierFn:    verifierFunction,
 	}
 }
-
-// RequiresTransaction implements [Transactional].
-func (p *PasswordCheckCommand) RequiresTransaction() {}
 
 // Events implements [Commander].
 func (p *PasswordCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
@@ -119,24 +122,42 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	if changesErr != nil {
 		return changesErr
 	}
+	beginner, ok := opts.DB().(database.Beginner)
+	if !ok {
+		return zerrors.ThrowInternal(nil, "DOM-fEhd79", "database doesn't implement database.Beginner")
+	}
+
+	tx, txErr := beginner.Begin(ctx, nil)
+	if txErr != nil {
+		return zerrors.ThrowInternal(err, "DOM-IR1vH2", "failed starting transaction")
+	}
+
+	defer func() {
+		if endErr := tx.End(ctx, txErr); endErr != nil {
+			err = endErr
+		}
+	}()
 
 	updateCount, updateErr := humanRepo.Update(
 		ctx,
-		opts.DB(),
+		tx,
 
 		humanRepo.IDCondition(p.FetchedUser.ID),
 
 		changes,
 	)
 	if updateErr != nil {
-		return zerrors.ThrowInternal(updateErr, "DOM-netNam", "failed updating user")
+		txErr = zerrors.ThrowInternal(updateErr, "DOM-netNam", "failed updating user")
+		return txErr
 	}
 
 	if updateCount == 0 {
-		return zerrors.ThrowNotFound(nil, "DOM-8wVrNc", "user not found")
+		txErr = zerrors.ThrowNotFound(nil, "DOM-8wVrNc", "user not found")
+		return txErr
 	}
 	if updateCount > 1 {
-		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-D4hy9C", "unexpected number of rows updated")
+		txErr = zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-D4hy9C", "unexpected number of rows updated")
+		return txErr
 	}
 
 	var passwordFactor SessionFactor
@@ -146,16 +167,19 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 		passwordFactor = &SessionFactorPassword{LastFailedAt: p.CheckTime}
 	}
 
-	updateCount, updateErr = sessionRepo.Update(ctx, opts.DB(), sessionRepo.IDCondition(p.SessionID), sessionRepo.SetFactor(passwordFactor))
+	updateCount, updateErr = sessionRepo.Update(ctx, tx, sessionRepo.IDCondition(p.SessionID), sessionRepo.SetFactor(passwordFactor))
 	if updateErr != nil {
-		return zerrors.ThrowInternal(updateErr, "DOM-IZagay", "failed updating session")
+		txErr = zerrors.ThrowInternal(updateErr, "DOM-IZagay", "failed updating session")
+		return txErr
 	}
 
 	if updateCount == 0 {
-		return zerrors.ThrowNotFound(nil, "DOM-H9Q59c", "session not found")
+		txErr = zerrors.ThrowNotFound(nil, "DOM-H9Q59c", "session not found")
+		return txErr
 	}
 	if updateCount > 1 {
-		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-Tbvpy8", "unexpected number of rows updated")
+		txErr = zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-Tbvpy8", "unexpected number of rows updated")
+		return txErr
 	}
 
 	if err != nil && p.TarpitFunc != nil {
@@ -165,8 +189,8 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	p.IsValidated = true
 	p.IsValidationSuccessful = err == nil
 
-	// TODO(IAM-Marco): The error returned here will block the transaction and stop events from being emitted.
-	// This error is functional so it should be returned AND the transaction should succeed. How can we fix it?
+	// This error is functional so it should be returned AND the transaction should succeed.
+	// Hence, do not use [Transactional] and make sure txErr = nil
 	return err
 }
 
@@ -313,4 +337,3 @@ func (p *PasswordCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 }
 
 var _ Commander = (*PasswordCheckCommand)(nil)
-var _ Transactional = (*PasswordCheckCommand)(nil)
