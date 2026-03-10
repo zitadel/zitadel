@@ -184,9 +184,9 @@ func AssertMetadataEquals(t assert.TestingT, expected []*metadata.Metadata, actu
 	assert.Equal(t, getMetadataMap(expected), getMetadataMap(actual), "metadata content mismatch")
 }
 
-func getMetadataMap(metadata []*metadata.Metadata) map[string][]byte {
-	metadataByKey := make(map[string][]byte, len(metadata))
-	for _, md := range metadata {
+func getMetadataMap(metadataEntries []*metadata.Metadata) map[string][]byte {
+	metadataByKey := make(map[string][]byte, len(metadataEntries))
+	for _, md := range metadataEntries {
 		metadataByKey[md.Key] = md.Value
 	}
 	return metadataByKey
