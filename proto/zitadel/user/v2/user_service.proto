@@ -3230,12 +3230,14 @@ message RetrieveIdentityProviderIntentResponse{
       example: "\"163840776835432345\"";
     }
   ];
+  // Deprecated field. Use create_user instead.
   AddHumanUserRequest add_human_user = 4 [
     deprecated = true,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Information to create a new human user with the IDP information. This field is deprecated, use create_user instead.";
     }
   ];
+  // Deprecated field. Use update_user instead.
   UpdateHumanUserRequest update_human_user = 5 [
     deprecated = true,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
