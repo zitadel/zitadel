@@ -34,6 +34,7 @@ type RelationalTableFeatureMatrix struct {
 	Name      string
 	Inst      *Instance
 	InstOwner context.Context
+	Enabled   bool
 }
 
 // TODO(IAM-Marco): Once we have gotten rid of eventstore, this can be removed
@@ -57,6 +58,7 @@ func RelationalTablesEnableMatrix(t *testing.T, ctx context.Context, sysAuthZ co
 				Name:      "when relational tables are enabled",
 				Inst:      inst,
 				InstOwner: instOwner,
+				Enabled:   true,
 			}
 		}(),
 	}
