@@ -1,9 +1,9 @@
 "use client";
 
+import { APPEARANCE_STYLES, getComponentRoundness, getThemeConfig } from "@/lib/theme";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { getThemeConfig, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
 
 function getThemeToggleRoundness() {
   return getComponentRoundness("themeSwitch");
@@ -51,14 +51,14 @@ export default function ThemeSwitch() {
   return (
     <div className={`flex space-x-1 p-1 ${toggleRoundness} ${cardAppearance}`}>
       <button
-        className={`w-8 h-8 flex flex-row items-center justify-center ${toggleRoundness} transition-colors ${getSelectedButtonStyle(theme === "light")}`}
+        className={`flex h-8 w-8 flex-row items-center justify-center ${toggleRoundness} transition-colors ${getSelectedButtonStyle(theme === "light")}`}
         onClick={() => setTheme("light")}
         aria-label="Switch to light mode"
       >
         <SunIcon className="h-5 w-5" />
       </button>
       <button
-        className={`w-8 h-8 flex flex-row items-center justify-center ${toggleRoundness} transition-colors ${getSelectedButtonStyle(theme === "dark")}`}
+        className={`flex h-8 w-8 flex-row items-center justify-center ${toggleRoundness} transition-colors ${getSelectedButtonStyle(theme === "dark")}`}
         onClick={() => setTheme("dark")}
         aria-label="Switch to dark mode"
       >

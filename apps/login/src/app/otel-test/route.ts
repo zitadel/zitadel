@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server";
-import { trace, metrics, SpanStatusCode } from "@opentelemetry/api";
 import { createLogger } from "@/lib/logger";
 import {
   recordAuthAttempt,
-  recordAuthSuccess,
   recordAuthFailure,
-  recordRequestStart,
+  recordAuthSuccess,
   recordRequestEnd,
+  recordRequestStart,
   recordSessionCreationDuration,
 } from "@/lib/metrics";
+import { metrics, SpanStatusCode, trace } from "@opentelemetry/api";
+import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 const logger = createLogger("otel-test");

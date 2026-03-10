@@ -1,16 +1,16 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { v4 as uuidv4 } from "uuid";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getFingerprintId,
-  setFingerprintIdCookie,
   getFingerprintIdCookie,
   getOrSetFingerprintId,
   getUserAgent,
+  setFingerprintIdCookie,
 } from "./fingerprint";
 
+import { create } from "@zitadel/client";
 import { cookies, headers } from "next/headers";
 import { userAgent } from "next/server";
-import { create } from "@zitadel/client";
 
 // Mock dependencies
 vi.mock("uuid");

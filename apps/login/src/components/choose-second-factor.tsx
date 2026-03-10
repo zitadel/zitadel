@@ -11,13 +11,7 @@ type Props = {
   userMethods: AuthenticationMethodType[];
 };
 
-export function ChooseSecondFactor({
-  loginName,
-  sessionId,
-  requestId,
-  organization,
-  userMethods,
-}: Props) {
+export function ChooseSecondFactor({ loginName, sessionId, requestId, organization, userMethods }: Props) {
   const params = new URLSearchParams({});
 
   if (loginName) {
@@ -38,14 +32,10 @@ export function ChooseSecondFactor({
       {userMethods.map((method, i) => {
         return (
           <div key={"method-" + i}>
-            {method === AuthenticationMethodType.TOTP &&
-              TOTP(false, "/otp/time-based?" + params)}
-            {method === AuthenticationMethodType.U2F &&
-              U2F(false, "/u2f?" + params)}
-            {method === AuthenticationMethodType.OTP_EMAIL &&
-              EMAIL(false, "/otp/email?" + params)}
-            {method === AuthenticationMethodType.OTP_SMS &&
-              SMS(false, "/otp/sms?" + params)}
+            {method === AuthenticationMethodType.TOTP && TOTP(false, "/otp/time-based?" + params)}
+            {method === AuthenticationMethodType.U2F && U2F(false, "/u2f?" + params)}
+            {method === AuthenticationMethodType.OTP_EMAIL && EMAIL(false, "/otp/email?" + params)}
+            {method === AuthenticationMethodType.OTP_SMS && SMS(false, "/otp/sms?" + params)}
           </div>
         );
       })}
