@@ -1,5 +1,6 @@
 ---
 title: Usage Control
+description: "Manage and limit resource usage in self-hosted ZITADEL instances by setting quotas for requests and action execution."
 sidebar_label: Usage Control
 ---
 
@@ -39,7 +40,7 @@ You can restrict the maximum age of events returned by the following APIs:
 - [A Projects History](/reference/api/management/zitadel.management.v1.ManagementService.ListProjectChanges)
 - [A Project Grants History](/reference/api/management/zitadel.management.v1.ManagementService.ListProjectGrantChanges)
 
-You can set a global default limit as well as a default limit [for new virtual instances](/concepts/structure/instance#multiple-virtual-instances) in the ZITADEL configuration.
+You can set a global default limit as well as a default limit [for new virtual instances](/concepts/structure/instance#multiple-virtual-instances) in the ZITADEL settings.
 The following snippets shows the defaults:
 
 ```yaml
@@ -64,7 +65,7 @@ For example, you might want to report usage to an external billing tool and noti
 
 ZITADEL supports limiting authenticated requests and action run seconds with quotas.
 
-For using the quotas feature you have to activate it in your ZITADEL configurations *Quotas* section.
+For using the quotas feature you have to activate it in your ZITADEL settings *Quotas* section.
 The following snippets shows the defaults:
 
 ```yaml
@@ -91,7 +92,7 @@ The following snippets shows the defaults:
 ```yaml
 DefaultInstance:
   Quotas:
-    # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
+    # Items take a slice of quota settings, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported
 
     # "requests.all.authenticated"

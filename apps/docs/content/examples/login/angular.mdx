@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Angular
+description: "Integrate ZITADEL into Angular applications using OIDC and PKCE for user authentication."
 sidebar_label: Angular
 ---
 
@@ -12,7 +13,7 @@ By the end of this guide, your application will have login functionality and wil
 
 ## Set up application and obtain keys
 
-Before we begin developing our application, we need to perform a few configuration steps in the ZITADEL Console.
+Before we begin developing our application, we need to perform a few setup steps in the ZITADEL Console.
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select the **User Agent** application type and continue.
 We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all SPA applications.
@@ -146,7 +147,7 @@ https://github.com/zitadel/zitadel-angular/blob/main/src/app/components/user/use
 
 ### Refresh token
 
-If you want to add a refresh token to your application, navigate to the management console application and check the box in the configuration section.
+If you want to add a refresh token to your application, navigate to the management console application and check the box in the settings section.
 Then add `offline_access` to the scopes and add the following line:
 
 ```
@@ -159,7 +160,7 @@ This line automatically refreshes a token before it expires.
 
 Congratulations! You have successfully integrated your Angular application with ZITADEL!
 
-If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-angular) application. This application includes all the functionalities mentioned in this quick-start. You can start by cloning the repository and replacing the _AuthConfig_ in the _AppModule_ with your own configuration. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel).
+If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-angular) application. This application includes all the functionalities mentioned in this quick-start. You can start by cloning the repository and replacing the _AuthConfig_ in the _AppModule_ with your own settings. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel).
 
 ![App in management console](../../../public/img/angular/app-screen.png)
 

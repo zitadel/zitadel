@@ -1,4 +1,8 @@
+import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
+import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
+import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
+import { createLogger } from "@/lib/logger";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
 import { findValidSession } from "@/lib/session";
@@ -19,13 +23,36 @@ import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitad
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
-import { DEFAULT_CSP } from "../../../constants/csp";
+import { buildCSP } from "../csp";
 import escapeHtml from "escape-html";
+
+const logger = createLogger("flow-initiation");
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
+
+function setCSPHeaders(
+  response: NextResponse,
+  serviceConfig: ServiceConfig,
+  securitySettings: SecuritySettings | undefined,
+): void {
+  const iframeOrigins =
+    securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
+      ? securitySettings.embeddedIframe.allowedOrigins
+      : undefined;
+
+  response.headers.set(
+    "Content-Security-Policy",
+    buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }),
+  );
+
+  if (!iframeOrigins) {
+    response.headers.set("X-Frame-Options", "deny");
+  }
+}
 
 const gotoAccounts = ({
   request,
@@ -64,6 +91,14 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
   const { authRequest } = await getAuthRequest({ serviceConfig, authRequestId: requestId.replace("oidc_", "") });
 
+  const locale = getValidLocaleFromUILocales(authRequest?.uiLocales);
+  if (locale) {
+    const existingLanguage = await getLanguageCookie();
+    if (shouldUILocalesOverrideCookie() || !existingLanguage) {
+      await setLanguageCookie(locale);
+    }
+  }
+
   let organization = "";
   let suffix = "";
   let idpId = "";
@@ -82,7 +117,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
         const orgDomain = matched?.[1] ?? "";
 
-        console.log("Extracted org domain:", orgDomain);
+        logger.info("Extracted org domain:", { orgDomain });
         if (orgDomain) {
           const orgs = await getOrgsByDomain({ serviceConfig, domain: orgDomain });
 
@@ -217,7 +252,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
             return NextResponse.redirect(absoluteUrl.toString());
           }
         } catch (error) {
-          console.error("Failed to execute sendLoginname:", error);
+          logger.error("Failed to execute sendLoginname:", { error });
         }
       }
 
@@ -240,15 +275,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest });
 
       const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
-
-      if (securitySettings?.embeddedIframe?.enabled) {
-        securitySettings.embeddedIframe.allowedOrigins;
-        noSessionResponse.headers.set(
-          "Content-Security-Policy",
-          `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
-        );
-        noSessionResponse.headers.delete("X-Frame-Options");
-      }
+      setCSPHeaders(noSessionResponse, serviceConfig, securitySettings);
 
       if (!selectedSession || !selectedSession.id) {
         return noSessionResponse;
@@ -277,15 +304,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       });
 
       const callbackResponse = NextResponse.redirect(callbackUrl);
-
-      if (securitySettings?.embeddedIframe?.enabled) {
-        securitySettings.embeddedIframe.allowedOrigins;
-        callbackResponse.headers.set(
-          "Content-Security-Policy",
-          `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
-        );
-        callbackResponse.headers.delete("X-Frame-Options");
-      }
+      setCSPHeaders(callbackResponse, serviceConfig, securitySettings);
 
       return callbackResponse;
     } else {
@@ -328,7 +347,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         if (callbackUrl) {
           return NextResponse.redirect(callbackUrl);
         } else {
-          console.log("could not create callback, redirect user to choose other account");
+          logger.info("could not create callback, redirect user to choose other account");
           return gotoAccounts({
             request,
             organization,
@@ -336,7 +355,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           });
         }
       } catch (error) {
-        console.error(error);
+        logger.error("Error creating callback:", { error });
         return gotoAccounts({
           request,
           requestId,
@@ -446,7 +465,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
       });
     }
   } catch (error) {
-    console.error("SAML createResponse failed:", error);
+    logger.error("SAML createResponse failed:", { error });
   }
 
   // Final fallback: SAML response creation failed - show account selection

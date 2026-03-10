@@ -36,17 +36,6 @@ func (a authorization) qualifiedAuthorizationRolesTableName() string {
 // repository
 // -------------------------------------------------------------
 
-const insertAuthorizationStmt = `INSERT INTO zitadel.authorizations (
-	instance_id, id, user_id, grant_id, project_id, state, created_at, updated_at
-)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-RETURNING created_at, updated_at`
-
-const insertAuthorizationWithRolesStmt = `WITH roles AS (
-  INSERT INTO zitadel.authorization_roles
-      (instance_id, authorization_id, grant_id, project_id, role_key)
-      VALUES ($1, $2, $4, $5, unnest($9::text[])))` + insertAuthorizationStmt
-
 // Create implements [domain.AuthorizationRepository].
 func (a authorization) Create(ctx context.Context, client database.QueryExecutor, authorization *domain.Authorization) error {
 	var (
@@ -59,17 +48,12 @@ func (a authorization) Create(ctx context.Context, client database.QueryExecutor
 		updatedAt = authorization.UpdatedAt
 	}
 
-	builder := database.NewStatementBuilder(insertAuthorizationWithRolesStmt,
-		authorization.InstanceID,
-		authorization.ID,
-		authorization.UserID,
-		authorization.GrantID,
-		authorization.ProjectID,
-		authorization.State,
-		createdAt,
-		updatedAt,
-		authorization.Roles,
+	builder := database.NewStatementBuilder("WITH roles AS (INSERT INTO zitadel.authorization_roles (instance_id, authorization_id, grant_id, project_id, role_key)"+
+		" VALUES ($1, $2, $3, $4, unnest($5::text[]))) INSERT INTO zitadel.authorizations (instance_id, id, grant_id, project_id, user_id, state, created_at, updated_at) VALUES ($1, $2, $3, $4, $6, $7, ",
+		authorization.InstanceID, authorization.ID, authorization.GrantID, authorization.ProjectID, authorization.Roles, authorization.UserID, authorization.State,
 	)
+	builder.WriteArgs(createdAt, updatedAt)
+	builder.WriteString(") RETURNING created_at, updated_at")
 
 	if err := client.QueryRow(
 		ctx,
@@ -191,10 +175,10 @@ func (a authorization) setRoles(ctx context.Context, client database.QueryExecut
 
 	// set the roles
 	builder.WriteString(updateAuthorizationRoleStmt)
-	err := database.Changes(changes).Write(builder)
-	if err != nil {
+	if err := database.Changes(changes).Write(builder); err != nil {
 		return 0, err
 	}
+
 	builder.WriteString(updateAuthorizationRoleStmtWhere)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)

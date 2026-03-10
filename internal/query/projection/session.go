@@ -169,6 +169,18 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanPasswordChangedType,
 					Reduce: p.reducePasswordChanged,
 				},
+				{
+					Event:  user.UserDeactivatedType,
+					Reduce: p.reduceUserStateNotActive,
+				},
+				{
+					Event:  user.UserLockedType,
+					Reduce: p.reduceUserStateNotActive,
+				},
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserStateNotActive,
+				},
 			},
 		},
 	}
@@ -462,6 +474,23 @@ func (p *sessionProjection) reducePasswordChanged(event eventstore.Event) (*hand
 			handler.NewCond(SessionColumnUserID, e.Aggregate().ID),
 			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewLessThanCond(SessionColumnPasswordCheckedAt, e.CreationDate()),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceUserStateNotActive(event eventstore.Event) (_ *handler.Statement, err error) {
+	switch t := event.(type) {
+	case *user.UserDeactivatedEvent, *user.UserRemovedEvent, *user.UserLockedEvent:
+		// ok
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-7zALpR", "reduce.wrong.event.type %v", t)
+	}
+
+	return handler.NewDeleteStatement(
+		event,
+		[]handler.Condition{
+			handler.NewCond(SessionColumnUserID, event.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }

@@ -11,14 +11,17 @@ import (
 )
 
 type ChangeMachine struct {
-	ID            string
-	ResourceOwner string
-	Username      *string
-	Name          *string
-	Description   *string
+	ID              string
+	ResourceOwner   string
+	Username        *string
+	Name            *string
+	Description     *string
+	AccessTokenType *domain.OIDCTokenType
 
 	// Details are set after a successful execution of the command
 	Details *domain.ObjectDetails
+
+	Metadata []*domain.Metadata
 }
 
 func (h *ChangeMachine) Changed() bool {
@@ -31,25 +34,38 @@ func (h *ChangeMachine) Changed() bool {
 	if h.Description != nil {
 		return true
 	}
+	if h.AccessTokenType != nil {
+		return true
+	}
+	if len(h.Metadata) > 0 {
+		return true
+	}
 	return false
 }
 
 func (c *Commands) ChangeUserMachine(ctx context.Context, machine *ChangeMachine) (err error) {
+	// get the existing user
 	existingMachine, err := c.UserMachineWriteModel(
 		ctx,
 		machine.ID,
 		machine.ResourceOwner,
-		false,
+		len(machine.Metadata) > 0,
 	)
 	if err != nil {
 		return err
 	}
-	if machine.Changed() {
-		if err := c.checkPermissionUpdateUser(ctx, existingMachine.ResourceOwner, existingMachine.AggregateID, true); err != nil {
-			return err
-		}
+	// check whether the user has permissions to make this change
+	if err := c.checkPermissionUpdateUser(ctx, existingMachine.ResourceOwner, existingMachine.AggregateID, true); err != nil {
+		return err
 	}
 
+	// if there are no changes, return the existing object details
+	if !machine.Changed() {
+		machine.Details = writeModelToObjectDetails(&existingMachine.WriteModel)
+		return nil
+	}
+
+	// create the events for the change
 	cmds := make([]eventstore.Command, 0)
 	if machine.Username != nil {
 		cmds, err = c.changeUsername(ctx, cmds, existingMachine, *machine.Username)
@@ -64,9 +80,20 @@ func (c *Commands) ChangeUserMachine(ctx context.Context, machine *ChangeMachine
 	if machine.Description != nil && *machine.Description != existingMachine.Description {
 		machineChanges = append(machineChanges, user.ChangeDescription(*machine.Description))
 	}
+	if machine.AccessTokenType != nil && *machine.AccessTokenType != existingMachine.AccessTokenType {
+		machineChanges = append(machineChanges, user.ChangeAccessTokenType(*machine.AccessTokenType))
+	}
 	if len(machineChanges) > 0 {
 		cmds = append(cmds, user.NewMachineChangedEvent(ctx, &existingMachine.Aggregate().Aggregate, machineChanges))
 	}
+	if len(machine.Metadata) > 0 {
+		metadataCmds, err := c.createMetadataEvents(ctx, machine.Metadata, existingMachine.Metadata, &existingMachine.Aggregate().Aggregate)
+		if err != nil {
+			return err
+		}
+		cmds = append(cmds, metadataCmds...)
+	}
+
 	if len(cmds) == 0 {
 		machine.Details = writeModelToObjectDetails(&existingMachine.WriteModel)
 		return nil

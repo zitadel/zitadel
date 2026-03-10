@@ -23,6 +23,7 @@ import (
 type MockSessionRepository struct {
 	ctrl     *gomock.Controller
 	recorder *MockSessionRepositoryMockRecorder
+	isgomock struct{}
 }
 
 // MockSessionRepositoryMockRecorder is the mock recorder for MockSessionRepository.
@@ -43,17 +44,17 @@ func (m *MockSessionRepository) EXPECT() *MockSessionRepositoryMockRecorder {
 }
 
 // ClearFactor mocks base method.
-func (m *MockSessionRepository) ClearFactor(arg0 domain.SessionFactorType) database.Change {
+func (m *MockSessionRepository) ClearFactor(factor domain.SessionFactorType) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ClearFactor", arg0)
+	ret := m.ctrl.Call(m, "ClearFactor", factor)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // ClearFactor indicates an expected call of ClearFactor.
-func (mr *MockSessionRepositoryMockRecorder) ClearFactor(arg0 any) *MockSessionRepositoryClearFactorCall {
+func (mr *MockSessionRepositoryMockRecorder) ClearFactor(factor any) *MockSessionRepositoryClearFactorCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClearFactor", reflect.TypeOf((*MockSessionRepository)(nil).ClearFactor), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClearFactor", reflect.TypeOf((*MockSessionRepository)(nil).ClearFactor), factor)
 	return &MockSessionRepositoryClearFactorCall{Call: call}
 }
 
@@ -81,17 +82,17 @@ func (c *MockSessionRepositoryClearFactorCall) DoAndReturn(f func(domain.Session
 }
 
 // Create mocks base method.
-func (m *MockSessionRepository) Create(arg0 context.Context, arg1 database.QueryExecutor, arg2 *domain.Session) error {
+func (m *MockSessionRepository) Create(ctx context.Context, client database.QueryExecutor, user *domain.Session) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Create", ctx, client, user)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockSessionRepositoryMockRecorder) Create(arg0, arg1, arg2 any) *MockSessionRepositoryCreateCall {
+func (mr *MockSessionRepositoryMockRecorder) Create(ctx, client, user any) *MockSessionRepositoryCreateCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockSessionRepository)(nil).Create), arg0, arg1, arg2)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockSessionRepository)(nil).Create), ctx, client, user)
 	return &MockSessionRepositoryCreateCall{Call: call}
 }
 
@@ -157,17 +158,17 @@ func (c *MockSessionRepositoryCreatedAtColumnCall) DoAndReturn(f func() database
 }
 
 // CreatedAtCondition mocks base method.
-func (m *MockSessionRepository) CreatedAtCondition(arg0 database.NumberOperation, arg1 time.Time) database.Condition {
+func (m *MockSessionRepository) CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreatedAtCondition", arg0, arg1)
+	ret := m.ctrl.Call(m, "CreatedAtCondition", op, createdAt)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // CreatedAtCondition indicates an expected call of CreatedAtCondition.
-func (mr *MockSessionRepositoryMockRecorder) CreatedAtCondition(arg0, arg1 any) *MockSessionRepositoryCreatedAtConditionCall {
+func (mr *MockSessionRepositoryMockRecorder) CreatedAtCondition(op, createdAt any) *MockSessionRepositoryCreatedAtConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatedAtCondition", reflect.TypeOf((*MockSessionRepository)(nil).CreatedAtCondition), arg0, arg1)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatedAtCondition", reflect.TypeOf((*MockSessionRepository)(nil).CreatedAtCondition), op, createdAt)
 	return &MockSessionRepositoryCreatedAtConditionCall{Call: call}
 }
 
@@ -195,17 +196,17 @@ func (c *MockSessionRepositoryCreatedAtConditionCall) DoAndReturn(f func(databas
 }
 
 // CreatorIDCondition mocks base method.
-func (m *MockSessionRepository) CreatorIDCondition(arg0 string) database.Condition {
+func (m *MockSessionRepository) CreatorIDCondition(creatorID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreatorIDCondition", arg0)
+	ret := m.ctrl.Call(m, "CreatorIDCondition", creatorID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // CreatorIDCondition indicates an expected call of CreatorIDCondition.
-func (mr *MockSessionRepositoryMockRecorder) CreatorIDCondition(arg0 any) *MockSessionRepositoryCreatorIDConditionCall {
+func (mr *MockSessionRepositoryMockRecorder) CreatorIDCondition(creatorID any) *MockSessionRepositoryCreatorIDConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatorIDCondition", reflect.TypeOf((*MockSessionRepository)(nil).CreatorIDCondition), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatorIDCondition", reflect.TypeOf((*MockSessionRepository)(nil).CreatorIDCondition), creatorID)
 	return &MockSessionRepositoryCreatorIDConditionCall{Call: call}
 }
 
@@ -233,18 +234,18 @@ func (c *MockSessionRepositoryCreatorIDConditionCall) DoAndReturn(f func(string)
 }
 
 // Delete mocks base method.
-func (m *MockSessionRepository) Delete(arg0 context.Context, arg1 database.QueryExecutor, arg2 database.Condition) (int64, error) {
+func (m *MockSessionRepository) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Delete", ctx, client, condition)
 	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockSessionRepositoryMockRecorder) Delete(arg0, arg1, arg2 any) *MockSessionRepositoryDeleteCall {
+func (mr *MockSessionRepositoryMockRecorder) Delete(ctx, client, condition any) *MockSessionRepositoryDeleteCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSessionRepository)(nil).Delete), arg0, arg1, arg2)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSessionRepository)(nil).Delete), ctx, client, condition)
 	return &MockSessionRepositoryDeleteCall{Call: call}
 }
 
@@ -272,17 +273,17 @@ func (c *MockSessionRepositoryDeleteCall) DoAndReturn(f func(context.Context, da
 }
 
 // ExistsFactor mocks base method.
-func (m *MockSessionRepository) ExistsFactor(arg0 database.Condition) database.Condition {
+func (m *MockSessionRepository) ExistsFactor(condition database.Condition) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ExistsFactor", arg0)
+	ret := m.ctrl.Call(m, "ExistsFactor", condition)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // ExistsFactor indicates an expected call of ExistsFactor.
-func (mr *MockSessionRepositoryMockRecorder) ExistsFactor(arg0 any) *MockSessionRepositoryExistsFactorCall {
+func (mr *MockSessionRepositoryMockRecorder) ExistsFactor(condition any) *MockSessionRepositoryExistsFactorCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsFactor", reflect.TypeOf((*MockSessionRepository)(nil).ExistsFactor), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsFactor", reflect.TypeOf((*MockSessionRepository)(nil).ExistsFactor), condition)
 	return &MockSessionRepositoryExistsFactorCall{Call: call}
 }
 
@@ -310,17 +311,17 @@ func (c *MockSessionRepositoryExistsFactorCall) DoAndReturn(f func(database.Cond
 }
 
 // ExistsMetadata mocks base method.
-func (m *MockSessionRepository) ExistsMetadata(arg0 database.Condition) database.Condition {
+func (m *MockSessionRepository) ExistsMetadata(condition database.Condition) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ExistsMetadata", arg0)
+	ret := m.ctrl.Call(m, "ExistsMetadata", condition)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // ExistsMetadata indicates an expected call of ExistsMetadata.
-func (mr *MockSessionRepositoryMockRecorder) ExistsMetadata(arg0 any) *MockSessionRepositoryExistsMetadataCall {
+func (mr *MockSessionRepositoryMockRecorder) ExistsMetadata(condition any) *MockSessionRepositoryExistsMetadataCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsMetadata", reflect.TypeOf((*MockSessionRepository)(nil).ExistsMetadata), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsMetadata", reflect.TypeOf((*MockSessionRepository)(nil).ExistsMetadata), condition)
 	return &MockSessionRepositoryExistsMetadataCall{Call: call}
 }
 
@@ -386,17 +387,17 @@ func (c *MockSessionRepositoryExpirationColumnCall) DoAndReturn(f func() databas
 }
 
 // ExpirationCondition mocks base method.
-func (m *MockSessionRepository) ExpirationCondition(arg0 database.NumberOperation, arg1 time.Time) database.Condition {
+func (m *MockSessionRepository) ExpirationCondition(op database.NumberOperation, expiration time.Time) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ExpirationCondition", arg0, arg1)
+	ret := m.ctrl.Call(m, "ExpirationCondition", op, expiration)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // ExpirationCondition indicates an expected call of ExpirationCondition.
-func (mr *MockSessionRepositoryMockRecorder) ExpirationCondition(arg0, arg1 any) *MockSessionRepositoryExpirationConditionCall {
+func (mr *MockSessionRepositoryMockRecorder) ExpirationCondition(op, expiration any) *MockSessionRepositoryExpirationConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExpirationCondition", reflect.TypeOf((*MockSessionRepository)(nil).ExpirationCondition), arg0, arg1)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExpirationCondition", reflect.TypeOf((*MockSessionRepository)(nil).ExpirationCondition), op, expiration)
 	return &MockSessionRepositoryExpirationConditionCall{Call: call}
 }
 
@@ -462,10 +463,10 @@ func (c *MockSessionRepositoryFactorConditionsCall) DoAndReturn(f func() domain.
 }
 
 // Get mocks base method.
-func (m *MockSessionRepository) Get(arg0 context.Context, arg1 database.QueryExecutor, arg2 ...database.QueryOption) (*domain.Session, error) {
+func (m *MockSessionRepository) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Session, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, client}
+	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Get", varargs...)
@@ -475,9 +476,9 @@ func (m *MockSessionRepository) Get(arg0 context.Context, arg1 database.QueryExe
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockSessionRepositoryMockRecorder) Get(arg0, arg1 any, arg2 ...any) *MockSessionRepositoryGetCall {
+func (mr *MockSessionRepositoryMockRecorder) Get(ctx, client any, opts ...any) *MockSessionRepositoryGetCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, client}, opts...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockSessionRepository)(nil).Get), varargs...)
 	return &MockSessionRepositoryGetCall{Call: call}
 }
@@ -544,17 +545,17 @@ func (c *MockSessionRepositoryIDColumnCall) DoAndReturn(f func() database.Column
 }
 
 // IDCondition mocks base method.
-func (m *MockSessionRepository) IDCondition(arg0 string) database.Condition {
+func (m *MockSessionRepository) IDCondition(sessionID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IDCondition", arg0)
+	ret := m.ctrl.Call(m, "IDCondition", sessionID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // IDCondition indicates an expected call of IDCondition.
-func (mr *MockSessionRepositoryMockRecorder) IDCondition(arg0 any) *MockSessionRepositoryIDConditionCall {
+func (mr *MockSessionRepositoryMockRecorder) IDCondition(sessionID any) *MockSessionRepositoryIDConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDCondition", reflect.TypeOf((*MockSessionRepository)(nil).IDCondition), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDCondition", reflect.TypeOf((*MockSessionRepository)(nil).IDCondition), sessionID)
 	return &MockSessionRepositoryIDConditionCall{Call: call}
 }
 
@@ -620,17 +621,17 @@ func (c *MockSessionRepositoryInstanceIDColumnCall) DoAndReturn(f func() databas
 }
 
 // InstanceIDCondition mocks base method.
-func (m *MockSessionRepository) InstanceIDCondition(arg0 string) database.Condition {
+func (m *MockSessionRepository) InstanceIDCondition(instanceID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InstanceIDCondition", arg0)
+	ret := m.ctrl.Call(m, "InstanceIDCondition", instanceID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // InstanceIDCondition indicates an expected call of InstanceIDCondition.
-func (mr *MockSessionRepositoryMockRecorder) InstanceIDCondition(arg0 any) *MockSessionRepositoryInstanceIDConditionCall {
+func (mr *MockSessionRepositoryMockRecorder) InstanceIDCondition(instanceID any) *MockSessionRepositoryInstanceIDConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceIDCondition", reflect.TypeOf((*MockSessionRepository)(nil).InstanceIDCondition), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceIDCondition", reflect.TypeOf((*MockSessionRepository)(nil).InstanceIDCondition), instanceID)
 	return &MockSessionRepositoryInstanceIDConditionCall{Call: call}
 }
 
@@ -696,10 +697,10 @@ func (c *MockSessionRepositoryLifetimeColumnCall) DoAndReturn(f func() database.
 }
 
 // List mocks base method.
-func (m *MockSessionRepository) List(arg0 context.Context, arg1 database.QueryExecutor, arg2 ...database.QueryOption) ([]*domain.Session, error) {
+func (m *MockSessionRepository) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Session, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, client}
+	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "List", varargs...)
@@ -709,9 +710,9 @@ func (m *MockSessionRepository) List(arg0 context.Context, arg1 database.QueryEx
 }
 
 // List indicates an expected call of List.
-func (mr *MockSessionRepositoryMockRecorder) List(arg0, arg1 any, arg2 ...any) *MockSessionRepositoryListCall {
+func (mr *MockSessionRepositoryMockRecorder) List(ctx, client any, opts ...any) *MockSessionRepositoryListCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, client}, opts...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockSessionRepository)(nil).List), varargs...)
 	return &MockSessionRepositoryListCall{Call: call}
 }
@@ -816,17 +817,17 @@ func (c *MockSessionRepositoryPrimaryKeyColumnsCall) DoAndReturn(f func() []data
 }
 
 // PrimaryKeyCondition mocks base method.
-func (m *MockSessionRepository) PrimaryKeyCondition(arg0, arg1 string) database.Condition {
+func (m *MockSessionRepository) PrimaryKeyCondition(instanceID, sessionID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PrimaryKeyCondition", arg0, arg1)
+	ret := m.ctrl.Call(m, "PrimaryKeyCondition", instanceID, sessionID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // PrimaryKeyCondition indicates an expected call of PrimaryKeyCondition.
-func (mr *MockSessionRepositoryMockRecorder) PrimaryKeyCondition(arg0, arg1 any) *MockSessionRepositoryPrimaryKeyConditionCall {
+func (mr *MockSessionRepositoryMockRecorder) PrimaryKeyCondition(instanceID, sessionID any) *MockSessionRepositoryPrimaryKeyConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrimaryKeyCondition", reflect.TypeOf((*MockSessionRepository)(nil).PrimaryKeyCondition), arg0, arg1)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrimaryKeyCondition", reflect.TypeOf((*MockSessionRepository)(nil).PrimaryKeyCondition), instanceID, sessionID)
 	return &MockSessionRepositoryPrimaryKeyConditionCall{Call: call}
 }
 
@@ -854,17 +855,17 @@ func (c *MockSessionRepositoryPrimaryKeyConditionCall) DoAndReturn(f func(string
 }
 
 // SetChallenge mocks base method.
-func (m *MockSessionRepository) SetChallenge(arg0 domain.SessionChallenge) database.Change {
+func (m *MockSessionRepository) SetChallenge(challenge domain.SessionChallenge) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetChallenge", arg0)
+	ret := m.ctrl.Call(m, "SetChallenge", challenge)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetChallenge indicates an expected call of SetChallenge.
-func (mr *MockSessionRepositoryMockRecorder) SetChallenge(arg0 any) *MockSessionRepositorySetChallengeCall {
+func (mr *MockSessionRepositoryMockRecorder) SetChallenge(challenge any) *MockSessionRepositorySetChallengeCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetChallenge", reflect.TypeOf((*MockSessionRepository)(nil).SetChallenge), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetChallenge", reflect.TypeOf((*MockSessionRepository)(nil).SetChallenge), challenge)
 	return &MockSessionRepositorySetChallengeCall{Call: call}
 }
 
@@ -892,17 +893,17 @@ func (c *MockSessionRepositorySetChallengeCall) DoAndReturn(f func(domain.Sessio
 }
 
 // SetFactor mocks base method.
-func (m *MockSessionRepository) SetFactor(arg0 domain.SessionFactor) database.Change {
+func (m *MockSessionRepository) SetFactor(factor domain.SessionFactor) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetFactor", arg0)
+	ret := m.ctrl.Call(m, "SetFactor", factor)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetFactor indicates an expected call of SetFactor.
-func (mr *MockSessionRepositoryMockRecorder) SetFactor(arg0 any) *MockSessionRepositorySetFactorCall {
+func (mr *MockSessionRepositoryMockRecorder) SetFactor(factor any) *MockSessionRepositorySetFactorCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetFactor", reflect.TypeOf((*MockSessionRepository)(nil).SetFactor), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetFactor", reflect.TypeOf((*MockSessionRepository)(nil).SetFactor), factor)
 	return &MockSessionRepositorySetFactorCall{Call: call}
 }
 
@@ -930,17 +931,17 @@ func (c *MockSessionRepositorySetFactorCall) DoAndReturn(f func(domain.SessionFa
 }
 
 // SetLifetime mocks base method.
-func (m *MockSessionRepository) SetLifetime(arg0 time.Duration) database.Change {
+func (m *MockSessionRepository) SetLifetime(lifetime time.Duration) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetLifetime", arg0)
+	ret := m.ctrl.Call(m, "SetLifetime", lifetime)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetLifetime indicates an expected call of SetLifetime.
-func (mr *MockSessionRepositoryMockRecorder) SetLifetime(arg0 any) *MockSessionRepositorySetLifetimeCall {
+func (mr *MockSessionRepositoryMockRecorder) SetLifetime(lifetime any) *MockSessionRepositorySetLifetimeCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetLifetime", reflect.TypeOf((*MockSessionRepository)(nil).SetLifetime), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetLifetime", reflect.TypeOf((*MockSessionRepository)(nil).SetLifetime), lifetime)
 	return &MockSessionRepositorySetLifetimeCall{Call: call}
 }
 
@@ -968,17 +969,17 @@ func (c *MockSessionRepositorySetLifetimeCall) DoAndReturn(f func(time.Duration)
 }
 
 // SetMetadata mocks base method.
-func (m *MockSessionRepository) SetMetadata(arg0 []*domain.SessionMetadata) database.Change {
+func (m *MockSessionRepository) SetMetadata(metadata []*domain.SessionMetadata) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetMetadata", arg0)
+	ret := m.ctrl.Call(m, "SetMetadata", metadata)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetMetadata indicates an expected call of SetMetadata.
-func (mr *MockSessionRepositoryMockRecorder) SetMetadata(arg0 any) *MockSessionRepositorySetMetadataCall {
+func (mr *MockSessionRepositoryMockRecorder) SetMetadata(metadata any) *MockSessionRepositorySetMetadataCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMetadata", reflect.TypeOf((*MockSessionRepository)(nil).SetMetadata), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMetadata", reflect.TypeOf((*MockSessionRepository)(nil).SetMetadata), metadata)
 	return &MockSessionRepositorySetMetadataCall{Call: call}
 }
 
@@ -1006,17 +1007,17 @@ func (c *MockSessionRepositorySetMetadataCall) DoAndReturn(f func([]*domain.Sess
 }
 
 // SetToken mocks base method.
-func (m *MockSessionRepository) SetToken(arg0 string) database.Change {
+func (m *MockSessionRepository) SetToken(token string) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetToken", arg0)
+	ret := m.ctrl.Call(m, "SetToken", token)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetToken indicates an expected call of SetToken.
-func (mr *MockSessionRepositoryMockRecorder) SetToken(arg0 any) *MockSessionRepositorySetTokenCall {
+func (mr *MockSessionRepositoryMockRecorder) SetToken(token any) *MockSessionRepositorySetTokenCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetToken", reflect.TypeOf((*MockSessionRepository)(nil).SetToken), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetToken", reflect.TypeOf((*MockSessionRepository)(nil).SetToken), token)
 	return &MockSessionRepositorySetTokenCall{Call: call}
 }
 
@@ -1044,17 +1045,17 @@ func (c *MockSessionRepositorySetTokenCall) DoAndReturn(f func(string) database.
 }
 
 // SetUpdatedAt mocks base method.
-func (m *MockSessionRepository) SetUpdatedAt(arg0 time.Time) database.Change {
+func (m *MockSessionRepository) SetUpdatedAt(updatedAt time.Time) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetUpdatedAt", arg0)
+	ret := m.ctrl.Call(m, "SetUpdatedAt", updatedAt)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetUpdatedAt indicates an expected call of SetUpdatedAt.
-func (mr *MockSessionRepositoryMockRecorder) SetUpdatedAt(arg0 any) *MockSessionRepositorySetUpdatedAtCall {
+func (mr *MockSessionRepositoryMockRecorder) SetUpdatedAt(updatedAt any) *MockSessionRepositorySetUpdatedAtCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUpdatedAt", reflect.TypeOf((*MockSessionRepository)(nil).SetUpdatedAt), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUpdatedAt", reflect.TypeOf((*MockSessionRepository)(nil).SetUpdatedAt), updatedAt)
 	return &MockSessionRepositorySetUpdatedAtCall{Call: call}
 }
 
@@ -1081,49 +1082,49 @@ func (c *MockSessionRepositorySetUpdatedAtCall) DoAndReturn(f func(time.Time) da
 	return c
 }
 
-// TokenColumn mocks base method.
-func (m *MockSessionRepository) TokenColumn() database.Column {
+// TokenIDColumn mocks base method.
+func (m *MockSessionRepository) TokenIDColumn() database.Column {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TokenColumn")
+	ret := m.ctrl.Call(m, "TokenIDColumn")
 	ret0, _ := ret[0].(database.Column)
 	return ret0
 }
 
-// TokenColumn indicates an expected call of TokenColumn.
-func (mr *MockSessionRepositoryMockRecorder) TokenColumn() *MockSessionRepositoryTokenColumnCall {
+// TokenIDColumn indicates an expected call of TokenIDColumn.
+func (mr *MockSessionRepositoryMockRecorder) TokenIDColumn() *MockSessionRepositoryTokenIDColumnCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TokenColumn", reflect.TypeOf((*MockSessionRepository)(nil).TokenColumn))
-	return &MockSessionRepositoryTokenColumnCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TokenIDColumn", reflect.TypeOf((*MockSessionRepository)(nil).TokenIDColumn))
+	return &MockSessionRepositoryTokenIDColumnCall{Call: call}
 }
 
-// MockSessionRepositoryTokenColumnCall wrap *gomock.Call
-type MockSessionRepositoryTokenColumnCall struct {
+// MockSessionRepositoryTokenIDColumnCall wrap *gomock.Call
+type MockSessionRepositoryTokenIDColumnCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockSessionRepositoryTokenColumnCall) Return(arg0 database.Column) *MockSessionRepositoryTokenColumnCall {
+func (c *MockSessionRepositoryTokenIDColumnCall) Return(arg0 database.Column) *MockSessionRepositoryTokenIDColumnCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockSessionRepositoryTokenColumnCall) Do(f func() database.Column) *MockSessionRepositoryTokenColumnCall {
+func (c *MockSessionRepositoryTokenIDColumnCall) Do(f func() database.Column) *MockSessionRepositoryTokenIDColumnCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockSessionRepositoryTokenColumnCall) DoAndReturn(f func() database.Column) *MockSessionRepositoryTokenColumnCall {
+func (c *MockSessionRepositoryTokenIDColumnCall) DoAndReturn(f func() database.Column) *MockSessionRepositoryTokenIDColumnCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Update mocks base method.
-func (m *MockSessionRepository) Update(arg0 context.Context, arg1 database.QueryExecutor, arg2 database.Condition, arg3 ...database.Change) (int64, error) {
+func (m *MockSessionRepository) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1, arg2}
-	for _, a := range arg3 {
+	varargs := []any{ctx, client, condition}
+	for _, a := range changes {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Update", varargs...)
@@ -1133,9 +1134,9 @@ func (m *MockSessionRepository) Update(arg0 context.Context, arg1 database.Query
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockSessionRepositoryMockRecorder) Update(arg0, arg1, arg2 any, arg3 ...any) *MockSessionRepositoryUpdateCall {
+func (mr *MockSessionRepositoryMockRecorder) Update(ctx, client, condition any, changes ...any) *MockSessionRepositoryUpdateCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1, arg2}, arg3...)
+	varargs := append([]any{ctx, client, condition}, changes...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockSessionRepository)(nil).Update), varargs...)
 	return &MockSessionRepositoryUpdateCall{Call: call}
 }
@@ -1202,17 +1203,17 @@ func (c *MockSessionRepositoryUpdatedAtColumnCall) DoAndReturn(f func() database
 }
 
 // UpdatedAtCondition mocks base method.
-func (m *MockSessionRepository) UpdatedAtCondition(arg0 database.NumberOperation, arg1 time.Time) database.Condition {
+func (m *MockSessionRepository) UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdatedAtCondition", arg0, arg1)
+	ret := m.ctrl.Call(m, "UpdatedAtCondition", op, updatedAt)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // UpdatedAtCondition indicates an expected call of UpdatedAtCondition.
-func (mr *MockSessionRepositoryMockRecorder) UpdatedAtCondition(arg0, arg1 any) *MockSessionRepositoryUpdatedAtConditionCall {
+func (mr *MockSessionRepositoryMockRecorder) UpdatedAtCondition(op, updatedAt any) *MockSessionRepositoryUpdatedAtConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatedAtCondition", reflect.TypeOf((*MockSessionRepository)(nil).UpdatedAtCondition), arg0, arg1)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatedAtCondition", reflect.TypeOf((*MockSessionRepository)(nil).UpdatedAtCondition), op, updatedAt)
 	return &MockSessionRepositoryUpdatedAtConditionCall{Call: call}
 }
 
@@ -1240,17 +1241,17 @@ func (c *MockSessionRepositoryUpdatedAtConditionCall) DoAndReturn(f func(databas
 }
 
 // UserAgentIDCondition mocks base method.
-func (m *MockSessionRepository) UserAgentIDCondition(arg0 string) database.Condition {
+func (m *MockSessionRepository) UserAgentIDCondition(userAgentID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UserAgentIDCondition", arg0)
+	ret := m.ctrl.Call(m, "UserAgentIDCondition", userAgentID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // UserAgentIDCondition indicates an expected call of UserAgentIDCondition.
-func (mr *MockSessionRepositoryMockRecorder) UserAgentIDCondition(arg0 any) *MockSessionRepositoryUserAgentIDConditionCall {
+func (mr *MockSessionRepositoryMockRecorder) UserAgentIDCondition(userAgentID any) *MockSessionRepositoryUserAgentIDConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserAgentIDCondition", reflect.TypeOf((*MockSessionRepository)(nil).UserAgentIDCondition), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserAgentIDCondition", reflect.TypeOf((*MockSessionRepository)(nil).UserAgentIDCondition), userAgentID)
 	return &MockSessionRepositoryUserAgentIDConditionCall{Call: call}
 }
 
@@ -1316,17 +1317,17 @@ func (c *MockSessionRepositoryUserIDColumnCall) DoAndReturn(f func() database.Co
 }
 
 // UserIDCondition mocks base method.
-func (m *MockSessionRepository) UserIDCondition(arg0 string) database.Condition {
+func (m *MockSessionRepository) UserIDCondition(userID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UserIDCondition", arg0)
+	ret := m.ctrl.Call(m, "UserIDCondition", userID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // UserIDCondition indicates an expected call of UserIDCondition.
-func (mr *MockSessionRepositoryMockRecorder) UserIDCondition(arg0 any) *MockSessionRepositoryUserIDConditionCall {
+func (mr *MockSessionRepositoryMockRecorder) UserIDCondition(userID any) *MockSessionRepositoryUserIDConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserIDCondition", reflect.TypeOf((*MockSessionRepository)(nil).UserIDCondition), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserIDCondition", reflect.TypeOf((*MockSessionRepository)(nil).UserIDCondition), userID)
 	return &MockSessionRepositoryUserIDConditionCall{Call: call}
 }
 

@@ -1,5 +1,6 @@
 ---
 title: Log in with ZITADEL on Gitlab OmniAuth Provider
+description: "Enable OIDC-based login for self-hosted GitLab instances using ZITADEL as the OmniAuth provider."
 ---
 
 import CreateApp from "../application/_application.mdx";
@@ -20,9 +21,9 @@ Prerequisites:
 
 <CreateApp components={props.components}  appType="web" authType="code" appName="Gitlab" redirectURI="https://<your_gitlab_url>/users/auth/openid_connect/callback"/>
 
-## Gitlab configuration
+## Gitlab settings
 
-Follow [this guide](https://docs.gitlab.com/ee/administration/auth/oidc.html) of gitlab to configure the omniauth provider. Following is an example configuration with redacted secrets.
+Follow [this guide](https://docs.gitlab.com/ee/administration/auth/oidc.html) of gitlab to configure the omniauth provider. Here are some example settings with redacted secrets.
 
 Replace the values of the following fields:
 

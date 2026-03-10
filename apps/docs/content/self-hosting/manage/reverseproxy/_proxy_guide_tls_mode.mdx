@@ -1,4 +1,4 @@
-import CodeBlock from '@/components/docusaurus/code-block';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 
 export const Description = ({mode, name}) => {
     let desc
@@ -37,24 +37,25 @@ export const Commands = ({mode, name, lower, configfilename}) => {
         // We only need that flag for TLS connections with the self-signed cert
         connInsecureFlag = ""
     }
+    const code = [
+        '# Download the configuration files.',
+        'export ZITADEL_CONFIG_FILES=https://raw.githubusercontent.com/zitadel/zitadel/main/apps/docs/content/self-hosting/manage/reverseproxy',
+        'wget ${ZITADEL_CONFIG_FILES}/docker-compose.yaml -O docker-compose-base.yaml --quiet',
+        `wget \${ZITADEL_CONFIG_FILES}/${lower}/docker-compose.yaml -O docker-compose-${lower}.yaml --quiet`,
+        `wget \${ZITADEL_CONFIG_FILES}/${lower}/${configfilename} -O ${configfilename} --quiet`,
+        ...(genCert ? ['', genCert.trimEnd()] : []),
+        '',
+        `# Run the database, and ${name}.`,
+        `docker compose --file docker-compose-base.yaml --file docker-compose-${lower}.yaml up --detach --wait db zitadel-init zitadel-${mode}-tls login-${mode}-tls proxy-${mode}-tls`,
+        '',
+        '# Test that gRPC and HTTP APIs work. Empty brackets like {} means success.',
+        '# Make sure you have the grpcurl cli installed on your machine https://github.com/fullstorydev/grpcurl?tab=readme-ov-file#installation',
+        `grpcurl ${connInsecureFlag}${grpcPlainTextFlag}127.0.0.1.sslip.io:${connPort} zitadel.admin.v1.AdminService/Healthz`,
+        `curl ${connInsecureFlag}${connScheme}://127.0.0.1.sslip.io:${connPort}/admin/v1/healthz`,
+    ].join('\n')
     return (
-        <div>
-            <CodeBlock  language="bash">
-                {'# Download the configuration files.'}{'\n'}
-                {'export ZITADEL_CONFIG_FILES=https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/manage/reverseproxy\n'}
-                {'wget ${ZITADEL_CONFIG_FILES}/docker-compose.yaml -O docker-compose-base.yaml --quiet \n'}
-                {'wget ${ZITADEL_CONFIG_FILES}/'}{lower}{'/docker-compose.yaml -O docker-compose-'}{lower}{'.yaml --quiet \n'}
-                {'wget ${ZITADEL_CONFIG_FILES}/'}{lower}{'/'}{configfilename}{' -O '}{configfilename}{' --quiet \n'}
-                {'\n'}
-                {genCert}
-                {'# Run the database,  and '}{name}{'.'}{'\n'}
-                {'docker compose --file docker-compose-base.yaml --file docker-compose-'}{lower}{'.yaml up --detach --wait db zitadel-init zitadel-'}{mode}{'-tls login-'}{mode}{'-tls proxy-'}{mode}{'-tls'}{'\n'}
-                {'\n'}
-                {'# Test that gRPC and HTTP APIs work. Empty brackets like {} means success.\n'}
-                {'# Make sure you have the grpcurl cli installed on your machine https://github.com/fullstorydev/grpcurl?tab=readme-ov-file#installation\n'}
-                {'grpcurl '}{connInsecureFlag}{grpcPlainTextFlag}{'127.0.0.1.sslip.io:'}{connPort}{' zitadel.admin.v1.AdminService/Healthz\n'}
-                {'curl '}{connInsecureFlag}{connScheme}{'://127.0.0.1.sslip.io:'}{connPort}{'/admin/v1/healthz\n'}
-            </CodeBlock>
+        <div className="mt-4">
+            <DynamicCodeBlock lang="bash" code={code} />
         </div>
     )
 }
@@ -72,7 +73,7 @@ export const LoginURL = ({mode}) => {
 
 <details open>
     <summary>{props.configfilename}</summary>
-    <CodeBlock >{props.configfilecontent}</CodeBlock>
+    <DynamicCodeBlock lang={props.lower === 'nginx' ? 'nginx' : props.lower === 'httpd' ? 'conf' : props.lower === 'caddy' ? 'caddy' : 'yaml'} code={props.configfilecontent} />
 </details>
 
 <Commands mode={props.mode} name={props.providername} lower={props.lower} configfilename={props.configfilename}/>
@@ -84,7 +85,4 @@ export const LoginURL = ({mode}) => {
 
 If the management console loads normally, you know that the HTTP and gRPC-Web and gRPC APIs are working correctly.
 
-<CodeBlock  language="bash">
-    {'# You can now stop the database, the Zitadel API, the Zitadel login and '}{props.providername}{'.'}{'\n'}
-    {'docker compose --file docker-compose-base.yaml --file docker-compose-'}{props.lower}{'.yaml down'}{'\n'}
-</CodeBlock>
+<DynamicCodeBlock lang="bash" code={`# You can now stop the database, the Zitadel API, the Zitadel login and ${props.providername}.\ndocker compose --file docker-compose-base.yaml --file docker-compose-${props.lower}.yaml down`} />

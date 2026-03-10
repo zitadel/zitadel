@@ -1,10 +1,11 @@
 ---
 title: Code examples
+description: "Practical code examples for ZITADEL Actions, from custom claims to external API integration."
 ---
 
-Actions are a powerful tool to extend ZITADEL and you might wonder what use cases actions can be used for.
+Actions are a powerful tool to extend ZITADEL, and you might wonder what use cases actions can be used for.
 
-This page provides a non-exhaustive list of possibilities which is provided by [examples](https://github.com/zitadel/actions/tree/main/examples). If a use case is missing feel free to contribute an issue or pull request to the repository, thanks in advance 🤗.
+This page provides a non-exhaustive list of possibilities which is provided by [examples](https://github.com/zitadel/actions/tree/main/examples). If a use case is missing, feel free to contribute an issue or pull request to the repository, thanks in advance 🤗.
 
 ## Customize OIDC response
 
@@ -16,7 +17,7 @@ Append claims returned on OIDC requests.
   - [Pre Userinfo creation](./complement-token#pre-userinfo-creation-id-token-userinfo-introspection-endpoint)
   - [Pre access token creation](./complement-token#pre-access-token-creation)
 
-### Set hardcoded claim
+### Set a hardcoded claim
 
 Extend the claims by a hardcoded value.
 
@@ -31,7 +32,7 @@ https://github.com/zitadel/actions/blob/main/examples/add_claim.js
 
 ### Set dynamic claim from user metadata
 
-Extend the claims by dynamically read metadata from a user and sets the picture-claim if idpPicture-metadata value is present.
+Extend the claims by dynamically reading metadata from a user and sets the picture-claim if idpPicture-metadata value is present.
 
 <details open="">
 <summary>{props.summary ? props.summary : 'Code example'}</summary>
@@ -44,7 +45,7 @@ https://github.com/zitadel/actions/blob/main/examples/add_picture_claim_from_idp
 
 ### Set dynamic claim from organization metadata
 
-Extend the claims by dynamically read metadata from an organization and sets the present metadata.
+Extend the claims by dynamically reading metadata from an organization and sets the present metadata.
 
 <details open="">
 <summary>Code example</summary>
@@ -105,7 +106,7 @@ https://github.com/zitadel/actions/blob/main/examples/set_custom_attribute.js
 
 ### Set dynamic attribute from organization metadata
 
-Extend the attributes by dynamically read metadata from an organization and sets the present metadata.
+Extend the attributes by dynamically reading metadata from an organization and sets the present metadata.
 
 <details open="">
 <summary>Code example</summary>
@@ -118,7 +119,7 @@ https://github.com/zitadel/actions/blob/main/examples/org_metadata_attribute.js
 
 ## Manipulate user
 
-You can automate manual tasks like setting default grants during user creation.
+You can automate manual tasks such as assigning default roles during user creation.
 
 ### Set email always verified
 
@@ -140,9 +141,9 @@ https://github.com/zitadel/actions/blob/main/examples/verify_email.js
 
 </details>
 
-### Add grants to users
+### Assign roles to users
 
-Allows you to add default user grants to a user after it was created or federated.
+Allows you to assign default roles to a user after the user was created or federated.
 
 #### Triggers
 
@@ -184,7 +185,7 @@ https://github.com/zitadel/actions/blob/main/examples/add_metadata.js
 
 ## Use provided fields of identity providers
 
-If you want to ensure that the data of a user are always up-to-date, you can automatically update user fields during authentication and save time of your customers and your team.
+If you want to ensure that the data of a user are always up to date, you can automatically update user fields during authentication and save time of your customers and your team.
 
 ### Trigger
 
@@ -193,7 +194,7 @@ If you want to ensure that the data of a user are always up-to-date, you can aut
 
 ### Fields provided by Okta as OIDC IdP
 
-If you use [Okta as an identity provider](/guides/integrate/identity-providers/okta-oidc) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use [Okta as an identity provider](/guides/integrate/identity-providers/okta-oidc), you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -206,7 +207,7 @@ https://github.com/zitadel/actions/blob/main/examples/okta_identity_provider.js
 
 ### Fields provided by Gitlab
 
-If you use [Gitlab as an identity provider](/guides/integrate/identity-providers/gitlab) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use [Gitlab as an identity provider](/guides/integrate/identity-providers/gitlab), you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -217,9 +218,9 @@ https://github.com/zitadel/actions/blob/main/examples/gitlab_identity_provider.j
 
 </details>
 
-### Fields provided by Github
+### Fields provided by GitHub
 
-If you use [Github as an identity provider](/guides/integrate/identity-providers/github) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use [GitHub as an identity provider](/guides/integrate/identity-providers/github), you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -232,7 +233,7 @@ https://github.com/zitadel/actions/blob/main/examples/github_identity_provider.j
 
 ### Claims provided by a generic OIDC identity provider
 
-If you use a [generic OIDC identity provider](/guides/integrate/identity-providers/migrate#migrate-generic-oidc-provider) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use a [generic OIDC identity provider](/guides/integrate/identity-providers/migrate#migrate-generic-oidc-provider), you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -245,7 +246,7 @@ https://github.com/zitadel/actions/blob/main/examples/set_idp_picture_metadata.j
 
 ### Attributes provided by Okta as SAML IDP
 
-If you use [Okta as an identity provider](/guides/integrate/identity-providers/okta_saml#add-attribute-statements) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use [Okta as an identity provider](/guides/integrate/identity-providers/okta_saml#add-attribute-statements), you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -258,7 +259,7 @@ https://github.com/zitadel/actions/blob/main/examples/okta_saml_prefil_register_
 
 ### Attributes provided by Microsoft Entra as SAML IDP
 
-If you use [Microsoft Entra as SAML identity provider](/guides/integrate/identity-providers/azure-ad-saml) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use [Microsoft Entra as SAML identity provider](/guides/integrate/identity-providers/azure-ad-saml), you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -271,7 +272,7 @@ https://github.com/zitadel/actions/blob/main/examples/entra_id_saml_prefil_regis
 
 ### Attributes provided by a generic SAML identity provider
 
-If you use a [SAML identity provider like mocksaml](/guides/integrate/identity-providers/mocksaml) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use a [SAML identity provider like mocksaml](/guides/integrate/identity-providers/mocksaml), you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -282,9 +283,9 @@ https://github.com/zitadel/actions/blob/main/examples/post_auth_saml.js
 
 </details>
 
-## Context aware execution
+## Context-aware execution
 
-Based on the context the execution path of an action can change. ZITADEL allows complex execution paths of course. 😎
+Based on the context, the execution path of an action can change. ZITADEL allows complex execution paths, of course. 😎
 
 ### Based on auth request information
 

@@ -14,7 +14,7 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
-import { handleServerActionResponse } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs = {
@@ -116,6 +116,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
           <TextInput
             type="password"
             autoComplete="password"
+            autoFocus
             {...register("password", { required: t("verify.required.password") })}
             label={t("verify.labels.password")}
             data-testid="password-text-input"

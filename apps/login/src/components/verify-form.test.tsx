@@ -28,6 +28,15 @@ describe("VerifyForm", () => {
 
   afterEach(cleanup);
 
+  describe("Input Focus", () => {
+    test("should autofocus the code input on mount", () => {
+      const { getByTestId } = render(
+        <VerifyForm userId="user-1" code="" isInvite={false} submit={false} />,
+      );
+      expect(getByTestId("code-text-input")).toHaveFocus();
+    });
+  });
+
   describe("Auto-submit Behavior", () => {
     test("should call sendVerification automatically when submit=true", async () => {
       render(<VerifyForm userId="user-1" code="123456" isInvite={false} submit={true} />);

@@ -96,7 +96,7 @@ func Test_reduceInstanceFeature(t *testing.T) {
 			name: "management console uses v2 user api",
 			args: args{
 				features: &InstanceFeatures{},
-				key:      feature.KeyManagementConsoleUseV2UserApi,
+				key:      feature.KeyConsoleUseV2UserApi,
 				value:    true,
 			},
 			expected: &InstanceFeatures{ManagementConsoleUseV2UserApi: gu.Ptr(true)},

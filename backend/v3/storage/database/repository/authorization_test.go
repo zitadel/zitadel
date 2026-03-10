@@ -29,10 +29,8 @@ func TestCreateAuthorization(t *testing.T) {
 	// create project roles
 	role1 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role1")
 	role2 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role2")
-	// TODO: uncomment when user table is available
-	// userID := createUser(t, tx, instanceID, organizationID)
-	// require.NotNil(t, userID)
-	userID := integration.ID()
+	userID := createHumanUser(t, tx, instanceID, organizationID)
+	require.NotNil(t, userID)
 
 	authorizationRepo := repository.AuthorizationRepository()
 
@@ -116,19 +114,18 @@ func TestCreateAuthorization(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
-		// TODO: uncomment when user table is available
-		// {
-		//	name: "non-existent user",
-		//	authorization: &domain.Authorization{
-		//		ID:         integration.ID(),
-		//		UserID:     "random-id",
-		//		ProjectID:  projectID,
-		//		InstanceID: instanceID,
-		//		State:      domain.AuthorizationStateActive,
-		//		Roles:      nil,
-		//	},
-		//	wantErr: new(database.ForeignKeyError),
-		// },
+		{
+			name: "non-existent user",
+			authorization: &domain.Authorization{
+				ID:         integration.ID(),
+				UserID:     "random-id",
+				ProjectID:  projectID,
+				InstanceID: instanceID,
+				State:      domain.AuthorizationStateActive,
+				Roles:      nil,
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
 		{
 			name: "duplicate authorization",
 			authorization: &domain.Authorization{
@@ -265,10 +262,8 @@ func TestGetAuthorization(t *testing.T) {
 	role1 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role1")
 	role2 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role2")
 
-	// TODO: uncomment when user table is available
-	// userID := createUser(t, tx, instanceID, organizationID)
-	// require.NotNil(t, userID)
-	userID := integration.ID()
+	userID := createHumanUser(t, tx, instanceID, organizationID)
+	require.NotNil(t, userID)
 
 	// create authorization with roles
 	authorizationRepo := repository.AuthorizationRepository()
@@ -458,13 +453,10 @@ func TestListAuthorization(t *testing.T) {
 	project2Role1 := createProjectRole(t, tx, instanceID, organizationID, project2ID, "project2Role1")
 	project2Role2 := createProjectRole(t, tx, instanceID, organizationID, project2ID, "project2Role2")
 
-	// TODO: uncomment when user table is available
-	// user1ID := createUser(t, tx, instanceID, organizationID)
-	// require.NotNil(t, user1ID)
-	user1ID := integration.ID()
-	// user2ID := createUser(t, tx, instanceID, organizationID)
-	// require.NotNil(t, user2ID)
-	user2ID := integration.ID()
+	user1ID := createHumanUser(t, tx, instanceID, organizationID)
+	require.NotNil(t, user1ID)
+	user2ID := createHumanUser(t, tx, instanceID, organizationID)
+	require.NotNil(t, user2ID)
 
 	// create authorization with roles for user1 for project1
 	authorizationRepo := repository.AuthorizationRepository()
@@ -890,11 +882,12 @@ func TestUpdateAuthorization(t *testing.T) {
 	instanceID := createInstance(t, tx)
 	organizationID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, organizationID)
+	userID := createHumanUser(t, tx, instanceID, organizationID)
 
 	authorizationRepo := repository.AuthorizationRepository()
 	activeAuthorization := &domain.Authorization{
 		ID:         integration.ID(),
-		UserID:     integration.ID(),
+		UserID:     userID,
 		ProjectID:  projectID,
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
@@ -907,7 +900,7 @@ func TestUpdateAuthorization(t *testing.T) {
 
 	inactiveAuthorization := &domain.Authorization{
 		ID:         integration.ID(),
-		UserID:     integration.ID(),
+		UserID:     userID,
 		ProjectID:  projectID,
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateInactive,
@@ -1012,10 +1005,12 @@ func TestAuthorizationUpdate_setRoles(t *testing.T) {
 	role5 := createProjectRole(t, tx, instanceID, organizationID, project2ID, "role5")
 	role6 := createProjectRole(t, tx, instanceID, organizationID, project2ID, "role6")
 
+	userID := createHumanUser(t, tx, instanceID, organizationID)
+
 	authorizationRepo := repository.AuthorizationRepository()
 	authorization1 := &domain.Authorization{
 		ID:         integration.ID(),
-		UserID:     integration.ID(),
+		UserID:     userID,
 		ProjectID:  projectID,
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
@@ -1028,7 +1023,7 @@ func TestAuthorizationUpdate_setRoles(t *testing.T) {
 
 	authorization2 := &domain.Authorization{
 		ID:         integration.ID(),
-		UserID:     integration.ID(),
+		UserID:     userID,
 		ProjectID:  project2ID,
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
@@ -1132,11 +1127,12 @@ func TestDeleteAuthorization(t *testing.T) {
 	projectID := createProject(t, tx, instanceID, organizationID)
 	role1 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role1")
 	role2 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role2")
+	userID := createHumanUser(t, tx, instanceID, organizationID)
 
 	authorizationRepo := repository.AuthorizationRepository()
 	authorizationWithRoles := &domain.Authorization{
 		ID:         integration.ID(),
-		UserID:     integration.ID(),
+		UserID:     userID,
 		ProjectID:  projectID,
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
@@ -1149,7 +1145,7 @@ func TestDeleteAuthorization(t *testing.T) {
 
 	authorizationWithoutRoles := &domain.Authorization{
 		ID:         integration.ID(),
-		UserID:     integration.ID(),
+		UserID:     userID,
 		ProjectID:  projectID,
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
@@ -1162,7 +1158,7 @@ func TestDeleteAuthorization(t *testing.T) {
 
 	deletedAuthorization := &domain.Authorization{
 		ID:         integration.ID(),
-		UserID:     integration.ID(),
+		UserID:     userID,
 		ProjectID:  projectID,
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
@@ -1182,7 +1178,7 @@ func TestDeleteAuthorization(t *testing.T) {
 	grantID := createProjectGrant(t, tx, instanceID, organizationID, grantedOrganizationID, projectID, []string{role1})
 	authorizationProjectGrant := &domain.Authorization{
 		ID:         integration.ID(),
-		UserID:     integration.ID(),
+		UserID:     userID,
 		ProjectID:  projectID,
 		GrantID:    gu.Ptr(grantID),
 		InstanceID: instanceID,

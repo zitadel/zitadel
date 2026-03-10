@@ -108,14 +108,17 @@
       "description": "Définissez le mot de passe de votre compte",
       "submit": "Continuer",
       "labels": {
+        "currentPassword": "Mot de passe actuel",
         "newPassword": "Nouveau mot de passe",
         "confirmPassword": "Confirmez le mot de passe"
       },
       "required": {
+        "currentPassword": "Vous devez fournir votre mot de passe actuel !",
         "newPassword": "Vous devez fournir un nouveau mot de passe !",
         "confirmPassword": "Ce champ est requis"
       },
       "errors": {
+        "currentPasswordInvalid": "Le mot de passe actuel est incorrect.",
         "couldNotChangePassword": "Impossible de changer le mot de passe",
         "couldNotVerifyPassword": "Impossible de vérifier le mot de passe",
         "unknownError": "Erreur inconnue"

@@ -1,6 +1,7 @@
 "use server";
 
 import { addSessionToCookie, updateSessionCookie } from "@/lib/cookies";
+import { createLogger } from "@/lib/logger";
 import {
   createSessionForUserIdAndIdpIntent,
   createSessionFromChecksAndChallenges,
@@ -15,6 +16,8 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import { getServiceConfig } from "../service-url";
+
+const logger = createLogger("cookie");
 
 type CustomCookieData = {
   id: string;
@@ -52,7 +55,7 @@ export async function createSessionAndUpdateCookie(command: {
   let sessionLifetime = command.lifetime;
 
   if (!sessionLifetime || !sessionLifetime.seconds) {
-    console.warn("No session lifetime provided, using default of 24 hours.");
+    logger.warn("No session lifetime provided, using default of 24 hours");
 
     sessionLifetime = {
       seconds: BigInt(24 * 60 * 60), // 24 hours
@@ -126,7 +129,7 @@ export async function createSessionForIdpAndUpdateCookie({
   let sessionLifetime = lifetime;
 
   if (!sessionLifetime || !sessionLifetime.seconds) {
-    console.warn("No IDP session lifetime provided, using default of 24 hours.");
+    logger.warn("No IDP session lifetime provided, using default of 24 hours");
 
     sessionLifetime = {
       seconds: BigInt(24 * 60 * 60), // 24 hours
@@ -140,7 +143,7 @@ export async function createSessionForIdpAndUpdateCookie({
     idpIntent,
     lifetime: sessionLifetime,
   }).catch((error: ErrorDetail | CredentialsCheckError) => {
-    console.error("Could not set session", error);
+    logger.error("Could not set session", { error });
     if ("failedAttempts" in error && error.failedAttempts) {
       throw {
         error: `Failed to authenticate: You had ${error.failedAttempts} password attempts.`,

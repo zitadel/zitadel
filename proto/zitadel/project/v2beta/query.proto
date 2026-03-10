@@ -113,9 +113,9 @@ message Project {
   ];
   // Describes if the roles of the user should be added to the token.
   bool project_role_assertion = 7;
-  // When enabled Zitadel will check if a user has an authorization to use this project assigned when login into an application of this project.
+  // When enabled, ZITADEL will check if a user has appropriate role assignments to use this project when they log into an application of this project.
   bool authorization_required = 8;
-  // When enabled Zitadel will check if the organization of the user, that is trying to log in, has access to this project (either owns the project or is granted).
+  // When enabled, ZITADEL will check if the organization of the user, that is trying to log in, has access to this project (either owns the project or is granted).
   bool project_access_required = 9;
   // Defines from where the private labeling should be triggered.
   PrivateLabelingSetting private_labeling_setting = 10;

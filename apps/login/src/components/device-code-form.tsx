@@ -65,6 +65,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
           <TextInput
             type="text"
             autoComplete="one-time-code"
+            autoFocus
             {...register("userCode", { required: t("usercode.required.code") })}
             label={t("usercode.labels.code")}
             data-testid="code-text-input"

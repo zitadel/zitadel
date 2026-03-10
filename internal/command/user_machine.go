@@ -26,6 +26,7 @@ type Machine struct {
 	Description     string
 	AccessTokenType domain.OIDCTokenType
 	PermissionCheck PermissionCheck
+	Metadata        []*AddMetadataEntry
 }
 
 func (m *Machine) IsZero() bool {
@@ -40,11 +41,9 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 		if a.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-p0p2mi", "Errors.User.UserIDMissing")
 		}
-		if machine.Name == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-bs9Ds", "Errors.User.Invalid")
-		}
-		if machine.Username == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
+		err = machine.Validate()
+		if err != nil {
+			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			ctx, span := tracing.NewSpan(ctx)
@@ -65,9 +64,18 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 			if err != nil {
 				return nil, err
 			}
-			return []eventstore.Command{
+			cmds := []eventstore.Command{
 				user.NewMachineAddedEvent(ctx, &a.Aggregate, machine.Username, machine.Name, machine.Description, domainPolicy.UserLoginMustBeDomain || orgScopedUsername, machine.AccessTokenType),
-			}, nil
+			}
+			for _, metadataEntry := range machine.Metadata {
+				cmds = append(cmds, user.NewMetadataSetEvent(
+					ctx,
+					&a.Aggregate,
+					metadataEntry.Key,
+					metadataEntry.Value,
+				))
+			}
+			return cmds, nil
 		}, nil
 	}
 }
@@ -213,4 +221,19 @@ func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, fil
 		}
 	}
 	return writeModel, err
+}
+
+func (m *Machine) Validate() (err error) {
+	if m.Name == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-bs9Ds", "Errors.User.Invalid")
+	}
+	if m.Username == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
+	}
+	for _, metadataEntry := range m.Metadata {
+		if err := metadataEntry.Valid(); err != nil {
+			return err
+		}
+	}
+	return nil
 }

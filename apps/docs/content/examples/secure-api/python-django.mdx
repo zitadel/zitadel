@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Django Python
+description: "Integrate ZITADEL with Django Python to validate tokens and check permissions for secure API access using OIDC protocol standards"
 sidebar_label: Django
 ---
 
@@ -11,7 +12,7 @@ import SetupPython from '../imports/_setup_python.mdx';
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your Django Python application.
 It explains how to check the token validity in the API and how to check for permissions.
 
-By the end of this guide, your application will have three different endpoint which are public, private(valid token) and private-scoped(valid token with specific role).
+By the end of this guide, your application will have three different endpoints that are public, private (valid token) and private-scoped (valid token with a specific role).
 
 <Callout>
 This documentation references our [example](https://github.com/zitadel/example-django-python-oauth) on GitHub.
@@ -19,7 +20,7 @@ This documentation references our [example](https://github.com/zitadel/example-d
 
 ## ZITADEL setup
 
-Before we can start building our application, we have to do a few configuration steps in ZITADEL Management Console.
+Before we can start building our application, we have to do a few setup steps in the ZITADEL Management Console.
 
 ### Create application
 
@@ -29,7 +30,7 @@ Before we can start building our application, we have to do a few configuration 
 
 <ServiceAccountJWT components={props.components} />
 
-### Give Service Account an authorization
+### Assign a role to the Service Account
 
 <ServiceAccountRole components={props.components} />
 
@@ -55,7 +56,7 @@ And the following from the Service Account:
 
 For this example we need the following dependencies:
 - `django`: to create an API with django
-- `python-dotenv`: to use environment variables in the configuration
+- `python-dotenv`: to use environment variables in the settings
 - `authlib`: client-side OAuth functionality
 - `requests`: HTTP requests for the introspection
 
@@ -85,7 +86,7 @@ There is info needed for the introspection calls, which we put into the settings
 https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/settings.py#L125-L133
 ```
 
-and create a ".env"-file in the root folder with the configuration as an example:
+and create a ".env"-file in the root folder with the settings as an example:
 ```bash
 ZITADEL_INTROSPECTION_URL = 'URL to the introspection endpoint to verify the provided token'
 ZITADEL_DOMAIN = 'Domain used as audience in the token verification'

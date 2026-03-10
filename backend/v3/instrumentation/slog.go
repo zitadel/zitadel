@@ -2,6 +2,7 @@ package instrumentation
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"os"
 	"slices"
@@ -82,9 +83,22 @@ type MaskConfig struct {
 	Value string
 }
 
+// replacer returns a function that replaces the value of any attribute whose key matches
+// one of the configured keys with the configured value.
+// If a group key matches, all attribute values in that group are replaced.
+// Attribute structure is preserved, e.g. "password" is replaced with "masked" but still appears as "password" in the logs.
 func (c MaskConfig) replacer() replacer {
-	return func(_ []string, a slog.Attr) slog.Attr {
-		if slices.Contains(c.Keys, a.Key) {
+	keys := slices.Clone(c.Keys)
+	slices.Sort(keys)
+	return func(groups []string, a slog.Attr) slog.Attr {
+		// mask all entries in a matching group, e.g. "data.*"
+		for _, g := range groups {
+			if _, found := slices.BinarySearch(keys, g); found {
+				a.Value = slog.StringValue(c.Value)
+				return a
+			}
+		}
+		if _, found := slices.BinarySearch(keys, a.Key); found {
 			a.Value = slog.StringValue(c.Value)
 		}
 		return a
@@ -146,6 +160,7 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 			Prependers: []slogctx.AttrExtractor{
 				instanceExtractor,
 				requestIDExtractor,
+				causeExtractor,
 				slogotel.ExtractTraceSpanID,
 				slogctx.ExtractPrepended,
 			},
@@ -206,6 +221,17 @@ func requestIDExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string
 	if r, ok := ctx.Value(ctxKeyRequestID).(xid.ID); ok {
 		return []slog.Attr{
 			slog.String("request_id", r.String()),
+		}
+	}
+	return nil
+}
+
+// causeExtractor sets the cause of a canceled context to a log entry.
+func causeExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
+	err := context.Cause(ctx)
+	if err != nil && !errors.Is(err, context.Canceled) && !errors.Is(err, context.DeadlineExceeded) {
+		return []slog.Attr{
+			slog.String("cause", err.Error()),
 		}
 	}
 	return nil

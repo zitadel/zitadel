@@ -10,6 +10,7 @@ import (
 	"github.com/riverqueue/river"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 )
@@ -46,7 +47,7 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) e
 		return river.JobCancel(fmt.Errorf("unable to unmarshal targets because %w", err))
 	}
 
-	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args), w.targetEncAlg, w.activeSigningKey)
+	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args), w.targetEncAlg, w.activeSigningKey, w.config.DenyList)
 	if err != nil {
 		// If there is an error returned from the targets, it means that the execution was interrupted
 		return river.JobCancel(fmt.Errorf("interruption during call of targets because %w", err))
@@ -61,6 +62,7 @@ type WorkerConfig struct {
 	Workers             uint8
 	TransactionDuration time.Duration
 	MaxTtl              time.Duration
+	DenyList            []denylist.AddressChecker
 }
 
 func NewWorker(

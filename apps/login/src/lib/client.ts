@@ -1,4 +1,9 @@
+"use server";
+
+import { headers } from "next/headers";
 import { completeAuthFlow } from "./server/auth-flow";
+import { getPublicHostWithProtocol } from "./server/host";
+import { isSafeRedirectUri } from "./client-utils";
 
 type FinishFlowCommand =
   | {
@@ -100,47 +105,52 @@ export async function getNextUrl(
   // OIDC/SAML flows are now handled by completeAuthFlowAction() server action
   // This function only handles device flows and fallback navigation
 
-  if (defaultRedirectUri) {
-    console.log("getNextUrl: Using defaultRedirectUri:", defaultRedirectUri);
-    return defaultRedirectUri;
-  }
-
-  const result = goToSignedInPage(command);
-  console.log("getNextUrl: got goToSignedInPage result");
+  const result = await resolveRedirectUri(command, defaultRedirectUri);
+  console.log("getNextUrl: Resolved redirect URI:", result);
   return result;
 }
 
-export type ServerActionResponse =
-  | { redirect: string }
-  | { error: string }
-  | { samlData: { url: string; fields: Record<string, string> } }
-  | undefined
-  | null;
-
-export function handleServerActionResponse(
-  response: ServerActionResponse,
-  router: { push: (url: string) => void },
-  setSamlData: (data: { url: string; fields: Record<string, string> }) => void,
-  setError: (error: string) => void,
-): boolean {
-  if (!response) {
-    return false;
+/**
+ * Resolves the redirect URI based on the following priority:
+ * 1. DEFAULT_REDIRECT_URI environment variable
+ * 2. defaultRedirectUri from organization settings
+ * 3. Relative signed-in page fallback
+ * 4. Reserved for future extensions
+ */
+export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedirectUri?: string): Promise<string> {
+  // 1. Environment variable override
+  const envOverride = process.env.DEFAULT_REDIRECT_URI;
+  if (envOverride) {
+    if (envOverride.startsWith("/")) {
+      // Special state: trigger absolute host-based redirect with provided path
+      try {
+        const _headers = await headers();
+        const host = getPublicHostWithProtocol(_headers);
+        const result = `${host}${envOverride}`;
+        console.log("resolveRedirectUri: Using host-based redirect from override:", result);
+        return result;
+      } catch (error) {
+        console.warn("resolveRedirectUri: Could not determine host for override, falling back", error);
+      }
+    } else {
+      console.log("resolveRedirectUri: Using DEFAULT_REDIRECT_URI override:", envOverride);
+      return envOverride;
+    }
   }
 
-  if ("redirect" in response && response.redirect) {
-    router.push(response.redirect);
-    return true;
+  // 2. Default redirect URI from settings
+  if (defaultRedirectUri) {
+    if (isSafeRedirectUri(defaultRedirectUri)) {
+      console.log("resolveRedirectUri: Using defaultRedirectUri from settings:", defaultRedirectUri);
+      return defaultRedirectUri;
+    } else {
+      console.warn("resolveRedirectUri: Unsafe defaultRedirectUri prevented:", defaultRedirectUri);
+    }
   }
 
-  if ("samlData" in response && response.samlData) {
-    setSamlData(response.samlData);
-    return true;
-  }
-
-  if ("error" in response && response.error) {
-    setError(response.error);
-    return true;
-  }
-
-  return false;
+  // 3. Default signed-in page (relative)
+  const result = goToSignedInPage(command);
+  console.log("resolveRedirectUri: Using relative goToSignedInPage result:", result);
+  return result;
 }
+

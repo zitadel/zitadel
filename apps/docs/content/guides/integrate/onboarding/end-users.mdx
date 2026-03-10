@@ -1,5 +1,6 @@
 ---
 title: Onboard Users
+description: "Onboard end-users with ZITADEL by enabling self-registration, manual user invites or automated provisioning using OIDC and external IdPs"
 sidebar_label: Onboard Users
 ---
 
@@ -98,12 +99,12 @@ You can only setup authentication with the built-in form.
 
 #### Registration with Social Login
 
-To allow your users to register with social logins you have to configure the external identity providers.
+To allow your users to register with social logins you have to set up the external identity providers.
 If you only need the social logins for your end users and you want to have them all in the organization, we recommend using the default organization for those users.
-In that case you can configure the identity providers on the default organization.
+In that case you can set up the identity providers on the default organization.
 If you want to have the social logins on different organizations you can configure the default on the instance, and enable it on the needed organizations.
 
-Please follow the configuration guides for the needed providers: [Let Users Login with Preferred Identity Provider in ZITADEL](/guides/integrate/identity-providers/introduction)
+Please follow the setup guides for the needed providers: [Let Users Login with Preferred Identity Provider in ZITADEL](/guides/integrate/identity-providers/introduction)
 
 The configured providers will be shown on the first login screen or when the users click on the registration button, they will be able to choose between local account or the social login.
 
@@ -114,10 +115,10 @@ The configured providers will be shown on the first login screen or when the use
 
 #### Registration with Organization External Identity Provider
 
-If your business customer already have an identity provider, and you want to allow SSO for them, you can configure their providers directly for their organization.
-Configure the needed provider such as Entra ID or OKTA.
+If your business customer already have an identity provider, and you want to allow SSO for them, you can set up their providers directly for their organization.
+Set up the needed provider such as Entra ID or OKTA.
 
-Please follow the configuration guides for the needed providers: [Let Users Login with Preferred Identity Provider in ZITADEL](/guides/integrate/identity-providers/introduction)
+Please follow the setup guides for the needed providers: [Let Users Login with Preferred Identity Provider in ZITADEL](/guides/integrate/identity-providers/introduction)
 
 <OrgLoginDescription components={props.components}  name="OrgLoginDescription" />
 

@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Java Spring Boot
+description: "Integrate ZITADEL into Java Spring Boot applications for user login and profile retrieval using OIDC."
 sidebar_label: Java Spring Boot
 ---
 
@@ -15,7 +16,7 @@ You can either create your own application or directly run the example by provid
 
 ## Set up application
 
-Before we begin developing our application, we need to perform a few configuration steps in the ZITADEL Console.
+Before we begin developing our application, we need to perform a few setup steps in the ZITADEL Console.
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select the **Web** application type and continue.
 
@@ -73,7 +74,7 @@ https://github.com/zitadel/zitadel-java/blob/main/web/src/main/java/demo/support
 https://github.com/zitadel/zitadel-java/blob/main/web/src/main/java/demo/support/AccessTokenInterceptor.java
 ```
 
-### Application server configuration
+### Application server settings
 
 As we have now our support classes, we can now create and configure the application server (and API client) itself.
 
@@ -90,7 +91,7 @@ mapping the claims (using the ZitadelGrantedAuthoritiesMapper) and also provide 
 https://github.com/zitadel/zitadel-java/blob/main/web/src/main/java/demo/config/WebSecurityConfig.java
 ```
 
-For the authentication (and the server in general) to work, the application needs some configuration, so please provide the following to your `application.yml` (resources folder):
+For the authentication (and the server in general) to work, the application needs some settings, so please provide the following to your `application.yml` (resources folder):
 
 ```yaml reference
 https://github.com/zitadel/zitadel-java/blob/main/web/src/main/resources/application.yml
@@ -173,4 +174,4 @@ Congratulations! You have successfully integrated your Spring Boot web applicati
 
 If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-java) application.
 This application includes all the functionalities mentioned in this quickstart.
-You can directly start it with your own configuration. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel-java/issues).
+You can directly start it with your own settings. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel-java/issues).

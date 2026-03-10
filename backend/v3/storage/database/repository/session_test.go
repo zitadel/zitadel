@@ -232,6 +232,9 @@ func TestSession_Update(t *testing.T) {
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
+	orgID := createOrganization(t, tx, instanceId)
+	userID := createHumanUser(t, tx, instanceId, orgID)
+
 	testNow := time.Now()
 	tests := []struct {
 		name         string
@@ -474,7 +477,7 @@ func TestSession_Update(t *testing.T) {
 				// update with updated values
 				session.Factors = []domain.SessionFactor{
 					&domain.SessionFactorUser{
-						UserID:         "user-id",
+						UserID:         userID,
 						LastVerifiedAt: testNow,
 					},
 				}
@@ -482,7 +485,7 @@ func TestSession_Update(t *testing.T) {
 			},
 			update: []database.Change{
 				sessionRepo.SetFactor(&domain.SessionFactorUser{
-					UserID:         "user-id",
+					UserID:         userID,
 					LastVerifiedAt: testNow,
 				}),
 			},
@@ -748,7 +751,7 @@ func TestSession_Update(t *testing.T) {
 				session.TokenID = "new-token"
 				session.Factors = []domain.SessionFactor{
 					&domain.SessionFactorUser{
-						UserID:         "user-id",
+						UserID:         userID,
 						LastVerifiedAt: testNow,
 					},
 					&domain.SessionFactorPassword{
@@ -794,7 +797,7 @@ func TestSession_Update(t *testing.T) {
 				sessionRepo.SetUpdatedAt(testNow),
 				sessionRepo.SetLifetime(time.Hour * 48),
 				sessionRepo.SetFactor(&domain.SessionFactorUser{
-					UserID:         "user-id",
+					UserID:         userID,
 					LastVerifiedAt: testNow,
 				}),
 				sessionRepo.SetFactor(&domain.SessionFactorPassword{
@@ -846,7 +849,7 @@ func TestSession_Update(t *testing.T) {
 				updatedRows, err := sessionRepo.Update(t.Context(), tx,
 					sessionRepo.PrimaryKeyCondition(session.InstanceID, session.ID),
 					sessionRepo.SetFactor(&domain.SessionFactorUser{
-						UserID:         "user-id",
+						UserID:         userID,
 						LastVerifiedAt: testNow,
 					}),
 					sessionRepo.SetFactor(&domain.SessionFactorPassword{
@@ -859,7 +862,7 @@ func TestSession_Update(t *testing.T) {
 				// update with updated values
 				session.Factors = []domain.SessionFactor{
 					&domain.SessionFactorUser{
-						UserID:         "user-id",
+						UserID:         userID,
 						LastVerifiedAt: testNow,
 					},
 				}
@@ -1101,9 +1104,12 @@ func TestSession_List(t *testing.T) {
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
+	orgID := createOrganization(t, tx, instanceId)
+	userIDs := []string{createHumanUser(t, tx, instanceId, orgID), createHumanUser(t, tx, instanceId, orgID)}
+
 	// create sessions
 	sessions := make([]*domain.Session, 5)
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		session := &domain.Session{
 			InstanceID: instanceId,
 			ID:         strconv.Itoa(i),
@@ -1138,7 +1144,7 @@ func TestSession_List(t *testing.T) {
 		session.Metadata = metadata
 		changes = append(changes, sessionRepo.SetMetadata(metadata))
 		userFactor := &domain.SessionFactorUser{
-			UserID:         "user-" + strconv.Itoa(i%2), // two users: user-0 and user-1
+			UserID:         userIDs[i%2],
 			LastVerifiedAt: time.Now(),
 		}
 		session.Factors.AppendTo(userFactor)

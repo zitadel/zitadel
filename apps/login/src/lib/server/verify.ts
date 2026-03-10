@@ -1,5 +1,6 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
 import {
   createInviteCode,
   getLoginSettings,
@@ -16,6 +17,7 @@ import crypto from "crypto";
 import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { cookies, headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
@@ -26,6 +28,8 @@ import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHostWithProtocol } from "./host";
 import { getTranslations } from "next-intl/server";
+
+const logger = createLogger("verify");
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
   const _headers = await headers();
@@ -62,11 +66,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   const verifyResponse = command.isInvite
     ? await verifyInviteCode({ serviceConfig, userId: command.userId, verificationCode: command.code }).catch((error) => {
-        console.warn(error);
+        logger.warn("Could not verify invite:", { error });
         return { error: t("errors.couldNotVerifyInvite") };
       })
     : await verifyEmail({ serviceConfig, userId: command.userId, verificationCode: command.code }).catch((error) => {
-        console.warn(error);
+        logger.warn("Could not verify email:", { error });
         return { error: t("errors.couldNotVerifyEmail") };
       });
 
@@ -101,7 +105,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       })
       .catch((error) => {
         // user session is not found, so we create a new one
-        console.warn("[verify] user session is not found, so we create a new one", error);
+        logger.warn("[verify] user session is not found, so we create a new one", { error });
         return undefined;
       });
   }
@@ -113,8 +117,16 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     return { error: t("errors.couldNotLoadAuthenticators") };
   }
 
-  // if no authmethods are found on the user, redirect to set one up
-  if (authMethodResponse && authMethodResponse.authMethodTypes && authMethodResponse.authMethodTypes.length == 0) {
+  const hasPrimaryMethod =
+    authMethodResponse?.authMethodTypes?.some(
+      (m: AuthenticationMethodType) =>
+        m === AuthenticationMethodType.PASSWORD ||
+        m === AuthenticationMethodType.PASSKEY ||
+        m === AuthenticationMethodType.IDP,
+    ) ?? false;
+
+  // if no primary auth methods are found on the user, redirect to set one up
+  if (!hasPrimaryMethod) {
     if (!session) {
       const checks = create(ChecksSchema, {
         user: {

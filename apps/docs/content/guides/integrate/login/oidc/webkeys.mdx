@@ -1,5 +1,6 @@
 ---
 title: OpenID Connect and OAuth2 web keys
+description: "Manage JSON Web Keys (JWKS) in ZITADEL to sign and verify tokens during OIDC and OAuth 2.0 authorization flows"
 sidebar_label: Web Keys
 ---
 
@@ -96,13 +97,13 @@ two web key pairs are created with one activated.
 ### Creation
 
 The web key [create](/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-create-web-key) endpoint generates a new web key pair,
-using the passed generator configuration from the request. This config is a one-of field of:
+using the passed generator settings from the request. This config is a one-of field of:
 
 - RSA
 - ECDSA
 - ED25519
 
-When the request does not contain any specific configuration,
+When the request does not contain any specific settings,
 [RSA](#rsa) is used as default with the default options as described below:
 
 ```bash
@@ -347,7 +348,7 @@ Cache-Control: max-age=300, must-revalidate
 ```
 
 Self-hosters can modify this setting through the `ZITADEL_OIDC_JWKSCACHECONTROLMAXAGE`
-environment variable or in the configuration yaml:
+environment variable or in the settings yaml:
 
 ```yaml
 OIDC:

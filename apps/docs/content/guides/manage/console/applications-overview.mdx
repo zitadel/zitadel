@@ -1,5 +1,6 @@
 ---
 title: Applications
+description: "Create and configure applications in ZITADEL to enable secure OIDC or SAML authentication."
 sidebar_label: Applications
 
 sidebar_position: 5
@@ -15,7 +16,7 @@ import AppType from "./_application-types.mdx";
 Applications are the entry point to your [Project Overview](/guides/manage/console/projects-overview)
 . Users either login into one of your applications (Frontend) and interact with them directly, or use one of your APIs (Backend).
 
-All applications within a project share the same **Roles** and **Authorizations**. This means you define a role once (e.g., `admin`) on the Project level, and it applies across all your web, mobile, and API applications.
+All applications within a project share the same **Roles** and **Role Assignments**. This means you define a role once (e.g., `admin`) on the Project level, and it applies across all your web, mobile, and API applications.
 
 To access your applications, navigate to your Project in the Management Console and select your application.
 
@@ -86,9 +87,9 @@ After creating a SAML app, you can either:
 1.  Add a link to a SAML metadata file.
 2.  Upload the metadata XML file directly.
 
-You can find example configurations for SAML 2.0 in our [integrate services](../../integrate/login/saml) guides.
+You can find example settings for SAML 2.0 in our [integrate services](../../integrate/login/saml) guides.
 
-## Configuration
+## Settings
 
 ### Redirect URIs
 
@@ -117,13 +118,13 @@ When disabled, ZITADEL enforces strict security and only allows `https`.
 **Glob Patterns:**
 Development mode allows the use of glob patterns in Redirect URIs for flexibility:
 
-| Special Terms | Meaning |
-| :--- | :--- |
-| `*` | Matches any sequence of **non-path-separators**. |
-| `/**/` | Matches zero or more directories. |
-| `?` | Matches any single non-path-separator character. |
-| `[class]` | Matches any single character against a class of characters (e.g., `[a-z]`). |
-| `{alt1,...}` | Matches a sequence if one of the comma-separated alternatives matches. |
+| Special Terms | Meaning                                                                     |
+|:--------------|:----------------------------------------------------------------------------|
+| `*`           | Matches any sequence of **non-path-separators**.                            |
+| `/**/`        | Matches zero or more directories.                                           |
+| `?`           | Matches any single non-path-separator character.                            |
+| `[class]`     | Matches any single character against a class of characters (e.g., `[a-z]`). |
+| `{alt1,...}`  | Matches a sequence if one of the comma-separated alternatives matches.      |
 
 <Callout type="note">
 Double stars (`**`) should appear surrounded by path separators (e.g., `/**/`). A pattern like `path/to/**.txt` is invalid; use `path/to/**/*.txt`.
@@ -134,15 +135,15 @@ IPv6
 When IPv6 URIs are used as redirects in development mode, square brackets must be escaped as they are special terms for globs. Example: `http://\[::1\]:80`
 </Callout>
 
-### Review Configuration
+### Review Settings
 
 <ReviewConfig components={props.components} authType="code" />
 
 ## Application Settings
 
-After creating an application, you can modify its configuration.
+After creating an application, you can modify its settings.
 * **Auth Method:** You can switch authentication methods (e.g., from Basic to Private Key JWT) via the toggle or dropdowns.
-* **OIDC Compliance:** The Management Console checks if your configuration is OIDC compliant and shows tasks for completion if anything is missing.
+* **OIDC Compliance:** The Management Console checks if your settings are OIDC compliant and shows tasks for completion if anything is missing.
 
 <Callout type="caution">
 You **cannot** change the Application Type (e.g., from Web to Native) after creation. You must delete and recreate the application.
@@ -179,10 +180,10 @@ If your application makes requests from domains other than the Redirect URI (e.g
 
 ## Security Considerations
 
-Ensure the configuration of application settings is limited to authorized users only.
+Ensure the management of application settings is limited to authorized users only.
 
 * Use [Administrator roles](./administrators) to limit permissions for your users to make changes to your applications.
-* When [granting projects](../../../concepts/structure/granted_projects) to other organizations, the receiving organization **cannot** see or change the application configuration. They can only assign roles.
+* When [granting projects](../../../concepts/structure/granted_projects) to other organizations, the receiving organization **cannot** see or change the application settings. They can only assign roles.
 
 ## References
 

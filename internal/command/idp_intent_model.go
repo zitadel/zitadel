@@ -23,8 +23,9 @@ type IDPIntentWriteModel struct {
 	UserID       string
 	LoginHint    string
 
-	IDPAccessToken *crypto.CryptoValue
-	IDPIDToken     string
+	IDPAccessToken  *crypto.CryptoValue
+	IDPRefreshToken *crypto.CryptoValue
+	IDPIDToken      string
 
 	IDPEntryAttributes map[string][]string
 
@@ -131,6 +132,7 @@ func (wm *IDPIntentWriteModel) reduceOAuthSucceededEvent(e *idpintent.SucceededE
 	wm.IDPUserID = e.IDPUserID
 	wm.IDPUserName = e.IDPUserName
 	wm.IDPAccessToken = e.IDPAccessToken
+	wm.IDPRefreshToken = e.IDPRefreshToken
 	wm.IDPIDToken = e.IDPIDToken
 	wm.State = domain.IDPIntentStateSucceeded
 	wm.succeededAt = e.CreationDate()

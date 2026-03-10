@@ -10,9 +10,15 @@ COPY --chown=nextjs:nodejs .next/standalone ./
 USER nextjs
 ENV HOSTNAME="::" \
     PORT="3000" \
-    NODE_ENV="production"
+    NODE_ENV="production" \
+    NODE_OPTIONS="--use-openssl-ca" \
+    SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt" \
+    SSL_CERT_DIR="/etc/ssl/certs" \
+    ZITADEL_TLS_ENABLED="false" \
+    OTEL_SERVICE_NAME="zitadel-login" \
+    OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
 
 # TODO: Check healthy, not ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD ["/bin/sh", "-c", "node /app/healthcheck.js http://localhost:${PORT}/ui/v2/login/healthy"]
-ENTRYPOINT ["/app/entrypoint.sh", "node", "apps/login/server.js" ]
+    CMD ["/usr/local/bin/node", "/app/healthcheck.mjs"]
+ENTRYPOINT ["/app/entrypoint.sh", "node", "apps/login/server.js"]

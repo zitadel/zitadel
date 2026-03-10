@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Pylon
+description: "Integrate ZITADEL with Pylon services by validating tokens and checking permissions for secure API endpoints"
 sidebar_label: Pylon
 ---
 
@@ -14,7 +15,7 @@ By the end of this guide, your application will have three different endpoint wh
 
 ## ZITADEL setup
 
-Before we can start building our application, we have to do a few configuration steps in ZITADEL Management Console.
+Before we can start building our application, we have to do a few setup steps in ZITADEL Management Console.
 
 ### Create application
 
@@ -24,7 +25,7 @@ Before we can start building our application, we have to do a few configuration 
 
 <ServiceAccountJWT components={props.components}  />
 
-### Give Service Account an authorization
+### Assign a role to the Service Account
 
 <ServiceAccountRole components={props.components}  />
 
@@ -42,7 +43,7 @@ And the following from the Service Account:
 
 ## Setup new Pylon service
 
-Pylon allows you to create a new service using the `npm create pylon` command. This command creates a new Pylon project with a basic project structure and configuration.
+Pylon allows you to create a new service using the `npm create pylon` command. This command creates a new Pylon project with a basic project structure and settings.
 During the setup process, you can choose your preferred runtime, such as Bun, Node.js, or Cloudflare Workers.
 
 **This guide uses the Bun runtime.**
@@ -98,7 +99,7 @@ export default app;
 
 ### Add ZITADEL info to the service
 
-1. Create a `.env` file in the root folder of your project and add the following configuration:
+1. Create a `.env` file in the root folder of your project and add the following settings:
 
 ```bash
 AUTH_ISSUER='URL to the zitadel instance'

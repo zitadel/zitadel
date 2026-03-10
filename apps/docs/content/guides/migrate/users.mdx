@@ -1,5 +1,6 @@
 ---
 title: Migrate Users
+description: "Explore APIs and strategies for importing user accounts and legacy credentials into ZITADEL."
 sidebar_label: Users
 ---
 
@@ -156,16 +157,16 @@ Essentially, a verifier ensures ZITADEL can work with passwords hashed using var
 </Callout>
 
 Regardless of the `passwordChangeRequired` setting, the password is rehashed using the configured hasher algorithm and stored.
-This ensures consistency and allows for automatic updates even when hasher configurations are changed, such as increasing salt cost for bcrypt.
+This ensures consistency and allows for automatic updates even when hasher settings are changed, such as increasing salt cost for bcrypt.
 
-To configure the default hasher for new user passwords, set the `Algorithm` of the `PasswordHasher` in the [runtime configuration file](/self-hosting/manage/configure/configure#runtime-configuration-file)
+To configure the default hasher for new user passwords, set the `Algorithm` of the `PasswordHasher` in the [runtime settings file](/self-hosting/manage/configure/configure#runtime-configuration-file)
 or by the environment variable `ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM`, for example:
 
 ```
 ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM='pbkdf2'
 ```
 
-Hasher configuration updates will automatically rehash existing passwords when they are validated or changed.
+Hasher settings updates will automatically rehash existing passwords when they are validated or changed.
 
 In case the hashes can't be transferred directly, you always have the option to create a user in ZITADEL without password and prompt users to create a new password.
 

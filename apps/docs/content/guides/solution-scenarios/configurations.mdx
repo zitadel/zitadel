@@ -1,9 +1,10 @@
 ---
-title: Configure ZITADEL for your Scenario
-sidebar_label: Common Configurations
+title: Set up ZITADEL for your Scenario
+description: "Common configuration patterns for different identity and access management scenarios in ZITADEL."
+sidebar_label: Common Settings
 ---
 
-Each customer does have different needs and use-cases. In ZITADEL you are able to configure your settings depending on your needs.
+Each customer does have different needs and use-cases. In ZITADEL you are able to adjust settings depending on your needs.
 In this section we show you the different use-cases we have already experienced, that could interest you.
 
 ## Automatically redirect users if the organization has only one identity provider
@@ -14,11 +15,11 @@ If a user of this organization wants to login, you don't want them to enter thei
 ### Settings
 
 1. Go to the "Identity Providers" Settings of the organization
-2. Configure the needed identity provider: Read this [guide](../integrate/identity-providers/introduction) if you don't know how
+2. Set up the needed identity provider: Read this [guide](../integrate/identity-providers/introduction) if you don't know how
 3. Go to the "Login Behavior and Security" settings of the organization
 4. Disable "Username Password Allowed" and enable "External IDP allowed" in the Advanced Section
 
-Now your application can send either the organizations id (`urn:zitadel:iam:org:id:{id}`) or organizations primary domain (`urn:zitadel:iam:org:domain:primary:{domainname}`) scope on your authorization request to identify on which organization the users should be logged in.
+Now your application can send either the organizations id (`urn:zitadel:iam:org:id:{id}`) or Organization Domain (`urn:zitadel:iam:org:domain:primary:{domainname}`) scope on your authorization request to identify on which organization the users should be logged in.
 
 More about the [scopes](/apis/openidoauth/scopes#reserved-scopes)
 
@@ -44,7 +45,7 @@ This will have the following impacts:
 - Trigger organization branding
 - Only allow users from selected organization to login
 
-To request the organization send either the the organization id (`urn:zitadel:iam:org:id:{id}`) or organization primary domain (`urn:zitadel:iam:org:domain:primary:{domainname}`) scope on your authentication request from your application.
+To request the organization send either the the organization id (`urn:zitadel:iam:org:id:{id}`) or Organization Domain (`urn:zitadel:iam:org:domain:primary:{domainname}`) scope on your authentication request from your application.
 More about the [scopes](/apis/openidoauth/scopes#reserved-scopes)
 
 ## Use email to login

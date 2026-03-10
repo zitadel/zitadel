@@ -1,5 +1,6 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
 import {
   createPasskeyRegistrationLink,
   getLoginSettings,
@@ -26,6 +27,8 @@ import { getPublicHost } from "./host";
 import { updateOrCreateSession } from "./session";
 import { completeFlowOrGetUrl } from "../client";
 import { createSessionAndUpdateCookie } from "./cookie";
+
+const logger = createLogger("passkeys");
 
 type VerifyPasskeyCommand = {
   passkeyId: string;
@@ -103,7 +106,7 @@ export async function registerPasskeyLink(
       // check if a verification was done earlier
       const hasValidUserVerificationCheck = await checkUserVerification(currentUserId);
 
-      console.log("hasValidUserVerificationCheck", hasValidUserVerificationCheck);
+      logger.info("hasValidUserVerificationCheck", { hasValidUserVerificationCheck });
       if (!hasValidUserVerificationCheck) {
         return { error: "User Verification Check has to be done" };
       }
@@ -295,7 +298,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   try {
     userResponse = await getUserByID({ serviceConfig, userId });
   } catch (error) {
-    console.error("Error fetching user by ID:", error);
+    logger.error("Error fetching user by ID:", { error });
     return { error: t("verify.errors.couldNotGetUser") };
   }
 

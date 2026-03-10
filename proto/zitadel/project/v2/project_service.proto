@@ -156,7 +156,7 @@ service ProjectService {
   // Remove Project Role
   //
   // Removes the role from the project and on every resource it has a dependency.
-  // This includes project grants and user grants.
+  // This includes project grants and user grants (role assignments).
   //
   // Required permission:
   //   - `project.role.write`
@@ -216,7 +216,7 @@ service ProjectService {
 
   // Delete Project Grant
   //
-  // Delete a project grant. All user grants for this project grant will also be removed.
+  // Delete a project grant. All user grants (role assignments) for this project grant will also be removed.
   // A user will not have access to the project afterward (if permissions are checked).
   // In case the project grant is not found, the request will return a successful response as
   // the desired state is already achieved.
@@ -638,7 +638,7 @@ message RemoveProjectRoleRequest {
   ];
 
   // RoleKey is the key of the role to be removed.
-  // All dependencies of this role will be removed as well, including project grants and user grants.
+  // All dependencies of this role will be removed as well, including project grants and user grants (role assignments).
   // If the role is not found, the request will return a successful response as the desired state is already achieved.
   string role_key = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -762,7 +762,7 @@ message UpdateProjectGrantRequest {
   // The roles are identified by their keys.
   // Any roles not included in this list will be removed from the project grant.
   // If you want to add a role, make sure to include all other existing roles as well.
-  // If any previous role is removed, all user grants for this project grant with this role will be removed as well.
+  // If any previous role is removed, all user grants (role assignments) for this project grant with this role will be removed as well.
   repeated string role_keys = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[\"RoleKey1\", \"RoleKey2\"]";

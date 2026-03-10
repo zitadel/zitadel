@@ -1,5 +1,6 @@
 ---
 title: Migrate from ZITADEL
+description: "Strategy for migrating between ZITADEL instances, including data export and import using service accounts."
 sidebar_label: From ZITADEL
 ---
 
@@ -90,7 +91,7 @@ curl  --request POST \
 ### Import from file
 
 <Callout>
-To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL, with all desired configuration and global resources.
+To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL, with all desired settings and global resources.
 </Callout>
 
 Then as an example you can use one request for the import:
@@ -161,7 +162,7 @@ data_orgsv1_gcs object:
 ### Import to GCS
 
 <Callout>
-To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL, with all desired configuration and global resources.
+To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL, with all desired settings and global resources.
 The used serviceaccount has to have at least the role "Storage Object Viewer" to read objects from GCS
 </Callout>
 

@@ -67,7 +67,7 @@ Depending on your authentication method you'll need additional headers and param
 
 Send your `client_id` and the previously generated string as `code_verifier` for us to recompute the `code_challenge` of the authorization request:
 
-```curl
+```bash
 curl --request POST \
 --url ${CUSTOM_DOMAIN}/oauth/v2/token \
 --header 'Content-Type: application/x-www-form-urlencoded' \

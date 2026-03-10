@@ -47,7 +47,7 @@ Add a custom background image:
 - Use external URLs: `https://example.com/background.jpg`
 - Leave empty for solid color backgrounds
 
-## Example Configurations
+## Example Settings
 
 ### Tech Startup
 
@@ -110,7 +110,7 @@ NEXT_PUBLIC_THEME_APPEARANCE=material
 For more detailed customization beyond these presets, you can:
 
 1. **Custom CSS**: Add your own CSS files in the `src/styles/` directory
-2. **Component Override**: Modify the theme configuration in `src/lib/theme.ts`
+2. **Component Override**: Modify the theme settings in `src/lib/theme.ts`
 3. **Custom Appearances**: Add new appearance options to the `APPEARANCE_STYLES` or `SPACING_STYLES` objects
 
 ## Troubleshooting

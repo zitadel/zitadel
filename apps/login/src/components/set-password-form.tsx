@@ -16,7 +16,7 @@ import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
-import { handleServerActionResponse } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs =
@@ -201,6 +201,7 @@ export function SetPasswordForm({
           <div>
             <TextInput
               type="text"
+              autoFocus
               required
               {...register("code", {
                 required: t("set.required.code"),
@@ -216,6 +217,7 @@ export function SetPasswordForm({
           <TextInput
             type="password"
             autoComplete="new-password"
+            autoFocus={!codeRequired}
             required
             {...register("password", {
               required: t("set.required.newPassword"),
