@@ -28,10 +28,10 @@ type CheckPasswordType struct {
 type PasswordCheckCommand struct {
 	CheckPassword *CheckPasswordType
 
-	sessionID  string
-	instanceID string
-	tarpitFunc tarpitFn
-	verifierFn func(encoded, password string) (updated string, err error)
+	SessionID  string
+	InstanceID string
+	TarpitFunc tarpitFn
+	VerifierFn func(encoded, password string) (updated string, err error)
 
 	FetchedUser      User
 	UpdatedHashedPsw string
@@ -68,10 +68,10 @@ func NewPasswordCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, 
 
 	return &PasswordCheckCommand{
 		CheckPassword: request,
-		sessionID:     strings.TrimSpace(sessionID),
-		instanceID:    strings.TrimSpace(instanceID),
-		tarpitFunc:    tf,
-		verifierFn:    verifierFunction,
+		SessionID:     strings.TrimSpace(sessionID),
+		InstanceID:    strings.TrimSpace(instanceID),
+		TarpitFunc:    tf,
+		VerifierFn:    verifierFunction,
 	}
 }
 
@@ -99,7 +99,7 @@ func (p *PasswordCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]
 		}
 	}
 
-	toReturn = append(toReturn, session.NewPasswordCheckedEvent(ctx, &session.NewAggregate(p.sessionID, p.instanceID).Aggregate, p.CheckTime))
+	toReturn = append(toReturn, session.NewPasswordCheckedEvent(ctx, &session.NewAggregate(p.SessionID, p.InstanceID).Aggregate, p.CheckTime))
 
 	return toReturn, nil
 }
@@ -113,7 +113,7 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	humanRepo := opts.userRepo.Human()
 	sessionRepo := opts.sessionRepo
 
-	updatedHash, err := p.verifierFn(p.FetchedUser.Human.Password.Hash, p.CheckPassword.Password)
+	updatedHash, err := p.VerifierFn(p.FetchedUser.Human.Password.Hash, p.CheckPassword.Password)
 	pswCheckType, err := p.GetPasswordCheckAndError(err)
 	changes, changesErr := p.GetPasswordCheckChanges(ctx, opts, humanRepo, updatedHash, pswCheckType)
 	if changesErr != nil {
@@ -146,7 +146,7 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 		passwordFactor = &SessionFactorPassword{LastFailedAt: p.CheckTime}
 	}
 
-	updateCount, updateErr = sessionRepo.Update(ctx, opts.DB(), sessionRepo.IDCondition(p.sessionID), sessionRepo.SetFactor(passwordFactor))
+	updateCount, updateErr = sessionRepo.Update(ctx, opts.DB(), sessionRepo.IDCondition(p.SessionID), sessionRepo.SetFactor(passwordFactor))
 	if updateErr != nil {
 		return zerrors.ThrowInternal(updateErr, "DOM-IZagay", "failed updating session")
 	}
@@ -158,8 +158,8 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-Tbvpy8", "unexpected number of rows updated")
 	}
 
-	if err != nil && p.tarpitFunc != nil {
-		p.tarpitFunc(uint64(p.FetchedUser.Human.Password.FailedAttempts + 1))
+	if err != nil && p.TarpitFunc != nil {
+		p.TarpitFunc(uint64(p.FetchedUser.Human.Password.FailedAttempts + 1))
 	}
 
 	p.IsValidated = true
@@ -196,9 +196,9 @@ func (p *PasswordCheckCommand) getLockoutPolicy(ctx context.Context, opts *Invok
 }
 
 func (p *PasswordCheckCommand) listLockoutSettingCondition(repo LockoutSettingsRepository, orgID string) database.QueryOption {
-	instanceAndOrg := database.And(repo.InstanceIDCondition(p.instanceID), repo.OrganizationIDCondition(&orgID))
+	instanceAndOrg := database.And(repo.InstanceIDCondition(p.InstanceID), repo.OrganizationIDCondition(&orgID))
 	orgNullOrEmpty := database.Or(repo.OrganizationIDCondition(nil), repo.OrganizationIDCondition(gu.Ptr("")))
-	onlyInstance := database.And(repo.InstanceIDCondition(p.instanceID), orgNullOrEmpty)
+	onlyInstance := database.And(repo.InstanceIDCondition(p.InstanceID), orgNullOrEmpty)
 
 	return database.WithCondition(database.Or(instanceAndOrg, onlyInstance))
 }
@@ -261,17 +261,17 @@ func (p *PasswordCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 		return nil
 	}
 
-	if p.sessionID == "" {
+	if p.SessionID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-cRKWNx", "Errors.Missing.SessionID")
 	}
-	if p.instanceID == "" {
+	if p.InstanceID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-JnEtcJ", "Errors.Missing.InstanceID")
 	}
 
 	sessionRepo := opts.sessionRepo
 	userRepo := opts.userRepo
 
-	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(p.sessionID)))
+	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(p.SessionID)))
 	if err != nil {
 		if errors.Is(err, &database.NoRowFoundError{}) {
 			return zerrors.ThrowNotFound(err, "DOM-0XRmp8", "session not found")

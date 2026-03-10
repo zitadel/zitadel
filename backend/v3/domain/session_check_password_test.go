@@ -34,33 +34,28 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		testName      string
 		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
 		userRepo      func(ctrl *gomock.Controller) domain.UserRepository
-		checkPassword *domain.CheckPasswordType
-		sessionID     string
-		instanceID    string
+		cmd           *domain.PasswordCheckCommand
 		expectedError error
 		expectedUser  domain.User
 	}{
 		{
 			testName:      "when checkPassword is nil should return no error",
-			checkPassword: nil,
+			cmd:           &domain.PasswordCheckCommand{},
 			expectedError: nil,
 		},
 		{
 			testName:      "when session ID is not set should return error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
+			cmd:           &domain.PasswordCheckCommand{CheckPassword: &domain.CheckPasswordType{Password: "test-password"}},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-cRKWNx", "Errors.Missing.SessionID"),
 		},
 		{
 			testName:      "when instance ID is not set should return error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
+			cmd:           domain.NewPasswordCheckCommand("session-1", "", nil, nil, &domain.CheckPasswordType{Password: "test-password"}),
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-JnEtcJ", "Errors.Missing.InstanceID"),
 		},
 		{
-			testName:      "when retrieving session fails should return error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			testName: "when retrieving session fails should return error",
+			cmd:      domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &domain.CheckPasswordType{Password: "test-password"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -77,10 +72,8 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(sessionGetErr, "DOM-qAoQrg", "failed fetching session"),
 		},
 		{
-			testName:      "when session not found should return not found error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			testName: "when session not found should return not found error",
+			cmd:      domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &domain.CheckPasswordType{Password: "test-password"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -97,10 +90,8 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-0XRmp8", "session not found"),
 		},
 		{
-			testName:      "when session userID is empty should return precondition failed error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			testName: "when session userID is empty should return precondition failed error",
+			cmd:      domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &domain.CheckPasswordType{Password: "test-password"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -120,10 +111,8 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-hord0Z", "Errors.User.UserIDMissing"),
 		},
 		{
-			testName:      "when retrieving user fails should return error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			testName: "when retrieving user fails should return error",
+			cmd:      domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &domain.CheckPasswordType{Password: "test-password"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -156,10 +145,8 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(userGetErr, "DOM-nKD4Gq", "failed fetching user"),
 		},
 		{
-			testName:      "when user not found should return not found error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			testName: "when user not found should return not found error",
+			cmd:      domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &domain.CheckPasswordType{Password: "test-password"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -192,10 +179,8 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-zxKosn", "Errors.User.NotFound"),
 		},
 		{
-			testName:      "when user is not human should return precondition failed error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			testName: "when user is not human should return precondition failed error",
+			cmd:      domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &domain.CheckPasswordType{Password: "test-password"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -231,10 +216,8 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-ADhxAx", "user not human"),
 		},
 		{
-			testName:      "when user is locked should return precondition failed error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			testName: "when user is locked should return precondition failed error",
+			cmd:      domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &domain.CheckPasswordType{Password: "test-password"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -275,10 +258,8 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(domain.NewPasswordVerificationError(5), "DOM-D804Sj", "Errors.User.Locked"),
 		},
 		{
-			testName:      "when user password is not set should return precondition failed error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			testName: "when user password is not set should return precondition failed error",
+			cmd:      domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &domain.CheckPasswordType{Password: "test-password"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -319,10 +300,8 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-gklgos", "Errors.User.Password.NotSet"),
 		},
 		{
-			testName:      "when all validations pass should return no error and set user",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
+			testName: "when all validations pass should return no error and set user",
+			cmd:      domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &domain.CheckPasswordType{Password: "test-password"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -378,9 +357,9 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			ctx := authz.NewMockContext(tc.instanceID, "", "")
+			ctx := authz.NewMockContext(tc.cmd.InstanceID, "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasswordCheckCommand(tc.sessionID, tc.instanceID, nil, nil, tc.checkPassword)
+			cmd := domain.NewPasswordCheckCommand(tc.cmd.SessionID, tc.cmd.InstanceID, nil, nil, tc.cmd.CheckPassword)
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
@@ -483,8 +462,7 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 		lockoutRepo func(ctrl *gomock.Controller) domain.LockoutSettingsRepository
 		updatedHash string
 		checkType   domain.VerificationType
-		checkTime   time.Time
-		fetchedUser domain.User
+		cmd         *domain.PasswordCheckCommand
 
 		expectedChanges    int
 		expectedError      error
@@ -497,6 +475,13 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 				repo := domainmock.NewHumanRepo(ctrl)
 				return repo
 			},
+			cmd: &domain.PasswordCheckCommand{
+				CheckTime:     time.Now(),
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(_, _ string) (_ string, _ error) { return "", nil },
+				CheckPassword: &domain.CheckPasswordType{Password: "test"},
+			},
 			updatedHash:     "",
 			checkType:       &domain.VerificationTypeSucceeded{},
 			expectedChanges: 1,
@@ -506,6 +491,13 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 			humanRepo: func(ctrl *gomock.Controller, checkTime time.Time) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
 				return repo
+			},
+			cmd: &domain.PasswordCheckCommand{
+				CheckTime:     time.Now(),
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(_, _ string) (_ string, _ error) { return "", nil },
+				CheckPassword: &domain.CheckPasswordType{Password: "test"},
 			},
 			updatedHash:       "new-hash",
 			checkType:         &domain.VerificationTypeSucceeded{},
@@ -538,8 +530,13 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 			},
 			updatedHash: "",
 			checkType:   &domain.VerificationTypeFailed{},
-			fetchedUser: domain.User{
-				OrganizationID: "org-1",
+			cmd: &domain.PasswordCheckCommand{
+				CheckTime:     time.Now(),
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(_, _ string) (_ string, _ error) { return "", nil },
+				CheckPassword: &domain.CheckPasswordType{Password: "test"},
+				FetchedUser:   domain.User{OrganizationID: "org-1"},
 			},
 			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 0), "DOM-mmsrCt", "unexpected number of rows returned"),
 		},
@@ -567,12 +564,17 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 
 				return repo
 			},
+			cmd: &domain.PasswordCheckCommand{
+				CheckTime:     time.Now(),
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(_, _ string) (_ string, _ error) { return "", nil },
+				CheckPassword: &domain.CheckPasswordType{Password: "test"},
+				FetchedUser:   domain.User{OrganizationID: "org-1"},
+			},
 			updatedHash:   "",
 			checkType:     &domain.VerificationTypeFailed{},
 			expectedError: zerrors.ThrowInternal(listErr, "DOM-3B8Z6s", "failed fetching lockout settings"),
-			fetchedUser: domain.User{
-				OrganizationID: "org-1",
-			},
 		},
 		{
 			testName: "when check type failed with nil max attempts should return check type failed change",
@@ -607,8 +609,13 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 			},
 			updatedHash: "",
 			checkType:   &domain.VerificationTypeFailed{},
-			fetchedUser: domain.User{
-				OrganizationID: "org-1",
+			cmd: &domain.PasswordCheckCommand{
+				CheckTime:     time.Now(),
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(_, _ string) (_ string, _ error) { return "", nil },
+				CheckPassword: &domain.CheckPasswordType{Password: "test"},
+				FetchedUser:   domain.User{OrganizationID: "org-1"},
 			},
 			expectedChanges: 1,
 		},
@@ -647,9 +654,16 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 			},
 			updatedHash: "",
 			checkType:   &domain.VerificationTypeFailed{},
-			fetchedUser: domain.User{
-				OrganizationID: "org-1",
-				Human:          &domain.HumanUser{Password: domain.HumanPassword{FailedAttempts: 2}},
+			cmd: &domain.PasswordCheckCommand{
+				CheckTime:     time.Now(),
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(_, _ string) (_ string, _ error) { return "", nil },
+				CheckPassword: &domain.CheckPasswordType{Password: "test"},
+				FetchedUser: domain.User{
+					OrganizationID: "org-1",
+					Human:          &domain.HumanUser{Password: domain.HumanPassword{FailedAttempts: 2}},
+				},
 			},
 			expectedChanges:    2,
 			expectedUserLocked: true,
@@ -663,9 +677,6 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasswordCheckCommand("session-1", "instance-1", nil, func(_, _ string) (_ string, _ error) { return "", nil }, &domain.CheckPasswordType{Password: "test"})
-			cmd.FetchedUser = tc.fetchedUser
-			cmd.CheckTime = time.Now()
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
@@ -676,12 +687,12 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 			}
 
 			// Test
-			changes, err := cmd.GetPasswordCheckChanges(ctx, opts, tc.humanRepo(ctrl, cmd.CheckTime), tc.updatedHash, tc.checkType)
+			changes, err := tc.cmd.GetPasswordCheckChanges(ctx, opts, tc.humanRepo(ctrl, tc.cmd.CheckTime), tc.updatedHash, tc.checkType)
 
 			// Verify
 			assert.ErrorIs(t, err, tc.expectedError)
-			assert.Equal(t, tc.expectedHashedPsw, cmd.UpdatedHashedPsw)
-			assert.Equal(t, tc.expectedUserLocked, cmd.IsUserLocked)
+			assert.Equal(t, tc.expectedHashedPsw, tc.cmd.UpdatedHashedPsw)
+			assert.Equal(t, tc.expectedUserLocked, tc.cmd.IsUserLocked)
 			assert.Len(t, changes, tc.expectedChanges)
 		})
 	}
@@ -694,17 +705,14 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 	sessionUpdateErr := errors.New("session update error")
 
 	tt := []struct {
-		testName      string
-		humanRepo     func(ctrl *gomock.Controller) domain.HumanUserRepository
-		lockoutRepo   func(ctrl *gomock.Controller) domain.LockoutSettingsRepository
-		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
-		verifier      func(password string, hash string) (string, error)
-		checkPassword *domain.CheckPasswordType
-		sessionID     string
-		instanceID    string
-		fetchedUser   domain.User
-		tarpitCalled  bool
+		testName    string
+		humanRepo   func(ctrl *gomock.Controller) domain.HumanUserRepository
+		lockoutRepo func(ctrl *gomock.Controller) domain.LockoutSettingsRepository
+		sessionRepo func(ctrl *gomock.Controller) domain.SessionRepository
 
+		cmd *domain.PasswordCheckCommand
+
+		expectTarpitCalled        bool
 		expectedError             error
 		expectedValidated         bool
 		expectedValidationSuccess bool
@@ -712,26 +720,25 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 	}{
 		{
 			testName:      "when checkPassword is nil should return no error",
-			checkPassword: nil,
-			verifier:      nil,
+			cmd:           &domain.PasswordCheckCommand{},
 			expectedError: nil,
 		},
 		{
-			testName:      "when user update fails should return error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					Password: domain.HumanPassword{
+			testName: "when user update fails should return error",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword: &domain.CheckPasswordType{Password: "test-password"},
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(password string, hash string) (string, error) { return "", nil },
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{Password: domain.HumanPassword{
 						Hash:           "hashed-password",
 						FailedAttempts: 0,
-					},
+					}},
 				},
 			},
-			verifier: func(password string, hash string) (string, error) { return "", nil },
 			humanRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
 				idCondition := repo.IDCondition("user-1")
@@ -744,21 +751,21 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-netNam", "failed updating user"),
 		},
 		{
-			testName:      "when user not found should return not found error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					Password: domain.HumanPassword{
+			testName: "when user not found should return not found error",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword: &domain.CheckPasswordType{Password: "test-password"},
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(password string, hash string) (string, error) { return "", nil },
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{Password: domain.HumanPassword{
 						Hash:           "hashed-password",
 						FailedAttempts: 0,
-					},
+					}},
 				},
 			},
-			verifier: func(password string, hash string) (string, error) { return "", nil },
 			humanRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
 				idCondition := repo.IDCondition("user-1")
@@ -771,21 +778,21 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowNotFound(nil, "DOM-8wVrNc", "user not found"),
 		},
 		{
-			testName:      "when user update returns multiple rows should return internal error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					Password: domain.HumanPassword{
+			testName: "when user update returns multiple rows should return internal error",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword: &domain.CheckPasswordType{Password: "test-password"},
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(password string, hash string) (string, error) { return "", nil },
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{Password: domain.HumanPassword{
 						Hash:           "hashed-password",
 						FailedAttempts: 0,
-					},
+					}},
 				},
 			},
-			verifier: func(password string, hash string) (string, error) { return "", nil },
 			humanRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
 				idCondition := repo.IDCondition("user-1")
@@ -798,21 +805,21 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-D4hy9C", "unexpected number of rows updated"),
 		},
 		{
-			testName:      "when session update fails should return error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					Password: domain.HumanPassword{
+			testName: "when session update fails should return error",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword: &domain.CheckPasswordType{Password: "test-password"},
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(password string, hash string) (string, error) { return "", nil },
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{Password: domain.HumanPassword{
 						Hash:           "hashed-password",
 						FailedAttempts: 0,
-					},
+					}},
 				},
 			},
-			verifier: func(password string, hash string) (string, error) { return "", nil },
 			humanRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
 				idCondition := repo.IDCondition("user-1")
@@ -835,21 +842,21 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-IZagay", "failed updating session"),
 		},
 		{
-			testName:      "when session not found should return not found error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					Password: domain.HumanPassword{
+			testName: "when session not found should return not found error",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword: &domain.CheckPasswordType{Password: "test-password"},
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(password string, hash string) (string, error) { return "", nil },
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{Password: domain.HumanPassword{
 						Hash:           "hashed-password",
 						FailedAttempts: 0,
-					},
+					}},
 				},
 			},
-			verifier: func(password string, hash string) (string, error) { return "", nil },
 			humanRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
 				idCondition := repo.IDCondition("user-1")
@@ -872,21 +879,21 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowNotFound(nil, "DOM-H9Q59c", "session not found"),
 		},
 		{
-			testName:      "when session update returns multiple rows should return internal error",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					Password: domain.HumanPassword{
+			testName: "when session update returns multiple rows should return internal error",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword: &domain.CheckPasswordType{Password: "test-password"},
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(password string, hash string) (string, error) { return "", nil },
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{Password: domain.HumanPassword{
 						Hash:           "hashed-password",
 						FailedAttempts: 0,
-					},
+					}},
 				},
 			},
-			verifier: func(password string, hash string) (string, error) { return "", nil },
 			humanRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
 				idCondition := repo.IDCondition("user-1")
@@ -909,21 +916,21 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-Tbvpy8", "unexpected number of rows updated"),
 		},
 		{
-			testName:      "when password check succeeds should execute successfully",
-			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					Password: domain.HumanPassword{
+			testName: "when password check succeeds should execute successfully",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword: &domain.CheckPasswordType{Password: "test-password"},
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn:    func(password string, hash string) (string, error) { return "", nil },
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{Password: domain.HumanPassword{
 						Hash:           "hashed-password",
 						FailedAttempts: 0,
-					},
+					}},
 				},
 			},
-			verifier: func(password string, hash string) (string, error) { return "", nil },
 			humanRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
 				idCondition := repo.IDCondition("user-1")
@@ -948,22 +955,22 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			expectedValidationSuccess: true,
 		},
 		{
-			testName:      "when password check fails should execute successfully with failed state",
-			checkPassword: &domain.CheckPasswordType{Password: "wrong-password"},
-			sessionID:     "session-1",
-			instanceID:    "instance-1",
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					Password: domain.HumanPassword{
+			testName: "when password check fails should execute successfully with failed state",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword: &domain.CheckPasswordType{Password: "wrong-password"},
+				SessionID:     "session-1",
+				InstanceID:    "instance-1",
+				VerifierFn: func(password string, hash string) (string, error) {
+					return "", passwap.ErrPasswordMismatch
+				},
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{Password: domain.HumanPassword{
 						Hash:           "hashed-password",
 						FailedAttempts: 2,
-					},
+					}},
 				},
-			},
-			verifier: func(password string, hash string) (string, error) {
-				return "", passwap.ErrPasswordMismatch
 			},
 			lockoutRepo: func(ctrl *gomock.Controller) domain.LockoutSettingsRepository {
 				repo := domainmock.NewLockoutSettingsRepo(ctrl)
@@ -1011,7 +1018,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 					Return(int64(1), nil)
 				return repo
 			},
-			tarpitCalled:              true,
+			expectTarpitCalled:        true,
 			expectedError:             zerrors.ThrowInvalidArgument(domain.NewPasswordVerificationError(3), "DOM-3gcfDV", "Errors.User.Password.Invalid"),
 			expectedValidated:         true,
 			expectedValidationSuccess: false,
@@ -1027,12 +1034,9 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			ctrl := gomock.NewController(t)
 
 			tarpitCalled := false
-			tarpitFunc := func(failedAttempts uint64) {
+			tc.cmd.TarpitFunc = func(_ uint64) {
 				tarpitCalled = true
 			}
-
-			cmd := domain.NewPasswordCheckCommand("session-1", "instance-1", tarpitFunc, tc.verifier, tc.checkPassword)
-			cmd.FetchedUser = tc.fetchedUser
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
@@ -1052,15 +1056,15 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			}
 
 			// Test
-			err := cmd.Execute(ctx, opts)
+			err := tc.cmd.Execute(ctx, opts)
 
 			// Verify
 			assert.ErrorIs(t, err, tc.expectedError)
-			if tc.checkPassword != nil {
-				assert.Equal(t, tc.expectedValidated, cmd.IsValidated)
-				assert.Equal(t, tc.expectedValidationSuccess, cmd.IsValidationSuccessful)
-				assert.Equal(t, tc.expectedUserLocked, cmd.IsUserLocked)
-				assert.Equal(t, tc.tarpitCalled, tarpitCalled)
+			if tc.cmd.CheckPassword != nil {
+				assert.Equal(t, tc.expectedValidated, tc.cmd.IsValidated)
+				assert.Equal(t, tc.expectedValidationSuccess, tc.cmd.IsValidationSuccessful)
+				assert.Equal(t, tc.expectedUserLocked, tc.cmd.IsUserLocked)
+				assert.Equal(t, tc.expectTarpitCalled, tarpitCalled)
 			}
 		})
 	}
@@ -1073,59 +1077,56 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 	sessAgg := session.NewAggregate("session-1", "instance-1").Aggregate
 
 	tt := []struct {
-		testName               string
-		checkPassword          *domain.CheckPasswordType
-		isValidated            bool
-		isValidationSuccessful bool
-		isUserLocked           bool
-		updatedHashedPsw       string
-		fetchedUser            domain.User
-		sessionID              string
-		instanceID             string
-		checkTime              time.Time
-		expectedEventTypes     []eventstore.Command
+		testName           string
+		cmd                *domain.PasswordCheckCommand
+		expectedEventTypes []eventstore.Command
 	}{
 		{
-			testName:      "when checkPassword is nil should return nil",
-			checkPassword: nil,
-			isValidated:   true,
+			testName: "when checkPassword is nil should return nil",
+			cmd:      &domain.PasswordCheckCommand{IsValidated: true},
 		},
 		{
-			testName:      "when not validated should return nil",
-			checkPassword: &domain.CheckPasswordType{Password: "test"},
-			isValidated:   false,
-		},
-		{
-			testName:               "when validation successful with no hash update should return check succeeded and password checked events",
-			checkPassword:          &domain.CheckPasswordType{Password: "test"},
-			isValidated:            true,
-			isValidationSuccessful: true,
-			updatedHashedPsw:       "",
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
+			testName: "when not validated should return nil",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword: &domain.CheckPasswordType{Password: "test"},
+				IsValidated:   false,
 			},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
-			checkTime:  time.Now(),
+		},
+		{
+			testName: "when validation successful with no hash update should return check succeeded and password checked events",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword:          &domain.CheckPasswordType{Password: "test"},
+				IsValidated:            true,
+				IsValidationSuccessful: true,
+				UpdatedHashedPsw:       "",
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+				},
+				SessionID:  "session-1",
+				InstanceID: "instance-1",
+				CheckTime:  time.Now(),
+			},
 			expectedEventTypes: []eventstore.Command{
 				user.NewHumanPasswordCheckSucceededEvent(t.Context(), &userAgg, nil),
 				session.NewPasswordCheckedEvent(t.Context(), &sessAgg, time.Now()),
 			},
 		},
 		{
-			testName:               "when validation successful with hash update should return check succeeded, hash updated, and password checked events",
-			checkPassword:          &domain.CheckPasswordType{Password: "test"},
-			isValidated:            true,
-			isValidationSuccessful: true,
-			updatedHashedPsw:       "new-hash",
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
+			testName: "when validation successful with hash update should return check succeeded, hash updated, and password checked events",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword:          &domain.CheckPasswordType{Password: "test"},
+				IsValidated:            true,
+				IsValidationSuccessful: true,
+				UpdatedHashedPsw:       "new-hash",
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+				},
+				SessionID:  "session-1",
+				InstanceID: "instance-1",
+				CheckTime:  time.Now(),
 			},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
-			checkTime:  time.Now(),
 			expectedEventTypes: []eventstore.Command{
 				user.NewHumanPasswordCheckSucceededEvent(t.Context(), &userAgg, nil),
 				user.NewHumanPasswordHashUpdatedEvent(t.Context(), &userAgg, "new-hash"),
@@ -1133,36 +1134,40 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 			},
 		},
 		{
-			testName:               "when validation failed without user locked should return check failed and password checked events",
-			checkPassword:          &domain.CheckPasswordType{Password: "wrong"},
-			isValidated:            true,
-			isValidationSuccessful: false,
-			isUserLocked:           false,
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
+			testName: "when validation failed without user locked should return check failed and password checked events",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword:          &domain.CheckPasswordType{Password: "wrong"},
+				IsValidated:            true,
+				IsValidationSuccessful: false,
+				IsUserLocked:           false,
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+				},
+				SessionID:  "session-1",
+				InstanceID: "instance-1",
+				CheckTime:  time.Now(),
 			},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
-			checkTime:  time.Now(),
 			expectedEventTypes: []eventstore.Command{
 				user.NewHumanPasswordCheckFailedEvent(t.Context(), &userAgg, nil),
 				session.NewPasswordCheckedEvent(t.Context(), &sessAgg, time.Now()),
 			},
 		},
 		{
-			testName:               "when validation failed with user locked should return check failed, user locked, and password checked events",
-			checkPassword:          &domain.CheckPasswordType{Password: "wrong"},
-			isValidated:            true,
-			isValidationSuccessful: false,
-			isUserLocked:           true,
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
+			testName: "when validation failed with user locked should return check failed, user locked, and password checked events",
+			cmd: &domain.PasswordCheckCommand{
+				CheckPassword:          &domain.CheckPasswordType{Password: "wrong"},
+				IsValidated:            true,
+				IsValidationSuccessful: false,
+				IsUserLocked:           true,
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+				},
+				SessionID:  "session-1",
+				InstanceID: "instance-1",
+				CheckTime:  time.Now(),
 			},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
-			checkTime:  time.Now(),
 			expectedEventTypes: []eventstore.Command{
 				user.NewHumanPasswordCheckFailedEvent(t.Context(), &userAgg, nil),
 				user.NewUserLockedEvent(t.Context(), &userAgg),
@@ -1174,17 +1179,10 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			ctx := authz.NewMockContext(tc.instanceID, "", "")
-			cmd := domain.NewPasswordCheckCommand(tc.sessionID, tc.instanceID, nil, nil, tc.checkPassword)
-			cmd.FetchedUser = tc.fetchedUser
-			cmd.IsValidated = tc.isValidated
-			cmd.IsValidationSuccessful = tc.isValidationSuccessful
-			cmd.IsUserLocked = tc.isUserLocked
-			cmd.UpdatedHashedPsw = tc.updatedHashedPsw
-			cmd.CheckTime = tc.checkTime
+			ctx := authz.NewMockContext(tc.cmd.InstanceID, "", "")
 
 			// Test
-			events, err := cmd.Events(ctx, &domain.InvokeOpts{})
+			events, err := tc.cmd.Events(ctx, &domain.InvokeOpts{})
 
 			// Verify
 			assert.NoError(t, err)
