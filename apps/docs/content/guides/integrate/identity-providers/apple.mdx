@@ -21,7 +21,8 @@ Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it in the Apple service later.
 
 :::note
-For Apple, the callback URL ends with `/form` (e.g., `.../callback/form` or `.../idps/callback/form`) because Apple uses a Form Post to return the authorization response.
+For Apple with V1 hosted login, the callback URL ends with `/form` (e.g., `.../ui/login/login/externalidp/callback/form`) because Apple uses a Form Post to return the authorization response.
+For V2, use the standard callback URL `.../idps/callback`, which already accepts POST requests.
 :::
 
 ![Apple Provider](../../../../public/img/guides/zitadel_apple_create_provider.png)
