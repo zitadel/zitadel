@@ -85,18 +85,11 @@ kubectl create secret generic zitadel-masterkey \
   --from-literal=masterkey="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
 ```
 
-Create the database credentials secret:
+Create the database credentials secret containing the DSN:
 
 ```bash
 kubectl create secret generic zitadel-db-credentials \
-  --from-literal=config.yaml="
-Database:
-  Postgres:
-    User:
-      Password: your-secure-app-password
-    Admin:
-      Password: your-secure-admin-password
-"
+  --from-literal=dsn="postgresql://zitadel:your-secure-password@postgres.database.svc.cluster.local:5432/zitadel?sslmode=verify-full"
 ```
 
 ### Step 2: Configure Values
@@ -108,26 +101,18 @@ replicaCount: 2
 
 zitadel:
   masterkeySecretName: zitadel-masterkey
-  configSecretName: zitadel-db-credentials
+  env:
+    - name: ZITADEL_DATABASE_POSTGRES_DSN
+      valueFrom:
+        secretKeyRef:
+          name: zitadel-db-credentials
+          key: dsn
   configmapConfig:
     ExternalDomain: "zitadel.example.com"
     ExternalSecure: true
     ExternalPort: 443
     TLS:
       Enabled: false
-    Database:
-      Postgres:
-        Host: "postgres.database.svc.cluster.local"
-        Port: 5432
-        Database: "zitadel"
-        User:
-          Username: "zitadel"
-          SSL:
-            Mode: "verify-full"
-        Admin:
-          Username: "postgres"
-          SSL:
-            Mode: "verify-full"
     FirstInstance:
       Org:
         Human:
