@@ -9,6 +9,8 @@ const (
 	DomainWritePermission       = "domain.write"
 	OrganizationReadPermission  = "organization.read"
 	OrganizationWritePermission = "organization.write"
+	SessionReadPermission       = "session.read"
+	SessionWritePermission      = "session.write"
 )
 
 // PermissionRepository is the interface that manages and checks Zitadel permissions.
@@ -36,9 +38,18 @@ type PermissionChecker interface {
 	// Check if the authenticated user has the given permission on the given project grant.
 	// A permission may be inherited from the instance or granted organization level.
 	CheckProjectGrantPermission(ctx context.Context, permission, projectGrantID string) error
+
+	// Check if the user in context has the given permission on the given session.
+	// A permission may be inherited from the instance or granted organization level.
+	CheckSessionPermission(ctx context.Context, permission, sessionID string) error
 }
 
 type noopPermissionChecker struct{}
+
+// CheckSessionPermission implements [PermissionChecker].
+func (n *noopPermissionChecker) CheckSessionPermission(ctx context.Context, permission string, sessionID string) error {
+	return nil
+}
 
 var _ PermissionChecker = (*noopPermissionChecker)(nil)
 
