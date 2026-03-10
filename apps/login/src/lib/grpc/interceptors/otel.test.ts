@@ -1,9 +1,6 @@
 import { SpanKind, SpanStatusCode } from "@opentelemetry/api";
 import { resourceFromAttributes } from "@opentelemetry/resources";
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from "@opentelemetry/sdk-trace-base";
+import { InMemorySpanExporter, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { otelGrpcInterceptor } from "./otel";
@@ -34,9 +31,7 @@ describe("otelGrpcInterceptor", () => {
       },
     });
 
-    expect(capturedHeaders["traceparent"]).toMatch(
-      /^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$/,
-    );
+    expect(capturedHeaders["traceparent"]).toMatch(/^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$/);
   });
 
   it("creates client spans with RPC attributes", async () => {

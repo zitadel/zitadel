@@ -24,14 +24,13 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
   return (
     <DynamicTheme branding={branding}>
@@ -51,7 +50,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
         {postErrorRedirectUrl && (
           <Link href={postErrorRedirectUrl}>
-            <Button className="bg-primary-light-500 hover:bg-primary-light-400 dark:bg-primary-dark-500 dark:hover:bg-primary-dark-400 w-full rounded-md px-4 py-3 text-center transition-all">
+            <Button className="w-full rounded-md bg-primary-light-500 px-4 py-3 text-center transition-all hover:bg-primary-light-400 dark:bg-primary-dark-500 dark:hover:bg-primary-dark-400">
               <Translated i18nKey="accountNotFound.backToLogin" namespace="idp" />
             </Button>
           </Link>

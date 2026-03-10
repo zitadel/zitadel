@@ -27,10 +27,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
     const hasPrivacyLink = !!legal?.privacyPolicyLink;
 
     // Check that all required checkboxes are accepted
-    return (
-      (!hasTosLink || newState.tosAccepted) &&
-      (!hasPrivacyLink || newState.privacyPolicyAccepted)
-    );
+    return (!hasTosLink || newState.tosAccepted) && (!hasPrivacyLink || newState.privacyPolicyAccepted);
   };
 
   return (
