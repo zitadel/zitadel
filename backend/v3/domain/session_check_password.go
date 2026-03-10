@@ -237,6 +237,7 @@ func (p *PasswordCheckCommand) GetPasswordCheckChanges(ctx context.Context, opts
 			dbUpdates = append(dbUpdates, humanRepo.SetPassword(updatedHash))
 		}
 	case *VerificationTypeFailed:
+		dbUpdates[0] = humanRepo.IncrementPasswordFailedAttempts()
 		lockoutPolicy, err := p.getLockoutPolicy(ctx, opts, p.FetchedUser.OrganizationID)
 		if err != nil {
 			return nil, err
