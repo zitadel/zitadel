@@ -359,7 +359,6 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext(tc.cmd.InstanceID, "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasswordCheckCommand(tc.cmd.SessionID, tc.cmd.InstanceID, nil, nil, tc.cmd.CheckPassword)
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
@@ -373,11 +372,11 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			}
 
 			// Test
-			err := cmd.Validate(ctx, opts)
+			err := tc.cmd.Validate(ctx, opts)
 
 			// Verify
 			assert.ErrorIs(t, err, tc.expectedError)
-			assert.Equal(t, tc.expectedUser, cmd.FetchedUser)
+			assert.Equal(t, tc.expectedUser, tc.cmd.FetchedUser)
 		})
 	}
 }
