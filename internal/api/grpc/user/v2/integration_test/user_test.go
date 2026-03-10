@@ -3590,7 +3590,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 							{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 							{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
 						}
-						assertMetadataEquals(t, expectedMetadata, getMetadataResponse.GetMetadata())
+						integration.AssertMetadataEquals(t, expectedMetadata, getMetadataResponse.GetMetadata())
 					},
 				}
 			},
@@ -3627,7 +3627,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 						expectedMetadata := []*metadata.Metadata{
 							{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 						}
-						assertMetadataEquals(t, expectedMetadata, getMetadataResponse.GetMetadata())
+						integration.AssertMetadataEquals(t, expectedMetadata, getMetadataResponse.GetMetadata())
 					},
 				}
 			},
@@ -3712,7 +3712,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 							{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 							{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
 						}
-						assertMetadataEquals(t, expectedMetadata, getMetadataResponse.GetMetadata())
+						integration.AssertMetadataEquals(t, expectedMetadata, getMetadataResponse.GetMetadata())
 					},
 				}
 			},
@@ -3803,19 +3803,6 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 			test.assert(t, createResponse, getResponse, gotMetadataResponse)
 		})
 	}
-}
-
-func getMetadataMap(metadata []*metadata.Metadata) map[string][]byte {
-	metadataByKey := make(map[string][]byte, len(metadata))
-	for _, md := range metadata {
-		metadataByKey[md.Key] = md.Value
-	}
-	return metadataByKey
-}
-
-func assertMetadataEquals(t *testing.T, expected []*metadata.Metadata, actual []*metadata.Metadata) {
-	assert.Equal(t, len(expected), len(actual))
-	assert.Equal(t, getMetadataMap(expected), getMetadataMap(actual))
 }
 
 func TestServer_CreateUser_Permission(t *testing.T) {
@@ -4615,7 +4602,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 							{Key: "key2", Value: []byte("value2")},
 							{Key: "key3", Value: []byte("value3")},
 						}
-						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+						integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
 					},
 				}
 			},
@@ -4683,7 +4670,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 							{Key: "key1", Value: []byte("updated_value1")},
 							{Key: "key4", Value: []byte("value4")},
 						}
-						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+						integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
 					},
 				}
 			},
@@ -4740,7 +4727,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 							{Key: "key2", Value: []byte("value2")},
 							{Key: "key3", Value: []byte("value3")},
 						}
-						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+						integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
 					},
 				}
 			},
@@ -4802,7 +4789,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 							{Key: "key1", Value: []byte("updated_value1")},
 							{Key: "key4", Value: []byte("value4")},
 						}
-						assertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+						integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
 					},
 				}
 			},
