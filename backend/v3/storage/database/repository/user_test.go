@@ -139,6 +139,15 @@ func Test_user_Get(t *testing.T) {
 			Name:        "My Machine",
 			Description: "This is my machine user",
 		},
+		Metadata: []*domain.Metadata{
+			{
+				InstanceID: instanceID,
+				Key:        "key",
+				Value:      []byte(`"something"`),
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+		},
 	}
 
 	err = userRepo.Create(t.Context(), tx, human)
