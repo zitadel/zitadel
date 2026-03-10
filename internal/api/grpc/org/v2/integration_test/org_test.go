@@ -282,7 +282,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 			name: "update org with non existent org id",
 			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &org.UpdateOrganizationRequest{
-				OrganizationId: "non existant org id",
+				OrganizationId: "non existent org id",
 				// Name: "",
 			},
 			wantErr: true,
@@ -1036,7 +1036,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 		ctx       context.Context
 		setupFunc func(ctx context.Context, orgID string, req *org.SetOrganizationMetadataRequest)
 		req       *org.SetOrganizationMetadataRequest
-		assert    func(t *testing.T, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse)
+		assert    func(ttt *assert.CollectT, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse)
 		err       error
 	}{
 		{
@@ -1063,17 +1063,17 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 				},
 			},
-			assert: func(t *testing.T, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
-				assert.WithinRange(t, setMetadataResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
+			assert: func(ttt *assert.CollectT, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
+				assert.WithinRange(ttt, setMetadataResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
 
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 				}
-				integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+				integration.AssertMetadataEquals(ttt, expectedMetadata, listMetadataResponse.GetMetadata())
 			},
 		},
 		{
-			name: "set org metadata on non existant org",
+			name: "set org metadata on non existent org",
 			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			setupFunc: func(ctx context.Context, _ string, req *org.SetOrganizationMetadataRequest) {
 				req.OrganizationId = "wrong-org-id"
@@ -1097,13 +1097,13 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated-value1")))},
 				},
 			},
-			assert: func(t *testing.T, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
-				assert.WithinRange(t, setMetadataResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
+			assert: func(ttt *assert.CollectT, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
+				assert.WithinRange(ttt, setMetadataResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
 
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated-value1")))},
 				}
-				integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+				integration.AssertMetadataEquals(ttt, expectedMetadata, listMetadataResponse.GetMetadata())
 			},
 		},
 		{
@@ -1118,13 +1118,13 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 				},
 			},
-			assert: func(t *testing.T, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
-				assert.True(t, setMetadataResponse.GetSetDate().AsTime().Before(testStartTime))
+			assert: func(ttt *assert.CollectT, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
+				assert.True(ttt, setMetadataResponse.GetSetDate().AsTime().Before(testStartTime))
 
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
 				}
-				integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+				integration.AssertMetadataEquals(ttt, expectedMetadata, listMetadataResponse.GetMetadata())
 			},
 		},
 		{
@@ -1143,14 +1143,14 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 					{Key: "key4"}, // deleting non-existent
 				},
 			},
-			assert: func(t *testing.T, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
-				assert.WithinRange(t, setMetadataResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
+			assert: func(ttt *assert.CollectT, setMetadataResponse *org.SetOrganizationMetadataResponse, testStartTime time.Time, listMetadataResponse *org.ListOrganizationMetadataResponse) {
+				assert.WithinRange(ttt, setMetadataResponse.GetSetDate().AsTime(), testStartTime, time.Now().UTC())
 
 				expectedMetadata := []*metadata.Metadata{
 					{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("updated-value1")))},
 					{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
 				}
-				integration.AssertMetadataEquals(t, expectedMetadata, listMetadataResponse.GetMetadata())
+				integration.AssertMetadataEquals(ttt, expectedMetadata, listMetadataResponse.GetMetadata())
 			},
 		},
 	}
@@ -1183,7 +1183,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 					OrganizationId: orgResponse.OrganizationId,
 				})
 				require.NoError(ttt, err)
-				tt.assert(t, got, testStartTime, listMetadataRes)
+				tt.assert(ttt, got, testStartTime, listMetadataRes)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
@@ -1278,7 +1278,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 		{
 			name:  "delete org metadata for org that does not exist",
 			ctx:   Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			orgId: "non existant org id",
+			orgId: "non existent org id",
 			metadataToDelete: []struct{ key, value string }{
 				{
 					key:   "key4",

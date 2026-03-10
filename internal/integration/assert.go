@@ -179,9 +179,9 @@ func diffProto(expected, actual proto.Message) string {
 }
 
 // AssertMetadataEquals verifies that two slices of proto Metadata are equal, comparing both length and content by key-value mapping.
-func AssertMetadataEquals(t *testing.T, expected []*metadata.Metadata, actual []*metadata.Metadata) {
-	assert.Equal(t, len(expected), len(actual))
-	assert.Equal(t, getMetadataMap(expected), getMetadataMap(actual))
+func AssertMetadataEquals(t assert.TestingT, expected []*metadata.Metadata, actual []*metadata.Metadata) {
+	assert.Equal(t, len(expected), len(actual), "metadata length mismatch")
+	assert.Equal(t, getMetadataMap(expected), getMetadataMap(actual), "metadata content mismatch")
 }
 
 func getMetadataMap(metadata []*metadata.Metadata) map[string][]byte {
