@@ -22,7 +22,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 func TestPasswordCheckCommand_Validate(t *testing.T) {
@@ -35,7 +34,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		testName      string
 		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
 		userRepo      func(ctrl *gomock.Controller) domain.UserRepository
-		checkPassword *session_grpc.CheckPassword
+		checkPassword *domain.CheckPasswordType
 		sessionID     string
 		instanceID    string
 		expectedError error
@@ -48,18 +47,18 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:      "when session ID is not set should return error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-cRKWNx", "Errors.Missing.SessionID"),
 		},
 		{
 			testName:      "when instance ID is not set should return error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-JnEtcJ", "Errors.Missing.InstanceID"),
 		},
 		{
 			testName:      "when retrieving session fails should return error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -79,7 +78,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:      "when session not found should return not found error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -99,7 +98,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:      "when session userID is empty should return precondition failed error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -122,7 +121,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:      "when retrieving user fails should return error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -158,7 +157,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:      "when user not found should return not found error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -194,7 +193,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:      "when user is not human should return precondition failed error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -233,7 +232,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:      "when user is locked should return precondition failed error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -277,7 +276,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:      "when user password is not set should return precondition failed error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -321,7 +320,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:      "when all validations pass should return no error and set user",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -454,7 +453,7 @@ func TestPasswordCheckCommand_GetPasswordCheckAndError(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			cmd := domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &session_grpc.CheckPassword{Password: "test"})
+			cmd := domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &domain.CheckPasswordType{Password: "test"})
 			cmd.FetchedUser = tc.fetchedUser
 
 			// Test
@@ -664,7 +663,7 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasswordCheckCommand("session-1", "instance-1", nil, func(_, _ string) (_ string, _ error) { return "", nil }, &session_grpc.CheckPassword{Password: "test"})
+			cmd := domain.NewPasswordCheckCommand("session-1", "instance-1", nil, func(_, _ string) (_ string, _ error) { return "", nil }, &domain.CheckPasswordType{Password: "test"})
 			cmd.FetchedUser = tc.fetchedUser
 			cmd.CheckTime = time.Now()
 
@@ -700,7 +699,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 		lockoutRepo   func(ctrl *gomock.Controller) domain.LockoutSettingsRepository
 		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
 		verifier      func(password string, hash string) (string, error)
-		checkPassword *session_grpc.CheckPassword
+		checkPassword *domain.CheckPasswordType
 		sessionID     string
 		instanceID    string
 		fetchedUser   domain.User
@@ -719,7 +718,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:      "when user update fails should return error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			fetchedUser: domain.User{
@@ -746,7 +745,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:      "when user not found should return not found error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			fetchedUser: domain.User{
@@ -773,7 +772,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:      "when user update returns multiple rows should return internal error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			fetchedUser: domain.User{
@@ -800,7 +799,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:      "when session update fails should return error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			fetchedUser: domain.User{
@@ -837,7 +836,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:      "when session not found should return not found error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			fetchedUser: domain.User{
@@ -874,7 +873,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:      "when session update returns multiple rows should return internal error",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			fetchedUser: domain.User{
@@ -911,7 +910,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:      "when password check succeeds should execute successfully",
-			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "test-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			fetchedUser: domain.User{
@@ -950,7 +949,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:      "when password check fails should execute successfully with failed state",
-			checkPassword: &session_grpc.CheckPassword{Password: "wrong-password"},
+			checkPassword: &domain.CheckPasswordType{Password: "wrong-password"},
 			sessionID:     "session-1",
 			instanceID:    "instance-1",
 			fetchedUser: domain.User{
@@ -1075,7 +1074,7 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 
 	tt := []struct {
 		testName               string
-		checkPassword          *session_grpc.CheckPassword
+		checkPassword          *domain.CheckPasswordType
 		isValidated            bool
 		isValidationSuccessful bool
 		isUserLocked           bool
@@ -1093,12 +1092,12 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 		},
 		{
 			testName:      "when not validated should return nil",
-			checkPassword: &session_grpc.CheckPassword{Password: "test"},
+			checkPassword: &domain.CheckPasswordType{Password: "test"},
 			isValidated:   false,
 		},
 		{
 			testName:               "when validation successful with no hash update should return check succeeded and password checked events",
-			checkPassword:          &session_grpc.CheckPassword{Password: "test"},
+			checkPassword:          &domain.CheckPasswordType{Password: "test"},
 			isValidated:            true,
 			isValidationSuccessful: true,
 			updatedHashedPsw:       "",
@@ -1116,7 +1115,7 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 		},
 		{
 			testName:               "when validation successful with hash update should return check succeeded, hash updated, and password checked events",
-			checkPassword:          &session_grpc.CheckPassword{Password: "test"},
+			checkPassword:          &domain.CheckPasswordType{Password: "test"},
 			isValidated:            true,
 			isValidationSuccessful: true,
 			updatedHashedPsw:       "new-hash",
@@ -1135,7 +1134,7 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 		},
 		{
 			testName:               "when validation failed without user locked should return check failed and password checked events",
-			checkPassword:          &session_grpc.CheckPassword{Password: "wrong"},
+			checkPassword:          &domain.CheckPasswordType{Password: "wrong"},
 			isValidated:            true,
 			isValidationSuccessful: false,
 			isUserLocked:           false,
@@ -1153,7 +1152,7 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 		},
 		{
 			testName:               "when validation failed with user locked should return check failed, user locked, and password checked events",
-			checkPassword:          &session_grpc.CheckPassword{Password: "wrong"},
+			checkPassword:          &domain.CheckPasswordType{Password: "wrong"},
 			isValidated:            true,
 			isValidationSuccessful: false,
 			isUserLocked:           true,

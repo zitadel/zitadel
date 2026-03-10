@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 // tarpitFn represents a tarpit function
@@ -22,8 +21,12 @@ import (
 // The input is the number of failed attempts after which the tarpit is started
 type tarpitFn func(failedAttempts uint64)
 
+type CheckPasswordType struct {
+	Password string
+}
+
 type PasswordCheckCommand struct {
-	CheckPassword *session_grpc.CheckPassword
+	CheckPassword *CheckPasswordType
 
 	sessionID  string
 	instanceID string
@@ -52,7 +55,7 @@ type PasswordCheckCommand struct {
 // verifyFn is a function that takes as input a target encoded password
 // and an input password to verify. It returns an updated hash and an error.
 // It defaults to [passwap.Swapper.Verify]
-func NewPasswordCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, verifyFn func(encoded, password string) (updated string, err error), request *session_grpc.CheckPassword) *PasswordCheckCommand {
+func NewPasswordCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, verifyFn func(encoded, password string) (updated string, err error), request *CheckPasswordType) *PasswordCheckCommand {
 	tf := sysConfig.Tarpit.Tarpit()
 	if tarpitFunc != nil {
 		tf = tarpitFunc
@@ -110,7 +113,7 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	humanRepo := opts.userRepo.Human()
 	sessionRepo := opts.sessionRepo
 
-	updatedHash, err := p.verifierFn(p.FetchedUser.Human.Password.Hash, p.CheckPassword.GetPassword())
+	updatedHash, err := p.verifierFn(p.FetchedUser.Human.Password.Hash, p.CheckPassword.Password)
 	pswCheckType, err := p.GetPasswordCheckAndError(err)
 	changes, changesErr := p.GetPasswordCheckChanges(ctx, opts, humanRepo, updatedHash, pswCheckType)
 	if changesErr != nil {
