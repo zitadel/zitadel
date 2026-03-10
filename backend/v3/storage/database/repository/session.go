@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -228,38 +229,60 @@ func sessionCTE(change database.Change, i, j int, builder *database.StatementBui
 }
 
 // Delete implements [domain.SessionRepository].
-func (s session) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, error) {
+func (s session) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error) {
 	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(s.InstanceIDColumn())
+		return 0, time.Time{}, database.NewMissingConditionError(s.InstanceIDColumn())
 	}
 	if condition.IsRestrictingColumn(s.IDColumn()) {
 		return s.deleteSingleSession(ctx, client, condition, permissionCondition)
 	}
 	// TODO: allow deletion of multiple sessions with permission check
-	return 0, database.NewMissingConditionError(s.IDColumn())
+	return 0, time.Time{}, database.NewMissingConditionError(s.IDColumn())
 }
 
-func (s session) deleteSingleSession(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, error) {
+// deleteSingleSession deletes a single session matching the given condition, and returns the number of rows affected and the deleted_at timestamp.
+// In case the session was already deleted, it returns 1 row affected and the deleted_at timestamp from the sessions_deleted table, without an error.
+// If no session matches the condition, it returns 0 rows affected and a zero time, without an error.
+func (s session) deleteSingleSession(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error) {
 	var builder database.StatementBuilder
 	builder.WriteString("WITH sessions AS ( SELECT instance_id, id, token_id, user_id, now() as deleted_at FROM zitadel.sessions")
 	writeCondition(&builder, condition)
 	builder.WriteString(" UNION ALL SELECT instance_id, id, token_id, user_id, deleted_at FROM zitadel.sessions_deleted as sessions")
 	writeCondition(&builder, condition)
-	builder.WriteString(") ")
-	if permissionCondition != nil {
-		builder.WriteString(", delete as (")
-	}
-	builder.WriteString("DELETE FROM zitadel.sessions")
+	builder.WriteString(") , delete as (DELETE FROM zitadel.sessions")
 	writeCondition(&builder, condition)
-	if permissionCondition != nil {
-		builder.WriteString(") ")
+	builder.WriteString(") ")
+	s.writeDeleteStatementWithPermission("SELECT deleted_at FROM sessions", &builder, permissionCondition)
+	//if permissionCondition != nil {
+	//	builder.WriteString(" SELECT CASE WHEN (EXISTS (SELECT 1 FROM sessions) or throw_not_permitted()) THEN CASE WHEN(")
+	//	permissionCondition.Write(&builder)
+	//	builder.WriteString(") THEN (")
+	//}
+	//builder.WriteString("SELECT deleted_at FROM sessions")
+	//if permissionCondition != nil {
+	//	builder.WriteString(") END END")
+	//}
+	var deletedAt time.Time
+	if err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&deletedAt); err != nil {
+		// If no row was deleted, we return 0 rows affected and a zero time, without an error.
+		if errors.Is(err, new(database.NoRowFoundError)) {
+			return 0, time.Time{}, nil
+		}
+		return 0, time.Time{}, err
 	}
-	if permissionCondition != nil {
-		builder.WriteString(" SELECT CASE WHEN (EXISTS (SELECT 1 FROM sessions) or throw_not_permitted()) THEN CASE WHEN(")
-		permissionCondition.Write(&builder)
-		builder.WriteString(") THEN (select deleted_at from sessions) END END")
+	return 1, deletedAt, nil
+}
+
+func (s session) writeDeleteStatementWithPermission(statement string, builder *database.StatementBuilder, permissionCondition database.Condition) {
+	if permissionCondition == nil {
+		builder.WriteString(statement)
+		return
 	}
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	builder.WriteString(" SELECT CASE WHEN (EXISTS (SELECT 1 FROM sessions) or throw_not_permitted()) THEN CASE WHEN(")
+	permissionCondition.Write(builder)
+	builder.WriteString(") THEN (")
+	builder.WriteString(statement)
+	builder.WriteString(") END END")
 }
 
 // -------------------------------------------------------------

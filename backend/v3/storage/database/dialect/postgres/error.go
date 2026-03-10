@@ -54,6 +54,9 @@ func wrapPgError(err *pgconn.PgError) error {
 	// 22P02: integrity violation - A value is being inserted into a enum that is not valid
 	case "22P02":
 		return database.NewCheckError(err.TableName, err.ConstraintName, err)
+		// 42501: insufficient_privilege - The current user does not have the necessary permissions to perform the operation.
+	case "42501":
+		return database.NewPermissionError(err)
 	default:
 		return database.NewUnknownError(err)
 	}

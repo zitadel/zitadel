@@ -918,6 +918,7 @@ func TestSession_Update(t *testing.T) {
 }
 
 func TestSession_Delete(t *testing.T) {
+	start := time.Now()
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
@@ -948,6 +949,7 @@ func TestSession_Delete(t *testing.T) {
 		name            string
 		testFunc        func(t *testing.T) *domain.Session
 		noOfDeletedRows int64
+		deletedAt       time.Time
 	}
 	tests := []test{
 		{
@@ -964,6 +966,7 @@ func TestSession_Delete(t *testing.T) {
 				return session
 			},
 			noOfDeletedRows: 1,
+			deletedAt:       time.Now(),
 		},
 		{
 			name: "delete non existent session",
@@ -977,18 +980,41 @@ func TestSession_Delete(t *testing.T) {
 			},
 			noOfDeletedRows: 0,
 		},
+		{
+			name: "delete previously existent session",
+			testFunc: func(t *testing.T) *domain.Session {
+				session := &domain.Session{
+					InstanceID: instanceId,
+					ID:         gofakeit.Name(),
+					Lifetime:   time.Hour * 24,
+					CreatorID:  gofakeit.Name(),
+				}
+				err := sessionRepo.Create(t.Context(), tx, session)
+				require.NoError(t, err)
+				_, _, err = sessionRepo.Delete(t.Context(), tx, sessionRepo.PrimaryKeyCondition(session.InstanceID, session.ID), nil)
+				require.NoError(t, err)
+				return session
+			},
+			noOfDeletedRows: 1,
+			deletedAt:       time.Now(),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			session := tt.testFunc(t)
 
 			// delete session
-			deletedRows, err := sessionRepo.Delete(t.Context(), tx,
+			deletedRows, deletedAt, err := sessionRepo.Delete(t.Context(), tx,
 				sessionRepo.PrimaryKeyCondition(session.InstanceID, session.ID),
 				nil,
 			)
 			require.NoError(t, err)
 			assert.Equal(t, tt.noOfDeletedRows, deletedRows)
+			if tt.deletedAt.IsZero() {
+				assert.Zero(t, deletedAt)
+			} else {
+				assert.WithinRange(t, deletedAt, start, tt.deletedAt)
+			}
 
 			// verify session deletion
 			deletedSession, err := sessionRepo.Get(t.Context(), tx,

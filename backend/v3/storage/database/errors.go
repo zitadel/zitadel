@@ -8,7 +8,6 @@ import (
 var (
 	ErrNoChanges           = errors.New("update must contain a change")
 	ErrInvalidChangeTarget = errors.New("change target must not be nil")
-	ErrMissingPermission   = errors.New("caller has insufficient permission")
 )
 
 type MissingConditionError struct {
@@ -271,5 +270,28 @@ func (e *UnknownError) Is(target error) bool {
 }
 
 func (e *UnknownError) Unwrap() error {
+	return e.original
+}
+
+type PermissionError struct {
+	original error
+}
+
+func NewPermissionError(original error) error {
+	return &PermissionError{
+		original: original,
+	}
+}
+
+func (e *PermissionError) Error() string {
+	return fmt.Sprintf("permission error: %v", e.original)
+}
+
+func (e *PermissionError) Is(target error) bool {
+	_, ok := target.(*PermissionError)
+	return ok
+}
+
+func (e *PermissionError) Unwrap() error {
 	return e.original
 }

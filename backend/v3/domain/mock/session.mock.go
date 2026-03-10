@@ -233,12 +233,13 @@ func (c *MockSessionRepositoryCreatorIDConditionCall) DoAndReturn(f func(string)
 }
 
 // Delete mocks base method.
-func (m *MockSessionRepository) Delete(arg0 context.Context, arg1 database.QueryExecutor, arg2, arg3 database.Condition) (int64, error) {
+func (m *MockSessionRepository) Delete(arg0 context.Context, arg1 database.QueryExecutor, arg2, arg3 database.Condition) (int64, time.Time, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(int64)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(time.Time)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // Delete indicates an expected call of Delete.
@@ -254,19 +255,19 @@ type MockSessionRepositoryDeleteCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockSessionRepositoryDeleteCall) Return(arg0 int64, arg1 error) *MockSessionRepositoryDeleteCall {
-	c.Call = c.Call.Return(arg0, arg1)
+func (c *MockSessionRepositoryDeleteCall) Return(arg0 int64, arg1 time.Time, arg2 error) *MockSessionRepositoryDeleteCall {
+	c.Call = c.Call.Return(arg0, arg1, arg2)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockSessionRepositoryDeleteCall) Do(f func(context.Context, database.QueryExecutor, database.Condition, database.Condition) (int64, error)) *MockSessionRepositoryDeleteCall {
+func (c *MockSessionRepositoryDeleteCall) Do(f func(context.Context, database.QueryExecutor, database.Condition, database.Condition) (int64, time.Time, error)) *MockSessionRepositoryDeleteCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockSessionRepositoryDeleteCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition, database.Condition) (int64, error)) *MockSessionRepositoryDeleteCall {
+func (c *MockSessionRepositoryDeleteCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition, database.Condition) (int64, time.Time, error)) *MockSessionRepositoryDeleteCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

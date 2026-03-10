@@ -53,9 +53,6 @@ func RelationalTablesEnableMatrix(t *testing.T, ctx context.Context, sysAuthZ co
 			instOwner := inst.WithAuthorizationToken(ctx, UserTypeIAMOwner)
 			_, err := inst.Client.FeatureV2.SetInstanceFeatures(instOwner, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)})
 			require.NoError(t, err)
-			//EnsureInstanceFeature(t, instOwner, inst, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			//	assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-			//})
 			return RelationalTableFeatureMatrix{
 				Name:      "when relational tables are enabled",
 				Inst:      inst,

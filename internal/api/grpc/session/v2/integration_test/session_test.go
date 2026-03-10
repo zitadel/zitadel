@@ -907,7 +907,7 @@ func TestServer_DeleteSession_token(t *testing.T) {
 			createResp, err := stateCase.Inst.Client.SessionV2.CreateSession(loginCTX, &session.CreateSessionRequest{})
 			require.NoError(t, err)
 
-			time.Sleep(3 * time.Second) //TODO: remove after create session also uses the relational tables directly
+			time.Sleep(5 * time.Second) //TODO: remove after create session also uses the relational tables directly
 
 			_, err = stateCase.Inst.Client.SessionV2.DeleteSession(stateCase.InstOwner, &session.DeleteSessionRequest{
 				SessionId:    createResp.GetSessionId(),
@@ -951,6 +951,8 @@ func TestServer_DeleteSession_own_session(t *testing.T) {
 				},
 			})
 			require.NoError(t, err)
+
+			time.Sleep(5 * time.Second) //TODO: remove after create session also uses the relational tables directly
 
 			// delete the new (user1) session must not be possible with user (has no permission)
 			_, err = stateCase.Inst.Client.SessionV2.DeleteSession(integration.WithAuthorizationToken(t.Context(), token2), &session.DeleteSessionRequest{

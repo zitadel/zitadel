@@ -42,7 +42,7 @@ type SessionRepository interface {
 	// The condition must include at least the instanceID of the session to update.
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	// Delete removes sessions based on the given condition.
-	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permission database.Condition) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permission database.Condition) (int64, time.Time, error)
 }
 
 // sessionColumns define all the columns of the session table.

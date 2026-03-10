@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -47,6 +48,14 @@ func (cmd *DeleteSessionCommand) Events(ctx context.Context, opts *InvokeOpts) (
 	}, nil
 }
 
+const (
+	ErrSessionTokenInvalid    = "ErrSessionTokenInvalid"
+	ErrMoreThanOneRowAffected = "ErrMoreThanOneRowAffected"
+	ErrIDMissing              = "ErrIDMissing"
+	ErrMissingPermission      = "ErrMissingPermission"
+	ErrInternal               = "ErrInternal"
+)
+
 func (cmd *DeleteSessionCommand) sessionDeletePermissionCheckCondition(ctx context.Context, sessionRepo SessionRepository, decryptor SessionTokenDecryptor) (database.Condition, error) {
 	if !cmd.MustCheckPermission {
 		return nil, nil
@@ -54,7 +63,7 @@ func (cmd *DeleteSessionCommand) sessionDeletePermissionCheckCondition(ctx conte
 	if cmd.Token != "" {
 		sessionID, tokenID, err := decryptor(ctx, cmd.Token)
 		if err != nil || sessionID != cmd.ID {
-			return nil, zerrors.ThrowInvalidArgumentf(err, "SESS-S3gq1", "Errors.Session.TokenInvalid")
+			return nil, zerrors.ThrowPermissionDenied(err, ErrSessionTokenInvalid, "Errors.Session.TokenInvalid")
 		}
 		return database.Or(database.Exists("sessions", sessionRepo.TokenIDCondition(tokenID)),
 			database.Permission(domain.PermissionSessionDelete, true),
@@ -76,40 +85,26 @@ func (cmd *DeleteSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 		return err
 	}
 
-	deletedRows, err := sessionRepo.Delete(ctx, opts.DB(),
+	_, deletedAt, err := sessionRepo.Delete(ctx, opts.DB(),
 		sessionRepo.PrimaryKeyCondition(instance.InstanceID(), cmd.ID),
 		permCheck,
 	)
 	if err != nil {
-		return err
+		if errors.Is(err, new(database.PermissionError)) {
+			return zerrors.ThrowPermissionDenied(err, ErrMissingPermission,
+				"insufficient permissions to delete session, require `session.delete` permission, ownership of the session or current session token")
+		}
+		return zerrors.ThrowInternal(err, ErrInternal, "an unexpected error occurred while deleting the session")
 	}
 
-	if deletedRows > 1 {
-		return zerrors.ThrowInternalf(nil, "DOM-wv33rsKpRw", "expecting 1 row deleted, got %d", deletedRows)
-	}
+	//if deletedRows > 1 {
+	//	return zerrors.ThrowInternalf(nil, ErrMoreThanOneRowAffected, "expecting 1 row deleted, got %d", deletedRows)
+	//}
 
-	if deletedRows == 1 {
-		// TODO(LS): Change this with the real update date when SessionRepo.Delete()
-		// returns the timestamp. See https://github.com/zitadel/zitadel/issues/10881
-		cmd.DeletedAt = time.Now()
-	}
+	//if deletedRows == 1 {
+	cmd.DeletedAt = deletedAt
+	//}
 	return nil
-}
-
-func (cmd *DeleteSessionCommand) checkPermission(ctx context.Context, session *Session, opts *InvokeOpts) error {
-	var id, tokenID, userID, userResourceOwner string
-	if session != nil {
-		id = session.ID
-		tokenID = session.TokenID
-		userID = session.UserID
-	}
-	if cmd.Token != "" {
-		return opts.sessionTokenVerifier(ctx, cmd.Token, id, tokenID)
-	}
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	return opts.Permissions.CheckOrganizationPermission(ctx, domain.PermissionSessionDelete, userResourceOwner)
 }
 
 // String implements [Commander].
@@ -120,7 +115,7 @@ func (*DeleteSessionCommand) String() string {
 // Validate implements [Commander].
 func (cmd *DeleteSessionCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	if cmd.ID = strings.TrimSpace(cmd.ID); cmd.ID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "SESS-3n9fs", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, ErrIDMissing, "Errors.IDMissing")
 	}
 	return nil
 }
