@@ -20,11 +20,9 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization });
 
   let authMethods: AuthenticationMethodType[] = [];
   let user: User | undefined = undefined;
@@ -39,8 +37,7 @@ export default async function Page(props: {
   }
 
   if (userId) {
-    const userResponse = await getUserByID({ serviceConfig, userId,
-    });
+    const userResponse = await getUserByID({ serviceConfig, userId });
     if (userResponse) {
       user = userResponse.user;
       if (user?.type.case === "human") {
@@ -52,8 +49,7 @@ export default async function Page(props: {
       }
     }
 
-    const authMethodsResponse = await listAuthenticationMethodTypes({ serviceConfig, userId,
-    });
+    const authMethodsResponse = await listAuthenticationMethodTypes({ serviceConfig, userId });
     if (authMethodsResponse.authMethodTypes) {
       authMethods = authMethodsResponse.authMethodTypes;
     }

@@ -1,7 +1,7 @@
 "use server";
 
 import { createLogger } from "@/lib/logger";
-import { recordAuthAttempt, recordAuthSuccess, recordAuthFailure } from "@/lib/metrics";
+import { recordAuthAttempt, recordAuthFailure, recordAuthSuccess } from "@/lib/metrics";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   getLockoutSettings,

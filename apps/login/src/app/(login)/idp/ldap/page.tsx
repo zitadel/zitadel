@@ -11,7 +11,7 @@ export default async function Page(props: {
   params: Promise<{ provider: string }>;
 }) {
   const searchParams = await props.searchParams;
-  const { idpId, organization, link } = searchParams;
+  const { idpId, organization, link, requestId, postErrorRedirectUrl, linkToSessionId, linkFingerprint } = searchParams;
 
   if (!idpId) {
     throw new Error("No idpId provided in searchParams");
@@ -22,14 +22,13 @@ export default async function Page(props: {
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
   // return login failed if no linking or creation is allowed and no user was found
   return (
@@ -44,7 +43,15 @@ export default async function Page(props: {
       </div>
 
       <div className="w-full">
-        <LDAPUsernamePasswordForm idpId={idpId} link={link === "true"}></LDAPUsernamePasswordForm>
+        <LDAPUsernamePasswordForm
+          idpId={idpId}
+          link={link === "true"}
+          requestId={requestId}
+          organization={organization}
+          postErrorRedirectUrl={postErrorRedirectUrl}
+          linkToSessionId={linkToSessionId}
+          linkFingerprint={linkFingerprint}
+        />
       </div>
     </DynamicTheme>
   );

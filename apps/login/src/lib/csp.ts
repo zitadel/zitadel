@@ -1,4 +1,3 @@
-
 const BASE_DIRECTIVES: Record<string, string[]> = {
   "default-src": ["'self'"],
   "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],

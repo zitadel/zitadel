@@ -17,16 +17,16 @@ import {
   RegisterPasskeyResponse,
   VerifyPasskeyRegistrationRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
-import { getTranslations } from "next-intl/server";
+import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById } from "../cookies";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkUserVerification } from "../verify-helper";
+import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
 import { updateOrCreateSession } from "./session";
-import { completeFlowOrGetUrl } from "../client";
-import { createSessionAndUpdateCookie } from "./cookie";
 
 const logger = createLogger("passkeys");
 

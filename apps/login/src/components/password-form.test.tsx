@@ -19,12 +19,7 @@ describe("PasswordForm", () => {
   afterEach(cleanup);
 
   test("should autofocus the password input on mount", () => {
-    const { getByTestId } = render(
-      <PasswordForm
-        loginSettings={undefined}
-        loginName="test@example.com"
-      />,
-    );
+    const { getByTestId } = render(<PasswordForm loginSettings={undefined} loginName="test@example.com" />);
     expect(getByTestId("password-text-input")).toHaveFocus();
   });
 });

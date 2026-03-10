@@ -1,6 +1,6 @@
 import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
-import { getHostedLoginTranslation, getAllowedLanguages } from "@/lib/zitadel";
+import { getAllowedLanguages, getHostedLoginTranslation } from "@/lib/zitadel";
 import { JsonObject } from "@zitadel/client";
 import deepmerge from "deepmerge";
 import { getRequestConfig } from "next-intl/server";

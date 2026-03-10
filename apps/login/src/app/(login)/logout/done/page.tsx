@@ -12,8 +12,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const { organization } = searchParams;
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
   return (
     <DynamicTheme branding={branding}>
