@@ -34,7 +34,7 @@ You will find more information in our guides on how to [authenticate users](/gui
 
 Use one of these methods to get the metadata for the currently logged in user.
 
-In case you want to manage metadata for other users than the currently logged in user, then you must use the [management service](#manage-user-metadata-through-the-management-api).
+In case you want to manage metadata for other users than the currently logged in user, then you must use the [UserService API](#manage-user-metadata-through-the-api).
 
 ### Request metadata from userinfo endpoint
 
@@ -217,12 +217,17 @@ An example response for your search looks like this:
 When you build your own registration UI you have the possibility to have custom fields and add them to the metadata of your user.
 Learn everything about how to build your own registration UI [here](/guides/integrate/onboarding/end-users#build-your-own-registration-form).
 
-## Manage user metadata through the management API
+## Manage user metadata through the API
 
 The previous methods allowed you to retrieve metadata only for the `sub` in the access token.
-In case you want to get the metadata for another user, you need to use the management service.
-The user that calls the management service must have [administrator permissions](/guides/manage/console/administrators).
-A user can be either a User (Human) or a Service Account.
+In case you want to manage metadata for another user, use the [User Service API](/reference/api/user).
+The calling user must have the `user.write` permission to set or delete metadata.
 
-You can get [metadata of a user filtered by your query](/apis/resources/mgmt/management-service-list-user-metadata) or [get a metadata object from a user by a specific key](/apis/resources/mgmt/management-service-get-user-metadata).
-The management service allows you to set and delete metadata, see the [API documentation for users](/reference/api/user).
+Use [SetUserMetadata](/apis/resources/user_service_v2/user-service-set-user-metadata) to insert or update metadata entries.
+Existing keys not included in the request are left unchanged.
+To delete a metadata entry, pass the key with an empty value — if the key does not exist, it is ignored.
+You can mix inserts, updates, and deletions in a single request.
+
+Alternatively, use [DeleteUserMetadata](/apis/resources/user_service_v2/user-service-delete-user-metadata) to delete one or more keys explicitly.
+
+Use [ListUserMetadata](/apis/resources/user_service_v2/user-service-list-user-metadata) to retrieve metadata for a user with optional filtering by key.

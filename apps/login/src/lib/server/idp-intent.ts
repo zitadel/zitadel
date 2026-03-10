@@ -1,6 +1,7 @@
 "use server";
 
 import { getSessionCookieById } from "@/lib/cookies";
+import { createLogger } from "@/lib/logger";
 import { getServiceConfig } from "@/lib/service-url";
 import {
   addHuman,
@@ -30,6 +31,8 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { getFingerprintIdCookie } from "../fingerprint";
 import { createNewSessionFromIdpIntent } from "./idp";
+
+const logger = createLogger("idp-intent");
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
@@ -139,7 +142,7 @@ async function resolveUserIdFromSession({
   try {
     const sessionCookie = await getSessionCookieById({ sessionId });
     if (!sessionCookie) {
-      console.warn("[IDP Process] Session for linking not found or invalid");
+      logger.warn("Session for linking not found or invalid");
       return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
     }
 
@@ -151,13 +154,13 @@ async function resolveUserIdFromSession({
     const session = sessionResp.session;
 
     if (!session?.factors?.user?.id) {
-      console.warn("[IDP Process] Session found but no userId associated for linking.");
+      logger.warn("Session found but no userId associated for linking");
       return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
     }
 
     return { userId: session.factors.user.id };
   } catch (error) {
-    console.warn("[IDP Process] Error retrieving session for linking:", error);
+    logger.warn("Error retrieving session for linking", { error });
     return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
   }
 }
@@ -173,7 +176,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
     const fingerprintCookie = await getFingerprintIdCookie();
 
     if (!linkFingerprint || !fingerprintCookie?.value) {
-      console.warn("[IDP Process] Missing fingerprint information for linking verification");
+      logger.warn("Missing fingerprint information for linking verification");
       return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
     }
 
@@ -183,7 +186,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
       .digest("hex");
 
     if (linkFingerprint !== expectedHash) {
-      console.warn("[IDP Process] Session linking fingerprint mismatch");
+      logger.warn("Session linking fingerprint mismatch");
       return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
     }
 
@@ -198,11 +201,11 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
       return { redirect: sessionRedirect || `/idp/${provider}/linking-failed?error=session_invalid` };
     }
 
-    console.log("[IDP Process] Resolved userId from session link:", resolvedUserId);
+    logger.debug("Resolved userId from session link", { userId: resolvedUserId });
 
     // 3. Perform Linking Logic
     if (!options?.isLinkingAllowed) {
-      console.error("[IDP Process] Linking not allowed by IDP configuration");
+      logger.error("Linking not allowed by IDP configuration");
       const params = buildRedirectParams();
       return { redirect: `/idp/${provider}/linking-failed?${params}&error=linking_not_allowed` };
     }
@@ -211,7 +214,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
       const targetUser = await getUserByID({ serviceConfig, userId: resolvedUserId });
 
       if (!targetUser || !targetUser.details?.resourceOwner) {
-        console.error("[IDP Process] User not found or missing organization");
+        logger.error("User not found or missing organization");
         const params = buildRedirectParams();
         return { redirect: `/idp/${provider}/linking-failed?${params}&error=user_not_found` };
       }
@@ -223,7 +226,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
       });
 
       if (!isAllowed) {
-        console.error("[IDP Process] IDP linking validation failed");
+        logger.error("IDP linking validation failed");
         const params = buildRedirectParams();
         return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
       }
@@ -237,7 +240,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
         },
         userId: resolvedUserId,
       });
-      console.log("[IDP Process] IDP linked successfully, creating session");
+      logger.info("IDP linked successfully, creating session");
 
       const sessionResult = await createNewSessionFromIdpIntent({
         userId: resolvedUserId,
@@ -250,23 +253,23 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
       });
 
       if ("error" in sessionResult && sessionResult.error) {
-        console.error("[IDP Process] Error creating session:", sessionResult.error);
+        logger.error("Error creating session", { error: sessionResult.error });
         return { error: sessionResult.error };
       }
 
       if ("redirect" in sessionResult && sessionResult.redirect) {
-        console.log("[IDP Process] Session created, redirecting to:", sessionResult.redirect);
+        logger.debug("Session created, redirecting", { redirect: sessionResult.redirect });
         return { redirect: sessionResult.redirect };
       }
 
       if ("samlData" in sessionResult && sessionResult.samlData) {
-        console.log("[IDP Process] Session created, returning samlData");
+        logger.info("Session created, returning samlData");
         return { samlData: sessionResult.samlData };
       }
 
       return { error: t("errors.sessionCreationFailed") };
     } catch (error) {
-      console.error("[IDP Process] Error linking IDP:", error);
+      logger.error("Error linking IDP", { error });
       const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
       let params = buildRedirectParams({ error: errorMessage });
       if (error instanceof ConnectError && error.code === Code.AlreadyExists) {
@@ -291,7 +294,7 @@ async function handleUserExists(ctx: IDPHandlerContext): Promise<IDPHandlerResul
     // Auto-update user if enabled
     if (options?.isAutoUpdate && updateHumanUser) {
       try {
-        console.log("[IDP Process] Auto-updating user profile");
+        logger.debug("Auto-updating user profile");
         await updateHuman({
           serviceConfig,
           request: create(UpdateHumanUserRequestSchema, {
@@ -302,13 +305,13 @@ async function handleUserExists(ctx: IDPHandlerContext): Promise<IDPHandlerResul
           }),
         });
       } catch (error) {
-        console.warn("[IDP Process] Failed to auto-update user:", error);
+        logger.warn("Failed to auto-update user", { error });
         // Continue with login even if update fails
       }
     }
 
     // Create session and handle redirect
-    console.log("[IDP Process] Creating session for existing user");
+    logger.debug("Creating session for existing user");
     const sessionResult = await createNewSessionFromIdpIntent({
       userId,
       idpIntent: {
@@ -320,17 +323,17 @@ async function handleUserExists(ctx: IDPHandlerContext): Promise<IDPHandlerResul
     });
 
     if ("error" in sessionResult && sessionResult.error) {
-      console.error("[IDP Process] Error creating session:", sessionResult.error);
+      logger.error("Error creating session", { error: sessionResult.error });
       return { error: sessionResult.error };
     }
 
     if ("redirect" in sessionResult && sessionResult.redirect) {
-      console.log("[IDP Process] Session created, redirecting to:", sessionResult.redirect);
+      logger.debug("Session created, redirecting", { redirect: sessionResult.redirect });
       return { redirect: sessionResult.redirect };
     }
 
     if ("samlData" in sessionResult && sessionResult.samlData) {
-      console.log("[IDP Process] Session created, returning samlData");
+      logger.info("Session created, returning samlData");
       return { samlData: sessionResult.samlData };
     }
 
@@ -378,7 +381,7 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
     if (foundUser) {
       try {
         if (!foundUser.details?.resourceOwner) {
-          console.error("[IDP Process] Found user missing organization information");
+          logger.error("Found user missing organization information");
           const params = buildRedirectParams();
           return { redirect: `/idp/${provider}/linking-failed?${params}&error=missing_organization` };
         }
@@ -391,7 +394,7 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
         });
 
         if (!isAllowed) {
-          console.error("[IDP Process] Auto-linking validation failed");
+          logger.error("Auto-linking validation failed");
           const params = buildRedirectParams();
           return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
         }
@@ -405,7 +408,7 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
           },
           userId: foundUser.userId,
         });
-        console.log("[IDP Process] User auto-linked successfully, creating session");
+        logger.info("User auto-linked successfully, creating session");
 
         // Create session after auto-linking
         const sessionResult = await createNewSessionFromIdpIntent({
@@ -419,23 +422,23 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
         });
 
         if ("error" in sessionResult && sessionResult.error) {
-          console.error("[IDP Process] Error creating session:", sessionResult.error);
+          logger.error("Error creating session", { error: sessionResult.error });
           return { error: sessionResult.error };
         }
 
         if ("redirect" in sessionResult && sessionResult.redirect) {
-          console.log("[IDP Process] Session created, redirecting to:", sessionResult.redirect);
+          logger.debug("Session created, redirecting", { redirect: sessionResult.redirect });
           return { redirect: sessionResult.redirect };
         }
 
         if ("samlData" in sessionResult && sessionResult.samlData) {
-          console.log("[IDP Process] Session created, returning samlData");
+          logger.info("Session created, returning samlData");
           return { samlData: sessionResult.samlData };
         }
 
         return { error: t("errors.sessionCreationFailed") };
       } catch (error) {
-        console.error("[IDP Process] Error auto-linking user:", error);
+        logger.error("Error auto-linking user", { error });
         const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
         const params = buildRedirectParams({ error: errorMessage });
         return { redirect: `/idp/${provider}/linking-failed?${params}` };
@@ -462,7 +465,7 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
     });
 
     if (!orgToRegisterOn) {
-      console.error("[IDP Process] Could not determine organization for auto-creation (no default org available)");
+      logger.error("Could not determine organization for auto-creation (no default org available)");
       const params = buildRedirectParams();
       return { redirect: `/idp/${provider}/failure?${params}&error=no_organization_context` };
     }
@@ -478,7 +481,7 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
 
     try {
       const newUser = await addHuman({ serviceConfig, request: addHumanUserWithOrganization });
-      console.log("[IDP Process] User auto-created successfully, creating session");
+      logger.info("User auto-created successfully, creating session");
 
       // Create session for newly created user
       const sessionResult = await createNewSessionFromIdpIntent({
@@ -492,23 +495,23 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
       });
 
       if ("error" in sessionResult && sessionResult.error) {
-        console.error("[IDP Process] Error creating session:", sessionResult.error);
+        logger.error("Error creating session", { error: sessionResult.error });
         return { error: sessionResult.error };
       }
 
       if ("redirect" in sessionResult && sessionResult.redirect) {
-        console.log("[IDP Process] Session created, redirecting to:", sessionResult.redirect);
+        logger.debug("Session created, redirecting", { redirect: sessionResult.redirect });
         return { redirect: sessionResult.redirect };
       }
 
       if ("samlData" in sessionResult && sessionResult.samlData) {
-        console.log("[IDP Process] Session created, returning samlData");
+        logger.info("Session created, returning samlData");
         return { samlData: sessionResult.samlData };
       }
 
       return { error: t("errors.sessionCreationFailed") };
     } catch (error: unknown) {
-      console.error("[IDP Process] Error auto-creating user:", error);
+      logger.error("Error auto-creating user", { error });
       const params = buildRedirectParams();
       return { redirect: `/idp/${provider}/failure?${params}&error=user_creation_failed` };
     }
@@ -533,7 +536,7 @@ async function handleManualCreation(ctx: IDPHandlerContext): Promise<IDPHandlerR
     });
 
     if (!orgToRegisterOn) {
-      console.error("[IDP Process] Could not determine organization for registration (no default org available)");
+      logger.error("Could not determine organization for registration (no default org available)");
       const params = buildRedirectParams();
       return { redirect: `/idp/${provider}/registration-failed?${params}` };
     }
@@ -565,7 +568,7 @@ async function handleManualCreation(ctx: IDPHandlerContext): Promise<IDPHandlerR
  */
 async function handleNoUserFound(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
   const { buildRedirectParams } = ctx;
-  console.log("[IDP Process] No matching user and creation not allowed");
+  logger.debug("No matching user and creation not allowed");
   const params = buildRedirectParams();
   return { redirect: `/idp/${ctx.params.provider}/account-not-found?${params}` };
 }
@@ -604,7 +607,7 @@ export async function processIDPCallback({
 
   // Validate required parameters
   if (!provider || !id || !token) {
-    console.error("[IDP Process] Missing required parameters:", { provider, id, hasToken: !!token });
+    logger.error("Missing required parameters", { provider, id, hasToken: !!token });
     const errorParams = new URLSearchParams();
     if (requestId) errorParams.set("requestId", requestId);
     if (organization) errorParams.set("organization", organization);
@@ -617,13 +620,13 @@ export async function processIDPCallback({
     // Consume the single-use token ONCE
     const intent = await retrieveIDPIntent({ serviceConfig, id, token });
 
-    console.log("[IDP Process] Intent retrieved successfully, processing business logic");
+    logger.debug("Intent retrieved successfully, processing business logic");
 
     const { idpInformation } = intent;
 
     // Verify we have IDP info early on
     if (!idpInformation) {
-      console.error("[IDP Process] IDP information missing");
+      logger.error("IDP information missing");
       return { redirect: `/idp/${provider}/failure?error=missing_idp_info` };
     }
 
@@ -693,7 +696,7 @@ export async function processIDPCallback({
     // Should theoretically be unreachable if handleNoUserFound covers the rest
     return { error: t("errors.unknown") };
   } catch (error: unknown) {
-    console.error("[IDP Process] Error processing intent:", error);
+    logger.error("Error processing intent", { error });
 
     const errorParams = new URLSearchParams();
     if (requestId) errorParams.set("requestId", requestId);
