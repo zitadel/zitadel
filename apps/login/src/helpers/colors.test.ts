@@ -1,17 +1,17 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  computeMap,
-  setTheme,
-  DARK_PRIMARY,
-  PRIMARY,
-  DARK_WARN,
-  WARN,
-  DARK_BACKGROUND,
-  BACKGROUND,
-  DARK_TEXT,
-  TEXT,
-} from "./colors";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  BACKGROUND,
+  computeMap,
+  DARK_BACKGROUND,
+  DARK_PRIMARY,
+  DARK_TEXT,
+  DARK_WARN,
+  PRIMARY,
+  setTheme,
+  TEXT,
+  WARN,
+} from "./colors";
 
 describe("color utilities", () => {
   describe("computeMap", () => {

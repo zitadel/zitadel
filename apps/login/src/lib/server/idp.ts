@@ -4,9 +4,9 @@ import {
   getLoginSettings,
   getUserByID,
   listAuthenticationMethodTypes,
+  ServiceConfig,
   startIdentityProviderFlow,
   startLDAPIdentityProviderFlow,
-  ServiceConfig,
 } from "@/lib/zitadel";
 import crypto from "crypto";
 import { headers } from "next/headers";

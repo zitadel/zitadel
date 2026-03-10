@@ -21,20 +21,12 @@ export async function registerNode(): Promise<LoggerProvider | null> {
     resource: resourceFromAttributes({
       "deployment.environment.name": process.env.NODE_ENV || "development",
     }),
-    resourceDetectors: [
-      envDetector,
-      processDetector,
-      hostDetector,
-      containerDetector,
-      gcpDetector,
-    ],
+    resourceDetectors: [envDetector, processDetector, hostDetector, containerDetector, gcpDetector],
     instrumentations: [
       getNodeAutoInstrumentations({
         "@opentelemetry/instrumentation-http": {
           ignoreIncomingRequestHook: (req) =>
-            ["/healthy", "/_next/", "/favicon.ico", "/__nextjs", "/metrics"].some((p) =>
-              req.url?.includes(p),
-            ),
+            ["/healthy", "/_next/", "/favicon.ico", "/__nextjs", "/metrics"].some((p) => req.url?.includes(p)),
         },
         "@opentelemetry/instrumentation-fs": { enabled: false },
         "@opentelemetry/instrumentation-winston": { disableLogSending: false },

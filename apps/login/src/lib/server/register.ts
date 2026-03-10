@@ -5,13 +5,13 @@ import { addHumanUser, addIDPLink, getLoginSettings, getUserByID, listAuthentica
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { cookies, headers } from "next/headers";
+import crypto from "crypto";
 import { getTranslations } from "next-intl/server";
+import { cookies, headers } from "next/headers";
+import { completeFlowOrGetUrl } from "../client";
+import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
-import { getOrSetFingerprintId } from "../fingerprint";
-import crypto from "crypto";
-import { completeFlowOrGetUrl } from "../client";
 
 type RegisterUserCommand = {
   email: string;

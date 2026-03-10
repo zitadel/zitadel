@@ -1,6 +1,6 @@
 import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
-import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
 import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
+import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
 import { idpTypeToSlug } from "@/lib/idp";
 import { createLogger } from "@/lib/logger";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
@@ -24,9 +24,9 @@ import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
+import escapeHtml from "escape-html";
 import { NextRequest, NextResponse } from "next/server";
 import { buildCSP } from "../csp";
-import escapeHtml from "escape-html";
 
 const logger = createLogger("flow-initiation");
 
@@ -44,10 +44,7 @@ function setCSPHeaders(
       ? securitySettings.embeddedIframe.allowedOrigins
       : undefined;
 
-  response.headers.set(
-    "Content-Security-Policy",
-    buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }),
-  );
+  response.headers.set("Content-Security-Policy", buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }));
 
   if (!iframeOrigins) {
     response.headers.set("X-Frame-Options", "deny");
@@ -197,7 +194,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
               </body>
             </html>
           `;
-
 
           return new NextResponse(html, {
             headers: { "Content-Type": "text/html" },

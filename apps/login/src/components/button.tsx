@@ -1,7 +1,7 @@
+import { APPEARANCE_STYLES, getComponentRoundness, getThemeConfig } from "@/lib/theme";
+import { ThemeableProps } from "@/lib/themeUtils";
 import { clsx } from "clsx";
 import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from "react";
-import { ThemeableProps } from "@/lib/themeUtils";
-import { getThemeConfig, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
 
 export enum ButtonSizes {
   Small = "Small",
