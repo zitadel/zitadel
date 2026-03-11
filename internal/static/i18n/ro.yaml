@@ -132,6 +132,8 @@ Errors:
         CouldNotGenerate: "Secretul nu a putut fi generat"
     PAT:
       NotFound: "Token-ul de acces personal nu a fost găsit"
+    Metadata:
+      Conflicting: "Metadatele nu trebuie setate simultan în câmpurile [user] și [human]"
     NotHuman: "Utilizatorul trebuie să fie personal"
     NotMachine: "Utilizatorul trebuie să fie tehnic"
     WrongType: "Nu este permis pentru acest tip de utilizator"
@@ -196,10 +198,6 @@ Errors:
     RefreshToken:
       Invalid: "Token-ul de reîmprospătare este invalid"
       NotFound: "Token-ul de reîmprospătare nu a fost găsit"
-  Instance:
-    NotFound: "Instanța nu a fost găsită"
-    AlreadyExists: "Instanța există deja"
-    NotChanged: "Instanța nu a fost schimbată"
   Org:
     AlreadyExists: "Numele sau ID-ul organizației este deja utilizat"
     Invalid: "Organizația este invalidă"
@@ -346,6 +344,8 @@ Errors:
       NotActive: "Acordarea proiectului nu este activă"
       NotInactive: "Acordarea proiectului nu este inactivă"
   Instance:
+    AlreadyExists: "Instanța există deja"
+    NotChanged: "Instanța nu a fost schimbată"
     NotFound: "Instanța nu a fost găsită. Asigurați-vă că aveți domeniul corect. Consultați https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Rolurile nu au fost schimbate"

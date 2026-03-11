@@ -45,6 +45,18 @@ func WithSessionRepo(repo SessionRepository) InvokeOpt {
 	}
 }
 
+func WithUserRepo(repo UserRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.userRepo = repo
+	}
+}
+
+func WithPermissionChecker(checker PermissionChecker) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.Permissions = checker
+	}
+}
+
 // WithQueryExecutor sets the database client to be used by the command.
 // If not set, the default pool will be used.
 // This is mainly used for testing.
@@ -81,15 +93,6 @@ func WithSessionTokenDecryptor(decryptor SessionTokenDecryptor) InvokeOpt {
 	}
 }
 
-// WithPermissionCheck sets the permission check used by the commands.
-// If not set, the default one will be used.
-// This is mainly used for testing
-func WithPermissionCheck(permissionCheck PermissionChecker) InvokeOpt {
-	return func(opts *InvokeOpts) {
-		opts.Permissions = permissionCheck
-	}
-}
-
 // InvokeOpts are passed to each command
 type InvokeOpts struct {
 	// db is the database client.
@@ -109,6 +112,7 @@ type InvokeOpts struct {
 	instanceRepo           InstanceRepository
 	instanceDomainRepo     InstanceDomainRepository
 	sessionRepo            SessionRepository
+	userRepo               UserRepository
 }
 
 func (o *InvokeOpts) DB() database.QueryExecutor {

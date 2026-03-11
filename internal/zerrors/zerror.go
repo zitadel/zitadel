@@ -80,6 +80,9 @@ const (
 	KindUnauthenticated Kind = 16
 )
 
+// IDRecover is the error ID used for errors created after recovery from panics.
+const IDRecover = "RECOVER"
+
 // Because errors are created through singletons, config is global.
 var (
 	enableReportLocation atomic.Bool

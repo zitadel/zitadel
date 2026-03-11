@@ -28,9 +28,7 @@ export function ConsentScreen({
 
   async function denyDeviceAuth() {
     setLoading(true);
-    const response = await completeDeviceAuthorization(
-      deviceAuthorizationRequestId,
-    )
+    const response = await completeDeviceAuthorization(deviceAuthorizationRequestId)
       .catch(() => {
         setError("Could not register user");
         return;
@@ -59,8 +57,7 @@ export function ConsentScreen({
           const description = t(translationKey);
 
           // Check if the key itself is returned and provide a fallback
-          const resolvedDescription =
-            description === translationKey ? "" : description;
+          const resolvedDescription = description === translationKey ? "" : description;
 
           return (
             <li
@@ -74,11 +71,7 @@ export function ConsentScreen({
       </ul>
 
       <p className="ztdl-p text-left text-xs">
-        <Translated
-          i18nKey="request.disclaimer"
-          namespace="device"
-          data={{ appName: appName }}
-        />
+        <Translated i18nKey="request.disclaimer" namespace="device" data={{ appName: appName }} />
       </p>
 
       {error && (
@@ -101,12 +94,7 @@ export function ConsentScreen({
         <span className="flex-grow"></span>
 
         <Link href={nextUrl}>
-          <Button
-            data-testid="submit-button"
-            type="submit"
-            className="self-end"
-            variant={ButtonVariants.Primary}
-          >
+          <Button data-testid="submit-button" type="submit" className="self-end" variant={ButtonVariants.Primary}>
             <Translated i18nKey="device.request.submit" namespace="device" />
           </Button>
         </Link>

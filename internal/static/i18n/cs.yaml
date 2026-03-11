@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Tajemství nelze vygenerovat"
     PAT:
       NotFound: "Osobní přístupový token nenalezen"
+    Metadata:
+      Conflicting: "Metadata nesmí být nastavena současně v polích [user] a [human]"
     NotHuman: "Uživatel musí být fyzická osoba"
     NotMachine: "Uživatel musí být systémový uživatel / technická entita"
     WrongType: "Nepovolen pro tento typ uživatele"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "Obnovovací token je neplatný"
       NotFound: "Obnovovací token nenalezen"
-  Instance:
-    NotFound: "Instance nenalezena"
-    AlreadyExists: "Instance již existuje"
-    NotChanged: "Instance nezměněna"
   Org:
     AlreadyExists: "Името или идентификационният номер на организацията вече е зает"
     Invalid: "Organizace je neplatná"
@@ -345,6 +343,8 @@ Errors:
       NotActive: "Grant projektu není aktivní"
       NotInactive: "Grant projektu není neaktivní"
   Instance:
+    AlreadyExists: "Instance již existuje"
+    NotChanged: "Instance nezměněna"
     NotFound: "Instance nebyla nalezena. Ujistěte se, že jste získali správnou doménu. Podívejte se na https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Role nebyly změněny"

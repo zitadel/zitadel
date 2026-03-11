@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal, WritableSignal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { WebKey } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
+import { WebKey } from '@zitadel/proto/zitadel/webkey/v2/key_pb';
 import { ReplaySubject } from 'rxjs';
-import { RSAHasher, RSABits, ECDSACurve } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
+import { RSAHasher, RSABits, ECDSACurve } from '@zitadel/proto/zitadel/webkey/v2/key_pb';
 
 type RawValue<T extends FormGroup> = ReturnType<T['getRawValue']>;
 

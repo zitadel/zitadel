@@ -414,9 +414,9 @@ func (s *Server) HumanMFAInitSkipped(ctx context.Context, req *connect.Request[u
 func (s *Server) CreateUser(ctx context.Context, req *connect.Request[user.CreateUserRequest]) (*connect.Response[user.CreateUserResponse], error) {
 	switch userType := req.Msg.GetUserType().(type) {
 	case *user.CreateUserRequest_Human_:
-		return s.createUserTypeHuman(ctx, userType.Human, req.Msg.GetOrganizationId(), req.Msg.Username, req.Msg.UserId)
+		return s.createUserTypeHuman(ctx, userType.Human, req.Msg.GetOrganizationId(), req.Msg.Username, req.Msg.UserId, req.Msg.GetMetadata())
 	case *user.CreateUserRequest_Machine_:
-		return s.createUserTypeMachine(ctx, userType.Machine, req.Msg.GetOrganizationId(), req.Msg.GetUsername(), req.Msg.GetUserId())
+		return s.createUserTypeMachine(ctx, userType.Machine, req.Msg.GetOrganizationId(), req.Msg.GetUsername(), req.Msg.GetUserId(), req.Msg.GetMetadata())
 	default:
 		return nil, zerrors.ThrowInternal(nil, "", "user type is not implemented")
 	}
@@ -425,9 +425,9 @@ func (s *Server) CreateUser(ctx context.Context, req *connect.Request[user.Creat
 func (s *Server) UpdateUser(ctx context.Context, req *connect.Request[user.UpdateUserRequest]) (*connect.Response[user.UpdateUserResponse], error) {
 	switch userType := req.Msg.GetUserType().(type) {
 	case *user.UpdateUserRequest_Human_:
-		return s.updateUserTypeHuman(ctx, userType.Human, req.Msg.GetUserId(), req.Msg.Username)
+		return s.updateUserTypeHuman(ctx, userType.Human, req.Msg.GetUserId(), req.Msg.Username, req.Msg.GetMetadata())
 	case *user.UpdateUserRequest_Machine_:
-		return s.updateUserTypeMachine(ctx, userType.Machine, req.Msg.GetUserId(), req.Msg.Username)
+		return s.updateUserTypeMachine(ctx, userType.Machine, req.Msg.GetUserId(), req.Msg.Username, req.Msg.GetMetadata())
 	default:
 		return nil, zerrors.ThrowUnimplemented(nil, "", "user type is not implemented")
 	}

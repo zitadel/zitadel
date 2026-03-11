@@ -47,7 +47,7 @@ func (c *Commands) verifyUserPasskeyCode(ctx context.Context, userID, resourceOw
 	if err != nil {
 		return nil, err
 	}
-	err = crypto.VerifyCode(wm.ChangeDate, wm.Expiration, wm.CryptoCode, code, alg)
+	err = crypto.VerifyCode(wm.CodeCreationDate, wm.CodeExpiration, wm.CryptoCode, code, alg)
 	if err != nil || wm.State != domain.PasswordlessInitCodeStateActive {
 		c.verifyUserPasskeyCodeFailed(ctx, wm)
 		return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid")

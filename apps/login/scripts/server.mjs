@@ -1,4 +1,4 @@
-import { readFileSync, accessSync, constants } from "node:fs";
+import { accessSync, constants, readFileSync } from "node:fs";
 import { createServer } from "node:https";
 import { createRequire } from "node:module";
 
@@ -154,7 +154,8 @@ if (process.env.ZITADEL_TLS_ENABLED !== "true") {
   }
 
   httpsServer.listen(currentPort, hostname, () => {
-    const readyUrl = new URL(`https://${hostname}:${currentPort}`);
+    const formattedHost = hostname.includes(":") ? `[${hostname}]` : hostname;
+    const readyUrl = new URL(`https://${formattedHost}:${currentPort}`);
     console.log(`> Ready on ${readyUrl}`);
   });
 }

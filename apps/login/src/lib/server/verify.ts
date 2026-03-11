@@ -1,5 +1,6 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
 import {
   createInviteCode,
   getLoginSettings,
@@ -17,6 +18,7 @@ import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getTranslations } from "next-intl/server";
 import { cookies, headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
@@ -26,7 +28,8 @@ import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHostWithProtocol } from "./host";
-import { getTranslations } from "next-intl/server";
+
+const logger = createLogger("verify");
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
   const _headers = await headers();
@@ -63,11 +66,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   const verifyResponse = command.isInvite
     ? await verifyInviteCode({ serviceConfig, userId: command.userId, verificationCode: command.code }).catch((error) => {
-        console.warn(error);
+        logger.warn("Could not verify invite:", { error });
         return { error: t("errors.couldNotVerifyInvite") };
       })
     : await verifyEmail({ serviceConfig, userId: command.userId, verificationCode: command.code }).catch((error) => {
-        console.warn(error);
+        logger.warn("Could not verify email:", { error });
         return { error: t("errors.couldNotVerifyEmail") };
       });
 
@@ -102,7 +105,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       })
       .catch((error) => {
         // user session is not found, so we create a new one
-        console.warn("[verify] user session is not found, so we create a new one", error);
+        logger.warn("[verify] user session is not found, so we create a new one", { error });
         return undefined;
       });
   }

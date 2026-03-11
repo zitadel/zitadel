@@ -24,8 +24,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({ serviceConfig, userCode,
-  });
+  const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({ serviceConfig, userCode });
 
   if (!deviceAuthorizationRequest) {
     return (
@@ -37,14 +36,13 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
   const params = new URLSearchParams();
 

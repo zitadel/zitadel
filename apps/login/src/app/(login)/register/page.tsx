@@ -31,31 +31,42 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const { serviceConfig } = getServiceConfig(_headers);
 
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
     if (org) {
       organization = org.id;
     }
   }
 
-  const legal = await getLegalAndSupportSettings({ serviceConfig, organization,
-  });
-  const passwordComplexitySettings = await getPasswordComplexitySettings({ serviceConfig, organization,
-  });
+  const legal = await getLegalAndSupportSettings({ serviceConfig, organization });
+  const passwordComplexitySettings = await getPasswordComplexitySettings({ serviceConfig, organization });
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization });
 
-  const identityProviders = await getActiveIdentityProviders({ serviceConfig, orgId: organization,
-  }).then((resp) => {
+  const identityProviders = await getActiveIdentityProviders({ serviceConfig, orgId: organization }).then((resp) => {
     return resp.identityProviders.filter((idp) => {
       return idp.options?.isAutoCreation || idp.options?.isCreationAllowed; // check if IDP allows to create account automatically or manual creation is allowed
     });
   });
 
-  if (!loginSettings?.allowRegister) {
+  if (!loginSettings) {
+    return (
+      <DynamicTheme branding={branding}>
+        <div className="flex flex-col space-y-4">
+          <h1>
+            <Translated i18nKey="title" namespace="register" />
+          </h1>
+          <Alert>
+            <Translated i18nKey="unknownContext" namespace="error" />
+          </Alert>
+        </div>
+        <div className="w-full"></div>
+      </DynamicTheme>
+    );
+  }
+
+  if (!loginSettings?.allowRegister && (!loginSettings.allowExternalIdp || identityProviders.length === 0)) {
     return (
       <DynamicTheme branding={branding}>
         <div className="flex flex-col space-y-4">
@@ -89,21 +100,18 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           </Alert>
         )}
 
-        {legal &&
-          passwordComplexitySettings &&
-          organization &&
-          loginSettings.allowLocalAuthentication && (
-            <RegisterForm
-              idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
-              legal={legal}
-              organization={organization}
-              firstname={firstname}
-              lastname={lastname}
-              email={email}
-              requestId={requestId}
-              loginSettings={loginSettings}
-            ></RegisterForm>
-          )}
+        {legal && passwordComplexitySettings && organization && loginSettings.allowLocalAuthentication && (
+          <RegisterForm
+            idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
+            legal={legal}
+            organization={organization}
+            firstname={firstname}
+            lastname={lastname}
+            email={email}
+            requestId={requestId}
+            loginSettings={loginSettings}
+          ></RegisterForm>
+        )}
 
         {loginSettings?.allowExternalIdp && !!identityProviders.length && (
           <>

@@ -32,8 +32,12 @@ import {
 import { getTranslations } from "next-intl/server";
 import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getUserAgent } from "./fingerprint";
+import { otelGrpcInterceptor } from "./grpc/interceptors/otel";
+import { createLogger } from "./logger";
 
 import { createServiceForHost } from "./service";
+
+const logger = createLogger("zitadel");
 
 const useCache = process.env.DEBUG !== "true";
 
@@ -1238,43 +1242,49 @@ export type WithServiceConfig<T = {}> = T & {
 };
 
 export function createServerTransport(token: string, serviceConfig: ServiceConfig) {
+  // Build interceptors list - OTEL interceptor is always included for trace propagation
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const interceptors: any[] = [otelGrpcInterceptor];
+
+  // Add custom headers interceptor if needed
+  if (process.env.CUSTOM_REQUEST_HEADERS || serviceConfig.instanceHost || serviceConfig.publicHost) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    interceptors.push((next: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (req: any) => {
+        // Apply headers from serviceConfig
+        if (serviceConfig.instanceHost) {
+          req.header.set("x-zitadel-instance-host", serviceConfig.instanceHost);
+        }
+        if (serviceConfig.publicHost) {
+          req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
+        }
+
+        // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
+        if (process.env.CUSTOM_REQUEST_HEADERS) {
+          process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
+            const kv = header.indexOf(":");
+            if (kv > 0) {
+              const key = header.slice(0, kv).trim();
+              const value = header.slice(kv + 1).trim();
+              if (value) {
+                req.header.set(key, value);
+              } else {
+                req.header.delete(key);
+              }
+            } else {
+              logger.warn("Skipping malformed header", { header });
+            }
+          });
+        }
+
+        return next(req);
+      };
+    });
+  }
+
   return libCreateServerTransport(token, {
     baseUrl: serviceConfig.baseUrl,
-    interceptors:
-      !process.env.CUSTOM_REQUEST_HEADERS && !serviceConfig.instanceHost && !serviceConfig.publicHost
-        ? undefined
-        : [
-            (next) => {
-              return (req) => {
-                // Apply headers from serviceConfig
-                if (serviceConfig.instanceHost) {
-                  req.header.set("x-zitadel-instance-host", serviceConfig.instanceHost);
-                }
-                if (serviceConfig.publicHost) {
-                  req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
-                }
-
-                // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
-                if (process.env.CUSTOM_REQUEST_HEADERS) {
-                  process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
-                    const kv = header.indexOf(":");
-                    if (kv > 0) {
-                      const key = header.slice(0, kv).trim();
-                      const value = header.slice(kv + 1).trim();
-                      if (value) {
-                        req.header.set(key, value);
-                      } else {
-                        req.header.delete(key);
-                      }
-                    } else {
-                      console.warn(`Skipping malformed header: ${header}`);
-                    }
-                  });
-                }
-
-                return next(req);
-              };
-            },
-          ],
+    interceptors,
   });
 }

@@ -81,48 +81,6 @@ func (c *MockMachineUserRepositoryAddKeyCall) DoAndReturn(f func(*domain.Machine
 	return c
 }
 
-// AddMetadata mocks base method.
-func (m *MockMachineUserRepository) AddMetadata(metadata ...*domain.Metadata) database.Change {
-	m.ctrl.T.Helper()
-	varargs := []any{}
-	for _, a := range metadata {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "AddMetadata", varargs...)
-	ret0, _ := ret[0].(database.Change)
-	return ret0
-}
-
-// AddMetadata indicates an expected call of AddMetadata.
-func (mr *MockMachineUserRepositoryMockRecorder) AddMetadata(metadata ...any) *MockMachineUserRepositoryAddMetadataCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMetadata", reflect.TypeOf((*MockMachineUserRepository)(nil).AddMetadata), metadata...)
-	return &MockMachineUserRepositoryAddMetadataCall{Call: call}
-}
-
-// MockMachineUserRepositoryAddMetadataCall wrap *gomock.Call
-type MockMachineUserRepositoryAddMetadataCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockMachineUserRepositoryAddMetadataCall) Return(arg0 database.Change) *MockMachineUserRepositoryAddMetadataCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockMachineUserRepositoryAddMetadataCall) Do(f func(...*domain.Metadata) database.Change) *MockMachineUserRepositoryAddMetadataCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockMachineUserRepositoryAddMetadataCall) DoAndReturn(f func(...*domain.Metadata) database.Change) *MockMachineUserRepositoryAddMetadataCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // AddPersonalAccessToken mocks base method.
 func (m *MockMachineUserRepository) AddPersonalAccessToken(pat *domain.PersonalAccessToken) database.Change {
 	m.ctrl.T.Helper()
@@ -765,6 +723,48 @@ func (c *MockMachineUserRepositorySetDescriptionCall) Do(f func(string) database
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockMachineUserRepositorySetDescriptionCall) DoAndReturn(f func(string) database.Change) *MockMachineUserRepositorySetDescriptionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetMetadata mocks base method.
+func (m *MockMachineUserRepository) SetMetadata(metadata ...*domain.Metadata) database.Change {
+	m.ctrl.T.Helper()
+	varargs := []any{}
+	for _, a := range metadata {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SetMetadata", varargs...)
+	ret0, _ := ret[0].(database.Change)
+	return ret0
+}
+
+// SetMetadata indicates an expected call of SetMetadata.
+func (mr *MockMachineUserRepositoryMockRecorder) SetMetadata(metadata ...any) *MockMachineUserRepositorySetMetadataCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMetadata", reflect.TypeOf((*MockMachineUserRepository)(nil).SetMetadata), metadata...)
+	return &MockMachineUserRepositorySetMetadataCall{Call: call}
+}
+
+// MockMachineUserRepositorySetMetadataCall wrap *gomock.Call
+type MockMachineUserRepositorySetMetadataCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockMachineUserRepositorySetMetadataCall) Return(arg0 database.Change) *MockMachineUserRepositorySetMetadataCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockMachineUserRepositorySetMetadataCall) Do(f func(...*domain.Metadata) database.Change) *MockMachineUserRepositorySetMetadataCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockMachineUserRepositorySetMetadataCall) DoAndReturn(f func(...*domain.Metadata) database.Change) *MockMachineUserRepositorySetMetadataCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

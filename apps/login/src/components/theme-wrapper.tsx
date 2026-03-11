@@ -2,8 +2,8 @@
 
 import { setTheme } from "@/helpers/colors";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
-import { ReactNode, useEffect } from "react";
 import { useTheme } from "next-themes";
+import { ReactNode, useEffect } from "react";
 
 type Props = {
   branding: BrandingSettings | undefined;
