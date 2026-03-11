@@ -2,16 +2,20 @@ import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute } from '@angular/router';
+import { RpcError } from 'grpc-web';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { UserGrantRoleDialogComponent } from 'src/app/modules/user-grant-role-dialog/user-grant-role-dialog.component';
+import {
+  UserGrantRoleDialogComponent,
+  UserGrantRoleDialogData,
+  UserGrantRoleDialogResult,
+} from 'src/app/modules/user-grant-role-dialog/user-grant-role-dialog.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
 import { ProjectGrantMembersDataSource } from './project-grant-members-datasource';
 
 @Component({
@@ -260,31 +264,38 @@ export class ProjectGrantDetailComponent {
   }
 
   public editRoles(): void {
-    const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
-      data: {
-        projectId: this.grant.projectId,
-        selectedRoleKeysList: this.grant.grantedRoleKeysList,
-        i18nTitle: 'PROJECT.GRANT.EDITTITLE',
+    const dialogRef = this.dialog.open<UserGrantRoleDialogComponent, UserGrantRoleDialogData, UserGrantRoleDialogResult>(
+      UserGrantRoleDialogComponent,
+      {
+        data: {
+          projectId: this.grant.projectId,
+          selectedRoleKeysList: this.grant.grantedRoleKeysList,
+          i18nTitle: 'PROJECT.GRANT.EDITTITLE',
+        },
+        width: '600px',
       },
-      width: '600px',
-    });
+    );
 
     dialogRef.afterClosed().subscribe((resp) => {
-      if (resp && resp.roles) {
-        this.mgmtService
-          .updateProjectGrant(this.grant.grantId, this.grant.projectId, resp.roles)
-          .then(() => {
-            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
-            this.grant.grantedRoleKeysList = resp.roles;
-            setTimeout(() => {
-              this.changePage.emit();
-            }, 1000);
-          })
-          .catch((error) => {
-            this.changePage.emit();
-            this.toast.showError(error);
-          });
+      if (!resp || !resp.roles) {
+        return;
       }
+      this.mgmtService
+        .updateProjectGrant(this.grant.grantId, this.grant.projectId, resp.roles)
+        .then(() => {
+          this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
+          this.grant.grantedRoleKeysList = resp.roles;
+          setTimeout(() => {
+            this.changePage.emit();
+          }, 1000);
+        })
+        .catch((error) => {
+          // Errors.UserGrant.NotChanged
+          if (!(error instanceof RpcError && error.message.includes('COMMAND-Rs8fy'))) {
+            this.toast.showError(error);
+          }
+          this.changePage.emit();
+        });
     });
   }
 }

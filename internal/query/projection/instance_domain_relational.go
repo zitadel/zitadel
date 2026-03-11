@@ -16,47 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type instanceDomainRelationalProjection struct{}
-
-func newInstanceDomainRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(instanceDomainRelationalProjection))
-}
-
-func (*instanceDomainRelationalProjection) Name() string {
-	return "zitadel.instance_domains"
-}
-
-func (p *instanceDomainRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: instance.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  instance.InstanceDomainAddedEventType,
-					Reduce: p.reduceCustomDomainAdded,
-				},
-				{
-					Event:  instance.InstanceDomainPrimarySetEventType,
-					Reduce: p.reduceDomainPrimarySet,
-				},
-				{
-					Event:  instance.InstanceDomainRemovedEventType,
-					Reduce: p.reduceCustomDomainRemoved,
-				},
-				{
-					Event:  instance.TrustedDomainAddedEventType,
-					Reduce: p.reduceTrustedDomainAdded,
-				},
-				{
-					Event:  instance.TrustedDomainRemovedEventType,
-					Reduce: p.reduceTrustedDomainRemoved,
-				},
-			},
-		},
-	}
-}
-
-func (p *instanceDomainRelationalProjection) reduceCustomDomainAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceCustomInstanceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-DU0xF", "reduce.wrong.event.type %s", instance.InstanceDomainAddedEventType)
@@ -78,7 +38,7 @@ func (p *instanceDomainRelationalProjection) reduceCustomDomainAdded(event event
 	}), nil
 }
 
-func (p *instanceDomainRelationalProjection) reduceDomainPrimarySet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceInstanceDomainPrimarySet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainPrimarySetEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-TdEWA", "reduce.wrong.event.type %s", instance.InstanceDomainPrimarySetEventType)
@@ -103,7 +63,7 @@ func (p *instanceDomainRelationalProjection) reduceDomainPrimarySet(event events
 	}), nil
 }
 
-func (p *instanceDomainRelationalProjection) reduceCustomDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceCustomInstanceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Hhcdl", "reduce.wrong.event.type %s", instance.InstanceDomainRemovedEventType)
@@ -125,7 +85,7 @@ func (p *instanceDomainRelationalProjection) reduceCustomDomainRemoved(event eve
 	}), nil
 }
 
-func (p *instanceDomainRelationalProjection) reduceTrustedDomainAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceTrustedInstanceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.TrustedDomainAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-svHDh", "reduce.wrong.event.type %s", instance.TrustedDomainAddedEventType)
@@ -145,7 +105,7 @@ func (p *instanceDomainRelationalProjection) reduceTrustedDomainAdded(event even
 	}), nil
 }
 
-func (p *instanceDomainRelationalProjection) reduceTrustedDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceTrustedInstanceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.TrustedDomainRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-4K74E", "reduce.wrong.event.type %s", instance.TrustedDomainRemovedEventType)

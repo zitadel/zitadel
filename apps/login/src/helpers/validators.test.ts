@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { symbolValidator, numberValidator, upperCaseValidator, lowerCaseValidator } from "./validators";
+import { describe, expect, it } from "vitest";
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "./validators";
 
 describe("validators", () => {
   describe("symbolValidator", () => {

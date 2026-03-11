@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { validateAuthRequest, isRSCRequest, isValidLanguage, getValidLocaleFromUILocales } from "./auth-utils";
+import { describe, expect, it } from "vitest";
+import { getValidLocaleFromUILocales, isRSCRequest, isValidLanguage, validateAuthRequest } from "./auth-utils";
 
 describe("auth-utils", () => {
   describe("isValidLanguage", () => {

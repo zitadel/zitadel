@@ -15,40 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const (
-	IDPIntentRelationalProjectionTable = "zitadel.identity_provider_intents"
-)
-
-type idpIntentRelationalProjection struct{}
-
-func (*idpIntentRelationalProjection) Name() string {
-	return IDPIntentRelationalProjectionTable
-}
-
-func newIDPIntentRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(idpIntentRelationalProjection))
-}
-
-// Reducers implements [handler.Projection].
-func (i *idpIntentRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: idpintent.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{Event: idpintent.StartedEventType, Reduce: i.reduceStartedEvent},
-				{Event: idpintent.SucceededEventType, Reduce: i.reduceSucceededEvent},
-				{Event: idpintent.SAMLSucceededEventType, Reduce: i.reduceSAMLSucceededEvent},
-				{Event: idpintent.SAMLRequestEventType, Reduce: i.reduceSAMLRequestEvent},
-				{Event: idpintent.LDAPSucceededEventType, Reduce: i.reduceLDAPSucceededEvent},
-				{Event: idpintent.FailedEventType, Reduce: i.reduceFailedEvent},
-				{Event: idpintent.ConsumedEventType, Reduce: i.reduceConsumedEvent},
-			},
-		},
-	}
-
-}
-
-func (i *idpIntentRelationalProjection) reduceStartedEvent(evt eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPIntentStartedEvent(evt eventstore.Event) (*handler.Statement, error) {
 	e, ok := evt.(*idpintent.StartedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInternalf(nil, "HANDL-Lqj3HB", "reduce.wrong.event.type %s", idpintent.StartedEventType)
@@ -74,7 +41,7 @@ func (i *idpIntentRelationalProjection) reduceStartedEvent(evt eventstore.Event)
 	}), nil
 }
 
-func (i *idpIntentRelationalProjection) reduceSucceededEvent(evt eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPIntentSucceededEvent(evt eventstore.Event) (*handler.Statement, error) {
 	e, ok := evt.(*idpintent.SucceededEvent)
 	if !ok {
 		return nil, zerrors.ThrowInternalf(nil, "HANDL-hQSxj0", "reduce.wrong.event.type %s", idpintent.SucceededEventType)
@@ -116,7 +83,7 @@ func (i *idpIntentRelationalProjection) reduceSucceededEvent(evt eventstore.Even
 	}), nil
 }
 
-func (i *idpIntentRelationalProjection) reduceSAMLSucceededEvent(evt eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPIntentSAMLSucceededEvent(evt eventstore.Event) (*handler.Statement, error) {
 	e, ok := evt.(*idpintent.SAMLSucceededEvent)
 	if !ok {
 		return nil, zerrors.ThrowInternalf(nil, "HANDL-t2uaiv", "reduce.wrong.event.type %s", idpintent.SAMLSucceededEventType)
@@ -153,7 +120,7 @@ func (i *idpIntentRelationalProjection) reduceSAMLSucceededEvent(evt eventstore.
 	}), nil
 }
 
-func (i *idpIntentRelationalProjection) reduceSAMLRequestEvent(evt eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPIntentSAMLRequestEvent(evt eventstore.Event) (*handler.Statement, error) {
 	e, ok := evt.(*idpintent.SAMLRequestEvent)
 	if !ok {
 		return nil, zerrors.ThrowInternalf(nil, "HANDL-f7O6K2", "reduce.wrong.event.type %s", idpintent.SAMLRequestEventType)
@@ -175,7 +142,7 @@ func (i *idpIntentRelationalProjection) reduceSAMLRequestEvent(evt eventstore.Ev
 	}), nil
 }
 
-func (i *idpIntentRelationalProjection) reduceLDAPSucceededEvent(evt eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPIntentLDAPSucceededEvent(evt eventstore.Event) (*handler.Statement, error) {
 	e, ok := evt.(*idpintent.LDAPSucceededEvent)
 	if !ok {
 		return nil, zerrors.ThrowInternalf(nil, "HANDL-Gw8ddW", "reduce.wrong.event.type %s", idpintent.LDAPSucceededEventType)
@@ -209,7 +176,7 @@ func (i *idpIntentRelationalProjection) reduceLDAPSucceededEvent(evt eventstore.
 	}), nil
 }
 
-func (i *idpIntentRelationalProjection) reduceFailedEvent(evt eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPIntentFailedEvent(evt eventstore.Event) (*handler.Statement, error) {
 	e, ok := evt.(*idpintent.FailedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInternalf(nil, "HANDL-x3o9LZ", "reduce.wrong.event.type %s", idpintent.FailedEventType)
@@ -233,7 +200,7 @@ func (i *idpIntentRelationalProjection) reduceFailedEvent(evt eventstore.Event) 
 	}), nil
 }
 
-func (i *idpIntentRelationalProjection) reduceConsumedEvent(evt eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceIDPIntentConsumedEvent(evt eventstore.Event) (*handler.Statement, error) {
 	e, ok := evt.(*idpintent.ConsumedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInternalf(nil, "HANDL-jHZs6T", "reduce.wrong.event.type %s", idpintent.ConsumedEventType)

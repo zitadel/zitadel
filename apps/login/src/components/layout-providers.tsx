@@ -11,7 +11,5 @@ export function LayoutProviders({ children }: Props) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
-  return (
-    <div className={`${isDark ? "ui-dark" : "ui-light"} `}>{children}</div>
-  );
+  return <div className={`${isDark ? "ui-dark" : "ui-light"} `}>{children}</div>;
 }
