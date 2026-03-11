@@ -9,65 +9,11 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const (
-	OrgRelationProjectionTable = "zitadel.organizations"
-)
-
-type orgRelationalProjection struct{}
-
-func (*orgRelationalProjection) Name() string {
-	return OrgRelationProjectionTable
-}
-
-func newOrgRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(orgRelationalProjection))
-}
-
-func (p *orgRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: org.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  org.OrgAddedEventType,
-					Reduce: p.reduceOrgRelationalAdded,
-				},
-				{
-					Event:  org.OrgChangedEventType,
-					Reduce: p.reduceOrgRelationalChanged,
-				},
-				{
-					Event:  org.OrgDeactivatedEventType,
-					Reduce: p.reduceOrgRelationalDeactivated,
-				},
-				{
-					Event:  org.OrgReactivatedEventType,
-					Reduce: p.reduceOrgRelationalReactivated,
-				},
-				{
-					Event:  org.OrgRemovedEventType,
-					Reduce: p.reduceOrgRelationalRemoved,
-				},
-			},
-		},
-		{
-			Aggregate: instance.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  instance.InstanceRemovedEventType,
-					Reduce: reduceInstanceRemovedHelper(OrgColumnInstanceID),
-				},
-			},
-		},
-	}
-}
-
-func (p *orgRelationalProjection) reduceOrgRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-uYq5R", "reduce.wrong.event.type %s", org.OrgAddedEventType)
@@ -91,7 +37,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalAdded(event eventstore.Even
 	}), nil
 }
 
-func (p *orgRelationalProjection) reduceOrgRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgChangedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Bg9om", "reduce.wrong.event.type %s", org.OrgChangedEventType)
@@ -115,7 +61,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalChanged(event eventstore.Ev
 	}), nil
 }
 
-func (p *orgRelationalProjection) reduceOrgRelationalDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgRelationalDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgDeactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-BApK5", "reduce.wrong.event.type %s", org.OrgDeactivatedEventType)
@@ -137,7 +83,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalDeactivated(event eventstor
 	}), nil
 }
 
-func (p *orgRelationalProjection) reduceOrgRelationalReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgRelationalReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgReactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-o38DE", "reduce.wrong.event.type %s", org.OrgReactivatedEventType)
@@ -158,7 +104,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalReactivated(event eventstor
 	}), nil
 }
 
-func (p *orgRelationalProjection) reduceOrgRelationalRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgRelationalRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-DGm9g", "reduce.wrong.event.type %s", org.OrgRemovedEventType)

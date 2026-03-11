@@ -1,4 +1,4 @@
-import { readFileSync, accessSync, constants } from "node:fs";
+import { accessSync, constants, readFileSync } from "node:fs";
 import { createServer } from "node:https";
 import { createRequire } from "node:module";
 

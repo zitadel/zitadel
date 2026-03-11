@@ -1,9 +1,9 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
-import { sendLoginname } from "./loginname";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { getIDPByID } from "../zitadel";
+import { sendLoginname } from "./loginname";
 
 // Mock all the dependencies
 vi.mock("next/headers", () => ({

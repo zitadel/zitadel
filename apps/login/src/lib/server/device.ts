@@ -12,7 +12,5 @@ export async function completeDeviceAuthorization(
   const { serviceConfig } = getServiceConfig(_headers);
 
   // without the session, device auth request is denied
-  return authorizeOrDenyDeviceAuthorization({ serviceConfig, deviceAuthorizationId,
-    session,
-  });
+  return authorizeOrDenyDeviceAuthorization({ serviceConfig, deviceAuthorizationId, session });
 }

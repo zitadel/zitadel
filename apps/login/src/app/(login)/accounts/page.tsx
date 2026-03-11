@@ -21,8 +21,7 @@ async function loadSessions({ serviceConfig }: { serviceConfig: ServiceConfig })
   const cookieIds = await getAllSessionCookieIds();
 
   if (cookieIds && cookieIds.length) {
-    const response = await listSessions({ serviceConfig, ids: cookieIds.filter((id) => !!id) as string[],
-    });
+    const response = await listSessions({ serviceConfig, ids: cookieIds.filter((id) => !!id) as string[] });
     return response?.sessions ?? [];
   } else {
     console.info("No session cookie found.");
@@ -41,7 +40,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
     if (org) {
       defaultOrganization = org.id;
     }
@@ -49,8 +48,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   let sessions = await loadSessions({ serviceConfig });
 
-  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
   const params = new URLSearchParams();
 

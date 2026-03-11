@@ -2,7 +2,6 @@ import { newSystemToken } from "@zitadel/client/node";
 import { readFile } from "fs/promises";
 import { getLoginSystemUserId } from "./deployment";
 
-
 // The key token is only loaded once from disk per process.
 // If the file was loaded you need to restart the process to switch the key.
 let keyToken: Promise<string> | undefined;

@@ -13,51 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type projectGrantRelationalProjection struct{}
-
-func (*projectGrantRelationalProjection) Name() string {
-	return "zitadel.project_grants"
-}
-
-func newProjectGrantRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(projectGrantRelationalProjection))
-}
-
-func (p *projectGrantRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: project.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  project.GrantAddedType,
-					Reduce: p.reduceProjectGrantAdded,
-				},
-				{
-					Event:  project.GrantChangedType,
-					Reduce: p.reduceProjectGrantChanged,
-				},
-				{
-					Event:  project.GrantCascadeChangedType,
-					Reduce: p.reduceProjectGrantCascadeChanged,
-				},
-				{
-					Event:  project.GrantDeactivatedType,
-					Reduce: p.reduceProjectGrantDeactivated,
-				},
-				{
-					Event:  project.GrantReactivatedType,
-					Reduce: p.reduceProjectGrantReactivated,
-				},
-				{
-					Event:  project.GrantRemovedType,
-					Reduce: p.reduceProjectGrantRemoved,
-				},
-			},
-		},
-	}
-}
-
-func (p *projectGrantRelationalProjection) reduceProjectGrantAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceProjectGrantAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInternalf(nil, "HANDL-5l2bWQrkKf", "reduce.wrong.event.type %s", project.GrantAddedType)
@@ -82,7 +38,7 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantAdded(event eventst
 	}), nil
 }
 
-func (p *projectGrantRelationalProjection) reduceProjectGrantChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceProjectGrantChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantChangedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-I2ciunHcy7", "reduce.wrong.event.type %s", project.GrantChangedType)
@@ -102,7 +58,7 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantChanged(event event
 	}), nil
 }
 
-func (p *projectGrantRelationalProjection) reduceProjectGrantCascadeChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceProjectGrantCascadeChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantCascadeChangedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-osXtu6jnWa", "reduce.wrong.event.type %s", project.GrantCascadeChangedType)
@@ -122,7 +78,7 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantCascadeChanged(even
 	}), nil
 }
 
-func (p *projectGrantRelationalProjection) reduceProjectGrantDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceProjectGrantDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantDeactivateEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-XraL17MUkr", "reduce.wrong.event.type %s", project.GrantDeactivatedType)
@@ -143,7 +99,7 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantDeactivated(event e
 	}), nil
 }
 
-func (p *projectGrantRelationalProjection) reduceProjectGrantReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceProjectGrantReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantReactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-vGUHp6uHJ7", "reduce.wrong.event.type %s", project.GrantReactivatedType)
@@ -164,7 +120,7 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantReactivated(event e
 	}), nil
 }
 
-func (p *projectGrantRelationalProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-MVPgtdg1w5", "reduce.wrong.event.type %s", project.GrantRemovedType)
