@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"net/http"
-	"strings"
 
 	"github.com/gorilla/mux"
 
@@ -27,41 +26,47 @@ func AuthorizationInterceptor(verifier authz.APITokenVerifier, systemAuthConfig 
 	}
 }
 
-func (a *AuthInterceptor) Handler(next http.Handler) http.Handler {
-	return a.HandlerFunc(next)
-}
-
-func (a *AuthInterceptor) HandlerFunc(next http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		ctx, err := authorize(r, a.verifier, a.systemAuthConfig, a.authConfig)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
-			return
-		}
-
-		r = r.WithContext(ctx)
-		next.ServeHTTP(w, r)
+func (a *AuthInterceptor) Handler(routePrefix string) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return a.HandlerFunc(routePrefix)(next)
 	}
 }
 
-func (a *AuthInterceptor) HandlerFuncWithError(next HandlerFuncWithError) HandlerFuncWithError {
-	return func(w http.ResponseWriter, r *http.Request) error {
-		ctx, err := authorize(r, a.verifier, a.systemAuthConfig, a.authConfig)
-		if err != nil {
-			return err
-		}
+func (a *AuthInterceptor) HandlerFunc(routePrefix string) func(http.Handler) http.HandlerFunc {
+	return func(next http.Handler) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			ctx, err := authorize(r, a.verifier, a.systemAuthConfig, a.authConfig, routePrefix)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusUnauthorized)
+				return
+			}
 
-		r = r.WithContext(ctx)
-		return next(w, r)
+			r = r.WithContext(ctx)
+			next.ServeHTTP(w, r)
+		}
+	}
+}
+
+func (a *AuthInterceptor) HandlerFuncWithError(routePrefix string) func(HandlerFuncWithError) HandlerFuncWithError {
+	return func(next HandlerFuncWithError) HandlerFuncWithError {
+		return func(w http.ResponseWriter, r *http.Request) error {
+			ctx, err := authorize(r, a.verifier, a.systemAuthConfig, a.authConfig, routePrefix)
+			if err != nil {
+				return err
+			}
+
+			r = r.WithContext(ctx)
+			return next(w, r)
+		}
 	}
 }
 
 type httpReq struct{}
 
-func authorize(r *http.Request, verifier authz.APITokenVerifier, systemAuthConfig authz.Config, authConfig authz.Config) (_ context.Context, err error) {
+func authorize(r *http.Request, verifier authz.APITokenVerifier, systemAuthConfig authz.Config, authConfig authz.Config, routePrefix string) (_ context.Context, err error) {
 	ctx := r.Context()
 
-	authOpt, needsToken := checkAuthMethod(r, verifier)
+	authOpt, needsToken := checkAuthMethod(r, verifier, routePrefix)
 	if !needsToken {
 		return ctx, nil
 	}
@@ -81,29 +86,21 @@ func authorize(r *http.Request, verifier authz.APITokenVerifier, systemAuthConfi
 	return ctxSetter(ctx), nil
 }
 
-func checkAuthMethod(r *http.Request, verifier authz.APITokenVerifier) (authz.Option, bool) {
+func checkAuthMethod(r *http.Request, verifier authz.APITokenVerifier, routePrefix string) (authz.Option, bool) {
 	authOpt, needsToken := verifier.CheckAuthMethod(r.Method + ":" + r.RequestURI)
 	if needsToken {
 		return authOpt, true
 	}
 
+	// If the exact path doesn't match, try matching the path template (e.g. /users/{id} instead of /users/123).
+	// Since the path template is registered with the sub-router, we need to add the route prefix to it.
 	route := mux.CurrentRoute(r)
 	if route == nil {
 		return authOpt, false
 	}
-
 	pathTemplate, err := route.GetPathTemplate()
 	if err != nil || pathTemplate == "" {
 		return authOpt, false
 	}
-
-	// the path prefix is usually handled in a router in upper layer
-	// trim the query and the path of the url to get the correct path prefix
-	pathPrefix := r.RequestURI
-	if i := strings.Index(pathPrefix, "?"); i != -1 {
-		pathPrefix = pathPrefix[0:i]
-	}
-	pathPrefix = strings.TrimSuffix(pathPrefix, r.URL.Path)
-
-	return verifier.CheckAuthMethod(r.Method + ":" + pathPrefix + pathTemplate)
+	return verifier.CheckAuthMethod(r.Method + ":" + routePrefix + pathTemplate)
 }
