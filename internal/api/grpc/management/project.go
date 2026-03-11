@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -18,6 +19,9 @@ func (s *Server) GetProjectByID(ctx context.Context, req *mgmt_pb.GetProjectByID
 	project, err := s.query.ProjectByID(ctx, true, req.Id)
 	if err != nil {
 		return nil, err
+	}
+	if project.ResourceOwner != authz.GetCtxData(ctx).OrgID {
+		return nil, zerrors.ThrowNotFound(nil, "MANAG-SFf2a", "Errors.Project.NotFound")
 	}
 	return &mgmt_pb.GetProjectByIDResponse{
 		Project: project_grpc.ProjectViewToPb(project),
@@ -28,6 +32,9 @@ func (s *Server) GetGrantedProjectByID(ctx context.Context, req *mgmt_pb.GetGran
 	grant, err := s.query.ProjectGrantByID(ctx, true, req.GrantId)
 	if err != nil {
 		return nil, err
+	}
+	if !(grant.ResourceOwner == authz.GetCtxData(ctx).OrgID || grant.GrantedOrgID == authz.GetCtxData(ctx).OrgID) {
+		return nil, zerrors.ThrowNotFound(nil, "MANAG-drt2a", "Errors.ProjectGrant.NotFound")
 	}
 	return &mgmt_pb.GetGrantedProjectByIDResponse{
 		GrantedProject: project_grpc.GrantedProjectViewToPb(grant),

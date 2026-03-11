@@ -11,13 +11,7 @@ import { Avatar } from "./avatar";
 import { isSessionValid } from "./session-item";
 import { Translated } from "./translated";
 
-export function SessionClearItem({
-  session,
-  reload,
-}: {
-  session: Session;
-  reload: () => void;
-}) {
+export function SessionClearItem({ session, reload }: { session: Session; reload: () => void }) {
   const currentLocale = useLocale();
   moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
 
@@ -65,9 +59,7 @@ export function SessionClearItem({
 
       <div className="flex flex-col items-start overflow-hidden">
         <span className="">{session.factors?.user?.displayName}</span>
-        <span className="text-ellipsis text-xs opacity-80">
-          {session.factors?.user?.loginName}
-        </span>
+        <span className="text-ellipsis text-xs opacity-80">{session.factors?.user?.loginName}</span>
         {valid ? (
           <span className="text-ellipsis text-xs opacity-80">
             {verifiedAt && (
@@ -81,9 +73,7 @@ export function SessionClearItem({
         ) : (
           verifiedAt && (
             <span className="text-ellipsis text-xs opacity-80">
-              expired{" "}
-              {session.expirationDate &&
-                moment(timestampDate(session.expirationDate)).fromNow()}
+              expired {session.expirationDate && moment(timestampDate(session.expirationDate)).fromNow()}
             </span>
           )
         )}

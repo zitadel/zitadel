@@ -1,7 +1,7 @@
-import { describe, expect, test, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import { LoginPasskey } from "./login-passkey";
 import { NextIntlClientProvider } from "next-intl";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { LoginPasskey } from "./login-passkey";
 
 // Mock next/navigation
 const mockPush = vi.fn();

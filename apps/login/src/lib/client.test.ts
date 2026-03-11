@@ -1,4 +1,4 @@
-import { describe, expect, test, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { getNextUrl } from "./client";
 
 // Mock next/headers
@@ -52,5 +52,3 @@ describe("getNextUrl", () => {
     expect(result).toBe("/signedin?loginName=test-user");
   });
 });
-
-

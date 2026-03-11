@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -19,13 +20,16 @@ func (s *Server) GetAppByID(ctx context.Context, req *mgmt_pb.GetAppByIDRequest)
 	if err != nil {
 		return nil, err
 	}
+	if app.ResourceOwner != authz.GetCtxData(ctx).OrgID {
+		return nil, zerrors.ThrowNotFound(nil, "MANAG-SFf2a", "Errors.Project.App.NotFound")
+	}
 	return &mgmt_pb.GetAppByIDResponse{
 		App: project_grpc.AppToPb(app),
 	}, nil
 }
 
 func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*mgmt_pb.ListAppsResponse, error) {
-	queries, err := ListAppsRequestToModel(req)
+	queries, err := ListAppsRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}

@@ -103,43 +103,18 @@ export function setTheme(document: any, policy?: BrandingSettings) {
   setColorAlpha(light.link, "link", "light", document);
 }
 
-function setColorShades(
-  map: Color[],
-  type: string,
-  theme: string,
-  document: any,
-) {
+function setColorShades(map: Color[], type: string, theme: string, document: any) {
   map.forEach((color) => {
-    document.documentElement.style.setProperty(
-      `--theme-${theme}-${type}-${color.name}`,
-      color.hex,
-    );
-    document.documentElement.style.setProperty(
-      `--theme-${theme}-${type}-contrast-${color.name}`,
-      color.contrastColor,
-    );
+    document.documentElement.style.setProperty(`--theme-${theme}-${type}-${color.name}`, color.hex);
+    document.documentElement.style.setProperty(`--theme-${theme}-${type}-contrast-${color.name}`, color.contrastColor);
   });
 }
 
-function setColorAlpha(
-  map: Color[],
-  type: string,
-  theme: string,
-  document: any,
-) {
+function setColorAlpha(map: Color[], type: string, theme: string, document: any) {
   map.forEach((color) => {
-    document.documentElement.style.setProperty(
-      `--theme-${theme}-${type}-${color.name}`,
-      color.hex,
-    );
-    document.documentElement.style.setProperty(
-      `--theme-${theme}-${type}-contrast-${color.name}`,
-      color.contrastColor,
-    );
-    document.documentElement.style.setProperty(
-      `--theme-${theme}-${type}-secondary-${color.name}`,
-      `${color.hex}c7`,
-    );
+    document.documentElement.style.setProperty(`--theme-${theme}-${type}-${color.name}`, color.hex);
+    document.documentElement.style.setProperty(`--theme-${theme}-${type}-contrast-${color.name}`, color.contrastColor);
+    document.documentElement.style.setProperty(`--theme-${theme}-${type}-secondary-${color.name}`, `${color.hex}c7`);
   });
 }
 
@@ -184,23 +159,11 @@ function getContrast(color: string): string {
 
 export function computeMap(branding: BrandingColors, dark: boolean): ColorMap {
   return {
-    background: computeColors(
-      dark
-        ? branding.darkTheme.backgroundColor
-        : branding.lightTheme.backgroundColor,
-    ),
-    primary: computeColors(
-      dark ? branding.darkTheme.primaryColor : branding.lightTheme.primaryColor,
-    ),
-    warn: computeColors(
-      dark ? branding.darkTheme.warnColor : branding.lightTheme.warnColor,
-    ),
-    text: computeColors(
-      dark ? branding.darkTheme.fontColor : branding.lightTheme.fontColor,
-    ),
-    link: computeColors(
-      dark ? branding.darkTheme.fontColor : branding.lightTheme.fontColor,
-    ),
+    background: computeColors(dark ? branding.darkTheme.backgroundColor : branding.lightTheme.backgroundColor),
+    primary: computeColors(dark ? branding.darkTheme.primaryColor : branding.lightTheme.primaryColor),
+    warn: computeColors(dark ? branding.darkTheme.warnColor : branding.lightTheme.warnColor),
+    text: computeColors(dark ? branding.darkTheme.fontColor : branding.lightTheme.fontColor),
+    link: computeColors(dark ? branding.darkTheme.fontColor : branding.lightTheme.fontColor),
   };
 }
 
@@ -371,12 +334,8 @@ export function hashCode(str: string, seed = 0): number {
     h1 = Math.imul(h1 ^ ch, 2654435761);
     h2 = Math.imul(h2 ^ ch, 1597334677);
   }
-  h1 =
-    Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
-    Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-  h2 =
-    Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
-    Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
 

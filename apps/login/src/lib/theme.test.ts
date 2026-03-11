@@ -1,17 +1,17 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
-  ThemeRoundness,
-  ThemeLayout,
-  ThemeAppearance,
-  ThemeSpacing,
+  APPEARANCE_STYLES,
   ComponentRoundnessConfig,
   DEFAULT_COMPONENT_ROUNDNESS,
   DEFAULT_THEME,
+  getComponentRoundness,
   getThemeConfig,
   ROUNDNESS_CLASSES,
-  getComponentRoundness,
   SPACING_STYLES,
-  APPEARANCE_STYLES,
+  ThemeAppearance,
+  ThemeLayout,
+  ThemeRoundness,
+  ThemeSpacing,
 } from "./theme";
 
 describe("Theme Configuration", () => {

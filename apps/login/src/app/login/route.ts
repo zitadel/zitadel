@@ -1,7 +1,7 @@
+import { isRSCRequest, validateAuthRequest } from "@/lib/auth-utils";
 import { getAllSessions } from "@/lib/cookies";
+import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiation } from "@/lib/server/flow-initiation";
 import { getServiceConfig } from "@/lib/service-url";
-import { validateAuthRequest, isRSCRequest } from "@/lib/auth-utils";
-import { handleOIDCFlowInitiation, handleSAMLFlowInitiation, FlowInitiationParams } from "@/lib/server/flow-initiation";
 import { listSessions, ServiceConfig } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";

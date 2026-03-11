@@ -1,12 +1,7 @@
-import {
-  lowerCaseValidator,
-  numberValidator,
-  symbolValidator,
-  upperCaseValidator,
-} from "@/helpers/validators";
+import { Translated } from "@/components/translated";
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
-import { Translated } from "@/components/translated";
 
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
@@ -26,11 +21,7 @@ function CheckIcon({ title }: { title: string }) {
       role="img"
     >
       <title>{title}</title>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M4.5 12.75l6 6 9-13.5"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
     </svg>
   );
 }
@@ -47,30 +38,17 @@ function CrossIcon({ title }: { title: string }) {
       role="img"
     >
       <title>{title}</title>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M6 18L18 6M6 6l12 12"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
     </svg>
   );
 }
 
 function renderIcon(matched: boolean, t: ReturnType<typeof useTranslations>) {
-  return matched ? (
-    <CheckIcon title={t("complexity.matches")} />
-  ) : (
-    <CrossIcon title={t("complexity.doesNotMatch")} />
-  );
+  return matched ? <CheckIcon title={t("complexity.matches")} /> : <CrossIcon title={t("complexity.doesNotMatch")} />;
 }
-const desc =
-  "text-14px leading-4 text-input-light-label dark:text-input-dark-label";
+const desc = "text-14px leading-4 text-input-light-label dark:text-input-dark-label";
 
-export function PasswordComplexity({
-  passwordComplexitySettings,
-  password,
-  equals,
-}: Props) {
+export function PasswordComplexity({ passwordComplexitySettings, password, equals }: Props) {
   const t = useTranslations("password");
   const hasMinLength = password?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(password);
