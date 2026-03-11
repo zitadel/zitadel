@@ -206,8 +206,10 @@ async function downloadVersion(tag, sourceRef) {
             '--strip-components=1'
         ];
 
-        // GNU tar requires --wildcards for patterns; always pass it since devbox may provide GNU tar even on macOS
-        tarArgsWildcard.push('--wildcards');
+        // GNU tar (Linux) requires --wildcards for patterns, BSD tar (macOS) does not support it (and uses patterns by default)
+        if (process.platform !== 'darwin') {
+            tarArgsWildcard.push('--wildcards');
+        }
 
         tarArgsWildcard.push(
             '*/apps/docs/content',
