@@ -15,59 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const (
-	AuthorizationRelationalProjectionTable = "zitadel.authorizations"
-)
-
-type authorizationRelationalProjection struct{}
-
-func (*authorizationRelationalProjection) Name() string {
-	return AuthorizationRelationalProjectionTable
-}
-
-func newAuthorizationRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(authorizationRelationalProjection))
-}
-
-func (a *authorizationRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: usergrant.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  usergrant.UserGrantAddedType,
-					Reduce: a.reduceUserGrantAdded,
-				},
-				{
-					Event:  usergrant.UserGrantChangedType,
-					Reduce: a.reduceUserGrantChanged,
-				},
-				{
-					Event:  usergrant.UserGrantCascadeChangedType,
-					Reduce: a.reduceUserGrantChanged,
-				},
-				{
-					Event:  usergrant.UserGrantCascadeRemovedType,
-					Reduce: a.reduceUserGrantRemoved,
-				},
-				{
-					Event:  usergrant.UserGrantRemovedType,
-					Reduce: a.reduceUserGrantRemoved,
-				},
-				{
-					Event:  usergrant.UserGrantDeactivatedType,
-					Reduce: a.reduceUserGrantDeactivated,
-				},
-				{
-					Event:  usergrant.UserGrantReactivatedType,
-					Reduce: a.reduceUserGrantReactivated,
-				},
-			},
-		},
-	}
-}
-
-func (a *authorizationRelationalProjection) reduceUserGrantAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceAuthorizationAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*usergrant.UserGrantAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInternalf(nil, "HANDL-an0k9a", "reduce.wrong.event.type %s", usergrant.UserGrantAddedType)
@@ -97,7 +45,7 @@ func (a *authorizationRelationalProjection) reduceUserGrantAdded(event eventstor
 	}), nil
 }
 
-func (a *authorizationRelationalProjection) reduceUserGrantChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceAuthorizationChanged(event eventstore.Event) (*handler.Statement, error) {
 	var roles []string
 	switch e := event.(type) {
 	case *usergrant.UserGrantChangedEvent:
@@ -124,7 +72,7 @@ func (a *authorizationRelationalProjection) reduceUserGrantChanged(event eventst
 	}), nil
 }
 
-func (a *authorizationRelationalProjection) reduceUserGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceAuthorizationRemoved(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
 	case *usergrant.UserGrantRemovedEvent, *usergrant.UserGrantCascadeRemovedEvent:
 		// ok
@@ -145,7 +93,7 @@ func (a *authorizationRelationalProjection) reduceUserGrantRemoved(event eventst
 	}), nil
 }
 
-func (a *authorizationRelationalProjection) reduceUserGrantDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceAuthorizationDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	_, ok := event.(*usergrant.UserGrantDeactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dFtRl0", "reduce.wrong.event.type %s", usergrant.UserGrantDeactivatedType)
@@ -166,7 +114,7 @@ func (a *authorizationRelationalProjection) reduceUserGrantDeactivated(event eve
 	}), nil
 }
 
-func (a *authorizationRelationalProjection) reduceUserGrantReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceAuthorizationReactivated(event eventstore.Event) (*handler.Statement, error) {
 	_, ok := event.(*usergrant.UserGrantReactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dFtRl1", "reduce.wrong.event.type %s", usergrant.UserGrantReactivatedType)

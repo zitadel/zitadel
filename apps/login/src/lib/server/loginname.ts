@@ -393,10 +393,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           };
 
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
-          if (
-            userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED ||
-            !userLoginSettings?.allowLocalAuthentication
-          ) {
+          if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED || !userLoginSettings?.allowLocalAuthentication) {
             if (command.ignoreUnknownUsernames) {
               return preventUserEnumeration(command.organization);
             }
@@ -504,7 +501,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
     const suffix = matched?.[1] ?? "";
 
-    // this just returns orgs where the suffix is set as the Organization Domain 
+    // this just returns orgs where the suffix is set as the Organization Domain
     const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix });
 
     const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;

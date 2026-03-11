@@ -1,23 +1,23 @@
 "use client";
 
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { changePassword, resetPassword, sendPassword } from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
-import { handleServerActionResponse } from "@/lib/client-utils";
-import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs =
   | {
@@ -175,95 +175,95 @@ export function SetPasswordForm({
     <>
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
-      <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
-        {codeRequired && (
-          <Alert type={AlertType.INFO}>
-            <div className="flex flex-row">
-              <span className="mr-auto flex-1 text-left">
-                <Translated i18nKey="set.noCodeReceived" namespace="password" />
-              </span>
-              <button
-                aria-label="Resend OTP Code"
-                disabled={loading}
-                type="button"
-                className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
-                onClick={() => {
-                  resendCode();
-                }}
-                data-testid="resend-button"
-              >
-                <Translated i18nKey="set.resend" namespace="password" />
-              </button>
+        <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
+          {codeRequired && (
+            <Alert type={AlertType.INFO}>
+              <div className="flex flex-row">
+                <span className="mr-auto flex-1 text-left">
+                  <Translated i18nKey="set.noCodeReceived" namespace="password" />
+                </span>
+                <button
+                  aria-label="Resend OTP Code"
+                  disabled={loading}
+                  type="button"
+                  className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
+                  onClick={() => {
+                    resendCode();
+                  }}
+                  data-testid="resend-button"
+                >
+                  <Translated i18nKey="set.resend" namespace="password" />
+                </button>
+              </div>
+            </Alert>
+          )}
+          {codeRequired && (
+            <div>
+              <TextInput
+                type="text"
+                autoFocus
+                required
+                {...register("code", {
+                  required: t("set.required.code"),
+                })}
+                label={t("set.labels.code")}
+                autoComplete="one-time-code"
+                error={errors.code?.message as string}
+                data-testid="code-text-input"
+              />
             </div>
-          </Alert>
-        )}
-        {codeRequired && (
+          )}
           <div>
             <TextInput
-              type="text"
-              autoFocus
+              type="password"
+              autoComplete="new-password"
+              autoFocus={!codeRequired}
               required
-              {...register("code", {
-                required: t("set.required.code"),
+              {...register("password", {
+                required: t("set.required.newPassword"),
               })}
-              label={t("set.labels.code")}
-              autoComplete="one-time-code"
-              error={errors.code?.message as string}
-              data-testid="code-text-input"
+              label={t("set.labels.newPassword")}
+              error={errors.password?.message as string}
+              data-testid="password-set-text-input"
             />
           </div>
+          <div>
+            <TextInput
+              type="password"
+              required
+              autoComplete="new-password"
+              {...register("confirmPassword", {
+                required: t("set.required.confirmPassword"),
+              })}
+              label={t("set.labels.confirmPassword")}
+              error={errors.confirmPassword?.message as string}
+              data-testid="password-set-confirm-text-input"
+            />
+          </div>
+        </div>
+
+        {passwordComplexitySettings && (
+          <PasswordComplexity
+            passwordComplexitySettings={passwordComplexitySettings}
+            password={watchPassword}
+            equals={!!watchPassword && watchPassword === watchConfirmPassword}
+          />
         )}
-        <div>
-          <TextInput
-            type="password"
-            autoComplete="new-password"
-            autoFocus={!codeRequired}
-            required
-            {...register("password", {
-              required: t("set.required.newPassword"),
-            })}
-            label={t("set.labels.newPassword")}
-            error={errors.password?.message as string}
-            data-testid="password-set-text-input"
-          />
+
+        {error && <Alert>{error}</Alert>}
+
+        <div className="mt-8 flex w-full flex-row items-center justify-between">
+          <BackButton data-testid="back-button" />
+          <Button
+            type="submit"
+            variant={ButtonVariants.Primary}
+            disabled={loading || !policyIsValid || !formState.isValid || watchPassword !== watchConfirmPassword}
+            onClick={handleSubmit(submitPassword)}
+            data-testid="submit-button"
+          >
+            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="password" />
+          </Button>
         </div>
-        <div>
-          <TextInput
-            type="password"
-            required
-            autoComplete="new-password"
-            {...register("confirmPassword", {
-              required: t("set.required.confirmPassword"),
-            })}
-            label={t("set.labels.confirmPassword")}
-            error={errors.confirmPassword?.message as string}
-            data-testid="password-set-confirm-text-input"
-          />
-        </div>
-      </div>
-
-      {passwordComplexitySettings && (
-        <PasswordComplexity
-          passwordComplexitySettings={passwordComplexitySettings}
-          password={watchPassword}
-          equals={!!watchPassword && watchPassword === watchConfirmPassword}
-        />
-      )}
-
-      {error && <Alert>{error}</Alert>}
-
-      <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <BackButton data-testid="back-button" />
-        <Button
-          type="submit"
-          variant={ButtonVariants.Primary}
-          disabled={loading || !policyIsValid || !formState.isValid || watchPassword !== watchConfirmPassword}
-          onClick={handleSubmit(submitPassword)}
-          data-testid="submit-button"
-        >
-          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="password" />
-        </Button>
-      </div>
       </form>
     </>
   );

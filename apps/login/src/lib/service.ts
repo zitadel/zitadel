@@ -6,8 +6,8 @@ import { SAMLService } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { systemAPIToken, loginServiceKeyToken } from "./api";
-import { hasSystemUserCredentials, hasLoginServiceKey, hasServiceUserToken } from "./deployment";
+import { loginServiceKeyToken, systemAPIToken } from "./api";
+import { hasLoginServiceKey, hasServiceUserToken, hasSystemUserCredentials } from "./deployment";
 import { createServerTransport, ServiceConfig } from "./zitadel";
 
 type ServiceClass =
