@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { render } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { Card } from "./card";
 
 describe("Card Component", () => {

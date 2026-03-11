@@ -1,17 +1,17 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { shouldEnforceMFA } from "./verify-helper";
-import { cookies } from "next/headers";
-import { getFingerprintIdCookie } from "./fingerprint";
 import crypto from "crypto";
+import { cookies } from "next/headers";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { getFingerprintIdCookie } from "./fingerprint";
+import { shouldEnforceMFA } from "./verify-helper";
 
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import {
-  checkPasswordChangeRequired,
-  checkEmailVerified,
   checkEmailVerification,
+  checkEmailVerified,
   checkMFAFactors,
+  checkPasswordChangeRequired,
   checkUserVerification,
 } from "./verify-helper";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 // Mock function to create timestamps - following the same pattern as session.test.ts
 function createMockTimestamp(offsetMs = 3600000): any {

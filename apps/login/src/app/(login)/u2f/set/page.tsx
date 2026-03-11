@@ -23,14 +23,15 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: {
+  const sessionFactors = await loadMostRecentSession({
+    serviceConfig,
+    sessionParams: {
       loginName,
       organization,
     },
   });
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
   return (
     <DynamicTheme branding={branding}>

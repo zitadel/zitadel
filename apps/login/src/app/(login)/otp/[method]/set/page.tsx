@@ -26,12 +26,12 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
-  const loginSettings = await getLoginSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization });
 
-  const session = await loadMostRecentSession({ serviceConfig, sessionParams: {
+  const session = await loadMostRecentSession({
+    serviceConfig,
+    sessionParams: {
       loginName,
       organization,
     },
@@ -40,8 +40,7 @@ export default async function Page(props: {
   let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
-      await registerTOTP({ serviceConfig, userId: session.factors.user.id,
-      })
+      await registerTOTP({ serviceConfig, userId: session.factors.user.id })
         .then((resp) => {
           if (resp) {
             totpResponse = resp;
@@ -51,14 +50,12 @@ export default async function Page(props: {
           error = err;
         });
     } else if (method === "sms") {
-      await addOTPSMS({ serviceConfig, userId: session.factors.user.id,
-      }).catch((_error) => {
+      await addOTPSMS({ serviceConfig, userId: session.factors.user.id }).catch((_error) => {
         // TODO: Throw this error?
         new Error("Could not add OTP via SMS");
       });
     } else if (method === "email") {
-      await addOTPEmail({ serviceConfig, userId: session.factors.user.id,
-      }).catch((_error) => {
+      await addOTPEmail({ serviceConfig, userId: session.factors.user.id }).catch((_error) => {
         // TODO: Throw this error?
         new Error("Could not add OTP via Email");
       });

@@ -1,8 +1,6 @@
 import { Client, create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
-import { otelGrpcInterceptor } from "./grpc/interceptors/otel";
-import { createLogger } from "./logger";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { OrganizationSchema, TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest, OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
@@ -34,6 +32,8 @@ import {
 import { getTranslations } from "next-intl/server";
 import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getUserAgent } from "./fingerprint";
+import { otelGrpcInterceptor } from "./grpc/interceptors/otel";
+import { createLogger } from "./logger";
 
 import { createServiceForHost } from "./service";
 

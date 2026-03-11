@@ -13,6 +13,4 @@ export interface GrpcError extends Error {
   readonly code?: number;
 }
 
-export type Interceptor<T = unknown> = (
-  next: (req: GrpcRequest) => Promise<T>,
-) => (req: GrpcRequest) => Promise<T>;
+export type Interceptor<T = unknown> = (next: (req: GrpcRequest) => Promise<T>) => (req: GrpcRequest) => Promise<T>;

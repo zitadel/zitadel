@@ -14,47 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type projectRelationalProjection struct{}
-
-func (*projectRelationalProjection) Name() string {
-	return "zitadel.projects"
-}
-
-func newProjectRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(projectRelationalProjection))
-}
-
-func (p *projectRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: project.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  project.ProjectAddedType,
-					Reduce: p.reduceProjectAdded,
-				},
-				{
-					Event:  project.ProjectChangedType,
-					Reduce: p.reduceProjectChanged,
-				},
-				{
-					Event:  project.ProjectDeactivatedType,
-					Reduce: p.reduceProjectDeactivated,
-				},
-				{
-					Event:  project.ProjectReactivatedType,
-					Reduce: p.reduceProjectReactivated,
-				},
-				{
-					Event:  project.ProjectRemovedType,
-					Reduce: p.reduceProjectRemoved,
-				},
-			},
-		},
-	}
-}
-
-func (p *projectRelationalProjection) reduceProjectAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceProjectAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInternalf(nil, "HANDL-Oox5e", "reduce.wrong.event.type %s", project.ProjectAddedType)
@@ -81,7 +41,7 @@ func (p *projectRelationalProjection) reduceProjectAdded(event eventstore.Event)
 	}), nil
 }
 
-func (p *projectRelationalProjection) reduceProjectChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceProjectChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectChangeEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Oox5e", "reduce.wrong.event.type %s", project.ProjectChangedType)
@@ -121,7 +81,7 @@ func (p *projectRelationalProjection) reduceProjectChanged(event eventstore.Even
 	}), nil
 }
 
-func (p *projectRelationalProjection) reduceProjectDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceProjectDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectDeactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Oox5e", "reduce.wrong.event.type %s", project.ProjectDeactivatedType)
@@ -141,7 +101,7 @@ func (p *projectRelationalProjection) reduceProjectDeactivated(event eventstore.
 	}), nil
 }
 
-func (p *projectRelationalProjection) reduceProjectReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceProjectReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectReactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-oof4U", "reduce.wrong.event.type %s", project.ProjectReactivatedType)
@@ -161,7 +121,7 @@ func (p *projectRelationalProjection) reduceProjectReactivated(event eventstore.
 	}), nil
 }
 
-func (p *projectRelationalProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Xae7w", "reduce.wrong.event.type %s", project.ProjectRemovedType)

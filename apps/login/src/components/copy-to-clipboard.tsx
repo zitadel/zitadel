@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ClipboardDocumentCheckIcon,
-  ClipboardIcon,
-} from "@heroicons/react/20/solid";
+import { ClipboardDocumentCheckIcon, ClipboardIcon } from "@heroicons/react/20/solid";
 import copy from "copy-to-clipboard";
 import { useEffect, useState } from "react";
 
@@ -30,11 +27,7 @@ export function CopyToClipboard({ value }: Props) {
         className="text-primary-light-500 dark:text-primary-dark-500"
         onClick={() => setCopied(true)}
       >
-        {!copied ? (
-          <ClipboardIcon className="h-5 w-5" />
-        ) : (
-          <ClipboardDocumentCheckIcon className="h-5 w-5" />
-        )}
+        {!copied ? <ClipboardIcon className="h-5 w-5" /> : <ClipboardDocumentCheckIcon className="h-5 w-5" />}
       </button>
     </div>
   );

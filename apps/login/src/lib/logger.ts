@@ -60,10 +60,7 @@ export const logger = winston.createLogger({
  * @param metadata - Optional additional metadata to include in all log messages
  * @returns A child logger instance
  */
-export function createLogger(
-  context: string,
-  metadata?: Record<string, unknown>,
-): winston.Logger {
+export function createLogger(context: string, metadata?: Record<string, unknown>): winston.Logger {
   return logger.child({ context, ...metadata });
 }
 
