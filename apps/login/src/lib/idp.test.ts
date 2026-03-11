@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { idpTypeToSlug, idpTypeToIdentityProviderType } from "./idp";
 import { IDPType } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { describe, expect, it } from "vitest";
+import { idpTypeToIdentityProviderType, idpTypeToSlug } from "./idp";
 
 describe("idp type mapping utilities", () => {
   describe("idpTypeToSlug", () => {

@@ -3,8 +3,8 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SetPasswordForm } from "@/components/set-password-form";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceConfig } from "@/lib/service-url";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -14,12 +14,12 @@ import {
   getUserByID,
   searchUsers,
 } from "@/lib/zitadel";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("password");

@@ -1,8 +1,8 @@
 "use client";
 
 import { ColorShade, getColorHash } from "@/helpers/colors";
-import { useTheme } from "next-themes";
 import { getComponentRoundness } from "@/lib/theme";
+import { useTheme } from "next-themes";
 
 interface AvatarProps {
   name: string | null | undefined;

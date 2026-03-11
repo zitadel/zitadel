@@ -130,7 +130,7 @@ func (c *Commands) HumanAddPasswordlessSetup(ctx context.Context, userID, resour
 }
 
 func (c *Commands) HumanAddPasswordlessSetupInitCode(ctx context.Context, userID, resourceowner, codeID, verificationCode string, preferredPlatformType domain.AuthenticatorAttachment, passwordlessCodeGenerator crypto.Generator) (*domain.WebAuthNToken, error) {
-	err := c.humanVerifyPasswordlessInitCode(ctx, userID, resourceowner, codeID, verificationCode, passwordlessCodeGenerator)
+	err := c.humanVerifyPasswordlessInitCode(ctx, userID, resourceowner, codeID, verificationCode, passwordlessCodeGenerator.Alg())
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +212,7 @@ func (c *Commands) HumanVerifyU2FSetup(ctx context.Context, userID, resourceowne
 }
 
 func (c *Commands) HumanPasswordlessSetupInitCode(ctx context.Context, userID, resourceowner, tokenName, userAgentID, codeID, verificationCode string, credentialData []byte, passwordlessCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
-	err := c.humanVerifyPasswordlessInitCode(ctx, userID, resourceowner, codeID, verificationCode, passwordlessCodeGenerator)
+	err := c.humanVerifyPasswordlessInitCode(ctx, userID, resourceowner, codeID, verificationCode, passwordlessCodeGenerator.Alg())
 	if err != nil {
 		return nil, err
 	}
@@ -569,7 +569,7 @@ func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, re
 	return err
 }
 
-func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, resourceOwner, codeID, verificationCode string, passwordlessCodeGenerator crypto.Generator) error {
+func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, resourceOwner, codeID, verificationCode string, alg crypto.EncryptionAlgorithm) error {
 	if userID == "" || codeID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
 	}
@@ -578,7 +578,7 @@ func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, 
 	if err != nil {
 		return err
 	}
-	err = crypto.VerifyCode(initCode.ChangeDate, initCode.Expiration, initCode.CryptoCode, verificationCode, passwordlessCodeGenerator.Alg())
+	err = crypto.VerifyCode(initCode.CodeCreationDate, initCode.CodeExpiration, initCode.CryptoCode, verificationCode, alg)
 	if err != nil || initCode.State != domain.PasswordlessInitCodeStateActive {
 		userAgg := UserAggregateFromWriteModel(&initCode.WriteModel)
 		_, err = c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, codeID))

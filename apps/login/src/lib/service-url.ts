@@ -1,7 +1,7 @@
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import { NextRequest } from "next/server";
-import { ServiceConfig } from "./zitadel";
 import { getInstanceHost, getPublicHost } from "./server/host";
+import { ServiceConfig } from "./zitadel";
 
 /**
  * Extracts the service URL based on deployment mode and configuration.
