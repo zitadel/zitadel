@@ -87,6 +87,7 @@ async function run() {
 
 
     // Use spawn (async) instead of spawnSync to avoid blocking the event loop
+    // eslint-disable-next-line no-async-promise-executor
     await new Promise(async (resolvePromise, rejectPromise) => {
         // Dynamic discovery of excluded paths
         const getExcludedPaths = async () => {

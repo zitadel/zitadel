@@ -341,58 +341,39 @@ export function hashCode(str: string, seed = 0): number {
 
 export function getMembershipColor(role: string): ColorShade {
   const hash = hashCode(role);
-  let color = COLORS[hash % COLORS.length];
-
   switch (role) {
     case "IAM_OWNER":
-      color = COLORS[0];
-      break;
+      return COLORS[0];
     case "IAM_OWNER_VIEWER":
-      color = COLORS[14];
-      break;
+      return COLORS[14];
     case "IAM_ORG_MANAGER":
-      color = COLORS[11];
-      break;
+      return COLORS[11];
     case "IAM_USER_MANAGER":
-      color = COLORS[8];
-      break;
+      return COLORS[8];
 
     case "ORG_OWNER":
-      color = COLORS[16];
-      break;
+      return COLORS[16];
     case "ORG_USER_MANAGER":
-      color = COLORS[8];
-      break;
+      return COLORS[8];
     case "ORG_OWNER_VIEWER":
-      color = COLORS[14];
-      break;
+      return COLORS[14];
     case "ORG_USER_PERMISSION_EDITOR":
-      color = COLORS[7];
-      break;
+      return COLORS[7];
     case "ORG_PROJECT_PERMISSION_EDITOR":
-      color = COLORS[11];
-      break;
+      return COLORS[11];
     case "ORG_PROJECT_CREATOR":
-      color = COLORS[12];
-      break;
+      return COLORS[12];
 
     case "PROJECT_OWNER":
-      color = COLORS[9];
-      break;
+      return COLORS[9];
     case "PROJECT_OWNER_VIEWER":
-      color = COLORS[10];
-      break;
+      return COLORS[10];
     case "PROJECT_OWNER_GLOBAL":
-      color = COLORS[11];
-      break;
+      return COLORS[11];
     case "PROJECT_OWNER_VIEWER_GLOBAL":
-      color = COLORS[12];
-      break;
+      return COLORS[12];
 
     default:
-      color = COLORS[hash % COLORS.length];
-      break;
+      return COLORS[hash % COLORS.length];
   }
-
-  return color;
 }

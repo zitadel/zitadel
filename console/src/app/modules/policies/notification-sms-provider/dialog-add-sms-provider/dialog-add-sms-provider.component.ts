@@ -48,7 +48,7 @@ export class DialogAddSMSProviderComponent {
     });
 
     this.smsProviders = data.smsProviders;
-    if (!!this.twilio) {
+    if (this.twilio) {
       this.twilioForm.patchValue(this.twilio);
     } else {
       this.twilioForm.addControl('token', new FormControl('', requiredValidator));

@@ -35,7 +35,6 @@ function getDefaultCardStyling(): string {
   return appearance?.card || "shadow-sm border-0"; // Fallback to material design
 }
 
-// eslint-disable-next-line react/display-name
 export const Card = forwardRef<HTMLDivElement, CardProps>(
   (
     {
