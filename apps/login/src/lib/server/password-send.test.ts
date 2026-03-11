@@ -113,7 +113,10 @@ describe("sendPassword", () => {
     });
 
     // 3. Login settings
-    mockGetLoginSettings.mockResolvedValue({ passwordCheckLifetime: { seconds: BigInt(86400) }, allowLocalAuthentication: true });
+    mockGetLoginSettings.mockResolvedValue({
+      passwordCheckLifetime: { seconds: BigInt(86400) },
+      allowLocalAuthentication: true,
+    });
 
     // 4. Create session success
     mockCreateSessionAndUpdateCookie.mockResolvedValue({

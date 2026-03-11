@@ -1,10 +1,10 @@
 "use client";
 
+import { APPEARANCE_STYLES, getComponentRoundness, getThemeConfig } from "@/lib/theme";
 import { clsx } from "clsx";
 import { Loader2Icon } from "lucide-react";
 import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from "react";
 import { useFormStatus } from "react-dom";
-import { getComponentRoundness, getThemeConfig, APPEARANCE_STYLES } from "@/lib/theme";
 
 export type SignInWithIdentityProviderProps = DetailedHTMLProps<
   ButtonHTMLAttributes<HTMLButtonElement>,

@@ -367,6 +367,12 @@ func AddNoOpStatement() func(eventstore.Event) Exec {
 	}
 }
 
+func AddStatement(e Exec) func(eventstore.Event) Exec {
+	return func(event eventstore.Event) Exec {
+		return NewStatement(event, e).Execute
+	}
+}
+
 func AddCreateStatement(columns []Column, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
 		return NewCreateStatement(event, columns, opts...).Execute

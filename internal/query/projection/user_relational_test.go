@@ -17,7 +17,7 @@ import (
 )
 
 func TestUserRelationalProjection_Reducers(t *testing.T) {
-	handler := &userRelationalProjection{}
+	handler := &relationalTablesProjection{}
 	rawTx, tx := getTransactions(t)
 	t.Cleanup(func() {
 		require.NoError(t, rawTx.Rollback())
