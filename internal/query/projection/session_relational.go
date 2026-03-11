@@ -5,13 +5,11 @@ import (
 	"database/sql"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
-	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/session"
-	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -430,63 +428,6 @@ func (p *relationalTablesProjection) reduceSessionTerminated(event eventstore.Ev
 
 		sessionRepo := repository.SessionRepository()
 		condition := sessionRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID)
-		_, _, err := sessionRepo.Delete(ctx, v3Tx, condition, nil)
-		return err
-	}), nil
-}
-
-func (p *relationalTablesProjection) reducePasswordChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, err := assertEvent[*user.HumanPasswordChangedEvent](event)
-	if err != nil {
-		return nil, err
-	}
-
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
-		}
-		v3Tx := v3_sql.SQLTx(tx)
-
-		sessionRepo := repository.SessionRepository()
-		condition := database.And(
-			sessionRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-			sessionRepo.UserIDCondition(e.Aggregate().ID),
-			sessionRepo.ExistsFactor(
-				database.And(
-					sessionRepo.FactorConditions().FactorTypeCondition(domain.SessionFactorTypePassword),
-					sessionRepo.FactorConditions().LastVerifiedBeforeCondition(e.CreatedAt()),
-				),
-			),
-		)
-		_, err = sessionRepo.Update(ctx, v3Tx, condition,
-			sessionRepo.SetUpdatedAt(e.CreatedAt()),
-			sessionRepo.ClearFactor(domain.SessionFactorTypePassword),
-		)
-		return err
-	}), nil
-}
-
-func (p *relationalTablesProjection) reduceUserStateNotActive(event eventstore.Event) (*handler.Statement, error) {
-	switch t := event.(type) {
-	case *user.UserDeactivatedEvent, *user.UserLockedEvent:
-		// ok
-	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-XBglbF", "reduce.wrong.event.type %v", t)
-	}
-
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-fcxV68", "reduce.wrong.db.pool %T", ex)
-		}
-		v3Tx := v3_sql.SQLTx(tx)
-
-		sessionRepo := repository.SessionRepository()
-		condition := database.And(
-			sessionRepo.InstanceIDCondition(event.Aggregate().InstanceID),
-			sessionRepo.UserIDCondition(event.Aggregate().ID),
-		)
 		_, _, err := sessionRepo.Delete(ctx, v3Tx, condition, nil)
 		return err
 	}), nil
