@@ -15,6 +15,7 @@ export default [
       "cypress/**",
       "acceptance/**",
       "integration/**",
+      "vitest.config*.ts",
       "next-env.d.ts",
     ],
   },
