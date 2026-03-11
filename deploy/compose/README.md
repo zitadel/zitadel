@@ -22,7 +22,7 @@
           └──────────────┘
 ```
 
-Optional services via profiles: `redis` (`cache`), `otel-collector` (`observability`).
+Optional services via profiles: `redis` (`cache`), `otel-collector` (`observability`), `ollama` + `zitadel-ml` (`ai`).
 
 ## File Conventions
 
@@ -78,6 +78,66 @@ Local NX targets for testing the compose stack:
 | `test` | Lightweight — delegates to `test-config` only. Safe for `nx affected` | No |
 | `test-full` | Full pipeline: `test-config` → `test-run` → Playwright wiring + browser tests → teardown | Yes |
 | `stop` | Tears down the `zitadel-compose-test` stack and removes volumes | Yes |
+
+## AI profile
+
+The optional `ai` profile starts:
+
+- `ollama` for local SLM/LLM inference
+- `ollama-pull-model` to pull the configured model once Ollama is healthy
+- `zitadel-ml` as the placeholder ML service for future ONNX-backed inference
+
+Suggested first-run flow:
+
+1. copy `.env.example` to `.env`
+2. change `ZITADEL_SYSTEMDEFAULTS_RISK_ENABLED=true`
+3. change `ZITADEL_SYSTEMDEFAULTS_RISK_LLM_MODE=observe`
+4. start with `docker compose --env-file .env --profile ai up -d --wait`
+
+Or use the single Nx command that builds everything and starts the stack:
+
+```
+pnpm nx run @zitadel/compose:start-ai
+```
+
+`start-ai` recreates the `zitadel-dev` volumes before startup because the dev stack boots ZITADEL with `start-from-init`; rerunning against an old PostgreSQL volume can otherwise leave the API in a restart loop during bootstrap.
+
+This keeps the base stack unchanged while letting the embedded API risk evaluator call Ollama directly. The default model (`qwen2.5:7b`) is Apache 2.0 and has no restrictions on automated decisions, so you can switch to `enforce` mode once you've validated its output quality.
+
+### Verifying Risk Signals
+
+When the signal store is enabled (`ZITADEL_SYSTEMDEFAULTS_RISK_SIGNALSTORE_ENABLED=true` in
+`docker-compose.dev.yml`), ZITADEL persists behavioral signals to PostgreSQL.
+
+After performing a login flow, verify signals are being written:
+
+```bash
+# Check signal partitions exist
+docker exec zitadel-dev-postgres-1 psql -U zitadel -d zitadel -c \
+  "SELECT schemaname, tablename FROM pg_tables WHERE schemaname = 'signals' ORDER BY tablename;"
+
+# Query recent signals
+docker exec zitadel-dev-postgres-1 psql -U zitadel -d zitadel -c \
+  "SELECT stream, operation, outcome, ip, created_at FROM signals.signals ORDER BY created_at DESC LIMIT 10;"
+
+# Count signals by stream
+docker exec zitadel-dev-postgres-1 psql -U zitadel -d zitadel -c \
+  "SELECT stream, count(*) FROM signals.signals GROUP BY stream;"
+```
+
+Expected streams after a login:
+- `auth` — session create/set events from the login flow
+- `request` — V2 API calls captured by the Connect interceptor
+
+Signal store configuration (all optional, shown with defaults):
+
+| Env Var | Default | Description |
+|---------|---------|-------------|
+| `ZITADEL_SYSTEMDEFAULTS_RISK_SIGNALSTORE_ENABLED` | `false` | Enable persistent signal storage |
+| `ZITADEL_SYSTEMDEFAULTS_RISK_SIGNALSTORE_MODE` | `pg` | Write target: `pg` (direct) or `redis` (hot tier) |
+| `ZITADEL_SYSTEMDEFAULTS_RISK_RATELIMIT_MODE` | `memory` | Rate-limit backend: `memory`, `redis`, or `pg` (`redis`/`pg` downgrade to memory with warning if unavailable at startup) |
+| `ZITADEL_SYSTEMDEFAULTS_RISK_CAPTCHA_ENABLED` | `false` | Enable risk-based captcha challenges |
+| `ZITADEL_SYSTEMDEFAULTS_RISK_CAPTCHA_PROVIDER` | `turnstile` | Captcha provider: `turnstile`, `hcaptcha`, `recaptcha` |
 
 ## Rejected Alternatives
 

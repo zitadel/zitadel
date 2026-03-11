@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -56,5 +57,39 @@ func VerifyGrant(databaseName, username string) func(context.Context, *database.
 		logging.Info(ctx, "verify grant", "user", username, "database", databaseName)
 
 		return exec(ctx, db, fmt.Sprintf(grantStmt, databaseName, username), nil)
+	}
+}
+
+// GrantPublicSchemaCreate grants CREATE ON SCHEMA public to the given user
+// in the target database. This is needed because DuckLake's postgres extension
+// creates catalog tables (ducklake_metadata, etc.) in the public schema, and
+// PostgreSQL 15+ no longer grants CREATE ON SCHEMA public to all users.
+//
+// The admin connection (db) targets the admin database, but the grant must
+// execute on the ZITADEL database where the public schema lives. A temporary
+// pool is created by copying the admin credentials and switching the database.
+func GrantPublicSchemaCreate(databaseName, username string) func(context.Context, *database.DB) error {
+	return func(ctx context.Context, db *database.DB) error {
+		if db.Pool == nil {
+			return errors.New("grant public schema: admin pool not available")
+		}
+
+		// Copy the admin pool config and retarget to the ZITADEL database.
+		cfg := db.Pool.Config().Copy()
+		cfg.ConnConfig.Database = databaseName
+
+		pool, err := pgxpool.NewWithConfig(ctx, cfg)
+		if err != nil {
+			return fmt.Errorf("grant public schema: connect to %s: %w", databaseName, err)
+		}
+		defer pool.Close()
+
+		stmt := fmt.Sprintf(`GRANT CREATE ON SCHEMA public TO "%s"`, username)
+		logging.Info(ctx, "verify public schema grant for DuckLake", "user", username, "database", databaseName)
+
+		if _, err := pool.Exec(ctx, stmt); err != nil {
+			return fmt.Errorf("grant CREATE ON SCHEMA public to %s: %w", username, err)
+		}
+		return nil
 	}
 }

@@ -69,6 +69,7 @@ import (
 	session_v2beta "github.com/zitadel/zitadel/internal/api/grpc/session/v2beta"
 	settings_v2 "github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
 	settings_v2beta "github.com/zitadel/zitadel/internal/api/grpc/settings/v2beta"
+	signal_v2 "github.com/zitadel/zitadel/internal/api/grpc/signal/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
 	user_v2 "github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
@@ -114,6 +115,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/serviceping"
+	"github.com/zitadel/zitadel/internal/signals"
 	"github.com/zitadel/zitadel/internal/static"
 	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
 	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
@@ -199,7 +201,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return err
 	}
 
-	config.Eventstore.Pusher = new_es.NewEventstore(dbClient, new_es.WithExecutionQueueOption(q))
+	esPusher := new_es.NewEventstore(dbClient, new_es.WithExecutionQueueOption(q))
+	config.Eventstore.Pusher = esPusher
 	config.Eventstore.Searcher = new_es.NewEventstore(dbClient, new_es.WithExecutionQueueOption(q))
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
@@ -290,6 +293,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.DefaultInstance.SecretGenerators,
 		config.Login.DefaultPaths,
 		config.Executions.DenyList,
+		dbClient.Pool.Config().ConnString(),
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -352,6 +356,17 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return err
 	}
 
+	if rt := commands.DetectionRuntime(); rt != nil {
+		// register DuckLake compaction worker
+		signals.RegisterCompactionWorker(ctx, q, rt.CompactionWorker())
+
+		// Hook into the eventstore Push path: every committed event is
+		// emitted as a signal on the "events" stream, fire-and-forget.
+		if emitter := rt.Emitter(); emitter != nil {
+			esPusher.SetSignalHook(signals.NewEventSignalHook(emitter))
+		}
+	}
+
 	if err = q.Start(ctx); err != nil {
 		return err
 	}
@@ -359,6 +374,11 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	// the scheduler / periodic jobs need to be started after the queue already runs
 	if err = serviceping.Start(ctx, config.ServicePing, q); err != nil {
 		return err
+	}
+
+	if rt := commands.DetectionRuntime(); rt != nil {
+		// start DuckLake compaction periodic job
+		signals.StartCompactionSchedule(ctx, q, rt.CompactionWorker())
 	}
 
 	router := mux.NewRouter()
@@ -467,6 +487,29 @@ func startAPIs(
 	)
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
 	translator := i18n.NewZitadelTranslator(language.English)
+	// Resolve signal emitter and stream config for request-level signal capture.
+	var signalEmitter *signals.Emitter
+	streamsConfig := config.SystemDefaults.Risk.SignalStore.Streams
+	if rt := commands.DetectionRuntime(); rt != nil {
+		signalEmitter = rt.Emitter()
+	}
+	// Apply stream defaults: if neither stream is explicitly enabled, enable all.
+	effectiveStreams := signals.StreamsConfig{API: streamsConfig.API, HTTPAccess: streamsConfig.HTTPAccess}.WithDefaults()
+	// HTTP-level signal middleware covers OIDC, SAML, login UI and all non-gRPC paths.
+	var httpSignalMiddleware func(http.Handler) http.Handler
+	if signalEmitter != nil && effectiveStreams.HTTPAccess {
+		httpSignalMiddleware = signals.SignalHTTPMiddleware(signalEmitter, config.SystemDefaults.Risk.GeoCountryHeader)
+	}
+	// Wire HTTP signal middleware onto the router before API registration.
+	if httpSignalMiddleware != nil {
+		router.Use(mux.MiddlewareFunc(httpSignalMiddleware))
+	}
+	// Pass nil emitter to API when API stream is disabled.
+	apiSignalEmitter := signalEmitter
+	if !effectiveStreams.API {
+		apiSignalEmitter = nil
+	}
+
 	apis, err := api.New(
 		ctx,
 		config.Port,
@@ -483,6 +526,8 @@ func startAPIs(
 		translator,
 		config.Instrumentation.Trace.TrustRemoteSpans,
 		config.Executions.DenyList,
+		apiSignalEmitter,
+		config.SystemDefaults.Risk.GeoCountryHeader,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
@@ -734,6 +779,15 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, saml_v2.CreateServer(commands, queries, samlProvider, config.ExternalSecure)); err != nil {
 		return nil, err
 	}
+	// Register Signal Service v2 when DuckLake store is available.
+	if rt := commands.DetectionRuntime(); rt != nil {
+		if signalServer := signal_v2.CreateServer(rt.DuckLakeStore()); signalServer != nil {
+			if err := apis.RegisterService(ctx, signalServer); err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
 	apis.RouteGRPC()
 	return apis, nil

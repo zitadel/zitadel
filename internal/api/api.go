@@ -29,6 +29,7 @@ import (
 	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/signals"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
@@ -59,6 +60,8 @@ type API struct {
 	translator                *i18n.Translator
 	connectOTELInterceptor    *otelconnect.Interceptor
 	actionV2DenyList          []denylist.AddressChecker
+	signalEmitter             *signals.Emitter
+	geoCountryHeader          string
 }
 
 func (a *API) ListGrpcServices() []string {
@@ -114,6 +117,8 @@ func New(
 	translator *i18n.Translator,
 	trustRemoteSpans bool,
 	deniedIPList []denylist.AddressChecker,
+	signalEmitter *signals.Emitter,
+	geoCountryHeader string,
 ) (_ *API, err error) {
 	api := &API{
 		port:                      port,
@@ -130,6 +135,8 @@ func New(
 		targetEncryptionAlgorithm: targetEncryptionAlgorithm,
 		translator:                translator,
 		actionV2DenyList:          deniedIPList,
+		signalEmitter:             signalEmitter,
+		geoCountryHeader:          geoCountryHeader,
 	}
 
 	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService(), targetEncryptionAlgorithm, api.translator, deniedIPList)
@@ -227,6 +234,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.ValidationHandler(),
 		connect_middleware.ServiceHandler(),
 		connect_middleware.ActivityInterceptor(),
+		signals.SignalConnectUnaryInterceptor(a.signalEmitter, a.geoCountryHeader),
 	)
 	methods := service.FileDescriptor().Services().Get(0).Methods()
 	methodNames := make([]string, methods.Len())

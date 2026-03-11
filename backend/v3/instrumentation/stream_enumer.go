@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _StreamName = "runtimereadyrequestevent_pusherevent_handlerqueue"
+const _StreamName = "runtimereadyrequestevent_pusherevent_handlerqueuerisk"
 
-var _StreamIndex = [...]uint8{0, 7, 12, 19, 31, 44, 49}
+var _StreamIndex = [...]uint8{0, 7, 12, 19, 31, 44, 49, 53}
 
-const _StreamLowerName = "runtimereadyrequestevent_pusherevent_handlerqueue"
+const _StreamLowerName = "runtimereadyrequestevent_pusherevent_handlerqueuerisk"
 
 func (i Stream) String() string {
 	if i < 0 || i >= Stream(len(_StreamIndex)-1) {
@@ -30,9 +30,10 @@ func _StreamNoOp() {
 	_ = x[StreamEventPusher-(3)]
 	_ = x[StreamEventHandler-(4)]
 	_ = x[StreamQueue-(5)]
+	_ = x[StreamRisk-(6)]
 }
 
-var _StreamValues = []Stream{StreamRuntime, StreamReady, StreamRequest, StreamEventPusher, StreamEventHandler, StreamQueue}
+var _StreamValues = []Stream{StreamRuntime, StreamReady, StreamRequest, StreamEventPusher, StreamEventHandler, StreamQueue, StreamRisk}
 
 var _StreamNameToValueMap = map[string]Stream{
 	_StreamName[0:7]:        StreamRuntime,
@@ -47,6 +48,8 @@ var _StreamNameToValueMap = map[string]Stream{
 	_StreamLowerName[31:44]: StreamEventHandler,
 	_StreamName[44:49]:      StreamQueue,
 	_StreamLowerName[44:49]: StreamQueue,
+	_StreamName[49:53]:      StreamRisk,
+	_StreamLowerName[49:53]: StreamRisk,
 }
 
 var _StreamNames = []string{
@@ -56,6 +59,7 @@ var _StreamNames = []string{
 	_StreamName[19:31],
 	_StreamName[31:44],
 	_StreamName[44:49],
+	_StreamName[49:53],
 }
 
 // StreamString retrieves an enum value from the enum constants string name.

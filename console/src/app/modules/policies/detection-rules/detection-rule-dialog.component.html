@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>
+  {{ (isEdit ? 'SETTING.DETECTION_RULES.EDIT_TITLE' : 'SETTING.DETECTION_RULES.CREATE_TITLE') | translate }}
+</h2>
+
+<mat-dialog-content>
+  <p class="cnsl-secondary-text">{{ 'SETTING.DETECTION_RULES.YAML_DESCRIPTION' | translate }}</p>
+
+  <ngx-codemirror
+    [ngModel]="yamlContent"
+    (ngModelChange)="onYamlChange($event)"
+    [options]="codemirrorOptions"
+  ></ngx-codemirror>
+
+  <p *ngIf="hasError" class="rule-yaml-error">{{ parseError }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions class="actions">
+  <button mat-stroked-button mat-dialog-close>
+    {{ 'ACTIONS.CANCEL' | translate }}
+  </button>
+  <button color="primary" mat-raised-button cdkFocusInitial (click)="closeWithResult()" [disabled]="hasError">
+    {{ (isEdit ? 'ACTIONS.CHANGE' : 'ACTIONS.CREATE') | translate }}
+  </button>
+</mat-dialog-actions>

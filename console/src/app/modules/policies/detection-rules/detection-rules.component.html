@@ -1,0 +1,133 @@
+<div class="spinner-wr">
+  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+</div>
+
+<div class="rules-header">
+  <div>
+    <h2>{{ 'DESCRIPTIONS.SETTINGS.DETECTION_RULES.TITLE' | translate }}</h2>
+    <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.DETECTION_RULES.DESCRIPTION' | translate }}</p>
+  </div>
+
+  <button
+    color="primary"
+    mat-raised-button
+    type="button"
+    (click)="openCreateDialog()"
+    [disabled]="loading || mutating || (canWrite$ | async) === false"
+  >
+    {{ 'SETTING.DETECTION_RULES.CREATE' | translate }}
+  </button>
+</div>
+
+<cnsl-info-section>
+  {{ 'SETTING.DETECTION_RULES.NOTE' | translate }}
+</cnsl-info-section>
+
+<cnsl-info-section *ngIf="!loading && rules.length === 0">
+  {{ 'SETTING.DETECTION_RULES.EMPTY' | translate }}
+</cnsl-info-section>
+
+<div class="rules-list">
+  <cnsl-card *ngFor="let rule of rules; trackBy: trackRule" [title]="rule.id" [description]="rule.description">
+    <div class="metadata-grid">
+      <div>
+        <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.ENGINE' | translate }}</span>
+        <span>{{ translationKeyForAction(rule.engine) | translate }}</span>
+      </div>
+
+      <div>
+        <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.PRIORITY' | translate }}</span>
+        <span>{{ rule.priority ?? 0 }}</span>
+      </div>
+
+      <div>
+        <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.STOP_ON_MATCH' | translate }}</span>
+        <span>
+          {{
+            (rule.stopOnMatch ? 'SETTING.DETECTION_RULES.STOP_ON_MATCH_ENABLED' : 'SETTING.DETECTION_RULES.STOP_ON_MATCH_DISABLED')
+              | translate
+          }}
+        </span>
+      </div>
+
+      <div *ngIf="rule.creationDate">
+        <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.CREATED_AT' | translate }}</span>
+        <span>{{ rule.creationDate | timestampToDate | date: 'medium' }}</span>
+      </div>
+
+      <div *ngIf="rule.changeDate">
+        <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.UPDATED_AT' | translate }}</span>
+        <span>{{ rule.changeDate | timestampToDate | date: 'medium' }}</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.EXPRESSION' | translate }}</span>
+      <pre>{{ rule.expr }}</pre>
+    </div>
+
+    <div class="section" *ngIf="rule.contextTemplate">
+      <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.CONTEXT_TEMPLATE' | translate }}</span>
+      <pre>{{ rule.contextTemplate }}</pre>
+    </div>
+
+    <div class="metadata-grid">
+      <div>
+        <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.FINDING_NAME' | translate }}</span>
+        <span>{{ rule.finding?.name || '—' }}</span>
+      </div>
+
+      <div>
+        <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.FINDING_BLOCK' | translate }}</span>
+        <span>
+          {{
+            (rule.finding?.block ? 'SETTING.DETECTION_RULES.BLOCKING_ENABLED' : 'SETTING.DETECTION_RULES.BLOCKING_DISABLED')
+              | translate
+          }}
+        </span>
+      </div>
+    </div>
+
+    <div class="section" *ngIf="rule.finding?.message">
+      <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.FINDING_MESSAGE' | translate }}</span>
+      <pre>{{ rule.finding?.message }}</pre>
+    </div>
+
+    <div class="metadata-grid" *ngIf="rule.rateLimit">
+      <div>
+        <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.RATE_LIMIT_KEY' | translate }}</span>
+        <span>{{ rule.rateLimit.key }}</span>
+      </div>
+      <div>
+        <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.RATE_LIMIT_WINDOW' | translate }}</span>
+        <span>{{ durationToSeconds(rule.rateLimit.window) }}s</span>
+      </div>
+      <div>
+        <span class="metadata-label">{{ 'SETTING.DETECTION_RULES.RATE_LIMIT_MAX' | translate }}</span>
+        <span>{{ rule.rateLimit.max }}</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="openEditDialog(rule)"
+        [disabled]="mutating || (canWrite$ | async) === false"
+      >
+        <mat-icon>edit</mat-icon>
+        {{ 'ACTIONS.EDIT' | translate }}
+      </button>
+      <button
+        color="warn"
+        mat-stroked-button
+        type="button"
+        (click)="confirmDelete(rule)"
+        [disabled]="mutating || (canDelete$ | async) === false"
+      >
+        <mat-icon>delete</mat-icon>
+        {{ 'ACTIONS.DELETE' | translate }}
+      </button>
+    </div>
+  </cnsl-card>
+</div>

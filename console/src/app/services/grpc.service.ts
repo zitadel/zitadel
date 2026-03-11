@@ -7,6 +7,7 @@ import { catchError, firstValueFrom, switchMap, tap } from 'rxjs';
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
 import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
 import { ManagementServiceClient } from '../proto/generated/zitadel/ManagementServiceClientPb';
+import { SignalServiceClient } from '../proto/generated/zitadel/signal/v2/Signal_serviceServiceClientPb';
 import { fallbackLanguage, supportedLanguagesRegexp } from '../utils/language';
 import { AuthenticationService } from './authentication.service';
 import { EnvironmentService } from './environment.service';
@@ -28,9 +29,11 @@ import { createClientFor } from '@zitadel/client';
 
 import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
 import { ActionService } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
+import { SettingsService } from '@zitadel/proto/zitadel/settings/v2/settings_service_pb';
 
 const createWebKeyServiceClient = createClientFor(WebKeyService);
 const createActionServiceClient = createClientFor(ActionService);
+const createSettingsServiceClient = createClientFor(SettingsService);
 
 @Injectable({
   providedIn: 'root',
@@ -40,11 +43,13 @@ export class GrpcService {
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;
   public user!: UserServiceClient;
+  public signal!: SignalServiceClient;
   public userNew!: ReturnType<typeof createUserServiceClient>;
   public session!: ReturnType<typeof createSessionServiceClient>;
   public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
   public authNew!: ReturnType<typeof createAuthServiceClient>;
   public featureNew!: ReturnType<typeof createFeatureServiceClient>;
+  public settingsNew!: ReturnType<typeof createSettingsServiceClient>;
   public actionNew!: ReturnType<typeof createActionServiceClient>;
   public webKey!: ReturnType<typeof createWebKeyServiceClient>;
   public organizationNew!: ReturnType<typeof createOrganizationServiceClient>;
@@ -87,6 +92,7 @@ export class GrpcService {
         this.mgmt = new ManagementServiceClient(env.api, null, interceptors);
         this.admin = new AdminServiceClient(env.api, null, interceptors);
         this.user = new UserServiceClient(env.api, null, interceptors);
+        this.signal = new SignalServiceClient(env.api, null, interceptors);
 
         const transport = createGrpcWebTransport({
           baseUrl: env.api,
@@ -104,6 +110,7 @@ export class GrpcService {
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);
         this.authNew = createAuthServiceClient(transportOldAPIs);
         this.featureNew = createFeatureServiceClient(transport);
+        this.settingsNew = createSettingsServiceClient(transport);
         this.actionNew = createActionServiceClient(transport);
         this.webKey = createWebKeyServiceClient(transport);
         this.organizationNew = createOrganizationServiceClient(transport);

@@ -248,6 +248,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s67SyncMemberRoleFields = &SyncMemberRoleFields{dbClient: dbClient}
 	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
 	steps.s69CacheTablesLogged = &CacheTablesLogged{dbClient: dbClient}
+	steps.s70SignalsSchema = &SignalsSchema{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	if err != nil {
@@ -305,6 +306,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s65FixUserMetadata5Index,
 		steps.s67SyncMemberRoleFields,
 		steps.s69CacheTablesLogged,
+		steps.s70SignalsSchema,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -576,6 +578,7 @@ func startCommandsQueries(
 		config.DefaultInstance.SecretGenerators,
 		config.Login.DefaultPaths,
 		config.Executions.DenyList,
+		"",
 	)
 	logging.OnError(ctx, err).Fatal("unable to start commands")
 

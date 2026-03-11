@@ -41,3 +41,7 @@ func NewSpanHTTP(r *http.Request) (*http.Request, *instrumentation.Span) {
 func TraceIDFromCtx(ctx context.Context) string {
 	return tracing.TraceIDFromCtx(ctx)
 }
+
+func SpanIDFromCtx(ctx context.Context) string {
+	return tracing.SpanIDFromCtx(ctx)
+}

@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package zitadel.settings.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "zitadel/object/v2/object.proto";
+
+enum DetectionRuleEngine {
+  DETECTION_RULE_ENGINE_UNSPECIFIED = 0;
+  DETECTION_RULE_ENGINE_BLOCK = 1;
+  DETECTION_RULE_ENGINE_RATE_LIMIT = 2;
+  DETECTION_RULE_ENGINE_LLM = 3;
+  DETECTION_RULE_ENGINE_LOG = 4;
+  DETECTION_RULE_ENGINE_CAPTCHA = 5;
+}
+
+message DetectionRuleFinding {
+  string name = 1;
+  string message = 2;
+  bool block = 3;
+}
+
+message DetectionRuleRateLimit {
+  string key = 1;
+  google.protobuf.Duration window = 2 [(validate.rules).duration = {gt: {seconds: 0}}];
+  uint32 max = 3;
+}
+
+message DetectionRule {
+  string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  google.protobuf.Timestamp creation_date = 2;
+  google.protobuf.Timestamp change_date = 3;
+  string description = 4;
+  string expr = 5 [(validate.rules).string = {min_len: 1}];
+  DetectionRuleEngine engine = 6 [(validate.rules).enum.defined_only = true];
+  DetectionRuleFinding finding = 7;
+  string context_template = 8;
+  DetectionRuleRateLimit rate_limit = 9;
+  int32 priority = 10;
+  bool stop_on_match = 11;
+}
+
+message ListDetectionRulesRequest {}
+
+message ListDetectionRulesResponse {
+  repeated DetectionRule rules = 1;
+}
+
+message GetDetectionRuleRequest {
+  string rule_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetDetectionRuleResponse {
+  DetectionRule rule = 1;
+}
+
+message CreateDetectionRuleRequest {
+  DetectionRule rule = 1 [(validate.rules).message.required = true];
+}
+
+message CreateDetectionRuleResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message UpdateDetectionRuleRequest {
+  string rule_id = 1 [(validate.rules).string.min_len = 1];
+  DetectionRule rule = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateDetectionRuleResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message DeleteDetectionRuleRequest {
+  string rule_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message DeleteDetectionRuleResponse {
+  zitadel.object.v2.Details details = 1;
+}

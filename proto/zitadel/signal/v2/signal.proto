@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package zitadel.signal.v2;
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/signal/v2;signal";
+
+// Signal is a single behavioral observation recorded during an auth operation.
+message Signal {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {title: "Signal" description: "A behavioral observation recorded during an auth operation."}
+  };
+
+  string instance_id = 1;
+  string user_id = 2;
+  string caller_id = 3;
+  string session_id = 4;
+  string fingerprint_id = 5;
+  string operation = 6;
+  string stream = 7;
+  string resource = 8;
+  string outcome = 9;
+  google.protobuf.Timestamp created_at = 10;
+  string ip = 11;
+  string user_agent = 12;
+  string accept_language = 13;
+  string country = 14;
+  string forwarded_chain = 15;
+  string referer = 16;
+  string sec_fetch_site = 17;
+  bool is_https = 18;
+  // Structured findings from detection engines (rule engine, LLM, rate limiter).
+  repeated Finding findings = 19;
+  // Raw event body for event-stream signals, or LLM context for llm-stream signals.
+  string payload = 20;
+  // OpenTelemetry trace ID that was active when this signal was emitted.
+  // Enables cross-stream correlation (e.g. request → LLM → event).
+  string trace_id = 21;
+  // OpenTelemetry span ID — identifies the specific operation within a trace.
+  string span_id = 22;
+}
+
+// Finding is a single detection outcome attached to a signal.
+message Finding {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {title: "Finding" description: "A detection outcome produced by a rule engine, LLM, or rate limiter."}
+  };
+
+  // Classification name (e.g. "llm_low_risk", "failure_burst", "rate_limit_exceeded").
+  string name = 1;
+  // Origin identifier (e.g. "rule:always-llm-test", "heuristic").
+  string source = 2;
+  // Human-readable explanation.
+  string message = 3;
+  // Model confidence in [0, 1]. Only set for LLM findings.
+  double confidence = 4;
+  // True when this finding caused the request to be blocked.
+  bool block = 5;
+  // True when this finding triggered a user challenge (e.g. captcha).
+  bool challenge = 6;
+  // Type of challenge required (e.g. "captcha", "otp").
+  string challenge_type = 7;
+}
+
+// SignalFilters narrows the signals returned by List or Aggregate.
+// The caller's instance is always applied automatically from the auth context.
+message SignalFilters {
+  string user_id = 1;
+  string session_id = 2;
+  string ip = 3;
+  string stream = 4;
+  string outcome = 5;
+  string operation = 6;
+  string country = 7;
+  // Filter by resource (e.g. aggregate type for events, "llm" for LLM signals).
+  string resource = 10;
+  // Substring match (ILIKE) against the payload field.
+  string payload = 11;
+  // Exact match on OpenTelemetry trace ID for cross-stream correlation.
+  string trace_id = 12;
+  // Exact match on OpenTelemetry span ID.
+  string span_id = 13;
+  // Only signals recorded after this time are returned.
+  optional google.protobuf.Timestamp after = 8;
+  // Only signals recorded before this time are returned.
+  optional google.protobuf.Timestamp before = 9;
+}
+
+// AggregationBucket is one bucket returned by AggregateSignals.
+message AggregationBucket {
+  string key = 1;
+  int64 count = 2;
+}

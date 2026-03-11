@@ -1,0 +1,94 @@
+<div class="spinner-wr">
+  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+</div>
+
+<h2>{{ 'DESCRIPTIONS.SETTINGS.DETECTION.TITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.DETECTION.DESCRIPTION' | translate }}</p>
+
+<cnsl-info-section>
+  {{ 'SETTING.DETECTION.NOTE' | translate }}
+</cnsl-info-section>
+
+<form class="settings-grid" [formGroup]="form">
+  <cnsl-card
+    [title]="'SETTING.DETECTION.RUNTIME_TITLE' | translate"
+    [description]="'SETTING.DETECTION.RUNTIME_DESCRIPTION' | translate"
+  >
+    <div class="checkbox-group">
+      <div class="checkbox-item">
+        <mat-checkbox color="primary" [formControl]="form.controls.enabled">
+          {{ 'SETTING.DETECTION.ENABLED' | translate }}
+        </mat-checkbox>
+        <span class="cnsl-secondary-text checkbox-hint">{{ 'SETTING.DETECTION.ENABLED_DESCRIPTION' | translate }}</span>
+      </div>
+      <mat-checkbox color="primary" [formControl]="form.controls.failOpen">
+        {{ 'SETTING.DETECTION.FAIL_OPEN' | translate }}
+      </mat-checkbox>
+    </div>
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'SETTING.DETECTION.FAILURE_BURST_THRESHOLD' | translate }}</cnsl-label>
+      <input cnslInput type="number" min="1" [formControl]="form.controls.failureBurstThreshold" />
+      <span class="cnsl-secondary-text" cnslHint>
+        {{ 'SETTING.DETECTION.FAILURE_BURST_THRESHOLD_HINT' | translate }}
+      </span>
+    </cnsl-form-field>
+  </cnsl-card>
+
+  <cnsl-card
+    [title]="'SETTING.DETECTION.WINDOWS_TITLE' | translate"
+    [description]="'SETTING.DETECTION.WINDOWS_DESCRIPTION' | translate"
+  >
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'SETTING.DETECTION.HISTORY_WINDOW' | translate }}</cnsl-label>
+      <input cnslInput type="number" min="1" [formControl]="form.controls.historyWindowSeconds" />
+      <span class="cnsl-secondary-text" cnslHint>
+        {{ 'SETTING.DETECTION.HISTORY_WINDOW_HINT' | translate }}
+      </span>
+    </cnsl-form-field>
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'SETTING.DETECTION.CONTEXT_CHANGE_WINDOW' | translate }}</cnsl-label>
+      <input cnslInput type="number" min="1" [formControl]="form.controls.contextChangeWindowSeconds" />
+      <span class="cnsl-secondary-text" cnslHint>
+        {{ 'SETTING.DETECTION.CONTEXT_CHANGE_WINDOW_HINT' | translate }}
+      </span>
+    </cnsl-form-field>
+  </cnsl-card>
+
+  <cnsl-card
+    [title]="'SETTING.DETECTION.CAPACITY_TITLE' | translate"
+    [description]="'SETTING.DETECTION.CAPACITY_DESCRIPTION' | translate"
+  >
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'SETTING.DETECTION.MAX_SIGNALS_PER_USER' | translate }}</cnsl-label>
+      <input cnslInput type="number" min="1" [formControl]="form.controls.maxSignalsPerUser" />
+      <span class="cnsl-secondary-text" cnslHint>
+        {{ 'SETTING.DETECTION.MAX_SIGNALS_PER_USER_HINT' | translate }}
+      </span>
+    </cnsl-form-field>
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'SETTING.DETECTION.MAX_SIGNALS_PER_SESSION' | translate }}</cnsl-label>
+      <input cnslInput type="number" min="1" [formControl]="form.controls.maxSignalsPerSession" />
+      <span class="cnsl-secondary-text" cnslHint>
+        {{ 'SETTING.DETECTION.MAX_SIGNALS_PER_SESSION_HINT' | translate }}
+      </span>
+    </cnsl-form-field>
+  </cnsl-card>
+</form>
+
+<div class="btn-container">
+  <button mat-stroked-button type="button" (click)="discard()" [disabled]="loading || saving || form.pristine">
+    {{ 'ACTIONS.DISCARD' | translate }}
+  </button>
+  <button
+    color="primary"
+    mat-raised-button
+    type="button"
+    (click)="save()"
+    [disabled]="loading || saving || form.invalid || form.pristine || (canWrite$ | async) === false"
+  >
+    {{ 'ACTIONS.SAVE' | translate }}
+  </button>
+</div>

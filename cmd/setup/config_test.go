@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/spf13/cobra"
@@ -237,6 +238,52 @@ Actions:
 					{Role: "ORG_OWNER", Permissions: []string{"org.write", "org.read"}},
 				},
 			})
+		},
+	}, {
+		name: "risk rule nested config ok",
+		args: args{yaml: `
+SystemDefaults:
+  Risk:
+    Enabled: true
+    FailureBurstThreshold: 3
+    HistoryWindow: 24h
+    ContextChangeWindow: 12h
+    MaxSignalsPerUser: 100
+    MaxSignalsPerSession: 50
+    Rules:
+      - id: fingerprint-flood
+        description: "Rate limit repeated device churn"
+        expr: 'DistinctFingerprints >= 3'
+        engine: rate_limit
+        context_template: 'User {{.Current.UserID}} changed devices'
+        rate_limit:
+          key: "fp-flood:{{.Current.UserID}}"
+          window: 5m
+          max: 10
+        finding:
+          name: fingerprint_flood
+          message: too many distinct device fingerprints in window
+          block: true
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`},
+		want: func(t *testing.T, config *Config) {
+			require.Len(t, config.SystemDefaults.Risk.Rules, 1)
+			rule := config.SystemDefaults.Risk.Rules[0]
+			assert.Equal(t, "fingerprint-flood", rule.ID)
+			assert.Equal(t, "Rate limit repeated device churn", rule.Description)
+			assert.Equal(t, "DistinctFingerprints >= 3", rule.Expr)
+			assert.Equal(t, "rate_limit", rule.Engine)
+			assert.Equal(t, "User {{.Current.UserID}} changed devices", rule.ContextTemplate)
+			assert.Equal(t, "fp-flood:{{.Current.UserID}}", rule.RateLimit.Key)
+			assert.Equal(t, 5*time.Minute, rule.RateLimit.Window)
+			assert.Equal(t, 10, rule.RateLimit.Max)
+			assert.Equal(t, "fingerprint_flood", rule.Finding.Name)
+			assert.Equal(t, "too many distinct device fingerprints in window", rule.Finding.Message)
+			assert.True(t, rule.Finding.Block)
 		},
 	}}
 	for _, tt := range tests {

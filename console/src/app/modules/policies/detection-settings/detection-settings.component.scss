@@ -1,0 +1,33 @@
+.settings-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.checkbox-group {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.checkbox-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.checkbox-hint {
+  font-size: 0.8125rem;
+  padding-left: 1.75rem;
+}
+
+.full-width {
+  display: block;
+  width: 100%;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}

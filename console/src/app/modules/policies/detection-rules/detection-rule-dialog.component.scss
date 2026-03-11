@@ -1,0 +1,27 @@
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.rule-yaml-error {
+  margin-top: 0.5rem;
+  color: var(--warn, #f44336);
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+::ng-deep .CodeMirror {
+  height: 420px;
+  width: 100%;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color, rgba(128, 128, 128, 0.2));
+  box-sizing: border-box;
+}
+
+::ng-deep ngx-codemirror {
+  display: block;
+  width: 100%;
+}

@@ -5,14 +5,18 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
+	detectionlog "github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/detection"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
@@ -20,10 +24,16 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/signals"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SessionCommand func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error)
+
+const (
+	sessionOperationCreate = "create_session"
+	sessionOperationUpdate = "set_session"
+)
 
 type SessionCommands struct {
 	sessionCommands []SessionCommand
@@ -44,9 +54,13 @@ type SessionCommands struct {
 	now                  func() time.Time
 	maxIdPIntentLifetime time.Duration
 	tarpit               func(failedAttempts uint64)
+	currentUserAgent     *domain.UserAgent
+	operation            string
+	detectionFindings    []detection.Finding
+	cachedDetectionSignal *signals.Signal // lazily built, reused across enforce + record
 }
 
-func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWriteModel) *SessionCommands {
+func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWriteModel, userAgent *domain.UserAgent, operation string) *SessionCommands {
 	return &SessionCommands{
 		sessionCommands:      cmds,
 		sessionWriteModel:    session,
@@ -62,6 +76,8 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		now:                  time.Now,
 		maxIdPIntentLifetime: c.maxIdPIntentLifetime,
 		tarpit:               c.tarpit,
+		currentUserAgent:     userAgent,
+		operation:            operation,
 	}
 }
 
@@ -311,7 +327,7 @@ func (c *Commands) CreateSession(
 	if err = c.checkSessionWritePermission(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
-	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
+	cmd := c.NewSessionCommands(cmds, sessionWriteModel, userAgent, sessionOperationCreate)
 	cmd.Start(ctx, userAgent)
 	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
@@ -331,7 +347,7 @@ func (c *Commands) UpdateSession(
 	if err = c.checkSessionWritePermission(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
-	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
+	cmd := c.NewSessionCommands(cmds, sessionWriteModel, nil, sessionOperationUpdate)
 	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
 
@@ -380,11 +396,15 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 			_, pushErr := c.eventstore.Push(ctx, cmds...)
 			logging.OnError(pushErr).Error("unable to store check failures")
 		}
+		c.recordDetectionOutcome(ctx, checks, signals.OutcomeFailure, nil)
 		return nil, err
 	}
 	checks.ChangeMetadata(ctx, metadata)
 	err = checks.SetLifetime(ctx, lifetime)
 	if err != nil {
+		return nil, err
+	}
+	if err = c.enforceDetection(ctx, checks); err != nil {
 		return nil, err
 	}
 	sessionToken, cmds, err := checks.commands(ctx)
@@ -402,9 +422,139 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 	if err != nil {
 		return nil, err
 	}
+	c.recordDetectionOutcome(ctx, checks, signals.OutcomeSuccess, checks.detectionFindings)
 	changed := sessionWriteModelToSessionChanged(checks.sessionWriteModel)
 	changed.NewToken = sessionToken
 	return changed, nil
+}
+
+func (c *Commands) enforceDetection(ctx context.Context, checks *SessionCommands) error {
+	if c.detectionEvaluator == nil {
+		return nil
+	}
+	ctx = detectionlog.NewCtx(ctx, detectionlog.StreamRisk)
+	signal := checks.detectionSignal(ctx, c.geoCountryHeader, signals.OutcomeSuccess)
+	decision, err := c.detectionEvaluator.Evaluate(ctx, signal)
+	if err != nil {
+		checks.detectionFindings = nil
+		return err
+	}
+	checks.detectionFindings = append([]detection.Finding(nil), decision.Findings...)
+	if decision.Allow {
+		return nil
+	}
+
+	// Challenge findings require a captcha response — return a specific
+	// error code so the client can present the challenge widget.
+	if decision.HasChallenge() && !decision.HasBlockingFindings() {
+		c.recordDetectionOutcome(ctx, checks, signals.OutcomeChallenged, decision.Findings)
+		detectionlog.Info(ctx, "detection.eval.challenge_required",
+			slog.String("detection_user_id", signal.UserID),
+			slog.String("detection_session_id", signal.SessionID),
+			slog.String("detection_operation", signal.Operation),
+			slog.String("detection_challenge_type", decision.ChallengeType()),
+			slog.Any("detection_findings", detectionFindingNames(decision.Findings)),
+		)
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-RISK1", "Errors.Risk.ChallengeRequired")
+	}
+
+	c.recordDetectionOutcome(ctx, checks, signals.OutcomeBlocked, decision.Findings)
+	detectionlog.Warn(ctx, "detection.eval.blocked",
+		slog.String("detection_user_id", signal.UserID),
+		slog.String("detection_session_id", signal.SessionID),
+		slog.String("detection_operation", signal.Operation),
+		slog.Any("detection_findings", detectionFindingNames(decision.Findings)),
+	)
+	return zerrors.ThrowPermissionDenied(nil, "COMMAND-RISK0", "Errors.PermissionDenied")
+}
+
+func (c *Commands) recordDetectionOutcome(ctx context.Context, checks *SessionCommands, outcome signals.Outcome, findings []detection.Finding) {
+	if c.signalRecorder == nil {
+		return
+	}
+	ctx = detectionlog.NewCtx(ctx, detectionlog.StreamRisk)
+	signal := checks.detectionSignal(ctx, c.geoCountryHeader, outcome)
+	signal.Stream = signals.StreamEvents
+	signal.CallerID = authz.GetCtxData(ctx).UserID
+	if err := c.signalRecorder.Record(ctx, signal, findings); err != nil {
+		detectionlog.WithError(ctx, err).Warn("detection.record.failed",
+			slog.String("detection_user_id", checks.sessionWriteModel.UserID),
+			slog.String("detection_session_id", checks.sessionWriteModel.AggregateID),
+			slog.String("detection_operation", checks.operation),
+		)
+	}
+}
+
+// detectionSignal returns a Signal for the current session context with the given
+// outcome. The base signal (everything except outcome) is built once and cached
+// so that enforceDetection + recordDetectionOutcome don't duplicate HTTP header
+// extraction and UserAgent parsing.
+func (s *SessionCommands) detectionSignal(ctx context.Context, geoCountryHeader string, outcome signals.Outcome) signals.Signal {
+	if s.cachedDetectionSignal == nil {
+		sig := s.buildDetectionSignal(ctx, geoCountryHeader)
+		s.cachedDetectionSignal = &sig
+	}
+	// Return a copy with the requested outcome.
+	sig := *s.cachedDetectionSignal
+	sig.Outcome = outcome
+	timestamp := time.Now().UTC()
+	if s.now != nil {
+		timestamp = s.now().UTC()
+	}
+	sig.Timestamp = timestamp
+	return sig
+}
+
+// buildDetectionSignal constructs the base signal (without outcome/timestamp) from
+// session state and HTTP context. Called once per session check.
+func (s *SessionCommands) buildDetectionSignal(ctx context.Context, geoCountryHeader string) signals.Signal {
+	signal := signals.Signal{
+		InstanceID: authz.GetInstance(ctx).InstanceID(),
+		UserID:     s.sessionWriteModel.UserID,
+		SessionID:  s.sessionWriteModel.AggregateID,
+		Operation:  s.operation,
+	}
+	if userAgent := s.effectiveUserAgent(); userAgent != nil {
+		if userAgent.FingerprintID != nil {
+			signal.FingerprintID = *userAgent.FingerprintID
+		}
+		if userAgent.Description != nil {
+			signal.UserAgent = *userAgent.Description
+		}
+		if userAgent.IP != nil {
+			signal.IP = userAgent.IP.String()
+		}
+		// Extract HTTP-derived context from UserAgent.Header (set by the client).
+		if userAgent.Header != nil {
+			httpCtx := signals.ExtractHTTPContext(userAgent.Header, geoCountryHeader)
+			httpCtx.ApplyTo(&signal)
+		}
+	}
+	// Fallback: extract from gRPC gateway headers if not set by the client.
+	if ctxHeaders, ok := http_util.HeadersFromCtx(ctx); ok {
+		httpCtx := signals.ExtractHTTPContext(ctxHeaders, geoCountryHeader)
+		httpCtx.ApplyTo(&signal)
+	}
+	// IP fallback from context if not set by UserAgent.
+	if signal.IP == "" {
+		signal.IP = http_util.RemoteIPFromCtx(ctx)
+	}
+	return signal
+}
+
+func (s *SessionCommands) effectiveUserAgent() *domain.UserAgent {
+	if s.currentUserAgent != nil {
+		return s.currentUserAgent
+	}
+	return s.sessionWriteModel.UserAgent
+}
+
+func detectionFindingNames(findings []detection.Finding) []string {
+	names := make([]string, 0, len(findings))
+	for _, finding := range findings {
+		names = append(names, finding.Name)
+	}
+	return names
 }
 
 // checkSessionWritePermission will check that the caller is granted the "session.write" permission on the resource owner of the authenticated user.

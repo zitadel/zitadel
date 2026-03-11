@@ -217,6 +217,7 @@ func projections(
 		config.DefaultInstance.SecretGenerators,
 		config.Login.DefaultPaths,
 		[]denylist.AddressChecker{},
+		"",
 	)
 	logging.OnError(ctx, err).Fatal("unable to start commands")
 

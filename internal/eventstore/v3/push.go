@@ -23,7 +23,14 @@ func (es *Eventstore) Push(ctx context.Context, client database.QueryExecutor, c
 
 	events, err = es.writeCommands(ctx, client, commands)
 	if isSetupNotExecutedError(err) {
-		return es.pushWithoutFunc(ctx, client, commands...)
+		events, err = es.pushWithoutFunc(ctx, client, commands...)
+	}
+
+	// Fire-and-forget: emit signals for every pushed event, outside the
+	// write transaction. Mirrors the execution hook pattern but without
+	// transactional safety — the user explicitly opted out of it.
+	if err == nil && es.signalHook != nil {
+		es.signalHook(ctx, events)
 	}
 
 	return events, err

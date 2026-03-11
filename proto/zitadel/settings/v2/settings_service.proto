@@ -11,6 +11,8 @@ import "zitadel/settings/v2/lockout_settings.proto";
 import "zitadel/settings/v2/login_settings.proto";
 import "zitadel/settings/v2/password_settings.proto";
 import "zitadel/settings/v2/security_settings.proto";
+import "zitadel/settings/v2/detection_settings.proto";
+import "zitadel/settings/v2/detection_rules.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -415,6 +417,135 @@ service SettingsService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "iam.policy.write"
+      }
+    };
+  }
+
+  // Get Detection Settings
+  //
+  // Returns the effective instance detection settings.
+  //
+  // Required permissions:
+  //   - `iam.policy.read`
+  rpc GetDetectionSettings(GetDetectionSettingsRequest) returns (GetDetectionSettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/detection";
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.read"
+      }
+    };
+  }
+
+  // Set Detection Settings
+  //
+  // Updates the instance detection settings.
+  //
+  // Required permissions:
+  //   - `iam.policy.write`
+  rpc SetDetectionSettings(SetDetectionSettingsRequest) returns (SetDetectionSettingsResponse) {
+    option (google.api.http) = {
+      put: "/v2/settings/detection";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+  }
+
+  // List Detection Rules
+  //
+  // Returns the effective instance detection rules.
+  //
+  // Required permissions:
+  //   - `iam.policy.read`
+  rpc ListDetectionRules(ListDetectionRulesRequest) returns (ListDetectionRulesResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/detection/rules";
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.read"
+      }
+    };
+  }
+
+  // Get Detection Rule
+  //
+  // Returns a single effective instance detection rule.
+  //
+  // Required permissions:
+  //   - `iam.policy.read`
+  rpc GetDetectionRule(GetDetectionRuleRequest) returns (GetDetectionRuleResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/detection/rules/{rule_id}";
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.read"
+      }
+    };
+  }
+
+  // Create Detection Rule
+  //
+  // Creates a detection rule for the instance.
+  //
+  // Required permissions:
+  //   - `iam.policy.write`
+  rpc CreateDetectionRule(CreateDetectionRuleRequest) returns (CreateDetectionRuleResponse) {
+    option (google.api.http) = {
+      post: "/v2/settings/detection/rules";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+  }
+
+  // Update Detection Rule
+  //
+  // Updates an instance detection rule.
+  //
+  // Required permissions:
+  //   - `iam.policy.write`
+  rpc UpdateDetectionRule(UpdateDetectionRuleRequest) returns (UpdateDetectionRuleResponse) {
+    option (google.api.http) = {
+      put: "/v2/settings/detection/rules/{rule_id}";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+  }
+
+  // Delete Detection Rule
+  //
+  // Deletes an instance detection rule.
+  //
+  // Required permissions:
+  //   - `iam.policy.delete`
+  rpc DeleteDetectionRule(DeleteDetectionRuleRequest) returns (DeleteDetectionRuleResponse) {
+    option (google.api.http) = {
+      delete: "/v2/settings/detection/rules/{rule_id}";
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.delete"
       }
     };
   }

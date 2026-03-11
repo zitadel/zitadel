@@ -1,0 +1,245 @@
+syntax = "proto3";
+
+package zitadel.signal.v2;
+
+import "zitadel/object/v2/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/signal/v2/signal.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/signal/v2;signal";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Signal Service";
+    version: "2.0";
+    description: "This API exposes behavioral signals collected during authentication operations. It is part of the ZITADEL Risk POC and requires an authenticated session to access.";
+    contact: {
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+  consumes: "application/json";
+  consumes: "application/grpc";
+  produces: "application/json";
+  produces: "application/grpc";
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+  host: "$CUSTOM_DOMAIN";
+  base_path: "/";
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+};
+
+// SignalService provides read access to behavioral signals for risk analysis.
+service SignalService {
+
+  // List signals with optional filters and pagination.
+  rpc ListSignals (ListSignalsRequest) returns (ListSignalsResponse) {
+    option (google.api.http) = {
+      post: "/v2/signals/search"
+      body: "*"
+    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "List Signals"
+      description: "List behavioral signals with optional filters. Returns a paginated list of signals recorded during authentication operations."
+      tags: ["Signal Service"]
+    };
+  }
+
+  // Aggregate signals by a field or time bucket.
+  rpc AggregateSignals (AggregateSignalsRequest) returns (AggregateSignalsResponse) {
+    option (google.api.http) = {
+      post: "/v2/signals/aggregate"
+      body: "*"
+    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Aggregate Signals"
+      description: "Aggregate behavioral signals by a field (e.g. stream, country) or time bucket. Returns counts per group."
+      tags: ["Signal Service"]
+    };
+  }
+
+  // List findings with optional filters and pagination.
+  // Findings are unnested from the JSON findings column on signal rows,
+  // making them first-class queryable entities.
+  rpc ListFindings (ListFindingsRequest) returns (ListFindingsResponse) {
+    option (google.api.http) = {
+      post: "/v2/signals/findings/search"
+      body: "*"
+    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "List Findings"
+      description: "List detection findings across signals with optional filters. Each finding includes its originating signal context for correlation."
+      tags: ["Signal Service"]
+    };
+  }
+
+  // Aggregate findings by name, source, block status, or other dimensions.
+  rpc AggregateFindings (AggregateFindingsRequest) returns (AggregateFindingsResponse) {
+    option (google.api.http) = {
+      post: "/v2/signals/findings/aggregate"
+      body: "*"
+    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Aggregate Findings"
+      description: "Aggregate detection findings by name, source, block status, user, or session. Returns counts per group."
+      tags: ["Signal Service"]
+    };
+  }
+}
+
+// ListSignalsRequest is the request message for ListSignals.
+message ListSignalsRequest {
+  // Pagination: offset and limit.
+  zitadel.object.v2.ListQuery query = 1;
+  // Optional filters applied before returning results.
+  SignalFilters filters = 2;
+}
+
+// ListSignalsResponse contains the matching signals and pagination details.
+message ListSignalsResponse {
+  zitadel.object.v2.ListDetails details = 1;
+  repeated Signal signals = 2;
+}
+
+// AggregateSignalsRequest is the request message for AggregateSignals.
+message AggregateSignalsRequest {
+  // Optional filters applied before aggregation.
+  SignalFilters filters = 1;
+
+  // The field to group by. Use "time_bucket" for time-based aggregation.
+  // Valid field values: stream, outcome, operation, country, user_id, ip.
+  string group_by = 2 [(google.api.field_behavior) = REQUIRED, (validate.rules).string = {min_len: 1}];
+
+  // When group_by is "time_bucket", this sets the bucket width (e.g. "1 hour", "1 day").
+  string time_bucket = 3;
+
+  // Aggregation metric: "count" (default) or "distinct_count".
+  string metric = 4;
+}
+
+// AggregateSignalsResponse contains the aggregation buckets.
+message AggregateSignalsResponse {
+  repeated AggregationBucket buckets = 1;
+}
+
+// FindingFilters defines filters for finding-level queries.
+message FindingFilters {
+  // Signal-level filters (instance isolation, time range, user, etc.)
+  SignalFilters signal_filters = 1;
+  // Exact match on finding name (e.g. "failure_burst", "llm_high_risk").
+  string finding_name = 2;
+  // Exact match on finding source (e.g. "rule:_builtin_failure_burst").
+  string finding_source = 3;
+  // Only return findings that triggered a block.
+  bool block_only = 4;
+  // Only return findings that triggered a challenge.
+  bool challenge_only = 5;
+}
+
+// FindingWithContext is a finding with its originating signal context.
+message FindingWithContext {
+  Finding finding = 1;
+  // Signal context for correlation.
+  google.protobuf.Timestamp signal_timestamp = 2;
+  string user_id = 3;
+  string session_id = 4;
+  string ip = 5;
+  string operation = 6;
+  string stream = 7;
+  string outcome = 8;
+  string trace_id = 9;
+}
+
+// ListFindingsRequest is the request message for ListFindings.
+message ListFindingsRequest {
+  // Pagination: offset and limit.
+  zitadel.object.v2.ListQuery query = 1;
+  // Optional filters for finding-level queries.
+  FindingFilters filters = 2;
+}
+
+// ListFindingsResponse contains the matching findings and pagination details.
+message ListFindingsResponse {
+  zitadel.object.v2.ListDetails details = 1;
+  repeated FindingWithContext findings = 2;
+}
+
+// AggregateFindingsRequest is the request message for AggregateFindings.
+message AggregateFindingsRequest {
+  // Optional filters applied before aggregation.
+  FindingFilters filters = 1;
+  // The dimension to group by: "name", "source", "block", "user_id", "session_id", "outcome".
+  string group_by = 2 [(google.api.field_behavior) = REQUIRED, (validate.rules).string = {min_len: 1}];
+  // Maximum number of buckets to return (default: 100).
+  int32 top_n = 3;
+}
+
+// AggregateFindingsResponse contains the aggregation buckets.
+message AggregateFindingsResponse {
+  repeated AggregationBucket buckets = 1;
+}

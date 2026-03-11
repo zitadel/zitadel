@@ -14,6 +14,15 @@
   <ng-container *ngIf="setting()?.id === 'login'">
     <cnsl-login-policy [serviceType]="serviceType"></cnsl-login-policy>
   </ng-container>
+  <ng-container *ngIf="setting()?.id === 'detection' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-detection-settings></cnsl-detection-settings>
+  </ng-container>
+  <ng-container *ngIf="setting()?.id === 'detection_rules' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-detection-rules></cnsl-detection-rules>
+  </ng-container>
+  <ng-container *ngIf="setting()?.id === 'signals_explorer' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-signals-explorer></cnsl-signals-explorer>
+  </ng-container>
   <ng-container *ngIf="setting()?.id === 'verified_domains'">
     <cnsl-domains></cnsl-domains>
   </ng-container>

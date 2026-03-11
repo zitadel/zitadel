@@ -33,9 +33,14 @@ var (
 	_ eventstore.Pusher = (*Eventstore)(nil)
 )
 
+// SignalHook is called after events are successfully pushed, outside the
+// write transaction. Implementations must not block — use fire-and-forget.
+type SignalHook func(ctx context.Context, events []eventstore.Event)
+
 type Eventstore struct {
-	client new_db.Pool
-	queue  eventstore.ExecutionQueue
+	client     new_db.Pool
+	queue      eventstore.ExecutionQueue
+	signalHook SignalHook
 }
 
 var (
@@ -211,4 +216,20 @@ func WithExecutionQueueOption(queue eventstore.ExecutionQueue) EventstoreOption 
 	return func(es *Eventstore) {
 		es.queue = queue
 	}
+}
+
+// WithSignalHook registers a callback invoked after each successful Push,
+// outside the transaction. The hook receives the committed events and should
+// not block.
+func WithSignalHook(hook SignalHook) EventstoreOption {
+	return func(es *Eventstore) {
+		es.signalHook = hook
+	}
+}
+
+// SetSignalHook registers (or replaces) the post-push signal hook at
+// runtime. This allows late-binding when the emitter is not yet available
+// at construction time.
+func (es *Eventstore) SetSignalHook(hook SignalHook) {
+	es.signalHook = hook
 }

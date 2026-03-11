@@ -76,6 +76,7 @@ func InitAll(ctx context.Context, config *Config) error {
 		VerifyUser(config.Database.Username(), config.Database.Password()),
 		VerifyDatabase(config.Database.DatabaseName()),
 		VerifyGrant(config.Database.DatabaseName(), config.Database.Username()),
+		GrantPublicSchemaCreate(config.Database.DatabaseName(), config.Database.Username()),
 	)
 	if err != nil {
 		return fmt.Errorf("initialize database failed: %w", err)

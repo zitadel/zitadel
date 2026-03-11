@@ -36,6 +36,9 @@ import {
   FEATURESETTINGS,
   ACTIONS,
   ACTIONS_TARGETS,
+  DETECTION,
+  DETECTION_RULES,
+  SIGNALS_EXPLORER,
 } from 'src/app/modules/settings-list/settings';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -65,6 +68,9 @@ export class InstanceComponent {
     SMS_PROVIDER,
     // login
     LOGIN,
+    DETECTION,
+    DETECTION_RULES,
+    SIGNALS_EXPLORER,
     IDP,
     COMPLEXITY,
     AGE,

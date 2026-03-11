@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
+	"github.com/redis/go-redis/v9"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -24,12 +25,17 @@ import (
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/captcha"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/denylist"
+	"github.com/zitadel/zitadel/internal/detection"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/llm"
 	internal_net "github.com/zitadel/zitadel/internal/net"
+	"github.com/zitadel/zitadel/internal/ratelimit"
+	"github.com/zitadel/zitadel/internal/signals"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -104,9 +110,16 @@ type Commands struct {
 	// so the query and cache overhead can be completely eliminated.
 	milestonesCompleted sync.Map
 
-	loginPaths        LoginPaths
-	ActionsV2DenyList []denylist.AddressChecker
-	IPLookupFunction  internal_net.IPLookupFunc
+	loginPaths              LoginPaths
+	ActionsV2DenyList       []denylist.AddressChecker
+	IPLookupFunction        internal_net.IPLookupFunc
+	defaultDetectionConfig  detection.Config
+	detectionPolicyProvider *instanceDetectionPolicyProvider
+	detectionEvaluator      detection.Evaluator
+	signalRecorder          detection.SignalRecorder
+	challengeVerifier       detection.ChallengeVerifier
+	detectionRuntime        *detection.Runtime
+	geoCountryHeader        string // proxy header name for geo-country (e.g. "CF-IPCountry")
 }
 
 //go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
@@ -136,6 +149,7 @@ func StartCommands(
 	defaultSecretGenerators *SecretGenerators,
 	loginPaths LoginPaths,
 	actionsDeniedHostList []denylist.AddressChecker,
+	pgDSN string,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -233,7 +247,115 @@ func StartCommands(
 	}
 	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
 	repo.tarpit = defaults.Tarpit.Tarpit()
+	detectionConfig := detection.Config{
+		Enabled:               defaults.Risk.Enabled,
+		FailOpen:              defaults.Risk.FailOpen,
+		FailureBurstThreshold: defaults.Risk.FailureBurstThreshold,
+		HistoryWindow:         defaults.Risk.HistoryWindow,
+		ContextChangeWindow:   defaults.Risk.ContextChangeWindow,
+		MaxSignalsPerUser:     defaults.Risk.MaxSignalsPerUser,
+		MaxSignalsPerSession:  defaults.Risk.MaxSignalsPerSession,
+		LLM: llm.Config{
+			Mode:               llm.LLMMode(defaults.Risk.LLM.Mode),
+			Endpoint:           defaults.Risk.LLM.Endpoint,
+			Model:              defaults.Risk.LLM.Model,
+			Timeout:            defaults.Risk.LLM.Timeout,
+			MaxEvents:          defaults.Risk.LLM.MaxEvents,
+			NumPredict:         defaults.Risk.LLM.NumPredict,
+			Temperature:        defaults.Risk.LLM.Temperature,
+			TopK:               defaults.Risk.LLM.TopK,
+			TopP:               defaults.Risk.LLM.TopP,
+			KeepAlive:          defaults.Risk.LLM.KeepAlive,
+			HighRiskConfidence: defaults.Risk.LLM.HighRiskConfidence,
+			LogPrompts:         defaults.Risk.LLM.LogPrompts,
+			CircuitBreaker:     llmCBConfig(defaults.Risk.LLM.CircuitBreaker),
+		},
+		Rules:            detectionRules(defaults.Risk.Rules),
+		GeoCountryHeader: defaults.Risk.GeoCountryHeader,
+		SignalStore: signals.SignalStoreConfig{
+			Enabled:     defaults.Risk.SignalStore.Enabled,
+			ChannelSize: defaults.Risk.SignalStore.ChannelSize,
+			Debounce: signals.DebouncerConfig{
+				MinFrequency: defaults.Risk.SignalStore.Debounce.MinFrequency,
+				MaxBulkSize:  defaults.Risk.SignalStore.Debounce.MaxBulkSize,
+			},
+			Streams: signals.StreamsConfig{
+				API:        defaults.Risk.SignalStore.Streams.API,
+				HTTPAccess: defaults.Risk.SignalStore.Streams.HTTPAccess,
+			},
+			DuckLake: signals.DuckLakeConfig{
+				Enabled:            defaults.Risk.SignalStore.DuckLake.Enabled,
+				DataPath:           defaults.Risk.SignalStore.DuckLake.DataPath,
+				Backend:            signals.ArchiveBackend(defaults.Risk.SignalStore.DuckLake.Backend),
+				FlushInterval:      defaults.Risk.SignalStore.DuckLake.FlushInterval,
+				CompactionInterval: defaults.Risk.SignalStore.DuckLake.CompactionInterval,
+				S3: signals.ArchiveS3Config{
+					Endpoint:  defaults.Risk.SignalStore.DuckLake.S3.Endpoint,
+					Bucket:    defaults.Risk.SignalStore.DuckLake.S3.Bucket,
+					AccessKey: defaults.Risk.SignalStore.DuckLake.S3.AccessKey,
+					SecretKey: defaults.Risk.SignalStore.DuckLake.S3.SecretKey,
+					UseSSL:    defaults.Risk.SignalStore.DuckLake.S3.UseSSL,
+				},
+			},
+		},
+		Captcha: captcha.CaptchaConfig{
+			Enabled:   defaults.Risk.Captcha.Enabled,
+			Provider:  defaults.Risk.Captcha.Provider,
+			SiteKey:   defaults.Risk.Captcha.SiteKey,
+			SecretKey: defaults.Risk.Captcha.SecretKey,
+			VerifyURL: defaults.Risk.Captcha.VerifyURL,
+			Timeout:   defaults.Risk.Captcha.Timeout,
+		},
+		RateLimit: ratelimit.Config{
+			Mode: ratelimit.Mode(defaults.Risk.RateLimit.Mode),
+		},
+	}
+	var detectionLLM llm.LLMClient
+	if detectionConfig.LLM.Enabled() {
+		detectionLLM = llm.NewOllamaClient(detectionConfig.LLM, httpClient)
+	}
+
+	// Extract Redis client from cache connectors if available.
+	var redisClient *redis.Client
+	if cacheConnectors.Redis != nil {
+		redisClient = cacheConnectors.Redis.Client
+	}
+
+	repo.defaultDetectionConfig = detectionConfig
+	repo.detectionPolicyProvider = newInstanceDetectionPolicyProvider(es, detectionConfig)
+	svc, err := detection.New(detectionConfig, repo.detectionPolicyProvider, nil, detectionLLM, pgDSN, redisClient)
+	if err != nil {
+		return nil, fmt.Errorf("detection evaluator: %w", err)
+	}
+	repo.detectionEvaluator = svc
+	repo.signalRecorder = svc
+	repo.challengeVerifier = svc
+	repo.detectionRuntime = svc.Runtime()
+	repo.geoCountryHeader = detectionConfig.GeoCountryHeader
 	return repo, nil
+}
+
+// DetectionRuntime returns the detection infrastructure runtime (emitter,
+// DuckLake, compaction), or nil when signal storage is not enabled.
+// Used by startup code to register signal workers and API servers.
+func (c *Commands) DetectionRuntime() *detection.Runtime {
+	if c == nil {
+		return nil
+	}
+	return c.detectionRuntime
+}
+
+// DetectionService returns the concrete detection service if available. Used
+// by the startup code to access the signal emitter via backward-compatible
+// accessor. Prefer DetectionRuntime() for new code.
+//
+// Deprecated: Use DetectionRuntime() instead.
+func (c *Commands) DetectionService() *detection.Service {
+	if c == nil {
+		return nil
+	}
+	svc, _ := c.detectionEvaluator.(*detection.Service)
+	return svc
 }
 
 type AppendReducer interface {
@@ -387,4 +509,45 @@ func (c *Commands) asyncPush(ctx context.Context, cmds ...eventstore.Command) {
 
 		span.EndWithError(err)
 	}()
+}
+
+func llmCBConfig(c *sd.RiskCBConfig) *llm.CBConfig {
+	if c == nil {
+		return nil
+	}
+	return &llm.CBConfig{
+		Interval:               c.Interval,
+		MaxConsecutiveFailures: c.MaxConsecutiveFailures,
+		MaxFailureRatio:        c.MaxFailureRatio,
+		Timeout:                c.Timeout,
+		MaxRetryRequests:       c.MaxRetryRequests,
+		FailOpen:               c.FailOpen,
+	}
+}
+
+func detectionRules(rules []sd.RiskRuleConfig) []detection.Rule {
+	if len(rules) == 0 {
+		return nil
+	}
+	out := make([]detection.Rule, len(rules))
+	for i, r := range rules {
+		out[i] = detection.Rule{
+			ID:          r.ID,
+			Description: r.Description,
+			Expr:        r.Expr,
+			Action:      detection.ActionType(r.Engine),
+			FindingCfg: detection.RuleFinding{
+				Name:    r.Finding.Name,
+				Message: r.Finding.Message,
+				Block:   r.Finding.Block,
+			},
+			ContextTemplate: r.ContextTemplate,
+			RateLimitCfg: detection.RuleRateLimit{
+				KeyTemplate: r.RateLimit.Key,
+				Window:      r.RateLimit.Window,
+				Max:         r.RateLimit.Max,
+			},
+		}
+	}
+	return out
 }
