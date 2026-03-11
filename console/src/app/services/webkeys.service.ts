@@ -7,7 +7,7 @@ import {
   CreateWebKeyRequestSchema,
   CreateWebKeyResponse,
   ActivateWebKeyResponse,
-} from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
+} from '@zitadel/proto/zitadel/webkey/v2/webkey_service_pb';
 
 @Injectable({
   providedIn: 'root',

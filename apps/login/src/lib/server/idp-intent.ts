@@ -124,7 +124,11 @@ interface IDPHandlerContext {
   buildRedirectParams: (additionalParams?: Record<string, string>, includeToken?: boolean) => string;
 }
 
-type IDPHandlerResult = { redirect?: string; error?: string; samlData?: { url: string; fields: Record<string, string> } } | null;
+type IDPHandlerResult = {
+  redirect?: string;
+  error?: string;
+  samlData?: { url: string; fields: Record<string, string> };
+} | null;
 
 /**
  * CASE 1: Explicit Linking (via sessionId)

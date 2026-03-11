@@ -28,21 +28,21 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   // also allow no session to be found for userId-based flows
   let session: Session | undefined;
   if (loginName) {
-    session = await loadMostRecentSession({ serviceConfig, sessionParams: {
+    session = await loadMostRecentSession({
+      serviceConfig,
+      sessionParams: {
         loginName,
         organization,
       },
     });
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
   let user: User | undefined;
   let displayName: string | undefined;
   if (userId) {
-    const userResponse = await getUserByID({ serviceConfig, userId,
-    });
+    const userResponse = await getUserByID({ serviceConfig, userId });
     user = userResponse.user;
 
     if (user?.type.case === "human") {

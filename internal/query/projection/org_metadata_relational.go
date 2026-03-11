@@ -14,45 +14,12 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type orgMetadataRelationalProjection struct{}
-
-func newOrgMetadataRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(orgMetadataRelationalProjection))
-}
-
-func (*orgMetadataRelationalProjection) Name() string {
-	return "zitadel.org_metadata"
-}
-
-func (p *orgMetadataRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: org.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  org.MetadataSetType,
-					Reduce: p.reduceSet,
-				},
-				{
-					Event:  org.MetadataRemovedType,
-					Reduce: p.reduceRemoved,
-				},
-				// This event cannot be tested because it was never used in the past
-				{
-					Event:  org.MetadataRemovedAllType,
-					Reduce: p.reduceRemovedAll,
-				},
-			},
-		},
-	}
-}
-
-func (p *orgMetadataRelationalProjection) reduceSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrganizationMetadataSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MetadataSetEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xOO4e", "reduce.wrong.event.type %s", org.MetadataSetType)
 	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-xg4IJ", "reduce.wrong.db.pool %T", ex)
@@ -70,12 +37,12 @@ func (p *orgMetadataRelationalProjection) reduceSet(event eventstore.Event) (*ha
 	}), nil
 }
 
-func (p *orgMetadataRelationalProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrganizationMetadataRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MetadataRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-XE6TF", "reduce.wrong.event.type %s", org.MetadataRemovedType)
 	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-QKMlz", "reduce.wrong.db.pool %T", ex)
@@ -92,12 +59,12 @@ func (p *orgMetadataRelationalProjection) reduceRemoved(event eventstore.Event) 
 	}), nil
 }
 
-func (p *orgMetadataRelationalProjection) reduceRemovedAll(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrganizationMetadataRemovedAll(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MetadataRemovedAllEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-EmyAe", "reduce.wrong.event.type %s", org.MetadataRemovedAllType)
 	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-hjEHg", "reduce.wrong.db.pool %T", ex)
