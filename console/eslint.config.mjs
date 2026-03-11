@@ -42,6 +42,7 @@ export default [
         createDefaultProgram: true,
       },
     },
+    processor: angularTemplatePlugin.processors["extract-inline-html"],
     settings: {
       "import/resolver": {
         typescript: true,
