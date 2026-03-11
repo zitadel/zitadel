@@ -385,7 +385,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 
 				// then
 				if relTableCase.Enabled {
-					return // TODO: remove when permission model is implemented in relational tables
+					ttt.Skip("TODO: remove when permission model is implemented in relational tables")
 				}
 				assert.Error(ttt, err)
 			})
@@ -742,7 +742,7 @@ func TestServer_DeleteOrganization(t *testing.T) {
 
 						// then
 						if relTableTestCase.Enabled {
-							return // TODO: remove when permission model is implemented in relational tables
+							tttt.Skip("TODO: remove when permission model is implemented in relational tables")
 						}
 						assert.ErrorContains(tttt, err, "membership not found")
 					})
@@ -840,7 +840,7 @@ func TestServer_ActivateOrganization(t *testing.T) {
 
 						// then
 						if testCase.Enabled {
-							return // TODO: remove when permission model is implemented in relational tables
+							tttt.Skip("TODO: remove when permission model is implemented in relational tables")
 						}
 						assert.ErrorContains(tttt, err, "membership not found")
 					})
@@ -913,7 +913,7 @@ func TestServer_DeactivateOrganization(t *testing.T) {
 
 						// then
 						if testCase.Enabled {
-							return // TODO: remove when permission model is implemented in relational tables
+							tttt.Skip("TODO: remove when permission model is implemented in relational tables")
 						}
 						assert.ErrorContains(tttt, err, "membership not found")
 					})
