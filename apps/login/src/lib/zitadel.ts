@@ -50,8 +50,8 @@ try {
   console.error("Failed to parse API_CACHE_CONFIG", e);
 }
 
-const defaultCacheTTL = (cacheConfig.default ?? 15) * 60 * 1000; // 15 mins default
-const longCacheTTL = (cacheConfig.long ?? 60) * 60 * 1000; // 1 hour default
+const defaultCacheTTL = (cacheConfig.defaultMinutes ?? 15) * 60 * 1000; // 15 mins default
+const longCacheTTL = (cacheConfig.longMinutes ?? 60) * 60 * 1000; // 1 hour default
 
 /**
  * Helper to determine the TTL for a specific API method.
