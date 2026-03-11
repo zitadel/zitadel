@@ -155,9 +155,18 @@ async function run() {
           env: process.env
         });
 
-        child.on('close', (code) => {
+        child.on('close', (code, signal) => {
           if (code !== 0) {
-            rejectPromise(new Error(`Failed to generate OpenAPI for ${label} (exit code ${code})`));
+            let reason;
+            if (code === null && signal) {
+              reason = `terminated by signal ${signal}`;
+            } else if (typeof code === 'number') {
+              reason = `exit code ${code}`;
+            } else {
+              reason = 'process terminated for an unknown reason';
+            }
+
+            rejectPromise(new Error(`Failed to generate OpenAPI for ${label} (${reason})`));
           } else {
             console.log(`Successfully generated OpenAPI for ${label}`);
                 
