@@ -3,6 +3,7 @@ import nextPlugin from "@next/eslint-plugin-next";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import prettierConfig from "eslint-config-prettier/flat";
+import importPlugin from "eslint-plugin-import";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import globals from "globals";
 
@@ -44,6 +45,7 @@ export default [
     files: ["**/*.{ts,tsx}"],
     plugins: {
       "@typescript-eslint": tsPlugin,
+      import: importPlugin,
     },
     languageOptions: {
       parser: tsParser,
@@ -54,8 +56,14 @@ export default [
         project: "./tsconfig.json",
       },
     },
+    settings: {
+      "import/resolver": {
+        typescript: true,
+      },
+    },
     rules: {
       ...tsPlugin.configs.recommended.rules,
+      ...importPlugin.configs.recommended.rules,
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",

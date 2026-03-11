@@ -4,6 +4,7 @@ import angularTemplatePlugin from "@angular-eslint/eslint-plugin-template";
 import angularTemplateParser from "@angular-eslint/template-parser";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
+import importPlugin from "eslint-plugin-import";
 import prettierConfig from "eslint-config-prettier/flat";
 import globals from "globals";
 
@@ -32,6 +33,7 @@ export default [
     plugins: {
       "@typescript-eslint": tsPlugin,
       "@angular-eslint": angularPlugin,
+      import: importPlugin,
     },
     languageOptions: {
       parser: tsParser,
@@ -40,8 +42,14 @@ export default [
         createDefaultProgram: true,
       },
     },
+    settings: {
+      "import/resolver": {
+        typescript: true,
+      },
+    },
     rules: {
       ...tsPlugin.configs.recommended.rules,
+      ...importPlugin.configs.recommended.rules,
       "no-unused-vars": "off",
       "no-undef": "off",
       "@typescript-eslint/no-unused-vars": [
