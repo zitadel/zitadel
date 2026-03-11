@@ -1237,7 +1237,8 @@ export interface ServiceConfig {
 /**
  * Base type that all function parameters must extend to ensure serviceConfig is always required
  */
-export type WithServiceConfig<T = Record<string, never>> = T & {
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export type WithServiceConfig<T = {}> = T & {
   serviceConfig: ServiceConfig;
 };
 
