@@ -65,8 +65,6 @@ function getTTLForKey(keyPrefix: string, fallbackTtl: number) {
   return fallbackTtl;
 }
 
-
-
 const promiseCache = new Map<string, { promise: Promise<any>; expiresAt: number }>();
 
 /**
@@ -126,7 +124,13 @@ export async function getHostedLoginTranslation({
       });
   };
 
-  return useCache ? freshCache(`getHostedLoginTranslation-${organization || "instance"}-${locale || "default"}`, fetcher, getTTLForKey("getHostedLoginTranslation", longCacheTTL)) : fetcher();
+  return useCache
+    ? freshCache(
+        `getHostedLoginTranslation-${organization || "instance"}-${locale || "default"}`,
+        fetcher,
+        getTTLForKey("getHostedLoginTranslation", longCacheTTL),
+      )
+    : fetcher();
 }
 
 export async function getBrandingSettings({
@@ -143,7 +147,13 @@ export async function getBrandingSettings({
       .then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache ? freshCache(`getBrandingSettings-${organization || "instance"}`, fetcher, getTTLForKey("getBrandingSettings", longCacheTTL)) : fetcher();
+  return useCache
+    ? freshCache(
+        `getBrandingSettings-${organization || "instance"}`,
+        fetcher,
+        getTTLForKey("getBrandingSettings", longCacheTTL),
+      )
+    : fetcher();
 }
 
 export async function getLoginSettings({
@@ -160,7 +170,13 @@ export async function getLoginSettings({
       .then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache ? freshCache(`getLoginSettings-${organization || "instance"}`, fetcher, getTTLForKey("getLoginSettings", defaultCacheTTL)) : fetcher();
+  return useCache
+    ? freshCache(
+        `getLoginSettings-${organization || "instance"}`,
+        fetcher,
+        getTTLForKey("getLoginSettings", defaultCacheTTL),
+      )
+    : fetcher();
 }
 
 export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) {
@@ -168,10 +184,11 @@ export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) 
     const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
     return settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
+  };
 
-    };
-
-  return useCache ? freshCache(`getSecuritySettings-${"instance"}`, fetcher, getTTLForKey("getSecuritySettings", defaultCacheTTL)) : fetcher();
+  return useCache
+    ? freshCache(`getSecuritySettings-${"instance"}`, fetcher, getTTLForKey("getSecuritySettings", defaultCacheTTL))
+    : fetcher();
 }
 
 export async function getLockoutSettings({ serviceConfig, orgId }: WithServiceConfig<{ orgId?: string }>) {
@@ -181,10 +198,11 @@ export async function getLockoutSettings({ serviceConfig, orgId }: WithServiceCo
     return settingsService
       .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
       .then((resp) => (resp.settings ? resp.settings : undefined));
+  };
 
-    };
-
-  return useCache ? freshCache(`getLockoutSettings-${orgId || "instance"}`, fetcher, getTTLForKey("getLockoutSettings", defaultCacheTTL)) : fetcher();
+  return useCache
+    ? freshCache(`getLockoutSettings-${orgId || "instance"}`, fetcher, getTTLForKey("getLockoutSettings", defaultCacheTTL))
+    : fetcher();
 }
 
 export async function getPasswordExpirySettings({ serviceConfig, orgId }: WithServiceConfig<{ orgId?: string }>) {
@@ -194,9 +212,15 @@ export async function getPasswordExpirySettings({ serviceConfig, orgId }: WithSe
     return settingsService
       .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
       .then((resp) => (resp.settings ? resp.settings : undefined));
-    };
+  };
 
-  return useCache ? freshCache(`getPasswordExpirySettings-${orgId || "instance"}`, fetcher, getTTLForKey("getPasswordExpirySettings", defaultCacheTTL)) : fetcher();
+  return useCache
+    ? freshCache(
+        `getPasswordExpirySettings-${orgId || "instance"}`,
+        fetcher,
+        getTTLForKey("getPasswordExpirySettings", defaultCacheTTL),
+      )
+    : fetcher();
 }
 
 export async function listIDPLinks({ serviceConfig, userId }: WithServiceConfig<{ userId: string }>) {
@@ -233,9 +257,11 @@ export async function getAllowedLanguages({ serviceConfig }: WithServiceConfig) 
         defaultLanguage: resp.defaultLanguage,
       };
     });
-  }
+  };
 
-  return useCache ? freshCache(`getGeneralSettings-${"instance"}`, fetcher, getTTLForKey("getGeneralSettings", longCacheTTL)) : fetcher();
+  return useCache
+    ? freshCache(`getGeneralSettings-${"instance"}`, fetcher, getTTLForKey("getGeneralSettings", longCacheTTL))
+    : fetcher();
 }
 
 export async function getLegalAndSupportSettings({
@@ -252,7 +278,13 @@ export async function getLegalAndSupportSettings({
       .then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache ? freshCache(`getLegalAndSupportSettings-${organization || "instance"}`, fetcher, getTTLForKey("getLegalAndSupportSettings", longCacheTTL)) : fetcher();
+  return useCache
+    ? freshCache(
+        `getLegalAndSupportSettings-${organization || "instance"}`,
+        fetcher,
+        getTTLForKey("getLegalAndSupportSettings", longCacheTTL),
+      )
+    : fetcher();
 }
 
 export async function getPasswordComplexitySettings({
@@ -269,7 +301,13 @@ export async function getPasswordComplexitySettings({
       .then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache ? freshCache(`getPasswordComplexitySettings-${organization || "instance"}`, fetcher, getTTLForKey("getPasswordComplexitySettings", defaultCacheTTL)) : fetcher();
+  return useCache
+    ? freshCache(
+        `getPasswordComplexitySettings-${organization || "instance"}`,
+        fetcher,
+        getTTLForKey("getPasswordComplexitySettings", defaultCacheTTL),
+      )
+    : fetcher();
 }
 
 export async function createSessionFromChecksAndChallenges({
@@ -825,7 +863,9 @@ export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promi
       .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
   };
 
-  return useCache ? freshCache(`getDefaultOrg-${"instance"}`, fetcher, getTTLForKey("getDefaultOrg", defaultCacheTTL)) : fetcher();
+  return useCache
+    ? freshCache(`getDefaultOrg-${"instance"}`, fetcher, getTTLForKey("getDefaultOrg", defaultCacheTTL))
+    : fetcher();
 }
 
 export async function getOrgsByDomain({ serviceConfig, domain }: WithServiceConfig<{ domain: string }>) {

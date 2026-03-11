@@ -37,7 +37,7 @@ export default async function ProcessPage(props: {
   }
 
   const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
-  
+
   return (
     <DynamicTheme branding={branding}>
       <IdpProcessHandler
@@ -50,7 +50,7 @@ export default async function ProcessPage(props: {
         sessionId={linkToSessionId}
         linkFingerprint={linkFingerprint}
         postErrorRedirectUrl={postErrorRedirectUrl}
-      /> 
+      />
     </DynamicTheme>
   );
 }
