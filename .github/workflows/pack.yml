@@ -53,12 +53,12 @@ jobs:
       packages: write
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           filter: tree:0
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ inputs.go_version }}
       - name: Set up pnpm
@@ -66,12 +66,12 @@ jobs:
         with:
           run_install: false
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
         with:
           version: v0.28.0
       - name: Install dependencies
@@ -87,29 +87,29 @@ jobs:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx fix-ci
       - name: Upload all platform archives
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: zitadel-archives
           path: .artifacts/pack
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       - name: Login to Docker registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Login to Google Artifact Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: europe-docker.pkg.dev
           username: _json_key_base64
           password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
       - name: Generate Standard Tags and Labels from the GitHub Context for the API Scratch Container Image
         id: scratch-meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ${{ inputs.image_name_github_api }}
@@ -119,7 +119,7 @@ jobs:
             type=sha,prefix=,suffix=,format=long
       - name: Build and Push the SHA-tagged API Scratch Container Image
         id: build-scratch
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         timeout-minutes: 3
         with:
           context: .
@@ -133,7 +133,7 @@ jobs:
           tags: ${{ steps.scratch-meta.outputs.tags }}
       - name: Generate Standard Tags and Labels from the GitHub Context for the API Debug Container Image
         id: debug-meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ${{ inputs.image_name_github_api }}
@@ -143,7 +143,7 @@ jobs:
             type=sha,prefix=,suffix=-debug,format=long
       - name: Build and Push the SHA-tagged API Debug Container Image
         id: build-debug
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         timeout-minutes: 5
         with:
           context: .
@@ -158,7 +158,7 @@ jobs:
           outputs: type=image,name=${{ inputs.image_name_github_api }},name-canonical=true
       - name: Generate Standard Tags and Labels from the GitHub Context for the Login Container Image
         id: login-meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ${{ inputs.image_name_github_login }}
@@ -170,7 +170,7 @@ jobs:
             type=sha,prefix=,suffix=,format=long
       - name: Build and Push the SHA-tagged Login Container Image
         id: build-login
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         timeout-minutes: 3
         with:
           context: apps/login
