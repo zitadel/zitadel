@@ -1,20 +1,21 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   Cookie,
   addSessionToCookie,
-  updateSessionCookie,
-  removeSessionFromCookie,
+  getAllSessionCookieIds,
+  getAllSessions,
+  getLanguageCookie,
+  getMostRecentCookieWithLoginname,
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
-  getAllSessionCookieIds,
-  getAllSessions,
-  getMostRecentCookieWithLoginname,
+  removeSessionFromCookie,
   setLanguageCookie,
+  updateSessionCookie,
 } from "./cookies";
 
-import { cookies } from "next/headers";
 import { timestampDate, timestampFromMs } from "@zitadel/client";
+import { cookies } from "next/headers";
 
 // Mock logger - use vi.hoisted to ensure it's defined before vi.mock runs
 const mockLogger = vi.hoisted(() => ({
@@ -64,6 +65,33 @@ describe("cookies", () => {
         httpOnly: true,
         path: "/",
       });
+    });
+  });
+
+  describe("getLanguageCookie", () => {
+    it("should return the language cookie value when set", async () => {
+      mockCookies.get.mockReturnValue({ value: "de" });
+
+      const result = await getLanguageCookie();
+
+      expect(result).toBe("de");
+      expect(mockCookies.get).toHaveBeenCalledWith("NEXT_LOCALE");
+    });
+
+    it("should return undefined when no language cookie exists", async () => {
+      mockCookies.get.mockReturnValue(undefined);
+
+      const result = await getLanguageCookie();
+
+      expect(result).toBeUndefined();
+    });
+
+    it("should return undefined when cookie has no value", async () => {
+      mockCookies.get.mockReturnValue({ value: undefined });
+
+      const result = await getLanguageCookie();
+
+      expect(result).toBeUndefined();
     });
   });
 

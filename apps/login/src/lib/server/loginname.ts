@@ -119,7 +119,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     // If no IDP links exist for the user (or no userId provided), try to get active IDPs from the organization
     if (identityProviders.length === 0) {
       const activeIdps = await getActiveIdentityProviders({ serviceConfig, orgId: organization }).then((resp) => {
-        return resp.identityProviders;
+        return resp.identityProviders.filter((idp) => idp.options?.isAutoCreation || idp.options?.isCreationAllowed);
       });
 
       // If exactly one active IDP exists in the organization, redirect to it
@@ -393,10 +393,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           };
 
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
-          if (
-            userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED ||
-            !userLoginSettings?.allowLocalAuthentication
-          ) {
+          if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED || !userLoginSettings?.allowLocalAuthentication) {
             if (command.ignoreUnknownUsernames) {
               return preventUserEnumeration(command.organization);
             }
@@ -504,7 +501,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
     const suffix = matched?.[1] ?? "";
 
-    // this just returns orgs where the suffix is set as the Organization Domain 
+    // this just returns orgs where the suffix is set as the Organization Domain
     const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix });
 
     const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
@@ -525,8 +522,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
-  // user not found, check if register is enabled on instance / organization context
-  if (effectiveLoginSettings?.allowRegister && !effectiveLoginSettings?.allowLocalAuthentication) {
+  // user not found, check if IDPs are available when local auth is not allowed
+  if (!effectiveLoginSettings?.allowLocalAuthentication) {
+    console.log("redirecting to IDP (register allowed, password not allowed)");
     logger.debug("redirecting to IDP (register allowed, password not allowed)");
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);
     if (resp) {

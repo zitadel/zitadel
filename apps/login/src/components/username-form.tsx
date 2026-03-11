@@ -1,19 +1,19 @@
 "use client";
 
-import { sendLoginname } from "@/lib/server/loginname";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { sendLoginname } from "@/lib/server/loginname";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
-import { useTranslations } from "next-intl";
-import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs = {
   loginName: string;

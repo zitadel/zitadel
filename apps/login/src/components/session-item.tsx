@@ -1,5 +1,6 @@
 "use client";
 
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { sendLoginname } from "@/lib/server/loginname";
 import { clearSession, continueWithSession, ContinueWithSessionCommand } from "@/lib/server/session";
 import { XCircleIcon } from "@heroicons/react/24/outline";
@@ -10,10 +11,9 @@ import moment from "moment";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { Avatar } from "./avatar";
 import { Translated } from "./translated";
-import { handleServerActionResponse } from "@/lib/client-utils";
-import { AutoSubmitForm } from "./auto-submit-form";
 
 export function isSessionValid(session: Partial<Session>): {
   valid: boolean;

@@ -1,7 +1,7 @@
 "use server";
 
 import { createLogger } from "@/lib/logger";
-import { recordAuthAttempt, recordAuthSuccess, recordAuthFailure } from "@/lib/metrics";
+import { recordAuthAttempt, recordAuthFailure, recordAuthSuccess } from "@/lib/metrics";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   getLockoutSettings,
@@ -58,6 +58,10 @@ export async function resetPassword(command: ResetPasswordCommand) {
 
   if (!loginSettings) {
     return { error: t("errors.couldNotSendResetLink") };
+  }
+
+  if (loginSettings.hidePasswordReset) {
+    return { error: t("errors.passwordResetNotAllowed") };
   }
 
   const searchResult = await searchUsers({
@@ -149,6 +153,20 @@ export async function sendPassword(
   let user: User | undefined;
   let loginSettingsByContext: LoginSettings | undefined;
   let loginSettingsByUser: LoginSettings | undefined;
+
+  // Perform policy check on context settings first if available, or fetch them if needed
+  if (!sessionCookie) {
+    if (!loginSettingsByContext) {
+      loginSettingsByContext = await getLoginSettings({
+        serviceConfig,
+        organization: command.organization ?? command.defaultOrganization,
+      });
+    }
+
+    if (loginSettingsByContext && !loginSettingsByContext.allowLocalAuthentication) {
+      return { error: t("errors.localAuthenticationNotAllowed") };
+    }
+  }
 
   if (sessionCookie) {
     try {

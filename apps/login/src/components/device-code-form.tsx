@@ -2,9 +2,9 @@
 
 import { Alert } from "@/components/alert";
 import { getDeviceAuthorizationRequest } from "@/lib/server/oidc";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";

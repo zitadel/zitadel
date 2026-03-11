@@ -392,6 +392,19 @@ func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail stri
 	return resp
 }
 
+func (i *Instance) SetOrganizationMetadata(ctx context.Context, id, key, value string) *org.SetOrganizationMetadataResponse {
+	resp, err := i.Client.OrgV2.SetOrganizationMetadata(ctx, &org.SetOrganizationMetadataRequest{
+		OrganizationId: id,
+		Metadata: []*org.Metadata{{
+			Key:   key,
+			Value: []byte(base64.StdEncoding.EncodeToString([]byte(value))),
+		},
+		},
+	})
+	logging.OnError(err).Panic("set organization metadata")
+	return resp
+}
+
 func (i *Instance) DeactivateOrganization(ctx context.Context, orgID string) *mgmt.DeactivateOrgResponse {
 	resp, err := i.Client.Mgmt.DeactivateOrg(
 		SetOrgID(ctx, orgID),

@@ -19,13 +19,7 @@
  * ```
  */
 
-import {
-  context,
-  propagation,
-  SpanKind,
-  SpanStatusCode,
-  trace,
-} from "@opentelemetry/api";
+import { context, propagation, SpanKind, SpanStatusCode, trace } from "@opentelemetry/api";
 import { GrpcError, Interceptor } from "./types";
 
 const TRACER_NAME = "zitadel-login-grpc" as const;
@@ -77,8 +71,7 @@ export function otelGrpcInterceptor(next: Parameters<Interceptor>[0]): ReturnTyp
           span.setStatus({ code: SpanStatusCode.OK });
           return response;
         } catch (err: unknown) {
-          const exception =
-            err instanceof Error ? err : new Error(String(err));
+          const exception = err instanceof Error ? err : new Error(String(err));
           span.recordException(exception);
           const grpcError = err as GrpcError;
           if (grpcError.code !== undefined) {
