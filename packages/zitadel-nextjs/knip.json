@@ -1,0 +1,7 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignoreDependencies": [
+    "@zitadel/zitadel-js",
+    "@zitadel/react"
+  ]
+}

@@ -1,0 +1,53 @@
+---
+title: SPA with Backend-for-Frontend (BFF)
+description: "Use a minimal BFF to keep sensitive auth responsibilities server-side for SPA architectures."
+sidebar_label: SPA + BFF Boundary
+---
+
+Single-page apps (React, Angular, Vue, etc.) are public clients. They are ideal for user-facing UI and route-level auth state, but some operations should still stay server-side.
+
+## Why use a BFF with SPAs
+
+A BFF lets you keep high-trust responsibilities out of browser code:
+
+- OIDC callback endpoint and code exchange side effects
+- secure session cookie management
+- confidential credentials (service user tokens, private keys)
+- token validation/proxying before upstream API calls
+- webhook verification and actions/event handling
+
+## Recommended split
+
+| Concern | Browser SPA | Server/BFF |
+| --- | --- | --- |
+| Login button and route UX | ✅ | ❌ |
+| Callback route and code exchange side effects | ❌ | ✅ |
+| Session cookie writes and invalidation | ❌ | ✅ |
+| Calls requiring confidential credentials | ❌ | ✅ |
+| Displaying minimal current-session state | ✅ (from BFF `/session`) | ✅ |
+| Webhook verification | ❌ | ✅ |
+
+## Example code
+
+Use this split as a reference architecture for your own SPA + BFF implementation:
+
+- Browser SPA for route/auth UX
+- Server/BFF for callback handling, token exchange side effects, and confidential operations
+
+For the currently maintained in-repo JavaScript SDK example path, use `examples/nextjs`.
+
+## Minimal endpoint contract
+
+A pragmatic starter contract is:
+
+- `GET /auth/login` - starts Authorization Code + PKCE flow
+- `GET /auth/callback` - handles callback and creates server session
+- `GET /session` - returns minimal auth state for SPA UI
+- `GET /api/userinfo` - server-side proxied resource call
+- `POST /logout` - clears session state
+
+## Package ownership
+
+- `@zitadel/zitadel-js`: core OIDC/session/webhook utilities used by BFF implementations.
+- `@zitadel/react` / `@zitadel/angular`: browser framework integration layers.
+- `@zitadel/nextjs`: full framework adapter where server and browser surfaces are already packaged together.

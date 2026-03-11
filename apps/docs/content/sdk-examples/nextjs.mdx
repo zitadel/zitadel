@@ -18,6 +18,31 @@ status: stable
 
 This example uses **[next-auth](https://www.npmjs.com/package/next-auth)** with **[openid-client](https://www.npmjs.com/package/openid-client)** to implement the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol, manage [PKCE](https://oauth.net/2/pkce/) code challenge generation, perform secure token exchange, and provide session management helpers.
 
+#### Official SDK option
+
+If you want to integrate with the official JavaScript SDK packages, use:
+
+- `npx @zitadel/nextjs add` to bootstrap OIDC routes, a `/auth` test page with OIDC result output, and `.env.example` in an existing Next.js App Router project (`--auth session`, `--with-api`, and `--with-webhook` are available for explicit scaffolding; use `--source workspace` for workspace-linked installs)
+- `@zitadel/nextjs/auth/oidc` for redirect-based "add login" flows
+- `@zitadel/nextjs/auth/session` for custom Login UI flows backed by the Session API
+- `@zitadel/nextjs/api` for server-side calls to ZITADEL v2 resource APIs
+- `@zitadel/nextjs/auth/bearer-token` for canonical bearer-token helpers
+- `@zitadel/nextjs/actions/webhook` for canonical Actions v2 webhook handling
+
+Related guides:
+
+- [Build your own Login UI](/guides/integrate/login-ui/login-app)
+- [Access ZITADEL APIs](/guides/integrate/zitadel-apis/access-zitadel-apis)
+- [Verify Actions payload integrity](/guides/integrate/actions/testing-request-signature)
+
+For SDK contributors in this repository, the fastest local inner loop is:
+
+```sh
+pnpm nx run @zitadel/nextjs-sdk-playground:dev-with-sdk
+```
+
+This runs watch builds for the SDK packages and serves the Next.js playground using workspace-linked dependencies.
+
 ---
 
 ## What this example demonstrates

@@ -289,8 +289,6 @@ export const guidesSidebar: readonly SidebarItem[] = [
             type: "category",
             label: "Frontend (SPA)",
             items: [
-              "sdk-examples/react",
-              "sdk-examples/angular",
               "sdk-examples/vue",
             ],
           },

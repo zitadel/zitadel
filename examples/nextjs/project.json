@@ -1,0 +1,36 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "dev": {
+      "description": "Runs the Next.js SDK demo app in development mode",
+      "continuous": true,
+      "dependsOn": ["^build"]
+    },
+    "dev-with-sdk": {
+      "description": "Runs local SDK watch builds together with the Next.js demo app",
+      "continuous": true,
+      "dependsOn": ["@zitadel/nextjs:build"],
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": true,
+        "commands": [
+          "nx run @zitadel/zitadel-js:dev --excludeTaskDependencies",
+          "nx run @zitadel/react:dev --excludeTaskDependencies",
+          "nx run @zitadel/nextjs:dev --excludeTaskDependencies",
+          "nx run @zitadel/examples/nextjs:dev --excludeTaskDependencies"
+        ]
+      }
+    },
+    "build": {
+      "description": "Builds the Next.js SDK demo app",
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/.env*"
+      ],
+      "outputs": ["{projectRoot}/.next", "!{projectRoot}/.next/cache"]
+    }
+  }
+}
