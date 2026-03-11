@@ -50,6 +50,8 @@ export default [
     rules: {
       ...tsPlugin.configs.recommended.rules,
       ...importPlugin.configs.recommended.rules,
+      // Proto imports are generated at build time and don't exist during lint
+      "import/no-unresolved": "off",
       "no-unused-vars": "off",
       "no-undef": "off",
       "@typescript-eslint/no-unused-vars": [
