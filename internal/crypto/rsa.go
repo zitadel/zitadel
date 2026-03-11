@@ -164,7 +164,7 @@ func BytesToPrivateKey(priv []byte) (*rsa.PrivateKey, error) {
 }
 
 var ErrEmpty = errors.New("cannot decode, empty data")
-var ErrNoPublicKey = errors.New("key is no supported public key type")
+var ErrNoPublicKey = errors.New("unsupported public key type")
 
 func BytesToPublicKey(pub []byte) (crypto.PublicKey, error) {
 	if len(pub) == 0 {
