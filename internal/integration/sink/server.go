@@ -408,7 +408,6 @@ func successfulIntentHandler(cmd *command.Commands, createIntent func(ctx contex
 			return
 		}
 		w.Write(data)
-		return
 	}
 }
 

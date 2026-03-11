@@ -458,16 +458,16 @@ func idpUserToCreateUser(idpUser idp.User, idpID string) *user.RetrieveIdentityP
 		createUser.Username = &username
 	}
 	if nickName := idpUser.GetNickname(); nickName != "" {
-		createUser.GetHuman().Profile.NickName = &nickName
+		createUser.GetHuman().GetProfile().NickName = &nickName
 	}
 	if displayName := idpUser.GetDisplayName(); displayName != "" {
-		createUser.GetHuman().Profile.DisplayName = &displayName
+		createUser.GetHuman().GetProfile().DisplayName = &displayName
 	}
 	if lang := idpUser.GetPreferredLanguage().String(); lang != "" {
-		createUser.GetHuman().Profile.PreferredLanguage = &lang
+		createUser.GetHuman().GetProfile().PreferredLanguage = &lang
 	}
 	if isEmailVerified := idpUser.IsEmailVerified(); isEmailVerified {
-		createUser.GetHuman().Email.Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
+		createUser.GetHuman().GetEmail().Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
 	}
 	if phone := idpUser.GetPhone(); phone != "" {
 		createUser.GetHuman().Phone = &user.SetHumanPhone{
@@ -475,7 +475,7 @@ func idpUserToCreateUser(idpUser idp.User, idpID string) *user.RetrieveIdentityP
 			Verification: &user.SetHumanPhone_SendCode{},
 		}
 		if isPhoneVerified := idpUser.IsPhoneVerified(); isPhoneVerified {
-			createUser.GetHuman().Phone.Verification = &user.SetHumanPhone_IsVerified{IsVerified: isPhoneVerified}
+			createUser.GetHuman().GetPhone().Verification = &user.SetHumanPhone_IsVerified{IsVerified: isPhoneVerified}
 		}
 	}
 	return &user.RetrieveIdentityProviderIntentResponse_CreateUser{
@@ -496,19 +496,19 @@ func idpUserToUpdateUser(userID string, idpUser idp.User) *user.RetrieveIdentity
 		updateUser.Username = &username
 	}
 	if firstName := idpUser.GetFirstName(); firstName != "" {
-		updateUser.GetHuman().Profile.GivenName = &firstName
+		updateUser.GetHuman().GetProfile().GivenName = &firstName
 	}
 	if lastName := idpUser.GetLastName(); lastName != "" {
-		updateUser.GetHuman().Profile.FamilyName = &lastName
+		updateUser.GetHuman().GetProfile().FamilyName = &lastName
 	}
 	if nickName := idpUser.GetNickname(); nickName != "" {
-		updateUser.GetHuman().Profile.NickName = &nickName
+		updateUser.GetHuman().GetProfile().NickName = &nickName
 	}
 	if displayName := idpUser.GetDisplayName(); displayName != "" {
-		updateUser.GetHuman().Profile.DisplayName = &displayName
+		updateUser.GetHuman().GetProfile().DisplayName = &displayName
 	}
 	if lang := idpUser.GetPreferredLanguage().String(); lang != "" {
-		updateUser.GetHuman().Profile.PreferredLanguage = &lang
+		updateUser.GetHuman().GetProfile().PreferredLanguage = &lang
 	}
 	if email := string(idpUser.GetEmail()); email != "" {
 		updateUser.GetHuman().Email = &user.SetHumanEmail{
@@ -516,7 +516,7 @@ func idpUserToUpdateUser(userID string, idpUser idp.User) *user.RetrieveIdentity
 			Verification: &user.SetHumanEmail_SendCode{},
 		}
 		if isEmailVerified := idpUser.IsEmailVerified(); isEmailVerified {
-			updateUser.GetHuman().Email.Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
+			updateUser.GetHuman().GetEmail().Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
 		}
 	}
 	if phone := string(idpUser.GetPhone()); phone != "" {
@@ -525,7 +525,7 @@ func idpUserToUpdateUser(userID string, idpUser idp.User) *user.RetrieveIdentity
 			Verification: &user.SetHumanPhone_SendCode{},
 		}
 		if isPhoneVerified := idpUser.IsPhoneVerified(); isPhoneVerified {
-			updateUser.GetHuman().Phone.Verification = &user.SetHumanPhone_IsVerified{IsVerified: isPhoneVerified}
+			updateUser.GetHuman().GetPhone().Verification = &user.SetHumanPhone_IsVerified{IsVerified: isPhoneVerified}
 		}
 	}
 
