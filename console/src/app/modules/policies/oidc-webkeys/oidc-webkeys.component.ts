@@ -9,9 +9,9 @@ import { TimestampToDatePipe } from 'src/app/pipes/timestamp-to-date-pipe/timest
 import { MatDialog } from '@angular/material/dialog';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { State, WebKey } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
-import { CreateWebKeyRequestSchema } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
-import { RSAHasher, RSABits, ECDSACurve } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
+import { State, WebKey } from '@zitadel/proto/zitadel/webkey/v2/key_pb';
+import { CreateWebKeyRequestSchema } from '@zitadel/proto/zitadel/webkey/v2/webkey_service_pb';
+import { RSAHasher, RSABits, ECDSACurve } from '@zitadel/proto/zitadel/webkey/v2/key_pb';
 
 const CACHE_WARNING_MS = 5 * 60 * 1000; // 5 minutes
 
