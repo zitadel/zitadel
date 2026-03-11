@@ -4,8 +4,6 @@ sidebar_label: Overview
 description: Deploy ZITADEL on Kubernetes using Helm — from a local 5-minute quickstart to a hardened production cluster.
 ---
 
-import DefaultUser from '../_defaultuser.mdx'
-
 This guide takes you from zero to a running ZITADEL instance on Kubernetes and then shows you how to harden it for production.
 
 ## Stage 1 — Quickstart
@@ -57,12 +55,10 @@ helm repo update &&
 helm upgrade --install zitadel zitadel/zitadel --values quickstart-values.yaml --wait
 ```
 
-That's it. Visit [http://localhost/ui/console](http://localhost/ui/console) to open the console.
-
-<DefaultUser components={props.components} />
+That's it. Visit [http://localhost/ui/console?login_hint=zitadel-admin@zitadel.localhost](http://localhost/ui/console?login_hint=zitadel-admin@zitadel.localhost) and log in with password `Password1!`.
 
 <Callout type="warn">
-The masterkey [encrypts sensitive data at rest](/concepts/architecture/secrets). The value above is a **dev placeholder** — generate a real one before any non-local deployment:
+The masterkey [encrypts sensitive data at rest](/concepts/architecture/secrets). The `quickstart-values.yaml` file contains a **dev placeholder** masterkey — generate a real one before any non-local deployment:
 ```bash
 tr -dc A-Za-z0-9 </dev/urandom | head -c 32
 ```
