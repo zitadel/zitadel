@@ -66,12 +66,12 @@ func (cmd *DeleteSessionCommand) sessionDeletePermissionCheckCondition(ctx conte
 			return nil, zerrors.ThrowPermissionDenied(err, ErrSessionTokenInvalid, "Errors.Session.TokenInvalid")
 		}
 		return database.Or(database.Exists("sessions", sessionRepo.TokenIDCondition(tokenID)),
-			database.Permission(domain.PermissionSessionDelete, true),
+			database.PermissionCheck(domain.PermissionSessionDelete, true),
 		), nil
 	}
 	return database.Or(
 		database.Exists("sessions", sessionRepo.UserIDCondition(authz.GetCtxData(ctx).UserID)),
-		database.Permission(domain.PermissionSessionDelete, true), // TODO: implement check
+		database.PermissionCheck(domain.PermissionSessionDelete, true), // TODO: implement check
 	), nil
 }
 
@@ -97,6 +97,7 @@ func (cmd *DeleteSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 		return zerrors.ThrowInternal(err, ErrInternal, "an unexpected error occurred while deleting the session")
 	}
 
+	// TODO: check for too many rows / no rows?
 	//if deletedRows > 1 {
 	//	return zerrors.ThrowInternalf(nil, ErrMoreThanOneRowAffected, "expecting 1 row deleted, got %d", deletedRows)
 	//}
@@ -121,6 +122,6 @@ func (cmd *DeleteSessionCommand) Validate(ctx context.Context, opts *InvokeOpts)
 }
 
 var (
-	_ Commander     = (*DeleteOrgCommand)(nil)
-	_ Transactional = (*DeleteOrgCommand)(nil)
+	_ Commander     = (*DeleteSessionCommand)(nil)
+	_ Transactional = (*DeleteSessionCommand)(nil)
 )

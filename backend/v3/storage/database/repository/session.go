@@ -253,15 +253,6 @@ func (s session) deleteSingleSession(ctx context.Context, client database.QueryE
 	writeCondition(&builder, condition)
 	builder.WriteString(") ")
 	s.writeDeleteStatementWithPermission("SELECT deleted_at FROM sessions", &builder, permissionCondition)
-	//if permissionCondition != nil {
-	//	builder.WriteString(" SELECT CASE WHEN (EXISTS (SELECT 1 FROM sessions) or throw_not_permitted()) THEN CASE WHEN(")
-	//	permissionCondition.Write(&builder)
-	//	builder.WriteString(") THEN (")
-	//}
-	//builder.WriteString("SELECT deleted_at FROM sessions")
-	//if permissionCondition != nil {
-	//	builder.WriteString(") END END")
-	//}
 	var deletedAt time.Time
 	if err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&deletedAt); err != nil {
 		// If no row was deleted, we return 0 rows affected and a zero time, without an error.
@@ -533,11 +524,6 @@ func (s session) MetadataConditions() domain.SessionMetadataConditions {
 	return s.metadataRepo
 }
 
-func (s session) PermissionCheckCondition(condition database.Condition) database.Condition {
-	//database.ForceRestrictingColumn()
-	return database.Or(condition)
-}
-
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
@@ -577,11 +563,6 @@ func (s session) ExpirationColumn() database.Column {
 
 // UserIDColumn implements [domain.sessionColumns].
 func (s session) UserIDColumn() database.Column {
-	return database.NewColumn(s.unqualifiedTableName(), "user_id")
-}
-
-// UserOrganizationColumn implements [domain.sessionColumns].
-func (s session) UserOrganizationColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "user_id")
 }
 

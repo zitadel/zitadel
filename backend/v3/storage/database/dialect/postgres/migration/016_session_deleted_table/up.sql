@@ -27,9 +27,11 @@ AFTER DELETE ON zitadel.sessions
 FOR EACH ROW
 EXECUTE FUNCTION zitadel.move_to_deleted_sessions();
 
+-- placeholder for permissions, will be replaced by actual permission checks in the future,
+-- respectively will be used to fallback to when permissions are not yet implemented for a specific action
 CREATE OR REPLACE FUNCTION zitadel.throw_not_permitted() returns boolean AS $$
 BEGIN
     RAISE EXCEPTION 'Permission denied: User does not have permission'
-        USING ERRCODE = 'insufficient_privilege';
+        USING ERRCODE = 'insufficient_privilege'; -- TODO: use a custom error code?
 END;
 $$ LANGUAGE plpgsql;

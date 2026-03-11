@@ -69,11 +69,8 @@ func TestDeleteSessionCommand_Validate(t *testing.T) {
 			if tc.fields.sessionRepo != nil {
 				domain.WithSessionRepo(tc.fields.sessionRepo(ctrl))(opts)
 			}
-			if tc.fields.sessionTokenVerifier != nil {
-				domain.WithSessionTokenVerifier(tc.fields.sessionTokenVerifier)(opts)
-			}
 			if tc.fields.permissionCheck != nil {
-				domain.WithPermissionCheck(tc.fields.permissionCheck(ctrl))(opts)
+				domain.WithPermissionChecker(tc.fields.permissionCheck(ctrl))(opts)
 			}
 
 			// Test
@@ -155,7 +152,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
 								database.Exists("sessions", repo.UserIDCondition(userID)),
-								database.Permission(zdomain.PermissionSessionDelete, true),
+								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
 							),
 						).
 						Times(1).
@@ -189,7 +186,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
 								database.Exists("sessions", repo.TokenIDCondition("token-1")),
-								database.Permission(zdomain.PermissionSessionDelete, true),
+								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
 							),
 						).
 						Times(1).
@@ -225,11 +222,11 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
 								database.Exists("sessions", repo.UserIDCondition(userID)),
-								database.Permission(zdomain.PermissionSessionDelete, true),
+								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
 							),
 						).
 						Times(1).
-						Return(int64(0), database.ErrMissingPermission)
+						Return(int64(0), database.NewPermissionError(nil))
 					return repo
 				},
 			},
@@ -238,7 +235,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 				mustCheckPermission: true,
 			},
 			res: res{
-				error: database.ErrMissingPermission,
+				error: new(database.PermissionError),
 			},
 		},
 		{

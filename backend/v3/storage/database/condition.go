@@ -14,45 +14,6 @@ type Condition interface {
 	IsRestrictingColumn(col Column) bool
 }
 
-type permission struct {
-	requiredPermission string
-	throwError         bool
-}
-
-func (p *permission) Matches(x any) bool {
-	toMatch, ok := x.(*permission)
-	if !ok {
-		return false
-	}
-	if toMatch.requiredPermission != p.requiredPermission {
-		return false
-	}
-	return toMatch.throwError == p.throwError
-}
-
-func (p *permission) String() string {
-	return "database.permission"
-}
-
-func (p *permission) Write(builder *StatementBuilder) {
-	if p.throwError {
-		builder.WriteString(" throw_not_permitted() ")
-		return
-	}
-	builder.WriteString(" true ")
-}
-
-func (p *permission) IsRestrictingColumn(col Column) bool {
-	return false
-}
-
-func Permission(requiredPermission string, throwError bool) *permission {
-	return &permission{
-		requiredPermission: requiredPermission,
-		throwError:         throwError,
-	}
-}
-
 type and struct {
 	conditions []Condition
 }
@@ -410,46 +371,45 @@ func ForceRestrictingColumn(cond Condition, isRestriction bool) Condition {
 
 var _ Condition = (*forcedRestrictingColumnCondition)(nil)
 
-// existsCondition is a helper to write an EXISTS (SELECT 1 FROM <table> WHERE <condition>) clause.
-// It implements [Condition] so it can be composed with other conditions using And/Or.
-type permissionCondition struct {
-	table     string
-	condition Condition
+type permissionCheck struct {
+	requiredPermission string
+	throwError         bool
 }
 
-// Matches implements [Condition].
-func (e *permissionCondition) Matches(x any) bool {
-	// Unimplemented
+func (p *permissionCheck) Matches(x any) bool {
+	toMatch, ok := x.(*permissionCheck)
+	if !ok {
+		return false
+	}
+	if toMatch.requiredPermission != p.requiredPermission {
+		return false
+	}
+	return toMatch.throwError == p.throwError
+}
+
+func (p *permissionCheck) String() string {
+	return "database.permissionCheck"
+}
+
+func (p *permissionCheck) Write(builder *StatementBuilder) {
+	// TODO: implement actual permission check once we have the necessary tables and functions in place.
+	// For now, we just write a dummy condition that can be used to verify that the permission check is included in the generated SQL.
+	if p.throwError {
+		builder.WriteString(" throw_not_permitted() ")
+		return
+	}
+	builder.WriteString(" true ")
+}
+
+func (p *permissionCheck) IsRestrictingColumn(_ Column) bool {
 	return false
 }
 
-// String implements [Condition].
-func (e *permissionCondition) String() string {
-	return "permissionCondition"
+func PermissionCheck(requiredPermission string, throwError bool) *permissionCheck {
+	return &permissionCheck{
+		requiredPermission: requiredPermission,
+		throwError:         throwError,
+	}
 }
 
-//
-//// Exists creates a condition that checks for the existence of rows in a subquery.
-//func Permission(table string, condition Condition) Condition {
-//	return &permissionCondition{
-//		table:     table,
-//		condition: condition,
-//	}
-//}
-
-// Write implements [Condition].
-func (e permissionCondition) Write(builder *StatementBuilder) {
-	builder.WriteString(" EXISTS (SELECT 1 FROM ")
-	builder.WriteString(e.table)
-	builder.WriteString(" WHERE ")
-	e.condition.Write(builder)
-	builder.WriteString(")")
-}
-
-// IsRestrictingColumn implements [Condition].
-func (e permissionCondition) IsRestrictingColumn(col Column) bool {
-	// Forward to the inner condition so safety checks (like instance_id presence) can still work.
-	return e.condition.IsRestrictingColumn(col)
-}
-
-var _ Condition = (*existsCondition)(nil)
+var _ Condition = (*permissionCheck)(nil)
