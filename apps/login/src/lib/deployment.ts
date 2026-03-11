@@ -12,8 +12,11 @@
  * @returns true if system user credentials are present, false otherwise
  */
 export function hasSystemUserCredentials(): boolean {
-  return !!process.env.AUDIENCE && !!process.env.SYSTEM_USER_ID &&
-    (!!process.env.SYSTEM_USER_PRIVATE_KEY || !!process.env.SYSTEM_USER_PRIVATE_KEY_FILE);
+  return (
+    !!process.env.AUDIENCE &&
+    !!process.env.SYSTEM_USER_ID &&
+    (!!process.env.SYSTEM_USER_PRIVATE_KEY || !!process.env.SYSTEM_USER_PRIVATE_KEY_FILE)
+  );
 }
 
 /**
