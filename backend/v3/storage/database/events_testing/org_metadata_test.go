@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
-	v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	v2 "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
 
 func TestServer_TestOrgMetadataReduces(t *testing.T) {
@@ -24,9 +24,9 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		// Add a metadata to the organization
 		org := createTestScopedOrg(t)
 		beforeAdd := time.Now()
-		_, err := OrgClient.SetOrganizationMetadata(CTX, &v2beta.SetOrganizationMetadataRequest{
-			OrganizationId: org.GetId(),
-			Metadata: []*v2beta.Metadata{
+		_, err := OrgClient.SetOrganizationMetadata(CTX, &v2.SetOrganizationMetadataRequest{
+			OrganizationId: org.OrganizationId,
+			Metadata: []*v2.Metadata{
 				{
 					Key:   "test-1-bool",
 					Value: []byte("false"),
@@ -61,7 +61,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrganizationIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.OrganizationId),
 						orgMetadataRepo.KeyCondition(database.TextOperationStartsWith, "test-"),
 					),
 				),
@@ -72,35 +72,35 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[0].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[0].OrganizationID)
+		assert.Equal(t, org.OrganizationId, gottenMetadata[0].OrganizationID)
 		assert.Equal(t, "test-1-bool", gottenMetadata[0].Key)
 		assert.Equal(t, []byte(`false`), gottenMetadata[0].Value)
 		assert.WithinRange(t, gottenMetadata[0].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[0].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[1].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[1].OrganizationID)
+		assert.Equal(t, org.OrganizationId, gottenMetadata[1].OrganizationID)
 		assert.Equal(t, "test-2-number", gottenMetadata[1].Key)
 		assert.Equal(t, []byte(`123`), gottenMetadata[1].Value)
 		assert.WithinRange(t, gottenMetadata[1].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[1].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[2].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[2].OrganizationID)
+		assert.Equal(t, org.OrganizationId, gottenMetadata[2].OrganizationID)
 		assert.Equal(t, "test-3-object", gottenMetadata[2].Key)
 		assert.JSONEq(t, `{"text":"value", "number":123, "bool": false}`, string(gottenMetadata[2].Value))
 		assert.WithinRange(t, gottenMetadata[2].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[2].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[3].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[3].OrganizationID)
+		assert.Equal(t, org.OrganizationId, gottenMetadata[3].OrganizationID)
 		assert.Equal(t, "test-4-text", gottenMetadata[3].Key)
 		assert.Equal(t, []byte(`"test-value"`), gottenMetadata[3].Value)
 		assert.WithinRange(t, gottenMetadata[3].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[3].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[4].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[4].OrganizationID)
+		assert.Equal(t, org.OrganizationId, gottenMetadata[4].OrganizationID)
 		assert.Equal(t, "test-5-bytes", gottenMetadata[4].Key)
 		assert.Equal(t, []byte(`test-value`), gottenMetadata[4].Value)
 		assert.WithinRange(t, gottenMetadata[4].CreatedAt, beforeAdd, afterAdd)
@@ -112,9 +112,9 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		// Add a metadata to the organization
 		org := createTestScopedOrg(t)
 		beforeAdd := time.Now()
-		_, err := OrgClient.SetOrganizationMetadata(CTX, &v2beta.SetOrganizationMetadataRequest{
-			OrganizationId: org.GetId(),
-			Metadata: []*v2beta.Metadata{
+		_, err := OrgClient.SetOrganizationMetadata(CTX, &v2.SetOrganizationMetadataRequest{
+			OrganizationId: org.GetOrganizationId(),
+			Metadata: []*v2.Metadata{
 				{
 					Key:   "test-1-bool",
 					Value: []byte("false"),
@@ -132,7 +132,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrganizationIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.OrganizationId),
 						orgMetadataRepo.KeyCondition(database.TextOperationStartsWith, "test-"),
 					),
 				),
@@ -143,15 +143,15 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[0].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[0].OrganizationID)
+		assert.Equal(t, org.OrganizationId, gottenMetadata[0].OrganizationID)
 		assert.Equal(t, "test-1-bool", gottenMetadata[0].Key)
 		assert.Equal(t, []byte(`false`), gottenMetadata[0].Value)
 		assert.WithinRange(t, gottenMetadata[0].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[0].UpdatedAt, beforeAdd, afterAdd)
 
-		_, err = OrgClient.SetOrganizationMetadata(CTX, &v2beta.SetOrganizationMetadataRequest{
-			OrganizationId: org.GetId(),
-			Metadata: []*v2beta.Metadata{
+		_, err = OrgClient.SetOrganizationMetadata(CTX, &v2.SetOrganizationMetadataRequest{
+			OrganizationId: org.GetOrganizationId(),
+			Metadata: []*v2.Metadata{
 				{
 					Key:   "test-1-bool",
 					Value: []byte("true"),
@@ -168,7 +168,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrganizationIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.OrganizationId),
 						orgMetadataRepo.KeyCondition(database.TextOperationStartsWith, "test-"),
 					),
 				),
@@ -180,7 +180,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[0].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[0].OrganizationID)
+		assert.Equal(t, org.OrganizationId, gottenMetadata[0].OrganizationID)
 		assert.Equal(t, "test-1-bool", gottenMetadata[0].Key)
 		assert.Equal(t, []byte(`true`), gottenMetadata[0].Value)
 		assert.WithinRange(t, gottenMetadata[0].CreatedAt, beforeAdd, afterAdd)
@@ -191,9 +191,9 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		// Add a metadata to the organization
 		org := createTestScopedOrg(t)
 
-		_, err := OrgClient.SetOrganizationMetadata(CTX, &v2beta.SetOrganizationMetadataRequest{
-			OrganizationId: org.GetId(),
-			Metadata: []*v2beta.Metadata{
+		_, err := OrgClient.SetOrganizationMetadata(CTX, &v2.SetOrganizationMetadataRequest{
+			OrganizationId: org.GetOrganizationId(),
+			Metadata: []*v2.Metadata{
 				{
 					Key:   "test-bool",
 					Value: []byte("false"),
@@ -211,8 +211,8 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// Remove the metadata
-		_, err = OrgClient.DeleteOrganizationMetadata(CTX, &v2beta.DeleteOrganizationMetadataRequest{
-			OrganizationId: org.GetId(),
+		_, err = OrgClient.DeleteOrganizationMetadata(CTX, &v2.DeleteOrganizationMetadataRequest{
+			OrganizationId: org.GetOrganizationId(),
 			Keys:           []string{"test-bool", "test-text"},
 		})
 		require.NoError(t, err)
@@ -224,7 +224,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrganizationIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.OrganizationId),
 					),
 				),
 			)
@@ -238,9 +238,9 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		// Add a metadata to the organization
 		org := createOrg(t)
 
-		_, err := OrgClient.SetOrganizationMetadata(CTX, &v2beta.SetOrganizationMetadataRequest{
-			OrganizationId: org.GetId(),
-			Metadata: []*v2beta.Metadata{
+		_, err := OrgClient.SetOrganizationMetadata(CTX, &v2.SetOrganizationMetadataRequest{
+			OrganizationId: org.GetOrganizationId(),
+			Metadata: []*v2.Metadata{
 				{
 					Key:   "test-bool",
 					Value: []byte("false"),
@@ -264,7 +264,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrganizationIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.OrganizationId),
 					),
 				),
 			)
@@ -272,8 +272,8 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 			assert.Len(t, metadata, 3)
 		}, retryDuration, tick)
 
-		_, err = OrgClient.DeleteOrganization(CTX, &v2beta.DeleteOrganizationRequest{
-			Id: org.Id,
+		_, err = OrgClient.DeleteOrganization(CTX, &v2.DeleteOrganizationRequest{
+			OrganizationId: org.OrganizationId,
 		})
 		require.NoError(t, err)
 
@@ -284,7 +284,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrganizationIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.OrganizationId),
 					),
 				),
 			)

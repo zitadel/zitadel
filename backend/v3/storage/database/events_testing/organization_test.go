@@ -14,9 +14,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	v2 "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
 
 func TestServer_TestOrganizationReduces(t *testing.T) {
@@ -27,15 +25,15 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		beforeCreate := time.Now()
 		orgName := gofakeit.Name()
 
-		org, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
+		org, err := OrgClient.AddOrganization(CTX, &v2.AddOrganizationRequest{
 			Name: orgName,
 		})
 		require.NoError(t, err)
 		afterCreate := time.Now()
 
 		t.Cleanup(func() {
-			_, err = OrgClient.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{
-				Id: org.GetId(),
+			_, err = OrgClient.DeleteOrganization(CTX, &v2.DeleteOrganizationRequest{
+				OrganizationId: org.GetOrganizationId(),
 			})
 			if err != nil {
 				t.Logf("Failed to delete organization on cleanup: %v", err)
@@ -45,7 +43,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(tt *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, org.GetId())),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, org.GetOrganizationId())),
 			)
 			require.NoError(tt, err)
 
@@ -63,14 +61,14 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		orgName := gofakeit.Name()
 
 		// 1. create org
-		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
+		organization, err := OrgClient.AddOrganization(CTX, &v2.AddOrganizationRequest{
 			Name: orgName,
 		})
 		require.NoError(t, err)
 
 		t.Cleanup(func() {
-			_, err = OrgClient.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{
-				Id: organization.Id,
+			_, err = OrgClient.DeleteOrganization(CTX, &v2.DeleteOrganizationRequest{
+				OrganizationId: organization.OrganizationId,
 			})
 			if err != nil {
 				t.Logf("Failed to delete organization on cleanup: %v", err)
@@ -80,9 +78,9 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		// 2. update org name
 		beforeUpdate := time.Now()
 		orgName = orgName + "_new"
-		_, err = OrgClient.UpdateOrganization(CTX, &v2beta_org.UpdateOrganizationRequest{
-			Id:   organization.Id,
-			Name: orgName,
+		_, err = OrgClient.UpdateOrganization(CTX, &v2.UpdateOrganizationRequest{
+			OrganizationId: organization.OrganizationId,
+			Name:           orgName,
 		})
 		require.NoError(t, err)
 		afterUpdate := time.Now()
@@ -90,7 +88,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetOrganizationId())),
 			)
 			require.NoError(t, err)
 
@@ -104,14 +102,14 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		orgName := gofakeit.Name()
 
 		// 1. create org
-		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
+		organization, err := OrgClient.AddOrganization(CTX, &v2.AddOrganizationRequest{
 			Name: orgName,
 		})
 		require.NoError(t, err)
 		t.Cleanup(func() {
 			// Cleanup: delete the organization
-			_, err = OrgClient.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{
-				Id: organization.Id,
+			_, err = OrgClient.DeleteOrganization(CTX, &v2.DeleteOrganizationRequest{
+				OrganizationId: organization.OrganizationId,
 			})
 			if err != nil {
 				t.Logf("Failed to delete organization on cleanup: %v", err)
@@ -120,8 +118,8 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 
 		// 2. deactivate org name
 		beforeDeactivate := time.Now()
-		_, err = OrgClient.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
-			Id: organization.Id,
+		_, err = OrgClient.DeactivateOrganization(CTX, &v2.DeactivateOrganizationRequest{
+			OrganizationId: organization.OrganizationId,
 		})
 
 		require.NoError(t, err)
@@ -130,7 +128,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetOrganizationId())),
 			)
 			require.NoError(t, err)
 
@@ -144,14 +142,14 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		orgName := gofakeit.Name()
 
 		// 1. create org
-		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
+		organization, err := OrgClient.AddOrganization(CTX, &v2.AddOrganizationRequest{
 			Name: orgName,
 		})
 		require.NoError(t, err)
 		t.Cleanup(func() {
 			// Cleanup: delete the organization
-			_, err = OrgClient.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{
-				Id: organization.Id,
+			_, err = OrgClient.DeleteOrganization(CTX, &v2.DeleteOrganizationRequest{
+				OrganizationId: organization.OrganizationId,
 			})
 			if err != nil {
 				t.Logf("Failed to delete organization on cleanup: %v", err)
@@ -159,8 +157,8 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		})
 
 		// 2. deactivate org name
-		_, err = OrgClient.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
-			Id: organization.Id,
+		_, err = OrgClient.DeactivateOrganization(CTX, &v2.DeactivateOrganizationRequest{
+			OrganizationId: organization.OrganizationId,
 		})
 		require.NoError(t, err)
 
@@ -169,7 +167,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetOrganizationId())),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, domain.OrgStateInactive, organization.State)
@@ -177,8 +175,8 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 
 		// 4. activate org name
 		beforeActivate := time.Now()
-		_, err = OrgClient.ActivateOrganization(CTX, &v2beta_org.ActivateOrganizationRequest{
-			Id: organization.Id,
+		_, err = OrgClient.ActivateOrganization(CTX, &v2.ActivateOrganizationRequest{
+			OrganizationId: organization.OrganizationId,
 		})
 		require.NoError(t, err)
 		afterActivate := time.Now()
@@ -186,7 +184,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetOrganizationId())),
 			)
 			require.NoError(t, err)
 
@@ -201,7 +199,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		orgName := gofakeit.Name()
 
 		// 1. create org
-		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
+		organization, err := OrgClient.AddOrganization(CTX, &v2.AddOrganizationRequest{
 			Name: orgName,
 		})
 		require.NoError(t, err)
@@ -211,21 +209,21 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetOrganizationId())),
 			)
 			require.NoError(t, err)
 		}, retryDuration, tick)
 
 		// 3. delete org
-		_, err = OrgClient.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{
-			Id: organization.Id,
+		_, err = OrgClient.DeleteOrganization(CTX, &v2.DeleteOrganizationRequest{
+			OrganizationId: organization.OrganizationId,
 		})
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetOrganizationId())),
 			)
 			require.ErrorIs(t, err, new(database.NoRowFoundError))
 
@@ -235,9 +233,9 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 	})
 }
 
-func createOrg(t *testing.T) *org.CreateOrganizationResponse {
+func createOrg(t *testing.T) *v2.AddOrganizationResponse {
 	t.Helper()
-	org, err := OrgClient.CreateOrganization(CTX, &org.CreateOrganizationRequest{
+	org, err := OrgClient.AddOrganization(CTX, &v2.AddOrganizationRequest{
 		Name: gofakeit.Name(),
 	})
 	require.NoError(t, err)
@@ -246,7 +244,7 @@ func createOrg(t *testing.T) *org.CreateOrganizationResponse {
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(t.Context(), time.Minute)
 	assert.EventuallyWithT(t, func(tc *assert.CollectT) {
 		_, err := orgRepo.Get(t.Context(), pool,
-			database.WithCondition(orgRepo.PrimaryKeyCondition(Instance.Instance.Id, org.GetId())),
+			database.WithCondition(orgRepo.PrimaryKeyCondition(Instance.Instance.Id, org.GetOrganizationId())),
 		)
 		assert.NoError(tc, err)
 	}, retryDuration, tick)
@@ -254,12 +252,12 @@ func createOrg(t *testing.T) *org.CreateOrganizationResponse {
 	return org
 }
 
-func createTestScopedOrg(t *testing.T) *org.CreateOrganizationResponse {
+func createTestScopedOrg(t *testing.T) *v2.AddOrganizationResponse {
 	org := createOrg(t)
 
 	t.Cleanup(func() {
-		_, err := OrgClient.DeleteOrganization(CTX, &v2beta.DeleteOrganizationRequest{
-			Id: org.GetId(),
+		_, err := OrgClient.DeleteOrganization(CTX, &v2.DeleteOrganizationRequest{
+			OrganizationId: org.GetOrganizationId(),
 		})
 		if err != nil {
 			t.Logf("Failed to delete organization on cleanup: %v", err)

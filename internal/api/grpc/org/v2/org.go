@@ -6,6 +6,8 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	orgv2 "github.com/zitadel/zitadel/backend/v3/api/org/v2"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	"github.com/zitadel/zitadel/internal/command"
@@ -28,6 +30,10 @@ func (s *Server) AddOrganization(ctx context.Context, request *connect.Request[o
 }
 
 func (s *Server) UpdateOrganization(ctx context.Context, request *connect.Request[org.UpdateOrganizationRequest]) (*connect.Response[org.UpdateOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.UpdateOrganization(ctx, request)
+	}
+
 	organization, err := s.command.ChangeOrg(ctx, request.Msg.GetOrganizationId(), request.Msg.GetName(), s.command.CheckPermissionOrganizationWrite)
 	if err != nil {
 		return nil, err
@@ -39,6 +45,10 @@ func (s *Server) UpdateOrganization(ctx context.Context, request *connect.Reques
 }
 
 func (s *Server) DeleteOrganization(ctx context.Context, request *connect.Request[org.DeleteOrganizationRequest]) (*connect.Response[org.DeleteOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.DeleteOrganization(ctx, request)
+	}
+
 	details, err := s.command.RemoveOrg(ctx, request.Msg.GetOrganizationId(), s.command.CheckPermissionOrganizationDelete, false)
 	if err != nil {
 		return nil, err
@@ -69,6 +79,10 @@ func (s *Server) DeleteOrganizationMetadata(ctx context.Context, request *connec
 }
 
 func (s *Server) DeactivateOrganization(ctx context.Context, request *connect.Request[org.DeactivateOrganizationRequest]) (*connect.Response[org.DeactivateOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.DeactivateOrganization(ctx, request)
+	}
+
 	objectDetails, err := s.command.DeactivateOrg(ctx, request.Msg.GetOrganizationId(), s.command.CheckPermissionOrganizationWrite)
 	if err != nil {
 		return nil, err
@@ -79,6 +93,10 @@ func (s *Server) DeactivateOrganization(ctx context.Context, request *connect.Re
 }
 
 func (s *Server) ActivateOrganization(ctx context.Context, request *connect.Request[org.ActivateOrganizationRequest]) (*connect.Response[org.ActivateOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.ActivateOrganization(ctx, request)
+	}
+
 	objectDetails, err := s.command.ReactivateOrg(ctx, request.Msg.GetOrganizationId(), s.command.CheckPermissionOrganizationWrite)
 	if err != nil {
 		return nil, err

@@ -21,7 +21,7 @@ func TestServer_AddProjectRole(t *testing.T) {
 	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.ProjectName(), integration.Email())
 	alreadyExistingProject := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 	alreadyExistingProjectRoleName := integration.RoleDisplayName()
-	instance.AddProjectRole(iamOwnerCtx, t, alreadyExistingProject.GetId(), alreadyExistingProjectRoleName, alreadyExistingProjectRoleName, "")
+	instance.AddProjectRole(iamOwnerCtx, t, alreadyExistingProject.GetProjectId(), alreadyExistingProjectRoleName, alreadyExistingProjectRoleName, "")
 
 	type want struct {
 		creationDate bool
@@ -39,7 +39,7 @@ func TestServer_AddProjectRole(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(t *testing.T, request *project.AddProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.ProjectId = projectResp.GetId()
+				request.ProjectId = projectResp.GetProjectId()
 			},
 			req: &project.AddProjectRoleRequest{
 				RoleKey:     "",
@@ -52,7 +52,7 @@ func TestServer_AddProjectRole(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(t *testing.T, request *project.AddProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.ProjectId = projectResp.GetId()
+				request.ProjectId = projectResp.GetProjectId()
 			},
 			req: &project.AddProjectRoleRequest{
 				RoleKey:     integration.RoleKey(),
@@ -64,7 +64,7 @@ func TestServer_AddProjectRole(t *testing.T) {
 			name: "already existing, error",
 			ctx:  iamOwnerCtx,
 			prepare: func(t *testing.T, request *project.AddProjectRoleRequest) {
-				request.ProjectId = alreadyExistingProject.GetId()
+				request.ProjectId = alreadyExistingProject.GetProjectId()
 			},
 			req: &project.AddProjectRoleRequest{
 				RoleKey:     alreadyExistingProjectRoleName,
@@ -77,7 +77,7 @@ func TestServer_AddProjectRole(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(t *testing.T, request *project.AddProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.ProjectId = projectResp.GetId()
+				request.ProjectId = projectResp.GetProjectId()
 			},
 			req: &project.AddProjectRoleRequest{
 				RoleKey:     integration.RoleKey(),
@@ -113,7 +113,7 @@ func TestServer_AddProjectRole_Permission(t *testing.T) {
 	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 	alreadyExistingProject := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 	alreadyExistingProjectRoleName := integration.RoleKey()
-	instance.AddProjectRole(iamOwnerCtx, t, alreadyExistingProject.GetId(), alreadyExistingProjectRoleName, alreadyExistingProjectRoleName, "")
+	instance.AddProjectRole(iamOwnerCtx, t, alreadyExistingProject.GetProjectId(), alreadyExistingProjectRoleName, alreadyExistingProjectRoleName, "")
 
 	type want struct {
 		creationDate bool
@@ -133,7 +133,7 @@ func TestServer_AddProjectRole_Permission(t *testing.T) {
 			ctx:  CTX,
 			prepare: func(t *testing.T, request *project.AddProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.ProjectId = projectResp.GetId()
+				request.ProjectId = projectResp.GetProjectId()
 			},
 			req: &project.AddProjectRoleRequest{
 				RoleKey:     integration.RoleKey(),
@@ -146,7 +146,7 @@ func TestServer_AddProjectRole_Permission(t *testing.T) {
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(t *testing.T, request *project.AddProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.ProjectId = projectResp.GetId()
+				request.ProjectId = projectResp.GetProjectId()
 			},
 			req: &project.AddProjectRoleRequest{
 				RoleKey:     integration.RoleKey(),
@@ -159,7 +159,7 @@ func TestServer_AddProjectRole_Permission(t *testing.T) {
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(t *testing.T, request *project.AddProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.ProjectId = projectResp.GetId()
+				request.ProjectId = projectResp.GetProjectId()
 			},
 			req: &project.AddProjectRoleRequest{
 				RoleKey:     integration.RoleKey(),
@@ -172,7 +172,7 @@ func TestServer_AddProjectRole_Permission(t *testing.T) {
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(t *testing.T, request *project.AddProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				request.ProjectId = projectResp.GetId()
+				request.ProjectId = projectResp.GetProjectId()
 			},
 			req: &project.AddProjectRoleRequest{
 				RoleKey:     integration.RoleKey(),
@@ -187,7 +187,7 @@ func TestServer_AddProjectRole_Permission(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(t *testing.T, request *project.AddProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.ProjectId = projectResp.GetId()
+				request.ProjectId = projectResp.GetProjectId()
 			},
 			req: &project.AddProjectRoleRequest{
 				RoleKey:     integration.RoleKey(),
@@ -219,7 +219,7 @@ func TestServer_AddProjectRole_Permission(t *testing.T) {
 				_, token, _, _ := instance.CreateVerifiedWebAuthNSession(t, loginCTX, userID)
 				// assign user as project admin
 				_, err := instance.Client.Mgmt.AddProjectMember(iamOwnerCtx, &management.AddProjectMemberRequest{
-					ProjectId: projectResp.GetId(),
+					ProjectId: projectResp.GetProjectId(),
 					UserId:    userID,
 					Roles:     []string{"PROJECT_OWNER_GLOBAL"},
 				})
@@ -228,7 +228,7 @@ func TestServer_AddProjectRole_Permission(t *testing.T) {
 				// set context
 				out.ctx = integration.WithAuthorizationToken(context.Background(), token)
 
-				request.ProjectId = projectResp.GetId()
+				request.ProjectId = projectResp.GetProjectId()
 			}
 
 			return &out
@@ -289,8 +289,8 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 			prepare: func(t *testing.T, request *project.UpdateProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 			},
 			args: args{
@@ -320,8 +320,8 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 			prepare: func(t *testing.T, request *project.UpdateProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 				request.DisplayName = gu.Ptr(roleName)
 			},
@@ -339,8 +339,8 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 			prepare: func(t *testing.T, request *project.UpdateProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 			},
 			args: args{
@@ -359,8 +359,8 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 			prepare: func(t *testing.T, request *project.UpdateProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 			},
 			args: args{
@@ -421,8 +421,8 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 			prepare: func(t *testing.T, request *project.UpdateProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 			},
 			args: args{
@@ -438,8 +438,8 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 			prepare: func(t *testing.T, request *project.UpdateProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 			},
 			args: args{
@@ -455,8 +455,8 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 			prepare: func(t *testing.T, request *project.UpdateProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 			},
 			args: args{
@@ -472,8 +472,8 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 			prepare: func(t *testing.T, request *project.UpdateProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 			},
 			args: args{
@@ -492,8 +492,8 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 			prepare: func(t *testing.T, request *project.UpdateProjectRoleRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 			},
 			args: args{
@@ -532,7 +532,7 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 				_, token, _, _ := instance.CreateVerifiedWebAuthNSession(t, loginCTX, userID)
 				// assign user as project admin
 				_, err := instance.Client.Mgmt.AddProjectMember(iamOwnerCtx, &management.AddProjectMemberRequest{
-					ProjectId: projectResp.GetId(),
+					ProjectId: projectResp.GetProjectId(),
 					UserId:    userID,
 					Roles:     []string{"PROJECT_OWNER_GLOBAL"},
 				})
@@ -542,8 +542,8 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 				out.args.ctx = integration.WithAuthorizationToken(context.Background(), token)
 
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 			}
 
@@ -619,8 +619,8 @@ func TestServer_DeleteProjectRole(t *testing.T) {
 				creationDate := time.Now().UTC()
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 				return creationDate, time.Time{}
 			},
@@ -634,10 +634,10 @@ func TestServer_DeleteProjectRole(t *testing.T) {
 				creationDate := time.Now().UTC()
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
-				instance.RemoveProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName)
+				instance.RemoveProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName)
 				return creationDate, time.Now().UTC()
 			},
 			req:              &project.RemoveProjectRoleRequest{},
@@ -681,8 +681,8 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 				creationDate := time.Now().UTC()
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 				return creationDate, time.Time{}
 			},
@@ -696,8 +696,8 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 				creationDate := time.Now().UTC()
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 				return creationDate, time.Time{}
 			},
@@ -711,8 +711,8 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 				creationDate := time.Now().UTC()
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 				return creationDate, time.Time{}
 			},
@@ -726,8 +726,8 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 				creationDate := time.Now().UTC()
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 				return creationDate, time.Time{}
 			},
@@ -741,8 +741,8 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 				creationDate := time.Now().UTC()
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 				return creationDate, time.Time{}
 			},
@@ -767,7 +767,7 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 				_, token, _, _ := instance.CreateVerifiedWebAuthNSession(t, loginCTX, userID)
 				// assign user as project admin
 				_, err := instance.Client.Mgmt.AddProjectMember(iamOwnerCtx, &management.AddProjectMemberRequest{
-					ProjectId: projectResp.GetId(),
+					ProjectId: projectResp.GetProjectId(),
 					UserId:    userID,
 					Roles:     []string{"PROJECT_OWNER_GLOBAL"},
 				})
@@ -777,8 +777,8 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 				out.ctx = integration.WithAuthorizationToken(context.Background(), token)
 
 				roleName := integration.RoleKey()
-				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
-				request.ProjectId = projectResp.GetId()
+				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetProjectId(), roleName, roleName, "")
+				request.ProjectId = projectResp.GetProjectId()
 				request.RoleKey = roleName
 				return creationDate, time.Time{}
 			}

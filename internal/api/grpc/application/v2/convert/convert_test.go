@@ -13,14 +13,13 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
+	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/application/v2"
 	filter_pb_v2 "github.com/zitadel/zitadel/pkg/grpc/filter/v2"
-	filter_pb_v2_beta "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 )
 
 func TestAppToPb(t *testing.T) {
@@ -78,7 +77,7 @@ func TestAppToPb(t *testing.T) {
 func TestListApplicationsRequestToModel(t *testing.T) {
 	t.Parallel()
 
-	validSearchByNameQuery, err := query.NewAppNameSearchQuery(filter.TextMethodPbToQuery(filter_pb_v2_beta.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS), "test")
+	validSearchByNameQuery, err := query.NewAppNameSearchQuery(filter.TextMethodPbToQuery(filter_pb_v2.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS), "test")
 	require.NoError(t, err)
 
 	validSearchByProjectQuery, err := query.NewAppProjectIDSearchQuery("project1")

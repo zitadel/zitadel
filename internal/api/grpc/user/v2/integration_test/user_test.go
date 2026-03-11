@@ -1830,8 +1830,8 @@ func TestServer_DeleteUser(t *testing.T) {
 				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					Instance.CreateProjectUserGrant(t, OrgCTX, Instance.DefaultOrg.GetId(), projectResp.GetId(), request.UserId)
-					Instance.CreateProjectMembership(t, OrgCTX, projectResp.GetId(), request.UserId)
+					Instance.CreateProjectUserGrant(t, OrgCTX, Instance.DefaultOrg.GetId(), projectResp.GetProjectId(), request.UserId)
+					Instance.CreateProjectMembership(t, OrgCTX, projectResp.GetProjectId(), request.UserId)
 					Instance.CreateOrgMembership(t, OrgCTX, Instance.DefaultOrg.Id, request.UserId)
 					return OrgCTX
 				},

@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"

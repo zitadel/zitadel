@@ -13,7 +13,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	metadata "github.com/zitadel/zitadel/pkg/grpc/metadata/v2"
-	resources_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
 // Details is the interface that covers both v1 and v2 proto generated object details.
@@ -38,10 +37,6 @@ type ListDetails interface {
 
 type ListDetailsMsg[L ListDetails] interface {
 	GetDetails() L
-}
-
-type ResourceListDetailsMsg interface {
-	GetDetails() *resources_object.ListDetails
 }
 
 // AssertDetails asserts values in a message's object Details,
@@ -79,32 +74,6 @@ func AssertDetails[D Details, M DetailsMsg[D]](t assert.TestingT, expected, actu
 	assert.Equal(t, wantDetails.GetResourceOwner(), gotDetails.GetResourceOwner())
 }
 
-func AssertResourceDetails(t assert.TestingT, expected *resources_object.Details, actual *resources_object.Details) {
-	if expected.GetChanged() != nil {
-		wantChangeDate := time.Now()
-		gotChangeDate := actual.GetChanged().AsTime()
-		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-time.Minute), wantChangeDate.Add(time.Minute))
-	}
-	if expected.GetCreated() != nil {
-		wantCreatedDate := time.Now()
-		gotCreatedDate := actual.GetCreated().AsTime()
-		assert.WithinRange(t, gotCreatedDate, wantCreatedDate.Add(-time.Minute), wantCreatedDate.Add(time.Minute))
-	}
-	if expected.GetOwner() != nil {
-		expectedOwner := expected.GetOwner()
-		actualOwner := actual.GetOwner()
-		if !assert.NotNil(t, actualOwner) {
-			return
-		}
-		assert.Equal(t, expectedOwner.GetId(), actualOwner.GetId())
-		assert.Equal(t, expectedOwner.GetType(), actualOwner.GetType())
-	}
-	assert.NotEmpty(t, actual.GetId())
-	if expected.GetId() != "" {
-		assert.Equal(t, expected.GetId(), actual.GetId())
-	}
-}
-
 func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t assert.TestingT, expected, actual D) {
 	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
 	var nilDetails L
@@ -113,23 +82,6 @@ func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t assert.TestingT, ex
 		return
 	}
 	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())
-
-	if wantDetails.GetTimestamp() != nil {
-		gotCD := gotDetails.GetTimestamp().AsTime()
-		wantCD := time.Now()
-		assert.WithinRange(t, gotCD, wantCD.Add(-10*time.Minute), wantCD.Add(time.Minute))
-	}
-}
-
-func AssertResourceListDetails[D ResourceListDetailsMsg](t assert.TestingT, expected, actual D) {
-	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
-	if wantDetails == nil {
-		assert.Nil(t, gotDetails)
-		return
-	}
-
-	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())
-	assert.Equal(t, wantDetails.GetAppliedLimit(), gotDetails.GetAppliedLimit())
 
 	if wantDetails.GetTimestamp() != nil {
 		gotCD := gotDetails.GetTimestamp().AsTime()

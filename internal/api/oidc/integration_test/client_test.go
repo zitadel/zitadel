@@ -33,50 +33,50 @@ func TestServer_Introspect(t *testing.T) {
 			name: "client assertion",
 			api: func(t *testing.T) (string, []string, rs.ResourceServer) {
 				project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
-				api, err := Instance.CreateAPIClientJWT(CTX, project.GetId())
+				api, err := Instance.CreateAPIClientJWT(CTX, project.GetProjectId())
 				require.NoError(t, err)
 				keyResp, err := Instance.Client.Mgmt.AddAppKey(CTX, &management.AddAppKeyRequest{
-					ProjectId:      project.GetId(),
+					ProjectId:      project.GetProjectId(),
 					AppId:          api.GetAppId(),
 					Type:           authn.KeyType_KEY_TYPE_JSON,
 					ExpirationDate: nil,
 				})
 				require.NoError(t, err)
 
-				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetProjectId(), false)
 				require.NoError(t, err)
 
 				resourceServer, err := Instance.CreateResourceServerJWTProfile(CTX, keyResp.GetKeyDetails())
 				require.NoError(t, err)
-				return app.GetClientId(), []string{app.GetClientId(), project.GetId(), api.GetClientId()}, resourceServer
+				return app.GetClientId(), []string{app.GetClientId(), project.GetProjectId(), api.GetClientId()}, resourceServer
 			},
 		},
 		{
 			name: "client credentials",
 			api: func(t *testing.T) (string, []string, rs.ResourceServer) {
 				project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
-				api, err := Instance.CreateAPIClientBasic(CTX, project.GetId())
+				api, err := Instance.CreateAPIClientBasic(CTX, project.GetProjectId())
 				require.NoError(t, err)
-				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetProjectId(), false)
 				require.NoError(t, err)
 
 				resourceServer, err := Instance.CreateResourceServerClientCredentials(CTX, api.GetClientId(), api.GetClientSecret())
 				require.NoError(t, err)
-				return app.GetClientId(), []string{app.GetClientId(), project.GetId(), api.GetClientId()}, resourceServer
+				return app.GetClientId(), []string{app.GetClientId(), project.GetProjectId(), api.GetClientId()}, resourceServer
 			},
 		},
 		{
 			name: "client invalid id, error",
 			api: func(t *testing.T) (string, []string, rs.ResourceServer) {
 				project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
-				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetProjectId(), false)
 				require.NoError(t, err)
 
-				api, err := Instance.CreateAPIClientBasic(CTX, project.GetId())
+				api, err := Instance.CreateAPIClientBasic(CTX, project.GetProjectId())
 				require.NoError(t, err)
 				resourceServer, err := Instance.CreateResourceServerClientCredentials(CTX, "xxxxx", api.GetClientSecret())
 				require.NoError(t, err)
-				return app.GetClientId(), []string{app.GetClientId(), project.GetId(), api.GetClientId()}, resourceServer
+				return app.GetClientId(), []string{app.GetClientId(), project.GetProjectId(), api.GetClientId()}, resourceServer
 			},
 			wantErr: true,
 		},
@@ -84,14 +84,14 @@ func TestServer_Introspect(t *testing.T) {
 			name: "client invalid secret, error",
 			api: func(t *testing.T) (string, []string, rs.ResourceServer) {
 				project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
-				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetProjectId(), false)
 				require.NoError(t, err)
 
-				api, err := Instance.CreateAPIClientBasic(CTX, project.GetId())
+				api, err := Instance.CreateAPIClientBasic(CTX, project.GetProjectId())
 				require.NoError(t, err)
 				resourceServer, err := Instance.CreateResourceServerClientCredentials(CTX, api.GetClientId(), "xxxxx")
 				require.NoError(t, err)
-				return app.GetClientId(), []string{app.GetClientId(), project.GetId(), api.GetClientId()}, resourceServer
+				return app.GetClientId(), []string{app.GetClientId(), project.GetProjectId(), api.GetClientId()}, resourceServer
 			},
 			wantErr: true,
 		},
@@ -99,14 +99,14 @@ func TestServer_Introspect(t *testing.T) {
 			name: "client credentials on jwt client, error",
 			api: func(t *testing.T) (string, []string, rs.ResourceServer) {
 				project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
-				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetProjectId(), false)
 				require.NoError(t, err)
 
-				api, err := Instance.CreateAPIClientJWT(CTX, project.GetId())
+				api, err := Instance.CreateAPIClientJWT(CTX, project.GetProjectId())
 				require.NoError(t, err)
 				resourceServer, err := Instance.CreateResourceServerClientCredentials(CTX, api.GetClientId(), "xxxxx")
 				require.NoError(t, err)
-				return app.GetClientId(), []string{app.GetClientId(), project.GetId(), api.GetClientId()}, resourceServer
+				return app.GetClientId(), []string{app.GetClientId(), project.GetProjectId(), api.GetClientId()}, resourceServer
 			},
 			wantErr: true,
 		},
@@ -203,15 +203,15 @@ func TestServer_VerifyClient(t *testing.T) {
 	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
 	projectInactive := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
 
-	inactiveClient, err := Instance.CreateOIDCInactivateClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	inactiveClient, err := Instance.CreateOIDCInactivateClient(CTX, redirectURI, logoutRedirectURI, project.GetProjectId())
 	require.NoError(t, err)
-	inactiveProjectClient, err := Instance.CreateOIDCInactivateProjectClient(CTX, redirectURI, logoutRedirectURI, projectInactive.GetId())
+	inactiveProjectClient, err := Instance.CreateOIDCInactivateProjectClient(CTX, redirectURI, logoutRedirectURI, projectInactive.GetProjectId())
 	require.NoError(t, err)
-	nativeClient, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+	nativeClient, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetProjectId(), false)
 	require.NoError(t, err)
-	basicWebClient, err := Instance.CreateOIDCWebClientBasic(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	basicWebClient, err := Instance.CreateOIDCWebClientBasic(CTX, redirectURI, logoutRedirectURI, project.GetProjectId())
 	require.NoError(t, err)
-	jwtWebClient, keyData, err := Instance.CreateOIDCWebClientJWT(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	jwtWebClient, keyData, err := Instance.CreateOIDCWebClientJWT(CTX, redirectURI, logoutRedirectURI, project.GetProjectId())
 	require.NoError(t, err)
 
 	type clientDetails struct {

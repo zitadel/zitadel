@@ -33,8 +33,8 @@ func TestServer_ListAuthorizations(t *testing.T) {
 		{Key: "role2", DisplayName: "Role 2", Group: "group2"},
 		{Key: "role3", DisplayName: "Role 3", Group: "group2"}}
 	for _, role := range roles {
-		InstanceQuery.AddProjectRole(iamOwnerCtx, t, project1.GetId(), role.Key, role.DisplayName, role.Group)
-		InstanceQuery.AddProjectRole(iamOwnerCtx, t, project2.GetId(), role.Key, role.DisplayName, role.Group)
+		InstanceQuery.AddProjectRole(iamOwnerCtx, t, project1.GetProjectId(), role.Key, role.DisplayName, role.Group)
+		InstanceQuery.AddProjectRole(iamOwnerCtx, t, project2.GetProjectId(), role.Key, role.DisplayName, role.Group)
 	}
 
 	grantedOrganizationName := integration.OrganizationName()
@@ -46,17 +46,17 @@ func TestServer_ListAuthorizations(t *testing.T) {
 		grantedRoleKeys[i] = role.Key
 	}
 
-	InstanceQuery.CreateProjectGrant(iamOwnerCtx, t, project2.GetId(), grantedOrganization.GetOrganizationId(), grantedRoleKeys...)
+	InstanceQuery.CreateProjectGrant(iamOwnerCtx, t, project2.GetProjectId(), grantedOrganization.GetOrganizationId(), grantedRoleKeys...)
 
 	user1 := InstanceQuery.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 	user2 := InstanceQuery.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 	user3 := InstanceQuery.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 
-	authorizationUser1Project1 := createAuthorizationForProject(iamOwnerCtx, InstanceQuery, t, organization.GetOrganizationId(), organizationName, user1.GetId(), project1.GetId(), projectName1, roles[0:1])
-	authorizationUser2Project1 := createAuthorizationForProject(iamOwnerCtx, InstanceQuery, t, organization.GetOrganizationId(), organizationName, user2.GetId(), project1.GetId(), projectName1, roles[0:1])
-	authorizationUser2Project2 := createAuthorizationForProject(iamOwnerCtx, InstanceQuery, t, organization.GetOrganizationId(), organizationName, user2.GetId(), project2.GetId(), projectName2, roles[1:2])
-	authorizationUser3Project2 := createAuthorizationForProject(iamOwnerCtx, InstanceQuery, t, organization.GetOrganizationId(), organizationName, user3.GetId(), project2.GetId(), projectName2, roles[2:3])
-	authorizationUser3ProjectGrant := createAuthorizationForProjectGrant(iamOwnerCtx, InstanceQuery, t, organization.GetOrganizationId(), user3.GetId(), project2.GetId(), projectName2, grantedOrganization.GetOrganizationId(), grantedOrganizationName, grantedRoles)
+	authorizationUser1Project1 := createAuthorizationForProject(iamOwnerCtx, InstanceQuery, t, organization.GetOrganizationId(), organizationName, user1.GetId(), project1.GetProjectId(), projectName1, roles[0:1])
+	authorizationUser2Project1 := createAuthorizationForProject(iamOwnerCtx, InstanceQuery, t, organization.GetOrganizationId(), organizationName, user2.GetId(), project1.GetProjectId(), projectName1, roles[0:1])
+	authorizationUser2Project2 := createAuthorizationForProject(iamOwnerCtx, InstanceQuery, t, organization.GetOrganizationId(), organizationName, user2.GetId(), project2.GetProjectId(), projectName2, roles[1:2])
+	authorizationUser3Project2 := createAuthorizationForProject(iamOwnerCtx, InstanceQuery, t, organization.GetOrganizationId(), organizationName, user3.GetId(), project2.GetProjectId(), projectName2, roles[2:3])
+	authorizationUser3ProjectGrant := createAuthorizationForProjectGrant(iamOwnerCtx, InstanceQuery, t, organization.GetOrganizationId(), user3.GetId(), project2.GetProjectId(), projectName2, grantedOrganization.GetOrganizationId(), grantedOrganizationName, grantedRoles)
 
 	organizationOwnerResp := InstanceQuery.CreateMachineUser(iamOwnerCtx)
 	organizationOwnerPatResp := InstanceQuery.CreatePersonalAccessToken(iamOwnerCtx, organizationOwnerResp.GetUserId())
@@ -65,12 +65,12 @@ func TestServer_ListAuthorizations(t *testing.T) {
 
 	projectOwnerResp := InstanceQuery.CreateMachineUser(iamOwnerCtx)
 	projectOwnerPatResp := InstanceQuery.CreatePersonalAccessToken(iamOwnerCtx, projectOwnerResp.GetUserId())
-	InstanceQuery.CreateProjectMembership(t, iamOwnerCtx, project2.GetId(), projectOwnerResp.GetUserId())
+	InstanceQuery.CreateProjectMembership(t, iamOwnerCtx, project2.GetProjectId(), projectOwnerResp.GetUserId())
 	projectOwnerCtx := integration.WithAuthorizationToken(EmptyCTX, projectOwnerPatResp.Token)
 
 	projectGrantOwnerResp := InstanceQuery.CreateMachineUser(iamOwnerCtx)
 	projectGrantOwnerPatResp := InstanceQuery.CreatePersonalAccessToken(iamOwnerCtx, projectGrantOwnerResp.GetUserId())
-	InstanceQuery.CreateProjectGrantMembership(t, iamOwnerCtx, project2.GetId(), grantedOrganization.GetOrganizationId(), projectGrantOwnerResp.GetUserId())
+	InstanceQuery.CreateProjectGrantMembership(t, iamOwnerCtx, project2.GetProjectId(), grantedOrganization.GetOrganizationId(), projectGrantOwnerResp.GetUserId())
 	projectGrantOwnerCtx := integration.WithAuthorizationToken(EmptyCTX, projectGrantOwnerPatResp.Token)
 
 	type args struct {
@@ -396,7 +396,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 						{
 							Filter: &authorization.AuthorizationsSearchFilter_ProjectId{
 								ProjectId: &filter.IDFilter{
-									Id: project1.GetId(),
+									Id: project1.GetProjectId(),
 								},
 							},
 						},
@@ -423,7 +423,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 						{
 							Filter: &authorization.AuthorizationsSearchFilter_ProjectId{
 								ProjectId: &filter.IDFilter{
-									Id: project2.GetId(),
+									Id: project2.GetProjectId(),
 								},
 							},
 						},
@@ -612,8 +612,8 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 		{Key: "role2", DisplayName: "Role 2", Group: "group2"},
 		{Key: "role3", DisplayName: "Role 3", Group: "group2"}}
 	for _, role := range roles {
-		InstancePermissionV2.AddProjectRole(iamOwnerCtx, t, project1.GetId(), role.Key, role.DisplayName, role.Group)
-		InstancePermissionV2.AddProjectRole(iamOwnerCtx, t, project2.GetId(), role.Key, role.DisplayName, role.Group)
+		InstancePermissionV2.AddProjectRole(iamOwnerCtx, t, project1.GetProjectId(), role.Key, role.DisplayName, role.Group)
+		InstancePermissionV2.AddProjectRole(iamOwnerCtx, t, project2.GetProjectId(), role.Key, role.DisplayName, role.Group)
 	}
 
 	grantedOrganizationName := integration.OrganizationName()
@@ -625,17 +625,17 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 		grantedRoleKeys[i] = role.Key
 	}
 
-	InstancePermissionV2.CreateProjectGrant(iamOwnerCtx, t, project2.GetId(), grantedOrganization.GetOrganizationId(), grantedRoleKeys...)
+	InstancePermissionV2.CreateProjectGrant(iamOwnerCtx, t, project2.GetProjectId(), grantedOrganization.GetOrganizationId(), grantedRoleKeys...)
 
 	user1 := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 	user2 := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 	user3 := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 
-	authorizationUser1Project1 := createAuthorizationForProject(iamOwnerCtx, InstancePermissionV2, t, organization.GetOrganizationId(), organizationName, user1.GetId(), project1.GetId(), projectName1, roles[0:1])
-	authorizationUser2Project1 := createAuthorizationForProject(iamOwnerCtx, InstancePermissionV2, t, organization.GetOrganizationId(), organizationName, user2.GetId(), project1.GetId(), projectName1, roles[0:1])
-	authorizationUser2Project2 := createAuthorizationForProject(iamOwnerCtx, InstancePermissionV2, t, organization.GetOrganizationId(), organizationName, user2.GetId(), project2.GetId(), projectName2, roles[1:2])
-	authorizationUser3Project2 := createAuthorizationForProject(iamOwnerCtx, InstancePermissionV2, t, organization.GetOrganizationId(), organizationName, user3.GetId(), project2.GetId(), projectName2, roles[2:3])
-	authorizationUser3ProjectGrant := createAuthorizationForProjectGrant(iamOwnerCtx, InstancePermissionV2, t, organization.GetOrganizationId(), user3.GetId(), project2.GetId(), projectName2, grantedOrganization.GetOrganizationId(), grantedOrganizationName, grantedRoles)
+	authorizationUser1Project1 := createAuthorizationForProject(iamOwnerCtx, InstancePermissionV2, t, organization.GetOrganizationId(), organizationName, user1.GetId(), project1.GetProjectId(), projectName1, roles[0:1])
+	authorizationUser2Project1 := createAuthorizationForProject(iamOwnerCtx, InstancePermissionV2, t, organization.GetOrganizationId(), organizationName, user2.GetId(), project1.GetProjectId(), projectName1, roles[0:1])
+	authorizationUser2Project2 := createAuthorizationForProject(iamOwnerCtx, InstancePermissionV2, t, organization.GetOrganizationId(), organizationName, user2.GetId(), project2.GetProjectId(), projectName2, roles[1:2])
+	authorizationUser3Project2 := createAuthorizationForProject(iamOwnerCtx, InstancePermissionV2, t, organization.GetOrganizationId(), organizationName, user3.GetId(), project2.GetProjectId(), projectName2, roles[2:3])
+	authorizationUser3ProjectGrant := createAuthorizationForProjectGrant(iamOwnerCtx, InstancePermissionV2, t, organization.GetOrganizationId(), user3.GetId(), project2.GetProjectId(), projectName2, grantedOrganization.GetOrganizationId(), grantedOrganizationName, grantedRoles)
 
 	organizationOwnerResp := InstancePermissionV2.CreateMachineUser(iamOwnerCtx)
 	organizationOwnerPatResp := InstancePermissionV2.CreatePersonalAccessToken(iamOwnerCtx, organizationOwnerResp.GetUserId())
@@ -644,12 +644,12 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 
 	projectOwnerResp := InstancePermissionV2.CreateMachineUser(iamOwnerCtx)
 	projectOwnerPatResp := InstancePermissionV2.CreatePersonalAccessToken(iamOwnerCtx, projectOwnerResp.GetUserId())
-	InstancePermissionV2.CreateProjectMembership(t, iamOwnerCtx, project2.GetId(), projectOwnerResp.GetUserId())
+	InstancePermissionV2.CreateProjectMembership(t, iamOwnerCtx, project2.GetProjectId(), projectOwnerResp.GetUserId())
 	projectOwnerCtx := integration.WithAuthorizationToken(EmptyCTX, projectOwnerPatResp.Token)
 
 	projectGrantOwnerResp := InstancePermissionV2.CreateMachineUser(iamOwnerCtx)
 	projectGrantOwnerPatResp := InstancePermissionV2.CreatePersonalAccessToken(iamOwnerCtx, projectGrantOwnerResp.GetUserId())
-	InstancePermissionV2.CreateProjectGrantMembership(t, iamOwnerCtx, project2.GetId(), grantedOrganization.GetOrganizationId(), projectGrantOwnerResp.GetUserId())
+	InstancePermissionV2.CreateProjectGrantMembership(t, iamOwnerCtx, project2.GetProjectId(), grantedOrganization.GetOrganizationId(), projectGrantOwnerResp.GetUserId())
 	projectGrantOwnerCtx := integration.WithAuthorizationToken(EmptyCTX, projectGrantOwnerPatResp.Token)
 
 	type args struct {
@@ -975,7 +975,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 						{
 							Filter: &authorization.AuthorizationsSearchFilter_ProjectId{
 								ProjectId: &filter.IDFilter{
-									Id: project1.GetId(),
+									Id: project1.GetProjectId(),
 								},
 							},
 						},
@@ -1002,7 +1002,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 						{
 							Filter: &authorization.AuthorizationsSearchFilter_ProjectId{
 								ProjectId: &filter.IDFilter{
-									Id: project2.GetId(),
+									Id: project2.GetProjectId(),
 								},
 							},
 						},

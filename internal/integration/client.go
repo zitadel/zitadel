@@ -20,89 +20,57 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/durationpb"
-	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
-	action_v2beta "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	app_v2beta "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/application/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	authorization_v2 "github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
-	authorization_v2beta "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
-	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
-	instance_v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	internal_permission_v2 "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2"
-	internal_permission_v2beta "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	object_v3alpha "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
-	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
-	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	project_v2 "github.com/zitadel/zitadel/pkg/grpc/project/v2"
-	project_v2beta "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
-	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
-	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
-	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
-	settings_v2beta "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
-	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 	webkey_v2 "github.com/zitadel/zitadel/pkg/grpc/webkey/v2"
-	webkey_v2beta "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta"
 )
 
 type Client struct {
-	CC                       *grpc.ClientConn
-	Admin                    admin.AdminServiceClient
-	Mgmt                     mgmt.ManagementServiceClient
-	Auth                     auth.AuthServiceClient
-	UserV2beta               user_v2beta.UserServiceClient
-	UserV2                   user_v2.UserServiceClient
-	SessionV2beta            session_v2beta.SessionServiceClient
-	SessionV2                session.SessionServiceClient
-	SettingsV2beta           settings_v2beta.SettingsServiceClient
-	SettingsV2               settings.SettingsServiceClient
-	OIDCv2beta               oidc_pb_v2beta.OIDCServiceClient
-	OIDCv2                   oidc_pb.OIDCServiceClient
-	OrgV2beta                org_v2beta.OrganizationServiceClient
-	OrgV2                    org.OrganizationServiceClient
-	ActionV2beta             action_v2beta.ActionServiceClient
-	ActionV2                 action.ActionServiceClient
-	FeatureV2beta            feature_v2beta.FeatureServiceClient
-	FeatureV2                feature.FeatureServiceClient
-	UserSchemaV3             userschema_v3alpha.ZITADELUserSchemasClient
-	WebKeyV2                 webkey_v2.WebKeyServiceClient
-	WebKeyV2Beta             webkey_v2beta.WebKeyServiceClient
-	IDPv2                    idp_pb.IdentityProviderServiceClient
-	UserV3Alpha              user_v3alpha.ZITADELUsersClient
-	SAMLv2                   saml_pb.SAMLServiceClient
-	SCIM                     *scim.Client
-	Projectv2Beta            project_v2beta.ProjectServiceClient
-	ProjectV2                project_v2.ProjectServiceClient
-	InstanceV2Beta           instance_v2beta.InstanceServiceClient //nolint:staticcheck // deprecated but still used in tests
-	InstanceV2               instance_v2.InstanceServiceClient
-	AppV2Beta                app_v2beta.AppServiceClient
-	ApplicationV2            application.ApplicationServiceClient
-	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
-	InternalPermissionV2     internal_permission_v2.InternalPermissionServiceClient
-	AuthorizationV2Beta      authorization_v2beta.AuthorizationServiceClient //nolint:staticcheck // deprecated, but still used in tests
-	AuthorizationV2          authorization_v2.AuthorizationServiceClient
-	GroupV2                  group_v2.GroupServiceClient
+	CC                   *grpc.ClientConn
+	Admin                admin.AdminServiceClient
+	Mgmt                 mgmt.ManagementServiceClient
+	Auth                 auth.AuthServiceClient
+	UserV2               user_v2.UserServiceClient
+	SessionV2            session.SessionServiceClient
+	SettingsV2           settings.SettingsServiceClient
+	OIDCv2               oidc_pb.OIDCServiceClient
+	OrgV2                org.OrganizationServiceClient
+	ActionV2             action.ActionServiceClient
+	FeatureV2            feature.FeatureServiceClient
+	WebKeyV2             webkey_v2.WebKeyServiceClient
+	IDPv2                idp_pb.IdentityProviderServiceClient
+	SAMLv2               saml_pb.SAMLServiceClient
+	SCIM                 *scim.Client
+	ProjectV2            project_v2.ProjectServiceClient
+	InstanceV2           instance_v2.InstanceServiceClient
+	ApplicationV2        application.ApplicationServiceClient
+	InternalPermissionV2 internal_permission_v2.InternalPermissionServiceClient
+	AuthorizationV2      authorization_v2.AuthorizationServiceClient
+	GroupV2              group_v2.GroupServiceClient
 }
 
 func NewDefaultClient(ctx context.Context) (*Client, error) {
@@ -117,42 +85,27 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		return nil, err
 	}
 	client := &Client{
-		CC:                       cc,
-		Admin:                    admin.NewAdminServiceClient(cc),
-		Mgmt:                     mgmt.NewManagementServiceClient(cc),
-		Auth:                     auth.NewAuthServiceClient(cc),
-		UserV2beta:               user_v2beta.NewUserServiceClient(cc),
-		UserV2:                   user_v2.NewUserServiceClient(cc),
-		SessionV2beta:            session_v2beta.NewSessionServiceClient(cc),
-		SessionV2:                session.NewSessionServiceClient(cc),
-		SettingsV2beta:           settings_v2beta.NewSettingsServiceClient(cc),
-		SettingsV2:               settings.NewSettingsServiceClient(cc),
-		OIDCv2beta:               oidc_pb_v2beta.NewOIDCServiceClient(cc),
-		OIDCv2:                   oidc_pb.NewOIDCServiceClient(cc),
-		OrgV2beta:                org_v2beta.NewOrganizationServiceClient(cc),
-		OrgV2:                    org.NewOrganizationServiceClient(cc),
-		ActionV2beta:             action_v2beta.NewActionServiceClient(cc),
-		ActionV2:                 action.NewActionServiceClient(cc),
-		FeatureV2beta:            feature_v2beta.NewFeatureServiceClient(cc),
-		FeatureV2:                feature.NewFeatureServiceClient(cc),
-		UserSchemaV3:             userschema_v3alpha.NewZITADELUserSchemasClient(cc),
-		WebKeyV2:                 webkey_v2.NewWebKeyServiceClient(cc),
-		WebKeyV2Beta:             webkey_v2beta.NewWebKeyServiceClient(cc),
-		IDPv2:                    idp_pb.NewIdentityProviderServiceClient(cc),
-		UserV3Alpha:              user_v3alpha.NewZITADELUsersClient(cc),
-		SAMLv2:                   saml_pb.NewSAMLServiceClient(cc),
-		SCIM:                     scim.NewScimClient(target),
-		Projectv2Beta:            project_v2beta.NewProjectServiceClient(cc),
-		ProjectV2:                project_v2.NewProjectServiceClient(cc),
-		InstanceV2Beta:           instance_v2beta.NewInstanceServiceClient(cc),
-		InstanceV2:               instance_v2.NewInstanceServiceClient(cc),
-		AppV2Beta:                app_v2beta.NewAppServiceClient(cc),
-		ApplicationV2:            application.NewApplicationServiceClient(cc),
-		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),
-		InternalPermissionV2:     internal_permission_v2.NewInternalPermissionServiceClient(cc),
-		AuthorizationV2Beta:      authorization_v2beta.NewAuthorizationServiceClient(cc),
-		AuthorizationV2:          authorization_v2.NewAuthorizationServiceClient(cc),
-		GroupV2:                  group_v2.NewGroupServiceClient(cc),
+		CC:                   cc,
+		Admin:                admin.NewAdminServiceClient(cc),
+		Mgmt:                 mgmt.NewManagementServiceClient(cc),
+		Auth:                 auth.NewAuthServiceClient(cc),
+		UserV2:               user_v2.NewUserServiceClient(cc),
+		SessionV2:            session.NewSessionServiceClient(cc),
+		SettingsV2:           settings.NewSettingsServiceClient(cc),
+		OIDCv2:               oidc_pb.NewOIDCServiceClient(cc),
+		OrgV2:                org.NewOrganizationServiceClient(cc),
+		ActionV2:             action.NewActionServiceClient(cc),
+		FeatureV2:            feature.NewFeatureServiceClient(cc),
+		WebKeyV2:             webkey_v2.NewWebKeyServiceClient(cc),
+		IDPv2:                idp_pb.NewIdentityProviderServiceClient(cc),
+		SAMLv2:               saml_pb.NewSAMLServiceClient(cc),
+		SCIM:                 scim.NewScimClient(target),
+		ProjectV2:            project_v2.NewProjectServiceClient(cc),
+		InstanceV2:           instance_v2.NewInstanceServiceClient(cc),
+		ApplicationV2:        application.NewApplicationServiceClient(cc),
+		InternalPermissionV2: internal_permission_v2.NewInternalPermissionServiceClient(cc),
+		AuthorizationV2:      authorization_v2.NewAuthorizationServiceClient(cc),
+		GroupV2:              group_v2.NewGroupServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -447,9 +400,9 @@ func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userI
 	return resp
 }
 
-func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, orgID string, organizationScopedUsernames bool) *settings_v2beta.SetOrganizationSettingsResponse {
-	resp, err := i.Client.SettingsV2beta.SetOrganizationSettings(ctx,
-		&settings_v2beta.SetOrganizationSettingsRequest{
+func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, orgID string, organizationScopedUsernames bool) *settings.SetOrganizationSettingsResponse {
+	resp, err := i.Client.SettingsV2.SetOrganizationSettings(ctx,
+		&settings.SetOrganizationSettingsRequest{
 			OrganizationId:              orgID,
 			OrganizationScopedUsernames: gu.Ptr(organizationScopedUsernames),
 		},
@@ -458,9 +411,9 @@ func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, or
 	return resp
 }
 
-func (i *Instance) DeleteOrganizationSettings(ctx context.Context, t *testing.T, orgID string) *settings_v2beta.DeleteOrganizationSettingsResponse {
-	resp, err := i.Client.SettingsV2beta.DeleteOrganizationSettings(ctx,
-		&settings_v2beta.DeleteOrganizationSettingsRequest{
+func (i *Instance) DeleteOrganizationSettings(ctx context.Context, t *testing.T, orgID string) *settings.DeleteOrganizationSettingsResponse {
+	resp, err := i.Client.SettingsV2.DeleteOrganizationSettings(ctx,
+		&settings.DeleteOrganizationSettingsRequest{
 			OrganizationId: orgID,
 		},
 	)
@@ -597,12 +550,12 @@ func (i *Instance) SetUserPassword(ctx context.Context, userID, password string,
 	return resp.GetDetails()
 }
 
-func (i *Instance) CreateProject(ctx context.Context, t *testing.T, orgID, name string, projectRoleCheck, hasProjectCheck bool) *project_v2beta.CreateProjectResponse {
+func (i *Instance) CreateProject(ctx context.Context, t *testing.T, orgID, name string, projectRoleCheck, hasProjectCheck bool) *project_v2.CreateProjectResponse {
 	if orgID == "" {
 		orgID = i.DefaultOrg.GetId()
 	}
 
-	resp, err := i.Client.Projectv2Beta.CreateProject(ctx, &project_v2beta.CreateProjectRequest{
+	resp, err := i.Client.ProjectV2.CreateProject(ctx, &project_v2.CreateProjectRequest{
 		OrganizationId:        orgID,
 		Name:                  name,
 		AuthorizationRequired: projectRoleCheck,
@@ -612,37 +565,37 @@ func (i *Instance) CreateProject(ctx context.Context, t *testing.T, orgID, name 
 	return resp
 }
 
-func (i *Instance) DeleteProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.DeleteProjectResponse {
-	resp, err := i.Client.Projectv2Beta.DeleteProject(ctx, &project_v2beta.DeleteProjectRequest{
-		Id: projectID,
+func (i *Instance) DeleteProject(ctx context.Context, t *testing.T, projectID string) *project_v2.DeleteProjectResponse {
+	resp, err := i.Client.ProjectV2.DeleteProject(ctx, &project_v2.DeleteProjectRequest{
+		ProjectId: projectID,
 	})
 	require.NoError(t, err)
 	return resp
 }
 
-func (i *Instance) DeactivateProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.DeactivateProjectResponse {
-	resp, err := i.Client.Projectv2Beta.DeactivateProject(ctx, &project_v2beta.DeactivateProjectRequest{
-		Id: projectID,
+func (i *Instance) DeactivateProject(ctx context.Context, t *testing.T, projectID string) *project_v2.DeactivateProjectResponse {
+	resp, err := i.Client.ProjectV2.DeactivateProject(ctx, &project_v2.DeactivateProjectRequest{
+		ProjectId: projectID,
 	})
 	require.NoError(t, err)
 	return resp
 }
 
-func (i *Instance) ActivateProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.ActivateProjectResponse {
-	resp, err := i.Client.Projectv2Beta.ActivateProject(ctx, &project_v2beta.ActivateProjectRequest{
-		Id: projectID,
+func (i *Instance) ActivateProject(ctx context.Context, t *testing.T, projectID string) *project_v2.ActivateProjectResponse {
+	resp, err := i.Client.ProjectV2.ActivateProject(ctx, &project_v2.ActivateProjectRequest{
+		ProjectId: projectID,
 	})
 	require.NoError(t, err)
 	return resp
 }
 
-func (i *Instance) AddProjectRole(ctx context.Context, t *testing.T, projectID, roleKey, displayName, group string) *project_v2beta.AddProjectRoleResponse {
+func (i *Instance) AddProjectRole(ctx context.Context, t *testing.T, projectID, roleKey, displayName, group string) *project_v2.AddProjectRoleResponse {
 	var groupP *string
 	if group != "" {
 		groupP = &group
 	}
 
-	resp, err := i.Client.Projectv2Beta.AddProjectRole(ctx, &project_v2beta.AddProjectRoleRequest{
+	resp, err := i.Client.ProjectV2.AddProjectRole(ctx, &project_v2.AddProjectRoleRequest{
 		ProjectId:   projectID,
 		RoleKey:     roleKey,
 		DisplayName: displayName,
@@ -652,8 +605,8 @@ func (i *Instance) AddProjectRole(ctx context.Context, t *testing.T, projectID, 
 	return resp
 }
 
-func (i *Instance) RemoveProjectRole(ctx context.Context, t *testing.T, projectID, roleKey string) *project_v2beta.RemoveProjectRoleResponse {
-	resp, err := i.Client.Projectv2Beta.RemoveProjectRole(ctx, &project_v2beta.RemoveProjectRoleRequest{
+func (i *Instance) RemoveProjectRole(ctx context.Context, t *testing.T, projectID, roleKey string) *project_v2.RemoveProjectRoleResponse {
+	resp, err := i.Client.ProjectV2.RemoveProjectRole(ctx, &project_v2.RemoveProjectRoleRequest{
 		ProjectId: projectID,
 		RoleKey:   roleKey,
 	})
@@ -1019,8 +972,8 @@ func (i *Instance) CreateIntentSession(t *testing.T, ctx context.Context, userID
 		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }
 
-func (i *Instance) CreateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string, roles ...string) *project_v2beta.CreateProjectGrantResponse {
-	resp, err := i.Client.Projectv2Beta.CreateProjectGrant(ctx, &project_v2beta.CreateProjectGrantRequest{
+func (i *Instance) CreateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string, roles ...string) *project_v2.CreateProjectGrantResponse {
+	resp, err := i.Client.ProjectV2.CreateProjectGrant(ctx, &project_v2.CreateProjectGrantRequest{
 		GrantedOrganizationId: grantedOrgID,
 		ProjectId:             projectID,
 		RoleKeys:              roles,
@@ -1029,8 +982,8 @@ func (i *Instance) CreateProjectGrant(ctx context.Context, t *testing.T, project
 	return resp
 }
 
-func (i *Instance) DeleteProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.DeleteProjectGrantResponse {
-	resp, err := i.Client.Projectv2Beta.DeleteProjectGrant(ctx, &project_v2beta.DeleteProjectGrantRequest{
+func (i *Instance) DeleteProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2.DeleteProjectGrantResponse {
+	resp, err := i.Client.ProjectV2.DeleteProjectGrant(ctx, &project_v2.DeleteProjectGrantRequest{
 		GrantedOrganizationId: grantedOrgID,
 		ProjectId:             projectID,
 	})
@@ -1038,8 +991,8 @@ func (i *Instance) DeleteProjectGrant(ctx context.Context, t *testing.T, project
 	return resp
 }
 
-func (i *Instance) DeactivateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.DeactivateProjectGrantResponse {
-	resp, err := i.Client.Projectv2Beta.DeactivateProjectGrant(ctx, &project_v2beta.DeactivateProjectGrantRequest{
+func (i *Instance) DeactivateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2.DeactivateProjectGrantResponse {
+	resp, err := i.Client.ProjectV2.DeactivateProjectGrant(ctx, &project_v2.DeactivateProjectGrantRequest{
 		ProjectId:             projectID,
 		GrantedOrganizationId: grantedOrgID,
 	})
@@ -1047,8 +1000,8 @@ func (i *Instance) DeactivateProjectGrant(ctx context.Context, t *testing.T, pro
 	return resp
 }
 
-func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.ActivateProjectGrantResponse {
-	resp, err := i.Client.Projectv2Beta.ActivateProjectGrant(ctx, &project_v2beta.ActivateProjectGrantRequest{
+func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2.ActivateProjectGrantResponse {
+	resp, err := i.Client.ProjectV2.ActivateProjectGrant(ctx, &project_v2.ActivateProjectGrantRequest{
 		ProjectId:             projectID,
 		GrantedOrganizationId: grantedOrgID,
 	})
@@ -1099,10 +1052,10 @@ func (i *Instance) CreateProjectGrantUserGrant(ctx context.Context, orgID, proje
 	return resp
 }
 
-func (i *Instance) CreateInstanceMembership(t *testing.T, ctx context.Context, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
-	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
-		Resource: &internal_permission_v2beta.ResourceType{
-			Resource: &internal_permission_v2beta.ResourceType_Instance{Instance: true},
+func (i *Instance) CreateInstanceMembership(t *testing.T, ctx context.Context, userID string) *internal_permission_v2.CreateAdministratorResponse {
+	resp, err := i.Client.InternalPermissionV2.CreateAdministrator(ctx, &internal_permission_v2.CreateAdministratorRequest{
+		Resource: &internal_permission_v2.ResourceType{
+			Resource: &internal_permission_v2.ResourceType_Instance{Instance: true},
 		},
 		UserId: userID,
 		Roles:  []string{domain.RoleIAMOwner},
@@ -1119,13 +1072,13 @@ func (i *Instance) DeleteInstanceMembership(t *testing.T, ctx context.Context, u
 }
 
 // CreateOrgMembership creates an org membership with the given roles. If no roles are provided, the user will be assigned the "org.owner" role.
-func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, orgID, userID string, roles ...string) *internal_permission_v2beta.CreateAdministratorResponse {
+func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, orgID, userID string, roles ...string) *internal_permission_v2.CreateAdministratorResponse {
 	if len(roles) == 0 {
 		roles = []string{domain.RoleOrgOwner}
 	}
-	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
-		Resource: &internal_permission_v2beta.ResourceType{
-			Resource: &internal_permission_v2beta.ResourceType_OrganizationId{OrganizationId: orgID},
+	resp, err := i.Client.InternalPermissionV2.CreateAdministrator(ctx, &internal_permission_v2.CreateAdministratorRequest{
+		Resource: &internal_permission_v2.ResourceType{
+			Resource: &internal_permission_v2.ResourceType_OrganizationId{OrganizationId: orgID},
 		},
 		UserId: userID,
 		Roles:  roles,
@@ -1141,10 +1094,10 @@ func (i *Instance) DeleteOrgMembership(t *testing.T, ctx context.Context, userID
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
-	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
-		Resource: &internal_permission_v2beta.ResourceType{
-			Resource: &internal_permission_v2beta.ResourceType_ProjectId{ProjectId: projectID},
+func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) *internal_permission_v2.CreateAdministratorResponse {
+	resp, err := i.Client.InternalPermissionV2.CreateAdministrator(ctx, &internal_permission_v2.CreateAdministratorRequest{
+		Resource: &internal_permission_v2.ResourceType{
+			Resource: &internal_permission_v2.ResourceType_ProjectId{ProjectId: projectID},
 		},
 		UserId: userID,
 		Roles:  []string{domain.RoleProjectOwner},
@@ -1154,17 +1107,17 @@ func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, pr
 }
 
 func (i *Instance) DeleteProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) {
-	_, err := i.Client.InternalPermissionv2Beta.DeleteAdministrator(ctx, &internal_permission_v2beta.DeleteAdministratorRequest{
-		Resource: &internal_permission_v2beta.ResourceType{Resource: &internal_permission_v2beta.ResourceType_ProjectId{ProjectId: projectID}},
+	_, err := i.Client.InternalPermissionV2.DeleteAdministrator(ctx, &internal_permission_v2.DeleteAdministratorRequest{
+		Resource: &internal_permission_v2.ResourceType{Resource: &internal_permission_v2.ResourceType_ProjectId{ProjectId: projectID}},
 		UserId:   userID,
 	})
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, orgID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
-	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
-		Resource: &internal_permission_v2beta.ResourceType{
-			Resource: &internal_permission_v2beta.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2beta.ResourceType_ProjectGrant{
+func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, orgID, userID string) *internal_permission_v2.CreateAdministratorResponse {
+	resp, err := i.Client.InternalPermissionV2.CreateAdministrator(ctx, &internal_permission_v2.CreateAdministratorRequest{
+		Resource: &internal_permission_v2.ResourceType{
+			Resource: &internal_permission_v2.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2.ResourceType_ProjectGrant{
 				ProjectId:      projectID,
 				OrganizationId: orgID,
 			}},
@@ -1177,9 +1130,9 @@ func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Contex
 }
 
 func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Context, projectID, orgID, userID string) {
-	_, err := i.Client.InternalPermissionv2Beta.DeleteAdministrator(ctx, &internal_permission_v2beta.DeleteAdministratorRequest{
-		Resource: &internal_permission_v2beta.ResourceType{
-			Resource: &internal_permission_v2beta.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2beta.ResourceType_ProjectGrant{
+	_, err := i.Client.InternalPermissionV2.DeleteAdministrator(ctx, &internal_permission_v2.DeleteAdministratorRequest{
+		Resource: &internal_permission_v2.ResourceType{
+			Resource: &internal_permission_v2.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2.ResourceType_ProjectGrant{
 				ProjectId:      projectID,
 				OrganizationId: orgID,
 			}},
@@ -1249,145 +1202,12 @@ func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.
 	return target
 }
 
-func (i *Instance) CreateUserSchemaEmpty(ctx context.Context) *userschema_v3alpha.CreateUserSchemaResponse {
-	return i.CreateUserSchemaEmptyWithType(ctx, fmt.Sprint(time.Now().UnixNano()+1))
-}
-
-func (i *Instance) CreateUserSchema(ctx context.Context, schemaData []byte) *userschema_v3alpha.CreateUserSchemaResponse {
-	userSchema := new(structpb.Struct)
-	err := userSchema.UnmarshalJSON(schemaData)
-	logging.OnError(err).Fatal("create userschema unmarshal")
-	schema, err := i.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
-		UserSchema: &userschema_v3alpha.UserSchema{
-			Type: fmt.Sprint(time.Now().UnixNano() + 1),
-			DataType: &userschema_v3alpha.UserSchema_Schema{
-				Schema: userSchema,
-			},
-		},
-	})
-	logging.OnError(err).Fatal("create userschema")
-	return schema
-}
-
-func (i *Instance) CreateUserSchemaEmptyWithType(ctx context.Context, schemaType string) *userschema_v3alpha.CreateUserSchemaResponse {
-	userSchema := new(structpb.Struct)
-	err := userSchema.UnmarshalJSON([]byte(`{
-		"$schema": "urn:zitadel:schema:v1",
-		"type": "object",
-		"properties": {}
-	}`))
-	logging.OnError(err).Fatal("create userschema unmarshal")
-	schema, err := i.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
-		UserSchema: &userschema_v3alpha.UserSchema{
-			Type: schemaType,
-			DataType: &userschema_v3alpha.UserSchema_Schema{
-				Schema: userSchema,
-			},
-		},
-	})
-	logging.OnError(err).Fatal("create userschema")
-	return schema
-}
-
-func (i *Instance) CreateSchemaUser(ctx context.Context, orgID string, schemaID string, data []byte) *user_v3alpha.CreateUserResponse {
-	userData := new(structpb.Struct)
-	err := userData.UnmarshalJSON(data)
-	logging.OnError(err).Fatal("create user unmarshal")
-	user, err := i.Client.UserV3Alpha.CreateUser(ctx, &user_v3alpha.CreateUserRequest{
-		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
-		User: &user_v3alpha.CreateUser{
-			SchemaId: schemaID,
-			Data:     userData,
-		},
-	})
-	logging.OnError(err).Fatal("create user")
-	return user
-}
-
-func (i *Instance) UpdateSchemaUserEmail(ctx context.Context, orgID string, userID string, email string) *user_v3alpha.SetContactEmailResponse {
-	user, err := i.Client.UserV3Alpha.SetContactEmail(ctx, &user_v3alpha.SetContactEmailRequest{
-		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
-		Id:           userID,
-		Email: &user_v3alpha.SetEmail{
-			Address:      email,
-			Verification: &user_v3alpha.SetEmail_ReturnCode{},
-		},
-	})
-	logging.OnError(err).Fatal("create user")
-	return user
-}
-
-func (i *Instance) UpdateSchemaUserPhone(ctx context.Context, orgID string, userID string, phone string) *user_v3alpha.SetContactPhoneResponse {
-	user, err := i.Client.UserV3Alpha.SetContactPhone(ctx, &user_v3alpha.SetContactPhoneRequest{
-		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
-		Id:           userID,
-		Phone: &user_v3alpha.SetPhone{
-			Number:       phone,
-			Verification: &user_v3alpha.SetPhone_ReturnCode{},
-		},
-	})
-	logging.OnError(err).Fatal("create user")
-	return user
-}
-
 func (i *Instance) CreateInviteCode(ctx context.Context, userID string) *user_v2.CreateInviteCodeResponse {
 	user, err := i.Client.UserV2.CreateInviteCode(ctx, &user_v2.CreateInviteCodeRequest{
 		UserId:       userID,
 		Verification: &user_v2.CreateInviteCodeRequest_ReturnCode{ReturnCode: &user_v2.ReturnInviteCode{}},
 	})
 	logging.OnError(err).Fatal("create invite code")
-	return user
-}
-
-func (i *Instance) LockSchemaUser(ctx context.Context, orgID string, userID string) *user_v3alpha.LockUserResponse {
-	var org *object_v3alpha.Organization
-	if orgID != "" {
-		org = &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}}
-	}
-	user, err := i.Client.UserV3Alpha.LockUser(ctx, &user_v3alpha.LockUserRequest{
-		Organization: org,
-		Id:           userID,
-	})
-	logging.OnError(err).Fatal("lock user")
-	return user
-}
-
-func (i *Instance) UnlockSchemaUser(ctx context.Context, orgID string, userID string) *user_v3alpha.UnlockUserResponse {
-	var org *object_v3alpha.Organization
-	if orgID != "" {
-		org = &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}}
-	}
-	user, err := i.Client.UserV3Alpha.UnlockUser(ctx, &user_v3alpha.UnlockUserRequest{
-		Organization: org,
-		Id:           userID,
-	})
-	logging.OnError(err).Fatal("unlock user")
-	return user
-}
-
-func (i *Instance) DeactivateSchemaUser(ctx context.Context, orgID string, userID string) *user_v3alpha.DeactivateUserResponse {
-	var org *object_v3alpha.Organization
-	if orgID != "" {
-		org = &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}}
-	}
-	user, err := i.Client.UserV3Alpha.DeactivateUser(ctx, &user_v3alpha.DeactivateUserRequest{
-		Organization: org,
-		Id:           userID,
-	})
-	logging.OnError(err).Fatal("deactivate user")
-	return user
-}
-
-func (i *Instance) ActivateSchemaUser(ctx context.Context, orgID string, userID string) *user_v3alpha.ActivateUserResponse {
-	var org *object_v3alpha.Organization
-	if orgID != "" {
-		org = &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}}
-	}
-	user, err := i.Client.UserV3Alpha.ActivateUser(ctx, &user_v3alpha.ActivateUserRequest{
-		Organization: org,
-		Id:           userID,
-	})
-	logging.OnError(err).Fatal("reactivate user")
 	return user
 }
 

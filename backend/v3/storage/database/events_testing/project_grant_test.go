@@ -13,8 +13,8 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	v2beta_project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/project/v2"
 )
 
 func TestServer_ProjectGrantReduces(t *testing.T) {
@@ -23,7 +23,7 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 	projectGrantRepo := repository.ProjectGrantRepository()
 
 	projectName := integration.ProjectName()
-	createProjectRes, err := ProjectClient.CreateProject(CTX, &v2beta_project.CreateProjectRequest{
+	createProjectRes, err := ProjectClient.CreateProject(CTX, &project.CreateProjectRequest{
 		OrganizationId:        orgID,
 		Name:                  projectName,
 		ProjectRoleAssertion:  true,
@@ -32,21 +32,21 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 	})
 	require.NoError(t, err)
 	keyName := "key"
-	_, err = ProjectClient.AddProjectRole(CTX, &v2beta_project.AddProjectRoleRequest{
-		ProjectId:   createProjectRes.GetId(),
+	_, err = ProjectClient.AddProjectRole(CTX, &project.AddProjectRoleRequest{
+		ProjectId:   createProjectRes.GetProjectId(),
 		RoleKey:     keyName,
 		DisplayName: "display",
 		Group:       nil,
 	})
 	require.NoError(t, err)
 
-	grantedOrgRes, err := OrgClient.CreateOrganization(CTX, &org.CreateOrganizationRequest{
+	grantedOrgRes, err := OrgClient.AddOrganization(CTX, &org.AddOrganizationRequest{
 		Name: integration.OrganizationName(),
 	})
 	require.NoError(t, err)
-	_, err = ProjectClient.CreateProjectGrant(CTX, &v2beta_project.CreateProjectGrantRequest{
-		ProjectId:             createProjectRes.GetId(),
-		GrantedOrganizationId: grantedOrgRes.GetId(),
+	_, err = ProjectClient.CreateProjectGrant(CTX, &project.CreateProjectGrantRequest{
+		ProjectId:             createProjectRes.GetProjectId(),
+		GrantedOrganizationId: grantedOrgRes.GetOrganizationId(),
 	})
 	require.NoError(t, err)
 
@@ -57,14 +57,14 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 			dbProjectGrant, err := projectGrantRepo.Get(CTX, pool, database.WithCondition(
 				database.And(
 					projectGrantRepo.InstanceIDCondition(instanceID),
-					projectGrantRepo.ProjectIDCondition(createProjectRes.GetId()),
-					projectGrantRepo.GrantedOrganizationIDCondition(grantedOrgRes.GetId()),
+					projectGrantRepo.ProjectIDCondition(createProjectRes.GetProjectId()),
+					projectGrantRepo.GrantedOrganizationIDCondition(grantedOrgRes.GetOrganizationId()),
 				),
 			))
 			require.NoError(collect, err)
-			assert.Equal(collect, createProjectRes.GetId(), dbProjectGrant.ProjectID)
+			assert.Equal(collect, createProjectRes.GetProjectId(), dbProjectGrant.ProjectID)
 			assert.Equal(collect, orgID, dbProjectGrant.GrantingOrganizationID)
-			assert.Equal(collect, grantedOrgRes.GetId(), dbProjectGrant.GrantedOrganizationID)
+			assert.Equal(collect, grantedOrgRes.GetOrganizationId(), dbProjectGrant.GrantedOrganizationID)
 			assert.Equal(collect, domain.ProjectGrantStateActive, dbProjectGrant.State)
 			assert.NotNil(collect, dbProjectGrant.CreatedAt)
 			assert.NotNil(collect, dbProjectGrant.UpdatedAt)
@@ -72,9 +72,9 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 	})
 
 	t.Run("update project grant reduces", func(t *testing.T) {
-		_, err := ProjectClient.UpdateProjectGrant(CTX, &v2beta_project.UpdateProjectGrantRequest{
-			ProjectId:             createProjectRes.GetId(),
-			GrantedOrganizationId: grantedOrgRes.GetId(),
+		_, err := ProjectClient.UpdateProjectGrant(CTX, &project.UpdateProjectGrantRequest{
+			ProjectId:             createProjectRes.GetProjectId(),
+			GrantedOrganizationId: grantedOrgRes.GetOrganizationId(),
 			RoleKeys:              []string{keyName},
 		})
 		require.NoError(t, err)
@@ -83,8 +83,8 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 			dbProjectGrant, err := projectGrantRepo.Get(CTX, pool, database.WithCondition(
 				database.And(
 					projectGrantRepo.InstanceIDCondition(instanceID),
-					projectGrantRepo.ProjectIDCondition(createProjectRes.GetId()),
-					projectGrantRepo.GrantedOrganizationIDCondition(grantedOrgRes.GetId()),
+					projectGrantRepo.ProjectIDCondition(createProjectRes.GetProjectId()),
+					projectGrantRepo.GrantedOrganizationIDCondition(grantedOrgRes.GetOrganizationId()),
 				),
 			))
 			require.NoError(collect, err)
@@ -96,9 +96,9 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 	})
 
 	t.Run("(de)activate project grant reduces", func(t *testing.T) {
-		_, err := ProjectClient.DeactivateProjectGrant(CTX, &v2beta_project.DeactivateProjectGrantRequest{
-			ProjectId:             createProjectRes.GetId(),
-			GrantedOrganizationId: grantedOrgRes.GetId(),
+		_, err := ProjectClient.DeactivateProjectGrant(CTX, &project.DeactivateProjectGrantRequest{
+			ProjectId:             createProjectRes.GetProjectId(),
+			GrantedOrganizationId: grantedOrgRes.GetOrganizationId(),
 		})
 		require.NoError(t, err)
 
@@ -106,17 +106,17 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 			dbProject, err := projectGrantRepo.Get(CTX, pool, database.WithCondition(
 				database.And(
 					projectGrantRepo.InstanceIDCondition(instanceID),
-					projectGrantRepo.ProjectIDCondition(createProjectRes.GetId()),
-					projectGrantRepo.GrantedOrganizationIDCondition(grantedOrgRes.GetId()),
+					projectGrantRepo.ProjectIDCondition(createProjectRes.GetProjectId()),
+					projectGrantRepo.GrantedOrganizationIDCondition(grantedOrgRes.GetOrganizationId()),
 				),
 			))
 			require.NoError(collect, err)
 			assert.Equal(collect, domain.ProjectGrantStateInactive, dbProject.State)
 		}, retryDuration, tick, "project grant not deactivated within %v: %v", retryDuration, err)
 
-		_, err = ProjectClient.ActivateProjectGrant(CTX, &v2beta_project.ActivateProjectGrantRequest{
-			ProjectId:             createProjectRes.GetId(),
-			GrantedOrganizationId: grantedOrgRes.GetId(),
+		_, err = ProjectClient.ActivateProjectGrant(CTX, &project.ActivateProjectGrantRequest{
+			ProjectId:             createProjectRes.GetProjectId(),
+			GrantedOrganizationId: grantedOrgRes.GetOrganizationId(),
 		})
 		require.NoError(t, err)
 
@@ -124,8 +124,8 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 			dbProject, err := projectGrantRepo.Get(CTX, pool, database.WithCondition(
 				database.And(
 					projectGrantRepo.InstanceIDCondition(instanceID),
-					projectGrantRepo.ProjectIDCondition(createProjectRes.GetId()),
-					projectGrantRepo.GrantedOrganizationIDCondition(grantedOrgRes.GetId()),
+					projectGrantRepo.ProjectIDCondition(createProjectRes.GetProjectId()),
+					projectGrantRepo.GrantedOrganizationIDCondition(grantedOrgRes.GetOrganizationId()),
 				),
 			))
 			require.NoError(collect, err)
@@ -134,9 +134,9 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 	})
 
 	t.Run("delete project grant reduces", func(t *testing.T) {
-		_, err := ProjectClient.DeleteProjectGrant(CTX, &v2beta_project.DeleteProjectGrantRequest{
-			ProjectId:             createProjectRes.GetId(),
-			GrantedOrganizationId: grantedOrgRes.GetId(),
+		_, err := ProjectClient.DeleteProjectGrant(CTX, &project.DeleteProjectGrantRequest{
+			ProjectId:             createProjectRes.GetProjectId(),
+			GrantedOrganizationId: grantedOrgRes.GetOrganizationId(),
 		})
 		require.NoError(t, err)
 
@@ -144,8 +144,8 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 			_, err := projectGrantRepo.Get(CTX, pool, database.WithCondition(
 				database.And(
 					projectGrantRepo.InstanceIDCondition(instanceID),
-					projectGrantRepo.ProjectIDCondition(createProjectRes.GetId()),
-					projectGrantRepo.GrantedOrganizationIDCondition(grantedOrgRes.GetId()),
+					projectGrantRepo.ProjectIDCondition(createProjectRes.GetProjectId()),
+					projectGrantRepo.GrantedOrganizationIDCondition(grantedOrgRes.GetOrganizationId()),
 				),
 			))
 			require.ErrorIs(collect, err, database.NewNoRowFoundError(nil))

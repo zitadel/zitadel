@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	authorization_v2beta "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
+	authorization_v2 "github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
@@ -209,7 +209,7 @@ func groupUserToPb(gu *query.GroupUser) *group_v2.GroupUser {
 	return &group_v2.GroupUser{
 		GroupId:        gu.GroupID,
 		OrganizationId: gu.ResourceOwner,
-		User: &authorization_v2beta.User{
+		User: &authorization_v2.User{
 			Id:                 gu.UserID,
 			PreferredLoginName: gu.PreferredLoginName,
 			DisplayName:        gu.DisplayName,

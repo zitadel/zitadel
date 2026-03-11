@@ -17,10 +17,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	project_v2beta "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	project_v2 "github.com/zitadel/zitadel/pkg/grpc/project/v2"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
@@ -690,9 +690,9 @@ func createSAMLSP(t *testing.T, idpMetadata *saml.EntityDescriptor, binding stri
 func createSAMLApplication(ctx context.Context, t *testing.T, idpMetadata *saml.EntityDescriptor, binding string, projectRoleCheck, hasProjectCheck bool) (string, string, *samlsp.Middleware) {
 	project := Instance.CreateProject(ctx, t, "", integration.ProjectName(), projectRoleCheck, hasProjectCheck)
 	rootURL, sp := createSAMLSP(t, idpMetadata, binding)
-	_, err := Instance.CreateSAMLClient(ctx, project.GetId(), sp)
+	_, err := Instance.CreateSAMLClient(ctx, project.GetProjectId(), sp)
 	require.NoError(t, err)
-	return project.GetId(), rootURL, sp
+	return project.GetProjectId(), rootURL, sp
 }
 
 func createProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) {
@@ -700,12 +700,12 @@ func createProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrg
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
-		resp, err := Instance.Client.Projectv2Beta.ListProjectGrants(ctx, &project_v2beta.ListProjectGrantsRequest{
-			Filters: []*project_v2beta.ProjectGrantSearchFilter{
-				{Filter: &project_v2beta.ProjectGrantSearchFilter_InProjectIdsFilter{InProjectIdsFilter: &filter.InIDsFilter{
+		resp, err := Instance.Client.ProjectV2.ListProjectGrants(ctx, &project_v2.ListProjectGrantsRequest{
+			Filters: []*project_v2.ProjectGrantSearchFilter{
+				{Filter: &project_v2.ProjectGrantSearchFilter_InProjectIdsFilter{InProjectIdsFilter: &filter.InIDsFilter{
 					Ids: []string{projectID},
 				}}},
-				{Filter: &project_v2beta.ProjectGrantSearchFilter_ProjectGrantResourceOwnerFilter{ProjectGrantResourceOwnerFilter: &filter.IDFilter{
+				{Filter: &project_v2.ProjectGrantSearchFilter_GrantedOrganizationIdFilter{GrantedOrganizationIdFilter: &filter.IDFilter{
 					Id: grantedOrgID,
 				}}},
 			},

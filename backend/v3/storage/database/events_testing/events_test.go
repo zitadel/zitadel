@@ -18,10 +18,10 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
-	v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	v2beta_project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/project/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -50,8 +50,8 @@ var (
 	IAMCTX              context.Context
 	Instance            *integration.Instance
 	SystemClient        system.SystemServiceClient
-	OrgClient           v2beta_org.OrganizationServiceClient
-	ProjectClient       v2beta_project.ProjectServiceClient
+	OrgClient           org.OrganizationServiceClient
+	ProjectClient       project.ProjectServiceClient
 	SessionClient       session.SessionServiceClient
 	UserClient          user.UserServiceClient
 	AdminClient         admin.AdminServiceClient
@@ -71,8 +71,8 @@ func TestMain(m *testing.M) {
 
 		IAMCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
 		SystemClient = integration.SystemClient()
-		OrgClient = Instance.Client.OrgV2beta
-		ProjectClient = Instance.Client.Projectv2Beta
+		OrgClient = Instance.Client.OrgV2
+		ProjectClient = Instance.Client.ProjectV2
 		SessionClient = Instance.Client.SessionV2
 		UserClient = Instance.Client.UserV2
 		AdminClient = Instance.Client.Admin
@@ -80,7 +80,7 @@ func TestMain(m *testing.M) {
 		AuthorizationClient = Instance.Client.AuthorizationV2
 
 		defer func() {
-			_, err := Instance.Client.InstanceV2Beta.DeleteInstance(CTX, &v2beta.DeleteInstanceRequest{
+			_, err := Instance.Client.InstanceV2.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 				InstanceId: Instance.Instance.Id,
 			})
 			if err != nil {

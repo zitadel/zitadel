@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
-	v2beta_project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/project/v2"
 )
 
 func TestServer_ProjectReduces(t *testing.T) {
@@ -23,7 +23,7 @@ func TestServer_ProjectReduces(t *testing.T) {
 	projectRepo := repository.ProjectRepository()
 
 	projectName := integration.ProjectName()
-	createRes, err := ProjectClient.CreateProject(CTX, &v2beta_project.CreateProjectRequest{
+	createRes, err := ProjectClient.CreateProject(CTX, &project.CreateProjectRequest{
 		OrganizationId:        orgID,
 		Name:                  projectName,
 		ProjectRoleAssertion:  true,
@@ -37,10 +37,10 @@ func TestServer_ProjectReduces(t *testing.T) {
 	t.Run("create project reduces", func(t *testing.T) {
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			dbProject, err := projectRepo.Get(CTX, pool, database.WithCondition(
-				projectRepo.PrimaryKeyCondition(instanceID, createRes.GetId()),
+				projectRepo.PrimaryKeyCondition(instanceID, createRes.GetProjectId()),
 			))
 			require.NoError(collect, err)
-			assert.Equal(collect, createRes.GetId(), dbProject.ID)
+			assert.Equal(collect, createRes.GetProjectId(), dbProject.ID)
 			assert.Equal(collect, orgID, dbProject.OrganizationID)
 			assert.Equal(collect, projectName, dbProject.Name)
 			assert.Equal(collect, domain.ProjectStateActive, dbProject.State)
@@ -53,19 +53,19 @@ func TestServer_ProjectReduces(t *testing.T) {
 	})
 
 	t.Run("update project reduces", func(t *testing.T) {
-		_, err := ProjectClient.UpdateProject(CTX, &v2beta_project.UpdateProjectRequest{
-			Id:                     createRes.GetId(),
+		_, err := ProjectClient.UpdateProject(CTX, &project.UpdateProjectRequest{
+			ProjectId:              createRes.GetProjectId(),
 			Name:                   gu.Ptr("new name"),
 			ProjectRoleAssertion:   gu.Ptr(false),
-			ProjectRoleCheck:       gu.Ptr(false),
-			HasProjectCheck:        gu.Ptr(false),
-			PrivateLabelingSetting: gu.Ptr(v2beta_project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY),
+			AuthorizationRequired:  gu.Ptr(false),
+			ProjectAccessRequired:  gu.Ptr(false),
+			PrivateLabelingSetting: gu.Ptr(project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY),
 		})
 		require.NoError(t, err)
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			dbProject, err := projectRepo.Get(CTX, pool, database.WithCondition(
-				projectRepo.PrimaryKeyCondition(instanceID, createRes.GetId()),
+				projectRepo.PrimaryKeyCondition(instanceID, createRes.GetProjectId()),
 			))
 			require.NoError(collect, err)
 			assert.Equal(collect, "new name", dbProject.Name)
@@ -77,27 +77,27 @@ func TestServer_ProjectReduces(t *testing.T) {
 	})
 
 	t.Run("(de)activate project reduces", func(t *testing.T) {
-		_, err := ProjectClient.DeactivateProject(CTX, &v2beta_project.DeactivateProjectRequest{
-			Id: createRes.GetId(),
+		_, err := ProjectClient.DeactivateProject(CTX, &project.DeactivateProjectRequest{
+			ProjectId: createRes.GetProjectId(),
 		})
 		require.NoError(t, err)
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			dbProject, err := projectRepo.Get(CTX, pool, database.WithCondition(
-				projectRepo.PrimaryKeyCondition(instanceID, createRes.GetId()),
+				projectRepo.PrimaryKeyCondition(instanceID, createRes.GetProjectId()),
 			))
 			require.NoError(collect, err)
 			assert.Equal(collect, domain.ProjectStateInactive, dbProject.State)
 		}, retryDuration, tick, "project not deactivated within %v: %v", retryDuration, err)
 
-		_, err = ProjectClient.ActivateProject(CTX, &v2beta_project.ActivateProjectRequest{
-			Id: createRes.GetId(),
+		_, err = ProjectClient.ActivateProject(CTX, &project.ActivateProjectRequest{
+			ProjectId: createRes.GetProjectId(),
 		})
 		require.NoError(t, err)
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			dbProject, err := projectRepo.Get(CTX, pool, database.WithCondition(
-				projectRepo.PrimaryKeyCondition(instanceID, createRes.GetId()),
+				projectRepo.PrimaryKeyCondition(instanceID, createRes.GetProjectId()),
 			))
 			require.NoError(collect, err)
 			assert.Equal(collect, domain.ProjectStateActive, dbProject.State)
@@ -105,14 +105,14 @@ func TestServer_ProjectReduces(t *testing.T) {
 	})
 
 	t.Run("delete project reduces", func(t *testing.T) {
-		_, err := ProjectClient.DeleteProject(CTX, &v2beta_project.DeleteProjectRequest{
-			Id: createRes.GetId(),
+		_, err := ProjectClient.DeleteProject(CTX, &project.DeleteProjectRequest{
+			ProjectId: createRes.GetProjectId(),
 		})
 		require.NoError(t, err)
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			_, err := projectRepo.Get(CTX, pool, database.WithCondition(
-				projectRepo.PrimaryKeyCondition(instanceID, createRes.GetId()),
+				projectRepo.PrimaryKeyCondition(instanceID, createRes.GetProjectId()),
 			))
 			require.ErrorIs(collect, err, database.NewNoRowFoundError(nil))
 		}, retryDuration, tick, "project not deleted within %v: %v", retryDuration, err)

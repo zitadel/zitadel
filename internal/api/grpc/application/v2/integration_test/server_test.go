@@ -17,7 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/application/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
-	project_v2beta "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/project/v2"
 )
 
 var (
@@ -50,11 +50,11 @@ func TestMain(m *testing.M) {
 	}())
 }
 
-func getProjectAndProjectContext(t *testing.T, inst *integration.Instance, ctx context.Context) (*project_v2beta.CreateProjectResponse, context.Context) {
+func getProjectAndProjectContext(t *testing.T, inst *integration.Instance, ctx context.Context) (*project.CreateProjectResponse, context.Context) {
 	project := inst.CreateProject(ctx, t, inst.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 	userResp := inst.CreateMachineUser(ctx)
 	patResp := inst.CreatePersonalAccessToken(ctx, userResp.GetUserId())
-	inst.CreateProjectMembership(t, ctx, project.GetId(), userResp.GetUserId())
+	inst.CreateProjectMembership(t, ctx, project.GetProjectId(), userResp.GetUserId())
 	projectOwnerCtx := integration.WithAuthorizationToken(context.Background(), patResp.Token)
 
 	return project, projectOwnerCtx

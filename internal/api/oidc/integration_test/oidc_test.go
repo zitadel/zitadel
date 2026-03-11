@@ -453,9 +453,9 @@ func createClientWithOpts(t testing.TB, instance *integration.Instance, opts cli
 	ctx := instance.WithAuthorization(CTX, integration.UserTypeOrgOwner)
 
 	project := instance.CreateProject(ctx, t.(*testing.T), "", integration.ProjectName(), false, false)
-	app, err := instance.CreateOIDCClientLoginVersion(ctx, opts.redirectURI, opts.logoutURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, opts.devMode, opts.LoginVersion)
+	app, err := instance.CreateOIDCClientLoginVersion(ctx, opts.redirectURI, opts.logoutURI, project.GetProjectId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, opts.devMode, opts.LoginVersion)
 	require.NoError(t, err)
-	return app.GetClientId(), project.GetId()
+	return app.GetClientId(), project.GetProjectId()
 }
 
 func createImplicitClient(t testing.TB) string {

@@ -24,7 +24,7 @@ func TestGetApplication(t *testing.T) {
 
 	apiAppName := integration.ApplicationName()
 	createdApiApp, errAPIAppCreation := instance.Client.ApplicationV2.CreateApplication(IAMOwnerCtx, &application.CreateApplicationRequest{
-		ProjectId: p.GetId(),
+		ProjectId: p.GetProjectId(),
 		Name:      apiAppName,
 		ApplicationType: &application.CreateApplicationRequest_ApiConfiguration{
 			ApiConfiguration: &application.CreateAPIApplicationRequest{
@@ -36,7 +36,7 @@ func TestGetApplication(t *testing.T) {
 
 	samlAppName := integration.ApplicationName()
 	createdSAMLApp, errSAMLAppCreation := instance.Client.ApplicationV2.CreateApplication(IAMOwnerCtx, &application.CreateApplicationRequest{
-		ProjectId: p.GetId(),
+		ProjectId: p.GetProjectId(),
 		Name:      samlAppName,
 		ApplicationType: &application.CreateApplicationRequest_SamlConfiguration{
 			SamlConfiguration: &application.CreateSAMLApplicationRequest{
@@ -49,7 +49,7 @@ func TestGetApplication(t *testing.T) {
 
 	oidcAppName := integration.ApplicationName()
 	createdOIDCApp, errOIDCAppCreation := instance.Client.ApplicationV2.CreateApplication(IAMOwnerCtx, &application.CreateApplicationRequest{
-		ProjectId: p.GetId(),
+		ProjectId: p.GetProjectId(),
 		Name:      oidcAppName,
 		ApplicationType: &application.CreateApplicationRequest_OidcConfiguration{
 			OidcConfiguration: &application.CreateOIDCApplicationRequest{
@@ -164,14 +164,14 @@ func TestListApplications(t *testing.T) {
 
 	t.Parallel()
 
-	createdApiApp, apiAppName := createAPIAppWithName(t, IAMOwnerCtx, instance, p.GetId())
+	createdApiApp, apiAppName := createAPIAppWithName(t, IAMOwnerCtx, instance, p.GetProjectId())
 
-	createdDeactivatedApiApp, deactivatedApiAppName := createAPIAppWithName(t, IAMOwnerCtx, instance, p.GetId())
-	deactivateApp(t, createdDeactivatedApiApp, p.GetId())
+	createdDeactivatedApiApp, deactivatedApiAppName := createAPIAppWithName(t, IAMOwnerCtx, instance, p.GetProjectId())
+	deactivateApp(t, createdDeactivatedApiApp, p.GetProjectId())
 
-	_, createdSAMLApp, samlAppName, samlEntityID := createSAMLAppWithName(t, integration.URL(), p.GetId())
+	_, createdSAMLApp, samlAppName, samlEntityID := createSAMLAppWithName(t, integration.URL(), p.GetProjectId())
 
-	createdOIDCApp, oidcAppName := createOIDCAppWithName(t, integration.URL(), p.GetId())
+	createdOIDCApp, oidcAppName := createOIDCAppWithName(t, integration.URL(), p.GetProjectId())
 
 	type appWithName struct {
 		app  *application.CreateApplicationResponse
@@ -265,7 +265,7 @@ func TestListApplications(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 				},
@@ -284,7 +284,7 @@ func TestListApplications(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 				},
@@ -316,7 +316,7 @@ func TestListApplications(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 				},
@@ -350,7 +350,7 @@ func TestListApplications(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 				},
@@ -382,7 +382,7 @@ func TestListApplications(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 				},
@@ -415,7 +415,7 @@ func TestListApplications(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 					{
@@ -454,7 +454,7 @@ func TestListApplications(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 					{Filter: &application.ApplicationSearchFilter_TypeFilter{
@@ -612,21 +612,21 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 	}
 
 	app1, appAPIConfigChangeErr := instancePermissionV2.Client.ApplicationV2.CreateApplication(iamOwnerCtx, &application.CreateApplicationRequest{
-		ProjectId:       p.GetId(),
+		ProjectId:       p.GetProjectId(),
 		Name:            appName1,
 		ApplicationType: reqForAPIAppCreation,
 	})
 	require.Nil(t, appAPIConfigChangeErr)
 
 	app2, appAPIConfigChangeErr := instancePermissionV2.Client.ApplicationV2.CreateApplication(iamOwnerCtx, &application.CreateApplicationRequest{
-		ProjectId:       p.GetId(),
+		ProjectId:       p.GetProjectId(),
 		Name:            appName2,
 		ApplicationType: reqForAPIAppCreation,
 	})
 	require.Nil(t, appAPIConfigChangeErr)
 
 	app3, appAPIConfigChangeErr := instancePermissionV2.Client.ApplicationV2.CreateApplication(iamOwnerCtx, &application.CreateApplicationRequest{
-		ProjectId:       p.GetId(),
+		ProjectId:       p.GetProjectId(),
 		Name:            appName3,
 		ApplicationType: reqForAPIAppCreation,
 	})
@@ -649,7 +649,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 				},
@@ -664,7 +664,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 				},
@@ -680,7 +680,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 				},
@@ -695,7 +695,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 				},
@@ -710,7 +710,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 				Filters: []*application.ApplicationSearchFilter{
 					{
 						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
-							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetProjectId()},
 						},
 					},
 				},
@@ -748,8 +748,8 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 
 func TestGetApplicationKey(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
-	createdApiApp := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
-	createdAppKey := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp.GetApplicationId(), time.Now().AddDate(0, 0, 1))
+	createdApiApp := createAPIApp(t, IAMOwnerCtx, instance, p.GetProjectId())
+	createdAppKey := createAppKey(t, IAMOwnerCtx, instance, p.GetProjectId(), createdApiApp.GetApplicationId(), time.Now().AddDate(0, 0, 1))
 
 	t.Parallel()
 
@@ -833,17 +833,17 @@ func TestGetApplicationKey(t *testing.T) {
 func TestListApplicationKeys(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 
-	createdApiApp1 := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
-	createdApiApp2 := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	createdApiApp1 := createAPIApp(t, IAMOwnerCtx, instance, p.GetProjectId())
+	createdApiApp2 := createAPIApp(t, IAMOwnerCtx, instance, p.GetProjectId())
 
 	tomorrow := time.Now().AddDate(0, 0, 1)
 	in2Days := tomorrow.AddDate(0, 0, 1)
 	in3Days := in2Days.AddDate(0, 0, 1)
 
-	appKey1 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetApplicationId(), in2Days)
-	appKey2 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetApplicationId(), in3Days)
-	appKey3 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetApplicationId(), tomorrow)
-	appKey4 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp2.GetApplicationId(), tomorrow)
+	appKey1 := createAppKey(t, IAMOwnerCtx, instance, p.GetProjectId(), createdApiApp1.GetApplicationId(), in2Days)
+	appKey2 := createAppKey(t, IAMOwnerCtx, instance, p.GetProjectId(), createdApiApp1.GetApplicationId(), in3Days)
+	appKey3 := createAppKey(t, IAMOwnerCtx, instance, p.GetProjectId(), createdApiApp1.GetApplicationId(), tomorrow)
+	appKey4 := createAppKey(t, IAMOwnerCtx, instance, p.GetProjectId(), createdApiApp2.GetApplicationId(), tomorrow)
 
 	t.Parallel()
 
@@ -864,7 +864,7 @@ func TestListApplicationKeys(t *testing.T) {
 				SortingColumn: application.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_EXPIRATION,
 				Filters: []*application.ApplicationKeySearchFilter{
 					{Filter: &application.ApplicationKeySearchFilter_ProjectIdFilter{
-						ProjectIdFilter: &application.ApplicationKeyProjectIDFilter{ProjectId: p.GetId()},
+						ProjectIdFilter: &application.ApplicationKeyProjectIDFilter{ProjectId: p.GetProjectId()},
 					}},
 				},
 			},
@@ -877,7 +877,7 @@ func TestListApplicationKeys(t *testing.T) {
 				SortingColumn: application.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_CREATION_DATE,
 				Filters: []*application.ApplicationKeySearchFilter{
 					{Filter: &application.ApplicationKeySearchFilter_ProjectIdFilter{
-						ProjectIdFilter: &application.ApplicationKeyProjectIDFilter{ProjectId: p.GetId()},
+						ProjectIdFilter: &application.ApplicationKeyProjectIDFilter{ProjectId: p.GetProjectId()},
 					}},
 				},
 			},
@@ -927,17 +927,17 @@ func TestListApplicationKeys_WithPermissionV2(t *testing.T) {
 	loginUserCtx := instancePermissionV2.WithAuthorizationToken(context.Background(), integration.UserTypeLogin)
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
 
-	createdApiApp1 := createAPIApp(t, iamOwnerCtx, instancePermissionV2, p.GetId())
-	createdApiApp2 := createAPIApp(t, iamOwnerCtx, instancePermissionV2, p.GetId())
+	createdApiApp1 := createAPIApp(t, iamOwnerCtx, instancePermissionV2, p.GetProjectId())
+	createdApiApp2 := createAPIApp(t, iamOwnerCtx, instancePermissionV2, p.GetProjectId())
 
 	tomorrow := time.Now().AddDate(0, 0, 1)
 	in2Days := tomorrow.AddDate(0, 0, 1)
 	in3Days := in2Days.AddDate(0, 0, 1)
 
-	appKey1 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetId(), createdApiApp1.GetApplicationId(), in2Days)
-	appKey2 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetId(), createdApiApp1.GetApplicationId(), in3Days)
-	appKey3 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetId(), createdApiApp1.GetApplicationId(), tomorrow)
-	appKey4 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetId(), createdApiApp2.GetApplicationId(), tomorrow)
+	appKey1 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetProjectId(), createdApiApp1.GetApplicationId(), in2Days)
+	appKey2 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetProjectId(), createdApiApp1.GetApplicationId(), in3Days)
+	appKey3 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetProjectId(), createdApiApp1.GetApplicationId(), tomorrow)
+	appKey4 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetProjectId(), createdApiApp2.GetApplicationId(), tomorrow)
 
 	t.Parallel()
 

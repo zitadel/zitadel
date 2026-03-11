@@ -137,7 +137,7 @@ func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.
 	project := i.CreateProject(ctx, t, "", ProjectName(), false, false)
 
 	resp, err := i.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
-		ProjectId:                project.GetId(),
+		ProjectId:                project.GetProjectId(),
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
 		RedirectUris:             []string{redirectURI},
 		ResponseTypes:            []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN},
@@ -161,13 +161,13 @@ func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.
 	}
 	return resp, await(func() error {
 		_, err := i.Client.Mgmt.GetProjectByID(ctx, &management.GetProjectByIDRequest{
-			Id: project.GetId(),
+			Id: project.GetProjectId(),
 		})
 		if err != nil {
 			return err
 		}
 		_, err = i.Client.Mgmt.GetAppByID(ctx, &management.GetAppByIDRequest{
-			ProjectId: project.GetId(),
+			ProjectId: project.GetProjectId(),
 			AppId:     resp.GetAppId(),
 		})
 		return err
@@ -176,7 +176,7 @@ func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.
 
 func (i *Instance) CreateOIDCTokenExchangeClient(ctx context.Context, t *testing.T) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
 	project := i.CreateProject(ctx, t, "", ProjectName(), false, false)
-	return i.CreateOIDCWebClientJWT(ctx, "", "", project.GetId(), app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE, app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN)
+	return i.CreateOIDCWebClientJWT(ctx, "", "", project.GetProjectId(), app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE, app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN)
 }
 
 func (i *Instance) CreateAPIClientJWT(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {

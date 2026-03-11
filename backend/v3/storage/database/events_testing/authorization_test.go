@@ -15,8 +15,8 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	authorization_v2 "github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
 	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
-	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	project_v2beta "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	org_v2 "github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	project_v2 "github.com/zitadel/zitadel/pkg/grpc/project/v2"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -54,7 +54,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 
 		// add a new role to the project
 		role3 := "role3"
-		_, err = ProjectClient.AddProjectRole(CTX, &project_v2beta.AddProjectRoleRequest{
+		_, err = ProjectClient.AddProjectRole(CTX, &project_v2.AddProjectRoleRequest{
 			ProjectId:   projectID,
 			RoleKey:     role3,
 			DisplayName: "display",
@@ -211,8 +211,8 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		// create authorization with roles
 		createdAuthorization := createAndEnsureAuthorization(t, instanceID, orgID, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
 		// delete the project
-		_, err := ProjectClient.DeleteProject(CTX, &project_v2beta.DeleteProjectRequest{
-			Id: projectID,
+		_, err := ProjectClient.DeleteProject(CTX, &project_v2.DeleteProjectRequest{
+			ProjectId: projectID,
 		})
 		require.NoError(t, err)
 
@@ -235,7 +235,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		// create authorization with roles
 		createdAuthorization := createAndEnsureAuthorization(t, instanceID, orgID, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
 		// delete a project role
-		roleRemoved, err := ProjectClient.RemoveProjectRole(CTX, &project_v2beta.RemoveProjectRoleRequest{
+		roleRemoved, err := ProjectClient.RemoveProjectRole(CTX, &project_v2.RemoveProjectRoleRequest{
 			ProjectId: projectID,
 			RoleKey:   role2,
 		})
@@ -266,7 +266,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		grantedOrganization := Instance.CreateOrganization(CTX, grantedOrganizationName, integration.Email())
 
 		// create project grant
-		_, err := ProjectClient.CreateProjectGrant(CTX, &project_v2beta.CreateProjectGrantRequest{
+		_, err := ProjectClient.CreateProjectGrant(CTX, &project_v2.CreateProjectGrantRequest{
 			ProjectId:             projectID,
 			RoleKeys:              []string{role1},
 			GrantedOrganizationId: grantedOrganization.OrganizationId,
@@ -289,7 +289,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		grantedOrganization := Instance.CreateOrganization(CTX, grantedOrganizationName, integration.Email())
 
 		// create project grant
-		_, err := ProjectClient.CreateProjectGrant(CTX, &project_v2beta.CreateProjectGrantRequest{
+		_, err := ProjectClient.CreateProjectGrant(CTX, &project_v2.CreateProjectGrantRequest{
 			ProjectId:             projectID,
 			RoleKeys:              []string{role1},
 			GrantedOrganizationId: grantedOrganization.OrganizationId,
@@ -300,7 +300,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		// create authorization with roles
 		createdAuthorization := createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1}, retryDuration, tick)
 		// delete project grant
-		_, err = ProjectClient.DeleteProjectGrant(CTX, &project_v2beta.DeleteProjectGrantRequest{
+		_, err = ProjectClient.DeleteProjectGrant(CTX, &project_v2.DeleteProjectGrantRequest{
 			ProjectId:             projectID,
 			GrantedOrganizationId: grantedOrganization.OrganizationId,
 		})
@@ -324,7 +324,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		grantedOrganizationName := integration.OrganizationName()
 		grantedOrganization := Instance.CreateOrganization(CTX, grantedOrganizationName, integration.Email())
 		// create project grant
-		_, err := ProjectClient.CreateProjectGrant(CTX, &project_v2beta.CreateProjectGrantRequest{
+		_, err := ProjectClient.CreateProjectGrant(CTX, &project_v2.CreateProjectGrantRequest{
 			ProjectId:             projectID,
 			RoleKeys:              []string{role1, role2},
 			GrantedOrganizationId: grantedOrganization.OrganizationId,
@@ -335,7 +335,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		// create authorization with roles
 		createdAuthorization := createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
 		// update project grant
-		_, err = ProjectClient.UpdateProjectGrant(CTX, &project_v2beta.UpdateProjectGrantRequest{
+		_, err = ProjectClient.UpdateProjectGrant(CTX, &project_v2.UpdateProjectGrantRequest{
 			ProjectId:             projectID,
 			GrantedOrganizationId: grantedOrganization.OrganizationId,
 			RoleKeys:              []string{role1},
@@ -368,8 +368,8 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		// create authorization with roles
 		createdAuthorization := createAndEnsureAuthorization(t, instanceID, orgResp.OrganizationId, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
 		// delete the organization
-		_, err := OrgClient.DeleteOrganization(CTX, &org_v2beta.DeleteOrganizationRequest{
-			Id: orgResp.OrganizationId,
+		_, err := OrgClient.DeleteOrganization(CTX, &org_v2.DeleteOrganizationRequest{
+			OrganizationId: orgResp.OrganizationId,
 		})
 		require.NoError(t, err)
 
@@ -393,13 +393,13 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"
 		projectResp := instance.CreateProject(CTX, t, orgResp.OrganizationId, integration.ProjectName(), false, false)
-		_ = instance.AddProjectRole(CTX, t, projectResp.Id, role1, "display", "")
-		_ = instance.AddProjectRole(CTX, t, projectResp.Id, role2, "display", "")
+		_ = instance.AddProjectRole(CTX, t, projectResp.ProjectId, role1, "display", "")
+		_ = instance.AddProjectRole(CTX, t, projectResp.ProjectId, role2, "display", "")
 
 		// create authorization with roles
 		createdAuthorization, err := instance.Client.AuthorizationV2.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
 			UserId:         user.UserId,
-			ProjectId:      projectResp.Id,
+			ProjectId:      projectResp.ProjectId,
 			RoleKeys:       []string{role1, role2},
 			OrganizationId: orgResp.OrganizationId,
 		})
@@ -463,14 +463,14 @@ func createAndEnsureAuthorization(t *testing.T, instanceID, orgID, userID, proje
 func prepareProjectAndProjectRoles(t *testing.T, orgID string, roles []string) string {
 	t.Helper()
 
-	project, err := ProjectClient.CreateProject(CTX, &project_v2beta.CreateProjectRequest{
+	project, err := ProjectClient.CreateProject(CTX, &project_v2.CreateProjectRequest{
 		OrganizationId: orgID,
 		Name:           integration.ProjectName(),
 	})
 	require.NoError(t, err)
 
 	if len(roles) == 0 {
-		return project.Id
+		return project.ProjectId
 	}
 
 	// Wait for the project to be created in the relational db before adding roles
@@ -478,18 +478,18 @@ func prepareProjectAndProjectRoles(t *testing.T, orgID string, roles []string) s
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
 		_, err := projectRepo.Get(CTX, pool, database.WithCondition(
-			projectRepo.PrimaryKeyCondition(Instance.ID(), project.Id),
+			projectRepo.PrimaryKeyCondition(Instance.ID(), project.ProjectId),
 		))
 		require.NoError(collect, err)
-	}, retryDuration, tick, "project %q not found within %v: %v", project.Id, retryDuration, err)
+	}, retryDuration, tick, "project %q not found within %v: %v", project.ProjectId, retryDuration, err)
 
 	for _, role := range roles {
-		_, err = ProjectClient.AddProjectRole(CTX, &project_v2beta.AddProjectRoleRequest{
-			ProjectId:   project.GetId(),
+		_, err = ProjectClient.AddProjectRole(CTX, &project_v2.AddProjectRoleRequest{
+			ProjectId:   project.GetProjectId(),
 			RoleKey:     role,
 			DisplayName: "display",
 		})
 		require.NoError(t, err)
 	}
-	return project.Id
+	return project.ProjectId
 }

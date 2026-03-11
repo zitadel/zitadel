@@ -24,7 +24,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/policy"
 	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
 )
@@ -301,7 +301,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
@@ -698,7 +698,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 
@@ -812,7 +812,7 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
@@ -904,7 +904,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
@@ -1000,7 +1000,7 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
@@ -1094,7 +1094,7 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
@@ -1183,7 +1183,7 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 
 	t.Run("test delete instance reduces", func(t *testing.T) {
 		// 3. delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
@@ -1268,7 +1268,7 @@ func TestServer_TestInstanceNotificationSettingsReduces(t *testing.T) {
 			require.NotNil(t, setting)
 		}, retryDuration, tick)
 
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
@@ -1370,7 +1370,7 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 			require.NotNil(t, setting)
 		}, retryDuration, tick)
 
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
@@ -1520,7 +1520,7 @@ func TestServer_TestInstanceSecretGeneratorSettingsReduces(t *testing.T) {
 			require.NotNil(collect, setting)
 		}, retryDuration, tick)
 
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)

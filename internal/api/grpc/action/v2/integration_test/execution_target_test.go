@@ -1274,9 +1274,9 @@ func createSAMLSP(t *testing.T, idpMetadata *saml.EntityDescriptor, binding stri
 func createSAMLApplication(ctx context.Context, t *testing.T, instance *integration.Instance, idpMetadata *saml.EntityDescriptor, binding string, projectRoleCheck, hasProjectCheck bool) (string, string, *samlsp.Middleware) {
 	project := instance.CreateProject(ctx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), projectRoleCheck, hasProjectCheck)
 	rootURL, sp := createSAMLSP(t, idpMetadata, binding)
-	_, err := instance.CreateSAMLClient(ctx, project.GetId(), sp)
+	_, err := instance.CreateSAMLClient(ctx, project.GetProjectId(), sp)
 	require.NoError(t, err)
-	return project.GetId(), rootURL, sp
+	return project.GetProjectId(), rootURL, sp
 }
 
 func getSAMLResponseAttributes(t *testing.T, samlResponse string, sp *samlsp.Middleware) []saml.Attribute {

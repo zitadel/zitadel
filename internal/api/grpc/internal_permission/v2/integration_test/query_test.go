@@ -38,27 +38,27 @@ func TestServer_ListAdministrators(t *testing.T) {
 	// project setup on the same organization with 3 project administrators to query
 	projectName := integration.ProjectName()
 	projectResp := instanceQuery.CreateProject(iamOwnerCtx, t, organizationResp.GetOrganizationId(), projectName, false, false)
-	projectAdministrator1 := createProjectAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
-	projectAdministrator2 := createProjectAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
-	projectAdministrator3 := createProjectAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
+	projectAdministrator1 := createProjectAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName)
+	projectAdministrator2 := createProjectAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName)
+	projectAdministrator3 := createProjectAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName)
 
 	// Additionally, a service account as a project owner to test permissions
 	userProjectResp := instanceQuery.CreateMachineUser(iamOwnerCtx)
-	instanceQuery.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userProjectResp.GetUserId())
+	instanceQuery.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetProjectId(), userProjectResp.GetUserId())
 	patProjectResp := instanceQuery.CreatePersonalAccessToken(iamOwnerCtx, userProjectResp.GetUserId())
 	projectOwnerCtx := integration.WithAuthorizationToken(CTX, patProjectResp.Token)
 
 	// project grant setup on the same project with 3 project grant administrators to query
 	grantedOrganizationName := integration.OrganizationName()
 	grantedOrganizationResp := instanceQuery.CreateOrganization(iamOwnerCtx, grantedOrganizationName, integration.Email())
-	instanceQuery.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrganizationResp.GetOrganizationId())
-	projectGrantAdministrator1 := createProjectGrantAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
-	projectGrantAdministrator2 := createProjectGrantAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
-	projectGrantAdministrator3 := createProjectGrantAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
+	instanceQuery.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetProjectId(), grantedOrganizationResp.GetOrganizationId())
+	projectGrantAdministrator1 := createProjectGrantAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName, grantedOrganizationResp.GetOrganizationId())
+	projectGrantAdministrator2 := createProjectGrantAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName, grantedOrganizationResp.GetOrganizationId())
+	projectGrantAdministrator3 := createProjectGrantAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName, grantedOrganizationResp.GetOrganizationId())
 
 	// Additionally, a service account as a project grant owner to test permissions
 	userProjectGrantResp := instanceQuery.CreateMachineUser(iamOwnerCtx)
-	instanceQuery.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), grantedOrganizationResp.GetOrganizationId(), userProjectGrantResp.GetUserId())
+	instanceQuery.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetProjectId(), grantedOrganizationResp.GetOrganizationId(), userProjectGrantResp.GetUserId())
 	patProjectGrantResp := instanceQuery.CreatePersonalAccessToken(iamOwnerCtx, userProjectGrantResp.GetUserId())
 	projectGrantOwnerCtx := integration.WithAuthorizationToken(CTX, patProjectGrantResp.Token)
 
@@ -538,7 +538,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 				dep: func(request *internal_permission.ListAdministratorsRequest, response *internal_permission.ListAdministratorsResponse) {
 					request.Filters[0].Filter = &internal_permission.AdministratorSearchFilter_Resource{
 						Resource: &internal_permission.ResourceFilter{
-							Resource: &internal_permission.ResourceFilter_ProjectId{ProjectId: projectResp.GetId()},
+							Resource: &internal_permission.ResourceFilter_ProjectId{ProjectId: projectResp.GetProjectId()},
 						},
 					}
 				},
@@ -564,7 +564,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 						Resource: &internal_permission.ResourceFilter{
 							Resource: &internal_permission.ResourceFilter_ProjectGrant_{
 								ProjectGrant: &internal_permission.ResourceFilter_ProjectGrant{
-									ProjectId:      projectResp.GetId(),
+									ProjectId:      projectResp.GetProjectId(),
 									OrganizationId: grantedOrganizationResp.GetOrganizationId(),
 								},
 							},
@@ -854,27 +854,27 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 	// project setup on the same organization with 3 project administrators to query
 	projectName := integration.ProjectName()
 	projectResp := instancePermissionV2.CreateProject(iamOwnerCtx, t, organizationResp.GetOrganizationId(), projectName, false, false)
-	projectAdministrator1 := createProjectAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
-	projectAdministrator2 := createProjectAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
-	projectAdministrator3 := createProjectAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
+	projectAdministrator1 := createProjectAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName)
+	projectAdministrator2 := createProjectAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName)
+	projectAdministrator3 := createProjectAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName)
 
 	// Additionally, a service account as a project owner to test permissions
 	userProjectResp := instancePermissionV2.CreateMachineUser(iamOwnerCtx)
-	instancePermissionV2.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userProjectResp.GetUserId())
+	instancePermissionV2.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetProjectId(), userProjectResp.GetUserId())
 	patProjectResp := instancePermissionV2.CreatePersonalAccessToken(iamOwnerCtx, userProjectResp.GetUserId())
 	projectOwnerCtx := integration.WithAuthorizationToken(CTX, patProjectResp.Token)
 
 	// project grant setup on the same project with 3 project grant administrators to query
 	grantedOrganizationName := integration.OrganizationName()
 	grantedOrganizationResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, grantedOrganizationName, integration.Email())
-	instancePermissionV2.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrganizationResp.GetOrganizationId())
-	projectGrantAdministrator1 := createProjectGrantAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
-	projectGrantAdministrator2 := createProjectGrantAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
-	projectGrantAdministrator3 := createProjectGrantAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
+	instancePermissionV2.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetProjectId(), grantedOrganizationResp.GetOrganizationId())
+	projectGrantAdministrator1 := createProjectGrantAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName, grantedOrganizationResp.GetOrganizationId())
+	projectGrantAdministrator2 := createProjectGrantAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName, grantedOrganizationResp.GetOrganizationId())
+	projectGrantAdministrator3 := createProjectGrantAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName, grantedOrganizationResp.GetOrganizationId())
 
 	// Additionally, a service account as a project grant owner to test permissions
 	userProjectGrantResp := instancePermissionV2.CreateMachineUser(iamOwnerCtx)
-	instancePermissionV2.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), grantedOrganizationResp.GetOrganizationId(), userProjectGrantResp.GetUserId())
+	instancePermissionV2.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetProjectId(), grantedOrganizationResp.GetOrganizationId(), userProjectGrantResp.GetUserId())
 	patProjectGrantResp := instancePermissionV2.CreatePersonalAccessToken(iamOwnerCtx, userProjectGrantResp.GetUserId())
 	projectGrantOwnerCtx := integration.WithAuthorizationToken(CTX, patProjectGrantResp.Token)
 	type args struct {
@@ -1351,7 +1351,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 				dep: func(request *internal_permission.ListAdministratorsRequest, response *internal_permission.ListAdministratorsResponse) {
 					request.Filters[0].Filter = &internal_permission.AdministratorSearchFilter_Resource{
 						Resource: &internal_permission.ResourceFilter{
-							Resource: &internal_permission.ResourceFilter_ProjectId{ProjectId: projectResp.GetId()},
+							Resource: &internal_permission.ResourceFilter_ProjectId{ProjectId: projectResp.GetProjectId()},
 						},
 					}
 				},
@@ -1377,7 +1377,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 						Resource: &internal_permission.ResourceFilter{
 							Resource: &internal_permission.ResourceFilter_ProjectGrant_{
 								ProjectGrant: &internal_permission.ResourceFilter_ProjectGrant{
-									ProjectId:      projectResp.GetId(),
+									ProjectId:      projectResp.GetProjectId(),
 									OrganizationId: grantedOrganizationResp.GetOrganizationId(),
 								},
 							},

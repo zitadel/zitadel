@@ -78,7 +78,7 @@ func TestDeleteUser_ensureReallyDeleted(t *testing.T) {
 	createUserResp := Instance.CreateHumanUser(CTX)
 	proj := Instance.CreateProject(CTX, t, Instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
-	Instance.CreateProjectUserGrant(t, CTX, Instance.DefaultOrg.GetId(), proj.Id, createUserResp.UserId)
+	Instance.CreateProjectUserGrant(t, CTX, Instance.DefaultOrg.GetId(), proj.ProjectId, createUserResp.UserId)
 
 	// delete user via scim
 	err := Instance.Client.SCIM.Users.Delete(CTX, Instance.DefaultOrg.Id, createUserResp.UserId)

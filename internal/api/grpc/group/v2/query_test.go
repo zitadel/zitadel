@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )

@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
-	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/project/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -33,7 +33,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					request.OrganizationId = selfOrgId
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					request.RoleKeys = []string{integration.RoleKey()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], integration.RoleDisplayName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
@@ -50,7 +50,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					request.RoleKeys = []string{integration.RoleKey()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], integration.RoleDisplayName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
@@ -69,7 +69,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					request.OrganizationId = selfOrgId
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					request.RoleKeys = []string{integration.RoleKey()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], integration.RoleDisplayName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
@@ -88,7 +88,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					request.OrganizationId = selfOrgId
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					request.RoleKeys = []string{integration.RoleKey()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], integration.RoleDisplayName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
@@ -106,7 +106,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					request.OrganizationId = selfOrgId
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					request.RoleKeys = []string{integration.RoleKey()}
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
@@ -140,7 +140,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					request.OrganizationId = "notexists"
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
 					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.Id)
@@ -159,7 +159,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					request.OrganizationId = selfOrgId
 					foreignOrg := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email())
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, integration.ProjectName(), false, false).Id
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, integration.ProjectName(), false, false).ProjectId
 					request.RoleKeys = []string{integration.RoleKey()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], integration.RoleDisplayName(), "")
 					Instance.CreateProjectGrant(IAMCTX, t, request.ProjectId, selfOrgId, request.RoleKeys...)
@@ -180,7 +180,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					request.OrganizationId = selfOrgId
 					foreignOrg := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email())
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, integration.ProjectName(), false, false).Id
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, integration.ProjectName(), false, false).ProjectId
 					request.RoleKeys = []string{integration.RoleKey()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], integration.RoleDisplayName(), "")
 					Instance.CreateProjectGrant(IAMCTX, t, request.ProjectId, selfOrgId)
@@ -201,7 +201,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					request.OrganizationId = selfOrgId
 					foreignOrg := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email())
-					projectID := Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, integration.ProjectName(), false, false).Id
+					projectID := Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, integration.ProjectName(), false, false).ProjectId
 					request.ProjectId = projectID
 					request.RoleKeys = []string{integration.RoleKey()}
 					Instance.AddProjectRole(IAMCTX, t, projectID, request.RoleKeys[0], integration.RoleDisplayName(), "")
@@ -223,7 +223,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					request.OrganizationId = selfOrgId
 					foreignOrg := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email())
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, integration.ProjectName(), false, false).Id
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, integration.ProjectName(), false, false).ProjectId
 					request.RoleKeys = []string{integration.RoleKey()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], integration.RoleDisplayName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
@@ -272,7 +272,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 			args: args{
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -299,7 +299,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 			args: args{
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -327,7 +327,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 			args: args{
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -356,7 +356,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					projectRole3 := integration.RoleKey()
@@ -386,7 +386,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					projectRole3 := integration.RoleKey()
@@ -418,7 +418,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					projectRole3 := integration.RoleKey()
@@ -437,7 +437,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					request.RoleKeys = []string{projectRole1}
 					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
 					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, selfOrgId, callingUser.Id)
-					_, err = Instance.Client.Projectv2Beta.DeleteProjectGrant(IAMCTX, &project.DeleteProjectGrantRequest{
+					_, err = Instance.Client.ProjectV2.DeleteProjectGrant(IAMCTX, &project.DeleteProjectGrantRequest{
 						ProjectId:             projectId,
 						GrantedOrganizationId: selfOrgId,
 					})
@@ -489,7 +489,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 			args: args{
 				func(t *testing.T, request *authorization.DeleteAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -515,7 +515,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.DeleteAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -542,7 +542,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.DeleteAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					projectRole3 := integration.RoleKey()
@@ -573,7 +573,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.DeleteAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					projectRole3 := integration.RoleKey()
@@ -600,7 +600,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 			args: args{
 				func(t *testing.T, request *authorization.DeleteAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -666,7 +666,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 			args: args{
 				func(t *testing.T, request *authorization.DeactivateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -692,7 +692,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.DeactivateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -719,7 +719,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.DeactivateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					projectRole3 := integration.RoleKey()
@@ -750,7 +750,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.DeactivateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					projectRole3 := integration.RoleKey()
@@ -776,7 +776,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 			args: args{
 				func(t *testing.T, request *authorization.DeactivateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -842,7 +842,7 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 			args: args{
 				func(t *testing.T, request *authorization.ActivateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -872,7 +872,7 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.ActivateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -903,7 +903,7 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.ActivateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					projectRole3 := integration.RoleKey()
@@ -938,7 +938,7 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 				func(t *testing.T, request *authorization.ActivateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					projectRole3 := integration.RoleKey()
@@ -967,7 +967,7 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 			args: args{
 				func(t *testing.T, request *authorization.ActivateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
-					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).Id
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, integration.ProjectName(), false, false).ProjectId
 					projectRole1 := integration.RoleKey()
 					projectRole2 := integration.RoleKey()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")

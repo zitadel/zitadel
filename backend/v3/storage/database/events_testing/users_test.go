@@ -703,7 +703,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
 			SetBody(deleteUserReqJSON).
-			Delete("http://localhost:8082" + "/v2beta/users/human")
+			Delete("http://localhost:8082" + "/v2/users/human")
 		require.NoError(t, err)
 		// require.Equal(t, 200, out.StatusCode())
 		// require.NoError(t, err)
@@ -747,7 +747,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
 			SetBody(createUserReqJSON).
-			Post("http://localhost:8082" + "/v2beta/users/human")
+			Post("http://localhost:8082" + "/v2/users/human")
 		require.NoError(t, err)
 		// require.Equal(t, 201, out.StatusCode())
 
@@ -809,7 +809,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
 			SetBody(deleteUserReqJSON).
-			Delete("http://localhost:8082" + "/v2beta/users/human")
+			Delete("http://localhost:8082" + "/v2/users/human")
 		require.NoError(t, err)
 		// require.Equal(t, 200, out.StatusCode())
 		// require.NoError(t, err)
@@ -853,7 +853,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
 			SetBody(createUserReqJSON).
-			Post("http://localhost:8082" + "/v2beta/users/human")
+			Post("http://localhost:8082" + "/v2/users/human")
 		require.NoError(t, err)
 		// require.Equal(t, 201, out.StatusCode())
 

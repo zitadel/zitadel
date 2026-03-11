@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
-	v2beta_project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/project/v2"
 )
 
 func TestServer_ProjectRoleReduces(t *testing.T) {
@@ -22,7 +22,7 @@ func TestServer_ProjectRoleReduces(t *testing.T) {
 	orgID := Instance.DefaultOrg.Id
 	roleRepo := repository.ProjectRepository().Role()
 
-	projectRes, err := ProjectClient.CreateProject(CTX, &v2beta_project.CreateProjectRequest{
+	projectRes, err := ProjectClient.CreateProject(CTX, &project.CreateProjectRequest{
 		OrganizationId:        orgID,
 		Name:                  integration.ProjectName(),
 		ProjectRoleAssertion:  true,
@@ -30,8 +30,8 @@ func TestServer_ProjectRoleReduces(t *testing.T) {
 		ProjectAccessRequired: true,
 	})
 	require.NoError(t, err)
-	projectID := projectRes.GetId()
-	_, err = ProjectClient.AddProjectRole(CTX, &v2beta_project.AddProjectRoleRequest{
+	projectID := projectRes.GetProjectId()
+	_, err = ProjectClient.AddProjectRole(CTX, &project.AddProjectRoleRequest{
 		ProjectId:   projectID,
 		RoleKey:     "key",
 		DisplayName: "display name",
@@ -58,7 +58,7 @@ func TestServer_ProjectRoleReduces(t *testing.T) {
 	})
 
 	t.Run("update project role reduces", func(t *testing.T) {
-		_, err := ProjectClient.UpdateProjectRole(CTX, &v2beta_project.UpdateProjectRoleRequest{
+		_, err := ProjectClient.UpdateProjectRole(CTX, &project.UpdateProjectRoleRequest{
 			ProjectId:   projectID,
 			RoleKey:     "key",
 			DisplayName: proto.String("new display name"),
@@ -78,7 +78,7 @@ func TestServer_ProjectRoleReduces(t *testing.T) {
 	})
 
 	t.Run("remove project role reduces", func(t *testing.T) {
-		_, err := ProjectClient.RemoveProjectRole(CTX, &v2beta_project.RemoveProjectRoleRequest{
+		_, err := ProjectClient.RemoveProjectRole(CTX, &project.RemoveProjectRoleRequest{
 			ProjectId: projectID,
 			RoleKey:   "key",
 		})

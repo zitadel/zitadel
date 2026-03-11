@@ -12,33 +12,33 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/application/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
-	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/project/v2"
 )
 
 func TestServer_ListAppKeys(t *testing.T) {
 	// create project
 	prjName := integration.ProjectName()
-	createPrjRes, err := Instance.Client.Projectv2Beta.CreateProject(IAMOwnerCTX, &project.CreateProjectRequest{
+	createPrjRes, err := Instance.Client.ProjectV2.CreateProject(IAMOwnerCTX, &project.CreateProjectRequest{
 		Name:           prjName,
 		OrganizationId: Instance.DefaultOrg.Id,
 	})
 	require.NoError(t, err)
-	prjId := createPrjRes.Id
+	prjId := createPrjRes.ProjectId
 
 	// add app to project
-	createAppjRes, err := Instance.Client.AppV2Beta.CreateApplication(IAMOwnerCTX, &app.CreateApplicationRequest{
+	createAppjRes, err := Instance.Client.ApplicationV2.CreateApplication(IAMOwnerCTX, &application.CreateApplicationRequest{
 		ProjectId: prjId,
 		Name:      integration.ApplicationName(),
-		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
-			ApiRequest: &app.CreateAPIApplicationRequest{
-				AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
+		ApplicationType: &application.CreateApplicationRequest_ApiConfiguration{
+			ApiConfiguration: &application.CreateAPIApplicationRequest{
+				AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
 			},
 		},
 	})
 	require.NoError(t, err)
-	appId := createAppjRes.AppId
+	appId := createAppjRes.ApplicationId
 
 	type test struct {
 		name               string
@@ -50,21 +50,21 @@ func TestServer_ListAppKeys(t *testing.T) {
 			name: "happy path",
 			expectedKeyIdsFunc: func() []string {
 				// add other app to project
-				createOtherAppjRes, err := Instance.Client.AppV2Beta.CreateApplication(IAMOwnerCTX, &app.CreateApplicationRequest{
+				createOtherAppjRes, err := Instance.Client.ApplicationV2.CreateApplication(IAMOwnerCTX, &application.CreateApplicationRequest{
 					ProjectId: prjId,
 					Name:      integration.ApplicationName(),
-					CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
-						ApiRequest: &app.CreateAPIApplicationRequest{
-							AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
+					ApplicationType: &application.CreateApplicationRequest_ApiConfiguration{
+						ApiConfiguration: &application.CreateAPIApplicationRequest{
+							AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
 						},
 					},
 				})
 				require.NoError(t, err)
-				otherAppId := createOtherAppjRes.AppId
+				otherAppId := createOtherAppjRes.ApplicationId
 				// add other project key ids - These SHOULD NOT be returned when calling ListAppKeys()
 				for range 5 {
-					_, err := Instance.Client.AppV2Beta.CreateApplicationKey(IAMOwnerCTX, &app.CreateApplicationKeyRequest{
-						AppId:          otherAppId,
+					_, err := Instance.Client.ApplicationV2.CreateApplicationKey(IAMOwnerCTX, &application.CreateApplicationKeyRequest{
+						ApplicationId:  otherAppId,
 						ProjectId:      prjId,
 						ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 					})
@@ -74,13 +74,13 @@ func TestServer_ListAppKeys(t *testing.T) {
 				// create app keys we expect to be rturned form ListAppKeys()
 				keyIDs := make([]string, 5)
 				for i := range len(keyIDs) {
-					res, err := Instance.Client.AppV2Beta.CreateApplicationKey(IAMOwnerCTX, &app.CreateApplicationKeyRequest{
-						AppId:          appId,
+					res, err := Instance.Client.ApplicationV2.CreateApplicationKey(IAMOwnerCTX, &application.CreateApplicationKeyRequest{
+						ApplicationId:  appId,
 						ProjectId:      prjId,
 						ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 					})
 					require.NoError(t, err)
-					keyIDs[i] = res.Id
+					keyIDs[i] = res.KeyId
 				}
 				return keyIDs
 			},

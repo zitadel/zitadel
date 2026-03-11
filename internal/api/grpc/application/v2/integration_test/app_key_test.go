@@ -19,7 +19,7 @@ import (
 
 func TestCreateApplicationKey(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
-	createdApp := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	createdApp := createAPIApp(t, IAMOwnerCtx, instance, p.GetProjectId())
 
 	t.Parallel()
 
@@ -34,7 +34,7 @@ func TestCreateApplicationKey(t *testing.T) {
 			testName: "when application id is not found should return failed precondition",
 			inputCtx: IAMOwnerCtx,
 			creationRequest: &application.CreateApplicationKeyRequest{
-				ProjectId:      p.GetId(),
+				ProjectId:      p.GetProjectId(),
 				ApplicationId:  integration.ID(),
 				ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 			},
@@ -44,7 +44,7 @@ func TestCreateApplicationKey(t *testing.T) {
 			testName: "when CreateAPIApp request is valid should create application and return no error",
 			inputCtx: IAMOwnerCtx,
 			creationRequest: &application.CreateApplicationKeyRequest{
-				ProjectId:      p.GetId(),
+				ProjectId:      p.GetProjectId(),
 				ApplicationId:  createdApp.GetApplicationId(),
 				ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 			},
@@ -55,7 +55,7 @@ func TestCreateApplicationKey(t *testing.T) {
 			testName: "when user has no project.application.write permission for application key generation should return permission error",
 			inputCtx: LoginUserCtx,
 			creationRequest: &application.CreateApplicationKeyRequest{
-				ProjectId:      p.GetId(),
+				ProjectId:      p.GetProjectId(),
 				ApplicationId:  createdApp.GetApplicationId(),
 				ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 			},
@@ -67,7 +67,7 @@ func TestCreateApplicationKey(t *testing.T) {
 			testName: "when user is OrgOwner application key request should succeed",
 			inputCtx: OrgOwnerCtx,
 			creationRequest: &application.CreateApplicationKeyRequest{
-				ProjectId:      p.GetId(),
+				ProjectId:      p.GetProjectId(),
 				ApplicationId:  createdApp.GetApplicationId(),
 				ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 			},
@@ -78,7 +78,7 @@ func TestCreateApplicationKey(t *testing.T) {
 			testName: "when user is ProjectOwner application key request should succeed",
 			inputCtx: projectOwnerCtx,
 			creationRequest: &application.CreateApplicationKeyRequest{
-				ProjectId:      p.GetId(),
+				ProjectId:      p.GetProjectId(),
 				ApplicationId:  createdApp.GetApplicationId(),
 				ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 			},
@@ -102,7 +102,7 @@ func TestCreateApplicationKey(t *testing.T) {
 
 func TestDeleteApplicationKey(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
-	createdApp := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	createdApp := createAPIApp(t, IAMOwnerCtx, instance, p.GetProjectId())
 
 	t.Parallel()
 
@@ -119,7 +119,7 @@ func TestDeleteApplicationKey(t *testing.T) {
 			deletionRequest: func(ttt *testing.T) *application.DeleteApplicationKeyRequest {
 				return &application.DeleteApplicationKeyRequest{
 					KeyId:         integration.ID(),
-					ProjectId:     p.GetId(),
+					ProjectId:     p.GetProjectId(),
 					ApplicationId: createdApp.GetApplicationId(),
 				}
 			},
@@ -129,11 +129,11 @@ func TestDeleteApplicationKey(t *testing.T) {
 			testName: "when valid application key ID should delete successfully",
 			inputCtx: IAMOwnerCtx,
 			deletionRequest: func(ttt *testing.T) *application.DeleteApplicationKeyRequest {
-				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetApplicationId(), time.Now().AddDate(0, 0, 1))
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetProjectId(), createdApp.GetApplicationId(), time.Now().AddDate(0, 0, 1))
 
 				return &application.DeleteApplicationKeyRequest{
 					KeyId:         createdAppKey.GetKeyId(),
-					ProjectId:     p.GetId(),
+					ProjectId:     p.GetProjectId(),
 					ApplicationId: createdApp.GetApplicationId(),
 				}
 			},
@@ -144,11 +144,11 @@ func TestDeleteApplicationKey(t *testing.T) {
 			testName: "when user has no project.application.write permission for application key deletion should return permission error",
 			inputCtx: LoginUserCtx,
 			deletionRequest: func(ttt *testing.T) *application.DeleteApplicationKeyRequest {
-				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetApplicationId(), time.Now().AddDate(0, 0, 1))
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetProjectId(), createdApp.GetApplicationId(), time.Now().AddDate(0, 0, 1))
 
 				return &application.DeleteApplicationKeyRequest{
 					KeyId:         createdAppKey.GetKeyId(),
-					ProjectId:     p.GetId(),
+					ProjectId:     p.GetProjectId(),
 					ApplicationId: createdApp.GetApplicationId(),
 				}
 			},
@@ -160,11 +160,11 @@ func TestDeleteApplicationKey(t *testing.T) {
 			testName: "when user is OrgOwner API request should succeed",
 			inputCtx: projectOwnerCtx,
 			deletionRequest: func(ttt *testing.T) *application.DeleteApplicationKeyRequest {
-				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetApplicationId(), time.Now().AddDate(0, 0, 1))
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetProjectId(), createdApp.GetApplicationId(), time.Now().AddDate(0, 0, 1))
 
 				return &application.DeleteApplicationKeyRequest{
 					KeyId:         createdAppKey.GetKeyId(),
-					ProjectId:     p.GetId(),
+					ProjectId:     p.GetProjectId(),
 					ApplicationId: createdApp.GetApplicationId(),
 				}
 			},
@@ -175,11 +175,11 @@ func TestDeleteApplicationKey(t *testing.T) {
 			testName: "when user is OrgOwner application key deletion request should succeed",
 			inputCtx: OrgOwnerCtx,
 			deletionRequest: func(ttt *testing.T) *application.DeleteApplicationKeyRequest {
-				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetApplicationId(), time.Now().AddDate(0, 0, 1))
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetProjectId(), createdApp.GetApplicationId(), time.Now().AddDate(0, 0, 1))
 
 				return &application.DeleteApplicationKeyRequest{
 					KeyId:         createdAppKey.GetKeyId(),
-					ProjectId:     p.GetId(),
+					ProjectId:     p.GetProjectId(),
 					ApplicationId: createdApp.GetApplicationId(),
 				}
 			},

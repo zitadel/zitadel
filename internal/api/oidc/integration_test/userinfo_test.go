@@ -290,7 +290,7 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 		roleBar = "bar"
 	)
 
-	projectID := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false).GetId()
+	projectID := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false).GetProjectId()
 	user, _, clientID, clientSecret, err := Instance.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
 	addProjectRolesGrants(t, user.GetUserId(), projectID, roleFoo, roleBar)

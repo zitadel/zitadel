@@ -25,9 +25,9 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
-	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/policy"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
@@ -36,11 +36,11 @@ func createInstanceWithOrg(t *testing.T) (context.Context, *integration.Instance
 
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
-	organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+	organization, err := newInstance.Client.OrgV2.AddOrganization(IAMCTX, &org.AddOrganizationRequest{
 		Name: integration.OrganizationName(),
 	})
 	require.NoError(t, err)
-	orgId := organization.GetId()
+	orgId := organization.GetOrganizationId()
 	IAMCTX = integration.SetOrgID(IAMCTX, orgId)
 
 	cleanupInstance(t, newInstance)
@@ -349,8 +349,8 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 
 	t.Run("test delete org reduces", func(t *testing.T) {
 		// add delete org
-		_, err := newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-			Id: orgId,
+		_, err := newInstance.Client.OrgV2.DeleteOrganization(IAMCTX, &org.DeleteOrganizationRequest{
+			OrganizationId: orgId,
 		})
 		require.NoError(t, err)
 
@@ -757,8 +757,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 
 	t.Run("test org delete reduces", func(t *testing.T) {
 		// delete org
-		_, err := newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-			Id: orgId,
+		_, err := newInstance.Client.OrgV2.DeleteOrganization(IAMCTX, &org.DeleteOrganizationRequest{
+			OrganizationId: orgId,
 		})
 		require.NoError(t, err)
 
@@ -897,8 +897,8 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// add delete org
-		_, err = newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-			Id: orgId,
+		_, err = newInstance.Client.OrgV2.DeleteOrganization(IAMCTX, &org.DeleteOrganizationRequest{
+			OrganizationId: orgId,
 		})
 		require.NoError(t, err)
 
@@ -1001,8 +1001,8 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 
 	t.Run("test delete org reduces", func(t *testing.T) {
 		// add delete org
-		_, err := newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-			Id: orgId,
+		_, err := newInstance.Client.OrgV2.DeleteOrganization(IAMCTX, &org.DeleteOrganizationRequest{
+			OrganizationId: orgId,
 		})
 		require.NoError(t, err)
 
@@ -1103,8 +1103,8 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 
 	t.Run("test delete org reduces", func(t *testing.T) {
 		// add delete org
-		_, err := newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-			Id: orgId,
+		_, err := newInstance.Client.OrgV2.DeleteOrganization(IAMCTX, &org.DeleteOrganizationRequest{
+			OrganizationId: orgId,
 		})
 		require.NoError(t, err)
 
@@ -1215,8 +1215,8 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 
 	t.Run("test delete org reduces", func(t *testing.T) {
 		// add delete org
-		_, err := newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-			Id: orgId,
+		_, err := newInstance.Client.OrgV2.DeleteOrganization(IAMCTX, &org.DeleteOrganizationRequest{
+			OrganizationId: orgId,
 		})
 		require.NoError(t, err)
 
@@ -1245,7 +1245,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 
 	t.Run("test add org settings set", func(t *testing.T) {
 		before := time.Now()
-		_, err := newInstance.Client.SettingsV2beta.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
+		_, err := newInstance.Client.SettingsV2.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
 			OrganizationId:              orgId,
 			OrganizationScopedUsernames: gu.Ptr(true),
 		})
@@ -1271,7 +1271,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 
 	t.Run("test add org settings re-set", func(t *testing.T) {
 		before := time.Now()
-		_, err := newInstance.Client.SettingsV2beta.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
+		_, err := newInstance.Client.SettingsV2.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
 			OrganizationId:              orgId,
 			OrganizationScopedUsernames: gu.Ptr(false),
 		})
@@ -1296,7 +1296,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 
 	t.Run("test organization settings removed reduces", func(t *testing.T) {
 		// delete organization setting
-		_, err := newInstance.Client.SettingsV2beta.DeleteOrganizationSettings(IAMCTX, &settings.DeleteOrganizationSettingsRequest{
+		_, err := newInstance.Client.SettingsV2.DeleteOrganizationSettings(IAMCTX, &settings.DeleteOrganizationSettingsRequest{
 			OrganizationId: orgId,
 		})
 		require.NoError(t, err)
@@ -1318,8 +1318,8 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 
 	t.Run("test organization removed reduces", func(t *testing.T) {
 		// add delete org
-		_, err := newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-			Id: orgId,
+		_, err := newInstance.Client.OrgV2.DeleteOrganization(IAMCTX, &org.DeleteOrganizationRequest{
+			OrganizationId: orgId,
 		})
 		require.NoError(t, err)
 
@@ -1412,8 +1412,8 @@ func TestServer_TestNotificationSettingsReduces(t *testing.T) {
 
 	t.Run("test organization removed reduces", func(t *testing.T) {
 		// add delete org
-		_, err := newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-			Id: orgId,
+		_, err := newInstance.Client.OrgV2.DeleteOrganization(IAMCTX, &org.DeleteOrganizationRequest{
+			OrganizationId: orgId,
 		})
 		require.NoError(t, err)
 
@@ -1529,8 +1529,8 @@ func TestServer_TestLegalAndSupportSettingsReduces(t *testing.T) {
 
 	t.Run("test organization removed reduces", func(t *testing.T) {
 		// add delete org
-		_, err := newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-			Id: orgId,
+		_, err := newInstance.Client.OrgV2.DeleteOrganization(IAMCTX, &org.DeleteOrganizationRequest{
+			OrganizationId: orgId,
 		})
 		require.NoError(t, err)
 
