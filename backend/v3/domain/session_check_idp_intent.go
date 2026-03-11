@@ -10,11 +10,15 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
+type CheckIDPIntentType struct {
+	ID    string
+	Token string
+}
+
 type IDPIntentCheckCommand struct {
-	CheckIntent *session_grpc.CheckIDPIntent
+	CheckIntent *CheckIDPIntentType
 
 	SessionID  string
 	InstanceID string
@@ -27,7 +31,7 @@ type IDPIntentCheckCommand struct {
 // NewIDPIntentCheckCommand returns an IDPIntentCheckCommand initialized with the input values.
 //
 // If encryptionAlgo is nil, the default [crypto.EncryptionAlgorithm] will be used
-func NewIDPIntentCheckCommand(request *session_grpc.CheckIDPIntent, sessionID, instanceID string, encryptionAlgo crypto.EncryptionAlgorithm) *IDPIntentCheckCommand {
+func NewIDPIntentCheckCommand(request *CheckIDPIntentType, sessionID, instanceID string, encryptionAlgo crypto.EncryptionAlgorithm) *IDPIntentCheckCommand {
 	idpCheckCommand := &IDPIntentCheckCommand{
 		CheckIntent: request,
 		SessionID:   sessionID,
@@ -50,7 +54,7 @@ func (i *IDPIntentCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([
 
 	return []eventstore.Command{
 		session.NewIntentCheckedEvent(ctx, &session.NewAggregate(i.SessionID, i.InstanceID).Aggregate, time.Now()),
-		idpintent.NewConsumedEvent(ctx, &idpintent.NewAggregate(i.CheckIntent.GetIdpIntentId(), "").Aggregate),
+		idpintent.NewConsumedEvent(ctx, &idpintent.NewAggregate(i.CheckIntent.ID, "").Aggregate),
 	}, nil
 }
 
@@ -62,7 +66,7 @@ func (i *IDPIntentCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 
 	intentRepo := opts.idpIntentRepo
 
-	removedRows, err := intentRepo.Delete(ctx, opts.DB(), intentRepo.PrimaryKeyCondition(i.InstanceID, i.CheckIntent.GetIdpIntentId()))
+	removedRows, err := intentRepo.Delete(ctx, opts.DB(), intentRepo.PrimaryKeyCondition(i.InstanceID, i.CheckIntent.ID))
 	if err != nil {
 		return zerrors.ThrowInternal(err, "DOM-j1s5Eu", "failed deleting IDP intent")
 	}
@@ -106,11 +110,11 @@ func (i *IDPIntentCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-IJcVkV", "Errors.User.UserIDMissing")
 	}
 
-	if err := crypto.CheckToken(i.EncAlgo, i.CheckIntent.GetIdpIntentToken(), i.CheckIntent.GetIdpIntentId()); err != nil {
+	if err := crypto.CheckToken(i.EncAlgo, i.CheckIntent.Token, i.CheckIntent.ID); err != nil {
 		return err
 	}
 
-	intent, err := idpIntentRepo.Get(ctx, opts.DB(), database.WithCondition(idpIntentRepo.IDCondition(i.CheckIntent.GetIdpIntentId())))
+	intent, err := idpIntentRepo.Get(ctx, opts.DB(), database.WithCondition(idpIntentRepo.IDCondition(i.CheckIntent.ID)))
 	if err = handleGetError(err, "DOM-5XkWJV", "intent"); err != nil {
 		return err
 	}

@@ -24,7 +24,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 func TestIDPIntentCheckCommand_Events(t *testing.T) {
@@ -44,13 +43,13 @@ func TestIDPIntentCheckCommand_Events(t *testing.T) {
 		{
 			name: "isCheckComplete false returns nil events",
 			command: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{},
+				CheckIntent: &domain.CheckIDPIntentType{},
 			},
 		},
 		{
 			name: "valid command returns events",
 			command: &domain.IDPIntentCheckCommand{
-				CheckIntent:     &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123"},
+				CheckIntent:     &domain.CheckIDPIntentType{ID: "intent-123"},
 				SessionID:       "session-456",
 				InstanceID:      "instance-789",
 				IsCheckComplete: true,
@@ -116,7 +115,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when session ID is not set should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "",
 				InstanceID:  "instance-1",
 			},
@@ -125,7 +124,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when instance ID is not set should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "",
 			},
@@ -134,7 +133,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when retrieving session fails should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -150,7 +149,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when session not found should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -166,7 +165,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when session userID is empty should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -182,7 +181,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when token verification fails should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: invalidTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: invalidTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -209,7 +208,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when retrieving intent fails should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -243,7 +242,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when intent not found should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -277,7 +276,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when intent state is not succeeded should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -311,7 +310,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when intent is expired should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -345,7 +344,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when retrieving user fails should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -386,7 +385,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when user is not found should return not found error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -427,7 +426,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when user is not human should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -468,7 +467,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when intent has user and it matches session user should return no error and set fetched user",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -522,7 +521,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when intent has user but it does not match session user should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -567,7 +566,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when user has no matching IDP link should return error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -612,7 +611,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		{
 			testName: "when all validations pass should return no error",
 			cmd: &domain.IDPIntentCheckCommand{
-				CheckIntent: &session_grpc.CheckIDPIntent{IdpIntentId: "intent-123", IdpIntentToken: validTokenEncoding},
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
 				SessionID:   "session-1",
 				InstanceID:  "instance-1",
 			},
@@ -723,7 +722,7 @@ func TestIDPIntentCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when intent deletion fails should return error",
-			cmd:      domain.NewIDPIntentCheckCommand(&session_grpc.CheckIDPIntent{IdpIntentId: "intent-123"}, "session-1", "instance-1", nil),
+			cmd:      domain.NewIDPIntentCheckCommand(&domain.CheckIDPIntentType{ID: "intent-123"}, "session-1", "instance-1", nil),
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
@@ -736,7 +735,7 @@ func TestIDPIntentCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when intent deletion returns unexpected row count should return error",
-			cmd:      domain.NewIDPIntentCheckCommand(&session_grpc.CheckIDPIntent{IdpIntentId: "intent-123"}, "session-1", "instance-1", nil),
+			cmd:      domain.NewIDPIntentCheckCommand(&domain.CheckIDPIntentType{ID: "intent-123"}, "session-1", "instance-1", nil),
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
@@ -749,7 +748,7 @@ func TestIDPIntentCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when intent is successfully deleted should mark complete",
-			cmd:      domain.NewIDPIntentCheckCommand(&session_grpc.CheckIDPIntent{IdpIntentId: "intent-123"}, "session-1", "instance-1", nil),
+			cmd:      domain.NewIDPIntentCheckCommand(&domain.CheckIDPIntentType{ID: "intent-123"}, "session-1", "instance-1", nil),
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
