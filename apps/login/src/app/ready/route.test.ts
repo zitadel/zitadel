@@ -6,6 +6,10 @@ vi.mock("@/lib/service", () => ({
   createServiceForHost: vi.fn(),
 }));
 
+vi.mock("@/lib/logger", () => ({
+  createLogger: () => ({ error: vi.fn() }),
+}));
+
 describe("GET /ready", () => {
   const originalEnv = process.env;
 
@@ -40,7 +44,7 @@ describe("GET /ready", () => {
 
     expect(response.status).toBe(503);
     expect(response.headers.get("Content-Type")).toBe("text/plain");
-    expect(await response.text()).toBe("connection refused");
+    expect(await response.text()).toBe("Service unavailable");
   });
 
   test("should return 503 when authentication fails", async () => {
@@ -50,7 +54,7 @@ describe("GET /ready", () => {
 
     expect(response.status).toBe(503);
     expect(response.headers.get("Content-Type")).toBe("text/plain");
-    expect(await response.text()).toContain("No authentication credentials found");
+    expect(await response.text()).toBe("Service unavailable");
   });
 
   test("should return 503 when ZITADEL_API_URL is not set", async () => {
@@ -60,6 +64,6 @@ describe("GET /ready", () => {
 
     expect(response.status).toBe(503);
     expect(response.headers.get("Content-Type")).toBe("text/plain");
-    expect(await response.text()).toBe("ZITADEL_API_URL is not set");
+    expect(await response.text()).toBe("Service unavailable");
   });
 });
