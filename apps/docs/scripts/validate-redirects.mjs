@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 
 const REDIRECTS_PATH = '/home/ffo/git/zitadel/zitadel/apps/docs/redirects.json';
 
@@ -37,7 +36,6 @@ function validateRedirects() {
     });
 
     // 2. Circular & Chains
-    const checked = new Set();
     sources.forEach((value, source) => {
         let currentSource = source;
         const path = [currentSource];

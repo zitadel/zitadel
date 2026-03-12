@@ -129,7 +129,7 @@
       "options": {
         "cwd": "{projectRoot}",
         "commands": [
-          "pnpm vitest --run --config vitest.config.dockerized.mts"
+          "pnpm vitest --run --config vitest.config.dockerized.ts"
         ]
       }
     },
@@ -149,7 +149,7 @@
       "options": {
         "cwd": "{projectRoot}",
         "commands": [
-          "pnpm vitest --run --config vitest.config.dockerized.mts dockerized/ssl"
+          "pnpm vitest --run --config vitest.config.dockerized.ts dockerized/ssl"
         ]
       }
     },

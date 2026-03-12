@@ -1,6 +1,5 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import yaml from 'js-yaml';
 
 const V1_BASE_PATHS: Record<string, string> = {
   'admin.openapi.json': '/admin/v1',
