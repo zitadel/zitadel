@@ -85,9 +85,7 @@ function freshCache<T>(key: string, fetcher: () => Promise<T>, ttlMs: number): P
   const promise = fetcher();
   promiseCache.set(key, { promise, expiresAt: now + ttlMs });
 
-  promise.catch(() => {
-    promiseCache.delete(key);
-  });
+  promise.catch(() => promiseCache.delete(key));
 
   return promise;
 }
