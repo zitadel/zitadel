@@ -72,10 +72,9 @@ export class StatehandlerServiceImpl implements StatehandlerService, OnDestroy {
   removeParam(key: string, sourceURL: string) {
     var rtn = sourceURL.split('?')[0],
       param,
-      params_arr = [],
       queryString = sourceURL.indexOf('?') !== -1 ? sourceURL.split('?')[1] : '';
     if (queryString !== '') {
-      params_arr = queryString.split('&');
+      var params_arr = queryString.split('&');
       for (var i = params_arr.length - 1; i >= 0; i -= 1) {
         param = params_arr[i].split('=')[0];
         if (param === key) {

@@ -13,30 +13,21 @@ interface AvatarProps {
 }
 
 export function getInitials(name: string, loginName: string) {
-  let credentials = "";
   if (name) {
     const split = name.split(" ");
-    if (split) {
-      const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
-      credentials = initials;
-    } else {
-      credentials = name.charAt(0);
-    }
-  } else {
-    const username = loginName.split("@")[0];
-    let separator = "_";
-    if (username.includes("-")) {
-      separator = "-";
-    }
-    if (username.includes(".")) {
-      separator = ".";
-    }
-    const split = username.split(separator);
-    const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
-    credentials = initials;
+    return split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
   }
 
-  return credentials;
+  const username = loginName.split("@")[0];
+  let separator = "_";
+  if (username.includes("-")) {
+    separator = "-";
+  }
+  if (username.includes(".")) {
+    separator = ".";
+  }
+  const split = username.split(separator);
+  return split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
 }
 
 // Helper function to get avatar roundness from theme
