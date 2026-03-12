@@ -523,6 +523,13 @@ func (s session) MetadataConditions() domain.SessionMetadataConditions {
 	return s.metadataRepo
 }
 
+func (s session) ExistsSession(cond database.Condition) database.Condition {
+	return database.Exists(
+		s.unqualifiedTableName(),
+		cond,
+	)
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------

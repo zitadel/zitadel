@@ -348,6 +348,44 @@ func (c *MockSessionRepositoryExistsMetadataCall) DoAndReturn(f func(database.Co
 	return c
 }
 
+// ExistsSession mocks base method.
+func (m *MockSessionRepository) ExistsSession(arg0 database.Condition) database.Condition {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExistsSession", arg0)
+	ret0, _ := ret[0].(database.Condition)
+	return ret0
+}
+
+// ExistsSession indicates an expected call of ExistsSession.
+func (mr *MockSessionRepositoryMockRecorder) ExistsSession(arg0 any) *MockSessionRepositoryExistsSessionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsSession", reflect.TypeOf((*MockSessionRepository)(nil).ExistsSession), arg0)
+	return &MockSessionRepositoryExistsSessionCall{Call: call}
+}
+
+// MockSessionRepositoryExistsSessionCall wrap *gomock.Call
+type MockSessionRepositoryExistsSessionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockSessionRepositoryExistsSessionCall) Return(arg0 database.Condition) *MockSessionRepositoryExistsSessionCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockSessionRepositoryExistsSessionCall) Do(f func(database.Condition) database.Condition) *MockSessionRepositoryExistsSessionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockSessionRepositoryExistsSessionCall) DoAndReturn(f func(database.Condition) database.Condition) *MockSessionRepositoryExistsSessionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // ExpirationColumn mocks base method.
 func (m *MockSessionRepository) ExpirationColumn() database.Column {
 	m.ctrl.T.Helper()

@@ -46,7 +46,7 @@ func TestDeleteSessionCommand_Validate(t *testing.T) {
 				sessionID: "",
 			},
 			fields:        fields{},
-			expectedError: zerrors.ThrowInvalidArgument(nil, "SESS-3n9fs", "Errors.IDMissing"),
+			expectedError: zerrors.ThrowInvalidArgument(nil, domain.ErrIDMissing, "Errors.IDMissing"),
 		},
 		{
 			name: "when sessionID is provided must validate successfully",
@@ -114,8 +114,8 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			testName: "when delete session fails should return error",
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-					repo := domainmock.NewMockSessionRepository(ctrl)
-					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+					repo := domainmock.NewSessionRepo(ctrl)
+					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
 
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
@@ -138,20 +138,16 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			testName: "when no token is provided but must check permission, should use userID check",
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-					repo := domainmock.NewMockSessionRepository(ctrl)
-					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+					repo := domainmock.NewSessionRepo(ctrl)
+					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
+					repo.ExpectUserIDCondition(userID)
+					repo.ExpectExistsSession(repo.UserIDCondition(userID))
 
-					repo.EXPECT().UserIDCondition(userID).Times(2).Return(
-						database.NewTextCondition(
-							database.NewColumn("sessions", "user_id"),
-							database.TextOperationEqual, userID,
-						),
-					)
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
-								database.Exists("sessions", repo.UserIDCondition(userID)),
+								repo.ExistsSession(repo.UserIDCondition(userID)),
 								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
 							),
 						).
@@ -172,20 +168,16 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			testName: "when token is provided and must check permission, should use tokenID check",
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-					repo := domainmock.NewMockSessionRepository(ctrl)
-					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+					repo := domainmock.NewSessionRepo(ctrl)
+					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
+					repo.ExpectExistsSession(repo.TokenIDCondition(userID))
+					repo.ExpectTokenIDCondition("token-1")
 
-					repo.EXPECT().TokenIDCondition("token-1").Times(2).Return(
-						database.NewTextCondition(
-							database.NewColumn("sessions", "token_id"),
-							database.TextOperationEqual, "token-1",
-						),
-					)
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
-								database.Exists("sessions", repo.TokenIDCondition("token-1")),
+								repo.ExistsSession(repo.TokenIDCondition("token-1")),
 								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
 							),
 						).
@@ -208,20 +200,16 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			testName: "when delete session without permission should return error",
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-					repo := domainmock.NewMockSessionRepository(ctrl)
-					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+					repo := domainmock.NewSessionRepo(ctrl)
+					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
+					repo.ExpectUserIDCondition(userID)
+					repo.ExpectExistsSession(repo.UserIDCondition(userID))
 
-					repo.EXPECT().UserIDCondition(userID).Times(2).Return(
-						database.NewTextCondition(
-							database.NewColumn("zitadel.sessions", "user_id"),
-							database.TextOperationEqual, userID,
-						),
-					)
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
-								database.Exists("sessions", repo.UserIDCondition(userID)),
+								repo.ExistsSession(repo.UserIDCondition(userID)),
 								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
 							),
 						).
@@ -242,8 +230,8 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			testName: "when more than one row deleted must return internal error",
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-					repo := domainmock.NewMockSessionRepository(ctrl)
-					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+					repo := domainmock.NewSessionRepo(ctrl)
+					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
 
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
@@ -266,8 +254,8 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			testName: "when no rows deleted should execute successfully",
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-					repo := domainmock.NewMockSessionRepository(ctrl)
-					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+					repo := domainmock.NewSessionRepo(ctrl)
+					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
 
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
@@ -290,8 +278,8 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			testName: "when one row deleted should execute successfully and set DeletedAt",
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-					repo := domainmock.NewMockSessionRepository(ctrl)
-					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+					repo := domainmock.NewSessionRepo(ctrl)
+					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
 
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
@@ -337,21 +325,6 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			assert.Equal(t, tc.res.deletedAt, !cmd.DeletedAt.IsZero())
 		})
 	}
-}
-
-func sessionRepositoryPrimaryKey(repo *domainmock.MockSessionRepository, instanceID, sessionID string) {
-	repo.EXPECT().PrimaryKeyCondition(instanceID, sessionID).MaxTimes(4).Return(
-		database.And(
-			database.NewTextCondition(
-				database.NewColumn("zitadel.sessions", "instance_id"),
-				database.TextOperationEqual, instanceID,
-			),
-			database.NewTextCondition(
-				database.NewColumn("zitadel.sessions", "id"),
-				database.TextOperationEqual, sessionID,
-			),
-		),
-	)
 }
 
 func mockSessionTokenDecryptor(expectedSessionToken, returnSessionID, returnSessionToken string) func(t *testing.T) domain.SessionTokenDecryptor {

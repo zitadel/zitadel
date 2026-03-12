@@ -65,12 +65,13 @@ func (cmd *DeleteSessionCommand) sessionDeletePermissionCheckCondition(ctx conte
 		if err != nil || sessionID != cmd.ID {
 			return nil, zerrors.ThrowPermissionDenied(err, ErrSessionTokenInvalid, "Errors.Session.TokenInvalid")
 		}
-		return database.Or(database.Exists("sessions", sessionRepo.TokenIDCondition(tokenID)),
+		return database.Or(
+			sessionRepo.ExistsSession(sessionRepo.TokenIDCondition(tokenID)),
 			database.PermissionCheck(domain.PermissionSessionDelete, true),
 		), nil
 	}
 	return database.Or(
-		database.Exists("sessions", sessionRepo.UserIDCondition(authz.GetCtxData(ctx).UserID)),
+		sessionRepo.ExistsSession(sessionRepo.UserIDCondition(authz.GetCtxData(ctx).UserID)),
 		database.PermissionCheck(domain.PermissionSessionDelete, true), // TODO: implement check once permissions are implemented
 	), nil
 }

@@ -46,3 +46,42 @@ func (s *SessionRepo) Update(ctx context.Context, client database.QueryExecutor,
 func (s *SessionRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error) {
 	return s.mock.Delete(ctx, client, condition, permissionCondition)
 }
+
+func (s *SessionRepo) ExpectPrimaryKeyCondition(instanceID, sessionID string) {
+	s.EXPECT().PrimaryKeyCondition(instanceID, sessionID).AnyTimes().Return(
+		database.And(
+			database.NewTextCondition(
+				database.NewColumn("zitadel.sessions", "instance_id"),
+				database.TextOperationEqual, instanceID,
+			),
+			database.NewTextCondition(
+				database.NewColumn("zitadel.sessions", "id"),
+				database.TextOperationEqual, sessionID,
+			),
+		),
+	)
+}
+
+func (s *SessionRepo) ExpectUserIDCondition(userID string) {
+	s.EXPECT().UserIDCondition(userID).AnyTimes().Return(
+		database.NewTextCondition(
+			database.NewColumn("sessions", "user_id"),
+			database.TextOperationEqual, userID,
+		),
+	)
+}
+
+func (s *SessionRepo) ExpectTokenIDCondition(tokenID string) {
+	s.EXPECT().TokenIDCondition(tokenID).AnyTimes().Return(
+		database.NewTextCondition(
+			database.NewColumn("sessions", "token_id"),
+			database.TextOperationEqual, tokenID,
+		),
+	)
+}
+
+func (s *SessionRepo) ExpectExistsSession(condition database.Condition) {
+	s.EXPECT().ExistsSession(condition).AnyTimes().Return(
+		condition,
+	)
+}

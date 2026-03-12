@@ -95,6 +95,10 @@ type sessionConditions interface {
 	ExistsMetadata(condition database.Condition) database.Condition
 	// MetadataConditions returns the conditions for the metadata fields.
 	MetadataConditions() SessionMetadataConditions
+
+	// ExistsSession returns a filter that checks for the existence of a session based on the given condition.
+	// This can be used to check if a session exists for a specific user or with a specific token id, for example.
+	ExistsSession(condition database.Condition) database.Condition
 }
 
 type sessionChanges interface {
