@@ -173,6 +173,7 @@ describe("OpenTelemetry Integration", () => {
     await fetch(`${appUrl}/ui/v2/login/otel-test`);
     await fetch(`${appUrl}/ui/v2/login/loginname`, { redirect: "manual" });
     await fetch(`${appUrl}/ui/v2/login/healthy`);
+    await fetch(`${appUrl}/ui/v2/login/ready`);
     await fetch(`${appUrl}/ui/v2/login/this-does-not-exist-404`);
 
     await new Promise((r) => setTimeout(r, 3000));
@@ -309,6 +310,29 @@ describe("OpenTelemetry Integration", () => {
             ),
         );
         expect(healthySpans).toHaveLength(0);
+      }, TEST_TIMEOUT);
+
+      it("HTTP instrumentation excludes /ready", () => {
+        const tracesContent = readTraces();
+        const traceObjects = tracesContent
+          .split("\n")
+          .filter((line) => line.trim())
+          .map((line) => JSON.parse(line));
+
+        const allResourceSpans = traceObjects.flatMap((t) => t.resourceSpans || []);
+
+        const httpSpans = allResourceSpans
+          .flatMap((rs: { scopeSpans: Array<{ scope: { name: string }; spans: unknown[] }> }) => rs.scopeSpans)
+          .filter((ss: { scope: { name: string } }) => ss.scope.name === "@opentelemetry/instrumentation-http")
+          .flatMap((ss: { spans: unknown[] }) => ss.spans);
+        const readySpans = httpSpans.filter(
+          (s: { attributes?: Array<{ key: string; value: { stringValue?: string } }> }) =>
+            s.attributes?.some(
+              (a: { key: string; value: { stringValue?: string } }) =>
+                a.key === "http.target" && a.value.stringValue?.includes("/ready"),
+            ),
+        );
+        expect(readySpans).toHaveLength(0);
       }, TEST_TIMEOUT);
 
       it("includes /otel-test in traces", () => {
