@@ -21,7 +21,7 @@ const OPENAPI_ROOT = join(ROOT_DIR, 'openapi');
 const CONTENT_ROOT = join(ROOT_DIR, 'content');
 const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content');
 const serviceRenameMap: Record<string, string> = {
-  'authorization': 'role_assignment',
+  'Authorization': 'Role Assignment',
 };
 
 async function generateVersionApiDocs(version: string) {
@@ -49,7 +49,6 @@ async function generateVersionApiDocs(version: string) {
     if (service.endsWith('_service')) {
       service = service.slice(0, -8);
     }
-    service = serviceRenameMap[service] ?? service;
 
     // For services in subdirectories (like resource/userschema), 
     // we want a unique but readable name.
@@ -73,7 +72,8 @@ async function generateVersionApiDocs(version: string) {
     });
 
     const indexPath = join(outputDir, 'index.mdx');
-    const title = uniqueService.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+    let title = uniqueService.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+    title = serviceRenameMap[title] ?? title;
     const indexContent = `---
 title: ${title} API
 description: Explore the ZITADEL ${title} API reference documentation. Learn how to manage resources, handle authentication, and integrate ${title} services into your application.
