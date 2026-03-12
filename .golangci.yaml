@@ -2,8 +2,6 @@ version: "2"
 run:
   concurrency: 4
   go: "1.24"
-  skip-dirs:
-    - apps/docs
 linters:
   enable:
     - asciicheck
@@ -131,10 +129,6 @@ issues:
   max-issues-per-linter: 0
   max-same-issues: 0
   new-from-rev: origin/main
-  exclude-rules:
-    - path: apps/docs/.*
-      linters:
-        - typecheck
 formatters:
   enable:
     - gci
