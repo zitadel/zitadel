@@ -41,9 +41,9 @@ const queryAdministratorStmt = "SELECT administrators.instance_id " +
 	", administrators.updated_at " +
 	", ARRAY_AGG(administrator_roles.role_name ORDER BY administrator_roles.role_name) FILTER (WHERE administrator_roles.administrator_id IS NOT NULL) AS roles " +
 	"FROM zitadel.administrators " +
-	"LEFT JOIN zitadel.administrator_roles " +
-	"ON administrators.instance_id = administrator_roles.instance_id " +
-	"AND administrators.id = administrator_roles.administrator_id"
+	"LEFT JOIN zitadel.administrator_roles" +
+	" ON administrators.instance_id = administrator_roles.instance_id" +
+	" AND administrators.id = administrator_roles.administrator_id"
 
 func (a administrator) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Administrator, error) {
 	builder, err := a.prepareQuery(opts)
