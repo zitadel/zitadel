@@ -91,7 +91,7 @@ export function IdpProcessHandler({
         setError(err instanceof Error ? err.message : t("processing.unexpectedError"));
         setLoading(false);
       });
-  }, [provider, id, token, requestId, organization, link, sessionId, postErrorRedirectUrl, router]);
+  }, [provider, id, token, requestId, organization, link, sessionId, linkFingerprint, postErrorRedirectUrl, router, t]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

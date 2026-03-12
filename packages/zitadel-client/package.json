@@ -65,7 +65,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
-    "lint-check-eslint": "eslint 'src/**/*.ts*'",
+    "lint-check-eslint": "eslint .",
     "lint-check-knip": "knip",
     "test-unit": "vitest --run",
     "clean": "rm -rf node_modules dist"
@@ -80,10 +80,15 @@
   },
   "devDependencies": {
     "@bufbuild/protocompile": "^0.0.1",
+    "@eslint/js": "^10.0.0",
     "@types/node": "^24.10.9",
-    "@typescript-eslint/eslint-plugin": "^8.54.0",
-    "@typescript-eslint/parser": "^8.54.0",
-    "eslint": "^8.57.1",
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "globals": "^17.0.0",
     "knip": "^5.82.1",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
