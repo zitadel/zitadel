@@ -32,6 +32,6 @@ EXECUTE FUNCTION zitadel.move_to_deleted_sessions();
 CREATE OR REPLACE FUNCTION zitadel.throw_not_permitted() returns boolean AS $$
 BEGIN
     RAISE EXCEPTION 'Permission denied: User does not have permission'
-        USING ERRCODE = 'insufficient_privilege'; -- TODO: use a custom error code?
+        USING ERRCODE = 'ZIT01';
 END;
 $$ LANGUAGE plpgsql;
