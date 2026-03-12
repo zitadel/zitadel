@@ -1,5 +1,5 @@
-import { createServiceForHost } from "@/lib/service";
 import { createLogger } from "@/lib/logger";
+import { createServiceForHost } from "@/lib/service";
 import { Client } from "@zitadel/client";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { NextResponse } from "next/server";
