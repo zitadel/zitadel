@@ -205,7 +205,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </div>
         )}
 
-        {id && send && (
+        {id && doSend && (
           <div className="w-full py-4">
             <Alert type={AlertType.INFO}>
               <Translated i18nKey="verify.codeSent" namespace="verify" />
