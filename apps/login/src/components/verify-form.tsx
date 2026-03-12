@@ -101,7 +101,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
         setLoading(false);
       }
     },
-    [isInvite, userId],
+    [isInvite, userId, loginName, organization, requestId, router, t],
   );
 
   useEffect(() => {

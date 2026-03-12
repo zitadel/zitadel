@@ -46,6 +46,8 @@ export async function loginServiceKeyToken() {
       key: key,
     });
   } catch (err) {
-    throw new Error(`Failed to read login service key file "${keyFile}": ${err instanceof Error ? err.message : err}`);
+    throw new Error(`Failed to read login service key file "${keyFile}": ${err instanceof Error ? err.message : err}`, {
+      cause: err,
+    });
   }
 }
