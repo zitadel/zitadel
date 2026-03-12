@@ -20,6 +20,9 @@ const ROOT_DIR = join(__dirname, '..');
 const OPENAPI_ROOT = join(ROOT_DIR, 'openapi');
 const CONTENT_ROOT = join(ROOT_DIR, 'content');
 const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content');
+const serviceRenameMap: Record<string, string> = {
+  'authorization': 'role_assignment',
+};
 
 async function generateVersionApiDocs(version: string) {
   const sourceRoot = join(OPENAPI_ROOT, version);
@@ -46,6 +49,7 @@ async function generateVersionApiDocs(version: string) {
     if (service.endsWith('_service')) {
       service = service.slice(0, -8);
     }
+    service = serviceRenameMap[service] ?? service;
 
     // For services in subdirectories (like resource/userschema), 
     // we want a unique but readable name.
