@@ -1,21 +1,21 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { sendPasskey } from "@/lib/server/passkeys";
 import { updateOrCreateSession } from "@/lib/server/session";
 import { create, JsonObject } from "@zitadel/client";
 import { RequestChallengesSchema, UserVerificationRequirement } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
-import { handleServerActionResponse } from "@/lib/client-utils";
 import { Alert } from "./alert";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
-import { AutoSubmitForm } from "./auto-submit-form";
 
 // either loginName or sessionId must be provided
 type Props = {

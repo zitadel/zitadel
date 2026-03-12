@@ -26,7 +26,7 @@ import { createAdminServiceClient, createAuthServiceClient, createManagementServ
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
 import { createClientFor } from '@zitadel/client';
 
-import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
+import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2/webkey_service_pb';
 import { ActionService } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
 
 const createWebKeyServiceClient = createClientFor(WebKeyService);

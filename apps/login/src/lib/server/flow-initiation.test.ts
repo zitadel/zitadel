@@ -1,6 +1,6 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import { handleOIDCFlowInitiation, FlowInitiationParams } from "./flow-initiation";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { FlowInitiationParams, handleOIDCFlowInitiation } from "./flow-initiation";
 
 vi.mock("@/lib/cookies", () => ({
   getLanguageCookie: vi.fn(),

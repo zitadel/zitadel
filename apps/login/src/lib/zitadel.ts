@@ -1,8 +1,6 @@
 import { Client, create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
-import { otelGrpcInterceptor } from "./grpc/interceptors/otel";
-import { createLogger } from "./logger";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { OrganizationSchema, TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest, OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
@@ -34,6 +32,8 @@ import {
 import { getTranslations } from "next-intl/server";
 import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getUserAgent } from "./fingerprint";
+import { otelGrpcInterceptor } from "./grpc/interceptors/otel";
+import { createLogger } from "./logger";
 
 import { createServiceForHost } from "./service";
 
@@ -1237,20 +1237,18 @@ export interface ServiceConfig {
 /**
  * Base type that all function parameters must extend to ensure serviceConfig is always required
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type WithServiceConfig<T = {}> = T & {
   serviceConfig: ServiceConfig;
 };
 
 export function createServerTransport(token: string, serviceConfig: ServiceConfig) {
   // Build interceptors list - OTEL interceptor is always included for trace propagation
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const interceptors: any[] = [otelGrpcInterceptor];
 
   // Add custom headers interceptor if needed
   if (process.env.CUSTOM_REQUEST_HEADERS || serviceConfig.instanceHost || serviceConfig.publicHost) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     interceptors.push((next: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return (req: any) => {
         // Apply headers from serviceConfig
         if (serviceConfig.instanceHost) {

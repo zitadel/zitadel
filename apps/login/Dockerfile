@@ -18,7 +18,6 @@ ENV HOSTNAME="::" \
     OTEL_SERVICE_NAME="zitadel-login" \
     OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
 
-# TODO: Check healthy, not ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD ["/usr/local/bin/node", "/app/healthcheck.mjs"]
+    CMD ["/usr/local/bin/node", "/app/healthcheck.mjs", "/ui/v2/login/ready"]
 ENTRYPOINT ["/app/entrypoint.sh", "node", "apps/login/server.js"]

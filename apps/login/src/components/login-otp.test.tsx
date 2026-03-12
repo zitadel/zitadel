@@ -23,9 +23,7 @@ describe("LoginOTP", () => {
   afterEach(cleanup);
 
   test("should autofocus the code input on mount", () => {
-    const { getByTestId } = render(
-      <LoginOTP host={null} method="time-based" />,
-    );
+    const { getByTestId } = render(<LoginOTP host={null} method="time-based" />);
     expect(getByTestId("code-text-input")).toHaveFocus();
   });
 });
