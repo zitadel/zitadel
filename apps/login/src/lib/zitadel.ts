@@ -122,13 +122,11 @@ export async function getHostedLoginTranslation({
       });
   };
 
-  return useCache
-    ? freshCache(
-        `getHostedLoginTranslation-${organization || "instance"}-${locale || "default"}`,
-        fetcher,
-        getTTLForKey("getHostedLoginTranslation", longCacheTTL),
-      )
-    : fetcher();
+  return freshCache(
+    `getHostedLoginTranslation-${organization || "instance"}-${locale || "default"}`,
+    fetcher,
+    getTTLForKey("getHostedLoginTranslation", longCacheTTL),
+  );
 }
 
 export async function getBrandingSettings({
@@ -145,13 +143,11 @@ export async function getBrandingSettings({
       .then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache
-    ? freshCache(
-        `getBrandingSettings-${organization || "instance"}`,
-        fetcher,
-        getTTLForKey("getBrandingSettings", longCacheTTL),
-      )
-    : fetcher();
+  return freshCache(
+    `getBrandingSettings-${organization || "instance"}`,
+    fetcher,
+    getTTLForKey("getBrandingSettings", longCacheTTL),
+  );
 }
 
 export async function getLoginSettings({
@@ -168,13 +164,11 @@ export async function getLoginSettings({
       .then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache
-    ? freshCache(
-        `getLoginSettings-${organization || "instance"}`,
-        fetcher,
-        getTTLForKey("getLoginSettings", defaultCacheTTL),
-      )
-    : fetcher();
+  return freshCache(
+    `getLoginSettings-${organization || "instance"}`,
+    fetcher,
+    getTTLForKey("getLoginSettings", defaultCacheTTL),
+  );
 }
 
 export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) {
@@ -184,9 +178,7 @@ export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) 
     return settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache
-    ? freshCache(`getSecuritySettings-${"instance"}`, fetcher, getTTLForKey("getSecuritySettings", defaultCacheTTL))
-    : fetcher();
+  return freshCache(`getSecuritySettings-instance`, fetcher, getTTLForKey("getSecuritySettings", defaultCacheTTL));
 }
 
 export async function getLockoutSettings({ serviceConfig, orgId }: WithServiceConfig<{ orgId?: string }>) {
@@ -198,9 +190,11 @@ export async function getLockoutSettings({ serviceConfig, orgId }: WithServiceCo
       .then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache
-    ? freshCache(`getLockoutSettings-${orgId || "instance"}`, fetcher, getTTLForKey("getLockoutSettings", defaultCacheTTL))
-    : fetcher();
+  return freshCache(
+    `getLockoutSettings-${orgId || "instance"}`,
+    fetcher,
+    getTTLForKey("getLockoutSettings", defaultCacheTTL),
+  );
 }
 
 export async function getPasswordExpirySettings({ serviceConfig, orgId }: WithServiceConfig<{ orgId?: string }>) {
@@ -212,13 +206,11 @@ export async function getPasswordExpirySettings({ serviceConfig, orgId }: WithSe
       .then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache
-    ? freshCache(
-        `getPasswordExpirySettings-${orgId || "instance"}`,
-        fetcher,
-        getTTLForKey("getPasswordExpirySettings", defaultCacheTTL),
-      )
-    : fetcher();
+  return freshCache(
+    `getPasswordExpirySettings-${orgId || "instance"}`,
+    fetcher,
+    getTTLForKey("getPasswordExpirySettings", defaultCacheTTL),
+  );
 }
 
 export async function listIDPLinks({ serviceConfig, userId }: WithServiceConfig<{ userId: string }>) {
@@ -257,9 +249,7 @@ export async function getAllowedLanguages({ serviceConfig }: WithServiceConfig) 
     });
   };
 
-  return useCache
-    ? freshCache(`getGeneralSettings-${"instance"}`, fetcher, getTTLForKey("getGeneralSettings", longCacheTTL))
-    : fetcher();
+  return freshCache(`getGeneralSettings-instance`, fetcher, getTTLForKey("getGeneralSettings", longCacheTTL));
 }
 
 export async function getLegalAndSupportSettings({
@@ -276,13 +266,11 @@ export async function getLegalAndSupportSettings({
       .then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache
-    ? freshCache(
-        `getLegalAndSupportSettings-${organization || "instance"}`,
-        fetcher,
-        getTTLForKey("getLegalAndSupportSettings", longCacheTTL),
-      )
-    : fetcher();
+  return freshCache(
+    `getLegalAndSupportSettings-${organization || "instance"}`,
+    fetcher,
+    getTTLForKey("getLegalAndSupportSettings", longCacheTTL),
+  );
 }
 
 export async function getPasswordComplexitySettings({
@@ -299,13 +287,11 @@ export async function getPasswordComplexitySettings({
       .then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return useCache
-    ? freshCache(
-        `getPasswordComplexitySettings-${organization || "instance"}`,
-        fetcher,
-        getTTLForKey("getPasswordComplexitySettings", defaultCacheTTL),
-      )
-    : fetcher();
+  return freshCache(
+    `getPasswordComplexitySettings-${organization || "instance"}`,
+    fetcher,
+    getTTLForKey("getPasswordComplexitySettings", defaultCacheTTL),
+  );
 }
 
 export async function createSessionFromChecksAndChallenges({
