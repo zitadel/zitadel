@@ -525,6 +525,7 @@ func (s session) MetadataConditions() domain.SessionMetadataConditions {
 	return s.metadataRepo
 }
 
+// ExistsSession implements [domain.sessionConditions].
 func (s session) ExistsSession(cond database.Condition) database.Condition {
 	return database.Exists(
 		s.unqualifiedTableName(),
