@@ -123,7 +123,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							nil,
 						).
 						Times(1).
-						Return(int64(0), deleteErr)
+						Return(int64(0), time.Time{}, deleteErr)
 					return repo
 				},
 			},
@@ -156,7 +156,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							),
 						).
 						Times(1).
-						Return(int64(0), nil)
+						Return(int64(0), time.Time{}, nil)
 					return repo
 				},
 			},
@@ -190,7 +190,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							),
 						).
 						Times(1).
-						Return(int64(0), nil)
+						Return(int64(0), time.Time{}, nil)
 					return repo
 				},
 				sessionTokenDecryptor: mockSessionTokenDecryptor("session-token-1", "session-1", "token-1"),
@@ -226,7 +226,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							),
 						).
 						Times(1).
-						Return(int64(0), database.NewPermissionError(nil))
+						Return(int64(0), time.Time{}, database.NewPermissionError(nil))
 					return repo
 				},
 			},
@@ -251,7 +251,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							nil,
 						).
 						Times(1).
-						Return(int64(2), nil)
+						Return(int64(2), time.Time{}, nil)
 					return repo
 				},
 			},
@@ -259,7 +259,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 				sessionID: "session-1",
 			},
 			res: res{
-				error: zerrors.ThrowInternalf(nil, "DOM-wv33rsKpRw", "expecting 1 row deleted, got %d", 2),
+				error: zerrors.ThrowInternalf(nil, domain.ErrMoreThanOneRowAffected, "expected 1 session to be deleted, got %d", 2),
 			},
 		},
 		{
@@ -275,7 +275,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							nil,
 						).
 						Times(1).
-						Return(int64(0), nil)
+						Return(int64(0), time.Time{}, nil)
 					return repo
 				},
 			},
@@ -299,7 +299,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							nil,
 						).
 						Times(1).
-						Return(int64(1), nil)
+						Return(int64(1), time.Now(), nil)
 					return repo
 				},
 			},

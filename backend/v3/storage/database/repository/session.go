@@ -251,29 +251,28 @@ func (s session) deleteSingleSession(ctx context.Context, client database.QueryE
 	writeCondition(&builder, condition)
 	builder.WriteString(") , delete as (DELETE FROM zitadel.sessions")
 	writeCondition(&builder, condition)
-	builder.WriteString(") ")
-	s.writeDeleteStatementWithPermission("SELECT deleted_at FROM sessions", &builder, permissionCondition)
+	builder.WriteString(" RETURNING 1 AS rows_affected) ")
+	s.writeDeleteStatementWithPermission(&builder, permissionCondition)
 	var deletedAt time.Time
-	if err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&deletedAt); err != nil {
+	var deletedSessions int64
+	if err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&deletedAt, &deletedSessions); err != nil {
 		// If no row was deleted, we return 0 rows affected and a zero time, without an error.
 		if errors.Is(err, new(database.NoRowFoundError)) {
 			return 0, time.Time{}, nil
 		}
 		return 0, time.Time{}, err
 	}
-	return 1, deletedAt, nil
+	return deletedSessions, deletedAt, nil
 }
 
-func (s session) writeDeleteStatementWithPermission(statement string, builder *database.StatementBuilder, permissionCondition database.Condition) {
+func (s session) writeDeleteStatementWithPermission(builder *database.StatementBuilder, permissionCondition database.Condition) {
 	if permissionCondition == nil {
-		builder.WriteString(statement)
+		builder.WriteString("SELECT (SELECT deleted_at FROM sessions), count(*) FROM delete AS rows_affected")
 		return
 	}
-	builder.WriteString(" SELECT CASE WHEN (EXISTS (SELECT 1 FROM sessions) or throw_not_permitted()) THEN CASE WHEN(")
+	builder.WriteString("SELECT CASE WHEN (EXISTS (SELECT 1 FROM sessions) or throw_not_permitted()) THEN CASE WHEN(")
 	permissionCondition.Write(builder)
-	builder.WriteString(") THEN (")
-	builder.WriteString(statement)
-	builder.WriteString(") END END")
+	builder.WriteString(") THEN (SELECT deleted_at FROM sessions as deleted_at) END END, count(*) FROM delete AS rows_affected")
 }
 
 // -------------------------------------------------------------

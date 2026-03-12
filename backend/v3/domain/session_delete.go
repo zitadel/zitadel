@@ -71,7 +71,7 @@ func (cmd *DeleteSessionCommand) sessionDeletePermissionCheckCondition(ctx conte
 	}
 	return database.Or(
 		database.Exists("sessions", sessionRepo.UserIDCondition(authz.GetCtxData(ctx).UserID)),
-		database.PermissionCheck(domain.PermissionSessionDelete, true), // TODO: implement check
+		database.PermissionCheck(domain.PermissionSessionDelete, true), // TODO: implement check once permissions are implemented
 	), nil
 }
 
@@ -85,7 +85,7 @@ func (cmd *DeleteSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 		return err
 	}
 
-	_, deletedAt, err := sessionRepo.Delete(ctx, opts.DB(),
+	deletedRows, deletedAt, err := sessionRepo.Delete(ctx, opts.DB(),
 		sessionRepo.PrimaryKeyCondition(instance.InstanceID(), cmd.ID),
 		permCheck,
 	)
@@ -97,14 +97,11 @@ func (cmd *DeleteSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 		return zerrors.ThrowInternal(err, ErrInternal, "an unexpected error occurred while deleting the session")
 	}
 
-	// TODO: check for too many rows / no rows?
-	//if deletedRows > 1 {
-	//	return zerrors.ThrowInternalf(nil, ErrMoreThanOneRowAffected, "expecting 1 row deleted, got %d", deletedRows)
-	//}
+	if deletedRows > 1 {
+		return zerrors.ThrowInternalf(nil, ErrMoreThanOneRowAffected, "expected 1 session to be deleted, got %d", deletedRows)
+	}
 
-	//if deletedRows == 1 {
 	cmd.DeletedAt = deletedAt
-	//}
 	return nil
 }
 
