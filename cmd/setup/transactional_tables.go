@@ -17,6 +17,7 @@ type TransactionalTables struct {
 }
 
 func (mig *TransactionalTables) Execute(ctx context.Context, _ eventstore.Event) error {
+	// TODO(adlerhurst): revert changes made in https://github.com/zitadel/zitadel/pull/11833 before v5 release.
 	if mig.ShouldRecreateSchema {
 		logging.Info(ctx, "dropping schema of relational tables")
 		if err := mig.dropSchema(ctx); err != nil {
