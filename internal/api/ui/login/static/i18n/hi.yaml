@@ -1,0 +1,542 @@
+Login:
+  Title: वापसी पर स्वागत है!
+  Description: अपने लॉगिन विवरण दर्ज करें।
+  TitleLinking: उपयोगकर्ता लिंकिंग के लिए लॉगिन
+  DescriptionLinking: अपने बाहरी उपयोगकर्ता को लिंक करने के लिए अपने लॉगिन विवरण दर्ज करें।
+  LoginNameLabel: लॉगिन नाम
+  UsernamePlaceHolder: username@domain
+  ExternalUserDescription: बाहरी उपयोगकर्ता के साथ लॉगिन करें।
+  MustBeMemberOfOrg: उपयोगकर्ता को {{.OrgName}} संगठन का सदस्य होना चाहिए।
+  RegisterButtonText: पंजीकरण करें
+  NextButtonText: अगला
+
+LDAP:
+  Title: लॉगिन
+  Description: अपने लॉगिन विवरण दर्ज करें।
+  LoginNameLabel: लॉगिन नाम
+  PasswordLabel: पासवर्ड
+  NextButtonText: अगला
+
+SelectAccount:
+  Title: खाता चुनें
+  Description: अपना खाता उपयोग करें
+  TitleLinking: उपयोगकर्ता लिंकिंग के लिए खाता चुनें
+  DescriptionLinking: अपने बाहरी उपयोगकर्ता के साथ लिंक करने के लिए अपना खाता चुनें।
+  OtherUser: अन्य उपयोगकर्ता
+  SessionState0: सक्रिय
+  SessionState1: साइन आउट
+  MustBeMemberOfOrg: उपयोगकर्ता को {{.OrgName}} संगठन का सदस्य होना चाहिए।
+
+Password:
+  Title: पासवर्ड
+  Description: अपने लॉगिन विवरण दर्ज करें।
+  MinLength: कम से कम
+  MinLengthp2: अक्षर लंबा होना चाहिए।
+  MaxLength: 70 अक्षरों से कम होना चाहिए।
+  HasUppercase: एक बड़े अक्षर को शामिल करना होगा।
+  HasLowercase: एक छोटे अक्षर को शामिल करना होगा।
+  HasNumber: एक संख्या शामिल करनी होगी।
+  HasSymbol: एक प्रतीक शामिल करना होगा।
+  Confirmation: पासवर्ड पुष्टि मेल खाती है।
+  ResetLinkText: पासवर्ड रीसेट करें
+  BackButtonText: वापस
+  NextButtonText: अगला
+
+UsernameChange:
+  Title: उपयोगकर्ता नाम बदलें
+  Description: अपना नया उपयोगकर्ता नाम सेट करें
+  UsernameLabel: उपयोगकर्ता नाम
+  CancelButtonText: रद्द करें
+  NextButtonText: अगला
+
+UsernameChangeDone:
+  Title: उपयोगकर्ता नाम बदला गया
+  Description: आपका उपयोगकर्ता नाम सफलतापूर्वक बदल दिया गया।
+  NextButtonText: अगला
+
+InitPassword:
+  Title: पासवर्ड सेट करें
+  Description: आपको एक कोड मिला है, जिसे आपको अपना नया पासवर्ड सेट करने के लिए नीचे दिए गए फॉर्म में दर्ज करना होगा।
+  CodeLabel: कोड
+  NewPasswordLabel: नया पासवर्ड
+  NewPasswordConfirmLabel: पासवर्ड की पुष्टि करें
+  ResendButtonText: कोड पुनः भेजें
+  NextButtonText: अगला
+
+InitPasswordDone:
+  Title: पासवर्ड सेट
+  Description: पासवर्ड सफलतापूर्वक सेट
+  NextButtonText: अगला
+  CancelButtonText: रद्द करें
+
+InitUser:
+  Title: उपयोगकर्ता सक्रिय करें
+  Description: नीचे दिए गए कोड के साथ अपने ई-मेल की पुष्टि करें और अपना पासवर्ड सेट करें।
+  CodeLabel: कोड
+  NewPasswordLabel: नया पासवर्ड
+  NewPasswordConfirm: पासवर्ड की पुष्टि करें
+  NextButtonText: अगला
+  ResendButtonText: कोड पुनः भेजें
+
+InitUserDone:
+  Title: उपयोगकर्ता सक्रिय
+  Description: ईमेल सत्यापित और पासवर्ड सफलतापूर्वक सेट
+  NextButtonText: अगला
+  CancelButtonText: रद्द करें
+
+InviteUser:
+  Title: उपयोगकर्ता सक्रिय करें
+  Description: नीचे दिए गए कोड के साथ अपने ई-मेल की पुष्टि करें और अपना पासवर्ड सेट करें।
+  CodeLabel: कोड
+  NewPasswordLabel: नया पासवर्ड
+  NewPasswordConfirm: पासवर्ड की पुष्टि करें
+  NextButtonText: अगला
+  ResendButtonText: कोड पुनः भेजें
+
+InitMFAPrompt:
+  Title: दो-कारक सेटअप
+  Description: दो-कारक प्रमाणीकरण आपके उपयोगकर्ता खाते के लिए अतिरिक्त सुरक्षा प्रदान करता है। यह सुनिश्चित करता है कि केवल आपके पास ही आपके खाते तक पहुंच है।
+  Provider0: प्रमाणक ऐप (जैसे Google/Microsoft प्रमाणक, Authy)
+  Provider1: डिवाइस आधारित (जैसे FaceID, Windows Hello, फिंगरप्रिंट)
+  Provider3: OTP SMS
+  Provider4: OTP ईमेल
+  NextButtonText: अगला
+  SkipButtonText: छोड़ें
+
+InitMFAOTP:
+  Title: दो-कारक सत्यापन
+  Description: अपना दो-कारक बनाएं। यदि आपके पास पहले से एक प्रमाणक ऐप नहीं है, तो एक डाउनलोड करें।
+  OTPDescription: अपने प्रमाणक ऐप (जैसे Google/Microsoft प्रमाणक, Authy) के साथ कोड स्कैन करें या गुप्त कोड कॉपी करें और नीचे उत्पन्न कोड दर्ज करें।
+  SecretLabel: गुप्त कोड
+  CodeLabel: कोड
+  NextButtonText: अगला
+  CancelButtonText: रद्द करें
+  EditButtonText: संपादित करें
+  ResendButtonText: कोड पुनः भेजें
+
+InitMFAOTPSMS:
+  Title: दो-कारक सत्यापन
+  DescriptionPhone: अपना दो-कारक बनाएं। इसे सत्यापित करने के लिए अपना फोन नंबर दर्ज करें।
+  DescriptionCode: अपना दो-कारक बनाएं। अपने फोन नंबर को सत्यापित करने के लिए प्राप्त कोड दर्ज करें।
+  CountryCodeLabel: देश
+  PhoneLabel: फोन
+  CodeLabel: कोड
+  EditButtonText: संपादित करें
+  ResendButtonText: कोड पुनः भेजें
+  NextButtonText: अगला
+
+InitMFAU2F:
+  Title: सुरक्षा कुंजी जोड़ें
+  Description: सुरक्षा कुंजी एक सत्यापन विधि है जिसे आपके फोन में बनाया जा सकता है, ब्लूटूथ का उपयोग कर सकता है, या सीधे अपने कंप्यूटर के USB पोर्ट में प्लग कर सकता है।
+  TokenNameLabel: सुरक्षा कुंजी / डिवाइस का नाम
+  RegisterTokenButtonText: सुरक्षा कुंजी जोड़ें
+  ErrorRetry: पुनः प्रयास करें, एक नई चुनौती बनाएं या अलग विधि चुनें।
+
+InitMFADone:
+  Title: दो-कारक सत्यापित
+  Description: बहुत बढ़िया! आपने अपना दो-कारक सफलतापूर्वक सेट कर लिया है और अपने खाते को बहुत अधिक सुरक्षित बना दिया है। प्रत्येक लॉगिन पर फैक्टर दर्ज करना होगा।
+  NextButtonText: अगला
+  CancelButtonText: रद्द करें
+
+MFAProvider:
+  Provider0: प्रमाणक ऐप (जैसे Google/Microsoft प्रमाणक, Authy)
+  Provider1: डिवाइस आधारित (जैसे FaceID, Windows Hello, फिंगरप्रिंट)
+  Provider3: OTP SMS
+  Provider4: OTP ईमेल
+  ChooseOther: या कोई अन्य विकल्प चुनें
+
+VerifyMFAOTP:
+  Title: दो-कारक सत्यापित करें
+  Description: अपना दूसरा फैक्टर सत्यापित करें
+  CodeLabel: कोड
+  NextButtonText: अगला
+  ResendButtonText: कोड पुनः भेजें
+
+VerifyOTP:
+  Title: दो-कारक सत्यापित करें
+  Description: अपना दूसरा फैक्टर सत्यापित करें
+  CodeLabel: कोड
+  NextButtonText: अगला
+  ResendButtonText: कोड पुनः भेजें
+
+VerifyMFAU2F:
+  Title: दो-कारक सत्यापन
+  Description: पंजीकृत डिवाइस (जैसे FaceID, Windows Hello, फिंगरप्रिंट) के साथ अपना दो-कारक सत्यापित करें
+  NotSupported: WebAuthN आपके ब्राउज़र द्वारा समर्थित नहीं है। सुनिश्चित करें कि आप नवीनतम संस्करण का उपयोग कर रहे हैं या अपना ब्राउज़र एक समर्थित ब्राउज़र में बदलें (Chrome, Safari, Firefox)
+  ErrorRetry: पुनः प्रयास करें, एक नया अनुरोध बनाएं या अलग विधि चुनें।
+  ValidateTokenButtonText: दो-कारक सत्यापित करें
+
+Passwordless:
+  Title: पासवर्डलेस लॉगिन
+  Description: FaceID, Windows Hello या फिंगरप्रिंट जैसी आपके डिवाइस द्वारा प्रदान की गई प्रमाणीकरण विधियों के साथ लॉगिन करें।
+  NotSupported: WebAuthN आपके ब्राउज़र द्वारा समर्थित नहीं है। कृपया सुनिश्चित करें कि यह अद्यतन है या एक अलग का उपयोग करें (जैसे Chrome, Safari, Firefox)
+  ErrorRetry: पुनः प्रयास करें, एक नई चुनौती बनाएं या अलग विधि चुनें।
+  LoginWithPwButtonText: पासवर्ड के साथ लॉगिन करें
+  ValidateTokenButtonText: पासवर्डलेस के साथ लॉगिन करें
+
+PasswordlessPrompt:
+  Title: पासवर्डलेस सेटअप
+  Description: क्या आप पासवर्डलेस लॉगिन सेट करना चाहेंगे? (FaceID, Windows Hello या फिंगरप्रिंट जैसी आपके डिवाइस की प्रमाणीकरण विधियाँ)
+  DescriptionInit: आपको पासवर्डलेस लॉगिन सेट करने की आवश्यकता है। अपने डिवाइस को पंजीकृत करने के लिए आपको दिए गए लिंक का उपयोग करें।
+  PasswordlessButtonText: पासवर्डलेस पर जाएं
+  NextButtonText: अगला
+  SkipButtonText: छोड़ें
+
+PasswordlessRegistration:
+  Title: पासवर्डलेस सेटअप
+  Description: एक नाम प्रदान करके (जैसे MyMobilePhone, MacBook, आदि) अपनी प्रमाणीकरण जोड़ें और फिर नीचे 'पासवर्डलेस पंजीकृत करें' बटन पर क्लिक करें।
+  TokenNameLabel: डिवाइस का नाम
+  NotSupported: WebAuthN आपके ब्राउज़र द्वारा समर्थित नहीं है। कृपया सुनिश्चित करें कि यह अद्यतन है या एक अलग का उपयोग करें (जैसे Chrome, Safari, Firefox)
+  RegisterTokenButtonText: पासवर्डलेस पंजीकृत करें
+  ErrorRetry: पुनः प्रयास करें, एक नई चुनौती बनाएं या अलग विधि चुनें।
+
+PasswordlessRegistrationDone:
+  Title: पासवर्डलेस सेटअप
+  Description: पासवर्डलेस के लिए डिवाइस सफलतापूर्वक जोड़ा गया।
+  DescriptionClose: अब आप इस विंडो को बंद कर सकते हैं।
+  NextButtonText: अगला
+  CancelButtonText: रद्द करें
+
+PasswordChange:
+  Title: पासवर्ड बदलें
+  Description: अपना पासवर्ड बदलें। अपना पुराना और नया पासवर्ड दर्ज करें।
+  ExpiredDescription: आपका पासवर्ड समाप्त हो गया है और इसे बदलना होगा। अपना पुराना और नया पासवर्ड दर्ज करें।
+  OldPasswordLabel: पुराना पासवर्ड
+  NewPasswordLabel: नया पासवर्ड
+  NewPasswordConfirmLabel: पासवर्ड पुष्टि
+  CancelButtonText: रद्द करें
+  NextButtonText: अगला
+  Footer: फुटर
+
+PasswordChangeDone:
+  Title: पासवर्ड बदलें
+  Description: आपका पासवर्ड सफलतापूर्वक बदल दिया गया।
+  NextButtonText: अगला
+
+PasswordResetDone:
+  Title: पासवर्ड रीसेट लिंक भेजा गया
+  Description: अपना पासवर्ड रीसेट करने के लिए अपना ईमेल जांचें।
+  NextButtonText: अगला
+
+EmailVerification:
+  Title: ई-मेल सत्यापन
+  Description: हमने आपके पते को सत्यापित करने के लिए आपको एक ईमेल भेजा है। कृपया नीचे दिए गए फॉर्म में कोड दर्ज करें।
+  CodeLabel: कोड
+  NextButtonText: अगला
+  ResendButtonText: कोड पुनः भेजें
+
+EmailVerificationDone:
+  Title: ई-मेल सत्यापन
+  Description: आपका ईमेल पता सफलतापूर्वक सत्यापित हो गया है।
+  NextButtonText: अगला
+  CancelButtonText: रद्द करें
+  LoginButtonText: लॉगिन करें
+
+RegisterOption:
+  Title: पंजीकरण विकल्प
+  Description: चुनें कि आप कैसे पंजीकरण करना चाहेंगे
+  RegisterUsernamePasswordButtonText: उपयोगकर्ता नाम और पासवर्ड के साथ
+  ExternalLoginDescription: या बाहरी उपयोगकर्ता के साथ पंजीकरण करें
+  LoginButtonText: लॉगिन करें
+
+RegistrationUser:
+  Title: पंजीकरण
+  Description: अपना उपयोगकर्ता डेटा दर्ज करें। आपका ईमेल पता आपके लॉगिन नाम के रूप में उपयोग किया जाएगा।
+  DescriptionOrgRegister: अपना उपयोगकर्ता डेटा दर्ज करें।
+  EmailLabel: ई-मेल
+  UsernameLabel: उपयोगकर्ता नाम
+  FirstnameLabel: पहला नाम
+  LastnameLabel: अंतिम नाम
+  LanguageLabel: भाषा
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Hindi: हिन्दी
+  GenderLabel: लिंग
+  Female: महिला
+  Male: पुरुष
+  Diverse: विविध / X
+  PasswordLabel: पासवर्ड
+  PasswordConfirmLabel: पासवर्ड पुष्टि
+  TosAndPrivacyLabel: नियम और शर्तें
+  TosConfirm: मैं स्वीकार करता हूं
+  TosLinkText: TOS
+  PrivacyConfirm: मैं स्वीकार करता हूं
+  PrivacyLinkText: गोपनीयता नीति
+  ExternalLogin: या बाहरी उपयोगकर्ता के साथ पंजीकरण करें
+  BackButtonText: लॉगिन
+  NextButtonText: अगला
+
+ExternalRegistrationUserOverview:
+  Title: बाहरी उपयोगकर्ता पंजीकरण
+  Description: हमने चयनित प्रदाता से आपके उपयोगकर्ता विवरण ले लिए हैं। अब आप उन्हें बदल या पूरा कर सकते हैं।
+  EmailLabel: ई-मेल
+  UsernameLabel: उपयोगकर्ता नाम
+  FirstnameLabel: पहला नाम
+  LastnameLabel: अंतिम नाम
+  NicknameLabel: उपनाम
+  PhoneLabel: फोन नंबर
+  LanguageLabel: भाषा
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Hindi: हिन्दी
+  TosAndPrivacyLabel: नियम और शर्तें
+  TosConfirm: मैं स्वीकार करता हूं
+  TosLinkText: TOS
+  PrivacyConfirm: मैं स्वीकार करता हूं
+  PrivacyLinkText: गोपनीयता नीति
+  ExternalLogin: या बाहरी उपयोगकर्ता के साथ पंजीकरण करें
+  BackButtonText: वापस
+  NextButtonText: सहेजें
+
+RegistrationOrg:
+  Title: संगठन पंजीकरण
+  Description: अपने संगठन का नाम और उपयोगकर्ता डेटा दर्ज करें।
+  OrgNameLabel: संगठन का नाम
+  EmailLabel: ई-मेल
+  UsernameLabel: उपयोगकर्ता नाम
+  FirstnameLabel: पहला नाम
+  LastnameLabel: अंतिम नाम
+  PasswordLabel: पासवर्ड
+  PasswordConfirmLabel: पासवर्ड पुष्टि
+  TosAndPrivacyLabel: नियम और शर्तें
+  TosConfirm: मैं स्वीकार करता हूं
+  TosLinkText: TOS
+  PrivacyConfirm: मैं स्वीकार करता हूं
+  PrivacyLinkText: गोपनीयता नीति
+  SaveButtonText: संगठन बनाएं
+
+LoginSuccess:
+  Title: लॉगिन सफल
+  AutoRedirectDescription: आप स्वचालित रूप से अपने एप्लिकेशन पर वापस भेज दिए जाएंगे। यदि नहीं, तो नीचे बटन पर क्लिक करें। इसके बाद आप विंडो बंद कर सकते हैं।
+  RedirectedDescription: अब आप इस विंडो को बंद कर सकते हैं।
+  NextButtonText: अगला
+
+LogoutDone:
+  Title: लॉग आउट
+  Description: आप सफलतापूर्वक लॉग आउट हो गए हैं।
+  LoginButtonText: लॉगिन करें
+
+LinkingUserPrompt:
+  Title: मौजूदा उपयोगकर्ता मिला
+  Description: "क्या आप अपना मौजूदा खाता लिंक करना चाहते हैं:"
+  LinkButtonText: लिंक करें
+  OtherButtonText: अन्य विकल्प
+
+LinkingUsersDone:
+  Title: उपयोगकर्ता लिंकिंग
+  Description: उपयोगकर्ता लिंक किया गया।
+  CancelButtonText: रद्द करें
+  NextButtonText: अगला
+
+ExternalNotFound:
+  Title: बाहरी उपयोगकर्ता नहीं मिला
+  Description: बाहरी उपयोगकर्ता नहीं मिला। क्या आप अपने उपयोगकर्ता को लिंक करना चाहते हैं या एक नया स्वचालित रूप से पंजीकृत करना चाहते हैं?
+  LinkButtonText: लिंक करें
+  AutoRegisterButtonText: पंजीकरण करें
+  TosAndPrivacyLabel: नियम और शर्तें
+  TosConfirm: मैं स्वीकार करता हूं
+  TosLinkText: TOS
+  PrivacyConfirm: मैं स्वीकार करता हूं
+  PrivacyLinkText: गोपनीयता नीति
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Hindi: हिन्दी
+
+DeviceAuth:
+  Title: डिवाइस प्राधिकरण
+  UserCode:
+    Label: उपयोगकर्ता कोड
+    Description: डिवाइस पर प्रस्तुत उपयोगकर्ता कोड दर्ज करें।
+    ButtonNext: अगला
+  Action:
+    Description: डिवाइस पहुंच प्रदान करें।
+    GrantDevice: आप डिवाइस प्रदान करने वाले हैं
+    AccessToScopes: निम्नलिखित स्कोप्स तक पहुंच
+    Button:
+      Allow: अनुमति दें
+      Deny: अस्वीकार करें
+  Done:
+    Description: हो गया।
+    Approved: डिवाइस प्राधिकरण स्वीकृत। अब आप डिवाइस पर वापस जा सकते हैं।
+    Denied: डिवाइस प्राधिकरण अस्वीकृत। अब आप डिवाइस पर वापस जा सकते हैं।
+
+Footer:
+  PoweredBy: द्वारा संचालित
+  Tos: TOS
+  PrivacyPolicy: गोपनीयता नीति
+  Help: मदद
+  SupportEmail: सहायता ई-मेल
+
+SignIn: {{.Provider}} के साथ साइन इन करें
+
+Errors:
+  Internal: एक आंतरिक त्रुटि हुई
+  AuthRequest:
+    NotFound: Authrequest नहीं मिला
+    UserAgentNotCorresponding: उपयोगकर्ता एजेंट मेल नहीं खाता
+    UserAgentNotFound: उपयोगकर्ता एजेंट ID नहीं मिला
+    TokenNotFound: टोकन नहीं मिला
+    RequestTypeNotSupported: अनुरोध प्रकार समर्थित नहीं है
+    MissingParameters: आवश्यक पैरामीटर गायब हैं
+  User:
+    NotFound: उपयोगकर्ता नहीं मिल सका
+    AlreadyExists: उपयोगकर्ता पहले से मौजूद है
+    Inactive: उपयोगकर्ता निष्क्रिय है
+    NotFoundOnOrg: चयनित संगठन पर उपयोगकर्ता नहीं मिला
+    NotAllowedOrg: उपयोगकर्ता आवश्यक संगठन का सदस्य नहीं है
+    NotMatchingUserID: उपयोगकर्ता और authrequest में उपयोगकर्ता मेल नहीं खाता
+    UserIDMissing: UserID खाली है
+    Invalid: अमान्य उपयोगकर्ता डेटा
+    DomainNotAllowedAsUsername: डोमेन पहले से आरक्षित है और उपयोग नहीं किया जा सकता
+    NotAllowedToLink: उपयोगकर्ता को बाहरी लॉगिन प्रदाता के साथ लिंक करने की अनुमति नहीं है
+    Profile:
+      NotFound: प्रोफ़ाइल नहीं मिला
+      NotChanged: प्रोफ़ाइल नहीं बदला
+      Empty: प्रोफ़ाइल खाली है
+      FirstNameEmpty: प्रोफ़ाइल में पहला नाम खाली है
+      LastNameEmpty: प्रोफ़ाइल में अंतिम नाम खाली है
+      IDMissing: प्रोफ़ाइल ID गायब है
+    Email:
+      NotFound: ईमेल नहीं मिला
+      Invalid: ईमेल अमान्य है
+      AlreadyVerified: ईमेल पहले से सत्यापित है
+      NotChanged: ईमेल नहीं बदला
+      Empty: ईमेल खाली है
+      IDMissing: ईमेल ID गायब है
+    Phone:
+      NotFound: फोन नहीं मिला
+      Invalid: फोन अमान्य है
+      AlreadyVerified: फोन पहले से सत्यापित है
+      Empty: फोन खाली है
+      NotChanged: फोन नहीं बदला
+    Address:
+      NotFound: पता नहीं मिला
+      NotChanged: पता नहीं बदला
+    Username:
+      AlreadyExists: उपयोगकर्ता नाम पहले से लिया गया है
+      Reserved: उपयोगकर्ता नाम पहले से लिया गया है
+      Empty: उपयोगकर्ता नाम खाली है
+    Password:
+      ConfirmationWrong: पासवर्ड पुष्टि गलत है
+      Empty: पासवर्ड खाली है
+      Invalid: पासवर्ड अमान्य है
+      InvalidAndLocked: पासवर्ड अमान्य है और उपयोगकर्ता लॉक है, अपने व्यवस्थापक से संपर्क करें।
+      NotChanged: नया पासवर्ड आपके वर्तमान पासवर्ड के समान नहीं हो सकता
+    UsernameOrPassword:
+      Invalid: उपयोगकर्ता नाम या पासवर्ड अमान्य है
+    PasswordComplexityPolicy:
+      NotFound: पासवर्ड नीति नहीं मिली
+      MinLength: पासवर्ड बहुत छोटा है
+      HasLower: पासवर्ड में छोटा अक्षर होना चाहिए
+      HasUpper: पासवर्ड में बड़ा अक्षर होना चाहिए
+      HasNumber: पासवर्ड में संख्या होनी चाहिए
+      HasSymbol: पासवर्ड में प्रतीक होना चाहिए
+    Code:
+      Expired: कोड समाप्त हो गया
+      Invalid: कोड अमान्य है
+      Empty: कोड खाली है
+      CryptoCodeNil: क्रिप्टो कोड निल है
+      NotFound: कोड नहीं मिला
+      GeneratorAlgNotSupported: असमर्थित जनरेटर एल्गोरिदम
+    EmailVerify:
+      UserIDEmpty: UserID खाली है
+    ExternalData:
+      CouldNotRead: बाहरी डेटा सही ढंग से नहीं पढ़ा जा सका
+    MFA:
+      NoProviders: कोई मल्टीफैक्टर प्रदाता उपलब्ध नहीं
+      OTP:
+        AlreadyReady: मल्टीफैक्टर OTP (वनटाइमपासवर्ड) पहले से सेटअप है
+        NotExisting: मल्टीफैक्टर OTP (वनटाइमपासवर्ड) मौजूद नहीं है
+        InvalidCode: अमान्य कोड
+        NotReady: मल्टीफैक्टर OTP (वनटाइमपासवर्ड) तैयार नहीं है
+    Locked: उपयोगकर्ता लॉक है
+    SomethingWentWrong: कुछ गलत हो गया
+    NotActive: उपयोगकर्ता सक्रिय नहीं है
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP प्रकार कार्यान्वित नहीं है
+      NotAllowed: बाहरी लॉगिन प्रदाता की अनुमति नहीं है
+      IDPConfigIDEmpty: पहचान प्रदाता ID खाली है
+      ExternalUserIDEmpty: बाहरी उपयोगकर्ता ID खाली है
+      UserDisplayNameEmpty: उपयोगकर्ता प्रदर्शन नाम खाली है
+      NoExternalUserData: कोई बाहरी उपयोगकर्ता डेटा प्राप्त नहीं हुआ
+      CreationNotAllowed: इस प्रदाता पर नए उपयोगकर्ता का निर्माण अनुमति नहीं है
+      LinkingNotAllowed: इस प्रदाता पर उपयोगकर्ता की लिंकिंग की अनुमति नहीं है
+      NoOptionAllowed: न ही निर्माण की अनुमति है और न ही लिंकिंग की अनुमति है। कृपया अपने व्यवस्थापक से संपर्क करें।
+      LoginFailedSwitchLocal: |
+        बाहरी IDP पर लॉगिन विफल। स्थानीय लॉगिन पर वापस आ रहा है।
+
+        त्रुटि विवरण: {{.Details}}
+    GrantRequired: लॉगिन संभव नहीं है। उपयोगकर्ता को एप्लिकेशन पर कम से कम एक अनुदान होना आवश्यक है। कृपया अपने व्यवस्थापक से संपर्क करें।
+    ProjectRequired: लॉगिन संभव नहीं है। उपयोगकर्ता का संगठन को प्रोजेक्ट को अनुदान दिया जाना चाहिए। कृपया अपने व्यवस्थापक से संपर्क करें।
+  IdentityProvider:
+    InvalidConfig: पहचान प्रदाता कॉन्फ़िगरेशन अमान्य है
+  IAM:
+    LockoutPolicy:
+      NotExisting: लॉकआउट नीति मौजूद नहीं है
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: पंजीकरण की अनुमति नहीं है
+  DeviceAuth:
+    NotExisting: उपयोगकर्ता कोड मौजूद नहीं है
+
+optional: (वैकल्पिक)

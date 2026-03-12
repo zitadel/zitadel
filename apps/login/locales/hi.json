@@ -1,0 +1,460 @@
+{
+  "common": {
+    "back": "वापस",
+    "title": "Zitadel के साथ लॉगिन करें"
+  },
+  "accounts": {
+    "title": "खाते",
+    "description": "वह खाता चुनें जिसे आप उपयोग करना चाहते हैं।",
+    "addAnother": "एक और खाता जोड़ें",
+    "noResults": "कोई खाता नहीं मिला",
+    "verified": "सत्यापित",
+    "expired": "समाप्त"
+  },
+  "logout": {
+    "title": "लॉग आउट",
+    "description": "सत्र समाप्त करने के लिए किसी खाते पर क्लिक करें",
+    "noResults": "कोई खाता नहीं मिला",
+    "clear": "सत्र समाप्त करें",
+    "verifiedAt": "अंतिम सक्रियता: {time}",
+    "success": {
+      "title": "सफलतापूर्वक लॉग आउट",
+      "description": "आप सफलतापूर्वक लॉग आउट हो गए हैं।"
+    }
+  },
+  "loginname": {
+    "title": "वापसी पर स्वागत है!",
+    "description": "अपने लॉगिन विवरण दर्ज करें।",
+    "register": "नया उपयोगकर्ता पंजीकृत करें",
+    "submit": "जारी रखें",
+    "labels": {
+      "loginname": "लॉगिन नाम",
+      "username": "उपयोगकर्ता नाम",
+      "usernameOrPhoneNumber": "उपयोगकर्ता नाम या फ़ोन नंबर",
+      "usernameOrEmail": "उपयोगकर्ता नाम या ईमेल"
+    },
+    "required": {
+      "loginName": "यह फ़ील्ड आवश्यक है"
+    },
+    "errors": {
+      "internalError": "एक आंतरिक त्रुटि हुई",
+      "couldNotGetLoginSettings": "लॉगिन सेटिंग्स प्राप्त नहीं कर सका",
+      "couldNotSearchUsers": "उपयोगकर्ताओं की खोज नहीं कर सका",
+      "couldNotGetDomain": "डोमेन प्राप्त नहीं कर सका",
+      "couldNotGetHost": "होस्ट प्राप्त नहीं कर सका",
+      "couldNotStartIDPFlow": "IDP प्रवाह प्रारंभ नहीं कर सका",
+      "moreThanOneUserFound": "एक से अधिक उपयोगकर्ता मिले। कृपया एक अद्वितीय पहचानकर्ता प्रदान करें।",
+      "userNotFound": "उपयोगकर्ता सिस्टम में नहीं मिला",
+      "couldNotCreateSession": "उपयोगकर्ता के लिए सत्र नहीं बना सका",
+      "initialUserNotSupported": "प्रारंभिक उपयोगकर्ता समर्थित नहीं है",
+      "localAuthenticationNotAllowed": "स्थानीय प्रमाणीकरण की अनुमति नहीं है! अधिक जानकारी के लिए अपने व्यवस्थापक से संपर्क करें।",
+      "passkeysNotAllowed": "पासकी की अनुमति नहीं है! अधिक जानकारी के लिए अपने व्यवस्थापक से संपर्क करें।",
+      "couldNotFindIdentityProvider": "पहचान प्रदाता नहीं मिला।",
+      "userNotActive": "उपयोगकर्ता सक्रिय नहीं है। अधिक जानकारी के लिए अपने व्यवस्थापक से संपर्क करें।"
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "एक त्रुटि हुई",
+      "multipleUsersFound": "कई उपयोगकर्ता मिले",
+      "userNotFound": "उपयोगकर्ता सिस्टम में नहीं मिला"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "पासवर्ड",
+      "description": "अपना पासवर्ड दर्ज करें।",
+      "resetPassword": "पासवर्ड रीसेट करें",
+      "submit": "जारी रखें",
+      "labels": {
+        "password": "पासवर्ड"
+      },
+      "required": {
+        "password": "यह फ़ील्ड आवश्यक है"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "पासवर्ड सत्यापित नहीं कर सका",
+        "couldNotResetPassword": "पासवर्ड रीसेट नहीं कर सका"
+      },
+      "info": {
+        "passwordResetSent": "पासवर्ड रीसेट हो गया। कृपया अपना ईमेल जांचें"
+      }
+    },
+    "set": {
+      "title": "पासवर्ड सेट करें",
+      "description": "अपने खाते के लिए पासवर्ड सेट करें",
+      "codeSent": "आपके ईमेल पते पर एक कोड भेजा गया है।",
+      "noCodeReceived": "कोड नहीं मिला?",
+      "resend": "कोड पुनः भेजें",
+      "submit": "जारी रखें",
+      "labels": {
+        "code": "कोड",
+        "newPassword": "नया पासवर्ड",
+        "confirmPassword": "पासवर्ड की पुष्टि करें"
+      },
+      "required": {
+        "code": "यह फ़ील्ड आवश्यक है",
+        "newPassword": "आपको एक पासवर्ड प्रदान करना होगा!",
+        "confirmPassword": "यह फ़ील्ड आवश्यक है"
+      },
+      "errors": {
+        "couldNotSetPassword": "पासवर्ड सेट नहीं कर सका",
+        "couldNotResetPassword": "पासवर्ड रीसेट नहीं कर सका",
+        "couldNotVerifyPassword": "पासवर्ड सत्यापित नहीं कर सका"
+      }
+    },
+    "change": {
+      "title": "पासवर्ड बदलें",
+      "description": "अपने खाते के लिए पासवर्ड सेट करें",
+      "submit": "जारी रखें",
+      "labels": {
+        "currentPassword": "वर्तमान पासवर्ड",
+        "newPassword": "नया पासवर्ड",
+        "confirmPassword": "पासवर्ड की पुष्टि करें"
+      },
+      "required": {
+        "currentPassword": "आपको अपना वर्तमान पासवर्ड प्रदान करना होगा!",
+        "newPassword": "आपको एक नया पासवर्ड प्रदान करना होगा!",
+        "confirmPassword": "यह फ़ील्ड आवश्यक है"
+      },
+      "errors": {
+        "currentPasswordInvalid": "वर्तमान पासवर्ड गलत है।",
+        "couldNotChangePassword": "पासवर्ड बदल नहीं सका",
+        "couldNotVerifyPassword": "पासवर्ड सत्यापित नहीं कर सका",
+        "unknownError": "अज्ञात त्रुटि"
+      }
+    },
+    "complexity": {
+      "length": "कम से कम {minLength} वर्ण लंबा होना चाहिए।",
+      "hasSymbol": "एक प्रतीक शामिल होना चाहिए।",
+      "hasNumber": "एक संख्या शामिल होनी चाहिए।",
+      "hasUppercase": "एक बड़े अक्षर शामिल होने चाहिए।",
+      "hasLowercase": "एक छोटे अक्षर शामिल होने चाहिए।",
+      "equals": "पासवर्ड पुष्टि मेल खाती है।",
+      "matches": "मेल खाता है",
+      "doesNotMatch": "मेल नहीं खाता"
+    },
+    "errors": {
+      "noHostFound": "कोई होस्ट नहीं मिला",
+      "couldNotSendResetLink": "पासवर्ड रीसेट लिंक भेज नहीं सका",
+      "couldNotCreateSessionForUser": "उपयोगकर्ता के लिए सत्र नहीं बना सका",
+      "couldNotVerifyPassword": "पासवर्ड सत्यापित नहीं कर सका",
+      "failedToAuthenticate": "प्रमाणीकरण विफल हुआ। आपने {maxPasswordAttempts} पासवर्ड प्रयासों में से {failedAttempts} प्रयास किए हैं।{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "प्रमाणीकरण विफल हुआ।",
+      "accountLockedContactAdmin": " अपना खाता अनलॉक करने के लिए अपने व्यवस्थापक से संपर्क करें",
+      "userNotFound": "उपयोगकर्ता सिस्टम में नहीं मिला",
+      "initialUserNotSupported": "प्रारंभिक उपयोगकर्ता समर्थित नहीं है",
+      "userInitialStateNotSupported": "उपयोगकर्ता प्रारंभिक स्थिति समर्थित नहीं है",
+      "codeOrVerificationRequired": "आपको एक कोड प्रदान करना होगा या एक वैध उपयोगकर्ता सत्यापन जांच होनी चाहिए",
+      "verificationRequired": "उपयोगकर्ता सत्यापन जांच करनी होगी",
+      "couldNotLoadSession": "सत्र लोड नहीं कर सका",
+      "couldNotLoadAuthMethods": "प्रमाणीकरण विधियां लोड नहीं कर सका",
+      "failedPrecondition": "पूर्व शर्त विफल",
+      "sessionNotValid": "सत्र मान्य नहीं है",
+      "passwordVerificationMissing": "पासवर्ड सत्यापन गायब है।",
+      "passwordVerificationTooOld": "पासवर्ड सत्यापन बहुत पुराना है। कृपया अपना पासवर्ड पुनः सत्यापित करें।"
+    }
+  },
+  "idp": {
+    "title": "SSO के साथ साइन इन करें",
+    "description": "साइन इन करने के लिए निम्नलिखित प्रदाताओं में से एक चुनें",
+    "orSignInWith": "या साइन इन करें",
+    "signInWithApple": "Apple के साथ साइन इन करें",
+    "signInWithGoogle": "Google के साथ साइन इन करें",
+    "signInWithAzureAD": "AzureAD के साथ साइन इन करें",
+    "signInWithGithub": "GitHub के साथ साइन इन करें",
+    "signInWithGitlab": "GitLab के साथ साइन इन करें",
+    "loginError": {
+      "title": "लॉगिन विफल",
+      "description": "लॉगिन करने का प्रयास करते समय एक त्रुटि हुई।"
+    },
+    "linkingError": {
+      "title": "खाता लिंक करना विफल",
+      "description": "अपना खाता लिंक करने का प्रयास करते समय एक त्रुटि हुई।"
+    },
+    "completeRegister": {
+      "title": "अपना डेटा पूरा करें",
+      "description": "आपको अपना ईमेल पता और नाम प्रदान करके अपना पंजीकरण पूरा करना होगा।"
+    },
+    "accountNotFound": {
+      "title": "खाता नहीं मिला",
+      "description": "हम आपके पहचान प्रदाता क्रेडेंशियल्स से जुड़ा कोई खाता नहीं ढूंढ सके।",
+      "info": "कोई मौजूदा खाता नहीं मिला। कृपया एक मौजूदा खाते से साइन इन करें या सहायता के लिए अपने व्यवस्थापक से संपर्क करें।",
+      "backToLogin": "लॉगिन पर वापस जाएं"
+    },
+    "registrationFailed": {
+      "title": "पंजीकरण उपलब्ध नहीं",
+      "description": "हम पंजीकरण प्रक्रिया पूरी नहीं कर सके।",
+      "info": "पंजीकरण के लिए संगठन निर्धारित नहीं कर सका। कृपया सहायता के लिए अपने व्यवस्थापक से संपर्क करें।",
+      "backToLogin": "लॉगिन पर वापस जाएं"
+    },
+    "processing": {
+      "message": "प्रमाणीकरण प्रसंस्करण...",
+      "noRedirect": "सर्वर से कोई रीडायरेक्ट या त्रुटि वापस नहीं आई",
+      "unexpectedError": "एक अप्रत्याशित त्रुटि हुई"
+    },
+    "errors": {
+      "missingParameters": "आवश्यक पैरामीटर गायब हैं",
+      "missingIdpInfo": "IDP जानकारी गायब है",
+      "idpNotFound": "पहचान प्रदाता नहीं मिला",
+      "linkingNotAllowed": "इस पहचान प्रदाता के लिए लिंक करने की अनुमति नहीं है",
+      "linkingFailed": "खाते से पहचान प्रदाता लिंक करने में विफल",
+      "autoLinkingFailed": "खाता स्वचालित रूप से लिंक करने में विफल",
+      "userCreationFailed": "उपयोगकर्ता खाता बनाने में विफल",
+      "orgResolutionFailed": "पंजीकरण के लिए संगठन निर्धारित नहीं कर सका",
+      "sessionCreationFailed": "सत्र बना नहीं सका या रीडायरेक्ट निर्धारित नहीं कर सका",
+      "unknownError": "एक अज्ञात त्रुटि हुई"
+    }
+  },
+  "ldap": {
+    "title": "LDAP लॉगिन",
+    "description": "अपने LDAP क्रेडेंशियल्स दर्ज करें।",
+    "submit": "जारी रखें",
+    "labels": {
+      "username": "उपयोगकर्ता नाम",
+      "password": "पासवर्ड"
+    },
+    "required": {
+      "username": "यह फ़ील्ड आवश्यक है",
+      "password": "यह फ़ील्ड आवश्यक है"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "अपनी पहचान सत्यापित करें",
+      "description": "निम्नलिखित कारकों में से एक चुनें।",
+      "noResults": "सेटअप करने के लिए कोई दूसरा कारक उपलब्ध नहीं है।"
+    },
+    "set": {
+      "title": "दो-कारक सेटअप करें",
+      "description": "निम्नलिखित दूसरे कारकों में से एक चुनें।",
+      "skip": "छोड़ें"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "दो-कारक सत्यापित करें",
+      "totpDescription": "अपने प्रमाणीकरण ऐप से कोड दर्ज करें।",
+      "smsDescription": "SMS के माध्यम से प्राप्त कोड दर्ज करें।",
+      "emailDescription": "ईमेल के माध्यम से प्राप्त कोड दर्ज करें।",
+      "noCodeReceived": "कोड नहीं मिला?",
+      "resendCode": "कोड पुनः भेजें",
+      "submit": "जारी रखें",
+      "labels": {
+        "code": "कोड"
+      },
+      "required": {
+        "code": "यह फ़ील्ड आवश्यक है"
+      }
+    },
+    "set": {
+      "title": "दो-कारक सेटअप करें",
+      "totpDescription": "अपने प्रमाणीकरण ऐप के साथ QR कोड स्कैन करें।",
+      "smsDescription": "SMS के माध्यम से कोड प्राप्त करने के लिए अपना फ़ोन नंबर दर्ज करें।",
+      "emailDescription": "ईमेल के माध्यम से कोड प्राप्त करने के लिए अपना ईमेल पता दर्ज करें।",
+      "totpRegisterDescription": "QR कोड स्कैन करें या URL पर नेविगेट करें।",
+      "submit": "जारी रखें",
+      "labels": {
+        "code": "कोड"
+      },
+      "required": {
+        "code": "यह फ़ील्ड आवश्यक है"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "पासकी के साथ प्रमाणीकरण करें",
+      "description": "आपका डिवाइस आपकी फिंगरप्रिंट, चेहरा, या स्क्रीन लॉक के लिए पूछेगा",
+      "usePassword": "पासवर्ड का उपयोग करें",
+      "submit": "जारी रखें",
+      "errors": {
+        "couldNotRequestChallenge": "पासकी चुनौती का अनुरोध नहीं कर सका",
+        "couldNotVerifyPasskey": "पासकी सत्यापित नहीं कर सका",
+        "noResponseReceived": "पासकी सत्यापन विफल - कोई प्रतिक्रिया प्राप्त नहीं हुई",
+        "noRedirectProvided": "पासकी सत्यापन पूरा हुआ लेकिन कोई रीडायरेक्ट प्रदान नहीं किया गया",
+        "couldNotRetrievePasskey": "पासकी पुनर्प्राप्त करते समय एक त्रुटि हुई",
+        "verificationCancelled": "पासकी सत्यापन रद्द कर दिया गया",
+        "verificationFailed": "पासकी सत्यापन के दौरान एक त्रुटि हुई",
+        "couldNotFindSession": "सत्र नहीं मिला",
+        "couldNotUpdateSession": "सत्र अपडेट नहीं कर सका",
+        "userNotFound": "उपयोगकर्ता सिस्टम में नहीं मिला",
+        "couldNotDetermineRedirect": "पासकी सत्यापन के बाद रीडायरेक्ट URL निर्धारित नहीं कर सका"
+      }
+    },
+    "set": {
+      "title": "पासकी सेटअप करें",
+      "description": "आपका डिवाइस आपकी फिंगरप्रिंट, चेहरा, या स्क्रीन लॉक के लिए पूछेगा",
+      "info": {
+        "description": "पासकी एक डिवाइस पर प्रमाणीकरण विधि है जैसे आपकी फिंगरप्रिंट, Apple FaceID या इसी तरह की विधि। ",
+        "link": "पासकी प्रमाणीकरण"
+      },
+      "skip": "छोड़ें",
+      "submit": "जारी रखें"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "दो-कारक सत्यापित करें",
+      "description": "अपने डिवाइस के साथ अपना खाता सत्यापित करें।"
+    },
+    "set": {
+      "title": "दो-कारक सेटअप करें",
+      "description": "एक दूसरे कारक के रूप में डिवाइस सेटअप करें।",
+      "submit": "जारी रखें"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "पासकी",
+      "password": "पासवर्ड"
+    },
+    "disabled": {
+      "title": "पंजीकरण अक्षम",
+      "description": "पंजीकरण अक्षम है। कृपया अपने व्यवस्थापक से संपर्क करें।"
+    },
+    "missingdata": {
+      "title": "डेटा गायब है",
+      "description": "पंजीकरण के लिए ईमेल, पहला और अंतिम नाम प्रदान करें।"
+    },
+    "title": "पंजीकरण",
+    "description": "अपना Zitadel खाता बनाएं।",
+    "noMethodAvailableWarning": "कोई प्रमाणीकरण विधि उपलब्ध नहीं है। कृपया अपने व्यवस्थापक से संपर्क करें।",
+    "selectMethod": "विधि चुनें जिससे आप प्रमाणीकरण करना चाहते हैं",
+    "agreeTo": "पंजीकरण के लिए आपको नियमों और शर्तों से सहमत होना होगा",
+    "termsOfService": "सेवा की शर्तें",
+    "privacyPolicy": "गोपनीयता नीति",
+    "submit": "जारी रखें",
+    "password": {
+      "title": "पासवर्ड सेट करें",
+      "description": "अपने खाते के लिए पासवर्ड सेट करें",
+      "submit": "जारी रखें",
+      "labels": {
+        "password": "पासवर्ड",
+        "confirmPassword": "पासवर्ड की पुष्टि करें"
+      },
+      "required": {
+        "password": "आपको एक पासवर्ड प्रदान करना होगा!",
+        "confirmPassword": "यह फ़ील्ड आवश्यक है"
+      }
+    },
+    "labels": {
+      "firstname": "पहला नाम",
+      "lastname": "अंतिम नाम",
+      "email": "ईमेल"
+    },
+    "required": {
+      "firstname": "यह फ़ील्ड आवश्यक है",
+      "lastname": "यह फ़ील्ड आवश्यक है",
+      "email": "यह फ़ील्ड आवश्यक है"
+    },
+    "errors": {
+      "couldNotCreateUser": "उपयोगकर्ता नहीं बना सका",
+      "couldNotCreateSession": "सत्र नहीं बना सका",
+      "userNotFound": "उपयोगकर्ता सिस्टम में नहीं मिला",
+      "couldNotLinkIDP": "उपयोगकर्ता से IDP लिंक नहीं कर सका",
+      "couldNotRegisterUser": "उपयोगकर्ता पंजीकृत नहीं कर सका"
+    }
+  },
+  "invite": {
+    "title": "उपयोगकर्ता आमंत्रित करें",
+    "description": "आमंत्रित करने के लिए उपयोगकर्ता का ईमेल पता और नाम प्रदान करें।",
+    "info": "उपयोगकर्ता को आगे के निर्देशों के साथ एक ईमेल प्राप्त होगा।",
+    "notAllowed": "आपकी सेटिंग्स आपको उपयोगकर्ताओं को आमंत्रित करने की अनुमति नहीं देती हैं।",
+    "submit": "जारी रखें",
+    "success": {
+      "title": "उपयोगकर्ता आमंत्रित",
+      "description": "ईमेल सफलतापूर्वक भेजा गया।",
+      "verified": "उपयोगकर्ता को आमंत्रित किया गया है और उन्होंने पहले ही अपना ईमेल सत्यापित कर लिया है।",
+      "notVerifiedYet": "उपयोगकर्ता को आमंत्रित किया गया है। उन्हें आगे के निर्देशों के साथ एक ईमेल प्राप्त होगा।",
+      "submit": "एक और उपयोगकर्ता आमंत्रित करें"
+    }
+  },
+  "signedin": {
+    "title": "स्वागत है {user}!",
+    "description": "आप साइन इन हैं।",
+    "continue": "जारी रखें",
+    "error": {
+      "title": "त्रुटि",
+      "description": "साइन इन करने का प्रयास करते समय एक त्रुटि हुई।"
+    }
+  },
+  "verify": {
+    "userIdMissing": "कोई userId प्रदान नहीं किया गया!",
+    "successTitle": "उपयोगकर्ता सत्यापित",
+    "successDescription": "उपयोगकर्ता सफलतापूर्वक सत्यापित हो गया है।",
+    "setupAuthenticator": "प्रमाणीकरण सेटअप करें",
+    "verify": {
+      "title": "उपयोगकर्ता सत्यापित करें",
+      "description": "सत्यापन ईमेल में प्रदान किया गया कोड दर्ज करें।",
+      "noCodeReceived": "कोड नहीं मिला?",
+      "resendCode": "कोड पुनः भेजें",
+      "codeSent": "आपके ईमेल पते पर अभी एक कोड भेजा गया है।",
+      "submit": "जारी रखें",
+      "labels": {
+        "code": "कोड"
+      },
+      "required": {
+        "code": "यह फ़ील्ड आवश्यक है"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "ईमेल पुनः भेज नहीं सका",
+      "couldNotVerifyUser": "उपयोगकर्ता सत्यापित नहीं कर सका",
+      "couldNotVerifyInvite": "आमंत्रण सत्यापित नहीं कर सका",
+      "couldNotVerifyEmail": "ईमेल सत्यापित नहीं कर सका",
+      "couldNotVerify": "सत्यापित नहीं कर सका",
+      "couldNotLoadUser": "उपयोगकर्ता लोड नहीं कर सका",
+      "couldNotLoadAuthenticators": "संभावित प्रमाणीकरण लोड नहीं कर सका",
+      "couldNotCreateSession": "सत्र नहीं बना सका",
+      "noHostFound": "कोई होस्ट नहीं मिला",
+      "userAlreadyVerified": "उपयोगकर्ता पहले ही सत्यापित है!",
+      "couldNotResendInvite": "आमंत्रण पुनः भेज नहीं सका",
+      "inviteSendFailed": "आमंत्रण ईमेल भेजने में विफल",
+      "emailSendFailed": "सत्यापन ईमेल भेजने में विफल",
+      "contextMissing": "एक त्रुटि हुई। कृपया पुनः प्रयास करें।"
+    }
+  },
+  "authenticator": {
+    "title": "प्रमाणीकरण विधि चुनें",
+    "description": "विधि चुनें जिससे आप प्रमाणीकरण करना चाहते हैं",
+    "noMethodsAvailable": "कोई प्रमाणीकरण विधि उपलब्ध नहीं है",
+    "allSetup": "आपने पहले ही एक प्रमाणीकरण सेटअप कर लिया है!",
+    "linkWithIDP": "या पहचान प्रदाता के साथ लिंक करें"
+  },
+  "device": {
+    "usercode": {
+      "title": "डिवाइस कोड",
+      "description": "अपने ऐप या डिवाइस पर प्रदर्शित कोड दर्ज करें।",
+      "submit": "जारी रखें",
+      "labels": {
+        "code": "कोड"
+      },
+      "required": {
+        "code": "यह फ़ील्ड आवश्यक है"
+      }
+    },
+    "request": {
+      "title": "{appName} कनेक्ट करना चाहता है",
+      "description": "{appName} के पास इसकी पहुंच होगी:",
+      "disclaimer": "Allow पर क्लिक करके, आप {appName} और Zitadel को उनकी संबंधित सेवा की शर्तों और गोपनीयता नीतियों के अनुसार आपकी जानकारी का उपयोग करने की अनुमति देते हैं। आप किसी भी समय इस पहुंच को वापस ले सकते हैं।",
+      "submit": "अनुमति दें",
+      "deny": "अस्वीकार करें"
+    },
+    "scope": {
+      "openid": "अपनी पहचान सत्यापित करें।",
+      "email": "अपना ईमेल पता देखें।",
+      "profile": "अपनी पूर्ण प्रोफ़ाइल जानकारी देखें।",
+      "offline_access": "अपने खाते तक ऑफ़लाइन पहुंच की अनुमति दें।"
+    }
+  },
+  "error": {
+    "noUserCode": "कोई उपयोगकर्ता कोड प्रदान नहीं किया गया!",
+    "noDeviceRequest": "कोई डिवाइस अनुरोध नहीं मिला।",
+    "unknownContext": "उपयोगकर्ता का संदर्भ प्राप्त नहीं कर सका। सुनिश्चित करें कि आप पहले उपयोगकर्ता नाम दर्ज करें या searchParam के रूप में loginName प्रदान करें।",
+    "sessionExpired": "आपका वर्तमान सत्र समाप्त हो गया है। कृपया पुनः लॉगिन करें।",
+    "failedLoading": "डेटा लोड करने में विफल। कृपया पुनः प्रयास करें।",
+    "tryagain": "पुनः प्रयास करें",
+    "couldNotContinueSession": "सत्र के साथ जारी नहीं रख सका - उपयोगकर्ता जानकारी गायब है"
+  }
+}
