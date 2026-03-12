@@ -65,7 +65,6 @@ function getDefaultButtonAppearance(): string {
   return appearance?.button || "border border-button-light-border dark:border-button-dark-border"; // Fallback to flat design
 }
 
-// eslint-disable-next-line react/display-name
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {

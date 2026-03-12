@@ -39,6 +39,7 @@
     "node_modules",
     "integration",
     "acceptance",
-    "dockerized"
+    "dockerized",
+    "vitest.config*.ts"
   ]
 }
