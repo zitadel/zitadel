@@ -100,125 +100,90 @@ describe("otelGrpcInterceptor", () => {
     expect(spans[0].events).toHaveLength(1);
     expect(spans[0].events[0].name).toBe("exception");
   });
-  //
-  // it("handles missing service/method gracefully", async () => {
-  //   await otelGrpcInterceptor(async () => ({ ok: true }))({
-  //     url: "https://api.zitadel.example.com",
-  //     header: { set: () => {} },
-  //   });
-  //
-  //   const spans = exporter.getFinishedSpans();
-  //   expect(spans).toHaveLength(1);
-  //   expect(spans[0]).toMatchObject({
-  //     name: "unknown/unknown",
-  //     attributes: { "rpc.service": "unknown", "rpc.method": "unknown" },
-  //   });
-  // });
-  //
-  // it("returns the response from the next handler", async () => {
-  //   const expectedResponse = { data: "test-data", items: [1, 2, 3] };
-  //
-  //   const result = await otelGrpcInterceptor(async () => expectedResponse)({
-  //     service: { typeName: "TestService" },
-  //     method: { name: "TestMethod" },
-  //     url: "https://test.example.com",
-  //     header: { set: () => {} },
-  //   });
-  //
-  //   expect(result).toEqual(expectedResponse);
-  // });
-  //
-  // it("records error spans without gRPC status code", async () => {
-  //   const error = new Error("Network failure");
-  //
-  //   await expect(
-  //     otelGrpcInterceptor(async () => {
-  //       throw error;
-  //     })({
-  //       service: { typeName: "zitadel.user.v2.UserService" },
-  //       method: { name: "ListUsers" },
-  //       url: "https://api.zitadel.example.com",
-  //       header: { set: () => {} },
-  //     }),
-  //   ).rejects.toThrow("Network failure");
-  //
-  //   const spans = exporter.getFinishedSpans();
-  //   expect(spans).toHaveLength(1);
-  //   expect(spans[0]).toMatchObject({
-  //     name: "zitadel.user.v2.UserService/ListUsers",
-  //     status: { code: SpanStatusCode.ERROR, message: "Network failure" },
-  //   });
-  //   expect(spans[0].attributes).not.toHaveProperty("rpc.grpc.status_code");
-  // });
-  //
-  // it("handles malformed URL gracefully", async () => {
-  //   await otelGrpcInterceptor(async () => ({ ok: true }))({
-  //     service: { typeName: "TestService" },
-  //     method: { name: "TestMethod" },
-  //     url: "not-a-valid-url",
-  //     header: { set: () => {} },
-  //   });
-  //
-  //   const spans = exporter.getFinishedSpans();
-  //   expect(spans).toHaveLength(1);
-  //   expect(spans[0].attributes["server.address"]).toBe("unknown");
-  // });
-  //
-  // it("handles missing URL gracefully", async () => {
-  //   await otelGrpcInterceptor(async () => ({ ok: true }))({
-  //     service: { typeName: "TestService" },
-  //     method: { name: "TestMethod" },
-  //     header: { set: () => {} },
-  //   });
-  //
-  //   const spans = exporter.getFinishedSpans();
-  //   expect(spans).toHaveLength(1);
-  //   expect(spans[0].attributes["server.address"]).toBe("unknown");
-  // });
-  //
-  // it("handles empty string URL gracefully", async () => {
-  //   await otelGrpcInterceptor(async () => ({ ok: true }))({
-  //     service: { typeName: "TestService" },
-  //     method: { name: "TestMethod" },
-  //     url: "",
-  //     header: { set: () => {} },
-  //   });
-  //
-  //   const spans = exporter.getFinishedSpans();
-  //   expect(spans).toHaveLength(1);
-  //   expect(spans[0].attributes["server.address"]).toBe("unknown");
-  // });
-  //
-  // it("uses empty strings as-is for service/method names", async () => {
-  //   await otelGrpcInterceptor(async () => ({ ok: true }))({
-  //     service: { typeName: "" },
-  //     method: { name: "" },
-  //     url: "https://api.example.com",
-  //     header: { set: () => {} },
-  //   });
-  //
-  //   const spans = exporter.getFinishedSpans();
-  //   expect(spans).toHaveLength(1);
-  //   expect(spans[0]).toMatchObject({
-  //     name: "/",
-  //     attributes: { "rpc.service": "", "rpc.method": "" },
-  //   });
-  // });
-  //
-  // it("handles non-Error exceptions", async () => {
-  //   await expect(
-  //     otelGrpcInterceptor(async () => {
-  //       throw "string error";
-  //     })({
-  //       service: { typeName: "TestService" },
-  //       method: { name: "TestMethod" },
-  //       url: "https://api.example.com",
-  //       header: { set: () => {} },
-  //     }),
-  //   ).rejects.toBe("string error");
-  //
-  //   const spans = exporter.getFinishedSpans();
-  //   expect(spans).toHaveLength(1);
-  //   expect(spans[0].status.code).toBe(SpanStatusCode.ERROR);
-  // });
+
+  it("returns the response from the next handler", async () => {
+    const expectedResponse = {
+      details: {},
+      sessionId: "test-session-id",
+      sessionToken: "test-token",
+    };
+
+    const mockTransport = createRouterTransport(
+      ({ service }) => {
+        service(SessionService, {
+          createSession: () => expectedResponse,
+        });
+      },
+      {
+        transport: {
+          interceptors: [otelGrpcInterceptor],
+        },
+      },
+    );
+
+    const client = createClientFor(SessionService)(mockTransport);
+    const result = await client.createSession({});
+    expect(result).toBe(expectedResponse);
+  });
+
+  it("handles in-memory transport URL gracefully", async () => {
+    const mockTransport = createRouterTransport(() => {}, {
+      transport: {
+        interceptors: [otelGrpcInterceptor],
+      },
+    });
+
+    const client = createClientFor(SessionService)(mockTransport);
+    await expect(client.createSession({})).rejects.toThrow();
+
+    const spans = exporter.getFinishedSpans();
+    expect(spans).toHaveLength(1);
+    expect(spans[0].attributes["server.address"]).toBeDefined();
+  });
+
+  it("sets correct service and method names from protobuf definitions", async () => {
+    const mockTransport = createRouterTransport(() => {}, {
+      transport: {
+        interceptors: [otelGrpcInterceptor],
+      },
+    });
+
+    const client = createClientFor(SessionService)(mockTransport);
+    await expect(client.deleteSession({})).rejects.toThrow();
+
+    const spans = exporter.getFinishedSpans();
+    expect(spans).toHaveLength(1);
+    expect(spans[0]).toMatchObject({
+      name: "zitadel.session.v2.SessionService/DeleteSession",
+      attributes: {
+        "rpc.service": "zitadel.session.v2.SessionService",
+        "rpc.method": "DeleteSession",
+      },
+    });
+  });
+
+  it("handles non-Error exceptions", async () => {
+    const mockTransport = createRouterTransport(
+      ({ service }) => {
+        service(SessionService, {
+          createSession: () => {
+            // eslint-disable-next-line no-throw-literal
+            throw "string error";
+          },
+        });
+      },
+      {
+        transport: {
+          interceptors: [otelGrpcInterceptor],
+        },
+      },
+    );
+
+    const client = createClientFor(SessionService)(mockTransport);
+    await expect(client.createSession({})).rejects.toThrow();
+
+    const spans = exporter.getFinishedSpans();
+    expect(spans).toHaveLength(1);
+    expect(spans[0].status.code).toBe(SpanStatusCode.ERROR);
+  });
 });

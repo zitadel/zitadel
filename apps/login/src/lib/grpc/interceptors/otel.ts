@@ -28,10 +28,7 @@ const TRACER_NAME = "zitadel-login-grpc" as const;
  * Extracts the hostname from a URL string. Returns "unknown" if the URL is
  * undefined or cannot be parsed.
  */
-function parseHostname(url: string | undefined): string {
-  if (!url) {
-    return "unknown";
-  }
+function parseHostname(url: string): string {
   try {
     return new URL(url).hostname;
   } catch {
