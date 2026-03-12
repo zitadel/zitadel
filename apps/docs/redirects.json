@@ -1,5 +1,50 @@
 [
   {
+    "source": "/examples/login/react",
+    "destination": "/sdk-examples/react",
+    "permanent": true
+  },
+  {
+    "source": "/examples/login/angular",
+    "destination": "/sdk-examples/angular",
+    "permanent": true
+  },
+  {
+    "source": "/examples/login/vue",
+    "destination": "/sdk-examples/vue",
+    "permanent": true
+  },
+  {
+    "source": "/examples/login/nextjs",
+    "destination": "/sdk-examples/nextjs",
+    "permanent": true
+  },
+  {
+    "source": "/examples/login/symfony",
+    "destination": "/sdk-examples/symfony",
+    "permanent": true
+  },
+  {
+    "source": "/examples/login/java-spring",
+    "destination": "/sdk-examples/spring",
+    "permanent": true
+  },
+  {
+    "source": "/examples/login/python-django",
+    "destination": "/sdk-examples/django",
+    "permanent": true
+  },
+  {
+    "source": "/examples/secure-api/python-flask",
+    "destination": "/sdk-examples/flask",
+    "permanent": true
+  },
+  {
+    "source": "/examples/secure-api/python-flask",
+    "destination": "/sdk-examples/flask",
+    "permanent": true
+  },
+  {
     "source": "/apis/resources/action_service_v2",
     "destination": "/reference/api/action",
     "permanent": true
