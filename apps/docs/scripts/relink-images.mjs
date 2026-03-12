@@ -43,10 +43,6 @@ walk(CONTENT_DIR, (filepath) => {
   // Replaces /docs/img/ -> correctPrefix + img/
   // Replaces /docs/vX.Y/ -> correctPrefix + vX.Y/
 
-  const PUBLIC_PREFIX = '/docs/img/';
-  const VERSION_PREFIXES = ['/docs/v4.10/', '/docs/v4.9/', '/docs/v4.8/'];
-  const TARGET_PATHS = [PUBLIC_PREFIX, ...VERSION_PREFIXES];
-
   // Pattern: (!\[.*?\]\(|src=["'])(/docs/(?:img|v\d+\.\d+)/.*?)(\)|["'])
   const pattern = /(!\[.*?\]\(|src=["'])\/docs\/((?:img|v\d+\.\d+)\/.*?)(\)|["'])/g;
 
