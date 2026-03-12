@@ -71,7 +71,7 @@ function getCurrentRef() {
       cachedRef = branch;
       return cachedRef;
     }
-  } catch (e) {
+  } catch {
     // Ignore git errors
   }
   console.log(`[ref] Defaulting to ${FALLBACK_BRANCH}`);
@@ -143,7 +143,7 @@ function copyDirectorySafely(src, dest) {
       if (versionDirPattern.test(item) && fs.statSync(join(src, item)).isDirectory()) {
         isVersionDir = true;
       }
-    } catch (e) {
+    } catch {
       // Ignore stat errors
     }
 
@@ -281,7 +281,7 @@ async function downloadFileContent(tagOrBranch, repoPath) {
     let decodedRepoPath;
     try {
         decodedRepoPath = decodeURIComponent(repoPath.replace(/\\/g, '/'));
-    } catch (e) {
+    } catch {
         // If decoding fails (malformed escape sequences), fall back to original
         decodedRepoPath = repoPath;
     }
@@ -370,7 +370,7 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
     });
 
     // 2. Markdown Images: ![alt](src)
-    const mdImgRegex = /(!\[.*?\]\()([^\)]+)(\))/g;
+    const mdImgRegex = /(!\[.*?\]\()([^)]+)(\))/g;
     content = content.replace(mdImgRegex, (match, p1, p2, p3) => {
       if (!p2.startsWith('.')) return match;
       const rewritten = rewritePath(filePath, p2);
@@ -452,7 +452,7 @@ function getLocalVersion() {
     if (!branch) {
         try {
             branch = execSync('git branch --show-current').toString().trim();
-        } catch (e) {}
+        } catch { /* ignore git errors */ }
     }
 
     if (branch && branch !== 'main' && branch !== 'master') {
@@ -467,7 +467,7 @@ function getLocalVersion() {
         if (semver.valid(tag) && semver.gt(tag, CUTOFF)) {
             return { label: tag, isUnreleased: false };
         }
-    } catch (e) { }
+    } catch { /* ignore git errors */ }
 
     return { label: 'v4.11.0', isUnreleased: true };
 }
