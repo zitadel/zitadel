@@ -4,7 +4,8 @@ Login:
   TitleLinking: उपयोगकर्ता लिंकिंग के लिए लॉगिन
   DescriptionLinking: अपने बाहरी उपयोगकर्ता को लिंक करने के लिए अपने लॉगिन विवरण दर्ज करें।
   LoginNameLabel: लॉगिन नाम
-  UsernamePlaceHolder: username@domain
+  UsernamePlaceHolder: username
+  LoginnamePlaceHolder: username@domain
   ExternalUserDescription: बाहरी उपयोगकर्ता के साथ लॉगिन करें।
   MustBeMemberOfOrg: उपयोगकर्ता को {{.OrgName}} संगठन का सदस्य होना चाहिए।
   RegisterButtonText: पंजीकरण करें
@@ -29,6 +30,7 @@ SelectAccount:
 
 Password:
   Title: पासवर्ड
+  PasswordLabel: पासवर्ड
   Description: अपने लॉगिन विवरण दर्ज करें।
   MinLength: कम से कम
   MinLengthp2: अक्षर लंबा होना चाहिए।
