@@ -26,7 +26,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
             checked={enabled}
             onChange={(event) => {
               setEnabled(event.target?.checked);
-              onChangeVal && onChangeVal(event.target?.checked);
+              if (onChangeVal) onChangeVal(event.target?.checked);
             }}
             disabled={disabled}
             type="checkbox"
