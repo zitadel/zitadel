@@ -1243,6 +1243,13 @@ export type WithServiceConfig<T = {}> = T & {
 };
 
 export function createServerTransport(token: string, serviceConfig: ServiceConfig) {
+  const authorizationInterceptor: Interceptor = (next) => (req) => {
+    if (!req.header.get("Authorization")) {
+      req.header.set("Authorization", `Bearer ${token}`);
+    }
+    return next(req);
+  };
+
   const headerInterceptor: Interceptor = (next) => (req) => {
     // Apply headers from serviceConfig
     if (serviceConfig.instanceHost) {
@@ -1270,13 +1277,6 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
       });
     }
 
-    return next(req);
-  };
-
-  const authorizationInterceptor: Interceptor = (next) => (req) => {
-    if (!req.header.get("Authorization")) {
-      req.header.set("Authorization", `Bearer ${token}`);
-    }
     return next(req);
   };
 
