@@ -1,11 +1,10 @@
+import { createServiceForHost } from "@/lib/service";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { GET } from "./route";
 
 vi.mock("@/lib/service", () => ({
   createServiceForHost: vi.fn(),
 }));
-
-import { createServiceForHost } from "@/lib/service";
 
 describe("GET /ready", () => {
   const originalEnv = process.env;
