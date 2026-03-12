@@ -26,7 +26,7 @@ export async function registerNode(): Promise<LoggerProvider | null> {
       getNodeAutoInstrumentations({
         "@opentelemetry/instrumentation-http": {
           ignoreIncomingRequestHook: (req) =>
-            ["/healthy", "/_next/", "/favicon.ico", "/__nextjs", "/metrics"].some((p) => req.url?.includes(p)),
+            ["/healthy", "/ready", "/_next/", "/favicon.ico", "/__nextjs", "/metrics"].some((p) => req.url?.includes(p)),
         },
         "@opentelemetry/instrumentation-fs": { enabled: false },
         "@opentelemetry/instrumentation-winston": { disableLogSending: false },
