@@ -85,8 +85,6 @@ func getTransactions(t *testing.T) (rawTx *sql.Tx, v3SQLTx *v3_sql.Transaction) 
 //  4. the reducer function for the input event executes without errors
 //
 // Returns false if any of the above checks fails
-//
-//nolint:contextcheck // we use the [testing.T.Context] for all operations in this function, so we don't need to pass a separate context parameter
 func callReduce(t *testing.T, tx *sql.Tx, projection handler.Projection, event eventstore.Event) bool {
 	reducers := projection.Reducers()
 	aggregateReducerIdx := slices.IndexFunc(reducers, func(r handler.AggregateReducer) bool {

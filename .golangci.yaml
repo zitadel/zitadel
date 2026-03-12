@@ -94,6 +94,14 @@ linters:
       - common-false-positives
       - legacy
       - std-error-handling
+    rules:
+      - path: apps/docs/.*
+        linters:
+          - typecheck
+      - path: internal/query/projection/.*_relational_test\.go
+        linters:
+          - contextcheck
+        source: callReduce\(
     paths:
       - .artifacts
       - .backups
