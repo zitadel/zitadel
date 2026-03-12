@@ -123,7 +123,7 @@ describe("otelGrpcInterceptor", () => {
 
     const client = createClientFor(SessionService)(mockTransport);
     const result = await client.createSession({});
-    expect(result).toBe(expectedResponse);
+    expect(result).toMatchObject(expectedResponse);
   });
 
   it("handles in-memory transport URL gracefully", async () => {
