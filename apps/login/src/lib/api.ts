@@ -4,18 +4,15 @@ import { getLoginSystemUserId } from "./deployment";
 
 // The key token is only loaded once from disk per process.
 // If the file was loaded you need to restart the process to switch the key.
-let keyToken: Promise<string> | undefined;
+let keyToken: string | undefined;
 
 async function getTokenFromFile(): Promise<string> {
-  keyToken ??= readFile(process.env.SYSTEM_USER_PRIVATE_KEY_FILE, "binary");
-
-  try {
-    return await keyToken;
-  } catch (error) {
-    // if the file doesn't exist, don't cache it
-    keyToken = undefined;
-    throw error;
+  if (keyToken) {
+    return keyToken;
   }
+
+  keyToken = await readFile(process.env.SYSTEM_USER_PRIVATE_KEY_FILE, "binary");
+  return keyToken;
 }
 
 /**
