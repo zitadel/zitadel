@@ -240,9 +240,11 @@ func (s session) Delete(ctx context.Context, client database.QueryExecutor, cond
 	return 0, time.Time{}, database.NewMissingConditionError(s.IDColumn())
 }
 
-// deleteSingleSession deletes a single session matching the given condition, and returns the number of rows affected and the deleted_at timestamp.
+// deleteSingleSession deletes a single session matching the given condition, then asserts the permissionCondition,
+// and returns the number of rows affected and the deleted_at timestamp.
 // In case the session was already deleted, it returns 1 row affected and the deleted_at timestamp from the sessions_deleted table, without an error.
 // If no session matches the condition, it returns 0 rows affected and a zero time, without an error.
+// In case the permission condition is not met, typically an error is returned (depending on the implementation of the permission check provided), and no session is deleted.
 func (s session) deleteSingleSession(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error) {
 	var builder database.StatementBuilder
 	builder.WriteString("WITH sessions AS ( SELECT instance_id, id, token_id, user_id, now() as deleted_at FROM zitadel.sessions")
@@ -256,7 +258,7 @@ func (s session) deleteSingleSession(ctx context.Context, client database.QueryE
 	var deletedAt time.Time
 	var deletedSessions int64
 	if err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&deletedAt, &deletedSessions); err != nil {
-		// If no row was deleted, we return 0 rows affected and a zero time, without an error.
+		// If the criteria did not match any session, ignore the error since the user would have had the permission to delete the session,
 		if errors.Is(err, new(database.NoRowFoundError)) {
 			return 0, time.Time{}, nil
 		}

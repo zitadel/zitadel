@@ -8,7 +8,6 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -102,6 +101,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 	type res struct {
 		error     error
 		deletedAt bool
+		events    int
 	}
 	tt := []struct {
 		testName string
@@ -296,6 +296,32 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			},
 			res: res{
 				deletedAt: true,
+				events:    1,
+			},
+		},
+		{
+			testName: "when session already deleted should execute successfully, set DeletedAt but no event",
+			args: args{
+				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+					repo := domainmock.NewSessionRepo(ctrl)
+					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
+
+					repo.EXPECT().
+						Delete(gomock.Any(), gomock.Any(),
+							repo.PrimaryKeyCondition("inst-1", "session-1"),
+							nil,
+						).
+						Times(1).
+						Return(int64(0), time.Now(), nil)
+					return repo
+				},
+			},
+			fields: fields{
+				sessionID: "session-1",
+			},
+			res: res{
+				deletedAt: true,
+				events:    0,
 			},
 		},
 	}
@@ -323,6 +349,11 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			// Verify
 			assert.ErrorIs(t, err, tc.res.error)
 			assert.Equal(t, tc.res.deletedAt, !cmd.DeletedAt.IsZero())
+
+			// Test events
+			cmds, err := cmd.Events(ctx, opts)
+			assert.NoError(t, err)
+			assert.Len(t, cmds, tc.res.events)
 		})
 	}
 }
@@ -335,56 +366,5 @@ func mockSessionTokenDecryptor(expectedSessionToken, returnSessionID, returnSess
 			}
 			return returnSessionID, returnSessionToken, nil
 		}
-	}
-}
-
-func TestDeleteSessionCommand_Events(t *testing.T) {
-	t.Parallel()
-	ctx := authz.NewMockContext("inst-1", "org-1", gofakeit.UUID())
-
-	tt := []struct {
-		testName      string
-		mockTx        func(ctrl *gomock.Controller) database.QueryExecutor
-		command       *domain.DeleteSessionCommand
-		expectedError error
-		expectedCount int
-	}{
-		{
-			testName: "should create session removed event",
-			command: &domain.DeleteSessionCommand{
-				ID:        "session-1",
-				DeletedAt: time.Now(),
-			},
-			expectedCount: 1,
-		},
-		{
-			testName: "should not create session removed event",
-			command: &domain.DeleteSessionCommand{
-				ID: "session-1",
-			},
-			expectedCount: 0,
-		},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.testName, func(t *testing.T) {
-			t.Parallel()
-
-			// Given
-			ctrl := gomock.NewController(t)
-			opts := &domain.InvokeOpts{}
-			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
-
-			if tc.mockTx != nil {
-				domain.WithQueryExecutor(tc.mockTx(ctrl))(opts)
-			}
-
-			// Test
-			cmds, err := tc.command.Events(ctx, opts)
-
-			// Verify
-			require.Equal(t, tc.expectedError, err)
-			assert.Len(t, cmds, tc.expectedCount)
-		})
 	}
 }

@@ -21,6 +21,8 @@ type DeleteSessionCommand struct {
 
 	// DeletedAt is set after successful execution.
 	DeletedAt time.Time `json:"deletedAt,omitempty"`
+	// deletedRows is set after successful execution, used to determine if the session was deleted or not.
+	deletedRows int64
 }
 
 func NewDeleteSessionCommand(
@@ -40,7 +42,7 @@ func (cmd *DeleteSessionCommand) RequiresTransaction() {}
 
 // Events implements [Commander].
 func (cmd *DeleteSessionCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
-	if cmd.DeletedAt.IsZero() {
+	if cmd.deletedRows == 0 {
 		return nil, nil
 	}
 	return []eventstore.Command{
@@ -103,6 +105,7 @@ func (cmd *DeleteSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 	}
 
 	cmd.DeletedAt = deletedAt
+	cmd.deletedRows = deletedRows
 	return nil
 }
 

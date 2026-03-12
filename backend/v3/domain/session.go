@@ -42,7 +42,10 @@ type SessionRepository interface {
 	// The condition must include at least the instanceID of the session to update.
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	// Delete removes sessions based on the given condition.
-	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permission database.Condition) (int64, time.Time, error)
+	// An additional permission condition can be provided to check if the session can be deleted, for example by checking the token id or user id.
+	// The primary condition is used to select the session(s) to be deleted, while the permission condition can be used to verify that the session(s) meet certain criteria before deletion
+	// respectively to return an error if the criteria are not met.
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error)
 }
 
 // sessionColumns define all the columns of the session table.
