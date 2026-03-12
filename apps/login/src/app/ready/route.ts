@@ -10,7 +10,7 @@ export async function GET() {
   if (!process.env.ZITADEL_API_URL) {
     return new NextResponse("Service unavailable", {
       status: 503,
-      headers: { "Content-Type": "text/plain" },
+      headers: { "Content-Type": "text/plain", "Cache-Control": "no-store" },
     });
   }
 
@@ -21,13 +21,13 @@ export async function GET() {
     await settingsService.getGeneralSettings({});
     return new NextResponse("OK", {
       status: 200,
-      headers: { "Content-Type": "text/plain" },
+      headers: { "Content-Type": "text/plain", "Cache-Control": "no-store" },
     });
   } catch (e) {
     logger.error("Readiness check failed", { error: e });
     return new NextResponse("Service unavailable", {
       status: 503,
-      headers: { "Content-Type": "text/plain" },
+      headers: { "Content-Type": "text/plain", "Cache-Control": "no-store" },
     });
   }
 }

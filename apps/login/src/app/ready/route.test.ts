@@ -11,15 +11,19 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 describe("GET /ready", () => {
-  const originalEnv = process.env;
+  let savedApiUrl: string | undefined;
 
   beforeEach(() => {
-    process.env = { ...originalEnv };
+    savedApiUrl = process.env.ZITADEL_API_URL;
     process.env.ZITADEL_API_URL = "http://localhost:8080";
   });
 
   afterEach(() => {
-    process.env = originalEnv;
+    if (savedApiUrl === undefined) {
+      delete process.env.ZITADEL_API_URL;
+    } else {
+      process.env.ZITADEL_API_URL = savedApiUrl;
+    }
     vi.restoreAllMocks();
   });
 
@@ -58,7 +62,7 @@ describe("GET /ready", () => {
   });
 
   test("should return 503 when ZITADEL_API_URL is not set", async () => {
-    process.env.ZITADEL_API_URL = undefined as any;
+    delete process.env.ZITADEL_API_URL;
 
     const response = await GET();
 
