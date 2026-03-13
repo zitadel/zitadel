@@ -408,7 +408,6 @@ func successfulIntentHandler(cmd *command.Commands, createIntent func(ctx contex
 			return
 		}
 		w.Write(data)
-		return
 	}
 }
 
@@ -499,6 +498,9 @@ func createSuccessfulAzureADIntent(ctx context.Context, cmd *command.Commands, r
 func createSuccessfulOIDCIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
 	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
 	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
+	if err != nil {
+		return nil, err
+	}
 	idpUser := openid.NewUser(
 		&oidc.UserInfo{
 			Subject: req.IDPUserID,
@@ -535,7 +537,9 @@ func createSuccessfulSAMLIntent(ctx context.Context, cmd *command.Commands, req 
 		intentID, _ = createIntent(ctx, cmd, req.InstanceID, req.IDPID)
 	}
 	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
-
+	if err != nil {
+		return nil, err
+	}
 	idpUser := &saml.UserMapper{
 		ID:         req.IDPUserID,
 		Attributes: map[string][]string{"attribute1": {"value1"}},
@@ -564,6 +568,9 @@ func createSuccessfulSAMLIntent(ctx context.Context, cmd *command.Commands, req 
 func createSuccessfulLDAPIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
 	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
 	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
+	if err != nil {
+		return nil, err
+	}
 	username := "username"
 	lang := language.Make("en")
 	idpUser := ldap.NewUser(
@@ -603,6 +610,9 @@ func createSuccessfulLDAPIntent(ctx context.Context, cmd *command.Commands, req 
 func createSuccessfulJWTIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
 	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
 	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
+	if err != nil {
+		return nil, err
+	}
 	idpUser := &jwt.User{
 		IDTokenClaims: &oidc.IDTokenClaims{
 			TokenClaims: oidc.TokenClaims{

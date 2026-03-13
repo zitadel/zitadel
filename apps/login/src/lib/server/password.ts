@@ -293,7 +293,7 @@ export async function sendPassword(
           return {
             error: t(messageKey, {
               failedAttempts: error.failedAttempts,
-              maxPasswordAttempts: hasLimit ? (lockoutSettings?.maxPasswordAttempts).toString() : "?",
+              maxPasswordAttempts: hasLimit ? String(lockoutSettings?.maxPasswordAttempts ?? 0) : "?",
               lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
             }),
           };
@@ -565,7 +565,7 @@ export async function checkSessionAndSetPassword({
       return {
         error: t(messageKey, {
           failedAttempts: error.failedAttempts,
-          maxPasswordAttempts: hasLimit ? (lockoutSettings?.maxPasswordAttempts).toString() : "?",
+          maxPasswordAttempts: hasLimit ? String(lockoutSettings?.maxPasswordAttempts ?? 0) : "?",
           lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
         }),
       };

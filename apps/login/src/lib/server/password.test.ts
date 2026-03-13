@@ -317,7 +317,6 @@ describe("sendPassword", () => {
     const { completeFlowOrGetUrl } = await import("../client");
     vi.mocked(completeFlowOrGetUrl).mockResolvedValue({ redirect: "https://example.com" });
 
-    // eslint-disable-next-line
     const verifyHelper = await import("../verify-helper");
     vi.mocked(verifyHelper.checkPasswordChangeRequired).mockReturnValue(undefined);
     vi.mocked(verifyHelper.checkEmailVerification).mockReturnValue(undefined);
