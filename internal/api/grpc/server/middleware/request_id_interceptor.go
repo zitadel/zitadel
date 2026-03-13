@@ -8,7 +8,6 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
-	"github.com/zitadel/zitadel/internal/api/call"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
@@ -17,7 +16,9 @@ import (
 // It depends on [CallDurationHandler] to set the request start time in the context.
 func RequestIDHandler() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		reqCtx, id := instrumentation.NewRequestID(ctx, call.FromContext(ctx))
+		domainCtx := http_util.DomainContext(ctx)
+		reqCtx := instrumentation.WithRequestDetails(ctx, domainCtx.InstanceHost, domainCtx.PublicHost)
+		id := instrumentation.GetRequestID(reqCtx)
 		md := metadata.New(map[string]string{http_util.XRequestID: id.String()})
 
 		err := grpc.SetHeader(reqCtx, md)

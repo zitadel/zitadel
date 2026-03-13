@@ -60,8 +60,8 @@ func TestRequestIDHandler_Connect(t *testing.T) {
 			// Create a mock handler
 			var capturedID string
 			handler := func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-				id, ok := instrumentation.GetRequestID(ctx)
-				require.True(t, ok, "Request ID should be present in context")
+				id := instrumentation.GetRequestID(ctx)
+				require.False(t, id.IsNil(), "Request ID should be present in context")
 				capturedID = id.String()
 
 				if tt.hasError {
@@ -116,8 +116,8 @@ func TestRequestIDHandler_Connect_Stability(t *testing.T) {
 
 	var capturedID string
 	handler := func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-		id, ok := instrumentation.GetRequestID(ctx)
-		require.True(t, ok, "Request ID should be present in context")
+		id := instrumentation.GetRequestID(ctx)
+		require.False(t, id.IsNil(), "Request ID should be present in context")
 		capturedID = id.String()
 		resp := &connect.Response[struct{}]{}
 		return resp, nil

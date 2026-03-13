@@ -51,9 +51,8 @@ func TestRequestIDHandler(t *testing.T) {
 			// Create test handler that returns the specified status
 			handler := RequestIDHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Verify request ID is in context
-				requestID, ok := instrumentation.GetRequestID(r.Context())
-				assert.True(t, ok, "Request ID should be present in context")
-				assert.NotEmpty(t, requestID.String(), "Request ID should be set in context")
+				requestID := instrumentation.GetRequestID(r.Context())
+				assert.False(t, requestID.IsNil(), "Request ID should be present in context")
 
 				w.WriteHeader(tt.status)
 			}))
@@ -83,8 +82,8 @@ func TestRequestIDHandler_Stability(t *testing.T) {
 
 	var capturedID string
 	handler := RequestIDHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, ok := instrumentation.GetRequestID(r.Context())
-		require.True(t, ok, "Request ID should be present in context")
+		id := instrumentation.GetRequestID(r.Context())
+		require.False(t, id.IsNil(), "Request ID should be present in context")
 		capturedID = id.String()
 	}))
 

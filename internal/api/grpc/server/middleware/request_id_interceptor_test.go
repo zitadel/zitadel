@@ -52,8 +52,8 @@ func TestRequestIDHandler_gRPC(t *testing.T) {
 			// Create a handler that captures the request ID from context
 			var capturedID string
 			handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-				id, ok := instrumentation.GetRequestID(ctx)
-				require.True(t, ok, "Request ID should be present in context")
+				id := instrumentation.GetRequestID(ctx)
+				require.False(t, id.IsNil(), "Request ID should be present in context")
 				capturedID = id.String()
 				return tt.handler(ctx, req)
 			}

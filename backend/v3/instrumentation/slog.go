@@ -9,7 +9,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/rs/xid"
 	slogmulti "github.com/samber/slog-multi"
 	slogctx "github.com/veqryn/slog-context"
 	slogotel "github.com/veqryn/slog-context/otel"
@@ -158,9 +157,9 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 		stdErrHandler,
 		&slogctx.HandlerOptions{
 			Prependers: []slogctx.AttrExtractor{
-				instanceExtractor,
 				requestIDExtractor,
 				causeExtractor,
+				requestDetailsExtractor,
 				slogotel.ExtractTraceSpanID,
 				slogctx.ExtractPrepended,
 			},
@@ -177,57 +176,11 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	slog.SetDefault(logger)
 }
 
-const (
-	ProtocolHttp    = "http"
-	ProtocolConnect = "connect"
-	ProtocolGrpc    = "grpc"
-)
-
-// Instance is a minimal interface for logging the instance ID.
-type Instance interface {
-	InstanceID() string
-}
-
-// SetInstance adds the instance to the context for logging.
-func SetInstance(ctx context.Context, instance Instance) context.Context {
-	return context.WithValue(ctx, ctxKeyInstance, instance)
-}
-
-// NewRequestID generates a new [xid.ID] based on the passed request timestamp
-// and adds it to the context.
-func NewRequestID(ctx context.Context, ts time.Time) (context.Context, xid.ID) {
-	id := xid.NewWithTime(ts)
-	return context.WithValue(ctx, ctxKeyRequestID, id), id
-}
-
-// GetRequestID retrieves the request ID from the context.
-func GetRequestID(ctx context.Context) (xid.ID, bool) {
-	id, ok := ctx.Value(ctxKeyRequestID).(xid.ID)
-	return id, ok
-}
-
-type ctxKeyType int
-
-const (
-	ctxKeyRequestID ctxKeyType = iota
-	ctxKeyInstance
-)
-
-// instanceExtractor sets the instance ID from [Instance] to a log entry.
-func instanceExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
-	if instance, ok := ctx.Value(ctxKeyInstance).(Instance); ok {
-		return []slog.Attr{
-			slog.String("instance", instance.InstanceID()),
-		}
-	}
-	return nil
-}
-
 // requestIDExtractor sets the request XID to a log entry.
 func requestIDExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
-	if r, ok := GetRequestID(ctx); ok {
+	if id := GetRequestID(ctx); !id.IsNil() {
 		return []slog.Attr{
-			slog.String("request_id", r.String()),
+			slog.String("request_id", id.String()),
 		}
 	}
 	return nil
