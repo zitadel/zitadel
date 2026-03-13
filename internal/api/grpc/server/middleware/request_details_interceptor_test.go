@@ -14,7 +14,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
-func TestRequestIDHandler_gRPC(t *testing.T) {
+func TestRequestDetailsHandler_gRPC(t *testing.T) {
 	tests := []struct {
 		name         string
 		setupContext bool
@@ -58,7 +58,7 @@ func TestRequestIDHandler_gRPC(t *testing.T) {
 				return tt.handler(ctx, req)
 			}
 
-			interceptor := RequestIDHandler()
+			interceptor := RequestDetailsHandler()
 			_, err := interceptor(ctx, &mockReq{}, mockInfo("/test"), handler)
 
 			if tt.wantErr {
@@ -73,7 +73,7 @@ func TestRequestIDHandler_gRPC(t *testing.T) {
 	}
 }
 
-func TestRequestIDHandler_gRPC_HeaderSet(t *testing.T) {
+func TestRequestDetailsHandler_gRPC_HeaderSet(t *testing.T) {
 	// Test that the request ID is set in response header
 	// This is verified indirectly through SetHeader call
 	// We can't directly test the metadata since it requires a real gRPC context
@@ -91,7 +91,7 @@ func TestRequestIDHandler_gRPC_HeaderSet(t *testing.T) {
 		return req, nil
 	}
 
-	interceptor := RequestIDHandler()
+	interceptor := RequestDetailsHandler()
 	_, err := interceptor(ctx, &mockReq{}, mockInfo("/test"), handler)
 	require.NoError(t, err)
 }

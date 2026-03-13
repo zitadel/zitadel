@@ -14,7 +14,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
-func TestRequestIDHandler(t *testing.T) {
+func TestRequestDetailsHandler(t *testing.T) {
 	tests := []struct {
 		name         string
 		setupContext bool
@@ -49,7 +49,7 @@ func TestRequestIDHandler(t *testing.T) {
 			rec := httptest.NewRecorder()
 
 			// Create test handler that returns the specified status
-			handler := RequestIDHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			handler := RequestDetailsHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Verify request ID is in context
 				requestID := instrumentation.GetRequestID(r.Context())
 				assert.False(t, requestID.IsNil(), "Request ID should be present in context")
@@ -74,14 +74,14 @@ func TestRequestIDHandler(t *testing.T) {
 	}
 }
 
-func TestRequestIDHandler_Stability(t *testing.T) {
+func TestRequestDetailsHandler_Stability(t *testing.T) {
 	// Test that the same request gets consistent request ID
 	req := httptest.NewRequest(http.MethodGet, "/test", nil)
 	req = req.WithContext(call.WithTimestamp(req.Context()))
 	rec := httptest.NewRecorder()
 
 	var capturedID string
-	handler := RequestIDHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := RequestDetailsHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id := instrumentation.GetRequestID(r.Context())
 		require.False(t, id.IsNil(), "Request ID should be present in context")
 		capturedID = id.String()

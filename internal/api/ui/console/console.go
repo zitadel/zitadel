@@ -116,7 +116,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 	env := handler.NewRoute().Path(envRequestPath).Subrouter()
 	env.Use(
 		callDurationInterceptor,
-		middleware.RequestIDHandler(),
+		middleware.RequestDetailsHandler(),
 		middleware.TraceHandler(),
 		middleware.LogHandler("console"),
 		instanceHandler,

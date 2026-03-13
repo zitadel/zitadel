@@ -16,7 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestRequestIDHandler_Connect(t *testing.T) {
+func TestRequestDetailsHandler_Connect(t *testing.T) {
 	tests := []struct {
 		name         string
 		setupContext bool
@@ -72,7 +72,7 @@ func TestRequestIDHandler_Connect(t *testing.T) {
 				return resp, nil
 			}
 
-			interceptor := RequestIDHandler()
+			interceptor := RequestDetailsHandler()
 			unaryFunc := interceptor(handler)
 			resp, err := unaryFunc(ctx, req)
 
@@ -106,7 +106,7 @@ func TestRequestIDHandler_Connect(t *testing.T) {
 	}
 }
 
-func TestRequestIDHandler_Connect_Stability(t *testing.T) {
+func TestRequestDetailsHandler_Connect_Stability(t *testing.T) {
 	// Test that the same request gets consistent request ID
 	ctx := call.WithTimestamp(context.Background())
 	req := &mockReq[struct{}]{
@@ -123,7 +123,7 @@ func TestRequestIDHandler_Connect_Stability(t *testing.T) {
 		return resp, nil
 	}
 
-	interceptor := RequestIDHandler()
+	interceptor := RequestDetailsHandler()
 	unaryFunc := interceptor(handler)
 	resp, err := unaryFunc(ctx, req)
 

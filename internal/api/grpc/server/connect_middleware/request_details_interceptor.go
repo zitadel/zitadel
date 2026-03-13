@@ -10,10 +10,10 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
-// RequestIDHandler is a connect interceptor that sets a request ID in the context
-// and adds it to the response headers.
+// RequestDetailsHandler is a connect interceptor that sets request details in the context
+// and adds the ID to the response headers.
 // It depends on [CallDurationHandler] to set the request start time in the context.
-func RequestIDHandler() connect.UnaryInterceptorFunc {
+func RequestDetailsHandler() connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
 			domainCtx := http_util.DomainContext(ctx)

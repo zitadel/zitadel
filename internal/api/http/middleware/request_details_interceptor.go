@@ -7,10 +7,10 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
-// RequestIDHandler is a HTTP middleware that sets a request ID in the context
-// and adds it to the response headers.
+// RequestDetailsHandler is a HTTP middleware that sets a request ID in the context
+// and adds the ID to the response headers.
 // It depends on [CallDurationHandler] to set the request start time in the context.
-func RequestIDHandler() func(http.Handler) http.Handler {
+func RequestDetailsHandler() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			domainCtx := http_util.DomainContext(r.Context())

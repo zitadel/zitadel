@@ -11,10 +11,10 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
-// RequestIDHandler is a gRPC interceptor that sets a request ID in the context
-// and adds it to the response headers.
+// RequestDetailsHandler is a gRPC interceptor that sets a request ID in the context
+// and adds the ID to the response headers.
 // It depends on [CallDurationHandler] to set the request start time in the context.
-func RequestIDHandler() grpc.UnaryServerInterceptor {
+func RequestDetailsHandler() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		domainCtx := http_util.DomainContext(ctx)
 		reqCtx := instrumentation.WithRequestDetails(ctx, domainCtx.InstanceHost, domainCtx.PublicHost)

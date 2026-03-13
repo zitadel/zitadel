@@ -217,7 +217,7 @@ func CreateLogin(
 
 	login.router = CreateRouter(login,
 		middleware.CallDurationHandler,
-		middleware.RequestIDHandler(),
+		middleware.RequestDetailsHandler(),
 		middleware.TraceHandler(IgnoreInstanceEndpoints...),
 		middleware.LogHandler("login_v1", IgnoreInstanceEndpoints...),
 		oidcInstanceHandler,

@@ -184,7 +184,7 @@ func NewServer(
 		op.WithFallbackLogger(fallbackLogger),
 		op.WithHTTPMiddleware(
 			middleware.CallDurationHandler,
-			middleware.RequestIDHandler(),
+			middleware.RequestDetailsHandler(),
 			middleware.MetricsHandler(metricTypes),
 			middleware.TraceHandler(),
 			middleware.LogHandler("oidc"),

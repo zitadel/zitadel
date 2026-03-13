@@ -15,7 +15,7 @@ import (
 
 // LogHandler is a connect interceptor that logs the request details
 // including protocol, domain, service, HTTP method, path, response code, and duration.
-// It depends on [CallDurationHandler] and [RequestIDHandler] to set the request start time and ID in the context.
+// It depends on [CallDurationHandler] and [RequestDetailsHandler] to set the request start time and ID in the context.
 func LogHandler(ignoredMethodSuffixes ...string) connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {

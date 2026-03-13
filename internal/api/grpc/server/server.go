@@ -72,7 +72,7 @@ func CreateServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.CallDurationHandler(),
-				middleware.RequestIDHandler(),
+				middleware.RequestDetailsHandler(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.LogHandler(grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),

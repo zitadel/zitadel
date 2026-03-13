@@ -18,7 +18,7 @@ import (
 
 // LogHandler is a gRPC interceptor that logs the request details
 // including protocol, domain, service, HTTP method, path, response code, and duration.
-// It depends on [CallDurationHandler] and [RequestIDHandler] to set the request start time and ID in the context.
+// It depends on [CallDurationHandler] and [RequestDetailsHandler] to set the request start time and ID in the context.
 func LogHandler(ignoredMethodSuffixes ...string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, next grpc.UnaryHandler) (any, error) {
 		if slices.ContainsFunc(ignoredMethodSuffixes, func(s string) bool {

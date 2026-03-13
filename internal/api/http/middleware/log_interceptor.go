@@ -12,7 +12,7 @@ import (
 
 // LogHandler is an HTTP middleware that logs the request details
 // including protocol, domain, service, HTTP method, path, response code, and duration.
-// It depends on [CallDurationHandler] and [RequestIDHandler] to set the request start time and ID in the context.
+// It depends on [CallDurationHandler] and [RequestDetailsHandler] to set the request start time and ID in the context.
 func LogHandler(service string, ignoredPrefix ...string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		filter := instrumentation.RequestFilter(ignoredPrefix...)
