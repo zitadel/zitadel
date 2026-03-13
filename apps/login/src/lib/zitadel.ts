@@ -1237,20 +1237,18 @@ export interface ServiceConfig {
 /**
  * Base type that all function parameters must extend to ensure serviceConfig is always required
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type WithServiceConfig<T = {}> = T & {
   serviceConfig: ServiceConfig;
 };
 
 export function createServerTransport(token: string, serviceConfig: ServiceConfig) {
   // Build interceptors list - OTEL interceptor is always included for trace propagation
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const interceptors: any[] = [otelGrpcInterceptor];
 
   // Add custom headers interceptor if needed
   if (process.env.CUSTOM_REQUEST_HEADERS || serviceConfig.instanceHost || serviceConfig.publicHost) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     interceptors.push((next: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return (req: any) => {
         // Apply headers from serviceConfig
         if (serviceConfig.instanceHost) {

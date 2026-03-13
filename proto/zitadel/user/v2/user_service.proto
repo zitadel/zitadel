@@ -3219,15 +3219,43 @@ message RetrieveIdentityProviderIntentRequest{
 
 message RetrieveIdentityProviderIntentResponse{
   zitadel.object.v2.Details details = 1;
-  IDPInformation idp_information = 2;
+  IDPInformation idp_information = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Information about the user returned by the external identity provider"
+    }
+  ];
   string user_id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "ID of the user in Zitadel if external user is linked"
       example: "\"163840776835432345\"";
     }
   ];
-  AddHumanUserRequest add_human_user = 4;
-  UpdateHumanUserRequest update_human_user = 5;
+  // Deprecated: use user_action.create_user instead.
+  AddHumanUserRequest add_human_user = 4 [
+    deprecated = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Information to create a new human user with the IDP information. This field is deprecated, use create_user instead.";
+    }
+  ];
+  // Deprecated: use user_action.update_user instead.
+  UpdateHumanUserRequest update_human_user = 5 [
+    deprecated = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Information to update an existing human user with the IDP information. This field is deprecated, use update_user instead.";
+    }
+  ];
+  oneof user_action {
+    CreateUserRequest create_user = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Information to create a new human user with the IDP information.";
+      }
+    ];
+    UpdateUserRequest update_user = 7 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Information to update an existing human user with the IDP information.";
+      }
+    ];
+  }
 }
 
 message AddIDPLinkRequest{
