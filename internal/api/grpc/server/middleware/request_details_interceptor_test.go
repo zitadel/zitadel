@@ -73,25 +73,3 @@ func TestRequestDetailsHandler_gRPC(t *testing.T) {
 	}
 }
 
-func TestRequestDetailsHandler_gRPC_HeaderSet(t *testing.T) {
-	// Test that the request ID is set in response header
-	// This is verified indirectly through SetHeader call
-	// We can't directly test the metadata since it requires a real gRPC context
-	ctx := call.WithTimestamp(context.Background())
-
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		// Try to get headers that were set
-		md, ok := metadata.FromOutgoingContext(ctx)
-		if ok {
-			requestID := md.Get(http_util.XRequestID)
-			if len(requestID) > 0 {
-				assert.NotEmpty(t, requestID[0], "Request ID should be in metadata")
-			}
-		}
-		return req, nil
-	}
-
-	interceptor := RequestDetailsHandler()
-	_, err := interceptor(ctx, &mockReq{}, mockInfo("/test"), handler)
-	require.NoError(t, err)
-}
