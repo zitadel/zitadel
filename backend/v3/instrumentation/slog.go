@@ -157,7 +157,6 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 		stdErrHandler,
 		&slogctx.HandlerOptions{
 			Prependers: []slogctx.AttrExtractor{
-				requestIDExtractor,
 				causeExtractor,
 				requestDetailsExtractor,
 				slogotel.ExtractTraceSpanID,
@@ -174,16 +173,6 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	logger := slog.New(slogmulti.Fanout(stdErrHandler, otelHandler))
 	logger.Info("structured logger configured", "config_level", cfg.Level, "format", cfg.Format)
 	slog.SetDefault(logger)
-}
-
-// requestIDExtractor sets the request XID to a log entry.
-func requestIDExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
-	if id := GetRequestID(ctx); !id.IsNil() {
-		return []slog.Attr{
-			slog.String("request_id", id.String()),
-		}
-	}
-	return nil
 }
 
 // causeExtractor sets the cause of a canceled context to a log entry.
