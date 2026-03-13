@@ -13,7 +13,6 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/api/call"
-	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
 // LogHandler is a gRPC interceptor that logs the request details
@@ -35,7 +34,6 @@ func LogHandler(ignoredMethodSuffixes ...string) grpc.UnaryServerInterceptor {
 		}
 		logging.Info(ctx, "request served",
 			slog.String("protocol", "grpc"),
-			slog.Any("domain", http_util.DomainContext(ctx)),
 			slog.String("service", serviceFromRPCMethod(info.FullMethod)),
 			slog.String("http_method", http.MethodPost), // gRPC always uses POST
 			slog.String("path", info.FullMethod),

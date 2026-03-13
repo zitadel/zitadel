@@ -10,7 +10,6 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/api/call"
-	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
 // LogHandler is a connect interceptor that logs the request details
@@ -34,7 +33,6 @@ func LogHandler(ignoredMethodSuffixes ...string) connect.UnaryInterceptorFunc {
 			spec := req.Spec()
 			logging.Info(ctx, "request served",
 				slog.String("protocol", "connect"),
-				slog.Any("domain", http_util.DomainContext(ctx)),
 				slog.String("service", serviceFromRPCMethod(spec.Procedure)),
 				slog.String("http_method", req.HTTPMethod()),
 				slog.String("path", spec.Procedure),
