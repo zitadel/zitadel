@@ -5,7 +5,7 @@ import { sendLoginname } from "@/lib/server/loginname";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
@@ -55,34 +55,37 @@ export function UsernameForm({
   const [error, setError] = useState<string>("");
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
-  async function submitLoginName(values: Inputs, organization?: string) {
-    setLoading(true);
+  const submitLoginName = useCallback(
+    async (values: Inputs, organization?: string) => {
+      setLoading(true);
 
-    try {
-      const res = await sendLoginname({
-        loginName: values.loginName,
-        organization,
-        defaultOrganization,
-        requestId,
-        suffix,
-        ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
-      });
+      try {
+        const res = await sendLoginname({
+          loginName: values.loginName,
+          organization,
+          defaultOrganization,
+          requestId,
+          suffix,
+          ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
+        });
 
-      handleServerActionResponse(res, router, setSamlData, setError);
-      return res;
-    } catch {
-      setError(t("errors.internalError"));
-    } finally {
-      setLoading(false);
-    }
-  }
+        handleServerActionResponse(res, router, setSamlData, setError);
+        return res;
+      } catch {
+        setError(t("errors.internalError"));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [defaultOrganization, requestId, suffix, loginSettings, router, t],
+  );
 
   useEffect(() => {
     if (submit && loginName) {
       // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
       submitLoginName({ loginName }, organization);
     }
-  }, []);
+  }, [submit, loginName, organization, submitLoginName]);
 
   let inputLabel = t("labels.loginname");
   if (loginSettings?.disableLoginWithEmail && loginSettings?.disableLoginWithPhone) {

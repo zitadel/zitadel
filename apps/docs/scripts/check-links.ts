@@ -10,7 +10,6 @@ register('fumadocs-mdx/node/loader', import.meta.url);
 import {
   type FileObject,
   printErrors,
-  scanURLs,
   validateFiles,
 } from 'next-validate-link';
 
