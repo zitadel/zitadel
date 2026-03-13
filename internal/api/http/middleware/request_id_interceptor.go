@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
-	"github.com/zitadel/zitadel/internal/api/call"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
@@ -14,7 +13,9 @@ import (
 func RequestIDHandler() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx, id := instrumentation.NewRequestID(r.Context(), call.FromContext(r.Context()))
+			domainCtx := http_util.DomainContext(r.Context())
+			ctx := instrumentation.WithRequestDetails(r.Context(), domainCtx.InstanceHost, domainCtx.PublicHost)
+			id := instrumentation.GetRequestID(ctx)
 			w.Header().Set(http_util.XRequestID, id.String())
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

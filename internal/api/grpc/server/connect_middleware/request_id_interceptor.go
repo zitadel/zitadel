@@ -7,7 +7,6 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
-	"github.com/zitadel/zitadel/internal/api/call"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
@@ -17,7 +16,10 @@ import (
 func RequestIDHandler() connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			reqCtx, id := instrumentation.NewRequestID(ctx, call.FromContext(ctx))
+			domainCtx := http_util.DomainContext(ctx)
+			reqCtx := instrumentation.WithRequestDetails(ctx, domainCtx.InstanceHost, domainCtx.PublicHost)
+			id := instrumentation.GetRequestID(reqCtx)
+
 			resp, err := next(reqCtx, req)
 			if resp != nil {
 				resp.Header().Set(http_util.XRequestID, id.String())
