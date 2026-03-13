@@ -412,12 +412,11 @@ func TestCreateUser_scopedExternalID(t *testing.T) {
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(tt *assert.CollectT) {
 		// unscoped externalID should not exist
-		unscoped, err := Instance.Client.Mgmt.GetUserMetadata(ctx, &management.GetUserMetadataRequest{
+		_, err := Instance.Client.Mgmt.GetUserMetadata(ctx, &management.GetUserMetadataRequest{
 			Id:  createdUser.ID,
 			Key: "urn:zitadel:scim:externalId",
 		})
 		integration.AssertGrpcStatus(tt, codes.NotFound, err)
-		unscoped = unscoped
 
 		// scoped externalID should exist
 		md, err := Instance.Client.Mgmt.GetUserMetadata(ctx, &management.GetUserMetadataRequest{
@@ -478,12 +477,12 @@ func TestCreateUser_ignorePasswordOnCreate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			// create a machine user
+			// create a service account
 			callingUserId, callingUserPat, err := Instance.CreateMachineUserPATWithMembership(CTX, "ORG_OWNER")
 			require.NoError(t, err)
 			ctx := integration.WithAuthorizationToken(CTX, callingUserPat)
 
-			// set urn:zitadel:scim:ignorePasswordOnCreate metadata for the machine user
+			// set urn:zitadel:scim:ignorePasswordOnCreate metadata for the service account
 			setAndEnsureMetadata(t, callingUserId, "urn:zitadel:scim:ignorePasswordOnCreate", tt.ignorePassword)
 
 			// create a user with an invalid password

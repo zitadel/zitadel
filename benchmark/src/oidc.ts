@@ -71,6 +71,7 @@ export function introspect(jwt: string, token: string) {
   );
   check(res, {
     'introspect status ok': (r) => r.status >= 200 && r.status < 300,
+    'introspect active': (r) => r.json('active') === true,
   });
 
   introspectTrend.add(res.timings.duration);

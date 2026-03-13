@@ -103,7 +103,7 @@ func (w *Worker) reportBaseInformation(ctx context.Context) (string, error) {
 func (w *Worker) reportResourceCounts(ctx context.Context, reportID string) error {
 	lastID := 0
 	// iterate over the resource counts until there are no more counts to report
-	// or the context gets cancelled
+	// or the context gets canceled
 	for {
 		select {
 		case <-ctx.Done():

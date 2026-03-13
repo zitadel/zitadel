@@ -10,7 +10,7 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: () => import('./pages/home/home.module'),
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['.'],
     },

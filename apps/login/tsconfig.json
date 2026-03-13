@@ -38,6 +38,8 @@
   "exclude": [
     "node_modules",
     "integration",
-    "acceptance"
+    "acceptance",
+    "dockerized",
+    "vitest.config*.ts"
   ]
 }

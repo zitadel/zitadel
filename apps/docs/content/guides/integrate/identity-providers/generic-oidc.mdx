@@ -1,5 +1,6 @@
 ---
 title: Configure a Generic OIDC Identity Provider in ZITADEL
+description: "Configure a generic OpenID Connect (OIDC) Identity Provider in ZITADEL to enable user authentication with external credentials."
 sidebar_label: Generic OIDC
 id: generic-oidc
 ---
@@ -19,7 +20,7 @@ import TestSetup from './_test_setup.mdx';
 <IDPsOverview components={props.components} templates="Generic OIDC"/>
 
 Click on the ZITADEL Callback URL to copy it to your clipboard.
-You will have to paste this URL in your external OIDC provider's application configuration later.
+You will have to paste this URL in your external OIDC provider's application settings later.
 
 ![Generic OIDC Provider](../../../../public/img/guides/zitadel_generic_oidc_create_provider.png)
 
@@ -36,7 +37,7 @@ You will have to paste this URL in your external OIDC provider's application con
 
 > The exact steps and terminology may vary for each provider. Refer to your provider's documentation if you don't see these options.
 
-## ZITADEL Configuration
+## ZITADEL Setup
 
 1. Return to [the Generic OIDC Provider template in ZITADEL](#open-the-generic-oidc-provider-template).
 2. Enter the **Client ID** and **Client Secret** from your OIDC provider's application.

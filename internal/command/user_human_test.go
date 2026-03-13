@@ -45,7 +45,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		newCode                     encrypedCodeFunc
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		defaultSecretGenerators     *SecretGenerators
-		defaultEmailCodeURLTemplate func(ctx context.Context) string
+		loginPaths                  func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx             context.Context
@@ -73,6 +73,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			name: "orgid missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -97,6 +98,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			name: "user invalid, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -123,6 +125,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -155,6 +158,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -196,6 +200,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -264,6 +269,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -333,6 +339,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -403,6 +410,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -473,6 +481,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -541,11 +550,11 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordHasher:          mockPasswordHasher("x"),
-				codeAlg:                     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:                     mockEncryptedCode("userinit", time.Hour),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "" },
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:            mockEncryptedCode("userinit", time.Hour),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -600,7 +609,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "", AllowedLanguage),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -619,6 +628,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:            mockEncryptedCode("emailCode", time.Hour),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -674,7 +684,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "", AllowedLanguage),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -689,11 +699,11 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordHasher:          mockPasswordHasher("x"),
-				codeAlg:                     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:                     mockEncryptedCode("emailCode", time.Hour),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:            mockEncryptedCode("emailCode", time.Hour),
+				loginPaths:         expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -755,6 +765,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -819,6 +830,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -883,6 +895,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -947,6 +960,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1000,6 +1014,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1086,6 +1101,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1195,6 +1211,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				codeAlg:                     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phonecode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1262,6 +1279,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1371,6 +1389,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				codeAlg:                     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1441,6 +1460,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1481,7 +1501,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				newEncryptedCode:            tt.fields.newCode,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
-				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
+				loginPaths:                  tt.fields.loginPaths(t),
 			}
 			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail)
 			if tt.res.err == nil {

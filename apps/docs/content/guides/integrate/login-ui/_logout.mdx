@@ -3,15 +3,15 @@ When your user is done using your application and clicks on the logout button, y
 
 Sessions can be terminated by either:
 - the authenticated user
-- a manager, who is granted `session.delete` (e.g. ORG_OWNER) on the authenticated users organisation
+- an administrator, who is granted `session.delete` (e.g. ORG_OWNER) on the authenticated users organization
 - providing the current session_token in the body.
 
 Terminating a session means to delete it.
 If you try to read or update the session afterward, you will get an error that the Session does not exist or was terminated.
 
-### Request for authenticated users or managers
+### Request for authenticated users or administrators
 
-Make sure that the provided token is from the authenticated user, resp. the manager:
+Make sure that the provided token is from the authenticated user, resp. the administrator:
 
 ```bash
 curl --request DELETE \

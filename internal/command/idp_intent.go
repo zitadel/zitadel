@@ -27,7 +27,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, successURL, failureURL string, idpArguments map[string]any) preparation.Validation {
+func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, successURL, failureURL string, loginHint string, idpArguments map[string]any) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if idpID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.IDPMissing")
@@ -55,6 +55,7 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, s
 					successURL,
 					failureURL,
 					idpID,
+					loginHint,
 					idpArguments,
 				),
 			}, nil
@@ -62,7 +63,7 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, s
 	}
 }
 
-func (c *Commands) CreateIntent(ctx context.Context, intentID, idpID, successURL, failureURL, resourceOwner string, idpArguments map[string]any) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
+func (c *Commands) CreateIntent(ctx context.Context, intentID, idpID, successURL, failureURL, resourceOwner, loginHint string, idpArguments map[string]any) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
 	if intentID == "" {
 		var err error
 		intentID, err = c.idGenerator.Next()
@@ -73,7 +74,7 @@ func (c *Commands) CreateIntent(ctx context.Context, intentID, idpID, successURL
 	writeModel := NewIDPIntentWriteModel(intentID, resourceOwner, c.maxIdPIntentLifetime)
 
 	//nolint: staticcheck
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL, idpArguments))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL, loginHint, idpArguments))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -135,7 +136,7 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 	return intent, nil
 }
 
-func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, samlRootURL string) (state string, session idp.Session, err error) {
+func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, samlRootURL string, loginHint string) (state string, session idp.Session, err error) {
 	state, err = c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
@@ -144,7 +145,11 @@ func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, sam
 	if err != nil {
 		return "", nil, err
 	}
-	session, err = provider.BeginAuth(ctx, state)
+	var params []idp.Parameter
+	if loginHint != "" {
+		params = append(params, idp.LoginHintParam(loginHint))
+	}
+	session, err = provider.BeginAuth(ctx, state, params...)
 	return state, session, err
 }
 
@@ -165,7 +170,7 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	if err != nil {
 		return "", err
 	}
-	accessToken, idToken, err := tokensForSucceededIDPIntent(idpSession, c.idpConfigEncryption)
+	accessToken, refreshToken, idToken, err := tokensForSucceededIDPIntent(idpSession, c.idpConfigEncryption)
 	if err != nil {
 		return "", err
 	}
@@ -181,6 +186,7 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 		idpUser.GetPreferredUsername(),
 		userID,
 		accessToken,
+		refreshToken,
 		idToken,
 		idpSession.ExpiresAt(),
 	)
@@ -290,8 +296,9 @@ func (c *Commands) GetIntentWriteModel(ctx context.Context, id, resourceOwner st
 	return writeModel, err
 }
 
-// tokensForSucceededIDPIntent extracts the oidc.Tokens if available (and encrypts the access_token) for the succeeded event payload
-func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.EncryptionAlgorithm) (*crypto.CryptoValue, string, error) {
+// tokensForSucceededIDPIntent extracts the oidc.Tokens if available for the succeeded event payload.
+// It also encrypts the access token and refresh token (if set).
+func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.EncryptionAlgorithm) (*crypto.CryptoValue, *crypto.CryptoValue, string, error) {
 	var tokens *oidc.Tokens[*oidc.IDTokenClaims]
 	switch s := session.(type) {
 	case *oauth.Session:
@@ -307,11 +314,25 @@ func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.Encry
 	case *apple.Session:
 		tokens = s.Tokens
 	default:
-		return nil, "", nil
+		return nil, nil, "", nil
+	}
+	if tokens == nil {
+		return nil, nil, "", nil
 	}
 	if tokens.Token == nil || tokens.AccessToken == "" {
-		return nil, tokens.IDToken, nil
+		return nil, nil, tokens.IDToken, nil
 	}
 	accessToken, err := crypto.Encrypt([]byte(tokens.AccessToken), encryptionAlg)
-	return accessToken, tokens.IDToken, err
+	if err != nil {
+		return nil, nil, tokens.IDToken, err
+	}
+	var refreshToken *crypto.CryptoValue
+	if tokens.RefreshToken != "" {
+		refreshToken, err = crypto.Encrypt([]byte(tokens.RefreshToken), encryptionAlg)
+		if err != nil {
+			return nil, nil, tokens.IDToken, err
+		}
+	}
+
+	return accessToken, refreshToken, tokens.IDToken, nil
 }

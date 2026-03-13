@@ -120,11 +120,7 @@ func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.
 		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
-	restrictions, err := s.query.GetInstanceRestrictions(ctx)
-	if err != nil {
-		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("internal server error"), http.StatusInternalServerError)
-	}
-	allowedLanguages := restrictions.AllowedLanguages
+	allowedLanguages := authz.GetInstance(ctx).AllowedLanguages()
 	if len(allowedLanguages) == 0 {
 		allowedLanguages = i18n.SupportedLanguages()
 	}

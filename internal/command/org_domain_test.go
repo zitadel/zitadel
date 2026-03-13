@@ -29,6 +29,7 @@ func TestAddDomain(t *testing.T) {
 		idGenerator     id.Generator
 		filter          preparation.FilterToQueryReducer
 		eventstore      func(*testing.T) *eventstore.Eventstore
+		loginPaths      func(*testing.T) LoginPaths
 		permissionCheck OrganizationPermissionCheck
 	}
 
@@ -45,6 +46,7 @@ func TestAddDomain(t *testing.T) {
 				a:          agg,
 				domain:     "",
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			want: Want{
 				ValidationErr: zerrors.ThrowInvalidArgument(nil, "ORG-r3h4J", "Errors.Invalid.Argument"),
@@ -69,6 +71,7 @@ func TestAddDomain(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			want: Want{
 				Commands: []eventstore.Command{
@@ -118,12 +121,13 @@ func TestAddDomain(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsDefaultDomainClaimedURLTemplate(""),
 			},
 			want: Want{
 				Commands: []eventstore.Command{
 					org.NewDomainAddedEvent(context.Background(), &agg.Aggregate, "domain"),
 					org.NewDomainVerifiedEvent(context.Background(), &agg.Aggregate, "domain"),
-					user.NewDomainClaimedEvent(http.WithRequestedHost(context.Background(), "domain"), &user.NewAggregate("userID1", "org2").Aggregate, "newID@temporary.domain", "username", false),
+					user.NewDomainClaimedEvent(http.WithRequestedHost(context.Background(), "domain"), &user.NewAggregate("userID1", "org2").Aggregate, "newID@temporary.domain", "username", false, ""),
 				},
 			},
 		},
@@ -148,6 +152,7 @@ func TestAddDomain(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			want: Want{
 				CreateErr: zerrors.ThrowAlreadyExists(nil, "", ""),
@@ -161,6 +166,7 @@ func TestAddDomain(t *testing.T) {
 				claimedUserIDs:  []string{"userID1"},
 				filter:          nil,
 				eventstore:      expectEventstore(),
+				loginPaths:      expectLoginPathsNoCall,
 				permissionCheck: newMockOrganizationPermissionCheckNotAllowed(),
 			},
 			want: Want{
@@ -186,6 +192,7 @@ func TestAddDomain(t *testing.T) {
 						),
 					),
 				),
+				loginPaths:      expectLoginPathsNoCall,
 				permissionCheck: newMockOrganizationPermissionCheckAllowed(),
 			},
 			want: Want{
@@ -200,7 +207,7 @@ func TestAddDomain(t *testing.T) {
 			AssertValidation(
 				t,
 				http.WithRequestedHost(context.Background(), "domain"),
-				(&Commands{idGenerator: tt.args.idGenerator, eventstore: tt.args.eventstore(t)}).prepareAddOrgDomain(tt.args.a, tt.args.domain, tt.args.claimedUserIDs, tt.args.permissionCheck),
+				(&Commands{idGenerator: tt.args.idGenerator, eventstore: tt.args.eventstore(t), loginPaths: tt.args.loginPaths(t)}).prepareAddOrgDomain(tt.args.a, tt.args.domain, tt.args.claimedUserIDs, tt.args.permissionCheck),
 				tt.args.filter,
 				tt.want,
 			)
@@ -879,6 +886,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 		secretGenerator      crypto.Generator
 		alg                  crypto.EncryptionAlgorithm
 		domainValidationFunc func(domain, token, verifier string, checkType http.CheckType) error
+		loginPaths           func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx             context.Context
@@ -900,6 +908,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 			name: "invalid domain, error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -917,6 +926,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 			name: "missing aggregateid, error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -941,6 +951,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -981,6 +992,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1015,6 +1027,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1070,6 +1083,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				),
 				alg:                  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				domainValidationFunc: invalidDomainVerification,
+				loginPaths:           expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1125,6 +1139,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				),
 				alg:                  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				domainValidationFunc: validDomainVerification,
+				loginPaths:           expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1183,6 +1198,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				),
 				alg:                  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				domainValidationFunc: validDomainVerification,
+				loginPaths:           expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1264,12 +1280,14 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 							"tempid@temporary.zitadel.ch",
 							"username@domain.ch",
 							false,
+							"",
 						),
 					),
 				),
 				alg:                  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				domainValidationFunc: validDomainVerification,
 				idGenerator:          id_mock.NewIDGeneratorExpectIDs(t, "tempid"),
+				loginPaths:           expectLoginPathsDefaultDomainClaimedURLTemplate(""),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1351,12 +1369,14 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 							"tempid@temporary.zitadel.ch",
 							"username@domain.ch",
 							true,
+							"",
 						),
 					),
 				),
 				alg:                  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				domainValidationFunc: validDomainVerification,
 				idGenerator:          id_mock.NewIDGeneratorExpectIDs(t, "tempid"),
+				loginPaths:           expectLoginPathsDefaultDomainClaimedURLTemplate(""),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1415,6 +1435,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				),
 				alg:                  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				domainValidationFunc: validDomainVerification,
+				loginPaths:           expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1439,6 +1460,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				eventstore:           expectEventstore(),
 				alg:                  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				domainValidationFunc: validDomainVerification,
+				loginPaths:           expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1464,6 +1486,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				domainVerificationAlg:       tt.fields.alg,
 				domainVerificationValidator: tt.fields.domainValidationFunc,
 				idGenerator:                 tt.fields.idGenerator,
+				loginPaths:                  tt.fields.loginPaths(t),
 			}
 			got, err := r.ValidateOrgDomain(http.WithRequestedHost(tt.args.ctx, "zitadel.ch"), tt.args.domain, tt.args.claimedUserIDs, tt.args.permissionCheck)
 			if tt.res.err == nil {

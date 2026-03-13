@@ -2,8 +2,13 @@ import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_se
 
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { DEFAULT_CSP } from "../constants/csp";
+import { buildCSP } from "./lib/csp";
+import { createLogger } from "./lib/logger";
 import { getServiceConfig } from "./lib/service-url";
+
+export const runtime = "nodejs";
+
+const logger = createLogger("middleware");
 export const config = {
   matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
 };
@@ -12,14 +17,14 @@ async function loadSecuritySettings(request: NextRequest): Promise<SecuritySetti
   const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
 
   if (!securityResponse.ok) {
-    console.error("Failed to fetch security settings:", securityResponse.statusText);
+    logger.error("Failed to fetch security settings:", { status: securityResponse.statusText });
     return null;
   }
 
   const response = await securityResponse.json();
 
   if (!response || !response.settings) {
-    console.error("No security settings found in the response.");
+    logger.error("No security settings found in the response.");
     return null;
   }
 
@@ -66,12 +71,15 @@ export async function middleware(request: NextRequest) {
 
   const securitySettings = await loadSecuritySettings(request);
 
-  if (securitySettings?.embeddedIframe?.enabled) {
-    responseHeaders.set(
-      "Content-Security-Policy",
-      `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
-    );
-    responseHeaders.delete("X-Frame-Options");
+  const iframeOrigins =
+    securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
+      ? securitySettings.embeddedIframe.allowedOrigins
+      : undefined;
+
+  responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }));
+
+  if (!iframeOrigins) {
+    responseHeaders.set("X-Frame-Options", "deny");
   }
 
   request.nextUrl.href = `${serviceConfig.baseUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;

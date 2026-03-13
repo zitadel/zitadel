@@ -2,6 +2,7 @@ package instrumentation
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"testing"
 	"time"
@@ -75,7 +76,7 @@ func TestLogConfig_replacer(t *testing.T) {
 			name: "masking configured key",
 			c: LogConfig{
 				Mask: MaskConfig{
-					Keys:  []string{"sensitive"},
+					Keys:  []string{"sensitive", "foo", "bar"},
 					Value: "masked",
 				},
 			},
@@ -88,7 +89,7 @@ func TestLogConfig_replacer(t *testing.T) {
 			name: "masking configured key in any group",
 			c: LogConfig{
 				Mask: MaskConfig{
-					Keys:  []string{"sensitive"},
+					Keys:  []string{"sensitive", "foo", "bar"},
 					Value: "masked",
 				},
 			},
@@ -99,10 +100,38 @@ func TestLogConfig_replacer(t *testing.T) {
 			want: slog.String("sensitive", "masked"),
 		},
 		{
+			name: "masking configured group",
+			c: LogConfig{
+				Mask: MaskConfig{
+					Keys:  []string{"sensitive", "foo", "bar"},
+					Value: "masked",
+				},
+			},
+			args: args{
+				groups: []string{"sensitive"},
+				a:      slog.String("unmatched", "value"),
+			},
+			want: slog.String("unmatched", "masked"),
+		},
+		{
+			name: "masking configured sub-group",
+			c: LogConfig{
+				Mask: MaskConfig{
+					Keys:  []string{"sensitive", "foo", "bar"},
+					Value: "masked",
+				},
+			},
+			args: args{
+				groups: []string{"a", "sensitive", "b"},
+				a:      slog.String("unmatched", "value"),
+			},
+			want: slog.String("unmatched", "masked"),
+		},
+		{
 			name: "not masking unmatched key",
 			c: LogConfig{
 				Mask: MaskConfig{
-					Keys:  []string{"sensitive"},
+					Keys:  []string{"sensitive", "foo", "bar"},
 					Value: "masked",
 				},
 			},
@@ -166,6 +195,51 @@ func TestGetRequestID(t *testing.T) {
 			got, ok := GetRequestID(tt.ctx)
 			assert.Equal(t, tt.wantOk, ok)
 			assert.Equal(t, tt.wantID, got)
+		})
+	}
+}
+
+func Test_causeExtractor(t *testing.T) {
+	background := context.Background()
+	canceled, cancel := context.WithCancel(background)
+	cancel()
+	timedOut, cancel := context.WithTimeout(background, -1)
+	defer cancel()
+	canceledCause, cause := context.WithCancelCause(background)
+	cause(errors.New("oops"))
+
+	tests := []struct {
+		name string // description of this test case
+		ctx  context.Context
+		want []slog.Attr
+	}{
+		{
+			name: "valid background, no attributes",
+			ctx:  background,
+			want: nil,
+		},
+		{
+			name: "regular canceled context",
+			ctx:  canceled,
+			want: nil,
+		},
+		{
+			name: "regular timed out context",
+			ctx:  timedOut,
+			want: nil,
+		},
+		{
+			name: "canceled context with cause",
+			ctx:  canceledCause,
+			want: []slog.Attr{
+				slog.String("cause", "oops"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := causeExtractor(tt.ctx, time.Time{}, 0, "")
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

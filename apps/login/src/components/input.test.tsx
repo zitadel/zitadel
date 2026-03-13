@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { TextInput } from "./input";
 
 describe("TextInput Component", () => {
@@ -124,6 +124,12 @@ describe("TextInput Component", () => {
       const input = container.querySelector("input");
       expect(input?.maxLength).toBe(10);
       expect(input?.type).toBe("email");
+    });
+
+    it("should support autoFocus", () => {
+      const { container } = render(<TextInput label="Test" autoFocus />);
+      const input = container.querySelector("input");
+      expect(input).toHaveFocus();
     });
   });
 

@@ -49,6 +49,7 @@ Instrumentation:
     # Streams enable logging for specific parts of the application.
     Streams: # ZITADEL_INSTRUMENTATION_LOG_STREAMS (comma separated list)
       - runtime # General runtime logs, such as startup and shutdown messages.
+      - ready # Logs related to readiness and health checks. (zitadel ready command)
       - request # Logs for incoming API and HTTP requests.
       - event_handler # Logs for event handling in projections.
       - queue # Logs for the job queue processing.
@@ -59,8 +60,10 @@ Instrumentation:
       # Keys are unqualified attribute names and apply to all attributes with the specified name,
       # regardless of their position in the attribute hierarchy.
       # Eg. "some_key" matches "some_key" and "parent.some_key" etc.
-      # If the matched log attribute is a nested object or array,
-      # the entire structure is replaced with the specified Value.
+      # When the key matches a group of attributes (e.g. slog.Group), all attribute values in the
+      # group are masked and the structure of the group is preserved.
+      # When the key matches a non-group attribute whose value is a nested object/array
+      # (e.g. added via slog.Any), the entire value is replaced with Value and its structure is not preserved.
       Keys: # ZITADEL_INSTRUMENTATION_LOG_MASK_KEYS (comma separated list)
         # - "first_name"
         # - "last_name"

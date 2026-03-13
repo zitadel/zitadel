@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/url"
 	"testing"
 	"time"
 
@@ -1936,7 +1937,9 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			smtpAlg,
 			f.SMSTokenCrypto,
 		),
-		otpEmailTmpl: defaultOTPEmailTemplate,
+		otpEmailTmpl: func(origin *url.URL) string {
+			return origin.String() + defaultOTPEmailTemplate
+		},
 	}
 }
 

@@ -28,7 +28,7 @@ var (
 	loadedConfig Config
 )
 
-// TmpDir returns the absolute path to the projects's temp directory.
+// TmpDir returns the absolute path to the project's temp directory.
 func TmpDir() string {
 	return tmpDir
 }

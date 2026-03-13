@@ -176,7 +176,9 @@ func (s session) Create(ctx context.Context, client database.QueryExecutor, sess
 		)
 		fingerprintID = session.UserAgent.FingerprintID
 	}
-	builder.WriteString(`INSERT INTO ` + s.qualifiedTableName() + ` (instance_id, id, lifetime, creator_id, user_agent_id, created_at, updated_at) VALUES ( `)
+	builder.WriteString(`INSERT INTO `)
+	builder.WriteString(s.qualifiedTableName())
+	builder.WriteString(` (instance_id, id, lifetime, creator_id, user_agent_id, created_at, updated_at) VALUES ( `)
 	builder.WriteArgs(session.InstanceID, session.ID, session.Lifetime, session.CreatorID, fingerprintID, createdAt, updatedAt)
 	builder.WriteString(` ) RETURNING created_at, updated_at`)
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&session.CreatedAt, &session.UpdatedAt)
@@ -547,13 +549,13 @@ func (s session) UpdatedAtColumn() database.Column {
 
 type rawSession struct {
 	*domain.Session
-	TokenID    *string                           `json:"tokenID" db:"token_id"`
-	Lifetime   *time.Duration                    `json:"lifetime" db:"lifetime"`
-	Expiration *time.Time                        `json:"expiration" db:"expiration"`
-	UserID     *string                           `json:"userID" db:"user_id"`
-	CreatorID  *string                           `json:"creatorID" db:"creator_id"`
-	Factors    JSONArray[rawFactor]              `json:"factors,omitempty" db:"factors"`
-	Metadata   JSONArray[domain.SessionMetadata] `json:"metadata,omitempty" db:"metadata"`
+	TokenID    *string                            `json:"tokenID" db:"token_id"`
+	Lifetime   *time.Duration                     `json:"lifetime" db:"lifetime"`
+	Expiration *time.Time                         `json:"expiration" db:"expiration"`
+	UserID     *string                            `json:"userID" db:"user_id"`
+	CreatorID  *string                            `json:"creatorID" db:"creator_id"`
+	Factors    JSONArray[*rawFactor]              `json:"factors,omitempty" db:"factors"`
+	Metadata   JSONArray[*domain.SessionMetadata] `json:"metadata,omitempty" db:"metadata"`
 }
 
 func scanSession(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Session, error) {

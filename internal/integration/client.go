@@ -329,7 +329,7 @@ func (i *Instance) CreateUserTypeMachine(ctx context.Context, orgId string) *use
 			},
 		},
 	})
-	logging.OnError(err).Panic("create machine user")
+	logging.OnError(err).Panic("create service account")
 	i.TriggerUserByID(ctx, resp.GetId())
 	return resp
 }
@@ -389,6 +389,19 @@ func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail stri
 	}
 	i.TriggerUserByID(ctx, users...)
 
+	return resp
+}
+
+func (i *Instance) SetOrganizationMetadata(ctx context.Context, id, key, value string) *org.SetOrganizationMetadataResponse {
+	resp, err := i.Client.OrgV2.SetOrganizationMetadata(ctx, &org.SetOrganizationMetadataRequest{
+		OrganizationId: id,
+		Metadata: []*org.Metadata{{
+			Key:   key,
+			Value: []byte(base64.StdEncoding.EncodeToString([]byte(value))),
+		},
+		},
+	})
+	logging.OnError(err).Panic("set organization metadata")
 	return resp
 }
 

@@ -3,7 +3,7 @@ import { createAPI, createAppKey } from '../app';
 import { createProject } from '../project';
 import { createOrg, removeOrg } from '../org';
 import { introspect } from '../oidc';
-import { Config, MaxVUs } from '../config';
+import { Config, MaxVUs, Client } from '../config';
 import { b64decode } from 'k6/encoding';
 // @ts-ignore Import module
 import zitadel from 'k6/x/zitadel';
@@ -41,11 +41,18 @@ export async function setup() {
   });
   console.info(`setup: ${tokens.length} tokens generated`);
 
-  return { adminTokens, tokens, org };
+  const client = { ...Client() };
+  client.scope = [client.scope, ...projects.map((p) => `urn:zitadel:iam:org:project:id:${p.id}:aud`)].join(' ');
+  console.info('setup: login user with scope %s', client.scope);
+
+  const userTokens = loginByUsernamePassword(Config.admin as User, client);
+  console.info('setup: user signed in');
+
+  return { adminTokens, userTokens, tokens, org };
 }
 
 export default function (data: any) {
-  introspect(data.tokens[__VU - 1], data.adminTokens.accessToken);
+  introspect(data.tokens[__VU - 1], data.userTokens.accessToken);
 }
 
 export function teardown(data: any) {

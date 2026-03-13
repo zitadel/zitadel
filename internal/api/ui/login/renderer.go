@@ -11,8 +11,9 @@ import (
 	"time"
 
 	"github.com/gorilla/csrf"
-	"github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -249,7 +250,7 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		tmplMapping, funcs,
 		cookieName,
 	)
-	logging.New().OnError(err).WithError(err).Panic("error creating renderer")
+	old_logging.New().OnError(err).WithError(err).Panic("error creating renderer")
 	return r
 }
 
@@ -342,18 +343,20 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
+	ctx := r.Context()
 	if err != nil {
-		log := logging.WithError(err)
+		log := logging.FromCtx(ctx).With("err", err)
 		if authReq != nil {
-			log = log.WithField("auth_req_id", authReq.ID)
+			log = log.With("auth_req_id", authReq.ID)
 		}
+		const msg = "render internal error"
 		if zerrors.IsInternal(err) {
-			log.Error()
+			log.ErrorContext(ctx, msg)
 		} else {
-			log.Info()
+			log.InfoContext(ctx, msg)
 		}
 	}
-	translator := l.getTranslator(r.Context(), authReq)
+	translator := l.getTranslator(ctx, authReq)
 	data := l.getBaseData(r, authReq, translator, "Errors.Internal", "", err)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplError], data, nil)
 }
@@ -433,11 +436,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, transl
 }
 
 func (l *Login) getTranslator(ctx context.Context, authReq *domain.AuthRequest) *i18n.Translator {
-	restrictions, err := l.query.GetInstanceRestrictions(ctx)
-	if err != nil {
-		logging.OnError(err).Warn("cannot load instance restrictions to retrieve allowed languages for creating the translator")
-	}
-	translator := l.renderer.NewTranslator(ctx, restrictions.AllowedLanguages)
+	translator := l.renderer.NewTranslator(ctx, authz.GetInstance(ctx).AllowedLanguages())
 	if authReq != nil {
 		l.addLoginTranslations(translator, authReq.DefaultTranslations)
 		l.addLoginTranslations(translator, authReq.OrgTranslations)
@@ -572,7 +571,7 @@ func (l *Login) getOrgPrimaryDomain(r *http.Request, authReq *domain.AuthRequest
 	}
 	org, err := l.query.OrgByID(r.Context(), orgID)
 	if err != nil {
-		logging.New().WithError(err).Error("cannot get default org")
+		old_logging.New().WithError(err).Error("cannot get default org")
 		return ""
 	}
 	return org.Domain
@@ -595,7 +594,7 @@ func (l *Login) addLoginTranslations(translator *i18n.Translator, customTexts []
 			Text: text.Text,
 		}
 		err := l.renderer.AddMessages(translator, text.Language, msg)
-		logging.OnError(err).Warn("could no add message to translator")
+		old_logging.OnError(err).Warn("could no add message to translator")
 	}
 }
 
@@ -603,7 +602,7 @@ func (l *Login) customTexts(ctx context.Context, translator *i18n.Translator, or
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceTexts, err := l.query.CustomTextListByTemplate(ctx, instanceID, domain.LoginCustomText, false)
 	if err != nil {
-		logging.WithFields("instanceID", instanceID).Warn("unable to load custom texts for instance")
+		old_logging.WithFields("instanceID", instanceID).Warn("unable to load custom texts for instance")
 		return
 	}
 	l.addLoginTranslations(translator, query.CustomTextsToDomain(instanceTexts))
@@ -612,7 +611,7 @@ func (l *Login) customTexts(ctx context.Context, translator *i18n.Translator, or
 	}
 	orgTexts, err := l.query.CustomTextListByTemplate(ctx, orgID, domain.LoginCustomText, false)
 	if err != nil {
-		logging.WithFields("instanceID", instanceID, "org", orgID).Warn("unable to load custom texts for org")
+		old_logging.WithFields("instanceID", instanceID, "org", orgID).Warn("unable to load custom texts for org")
 		return
 	}
 	l.addLoginTranslations(translator, query.CustomTextsToDomain(orgTexts))

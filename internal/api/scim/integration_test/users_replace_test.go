@@ -344,7 +344,7 @@ func TestReplaceUser_scopedExternalID(t *testing.T) {
 	callingUserId, callingUserPat, err := Instance.CreateMachineUserPATWithMembership(CTX, "ORG_OWNER")
 	require.NoError(t, err)
 	ctx := integration.WithAuthorizationToken(CTX, callingUserPat)
-	// set provisioning domain of service user
+	// set provisioning domain of service account
 	setProvisioningDomain(t, callingUserId, "fooBazz")
 
 	// replace the user with provisioning domain set

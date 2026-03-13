@@ -48,13 +48,13 @@ type Event struct {
 	// it's used in read models to reduce the events in the correct definition
 	Version eventstore.Version
 	// AggregateID id is the unique identifier of the aggregate
-	// the client must generate it by it's own
+	// the client must generate it on its own
 	AggregateID string
 	// AggregateType describes the meaning of the aggregate for this event
 	// it could an object like user
 	AggregateType eventstore.AggregateType
-	// ResourceOwner is the organisation which owns this aggregate
-	// an aggregate can only be managed by one organisation
+	// ResourceOwner is the organization which owns this aggregate
+	// an aggregate can only be managed by one organization
 	// use the ID of the org
 	ResourceOwner sql.NullString
 	// InstanceID is the instance where this event belongs to

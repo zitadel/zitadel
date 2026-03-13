@@ -1,5 +1,6 @@
 ---
 title: Multi-Factor Authentication (MFA) in a Custom Login UI
+description: "Support multi-factor authentication (MFA) methods like TOTP, SMS, and WebAuthn in your custom login UI."
 sidebar_label: Multi-Factor Authentication (MFA)
 ---
 
@@ -32,7 +33,7 @@ ZITADEL supports different Methods:
 The user has selected to setup TOTP.
 To show the user the QR to register TOTP with his Authenticator App like Google/Microsoft Authenticator or Authy you have to start the registration on the ZITADEL API.
 Generate the QR Code with the URI from the response.
-For users that do not have a QR Code reader make sure to also show the secret, to enable manual configuration.
+For users that do not have a QR Code reader make sure to also show the secret, to enable manual setup.
 
 More detailed information about the API: [Start TOTP Registration Documentation](/reference/api/user/zitadel.user.v2.UserService.RegisterTOTP)
 

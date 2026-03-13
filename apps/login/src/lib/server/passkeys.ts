@@ -1,5 +1,6 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
 import {
   createPasskeyRegistrationLink,
   getLoginSettings,
@@ -16,16 +17,18 @@ import {
   RegisterPasskeyResponse,
   VerifyPasskeyRegistrationRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
-import { getTranslations } from "next-intl/server";
+import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById } from "../cookies";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkUserVerification } from "../verify-helper";
+import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
 import { updateOrCreateSession } from "./session";
-import { completeFlowOrGetUrl } from "../client";
-import { createSessionAndUpdateCookie } from "./cookie";
+
+const logger = createLogger("passkeys");
 
 type VerifyPasskeyCommand = {
   passkeyId: string;
@@ -103,7 +106,7 @@ export async function registerPasskeyLink(
       // check if a verification was done earlier
       const hasValidUserVerificationCheck = await checkUserVerification(currentUserId);
 
-      console.log("hasValidUserVerificationCheck", hasValidUserVerificationCheck);
+      logger.info("hasValidUserVerificationCheck", { hasValidUserVerificationCheck });
       if (!hasValidUserVerificationCheck) {
         return { error: "User Verification Check has to be done" };
       }
@@ -196,6 +199,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     }${os.name}${os.name ? ", " : ""}${browser.name}`;
   }
 
+  let loginName: string | undefined;
   let currentUserId: string;
 
   if (command.sessionId) {
@@ -216,6 +220,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     }
 
     currentUserId = userId;
+    loginName = session?.session?.factors?.user?.loginName;
   } else {
     // UserId-based flow
     currentUserId = command.userId!;
@@ -226,9 +231,11 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     if (!userResponse || !userResponse.user) {
       throw new Error("User not found");
     }
+
+    loginName = userResponse.user.preferredLoginName;
   }
 
-  return zitadelVerifyPasskeyRegistration({
+  const response = await zitadelVerifyPasskeyRegistration({
     serviceConfig,
     request: create(VerifyPasskeyRegistrationRequestSchema, {
       passkeyId: command.passkeyId,
@@ -237,6 +244,8 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
       userId: currentUserId,
     }),
   });
+
+  return { ...response, loginName };
 }
 
 type SendPasskeyCommand = {
@@ -289,7 +298,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   try {
     userResponse = await getUserByID({ serviceConfig, userId });
   } catch (error) {
-    console.error("Error fetching user by ID:", error);
+    logger.error("Error fetching user by ID:", { error });
     return { error: t("verify.errors.couldNotGetUser") };
   }
 

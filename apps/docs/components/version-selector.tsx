@@ -20,7 +20,7 @@ export function VersionSelector() {
 
     // Handle basePath issues: usePathname() typically returns path relative to basePath if configured?
     // But purely relying on that is tricky. Let's normalize.
-    // If pathname starts with /docs, assume it's the full path and we strip it for logic, 
+    // If pathname starts with /docs, assume it's the full path, and we strip it for logic,
     // then let router handle re-adding it if needed (or we check behaviors).
     // Actually, Next.js router.push() expects path relative to basePath usually?
     // Let's implement robust segment swapping.

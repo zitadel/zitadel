@@ -158,8 +158,12 @@ func eventFromEventPusherWithInstanceID(instanceID string, event eventstore.Comm
 }
 
 func eventFromEventPusherWithCreationDateNow(event eventstore.Command) *repository.Event {
+	return eventFromEventPusherWithCreationDate(event, time.Now())
+}
+
+func eventFromEventPusherWithCreationDate(event eventstore.Command, creationDate time.Time) *repository.Event {
 	e := eventFromEventPusher(event)
-	e.CreationDate = time.Now()
+	e.CreationDate = creationDate
 	return e
 }
 
@@ -203,6 +207,10 @@ func (m *mockInstance) ManagementConsoleApplicationID() string {
 
 func (m *mockInstance) DefaultLanguage() language.Tag {
 	return AllowedLanguage
+}
+
+func (m *mockInstance) AllowedLanguages() []language.Tag {
+	return []language.Tag{language.English}
 }
 
 func (m *mockInstance) DefaultOrganisationID() string {

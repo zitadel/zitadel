@@ -2,9 +2,9 @@
 
 import { Alert } from "@/components/alert";
 import { getDeviceAuthorizationRequest } from "@/lib/server/oidc";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
@@ -65,6 +65,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
           <TextInput
             type="text"
             autoComplete="one-time-code"
+            autoFocus
             {...register("userCode", { required: t("usercode.required.code") })}
             label={t("usercode.labels.code")}
             data-testid="code-text-input"

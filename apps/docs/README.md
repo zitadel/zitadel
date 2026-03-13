@@ -20,24 +20,24 @@ The site will be available at http://localhost:3000.
 
 Key scripts for documentation workflows:
 
-| Script | Description |
-| :--- | :--- |
-| `dev` | Starts the development server. |
-| `build` | Builds the production application. |
-| `fetch:remote-content` | Fetches remote tags and referenced content. |
-| `generate` | Runs all generation steps (`fetch:remote-content`, `generate:proto-docs`, `generate:api-reference`, `generate:index-pages`). |
-| `check:links` | Validates content integrity (broken links, missing frontmatter, schema errors). |
-| `check-types` | Validates typescript types. |
-| `test` | Runs all validation steps (`check-types`, `check:links`). |
-| `lint` | checks for code style and syntax errors (ESLint). |
-| `clean` | Cleans the build output and generated files. |
+| Script                 | Description                                                                                                                  |
+|:-----------------------|:-----------------------------------------------------------------------------------------------------------------------------|
+| `dev`                  | Starts the development server.                                                                                               |
+| `build`                | Builds the production application.                                                                                           |
+| `fetch:remote-content` | Fetches remote tags and referenced content.                                                                                  |
+| `generate`             | Runs all generation steps (`fetch:remote-content`, `generate:proto-docs`, `generate:api-reference`, `generate:index-pages`). |
+| `check:links`          | Validates content integrity (broken links, missing frontmatter, schema errors).                                              |
+| `check-types`          | Validates typescript types.                                                                                                  |
+| `test`                 | Runs all validation steps (`check-types`, `check:links`).                                                                    |
+| `lint`                 | checks for code style and syntax errors (ESLint).                                                                            |
+| `clean`                | Cleans the build output and generated files.                                                                                 |
 
 ### Validation
 
 *   **Code Quality**: Run `pnpm lint` to check for syntax and style issues in JS/TS/MDX files.
 *   **Content Integrity**: Run `pnpm check:links` to validate content structure, including:
     *   Broken internal links
-    *   Missing required frontmatter (e.g., `title`)
+    *   Missing required front-matter (e.g., `title`)
     *   Image references
 
 ## Contributing
@@ -65,7 +65,7 @@ All documentation content is located in the `content` directory. Note that the s
 
 To add a new page:
 1.  Create a `.mdx` file in the appropriate subdirectory of [`content`](./content).
-2.  Register the new page in the sidebar configuration at [`lib/sidebar-data.ts`](./lib/sidebar-data.ts) to make it accessible in the navigation.
+2.  Register the new page in the sidebar settings at [`lib/sidebar-data.ts`](./lib/sidebar-data.ts) to make it accessible in the navigation.
 
 
 ### Pull Requests

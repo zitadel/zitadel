@@ -10,28 +10,28 @@ Tests are halted after this test run because of too many [client read events](ht
 
 ## Performance test results
 
-| Metric | Value |
-| :---- | :---- |
-| Baseline | none |
-| Test start | 22-10-2024 16:20 UTC |
-| Test duration | 30min |
-| Executed test | machine\_jwt\_profile\_grant |
-| k6 version | v0.54.0 |
-| VUs | 50 |
-| Client location | US1 |
-| Client machine specification | e2-high-cpu-4 |
-| Zitadel location | US1 |
-| Zitadel container specification | vCPUs: 2<br/>Memory: 512 MiB<br/>Container count: 2 |
-| Zitadel feature flags | none |
-| Database | postgres v15 |
-| Database location | US1 |
-| Database specification | vCPUs: 4<br/>Memory: 16 GiB |
-| Zitadel metrics during test |  |
-| Observed errors | Many client read events during push |
+| Metric                                | Value                                                                                                                                                                                                                 |
+|:--------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Baseline                              | none                                                                                                                                                                                                                  |
+| Test start                            | 22-10-2024 16:20 UTC                                                                                                                                                                                                  |
+| Test duration                         | 30min                                                                                                                                                                                                                 |
+| Executed test                         | machine\_jwt\_profile\_grant                                                                                                                                                                                          |
+| k6 version                            | v0.54.0                                                                                                                                                                                                               |
+| VUs                                   | 50                                                                                                                                                                                                                    |
+| Client location                       | US1                                                                                                                                                                                                                   |
+| Client machine specification          | e2-high-cpu-4                                                                                                                                                                                                         |
+| Zitadel location                      | US1                                                                                                                                                                                                                   |
+| Zitadel container specification       | vCPUs: 2<br/>Memory: 512 MiB<br/>Container count: 2                                                                                                                                                                   |
+| Zitadel feature flags                 | none                                                                                                                                                                                                                  |
+| Database                              | postgres v15                                                                                                                                                                                                          |
+| Database location                     | US1                                                                                                                                                                                                                   |
+| Database specification                | vCPUs: 4<br/>Memory: 16 GiB                                                                                                                                                                                           |
+| Zitadel metrics during test           |                                                                                                                                                                                                                       |
+| Observed errors                       | Many client read events during push                                                                                                                                                                                   |
 | Top 3 most expensive database queries | 1: Query events `instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3 AND event_type = ANY($4)`<br/>2: latest sequence query during push events<br/>3: writing events during push (caused lock wait events) |
-| k6 iterations per second | 193 |
-| k6 overview | [output](#k6-output) |
-| flowchart outcome | Halt tests, must resolve an issue |
+| k6 iterations per second              | 193                                                                                                                                                                                                                   |
+| k6 overview                           | [output](#k6-output)                                                                                                                                                                                                  |
+| flowchart outcome                     | Halt tests, must resolve an issue                                                                                                                                                                                     |
 
 ## /token endpoint latencies
 

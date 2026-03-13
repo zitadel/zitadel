@@ -1,9 +1,9 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
-import { sendLoginname } from "./loginname";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { getIDPByID } from "../zitadel";
+import { sendLoginname } from "./loginname";
 
 // Mock all the dependencies
 vi.mock("next/headers", () => ({
@@ -276,7 +276,7 @@ describe("sendLoginname", () => {
         });
         mockListIDPLinks.mockResolvedValue({ result: [] });
         mockGetActiveIdentityProviders.mockResolvedValue({
-          identityProviders: [{ id: "org-idp-123", type: 0 }],
+          identityProviders: [{ id: "org-idp-123", type: 0, options: { isAutoCreation: true } }],
         });
         mockIdpTypeToSlug.mockReturnValue("google");
         mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://org-idp.example.com/auth" });
@@ -469,7 +469,7 @@ describe("sendLoginname", () => {
         allowLocalAuthentication: false,
       });
       mockGetActiveIdentityProviders.mockResolvedValue({
-        identityProviders: [{ id: "idp123", type: "OIDC" }],
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
       });
       mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
@@ -503,6 +503,7 @@ describe("sendLoginname", () => {
     test("should redirect to password when ignoreUnknownUsernames is true", async () => {
       mockGetLoginSettings.mockResolvedValue({
         ignoreUnknownUsernames: true,
+        allowLocalAuthentication: true,
       });
 
       const result = await sendLoginname({
@@ -523,6 +524,39 @@ describe("sendLoginname", () => {
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: false,
         allowLocalAuthentication: true,
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).toEqual({ error: "errors.userNotFound" });
+    });
+
+    test("should redirect to IDP when allowRegister: false, allowLocalAuthentication: false and a single active IDP exists", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: false,
+        allowLocalAuthentication: false,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
+    });
+
+    test("should not redirect to IDP when single active IDP does not allow creation", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: false,
+        allowLocalAuthentication: false,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: false, isCreationAllowed: false } }],
       });
 
       const result = await sendLoginname({
@@ -592,7 +626,7 @@ describe("sendLoginname", () => {
       });
 
       mockGetActiveIdentityProviders.mockResolvedValue({
-        identityProviders: [{ id: "idp123", type: "OIDC" }],
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
       });
       mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth?org=discovered-org-456" });
 
@@ -729,6 +763,75 @@ describe("sendLoginname", () => {
       expect(result).not.toEqual({ error: "errors.userNotFound" });
       expect(result).toHaveProperty("redirect");
       expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
+
+    test("should allow login with email when disableLoginWithPhone is true and preferred login name differs from email", async () => {
+      // Regression test for: https://github.com/zitadel/zitadel/issues/11518
+      // When preferredLoginName (e.g. username@org-domain) differs from the user's email, logging
+      // in with the email while disableLoginWithPhone=true must NOT be blocked.
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@orgdomain.com", // org-domain scoped login name
+        details: { resourceOwner: "org123" },
+        type: {
+          case: "human",
+          value: { email: { email: "user@test.com" }, phone: { phone: "+1234567890" } },
+        },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: {
+          user: {
+            id: "user123",
+            loginName: "user@orgdomain.com",
+            organizationId: "org123",
+          },
+        },
+      };
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockGetLoginSettings.mockResolvedValue({
+        disableLoginWithPhone: true,
+        allowLocalAuthentication: true,
+      });
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@test.com", // logging in with email, not phone
+      });
+
+      // Must NOT return "User not found" — email-based login must be allowed when only phone is disabled
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+    });
+
+    test("should block login with phone number when disableLoginWithPhone is true", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@orgdomain.com",
+        details: { resourceOwner: "org123" },
+        type: {
+          case: "human",
+          value: { email: { email: "user@example.com" }, phone: { phone: "+1234567890" } },
+        },
+        state: UserState.ACTIVE,
+      };
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockGetLoginSettings.mockResolvedValue({
+        disableLoginWithPhone: true,
+      });
+
+      const result = await sendLoginname({
+        loginName: "+1234567890", // logging in with phone — must be blocked
+      });
+
+      expect(result).toEqual({ error: "errors.userNotFound" });
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
 
     test("should redirect to password when ignoreUnknownUsernames is true and more than one user found", async () => {

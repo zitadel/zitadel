@@ -1,8 +1,8 @@
 Login:
   Title: Welcome Back!
-  Description: Enter your login data.
+  Description: Enter your login details.
   TitleLinking: Login for user linking
-  DescriptionLinking: Enter your login data to link your external user.
+  DescriptionLinking: Enter your login details to link your external user.
   LoginNameLabel: Login Name
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
@@ -13,7 +13,7 @@ Login:
 
 LDAP:
   Title: Login
-  Description: Enter your login data.
+  Description: Enter your login details.
   LoginNameLabel: Login Name
   PasswordLabel: Password
   NextButtonText: Next
@@ -30,7 +30,7 @@ SelectAccount:
 
 Password:
   Title: Password
-  Description: Enter your login data.
+  Description: Enter your login details.
   PasswordLabel: Password
   MinLength: Must be at least
   MinLengthp2: characters long.

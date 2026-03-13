@@ -23,7 +23,6 @@ export class InfoRowComponent {
   @Input() public org!: Org.AsObject | OrgV2 | OrgV1;
   @Input() public instance!: InstanceDetail.AsObject;
   @Input() public app!: App.AsObject;
-  @Input() public idp!: IDP.AsObject;
   @Input() public project!: Project.AsObject;
   @Input() public grantedProject!: GrantedProject.AsObject;
   @Input() public loginPolicy?: LoginPolicy.AsObject | LoginPolicyV2;
@@ -32,7 +31,6 @@ export class InfoRowComponent {
   public State = State;
   public OrgState = OrgState;
   public AppState = AppState;
-  public IDPState = IDPState;
   public ProjectState = ProjectState;
   public ProjectGrantState = ProjectGrantState;
 

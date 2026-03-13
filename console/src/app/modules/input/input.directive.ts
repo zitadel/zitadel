@@ -248,6 +248,7 @@ export class InputDirective implements MatFormFieldControl<any>, OnChanges, OnDe
     this._previousNativeValue = this.value;
 
     // Force setter to be called in case id was not specified.
+    // eslint-disable-next-line no-self-assign
     this.id = this.id;
 
     // On some versions of iOS the caret gets stuck in the wrong place when holding down the delete

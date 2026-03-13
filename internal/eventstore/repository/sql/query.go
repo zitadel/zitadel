@@ -101,7 +101,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		q.Desc = true
 	}
 
-	// if there is only one subquery we can optimize the query ordering by ordering by sequence
+	// if there is only one subquery we can optimize the query ordering by sequence
 	var shouldOrderBySequence bool
 	if len(q.SubQueries) == 1 {
 		for _, filter := range q.SubQueries[0] {

@@ -29,7 +29,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 	organizationAdmin2 := createOrganizationAdministrator(iamOwnerCtx, instanceQuery, organizationResp.GetOrganizationId(), organizationName, t)
 	organizationAdmin3 := createOrganizationAdministrator(iamOwnerCtx, instanceQuery, organizationResp.GetOrganizationId(), organizationName, t)
 
-	// Additionally, a machine user as a project grant owner to test permissions
+	// Additionally, a service account as a project grant owner to test permissions
 	userOrganizationResp := instanceQuery.CreateMachineUser(iamOwnerCtx)
 	instanceQuery.CreateOrgMembership(t, iamOwnerCtx, organizationResp.GetOrganizationId(), userOrganizationResp.GetUserId())
 	patOrganizationResp := instanceQuery.CreatePersonalAccessToken(iamOwnerCtx, userOrganizationResp.GetUserId())
@@ -42,7 +42,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 	projectAdministrator2 := createProjectAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
 	projectAdministrator3 := createProjectAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
 
-	// Additionally, a machine user as a project owner to test permissions
+	// Additionally, a service account as a project owner to test permissions
 	userProjectResp := instanceQuery.CreateMachineUser(iamOwnerCtx)
 	instanceQuery.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userProjectResp.GetUserId())
 	patProjectResp := instanceQuery.CreatePersonalAccessToken(iamOwnerCtx, userProjectResp.GetUserId())
@@ -56,7 +56,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 	projectGrantAdministrator2 := createProjectGrantAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
 	projectGrantAdministrator3 := createProjectGrantAdministrator(iamOwnerCtx, instanceQuery, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
 
-	// Additionally, a machine user as a project grant owner to test permissions
+	// Additionally, a service account as a project grant owner to test permissions
 	userProjectGrantResp := instanceQuery.CreateMachineUser(iamOwnerCtx)
 	instanceQuery.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), grantedOrganizationResp.GetOrganizationId(), userProjectGrantResp.GetUserId())
 	patProjectGrantResp := instanceQuery.CreatePersonalAccessToken(iamOwnerCtx, userProjectGrantResp.GetUserId())
@@ -845,7 +845,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 	organizationAdmin2 := createOrganizationAdministrator(iamOwnerCtx, instancePermissionV2, organizationResp.GetOrganizationId(), organizationName, t)
 	organizationAdmin3 := createOrganizationAdministrator(iamOwnerCtx, instancePermissionV2, organizationResp.GetOrganizationId(), organizationName, t)
 
-	// Additionally, a machine user as a project grant owner to test permissions
+	// Additionally, a service account as a project grant owner to test permissions
 	userOrganizationResp := instancePermissionV2.CreateMachineUser(iamOwnerCtx)
 	instancePermissionV2.CreateOrgMembership(t, iamOwnerCtx, organizationResp.GetOrganizationId(), userOrganizationResp.GetUserId())
 	patOrganizationResp := instancePermissionV2.CreatePersonalAccessToken(iamOwnerCtx, userOrganizationResp.GetUserId())
@@ -858,7 +858,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 	projectAdministrator2 := createProjectAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
 	projectAdministrator3 := createProjectAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName)
 
-	// Additionally, a machine user as a project owner to test permissions
+	// Additionally, a service account as a project owner to test permissions
 	userProjectResp := instancePermissionV2.CreateMachineUser(iamOwnerCtx)
 	instancePermissionV2.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userProjectResp.GetUserId())
 	patProjectResp := instancePermissionV2.CreatePersonalAccessToken(iamOwnerCtx, userProjectResp.GetUserId())
@@ -872,7 +872,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 	projectGrantAdministrator2 := createProjectGrantAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
 	projectGrantAdministrator3 := createProjectGrantAdministrator(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetId(), projectName, grantedOrganizationResp.GetOrganizationId())
 
-	// Additionally, a machine user as a project grant owner to test permissions
+	// Additionally, a service account as a project grant owner to test permissions
 	userProjectGrantResp := instancePermissionV2.CreateMachineUser(iamOwnerCtx)
 	instancePermissionV2.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), grantedOrganizationResp.GetOrganizationId(), userProjectGrantResp.GetUserId())
 	patProjectGrantResp := instancePermissionV2.CreatePersonalAccessToken(iamOwnerCtx, userProjectGrantResp.GetUserId())

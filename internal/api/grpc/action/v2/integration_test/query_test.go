@@ -1112,7 +1112,9 @@ func TestServer_ListPublicKeys(t *testing.T) {
 
 func assertPublicKeys(ttt *assert.CollectT, want *action.ListPublicKeysResponse, got *action.ListPublicKeysResponse) {
 	assert.EqualExportedValues(ttt, want.Pagination, got.Pagination)
-	assert.Len(ttt, got.PublicKeys, len(want.PublicKeys))
+	if !assert.Len(ttt, got.PublicKeys, len(want.PublicKeys)) {
+		return
+	}
 	for i := range want.PublicKeys {
 		assert.Equal(ttt, want.PublicKeys[i].GetKeyId(), got.PublicKeys[i].GetKeyId())
 		assert.Equal(ttt, want.PublicKeys[i].GetActive(), got.PublicKeys[i].GetActive())

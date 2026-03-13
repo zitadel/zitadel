@@ -1,13 +1,13 @@
 # Contributing to Zitadel
 
-Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (API), Next.js/React (Login), Angular (Console), and Docusaurus (Docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
+Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (API), Next.js/React (Login), Angular (Console), and Fumadocs (Docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
 
 ## Quick Start
 
 1. Clone the repository: `git clone https://github.com/zitadel/zitadel` or [open it in a local Dev Container](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel) or [create a GitHub Codespace](https://codespaces.new/zitadel/zitadel)
 2. If you cloned the repository to your local machine, install the required development dependencies
    - [Node.js v22.x](https://nodejs.org/en/download/) - Required for UI development and to run development commands `pnpm nx ...`
-   - [Go 1.24.x](https://go.dev/doc/install) - Required for API development
+   - [Go](https://go.dev/doc/install) - Required for API development. Use the version declared in `go.mod`.
    - [Docker](https://docs.docker.com/engine/install/) - Required for supporting services like the development database and for tests.
    - [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies) - Required for Browser UI tests
    <details>
@@ -49,8 +49,9 @@ You can build and start any project with Nx commands.
 | **Develop**                   | `pnpm nx run PROJECT:dev`                   | Development server           |                                                                                                                                                                                                  |
 | **Generate**                  | `pnpm nx run PROJECT:generate`              | Generate .gitignored files   |                                                                                                                                                                                                  |
 | **Generate Go Files**         | `pnpm nx run @zitadel/api:generate-go`      | Regenerate checked-in files  | This is needed to generate files using [Stringer](https://pkg.go.dev/golang.org/x/tools/cmd/stringer), [Enumer](https://github.com/dmarkham/enumer) or [gomock](https://github.com/uber-go/mock) |
+| **Install Proto Plugins**     | `pnpm nx run @zitadel/api:generate-install` | Install proto toolchain      | Installs Go-based plugins (protoc-gen-go, connect-go, …) to `.artifacts/bin/`. Run automatically by `generate` targets; Nx caches the outputs. |
 | **Test - Unit**               | `pnpm nx run PROJECT:test-unit`             | Run unit tests               |                                                                                                                                                                                                  |
-| **Test - Integration**        | `pnpm nx run PROJECT:test-integration`      | Run integration tests        | Learn mnore about how to [debug API integration tests](#run-api-integration-tests)                                                                                                               |
+| **Test - Integration**        | `pnpm nx run PROJECT:test-integration`      | Run integration tests        | Learn more about how to [debug API integration tests](#run-api-integration-tests)                                                                                                               |
 | **Test - Integration Stop**   | `pnpm nx run PROJECT:test-integration-stop` | Stop integration containers  |                                                                                                                                                                                                  |
 | **Test - Functional UI**      | `pnpm nx run @zitadel/functional-ui:test`   | Run functional UI tests      | Learn more about how to [develop the Management Console and opening the interactive Test Suite](#pass-management-console-quality-checks)                                                                               |
 | **Test - Functional UI Stop** | `pnpm nx run @zitadel/functional-ui:stop`   | Run functional UI containers |                                                                                                                                                                                                  |
@@ -129,7 +130,7 @@ The code consists of the following parts:
 | API definitions    | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#contribute-to-api)             |
 | Management Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-to-frontend)   |
 | Login              | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#contribute-to-frontend)   |
-| Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./apps/docs](./apps/docs)                          | [Contribute to Frontend](#contribute-to-frontend)   |
+| Docs               | Project documentation made with Fumadocs           | [Fumadocs](https://fumadocs.dev/)                                                                         | [./apps/docs](./apps/docs)                          | [Contribute to Frontend](#contribute-to-frontend)   |
 | translations       | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#contribute-translations) |
 
 Please follow the guides to validate and test the code before you contribute.
@@ -173,15 +174,13 @@ Make sure you use [semantic release messages format](https://github.com/angular/
 
 #### Type
 
-Must be one of the following:
-
-- **feat**: New Feature
-- **fix**: Bug Fix
-- **docs**: Documentation
+Allowed values are listed in [`.github/semantic.yml`](.github/semantic.yml) under `types:`.
 
 #### Scope
 
-This is optional to indicate which component is affected. If in doubt, leave blank (`<type>: <short summary>`)
+This is optional to indicate which component is affected.
+Allowed values are listed in [`.github/semantic.yml`](.github/semantic.yml) under `scopes:`.
+When in doubt, omit the scope — `<type>: <short summary>` is always valid.
 
 #### Short summary
 
@@ -368,7 +367,7 @@ Choose your contribution area:
 
 - **[Login App](#contribute-to-login)** (Next.js/React) - Modern authentication flows
 - **[Console](#contribute-to-console)** (Angular) - Admin dashboard and user management
-- **[Docs](#contribute-to-docs)** (Docusaurus) - Project documentation
+- **[Docs](#contribute-to-docs)** (Fumadocs) - Project documentation
 - **[Client Packages](#client-packages)** - Shared libraries for API communication
 
 ### Project Dependencies
@@ -579,6 +578,18 @@ pnpm nx run @zitadel/proto:generate  # Regenerate after proto changes
 ```bash
 pnpm nx run @zitadel/client:build  # Build after changes
 ```
+
+### Proto Plugin Convention
+
+All binary proto plugins are installed to `.artifacts/bin/<GOOS>/<GOARCH>/` and declared as Nx target outputs, making them eligible for Nx remote cache.
+
+| Scope | Target | Installs |
+|---|---|---|
+| `@zitadel/api` | `generate-install` | Go-based plugins: `buf`, `protoc-gen-go`, `protoc-gen-connect-go`, `protoc-gen-openapiv2`, `protoc-gen-validate`, `protoc-gen-authoption`, … |
+| `@zitadel/console` | `install-proto-plugins` | `protoc-gen-grpc-web`, `protoc-gen-js`, `protoc-gen-openapiv2` (pre-built binaries, no Go required) |
+| `@zitadel/docs` | `install-proto-plugins` | `protoc-gen-connect-openapi` (pre-built binary, no Go required) |
+
+`generate` targets depend on the appropriate install targets and prepend `.artifacts/bin/` to `$PATH` automatically. Running `pnpm nx run PROJECT:generate` is sufficient — no manual plugin installation needed.
 
 ### Contribute to Docs
 

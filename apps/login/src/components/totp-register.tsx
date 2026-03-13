@@ -1,21 +1,22 @@
 "use client";
 
-import { completeFlowOrGetUrl, handleServerActionResponse } from "@/lib/client";
+import { completeFlowOrGetUrl } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { verifyTOTP } from "@/lib/server/verify";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { Button, ButtonVariants } from "./button";
 import { CopyToClipboard } from "./copy-to-clipboard";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
-import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs = {
   code: string;
@@ -116,6 +117,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
             <div className="">
               <TextInput
                 type="text"
+                autoFocus
                 {...register("code", { required: t("set.required.code") })}
                 label={t("set.labels.code")}
                 data-testid="code-text-input"

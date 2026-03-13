@@ -9,6 +9,7 @@ import (
 	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	proj_grpc "github.com/zitadel/zitadel/internal/api/grpc/project"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -16,6 +17,9 @@ func (s *Server) GetProjectGrantByID(ctx context.Context, req *mgmt_pb.GetProjec
 	grant, err := s.query.ProjectGrantByID(ctx, true, req.GrantId)
 	if err != nil {
 		return nil, err
+	}
+	if !(grant.ResourceOwner == authz.GetCtxData(ctx).OrgID || grant.GrantedOrgID == authz.GetCtxData(ctx).OrgID) {
+		return nil, zerrors.ThrowNotFound(nil, "MANAG-d3g31", "Errors.ProjectGrant.NotFound")
 	}
 	return &mgmt_pb.GetProjectGrantByIDResponse{
 		ProjectGrant: proj_grpc.GrantedProjectViewToPb(grant),

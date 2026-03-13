@@ -30,6 +30,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/execution"
@@ -146,11 +147,13 @@ func readConfig(v *viper.Viper) (*Config, error) {
 			hooks.MapHTTPHeaderStringDecode,
 			database.DecodeHook(false),
 			actions.HTTPConfigDecodeHook,
+			denylist.DenyListDecodeHook,
 			hook.EnumHookFunc(authz.MemberTypeString),
 			hooks.MapTypeStringDecode[domain.Feature, any],
 			hooks.SliceTypeStringDecode[*command.SetQuota],
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
+			hook.StringToURLHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),

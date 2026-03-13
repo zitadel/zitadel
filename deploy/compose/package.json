@@ -1,0 +1,8 @@
+{
+  "name": "@zitadel/compose",
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "dotenv": "^16.0.0"
+  }
+}

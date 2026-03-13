@@ -263,7 +263,7 @@ service OrganizationService {
 
   // Set Organization Metadata
   //
-  // Adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
+  // Sets a list of key value pairs. Existing metadata entries with matching keys are overwritten. Existing metadata entries without matching keys are untouched. To remove existing metadata entries, pass an empty metadata value or use [DeleteOrganizationMetadata](/docs/reference/api/org/zitadel.org.v2.OrganizationService.DeleteOrganizationMetadata). If no metadata entry exists for a given key, passing an empty value for that key has no effect (no-op). For HTTP requests, make sure the bytes array value is base64 encoded.
   //
   // Required permission:
   //  - `org.write`
@@ -616,7 +616,7 @@ message UpdateOrganizationRequest {
   // changing the name will also change the domain.
   // Additionally, if the domain is used as suffix for user logins,
   // their login names will also change accordingly.
-  // It will not affect any organization domains added to the organization.
+  // It will not affect any Organization Domains added to the organization.
   string name = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -752,7 +752,7 @@ message AddOrganizationDomainRequest {
 }
 
 message AddOrganizationDomainResponse {
-  // CreationDate is the timestamp when the organization domain was created.
+  // CreationDate is the timestamp when the Organization Domain was created.
   google.protobuf.Timestamp creation_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
@@ -820,7 +820,7 @@ message DeleteOrganizationDomainRequest {
 }
 
 message DeleteOrganizationDomainResponse {
-  // DeletionDate is the timestamp of the deletion of the organization domain.
+  // DeletionDate is the timestamp of the deletion of the Organization Domain.
   google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -902,7 +902,7 @@ message VerifyOrganizationDomainRequest {
 }
 
 message VerifyOrganizationDomainResponse {
-  // ChangeDate is the timestamp of the verification of the organization domain.
+  // ChangeDate is the timestamp of the verification of the Organization Domain.
   google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -914,8 +914,8 @@ message Metadata {
   // Key is identifier of the metadata entry.
   string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-  // Value is the values of the metadata entry.
-  bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+  // Value in the metadata key/value pair. On updates, an empty value will delete the metadata entry.
+  bytes value = 2 [(validate.rules).bytes = {max_len: 500000}];
 }
 message SetOrganizationMetadataRequest{
   // Organization ID is the unique identifier of the organization whose metadata is to be set.

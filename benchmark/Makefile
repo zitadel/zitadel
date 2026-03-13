@@ -28,7 +28,7 @@ manipulate_user: bundle
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/manipulate_user.js --vus ${VUS} --duration ${DURATION} --out csv=output/manipulate_user_${DATE}.csv
 
 .PHONY: introspect
-introspect: ensure_modules bundle
+introspect: ensure_key_pair ensure_modules bundle
 	go install go.k6.io/xk6/cmd/xk6@latest
 	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/introspection.js --vus ${VUS} --duration ${DURATION} --out csv=output/introspect_${DATE}.csv
@@ -46,7 +46,7 @@ password_session: ensure_key_pair ensure_modules bundle
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/password_session.js --vus ${VUS} --duration ${DURATION} --out csv=output/otp_session_${DATE}.csv
 
 .PHONY: add_session
-add_session: ensure_modules bundle
+add_session: ensure_key_pair ensure_modules bundle
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/add_session.js --vus ${VUS} --duration ${DURATION} --out csv=output/add_session_${DATE}.csv
 
 .PHONY: machine_jwt_profile_grant

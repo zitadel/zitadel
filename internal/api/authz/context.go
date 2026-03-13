@@ -151,7 +151,7 @@ func projectIDAndCheckOriginForClientID(ctx context.Context, clientID string, t 
 	projectID, origins, err := t.ProjectIDAndOriginsByClientID(ctx, clientID)
 	logging.WithFields("clientID", clientID).OnError(err).Debug("could not check projectID and origin of clientID (might be service account)")
 
-	// We used to check origins for every token, but service users shouldn't be used publicly (native app / SPA).
+	// We used to check origins for every token, but service accounts shouldn't be used publicly (native app / SPA).
 	// Therefore, mostly won't send an origin and aren't able to configure them anyway.
 	// For the current time we will only check origins for tokens issued to users through apps (code / implicit flow).
 	if projectID == "" {

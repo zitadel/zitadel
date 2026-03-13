@@ -223,6 +223,12 @@ export class AppComponent {
         takeUntilDestroyed(),
       )
       .subscribe({
+        next: async (org) => {
+          if (!org) {
+            return this.router.navigate(['/users/me']);
+          }
+          return true;
+        },
         error: async (err) => {
           console.error(err);
           return this.router.navigate(['/users/me']);

@@ -368,7 +368,7 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *connect.Request[user.StartIdentityProviderIntentRequest]) (_ *connect.Response[user.StartIdentityProviderIntentResponse], err error) {
 	switch t := req.Msg.GetContent().(type) {
 	case *user.StartIdentityProviderIntentRequest_Urls:
-		return s.startIDPIntent(ctx, req.Msg.GetIdpId(), t.Urls)
+		return s.startIDPIntent(ctx, req.Msg.GetIdpId(), t.Urls, t.Urls.LoginHint)
 	case *user.StartIdentityProviderIntentRequest_Ldap:
 		return s.startLDAPIntent(ctx, req.Msg.GetIdpId(), t.Ldap)
 	default:
@@ -376,12 +376,12 @@ func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *connect.R
 	}
 }
 
-func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*connect.Response[user.StartIdentityProviderIntentResponse], error) {
-	state, session, err := s.command.AuthFromProvider(ctx, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
+func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs, loginHint string) (*connect.Response[user.StartIdentityProviderIntentResponse], error) {
+	state, session, err := s.command.AuthFromProvider(ctx, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID), loginHint)
 	if err != nil {
 		return nil, err
 	}
-	_, details, err := s.command.CreateIntent(ctx, state, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID(), session.PersistentParameters())
+	_, details, err := s.command.CreateIntent(ctx, state, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID(), loginHint, session.PersistentParameters())
 	if err != nil {
 		return nil, err
 	}
@@ -410,7 +410,7 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 }
 
 func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*connect.Response[user.StartIdentityProviderIntentResponse], error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, "", idpID, "", "", authz.GetInstance(ctx).InstanceID(), nil)
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, "", idpID, "", "", authz.GetInstance(ctx).InstanceID(), "", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -522,7 +522,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 		UserId: intent.UserID,
 	}
 	if intent.IDPIDToken != "" || intent.IDPAccessToken != nil {
-		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, alg)
+		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, intent.IDPRefreshToken, alg)
 		if err != nil {
 			return nil, err
 		}
@@ -547,7 +547,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 	return connect.NewResponse(information), nil
 }
 
-func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
+func idpOAuthTokensToPb(idpIDToken string, idpAccessToken, idpRefreshToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
 	var idToken *string
 	if idpIDToken != "" {
 		idToken = &idpIDToken
@@ -559,10 +559,19 @@ func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, a
 			return nil, err
 		}
 	}
+	var refreshToken *string
+	if idpRefreshToken != nil {
+		decryptedRefreshToken, err := crypto.DecryptString(idpRefreshToken, alg)
+		if err != nil {
+			return nil, err
+		}
+		refreshToken = &decryptedRefreshToken
+	}
 	return &user.IDPInformation_Oauth{
 		Oauth: &user.IDPOAuthAccessInformation{
-			AccessToken: accessToken,
-			IdToken:     idToken,
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+			IdToken:      idToken,
 		},
 	}, nil
 }

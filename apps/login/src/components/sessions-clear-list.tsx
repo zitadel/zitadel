@@ -4,7 +4,7 @@ import { clearSession } from "@/lib/server/session";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { redirect, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Alert, AlertType } from "./alert";
 import { SessionClearItem } from "./session-clear-item";
 import { Translated } from "./translated";
@@ -20,7 +20,7 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
   const [list, setList] = useState<Session[]>(sessions);
   const router = useRouter();
 
-  async function clearHintedSession() {
+  const clearHintedSession = useCallback(async () => {
     console.log("Clearing session for login hint:", logoutHint);
     // If a login hint is provided, we logout that specific session
     const sessionIdToBeCleared = sessions.find((session) => {
@@ -53,13 +53,13 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
     } else {
       console.warn(`No session found for login hint: ${logoutHint}`);
     }
-  }
+  }, [logoutHint, sessions, postLogoutRedirectUri, organization, router]);
 
   useEffect(() => {
     if (logoutHint) {
       clearHintedSession();
     }
-  }, []);
+  }, [logoutHint, clearHintedSession]);
 
   return sessions ? (
     <div className="flex flex-col space-y-2">
