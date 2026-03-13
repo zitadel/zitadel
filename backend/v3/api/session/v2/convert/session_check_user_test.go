@@ -47,7 +47,7 @@ func TestCheckUserGRPCToQueryOpt(t *testing.T) {
 			t.Parallel()
 
 			// Test
-			res, err := CheckUserGRPCToQueryOpt(tc.inputCheckUser)
+			res, err := CheckUserGRPCToDomain(tc.inputCheckUser)
 
 			// Verify
 			assert.ErrorIs(t, err, tc.expectedError)
