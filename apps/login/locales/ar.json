@@ -25,7 +25,8 @@
   "loginname": {
     "title": "مرحباً بعودتك!",
     "description": "أدخل بيانات الدخول الخاصة بك.",
-    "register": "تسجيل مستخدم جديد",
+    "register": "إنشاء حساب",
+    "noAccount": "ليس لديك حساب؟",
     "submit": "متابعة",
     "labels": {
       "loginname": "اسم الدخول",

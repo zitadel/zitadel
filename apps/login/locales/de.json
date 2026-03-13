@@ -25,7 +25,8 @@
   "loginname": {
     "title": "Willkommen zurück!",
     "description": "Geben Sie Ihre Anmeldedaten ein.",
-    "register": "Neuen Benutzer registrieren",
+    "register": "Konto erstellen",
+    "noAccount": "Noch kein Konto?",
     "submit": "Weiter",
     "labels": {
       "loginname": "Loginname",

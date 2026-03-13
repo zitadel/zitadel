@@ -25,7 +25,8 @@
   "loginname": {
     "title": "Bentornato!",
     "description": "Inserisci i tuoi dati di accesso.",
-    "register": "Registrati come nuovo utente",
+    "register": "Crea un account",
+    "noAccount": "Non hai un account?",
     "submit": "Continua",
     "labels": {
       "loginname": "Nome di accesso",

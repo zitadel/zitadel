@@ -25,7 +25,8 @@
   "loginname": {
     "title": "お帰りなさい！",
     "description": "ログイン情報を入力してください。",
-    "register": "新規ユーザー登録",
+    "register": "アカウントを作成",
+    "noAccount": "アカウントをお持ちでないですか？",
     "submit": "続行",
     "labels": {
       "loginname": "ログイン名",

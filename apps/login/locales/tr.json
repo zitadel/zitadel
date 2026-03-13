@@ -25,7 +25,8 @@
   "loginname": {
     "title": "Tekrar hoş geldiniz!",
     "description": "Giriş bilgilerinizi girin.",
-    "register": "Yeni kullanıcı kaydet",
+    "register": "Hesap oluştur",
+    "noAccount": "Hesabınız yok mu?",
     "submit": "Devam",
     "labels": {
       "loginname": "Kullanıcı adı",
