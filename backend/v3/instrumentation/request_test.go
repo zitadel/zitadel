@@ -12,14 +12,15 @@ import (
 
 var testID = xid.New()
 
-func init() {
-	// Override idWithTime to return a fixed ID for testing
+func TestSetInstanceID(t *testing.T) {
+	originalXidWithTime := xidWithTime
 	xidWithTime = func(time.Time) xid.ID {
 		return testID
 	}
-}
+	t.Cleanup(func() {
+		xidWithTime = originalXidWithTime
+	})
 
-func TestSetInstanceID(t *testing.T) {
 	tests := []struct {
 		name        string
 		ctx         context.Context
@@ -54,6 +55,14 @@ func TestSetInstanceID(t *testing.T) {
 }
 
 func TestSetUserID(t *testing.T) {
+	originalXidWithTime := xidWithTime
+	xidWithTime = func(time.Time) xid.ID {
+		return testID
+	}
+	t.Cleanup(func() {
+		xidWithTime = originalXidWithTime
+	})
+
 	tests := []struct {
 		name        string
 		ctx         context.Context
