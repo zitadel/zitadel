@@ -71,7 +71,7 @@ type requestDetails struct {
 	mtx          sync.Mutex
 	id           xid.ID
 	instanceHost string
-	publicHost   string
+	publicHost   string // may optionally be set through header (login v2)
 	instanceID   string
 	userID       string
 }
@@ -85,8 +85,10 @@ func (d *requestDetails) slogAttributes() []any {
 	attributes = append(attributes,
 		slog.String("id", d.id.String()),
 		slog.String("instance_host", d.instanceHost),
-		slog.String("public_host", d.publicHost),
 	)
+	if d.publicHost != "" {
+		attributes = append(attributes, slog.String("public_host", d.publicHost))
+	}
 	if d.instanceID != "" {
 		attributes = append(attributes, slog.String("instance_id", d.instanceID))
 	}
