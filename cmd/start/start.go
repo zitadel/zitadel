@@ -208,6 +208,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}))
 
 	new_domain.SetLegacyEventstore(eventstoreClient)
+	new_domain.SetSystemConfig(config.SystemDefaults)
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)

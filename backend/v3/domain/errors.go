@@ -74,3 +74,44 @@ func NewUnexpectedTextQueryOperationError[T any](assertedType T) error {
 func (u *UnexpectedTextQueryOperationError[T]) Error() string {
 	return fmt.Sprintf("Message=unexpected text query operation type '%T'", u.assertedType)
 }
+
+type PasswordVerificationError struct {
+	failedAttempts uint8
+}
+
+func NewPasswordVerificationError(failedPassAttempts uint8) error {
+	return &PasswordVerificationError{
+		failedAttempts: failedPassAttempts,
+	}
+}
+
+func (e *PasswordVerificationError) Error() string {
+	return fmt.Sprintf("Message=failed password attempts (%d)", e.failedAttempts)
+}
+
+func (err *PasswordVerificationError) Is(target error) bool {
+	_, ok := target.(*PasswordVerificationError)
+	return ok
+}
+
+type RowsReturnedMismatchError struct {
+	Msg      string
+	Expected int64
+	Actual   int64
+}
+
+func NewRowsReturnedMismatchError(expected, actual int64) error {
+	return &RowsReturnedMismatchError{
+		Expected: expected,
+		Actual:   actual,
+	}
+}
+
+func (err *RowsReturnedMismatchError) Error() string {
+	return fmt.Sprintf("Message=expecting %d row(s) returned, got %d", err.Expected, err.Actual)
+}
+
+func (err *RowsReturnedMismatchError) Is(target error) bool {
+	_, ok := target.(*RowsReturnedMismatchError)
+	return ok
+}

@@ -51,6 +51,12 @@ func WithUserRepo(repo UserRepository) InvokeOpt {
 	}
 }
 
+func WithLockoutSettingsRepo(repo LockoutSettingsRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.lockoutSettingRepo = repo
+	}
+}
+
 func WithPermissionChecker(checker PermissionChecker) InvokeOpt {
 	return func(opts *InvokeOpts) {
 		opts.Permissions = checker
@@ -93,6 +99,9 @@ type InvokeOpts struct {
 	instanceDomainRepo     InstanceDomainRepository
 	sessionRepo            SessionRepository
 	userRepo               UserRepository
+
+	// Settings repos
+	lockoutSettingRepo LockoutSettingsRepository
 }
 
 func (o *InvokeOpts) DB() database.QueryExecutor {
