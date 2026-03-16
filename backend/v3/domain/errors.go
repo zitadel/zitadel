@@ -109,7 +109,7 @@ func handleGetError(inputErr error, errorID, objectType string) error {
 		return zerrors.ThrowNotFoundf(inputErr, errorID, "%s not found", objectType)
 	}
 
-	return zerrors.ThrowInternalf(inputErr, errorID, "failed fetching %s", objectType)
+	return zerrors.CreateZitadelError(zerrors.KindInternal, inputErr, errorID, fmt.Sprintf("failed fetching %s", objectType), 1)
 }
 
 func (err *PasswordVerificationError) Is(target error) bool {
