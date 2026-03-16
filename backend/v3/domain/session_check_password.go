@@ -194,39 +194,6 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	return err
 }
 
-func (p *PasswordCheckCommand) getLockoutPolicy(ctx context.Context, opts *InvokeOpts, orgID string) (*LockoutSettings, error) {
-	lockoutSettingRepo := opts.lockoutSettingRepo
-
-	// We need the organization lockout policy first, and if not available, the instance (default) policy.
-	// So we retrieve all records with a matching instance ID and organization ID OR
-	// all records with a matching instance ID and NULL (or empty) organization ID.
-	// Then we assume NULLs are sorted as largest numbers (that's the case in Postgres),
-	// so we sort ascending by organization ID.
-	// We limit the result to 1 so that we get either the org policy or the instance one.
-	settings, err := lockoutSettingRepo.List(ctx, opts.DB(),
-		p.listLockoutSettingCondition(lockoutSettingRepo, orgID),
-		database.WithOrderByAscending(lockoutSettingRepo.OrganizationIDColumn(), lockoutSettingRepo.InstanceIDColumn()),
-		database.WithLimit(1),
-	)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "DOM-3B8Z6s", "failed fetching lockout settings")
-	}
-
-	if rowsReturned := len(settings); rowsReturned != 1 {
-		return nil, zerrors.ThrowInternal(NewRowsReturnedMismatchError(1, int64(rowsReturned)), "DOM-mmsrCt", "unexpected number of rows returned")
-	}
-
-	return settings[0], nil
-}
-
-func (p *PasswordCheckCommand) listLockoutSettingCondition(repo LockoutSettingsRepository, orgID string) database.QueryOption {
-	instanceAndOrg := database.And(repo.InstanceIDCondition(p.InstanceID), repo.OrganizationIDCondition(&orgID))
-	orgNullOrEmpty := database.Or(repo.OrganizationIDCondition(nil), repo.OrganizationIDCondition(gu.Ptr("")))
-	onlyInstance := database.And(repo.InstanceIDCondition(p.InstanceID), orgNullOrEmpty)
-
-	return database.WithCondition(database.Or(instanceAndOrg, onlyInstance))
-}
-
 func (p *PasswordCheckCommand) GetPasswordCheckChanges(ctx context.Context, opts *InvokeOpts, humanRepo HumanUserRepository, updatedHash string, checkType VerificationType) (database.Changes, error) {
 	dbUpdates := make(database.Changes, 1)
 	switch ct := checkType.(type) {
@@ -238,7 +205,7 @@ func (p *PasswordCheckCommand) GetPasswordCheckChanges(ctx context.Context, opts
 		}
 	case *VerificationTypeFailed:
 		dbUpdates[0] = humanRepo.IncrementPasswordFailedAttempts()
-		lockoutPolicy, err := p.getLockoutPolicy(ctx, opts, p.FetchedUser.OrganizationID)
+		lockoutPolicy, err := getLockoutPolicy(ctx, opts, p.InstanceID, p.FetchedUser.OrganizationID)
 		if err != nil {
 			return nil, err
 		}
@@ -267,7 +234,7 @@ func (p *PasswordCheckCommand) GetPasswordCheckAndError(err error) (Verification
 		err = zerrors.ThrowInvalidArgument(
 			NewPasswordVerificationError(p.FetchedUser.Human.Password.FailedAttempts+1),
 			"DOM-3gcfDV",
-			"Errors.User.Password.Invalid",
+			"Errors.user.Password.Invalid",
 		)
 		return &VerificationTypeFailed{FailedAt: p.CheckTime}, err
 	}
@@ -305,13 +272,13 @@ func (p *PasswordCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 	}
 
 	if session.UserID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-hord0Z", "Errors.User.UserIDMissing")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-hord0Z", "Errors.user.UserIDMissing")
 	}
 
 	user, err := userRepo.Get(ctx, opts.DB(), database.WithCondition(userRepo.IDCondition(session.UserID)))
 	if err != nil {
 		if errors.Is(err, &database.NoRowFoundError{}) {
-			return zerrors.ThrowNotFound(err, "DOM-zxKosn", "Errors.User.NotFound")
+			return zerrors.ThrowNotFound(err, "DOM-zxKosn", "Errors.user.NotFound")
 		}
 		return zerrors.ThrowInternal(err, "DOM-nKD4Gq", "failed fetching user")
 	}
@@ -324,12 +291,12 @@ func (p *PasswordCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 		return zerrors.ThrowPreconditionFailedf(
 			NewPasswordVerificationError(user.Human.Password.FailedAttempts),
 			"DOM-D804Sj",
-			"Errors.User.Locked",
+			"Errors.user.Locked",
 		)
 	}
 
 	if human.Password.Hash == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-gklgos", "Errors.User.Password.NotSet")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-gklgos", "Errors.user.Password.NotSet")
 	}
 
 	p.FetchedUser = *user
@@ -338,3 +305,37 @@ func (p *PasswordCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 }
 
 var _ Commander = (*PasswordCheckCommand)(nil)
+
+// todo: move to a common file for use in other checks as well
+func getLockoutPolicy(ctx context.Context, opts *InvokeOpts, instanceID, orgID string) (*LockoutSettings, error) {
+	lockoutSettingRepo := opts.lockoutSettingRepo
+
+	// We need the organization lockout policy first, and if not available, the instance (default) policy.
+	// So we retrieve all records with a matching instance ID and organization ID OR
+	// all records with a matching instance ID and NULL (or empty) organization ID.
+	// Then we assume NULLs are sorted as largest numbers (that's the case in Postgres),
+	// so we sort ascending by organization ID.
+	// We limit the result to 1 so that we get either the org policy or the instance one.
+	settings, err := lockoutSettingRepo.List(ctx, opts.DB(),
+		listLockoutSettingCondition(lockoutSettingRepo, instanceID, orgID),
+		database.WithOrderByAscending(lockoutSettingRepo.OrganizationIDColumn(), lockoutSettingRepo.InstanceIDColumn()),
+		database.WithLimit(1),
+	)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "DOM-3B8Z6s", "failed fetching lockout settings")
+	}
+
+	if rowsReturned := len(settings); rowsReturned != 1 {
+		return nil, zerrors.ThrowInternal(NewRowsReturnedMismatchError(1, int64(rowsReturned)), "DOM-mmsrCt", "unexpected number of rows returned")
+	}
+
+	return settings[0], nil
+}
+
+func listLockoutSettingCondition(repo LockoutSettingsRepository, instanceID, orgID string) database.QueryOption {
+	instanceAndOrg := database.And(repo.InstanceIDCondition(instanceID), repo.OrganizationIDCondition(&orgID))
+	orgNullOrEmpty := database.Or(repo.OrganizationIDCondition(nil), repo.OrganizationIDCondition(gu.Ptr("")))
+	onlyInstance := database.And(repo.InstanceIDCondition(instanceID), orgNullOrEmpty)
+
+	return database.WithCondition(database.Or(instanceAndOrg, onlyInstance))
+}
