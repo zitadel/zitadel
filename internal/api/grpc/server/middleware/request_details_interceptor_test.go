@@ -4,14 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/internal/api/call"
-	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
 func TestRequestDetailsHandler_gRPC(t *testing.T) {
@@ -72,4 +69,3 @@ func TestRequestDetailsHandler_gRPC(t *testing.T) {
 		})
 	}
 }
-
