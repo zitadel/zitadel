@@ -18,7 +18,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
-	cryptomock "github.com/zitadel/zitadel/internal/crypto/mock"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
@@ -1044,7 +1043,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			"encryption fails",
 			fields{
 				idpConfigEncryption: func() crypto.EncryptionAlgorithm {
-					m := cryptomock.NewMockEncryptionAlgorithm(gomock.NewController(t))
+					m := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
 					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
@@ -1062,7 +1061,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			"token encryption fails",
 			fields{
 				idpConfigEncryption: func() crypto.EncryptionAlgorithm {
-					m := cryptomock.NewMockEncryptionAlgorithm(gomock.NewController(t))
+					m := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
 					m.EXPECT().Encrypt(gomock.Any()).DoAndReturn(func(value []byte) ([]byte, error) {
 						return value, nil
 					})
@@ -1183,7 +1182,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			"encryption fails",
 			fields{
 				idpConfigEncryption: func() crypto.EncryptionAlgorithm {
-					m := cryptomock.NewMockEncryptionAlgorithm(gomock.NewController(t))
+					m := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
 					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
@@ -1371,7 +1370,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 			"encryption fails",
 			fields{
 				idpConfigEncryption: func() crypto.EncryptionAlgorithm {
-					m := cryptomock.NewMockEncryptionAlgorithm(gomock.NewController(t))
+					m := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
 					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
@@ -1543,7 +1542,7 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 					},
 				},
 				func() crypto.EncryptionAlgorithm {
-					m := cryptomock.NewMockEncryptionAlgorithm(gomock.NewController(t))
+					m := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
 					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),

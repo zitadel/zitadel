@@ -10,7 +10,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	cryptomock "github.com/zitadel/zitadel/internal/crypto/mock"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -372,7 +371,7 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 						),
 					),
 				),
-				userEncryption:              cryptomock.NewMockEncryptionAlgorithm(gomock.NewController(t)),
+				userEncryption:              crypto.NewMockEncryptionAlgorithm(gomock.NewController(t)),
 				defaultSecretGenerators:     defaultGenerators,
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("a", time.Hour),
 			},
@@ -460,7 +459,7 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 						),
 					),
 				),
-				userEncryption:          cryptomock.NewMockEncryptionAlgorithm(gomock.NewController(t)),
+				userEncryption:          crypto.NewMockEncryptionAlgorithm(gomock.NewController(t)),
 				defaultSecretGenerators: defaultGenerators,
 			},
 			args: args{

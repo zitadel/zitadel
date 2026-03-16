@@ -5,7 +5,6 @@ import (
 
 	"go.uber.org/mock/gomock"
 
-	cryptomock "github.com/zitadel/zitadel/internal/crypto/mock"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -18,8 +17,8 @@ func CreateMockEncryptionAlg(ctrl *gomock.Controller) EncryptionAlgorithm {
 	)
 }
 
-func createMockEncryptionAlgorithm(ctrl *gomock.Controller, encryptFunction func(c []byte) ([]byte, error)) *cryptomock.MockEncryptionAlgorithm {
-	mCrypto := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+func createMockEncryptionAlgorithm(ctrl *gomock.Controller, encryptFunction func(c []byte) ([]byte, error)) EncryptionAlgorithm {
+	mCrypto := NewMockEncryptionAlgorithm(ctrl)
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("enc")
 	mCrypto.EXPECT().EncryptionKeyID().AnyTimes().Return("id")
 	mCrypto.EXPECT().DecryptionKeyIDs().AnyTimes().Return([]string{"id"})
@@ -46,7 +45,7 @@ func createMockEncryptionAlgorithm(ctrl *gomock.Controller, encryptFunction func
 }
 
 func createMockCrypto(t *testing.T) EncryptionAlgorithm {
-	mCrypto := cryptomock.NewMockEncryptionAlgorithm(gomock.NewController(t))
+	mCrypto := NewMockEncryptionAlgorithm(gomock.NewController(t))
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("crypto")
 	return mCrypto
 }

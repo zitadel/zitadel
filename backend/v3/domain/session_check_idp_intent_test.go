@@ -19,7 +19,6 @@ import (
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
-	cryptomock "github.com/zitadel/zitadel/internal/crypto/mock"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/session"
@@ -193,7 +192,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -220,7 +219,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -254,7 +253,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -288,7 +287,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -322,7 +321,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -356,7 +355,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -390,7 +389,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -431,7 +430,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -472,7 +471,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -513,7 +512,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -567,7 +566,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -612,7 +611,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
@@ -657,7 +656,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
 					EncryptionKeyID().
 					Times(1)
