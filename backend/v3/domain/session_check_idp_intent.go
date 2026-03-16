@@ -36,9 +36,9 @@ func NewIDPIntentCheckCommand(request *CheckIDPIntentType, sessionID, instanceID
 		CheckIntent: request,
 		SessionID:   sessionID,
 		InstanceID:  instanceID,
+		EncAlgo:     idpEncryptionAlgo,
 	}
 
-	idpCheckCommand.EncAlgo = idpEncryptionAlgo
 	if encryptionAlgo != nil {
 		idpCheckCommand.EncAlgo = encryptionAlgo
 	}

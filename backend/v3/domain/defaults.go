@@ -13,8 +13,8 @@ import (
 
 var (
 	pool              database.Pool
-	tracer            tracing.Tracer
-	runtimeLogger     *slog.Logger = logging.New(logging.StreamRuntime, nil)
+	tracer            tracing.Tracer = tracing.GlobalTracer()
+	runtimeLogger     *slog.Logger   = logging.New(logging.StreamRuntime, nil)
 	legacyEventstore  eventstore.LegacyEventstore
 	sysConfig         systemdefaults.SystemDefaults
 	passwordHasher    *crypto.Hasher
