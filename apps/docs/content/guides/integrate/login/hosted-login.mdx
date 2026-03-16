@@ -81,6 +81,12 @@ The login page can be changed by customizing different branding aspects and you 
 By default, the displayed branding is defined [based on the user's domain](/guides/solution-scenarios/domain-discovery). In case you want to show the branding of a specific organization by default, you need to either pass an Organization Domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
 </Callout>
 
+<Callout type="warning" title="Customizing texts in Hosted Login V2">
+Currently, interface texts for the new Hosted Login V2 cannot be customized directly through the Management Console.
+
+To update translations in Login V2, you must use the [Settings V2 API](/apis/resources/settings_service_v2/settings-service-set-hosted-login-translation). You can reference the default keys in the [`en.json` locale file](https://github.com/zitadel/zitadel/blob/main/apps/login/locales/en.json) from the ZITADEL repository. You can send a payload that includes only the keys you want to override; Login V2 will automatically merge your keys with the defaults and handle any fallbacks.
+</Callout>
+
 ### Fast account switching
 
 The hosted login page remembers users who have previously authenticated.
