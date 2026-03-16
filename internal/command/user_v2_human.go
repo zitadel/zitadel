@@ -301,7 +301,9 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 	}
 
 	if human.Changed() {
-		if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, !metadataChanged); err != nil {
+		// Changing metadata or setting email, resp. phone to verified is only allowed with user write permissions, but not for self-management.
+		requireWritePermission := metadataChanged || (human.Email != nil && human.Email.Verified) || (human.Phone != nil && human.Phone.Verified)
+		if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, !requireWritePermission); err != nil {
 			return err
 		}
 	}
@@ -339,13 +341,12 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 		}
 	}
 
-	for _, md := range human.Metadata {
-		cmd, err := c.setUserMetadata(ctx, userAgg, md)
+	if len(human.Metadata) > 0 {
+		metadataCmds, err := c.createMetadataEvents(ctx, human.Metadata, existingHuman.Metadata, userAgg)
 		if err != nil {
 			return err
 		}
-
-		cmds = append(cmds, cmd)
+		cmds = append(cmds, metadataCmds...)
 	}
 
 	for _, mdKey := range human.MetadataKeysToRemove {

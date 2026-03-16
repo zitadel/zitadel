@@ -8,6 +8,5 @@ export async function getDeviceAuthorizationRequest(userCode: string) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  return zitadelGetDeviceAuthorizationRequest({ serviceConfig, userCode,
-  });
+  return zitadelGetDeviceAuthorizationRequest({ serviceConfig, userCode });
 }

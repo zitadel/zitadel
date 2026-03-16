@@ -27,9 +27,7 @@ describe("TotpRegister", () => {
   afterEach(cleanup);
 
   test("should autofocus the code input on mount", () => {
-    const { getByTestId } = render(
-      <TotpRegister uri="otpauth://totp/test" secret="SECRET" />,
-    );
+    const { getByTestId } = render(<TotpRegister uri="otpauth://totp/test" secret="SECRET" />);
     expect(getByTestId("code-text-input")).toHaveFocus();
   });
 });

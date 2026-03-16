@@ -31,8 +31,6 @@ CREATE TABLE zitadel.identity_provider_intents
     expires_at              TIMESTAMPTZ,
 
     PRIMARY KEY (instance_id, id),
-    -- TODO(@adlerhurst): easiest would be to create the index in the user migrations so that we can merge this one but the problem is that the migration might fail if there are already intents created.
-    -- FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users (instance_id, id) ON DELETE CASCADE,
     FOREIGN KEY (instance_id, idp_id) REFERENCES zitadel.identity_providers (instance_id, id) ON DELETE CASCADE
 );
 

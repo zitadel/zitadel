@@ -121,6 +121,11 @@ FirstInstance:
   PatPath: # ZITADEL_FIRSTINSTANCE_PATPATH
   LoginClientPatPath: # ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH
   InstanceName: ZITADEL # ZITADEL_FIRSTINSTANCE_INSTANCENAME
+  # A list of trusted domains, which are allowed to be used for public responses like email links or when running
+  # ZITADEL or the login UI behind a reverse proxy. If no trusted domain is set, the instance domain is used.
+  TrustedDomains: # ZITADEL_FIRSTINSTANCE_TRUSTEDDOMAINS
+  #  - login.example.com
+  #  - api.example.com
   DefaultLanguage: en # ZITADEL_FIRSTINSTANCE_DEFAULTLANGUAGE
   Org:
     Name: ZITADEL # ZITADEL_FIRSTINSTANCE_ORG_NAME

@@ -1,0 +1,28 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+
+exporters:
+  # Traces are logged to stdout in a human-readable format by default.
+  # To forward to your own OTLP-compatible backend (Grafana Tempo, Jaeger, OpenObserve, etc.),
+  # uncomment the otlp exporter below and set OTEL_BACKEND_ENDPOINT in .env.
+  debug:
+    verbosity: basic
+  # otlp:
+  #   endpoint: ${env:OTEL_BACKEND_ENDPOINT}
+  #   tls:
+  #     insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
+      # To also forward to a backend, add otlp to the list:
+      # exporters: [debug, otlp]

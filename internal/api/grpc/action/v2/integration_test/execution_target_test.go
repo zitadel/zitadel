@@ -71,7 +71,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 				// create target for target changes
 				targetCreatedName := integration.TargetName()
-				targetCreatedURL := "https://nonexistent"
+				targetCreatedURL := "https://example.com"
 				targetCreatedPayloadType := action.PayloadType_PAYLOAD_TYPE_JSON
 
 				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false, targetCreatedPayloadType)
@@ -225,7 +225,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 				// create target for target changes
 				targetCreatedName := integration.TargetName()
-				targetCreatedURL := "https://nonexistent"
+				targetCreatedURL := "https://example.com"
 				targetCreatedPayloadType := action.PayloadType_PAYLOAD_TYPE_JSON
 
 				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false, targetCreatedPayloadType)

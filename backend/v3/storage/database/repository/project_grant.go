@@ -64,7 +64,9 @@ func (p projectGrant) Create(ctx context.Context, client database.QueryExecutor,
 	// separate statement to add roles to project grant
 	builder := database.NewStatementBuilder(insertProjectGrantRolesStmt, projectGrant.RoleKeys)
 
-	builder.WriteString(`INSERT INTO ` + p.qualifiedTableName() + ` (instance_id, id, project_id, granting_organization_id, granted_organization_id, state, created_at, updated_at) VALUES ( `)
+	builder.WriteString(`INSERT INTO `)
+	builder.WriteString(p.qualifiedTableName())
+	builder.WriteString(` (instance_id, id, project_id, granting_organization_id, granted_organization_id, state, created_at, updated_at) VALUES ( `)
 	builder.WriteArgs(
 		projectGrant.InstanceID,
 		projectGrant.ID,
@@ -123,7 +125,9 @@ func (p projectGrant) Update(ctx context.Context, client database.QueryExecutor,
 
 	// now we add the logic to do the required changes based on the given project grant
 	builder.WriteString(updateProjectGrantRoleStmt)
-	database.Changes(changes).Write(builder)
+	if err := database.Changes(changes).Write(builder); err != nil {
+		return 0, err
+	}
 	builder.WriteString(updateProjectGrantRoleStmtWhere)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)

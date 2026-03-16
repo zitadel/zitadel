@@ -186,6 +186,7 @@ func NewServer(
 			middleware.MetricsHandler(metricTypes),
 			middleware.TraceHandler(),
 			middleware.LogHandler("oidc"),
+			middleware.RecoverHandler(writeRecoverError),
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
