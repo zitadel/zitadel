@@ -752,13 +752,14 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 					require.NoError(t, err)
 					var id string
-					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
+					require.EventuallyWithT(t, func(collectT *assert.CollectT) {
 						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 							UserCode: req.UserCode,
 						})
 						assert.NoError(collectT, err)
 						id = resp.GetDeviceAuthorizationRequest().GetId()
-					}, 5*time.Second, 100*time.Millisecond)
+					}, retryDuration, tick)
 					return id
 				}(),
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
@@ -778,13 +779,14 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 					require.NoError(t, err)
 					var id string
-					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
+					require.EventuallyWithT(t, func(collectT *assert.CollectT) {
 						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 							UserCode: req.UserCode,
 						})
 						assert.NoError(collectT, err)
 						id = resp.GetDeviceAuthorizationRequest().GetId()
-					}, 5*time.Second, 100*time.Millisecond)
+					}, retryDuration, tick)
 					return id
 				}(),
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
@@ -804,13 +806,14 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 					require.NoError(t, err)
 					var id string
-					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
+					require.EventuallyWithT(t, func(collectT *assert.CollectT) {
 						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 							UserCode: req.UserCode,
 						})
 						assert.NoError(collectT, err)
 						id = resp.GetDeviceAuthorizationRequest().GetId()
-					}, 5*time.Second, 100*time.Millisecond)
+					}, retryDuration, tick)
 					return id
 				}(),
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Deny{},
@@ -826,13 +829,14 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 					require.NoError(t, err)
 					var id string
-					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
+					require.EventuallyWithT(t, func(collectT *assert.CollectT) {
 						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 							UserCode: req.UserCode,
 						})
 						assert.NoError(collectT, err)
 						id = resp.GetDeviceAuthorizationRequest().GetId()
-					}, 5*time.Second, 100*time.Millisecond)
+					}, retryDuration, tick)
 					return id
 				}(),
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Deny{},
@@ -848,13 +852,14 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 					require.NoError(t, err)
 					var id string
-					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
+					require.EventuallyWithT(t, func(collectT *assert.CollectT) {
 						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 							UserCode: req.UserCode,
 						})
 						assert.NoError(collectT, err)
 						id = resp.GetDeviceAuthorizationRequest().GetId()
-					}, 5*time.Second, 100*time.Millisecond)
+					}, retryDuration, tick)
 					return id
 				}(),
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
@@ -874,13 +879,14 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 					require.NoError(t, err)
 					var id string
-					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
+					require.EventuallyWithT(t, func(collectT *assert.CollectT) {
 						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 							UserCode: req.UserCode,
 						})
 						assert.NoError(collectT, err)
 						id = resp.GetDeviceAuthorizationRequest().GetId()
-					}, 5*time.Second, 100*time.Millisecond)
+					}, retryDuration, tick)
 					return id
 				}(),
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{

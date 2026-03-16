@@ -19,8 +19,6 @@ export class DisplayJsonDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
     this.event = data.event;
-    if ((data.event as Event) && data.event.payload) {
-    }
   }
 
   public closeDialog(): void {

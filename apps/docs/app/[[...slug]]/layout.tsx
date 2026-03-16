@@ -26,7 +26,7 @@ export default async function Layout(props: { children: ReactNode; params: Promi
     }
   });
 
-  let tree = source.pageTree;
+  let tree: typeof source.pageTree;
   if (currentVersion !== 'latest') {
     // Hoist the version folder to root to flatten sidebar
     // versionSource.pageTree -> [ v4.10 folder, v4.9 folder ... ]

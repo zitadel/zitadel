@@ -176,6 +176,7 @@ func NewJsonChanges(col database.Column, changes ...JsonUpdate) database.Change 
 	}
 }
 
+// WriteArg implements [gomock.Matcher].
 func (c *jsonChanges) Matches(x any) bool {
 	toMatch, ok := x.(*jsonChanges)
 	if !ok {
@@ -205,10 +206,12 @@ func (c *jsonChanges) Matches(x any) bool {
 	return true
 }
 
+// WriteArg implements [database.Change].
 func (c *jsonChanges) String() string {
 	return "database.json.jsonChange"
 }
 
+// WriteArg implements [database.Change].
 func (c jsonChanges) Write(builder *database.StatementBuilder) error {
 	c.column.WriteUnqualified(builder)
 	builder.WriteString(" = ")
@@ -220,6 +223,12 @@ func (c jsonChanges) Write(builder *database.StatementBuilder) error {
 	return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
 }
 
+// WriteArg implements [database.Change].
 func (c jsonChanges) IsOnColumn(col database.Column) bool {
 	return c.column.Equals(col)
+}
+
+// WriteArg implements [database.Change].
+func (c jsonChanges) WriteArg(builder *database.StatementBuilder) {
+	c.column.WriteArg(builder)
 }

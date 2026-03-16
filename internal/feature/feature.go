@@ -9,6 +9,10 @@ import (
 type Key int
 
 const (
+	// Note: Do not change the values of the existing keys, as they are used in events and changing them would break existing events.
+	// If a key / feature is no longer used, mark it as reserved to prevent future use.
+	// And iterate the features projections to prevent them from getting stuck.
+
 	// Reserved: 2, 3, 5, 6, 8, 11, 12
 
 	KeyUnspecified                    Key = 0
@@ -19,7 +23,7 @@ const (
 	KeyOIDCSingleV1SessionTermination Key = 10
 	KeyLoginV2                        Key = 13
 	KeyPermissionCheckV2              Key = 14
-	KeyManagementConsoleUseV2UserApi  Key = 15
+	KeyConsoleUseV2UserApi            Key = 15
 	KeyEnableRelationalTables         Key = 16
 )
 

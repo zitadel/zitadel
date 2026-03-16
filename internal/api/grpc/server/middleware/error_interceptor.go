@@ -2,11 +2,13 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
 	_ "github.com/zitadel/zitadel/internal/statik"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func ErrorHandler() grpc.UnaryServerInterceptor {
@@ -15,7 +17,21 @@ func ErrorHandler() grpc.UnaryServerInterceptor {
 	}
 }
 
-func toGRPCError(ctx context.Context, req interface{}, handler grpc.UnaryHandler) (interface{}, error) {
-	resp, err := handler(ctx, req)
-	return resp, gerrors.ZITADELToGRPCError(ctx, err)
+func toGRPCError(ctx context.Context, req interface{}, handler grpc.UnaryHandler) (_ interface{}, err error) {
+	ctx, cancel := context.WithCancelCause(ctx)
+	defer func() {
+		if rec := recover(); rec != nil {
+			recErr, ok := rec.(error)
+			if !ok {
+				recErr = fmt.Errorf("%v", rec)
+			}
+			if recErr != nil {
+				err = zerrors.ThrowInternal(recErr, zerrors.IDRecover, "Errors.Internal")
+			}
+		}
+		cause := err // avoid passing the transport error as cancel cause.
+		err = gerrors.ZITADELToGRPCError(ctx, err)
+		cancel(cause)
+	}()
+	return handler(ctx, req)
 }

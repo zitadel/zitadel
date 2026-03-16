@@ -29,16 +29,12 @@ describe("RegisterFormIDPIncomplete", () => {
   afterEach(cleanup);
 
   test("should autofocus the username input when idpUserName is not provided", () => {
-    const { getByTestId } = render(
-      <RegisterFormIDPIncomplete {...defaultProps} />,
-    );
+    const { getByTestId } = render(<RegisterFormIDPIncomplete {...defaultProps} />);
     expect(getByTestId("username-text-input")).toHaveFocus();
   });
 
   test("should autofocus the firstname input when idpUserName is provided", () => {
-    const { getByTestId } = render(
-      <RegisterFormIDPIncomplete {...defaultProps} idpUserName="existing-user" />,
-    );
+    const { getByTestId } = render(<RegisterFormIDPIncomplete {...defaultProps} idpUserName="existing-user" />);
     expect(getByTestId("firstname-text-input")).toHaveFocus();
   });
 });

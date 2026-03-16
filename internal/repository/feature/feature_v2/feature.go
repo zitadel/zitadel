@@ -28,7 +28,7 @@ var (
 	InstanceOIDCSingleV1SessionTerminationEventType = setEventTypeFromFeature(feature.LevelInstance, feature.KeyOIDCSingleV1SessionTermination)
 	InstanceLoginVersion                            = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginV2)
 	InstancePermissionCheckV2                       = setEventTypeFromFeature(feature.LevelInstance, feature.KeyPermissionCheckV2)
-	InstanceManagementConsoleUseV2UserApi           = setEventTypeFromFeature(feature.LevelInstance, feature.KeyManagementConsoleUseV2UserApi)
+	InstanceManagementConsoleUseV2UserApi           = setEventTypeFromFeature(feature.LevelInstance, feature.KeyConsoleUseV2UserApi)
 	InstanceEnableRelationalTables                  = setEventTypeFromFeature(feature.LevelInstance, feature.KeyEnableRelationalTables)
 )
 

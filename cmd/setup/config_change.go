@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -60,6 +61,7 @@ func (mig *externalConfigChange) Execute(ctx context.Context, _ eventstore.Event
 		0,
 		nil,
 		&login.DefaultPaths{},
+		[]denylist.AddressChecker{},
 	)
 
 	if err != nil {

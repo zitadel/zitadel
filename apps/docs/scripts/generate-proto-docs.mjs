@@ -1,16 +1,17 @@
 import fs from 'fs';
 import { glob } from 'glob';
 import { join, dirname, resolve } from 'path';
-import { spawnSync } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
-import os from 'os';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
+const WORKSPACE_ROOT = resolve(ROOT_DIR, '../..');
 const PROTO_DIR = join(ROOT_DIR, '../../proto');
 const OPENAPI_DIR = join(ROOT_DIR, 'openapi');
 const VERSIONS_FILE = join(ROOT_DIR, 'content/versions.json');
 const REPO_URL = 'https://github.com/zitadel/zitadel.git';
+const PNPM_COMMAND = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
 
 async function run() {
   if (!fs.existsSync(VERSIONS_FILE)) {
@@ -21,14 +22,8 @@ async function run() {
   const versions = JSON.parse(fs.readFileSync(VERSIONS_FILE, 'utf8'));
   console.log(`Processing ${versions.length} versions from versions.json`);
 
-  const baseTempDir = fs.mkdtempSync(join(os.tmpdir(), 'zitadel-buf-'));
-  // Use a subdirectory for local generation to avoid pollution
-  const localGenDir = join(baseTempDir, 'local'); 
-  fs.mkdirSync(localGenDir, { recursive: true });
-
   const templatePath = resolve(join(ROOT_DIR, 'buf.gen.yaml'));
 
-  try {
   // Simple p-limit implementation to avoid adding dependency
   const pLimit = (concurrency) => {
     const queue = [];
@@ -69,10 +64,6 @@ async function run() {
     fs.rmSync(outputPath, { recursive: true, force: true });
     fs.mkdirSync(outputPath, { recursive: true });
 
-    // Create a unique temp dir for this specific generation task to avoid conflicts
-    const taskTempDir = join(baseTempDir, label);
-    fs.mkdirSync(taskTempDir, { recursive: true });
-
     // Determine buf input based on refType
     let bufInput;
     if (v.refType === 'local') {
@@ -87,6 +78,7 @@ async function run() {
 
 
     // Use spawn (async) instead of spawnSync to avoid blocking the event loop
+    // eslint-disable-next-line no-async-promise-executor
     await new Promise(async (resolvePromise, rejectPromise) => {
         // Dynamic discovery of excluded paths
         const getExcludedPaths = async () => {
@@ -145,56 +137,61 @@ async function run() {
             console.log(`Excluding ${excludedPaths.length} paths matching v3alpha or v2beta`);
         }
 
-        import('child_process').then(({ spawn }) => {
-            const args = [
-              '@bufbuild/buf', 'generate',
-              bufInput,
-              '--template', templatePath,
-              '--output', outputPath
-            ];
+        const args = [
+          'exec', 'buf', 'generate',
+          bufInput,
+          '--template', templatePath,
+          '--output', outputPath
+        ];
 
-            // Add excluded paths
-            for (const excludedPath of excludedPaths) {
-                args.push('--exclude-path', excludedPath);
+        // Add excluded paths
+        for (const excludedPath of excludedPaths) {
+          args.push('--exclude-path', excludedPath);
+        }
+
+        // Run from the workspace root so pnpm resolves the repo-pinned Buf binary.
+        const child = spawn(PNPM_COMMAND, args, {
+          cwd: WORKSPACE_ROOT,
+          stdio: 'inherit',
+          env: process.env
+        });
+
+        child.on('close', (code, signal) => {
+          if (code !== 0) {
+            let reason;
+            if (code === null && signal) {
+              reason = `terminated by signal ${signal}`;
+            } else if (typeof code === 'number') {
+              reason = `exit code ${code}`;
+            } else {
+              reason = 'process terminated for an unknown reason';
             }
 
-            const child = spawn('npx', args, {
-              cwd: taskTempDir, 
-              stdio: 'inherit',
-              env: process.env
-            });
-
-            child.on('close', (code) => {
-                if (code !== 0) {
-                    rejectPromise(new Error(`Failed to generate OpenAPI for ${label} (exit code ${code})`));
-                } else {
-                    console.log(`Successfully generated OpenAPI for ${label}`);
-                    
-                    // Post-generation cleanup: delete any missed v2beta/v3alpha files
-                    try {
-                        const generatedFiles = glob.sync('**/*', { cwd: outputPath, absolute: true, nodir: false });
-                        generatedFiles.forEach(f => {
-                            if (f.includes('v2beta') || f.includes('v3alpha')) {
-                                fs.rmSync(f, { recursive: true, force: true });
-                            }
-                        });
-                    } catch (e) {
-                        console.warn(`Failed to clean up OpenAPI specs for ${label}`, e);
-                    }
-                    
-                    resolvePromise();
+            rejectPromise(new Error(`Failed to generate OpenAPI for ${label} (${reason})`));
+          } else {
+            console.log(`Successfully generated OpenAPI for ${label}`);
+                
+            // Post-generation cleanup: delete any missed v2beta/v3alpha files
+            try {
+              const generatedFiles = glob.sync('**/*', { cwd: outputPath, absolute: true, nodir: false });
+              generatedFiles.forEach(f => {
+                if (f.includes('v2beta') || f.includes('v3alpha')) {
+                  fs.rmSync(f, { recursive: true, force: true });
                 }
-            });
-              
-            child.on('error', (err) => {
-                rejectPromise(err);
-            });
+              });
+            } catch (e) {
+              console.warn(`Failed to clean up OpenAPI specs for ${label}`, e);
+            }
+                
+            resolvePromise();
+          }
+        });
+          
+        child.on('error', (err) => {
+          rejectPromise(err);
         });
     });
   })));
-  } finally {
-    fs.rmSync(baseTempDir, { recursive: true, force: true });
-  }
 }
 
 run().catch(err => {

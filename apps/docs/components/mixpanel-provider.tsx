@@ -1,6 +1,6 @@
 'use client';
 
-import { initMixpanel, mixpanelClient, optInTracking, optOutTracking } from '@/utils/mixpanel';
+import { initMixpanel, optInTracking, optOutTracking } from '@/utils/mixpanel';
 import React, { useEffect } from 'react';
 
 export default function MixpanelProvider({ children }: { children: React.ReactNode }) {

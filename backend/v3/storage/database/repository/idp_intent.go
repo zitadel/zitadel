@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"time"
 
@@ -70,7 +69,9 @@ func (i idpIntentRepository) Create(ctx context.Context, client database.QueryEx
 	}
 
 	builder := new(database.StatementBuilder)
-	builder.WriteString(`INSERT INTO ` + i.qualifiedTableName() + ` (instance_id, id, success_url, failure_url, idp_id, idp_arguments, created_at, updated_at) VALUES ( `)
+	builder.WriteString(`INSERT INTO `)
+	builder.WriteString(i.qualifiedTableName())
+	builder.WriteString(` (instance_id, id, success_url, failure_url, idp_id, idp_arguments, created_at, updated_at) VALUES ( `)
 	builder.WriteArgs(intent.InstanceID, intent.ID, intent.SuccessURL.String(), intent.FailureURL.String(), intent.IDPID, intent.IDPArguments, createdAt, updatedAt)
 	builder.WriteString(` ) RETURNING created_at, updated_at`)
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&intent.CreatedAt, &intent.UpdatedAt)
@@ -95,7 +96,6 @@ func (i idpIntentRepository) Get(ctx context.Context, client database.QueryExecu
 	var builder database.StatementBuilder
 	builder.WriteString(queryIDPIntentStmt)
 	options.Write(&builder)
-	fmt.Println(builder.String())
 
 	return scanIDPIntent(ctx, client, &builder)
 }

@@ -3,10 +3,12 @@ package oidc
 import (
 	"context"
 	"errors"
+	"net/http"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -46,4 +48,8 @@ func oidcError(ctx context.Context, err error) error {
 	oidcErr := newOidcErr().WithParent(err)
 	oidcErr.Description = zError.GetMessage()
 	return op.NewStatusError(oidcErr, statusCode)
+}
+
+func writeRecoverError(w http.ResponseWriter, r *http.Request, err error) {
+	op.WriteError(w, r, err, logging.FromCtx(r.Context()))
 }
