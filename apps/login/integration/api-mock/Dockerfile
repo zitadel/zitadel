@@ -4,9 +4,9 @@ RUN buf export https://github.com/envoyproxy/protoc-gen-validate.git --path vali
     buf export https://github.com/googleapis/googleapis.git --path google/api/annotations.proto --path google/api/http.proto --path google/api/field_behavior.proto --output /proto
 
     
-FROM golang:1.20.5-alpine3.18 AS mock-zitadel
+FROM golang:1.25.8-alpine3.22 AS mock-zitadel
 
-RUN go install github.com/eliobischof/grpc-mock/cmd/grpc-mock@01b09f60db1b501178af59bed03b2c22661df48c
+RUN go install github.com/conblem/grpc-mock/cmd/grpc-mock@f3c4cdd486f5afe7effa3a8aae5d26f45aa684c9
 
 COPY mocked-services.cfg .
 COPY initial-stubs initial-stubs
