@@ -44,8 +44,11 @@ type SessionRepository interface {
 	// Delete removes sessions based on the given condition.
 	// An additional permission condition can be provided to check if the session can be deleted, for example by checking the token id or user id.
 	// The primary condition is used to select the session(s) to be deleted, while the permission condition can be used to verify that the session(s) meet certain criteria before deletion
-	// respectively to return an error if the criteria are not met.
-	// The method returns the number of deleted rows and the latest expiration time of the deleted session in case of a single deleted session.
+	// respectively to return an error if the criteria are not met. In case no session matches the primary condition and a permission condition is provided,
+	// the method will return a permission denied error, as the session(s) that should be deleted do not meet the criteria defined in the permission condition.
+	// The method returns the number of deleted rows / session(s) and the latest deletion timestamp of the deleted session in case of a single deleted session.
+	// In case the session was previously deleted, the method returns 0 and the previous deletion timestamp.
+	// If multiple sessions are deleted, the method returns the number of deleted sessions and no timestamp, as it cannot be determined which session's deletion timestamp to return.
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error)
 }
 

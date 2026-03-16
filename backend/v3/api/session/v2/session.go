@@ -23,9 +23,12 @@ func DeleteSession(ctx context.Context, request *connect.Request[session.DeleteS
 		return nil, err
 	}
 
+	details := &object.Details{}
+	if !sessionDeleteCmd.DeletedAt.IsZero() {
+		details.ChangeDate = timestamppb.New(sessionDeleteCmd.DeletedAt)
+	}
+
 	return connect.NewResponse(&session.DeleteSessionResponse{
-		Details: &object.Details{
-			ChangeDate: timestamppb.New(sessionDeleteCmd.DeletedAt),
-		},
+		Details: details,
 	}), nil
 }

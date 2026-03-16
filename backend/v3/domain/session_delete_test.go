@@ -29,9 +29,8 @@ func TestDeleteSessionCommand_Validate(t *testing.T) {
 		mustCheckToken bool
 	}
 	type fields struct {
-		sessionRepo          func(ctrl *gomock.Controller) domain.SessionRepository
-		sessionTokenVerifier domain.SessionTokenVerifier
-		permissionCheck      func(ctrl *gomock.Controller) domain.PermissionChecker
+		sessionRepo     func(ctrl *gomock.Controller) domain.SessionRepository
+		permissionCheck func(ctrl *gomock.Controller) domain.PermissionChecker
 	}
 	tt := []struct {
 		name          string

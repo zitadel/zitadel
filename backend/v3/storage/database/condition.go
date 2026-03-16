@@ -395,7 +395,7 @@ func (p *permissionCheck) Write(builder *StatementBuilder) {
 	// TODO: implement actual permission check once we have the necessary tables and functions in place.
 	// For now, we just write a dummy condition that can be used to verify that the permission check is included in the generated SQL.
 	if p.throwError {
-		builder.WriteString(" throw_not_permitted() ")
+		builder.WriteString(" zitadel.throw_not_permitted() ")
 		return
 	}
 	builder.WriteString(" true ")

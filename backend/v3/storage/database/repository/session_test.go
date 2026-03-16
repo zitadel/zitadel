@@ -1125,7 +1125,7 @@ func TestSession_Delete(t *testing.T) {
 			if tt.res.deletedAt.IsZero() {
 				assert.Zero(t, deletedAt)
 			} else {
-				assert.WithinRange(t, deletedAt, start, tt.res.deletedAt)
+				assert.WithinRange(t, deletedAt, start, time.Now())
 			}
 
 			if err != nil {
