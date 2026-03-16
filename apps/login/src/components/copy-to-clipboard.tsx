@@ -17,7 +17,7 @@ export function CopyToClipboard({ value }: Props) {
       const to = setTimeout(setCopied, 1000, false);
       return () => clearTimeout(to);
     }
-  }, [copied]);
+  }, [copied, value]);
 
   return (
     <div className="flex flex-row items-center px-2">

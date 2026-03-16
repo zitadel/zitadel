@@ -4,7 +4,6 @@ import { writeFileSync, mkdirSync, readdirSync, lstatSync, readFileSync, existsS
 import path, { join, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { glob } from 'glob';
-import yaml from 'js-yaml';
 
 // Suppress "Generated: ..." logs to avoid Vercel log limits
 const originalLog = console.log;
@@ -147,7 +146,7 @@ async function fixAllGeneratedLinks() {
     const versionMap = fileIndex.get(version);
 
     // [Text](apis/resources/service_name/file_name.api.mdx)
-    const linkRegex = /\[([^\]]+)\]\(([\/]?apis\/resources\/([^\/]+)\/([^\/)]+)\.api\.mdx)\)/g;
+    const linkRegex = /\[([^\]]+)\]\(([/]?apis\/resources\/([^/]+)\/([^/)]+)\.api\.mdx)\)/g;
 
     let modified = false;
     let newContent = content.replace(linkRegex, (match, text, fullLink, serviceSlug, fileSlug) => {
@@ -178,7 +177,7 @@ async function fixAllGeneratedLinks() {
 
     // Fix v2beta links that were likely in the source proto comments
     // and also remove potential double /docs prefixing from source comments
-    const internalLinkRegex = /\[([^\]]+)\]\(([\/]?docs\/)?reference\/api\/([^\/]+)\/([^\s)]+)\)/g;
+    const internalLinkRegex = /\[([^\]]+)\]\(([/]?docs\/)?reference\/api\/([^/]+)\/([^\s)]+)\)/g;
     newContent = newContent.replace(internalLinkRegex, (match, text, docsPrefix, service, fileSlug) => {
       let targetFileSlug = fileSlug;
       let isV2Beta = fileSlug.includes('.v2beta.');
