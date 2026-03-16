@@ -57,13 +57,7 @@ func TestRequestDetailsHandler_gRPC(t *testing.T) {
 
 			interceptor := RequestDetailsHandler()
 			_, err := interceptor(ctx, &mockReq{}, mockInfo("/test"), handler)
-
-			if tt.wantErr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-			}
-
+			require.Equalf(t, tt.wantErr, err != nil, "Expected error: %v, got: %v", tt.wantErr, err)
 			// Verify request ID is set in context
 			require.NotEmpty(t, capturedID, "Request ID should be set in context")
 		})
