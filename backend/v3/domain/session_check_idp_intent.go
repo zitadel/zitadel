@@ -101,7 +101,7 @@ func (i *IDPIntentCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 	idpIntentRepo := opts.idpIntentRepo
 	userRepo := opts.userRepo
 
-	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(i.SessionID)))
+	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.PrimaryKeyCondition(i.InstanceID, i.SessionID)))
 	if err = handleGetError(err, "DOM-EhIgey", "session"); err != nil {
 		return err
 	}
@@ -114,7 +114,7 @@ func (i *IDPIntentCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 		return err
 	}
 
-	intent, err := idpIntentRepo.Get(ctx, opts.DB(), database.WithCondition(idpIntentRepo.IDCondition(i.CheckIntent.ID)))
+	intent, err := idpIntentRepo.Get(ctx, opts.DB(), database.WithCondition(idpIntentRepo.PrimaryKeyCondition(i.InstanceID, i.CheckIntent.ID)))
 	if err = handleGetError(err, "DOM-5XkWJV", "intent"); err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func (i *IDPIntentCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-kDR1XK", "Errors.Intent.Expired")
 	}
 
-	user, err := userRepo.Get(ctx, opts.DB(), database.WithCondition(userRepo.IDCondition(session.UserID)))
+	user, err := userRepo.Get(ctx, opts.DB(), database.WithCondition(userRepo.PrimaryKeyCondition(i.InstanceID, session.UserID)))
 	if err = handleGetError(err, "DOM-Vnx2G9", "user"); err != nil {
 		return err
 	}

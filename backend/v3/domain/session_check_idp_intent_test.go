@@ -140,7 +140,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(nil, getErr)
 				return repo
 			},
@@ -156,7 +156,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(nil, notFoundErr)
 				return repo
 			},
@@ -172,7 +172,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: ""}, nil)
 				return repo
 			},
@@ -188,7 +188,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -215,7 +215,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -233,7 +233,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("intent-123")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
 					Return(nil, getErr)
 				return repo
 			},
@@ -249,7 +249,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -267,7 +267,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("intent-123")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
 					Return(nil, notFoundErr)
 				return repo
 			},
@@ -283,7 +283,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -301,7 +301,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("intent-123")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
 					Return(&domain.IDPIntent{ID: "intent-123", State: domain.IDPIntentStateFailed, ExpiresAt: gu.Ptr(time.Now().Add(time.Hour))}, nil)
 				return repo
 			},
@@ -317,7 +317,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -335,7 +335,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("intent-123")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
 					Return(&domain.IDPIntent{ID: "intent-123", State: domain.IDPIntentStateSucceeded, ExpiresAt: gu.Ptr(time.Now().Add(-time.Hour))}, nil)
 				return repo
 			},
@@ -351,7 +351,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -369,14 +369,14 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("intent-123")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
 					Return(&domain.IDPIntent{ID: "intent-123", State: domain.IDPIntentStateSucceeded, ExpiresAt: gu.Ptr(time.Now().Add(time.Hour)), UserID: ""}, nil)
 				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewUserRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("user-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "user-1")))).
 					Return(nil, getErr)
 				return repo
 			},
@@ -392,7 +392,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -410,14 +410,14 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("intent-123")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
 					Return(&domain.IDPIntent{ID: "intent-123", State: domain.IDPIntentStateSucceeded, ExpiresAt: gu.Ptr(time.Now().Add(time.Hour)), UserID: ""}, nil)
 				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewUserRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("user-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "user-1")))).
 					Return(nil, notFoundErr)
 				return repo
 			},
@@ -433,7 +433,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -451,14 +451,14 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("intent-123")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
 					Return(&domain.IDPIntent{ID: "intent-123", State: domain.IDPIntentStateSucceeded, ExpiresAt: gu.Ptr(time.Now().Add(time.Hour)), UserID: ""}, nil)
 				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewUserRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("user-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "user-1")))).
 					Return(&domain.User{ID: "user-1", State: domain.UserStateActive, Human: nil}, nil)
 				return repo
 			},
@@ -474,7 +474,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -492,7 +492,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewUserRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("user-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "user-1")))).
 					Return(&domain.User{
 						ID:    "user-1",
 						State: domain.UserStateActive,
@@ -503,7 +503,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("intent-123")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
 					Return(&domain.IDPIntent{ID: "intent-123", State: domain.IDPIntentStateSucceeded, ExpiresAt: gu.Ptr(time.Now().Add(time.Hour)), UserID: "user-1"}, nil)
 				return repo
 			},
@@ -528,7 +528,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -546,7 +546,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewUserRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("user-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "user-1")))).
 					Return(&domain.User{
 						ID:    "user-1",
 						State: domain.UserStateActive,
@@ -557,7 +557,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("intent-123")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
 					Return(&domain.IDPIntent{ID: "intent-123", State: domain.IDPIntentStateSucceeded, ExpiresAt: gu.Ptr(time.Now().Add(time.Hour)), UserID: "user-2"}, nil)
 				return repo
 			},
@@ -573,7 +573,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -591,14 +591,14 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("intent-123")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
 					Return(&domain.IDPIntent{ID: "intent-123", State: domain.IDPIntentStateSucceeded, ExpiresAt: gu.Ptr(time.Now().Add(time.Hour)), UserID: "", IDPID: "idp-123"}, nil)
 				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewUserRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("user-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "user-1")))).
 					Return(&domain.User{
 						ID:    "user-1",
 						State: domain.UserStateActive,
@@ -618,7 +618,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("session-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
@@ -636,14 +636,14 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("intent-123")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
 					Return(&domain.IDPIntent{ID: "intent-123", State: domain.IDPIntentStateSucceeded, ExpiresAt: gu.Ptr(time.Now().Add(time.Hour)), UserID: "", IDPID: "idp-123"}, nil)
 				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewUserRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("user-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "user-1")))).
 					Return(&domain.User{
 						ID:    "user-1",
 						State: domain.UserStateActive,
