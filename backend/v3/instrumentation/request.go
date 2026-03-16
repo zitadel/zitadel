@@ -54,7 +54,7 @@ func SetUserID(ctx context.Context, userID string) {
 }
 
 // GetRequestID retrieves the request ID from the context.
-// [xid.NilID()] is returned if no request details are found in the context.
+// [xid.NilID] is returned if no request details are found in the context.
 func GetRequestID(ctx context.Context) xid.ID {
 	d, ok := getRequestDetails(ctx)
 	if !ok {
