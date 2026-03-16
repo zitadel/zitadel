@@ -18,51 +18,90 @@ import (
 
 func TestAdministratorRelationalReducers(t *testing.T) {
 	handler := new(relationalTablesProjection)
+	rawTx, tx := getTransactions(t)
+	t.Cleanup(func() {
+		require.NoError(t, rawTx.Rollback())
+	})
 
-	t.Run("instance administrator", func(t *testing.T) {
-		rawTx, tx := getTransactions(t)
-		t.Cleanup(func() {
-			require.NoError(t, rawTx.Rollback())
+	instanceID, _, orgID, projectID, grantID := seedAdministratorRelationalState(t, tx)
+	adminRepo := repository.AdministratorRepository()
+	userRepo := repository.UserRepository()
+
+	var userSeq int
+	createUser := func(t *testing.T) string {
+		t.Helper()
+		userSeq++
+		userID := fmt.Sprintf("admin-test-user-%d", userSeq)
+		err := userRepo.Create(t.Context(), tx, &repoDomain.User{
+			InstanceID:     instanceID,
+			OrganizationID: orgID,
+			ID:             userID,
+			Username:       userID,
+			State:          repoDomain.UserStateActive,
+			Machine: &repoDomain.MachineUser{
+				Name: "machine",
+			},
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		})
+		require.NoError(t, err)
+		return userID
+	}
 
-		instanceID, userID, _, _, _ := seedAdministratorRelationalState(t, tx)
-		adminRepo := repository.AdministratorRepository()
+	t.Run("'instance member added' reducer should create instance administrator", func(t *testing.T) {
+		userID := createUser(t)
 
 		added := instance.NewMemberAddedEvent(t.Context(), &instance.NewAggregate(instanceID).Aggregate, userID, "IAM_OWNER")
 		require.True(t, callReduce(t, rawTx, handler, added))
 
 		admin, err := adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.InstanceAdministratorCondition(instanceID), adminRepo.UserIDCondition(userID)),
+			adminRepo.InstanceAdministratorCondition(instanceID, userID),
 		))
 		require.NoError(t, err)
 		assert.Equal(t, []string{"IAM_OWNER"}, admin.Roles)
+	})
+
+	t.Run("'instance member changed' reducer should update instance administrator roles", func(t *testing.T) {
+		userID := createUser(t)
+		err := adminRepo.Create(t.Context(), tx, &repoDomain.Administrator{
+			InstanceID: instanceID,
+			UserID:     userID,
+			Scope:      repoDomain.AdministratorScopeInstance,
+			Roles:      []string{"IAM_OWNER"},
+		})
+		require.NoError(t, err)
 
 		changed := instance.NewMemberChangedEvent(t.Context(), &instance.NewAggregate(instanceID).Aggregate, userID, "IAM_OWNER_VIEWER")
 		require.True(t, callReduce(t, rawTx, handler, changed))
 
-		admin, err = adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.InstanceAdministratorCondition(instanceID), adminRepo.UserIDCondition(userID)),
+		admin, err := adminRepo.Get(t.Context(), tx, database.WithCondition(
+			adminRepo.InstanceAdministratorCondition(instanceID, userID),
 		))
 		require.NoError(t, err)
 		assert.Equal(t, []string{"IAM_OWNER_VIEWER"}, admin.Roles)
+	})
+
+	t.Run("'instance member removed' reducer should remove instance administrator", func(t *testing.T) {
+		userID := createUser(t)
+		err := adminRepo.Create(t.Context(), tx, &repoDomain.Administrator{
+			InstanceID: instanceID,
+			UserID:     userID,
+			Scope:      repoDomain.AdministratorScopeInstance,
+			Roles:      []string{"IAM_OWNER"},
+		})
+		require.NoError(t, err)
 
 		removed := instance.NewMemberRemovedEvent(t.Context(), &instance.NewAggregate(instanceID).Aggregate, userID)
 		require.True(t, callReduce(t, rawTx, handler, removed))
 
 		_, err = adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.InstanceAdministratorCondition(instanceID), adminRepo.UserIDCondition(userID)),
+			adminRepo.InstanceAdministratorCondition(instanceID, userID),
 		))
 		require.ErrorIs(t, err, database.NewNoRowFoundError(nil))
 	})
 
-	t.Run("organization administrator", func(t *testing.T) {
-		rawTx, tx := getTransactions(t)
-		t.Cleanup(func() {
-			require.NoError(t, rawTx.Rollback())
-		})
-
-		instanceID, userID, orgID, _, _ := seedAdministratorRelationalState(t, tx)
-		adminRepo := repository.AdministratorRepository()
+	t.Run("'org member added' reducer should create organization administrator", func(t *testing.T) {
+		userID := createUser(t)
 
 		orgAggregate := org.NewAggregate(orgID)
 		orgAggregate.InstanceID = instanceID
@@ -71,37 +110,61 @@ func TestAdministratorRelationalReducers(t *testing.T) {
 		require.True(t, callReduce(t, rawTx, handler, added))
 
 		admin, err := adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.OrganizationAdministratorCondition(instanceID, orgID), adminRepo.UserIDCondition(userID)),
+			adminRepo.OrganizationAdministratorCondition(instanceID, orgID, userID),
 		))
 		require.NoError(t, err)
 		assert.Equal(t, []string{"ORG_OWNER"}, admin.Roles)
+	})
+
+	t.Run("'org member changed' reducer should update organization administrator roles", func(t *testing.T) {
+		userID := createUser(t)
+		err := adminRepo.Create(t.Context(), tx, &repoDomain.Administrator{
+			InstanceID:     instanceID,
+			UserID:         userID,
+			Scope:          repoDomain.AdministratorScopeOrganization,
+			OrganizationID: &orgID,
+			Roles:          []string{"ORG_OWNER"},
+		})
+		require.NoError(t, err)
+
+		orgAggregate := org.NewAggregate(orgID)
+		orgAggregate.InstanceID = instanceID
 
 		changed := org.NewMemberChangedEvent(t.Context(), &orgAggregate.Aggregate, userID, "ORG_OWNER_VIEWER")
 		require.True(t, callReduce(t, rawTx, handler, changed))
 
-		admin, err = adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.OrganizationAdministratorCondition(instanceID, orgID), adminRepo.UserIDCondition(userID)),
+		admin, err := adminRepo.Get(t.Context(), tx, database.WithCondition(
+			adminRepo.OrganizationAdministratorCondition(instanceID, orgID, userID),
 		))
 		require.NoError(t, err)
 		assert.Equal(t, []string{"ORG_OWNER_VIEWER"}, admin.Roles)
+	})
+
+	t.Run("'org member removed' reducer should remove organization administrator", func(t *testing.T) {
+		userID := createUser(t)
+		err := adminRepo.Create(t.Context(), tx, &repoDomain.Administrator{
+			InstanceID:     instanceID,
+			UserID:         userID,
+			Scope:          repoDomain.AdministratorScopeOrganization,
+			OrganizationID: &orgID,
+			Roles:          []string{"ORG_OWNER"},
+		})
+		require.NoError(t, err)
+
+		orgAggregate := org.NewAggregate(orgID)
+		orgAggregate.InstanceID = instanceID
 
 		removed := org.NewMemberRemovedEvent(t.Context(), &orgAggregate.Aggregate, userID)
 		require.True(t, callReduce(t, rawTx, handler, removed))
 
 		_, err = adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.OrganizationAdministratorCondition(instanceID, orgID), adminRepo.UserIDCondition(userID)),
+			adminRepo.OrganizationAdministratorCondition(instanceID, orgID, userID),
 		))
 		require.ErrorIs(t, err, database.NewNoRowFoundError(nil))
 	})
 
-	t.Run("project administrator", func(t *testing.T) {
-		rawTx, tx := getTransactions(t)
-		t.Cleanup(func() {
-			require.NoError(t, rawTx.Rollback())
-		})
-
-		instanceID, userID, orgID, projectID, _ := seedAdministratorRelationalState(t, tx)
-		adminRepo := repository.AdministratorRepository()
+	t.Run("'project member added' reducer should create project administrator", func(t *testing.T) {
+		userID := createUser(t)
 
 		projectAggregate := project.NewAggregate(projectID, orgID)
 		projectAggregate.InstanceID = instanceID
@@ -110,37 +173,61 @@ func TestAdministratorRelationalReducers(t *testing.T) {
 		require.True(t, callReduce(t, rawTx, handler, added))
 
 		admin, err := adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.ProjectAdministratorCondition(instanceID, projectID), adminRepo.UserIDCondition(userID)),
+			adminRepo.ProjectAdministratorCondition(instanceID, projectID, userID),
 		))
 		require.NoError(t, err)
 		assert.Equal(t, []string{"PROJECT_OWNER"}, admin.Roles)
+	})
+
+	t.Run("'project member changed' reducer should update project administrator roles", func(t *testing.T) {
+		userID := createUser(t)
+		err := adminRepo.Create(t.Context(), tx, &repoDomain.Administrator{
+			InstanceID: instanceID,
+			UserID:     userID,
+			Scope:      repoDomain.AdministratorScopeProject,
+			ProjectID:  &projectID,
+			Roles:      []string{"PROJECT_OWNER"},
+		})
+		require.NoError(t, err)
+
+		projectAggregate := project.NewAggregate(projectID, orgID)
+		projectAggregate.InstanceID = instanceID
 
 		changed := project.NewProjectMemberChangedEvent(t.Context(), &projectAggregate.Aggregate, userID, "PROJECT_OWNER_VIEWER")
 		require.True(t, callReduce(t, rawTx, handler, changed))
 
-		admin, err = adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.ProjectAdministratorCondition(instanceID, projectID), adminRepo.UserIDCondition(userID)),
+		admin, err := adminRepo.Get(t.Context(), tx, database.WithCondition(
+			adminRepo.ProjectAdministratorCondition(instanceID, projectID, userID),
 		))
 		require.NoError(t, err)
 		assert.Equal(t, []string{"PROJECT_OWNER_VIEWER"}, admin.Roles)
+	})
+
+	t.Run("'project member removed' reducer should remove project administrator", func(t *testing.T) {
+		userID := createUser(t)
+		err := adminRepo.Create(t.Context(), tx, &repoDomain.Administrator{
+			InstanceID: instanceID,
+			UserID:     userID,
+			Scope:      repoDomain.AdministratorScopeProject,
+			ProjectID:  &projectID,
+			Roles:      []string{"PROJECT_OWNER"},
+		})
+		require.NoError(t, err)
+
+		projectAggregate := project.NewAggregate(projectID, orgID)
+		projectAggregate.InstanceID = instanceID
 
 		removed := project.NewProjectMemberRemovedEvent(t.Context(), &projectAggregate.Aggregate, userID)
 		require.True(t, callReduce(t, rawTx, handler, removed))
 
 		_, err = adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.ProjectAdministratorCondition(instanceID, projectID), adminRepo.UserIDCondition(userID)),
+			adminRepo.ProjectAdministratorCondition(instanceID, projectID, userID),
 		))
 		require.ErrorIs(t, err, database.NewNoRowFoundError(nil))
 	})
 
-	t.Run("project grant administrator cascade removed", func(t *testing.T) {
-		rawTx, tx := getTransactions(t)
-		t.Cleanup(func() {
-			require.NoError(t, rawTx.Rollback())
-		})
-
-		instanceID, userID, orgID, projectID, grantID := seedAdministratorRelationalState(t, tx)
-		adminRepo := repository.AdministratorRepository()
+	t.Run("'project grant member added' reducer should create project grant administrator", func(t *testing.T) {
+		userID := createUser(t)
 
 		projectAggregate := project.NewAggregate(projectID, orgID)
 		projectAggregate.InstanceID = instanceID
@@ -149,25 +236,55 @@ func TestAdministratorRelationalReducers(t *testing.T) {
 		require.True(t, callReduce(t, rawTx, handler, added))
 
 		admin, err := adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.ProjectGrantAdministratorCondition(instanceID, grantID), adminRepo.UserIDCondition(userID)),
+			adminRepo.ProjectGrantAdministratorCondition(instanceID, grantID, userID),
 		))
 		require.NoError(t, err)
 		assert.Equal(t, []string{"PROJECT_OWNER"}, admin.Roles)
+	})
+
+	t.Run("'project grant member changed' reducer should update project grant administrator roles", func(t *testing.T) {
+		userID := createUser(t)
+		err := adminRepo.Create(t.Context(), tx, &repoDomain.Administrator{
+			InstanceID:     instanceID,
+			UserID:         userID,
+			Scope:          repoDomain.AdministratorScopeProjectGrant,
+			ProjectGrantID: &grantID,
+			Roles:          []string{"PROJECT_OWNER"},
+		})
+		require.NoError(t, err)
+
+		projectAggregate := project.NewAggregate(projectID, orgID)
+		projectAggregate.InstanceID = instanceID
 
 		changed := project.NewProjectGrantMemberChangedEvent(t.Context(), &projectAggregate.Aggregate, userID, grantID, "PROJECT_OWNER_VIEWER")
 		require.True(t, callReduce(t, rawTx, handler, changed))
 
-		admin, err = adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.ProjectGrantAdministratorCondition(instanceID, grantID), adminRepo.UserIDCondition(userID)),
+		admin, err := adminRepo.Get(t.Context(), tx, database.WithCondition(
+			adminRepo.ProjectGrantAdministratorCondition(instanceID, grantID, userID),
 		))
 		require.NoError(t, err)
 		assert.Equal(t, []string{"PROJECT_OWNER_VIEWER"}, admin.Roles)
+	})
+
+	t.Run("'project grant member cascade removed' reducer should remove project grant administrator", func(t *testing.T) {
+		userID := createUser(t)
+		err := adminRepo.Create(t.Context(), tx, &repoDomain.Administrator{
+			InstanceID:     instanceID,
+			UserID:         userID,
+			Scope:          repoDomain.AdministratorScopeProjectGrant,
+			ProjectGrantID: &grantID,
+			Roles:          []string{"PROJECT_OWNER"},
+		})
+		require.NoError(t, err)
+
+		projectAggregate := project.NewAggregate(projectID, orgID)
+		projectAggregate.InstanceID = instanceID
 
 		removed := project.NewProjectGrantMemberCascadeRemovedEvent(t.Context(), &projectAggregate.Aggregate, userID, grantID)
 		require.True(t, callReduce(t, rawTx, handler, removed))
 
 		_, err = adminRepo.Get(t.Context(), tx, database.WithCondition(
-			database.And(adminRepo.ProjectGrantAdministratorCondition(instanceID, grantID), adminRepo.UserIDCondition(userID)),
+			adminRepo.ProjectGrantAdministratorCondition(instanceID, grantID, userID),
 		))
 		require.ErrorIs(t, err, database.NewNoRowFoundError(nil))
 	})

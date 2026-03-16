@@ -217,34 +217,38 @@ func (a administrator) ScopeCondition(scope domain.AdministratorScope) database.
 	return database.NewTextCondition(a.ScopeColumn(), database.TextOperationEqual, scope.String())
 }
 
-func (a administrator) InstanceAdministratorCondition(instanceID string) database.Condition {
+func (a administrator) InstanceAdministratorCondition(instanceID, userID string) database.Condition {
 	return database.And(
 		a.InstanceIDCondition(instanceID),
 		a.ScopeCondition(domain.AdministratorScopeInstance),
+		a.UserIDCondition(userID),
 	)
 }
 
-func (a administrator) OrganizationAdministratorCondition(instanceID, organizationID string) database.Condition {
+func (a administrator) OrganizationAdministratorCondition(instanceID, organizationID, userID string) database.Condition {
 	return database.And(
 		a.InstanceIDCondition(instanceID),
 		a.ScopeCondition(domain.AdministratorScopeOrganization),
 		a.OrganizationIDCondition(organizationID),
+		a.UserIDCondition(userID),
 	)
 }
 
-func (a administrator) ProjectAdministratorCondition(instanceID, projectID string) database.Condition {
+func (a administrator) ProjectAdministratorCondition(instanceID, projectID, userID string) database.Condition {
 	return database.And(
 		a.InstanceIDCondition(instanceID),
 		a.ScopeCondition(domain.AdministratorScopeProject),
 		a.ProjectIDCondition(projectID),
+		a.UserIDCondition(userID),
 	)
 }
 
-func (a administrator) ProjectGrantAdministratorCondition(instanceID, projectGrantID string) database.Condition {
+func (a administrator) ProjectGrantAdministratorCondition(instanceID, projectGrantID, userID string) database.Condition {
 	return database.And(
 		a.InstanceIDCondition(instanceID),
 		a.ScopeCondition(domain.AdministratorScopeProjectGrant),
 		a.ProjectGrantIDCondition(projectGrantID),
+		a.UserIDCondition(userID),
 	)
 }
 

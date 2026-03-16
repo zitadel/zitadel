@@ -317,17 +317,17 @@ func (c *MockAdministratorRepositoryIDConditionCall) DoAndReturn(f func(string) 
 }
 
 // InstanceAdministratorCondition mocks base method.
-func (m *MockAdministratorRepository) InstanceAdministratorCondition(instanceID string) database.Condition {
+func (m *MockAdministratorRepository) InstanceAdministratorCondition(instanceID, userID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InstanceAdministratorCondition", instanceID)
+	ret := m.ctrl.Call(m, "InstanceAdministratorCondition", instanceID, userID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // InstanceAdministratorCondition indicates an expected call of InstanceAdministratorCondition.
-func (mr *MockAdministratorRepositoryMockRecorder) InstanceAdministratorCondition(instanceID any) *MockAdministratorRepositoryInstanceAdministratorConditionCall {
+func (mr *MockAdministratorRepositoryMockRecorder) InstanceAdministratorCondition(instanceID, userID any) *MockAdministratorRepositoryInstanceAdministratorConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceAdministratorCondition", reflect.TypeOf((*MockAdministratorRepository)(nil).InstanceAdministratorCondition), instanceID)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceAdministratorCondition", reflect.TypeOf((*MockAdministratorRepository)(nil).InstanceAdministratorCondition), instanceID, userID)
 	return &MockAdministratorRepositoryInstanceAdministratorConditionCall{Call: call}
 }
 
@@ -343,13 +343,13 @@ func (c *MockAdministratorRepositoryInstanceAdministratorConditionCall) Return(a
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockAdministratorRepositoryInstanceAdministratorConditionCall) Do(f func(string) database.Condition) *MockAdministratorRepositoryInstanceAdministratorConditionCall {
+func (c *MockAdministratorRepositoryInstanceAdministratorConditionCall) Do(f func(string, string) database.Condition) *MockAdministratorRepositoryInstanceAdministratorConditionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockAdministratorRepositoryInstanceAdministratorConditionCall) DoAndReturn(f func(string) database.Condition) *MockAdministratorRepositoryInstanceAdministratorConditionCall {
+func (c *MockAdministratorRepositoryInstanceAdministratorConditionCall) DoAndReturn(f func(string, string) database.Condition) *MockAdministratorRepositoryInstanceAdministratorConditionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -475,17 +475,17 @@ func (c *MockAdministratorRepositoryListCall) DoAndReturn(f func(context.Context
 }
 
 // OrganizationAdministratorCondition mocks base method.
-func (m *MockAdministratorRepository) OrganizationAdministratorCondition(instanceID, organizationID string) database.Condition {
+func (m *MockAdministratorRepository) OrganizationAdministratorCondition(instanceID, organizationID, userID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "OrganizationAdministratorCondition", instanceID, organizationID)
+	ret := m.ctrl.Call(m, "OrganizationAdministratorCondition", instanceID, organizationID, userID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // OrganizationAdministratorCondition indicates an expected call of OrganizationAdministratorCondition.
-func (mr *MockAdministratorRepositoryMockRecorder) OrganizationAdministratorCondition(instanceID, organizationID any) *MockAdministratorRepositoryOrganizationAdministratorConditionCall {
+func (mr *MockAdministratorRepositoryMockRecorder) OrganizationAdministratorCondition(instanceID, organizationID, userID any) *MockAdministratorRepositoryOrganizationAdministratorConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OrganizationAdministratorCondition", reflect.TypeOf((*MockAdministratorRepository)(nil).OrganizationAdministratorCondition), instanceID, organizationID)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OrganizationAdministratorCondition", reflect.TypeOf((*MockAdministratorRepository)(nil).OrganizationAdministratorCondition), instanceID, organizationID, userID)
 	return &MockAdministratorRepositoryOrganizationAdministratorConditionCall{Call: call}
 }
 
@@ -501,13 +501,13 @@ func (c *MockAdministratorRepositoryOrganizationAdministratorConditionCall) Retu
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockAdministratorRepositoryOrganizationAdministratorConditionCall) Do(f func(string, string) database.Condition) *MockAdministratorRepositoryOrganizationAdministratorConditionCall {
+func (c *MockAdministratorRepositoryOrganizationAdministratorConditionCall) Do(f func(string, string, string) database.Condition) *MockAdministratorRepositoryOrganizationAdministratorConditionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockAdministratorRepositoryOrganizationAdministratorConditionCall) DoAndReturn(f func(string, string) database.Condition) *MockAdministratorRepositoryOrganizationAdministratorConditionCall {
+func (c *MockAdministratorRepositoryOrganizationAdministratorConditionCall) DoAndReturn(f func(string, string, string) database.Condition) *MockAdministratorRepositoryOrganizationAdministratorConditionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -665,17 +665,17 @@ func (c *MockAdministratorRepositoryPrimaryKeyConditionCall) DoAndReturn(f func(
 }
 
 // ProjectAdministratorCondition mocks base method.
-func (m *MockAdministratorRepository) ProjectAdministratorCondition(instanceID, projectID string) database.Condition {
+func (m *MockAdministratorRepository) ProjectAdministratorCondition(instanceID, projectID, userID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ProjectAdministratorCondition", instanceID, projectID)
+	ret := m.ctrl.Call(m, "ProjectAdministratorCondition", instanceID, projectID, userID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // ProjectAdministratorCondition indicates an expected call of ProjectAdministratorCondition.
-func (mr *MockAdministratorRepositoryMockRecorder) ProjectAdministratorCondition(instanceID, projectID any) *MockAdministratorRepositoryProjectAdministratorConditionCall {
+func (mr *MockAdministratorRepositoryMockRecorder) ProjectAdministratorCondition(instanceID, projectID, userID any) *MockAdministratorRepositoryProjectAdministratorConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectAdministratorCondition", reflect.TypeOf((*MockAdministratorRepository)(nil).ProjectAdministratorCondition), instanceID, projectID)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectAdministratorCondition", reflect.TypeOf((*MockAdministratorRepository)(nil).ProjectAdministratorCondition), instanceID, projectID, userID)
 	return &MockAdministratorRepositoryProjectAdministratorConditionCall{Call: call}
 }
 
@@ -691,29 +691,29 @@ func (c *MockAdministratorRepositoryProjectAdministratorConditionCall) Return(ar
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockAdministratorRepositoryProjectAdministratorConditionCall) Do(f func(string, string) database.Condition) *MockAdministratorRepositoryProjectAdministratorConditionCall {
+func (c *MockAdministratorRepositoryProjectAdministratorConditionCall) Do(f func(string, string, string) database.Condition) *MockAdministratorRepositoryProjectAdministratorConditionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockAdministratorRepositoryProjectAdministratorConditionCall) DoAndReturn(f func(string, string) database.Condition) *MockAdministratorRepositoryProjectAdministratorConditionCall {
+func (c *MockAdministratorRepositoryProjectAdministratorConditionCall) DoAndReturn(f func(string, string, string) database.Condition) *MockAdministratorRepositoryProjectAdministratorConditionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // ProjectGrantAdministratorCondition mocks base method.
-func (m *MockAdministratorRepository) ProjectGrantAdministratorCondition(instanceID, projectGrantID string) database.Condition {
+func (m *MockAdministratorRepository) ProjectGrantAdministratorCondition(instanceID, projectGrantID, userID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ProjectGrantAdministratorCondition", instanceID, projectGrantID)
+	ret := m.ctrl.Call(m, "ProjectGrantAdministratorCondition", instanceID, projectGrantID, userID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // ProjectGrantAdministratorCondition indicates an expected call of ProjectGrantAdministratorCondition.
-func (mr *MockAdministratorRepositoryMockRecorder) ProjectGrantAdministratorCondition(instanceID, projectGrantID any) *MockAdministratorRepositoryProjectGrantAdministratorConditionCall {
+func (mr *MockAdministratorRepositoryMockRecorder) ProjectGrantAdministratorCondition(instanceID, projectGrantID, userID any) *MockAdministratorRepositoryProjectGrantAdministratorConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectGrantAdministratorCondition", reflect.TypeOf((*MockAdministratorRepository)(nil).ProjectGrantAdministratorCondition), instanceID, projectGrantID)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectGrantAdministratorCondition", reflect.TypeOf((*MockAdministratorRepository)(nil).ProjectGrantAdministratorCondition), instanceID, projectGrantID, userID)
 	return &MockAdministratorRepositoryProjectGrantAdministratorConditionCall{Call: call}
 }
 
@@ -729,13 +729,13 @@ func (c *MockAdministratorRepositoryProjectGrantAdministratorConditionCall) Retu
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockAdministratorRepositoryProjectGrantAdministratorConditionCall) Do(f func(string, string) database.Condition) *MockAdministratorRepositoryProjectGrantAdministratorConditionCall {
+func (c *MockAdministratorRepositoryProjectGrantAdministratorConditionCall) Do(f func(string, string, string) database.Condition) *MockAdministratorRepositoryProjectGrantAdministratorConditionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockAdministratorRepositoryProjectGrantAdministratorConditionCall) DoAndReturn(f func(string, string) database.Condition) *MockAdministratorRepositoryProjectGrantAdministratorConditionCall {
+func (c *MockAdministratorRepositoryProjectGrantAdministratorConditionCall) DoAndReturn(f func(string, string, string) database.Condition) *MockAdministratorRepositoryProjectGrantAdministratorConditionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

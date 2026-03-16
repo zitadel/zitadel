@@ -37,10 +37,7 @@ func (p *relationalTablesProjection) reduceInstanceAdminChanged(event eventstore
 		return nil, err
 	}
 	return p.updateAdministratorStatement(e,
-		database.And(
-			repository.AdministratorRepository().InstanceAdministratorCondition(e.Aggregate().InstanceID),
-			repository.AdministratorRepository().UserIDCondition(e.UserID),
-		),
+		repository.AdministratorRepository().InstanceAdministratorCondition(e.Aggregate().InstanceID, e.UserID),
 		repository.AdministratorRepository().SetUpdatedAt(e.CreationDate()),
 		repository.AdministratorRepository().SetRoles(e.Roles),
 	)
@@ -50,17 +47,11 @@ func (p *relationalTablesProjection) reduceInstanceAdminRemoved(event eventstore
 	switch e := event.(type) {
 	case *instance.MemberRemovedEvent:
 		return p.removeAdministratorStatement(e,
-			database.And(
-				repository.AdministratorRepository().InstanceAdministratorCondition(e.Aggregate().InstanceID),
-				repository.AdministratorRepository().UserIDCondition(e.UserID),
-			),
+			repository.AdministratorRepository().InstanceAdministratorCondition(e.Aggregate().InstanceID, e.UserID),
 		)
 	case *instance.MemberCascadeRemovedEvent:
 		return p.removeAdministratorStatement(e,
-			database.And(
-				repository.AdministratorRepository().InstanceAdministratorCondition(e.Aggregate().InstanceID),
-				repository.AdministratorRepository().UserIDCondition(e.UserID),
-			),
+			repository.AdministratorRepository().InstanceAdministratorCondition(e.Aggregate().InstanceID, e.UserID),
 		)
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-v3ADM03", "reduce.wrong.event.type %v", []eventstore.EventType{instance.MemberRemovedEventType, instance.MemberCascadeRemovedEventType})
@@ -89,10 +80,7 @@ func (p *relationalTablesProjection) reduceOrganizationAdminChanged(event events
 		return nil, err
 	}
 	return p.updateAdministratorStatement(e,
-		database.And(
-			repository.AdministratorRepository().OrganizationAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repository.AdministratorRepository().UserIDCondition(e.UserID),
-		),
+		repository.AdministratorRepository().OrganizationAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID, e.UserID),
 		repository.AdministratorRepository().SetUpdatedAt(e.CreationDate()),
 		repository.AdministratorRepository().SetRoles(e.Roles),
 	)
@@ -102,17 +90,11 @@ func (p *relationalTablesProjection) reduceOrganizationAdminRemoved(event events
 	switch e := event.(type) {
 	case *org.MemberRemovedEvent:
 		return p.removeAdministratorStatement(e,
-			database.And(
-				repository.AdministratorRepository().OrganizationAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-				repository.AdministratorRepository().UserIDCondition(e.UserID),
-			),
+			repository.AdministratorRepository().OrganizationAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID, e.UserID),
 		)
 	case *org.MemberCascadeRemovedEvent:
 		return p.removeAdministratorStatement(e,
-			database.And(
-				repository.AdministratorRepository().OrganizationAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-				repository.AdministratorRepository().UserIDCondition(e.UserID),
-			),
+			repository.AdministratorRepository().OrganizationAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID, e.UserID),
 		)
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-v3ADM06", "reduce.wrong.event.type %v", []eventstore.EventType{org.MemberRemovedEventType, org.MemberCascadeRemovedEventType})
@@ -141,10 +123,7 @@ func (p *relationalTablesProjection) reduceProjectAdminChanged(event eventstore.
 		return nil, err
 	}
 	return p.updateAdministratorStatement(e,
-		database.And(
-			repository.AdministratorRepository().ProjectAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repository.AdministratorRepository().UserIDCondition(e.UserID),
-		),
+		repository.AdministratorRepository().ProjectAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID, e.UserID),
 		repository.AdministratorRepository().SetUpdatedAt(e.CreationDate()),
 		repository.AdministratorRepository().SetRoles(e.Roles),
 	)
@@ -154,17 +133,11 @@ func (p *relationalTablesProjection) reduceProjectAdminRemoved(event eventstore.
 	switch e := event.(type) {
 	case *project.MemberRemovedEvent:
 		return p.removeAdministratorStatement(e,
-			database.And(
-				repository.AdministratorRepository().ProjectAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-				repository.AdministratorRepository().UserIDCondition(e.UserID),
-			),
+			repository.AdministratorRepository().ProjectAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID, e.UserID),
 		)
 	case *project.MemberCascadeRemovedEvent:
 		return p.removeAdministratorStatement(e,
-			database.And(
-				repository.AdministratorRepository().ProjectAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-				repository.AdministratorRepository().UserIDCondition(e.UserID),
-			),
+			repository.AdministratorRepository().ProjectAdministratorCondition(e.Aggregate().InstanceID, e.Aggregate().ID, e.UserID),
 		)
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-v3ADM09", "reduce.wrong.event.type %v", []eventstore.EventType{project.MemberRemovedEventType, project.MemberCascadeRemovedEventType})
@@ -193,10 +166,7 @@ func (p *relationalTablesProjection) reduceProjectGrantAdminChanged(event events
 		return nil, err
 	}
 	return p.updateAdministratorStatement(e,
-		database.And(
-			repository.AdministratorRepository().ProjectGrantAdministratorCondition(e.Aggregate().InstanceID, e.GrantID),
-			repository.AdministratorRepository().UserIDCondition(e.UserID),
-		),
+		repository.AdministratorRepository().ProjectGrantAdministratorCondition(e.Aggregate().InstanceID, e.GrantID, e.UserID),
 		repository.AdministratorRepository().SetUpdatedAt(e.CreationDate()),
 		repository.AdministratorRepository().SetRoles(e.Roles),
 	)
@@ -206,17 +176,11 @@ func (p *relationalTablesProjection) reduceProjectGrantAdminRemoved(event events
 	switch e := event.(type) {
 	case *project.GrantMemberRemovedEvent:
 		return p.removeAdministratorStatement(e,
-			database.And(
-				repository.AdministratorRepository().ProjectGrantAdministratorCondition(e.Aggregate().InstanceID, e.GrantID),
-				repository.AdministratorRepository().UserIDCondition(e.UserID),
-			),
+			repository.AdministratorRepository().ProjectGrantAdministratorCondition(e.Aggregate().InstanceID, e.GrantID, e.UserID),
 		)
 	case *project.GrantMemberCascadeRemovedEvent:
 		return p.removeAdministratorStatement(e,
-			database.And(
-				repository.AdministratorRepository().ProjectGrantAdministratorCondition(e.Aggregate().InstanceID, e.GrantID),
-				repository.AdministratorRepository().UserIDCondition(e.UserID),
-			),
+			repository.AdministratorRepository().ProjectGrantAdministratorCondition(e.Aggregate().InstanceID, e.GrantID, e.UserID),
 		)
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-v3ADM12", "reduce.wrong.event.type %v", []eventstore.EventType{project.GrantMemberRemovedType, project.GrantMemberCascadeRemovedType})
