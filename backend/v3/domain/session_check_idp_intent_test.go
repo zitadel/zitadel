@@ -342,6 +342,40 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-kDR1XK", "Errors.Intent.Expired"),
 		},
 		{
+			testName: "when intent expiration is nil should return error",
+			cmd: &domain.IDPIntentCheckCommand{
+				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},
+				SessionID:   "session-1",
+				InstanceID:  "instance-1",
+			},
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewSessionRepo(ctrl)
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "session-1")))).
+					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
+				return repo
+			},
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
+				cryptoAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
+				cryptoAlg.EXPECT().
+					EncryptionKeyID().
+					Times(1)
+				cryptoAlg.EXPECT().
+					DecryptString(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return("intent-123", nil)
+				return cryptoAlg
+			},
+			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
+				repo := domainmock.NewIDPIntentRepo(ctrl)
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.PrimaryKeyCondition("instance-1", "intent-123")))).
+					Return(&domain.IDPIntent{ID: "intent-123", State: domain.IDPIntentStateSucceeded, ExpiresAt: nil}, nil)
+				return repo
+			},
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-kDR1XK", "Errors.Intent.Expired"),
+		},
+		{
 			testName: "when retrieving user fails should return error",
 			cmd: &domain.IDPIntentCheckCommand{
 				CheckIntent: &domain.CheckIDPIntentType{ID: "intent-123", Token: validTokenEncoding},

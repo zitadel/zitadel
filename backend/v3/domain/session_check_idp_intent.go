@@ -123,7 +123,7 @@ func (i *IDPIntentCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-0UKHku", "Errors.Intent.NotSucceeded")
 	}
 
-	if intent.ExpiresAt.Before(time.Now()) {
+	if intent.ExpiresAt == nil || intent.ExpiresAt.Before(time.Now()) {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-kDR1XK", "Errors.Intent.Expired")
 	}
 
