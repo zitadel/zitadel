@@ -124,8 +124,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "add machine with invalid metadata key, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
@@ -153,8 +157,12 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		{
 			name: "add machine with invalid metadata value, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
