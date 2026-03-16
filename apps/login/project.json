@@ -96,6 +96,9 @@
       "cache": true,
       "inputs": [
         "default"
+      ],
+      "dependsOn": [
+        "^generate"
       ]
     },
     "test": {
