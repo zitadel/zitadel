@@ -9,21 +9,14 @@ import (
 )
 
 func CreateMockEncryptionAlg(ctrl *gomock.Controller) EncryptionAlgorithm {
-	return createMockEncryptionAlgorithm(
-		ctrl,
-		func(code []byte) ([]byte, error) {
-			return code, nil
-		},
-	)
-}
-
-func createMockEncryptionAlgorithm(ctrl *gomock.Controller, encryptFunction func(c []byte) ([]byte, error)) EncryptionAlgorithm {
 	mCrypto := NewMockEncryptionAlgorithm(ctrl)
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("enc")
 	mCrypto.EXPECT().EncryptionKeyID().AnyTimes().Return("id")
 	mCrypto.EXPECT().DecryptionKeyIDs().AnyTimes().Return([]string{"id"})
 	mCrypto.EXPECT().Encrypt(gomock.Any()).AnyTimes().DoAndReturn(
-		encryptFunction,
+		func(code []byte) ([]byte, error) {
+			return code, nil
+		},
 	)
 	mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(code []byte, keyID string) (string, error) {
