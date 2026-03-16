@@ -25,6 +25,8 @@ export class ScrollableDirective {
       if (top === 0) {
         this.scrollPosition.emit('top');
       }
-    } catch (err) {}
+    } catch {
+      // scroll position detection may fail in some browsers
+    }
   }
 }

@@ -310,6 +310,11 @@ test.describe("login ui", () => {
     expect(resp.status()).toBe(200);
   });
 
+  test("GET /ui/v2/login/ready → 200", async ({ request }) => {
+    const resp = await request.get("/ui/v2/login/ready");
+    expect(resp.status()).toBe(200);
+  });
+
   test("GET /ui/v2/login/ → 200 HTML", async ({ request }) => {
     const resp = await request.get("/ui/v2/login/");
     expect(resp.status()).toBe(200);

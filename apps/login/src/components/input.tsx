@@ -1,9 +1,9 @@
 "use client";
 
+import { getComponentRoundness } from "@/lib/theme";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { clsx } from "clsx";
 import { ChangeEvent, DetailedHTMLProps, forwardRef, InputHTMLAttributes, ReactNode } from "react";
-import { getComponentRoundness } from "@/lib/theme";
 
 export type TextInputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
   label: string;
@@ -37,7 +37,6 @@ function getDefaultInputRoundness(): string {
   return getComponentRoundness("input");
 }
 
-// eslint-disable-next-line react/display-name
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   (
     {

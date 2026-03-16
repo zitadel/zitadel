@@ -1,5 +1,5 @@
-import * as https from "node:https";
 import * as http from "node:http";
+import * as https from "node:https";
 
 const scheme = process.env.ZITADEL_TLS_ENABLED === "true" ? "https" : "http";
 const port = process.env.PORT || "3000";

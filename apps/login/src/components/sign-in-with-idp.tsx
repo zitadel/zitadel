@@ -5,6 +5,7 @@ import { redirectToIdp } from "@/lib/server/idp";
 import { IdentityProvider, IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { ReactNode, useActionState } from "react";
 import { Alert } from "./alert";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { SignInWithIdentityProviderProps } from "./idps/base-button";
 import { SignInWithApple } from "./idps/sign-in-with-apple";
 import { SignInWithAzureAd } from "./idps/sign-in-with-azure-ad";
@@ -13,7 +14,6 @@ import { SignInWithGithub } from "./idps/sign-in-with-github";
 import { SignInWithGitlab } from "./idps/sign-in-with-gitlab";
 import { SignInWithGoogle } from "./idps/sign-in-with-google";
 import { Translated } from "./translated";
-import { AutoSubmitForm } from "./auto-submit-form";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;

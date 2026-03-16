@@ -5,6 +5,7 @@ import { MatInput } from '@angular/material/input';
 import { MatTable } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
+import { RpcError } from 'grpc-web';
 import { enterAnimations } from 'src/app/animations';
 import { UserGrant as AuthUserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
 import {
@@ -20,7 +21,11 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { ActionKeysType } from '../action-keys/action-keys.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
-import { UserGrantRoleDialogComponent } from '../user-grant-role-dialog/user-grant-role-dialog.component';
+import {
+  UserGrantRoleDialogComponent,
+  UserGrantRoleDialogData,
+  UserGrantRoleDialogResult,
+} from '../user-grant-role-dialog/user-grant-role-dialog.component';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
@@ -176,32 +181,40 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   }
 
   public openEditDialog(grant: UserGrantAsObject): void {
-    const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
-      data: {
-        projectId: grant.projectId,
-        grantId: grant?.projectGrantId,
-        selectedRoleKeysList: grant.roleKeysList,
-        i18nTitle: 'GRANTS.EDIT.TITLE',
+    const dialogRef = this.dialog.open<UserGrantRoleDialogComponent, UserGrantRoleDialogData, UserGrantRoleDialogResult>(
+      UserGrantRoleDialogComponent,
+      {
+        data: {
+          projectId: grant.projectId,
+          grantId: grant?.projectGrantId,
+          selectedRoleKeysList: grant.roleKeysList,
+          i18nTitle: 'GRANTS.EDIT.TITLE',
+        },
+        width: '600px',
       },
-      width: '600px',
-    });
+    );
 
     dialogRef.afterClosed().subscribe((resp) => {
-      if (resp && resp.roles) {
-        this.userService
-          .updateUserGrant(
-            (grant as MgmtUserGrant.AsObject).id ?? (grant as AuthUserGrant.AsObject).grantId,
-            grant.userId,
-            resp.roles,
-          )
-          .then(() => {
-            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
-            grant.roleKeysList = resp.roles;
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
+      if (!resp || !resp.roles) {
+        return;
       }
+      this.userService
+        .updateUserGrant(
+          (grant as MgmtUserGrant.AsObject).id ?? (grant as AuthUserGrant.AsObject).grantId,
+          grant.userId,
+          resp.roles,
+        )
+        .then(() => {
+          this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
+          grant.roleKeysList = resp.roles;
+        })
+        .catch((error) => {
+          // Errors.UserGrant.NotChanged
+          if (error instanceof RpcError && error.message.includes('COMMAND-Rs8fy')) {
+            return;
+          }
+          this.toast.showError(error);
+        });
     });
   }
 

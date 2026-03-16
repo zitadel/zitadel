@@ -30,9 +30,7 @@ describe("VerifyForm", () => {
 
   describe("Input Focus", () => {
     test("should autofocus the code input on mount", () => {
-      const { getByTestId } = render(
-        <VerifyForm userId="user-1" code="" isInvite={false} submit={false} />,
-      );
+      const { getByTestId } = render(<VerifyForm userId="user-1" code="" isInvite={false} submit={false} />);
       expect(getByTestId("code-text-input")).toHaveFocus();
     });
   });

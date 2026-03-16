@@ -15,7 +15,7 @@ import (
 )
 
 func TestInstanceDomainReducers(t *testing.T) {
-	handler := &instanceDomainRelationalProjection{}
+	handler := &relationalTablesProjection{}
 	rawTx, tx := getTransactions(t)
 
 	t.Cleanup(func() {

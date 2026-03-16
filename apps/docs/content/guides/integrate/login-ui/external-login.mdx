@@ -66,7 +66,9 @@ https://accounts.google.com/o/oauth2/v2/auth?client_id=Test&prompt=select_accoun
 After the user has successfully authenticated, a redirect to the ZITADEL backend /idps/callback will automatically be performed.
 
 <Callout type="warn">
-Note that the redirect URL is `https://${CUSTOM_DOMAIN}/idps/callback` when using the new V2 hosted login compared to the V1 hosted login, which was `https://${CUSTOM_DOMAIN}/ui/login/login/externalidp/callback`.
+The redirect URL differs between login versions. V2 uses `https://${CUSTOM_DOMAIN}/idps/callback`, while V1 uses `https://${CUSTOM_DOMAIN}/ui/login/login/externalidp/callback`.
+
+For Form Post based callbacks, V1 requires a separate `/form`-suffixed URL (`https://${CUSTOM_DOMAIN}/ui/login/login/externalidp/callback/form`), whereas V2's standard callback URL handles Form Post callbacks natively, so no separate URL is needed.
 </Callout>
 
 ## Get Provider Information

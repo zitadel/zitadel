@@ -15,9 +15,7 @@ export async function systemAPIToken() {
   const token = {
     audience: process.env.AUDIENCE,
     userID: process.env.SYSTEM_USER_ID,
-    token: Buffer.from(process.env.SYSTEM_USER_PRIVATE_KEY, "base64").toString(
-      "utf-8",
-    ),
+    token: Buffer.from(process.env.SYSTEM_USER_PRIVATE_KEY, "base64").toString("utf-8"),
   };
 
   return newSystemToken({
@@ -48,6 +46,8 @@ export async function loginServiceKeyToken() {
       key: key,
     });
   } catch (err) {
-    throw new Error(`Failed to read login service key file "${keyFile}": ${err instanceof Error ? err.message : err}`);
+    throw new Error(`Failed to read login service key file "${keyFile}": ${err instanceof Error ? err.message : err}`, {
+      cause: err,
+    });
   }
 }

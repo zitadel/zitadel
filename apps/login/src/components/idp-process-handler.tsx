@@ -1,11 +1,11 @@
 "use client";
 
 import { processIDPCallback } from "@/lib/server/idp-intent";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "./alert";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { Spinner } from "./spinner";
 
 type Props = {
@@ -91,7 +91,7 @@ export function IdpProcessHandler({
         setError(err instanceof Error ? err.message : t("processing.unexpectedError"));
         setLoading(false);
       });
-  }, [provider, id, token, requestId, organization, link, sessionId, postErrorRedirectUrl, router]);
+  }, [provider, id, token, requestId, organization, link, sessionId, linkFingerprint, postErrorRedirectUrl, router, t]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

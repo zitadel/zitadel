@@ -18,6 +18,7 @@
     },
     "lint-check-eslint": {
       "description": "Checks code formatting with ESLint",
+      "dependsOn": ["^generate"],
       "inputs": [
         "default"
       ],
