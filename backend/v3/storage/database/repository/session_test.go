@@ -918,6 +918,7 @@ func TestSession_Update(t *testing.T) {
 }
 
 func TestSession_Delete(t *testing.T) {
+	start := time.Now()
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
@@ -1111,7 +1112,6 @@ func TestSession_Delete(t *testing.T) {
 				permissionCondition = tt.args.permissionCondition(sessions)
 			}
 
-			start := time.Now()
 			// let's create a snapshot before deletion to make sure we could rollback in case of error
 			snapshot, err := tx.Begin(t.Context())
 			require.NoError(t, err)
