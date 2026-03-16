@@ -129,6 +129,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 					),
@@ -162,6 +167,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			fields: fields{
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -194,6 +204,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			fields: fields{
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -235,9 +250,46 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 		},
 		{
+			name: "org not found, precondition error",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "non-existing-org",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Password:  "pass",
+					Email: Email{
+						Address:  "email@test.ch",
+						Verified: true,
+					},
+					PreferredLanguage: language.English,
+				},
+				allowInitMail: true,
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-QXPGs", "Errors.Org.NotFound"))
+				},
+			},
+		},
+		{
 			name: "register human (with initial code), ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -343,6 +395,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human (email not verified, no password), ok (init code)",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -415,6 +472,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human (email not verified, with password), ok (init code)",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -488,6 +550,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human (email not verified, no password, no allowInitMail), ok (email verification with passwordInit)",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -549,6 +616,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human (with password and email code custom template), ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -625,6 +697,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human (with password and return email code), ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -702,6 +779,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human email verified and password, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -768,6 +850,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human email verified, trim spaces, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -834,6 +921,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human, email verified, userLoginMustBeDomain false, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -900,6 +992,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human claimed domain, userLoginMustBeDomain false, error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -954,6 +1051,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human domain, userLoginMustBeDomain false, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1044,6 +1146,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human (with phone), ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1156,6 +1263,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human (with phone), ok (external)",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1263,6 +1375,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human (with verified phone), ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1331,6 +1448,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human (with phone return code), ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1444,6 +1566,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "add human with metadata, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1516,6 +1643,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "register human with idp, unverified email, allow init mail, ok (verify mail)",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1607,6 +1739,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "register human with idp, verified email, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1689,6 +1826,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "register human with TOTPSecret, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1774,6 +1916,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "register human with TOTPSecret, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1859,6 +2006,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "register human (validate domain), already verified",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1913,6 +2065,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "register human (validate domain), orgScopedUsername, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -1997,6 +2154,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "register human (validate domain, domain removed), ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -2088,6 +2250,11 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			name: "register human (validate domain, org removed), ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, "org1"),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
