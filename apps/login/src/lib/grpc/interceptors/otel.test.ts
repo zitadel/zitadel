@@ -167,7 +167,6 @@ describe("otelGrpcInterceptor", () => {
       ({ service }) => {
         service(SessionService, {
           createSession: () => {
-            // eslint-disable-next-line no-throw-literal
             throw "string error";
           },
         });
