@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -233,29 +234,28 @@ func (s session) Delete(ctx context.Context, client database.QueryExecutor, cond
 	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
 		return 0, time.Time{}, database.NewMissingConditionError(s.InstanceIDColumn())
 	}
-	if condition.IsRestrictingColumn(s.IDColumn()) {
-		return s.deleteSingleSession(ctx, client, condition, permissionCondition)
-	}
-	// TODO: allow deletion of multiple sessions with permission check
-	return 0, time.Time{}, database.NewMissingConditionError(s.IDColumn())
-}
-
-// deleteSingleSession deletes a single session matching the given condition, then asserts the permissionCondition,
-// and returns the number of rows affected and the deleted_at timestamp.
-// In case the session was already deleted, it returns 1 row affected and the deleted_at timestamp from the sessions_deleted table, without an error.
-// If no session matches the condition, it returns 0 rows affected and a zero time, without an error.
-// In case the permission condition is not met, typically an error is returned (depending on the implementation of the permission check provided), and no session is deleted.
-func (s session) deleteSingleSession(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error) {
 	var builder database.StatementBuilder
-	builder.WriteString("WITH sessions AS ( SELECT instance_id, id, token_id, user_id, now() as deleted_at FROM zitadel.sessions")
+	builder.WriteString("WITH gatekeeper AS (SELECT count(*) as total_found, MAX(sessions.deleted_at) as deleted_at FROM (SELECT instance_id, user_id, token_id, now() as deleted_at FROM zitadel.sessions")
 	writeCondition(&builder, condition)
-	builder.WriteString(" UNION ALL SELECT instance_id, id, token_id, user_id, deleted_at FROM zitadel.sessions_deleted as sessions")
+	// In case the deletion is intended for a specific session,
+	// we'll also include already deleted session to check the permission against,
+	// and to return the deleted_at timestamp from the previous deletion in case the session was already deleted.
+	if condition.IsRestrictingColumn(s.IDColumn()) {
+		builder.WriteString(" UNION ALL SELECT instance_id, user_id, token_id, deleted_at FROM zitadel.sessions_deleted as sessions")
+		writeCondition(&builder, condition)
+	}
+	// join the users table to get the user's organization, which will be needed for checking the permission
+	builder.WriteString(") as sessions")
+	if permissionCondition != nil {
+		builder.WriteString(" LEFT JOIN zitadel.users ON users.instance_id = sessions.instance_id AND users.id = sessions.user_id HAVING (bool_and(")
+		permissionCondition.Write(&builder)
+		builder.WriteString(") AND count(*) > 0) or zitadel.throw_not_permitted()") //TODO: change throw_not_permitted to actual permission check
+	}
+	builder.WriteString("),")
+	builder.WriteString(" execution AS (DELETE FROM zitadel.sessions")
 	writeCondition(&builder, condition)
-	builder.WriteString(") , delete as (DELETE FROM zitadel.sessions")
-	writeCondition(&builder, condition)
-	builder.WriteString(" RETURNING 1 AS rows_affected) ")
-	s.writeDeleteStatementWithPermission(&builder, permissionCondition)
-	var deletedAt time.Time
+	builder.WriteString(" and exists (SELECT 1 FROM gatekeeper) RETURNING 1 AS rows_affected) SELECT (CASE WHEN gatekeeper.total_found = 1 THEN gatekeeper.deleted_at END) as deleted_at, (SELECT count(*) FROM execution) as rows_affected FROM gatekeeper")
+	var deletedAt sql.NullTime
 	var deletedSessions int64
 	if err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&deletedAt, &deletedSessions); err != nil {
 		// If the criteria did not match any session, ignore the error since the user would have had the permission to delete the session,
@@ -264,17 +264,7 @@ func (s session) deleteSingleSession(ctx context.Context, client database.QueryE
 		}
 		return 0, time.Time{}, err
 	}
-	return deletedSessions, deletedAt, nil
-}
-
-func (s session) writeDeleteStatementWithPermission(builder *database.StatementBuilder, permissionCondition database.Condition) {
-	if permissionCondition == nil {
-		builder.WriteString("SELECT (SELECT deleted_at FROM sessions), count(*) FROM delete AS rows_affected")
-		return
-	}
-	builder.WriteString("SELECT CASE WHEN (EXISTS (SELECT 1 FROM sessions) or throw_not_permitted()) THEN CASE WHEN(")
-	permissionCondition.Write(builder)
-	builder.WriteString(") THEN (SELECT deleted_at FROM sessions as deleted_at) END END, count(*) FROM delete AS rows_affected")
+	return deletedSessions, deletedAt.Time, nil
 }
 
 // -------------------------------------------------------------
@@ -523,14 +513,6 @@ func (s session) ExistsMetadata(cond database.Condition) database.Condition {
 // MetadataConditions implements [domain.sessionConditions].
 func (s session) MetadataConditions() domain.SessionMetadataConditions {
 	return s.metadataRepo
-}
-
-// ExistsSession implements [domain.sessionConditions].
-func (s session) ExistsSession(cond database.Condition) database.Condition {
-	return database.Exists(
-		s.unqualifiedTableName(),
-		cond,
-	)
 }
 
 // -------------------------------------------------------------

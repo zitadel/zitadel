@@ -115,8 +115,6 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 					repo := domainmock.NewSessionRepo(ctrl)
-					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
-
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
@@ -139,15 +137,11 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 					repo := domainmock.NewSessionRepo(ctrl)
-					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
-					repo.ExpectUserIDCondition(userID)
-					repo.ExpectExistsSession(repo.UserIDCondition(userID))
-
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
-								repo.ExistsSession(repo.UserIDCondition(userID)),
+								repo.UserIDCondition(userID),
 								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
 							),
 						).
@@ -169,15 +163,11 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 					repo := domainmock.NewSessionRepo(ctrl)
-					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
-					repo.ExpectExistsSession(repo.TokenIDCondition(userID))
-					repo.ExpectTokenIDCondition("token-1")
-
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
-								repo.ExistsSession(repo.TokenIDCondition("token-1")),
+								repo.TokenIDCondition("token-1"),
 								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
 							),
 						).
@@ -201,15 +191,11 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 					repo := domainmock.NewSessionRepo(ctrl)
-					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
-					repo.ExpectUserIDCondition(userID)
-					repo.ExpectExistsSession(repo.UserIDCondition(userID))
-
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
-								repo.ExistsSession(repo.UserIDCondition(userID)),
+								repo.UserIDCondition(userID),
 								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
 							),
 						).
@@ -231,8 +217,6 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 					repo := domainmock.NewSessionRepo(ctrl)
-					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
-
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
@@ -255,8 +239,6 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 					repo := domainmock.NewSessionRepo(ctrl)
-					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
-
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
@@ -279,8 +261,6 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 					repo := domainmock.NewSessionRepo(ctrl)
-					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
-
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
@@ -304,8 +284,6 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			args: args{
 				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 					repo := domainmock.NewSessionRepo(ctrl)
-					repo.ExpectPrimaryKeyCondition("inst-1", "session-1")
-
 					repo.EXPECT().
 						Delete(gomock.Any(), gomock.Any(),
 							repo.PrimaryKeyCondition("inst-1", "session-1"),

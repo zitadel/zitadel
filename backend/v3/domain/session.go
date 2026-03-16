@@ -45,6 +45,7 @@ type SessionRepository interface {
 	// An additional permission condition can be provided to check if the session can be deleted, for example by checking the token id or user id.
 	// The primary condition is used to select the session(s) to be deleted, while the permission condition can be used to verify that the session(s) meet certain criteria before deletion
 	// respectively to return an error if the criteria are not met.
+	// The method returns the number of deleted rows and the latest expiration time of the deleted session in case of a single deleted session.
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error)
 }
 
@@ -98,9 +99,6 @@ type sessionConditions interface {
 	ExistsMetadata(condition database.Condition) database.Condition
 	// MetadataConditions returns the conditions for the metadata fields.
 	MetadataConditions() SessionMetadataConditions
-	// ExistsSession returns a filter that checks for the existence of a session based on the given condition.
-	// This can be used to check if a session exists for a specific user or with a specific token id, for example.
-	ExistsSession(condition database.Condition) database.Condition
 }
 
 type sessionChanges interface {
