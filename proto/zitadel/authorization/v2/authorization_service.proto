@@ -22,7 +22,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorization/v2;author
 // users, etc., please use the InternalPermissionService.
 service AuthorizationService {
 
-  // List Authorizations
+  // List Role Assignments
   //
   // ListAuthorizations returns all authorizations matching the request and necessary permissions.
   //
@@ -39,7 +39,7 @@ service AuthorizationService {
     };
   }
 
-  // Create Authorization
+  // Create Role Assignments
   //
   // CreateAuthorization creates a new authorization for a user in an owned or granted project.
   //
@@ -55,7 +55,7 @@ service AuthorizationService {
     };
   }
 
-  // Update Authorization
+  // Update Role Assignments
   //
   // UpdateAuthorization updates the authorization.
   //
@@ -73,7 +73,7 @@ service AuthorizationService {
     };
   }
 
-  // Delete Authorization
+  // Delete Role Assignments
   //
   // DeleteAuthorization deletes the authorization.
   //
@@ -93,7 +93,7 @@ service AuthorizationService {
     };
   }
 
-  // Activate Authorization
+  // Activate Role Assignments
   //
   // ActivateAuthorization activates an existing but inactive authorization.
   //
@@ -113,7 +113,7 @@ service AuthorizationService {
     };
   }
 
-  // Deactivate Authorization
+  // Deactivate Role Assignments
   //
   // DeactivateAuthorization deactivates an existing and active authorization.
   //
