@@ -132,8 +132,8 @@ describe("OpenTelemetry Integration", () => {
         OUTPUT_DIR: "/tmp/otel",
       })
       .withCommand(["node", "/app/server.js"])
-      .withExposedPorts(8080, 7432)
-      .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+      .withExposedPorts(8080)
+      .withWaitStrategy(Wait.forLogMessage("Mock Zitadel server listening"))
       .start();
 
     try {
@@ -409,10 +409,10 @@ describe("OpenTelemetry Integration", () => {
     });
 
     describe("Trace Propagation", () => {
-      it("propagates traceparent to gRPC", () => {
+      it("propagates traceparent to backend calls", () => {
         const requests = readCapturedHeaders();
-        const grpcCalls = requests.filter((r) => r.method === "POST" && r.traceparent !== null);
-        expect(grpcCalls.length).toBeGreaterThan(0);
+        const backendCalls = requests.filter((r) => r.traceparent !== null);
+        expect(backendCalls.length).toBeGreaterThan(0);
       }, TEST_TIMEOUT);
 
       it("uses W3C traceparent format", () => {
@@ -435,8 +435,8 @@ describe("OpenTelemetry Integration", () => {
 
       it("maintains trace ID consistency", () => {
         const requests = readCapturedHeaders();
-        const grpcCalls = requests.filter((r) => r.method === "POST" && r.traceparent !== null);
-        const traceIds = grpcCalls.map((r) => r.traceparent!.split("-")[1]);
+        const backendCalls = requests.filter((r) => r.traceparent !== null);
+        const traceIds = backendCalls.map((r) => r.traceparent!.split("-")[1]);
         const uniqueIds = new Set(traceIds);
         expect(uniqueIds.size).toBeLessThan(traceIds.length);
       }, TEST_TIMEOUT);
@@ -819,8 +819,8 @@ describe("OpenTelemetry Disabled", () => {
         PORT: "8080",
       })
       .withCommand(["node", "/app/server.js"])
-      .withExposedPorts(8080, 7432)
-      .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+      .withExposedPorts(8080)
+      .withWaitStrategy(Wait.forLogMessage("Mock Zitadel server listening"))
       .start();
 
     loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
@@ -906,8 +906,8 @@ describe("Log Level Configuration", () => {
             PORT: "8080",
           })
           .withCommand(["node", "/app/server.js"])
-          .withExposedPorts(8080, 7432)
-          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+          .withExposedPorts(8080)
+          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel server listening"))
           .start();
 
         loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
@@ -967,8 +967,8 @@ describe("Log Level Configuration", () => {
             PORT: "8080",
           })
           .withCommand(["node", "/app/server.js"])
-          .withExposedPorts(8080, 7432)
-          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+          .withExposedPorts(8080)
+          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel server listening"))
           .start();
 
         loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
@@ -1058,8 +1058,8 @@ describe("Log Level Configuration", () => {
             PORT: "8080",
           })
           .withCommand(["node", "/app/server.js"])
-          .withExposedPorts(8080, 7432)
-          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+          .withExposedPorts(8080)
+          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel server listening"))
           .start();
 
         loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
@@ -1158,8 +1158,8 @@ describe("Log Level Configuration", () => {
             PORT: "8080",
           })
           .withCommand(["node", "/app/server.js"])
-          .withExposedPorts(8080, 7432)
-          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel HTTP/2 server listening"))
+          .withExposedPorts(8080)
+          .withWaitStrategy(Wait.forLogMessage("Mock Zitadel server listening"))
           .start();
 
         loginApp = await new GenericContainer(LOGIN_IMAGE_TAG)
