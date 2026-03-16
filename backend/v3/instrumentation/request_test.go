@@ -182,7 +182,7 @@ func Test_requestDetails_slogAttributes(t *testing.T) {
 
 func Test_requestDetailsExtractor(t *testing.T) {
 	tests := []struct {
-		name string // description of this test case
+		name string
 		ctx  context.Context
 		want []slog.Attr
 	}{
