@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -627,6 +628,34 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			res: res{
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "org not found, precondition error",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "non-existing-org",
+					},
+					Description: "description",
+					Name:        "name",
+					Username:    "username",
+				},
+				check: func(resourceOwner, aggregateID string) error {
+					return nil
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-QXPGs", "Errors.Org.NotFound"))
 				},
 			},
 		},
