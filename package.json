@@ -1,5 +1,5 @@
 {
-  "packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264",
+  "packageManager": "pnpm@10.30.3",
   "private": true,
   "name": "@zitadel/zitadel",
   "pnpm": {
@@ -16,8 +16,8 @@
     "@bufbuild/buf": "^1.65.0",
     "@changesets/cli": "^2.29.8",
     "nx": "21.6.9",
-    "shiki": "^3.21.0",
     "sass": "^1.97.3",
+    "shiki": "^3.21.0",
     "wait-on": "^9.0.3"
   }
 }

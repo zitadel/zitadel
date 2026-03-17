@@ -17,12 +17,21 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
-async function loadSessions({ serviceConfig }: { serviceConfig: ServiceConfig }) {
+async function loadSessions({ serviceConfig, organization }: { serviceConfig: ServiceConfig; organization?: string }) {
   const cookieIds = await getAllSessionCookieIds();
 
   if (cookieIds && cookieIds.length) {
-    const response = await listSessions({ serviceConfig, ids: cookieIds.filter((id) => !!id) as string[] });
-    return response?.sessions ?? [];
+    const response = await listSessions({
+      serviceConfig,
+      ids: cookieIds.filter((id) => !!id) as string[],
+    });
+
+    let sessions = response?.sessions ?? [];
+    if (organization) {
+      sessions = sessions.filter((s) => s.factors?.user?.organizationId === organization);
+    }
+
+    return sessions;
   } else {
     console.info("No session cookie found.");
     return [];
@@ -46,7 +55,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     }
   }
 
-  let sessions = await loadSessions({ serviceConfig });
+  let sessions = await loadSessions({ serviceConfig, organization });
 
   const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 

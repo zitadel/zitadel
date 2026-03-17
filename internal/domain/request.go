@@ -17,6 +17,7 @@ const (
 type Request interface {
 	Type() AuthRequestType
 	IsValid() bool
+	GetScopes() []string
 }
 
 type AuthRequestType int32
@@ -35,6 +36,18 @@ type AuthRequestOIDC struct {
 	CodeChallenge *OIDCCodeChallenge
 }
 
+func NewAuthRequestOIDC(
+	scopes []string,
+	responseType OIDCResponseType,
+	responseMode OIDCResponseMode,
+	nonce string,
+	codeChallenge *OIDCCodeChallenge,
+) *AuthRequestOIDC {
+	return &AuthRequestOIDC{
+		scopes, responseType, responseMode, nonce, codeChallenge,
+	}
+}
+
 func (a *AuthRequestOIDC) Type() AuthRequestType {
 	return AuthRequestTypeOIDC
 }
@@ -42,6 +55,10 @@ func (a *AuthRequestOIDC) Type() AuthRequestType {
 func (a *AuthRequestOIDC) IsValid() bool {
 	return len(a.Scopes) > 0 &&
 		a.CodeChallenge == nil || a.CodeChallenge != nil && a.CodeChallenge.IsValid()
+}
+
+func (a *AuthRequestOIDC) GetScopes() []string {
+	return a.Scopes
 }
 
 type AuthRequestSAML struct {
@@ -61,6 +78,10 @@ func (a *AuthRequestSAML) IsValid() bool {
 	return true
 }
 
+func (*AuthRequestSAML) GetScopes() []string {
+	return nil
+}
+
 type AuthRequestDevice struct {
 	ClientID    string
 	DeviceCode  string
@@ -71,10 +92,28 @@ type AuthRequestDevice struct {
 	ProjectName string
 }
 
+func NewAuthRequestDevice(
+	clientID string,
+	deviceCode string,
+	userCode string,
+	scopes []string,
+	audience []string,
+	appName string,
+	projectName string,
+) *AuthRequestDevice {
+	return &AuthRequestDevice{
+		clientID, deviceCode, userCode, scopes, audience, appName, projectName,
+	}
+}
+
 func (*AuthRequestDevice) Type() AuthRequestType {
 	return AuthRequestTypeDevice
 }
 
 func (a *AuthRequestDevice) IsValid() bool {
 	return a.DeviceCode != "" && a.UserCode != ""
+}
+
+func (a *AuthRequestDevice) GetScopes() []string {
+	return a.Scopes
 }
