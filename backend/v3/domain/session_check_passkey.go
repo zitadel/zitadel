@@ -3,7 +3,6 @@ package domain
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -14,13 +13,13 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 type FinishLoginFunc func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error)
 
 type PasskeyCheckCommand struct {
-	CheckPasskey *session_grpc.CheckWebAuthN
+	// CheckPasskey is the assertion data for the passkey
+	CheckPasskey []byte
 
 	finishLoginFn FinishLoginFunc
 
@@ -37,9 +36,9 @@ type PasskeyCheckCommand struct {
 	PKeySignCount uint32
 }
 
-func NewPasskeyCheckCommand(sessionID, instanceID string, request *session_grpc.CheckWebAuthN, finishLoginFn FinishLoginFunc) *PasskeyCheckCommand {
+func NewPasskeyCheckCommand(sessionID, instanceID string, assertionData []byte, finishLoginFn FinishLoginFunc) *PasskeyCheckCommand {
 	pcc := &PasskeyCheckCommand{
-		CheckPasskey:  request,
+		CheckPasskey:  assertionData,
 		sessionID:     sessionID,
 		instanceID:    instanceID,
 		finishLoginFn: webauthnConfig.FinishLoginWithNewDomainModel,
@@ -95,12 +94,8 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 		displayName: p.FetchedUser.Human.DisplayName,
 		creds:       PasskeysToCredentials(ctx, userPKeys, passkeyChallenge.RPID),
 	}
-	credentialAssertionData, err := json.Marshal(p.CheckPasskey.GetCredentialAssertionData())
-	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-I84Iyp", "Errors.Internal")
-	}
 
-	webAuthCreds, err := p.finishLoginFn(ctx, p.getWebAuthNSessionData(passkeyChallenge, p.FetchedUser.ID), webAuthnUsr, credentialAssertionData, passkeyChallenge.RPID)
+	webAuthCreds, err := p.finishLoginFn(ctx, p.getWebAuthNSessionData(passkeyChallenge, p.FetchedUser.ID), webAuthnUsr, p.CheckPasskey, passkeyChallenge.RPID)
 	if err != nil && (webAuthCreds == nil || webAuthCreds.ID == nil) {
 		return err
 	}

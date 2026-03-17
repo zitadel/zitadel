@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
-	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	domainmock "github.com/zitadel/zitadel/backend/v3/domain/mock"
@@ -23,7 +22,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 func TestPasskeyCheckCommand_Validate(t *testing.T) {
@@ -34,7 +32,7 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 		testName      string
 		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
 		userRepo      func(ctrl *gomock.Controller) domain.UserRepository
-		checkPasskey  *session_grpc.CheckWebAuthN
+		checkPasskey  []byte
 		sessionID     string
 		instanceID    string
 		expectedError error
@@ -45,27 +43,21 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			testName: "when sessionID is not set should return error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
+			testName:      "when sessionID is not set should return error",
+			checkPasskey:  []byte{},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-4QJa2k", "Errors.Missing.SessionID"),
 		},
 		{
-			testName: "when instanceID is not set should return error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
+			testName:      "when instanceID is not set should return error",
+			checkPasskey:  []byte{},
 			sessionID:     "session-1",
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-XlOhxU", "Errors.Missing.InstanceID"),
 		},
 		{
-			testName: "when retrieving session fails should return error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName:     "when retrieving session fails should return error",
+			checkPasskey: []byte{},
+			sessionID:    "session-1",
+			instanceID:   "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -86,12 +78,10 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(getErr, "DOM-CUnePh", "failed fetching session"),
 		},
 		{
-			testName: "when session has no passkey challenge should return precondition failed error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName:     "when session has no passkey challenge should return precondition failed error",
+			checkPasskey: []byte{},
+			sessionID:    "session-1",
+			instanceID:   "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -115,12 +105,10 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-lQhNR4", "Errors.Session.WebAuthN.NoChallenge"),
 		},
 		{
-			testName: "when session has no user ID should return precondition failed error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName:     "when session has no user ID should return precondition failed error",
+			checkPasskey: []byte{},
+			sessionID:    "session-1",
+			instanceID:   "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 
@@ -154,12 +142,10 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-jy0zq7", "Errors.User.UserIDMissing"),
 		},
 		{
-			testName: "when retrieving user fails should return error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName:     "when retrieving user fails should return error",
+			checkPasskey: []byte{},
+			sessionID:    "session-1",
+			instanceID:   "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -209,12 +195,10 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(getErr, "DOM-pB6Mlm", "failed fetching user"),
 		},
 		{
-			testName: "when all validations pass should return no error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName:     "when all validations pass should return no error",
+			checkPasskey: []byte{},
+			sessionID:    "session-1",
+			instanceID:   "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -307,7 +291,7 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 		sessionRepo    func(ctrl *gomock.Controller) domain.SessionRepository
 		userRepo       func(ctrl *gomock.Controller) domain.UserRepository
 		finishLoginFn  func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error)
-		checkPasskey   *session_grpc.CheckWebAuthN
+		checkPasskey   []byte
 		fetchedUser    *domain.User
 		fetchedSession *domain.Session
 
@@ -319,10 +303,8 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			testName: "when finish login fails should return error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
+			testName:     "when finish login fails should return error",
+			checkPasskey: []byte{},
 			fetchedSession: &domain.Session{
 				ID:     "session-1",
 				UserID: "user-1",
@@ -347,10 +329,8 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			expectedError: finishLoginErr,
 		},
 		{
-			testName: "when passkey not found should return precondition failed error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
+			testName:     "when passkey not found should return precondition failed error",
+			checkPasskey: []byte{},
 			fetchedSession: &domain.Session{
 				ID:     "session-1",
 				UserID: "user-1",
@@ -382,10 +362,8 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-uuxodH", "Errors.User.WebAuthN.NotFound"),
 		},
 		{
-			testName: "when session update fails should return error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
+			testName:     "when session update fails should return error",
+			checkPasskey: []byte{},
 			fetchedSession: &domain.Session{
 				ID:     "session-1",
 				UserID: "user-1",
@@ -439,10 +417,8 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-Uadvap", "failed updating session"),
 		},
 		{
-			testName: "when session not found should return not found error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
+			testName:     "when session not found should return not found error",
+			checkPasskey: []byte{},
 			fetchedSession: &domain.Session{
 				ID:     "session-1",
 				UserID: "user-1",
@@ -496,10 +472,8 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowNotFound(nil, "DOM-Uadvap", "session not found"),
 		},
 		{
-			testName: "when user update fails should return error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
+			testName:     "when user update fails should return error",
+			checkPasskey: []byte{},
 			fetchedSession: &domain.Session{
 				ID:     "session-1",
 				UserID: "user-1",
@@ -566,10 +540,8 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-wdwZYk", "failed updating user"),
 		},
 		{
-			testName: "when execute succeeds should return no error",
-			checkPasskey: &session_grpc.CheckWebAuthN{
-				CredentialAssertionData: &structpb.Struct{},
-			},
+			testName:     "when execute succeeds should return no error",
+			checkPasskey: []byte{},
 			fetchedSession: &domain.Session{
 				ID:     "session-1",
 				UserID: "user-1",
@@ -673,7 +645,7 @@ func TestPasskeyCheckCommand_Events(t *testing.T) {
 
 	tt := []struct {
 		testName           string
-		checkPasskey       *session_grpc.CheckWebAuthN
+		checkPasskey       []byte
 		fetchedSession     *domain.Session
 		fetchedUser        *domain.User
 		lastVerifiedAt     time.Time
@@ -691,7 +663,7 @@ func TestPasskeyCheckCommand_Events(t *testing.T) {
 		},
 		{
 			testName:       "when user verification is required should return WebAuthNCheckedEvent and PasswordlessSignCountChangedEvent",
-			checkPasskey:   &session_grpc.CheckWebAuthN{},
+			checkPasskey:   []byte{},
 			lastVerifiedAt: time.Now(),
 			userVerified:   true,
 			pkeyID:         "pkey-1",
@@ -728,7 +700,7 @@ func TestPasskeyCheckCommand_Events(t *testing.T) {
 		},
 		{
 			testName:       "when user verification is not required should return WebAuthNCheckedEvent and U2FSignCountChangedEvent",
-			checkPasskey:   &session_grpc.CheckWebAuthN{},
+			checkPasskey:   []byte{},
 			lastVerifiedAt: time.Now(),
 			userVerified:   false,
 			pkeyID:         "pkey-2",
