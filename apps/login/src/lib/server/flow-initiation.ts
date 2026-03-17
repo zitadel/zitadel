@@ -268,7 +268,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
       const securitySettings = await getSecuritySettings({ serviceConfig });
 
-      const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest });
+      const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
       setCSPHeaders(noSessionResponse, serviceConfig, securitySettings);
@@ -304,7 +304,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
       return callbackResponse;
     } else {
-      let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest });
+      let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       if (!selectedSession || !selectedSession.id) {
         return gotoAccounts({

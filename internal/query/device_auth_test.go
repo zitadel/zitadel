@@ -52,15 +52,15 @@ var (
 		"appName",
 		"projectName",
 	}
-	expectedDeviceAuth = &domain.AuthRequestDevice{
-		ClientID:    "client-id",
-		DeviceCode:  "device1",
-		UserCode:    "user-code",
-		Scopes:      []string{"a", "b", "c"},
-		Audience:    []string{"projectID", "clientID"},
-		AppName:     "appName",
-		ProjectName: "projectName",
-	}
+	expectedDeviceAuth = domain.NewAuthRequestDevice(
+		"client-id",
+		"device1",
+		"user-code",
+		[]string{"a", "b", "c"},
+		[]string{"projectID", "clientID"},
+		"appName",
+		"projectName",
+	)
 )
 
 func TestQueries_DeviceAuthRequestByUserCode(t *testing.T) {
