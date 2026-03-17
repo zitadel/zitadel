@@ -106,7 +106,7 @@ func handleGetError(inputErr error, errorID, objectType string) error {
 	}
 
 	if errors.Is(inputErr, &database.NoRowFoundError{}) {
-		return zerrors.ThrowNotFoundf(inputErr, errorID, "%s not found", objectType)
+		return zerrors.CreateZitadelError(zerrors.KindNotFound, inputErr, errorID, fmt.Sprintf("%s not found", objectType), 1)
 	}
 
 	return zerrors.CreateZitadelError(zerrors.KindInternal, inputErr, errorID, fmt.Sprintf("failed fetching %s", objectType), 1)
