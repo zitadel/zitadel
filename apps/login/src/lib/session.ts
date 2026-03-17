@@ -142,13 +142,15 @@ export async function findValidSession({
   sessions,
   authRequest,
   samlRequest,
+  organization,
 }: {
   serviceConfig: ServiceConfig;
   sessions: Session[];
   authRequest?: AuthRequest;
   samlRequest?: SAMLRequest;
+  organization?: string;
 }): Promise<Session | undefined> {
-  const sessionsWithHint = sessions.filter((s) => {
+  let sessionsWithHint = sessions.filter((s) => {
     if (authRequest && authRequest.hintUserId) {
       return s.factors?.user?.id === authRequest.hintUserId;
     }
@@ -162,6 +164,10 @@ export async function findValidSession({
     }
     return true;
   });
+
+  if (organization) {
+    sessionsWithHint = sessionsWithHint.filter((s) => s.factors?.user?.organizationId === organization);
+  }
 
   if (sessionsWithHint.length === 0) {
     return undefined;

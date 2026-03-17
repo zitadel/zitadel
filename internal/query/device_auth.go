@@ -98,8 +98,10 @@ func prepareDeviceAuthQuery() (sq.SelectBuilder, func(*sql.Row) (*domain.AuthReq
 			LeftJoin(join(ProjectColumnID, AppColumnProjectID)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*domain.AuthRequestDevice, error) {
-			dst := new(domain.AuthRequestDevice)
 			var (
+				clientID    string
+				deviceCode  string
+				userCode    string
 				scopes      database.TextArray[string]
 				audience    database.TextArray[string]
 				appName     sql.NullString
@@ -107,9 +109,9 @@ func prepareDeviceAuthQuery() (sq.SelectBuilder, func(*sql.Row) (*domain.AuthReq
 			)
 
 			err := row.Scan(
-				&dst.ClientID,
-				&dst.DeviceCode,
-				&dst.UserCode,
+				&clientID,
+				&deviceCode,
+				&userCode,
 				&scopes,
 				&audience,
 				&appName,
@@ -121,11 +123,6 @@ func prepareDeviceAuthQuery() (sq.SelectBuilder, func(*sql.Row) (*domain.AuthReq
 			if err != nil {
 				return nil, zerrors.ThrowInternal(err, "QUERY-Voo3o", "Errors.Internal")
 			}
-			dst.Scopes = scopes
-			dst.Audience = audience
-			dst.AppName = appName.String
-			dst.ProjectName = projectName.String
-
-			return dst, nil
+			return domain.NewAuthRequestDevice(clientID, deviceCode, userCode, scopes, audience, appName.String, projectName.String), nil
 		}
 }
