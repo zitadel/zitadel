@@ -14,7 +14,7 @@
     "test-unit": "vitest --run",
     "test-dockerized": "vitest --run --config vitest.config.dockerized.ts",
     "lint-staged": "lint-staged",
-    "clean": "rm -rf node_modules .next cypress"
+    "clean": "rm -rf node_modules .next"
   },
   "git": {
     "pre-commit": "lint-staged"
@@ -41,8 +41,8 @@
     "escape-html": "^1.0.3",
     "lucide-react": "^0.562.0",
     "moment": "^2.30.1",
-    "next": "15.5.10",
-    "next-intl": "^3.26.5",
+    "next": "16.1.6",
+    "next-intl": "^4.8.3",
     "next-themes": "^0.2.1",
     "nice-grpc": "^2.1.14",
     "qrcode.react": "^4.2.0",
@@ -52,6 +52,8 @@
     "server-only": "^0.0.1",
     "tinycolor2": "^1.6.0",
     "uuid": "^13.0.0",
+    "@connectrpc/connect-node": "^2.1.1",
+    "@connectrpc/connect": "^2.1.1",
     "winston": "^3.17.0"
   },
   "devDependencies": {
@@ -81,7 +83,6 @@
     "@zitadel/proto": "workspace:*",
     "autoprefixer": "^10.4.23",
     "concurrently": "^9.2.1",
-    "cypress": "^14.5.4",
     "dotenv-cli": "^8.0.0",
     "env-cmd": "^10.1.0",
     "esbuild": "^0.27.3",

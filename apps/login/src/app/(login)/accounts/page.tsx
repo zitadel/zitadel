@@ -17,13 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
-async function loadSessions({
-  serviceConfig,
-  organization,
-}: {
-  serviceConfig: ServiceConfig;
-  organization?: string;
-}) {
+async function loadSessions({ serviceConfig, organization }: { serviceConfig: ServiceConfig; organization?: string }) {
   const cookieIds = await getAllSessionCookieIds();
 
   if (cookieIds && cookieIds.length) {
