@@ -32,32 +32,27 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 		testName      string
 		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
 		userRepo      func(ctrl *gomock.Controller) domain.UserRepository
-		checkPasskey  []byte
-		sessionID     string
-		instanceID    string
+		cmd           *domain.PasskeyCheckCommand
 		expectedError error
 	}{
 		{
 			testName:      "when checkPasskey is nil should return no error",
-			checkPasskey:  nil,
+			cmd:           domain.NewPasskeyCheckCommand("", "", nil, nil),
 			expectedError: nil,
 		},
 		{
 			testName:      "when sessionID is not set should return error",
-			checkPasskey:  []byte{},
+			cmd:           domain.NewPasskeyCheckCommand("", "", []byte{}, nil),
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-4QJa2k", "Errors.Missing.SessionID"),
 		},
 		{
 			testName:      "when instanceID is not set should return error",
-			checkPasskey:  []byte{},
-			sessionID:     "session-1",
+			cmd:           domain.NewPasskeyCheckCommand("session-1", "", []byte{}, nil),
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-XlOhxU", "Errors.Missing.InstanceID"),
 		},
 		{
-			testName:     "when retrieving session fails should return error",
-			checkPasskey: []byte{},
-			sessionID:    "session-1",
-			instanceID:   "instance-1",
+			testName: "when retrieving session fails should return error",
+			cmd:      domain.NewPasskeyCheckCommand("session-1", "instance-1", []byte{}, nil),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -78,10 +73,8 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(getErr, "DOM-CUnePh", "failed fetching session"),
 		},
 		{
-			testName:     "when session has no passkey challenge should return precondition failed error",
-			checkPasskey: []byte{},
-			sessionID:    "session-1",
-			instanceID:   "instance-1",
+			testName: "when session has no passkey challenge should return precondition failed error",
+			cmd:      domain.NewPasskeyCheckCommand("session-1", "instance-1", []byte{}, nil),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -105,10 +98,8 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-lQhNR4", "Errors.Session.WebAuthN.NoChallenge"),
 		},
 		{
-			testName:     "when session has no user ID should return precondition failed error",
-			checkPasskey: []byte{},
-			sessionID:    "session-1",
-			instanceID:   "instance-1",
+			testName: "when session has no user ID should return precondition failed error",
+			cmd:      domain.NewPasskeyCheckCommand("session-1", "instance-1", []byte{}, nil),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 
@@ -142,10 +133,8 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-jy0zq7", "Errors.User.UserIDMissing"),
 		},
 		{
-			testName:     "when retrieving user fails should return error",
-			checkPasskey: []byte{},
-			sessionID:    "session-1",
-			instanceID:   "instance-1",
+			testName: "when retrieving user fails should return error",
+			cmd:      domain.NewPasskeyCheckCommand("session-1", "instance-1", []byte{}, nil),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -195,10 +184,8 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(getErr, "DOM-pB6Mlm", "failed fetching user"),
 		},
 		{
-			testName:     "when all validations pass should return no error",
-			checkPasskey: []byte{},
-			sessionID:    "session-1",
-			instanceID:   "instance-1",
+			testName: "when all validations pass should return no error",
+			cmd:      domain.NewPasskeyCheckCommand("session-1", "instance-1", []byte{}, nil),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -258,9 +245,8 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			ctx := authz.NewMockContext(tc.instanceID, "", "")
+			ctx := authz.NewMockContext(tc.cmd.InstanceID, "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasskeyCheckCommand(tc.sessionID, tc.instanceID, tc.checkPasskey, nil)
 
 			opts := &domain.InvokeOpts{}
 			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
@@ -272,7 +258,7 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			}
 
 			// Test
-			err := cmd.Validate(ctx, opts)
+			err := tc.cmd.Validate(ctx, opts)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)
@@ -286,117 +272,111 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 	sessionUpdateErr := errors.New("session update error")
 	userUpdateErr := errors.New("user update error")
 
+	finishLoginErrFn := func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error) {
+		return nil, finishLoginErr
+	}
+	finishLoginNonMatchingPasskeyFn := func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error) {
+		return &webauthn.Credential{ID: []byte("non-matching-key-id")}, nil
+	}
+	finishLoginOKFn := func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error) {
+		return &webauthn.Credential{
+			ID: []byte("key-id-1"),
+			Flags: webauthn.CredentialFlags{
+				UserVerified: true,
+			},
+			Authenticator: webauthn.Authenticator{
+				SignCount: 5,
+			},
+		}, nil
+	}
+
 	tt := []struct {
-		testName       string
-		sessionRepo    func(ctrl *gomock.Controller) domain.SessionRepository
-		userRepo       func(ctrl *gomock.Controller) domain.UserRepository
-		finishLoginFn  func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error)
-		checkPasskey   []byte
-		fetchedUser    *domain.User
-		fetchedSession *domain.Session
+		testName      string
+		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
+		userRepo      func(ctrl *gomock.Controller) domain.UserRepository
+		finishLoginFn func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error)
+		cmd           *domain.PasskeyCheckCommand
 
 		expectedError error
 	}{
 		{
 			testName:      "when checkPasskey is nil should return no error",
-			checkPasskey:  nil,
+			cmd:           domain.NewPasskeyCheckCommand("", "", nil, nil),
 			expectedError: nil,
 		},
 		{
-			testName:     "when finish login fails should return error",
-			checkPasskey: []byte{},
-			fetchedSession: &domain.Session{
-				ID:     "session-1",
-				UserID: "user-1",
-				Challenges: domain.SessionChallenges{
-					&domain.SessionChallengePasskey{
-						Challenge: "challenge",
-						RPID:      "example.com",
+			testName: "when finish login fails should return error",
+			cmd: &domain.PasskeyCheckCommand{
+				CheckPasskey: []byte{},
+				SessionID:    "session-1",
+				InstanceID:   "instance-1",
+				FetchedUser: &domain.User{
+					ID:       "user-1",
+					Username: "testuser",
+					Human:    &domain.HumanUser{DisplayName: "Test User", Passkeys: []*domain.Passkey{}},
+				},
+				FetchedSession: &domain.Session{
+					ID:     "session-1",
+					UserID: "user-1",
+					Challenges: domain.SessionChallenges{
+						&domain.SessionChallengePasskey{Challenge: "challenge", RPID: "example.com"},
 					},
 				},
-			},
-			fetchedUser: &domain.User{
-				ID:       "user-1",
-				Username: "testuser",
-				Human: &domain.HumanUser{
-					DisplayName: "Test User",
-					Passkeys:    []*domain.Passkey{},
-				},
-			},
-			finishLoginFn: func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error) {
-				return nil, finishLoginErr
+				FinishLoginFn: finishLoginErrFn,
 			},
 			expectedError: finishLoginErr,
 		},
 		{
-			testName:     "when passkey not found should return precondition failed error",
-			checkPasskey: []byte{},
-			fetchedSession: &domain.Session{
-				ID:     "session-1",
-				UserID: "user-1",
-				Challenges: domain.SessionChallenges{
-					&domain.SessionChallengePasskey{
-						Challenge: "challenge",
-						RPID:      "example.com",
-					},
-				},
-			},
-			fetchedUser: &domain.User{
-				ID:       "user-1",
-				Username: "testuser",
-				Human: &domain.HumanUser{
-					DisplayName: "Test User",
-					Passkeys: []*domain.Passkey{
-						{
-							ID:    "pkey-1",
-							KeyID: []byte("key-id-1"),
+			testName: "when passkey not found should return precondition failed error",
+			cmd: &domain.PasskeyCheckCommand{
+				CheckPasskey: []byte{},
+				SessionID:    "session-1",
+				InstanceID:   "instance-1",
+				FetchedUser: &domain.User{
+					ID:       "user-1",
+					Username: "testuser",
+					Human: &domain.HumanUser{
+						DisplayName: "Test User",
+						Passkeys: []*domain.Passkey{
+							{ID: "pkey-1", KeyID: []byte("key-id-1")},
 						},
 					},
 				},
-			},
-			finishLoginFn: func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error) {
-				return &webauthn.Credential{
-					ID: []byte("non-matching-key-id"),
-				}, nil
+				FetchedSession: &domain.Session{
+					ID:     "session-1",
+					UserID: "user-1",
+					Challenges: domain.SessionChallenges{
+						&domain.SessionChallengePasskey{Challenge: "challenge", RPID: "example.com"},
+					},
+				},
+				FinishLoginFn: finishLoginNonMatchingPasskeyFn,
 			},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-uuxodH", "Errors.User.WebAuthN.NotFound"),
 		},
 		{
-			testName:     "when session update fails should return error",
-			checkPasskey: []byte{},
-			fetchedSession: &domain.Session{
-				ID:     "session-1",
-				UserID: "user-1",
-				Challenges: domain.SessionChallenges{
-					&domain.SessionChallengePasskey{
-						Challenge: "challenge",
-						RPID:      "example.com",
-					},
-				},
-			},
-			fetchedUser: &domain.User{
-				ID:       "user-1",
-				Username: "testuser",
-				Human: &domain.HumanUser{
-					DisplayName: "Test User",
-					Passkeys: []*domain.Passkey{
-						{
-							ID:    "pkey-1",
-							KeyID: []byte("key-id-1"),
+			testName: "when session update fails should return error",
+			cmd: &domain.PasskeyCheckCommand{
+				CheckPasskey: []byte{},
+				SessionID:    "session-1",
+				InstanceID:   "instance-1",
+				FetchedUser: &domain.User{
+					ID:       "user-1",
+					Username: "testuser",
+					Human: &domain.HumanUser{
+						DisplayName: "Test User",
+						Passkeys: []*domain.Passkey{
+							{ID: "pkey-1", KeyID: []byte("key-id-1")},
 						},
 					},
 				},
-			},
-			finishLoginFn: func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error) {
-				return &webauthn.Credential{
-					ID: []byte("key-id-1"),
-					Flags: webauthn.CredentialFlags{
-						UserVerified: true,
+				FetchedSession: &domain.Session{
+					ID:     "session-1",
+					UserID: "user-1",
+					Challenges: domain.SessionChallenges{
+						&domain.SessionChallengePasskey{Challenge: "challenge", RPID: "example.com"},
 					},
-					Authenticator: webauthn.Authenticator{
-						SignCount: 5,
-					},
-				}, nil
+				},
+				FinishLoginFn: finishLoginOKFn,
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
@@ -417,41 +397,29 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-Uadvap", "failed updating session"),
 		},
 		{
-			testName:     "when session not found should return not found error",
-			checkPasskey: []byte{},
-			fetchedSession: &domain.Session{
-				ID:     "session-1",
-				UserID: "user-1",
-				Challenges: domain.SessionChallenges{
-					&domain.SessionChallengePasskey{
-						Challenge: "challenge",
-						RPID:      "example.com",
-					},
-				},
-			},
-			fetchedUser: &domain.User{
-				ID:       "user-1",
-				Username: "testuser",
-				Human: &domain.HumanUser{
-					DisplayName: "Test User",
-					Passkeys: []*domain.Passkey{
-						{
-							ID:    "pkey-1",
-							KeyID: []byte("key-id-1"),
+			testName: "when session not found should return not found error",
+			cmd: &domain.PasskeyCheckCommand{
+				CheckPasskey: []byte{},
+				SessionID:    "session-1",
+				InstanceID:   "instance-1",
+				FetchedUser: &domain.User{
+					ID:       "user-1",
+					Username: "testuser",
+					Human: &domain.HumanUser{
+						DisplayName: "Test User",
+						Passkeys: []*domain.Passkey{
+							{ID: "pkey-1", KeyID: []byte("key-id-1")},
 						},
 					},
 				},
-			},
-			finishLoginFn: func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error) {
-				return &webauthn.Credential{
-					ID: []byte("key-id-1"),
-					Flags: webauthn.CredentialFlags{
-						UserVerified: true,
+				FetchedSession: &domain.Session{
+					ID:     "session-1",
+					UserID: "user-1",
+					Challenges: domain.SessionChallenges{
+						&domain.SessionChallengePasskey{Challenge: "challenge", RPID: "example.com"},
 					},
-					Authenticator: webauthn.Authenticator{
-						SignCount: 5,
-					},
-				}, nil
+				},
+				FinishLoginFn: finishLoginOKFn,
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
@@ -472,41 +440,29 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowNotFound(nil, "DOM-Uadvap", "session not found"),
 		},
 		{
-			testName:     "when user update fails should return error",
-			checkPasskey: []byte{},
-			fetchedSession: &domain.Session{
-				ID:     "session-1",
-				UserID: "user-1",
-				Challenges: domain.SessionChallenges{
-					&domain.SessionChallengePasskey{
-						Challenge: "challenge",
-						RPID:      "example.com",
-					},
-				},
-			},
-			fetchedUser: &domain.User{
-				ID:       "user-1",
-				Username: "testuser",
-				Human: &domain.HumanUser{
-					DisplayName: "Test User",
-					Passkeys: []*domain.Passkey{
-						{
-							ID:    "pkey-1",
-							KeyID: []byte("key-id-1"),
+			testName: "when user update fails should return error",
+			cmd: &domain.PasskeyCheckCommand{
+				CheckPasskey: []byte{},
+				SessionID:    "session-1",
+				InstanceID:   "instance-1",
+				FetchedUser: &domain.User{
+					ID:       "user-1",
+					Username: "testuser",
+					Human: &domain.HumanUser{
+						DisplayName: "Test User",
+						Passkeys: []*domain.Passkey{
+							{ID: "pkey-1", KeyID: []byte("key-id-1")},
 						},
 					},
 				},
-			},
-			finishLoginFn: func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error) {
-				return &webauthn.Credential{
-					ID: []byte("key-id-1"),
-					Flags: webauthn.CredentialFlags{
-						UserVerified: true,
+				FetchedSession: &domain.Session{
+					ID:     "session-1",
+					UserID: "user-1",
+					Challenges: domain.SessionChallenges{
+						&domain.SessionChallengePasskey{Challenge: "challenge", RPID: "example.com"},
 					},
-					Authenticator: webauthn.Authenticator{
-						SignCount: 5,
-					},
-				}, nil
+				},
+				FinishLoginFn: finishLoginOKFn,
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
@@ -540,41 +496,29 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-wdwZYk", "failed updating user"),
 		},
 		{
-			testName:     "when execute succeeds should return no error",
-			checkPasskey: []byte{},
-			fetchedSession: &domain.Session{
-				ID:     "session-1",
-				UserID: "user-1",
-				Challenges: domain.SessionChallenges{
-					&domain.SessionChallengePasskey{
-						Challenge: "challenge",
-						RPID:      "example.com",
-					},
-				},
-			},
-			fetchedUser: &domain.User{
-				ID:       "user-1",
-				Username: "testuser",
-				Human: &domain.HumanUser{
-					DisplayName: "Test User",
-					Passkeys: []*domain.Passkey{
-						{
-							ID:    "pkey-1",
-							KeyID: []byte("key-id-1"),
+			testName: "when execute succeeds should return no error",
+			cmd: &domain.PasskeyCheckCommand{
+				CheckPasskey: []byte{},
+				SessionID:    "session-1",
+				InstanceID:   "instance-1",
+				FetchedUser: &domain.User{
+					ID:       "user-1",
+					Username: "testuser",
+					Human: &domain.HumanUser{
+						DisplayName: "Test User",
+						Passkeys: []*domain.Passkey{
+							{ID: "pkey-1", KeyID: []byte("key-id-1")},
 						},
 					},
 				},
-			},
-			finishLoginFn: func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error) {
-				return &webauthn.Credential{
-					ID: []byte("key-id-1"),
-					Flags: webauthn.CredentialFlags{
-						UserVerified: true,
+				FetchedSession: &domain.Session{
+					ID:     "session-1",
+					UserID: "user-1",
+					Challenges: domain.SessionChallenges{
+						&domain.SessionChallengePasskey{Challenge: "challenge", RPID: "example.com"},
 					},
-					Authenticator: webauthn.Authenticator{
-						SignCount: 5,
-					},
-				}, nil
+				},
+				FinishLoginFn: finishLoginOKFn,
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
@@ -613,11 +557,8 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			ctx := authz.NewMockContext("instance-1", "", "")
+			ctx := authz.NewMockContext(tc.cmd.InstanceID, "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasskeyCheckCommand("session-1", "instance-1", tc.checkPasskey, tc.finishLoginFn)
-			cmd.FetchedSession = tc.fetchedSession
-			cmd.FetchedUser = tc.fetchedUser
 
 			opts := &domain.InvokeOpts{}
 			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
@@ -629,12 +570,12 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			}
 
 			// Test
-			err := cmd.Execute(ctx, opts)
+			err := tc.cmd.Execute(ctx, opts)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)
-			if tc.checkPasskey != nil && tc.expectedError == nil {
-				assert.NotZero(t, cmd.LastVeriedAt)
+			if tc.cmd.CheckPasskey != nil && tc.expectedError == nil {
+				assert.NotZero(t, tc.cmd.LastVeriedAt)
 			}
 		})
 	}
@@ -644,92 +585,77 @@ func TestPasskeyCheckCommand_Events(t *testing.T) {
 	t.Parallel()
 
 	tt := []struct {
-		testName           string
-		checkPasskey       []byte
-		fetchedSession     *domain.Session
-		fetchedUser        *domain.User
-		lastVerifiedAt     time.Time
-		userVerified       bool
-		pkeyID             string
-		pkeySignCount      uint32
-		expectedEventCount int
-		expectedEvents     []eventstore.Command
+		testName string
+		cmd      *domain.PasskeyCheckCommand
+
+		expectedEvents []eventstore.Command
 	}{
 		{
-			testName:           "when checkPasskey is nil should return no events",
-			checkPasskey:       nil,
-			expectedEventCount: 0,
-			expectedEvents:     []eventstore.Command{},
+			testName:       "when checkPasskey is nil should return no events",
+			cmd:            &domain.PasskeyCheckCommand{},
+			expectedEvents: []eventstore.Command{},
 		},
 		{
-			testName:       "when user verification is required should return WebAuthNCheckedEvent and PasswordlessSignCountChangedEvent",
-			checkPasskey:   []byte{},
-			lastVerifiedAt: time.Now(),
-			userVerified:   true,
-			pkeyID:         "pkey-1",
-			pkeySignCount:  5,
-			fetchedSession: &domain.Session{
-				ID:     "session-1",
-				UserID: "user-1",
-				Challenges: domain.SessionChallenges{
-					&domain.SessionChallengePasskey{
-						Challenge:        "challenge",
-						RPID:             "example.com",
-						UserVerification: old_domain.UserVerificationRequirementRequired,
-					},
-				},
-			},
-			fetchedUser: &domain.User{
-				ID:       "user-1",
-				Username: "testuser",
-				Human: &domain.HumanUser{
-					DisplayName: "Test User",
-					Passkeys: []*domain.Passkey{
-						{
-							ID:    "pkey-1",
-							KeyID: []byte("key-id-1"),
+			testName: "when user verification is required should return WebAuthNCheckedEvent and PasswordlessSignCountChangedEvent",
+			cmd: &domain.PasskeyCheckCommand{
+				CheckPasskey: []byte{},
+				SessionID:    "session-1",
+				InstanceID:   "instance-1",
+				FetchedUser: &domain.User{
+					ID:       "user-1",
+					Username: "testuser",
+					Human: &domain.HumanUser{
+						DisplayName: "Test User",
+						Passkeys: []*domain.Passkey{
+							{ID: "pkey-1", KeyID: []byte("key-id-1")},
 						},
 					},
 				},
+				FetchedSession: &domain.Session{
+					ID:     "session-1",
+					UserID: "user-1",
+					Challenges: domain.SessionChallenges{
+						&domain.SessionChallengePasskey{Challenge: "challenge", RPID: "example.com", UserVerification: old_domain.UserVerificationRequirementRequired},
+					},
+				},
+				LastVeriedAt:  time.Now(),
+				UserVerified:  true,
+				PKeyID:        "pkey-1",
+				PKeySignCount: 5,
 			},
-			expectedEventCount: 2,
 			expectedEvents: []eventstore.Command{
 				session.NewWebAuthNCheckedEvent(t.Context(), nil, time.Now(), true),
 				user.NewHumanPasswordlessSignCountChangedEvent(t.Context(), nil, "pkey-1", 5),
 			},
 		},
 		{
-			testName:       "when user verification is not required should return WebAuthNCheckedEvent and U2FSignCountChangedEvent",
-			checkPasskey:   []byte{},
-			lastVerifiedAt: time.Now(),
-			userVerified:   false,
-			pkeyID:         "pkey-2",
-			pkeySignCount:  10,
-			fetchedSession: &domain.Session{
-				ID:     "session-1",
-				UserID: "user-1",
-				Challenges: domain.SessionChallenges{
-					&domain.SessionChallengePasskey{
-						Challenge:        "challenge",
-						RPID:             "example.com",
-						UserVerification: old_domain.UserVerificationRequirementPreferred,
-					},
-				},
-			},
-			fetchedUser: &domain.User{
-				ID:       "user-1",
-				Username: "testuser",
-				Human: &domain.HumanUser{
-					DisplayName: "Test User",
-					Passkeys: []*domain.Passkey{
-						{
-							ID:    "pkey-2",
-							KeyID: []byte("key-id-2"),
+			testName: "when user verification is not required should return WebAuthNCheckedEvent and U2FSignCountChangedEvent",
+			cmd: &domain.PasskeyCheckCommand{
+				CheckPasskey: []byte{},
+				SessionID:    "session-1",
+				InstanceID:   "instance-1",
+				FetchedUser: &domain.User{
+					ID:       "user-1",
+					Username: "testuser",
+					Human: &domain.HumanUser{
+						DisplayName: "Test User",
+						Passkeys: []*domain.Passkey{
+							{ID: "pkey-2", KeyID: []byte("key-id-2")},
 						},
 					},
 				},
+				FetchedSession: &domain.Session{
+					ID:     "session-1",
+					UserID: "user-1",
+					Challenges: domain.SessionChallenges{
+						&domain.SessionChallengePasskey{Challenge: "challenge", RPID: "example.com", UserVerification: old_domain.UserVerificationRequirementPreferred},
+					},
+				},
+				LastVeriedAt:  time.Now(),
+				UserVerified:  false,
+				PKeyID:        "pkey-2",
+				PKeySignCount: 10,
 			},
-			expectedEventCount: 2,
 			expectedEvents: []eventstore.Command{
 				session.NewWebAuthNCheckedEvent(t.Context(), nil, time.Now(), false),
 				user.NewHumanU2FSignCountChangedEvent(t.Context(), nil, "pkey-2", 10),
@@ -740,23 +666,16 @@ func TestPasskeyCheckCommand_Events(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			// Given
-			ctx := authz.NewMockContext("instance-1", "", "")
-			cmd := domain.NewPasskeyCheckCommand("session-1", "instance-1", tc.checkPasskey, nil)
-			cmd.FetchedSession = tc.fetchedSession
-			cmd.FetchedUser = tc.fetchedUser
-			cmd.LastVeriedAt = tc.lastVerifiedAt
-			cmd.UserVerified = tc.userVerified
-			cmd.PKeyID = tc.pkeyID
-			cmd.PKeySignCount = tc.pkeySignCount
+			ctx := authz.NewMockContext(tc.cmd.InstanceID, "", "")
 
 			opts := &domain.InvokeOpts{}
 
 			// Test
-			events, err := cmd.Events(ctx, opts)
+			events, err := tc.cmd.Events(ctx, opts)
 
 			// Verify
 			assert.NoError(t, err)
-			assert.Len(t, events, tc.expectedEventCount)
+			require.Len(t, events, len(tc.expectedEvents))
 			for i, expectedType := range tc.expectedEvents {
 				assert.IsType(t, expectedType, events[i])
 				switch expectedAssertedType := expectedType.(type) {

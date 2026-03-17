@@ -21,10 +21,10 @@ type PasskeyCheckCommand struct {
 	// CheckPasskey is the assertion data for the passkey
 	CheckPasskey []byte
 
-	finishLoginFn FinishLoginFunc
+	FinishLoginFn FinishLoginFunc
 
-	sessionID  string
-	instanceID string
+	SessionID  string
+	InstanceID string
 
 	FetchedUser    *User
 	FetchedSession *Session
@@ -39,13 +39,13 @@ type PasskeyCheckCommand struct {
 func NewPasskeyCheckCommand(sessionID, instanceID string, assertionData []byte, finishLoginFn FinishLoginFunc) *PasskeyCheckCommand {
 	pcc := &PasskeyCheckCommand{
 		CheckPasskey:  assertionData,
-		sessionID:     sessionID,
-		instanceID:    instanceID,
-		finishLoginFn: webauthnConfig.FinishLoginWithNewDomainModel,
+		SessionID:     sessionID,
+		InstanceID:    instanceID,
+		FinishLoginFn: webauthnConfig.FinishLoginWithNewDomainModel,
 	}
 
 	if finishLoginFn != nil {
-		pcc.finishLoginFn = finishLoginFn
+		pcc.FinishLoginFn = finishLoginFn
 	}
 
 	return pcc
@@ -64,7 +64,7 @@ func (p *PasskeyCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]e
 
 	toReturn := make([]eventstore.Command, 2)
 
-	sessionAgg := &session.NewAggregate(p.sessionID, p.instanceID).Aggregate
+	sessionAgg := &session.NewAggregate(p.SessionID, p.InstanceID).Aggregate
 	toReturn[0] = session.NewWebAuthNCheckedEvent(ctx, sessionAgg, p.LastVeriedAt, p.UserVerified)
 	if passkeyChallenge.UserVerification == old_domain.UserVerificationRequirementRequired {
 		toReturn[1] = user.NewHumanPasswordlessSignCountChangedEvent(ctx, sessionAgg, p.PKeyID, p.PKeySignCount)
@@ -95,7 +95,7 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 		creds:       PasskeysToCredentials(ctx, userPKeys, passkeyChallenge.RPID),
 	}
 
-	webAuthCreds, err := p.finishLoginFn(ctx, p.getWebAuthNSessionData(passkeyChallenge, p.FetchedUser.ID), webAuthnUsr, p.CheckPasskey, passkeyChallenge.RPID)
+	webAuthCreds, err := p.FinishLoginFn(ctx, p.getWebAuthNSessionData(passkeyChallenge, p.FetchedUser.ID), webAuthnUsr, p.CheckPasskey, passkeyChallenge.RPID)
 	if err != nil && (webAuthCreds == nil || webAuthCreds.ID == nil) {
 		return err
 	}
@@ -114,7 +114,7 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 	p.UserVerified = webAuthCreds.Flags.UserVerified
 	p.LastVeriedAt = time.Now()
 	rowCount, err := sessionRepo.Update(ctx, opts.DB(),
-		sessionRepo.IDCondition(p.sessionID),
+		sessionRepo.IDCondition(p.SessionID),
 		sessionRepo.SetFactor(&SessionFactorPasskey{LastVerifiedAt: p.LastVeriedAt, UserVerified: p.UserVerified}),
 	)
 	if err := handleUpdateError(err, 1, rowCount, "DOM-Uadvap", "session"); err != nil {
@@ -123,7 +123,7 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 
 	rowCount, err = userRepo.Update(ctx, opts.DB(),
 		database.And(
-			userRepo.Human().PrimaryKeyCondition(p.instanceID, p.FetchedUser.ID),
+			userRepo.Human().PrimaryKeyCondition(p.InstanceID, p.FetchedUser.ID),
 			userRepo.Human().PasskeyConditions().IDCondition(matchingPKey.ID),
 		),
 		userRepo.Human().SetPasskeySignCount(webAuthCreds.Authenticator.SignCount),
@@ -146,17 +146,17 @@ func (p *PasskeyCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (e
 		return nil
 	}
 
-	if p.sessionID == "" {
+	if p.SessionID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-4QJa2k", "Errors.Missing.SessionID")
 	}
-	if p.instanceID == "" {
+	if p.InstanceID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-XlOhxU", "Errors.Missing.InstanceID")
 	}
 
 	sessionRepo := opts.sessionRepo
 	userRepo := opts.userRepo
 
-	p.FetchedSession, err = sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(p.sessionID)))
+	p.FetchedSession, err = sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(p.SessionID)))
 	if err := handleGetError(err, "DOM-CUnePh", "session"); err != nil {
 		return err
 	}
