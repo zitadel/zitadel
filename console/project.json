@@ -22,6 +22,7 @@
         "command": "bash -c 'PATH=\"${PWD}/../.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" pnpm exec buf generate ../proto --include-imports --include-wkt'",
         "cwd": "console"
       },
+      "cache": true,
       "dependsOn": ["install-proto-plugins"],
       "inputs": [
         "{workspaceRoot}/proto/**/*",

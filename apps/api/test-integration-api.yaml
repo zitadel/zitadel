@@ -23,7 +23,13 @@ FirstInstance:
       PasswordChangeRequired: false
 
 Log:
-  Level: info
+  Level: warn
+
+Instrumentation:
+  Log:
+    Level: "WARN"
+
+Port: 8082
 
 ExternalSecure: false
 
@@ -43,19 +49,19 @@ Caches:
     MaxAge: 5m
     LastUsage: 1m
     Log:
-      Level: info
+      Level: error
   Milestones:
     Connector: "postgres"
     MaxAge: 5m
     LastUsage: 1m
     Log:
-      Level: info
+      Level: error
   Organization:
     Connector: "redis"
     MaxAge: 5m
     LastUsage: 1m
     Log:
-      Level: info
+      Level: error
 
 Quotas:
   Access:

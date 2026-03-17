@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9/maintnotifications"
 )
 
 type Config struct {
@@ -149,6 +150,9 @@ func optionsFromConfig(c Config) *redis.Options {
 		DisableIndentity:      c.DisableIndentity,
 		IdentitySuffix:        c.IdentitySuffix,
 		Limiter:               newLimiter(c.CircuitBreaker, c.MaxActiveConns),
+		MaintNotificationsConfig: &maintnotifications.Config{
+			Mode: maintnotifications.ModeDisabled,
+		},
 	}
 	if c.EnableTLS {
 		opts.TLSConfig = new(tls.Config)

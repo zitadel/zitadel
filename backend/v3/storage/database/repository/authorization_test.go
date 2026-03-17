@@ -461,7 +461,7 @@ func TestListAuthorization(t *testing.T) {
 	// create authorization with roles for user1 for project1
 	authorizationRepo := repository.AuthorizationRepository()
 	authorizationWithRolesUser1Project1 := &domain.Authorization{
-		ID:         "authorization1-user1",
+		ID:         "authorization01-user1",
 		UserID:     user1ID,
 		ProjectID:  project1ID,
 		InstanceID: instanceID,
@@ -475,7 +475,7 @@ func TestListAuthorization(t *testing.T) {
 
 	// create authorization without roles for user1 for project1
 	authorizationWithoutRolesUser1Project1 := &domain.Authorization{
-		ID:         "authorization2-user1",
+		ID:         "authorization02-user1",
 		UserID:     user1ID,
 		ProjectID:  project1ID,
 		InstanceID: instanceID,
@@ -489,7 +489,7 @@ func TestListAuthorization(t *testing.T) {
 
 	// create authorization with roles for user1 for project2
 	authorizationWithRolesUser1Project2 := &domain.Authorization{
-		ID:         "authorization3-user1",
+		ID:         "authorization03-user1",
 		UserID:     user1ID,
 		ProjectID:  project2ID,
 		InstanceID: instanceID,
@@ -503,7 +503,7 @@ func TestListAuthorization(t *testing.T) {
 
 	// create authorization without roles for user1 for project2
 	authorizationWithoutRolesUser1Project2 := &domain.Authorization{
-		ID:        "authorization4-user1",
+		ID:        "authorization04-user1",
 		UserID:    user1ID,
 		ProjectID: project2ID,
 
@@ -518,7 +518,7 @@ func TestListAuthorization(t *testing.T) {
 
 	// create authorization with roles for user2 for project1
 	authorizationWithRolesUser2Project1 := &domain.Authorization{
-		ID:        "authorization5-user2",
+		ID:        "authorization05-user2",
 		UserID:    user2ID,
 		ProjectID: project1ID,
 
@@ -533,7 +533,7 @@ func TestListAuthorization(t *testing.T) {
 
 	// create authorization without roles for user2 for project1
 	authorizationWithoutRolesUser2Project1 := &domain.Authorization{
-		ID:         "authorization6-user2",
+		ID:         "authorization06-user2",
 		UserID:     user2ID,
 		ProjectID:  project1ID,
 		InstanceID: instanceID,
@@ -547,7 +547,7 @@ func TestListAuthorization(t *testing.T) {
 
 	// create authorization with roles for user2 for project2
 	authorizationWithRolesUser2Project2 := &domain.Authorization{
-		ID:         "authorization7-user2",
+		ID:         "authorization07-user2",
 		UserID:     user2ID,
 		ProjectID:  project2ID,
 		InstanceID: instanceID,
@@ -561,7 +561,7 @@ func TestListAuthorization(t *testing.T) {
 
 	// create authorization without roles for user2 for project2
 	authorizationWithoutRolesUser2Project2 := &domain.Authorization{
-		ID:         "authorization8-user2",
+		ID:         "authorization08-user2",
 		UserID:     user2ID,
 		ProjectID:  project2ID,
 		InstanceID: instanceID,
@@ -578,7 +578,7 @@ func TestListAuthorization(t *testing.T) {
 	grantID := createProjectGrant(t, tx, instanceID, organizationID, grantedOrganizationID, project1ID, []string{project1Role1, project1Role2})
 
 	authorizationProjectGrantWithRoles := &domain.Authorization{
-		ID:         "authorization9-user1",
+		ID:         "authorization09-user1",
 		UserID:     user1ID,
 		ProjectID:  project1ID,
 		GrantID:    gu.Ptr(grantID),
@@ -639,7 +639,6 @@ func TestListAuthorization(t *testing.T) {
 			},
 			want: []*domain.Authorization{
 				authorizationWithRolesUser1Project1,
-				authorizationProjectGrantWithoutRoles,
 				authorizationWithoutRolesUser1Project1,
 				authorizationWithRolesUser1Project2,
 				authorizationWithoutRolesUser1Project2,
@@ -648,6 +647,7 @@ func TestListAuthorization(t *testing.T) {
 				authorizationWithRolesUser2Project2,
 				authorizationWithoutRolesUser2Project2,
 				authorizationProjectGrantWithRoles,
+				authorizationProjectGrantWithoutRoles,
 			},
 		},
 		{
@@ -678,13 +678,14 @@ func TestListAuthorization(t *testing.T) {
 						authorizationRepo.UserIDCondition(user2ID),
 					),
 				),
+				database.WithOrderByAscending(authorizationRepo.IDColumn()),
 			},
 			want: []*domain.Authorization{
-				authorizationProjectGrantWithoutRoles,
 				authorizationWithRolesUser2Project1,
 				authorizationWithoutRolesUser2Project1,
 				authorizationWithRolesUser2Project2,
 				authorizationWithoutRolesUser2Project2,
+				authorizationProjectGrantWithoutRoles,
 			},
 		},
 		{
@@ -697,6 +698,7 @@ func TestListAuthorization(t *testing.T) {
 						authorizationRepo.ProjectIDCondition(project2ID),
 					),
 				),
+				database.WithOrderByAscending(authorizationRepo.IDColumn()),
 			},
 			want: []*domain.Authorization{
 				authorizationWithRolesUser1Project2,
@@ -716,9 +718,9 @@ func TestListAuthorization(t *testing.T) {
 				database.WithOrderByDescending(authorizationRepo.IDColumn()),
 			},
 			want: []*domain.Authorization{
+				authorizationProjectGrantWithoutRoles,
 				authorizationWithoutRolesUser2Project1,
 				authorizationWithRolesUser2Project1,
-				authorizationProjectGrantWithoutRoles,
 			},
 		},
 		{
@@ -734,8 +736,8 @@ func TestListAuthorization(t *testing.T) {
 				database.WithOrderByDescending(authorizationRepo.IDColumn()),
 			},
 			want: []*domain.Authorization{
+				authorizationProjectGrantWithoutRoles,
 				authorizationProjectGrantWithRoles,
-				authorizationWithoutRolesUser2Project1,
 			},
 		},
 		{
@@ -767,7 +769,7 @@ func TestListAuthorization(t *testing.T) {
 			},
 			want: []*domain.Authorization{
 				{
-					ID:         "authorization1-user1",
+					ID:         "authorization01-user1",
 					UserID:     user1ID,
 					ProjectID:  project1ID,
 					GrantID:    authorizationWithRolesUser1Project1.GrantID,
@@ -778,7 +780,7 @@ func TestListAuthorization(t *testing.T) {
 					UpdatedAt:  authorizationWithRolesUser1Project1.UpdatedAt,
 				},
 				{
-					ID:         "authorization5-user2",
+					ID:         "authorization05-user2",
 					UserID:     user2ID,
 					ProjectID:  project1ID,
 					GrantID:    authorizationWithRolesUser2Project1.GrantID,
@@ -789,7 +791,7 @@ func TestListAuthorization(t *testing.T) {
 					UpdatedAt:  authorizationWithRolesUser2Project1.UpdatedAt,
 				},
 				{
-					ID:         "authorization9-user1",
+					ID:         "authorization09-user1",
 					UserID:     user1ID,
 					ProjectID:  project1ID,
 					GrantID:    gu.Ptr(grantID),
@@ -813,8 +815,8 @@ func TestListAuthorization(t *testing.T) {
 				database.WithOrderByDescending(authorizationRepo.IDColumn()),
 			},
 			want: []*domain.Authorization{
-				authorizationProjectGrantWithRoles,
 				authorizationProjectGrantWithoutRoles,
+				authorizationProjectGrantWithRoles,
 			},
 		},
 		{

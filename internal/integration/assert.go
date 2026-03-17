@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"sort"
 	"testing"
 	"time"
 
@@ -178,16 +179,28 @@ func diffProto(expected, actual proto.Message) string {
 	return "\n\nDiff:\n" + diff
 }
 
-// AssertMetadataEquals verifies that two slices of proto Metadata are equal, comparing both length and content by key-value mapping.
+// AssertMetadataEquals compares two metadata slices by key and value,
+// ignoring dynamic fields like timestamps and resource owner.
+// Both slices are sorted by key before comparison.
 func AssertMetadataEquals(t assert.TestingT, expected []*metadata.Metadata, actual []*metadata.Metadata) {
-	assert.Equal(t, len(expected), len(actual), "metadata length mismatch")
-	assert.Equal(t, getMetadataMap(expected), getMetadataMap(actual), "metadata content mismatch")
-}
-
-func getMetadataMap(metadataEntries []*metadata.Metadata) map[string][]byte {
-	metadataByKey := make(map[string][]byte, len(metadataEntries))
-	for _, md := range metadataEntries {
-		metadataByKey[md.Key] = md.Value
+	if !assert.Len(t, actual, len(expected)) {
+		return
 	}
-	return metadataByKey
+
+	sortedExpected := make([]*metadata.Metadata, len(expected))
+	copy(sortedExpected, expected)
+	sort.Slice(sortedExpected, func(i, j int) bool {
+		return sortedExpected[i].GetKey() < sortedExpected[j].GetKey()
+	})
+
+	sortedActual := make([]*metadata.Metadata, len(actual))
+	copy(sortedActual, actual)
+	sort.Slice(sortedActual, func(i, j int) bool {
+		return sortedActual[i].GetKey() < sortedActual[j].GetKey()
+	})
+
+	for i := range sortedExpected {
+		assert.Equal(t, sortedExpected[i].GetKey(), sortedActual[i].GetKey())
+		assert.Equal(t, sortedExpected[i].GetValue(), sortedActual[i].GetValue())
+	}
 }

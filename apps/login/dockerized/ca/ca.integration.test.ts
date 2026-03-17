@@ -13,6 +13,7 @@ import { generateCertificates } from "./utils/tls.ts";
 
 const TEST_DIR = path.dirname(new URL(import.meta.url).pathname);
 const LOGIN_APP_DIR = path.join(TEST_DIR, "../..");
+const REPO_ROOT = path.join(LOGIN_APP_DIR, "../..");
 
 const SMOCKER_MOCK_PORT = 443;
 const SMOCKER_ADMIN_PORT = 8081;
@@ -73,7 +74,7 @@ describe("Custom CA Certificate Integration", () => {
       .start();
 
     try {
-      await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+      await GenericContainer.fromDockerfile(REPO_ROOT, "apps/login/Dockerfile").build(LOGIN_IMAGE_TAG);
     } catch (err) {
       throw new Error(`Failed to build login Docker image: ${err instanceof Error ? err.message : err}`);
     }

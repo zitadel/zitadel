@@ -52,12 +52,10 @@ You can build and start any project with Nx commands.
 | **Install Proto Plugins**     | `pnpm nx run @zitadel/api:generate-install` | Install proto toolchain      | Installs Go-based plugins (protoc-gen-go, connect-go, …) to `.artifacts/bin/`. Run automatically by `generate` targets; Nx caches the outputs. |
 | **Test - Unit**               | `pnpm nx run PROJECT:test-unit`             | Run unit tests               |                                                                                                                                                                                                  |
 | **Test - Integration**        | `pnpm nx run PROJECT:test-integration`      | Run integration tests        | Learn more about how to [debug API integration tests](#run-api-integration-tests)                                                                                                               |
-| **Test - Integration Stop**   | `pnpm nx run PROJECT:test-integration-stop` | Stop integration containers  |                                                                                                                                                                                                  |
 | **Test - Functional UI**      | `pnpm nx run @zitadel/functional-ui:test`   | Run functional UI tests      | Learn more about how to [develop the Management Console and opening the interactive Test Suite](#pass-management-console-quality-checks)                                                                               |
-| **Test - Functional UI Stop** | `pnpm nx run @zitadel/functional-ui:stop`   | Run functional UI containers |                                                                                                                                                                                                  |
+| **Test - Functional UI Stop** | `pnpm nx run @zitadel/functional-ui:stop`   | Stop functional UI containers |                                                                                                                                                                                                  |
 | **Test**                      | `pnpm nx run PROJECT:test`                  | Run all tests                |                                                                                                                                                                                                  |
 | **Lint**                      | `pnpm nx run PROJECT:lint`                  | Check code style             |                                                                                                                                                                                                  |
-| **Lint Fix**                  | `pnpm nx run PROJECT:lint-fix`              | Auto-fix style issues        |                                                                                                                                                                                                  |
 
 Replace `PROJECT` with one of the following:
 
@@ -293,56 +291,27 @@ pnpm nx run @zitadel/api:test-unit
 
 API tests are run as gRPC clients against a running Zitadel server binary.
 The server binary is [built with coverage enabled](https://go.dev/doc/build-cover).
+The test infrastructure uses [testcontainers-go](https://golang.testcontainers.org/) to automatically start Postgres and Redis.
 
+Run all integration tests with a single command:
 
 ```bash
 pnpm nx run @zitadel/api:test-integration
 ```
 
-To develop and run the test cases from within your IDE or by the command line, start only the database and the API.
+To run a specific package, use the `INTEGRATION_PACKAGE_FILTER` environment variable:
+
+```bash
+INTEGRATION_PACKAGE_FILTER=api/grpc/management pnpm nx run @zitadel/api:test-integration
+```
+
 The actual integration test clients reside in the `integration_test` subdirectory of the package they aim to test.
 Integration test files use the `integration` build tag, in order to be excluded from regular unit tests.
-Because of the server-client split, Go is usually unaware of changes in server code and tends to cache test results.
-Pass `-count 1` to disable test caching.
 
-Start the ephemeral database for integration tests.
+You can also run integration tests directly with `go test`:
 
 ```bash
-pnpm nx run @zitadel/api:test-integration-run-db
-```
-
-In another terminal, start the API.
-
-```bash
-pnpm nx run @zitadel/api:test-integration-run-api
-```
-
-Example command to run a single package integration test:
-
-```bash
-go test -count 1 -tags integration ./internal/api/grpc/management/integration_test
-```
-
-To run all available integration tests:
-
-```bash
-go test -count 1 -tags integration -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")
-```
-
-It is also possible to run the API in a debugger and run the integrations tests against it.
-
-First, start the ephemeral database for integration tests.
-
-```bash
-pnpm nx run @zitadel/api:test-integration-run-db
-```
-
-When starting the debugger, make sure the Zitadel binary starts with `start-from-init --config=./apps/api/test-integration-api.yaml --steps=./apps/api/test-integration-api.yaml --masterkey=MasterkeyNeedsToHave32Characters"`
-
-To cleanup after testing (deletes the ephemeral database!):
-
-```bash
-pnpm nx run @zitadel/devcontainer:compose down db-api-integration cache-api-integration
+go test -count 1 -tags integration -timeout 60m -v ./tests/integration/...
 ```
 
 ### Run Functional UI Tests
@@ -460,6 +429,31 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 - Build and deploy with Docker: `pnpm nx run @zitadel/login:build && docker build -t my-zitadel-login apps/login`
 - Build and deploy with NodeJS: `pnpm nx run @zitadel/login:prod`
 
+#### Build Release Artifacts (GoReleaser)
+
+To build all release artifacts locally (binaries, packages, Docker images for amd64 and arm64) without publishing them:
+
+```bash
+# Register QEMU for cross-platform Docker builds (once per boot)
+docker run --privileged --rm tonistiigi/binfmt --install all
+
+# Option A: Fast snapshot check (no tag required)
+goreleaser release --snapshot --clean
+
+# Option B: Full dry-run (requires a tag, but won't upload)
+git tag -a v0.0.0-test -m "test"
+goreleaser release --skip=publish --clean
+git tag -d v0.0.0-test
+```
+
+**Testing Flags Cheat Sheet:**
+- `--snapshot`: Skips validation (like git state) and publishing. Fast for local testing.
+- `--skip=publish`: Performs a full run but skips uploading to GitHub/Docker registries.
+- `--skip=push`: Specifically skips pushing Docker images.
+- `--draft`: Creates the GitHub release as a draft (hidden from public).
+
+See `.goreleaser.yml` for the full configuration.
+
 ### Contribute to the Management Console
 
 To learn more about the Management Console, go to the Management Consoles [README.md](./console/README.md).
@@ -536,7 +530,7 @@ Run the quality checks for the code you changed.
 
 ```bash
 # Run the management console-related linting builds and unit tests
-pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test
+pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build
 ```
 
 Run functional UI tests against a locally built API and a dev server Management Console.

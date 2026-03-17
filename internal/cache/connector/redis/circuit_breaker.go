@@ -87,5 +87,6 @@ func (l *limiter) ReportResult(err error) {
 	done(err == nil ||
 		errors.Is(err, redis.Nil) ||
 		errors.Is(err, context.Canceled) ||
-		redis.HasErrorPrefix(err, "NOSCRIPT"))
+		redis.HasErrorPrefix(err, "NOSCRIPT") ||
+		redis.HasErrorPrefix(err, "ERR unknown subcommand"))
 }

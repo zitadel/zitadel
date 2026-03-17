@@ -7,6 +7,7 @@ import * as path from "path";
 const TEST_DIR = path.dirname(new URL(import.meta.url).pathname);
 const OUTPUT_DIR = path.join(TEST_DIR, "output");
 const LOGIN_APP_DIR = path.join(TEST_DIR, "../..");
+const REPO_ROOT = path.join(LOGIN_APP_DIR, "../..");
 
 const DOCKER_TIMEOUT = 180000;
 const TEST_TIMEOUT = 30000;
@@ -137,7 +138,7 @@ describe("OpenTelemetry Integration", () => {
       .start();
 
     try {
-      await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+      await GenericContainer.fromDockerfile(REPO_ROOT, "apps/login/Dockerfile").build(LOGIN_IMAGE_TAG);
     } catch (err) {
       throw new Error(`Failed to build login Docker image: ${err instanceof Error ? err.message : err}`);
     }

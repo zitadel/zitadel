@@ -377,9 +377,9 @@ func TestListTrustedDomains(t *testing.T) {
 	orgOwnerCtxRelational := instRelational.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
 	d1Relational, d2Relational := "trusted."+integration.DomainName(), "trusted."+integration.DomainName()
 	_, err = instRelational.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: instRelational.ID(), Domain: d1Relational})
-	require.Nil(t, err)
+	require.NoError(t, err)
 	_, err = instRelational.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: instRelational.ID(), Domain: d2Relational})
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	t.Cleanup(func() {
 		instES.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: instES.ID(), Domain: d1ES})

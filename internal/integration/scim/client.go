@@ -111,15 +111,43 @@ const (
 	listQueryParamFilter     = "filter"
 )
 
-func NewScimClient(target string) *Client {
-	target = "http://" + target + schemas.HandlerPrefix
-	client := &http.Client{}
+// hostOverrideTransport rewrites the dial address to serverAddr while
+// preserving the original Host header.  This is needed when the instance
+// domain (e.g. "abc.integration.localhost") is not resolvable via DNS:
+// we physically connect to the real server but ZITADEL's routing still
+// sees the correct instance domain in the Host header.
+type hostOverrideTransport struct {
+	serverAddr string
+	wrapped    http.RoundTripper
+}
+
+func (t *hostOverrideTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	r := req.Clone(req.Context())
+	r.Host = req.URL.Host // keep original Host: header for ZITADEL routing
+	r.URL.Host = t.serverAddr
+	return t.wrapped.RoundTrip(r)
+}
+
+// NewScimClient creates a SCIM client that targets the given instance domain.
+// serverAddr is the physical address of the ZITADEL server (e.g. "localhost:8082").
+// When target and serverAddr differ, a transport override is used so that the
+// HTTP connection goes to serverAddr while the Host header still carries target.
+func NewScimClient(target, serverAddr string) *Client {
+	baseURL := "http://" + target + schemas.HandlerPrefix
+	transport := http.DefaultTransport
+	if target != serverAddr {
+		transport = &hostOverrideTransport{
+			serverAddr: serverAddr,
+			wrapped:    http.DefaultTransport,
+		}
+	}
+	client := &http.Client{Transport: transport}
 	return &Client{
 		client:  client,
-		baseURL: target,
+		baseURL: baseURL,
 		Users: &ResourceClient[resources.ScimUser]{
 			client:       client,
-			baseURL:      target,
+			baseURL:      baseURL,
 			resourceName: "Users",
 		},
 	}

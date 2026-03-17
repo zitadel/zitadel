@@ -76,8 +76,8 @@ users_by_metadata_value: ensure_modules bundle
 
 .PHONY: lint
 lint:
-	npm i
-	npm run lint:fix
+	pnpm install
+	pnpm run lint:fix
 
 .PHONY: ensure_modules
 ensure_modules:
@@ -90,8 +90,8 @@ endif
 .PHONY: bundle
 bundle:
 	mkdir -p output
-	npm i
-	npm run bundle
+	pnpm install
+	pnpm run bundle
 	go install go.k6.io/xk6/cmd/xk6@latest
 	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
 

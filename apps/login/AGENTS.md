@@ -23,3 +23,8 @@ The **Login App** (`apps/login`) provides the user interface for authentication 
 - **Test (unit)**: `pnpm nx run @zitadel/login:test-unit`
 - **Test (integration)**: `pnpm nx run @zitadel/login:test-integration`
 - **Pack (Docker)**: `pnpm nx run @zitadel/login:pack` — builds a local Docker image `zitadel/zitadel-login:local`. Requires Docker daemon.
+
+## Dockerfile & Release
+- `apps/login/Dockerfile` is a **deployment-only** Dockerfile — it copies the pre-built Next.js standalone output, no compilation happens inside it.
+- GoReleaser's `dockers_v2` preserves `extra_files` directory structure. `COPY` commands must use the full path (e.g., `COPY apps/login/.next/standalone`).
+- Built images: `ghcr.io/zitadel/login` and `ghcr.io/zitadel/zitadel-login`.

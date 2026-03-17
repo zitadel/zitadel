@@ -9,7 +9,7 @@ ARG BINARY=zitadel
 RUN apt-get update && apt-get install ca-certificates -y
 
 COPY apps/api/entrypoint.sh /app/entrypoint.sh
-COPY ./.artifacts/bin/${TARGETPLATFORM}/${BINARY} /app/zitadel
+COPY ${TARGETPLATFORM}/${BINARY} /app/zitadel
 
 RUN useradd -s "" --home / zitadel && \
     chown zitadel /app/zitadel && \

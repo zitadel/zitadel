@@ -5,7 +5,7 @@
     "run-db": {
       "continuous": true,
       "description": "Runs a local ephemeral Postgres database for functional UI (Console) tests.",
-      "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-functional-ui"
+      "command": "docker rm -f zitadel-functional-ui-db 2>/dev/null; docker run --rm --name zitadel-functional-ui-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=zitadel -p 5434:5432 postgres:18"
     },
     "run-api": {
       "description": "Sets up and runs the Zitadel API with the embedded Management Console against which the functional UI tests are run.",
@@ -40,7 +40,7 @@
     },
     "stop": {
       "description": "Stops the local Postgres database used for functional UI (Console) tests.",
-      "command": "nx run @zitadel/devcontainer:compose down --volumes db-functional-ui"
+      "command": "docker rm -f zitadel-functional-ui-db || true"
     }
   }
 }

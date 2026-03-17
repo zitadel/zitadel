@@ -1,72 +1,337 @@
-name: CI 
+name: CI
 
 on:
-  push:
-    tags-ignore:
-      - "*"
-    branches:
-      - "main"
   pull_request:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: write
-  packages: write
-  issues: write
-  pull-requests: write
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  lint_test_build:
-    uses: ./.github/workflows/lint_test_build.yml
-    if: ${{ github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
-    permissions:
-      contents: read
-    with:
-      go_version: "1.25"
-      node_version: "22"
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      NX_CLOUD_ACCESS_TOKEN_READONLY: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+  # ─── Lint ───────────────────────────────────────────────────────────
+  lint:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: "@zitadel/api"
+            label: api
+            go: true
+          - project: "@zitadel/login"
+            label: login
+            go: false
+          - project: "@zitadel/console"
+            label: console
+            go: false
 
-  pack:
-    uses: ./.github/workflows/pack.yml
-    permissions:
-      contents: write
-      packages: write
-    secrets:
-      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    with:
-      go_version: "1.25"
-      node_version: "22"
-      semantic_version: "23.0.7"
-      image_name_github_api: "ghcr.io/zitadel/zitadel"
-      image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
-      image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
+    name: "lint · ${{ matrix.label }}"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
-  release:
-    uses: ./.github/workflows/release.yml
-    permissions:
-      packages: write
-      contents: write
-      issues: write
-      pull-requests: write
-    needs:
-      - lint_test_build
-      - pack
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    secrets:
-      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-      APP_ID: ${{ secrets.APP_ID }}
-      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
-    with:
-      semantic_version: "23.0.7"
-      image_name_github_api: "ghcr.io/zitadel/zitadel"
-      image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
-      image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
+      - uses: actions/setup-go@v6
+        if: matrix.go
+        with:
+          go-version-file: go.mod
+
+      - name: Go build cache
+        if: matrix.go
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/go-build
+          key: go-build-lint-${{ hashFiles('go.sum') }}
+          restore-keys: go-build-lint-
+
+      - uses: golangci/golangci-lint-action@v9
+        if: matrix.go
+        with:
+          version: v2.11.3
+          install-only: true
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm nx run ${{ matrix.project }}:lint
+
+  # ─── Test (unit + login) ────────────────────────────────────────────
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: "@zitadel/api"
+            label: api
+            target: test-unit
+            go: true
+            coverage_file: profile.api.test-unit.cov
+          - project: "@zitadel/api"
+            label: api
+            target: test-unit-race
+            go: true
+          - project: "@zitadel/login"
+            label: login
+            target: test-unit
+            go: false
+            coverage_file: apps/login/coverage/lcov.info
+          - project: "@zitadel/login"
+            label: login
+            target: test-integration
+            go: false
+            cypress: true
+          - project: "@zitadel/login"
+            label: login
+            target: test-dockerized
+            go: false
+
+    name: "test · ${{ matrix.label }} · ${{ matrix.target }}"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v6
+        if: matrix.go
+        with:
+          go-version-file: go.mod
+
+      - name: Go build cache
+        if: matrix.go
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/go-build
+          key: go-build-test-${{ matrix.target }}-${{ hashFiles('go.sum') }}
+          restore-keys: go-build-test-${{ matrix.target }}-
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install Cypress system dependencies
+        if: matrix.cypress
+        run: sudo apt-get update && sudo apt-get install -y xvfb libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64
+
+      - name: Run ${{ matrix.target }}
+        run: pnpm nx run ${{ matrix.project }}:${{ matrix.target }}
+
+      - name: Upload coverage
+        if: matrix.coverage_file
+        uses: codecov/codecov-action@v5
+        with:
+          files: ${{ matrix.coverage_file }}
+          flags: ${{ matrix.target }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          disable_search: true
+
+  # ─── Integration Test: Discover Packages ────────────────────────────
+  discover-integration-packages:
+    name: "integration · discover-packages"
+    runs-on: ubuntu-24.04
+    outputs:
+      packages: ${{ steps.list.outputs.packages }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Discover integration test packages
+        id: list
+        run: |
+          packages=$(find internal -type d \( -name 'integration_test' -o -name 'events_testing' \) \
+            | grep -v v2beta \
+            | sed 's|^internal/||; s|/integration_test$||; s|/events_testing$||' \
+            | jq -R '.' | jq -sc '.')
+          echo "packages=$packages" >> "$GITHUB_OUTPUT"
+          echo "Found $(echo "$packages" | jq length) packages"
+
+  # ─── Integration Test: Per-Package Runner ───────────────────────────
+  test-integration:
+    needs: discover-integration-packages
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJson(needs.discover-integration-packages.outputs.packages) }}
+
+    name: "integration · ${{ matrix.package }}"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Go build cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/go-build
+          key: go-build-integration-${{ hashFiles('go.sum') }}
+          restore-keys: go-build-integration-
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Run integration tests
+        run: pnpm nx run @zitadel/api:test-integration
+        env:
+          INTEGRATION_PACKAGE_FILTER: ${{ matrix.package }}
+
+  # ─── Build: Console (must complete before API) ──────────────────────
+  # TODO: Remove this separate job once the console is no longer embedded
+  # in the zitadel binary and ships as its own container.
+  build-console:
+    runs-on: ubuntu-24.04
+    name: "build · console"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm nx run @zitadel/console:build
+
+  # ─── Build: API + Login ────────────────────────────────────────────
+  build:
+    needs: build-console
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: "@zitadel/api"
+            label: api
+            go: true
+          - project: "@zitadel/login"
+            label: login
+            go: false
+
+    name: "build · ${{ matrix.label }}"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v6
+        if: matrix.go
+        with:
+          go-version-file: go.mod
+
+      - name: Go build cache
+        if: matrix.go
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/go-build
+          key: go-build-build-${{ hashFiles('go.sum') }}
+          restore-keys: go-build-build-
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm nx run ${{ matrix.project }}:build
+
+  # ─── E2E ────────────────────────────────────────────────────────────
+  e2e:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: "@zitadel/functional-ui"
+            label: functional-ui
+            target: test
+            go: true
+            cypress: true
+          - project: "@zitadel/compose"
+            label: compose
+            target: test
+            go: true
+            playwright: true
+
+    name: "e2e · ${{ matrix.label }}"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v6
+        if: matrix.go
+        with:
+          go-version-file: go.mod
+
+      - name: Go build cache
+        if: matrix.go
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/go-build
+          key: go-build-e2e-${{ matrix.project }}-${{ hashFiles('go.sum') }}
+          restore-keys: go-build-e2e-${{ matrix.project }}-
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install Cypress system dependencies
+        if: matrix.cypress
+        run: sudo apt-get update && sudo apt-get install -y xvfb libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64
+
+      - name: Install Playwright browsers
+        if: matrix.playwright
+        run: pnpm --filter @zitadel/compose exec playwright install --with-deps chromium
+
+      - name: Run ${{ matrix.target }}
+        run: pnpm nx run ${{ matrix.project }}:${{ matrix.target }}
+
+

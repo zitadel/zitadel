@@ -136,6 +136,8 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 	return config, shutdown, nil
 }
 
+// readConfig decodes the viper config into a [Config] struct using all
+// required decode hooks for custom types (enums, language tags, etc.).
 func readConfig(v *viper.Viper) (*Config, error) {
 	config := new(Config)
 

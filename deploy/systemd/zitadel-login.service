@@ -1,0 +1,20 @@
+[Unit]
+Description=ZITADEL Login UI
+Documentation=https://zitadel.com/docs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zitadel
+Group=zitadel
+WorkingDirectory=/opt/zitadel/login
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOSTNAME=0.0.0.0
+
+[Install]
+WantedBy=multi-user.target

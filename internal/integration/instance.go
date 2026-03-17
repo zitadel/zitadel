@@ -8,6 +8,8 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -19,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/instance"
+	internal_permission_v2 "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/org"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
@@ -29,6 +32,22 @@ import (
 // NotEmpty can be used as placeholder, when the returned values is unknown.
 // It can be used in tests to assert whether a value should be empty or not.
 const NotEmpty = "not empty"
+
+// newInstanceSem limits how many NewInstance calls run concurrently.
+// Each CreateInstance call generates ~50 projection events; bursting all
+// test packages simultaneously overwhelms the projection pipeline and causes
+// "not found" errors. Limiting to a small number lets workers keep pace.
+// Override with INTEGRATION_INSTANCE_CONCURRENCY env var.
+var newInstanceSem = make(chan struct{}, newInstanceConcurrency())
+
+func newInstanceConcurrency() int {
+	if s := os.Getenv("INTEGRATION_INSTANCE_CONCURRENCY"); s != "" {
+		if n, err := strconv.Atoi(s); err == nil && n > 0 {
+			return n
+		}
+	}
+	return 4
+}
 
 const (
 	adminPATFile = "admin-pat.txt"
@@ -106,6 +125,25 @@ type Instance struct {
 //
 // The instance is isolated and is safe for parallel testing.
 func NewInstance(ctx context.Context) *Instance {
+	inst, err := CreateInstance(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return inst
+}
+
+// CreateInstance returns a new instance that can be used for integration tests.
+// It returns an error instead of panicking.
+func CreateInstance(ctx context.Context) (*Instance, error) {
+	// Acquire semaphore to prevent burst-creating too many instances at once,
+	// which overwhelms read-model projection workers.
+	select {
+	case newInstanceSem <- struct{}{}:
+		defer func() { <-newInstanceSem }()
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+
 	primaryDomain := RandString(5) + ".integration.localhost"
 
 	ctx = WithSystemAuthorization(ctx)
@@ -121,23 +159,32 @@ func NewInstance(ctx context.Context) *Instance {
 		},
 	})
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	i := &Instance{
 		Config: loadedConfig,
 		Domain: primaryDomain,
 	}
-	i.setClient(ctx)
-	i.awaitFirstUser(WithAuthorizationToken(ctx, resp.GetPat()))
-	i.setupInstance(ctx, resp.GetPat())
-	return i
+	if err := i.setClient(ctx); err != nil {
+		return nil, err
+	}
+	if err := i.awaitFirstUser(WithAuthorizationToken(ctx, resp.GetPat())); err != nil {
+		return nil, err
+	}
+	if err := i.setupInstance(ctx, resp.GetPat()); err != nil {
+		return nil, err
+	}
+	if err := i.awaitReadProjections(ctx); err != nil {
+		return nil, err
+	}
+	return i, nil
 }
 
 func (i *Instance) ID() string {
 	return i.Instance.GetId()
 }
 
-func (i *Instance) awaitFirstUser(ctx context.Context) {
+func (i *Instance) awaitFirstUser(ctx context.Context) error {
 	var allErrs []error
 	for {
 		resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
@@ -162,29 +209,60 @@ func (i *Instance) awaitFirstUser(ctx context.Context) {
 		})
 		if err == nil {
 			i.AdminUserID = resp.GetUserId()
-			return
+			return nil
 		}
 		logging.WithError(err).Debug("await first instance user")
 		allErrs = append(allErrs, err)
 		select {
 		case <-ctx.Done():
-			panic(errors.Join(append(allErrs, ctx.Err())...))
+			return errors.Join(append(allErrs, ctx.Err())...)
 		case <-time.After(time.Second):
 			continue
 		}
 	}
 }
 
-func (i *Instance) setupInstance(ctx context.Context, token string) {
+func (i *Instance) setupInstance(ctx context.Context, token string) error {
 	i.Users = make(UserMap)
 	ctx = WithAuthorizationToken(ctx, token)
-	i.setInstance(ctx)
-	i.setOrganization(ctx)
-	i.createMachineUserInstanceOwner(ctx, token)
-	i.createMachineUserOrgOwner(ctx)
-	i.createLoginClient(ctx)
-	i.createMachineUserNoPermission(ctx)
+	if err := i.setInstance(ctx); err != nil {
+		return err
+	}
+	if err := i.setOrganization(ctx); err != nil {
+		return err
+	}
+	if err := i.createMachineUserInstanceOwner(ctx, token); err != nil {
+		return err
+	}
+	if _, err := i.createMachineUser(ctx, UserTypeOrgOwner); err != nil {
+		return err
+	}
+	if _, err := i.Client.InternalPermissionV2.CreateAdministrator(ctx, &internal_permission_v2.CreateAdministratorRequest{
+		Resource: &internal_permission_v2.ResourceType{
+			Resource: &internal_permission_v2.ResourceType_OrganizationId{OrganizationId: i.DefaultOrg.GetId()},
+		},
+		UserId: i.Users.Get(UserTypeOrgOwner).ID,
+		Roles:  []string{"ORG_OWNER"},
+	}); err != nil {
+		return err
+	}
+	if _, err := i.createMachineUser(ctx, UserTypeLogin); err != nil {
+		return err
+	}
+	if _, err := i.Client.InternalPermissionV2.CreateAdministrator(ctx, &internal_permission_v2.CreateAdministratorRequest{
+		Resource: &internal_permission_v2.ResourceType{
+			Resource: &internal_permission_v2.ResourceType_Instance{Instance: true},
+		},
+		UserId: i.Users.Get(UserTypeLogin).ID,
+		Roles:  []string{"IAM_LOGIN_CLIENT"},
+	}); err != nil {
+		return err
+	}
+	if _, err := i.createMachineUser(ctx, UserTypeNoPermission); err != nil {
+		return err
+	}
 	i.createWebAuthNClient()
+	return nil
 }
 
 // Host returns the primary Domain of the instance with the port.
@@ -192,8 +270,8 @@ func (i *Instance) Host() string {
 	return fmt.Sprintf("%s:%d", i.Domain, i.Config.Port)
 }
 
-func (i *Instance) createMachineUserInstanceOwner(ctx context.Context, token string) {
-	mustAwait(func() error {
+func (i *Instance) createMachineUserInstanceOwner(ctx context.Context, token string) error {
+	return await(func() error {
 		user, err := i.Client.Auth.GetMyUser(WithAuthorizationToken(ctx, token), &auth.GetMyUserRequest{})
 		if err != nil {
 			return err
@@ -207,56 +285,81 @@ func (i *Instance) createMachineUserInstanceOwner(ctx context.Context, token str
 	})
 }
 
-func (i *Instance) createMachineUserOrgOwner(ctx context.Context) {
-	_, err := i.Client.Mgmt.AddOrgMember(ctx, &management.AddOrgMemberRequest{
-		UserId: i.createMachineUser(ctx, UserTypeOrgOwner),
-		Roles:  []string{"ORG_OWNER"},
-	})
-	if err != nil {
-		panic(err)
+// awaitReadProjections waits until the key read-model projections have caught
+// up to at least the last event written during setupInstance.  Under parallel
+// load many instances are set up concurrently and projection workers can fall
+// behind, causing "not found" errors in the first few test calls.
+//
+// We probe two independent projections:
+//  1. projections.users (via GetUserByID for UserTypeNoPermission — the last
+//     user written in setupInstance).
+//  2. projections.secret_generators (via ListSecretGenerators) — populated
+//     from instance-creation events and required by ImportHumanUser /
+//     AddHumanUser notification flows.
+func (i *Instance) awaitReadProjections(ctx context.Context) error {
+	ownerCtx := i.WithAuthorizationToken(ctx, UserTypeIAMOwner)
+	userID := i.Users.Get(UserTypeNoPermission).ID
+
+	// Wait for projections.users
+	if err := await(func() error {
+		_, err := i.Client.UserV2.GetUserByID(ownerCtx, &user_v2.GetUserByIDRequest{
+			UserId: userID,
+		})
+		if err != nil {
+			logging.WithError(err).Debug("await users projection")
+		}
+		return err
+	}); err != nil {
+		return err
 	}
-}
 
-func (i *Instance) createLoginClient(ctx context.Context) {
-	_, err := i.Client.Admin.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
-		UserId: i.createMachineUser(ctx, UserTypeLogin),
-		Roles:  []string{"IAM_LOGIN_CLIENT"},
+	// Wait for projections.secret_generators
+	return await(func() error {
+		resp, err := i.Client.Admin.ListSecretGenerators(ownerCtx, &admin.ListSecretGeneratorsRequest{})
+		if err != nil {
+			logging.WithError(err).Debug("await secret_generators projection")
+			return err
+		}
+		if len(resp.GetResult()) == 0 {
+			return errors.New("secret_generators projection not yet ready")
+		}
+		return nil
 	})
-	if err != nil {
-		panic(err)
-	}
 }
 
-func (i *Instance) createMachineUserNoPermission(ctx context.Context) {
-	i.createMachineUser(ctx, UserTypeNoPermission)
-}
-
-func (i *Instance) setClient(ctx context.Context) {
+func (i *Instance) setClient(ctx context.Context) error {
 	client, err := newClient(ctx, i.Host())
 	if err != nil {
-		panic(err)
+		return err
 	}
 	i.Client = client
+	return nil
 }
 
-func (i *Instance) setInstance(ctx context.Context) {
-	mustAwait(func() error {
+func (i *Instance) setInstance(ctx context.Context) error {
+	return await(func() error {
 		instance, err := i.Client.Admin.GetMyInstance(ctx, &admin.GetMyInstanceRequest{})
+		if err != nil {
+			return err
+		}
 		i.Instance = instance.GetInstance()
-		return err
+		return nil
 	})
 }
 
-func (i *Instance) setOrganization(ctx context.Context) {
-	mustAwait(func() error {
+func (i *Instance) setOrganization(ctx context.Context) error {
+	return await(func() error {
 		resp, err := i.Client.Mgmt.GetMyOrg(ctx, &management.GetMyOrgRequest{})
+		if err != nil {
+			return err
+		}
 		i.DefaultOrg = resp.GetOrg()
-		return err
+		return nil
 	})
 }
 
-func (i *Instance) createMachineUser(ctx context.Context, userType UserType) (userID string) {
-	mustAwait(func() error {
+func (i *Instance) createMachineUser(ctx context.Context, userType UserType) (userID string, err error) {
+	err = await(func() error {
 		username := Username()
 		userResp, err := i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 			UserName:        username,
@@ -281,7 +384,7 @@ func (i *Instance) createMachineUser(ctx context.Context, userType UserType) (us
 		})
 		return nil
 	})
-	return userID
+	return userID, err
 }
 
 func (i *Instance) createWebAuthNClient() {

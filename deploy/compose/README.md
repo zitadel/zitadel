@@ -35,10 +35,10 @@ Optional services via profiles: `redis` (`cache`), `otel-collector` (`observabil
 | `docker-compose.prodlike.yml` | Init/setup/start split | Uses YAML anchors for shared DB env |
 | `docker-compose.test.yml` | CI smoke test overlay | Overrides images to `:local` tags |
 | `.env.example` | User-facing config template | Copy to `.env` before first run |
-| `.env.test` | CI-only config | Used by NX targets: `test-run`, `test-e2e`, `test-full`, `stop` |
+| `.env.test` | CI-only config | Used by NX targets: `test-run`, `test-e2e`, `test-integration`, `stop` |
 | `otel-collector-config.yaml` | OTEL Collector pipeline config | Logs traces to stdout; configure `OTEL_BACKEND_ENDPOINT` to forward to a backend |
 | `traefik-local-tls.yml` | Traefik dynamic config for local certs | Referenced by local-tls overlay |
-| `project.json` | NX project definition | Targets: `test-config`, `test-run`, `test-e2e`, `test`, `test-full`, `stop` |
+| `project.json` | NX project definition | Targets: `test-config`, `test-run`, `test-e2e`, `test`, `test-integration`, `stop` |
 | `AGENTS.md` | AI agent instructions for this directory | |
 
 ## Routing Rules
@@ -76,7 +76,7 @@ Local NX targets for testing the compose stack:
 | `test-run` | Builds local images (`@zitadel/api:pack` + `@zitadel/login:pack`), starts the stack with `docker compose up --wait` | Yes |
 | `test-e2e` | Runs the full Playwright suite (`wiring.spec.ts` + `smoke.spec.ts`) against `localhost:8888` through Traefik: per-service wiring checks (login, console, OIDC, SAML, API v1 REST, gRPC h2c, gRPC-web, API v2 REST HTTP/1.1 + HTTP/2) and the browser login flow | Yes (stack must be running) |
 | `test` | Lightweight — delegates to `test-config` only. Safe for `nx affected` | No |
-| `test-full` | Full pipeline: `test-config` → `test-run` → Playwright wiring + browser tests → teardown | Yes |
+| `test-integration` | Full pipeline: `test-config` → `test-run` → Playwright wiring + browser tests → teardown | Yes |
 | `stop` | Tears down the `zitadel-compose-test` stack and removes volumes | Yes |
 
 ## Rejected Alternatives

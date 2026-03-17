@@ -106,3 +106,6 @@ CLAUDE.md
 .gemini/*
 
 docs_old
+
+# GoReleaser
+dist/

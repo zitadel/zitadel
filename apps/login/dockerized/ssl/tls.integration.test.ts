@@ -10,6 +10,7 @@ const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = path.join(TEST_DIR, "output");
 const CERTS_DIR = path.join(OUTPUT_DIR, "certs");
 const LOGIN_APP_DIR = path.join(TEST_DIR, "../..");
+const REPO_ROOT = path.join(LOGIN_APP_DIR, "../..");
 const LOGIN_IMAGE_TAG = `zitadel-login-test:${process.env.GITHUB_SHA || "local"}`;
 
 /**
@@ -45,7 +46,7 @@ describe("Login Container TLS Support", () => {
     fs.writeFileSync(path.join(CERTS_DIR, "server.crt"), certs.server.cert);
     fs.writeFileSync(path.join(CERTS_DIR, "server.key"), certs.server.key);
 
-    await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+    await GenericContainer.fromDockerfile(REPO_ROOT, "apps/login/Dockerfile").build(LOGIN_IMAGE_TAG);
     loginImage = new GenericContainer(LOGIN_IMAGE_TAG);
   });
 

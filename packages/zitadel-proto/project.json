@@ -3,6 +3,7 @@
   "targets": {
     "generate": {
       "executor": "nx:run-commands",
+      "cache": true,
       "options": {
         "command": "pnpm exec buf generate ../../proto",
         "cwd": "packages/zitadel-proto"

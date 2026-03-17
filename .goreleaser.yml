@@ -1,0 +1,151 @@
+version: 2
+
+project_name: zitadel
+
+before:
+  hooks:
+    - pnpm install --frozen-lockfile
+    - env NX_DAEMON=false pnpm nx run-many -t build -p @zitadel/api @zitadel/console @zitadel/login
+
+builds:
+  - id: zitadel
+    main: .
+    binary: zitadel
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/zitadel/zitadel/cmd/build.version={{.Version}}
+      - -X github.com/zitadel/zitadel/cmd/build.commit={{.ShortCommit}}
+      - -X github.com/zitadel/zitadel/cmd/build.date={{.Date}}
+
+archives:
+  - id: zitadel
+    ids:
+      - zitadel
+    name_template: "zitadel-{{ .Os }}-{{ .Arch }}"
+    formats:
+      - tar.gz
+    files:
+      - README.md
+      - LICENSING.md
+      - LICENSE
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^chore:"
+      - "^ci:"
+      - "^test:"
+
+# Docker images — deployment-only Dockerfiles
+# All building happens inside the devcontainer; Dockerfiles just COPY artifacts.
+dockers_v2:
+  # API container — copy-only Dockerfile, GoReleaser provides the binary
+  - id: zitadel
+    ids:
+      - zitadel
+    images:
+      - "ghcr.io/zitadel/zitadel"
+      - "ghcr.io/zitadel/api"
+      - "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
+    tags:
+      - "{{ .Version }}"
+      - "{{ .Major }}.{{ .Minor }}"
+      - latest
+    dockerfile: apps/api/Dockerfile
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    build_args:
+      BINARY: zitadel
+    extra_files:
+      - apps/api/entrypoint.sh
+
+  # Login container — copies pre-built Next.js standalone output
+  - id: login
+    ids: []
+    images:
+      - "ghcr.io/zitadel/login"
+      - "ghcr.io/zitadel/zitadel-login"
+      - "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
+    tags:
+      - "{{ .Version }}"
+      - "{{ .Major }}.{{ .Minor }}"
+      - latest
+    dockerfile: apps/login/Dockerfile
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    extra_files:
+      - apps/login/.next/standalone
+
+# Native packages (deb, rpm, apk)
+nfpms:
+  - id: zitadel
+    ids:
+      - zitadel
+    package_name: zitadel
+    vendor: ZITADEL
+    homepage: https://zitadel.com
+    maintainer: ZITADEL <hi@zitadel.com>
+    description: "ZITADEL Identity Management System"
+    license: AGPL-3.0-only
+    formats:
+      - deb
+      - rpm
+      - apk
+    dependencies:
+      - postgresql (>= 14)
+      - nodejs (>= 22)
+    recommends:
+      - caddy | nginx | traefik
+    contents:
+      # Config
+      - src: cmd/defaults.yaml
+        dst: /etc/zitadel/defaults.yaml
+        type: config
+      # Login standalone app
+      - src: apps/login/.next/standalone/
+        dst: /opt/zitadel/login/
+        type: tree
+      # Systemd services
+      - src: deploy/systemd/zitadel.service
+        dst: /etc/systemd/system/zitadel.service
+      - src: deploy/systemd/zitadel-login.service
+        dst: /etc/systemd/system/zitadel-login.service
+    scripts:
+      postinstall: deploy/scripts/postinstall.sh
+
+release:
+  github:
+    owner: zitadel
+    name: zitadel
+  draft: true
+
+homebrew_casks:
+  - name: zitadel
+    ids:
+      - zitadel
+    repository:
+      owner: zitadel
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: zitadel-bot
+      email: bot@zitadel.com
+    homepage: https://zitadel.com
+    description: "ZITADEL Identity Management System"
+    license: AGPL-3.0-only

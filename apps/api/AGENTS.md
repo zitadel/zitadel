@@ -24,3 +24,8 @@ The **API App** (`apps/api`) is the Nx application target for building and runni
 - `@zitadel/api:generate` can update generated, tracked files (stubs/assets/statik). Run it intentionally.
 - API changes in `proto/` often require regenerating API, package, and docs artifacts.
 - Proto plugins are installed to `.artifacts/bin/` — do not commit these binaries; they are declared as Nx outputs and restored from cache.
+
+## Dockerfile & Release
+- `apps/api/Dockerfile` is a **deployment-only** Dockerfile — it copies pre-built artifacts, no compilation happens inside it.
+- GoReleaser's `dockers_v2` places binaries under `<GOOS>/<GOARCH>/` and preserves `extra_files` directory structure. `COPY` commands must match this layout (e.g., `COPY apps/api/entrypoint.sh`, `COPY ${TARGETPLATFORM}/zitadel`).
+- Built images: `ghcr.io/zitadel/zitadel` and `ghcr.io/zitadel/api`.

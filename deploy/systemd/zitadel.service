@@ -1,0 +1,19 @@
+[Unit]
+Description=ZITADEL Identity Management System
+Documentation=https://zitadel.com/docs
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=zitadel
+Group=zitadel
+ExecStart=/usr/bin/zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --config /etc/zitadel/defaults.yaml
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65535
+Environment=ZITADEL_MASTERKEY=
+
+[Install]
+WantedBy=multi-user.target

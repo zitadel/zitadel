@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	internal_permission_v2 "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -35,7 +35,10 @@ func (i *Instance) CreateMachineUserPATWithMembership(ctx context.Context, roles
 	}
 
 	if len(orgRoles) > 0 {
-		_, err := i.Client.Mgmt.AddOrgMember(ctx, &management.AddOrgMemberRequest{
+		_, err := i.Client.InternalPermissionV2.CreateAdministrator(ctx, &internal_permission_v2.CreateAdministratorRequest{
+			Resource: &internal_permission_v2.ResourceType{
+				Resource: &internal_permission_v2.ResourceType_OrganizationId{OrganizationId: i.DefaultOrg.GetId()},
+			},
 			UserId: user.GetUserId(),
 			Roles:  orgRoles,
 		})
@@ -44,7 +47,10 @@ func (i *Instance) CreateMachineUserPATWithMembership(ctx context.Context, roles
 		}
 	}
 	if len(iamRoles) > 0 {
-		_, err := i.Client.Admin.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
+		_, err := i.Client.InternalPermissionV2.CreateAdministrator(ctx, &internal_permission_v2.CreateAdministratorRequest{
+			Resource: &internal_permission_v2.ResourceType{
+				Resource: &internal_permission_v2.ResourceType_Instance{Instance: true},
+			},
 			UserId: user.GetUserId(),
 			Roles:  iamRoles,
 		})

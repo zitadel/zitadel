@@ -51,7 +51,7 @@ These designs were considered and explicitly rejected — do not re-propose them
 | Start (Let's Encrypt) | `docker compose --env-file .env -f docker-compose.yml -f docker-compose.mode-letsencrypt.yml up -d --wait` |
 | Start (production-like) | `docker compose --env-file .env -f docker-compose.yml -f docker-compose.prodlike.yml up -d --wait` |
 | Validate all configs | `docker compose --env-file .env.example -f docker-compose.yml -f <overlay> config > /dev/null` for each overlay |
-| Run CI smoke test | `pnpm nx run @zitadel/compose:test-full` |
+| Run CI smoke test | `pnpm nx run @zitadel/compose:test-integration` |
 | Smoke check | `curl -sS http://localhost:8888/.well-known/openid-configuration` |
 
 ### 6. Terminology

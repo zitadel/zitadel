@@ -145,9 +145,9 @@ func TestRemoveCustomDomain(t *testing.T) {
 	customDomainRelational := integration.DomainName()
 
 	_, err := instES.Client.InstanceV2.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: instES.ID(), CustomDomain: customDomainES})
-	require.Nil(t, err)
+	require.NoError(t, err)
 	_, err = instRelational.Client.InstanceV2.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: instRelational.ID(), CustomDomain: customDomainRelational})
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	t.Cleanup(func() {
 		instES.Client.InstanceV2.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: instES.ID(), CustomDomain: customDomainES})
