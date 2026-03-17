@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
@@ -158,6 +159,25 @@ func TestServer_CreateCallback(t *testing.T) {
 					Session: &oidc_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: "bar",
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid organization",
+			ctx:  CTXLoginClient,
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					org := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email())
+					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTXLoginClient, client.GetClientId(), Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID, domain.OrgIDScope+org.OrganizationId)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
 					},
 				},
 			},
@@ -349,6 +369,31 @@ func TestServer_CreateCallback(t *testing.T) {
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `http:\/\/localhost:9999\/callback#access_token=(.*)&expires_in=(.*)&id_token=(.*)&state=state&token_type=Bearer`,
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.ID(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "callback with required organization",
+			ctx:  CTXLoginClient,
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTXLoginClient, client.GetClientId(), Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID, domain.OrgIDScope+Instance.DefaultOrg.Id)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			want: &oidc_pb.CreateCallbackResponse{
+				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
@@ -749,7 +794,7 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 			ctx:  CTXLoginClient,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: func() string {
-					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), oidc.ScopeOpenID)
 					require.NoError(t, err)
 					var id string
 					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
@@ -776,7 +821,7 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 			ctx:  CTXLoginClient,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: func() string {
-					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), oidc.ScopeOpenID)
 					require.NoError(t, err)
 					var id string
 					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
@@ -799,11 +844,39 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "invalid organization",
+			ctx:  CTXLoginClient,
+			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
+				DeviceAuthorizationId: func() string {
+					org := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email())
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), oidc.ScopeOpenID, domain.OrgIDScope+org.OrganizationId)
+					require.NoError(t, err)
+					var id string
+					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
+					require.EventuallyWithT(t, func(collectT *assert.CollectT) {
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+							UserCode: req.UserCode,
+						})
+						assert.NoError(collectT, err)
+						id = resp.GetDeviceAuthorizationRequest().GetId()
+					}, retryDuration, tick)
+					return id
+				}(),
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "deny device authorization",
 			ctx:  CTXLoginClient,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: func() string {
-					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), oidc.ScopeOpenID)
 					require.NoError(t, err)
 					var id string
 					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
@@ -826,7 +899,7 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 			ctx:  CTX,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: func() string {
-					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), oidc.ScopeOpenID)
 					require.NoError(t, err)
 					var id string
 					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
@@ -849,7 +922,7 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 			ctx:  CTX,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: func() string {
-					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), oidc.ScopeOpenID)
 					require.NoError(t, err)
 					var id string
 					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
@@ -876,7 +949,34 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 			ctx:  CTXLoginClient,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: func() string {
-					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), oidc.ScopeOpenID)
+					require.NoError(t, err)
+					var id string
+					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
+					require.EventuallyWithT(t, func(collectT *assert.CollectT) {
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+							UserCode: req.UserCode,
+						})
+						assert.NoError(collectT, err)
+						id = resp.GetDeviceAuthorizationRequest().GetId()
+					}, retryDuration, tick)
+					return id
+				}(),
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "authorize, with organization scope",
+			ctx:  CTXLoginClient,
+			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
+				DeviceAuthorizationId: func() string {
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), oidc.ScopeOpenID, domain.OrgIDScope+Instance.DefaultOrg.GetId())
 					require.NoError(t, err)
 					var id string
 					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTXLoginClient, time.Minute)
