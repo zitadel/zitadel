@@ -407,6 +407,7 @@ export class AuthUserDetailComponent implements OnInit {
 
     const dialogRef = this.dialog.open<WarnDialogComponent, typeof data, boolean>(WarnDialogComponent, {
       width: '400px',
+      data,
     });
 
     dialogRef

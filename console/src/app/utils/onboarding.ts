@@ -2,23 +2,23 @@ import { OnboardingActions } from '../services/admin.service';
 import { COLORS } from './color';
 import { MilestoneType } from '../proto/generated/zitadel/milestone/v1/milestone_pb';
 
-const reddark: string = COLORS[0][700];
-const redlight = COLORS[0][200];
+// const reddark: string = COLORS[0][700];
+// const redlight = COLORS[0][200];
 
-const yellowdark: string = COLORS[3][700];
-const yellowlight = COLORS[3][200];
+// const yellowdark: string = COLORS[3][700];
+// const yellowlight = COLORS[3][200];
 
 const greendark: string = COLORS[6][700];
 const greenlight = COLORS[6][200];
 
-const bluedark: string = COLORS[9][700];
-const bluelight = COLORS[9][200];
+// const bluedark: string = COLORS[9][700];
+// const bluelight = COLORS[9][200];
 
 const purpledark: string = COLORS[12][700];
 const purplelight = COLORS[12][200];
 
-const pinkdark: string = COLORS[15][700];
-const pinklight = COLORS[15][200];
+// const pinkdark: string = COLORS[15][700];
+// const pinklight = COLORS[15][200];
 
 const sthdark: string = COLORS[18][700];
 const sthlight = COLORS[18][200];

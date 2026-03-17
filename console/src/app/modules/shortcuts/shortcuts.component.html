@@ -17,7 +17,7 @@
     </div>
 
     <div class="shortcut-list-row">
-      <div cdkDropList [cdkDropListData]="main" class="shortcut-list" (cdkDropListDropped)="drop($event, 'main')">
+      <div cdkDropList [cdkDropListData]="main" class="shortcut-list" (cdkDropListDropped)="drop($event)">
         <p *ngIf="editState" class="shortcut-desc cnsl-secondary-text">{{ 'HOME.SHORTCUTS.REORDER' | translate }}</p>
         <ng-container *ngFor="let shortcut of main">
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
@@ -55,7 +55,7 @@
         </ng-container>
       </div>
 
-      <div cdkDropList [cdkDropListData]="secondary" class="shortcut-list" (cdkDropListDropped)="drop($event, 'secondary')">
+      <div cdkDropList [cdkDropListData]="secondary" class="shortcut-list" (cdkDropListDropped)="drop($event)">
         <p *ngIf="editState" class="shortcut-desc cnsl-secondary-text">{{ 'HOME.SHORTCUTS.REORDER' | translate }}</p>
         <ng-container *ngFor="let shortcut of secondary">
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
@@ -93,7 +93,7 @@
         </ng-container>
       </div>
 
-      <div cdkDropList [cdkDropListData]="third" class="shortcut-list" (cdkDropListDropped)="drop($event, 'third')">
+      <div cdkDropList [cdkDropListData]="third" class="shortcut-list" (cdkDropListDropped)="drop($event)">
         <p *ngIf="editState" class="shortcut-desc cnsl-secondary-text">{{ 'HOME.SHORTCUTS.REORDER' | translate }}</p>
         <ng-container *ngFor="let shortcut of third">
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
@@ -144,7 +144,7 @@
         cdkDropList
         [cdkDropListData]="allAvailableShortcuts"
         class="available-shortcut-list"
-        (cdkDropListDropped)="drop($event, 'main')"
+        (cdkDropListDropped)="drop($event)"
       >
         <ng-container *ngFor="let shortcut of allAvailableShortcuts">
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">

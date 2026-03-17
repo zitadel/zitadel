@@ -208,7 +208,7 @@ export class ProviderJWTComponent {
       this.loading = true;
       this.service
         .updateJWTProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();
