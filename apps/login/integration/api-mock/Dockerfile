@@ -6,7 +6,7 @@ RUN buf export https://github.com/envoyproxy/protoc-gen-validate.git --path vali
     
 FROM golang:1.25.8-alpine3.22 AS mock-zitadel
 
-RUN go install github.com/conblem/grpc-mock/cmd/grpc-mock@513ee05492b89b5e3316edfaa5979de221501ab9
+RUN go install github.com/conblem/grpc-mock/cmd/grpc-mock@f3c4cdd486f5afe7effa3a8aae5d26f45aa684c9
 
 COPY mocked-services.cfg .
 COPY initial-stubs initial-stubs
