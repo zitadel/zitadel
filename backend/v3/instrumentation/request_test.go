@@ -96,6 +96,14 @@ func TestSetUserID(t *testing.T) {
 }
 
 func TestGetRequestID(t *testing.T) {
+	originalXidWithTime := xidWithTime
+	xidWithTime = func(time.Time) xid.ID {
+		return testID
+	}
+	t.Cleanup(func() {
+		xidWithTime = originalXidWithTime
+	})
+
 	reqCtx := WithRequestDetails(context.Background(), "instanceHost", "publicHost")
 	tests := []struct {
 		name   string
@@ -181,6 +189,13 @@ func Test_requestDetails_slogAttributes(t *testing.T) {
 }
 
 func Test_requestDetailsExtractor(t *testing.T) {
+	originalXidWithTime := xidWithTime
+	xidWithTime = func(time.Time) xid.ID {
+		return testID
+	}
+	t.Cleanup(func() {
+		xidWithTime = originalXidWithTime
+	})
 	tests := []struct {
 		name string
 		ctx  context.Context
