@@ -466,6 +466,31 @@ func Test_prepareCondition(t *testing.T) {
 				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}},
 			},
 		},
+		{
+			name: "exclude relational events v2",
+			args: args{
+				query: &repository.SearchQuery{
+					ExcludeRelationalEvents: true,
+				},
+			},
+			res: res{
+				clause: ` WHERE written_by_relational IS false`,
+				values: nil,
+			},
+		},
+		{
+			name: "exclude relational events ignored on v1",
+			args: args{
+				query: &repository.SearchQuery{
+					ExcludeRelationalEvents: true,
+				},
+				useV1: true,
+			},
+			res: res{
+				clause: "",
+				values: nil,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

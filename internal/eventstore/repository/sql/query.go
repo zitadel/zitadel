@@ -296,6 +296,13 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		args = append(args, excludeAggregateIDsArgs...)
 	}
 
+	if query.ExcludeRelationalEvents && !useV1 {
+		if clauses != "" {
+			clauses += " AND "
+		}
+		clauses += "written_by_relational IS false"
+	}
+
 	if clauses == "" {
 		return "", nil
 	}

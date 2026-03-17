@@ -185,6 +185,7 @@ type Steps struct {
 	s67SyncMemberRoleFields                 *SyncMemberRoleFields
 	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
 	s69CacheTablesLogged                    *CacheTablesLogged
+	s70AddWrittenByV3Column                 *AddWrittenByV3Column
 }
 
 func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {

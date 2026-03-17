@@ -40,6 +40,13 @@ type Command interface {
 	Fields() []*FieldOperation
 }
 
+// RelationalCommand is a marker interface for commands created through the relational storage adapter.
+// Events created from these commands will have WrittenByRelational set to true.
+type RelationalCommand interface {
+	Command
+	IsRelationalCommand()
+}
+
 // Event is a stored activity
 type Event interface {
 	action

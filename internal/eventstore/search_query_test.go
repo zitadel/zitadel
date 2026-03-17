@@ -73,6 +73,13 @@ func testSetResourceOwner(resourceOwner string) func(*SearchQueryBuilder) *Searc
 	}
 }
 
+func testSetExcludeRelationalEvents() func(*SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+		builder = builder.ExcludeRelationalEvents()
+		return builder
+	}
+}
+
 func testSetSortOrder(asc bool) func(*SearchQueryBuilder) *SearchQueryBuilder {
 	return func(query *SearchQueryBuilder) *SearchQueryBuilder {
 		if asc {
@@ -168,6 +175,15 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 			},
 		},
 		{
+			name: "set exclude relational events",
+			args: args{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetExcludeRelationalEvents()},
+			},
+			res: &SearchQueryBuilder{
+				excludeRelationalEvents: true,
+			},
+		},
+		{
 			name: "default search query",
 			args: args{
 				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddSubQuery(testSetAggregateTypes("user"), testSetAggregateIDs("1235", "024")), testSetSortOrder(false)},
@@ -209,6 +225,9 @@ func assertBuilder(t *testing.T, want, got *SearchQueryBuilder) {
 	}
 	if got.resourceOwner != want.resourceOwner {
 		t.Errorf("wrong : got: %v want: %v", got.resourceOwner, want.resourceOwner)
+	}
+	if got.excludeRelationalEvents != want.excludeRelationalEvents {
+		t.Errorf("wrong excludeRelationalEvents: got: %v want: %v", got.excludeRelationalEvents, want.excludeRelationalEvents)
 	}
 	if len(got.queries) != len(want.queries) {
 		t.Errorf("wrong length of queries: got: %v want: %v", len(got.queries), len(want.queries))

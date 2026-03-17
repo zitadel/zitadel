@@ -12,6 +12,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
+type mockRelationalCommand struct {
+	*mockCommand
+}
+
+func (m *mockRelationalCommand) IsRelationalCommand() {}
+
 func Test_commandToEvent(t *testing.T) {
 	payload := struct {
 		ID string
@@ -104,7 +110,7 @@ func Test_commandToEvent(t *testing.T) {
 			}
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := commandToEvent(tt.args.command)
+			got, err := commandToEvent(tt.args.command, false)
 
 			tt.want.err(t, err)
 			if tt.want.event == nil {
@@ -250,7 +256,7 @@ func Test_commandsToEvents(t *testing.T) {
 	}
 	type want struct {
 		events   []eventstore.Event
-		commands []*command
+		commands []*command2
 		err      func(t *testing.T, err error)
 	}
 	tests := []struct {
@@ -266,7 +272,7 @@ func Test_commandsToEvents(t *testing.T) {
 			},
 			want: want{
 				events:   []eventstore.Event{},
-				commands: []*command{},
+				commands: []*command2{},
 				err: func(t *testing.T, err error) {
 					require.NoError(t, err)
 				},
@@ -291,7 +297,7 @@ func Test_commandsToEvents(t *testing.T) {
 						nil,
 					),
 				},
-				commands: []*command{
+				commands: []*command2{
 					{
 						InstanceID:    "instance",
 						AggregateType: "type",
@@ -327,7 +333,7 @@ func Test_commandsToEvents(t *testing.T) {
 						nil,
 					),
 				},
-				commands: []*command{
+				commands: []*command2{
 					{
 						InstanceID:    "instance from ctx",
 						AggregateType: "type",
@@ -363,7 +369,7 @@ func Test_commandsToEvents(t *testing.T) {
 						payloadMarshalled,
 					),
 				},
-				commands: []*command{
+				commands: []*command2{
 					{
 						InstanceID:    "instance",
 						AggregateType: "type",
@@ -373,6 +379,51 @@ func Test_commandsToEvents(t *testing.T) {
 						Revision:      1,
 						Payload:       payloadMarshalled,
 						Creator:       "creator",
+					},
+				},
+				err: func(t *testing.T, err error) {
+					require.NoError(t, err)
+				},
+			},
+		},
+		{
+			name: "single relational command marks written by v3",
+			args: args{
+				ctx: ctx,
+				cmds: []eventstore.Command{
+					&mockRelationalCommand{
+						mockCommand: &mockCommand{
+							aggregate: mockAggregate("V3-Red9I"),
+							payload:   nil,
+						},
+					},
+				},
+			},
+			want: want{
+				events: []eventstore.Event{
+					&event{command: &command2{
+						InstanceID:    "instance",
+						AggregateType: "type",
+						AggregateID:   "V3-Red9I",
+						Owner:         "ro",
+						CommandType:   "event.type",
+						Revision:      1,
+						Payload:       nil,
+						Creator:       "creator",
+						WrittenByV3:   true,
+					}},
+				},
+				commands: []*command2{
+					{
+						InstanceID:    "instance",
+						AggregateType: "type",
+						AggregateID:   "V3-Red9I",
+						Owner:         "ro",
+						CommandType:   "event.type",
+						Revision:      1,
+						Payload:       nil,
+						Creator:       "creator",
+						WrittenByV3:   true,
 					},
 				},
 				err: func(t *testing.T, err error) {
@@ -408,7 +459,7 @@ func Test_commandsToEvents(t *testing.T) {
 						nil,
 					),
 				},
-				commands: []*command{
+				commands: []*command2{
 					{
 						InstanceID:    "instance",
 						AggregateType: "type",
@@ -469,7 +520,7 @@ func Test_commandsToEvents(t *testing.T) {
 	}
 }
 
-func assertCommand(t *testing.T, want, got *command) {
+func assertCommand(t *testing.T, want, got *command2) {
 	t.Helper()
 	assert.Equal(t, want.CommandType, got.CommandType)
 	assert.Equal(t, want.Payload, got.Payload)
@@ -479,4 +530,5 @@ func assertCommand(t *testing.T, want, got *command) {
 	assert.Equal(t, want.AggregateType, got.AggregateType)
 	assert.Equal(t, want.InstanceID, got.InstanceID)
 	assert.Equal(t, want.Revision, got.Revision)
+	assert.Equal(t, want.WrittenByV3, got.WrittenByV3)
 }

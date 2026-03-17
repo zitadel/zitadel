@@ -1,4 +1,22 @@
-CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[])
+DO $$ BEGIN
+    CREATE TYPE eventstore.command2 AS (
+        instance_id TEXT
+        , aggregate_type TEXT
+        , aggregate_id TEXT
+        , command_type TEXT
+        , revision INT2
+        , payload JSONB
+        , creator TEXT
+        , owner TEXT
+        , written_by_relational BOOLEAN
+    );
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+ALTER TABLE IF EXISTS eventstore.events2 ADD COLUMN IF NOT EXISTS written_by_relational BOOLEAN NOT NULL DEFAULT false;
+
+CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command2[])
     RETURNS SETOF eventstore.events2 
     LANGUAGE 'plpgsql'
     STABLE PARALLEL SAFE
@@ -43,6 +61,7 @@ BEGIN
             , COALESCE(current_owner, c.owner) -- AS owner
             , EXTRACT(EPOCH FROM created_at) -- AS position
             , c.ordinality::%s -- AS in_tx_order
+            , COALESCE(c.written_by_relational, false) -- AS written_by_relational
         FROM
             UNNEST(commands) WITH ORDINALITY AS c
         WHERE

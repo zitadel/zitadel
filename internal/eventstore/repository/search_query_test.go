@@ -1,8 +1,10 @@
 package repository
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -30,9 +32,8 @@ func TestNewFilter(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewFilter(tt.args.field, tt.args.value, tt.args.operation); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewFilter() = %v, want %v", got, tt.want)
-			}
+			got := NewFilter(tt.args.field, tt.args.value, tt.args.operation)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -98,9 +99,12 @@ func TestFilter_Validate(t *testing.T) {
 					Operation: tt.fields.operation,
 				}
 			}
-			if err := f.Validate(); (err != nil) != tt.wantErr {
-				t.Errorf("Filter.Validate() error = %v, wantErr %v", err, tt.wantErr)
+			err := f.Validate()
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
 			}
+			assert.NoError(t, err)
 		})
 	}
 }
@@ -138,9 +142,31 @@ func TestColumns_Validate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.fields.columns.Validate(); (err != nil) != tt.wantErr {
-				t.Errorf("Columns.Validate() error = %v, wantErr %v", err, tt.wantErr)
+			err := tt.fields.columns.Validate()
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
 			}
+			assert.NoError(t, err)
 		})
 	}
+}
+
+func TestQueryFromBuilder_ExcludeRelationalEvents(t *testing.T) {
+	t.Run("set exclude relational events", func(t *testing.T) {
+		builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			ExcludeRelationalEvents()
+
+		query, err := QueryFromBuilder(builder)
+		require.NoError(t, err)
+		assert.True(t, query.ExcludeRelationalEvents)
+	})
+
+	t.Run("exclude relational events defaults to false", func(t *testing.T) {
+		builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent)
+
+		query, err := QueryFromBuilder(builder)
+		require.NoError(t, err)
+		assert.False(t, query.ExcludeRelationalEvents)
+	})
 }
