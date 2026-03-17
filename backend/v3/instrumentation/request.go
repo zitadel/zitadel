@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/rs/xid"
+
 	"github.com/zitadel/zitadel/internal/api/call"
 )
 
