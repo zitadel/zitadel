@@ -14,7 +14,6 @@ services:
       DEVCONTAINER_DB_HOST: db
       DEVCONTAINER_API_HOST: api
       DEVCONTAINER_LOGIN_HOST: login
-      DEVCONTAINER_LOGIN_API_MOCK_HOST: login-api-mock
       DEVCONTAINER_DB_API_INTEGRATION_HOST: db-api-integration
       DEVCONTAINER_DB_FUNCTIONAL_UI_HOST: db-functional-ui
     ports:
@@ -73,15 +72,6 @@ services:
       start_period: "20s"
     ports:
       - "5434:5434"
-
-  login-api-mock:
-    build:
-      context: ../apps/login/integration/api-mock
-      additional_contexts:
-        zitadel-protos: ../proto
-    ports:
-      - "22220:22220"
-      - "22222:22222"
 
 volumes:
   db-data-dev:

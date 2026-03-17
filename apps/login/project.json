@@ -1,6 +1,5 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "implicitDependencies": ["@zitadel/login-api-mock"],
   "targets": {
     "prod": {
       "description": "Runs the Next.js Login application in production mode from the standalone build",
