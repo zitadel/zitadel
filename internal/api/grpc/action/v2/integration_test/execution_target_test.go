@@ -367,11 +367,11 @@ func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
 	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	event := "session.added"
-	// call takes longer than timeout of target
-	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 5*time.Second, http.StatusOK, nil)
+	// call takes longer than timeout of target (500ms server sleep > 200ms target timeout)
+	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 500*time.Millisecond, http.StatusOK, nil)
 	defer closeF()
 
-	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, target_domain.TargetTypeWebhook, true, action.PayloadType_PAYLOAD_TYPE_JSON)
+	targetResponse := waitForTargetTimeout(isolatedIAMOwnerCTX, t, instance, urlRequest, target_domain.TargetTypeWebhook, true, action.PayloadType_PAYLOAD_TYPE_JSON, 200*time.Millisecond)
 	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), []string{targetResponse.GetId()})
 
 	tests := []struct {
@@ -419,7 +419,7 @@ func TestServer_ExecutionTarget_Event_LongerThanTransactionTimeout(t *testing.T)
 	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	event := "session.added"
-	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 1*time.Second, http.StatusOK, nil)
+	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 200*time.Millisecond, http.StatusOK, nil)
 	defer closeF()
 
 	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, target_domain.TargetTypeWebhook, true, action.PayloadType_PAYLOAD_TYPE_JSON)
@@ -503,6 +503,29 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 			}
 		}
 	}, retryDuration, tick, "timeout waiting for expected execution result")
+}
+
+// waitForTargetTimeout creates a target with a custom timeout and waits for it
+// to appear in the projection. Use this instead of waitForTarget when the test
+// needs to control the relationship between server response time and target timeout.
+func waitForTargetTimeout(ctx context.Context, t *testing.T, instance *integration.Instance, endpoint string, ty target_domain.TargetType, interrupt bool, payloadType action.PayloadType, targetTimeout time.Duration) *action.CreateTargetResponse {
+	resp := instance.CreateTargetWithTimeout(ctx, t, "", endpoint, ty, interrupt, payloadType, targetTimeout)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		got, err := instance.Client.ActionV2.ListTargets(ctx, &action.ListTargetsRequest{
+			Filters: []*action.TargetSearchFilter{
+				{Filter: &action.TargetSearchFilter_InTargetIdsFilter{
+					InTargetIdsFilter: &action.InTargetIDsFilter{TargetIds: []string{resp.GetId()}},
+				}},
+			},
+		})
+		if !assert.NoError(ttt, err) {
+			return
+		}
+		assert.Len(ttt, got.GetTargets(), 1)
+	}, retryDuration, tick, "timeout waiting for target to be projected")
+	return resp
 }
 
 func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Instance, endpoint string, ty target_domain.TargetType, interrupt bool, payloadType action.PayloadType) *action.CreateTargetResponse {

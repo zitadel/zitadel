@@ -148,9 +148,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 	t.Run("test instance idp add reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, defaultOIDCIDPReq(name, true))
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -183,14 +183,14 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateIDP(IAMCTX, &admin.UpdateIDPRequest{
 			IdpId:        addOIDC.IdpId,
 			Name:         name,
 			StylingType:  idp_grpc.IDPStylingType_STYLING_TYPE_UNSPECIFIED,
 			AutoRegister: false,
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -214,11 +214,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// deactivate idp
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.DeactivateIDP(IAMCTX, &admin.DeactivateIDPRequest{
 			IdpId: addOIDC.IdpId,
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -259,11 +259,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// reactivate idp
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.ReactivateIDP(IAMCTX, &admin.ReactivateIDPRequest{
 			IdpId: addOIDC.IdpId,
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -357,7 +357,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, addOIDC.IdpId, oidc.ID)
 		}, retryDuration, tick)
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateIDPOIDCConfig(IAMCTX, &admin.UpdateIDPOIDCConfigRequest{
 			IdpId:              addOIDC.IdpId,
 			ClientId:           "new_clientID",
@@ -367,7 +367,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 			UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -451,7 +451,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository()
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateIDPJWTConfig(IAMCTX, &admin.UpdateIDPJWTConfigRequest{
 			IdpId:        addJWT.IdpId,
 			JwtEndpoint:  "new_jwtEndpoint",
@@ -459,7 +459,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			KeysEndpoint: "new_keyEndpoint",
 			HeaderName:   "new_headerName",
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -485,7 +485,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oauth
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addOAuth, err := AdminClient.AddGenericOAuthProvider(IAMCTX, &admin.AddGenericOAuthProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
@@ -504,7 +504,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			},
 			UsePkce: false,
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -578,7 +578,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		name = "new_" + name
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateGenericOAuthProvider(IAMCTX, &admin.UpdateGenericOAuthProviderRequest{
 			Id:                    addOAuth.Id,
 			Name:                  name,
@@ -598,7 +598,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			},
 			UsePkce: true,
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -634,7 +634,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addOIDC, err := AdminClient.AddGenericOIDCProvider(IAMCTX, &admin.AddGenericOIDCProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -651,7 +651,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			IsIdTokenMapping: false,
 			UsePkce:          false,
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -719,7 +719,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		name = "new_" + name
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateGenericOIDCProvider(IAMCTX, &admin.UpdateGenericOIDCProviderRequest{
 			Id:           addOIDC.Id,
 			Name:         name,
@@ -737,7 +737,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			IsIdTokenMapping: true,
 			UsePkce:          true,
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -800,7 +800,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, domain.IDPTypeOIDC, domain.IDPType(*oidc.Type))
 		}, retryDuration, tick)
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.MigrateGenericOIDCProvider(IAMCTX, &admin.MigrateGenericOIDCProviderRequest{
 			Id: addOIDC.Id,
 			Template: &admin.MigrateGenericOIDCProviderRequest_Azure{
@@ -825,7 +825,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				},
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -888,7 +888,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, domain.IDPTypeOIDC, domain.IDPType(*oidc.Type))
 		}, retryDuration, tick)
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.MigrateGenericOIDCProvider(IAMCTX, &admin.MigrateGenericOIDCProviderRequest{
 			Id: addOIDC.Id,
 			Template: &admin.MigrateGenericOIDCProviderRequest_Google{
@@ -907,7 +907,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				},
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
@@ -940,7 +940,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addJWT, err := AdminClient.AddJWTProvider(IAMCTX, &admin.AddJWTProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
@@ -955,7 +955,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -1010,7 +1010,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change jwt
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateJWTProvider(IAMCTX, &admin.UpdateJWTProviderRequest{
 			Id:           addJWT.Id,
 			Name:         name,
@@ -1026,7 +1026,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -1062,7 +1062,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add azure
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addAzure, err := AdminClient.AddAzureADProvider(IAMCTX, &admin.AddAzureADProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1082,7 +1082,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -1152,7 +1152,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change azure
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateAzureADProvider(IAMCTX, &admin.UpdateAzureADProviderRequest{
 			Id:           addAzure.Id,
 			Name:         name,
@@ -1173,7 +1173,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		// check values for azure
@@ -1208,7 +1208,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addGithub, err := AdminClient.AddGitHubProvider(IAMCTX, &admin.AddGitHubProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1222,7 +1222,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -1283,7 +1283,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change github
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateGitHubProvider(IAMCTX, &admin.UpdateGitHubProviderRequest{
 			Id:           addGithub.Id,
 			Name:         name,
@@ -1298,7 +1298,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		// check values for azure
@@ -1331,7 +1331,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github enterprise
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addGithubEnterprise, err := AdminClient.AddGitHubEnterpriseServerProvider(IAMCTX, &admin.AddGitHubEnterpriseServerProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
@@ -1348,7 +1348,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -1417,7 +1417,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change github enterprise
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateGitHubEnterpriseServerProvider(IAMCTX, &admin.UpdateGitHubEnterpriseServerProviderRequest{
 			Id:                    addGithubEnterprise.Id,
 			Name:                  name,
@@ -1435,7 +1435,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		// check values for azure
@@ -1471,7 +1471,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addGithub, err := AdminClient.AddGitLabProvider(IAMCTX, &admin.AddGitLabProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1485,7 +1485,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -1548,7 +1548,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change gitlab
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateGitLabProvider(IAMCTX, &admin.UpdateGitLabProviderRequest{
 			Id:           addGitlab.Id,
 			Name:         name,
@@ -1563,7 +1563,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		// check values for gitlab
@@ -1596,7 +1596,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab self hosted
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addGitlabSelfHosted, err := AdminClient.AddGitLabSelfHostedProvider(IAMCTX, &admin.AddGitLabSelfHostedProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
@@ -1611,7 +1611,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -1676,7 +1676,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change gitlab self hosted
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateGitLabSelfHostedProvider(IAMCTX, &admin.UpdateGitLabSelfHostedProviderRequest{
 			Id:           addGitlabSelfHosted.Id,
 			Name:         name,
@@ -1692,7 +1692,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		// check values for gitlab self hosted
@@ -1726,7 +1726,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add google
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addGoogle, err := AdminClient.AddGoogleProvider(IAMCTX, &admin.AddGoogleProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1740,7 +1740,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -1803,7 +1803,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change google
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateGoogleProvider(IAMCTX, &admin.UpdateGoogleProviderRequest{
 			Id:           addGoogle.Id,
 			Name:         name,
@@ -1818,7 +1818,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		// check values for google
@@ -1851,9 +1851,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add ldap
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addLdap, err := AdminClient.AddLDAPProvider(IAMCTX, defaultInstanceLDAPRequest(name))
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -1922,7 +1922,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change ldap
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateLDAPProvider(IAMCTX, &admin.UpdateLDAPProviderRequest{
 			Id:                addLdap.Id,
 			Name:              name,
@@ -1958,7 +1958,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		// check values for ldap
@@ -2010,7 +2010,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add apple
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addApple, err := AdminClient.AddAppleProvider(IAMCTX, &admin.AddAppleProviderRequest{
 			Name:       name,
 			ClientId:   "clientID",
@@ -2026,7 +2026,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -2092,7 +2092,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change apple
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateAppleProvider(IAMCTX, &admin.UpdateAppleProviderRequest{
 			Id:         addApple.Id,
 			Name:       name,
@@ -2109,7 +2109,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		// check values for apple
@@ -2145,9 +2145,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		federatedLogoutEnabled := false
 
 		// add saml
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		addSAML, err := AdminClient.AddSAMLProvider(IAMCTX, defaultInstanceSAMLRequest(name, &federatedLogoutEnabled))
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -2205,7 +2205,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 		federatedLogoutEnabled = true
 		// change saml
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = AdminClient.UpdateSAMLProvider(IAMCTX, &admin.UpdateSAMLProviderRequest{
 			Id:   addSAML.Id,
 			Name: name,
@@ -2226,7 +2226,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			},
 			SignatureAlgorithm: idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256,
 		})
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		// check values for apple

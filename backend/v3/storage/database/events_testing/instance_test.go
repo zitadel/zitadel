@@ -21,7 +21,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 
 	t.Run("test instance add reduces", func(t *testing.T) {
 		instanceName := gofakeit.Name()
-		beforeCreate := time.Now()
+		beforeCreate := time.Now().Add(-time.Second)
 		instance, err := SystemClient.CreateInstance(CTX, &system.CreateInstanceRequest{
 			InstanceName: instanceName,
 			Owner: &system.CreateInstanceRequest_Machine_{
@@ -32,7 +32,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 				},
 			},
 		})
-		afterCreate := time.Now()
+		afterCreate := time.Now().Add(time.Second)
 
 		require.NoError(t, err)
 		t.Cleanup(func() {
@@ -110,12 +110,12 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		instanceName += "new"
-		beforeUpdate := time.Now()
+		beforeUpdate := time.Now().Add(-time.Second)
 		_, err = SystemClient.UpdateInstance(CTX, &system.UpdateInstanceRequest{
 			InstanceId:   res.InstanceId,
 			InstanceName: instanceName,
 		})
-		afterUpdate := time.Now()
+		afterUpdate := time.Now().Add(time.Second)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)

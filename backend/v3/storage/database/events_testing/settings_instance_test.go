@@ -66,9 +66,9 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 	t.Parallel()
 
 	settingsRepo := repository.LoginSettingsRepository()
-	before := time.Now()
+	before := time.Now().Add(-time.Second)
 	newInstance := integration.NewInstance(t.Context())
-	after := time.Now()
+	after := time.Now().Add(time.Second)
 
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
@@ -120,7 +120,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			ForceMfaLocalOnly:          true,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -191,12 +191,12 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			assert.Equal(collect, []domain.MultiFactorType{}, setting.MFAType)
 		}, retryDuration, tick)
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = newInstance.Client.Admin.AddMultiFactorToLoginPolicy(IAMCTX, &admin.AddMultiFactorToLoginPolicyRequest{
 			Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		// add MFAType
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
@@ -216,7 +216,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test added/removed second multifactor reduces", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		// get current second factor types
 		var secondFactorTypes []domain.SecondFactorType
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
@@ -233,12 +233,12 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// add new second factor type
-		before = time.Now()
+		before = time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.AddSecondFactorToLoginPolicy(IAMCTX, &admin.AddSecondFactorToLoginPolicyRequest{
 			Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		secondFactorTypes = append(secondFactorTypes, domain.SecondFactorType(policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS))
 
@@ -259,12 +259,12 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// remove second factor type
-		before = time.Now()
+		before = time.Now().Add(-time.Second)
 		_, err = newInstance.Client.Admin.RemoveSecondFactorFromLoginPolicy(IAMCTX, &admin.RemoveSecondFactorFromLoginPolicyRequest{
 			Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
 		})
 		require.NoError(t, err)
-		after = time.Now()
+		after = time.Now().Add(time.Second)
 
 		secondFactorTypes = secondFactorTypes[0 : len(secondFactorTypes)-1]
 
@@ -365,7 +365,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy label change", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.UpdateLabelPolicy(IAMCTX, &admin.UpdateLabelPolicyRequest{
 			PrimaryColor:        "#055000",
 			HideLoginNameSuffix: true,
@@ -380,7 +380,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			ThemeMode:           policy.ThemeMode_THEME_MODE_LIGHT,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -459,10 +459,10 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy label logo light removed", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.RemoveLabelPolicyLogo(IAMCTX, &admin.RemoveLabelPolicyLogoRequest{})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		// check light logo removed
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
@@ -476,16 +476,18 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.logo.removed
-			assert.Equal(collect, url.URL{}, *setting.LogoURLLight)
+			if assert.NotNil(collect, setting.LogoURLLight) {
+				assert.Equal(collect, url.URL{}, *setting.LogoURLLight)
+			}
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
 	t.Run("test policy label logo dark added", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		uploadInstanceAsset(IAMCTX, t, newInstance, "/instance/policy/label/logo/dark", bytes.NewReader(picture))
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -505,10 +507,10 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy label logo dark removed", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.RemoveLabelPolicyLogoDark(IAMCTX, &admin.RemoveLabelPolicyLogoDarkRequest{})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		// check dark logo removed
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
@@ -522,16 +524,18 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.logo.dark.removed
-			assert.Equal(collect, url.URL{}, *setting.LogoURLDark)
+			if assert.NotNil(collect, setting.LogoURLDark) {
+				assert.Equal(collect, url.URL{}, *setting.LogoURLDark)
+			}
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
 	t.Run("test policy label icon light added", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		uploadInstanceAsset(IAMCTX, t, newInstance, "/instance/policy/label/icon", bytes.NewReader(picture))
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -551,9 +555,9 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy label icon dark added", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		uploadInstanceAsset(IAMCTX, t, newInstance, "/instance/policy/label/icon/dark", bytes.NewReader(picture))
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -574,10 +578,10 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 	t.Run("test policy label icon light removed", func(t *testing.T) {
 		// remote logo light
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.RemoveLabelPolicyIcon(IAMCTX, &admin.RemoveLabelPolicyIconRequest{})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		// check light icon removed
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
@@ -591,17 +595,19 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.icon.removed
-			assert.Equal(collect, url.URL{}, *setting.IconURLLight)
+			if assert.NotNil(collect, setting.IconURLLight) {
+				assert.Equal(collect, url.URL{}, *setting.IconURLLight)
+			}
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
 	t.Run("test policy label icon dark removed", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.RemoveLabelPolicyIconDark(IAMCTX, &admin.RemoveLabelPolicyIconDarkRequest{})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		// check dark icon removed
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
@@ -615,16 +621,18 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.icon.dark.removed
-			assert.Equal(collect, url.URL{}, *setting.IconURLDark)
+			if assert.NotNil(collect, setting.IconURLDark) {
+				assert.Equal(collect, url.URL{}, *setting.IconURLDark)
+			}
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
 	t.Run("test policy font added", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		uploadInstanceAsset(IAMCTX, t, newInstance, "/instance/policy/label/font", bytes.NewReader(font))
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -645,10 +653,10 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 	t.Run("test policy font removed", func(t *testing.T) {
 		// remote logo light
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.RemoveLabelPolicyFont(IAMCTX, &admin.RemoveLabelPolicyFontRequest{})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		// check font policy removed
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
@@ -662,7 +670,9 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.font.removed
-			assert.Equal(collect, url.URL{}, *setting.FontURL)
+			if assert.NotNil(collect, setting.FontURL) {
+				assert.Equal(collect, url.URL{}, *setting.FontURL)
+			}
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -736,9 +746,9 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 
 	settingsRepo := repository.PasswordComplexitySettingsRepository()
 
-	before := time.Now()
+	before := time.Now().Add(-time.Second)
 	newInstance := integration.NewInstance(t.Context())
-	after := time.Now()
+	after := time.Now().Add(time.Second)
 
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 	t.Run("test password complexity added", func(t *testing.T) {
@@ -765,7 +775,7 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test password complexity change", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.UpdatePasswordComplexityPolicy(IAMCTX, &admin.UpdatePasswordComplexityPolicyRequest{
 			MinLength:    5,
 			HasUppercase: false,
@@ -774,7 +784,7 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 			HasSymbol:    false,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -837,9 +847,9 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 	t.Parallel()
 
 	settingsRepo := repository.PasswordExpirySettingsRepository()
-	before := time.Now()
+	before := time.Now().Add(-time.Second)
 	newInstance := integration.NewInstance(t.Context())
-	after := time.Now()
+	after := time.Now().Add(time.Second)
 
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
@@ -863,13 +873,13 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test password policy changed", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.UpdatePasswordAgePolicy(IAMCTX, &admin.UpdatePasswordAgePolicyRequest{
 			MaxAgeDays:     30,
 			ExpireWarnDays: 30,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -929,9 +939,9 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 	t.Parallel()
 
 	settingsRepo := repository.DomainSettingsRepository()
-	before := time.Now()
+	before := time.Now().Add(-time.Second)
 	newInstance := integration.NewInstance(t.Context())
-	after := time.Now()
+	after := time.Now().Add(time.Second)
 
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
@@ -957,14 +967,14 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test domain policy changed", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.UpdateDomainPolicy(IAMCTX, &admin.UpdateDomainPolicyRequest{
 			UserLoginMustBeDomain:                  true,
 			ValidateOrgDomains:                     true,
 			SmtpSenderAddressMatchesInstanceDomain: true,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -1026,9 +1036,9 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 
 	settingsRepo := repository.LockoutSettingsRepository()
 
-	before := time.Now()
+	before := time.Now().Add(-time.Second)
 	newInstance := integration.NewInstance(t.Context())
-	after := time.Now()
+	after := time.Now().Add(time.Second)
 
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
@@ -1053,13 +1063,13 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test password policy changed", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.UpdateLockoutPolicy(IAMCTX, &admin.UpdateLockoutPolicyRequest{
 			MaxPasswordAttempts: 5,
 			MaxOtpAttempts:      5,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -1125,14 +1135,14 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 
 	t.Run("test security policy set", func(t *testing.T) {
 		// 1. set security policy
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
 			EnableIframeEmbedding: true,
 			AllowedOrigins:        []string{"value"},
 			EnableImpersonation:   true,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -1154,14 +1164,14 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 
 	t.Run("test security policy re-set", func(t *testing.T) {
 		// 2. re-set security policy
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
 			EnableIframeEmbedding: false,
 			AllowedOrigins:        []string{"new_value"},
 			EnableImpersonation:   false,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -1209,9 +1219,9 @@ func TestServer_TestInstanceNotificationSettingsReduces(t *testing.T) {
 
 	settingsRepo := repository.NotificationSettingsRepository()
 
-	before := time.Now()
+	before := time.Now().Add(-time.Second)
 	newInstance := integration.NewInstance(t.Context())
-	after := time.Now()
+	after := time.Now().Add(time.Second)
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
 	t.Run("test add notification settings set", func(t *testing.T) {
@@ -1232,12 +1242,12 @@ func TestServer_TestInstanceNotificationSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test add notification settings re-set", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.UpdateNotificationPolicy(IAMCTX, &admin.UpdateNotificationPolicyRequest{
 			PasswordChange: false,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1292,9 +1302,9 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 
 	settingsRepo := repository.LegalAndSupportSettingsRepository()
 
-	before := time.Now()
+	before := time.Now().Add(-time.Second)
 	newInstance := integration.NewInstance(t.Context())
-	after := time.Now()
+	after := time.Now().Add(time.Second)
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
 	t.Run("test add legal and support settings set", func(t *testing.T) {
@@ -1322,7 +1332,7 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test add legal and support settings re-set", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.UpdatePrivacyPolicy(IAMCTX, &admin.UpdatePrivacyPolicyRequest{
 			TosLink:        "https://tos.example2.com",
 			PrivacyLink:    "https://privacy.example2.com",
@@ -1333,7 +1343,7 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 			CustomLinkText: "Custom link text2",
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1481,7 +1491,7 @@ func TestServer_TestInstanceSecretGeneratorSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test secret generator settings update", func(t *testing.T) {
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.UpdateSecretGenerator(IAMCTX, &admin.UpdateSecretGeneratorRequest{
 			GeneratorType:       settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_INIT_CODE,
 			IncludeLowerLetters: true,
@@ -1489,7 +1499,7 @@ func TestServer_TestInstanceSecretGeneratorSettingsReduces(t *testing.T) {
 			Length:              uint32(8),
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {

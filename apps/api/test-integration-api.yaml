@@ -23,8 +23,14 @@ FirstInstance:
       PasswordChangeRequired: false
 
 Log:
-  Level: info
+  Level: warn
 
+Instrumentation:
+  Log:
+    Level: WARN
+    Format: text
+    Streams:
+      - runtime
 ExternalSecure: false
 
 TLS:
@@ -43,19 +49,19 @@ Caches:
     MaxAge: 5m
     LastUsage: 1m
     Log:
-      Level: info
+      Level: error
   Milestones:
     Connector: "postgres"
     MaxAge: 5m
     LastUsage: 1m
     Log:
-      Level: info
+      Level: error
   Organization:
     Connector: "redis"
     MaxAge: 5m
     LastUsage: 1m
     Log:
-      Level: info
+      Level: error
 
 Quotas:
   Access:
@@ -64,24 +70,25 @@ Quotas:
 Telemetry:
   Enabled: true
   Endpoints:
-  - http://localhost:8081/milestone
+  - http://127.0.0.1:8081/milestone
   Headers:
     single-value: "single-value"
     multi-value:
     - "multi-value-1"
     - "multi-value-2"
 
+
 LogStore:
   Execution:
     Stdout:
-      Enabled: true
+      Enabled: false
 
 Executions:
   DenyList: # ZITADEL_EXECUTIONS_DENYLIST (comma separated list)
 
 Projections:
   HandleActiveInstances: 30m
-  RequeueEvery: 20s
+  RequeueEvery: 1s
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 5s
@@ -127,6 +134,8 @@ SystemDefaults:
 OIDC:
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  DeviceAuth:
+    PollInterval: 1s # reduce from default 5s to speed up integration tests
 
 SAML:
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2

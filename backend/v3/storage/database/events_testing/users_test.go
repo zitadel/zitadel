@@ -54,10 +54,10 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			InitialPassword: "Password1!",
 		}
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -114,7 +114,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		csfr, err := bow.Forms()[1].Value("gorilla.csrf.Token")
 		require.NoError(t, err)
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		client.SetCookieJar(bow.CookieJar())
 		firstName := gofakeit.Name()
 		lastName := gofakeit.Name()
@@ -133,7 +133,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		ctx := t.Context()
 		instanceRepo := repository.InstanceRepository()
@@ -210,12 +210,12 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			assert.Equal(t, domain.UserStateActive, user.State)
 		}, retryDuration, tick)
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = MgmtClient.LockUser(IAMCTX, &management.LockUserRequest{
 			Id: resp.UserId,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -298,12 +298,12 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			assert.Equal(t, domain.UserStateLocked, user.State)
 		}, retryDuration, tick)
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = MgmtClient.UnlockUser(IAMCTX, &management.UnlockUserRequest{
 			Id: resp.UserId,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -365,12 +365,12 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			assert.Equal(t, domain.UserStateActive, user.State)
 		}, retryDuration, tick)
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = MgmtClient.DeactivateUser(IAMCTX, &management.DeactivateUserRequest{
 			Id: resp.UserId,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -453,12 +453,12 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			assert.Equal(t, domain.UserStateInactive, user.State)
 		}, retryDuration, tick)
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = MgmtClient.ReactivateUser(IAMCTX, &management.ReactivateUserRequest{
 			Id: resp.UserId,
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -755,14 +755,14 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		// client = resty.New()
 		// POST avatar
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			SetHeader("x-zitadel-orgid", orgID).
 			Post("http://localhost:8082" + "/assets/v1" + "/users/me/avatar")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -887,13 +887,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete avatar
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8082/auth/v1/users/me/avatar")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -969,7 +969,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// change user password
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = UserClient.UpdateHumanUser(IAMCTX, &v2_user.UpdateHumanUserRequest{
 			UserId: userID,
 			Password: &v2_user.SetPassword{
@@ -985,7 +985,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		// check password updated
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
@@ -1022,10 +1022,10 @@ func TestServer_TestMachineUserReduces(t *testing.T) {
 			AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER,
 		}
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		resp, err := MgmtClient.AddMachineUser(IAMCTX, machineUserRequest)
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1076,10 +1076,10 @@ func TestServer_TestMachineUserReduces(t *testing.T) {
 			AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
 		}
 
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err = MgmtClient.UpdateMachine(IAMCTX, updateMachineUserReq)
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*15)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {

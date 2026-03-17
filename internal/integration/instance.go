@@ -8,6 +8,8 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -29,6 +31,22 @@ import (
 // NotEmpty can be used as placeholder, when the returned values is unknown.
 // It can be used in tests to assert whether a value should be empty or not.
 const NotEmpty = "not empty"
+
+// newInstanceSem limits how many NewInstance calls run concurrently.
+// Each CreateInstance call generates ~50 projection events; bursting all
+// test packages simultaneously overwhelms the projection pipeline and causes
+// "not found" errors. Limiting to a small number lets workers keep pace.
+// Override with INTEGRATION_INSTANCE_CONCURRENCY env var.
+var newInstanceSem = make(chan struct{}, newInstanceConcurrency())
+
+func newInstanceConcurrency() int {
+	if s := os.Getenv("INTEGRATION_INSTANCE_CONCURRENCY"); s != "" {
+		if n, err := strconv.Atoi(s); err == nil && n > 0 {
+			return n
+		}
+	}
+	return 4
+}
 
 const (
 	adminPATFile = "admin-pat.txt"
@@ -106,6 +124,15 @@ type Instance struct {
 //
 // The instance is isolated and is safe for parallel testing.
 func NewInstance(ctx context.Context) *Instance {
+	// Acquire semaphore to prevent burst-creating too many instances at once,
+	// which overwhelms read-model projection workers.
+	select {
+	case newInstanceSem <- struct{}{}:
+		defer func() { <-newInstanceSem }()
+	case <-ctx.Done():
+		panic(ctx.Err())
+	}
+
 	primaryDomain := RandString(5) + ".integration.localhost"
 
 	ctx = WithSystemAuthorization(ctx)
@@ -130,6 +157,7 @@ func NewInstance(ctx context.Context) *Instance {
 	i.setClient(ctx)
 	i.awaitFirstUser(WithAuthorizationToken(ctx, resp.GetPat()))
 	i.setupInstance(ctx, resp.GetPat())
+	i.awaitReadProjections(ctx)
 	return i
 }
 
@@ -229,6 +257,46 @@ func (i *Instance) createLoginClient(ctx context.Context) {
 
 func (i *Instance) createMachineUserNoPermission(ctx context.Context) {
 	i.createMachineUser(ctx, UserTypeNoPermission)
+}
+
+// awaitReadProjections waits until the key read-model projections have caught
+// up to at least the last event written during setupInstance.  Under parallel
+// load many instances are set up concurrently and projection workers can fall
+// behind, causing "not found" errors in the first few test calls.
+//
+// We probe two independent projections:
+//  1. projections.users (via GetUserByID for UserTypeNoPermission — the last
+//     user written in setupInstance).
+//  2. projections.secret_generators (via ListSecretGenerators) — populated
+//     from instance-creation events and required by ImportHumanUser /
+//     AddHumanUser notification flows.
+func (i *Instance) awaitReadProjections(ctx context.Context) {
+	ownerCtx := i.WithAuthorizationToken(ctx, UserTypeIAMOwner)
+	userID := i.Users.Get(UserTypeNoPermission).ID
+
+	// Wait for projections.users
+	mustAwait(func() error {
+		_, err := i.Client.UserV2.GetUserByID(ownerCtx, &user_v2.GetUserByIDRequest{
+			UserId: userID,
+		})
+		if err != nil {
+			logging.WithError(err).Debug("await users projection")
+		}
+		return err
+	})
+
+	// Wait for projections.secret_generators
+	mustAwait(func() error {
+		resp, err := i.Client.Admin.ListSecretGenerators(ownerCtx, &admin.ListSecretGeneratorsRequest{})
+		if err != nil {
+			logging.WithError(err).Debug("await secret_generators projection")
+			return err
+		}
+		if len(resp.GetResult()) == 0 {
+			return errors.New("secret_generators projection not yet ready")
+		}
+		return nil
+	})
 }
 
 func (i *Instance) setClient(ctx context.Context) {

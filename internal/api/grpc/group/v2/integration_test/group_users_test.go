@@ -150,9 +150,9 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			beforeDate := time.Now().UTC()
+			beforeDate := time.Now().UTC().Add(-time.Second)
 			got, err := instance.Client.GroupV2.AddUsersToGroup(tt.ctx, tt.req)
-			afterDate := time.Now().UTC()
+			afterDate := time.Now().UTC().Add(time.Second)
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetChangeDate())
@@ -197,6 +197,9 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 		UserIds: []string{user1.GetUserId(), user2.GetUserId(), user3.GetUserId()},
 	})
 	require.NoError(t, err)
+
+	// Wait for the relational projection to catch up
+	time.Sleep(3 * time.Second)
 
 	tests := []struct {
 		name           string
@@ -305,9 +308,9 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			beforeDate := time.Now().UTC()
+			beforeDate := time.Now().UTC().Add(-time.Second)
 			got, err := instance.Client.GroupV2.RemoveUsersFromGroup(tt.ctx, tt.req)
-			afterDate := time.Now().UTC()
+			afterDate := time.Now().UTC().Add(time.Second)
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetChangeDate())

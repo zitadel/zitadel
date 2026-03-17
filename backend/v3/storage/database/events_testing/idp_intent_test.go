@@ -118,7 +118,7 @@ package events_test
 // 	})
 
 // 	t.Run("when successful oidc intent should update intent state to succeeded", func(t *testing.T) {
-// 		beforeCreate := time.Now()
+// 		beforeCreate := time.Now().Add(-time.Second)
 // 		idpCreateReq := defaultOIDCIDReq(gofakeit.Name(), true)
 // 		idpCreateReq.Issuer = "http://localhost:8082"
 // 		oidcIDP, err := AdminClient.AddOIDCIDP(IAMCTX, idpCreateReq)
@@ -127,7 +127,7 @@ package events_test
 // 		expiryDate := time.Now().Add(time.Minute * 30)
 // 		idpIntentID, _, _, _, err := sink.SuccessfulOIDCIntent(instanceID, oidcIDP.GetIdpId(), "some-idp-user", "some-user", expiryDate)
 // 		require.NoError(t, err)
-// 		afterSuccess := time.Now()
+// 		afterSuccess := time.Now().Add(time.Second)
 // 		t.Cleanup(func() {
 // 			idpIntentRepo.Delete(IAMCTX, pool, idpIntentRepo.PrimaryKeyCondition(instanceID, idpIntentID))
 // 			AdminClient.RemoveIDP(IAMCTX, &admin.RemoveIDPRequest{IdpId: oidcIDP.GetIdpId()})
@@ -155,14 +155,14 @@ package events_test
 // 	})
 
 // 	t.Run("when successful SAML intent should update intent state to succeeded", func(t *testing.T) {
-// 		beforeCreate := time.Now()
+// 		beforeCreate := time.Now().Add(-time.Second)
 // 		samlIDP, err := AdminClient.AddSAMLProvider(IAMCTX, defaultInstanceSAMLRequest(gofakeit.Name(), gu.Ptr(true)))
 // 		require.NoError(t, err)
 
 // 		expiryDate := time.Now().Add(time.Minute * 30)
 // 		idpIntentID, _, _, _, err := sink.SuccessfulSAMLIntent(instanceID, samlIDP.GetId(), "some-idp-user", "some-user", "", expiryDate)
 // 		require.NoError(t, err)
-// 		afterSuccess := time.Now()
+// 		afterSuccess := time.Now().Add(time.Second)
 // 		t.Cleanup(func() {
 // 			idpIntentRepo.Delete(IAMCTX, pool, idpIntentRepo.PrimaryKeyCondition(instanceID, idpIntentID))
 // 			AdminClient.RemoveIDP(IAMCTX, &admin.RemoveIDPRequest{IdpId: samlIDP.GetId()})
@@ -238,7 +238,7 @@ package events_test
 // 	})
 
 // 	t.Run("when LDAP intent flow fails should update intent state and reason", func(t *testing.T) {
-// 		beforeCreate := time.Now()
+// 		beforeCreate := time.Now().Add(-time.Second)
 // 		ldapProvider, err := AdminClient.AddLDAPProvider(IAMCTX, defaultInstanceLDAPRequest(gofakeit.Name()))
 // 		require.NoError(t, err)
 
@@ -253,7 +253,7 @@ package events_test
 // 		}
 // 		_, err = UserClient.StartIdentityProviderIntent(IAMCTX, req)
 // 		require.Error(t, err)
-// 		afterFail := time.Now()
+// 		afterFail := time.Now().Add(time.Second)
 
 // 		var idpIntentID string
 // 		t.Cleanup(func() {

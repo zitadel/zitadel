@@ -24,14 +24,14 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 	orgRepo := repository.OrganizationRepository()
 
 	t.Run("test org add reduces", func(t *testing.T) {
-		beforeCreate := time.Now()
+		beforeCreate := time.Now().Add(-time.Second)
 		orgName := gofakeit.Name()
 
 		org, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
 			Name: orgName,
 		})
 		require.NoError(t, err)
-		afterCreate := time.Now()
+		afterCreate := time.Now().Add(time.Second)
 
 		t.Cleanup(func() {
 			_, err = OrgClient.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{
@@ -78,14 +78,14 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		})
 
 		// 2. update org name
-		beforeUpdate := time.Now()
+		beforeUpdate := time.Now().Add(-time.Second)
 		orgName = orgName + "_new"
 		_, err = OrgClient.UpdateOrganization(CTX, &v2beta_org.UpdateOrganizationRequest{
 			Id:   organization.Id,
 			Name: orgName,
 		})
 		require.NoError(t, err)
-		afterUpdate := time.Now()
+		afterUpdate := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -119,13 +119,13 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		})
 
 		// 2. deactivate org name
-		beforeDeactivate := time.Now()
+		beforeDeactivate := time.Now().Add(-time.Second)
 		_, err = OrgClient.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
 			Id: organization.Id,
 		})
 
 		require.NoError(t, err)
-		afterDeactivate := time.Now()
+		afterDeactivate := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -176,12 +176,12 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// 4. activate org name
-		beforeActivate := time.Now()
+		beforeActivate := time.Now().Add(-time.Second)
 		_, err = OrgClient.ActivateOrganization(CTX, &v2beta_org.ActivateOrganizationRequest{
 			Id: organization.Id,
 		})
 		require.NoError(t, err)
-		afterActivate := time.Now()
+		afterActivate := time.Now().Add(time.Second)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {

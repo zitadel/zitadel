@@ -23,7 +23,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 	t.Run("test organization metadata add reduces", func(t *testing.T) {
 		// Add a metadata to the organization
 		org := createTestScopedOrg(t)
-		beforeAdd := time.Now()
+		beforeAdd := time.Now().Add(-time.Second)
 		_, err := OrgClient.SetOrganizationMetadata(CTX, &v2beta.SetOrganizationMetadataRequest{
 			OrganizationId: org.GetId(),
 			Metadata: []*v2beta.Metadata{
@@ -50,7 +50,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-		afterAdd := time.Now()
+		afterAdd := time.Now().Add(time.Second)
 
 		// Test that metadata add reduces
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
@@ -111,7 +111,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 	t.Run("ensure update works", func(t *testing.T) {
 		// Add a metadata to the organization
 		org := createTestScopedOrg(t)
-		beforeAdd := time.Now()
+		beforeAdd := time.Now().Add(-time.Second)
 		_, err := OrgClient.SetOrganizationMetadata(CTX, &v2beta.SetOrganizationMetadataRequest{
 			OrganizationId: org.GetId(),
 			Metadata: []*v2beta.Metadata{
@@ -122,7 +122,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-		afterAdd := time.Now()
+		afterAdd := time.Now().Add(time.Second)
 
 		// Test that metadata add reduces
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
@@ -149,6 +149,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		assert.WithinRange(t, gottenMetadata[0].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[0].UpdatedAt, beforeAdd, afterAdd)
 
+		beforeUpdate := time.Now().Add(-time.Second)
 		_, err = OrgClient.SetOrganizationMetadata(CTX, &v2beta.SetOrganizationMetadataRequest{
 			OrganizationId: org.GetId(),
 			Metadata: []*v2beta.Metadata{
@@ -159,7 +160,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-		afterUpdate := time.Now()
+		afterUpdate := time.Now().Add(time.Second)
 
 		// Test that metadata add reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
@@ -184,7 +185,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		assert.Equal(t, "test-1-bool", gottenMetadata[0].Key)
 		assert.Equal(t, []byte(`true`), gottenMetadata[0].Value)
 		assert.WithinRange(t, gottenMetadata[0].CreatedAt, beforeAdd, afterAdd)
-		assert.WithinRange(t, gottenMetadata[0].UpdatedAt, afterAdd, afterUpdate)
+		assert.WithinRange(t, gottenMetadata[0].UpdatedAt, beforeUpdate, afterUpdate)
 	})
 
 	t.Run("test org metadata remove reduces", func(t *testing.T) {

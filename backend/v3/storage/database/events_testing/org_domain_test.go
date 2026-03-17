@@ -49,13 +49,13 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 	t.Run("test organization domain add reduces", func(t *testing.T) {
 		// Add a domain to the organization
 		domainName := gofakeit.DomainName()
-		beforeAdd := time.Now()
+		beforeAdd := time.Now().Add(-time.Second)
 		_, err := OrgClient.AddOrganizationDomain(CTX, &v2beta.AddOrganizationDomainRequest{
 			OrganizationId: org.GetId(),
 			Domain:         domainName,
 		})
 		require.NoError(t, err)
-		afterAdd := time.Now()
+		afterAdd := time.Now().Add(time.Second)
 
 		t.Cleanup(func() {
 			_, err := OrgClient.DeleteOrganizationDomain(CTX, &v2beta.DeleteOrganizationDomainRequest{

@@ -39,7 +39,7 @@ import (
 const (
 	port       = "8081"
 	listenAddr = "127.0.0.1:" + port
-	host       = "localhost:" + port
+	host       = "127.0.0.1:" + port
 )
 
 // CallURL returns the full URL to the handler of a [Channel].

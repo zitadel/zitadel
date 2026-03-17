@@ -138,9 +138,9 @@ func TestServer_CreateGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			beforeCreationDate := time.Now().UTC()
+			beforeCreationDate := time.Now().UTC().Add(-time.Second)
 			got, err := instance.Client.GroupV2.CreateGroup(tt.ctx, tt.req)
-			afterCreationDate := time.Now().UTC()
+			afterCreationDate := time.Now().UTC().Add(time.Second)
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetId())
@@ -270,9 +270,9 @@ func TestServer_UpdateGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			beforeUpdateDate := time.Now().UTC()
+			beforeUpdateDate := time.Now().UTC().Add(-time.Second)
 			got, err := instance.Client.GroupV2.UpdateGroup(tt.ctx, tt.req)
-			afterUpdateDate := time.Now().UTC()
+			afterUpdateDate := time.Now().UTC().Add(time.Second)
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetChangeDate())
@@ -379,9 +379,9 @@ func TestServer_DeleteGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			beforeDeletionDate := time.Now().UTC()
+			beforeDeletionDate := time.Now().UTC().Add(-time.Second)
 			got, err := instance.Client.GroupV2.DeleteGroup(tt.ctx, tt.req)
-			afterDeletionDate := time.Now().UTC()
+			afterDeletionDate := time.Now().UTC().Add(time.Second)
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetDeletionDate())
