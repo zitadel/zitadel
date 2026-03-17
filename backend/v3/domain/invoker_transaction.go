@@ -19,6 +19,9 @@ func NewTransactionInvoker(next Invoker) *transactionInvoker {
 
 // Transactional is implemented by [Commander]s and [Querier]s wishing to access the DB inside a transaction.
 //
+// It is NOT recommended to use this when non-DB operation inside a transaction take time (e.g. password hash verification).
+// In that case, it is advisable to manually manage the transaction by type asserting [database.Beginner] on db.DB()
+//
 //go:generate mockgen -destination=mock/transactional.mock.go -package=domainmock . Transactional
 type Transactional interface {
 	RequiresTransaction()

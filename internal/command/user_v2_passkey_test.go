@@ -326,6 +326,68 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 			},
 			want: user.NewHumanPasswordlessInitCodeCheckSucceededEvent(ctx, userAgg, "123"),
 		},
+		{
+			name: "expired error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithCreationDate(
+							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
+								userAgg, "123", code.Crypted, time.Minute, "", false,
+							),
+							time.Now().Add(-2*time.Minute),
+						),
+						eventFromEventPusherWithCreationDate(
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
+							time.Now().Add(-2*time.Minute),
+						),
+					),
+					expectPush(
+						user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, "123"),
+					),
+				),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				codeID:        "123",
+				code:          code.Plain,
+			},
+			wantErr: zerrors.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid"),
+		},
+		{
+			// https://github.com/zitadel/zitadel/security/advisories/GHSA-2x66-r53r-9r86
+			name: "expired, fail, check again",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithCreationDate(
+							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
+								userAgg, "123", code.Crypted, time.Minute, "", false,
+							),
+							time.Now().Add(-2*time.Minute),
+						),
+						eventFromEventPusherWithCreationDate(
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
+							time.Now().Add(-2*time.Minute),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, "123"),
+						),
+					),
+					expectPush(
+						user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, "123"),
+					),
+				),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				codeID:        "123",
+				code:          code.Plain,
+			},
+			wantErr: zerrors.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

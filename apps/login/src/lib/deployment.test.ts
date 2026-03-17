@@ -1,5 +1,5 @@
-import { describe, expect, test, beforeEach, afterEach } from "vitest";
-import { hasSystemUserCredentials, hasServiceUserToken, hasLoginServiceKey, getLoginSystemUserId } from "./deployment";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { getLoginSystemUserId, hasLoginServiceKey, hasServiceUserToken, hasSystemUserCredentials } from "./deployment";
 
 describe("Deployment utilities", () => {
   const originalEnv = process.env;

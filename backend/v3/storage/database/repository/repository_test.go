@@ -186,7 +186,7 @@ func createProjectGrant(t *testing.T, tx database.Transaction, instanceID, grant
 	return projectGrant.ID
 }
 
-func createIdentityProvider(t *testing.T, tx database.Transaction, instanceID, orgID string) string {
+func createIdentityProvider(t *testing.T, tx database.QueryExecutor, instanceID, orgID string) string {
 	t.Helper()
 	idp := domain.IdentityProvider{
 		InstanceID:        instanceID,
@@ -199,7 +199,7 @@ func createIdentityProvider(t *testing.T, tx database.Transaction, instanceID, o
 		AllowAutoCreation: true,
 		AllowAutoUpdate:   true,
 		AllowLinking:      true,
-		StylingType:       &stylingType,
+		AutoLinkingField:  gu.Ptr(domain.IDPAutoLinkingFieldEmail),
 		Payload:           []byte("{}"),
 	}
 	idpRepo := repository.IDProviderRepository()

@@ -1,6 +1,6 @@
 import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
-import { getHostedLoginTranslation, getAllowedLanguages } from "@/lib/zitadel";
+import { getAllowedLanguages, getHostedLoginTranslation } from "@/lib/zitadel";
 import { JsonObject } from "@zitadel/client";
 import deepmerge from "deepmerge";
 import { getRequestConfig } from "next-intl/server";
@@ -52,7 +52,7 @@ export default getRequestConfig(async () => {
 
   const i18nOrganization = _headers.get("x-zitadel-i18n-organization") || ""; // You may need to set this header in middleware
 
-  let translations: JsonObject | {} = {};
+  let translations: JsonObject | Record<string, never> = {};
   try {
     const i18nJSON = await getHostedLoginTranslation({
       serviceConfig,
