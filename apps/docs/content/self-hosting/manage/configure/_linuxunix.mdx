@@ -52,15 +52,8 @@ zitadel start-from-init \
 ### Configure by Environment Variables
 
 ```bash
-# Set runtime environment variables
-export ZITADEL_DATABASE_POSTGRES_HOST=my.database
-export ZITADEL_DATABASE_POSTGRES_PORT=5432
-export ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
-export ZITADEL_DATABASE_POSTGRES_USER_USERNAME=my_zitadel_db_user
-export ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=Secret_DB_User_Password
-export ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
-export ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
-export ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
+# Set the PostgreSQL connection via a single DSN
+export ZITADEL_DATABASE_POSTGRES_DSN=postgresql://my_zitadel_db_user:Secret_DB_User_Password@my.database:5432/zitadel?sslmode=disable
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME="root"
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
 
