@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -24,11 +23,11 @@ type CheckRecoveryCode struct {
 
 type RecoveryCodeCheckCommand struct {
 	CheckRecoveryCode *CheckRecoveryCode
-	Hasher            *crypto.Hasher
 
 	SessionID  string
 	InstanceID string
 
+	verify  verifierFn
 	session *Session
 	user    *User
 
@@ -45,12 +44,16 @@ type RecoveryCodeCheckCommand struct {
 //
 // The check will update the existing session or return an error if the session
 // is not found or validation fails.
-func NewRecoveryCodeCheckCommand(sessionID, instanceID string, check *CheckRecoveryCode, hasher *crypto.Hasher) *RecoveryCodeCheckCommand {
+func NewRecoveryCodeCheckCommand(sessionID, instanceID string, check *CheckRecoveryCode, verifier verifierFn) *RecoveryCodeCheckCommand {
+	if verifier == nil {
+		verifier = passwordHasher.Verify
+	}
+
 	return &RecoveryCodeCheckCommand{
 		SessionID:         sessionID,
 		InstanceID:        instanceID,
 		CheckRecoveryCode: check,
-		Hasher:            hasher,
+		verify:            verifier,
 	}
 }
 
@@ -63,16 +66,21 @@ func (rc *RecoveryCodeCheckCommand) Validate(ctx context.Context, opts *InvokeOp
 
 	// precondition checks
 	if rc.CheckRecoveryCode.RecoveryCode == "" {
-		return zerrors.ThrowInvalidArgument(nil, "DOM-cEKxoG", "Errors.user.MFA.RecoveryCodes.Empty")
+		return zerrors.ThrowInvalidArgument(nil, "DOM-cEKxoG", "Errors.User.MFA.RecoveryCodes.Empty")
 	}
 	if rc.SessionID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-hsbVyd", "Errors.session.IDMissing")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-hsbVyd", "Errors.Session.IDMissing")
 	}
 	if rc.InstanceID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-lGIe1v", "Errors.Instance.IDMissing")
 	}
 
-	// todo: review permission check
+	// check if the password hash verifier is set
+	if rc.verify == nil {
+		return zerrors.ThrowInternal(nil, "DOM-rhMvn5", "Errors.Internal")
+	}
+
+	// (@grvijayan) todo: review permission check
 
 	// get session
 	sessionRepo := opts.sessionRepo
@@ -83,13 +91,13 @@ func (rc *RecoveryCodeCheckCommand) Validate(ctx context.Context, opts *InvokeOp
 	)
 	if err != nil {
 		if errors.Is(err, &database.NoRowFoundError{}) {
-			return zerrors.ThrowNotFound(err, "DOM-Ot3qO6", "Errors.session.NotFound")
+			return zerrors.ThrowNotFound(err, "DOM-Ot3qO6", "Errors.Session.NotFound")
 		}
 		return zerrors.ThrowInternal(err, "DOM-2sF2kF", "Errors.Internal")
 	}
 
 	if retrievedSession.UserID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "DOM-EaLqwq", "Errors.user.UserIDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "DOM-EaLqwq", "Errors.User.UserIDMissing")
 	}
 
 	// get the user from the session
@@ -98,24 +106,23 @@ func (rc *RecoveryCodeCheckCommand) Validate(ctx context.Context, opts *InvokeOp
 		ctx,
 		opts.DB(),
 		database.WithCondition(userRepo.IDCondition(retrievedSession.UserID)),
+		database.WithResultLock(),
 	)
 	if err != nil {
 		if errors.Is(err, &database.NoRowFoundError{}) {
-			return zerrors.ThrowNotFound(err, "DOM-Ot3qO6", "Errors.user.NotFound")
+			return zerrors.ThrowNotFound(err, "DOM-Ot3qO6", "Errors.User.NotFound")
 		}
 		return zerrors.ThrowInternal(err, "DOM-7sWTNf", "Errors.Internal")
 	}
 
 	// check user state
-	// todo: review: checked twice in the eventstore model
 	if retrievedUser.State == UserStateLocked {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-47H1Ii", "Errors.user.Locked")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-47H1Ii", "Errors.User.Locked")
 	}
 
 	// check user MFA state
-	// todo: review MFA state check
 	if retrievedUser.Human == nil || retrievedUser.Human.RecoveryCodes == nil || len(retrievedUser.Human.RecoveryCodes.Codes) == 0 {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-tzN2a1", "Errors.user.MFA.RecoveryCodes.NotReady")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-tzN2a1", "Errors.User.MFA.RecoveryCodes.NotReady")
 	}
 
 	rc.session = retrievedSession
@@ -131,12 +138,11 @@ func (rc *RecoveryCodeCheckCommand) Execute(ctx context.Context, opts *InvokeOpt
 		return nil
 	}
 
-	hashedRecoveryCode, checkErr := validateRecoveryCode(rc.CheckRecoveryCode.RecoveryCode, rc.user.Human.RecoveryCodes.Codes, rc.Hasher)
+	hashedRecoveryCode, checkErr := validateRecoveryCode(rc.CheckRecoveryCode.RecoveryCode, rc.user.Human.RecoveryCodes.Codes, rc.verify)
 	if checkErr != nil {
 		err = rc.handleRecoveryCodeCheckFailed(ctx, opts)
-		if err != nil {
-			return errors.Join(checkErr, err) // todo: or just log the update error?
-		}
+		// logging the update error and returning the original error related to recovery code verification
+		logging.OnError(err).Error("failed to update user and session after recovery code check failure")
 		return checkErr
 	}
 
@@ -156,7 +162,8 @@ func (rc *RecoveryCodeCheckCommand) Events(ctx context.Context, _ *InvokeOpts) (
 				ctx,
 				&user.NewAggregate(rc.user.ID, rc.user.OrganizationID).Aggregate,
 				nil,
-			))
+			),
+		)
 		if rc.userLocked {
 			events = append(events,
 				user.NewUserLockedEvent(
@@ -195,27 +202,28 @@ func (rc *RecoveryCodeCheckCommand) handleRecoveryCodeCheckFailed(ctx context.Co
 	checkTime := time.Now()
 
 	lockoutPolicy, err := getLockoutPolicy(ctx, opts, rc.InstanceID, rc.user.OrganizationID)
-	logging.OnError(err).Error("failed to get lockout policy") // todo: review
+	logging.OnError(err).Error("failed to get lockout policy")
 
 	// update user state and recovery_code_failed_attempts
-	userRepo := opts.userRepo.Human()
+	humanRepo := opts.userRepo.Human()
 	userUpdates := make([]database.Change, 0, 2)
 
 	// update recovery_code_failed_attempts for the user
-	userUpdates = append(userUpdates, userRepo.IncrementRecoveryCodeFailedAttempts())
+	userUpdates = append(userUpdates, humanRepo.IncrementRecoveryCodeFailedAttempts())
 
 	// update the user's state to locked if the failed recovery code check attempts exceed the configured max value
 	if lockoutPolicy != nil &&
 		lockoutPolicy.MaxOTPAttempts != nil &&
 		*lockoutPolicy.MaxOTPAttempts > 0 &&
 		(uint64(rc.user.Human.RecoveryCodes.FailedAttempts)+1 >= *lockoutPolicy.MaxOTPAttempts) {
-		userUpdates = append(userUpdates, userRepo.SetState(UserStateLocked))
+		userUpdates = append(userUpdates, humanRepo.SetState(UserStateLocked))
 		rc.userLocked = true
 	}
 
 	err = rc.updateUser(
 		ctx,
 		opts,
+		humanRepo,
 		userUpdates...,
 	)
 	if err != nil {
@@ -245,12 +253,13 @@ func (rc *RecoveryCodeCheckCommand) handleRecoveryCodeCheckSucceeded(ctx context
 
 	// update the recovery_code_last_successful_check timestamp for the user
 	// and remove the used recovery code from the user's list of recovery codes
-	userRepo := opts.userRepo.Human()
+	humanRepo := opts.userRepo.Human()
 	err := rc.updateUser(
 		ctx,
 		opts,
-		userRepo.SetLastSuccessfulRecoveryCodeCheck(checkTime),
-		userRepo.RemoveRecoveryCode(hashedRecoveryCode),
+		humanRepo,
+		humanRepo.SetLastSuccessfulRecoveryCodeCheck(checkTime),
+		humanRepo.RemoveRecoveryCode(hashedRecoveryCode),
 	)
 	if err != nil {
 		return err
@@ -286,10 +295,10 @@ func (rc *RecoveryCodeCheckCommand) updateSession(ctx context.Context, opts *Inv
 		changes...,
 	)
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-fhR4N3", "session update failed") // todo: review error message format
+		return zerrors.ThrowInternal(err, "DOM-fhR4N3", "session update failed") // (@grvijayan) todo: review error message format
 	}
 	if updateCount == 0 {
-		return zerrors.ThrowNotFound(nil, "DOM-Frnwxt", "Errors.session.NotFound")
+		return zerrors.ThrowNotFound(nil, "DOM-Frnwxt", "Errors.Session.NotFound")
 	}
 	if updateCount > 1 {
 		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-gYp8tG", "unexpected number of rows updateCount")
@@ -297,37 +306,44 @@ func (rc *RecoveryCodeCheckCommand) updateSession(ctx context.Context, opts *Inv
 	return nil
 }
 
-func (rc *RecoveryCodeCheckCommand) updateUser(ctx context.Context, opts *InvokeOpts, changes ...database.Change) error {
-	userRepo := opts.userRepo.Human()
-	updateCount, err := userRepo.Update(
+func (rc *RecoveryCodeCheckCommand) updateUser(
+	ctx context.Context,
+	opts *InvokeOpts,
+	humanRepo HumanUserRepository,
+	changes ...database.Change,
+) error {
+	updateCount, err := humanRepo.Update(
 		ctx,
 		opts.DB(),
-		userRepo.PrimaryKeyCondition(rc.InstanceID, rc.user.ID),
+		humanRepo.PrimaryKeyCondition(rc.InstanceID, rc.user.ID),
 		changes...,
 	)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "DOM-XGf3Tk", "user update failed")
 	}
 	if updateCount == 0 {
-		return zerrors.ThrowNotFound(nil, "DOM-hQu5ns", "Errors.user.NotFound")
+		return zerrors.ThrowNotFound(nil, "DOM-hQu5ns", "Errors.User.NotFound")
 	}
 	if updateCount > 1 {
 		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-EWjTOH", "Errors.Internal")
 	}
 	return nil
+
 }
 
-// todo: review: duplicated from the domain layer
-func validateRecoveryCode(reqRecoveryCode string, recoveryCodes []string, hasher *crypto.Hasher) (string, error) {
+func validateRecoveryCode(reqRecoveryCode string, recoveryCodes []string, verify verifierFn) (string, error) {
 	if reqRecoveryCode == "" {
-		return "", zerrors.ThrowInvalidArgument(nil, "DOM-dk1MaX", "Errors.user.MFA.RecoveryCodes.InvalidCode")
+		return "", zerrors.ThrowInvalidArgument(nil, "DOM-dk1MaX", "Errors.User.MFA.RecoveryCodes.InvalidCode")
 	}
+	var matchedCode string
 	for _, recoveryCode := range recoveryCodes {
-		_, verifyErr := hasher.Verify(recoveryCode, reqRecoveryCode)
-		if verifyErr != nil {
-			continue
+		_, err := verify(recoveryCode, reqRecoveryCode)
+		if err == nil && matchedCode == "" {
+			matchedCode = recoveryCode
 		}
-		return recoveryCode, nil
 	}
-	return "", zerrors.ThrowInvalidArgument(nil, "DOM-845kaq", "Errors.user.MFA.RecoveryCodes.InvalidCode")
+	if matchedCode != "" {
+		return matchedCode, nil
+	}
+	return "", zerrors.ThrowInvalidArgument(nil, "DOM-845kaq", "Errors.User.MFA.RecoveryCodes.InvalidCode")
 }

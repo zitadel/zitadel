@@ -20,6 +20,7 @@ import (
 //
 // The input is the number of failed attempts after which the tarpit is started
 type tarpitFn func(failedAttempts uint64)
+type verifierFn func(encoded, password string) (updated string, err error)
 
 type CheckPasswordType struct {
 	Password string
@@ -31,7 +32,7 @@ type PasswordCheckCommand struct {
 	SessionID  string
 	InstanceID string
 	TarpitFunc tarpitFn
-	VerifierFn func(encoded, password string) (updated string, err error)
+	VerifierFn verifierFn
 
 	FetchedUser      User
 	UpdatedHashedPsw string
@@ -234,7 +235,7 @@ func (p *PasswordCheckCommand) GetPasswordCheckAndError(err error) (Verification
 		err = zerrors.ThrowInvalidArgument(
 			NewPasswordVerificationError(p.FetchedUser.Human.Password.FailedAttempts+1),
 			"DOM-3gcfDV",
-			"Errors.user.Password.Invalid",
+			"Errors.User.Password.Invalid",
 		)
 		return &VerificationTypeFailed{FailedAt: p.CheckTime}, err
 	}
@@ -272,13 +273,13 @@ func (p *PasswordCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 	}
 
 	if session.UserID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-hord0Z", "Errors.user.UserIDMissing")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-hord0Z", "Errors.User.UserIDMissing")
 	}
 
 	user, err := userRepo.Get(ctx, opts.DB(), database.WithCondition(userRepo.IDCondition(session.UserID)))
 	if err != nil {
 		if errors.Is(err, &database.NoRowFoundError{}) {
-			return zerrors.ThrowNotFound(err, "DOM-zxKosn", "Errors.user.NotFound")
+			return zerrors.ThrowNotFound(err, "DOM-zxKosn", "Errors.User.NotFound")
 		}
 		return zerrors.ThrowInternal(err, "DOM-nKD4Gq", "failed fetching user")
 	}
@@ -291,12 +292,12 @@ func (p *PasswordCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 		return zerrors.ThrowPreconditionFailedf(
 			NewPasswordVerificationError(user.Human.Password.FailedAttempts),
 			"DOM-D804Sj",
-			"Errors.user.Locked",
+			"Errors.User.Locked",
 		)
 	}
 
 	if human.Password.Hash == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-gklgos", "Errors.user.Password.NotSet")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-gklgos", "Errors.User.Password.NotSet")
 	}
 
 	p.FetchedUser = *user
