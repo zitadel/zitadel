@@ -80,25 +80,31 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	}
 }
 
-func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, clientID string, reqScope []string) (scope, audience []string, err error) {
+func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, clientID string, reqScope []string) (scope, audience []string, orgID string, err error) {
 	project, err := o.query.ProjectByClientID(ctx, clientID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
+
+	orgID, err = o.assertOrgScope(ctx, reqScope)
+	if err != nil {
+		return nil, nil, "", err
+	}
+
 	scope, err = o.assertProjectRoleScopesByProject(ctx, project, reqScope)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
 	audience, err = o.audienceFromProjectID(ctx, project.ID)
 	audience = domain.AddAudScopeToAudience(ctx, audience, scope)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
-	return scope, audience, nil
+	return scope, audience, orgID, nil
 }
 
 func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.AuthRequest, hintUserID, loginClient string) (op.AuthRequest, error) {
-	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
+	scope, audience, orgID, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
 	if err != nil {
 		return nil, err
 	}
@@ -118,6 +124,7 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		UILocales:        UILocalesToBusiness(req.UILocales),
 		MaxAge:           MaxAgeToBusiness(req.MaxAge),
 		Issuer:           o.contextToIssuer(ctx),
+		OrganizationID:   orgID,
 	}
 	if req.LoginHint != "" {
 		authRequest.LoginHint = &req.LoginHint
@@ -138,7 +145,8 @@ func (o *OPStorage) createAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if !ok {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
-	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
+	// we do not need to handle the orgID for the v1 login, since it handles it already
+	scope, audience, _, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
 	if err != nil {
 		return nil, err
 	}
@@ -528,6 +536,39 @@ func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, to
 		return "", "", oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
 	}
 	return refreshToken.UserID, refreshToken.ID, nil
+}
+
+// assertOrgScope checks the scopes for organization scopes and returns the orgID if exactly one org scope is found.
+// If multiple org scopes are found or if the org scope is invalid, an error is returned.
+// For backwards compatibility, we support both orgID and orgDomain scopes, but they need to be consistent,
+// meaning that if both are provided, they need to belong to the same organization.
+func (o *OPStorage) assertOrgScope(ctx context.Context, scopes []string) (string, error) {
+	var id string
+	for _, scope := range scopes {
+		if orgID, ok := strings.CutPrefix(scope, domain.OrgIDScope); ok {
+			org, err := o.query.OrgByID(ctx, orgID)
+			if err != nil {
+				return "", err
+			}
+			if id != "" && id != org.ID {
+				return "", oidc.ErrInvalidScope().WithDescription("Only one organization scope may be provided")
+			}
+			id = org.ID
+			continue
+		}
+
+		if orgDomain, ok := strings.CutPrefix(scope, domain.OrgDomainPrimaryScope); ok {
+			org, err := o.query.OrgByPrimaryDomain(ctx, orgDomain)
+			if err != nil {
+				return "", err
+			}
+			if id != "" && id != org.ID {
+				return "", oidc.ErrInvalidScope().WithDescription("Only one organization scope may be provided")
+			}
+			id = org.ID
+		}
+	}
+	return id, nil
 }
 
 func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, project *query.Project, scopes []string) ([]string, error) {
