@@ -36,6 +36,14 @@ type PasskeyCheckCommand struct {
 	PKeySignCount uint32
 }
 
+// NewPasskeyCheckCommand initializes a new [PasskeyCheckCommand]
+//
+// If finishLoginFn is nil, [webauthn.FinishLoginWithNewDomainModel] will be used.
+//
+// assertionData is passkey assertion required for validation
+//
+// The command does not implement [Transactional] due finishLoginFn that might take a long time to execute.
+// So the DB transaction will be started only after finishLoginFn has been run.
 func NewPasskeyCheckCommand(sessionID, instanceID string, assertionData []byte, finishLoginFn FinishLoginFunc) *PasskeyCheckCommand {
 	pcc := &PasskeyCheckCommand{
 		CheckPasskey:  assertionData,
@@ -50,9 +58,6 @@ func NewPasskeyCheckCommand(sessionID, instanceID string, assertionData []byte, 
 
 	return pcc
 }
-
-// RequiresTransaction implements [Transactional].
-func (p *PasskeyCheckCommand) RequiresTransaction() {}
 
 // Events implements [Commander].
 func (p *PasskeyCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
@@ -111,9 +116,25 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-uuxodH", "Errors.User.WebAuthN.NotFound")
 	}
 
+	beginner, ok := opts.DB().(database.Beginner)
+	if !ok {
+		return zerrors.ThrowInternal(nil, "DOM-LqxZbk", "database doesn't implement database.Beginner")
+	}
+
+	tx, txErr := beginner.Begin(ctx, nil)
+	if txErr != nil {
+		return zerrors.ThrowInternal(txErr, "DOM-sAAd3V", "failed starting transaction")
+	}
+
+	defer func() {
+		if endErr := tx.End(ctx, txErr); endErr != nil {
+			err = endErr
+		}
+	}()
+
 	p.UserVerified = webAuthCreds.Flags.UserVerified
 	p.LastVeriedAt = time.Now()
-	rowCount, err := sessionRepo.Update(ctx, opts.DB(),
+	rowCount, err := sessionRepo.Update(ctx, tx,
 		sessionRepo.IDCondition(p.SessionID),
 		sessionRepo.SetFactor(&SessionFactorPasskey{LastVerifiedAt: p.LastVeriedAt, UserVerified: p.UserVerified}),
 	)
@@ -121,7 +142,7 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 		return err
 	}
 
-	rowCount, err = userRepo.Update(ctx, opts.DB(),
+	rowCount, err = userRepo.Update(ctx, tx,
 		database.And(
 			userRepo.Human().PrimaryKeyCondition(p.InstanceID, p.FetchedUser.ID),
 			userRepo.Human().PasskeyConditions().IDCondition(matchingPKey.ID),
@@ -198,4 +219,3 @@ func (p *PasskeyCheckCommand) getWebAuthNSessionData(sessionChallenge *SessionCh
 }
 
 var _ Commander = (*PasskeyCheckCommand)(nil)
-var _ Transactional = (*PasskeyCheckCommand)(nil)
