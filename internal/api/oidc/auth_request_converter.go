@@ -119,13 +119,13 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 		UserID:              userID,
 		InstanceID:          authz.GetInstance(ctx).InstanceID(),
 		Audience:            audience,
-		Request: &domain.AuthRequestOIDC{
-			Scopes:        authReq.Scopes,
-			ResponseType:  ResponseTypeToBusiness(authReq.ResponseType),
-			ResponseMode:  ResponseModeToBusiness(authReq.ResponseMode),
-			Nonce:         authReq.Nonce,
-			CodeChallenge: CodeChallengeToBusiness(authReq.CodeChallenge, authReq.CodeChallengeMethod),
-		},
+		Request: domain.NewAuthRequestOIDC(
+			authReq.Scopes,
+			ResponseTypeToBusiness(authReq.ResponseType),
+			ResponseModeToBusiness(authReq.ResponseMode),
+			authReq.Nonce,
+			CodeChallengeToBusiness(authReq.CodeChallenge, authReq.CodeChallengeMethod),
+		),
 	}
 }
 
