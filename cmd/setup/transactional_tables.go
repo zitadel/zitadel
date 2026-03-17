@@ -41,7 +41,7 @@ func (mig *TransactionalTables) Check(lastRun map[string]interface{}) bool {
 	return true
 }
 
-func (mig *TransactionalTables) dropSchema(ctx context.Context) error {
+func (mig *TransactionalTables) dropSchema(ctx context.Context) (err error) {
 	tx, err := mig.dbClient.BeginTx(ctx, nil)
 	if err != nil {
 		return err
