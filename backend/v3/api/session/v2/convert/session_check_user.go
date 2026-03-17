@@ -6,7 +6,7 @@ import (
 	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
-func CheckUserGRPCToQueryOpt(checkUser *session_grpc.CheckUser) (*domain.CheckUserType, error) {
+func CheckUserGRPCToDomain(checkUser *session_grpc.CheckUser) (*domain.CheckUserType, error) {
 	var toReturn *domain.CheckUserType
 	if checkUser == nil {
 		return toReturn, nil

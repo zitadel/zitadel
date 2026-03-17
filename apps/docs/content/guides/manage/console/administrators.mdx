@@ -9,6 +9,11 @@ import AddAdministrator from "./_add_administrator.mdx";
 import PermissionTable from '@/components/PermissionTable';
 import permissionData from "../../../../../../cmd/defaults.yaml";
 
+<TerminologyUpdate
+    newTerm="Administrators"
+    oldTerms={["Members", "Memberships", "Managers"]}
+/>
+
 <AdministratorDescription components={props.components}  name="AdministratorDescription" />
 
 To configure administrators in ZITADEL, go to the resource where you like to add it (e.g., Instance, Organization, Project, GrantedProject).

@@ -4,7 +4,6 @@ import { writeFileSync, mkdirSync, readdirSync, lstatSync, readFileSync, existsS
 import path, { join, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { glob } from 'glob';
-import yaml from 'js-yaml';
 
 // Suppress "Generated: ..." logs to avoid Vercel log limits
 const originalLog = console.log;
@@ -20,6 +19,9 @@ const ROOT_DIR = join(__dirname, '..');
 const OPENAPI_ROOT = join(ROOT_DIR, 'openapi');
 const CONTENT_ROOT = join(ROOT_DIR, 'content');
 const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content');
+const serviceRenameMap: Record<string, string> = {
+  'Authorization': 'Role Assignment',
+};
 
 async function generateVersionApiDocs(version: string) {
   const sourceRoot = join(OPENAPI_ROOT, version);
@@ -69,13 +71,22 @@ async function generateVersionApiDocs(version: string) {
     });
 
     const indexPath = join(outputDir, 'index.mdx');
-    const title = uniqueService.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+    let originalTitle = uniqueService.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+    let newTitle = serviceRenameMap[originalTitle] ?? originalTitle;
+    const hasBeenRenamed = !!newTitle;
+    const title = newTitle ?? originalTitle;
+    const renameNote = hasBeenRenamed
+        ? `\n> **Terminology Update:** We have streamlined our naming conventions to improve clarity. The term **${originalTitle}** has been replaced with **${title}**. To avoid breaking changes the APIs still make use of the old term. Both terms refer to the same underlying functionality.\n`
+        : '';
+
     const indexContent = `---
 title: ${title} API
 description: Explore the ZITADEL ${title} API reference documentation. Learn how to manage resources, handle authentication, and integrate ${title} services into your application.
 ---
 
 API Reference for ${title}
+
+${renameNote}
 `;
     writeFileSync(indexPath, indexContent);
   }
@@ -147,7 +158,7 @@ async function fixAllGeneratedLinks() {
     const versionMap = fileIndex.get(version);
 
     // [Text](apis/resources/service_name/file_name.api.mdx)
-    const linkRegex = /\[([^\]]+)\]\(([\/]?apis\/resources\/([^\/]+)\/([^\/)]+)\.api\.mdx)\)/g;
+    const linkRegex = /\[([^\]]+)\]\(([/]?apis\/resources\/([^/]+)\/([^/)]+)\.api\.mdx)\)/g;
 
     let modified = false;
     let newContent = content.replace(linkRegex, (match, text, fullLink, serviceSlug, fileSlug) => {
@@ -178,7 +189,7 @@ async function fixAllGeneratedLinks() {
 
     // Fix v2beta links that were likely in the source proto comments
     // and also remove potential double /docs prefixing from source comments
-    const internalLinkRegex = /\[([^\]]+)\]\(([\/]?docs\/)?reference\/api\/([^\/]+)\/([^\s)]+)\)/g;
+    const internalLinkRegex = /\[([^\]]+)\]\(([/]?docs\/)?reference\/api\/([^/]+)\/([^\s)]+)\)/g;
     newContent = newContent.replace(internalLinkRegex, (match, text, docsPrefix, service, fileSlug) => {
       let targetFileSlug = fileSlug;
       let isV2Beta = fileSlug.includes('.v2beta.');

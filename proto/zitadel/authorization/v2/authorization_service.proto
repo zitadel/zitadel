@@ -16,7 +16,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorization/v2;author
 
 // AuthorizationService provides methods to manage authorizations for users within your projects and applications.
 //
-// Note: Authorization in this context refers to role assignments, not to OAuth authorization.
+// Note: We have streamlined our naming conventions to improve clarity. Authorization in this context refers to role assignments, not to OAuth authorization.
 //
 // For managing permissions and roles for Zitadel internal resources, like organizations, projects,
 // users, etc., please use the InternalPermissionService.

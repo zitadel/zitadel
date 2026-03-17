@@ -374,23 +374,25 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             };
           }
 
-          const paramsPassword = new URLSearchParams({
-            loginName: command.ignoreUnknownUsernames
-              ? command.loginName
-              : (session?.factors?.user?.loginName ?? user.preferredLoginName),
-          });
+          {
+            const paramsPassword = new URLSearchParams({
+              loginName: command.ignoreUnknownUsernames
+                ? command.loginName
+                : (session?.factors?.user?.loginName ?? user.preferredLoginName),
+            });
 
-          if (organization) {
-            paramsPassword.append("organization", organization);
+            if (organization) {
+              paramsPassword.append("organization", organization);
+            }
+
+            if (command.requestId) {
+              paramsPassword.append("requestId", command.requestId);
+            }
+
+            return {
+              redirect: "/password?" + paramsPassword,
+            };
           }
-
-          if (command.requestId) {
-            paramsPassword.append("requestId", command.requestId);
-          }
-
-          return {
-            redirect: "/password?" + paramsPassword,
-          };
 
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
           if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED || !userLoginSettings?.allowLocalAuthentication) {
@@ -402,22 +404,24 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             };
           }
 
-          const paramsPasskey = new URLSearchParams({
-            loginName: command.ignoreUnknownUsernames
-              ? command.loginName
-              : (session?.factors?.user?.loginName ?? user.preferredLoginName),
-          });
-          if (command.requestId) {
-            paramsPasskey.append("requestId", command.requestId);
+          {
+            const paramsPasskey = new URLSearchParams({
+              loginName: command.ignoreUnknownUsernames
+                ? command.loginName
+                : (session?.factors?.user?.loginName ?? user.preferredLoginName),
+            });
+            if (command.requestId) {
+              paramsPasskey.append("requestId", command.requestId);
+            }
+
+            if (organization) {
+              paramsPasskey.append("organization", organization);
+            }
+
+            return { redirect: "/passkey?" + paramsPasskey };
           }
 
-          if (organization) {
-            paramsPasskey.append("organization", organization);
-          }
-
-          return { redirect: "/passkey?" + paramsPasskey };
-
-        case AuthenticationMethodType.IDP:
+        case AuthenticationMethodType.IDP: {
           const resp = await redirectUserToIDP(userId, organization);
 
           if (resp?.error) {
@@ -425,6 +429,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           }
 
           return resp;
+        }
       }
     } else {
       // prefer passkey in favor of other methods
