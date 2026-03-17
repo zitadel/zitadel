@@ -4,10 +4,12 @@ declare namespace NodeJS {
     [key: `${string}_AUDIENCE`]: string; // The system api url
     [key: `${string}_SYSTEM_USER_ID`]: string; // The service account id
     [key: `${string}_SYSTEM_USER_PRIVATE_KEY`]: string; // The service account private key
+    [key: `${string}_SYSTEM_USER_PRIVATE_KEY_FILE`]: string; // The service account private key file path
 
     AUDIENCE: string; // The fallback system api url
     SYSTEM_USER_ID: string; // The fallback service account id
     SYSTEM_USER_PRIVATE_KEY: string; // The fallback service account private key
+    SYSTEM_USER_PRIVATE_KEY_FILE: string; // The fallback service account private key file path
 
     /**
      * The Zitadel API url
@@ -81,5 +83,11 @@ declare namespace NodeJS {
      * which is safer for environments with enterprise email link scanners.
      */
     NEXT_PUBLIC_AUTO_SUBMIT_CODE?: string;
+    /**
+     * Optional: Disable OpenTelemetry instrumentation.
+     * Set to "true" to bypass OTEL initialization.
+     * In local development (NODE_ENV=development), it is disabled by default unless explicitly set to "false".
+     */
+    OTEL_SDK_DISABLED?: string;
   }
 }

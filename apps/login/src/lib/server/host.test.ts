@@ -1,5 +1,5 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
-import { getInstanceHost, getPublicHostWithProtocol, getPublicHost } from "./host";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { getInstanceHost, getPublicHost, getPublicHostWithProtocol } from "./host";
 
 describe("Host utility functions", () => {
   beforeEach(() => {

@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { loginWithOIDCAndSession } from "./oidc";
+import * as loginnameModule from "./server/loginname";
 import * as sessionModule from "./session";
 import * as zitadelModule from "./zitadel";
-import * as loginnameModule from "./server/loginname";
 
 vi.mock("./session");
 vi.mock("./zitadel");

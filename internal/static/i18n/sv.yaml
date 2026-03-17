@@ -236,12 +236,6 @@ Errors:
       AlreadyExists: "Domänen finns redan"
       InvalidCharacter: "Endast alfanumeriska tecken, . och - är tillåtna för en domän"
       EmptyString: "Ogiltiga icke-numeriska och alfabetiska tecken ersattes med tomma utrymmen och den resulterande domänen är en tom sträng"
-    IDP:
-      InvalidSearchQuery: "Ogiltig sökfråga"
-      ClientIDMissing: "ClientID saknas"
-      TeamIDMissing: "TeamID saknas"
-      KeyIDMissing: "KeyID saknas"
-      PrivateKeyMissing: "Privat nyckel saknas"
     LoginPolicy:
       NotFound: "Inloggningspolicyn hittades inte"
       Invalid: "Inloggningspolicyn är ogiltig"
@@ -613,6 +607,13 @@ Errors:
     Duplicate: "Webnyckel-ID är inte unikt"
     NoActive: "Ingen aktiv webbnyckel hittades"
     NotFound: "Webnyckel hittades inte"
+  IDP:
+    InvalidSearchQuery: "Ogiltig sökfråga"
+    ClientIDMissing: "ClientID saknas"
+    TeamIDMissing: "TeamID saknas"
+    KeyIDMissing: "KeyID saknas"
+    PrivateKeyMissing: "Privat nyckel saknas"
+    InvalidPrivateKey: "Ogiltigt format för privat nyckel"
 
 AggregateTypes:
   action: "Åtgärd"

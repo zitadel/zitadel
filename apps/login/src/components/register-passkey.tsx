@@ -3,7 +3,7 @@
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { registerPasskeyLink, verifyPasskeyRegistration } from "@/lib/server/passkeys";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
@@ -11,7 +11,7 @@ import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 
-type Inputs = {};
+type Inputs = Record<string, never>;
 
 type Props = {
   sessionId?: string;
@@ -43,6 +43,35 @@ export function RegisterPasskey({
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
+
+  const continueAndLogin = useCallback(
+    (loginName?: string) => {
+      const params = new URLSearchParams();
+
+      if (organization) {
+        params.set("organization", organization);
+      }
+
+      if (requestId) {
+        params.set("requestId", requestId);
+      }
+
+      if (sessionId) {
+        params.set("sessionId", sessionId);
+      }
+
+      if (userId) {
+        params.set("userId", userId);
+      }
+
+      if (loginName ?? initialLoginName) {
+        params.set("loginName", loginName ?? initialLoginName ?? "");
+      }
+
+      router.push("/passkey?" + params);
+    },
+    [organization, requestId, sessionId, userId, initialLoginName, router],
+  );
 
   async function submitVerify(
     passkeyId: string,
@@ -166,7 +195,7 @@ export function RegisterPasskey({
     }
 
     continueAndLogin(verificationResponse.loginName);
-  }, [sessionId, userId, code]);
+  }, [sessionId, userId, code, codeId, continueAndLogin]);
 
   // Auto-submit when code is provided (similar to VerifyForm)
   useEffect(() => {
@@ -174,32 +203,6 @@ export function RegisterPasskey({
       submitRegisterAndContinue();
     }
   }, [code, submitRegisterAndContinue]);
-
-  function continueAndLogin(loginName?: string) {
-    const params = new URLSearchParams();
-
-    if (organization) {
-      params.set("organization", organization);
-    }
-
-    if (requestId) {
-      params.set("requestId", requestId);
-    }
-
-    if (sessionId) {
-      params.set("sessionId", sessionId);
-    }
-
-    if (userId) {
-      params.set("userId", userId);
-    }
-
-    if (loginName ?? initialLoginName) {
-      params.set("loginName", loginName ?? initialLoginName ?? "");
-    }
-
-    router.push("/passkey?" + params);
-  }
 
   return (
     <form className="w-full">

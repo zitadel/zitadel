@@ -39,6 +39,30 @@ func WithInstanceDomainRepo(repo InstanceDomainRepository) InvokeOpt {
 	}
 }
 
+func WithSessionRepo(repo SessionRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.sessionRepo = repo
+	}
+}
+
+func WithUserRepo(repo UserRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.userRepo = repo
+	}
+}
+
+func WithLockoutSettingsRepo(repo LockoutSettingsRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.lockoutSettingRepo = repo
+	}
+}
+
+func WithPermissionChecker(checker PermissionChecker) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.Permissions = checker
+	}
+}
+
 // WithQueryExecutor sets the database client to be used by the command.
 // If not set, the default pool will be used.
 // This is mainly used for testing.
@@ -73,6 +97,11 @@ type InvokeOpts struct {
 	projectRepo            ProjectRepository
 	instanceRepo           InstanceRepository
 	instanceDomainRepo     InstanceDomainRepository
+	sessionRepo            SessionRepository
+	userRepo               UserRepository
+
+	// Settings repos
+	lockoutSettingRepo LockoutSettingsRepository
 }
 
 func (o *InvokeOpts) DB() database.QueryExecutor {
