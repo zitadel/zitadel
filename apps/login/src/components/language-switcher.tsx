@@ -2,7 +2,7 @@
 
 import { setLanguageCookie } from "@/lib/cookies";
 import { Lang } from "@/lib/i18n";
-import { getThemeConfig, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
+import { APPEARANCE_STYLES, getComponentRoundness, getThemeConfig } from "@/lib/theme";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
@@ -57,7 +57,7 @@ export function LanguageSwitcher({ languages }: { languages: Lang[] }) {
           anchor="bottom"
           transition
           className={clsx(
-            `w-[var(--button-width)] border border-black/5 bg-background-light-500 p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none dark:border-white/5 dark:bg-background-dark-500 rounded-md`,
+            `w-[var(--button-width)] rounded-md border border-black/5 bg-background-light-500 p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none dark:border-white/5 dark:bg-background-dark-500`,
             "transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0",
           )}
         >

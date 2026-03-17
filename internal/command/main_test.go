@@ -158,8 +158,12 @@ func eventFromEventPusherWithInstanceID(instanceID string, event eventstore.Comm
 }
 
 func eventFromEventPusherWithCreationDateNow(event eventstore.Command) *repository.Event {
+	return eventFromEventPusherWithCreationDate(event, time.Now())
+}
+
+func eventFromEventPusherWithCreationDate(event eventstore.Command, creationDate time.Time) *repository.Event {
 	e := eventFromEventPusher(event)
-	e.CreationDate = time.Now()
+	e.CreationDate = creationDate
 	return e
 }
 

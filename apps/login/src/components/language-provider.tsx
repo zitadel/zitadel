@@ -5,9 +5,5 @@ import { ReactNode } from "react";
 export async function LanguageProvider({ children }: { children: ReactNode }) {
   const messages = await getMessages();
 
-  return (
-    <NextIntlClientProvider messages={messages}>
-      {children}
-    </NextIntlClientProvider>
-  );
+  return <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>;
 }

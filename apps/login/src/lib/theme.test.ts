@@ -1,18 +1,18 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
-  ThemeRoundness,
-  ThemeLayout,
-  ThemeAppearance,
-  ThemeSpacing,
+  APPEARANCE_STYLES,
   ComponentRoundnessConfig,
   DEFAULT_COMPONENT_ROUNDNESS,
   DEFAULT_THEME,
+  getComponentRoundness,
   getThemeConfig,
   normalizeCustomCssFile,
   ROUNDNESS_CLASSES,
-  getComponentRoundness,
   SPACING_STYLES,
-  APPEARANCE_STYLES,
+  ThemeAppearance,
+  ThemeLayout,
+  ThemeRoundness,
+  ThemeSpacing,
 } from "./theme";
 
 describe("Theme Configuration", () => {
@@ -79,6 +79,12 @@ describe("Theme Configuration", () => {
 
   describe("getThemeConfig", () => {
     it("should return default theme when no environment variables are set", () => {
+      delete process.env.NEXT_PUBLIC_THEME_ROUNDNESS;
+      delete process.env.NEXT_PUBLIC_THEME_LAYOUT;
+      delete process.env.NEXT_PUBLIC_THEME_APPEARANCE;
+      delete process.env.NEXT_PUBLIC_THEME_SPACING;
+      delete process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE;
+
       const config = getThemeConfig();
 
       expect(config.roundness).toBe(DEFAULT_THEME.roundness);

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { useThemeConfig } from "@/lib/theme-hooks";
+import { useEffect, useRef } from "react";
 
 export function CustomCssWrapper({ children }: { children: React.ReactNode }) {
   const themeConfig = useThemeConfig();

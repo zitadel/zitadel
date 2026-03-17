@@ -1,7 +1,11 @@
 package domain
 
 import (
+	"errors"
 	"fmt"
+
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type wrongIDPTypeError struct {
@@ -73,4 +77,64 @@ func NewUnexpectedTextQueryOperationError[T any](assertedType T) error {
 
 func (u *UnexpectedTextQueryOperationError[T]) Error() string {
 	return fmt.Sprintf("Message=unexpected text query operation type '%T'", u.assertedType)
+}
+
+type PasswordVerificationError struct {
+	failedAttempts uint8
+}
+
+func NewPasswordVerificationError(failedPassAttempts uint8) error {
+	return &PasswordVerificationError{
+		failedAttempts: failedPassAttempts,
+	}
+}
+
+func (e *PasswordVerificationError) Error() string {
+	return fmt.Sprintf("Message=failed password attempts (%d)", e.failedAttempts)
+}
+
+// handleGetError wraps DB errors coming from Get calls into [zerrors] errors.
+//
+//   - errorID should be in the format <package short name>-<random id>
+//   - objectType should be the string representation of a DB object (e.g. 'user', 'session', 'idp'...)
+//
+// The function wraps [database.NoRowFoundError] to [zerrors.NotFound] error
+// and any other error to [zerrors.InternalError]
+func handleGetError(inputErr error, errorID, objectType string) error {
+	if inputErr == nil {
+		return nil
+	}
+
+	if errors.Is(inputErr, &database.NoRowFoundError{}) {
+		return zerrors.CreateZitadelError(zerrors.KindNotFound, inputErr, errorID, fmt.Sprintf("%s not found", objectType), 1)
+	}
+
+	return zerrors.CreateZitadelError(zerrors.KindInternal, inputErr, errorID, fmt.Sprintf("failed fetching %s", objectType), 1)
+}
+
+func (err *PasswordVerificationError) Is(target error) bool {
+	_, ok := target.(*PasswordVerificationError)
+	return ok
+}
+
+type RowsReturnedMismatchError struct {
+	Msg      string
+	Expected int64
+	Actual   int64
+}
+
+func NewRowsReturnedMismatchError(expected, actual int64) error {
+	return &RowsReturnedMismatchError{
+		Expected: expected,
+		Actual:   actual,
+	}
+}
+
+func (err *RowsReturnedMismatchError) Error() string {
+	return fmt.Sprintf("Message=expecting %d row(s) returned, got %d", err.Expected, err.Actual)
+}
+
+func (err *RowsReturnedMismatchError) Is(target error) bool {
+	_, ok := target.(*RowsReturnedMismatchError)
+	return ok
 }

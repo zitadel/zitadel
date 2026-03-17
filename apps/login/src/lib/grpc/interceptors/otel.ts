@@ -19,14 +19,8 @@
  * ```
  */
 
-import {
-  context,
-  propagation,
-  SpanKind,
-  SpanStatusCode,
-  trace,
-} from "@opentelemetry/api";
-import { GrpcError, Interceptor } from "./types";
+import { ConnectError, Interceptor } from "@connectrpc/connect";
+import { context, propagation, SpanKind, SpanStatusCode, trace } from "@opentelemetry/api";
 
 const TRACER_NAME = "zitadel-login-grpc" as const;
 
@@ -34,10 +28,7 @@ const TRACER_NAME = "zitadel-login-grpc" as const;
  * Extracts the hostname from a URL string. Returns "unknown" if the URL is
  * undefined or cannot be parsed.
  */
-function parseHostname(url: string | undefined): string {
-  if (!url) {
-    return "unknown";
-  }
+function parseHostname(url: string): string {
   try {
     return new URL(url).hostname;
   } catch {
@@ -50,8 +41,8 @@ function parseHostname(url: string | undefined): string {
  * client span, injects trace context headers for distributed tracing, and
  * records any errors that occur during the call.
  */
-export function otelGrpcInterceptor(next: Parameters<Interceptor>[0]): ReturnType<Interceptor> {
-  return async function tracedCall(req) {
+export const otelGrpcInterceptor: Interceptor = (next) =>
+  async function tracedCall(req) {
     const serviceName: string = req.service?.typeName ?? "unknown";
     const methodName: string = req.method?.name ?? "unknown";
 
@@ -76,13 +67,12 @@ export function otelGrpcInterceptor(next: Parameters<Interceptor>[0]): ReturnTyp
           const response = await next(req);
           span.setStatus({ code: SpanStatusCode.OK });
           return response;
-        } catch (err: unknown) {
-          const exception =
-            err instanceof Error ? err : new Error(String(err));
+        } catch (err) {
+          const exception = err instanceof Error ? err : new Error(String(err));
           span.recordException(exception);
-          const grpcError = err as GrpcError;
-          if (grpcError.code !== undefined) {
-            span.setAttribute("rpc.grpc.status_code", grpcError.code);
+
+          if (exception instanceof ConnectError) {
+            span.setAttribute("rpc.grpc.status_code", exception.code);
           }
           span.setStatus({
             code: SpanStatusCode.ERROR,
@@ -95,4 +85,3 @@ export function otelGrpcInterceptor(next: Parameters<Interceptor>[0]): ReturnTyp
       },
     );
   };
-}
