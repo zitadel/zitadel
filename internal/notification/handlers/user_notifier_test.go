@@ -2018,7 +2018,7 @@ func expectTemplateWithNotifyUserQueriesSMS(queries *mock.MockQueries) {
 	queries.EXPECT().CustomTextListByTemplate(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(2).Return(&query.CustomTexts{}, nil)
 }
 
-func cryptoValue(t *testing.T, ctrl *gomock.Controller, value string) (*crypto.MockEncryptionAlgorithm, *crypto.CryptoValue) {
+func cryptoValue(t *testing.T, ctrl *gomock.Controller, value string) (crypto.EncryptionAlgorithm, *crypto.CryptoValue) {
 	encAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 	encAlg.EXPECT().Algorithm().AnyTimes().Return("enc")
 	encAlg.EXPECT().EncryptionKeyID().AnyTimes().Return("id")
