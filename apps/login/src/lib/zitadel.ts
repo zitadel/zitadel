@@ -1,5 +1,5 @@
+import { createConnectTransport } from "@connectrpc/connect-node";
 import { Client, create, Duration } from "@zitadel/client";
-import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { OrganizationSchema, TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
@@ -32,9 +32,10 @@ import {
 import { getTranslations } from "next-intl/server";
 
 import { getUserAgent } from "./fingerprint";
-import { otelGrpcInterceptor } from "./grpc/interceptors/otel";
 import { createLogger } from "./logger";
 
+import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
+import { Interceptor } from "@connectrpc/connect";
 import { createServiceForHost } from "./service";
 
 const logger = createLogger("zitadel");
@@ -1337,46 +1338,46 @@ export type WithServiceConfig<T = {}> = T & {
 };
 
 export function createServerTransport(token: string, serviceConfig: ServiceConfig) {
-  // Build interceptors list - OTEL interceptor is always included for trace propagation
-  const interceptors: any[] = [otelGrpcInterceptor];
+  const authorizationInterceptor: Interceptor = (next) => (req) => {
+    if (!req.header.get("Authorization")) {
+      req.header.set("Authorization", `Bearer ${token}`);
+    }
+    return next(req);
+  };
 
-  // Add custom headers interceptor if needed
-  if (process.env.CUSTOM_REQUEST_HEADERS || serviceConfig.instanceHost || serviceConfig.publicHost) {
-    interceptors.push((next: any) => {
-      return (req: any) => {
-        // Apply headers from serviceConfig
-        if (serviceConfig.instanceHost) {
-          req.header.set("x-zitadel-instance-host", serviceConfig.instanceHost);
+  const headerInterceptor: Interceptor = (next) => (req) => {
+    // Apply headers from serviceConfig
+    if (serviceConfig.instanceHost) {
+      req.header.set("x-zitadel-instance-host", serviceConfig.instanceHost);
+    }
+    if (serviceConfig.publicHost) {
+      req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
+    }
+
+    // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
+    if (process.env.CUSTOM_REQUEST_HEADERS) {
+      process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
+        const kv = header.indexOf(":");
+        if (kv > 0) {
+          const key = header.slice(0, kv).trim();
+          const value = header.slice(kv + 1).trim();
+          if (value) {
+            req.header.set(key, value);
+          } else {
+            req.header.delete(key);
+          }
+        } else {
+          logger.warn("Skipping malformed header", { header });
         }
-        if (serviceConfig.publicHost) {
-          req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
-        }
+      });
+    }
 
-        // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
-        if (process.env.CUSTOM_REQUEST_HEADERS) {
-          process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
-            const kv = header.indexOf(":");
-            if (kv > 0) {
-              const key = header.slice(0, kv).trim();
-              const value = header.slice(kv + 1).trim();
-              if (value) {
-                req.header.set(key, value);
-              } else {
-                req.header.delete(key);
-              }
-            } else {
-              logger.warn("Skipping malformed header", { header });
-            }
-          });
-        }
+    return next(req);
+  };
 
-        return next(req);
-      };
-    });
-  }
-
-  return libCreateServerTransport(token, {
+  return createConnectTransport({
+    httpVersion: "1.1",
     baseUrl: serviceConfig.baseUrl,
-    interceptors,
+    interceptors: [otelGrpcInterceptor, authorizationInterceptor, headerInterceptor],
   });
 }
