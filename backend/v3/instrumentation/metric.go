@@ -166,8 +166,11 @@ func newMeterProvider(ctx context.Context, cfg MetricConfig, resource *resource.
 		reader, err = autoexport.NewMetricReader(ctx,
 			autoexport.WithFallbackMetricReader(noopMetricReaderFactory()),
 		)
-		if err == nil && !autoexport.IsNoneMetricReader(reader) {
-			readerOption = sdk_metric.WithReader(reader)
+		if err == nil {
+			_, isManual := reader.(*sdk_metric.ManualReader)
+			if !isManual && !autoexport.IsNoneMetricReader(reader) {
+				readerOption = sdk_metric.WithReader(reader)
+			}
 		}
 	case ExporterTypeNone:
 		// no reader option

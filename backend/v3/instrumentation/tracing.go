@@ -141,8 +141,10 @@ func newTracerProvider(ctx context.Context, cfg TraceConfig, resource *resource.
 		exporter, err = autoexport.NewSpanExporter(ctx,
 			autoexport.WithFallbackSpanExporter(noopSpanExporterFactory()),
 		)
-		if err == nil && autoexport.IsNoneSpanExporter(exporter) {
-			exporter = nil
+		if err == nil {
+			if _, ok := exporter.(noopSpanExporter); ok || autoexport.IsNoneSpanExporter(exporter) {
+				exporter = nil
+			}
 		}
 	case ExporterTypeNone:
 		// no exporter
@@ -221,7 +223,7 @@ func traceHttpExporter(ctx context.Context, cfg ExporterConfig) (sdk_trace.SpanE
 }
 
 // noopSpanExporterFactory returns a fallback factory for autoexport that produces
-// a "none" span exporter, used when no OTEL env vars are configured.
+// a noop span exporter, used when no OTEL env vars are configured.
 func noopSpanExporterFactory() func(ctx context.Context) (sdk_trace.SpanExporter, error) {
 	return func(ctx context.Context) (sdk_trace.SpanExporter, error) {
 		return noopSpanExporter{}, nil
@@ -229,7 +231,6 @@ func noopSpanExporterFactory() func(ctx context.Context) (sdk_trace.SpanExporter
 }
 
 // noopSpanExporter is a span exporter that does nothing.
-// It is detected by [autoexport.IsNoneSpanExporter] via type assertion.
 type noopSpanExporter struct{}
 
 func (noopSpanExporter) ExportSpans(context.Context, []sdk_trace.ReadOnlySpan) error { return nil }
