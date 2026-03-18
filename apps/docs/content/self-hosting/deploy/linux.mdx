@@ -62,7 +62,7 @@ ZITADEL_DATABASE_POSTGRES_DSN=postgresql://root:postgres@localhost:5432/zitadel?
 ### Setup Zitadel with a service account
 
 ```bash
-ZITADEL_DATABASE_POSTGRES_DSN=postgresql://root:postgres@localhost:5432/zitadel?sslmode=disable ZITADEL_EXTERNALSECURE=false ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH=/tmp/zitadel-admin-sa.json ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME=zitadel-admin-sa ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+ZITADEL_DATABASE_POSTGRES_DSN=postgresql://root:postgres@localhost:5432/postgres?sslmode=disable ZITADEL_EXTERNALSECURE=false ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH=/tmp/zitadel-admin-sa.json ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME=zitadel-admin-sa ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
 
 # then you can move your machine key
 mv /tmp/zitadel-admin-sa.json $HOME/zitadel-admin-sa.json
