@@ -117,7 +117,7 @@ func GetFeatures(ctx context.Context) feature.Features {
 }
 
 func WithInstance(ctx context.Context, instance Instance) context.Context {
-	ctx = instrumentation.SetInstance(ctx, instance)
+	instrumentation.SetInstanceID(ctx, instance.InstanceID())
 	return context.WithValue(ctx, instanceKey, instance)
 }
 

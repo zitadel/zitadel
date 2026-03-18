@@ -1007,6 +1007,10 @@ export const apisSidebar: readonly SidebarItem[] = [
   {
     type: "category",
     label: "Benchmarks",
+    link: {
+      type: "doc",
+      id: "apis/benchmarks/index",
+    },
     items: [
       {
         type: "category",
