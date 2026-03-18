@@ -218,9 +218,6 @@ func Test_newTracerProvider_autoexport(t *testing.T) {
 					Type: ExporterTypeUnspecified,
 				},
 			},
-			envVars: map[string]string{
-				"OTEL_TRACES_EXPORTER": "none",
-			},
 		},
 		{
 			name: "none type ignores OTEL env vars (explicit disable)",
@@ -230,7 +227,7 @@ func Test_newTracerProvider_autoexport(t *testing.T) {
 				},
 			},
 			envVars: map[string]string{
-				"OTEL_TRACES_EXPORTER": "console",
+				"OTEL_TRACES_EXPORTER": "invalid_exporter",
 			},
 		},
 	}

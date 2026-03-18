@@ -213,9 +213,6 @@ func Test_newMeterProvider_autoexport(t *testing.T) {
 					Type: ExporterTypeUnspecified,
 				},
 			},
-			envVars: map[string]string{
-				"OTEL_METRICS_EXPORTER": "none",
-			},
 		},
 		{
 			name: "none type ignores OTEL env vars (explicit disable)",
@@ -225,7 +222,7 @@ func Test_newMeterProvider_autoexport(t *testing.T) {
 				},
 			},
 			envVars: map[string]string{
-				"OTEL_METRICS_EXPORTER": "console",
+				"OTEL_METRICS_EXPORTER": "invalid_exporter",
 			},
 		},
 	}

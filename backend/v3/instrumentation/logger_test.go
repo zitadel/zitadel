@@ -104,9 +104,6 @@ func Test_newLoggerProvider_autoexport(t *testing.T) {
 			cfg: ExporterConfig{
 				Type: ExporterTypeUnspecified,
 			},
-			envVars: map[string]string{
-				"OTEL_LOGS_EXPORTER": "none",
-			},
 		},
 		{
 			name: "none type ignores OTEL env vars (explicit disable)",
@@ -114,7 +111,7 @@ func Test_newLoggerProvider_autoexport(t *testing.T) {
 				Type: ExporterTypeNone,
 			},
 			envVars: map[string]string{
-				"OTEL_LOGS_EXPORTER": "console",
+				"OTEL_LOGS_EXPORTER": "invalid_exporter",
 			},
 		},
 	}
