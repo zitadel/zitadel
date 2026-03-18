@@ -22,9 +22,9 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorization/v2;author
 // users, etc., please use the InternalPermissionService.
 service AuthorizationService {
 
-  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
-  //
   // List Role Assignment
+  //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // ListAuthorizations returns all authorizations matching the request and necessary permissions.
   //
@@ -39,9 +39,9 @@ service AuthorizationService {
     };
   }
 
-  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
-  //
   // Create Role Assignment
+  //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // CreateAuthorization creates a new authorization for a user in an owned or granted project.
   //
@@ -55,9 +55,9 @@ service AuthorizationService {
     };
   }
 
-  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
-  //
   // Update Role Assignments
+  //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // UpdateAuthorization updates the authorization.
   //
@@ -73,9 +73,9 @@ service AuthorizationService {
     };
   }
 
-  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
-  //
   // Delete Role Assignment
+  //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // DeleteAuthorization deletes the authorization.
   //
@@ -93,9 +93,9 @@ service AuthorizationService {
     };
   }
 
-  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
-  //
   // Activate Role Assignment
+  //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // ActivateAuthorization activates an existing but inactive authorization.
   //
@@ -113,11 +113,11 @@ service AuthorizationService {
     };
   }
 
-  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
-  //
   // Deactivate Role Assignment
   //
   // DeactivateAuthorization deactivates an existing and active authorization.
+  //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // In case the authorization is already inactive, the request will return a successful response as
   // the desired state is already achieved.
