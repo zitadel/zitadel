@@ -181,3 +181,7 @@ AddEventCreatedAt:
 
 FillFields:
   BatchSize: 1000 # ZITADEL_EVENTSTORE_FILLFIELDS_BULKLIMIT
+
+RelationalTables:
+  # This is used for development DO NOT USE IN PRODUCTION
+  ShouldRecreateSchema: false # ZITADEL_RELATIONALTABLES_SHOULDRECREATESCHEMA
