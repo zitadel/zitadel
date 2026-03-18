@@ -230,24 +230,18 @@ func (a *AuthRequest) AppendAudIfNotExisting(aud string) {
 }
 
 func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
-	switch request := a.Request.(type) {
-	case *AuthRequestOIDC:
-		for _, scope := range request.Scopes {
-			if strings.HasPrefix(scope, OrgDomainPrimaryScope) {
-				return strings.TrimPrefix(scope, OrgDomainPrimaryScope)
-			}
+	for _, scope := range a.Request.GetScopes() {
+		if strings.HasPrefix(scope, OrgDomainPrimaryScope) {
+			return strings.TrimPrefix(scope, OrgDomainPrimaryScope)
 		}
 	}
 	return ""
 }
 
 func (a *AuthRequest) GetScopeOrgID() string {
-	switch request := a.Request.(type) {
-	case *AuthRequestOIDC:
-		for _, scope := range request.Scopes {
-			if strings.HasPrefix(scope, OrgIDScope) {
-				return strings.TrimPrefix(scope, OrgIDScope)
-			}
+	for _, scope := range a.Request.GetScopes() {
+		if strings.HasPrefix(scope, OrgIDScope) {
+			return strings.TrimPrefix(scope, OrgIDScope)
 		}
 	}
 	return ""

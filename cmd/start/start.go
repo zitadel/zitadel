@@ -209,6 +209,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	new_domain.SetLegacyEventstore(eventstoreClient)
 	new_domain.SetSystemConfig(config.SystemDefaults)
+	new_domain.SetIDPEncryptionAlgorithm(keys.IDPConfig)
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 	sessionTokenDecryptor := internal_authz.SessionTokenDecryptor(keys.OIDC)

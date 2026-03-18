@@ -17,6 +17,7 @@ import (
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
@@ -36,6 +37,20 @@ func TestOPStorage_CreateAuthRequest(t *testing.T) {
 
 	id2 := createAuthRequestNoLoginClientHeader(t, Instance, clientIDV2, redirectURI)
 	require.Contains(t, id2, command.IDPrefixV2)
+
+	// valid org scope must succeed
+	_, _, err := Instance.CreateOIDCAuthRequest(CTX, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID, domain.OrgIDScope+Instance.DefaultOrg.Id)
+	require.NoError(t, err)
+
+	_, _, err = Instance.CreateOIDCAuthRequest(CTX, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID, domain.OrgIDScope+Instance.DefaultOrg.Id)
+	require.NoError(t, err)
+
+	// invalid org scope must fail
+	_, _, err = Instance.CreateOIDCAuthRequest(CTX, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID, domain.OrgIDScope+"invalid")
+	require.Error(t, err)
+
+	_, _, err = Instance.CreateOIDCAuthRequest(CTX, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID, domain.OrgIDScope+"invalid")
+	require.Error(t, err)
 }
 
 func TestOPStorage_CreateAccessToken_code(t *testing.T) {

@@ -63,6 +63,12 @@ func WithPermissionChecker(checker PermissionChecker) InvokeOpt {
 	}
 }
 
+func WithIDPIntentRepo(repo IDPIntentRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.idpIntentRepo = repo
+	}
+}
+
 // WithQueryExecutor sets the database client to be used by the command.
 // If not set, the default pool will be used.
 // This is mainly used for testing.
@@ -109,6 +115,7 @@ type InvokeOpts struct {
 	instanceDomainRepo     InstanceDomainRepository
 	sessionRepo            SessionRepository
 	userRepo               UserRepository
+	idpIntentRepo          IDPIntentRepository
 
 	// Settings repos
 	lockoutSettingRepo LockoutSettingsRepository

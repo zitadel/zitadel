@@ -10,7 +10,6 @@ import {
 import { metrics, SpanStatusCode, trace } from "@opentelemetry/api";
 import { NextResponse } from "next/server";
 
-export const runtime = "nodejs";
 const logger = createLogger("otel-test");
 
 export async function GET() {
