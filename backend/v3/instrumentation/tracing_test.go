@@ -189,3 +189,64 @@ func Test_newTracerProvider(t *testing.T) {
 		})
 	}
 }
+
+func Test_newTracerProvider_autoexport(t *testing.T) {
+	resource, err := resource.New(t.Context())
+	require.NoError(t, err)
+
+	tests := []struct {
+		name    string
+		cfg     TraceConfig
+		envVars map[string]string
+		wantErr bool
+	}{
+		{
+			name: "unspecified type with OTEL_TRACES_EXPORTER=console creates provider",
+			cfg: TraceConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeUnspecified,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_TRACES_EXPORTER": "console",
+			},
+		},
+		{
+			name: "unspecified type with no OTEL env vars creates provider (noop fallback)",
+			cfg: TraceConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeUnspecified,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_TRACES_EXPORTER": "none",
+			},
+		},
+		{
+			name: "none type ignores OTEL env vars (explicit disable)",
+			cfg: TraceConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeNone,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_TRACES_EXPORTER": "console",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			for k, v := range tt.envVars {
+				t.Setenv(k, v)
+			}
+			got, gotErr := newTracerProvider(t.Context(), tt.cfg, resource)
+			if tt.wantErr {
+				assert.Error(t, gotErr)
+				assert.Nil(t, got)
+			} else {
+				assert.NoError(t, gotErr)
+				assert.NotNil(t, got)
+			}
+		})
+	}
+}

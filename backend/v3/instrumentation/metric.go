@@ -9,6 +9,7 @@ import (
 
 	google_metric "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/contrib/exporters/autoexport"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
@@ -160,7 +161,15 @@ func labelsToAttributes(labels map[string]attribute.Value) []attribute.KeyValue 
 func newMeterProvider(ctx context.Context, cfg MetricConfig, resource *resource.Resource) (_ *sdk_metric.MeterProvider, err error) {
 	var readerOption sdk_metric.Option
 	switch cfg.Exporter.Type {
-	case ExporterTypeUnspecified, ExporterTypeNone:
+	case ExporterTypeUnspecified:
+		var reader sdk_metric.Reader
+		reader, err = autoexport.NewMetricReader(ctx,
+			autoexport.WithFallbackMetricReader(noopMetricReaderFactory()),
+		)
+		if err == nil {
+			readerOption = sdk_metric.WithReader(reader)
+		}
+	case ExporterTypeNone:
 		// no reader option
 	case ExporterTypeStdOut, ExporterTypeStdErr:
 		readerOption, err = metricStdOutOption(cfg.Exporter)
@@ -283,4 +292,12 @@ func metricPrometheusOption() (sdk_metric.Option, error) {
 	}
 	hasPrometheusExporter = true
 	return sdk_metric.WithReader(prom), nil
+}
+
+// noopMetricReaderFactory returns a fallback factory for autoexport that produces
+// a manual metric reader, used when no OTEL env vars are configured.
+func noopMetricReaderFactory() func(ctx context.Context) (sdk_metric.Reader, error) {
+	return func(ctx context.Context) (sdk_metric.Reader, error) {
+		return sdk_metric.NewManualReader(), nil
+	}
 }

@@ -9,6 +9,7 @@ import (
 	"slices"
 
 	google_trace "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
+	"go.opentelemetry.io/contrib/exporters/autoexport"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -136,7 +137,11 @@ func (s *Span) SetStatusByError(err error) {
 func newTracerProvider(ctx context.Context, cfg TraceConfig, resource *resource.Resource) (_ *sdk_trace.TracerProvider, err error) {
 	var exporter sdk_trace.SpanExporter
 	switch cfg.Exporter.Type {
-	case ExporterTypeUnspecified, ExporterTypeNone:
+	case ExporterTypeUnspecified:
+		exporter, err = autoexport.NewSpanExporter(ctx,
+			autoexport.WithFallbackSpanExporter(noopSpanExporterFactory()),
+		)
+	case ExporterTypeNone:
 		// no exporter
 	case ExporterTypeStdOut, ExporterTypeStdErr:
 		exporter, err = traceStdOutExporter(cfg.Exporter)
@@ -211,6 +216,21 @@ func traceHttpExporter(ctx context.Context, cfg ExporterConfig) (sdk_trace.SpanE
 	}
 	return exporter, nil
 }
+
+// noopSpanExporterFactory returns a fallback factory for autoexport that produces
+// a "none" span exporter, used when no OTEL env vars are configured.
+func noopSpanExporterFactory() func(ctx context.Context) (sdk_trace.SpanExporter, error) {
+	return func(ctx context.Context) (sdk_trace.SpanExporter, error) {
+		return noopSpanExporter{}, nil
+	}
+}
+
+// noopSpanExporter is a span exporter that does nothing.
+// It is detected by [autoexport.IsNoneSpanExporter] via type assertion.
+type noopSpanExporter struct{}
+
+func (noopSpanExporter) ExportSpans(context.Context, []sdk_trace.ReadOnlySpan) error { return nil }
+func (noopSpanExporter) Shutdown(context.Context) error                              { return nil }
 
 func traceGoogleExporter(ctx context.Context, cfg ExporterConfig) (sdk_trace.SpanExporter, error) {
 	exporter, err := google_trace.New(

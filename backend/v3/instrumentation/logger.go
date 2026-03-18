@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"go.opentelemetry.io/contrib/exporters/autoexport"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
@@ -15,7 +16,11 @@ import (
 func newLoggerProvider(ctx context.Context, cfg ExporterConfig, resource *resource.Resource) (_ *sdk_log.LoggerProvider, err error) {
 	var exporter sdk_log.Exporter
 	switch cfg.Type {
-	case ExporterTypeUnspecified, ExporterTypeNone:
+	case ExporterTypeUnspecified:
+		exporter, err = autoexport.NewLogExporter(ctx,
+			autoexport.WithFallbackLogExporter(noopLogExporterFactory()),
+		)
+	case ExporterTypeNone:
 		// no exporter
 	case ExporterTypeStdOut, ExporterTypeStdErr:
 		exporter, err = logStdOutExporter(cfg)
@@ -91,3 +96,18 @@ func logHttpExporter(ctx context.Context, cfg ExporterConfig) (sdk_log.Exporter,
 	}
 	return exporter, nil
 }
+
+// noopLogExporterFactory returns a fallback factory for autoexport that produces
+// a noop log exporter, used when no OTEL env vars are configured.
+func noopLogExporterFactory() func(ctx context.Context) (sdk_log.Exporter, error) {
+	return func(ctx context.Context) (sdk_log.Exporter, error) {
+		return noopLogExporter{}, nil
+	}
+}
+
+// noopLogExporter is a log exporter that does nothing.
+type noopLogExporter struct{}
+
+func (noopLogExporter) Export(context.Context, []sdk_log.Record) error { return nil }
+func (noopLogExporter) Shutdown(context.Context) error                 { return nil }
+func (noopLogExporter) ForceFlush(context.Context) error               { return nil }

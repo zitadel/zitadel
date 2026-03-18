@@ -79,3 +79,58 @@ func Test_newLoggerProvider(t *testing.T) {
 		})
 	}
 }
+
+func Test_newLoggerProvider_autoexport(t *testing.T) {
+	resource, err := resource.New(t.Context())
+	require.NoError(t, err)
+
+	tests := []struct {
+		name    string
+		cfg     ExporterConfig
+		envVars map[string]string
+		wantErr bool
+	}{
+		{
+			name: "unspecified type with OTEL_LOGS_EXPORTER=console creates provider",
+			cfg: ExporterConfig{
+				Type: ExporterTypeUnspecified,
+			},
+			envVars: map[string]string{
+				"OTEL_LOGS_EXPORTER": "console",
+			},
+		},
+		{
+			name: "unspecified type with no OTEL env vars creates provider (noop fallback)",
+			cfg: ExporterConfig{
+				Type: ExporterTypeUnspecified,
+			},
+			envVars: map[string]string{
+				"OTEL_LOGS_EXPORTER": "none",
+			},
+		},
+		{
+			name: "none type ignores OTEL env vars (explicit disable)",
+			cfg: ExporterConfig{
+				Type: ExporterTypeNone,
+			},
+			envVars: map[string]string{
+				"OTEL_LOGS_EXPORTER": "console",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			for k, v := range tt.envVars {
+				t.Setenv(k, v)
+			}
+			got, gotErr := newLoggerProvider(t.Context(), tt.cfg, resource)
+			if tt.wantErr {
+				assert.Error(t, gotErr)
+				assert.Nil(t, got)
+			} else {
+				assert.NoError(t, gotErr)
+				assert.NotNil(t, got)
+			}
+		})
+	}
+}
