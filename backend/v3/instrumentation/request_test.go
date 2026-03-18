@@ -8,6 +8,7 @@ import (
 
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var testID = xid.New()
@@ -48,7 +49,8 @@ func TestSetInstanceID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			SetInstanceID(tt.ctx, tt.instanceID)
-			got, _ := getRequestDetails(tt.ctx)
+			got, ok := getRequestDetails(tt.ctx)
+			require.Equal(t, tt.wantDetails != nil, ok)
 			assert.Equal(t, tt.wantDetails, got)
 		})
 	}
@@ -89,7 +91,8 @@ func TestSetUserID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			SetUserID(tt.ctx, tt.userID)
-			got, _ := getRequestDetails(tt.ctx)
+			got, ok := getRequestDetails(tt.ctx)
+			require.Equal(t, tt.wantDetails != nil, ok)
 			assert.Equal(t, tt.wantDetails, got)
 		})
 	}
