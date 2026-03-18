@@ -1,4 +1,4 @@
-CREATE TABLE zitadel.sessions_deleted (
+CREATE TABLE zitadel.archived_sessions (
     instance_id TEXT NOT NULL
     , id TEXT NOT NULL CHECK (id <> '')
     , token_id TEXT
@@ -14,18 +14,18 @@ CREATE TABLE zitadel.sessions_deleted (
     , FOREIGN KEY (instance_id, user_agent_id) REFERENCES zitadel.session_user_agents(instance_id, fingerprint_id) ON DELETE SET NULL (user_agent_id)
 );
 
-CREATE OR REPLACE FUNCTION zitadel.move_to_deleted_sessions() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION zitadel.move_to_archived_sessions() RETURNS trigger AS $$
 BEGIN
-    INSERT INTO zitadel.sessions_deleted (instance_id, id, token_id, user_agent_id, expiration, user_id, creator_id, deleted_at)
+    INSERT INTO zitadel.archived_sessions (instance_id, id, token_id, user_agent_id, expiration, user_id, creator_id, deleted_at)
     VALUES (OLD.instance_id, OLD.id, OLD.token_id, OLD.user_agent_id, OLD.expiration, OLD.user_id, OLD.creator_id, now());
     RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_move_to_deleted_sessions
+CREATE TRIGGER trg_move_to_archived_sessions
 AFTER DELETE ON zitadel.sessions
 FOR EACH ROW
-EXECUTE FUNCTION zitadel.move_to_deleted_sessions();
+EXECUTE FUNCTION zitadel.move_to_archived_sessions();
 
 -- placeholder for permissions, will be replaced by actual permission checks in the future,
 -- respectively will be used to fallback to when permissions are not yet implemented for a specific action

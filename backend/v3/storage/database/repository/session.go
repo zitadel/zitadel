@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -241,7 +240,7 @@ func (s session) Delete(ctx context.Context, client database.QueryExecutor, cond
 	// we'll also include already deleted session to check the permission against,
 	// and to return the deleted_at timestamp from the previous deletion in case the session was already deleted.
 	if condition.IsRestrictingColumn(s.IDColumn()) {
-		builder.WriteString(" UNION ALL SELECT instance_id, user_id, token_id, deleted_at FROM zitadel.sessions_deleted as sessions")
+		builder.WriteString(" UNION ALL SELECT instance_id, user_id, token_id, deleted_at FROM zitadel.archived_sessions as sessions")
 		writeCondition(&builder, condition)
 	}
 	// join the users table to get the user's organization, which will be needed for checking the permission
@@ -251,11 +250,10 @@ func (s session) Delete(ctx context.Context, client database.QueryExecutor, cond
 		permissionCondition.Write(&builder)
 		builder.WriteString(") AND count(*) > 0) or zitadel.throw_not_permitted()") //TODO: change throw_not_permitted to actual permission check
 	}
-	builder.WriteString("),")
-	builder.WriteString(" execution AS (DELETE FROM zitadel.sessions")
+	builder.WriteString("), execution AS (DELETE FROM zitadel.sessions")
 	writeCondition(&builder, condition)
 	builder.WriteString(" and exists (SELECT 1 FROM gatekeeper) RETURNING 1 AS rows_affected) SELECT (CASE WHEN gatekeeper.total_found = 1 THEN gatekeeper.deleted_at END) as deleted_at, (SELECT count(*) FROM execution) as rows_affected FROM gatekeeper")
-	var deletedAt sql.NullTime
+	var deletedAt database.Null[time.Time]
 	var deletedSessions int64
 	if err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&deletedAt, &deletedSessions); err != nil {
 		// If the criteria did not match any session, ignore the error since the user would have had the permission to delete the session,
@@ -264,7 +262,7 @@ func (s session) Delete(ctx context.Context, client database.QueryExecutor, cond
 		}
 		return 0, time.Time{}, err
 	}
-	return deletedSessions, deletedAt.Time, nil
+	return deletedSessions, deletedAt.V, nil
 }
 
 // -------------------------------------------------------------
