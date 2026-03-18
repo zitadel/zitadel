@@ -74,5 +74,5 @@ func (r *Rows) CollectExactlyOneRow(dest any) (err error) {
 // Close implements [database.Rows].
 // Subtle: this method shadows the method (Rows).Close of Rows.Rows.
 func (r *Rows) Close() error {
-	return r.Rows.Close()
+	return wrapError(r.Rows.Close())
 }
