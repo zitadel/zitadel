@@ -20,6 +20,9 @@ func newLoggerProvider(ctx context.Context, cfg ExporterConfig, resource *resour
 		exporter, err = autoexport.NewLogExporter(ctx,
 			autoexport.WithFallbackLogExporter(noopLogExporterFactory()),
 		)
+		if err == nil && autoexport.IsNoneLogExporter(exporter) {
+			exporter = nil
+		}
 	case ExporterTypeNone:
 		// no exporter
 	case ExporterTypeStdOut, ExporterTypeStdErr:

@@ -141,6 +141,9 @@ func newTracerProvider(ctx context.Context, cfg TraceConfig, resource *resource.
 		exporter, err = autoexport.NewSpanExporter(ctx,
 			autoexport.WithFallbackSpanExporter(noopSpanExporterFactory()),
 		)
+		if err == nil && autoexport.IsNoneSpanExporter(exporter) {
+			exporter = nil
+		}
 	case ExporterTypeNone:
 		// no exporter
 	case ExporterTypeStdOut, ExporterTypeStdErr:
