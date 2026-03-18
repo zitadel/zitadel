@@ -53,7 +53,7 @@ Key scripts for documentation workflows:
 
 ### Build Process
 
-The docs build process automatically handling the following steps via `generate`:
+The docs build process automatically handles the following steps via `generate`:
 
 1. Downloads required protoc plugins.
 2. Generates gRPC documentation from proto files.
