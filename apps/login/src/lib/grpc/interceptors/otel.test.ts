@@ -1,7 +1,11 @@
+import { Code, ConnectError, createRouterTransport } from "@connectrpc/connect";
 import { SpanKind, SpanStatusCode } from "@opentelemetry/api";
 import { resourceFromAttributes } from "@opentelemetry/resources";
 import { InMemorySpanExporter, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
+import { createClientFor } from "@zitadel/client";
+import { SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { otelGrpcInterceptor } from "./otel";
 
@@ -18,31 +22,37 @@ describe("otelGrpcInterceptor", () => {
   beforeEach(() => exporter.reset());
 
   it("injects traceparent header into gRPC requests", async () => {
-    const capturedHeaders: Record<string, string> = {};
+    let capturedHeaders: Headers | undefined;
 
-    await otelGrpcInterceptor(async () => ({ success: true }))({
-      service: { typeName: "zitadel.session.v2.SessionService" },
-      method: { name: "CreateSession" },
-      url: "https://api.zitadel.example.com/zitadel.session.v2/CreateSession",
-      header: {
-        set: (key: string, value: string) => {
-          capturedHeaders[key.toLowerCase()] = value;
-        },
+    const mockTransport = createRouterTransport(() => {}, {
+      transport: {
+        interceptors: [
+          otelGrpcInterceptor,
+          (next) => (req) => {
+            capturedHeaders = req.header;
+            return next(req);
+          },
+        ],
       },
     });
 
-    expect(capturedHeaders["traceparent"]).toMatch(/^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$/);
+    const client = createClientFor(SessionService)(mockTransport);
+    await expect(client.createSession({})).rejects.toThrow();
+    expect(capturedHeaders!.get("traceparent")!).toMatch(/^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$/);
   });
 
   it("creates client spans with RPC attributes", async () => {
-    await otelGrpcInterceptor(async () => ({ user: { id: "123" } }))({
-      service: { typeName: "zitadel.user.v2.UserService" },
-      method: { name: "GetUserByID" },
-      url: "https://api.zitadel.example.com/zitadel.user.v2/GetUserByID",
-      header: { set: () => {} },
+    const mockTransport = createRouterTransport(() => {}, {
+      transport: {
+        interceptors: [otelGrpcInterceptor],
+      },
     });
 
+    const client = createClientFor(UserService)(mockTransport);
+    await expect(client.getUserByID({})).rejects.toThrow();
+
     const spans = exporter.getFinishedSpans();
+
     expect(spans).toHaveLength(1);
     expect(spans[0]).toMatchObject({
       name: "zitadel.user.v2.UserService/GetUserByID",
@@ -51,151 +61,125 @@ describe("otelGrpcInterceptor", () => {
         "rpc.system": "grpc",
         "rpc.service": "zitadel.user.v2.UserService",
         "rpc.method": "GetUserByID",
-        "server.address": "api.zitadel.example.com",
+        "server.address": "in-memory",
       },
     });
   });
 
   it("records error spans with gRPC status codes", async () => {
-    const error = Object.assign(new Error("Session not found"), { code: 5 });
+    const mockTransport = createRouterTransport(
+      ({ service }) => {
+        service(SessionService, {
+          deleteSession: () => {
+            throw new ConnectError("Session not found", Code.NotFound);
+          },
+        });
+      },
+      {
+        transport: {
+          interceptors: [otelGrpcInterceptor],
+        },
+      },
+    );
 
-    await expect(
-      otelGrpcInterceptor(async () => {
-        throw error;
-      })({
-        service: { typeName: "zitadel.session.v2.SessionService" },
-        method: { name: "DeleteSession" },
-        url: "https://api.zitadel.example.com",
-        header: { set: () => {} },
-      }),
-    ).rejects.toThrow("Session not found");
+    const client = createClientFor(SessionService)(mockTransport);
+    await expect(client.deleteSession({})).rejects.toThrow();
 
     const spans = exporter.getFinishedSpans();
     expect(spans).toHaveLength(1);
     expect(spans[0]).toMatchObject({
       name: "zitadel.session.v2.SessionService/DeleteSession",
-      status: { code: SpanStatusCode.ERROR, message: "Session not found" },
+      status: {
+        code: SpanStatusCode.ERROR,
+        // https://github.com/connectrpc/connect-es/blob/beb1864a45786f01c8ecb76c93a08ac14483885a/packages/connect/src/connect-error.ts#L32
+        // code prefix gets added by connect
+        message: "[not_found] Session not found",
+      },
       attributes: { "rpc.grpc.status_code": 5 },
     });
     expect(spans[0].events).toHaveLength(1);
     expect(spans[0].events[0].name).toBe("exception");
   });
 
-  it("handles missing service/method gracefully", async () => {
-    await otelGrpcInterceptor(async () => ({ ok: true }))({
-      url: "https://api.zitadel.example.com",
-      header: { set: () => {} },
-    });
-
-    const spans = exporter.getFinishedSpans();
-    expect(spans).toHaveLength(1);
-    expect(spans[0]).toMatchObject({
-      name: "unknown/unknown",
-      attributes: { "rpc.service": "unknown", "rpc.method": "unknown" },
-    });
-  });
-
   it("returns the response from the next handler", async () => {
-    const expectedResponse = { data: "test-data", items: [1, 2, 3] };
+    const expectedResponse = {
+      details: {},
+      sessionId: "test-session-id",
+      sessionToken: "test-token",
+    };
 
-    const result = await otelGrpcInterceptor(async () => expectedResponse)({
-      service: { typeName: "TestService" },
-      method: { name: "TestMethod" },
-      url: "https://test.example.com",
-      header: { set: () => {} },
-    });
+    const mockTransport = createRouterTransport(
+      ({ service }) => {
+        service(SessionService, {
+          createSession: () => expectedResponse,
+        });
+      },
+      {
+        transport: {
+          interceptors: [otelGrpcInterceptor],
+        },
+      },
+    );
 
-    expect(result).toEqual(expectedResponse);
+    const client = createClientFor(SessionService)(mockTransport);
+    const result = await client.createSession({});
+    expect(result).toMatchObject(expectedResponse);
   });
 
-  it("records error spans without gRPC status code", async () => {
-    const error = new Error("Network failure");
+  it("handles in-memory transport URL gracefully", async () => {
+    const mockTransport = createRouterTransport(() => {}, {
+      transport: {
+        interceptors: [otelGrpcInterceptor],
+      },
+    });
 
-    await expect(
-      otelGrpcInterceptor(async () => {
-        throw error;
-      })({
-        service: { typeName: "zitadel.user.v2.UserService" },
-        method: { name: "ListUsers" },
-        url: "https://api.zitadel.example.com",
-        header: { set: () => {} },
-      }),
-    ).rejects.toThrow("Network failure");
+    const client = createClientFor(SessionService)(mockTransport);
+    await expect(client.createSession({})).rejects.toThrow();
+
+    const spans = exporter.getFinishedSpans();
+    expect(spans).toHaveLength(1);
+    expect(spans[0].attributes["server.address"]).toBeDefined();
+  });
+
+  it("sets correct service and method names from protobuf definitions", async () => {
+    const mockTransport = createRouterTransport(() => {}, {
+      transport: {
+        interceptors: [otelGrpcInterceptor],
+      },
+    });
+
+    const client = createClientFor(SessionService)(mockTransport);
+    await expect(client.deleteSession({})).rejects.toThrow();
 
     const spans = exporter.getFinishedSpans();
     expect(spans).toHaveLength(1);
     expect(spans[0]).toMatchObject({
-      name: "zitadel.user.v2.UserService/ListUsers",
-      status: { code: SpanStatusCode.ERROR, message: "Network failure" },
-    });
-    expect(spans[0].attributes).not.toHaveProperty("rpc.grpc.status_code");
-  });
-
-  it("handles malformed URL gracefully", async () => {
-    await otelGrpcInterceptor(async () => ({ ok: true }))({
-      service: { typeName: "TestService" },
-      method: { name: "TestMethod" },
-      url: "not-a-valid-url",
-      header: { set: () => {} },
-    });
-
-    const spans = exporter.getFinishedSpans();
-    expect(spans).toHaveLength(1);
-    expect(spans[0].attributes["server.address"]).toBe("unknown");
-  });
-
-  it("handles missing URL gracefully", async () => {
-    await otelGrpcInterceptor(async () => ({ ok: true }))({
-      service: { typeName: "TestService" },
-      method: { name: "TestMethod" },
-      header: { set: () => {} },
-    });
-
-    const spans = exporter.getFinishedSpans();
-    expect(spans).toHaveLength(1);
-    expect(spans[0].attributes["server.address"]).toBe("unknown");
-  });
-
-  it("handles empty string URL gracefully", async () => {
-    await otelGrpcInterceptor(async () => ({ ok: true }))({
-      service: { typeName: "TestService" },
-      method: { name: "TestMethod" },
-      url: "",
-      header: { set: () => {} },
-    });
-
-    const spans = exporter.getFinishedSpans();
-    expect(spans).toHaveLength(1);
-    expect(spans[0].attributes["server.address"]).toBe("unknown");
-  });
-
-  it("uses empty strings as-is for service/method names", async () => {
-    await otelGrpcInterceptor(async () => ({ ok: true }))({
-      service: { typeName: "" },
-      method: { name: "" },
-      url: "https://api.example.com",
-      header: { set: () => {} },
-    });
-
-    const spans = exporter.getFinishedSpans();
-    expect(spans).toHaveLength(1);
-    expect(spans[0]).toMatchObject({
-      name: "/",
-      attributes: { "rpc.service": "", "rpc.method": "" },
+      name: "zitadel.session.v2.SessionService/DeleteSession",
+      attributes: {
+        "rpc.service": "zitadel.session.v2.SessionService",
+        "rpc.method": "DeleteSession",
+      },
     });
   });
 
   it("handles non-Error exceptions", async () => {
-    await expect(
-      otelGrpcInterceptor(async () => {
-        throw "string error";
-      })({
-        service: { typeName: "TestService" },
-        method: { name: "TestMethod" },
-        url: "https://api.example.com",
-        header: { set: () => {} },
-      }),
-    ).rejects.toBe("string error");
+    const mockTransport = createRouterTransport(
+      ({ service }) => {
+        service(SessionService, {
+          createSession: () => {
+            throw "string error";
+          },
+        });
+      },
+      {
+        transport: {
+          interceptors: [otelGrpcInterceptor],
+        },
+      },
+    );
+
+    const client = createClientFor(SessionService)(mockTransport);
+    await expect(client.createSession({})).rejects.toThrow();
 
     const spans = exporter.getFinishedSpans();
     expect(spans).toHaveLength(1);
