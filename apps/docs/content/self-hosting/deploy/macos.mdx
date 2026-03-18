@@ -45,7 +45,7 @@ LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep locat
 ## Run ZITADEL
 
 ```bash
-ZITADEL_DATABASE_POSTGRES_DSN="postgresql://root:postgres@localhost:5432/zitadel?sslmode=disable" ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+ZITADEL_DATABASE_POSTGRES_DSN="postgresql://root:postgres@localhost:5432/postgres?sslmode=disable" ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
 ```
 
 <DefaultUser components={props.components} />
