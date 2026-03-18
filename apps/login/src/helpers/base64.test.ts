@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { coerceToBase64Url, coerceToArrayBuffer } from "./base64";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { coerceToArrayBuffer, coerceToBase64Url } from "./base64";
 
 const originalBtoa = global.btoa;
 const originalAtob = global.atob;

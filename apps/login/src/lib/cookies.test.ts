@@ -1,21 +1,21 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   Cookie,
   addSessionToCookie,
-  updateSessionCookie,
-  removeSessionFromCookie,
+  getAllSessionCookieIds,
+  getAllSessions,
+  getLanguageCookie,
+  getMostRecentCookieWithLoginname,
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
-  getAllSessionCookieIds,
-  getAllSessions,
-  getMostRecentCookieWithLoginname,
+  removeSessionFromCookie,
   setLanguageCookie,
-  getLanguageCookie,
+  updateSessionCookie,
 } from "./cookies";
 
-import { cookies } from "next/headers";
 import { timestampDate, timestampFromMs } from "@zitadel/client";
+import { cookies } from "next/headers";
 
 // Mock logger - use vi.hoisted to ensure it's defined before vi.mock runs
 const mockLogger = vi.hoisted(() => ({

@@ -61,7 +61,7 @@ export class NotificationSMSProviderComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((req: AddSMSProviderTwilioRequest | UpdateSMSProviderTwilioRequest) => {
       if (req) {
-        if (!!this.twilio) {
+        if (this.twilio) {
           this.service
             .updateSMSProviderTwilio(req as UpdateSMSProviderTwilioRequest)
             .then(() => {

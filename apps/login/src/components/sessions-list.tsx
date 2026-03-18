@@ -20,12 +20,8 @@ export function SessionsList({ sessions, requestId }: Props) {
         .filter((session) => session?.factors?.user?.loginName)
         // sort by change date descending
         .sort((a, b) => {
-          const dateA = a.changeDate
-            ? timestampDate(a.changeDate).getTime()
-            : 0;
-          const dateB = b.changeDate
-            ? timestampDate(b.changeDate).getTime()
-            : 0;
+          const dateA = a.changeDate ? timestampDate(a.changeDate).getTime() : 0;
+          const dateB = b.changeDate ? timestampDate(b.changeDate).getTime() : 0;
           return dateB - dateA;
         })
         // TODO: add sorting to move invalid sessions to the bottom

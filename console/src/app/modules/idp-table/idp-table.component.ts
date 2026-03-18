@@ -235,6 +235,7 @@ export class IdpTableComponent implements OnInit, OnDestroy {
     } else if (this.service instanceof ManagementService) {
       return ['/org', 'idp', 'create'];
     }
+    return undefined;
   }
 
   public routerLinkForRow(row: Provider.AsObject): any {
