@@ -43,8 +43,8 @@ Key scripts for documentation workflows:
 
 ### Validation
 
-* **Code Quality**: Run `pnpm lint` to check for syntax and style issues in JS/TS/MDX files.
-* **Content Integrity**: Run `pnpm check:links` to validate content structure, including:
+* **Code Quality**: From `apps/docs`, run `pnpm lint` to check for syntax and style issues in JS/TS/MDX files.
+* **Content Integrity**: From `apps/docs`, run `pnpm check:links` to validate content structure, including:
   * Broken internal links
   * Missing required front-matter (e.g., `title`)
   * Image references
