@@ -8,9 +8,18 @@ Ensure you have followed the [root quick start](../../CONTRIBUTING.md#quick-star
 
 ### Local Development
 
+Ensure all dependencies are installed:
+
+```bash
+cd apps/docs # if your shell is still in the project root
+pnpm install
+pnpm fetch:remote-content 
+```
+
 Start the development server:
 
 ```bash
+# in the project root
 pnpm nx run @zitadel/docs:dev
 ```
 
@@ -34,28 +43,29 @@ Key scripts for documentation workflows:
 
 ### Validation
 
-*   **Code Quality**: Run `pnpm lint` to check for syntax and style issues in JS/TS/MDX files.
-*   **Content Integrity**: Run `pnpm check:links` to validate content structure, including:
-    *   Broken internal links
-    *   Missing required front-matter (e.g., `title`)
-    *   Image references
+* **Code Quality**: Run `pnpm lint` to check for syntax and style issues in JS/TS/MDX files.
+* **Content Integrity**: Run `pnpm check:links` to validate content structure, including:
+  * Broken internal links
+  * Missing required front-matter (e.g., `title`)
+  * Image references
 
 ## Contributing
 
 ### Build Process
 
 The docs build process automatically handling the following steps via `generate`:
-1.  Downloads required protoc plugins.
-2.  Generates gRPC documentation from proto files.
-3.  Generates API documentation from OpenAPI specs.
-4.  Generates index files for directory structures.
+
+1. Downloads required protoc plugins.
+2. Generates gRPC documentation from proto files.
+3. Generates API documentation from OpenAPI specs.
+4. Generates index files for directory structures.
 
 ### Style Guide
 
-- **Variables**: Use environment variables in code snippets where possible.
-- **Embedded Content**: Use `_filename.mdx` for content embedded in other pages (not indexed individually).
-- **Code Embedding**: Use the `file` property in code blocks to embed code from the repo.
-- **Voice**: Use active voice and sentence case for titles.
+* **Variables**: Use environment variables in code snippets where possible.
+* **Embedded Content**: Use `_filename.mdx` for content embedded in other pages (not indexed individually).
+* **Code Embedding**: Use the `file` property in code blocks to embed code from the repo.
+* **Voice**: Use active voice and sentence case for titles.
 
 Refer to the [Google Developer Style Guide](https://developers.google.com/style) for general guidelines.
 
@@ -64,9 +74,9 @@ Refer to the [Google Developer Style Guide](https://developers.google.com/style)
 All documentation content is located in the `content` directory. Note that the system strictly accepts **only `.mdx` files**.
 
 To add a new page:
-1.  Create a `.mdx` file in the appropriate subdirectory of [`content`](./content).
-2.  Register the new page in the sidebar settings at [`lib/sidebar-data.ts`](./lib/sidebar-data.ts) to make it accessible in the navigation.
 
+1. Create a `.mdx` file in the appropriate subdirectory of [`content`](./content).
+2. Register the new page in the sidebar settings at [`lib/sidebar-data.ts`](./lib/sidebar-data.ts) to make it accessible in the navigation.
 
 ### Pull Requests
 
@@ -79,5 +89,6 @@ pnpm nx run @zitadel/docs:check:links
 ```
 
 You can also run specific steps individually:
-*   `pnpm fetch:remote-content`
-*   `pnpm generate:api-reference`
+
+* `pnpm fetch:remote-content`
+* `pnpm generate:api-reference`
