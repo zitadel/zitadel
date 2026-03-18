@@ -13,7 +13,7 @@ Ensure all dependencies are installed:
 ```bash
 cd apps/docs # if your shell is still in the project root
 pnpm install
-pnpm fetch:remote-content 
+pnpm fetch:remote-content
 ```
 
 Start the development server:
