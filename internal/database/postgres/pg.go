@@ -265,7 +265,7 @@ func (s *Config) checkSSL(user User) {
 	}
 }
 
-func (c Config) String(useAdmin bool) string {
+func (c *Config) String(useAdmin bool) string {
 	if c.DSN != "" {
 		return c.DSN
 	}
