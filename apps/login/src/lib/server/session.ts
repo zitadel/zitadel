@@ -259,7 +259,11 @@ type ClearSessionOptions = {
   sessionId: string;
 };
 
-export async function clearSession(options: ClearSessionOptions) {
+type ClearSessionResult = {
+  success: boolean;
+};
+
+export async function clearSession(options: ClearSessionOptions): Promise<ClearSessionResult> {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
@@ -268,7 +272,7 @@ export async function clearSession(options: ClearSessionOptions) {
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   if (!sessionCookie) {
-    return;
+    return { success: false };
   }
 
   const deleteResponse = await deleteSession({
@@ -284,5 +288,7 @@ export async function clearSession(options: ClearSessionOptions) {
     throw new Error("Could not delete session");
   }
 
-  return removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
+  await removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
+
+  return { success: true };
 }
