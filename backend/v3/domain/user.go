@@ -9,17 +9,23 @@ import (
 )
 
 type User struct {
-	InstanceID     string    `json:"instanceId,omitempty" db:"instance_id"`
-	OrganizationID string    `json:"organizationId,omitempty" db:"organization_id"`
-	ID             string    `json:"id,omitempty" db:"id"`
-	Username       string    `json:"username,omitempty" db:"username"`
-	State          UserState `json:"state,omitempty" db:"state"`
-	CreatedAt      time.Time `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt      time.Time `json:"updatedAt,omitzero" db:"updated_at"`
+	InstanceID     string      `json:"instanceId,omitempty" db:"instance_id"`
+	OrganizationID string      `json:"organizationId,omitempty" db:"organization_id"`
+	ID             string      `json:"id,omitempty" db:"id"`
+	Username       string      `json:"username,omitempty" db:"username"`
+	LoginNames     []LoginName `json:"loginNames,omitempty" db:"login_names"`
+	State          UserState   `json:"state,omitempty" db:"state"`
+	CreatedAt      time.Time   `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt      time.Time   `json:"updatedAt,omitzero" db:"updated_at"`
 
 	Machine  *MachineUser `json:"machine,omitempty" db:"-"`
 	Human    *HumanUser   `json:"human,omitempty" db:"-"`
 	Metadata []*Metadata  `json:"metadata,omitempty" db:"metadata"`
+}
+
+type LoginName struct {
+	LoginName   string `json:"loginName,omitempty" db:"-"`
+	IsPreferred bool   `json:"isPreferred,omitempty" db:"-"`
 }
 
 type MachineUser struct {

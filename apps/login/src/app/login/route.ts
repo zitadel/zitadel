@@ -1,7 +1,7 @@
+import { isRSCRequest, validateAuthRequest } from "@/lib/auth-utils";
 import { getAllSessions } from "@/lib/cookies";
+import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiation } from "@/lib/server/flow-initiation";
 import { getServiceConfig } from "@/lib/service-url";
-import { validateAuthRequest, isRSCRequest } from "@/lib/auth-utils";
-import { handleOIDCFlowInitiation, handleSAMLFlowInitiation, FlowInitiationParams } from "@/lib/server/flow-initiation";
 import { listSessions, ServiceConfig } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
@@ -10,8 +10,6 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
-// Add this to prevent RSC requests
-export const runtime = "nodejs";
 
 async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConfig; ids: string[] }): Promise<Session[]> {
   const response = await listSessions({ serviceConfig, ids: ids.filter((id: string | undefined) => !!id) });

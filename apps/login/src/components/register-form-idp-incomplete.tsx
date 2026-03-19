@@ -1,18 +1,18 @@
 "use client";
 
-import { registerUserAndLinkToIDP } from "@/lib/server/register";
 import { handleServerActionResponse } from "@/lib/client-utils";
-import { useState } from "react";
+import { registerUserAndLinkToIDP } from "@/lib/server/register";
 import { useTranslations } from "next-intl";
-import { FieldValues, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
-import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs =
   | {

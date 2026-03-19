@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Non è stato possibile generare il Secret"
     PAT:
       NotFound: "Personal Access Token non trovato"
+    Metadata:
+      Conflicting: "I metadati non devono essere impostati contemporaneamente nei campi [user] e [human]"
     NotHuman: "L'utente deve essere personale"
     NotMachine: "L'utente deve essere tecnico"
     WrongType: "Non consentito per questo tipo di utente"
@@ -234,12 +236,6 @@ Errors:
       AlreadyExists: "Il dominio già esistente"
       InvalidCharacter: "Solo caratteri alfanumerici, . e - sono consentiti per un dominio"
       EmptyString: "I caratteri non numerici e alfabetici non validi sono stati sostituiti con spazi vuoti e il dominio risultante è una stringa vuota"
-    IDP:
-      InvalidSearchQuery: "Parametro di ricerca non valido"
-      ClientIDMissing: "ClientID mancante"
-      TeamIDMissing: "TeamID mancante"
-      KeyIDMissing: "ID chiave mancante"
-      PrivateKeyMissing: "Chiave privata mancante"
     LoginPolicy:
       NotFound: "Impostazioni di accesso non trovati"
       Invalid: "Impostazioni di accesso non sono validi"
@@ -611,6 +607,13 @@ Errors:
     Duplicate: "ID chiave Web non univoco"
     NoActive: "Nessuna chiave Web attiva trovata"
     NotFound: "Chiave Web non trovata"
+  IDP:
+    InvalidSearchQuery: "Parametro di ricerca non valido"
+    ClientIDMissing: "ClientID mancante"
+    TeamIDMissing: "TeamID mancante"
+    KeyIDMissing: "ID chiave mancante"
+    PrivateKeyMissing: "Chiave privata mancante"
+    InvalidPrivateKey: "Formato chiave privata non valido"
 
 AggregateTypes:
   action: "Azione"

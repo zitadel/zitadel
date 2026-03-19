@@ -918,6 +918,7 @@ func TestSession_Update(t *testing.T) {
 }
 
 func TestSession_Delete(t *testing.T) {
+	start := time.Now()
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
@@ -944,59 +945,207 @@ func TestSession_Delete(t *testing.T) {
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
-	type test struct {
-		name            string
-		testFunc        func(t *testing.T) *domain.Session
+	type fields struct {
+		testFunc func(t *testing.T) []*domain.Session
+	}
+	type args struct {
+		condition           func([]*domain.Session) database.Condition
+		permissionCondition func([]*domain.Session) database.Condition
+	}
+	type res struct {
 		noOfDeletedRows int64
+		deletedAt       time.Time
+		err             error
+	}
+
+	type test struct {
+		name   string
+		fields fields
+		args   args
+		res    res
 	}
 	tests := []test{
 		{
 			name: "delete existent session",
-			testFunc: func(t *testing.T) *domain.Session {
-				session := &domain.Session{
-					InstanceID: instanceId,
-					ID:         gofakeit.Name(),
-					Lifetime:   time.Hour * 24,
-					CreatorID:  gofakeit.Name(),
-				}
-				err := sessionRepo.Create(t.Context(), tx, session)
-				require.NoError(t, err)
-				return session
+			fields: fields{
+				testFunc: func(t *testing.T) []*domain.Session {
+					session := &domain.Session{
+						InstanceID: instanceId,
+						ID:         gofakeit.Name(),
+						Lifetime:   time.Hour * 24,
+						CreatorID:  gofakeit.Name(),
+					}
+					err := sessionRepo.Create(t.Context(), tx, session)
+					require.NoError(t, err)
+					return []*domain.Session{session}
+				},
 			},
-			noOfDeletedRows: 1,
+			args: args{
+				condition: func(sessions []*domain.Session) database.Condition {
+					return sessionRepo.PrimaryKeyCondition(instanceId, sessions[0].ID)
+				},
+			},
+			res: res{
+				noOfDeletedRows: 1,
+				deletedAt:       time.Now(),
+			},
 		},
 		{
 			name: "delete non existent session",
-			testFunc: func(t *testing.T) *domain.Session {
-				return &domain.Session{
-					InstanceID: instanceId,
-					ID:         gofakeit.Name(),
-					Lifetime:   time.Hour * 24,
-					CreatorID:  gofakeit.Name(),
-				}
+			fields: fields{
+				testFunc: func(t *testing.T) []*domain.Session {
+					return []*domain.Session{}
+				},
 			},
-			noOfDeletedRows: 0,
+			args: args{
+				condition: func(sessions []*domain.Session) database.Condition {
+					return sessionRepo.PrimaryKeyCondition(instanceId, gofakeit.UUID())
+				},
+			},
+			res: res{
+				noOfDeletedRows: 0,
+			},
+		},
+		{
+			name: "delete previously existent session",
+			fields: fields{
+				testFunc: func(t *testing.T) []*domain.Session {
+					session := &domain.Session{
+						InstanceID: instanceId,
+						ID:         gofakeit.Name(),
+						Lifetime:   time.Hour * 24,
+						CreatorID:  gofakeit.Name(),
+					}
+					err := sessionRepo.Create(t.Context(), tx, session)
+					require.NoError(t, err)
+					_, _, err = sessionRepo.Delete(t.Context(), tx, sessionRepo.PrimaryKeyCondition(session.InstanceID, session.ID), nil)
+					require.NoError(t, err)
+					return []*domain.Session{session}
+				},
+			},
+			args: args{
+				condition: func(sessions []*domain.Session) database.Condition {
+					return sessionRepo.PrimaryKeyCondition(instanceId, sessions[0].ID)
+				},
+			},
+			res: res{
+				noOfDeletedRows: 0,
+				deletedAt:       time.Now(),
+			},
+		},
+		{
+			name: "delete multiple sessions",
+			fields: fields{
+				testFunc: func(t *testing.T) []*domain.Session {
+					session := &domain.Session{
+						InstanceID: instanceId,
+						ID:         gofakeit.Name(),
+						Lifetime:   time.Hour * 24,
+						CreatorID:  gofakeit.Name(),
+					}
+					err := sessionRepo.Create(t.Context(), tx, session)
+					require.NoError(t, err)
+					session2 := &domain.Session{
+						InstanceID: instanceId,
+						ID:         gofakeit.Name(),
+						Lifetime:   time.Hour * 24,
+						CreatorID:  gofakeit.Name(),
+					}
+					err = sessionRepo.Create(t.Context(), tx, session2)
+					require.NoError(t, err)
+					return []*domain.Session{session, session2}
+				},
+			},
+			args: args{
+				condition: func(sessions []*domain.Session) database.Condition {
+					return sessionRepo.InstanceIDCondition(instanceId)
+				},
+			},
+			res: res{
+				noOfDeletedRows: 2,
+				deletedAt:       time.Time{},
+			},
+		},
+		{
+			name: "delete without permission",
+			fields: fields{
+				testFunc: func(t *testing.T) []*domain.Session {
+					session := &domain.Session{
+						InstanceID: instanceId,
+						ID:         gofakeit.Name(),
+						TokenID:    gofakeit.UUID(),
+						Lifetime:   time.Hour * 24,
+						CreatorID:  gofakeit.Name(),
+					}
+					err := sessionRepo.Create(t.Context(), tx, session)
+					require.NoError(t, err)
+					return []*domain.Session{session}
+				},
+			},
+			args: args{
+				condition: func(sessions []*domain.Session) database.Condition {
+					return sessionRepo.InstanceIDCondition(instanceId)
+				},
+				permissionCondition: func(sessions []*domain.Session) database.Condition {
+					return sessionRepo.TokenIDCondition("invalid")
+				},
+			},
+			res: res{
+				noOfDeletedRows: 0,
+				deletedAt:       time.Time{},
+				err:             database.NewPermissionError(nil),
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			session := tt.testFunc(t)
+			var sessions []*domain.Session
+			if tt.fields.testFunc != nil {
+				sessions = tt.fields.testFunc(t)
+			}
+
+			var condition, permissionCondition database.Condition
+			if tt.args.condition != nil {
+				condition = tt.args.condition(sessions)
+			}
+			if tt.args.permissionCondition != nil {
+				permissionCondition = tt.args.permissionCondition(sessions)
+			}
+
+			// let's create a snapshot before deletion to make sure we could rollback in case of error
+			snapshot, err := tx.Begin(t.Context())
+			require.NoError(t, err)
 
 			// delete session
-			deletedRows, err := sessionRepo.Delete(t.Context(), tx,
-				sessionRepo.PrimaryKeyCondition(session.InstanceID, session.ID),
+			deletedRows, deletedAt, err := sessionRepo.Delete(t.Context(), tx,
+				condition, permissionCondition,
 			)
-			require.NoError(t, err)
-			assert.Equal(t, tt.noOfDeletedRows, deletedRows)
+			require.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.noOfDeletedRows, deletedRows)
+			if tt.res.deletedAt.IsZero() {
+				assert.Zero(t, deletedAt)
+			} else {
+				assert.WithinRange(t, deletedAt, start, time.Now())
+			}
+
+			if err != nil {
+				err = snapshot.Rollback(t.Context())
+				require.NoError(t, err)
+			}
 
 			// verify session deletion
-			deletedSession, err := sessionRepo.Get(t.Context(), tx,
-				database.WithCondition(
-					sessionRepo.PrimaryKeyCondition(session.InstanceID, session.ID),
-				),
+			deletedSessions, err := sessionRepo.List(t.Context(), tx,
+				database.WithCondition(condition),
 			)
-			require.Error(t, err, new(database.NoRowFoundError))
-			assert.Nil(t, deletedSession)
+			require.NoError(t, err)
+			expectedSessions := 0
+
+			// in case of permission error, sessions are not deleted,
+			// so expectedSessions should be equal to the number of created sessions
+			if tt.res.err != nil {
+				expectedSessions = len(sessions)
+			}
+			assert.Len(t, deletedSessions, expectedSessions)
 		})
 	}
 }

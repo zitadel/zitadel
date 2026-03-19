@@ -1,19 +1,19 @@
 "use client";
 
 import { Alert, AlertType } from "@/components/alert";
-import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
+import { resendVerification, sendVerification } from "@/lib/server/verify";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
-import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs = {
   code: string;
@@ -101,7 +101,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
         setLoading(false);
       }
     },
-    [isInvite, userId],
+    [isInvite, userId, loginName, organization, requestId, router, t],
   );
 
   useEffect(() => {

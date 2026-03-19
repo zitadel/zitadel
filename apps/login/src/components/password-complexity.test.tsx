@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
+import { NextIntlClientProvider } from "next-intl";
 import { afterEach, describe, expect, test } from "vitest";
 import { PasswordComplexity } from "./password-complexity";
-import { NextIntlClientProvider } from "next-intl";
 
 describe("<PasswordComplexity/>", () => {
   const messages = {

@@ -197,32 +197,6 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid metadata, pre condition error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"ZITADEL",
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				metadataList: []*domain.Metadata{
-					{Key: "key"},
-					{Key: "key1"},
-				},
-			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "add metadata, ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -234,6 +208,7 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						org.NewMetadataSetEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate,
@@ -274,6 +249,7 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						org.NewMetadataSetEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate,
@@ -295,6 +271,75 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 				metadataList: []*domain.Metadata{
 					{Key: "key", Value: []byte("value")},
 					{Key: "key1", Value: []byte("value1")},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "update and delete metadata, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"ZITADEL",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewMetadataSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"key",
+								[]byte("value"),
+							),
+						),
+						eventFromEventPusher(
+							org.NewMetadataSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"key1",
+								[]byte("value1"),
+							),
+						),
+						eventFromEventPusher(
+							org.NewMetadataSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"key2",
+								[]byte("value2"),
+							),
+						)),
+					expectPush(
+						org.NewMetadataSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+							[]byte("updated_value"),
+						),
+						org.NewMetadataRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key1",
+						),
+						org.NewMetadataSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key3",
+							[]byte("value3"),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				metadataList: []*domain.Metadata{
+					{Key: "key", Value: []byte("updated_value")}, // update an existing key
+					{Key: "key1"},                          // delete an existing key
+					{Key: "key2", Value: []byte("value2")}, // unchanged value
+					{Key: "key3", Value: []byte("value3")}, // add a new key
+					{Key: "key4"},                          // delete a non-existing key
 				},
 			},
 			res: res{

@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/base64"
 	"encoding/json"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -12,6 +13,8 @@ const (
 	TypeEncryption CryptoType = iota
 	TypeHash                  // Depcrecated: use [passwap.Swapper] instead
 )
+
+//go:generate mockgen -typed -package crypto -destination ./crypto.mock.go . EncryptionAlgorithm
 
 type EncryptionAlgorithm interface {
 	Algorithm() string
@@ -41,7 +44,7 @@ func (c *CryptoValue) Value() (driver.Value, error) {
 	return json.Marshal(c)
 }
 
-func (c *CryptoValue) Scan(src interface{}) error {
+func (c *CryptoValue) Scan(src any) error {
 	if b, ok := src.([]byte); ok {
 		return json.Unmarshal(b, c)
 	}
@@ -58,6 +61,9 @@ func Crypt(value []byte, alg EncryptionAlgorithm) (*CryptoValue, error) {
 }
 
 func Encrypt(value []byte, alg EncryptionAlgorithm) (*CryptoValue, error) {
+	if alg == nil {
+		return nil, zerrors.ThrowInvalidArgument(nil, "CRYPT-03ltQd", "input encryption algorithm cannot be nil")
+	}
 	encrypted, err := alg.Encrypt(value)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "CRYPT-qCD0JB", "error encrypting value")
@@ -106,13 +112,17 @@ func DecryptString(value *CryptoValue, alg EncryptionAlgorithm) (string, error) 
 }
 
 func checkEncryptionAlgorithm(value *CryptoValue, alg EncryptionAlgorithm) error {
+	if value == nil {
+		return zerrors.ThrowInvalidArgument(nil, "CRYPT-mNsQwe", "input value cannot be nil")
+	}
+	if alg == nil {
+		return zerrors.ThrowInvalidArgument(nil, "CRYPT-paiRey", "input encryption algorithm cannot be nil")
+	}
 	if value.Algorithm != alg.Algorithm() {
 		return zerrors.ThrowInvalidArgument(nil, "CRYPT-Nx7XlT", "value was encrypted with a different key")
 	}
-	for _, id := range alg.DecryptionKeyIDs() {
-		if id == value.KeyID {
-			return nil
-		}
+	if slices.Contains(alg.DecryptionKeyIDs(), value.KeyID) {
+		return nil
 	}
 	return zerrors.ThrowInvalidArgument(nil, "CRYPT-Kq12vn", "value was encrypted with a different key")
 }
@@ -120,6 +130,9 @@ func checkEncryptionAlgorithm(value *CryptoValue, alg EncryptionAlgorithm) error
 func CheckToken(alg EncryptionAlgorithm, token string, content string) error {
 	if token == "" {
 		return zerrors.ThrowPermissionDenied(nil, "CRYPTO-Sfefs", "Errors.Intent.InvalidToken")
+	}
+	if alg == nil {
+		return zerrors.ThrowInvalidArgument(nil, "CRYPT-edCJsp", "input encryption algorithm cannot be nil")
 	}
 	data, err := base64.RawURLEncoding.DecodeString(token)
 	if err != nil {

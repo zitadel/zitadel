@@ -30,6 +30,7 @@ type AuthRequest struct {
 	HintUserID       *string
 	NeedRefreshToken bool
 	Issuer           string
+	OrganizationID   string
 }
 
 type CurrentAuthRequest struct {
@@ -75,6 +76,7 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 		authRequest.HintUserID,
 		authRequest.NeedRefreshToken,
 		authRequest.Issuer,
+		authRequest.OrganizationID,
 	))
 	if err != nil {
 		return nil, err
@@ -115,6 +117,9 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 		if err := projectPermissionCheck(ctx, writeModel.ClientID, sessionWriteModel.UserID); err != nil {
 			return nil, nil, err
 		}
+	}
+	if writeModel.OrganizationID != "" && writeModel.OrganizationID != sessionWriteModel.UserResourceOwner {
+		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-59ljd", "Errors.User.NotAllowedOrg")
 	}
 
 	if err := c.pushAppendAndReduce(ctx, writeModel, authrequest.NewSessionLinkedEvent(
@@ -171,23 +176,24 @@ func (c *Commands) AddAuthRequestCode(ctx context.Context, authRequestID, code s
 func authRequestWriteModelToCurrentAuthRequest(writeModel *AuthRequestWriteModel) (_ *CurrentAuthRequest) {
 	return &CurrentAuthRequest{
 		AuthRequest: &AuthRequest{
-			ID:            writeModel.AggregateID,
-			LoginClient:   writeModel.LoginClient,
-			ClientID:      writeModel.ClientID,
-			RedirectURI:   writeModel.RedirectURI,
-			State:         writeModel.State,
-			Nonce:         writeModel.Nonce,
-			Scope:         writeModel.Scope,
-			Audience:      writeModel.Audience,
-			ResponseType:  writeModel.ResponseType,
-			ResponseMode:  writeModel.ResponseMode,
-			CodeChallenge: writeModel.CodeChallenge,
-			Prompt:        writeModel.Prompt,
-			UILocales:     writeModel.UILocales,
-			MaxAge:        writeModel.MaxAge,
-			LoginHint:     writeModel.LoginHint,
-			HintUserID:    writeModel.HintUserID,
-			Issuer:        writeModel.Issuer,
+			ID:             writeModel.AggregateID,
+			LoginClient:    writeModel.LoginClient,
+			ClientID:       writeModel.ClientID,
+			RedirectURI:    writeModel.RedirectURI,
+			State:          writeModel.State,
+			Nonce:          writeModel.Nonce,
+			Scope:          writeModel.Scope,
+			Audience:       writeModel.Audience,
+			ResponseType:   writeModel.ResponseType,
+			ResponseMode:   writeModel.ResponseMode,
+			CodeChallenge:  writeModel.CodeChallenge,
+			Prompt:         writeModel.Prompt,
+			UILocales:      writeModel.UILocales,
+			MaxAge:         writeModel.MaxAge,
+			LoginHint:      writeModel.LoginHint,
+			HintUserID:     writeModel.HintUserID,
+			Issuer:         writeModel.Issuer,
+			OrganizationID: writeModel.OrganizationID,
 		},
 		SessionID:   writeModel.SessionID,
 		UserID:      writeModel.UserID,

@@ -663,7 +663,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "usergrant without resource owner on project, ok",
+			name: "usergrant without Organization ID on project, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -816,7 +816,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "usergrant for granted resource owner, ok",
+			name: "usergrant for granted Organization ID, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1717,7 +1717,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "usergrant for projectgrant same resource owner, ok",
+			name: "usergrant for projectgrant same Organization ID, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1813,7 +1813,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "usergrant for project without resource owner, ok",
+			name: "usergrant for project without Organization ID, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(

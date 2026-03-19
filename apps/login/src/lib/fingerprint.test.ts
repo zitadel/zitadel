@@ -1,12 +1,16 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { v4 as uuidv4 } from "uuid";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getFingerprintId,
-  setFingerprintIdCookie,
   getFingerprintIdCookie,
   getOrSetFingerprintId,
   getUserAgent,
+  setFingerprintIdCookie,
 } from "./fingerprint";
+
+import { create } from "@zitadel/client";
+import { cookies, headers } from "next/headers";
+import { userAgent } from "next/server";
 
 // Mock dependencies
 vi.mock("uuid");
@@ -20,10 +24,6 @@ vi.mock("next/server", () => ({
 vi.mock("@zitadel/client", () => ({
   create: vi.fn(),
 }));
-
-import { cookies, headers } from "next/headers";
-import { userAgent } from "next/server";
-import { create } from "@zitadel/client";
 
 describe("fingerprint", () => {
   beforeEach(() => {

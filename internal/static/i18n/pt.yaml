@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Não foi possível gerar o segredo"
     PAT:
       NotFound: "Token de Acesso Pessoal não encontrado"
+    Metadata:
+      Conflicting: "Os metadados não devem ser definidos simultaneamente nos campos [user] e [human]"
     NotHuman: "O usuário deve ser pessoal"
     NotMachine: "O usuário deve ser técnico"
     WrongType: "Não permitido para este tipo de usuário"
@@ -233,12 +235,6 @@ Errors:
       AlreadyExists: "Domínio já existe"
       InvalidCharacter: "Apenas caracteres alfanuméricos, . e - são permitidos para um domínio"
       EmptyString: "Caracteres não numéricos e alfabéticos inválidos foram substituídos por espaços vazios e o domínio resultante é uma string vazia"
-    IDP:
-      InvalidSearchQuery: "Consulta de pesquisa inválida"
-      ClientIDMissing: "ClientID ausente"
-      TeamIDMissing: "TeamID ausente"
-      KeyIDMissing: "KeyID ausente"
-      PrivateKeyMissing: "Chave privada ausente"
     LoginPolicy:
       NotFound: "Política de login não encontrada"
       Invalid: "Política de login é inválida"
@@ -610,6 +606,13 @@ Errors:
     Duplicate: "ID da chave Web não exclusivo"
     NoActive: "Nenhuma chave web ativa encontrada"
     NotFound: "Chave Web não encontrada"
+  IDP:
+    InvalidSearchQuery: "Consulta de pesquisa inválida"
+    ClientIDMissing: "ClientID ausente"
+    TeamIDMissing: "TeamID ausente"
+    KeyIDMissing: "KeyID ausente"
+    PrivateKeyMissing: "Chave privada ausente"
+    InvalidPrivateKey: "Formato de chave privada inválido"
 
 AggregateTypes:
   action: "Ação"

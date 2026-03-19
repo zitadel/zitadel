@@ -17,13 +17,7 @@ export function SelfServiceMenu() {
   return (
     <div className="flex w-full flex-col space-y-2">
       {list.map((menuitem, index) => {
-        return (
-          <SelfServiceItem
-            link={menuitem.link}
-            key={"self-service-" + index}
-            name={menuitem.name}
-          />
-        );
+        return <SelfServiceItem link={menuitem.link} key={"self-service-" + index} name={menuitem.name} />;
       })}
     </div>
   );
