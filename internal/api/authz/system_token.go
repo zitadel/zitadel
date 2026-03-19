@@ -124,7 +124,7 @@ func (s *SystemAPIUser) readKey() (*SystemAPIPublicKey, error) {
 
 	key, ok := cert.PublicKey.(*rsa.PublicKey)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgument(err, "AUTHZ-PNKOMf", "Errors.SystemApiUser.UsupportedPublicKey")
+		return nil, zerrors.ThrowInternal(err, "AUTHZ-PNKOMf", "Errors.SystemApiUser.UnsupportedPublicKey")
 	}
 
 	return &SystemAPIPublicKey{
@@ -135,18 +135,26 @@ func (s *SystemAPIUser) readKey() (*SystemAPIPublicKey, error) {
 }
 
 func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID string) (*jose.JSONWebKey, error) {
+	now := time.Now().UTC()
+
 	s.mutex.RLock()
 	key, ok := s.cachedKeys[userID]
+	// If a key is found but expired, read delete it and mark it as not found. This will trigger the key to be read from
+	// file again in case the file was replaced with a new key.
+	if ok && key.NotAfter != nil && now.After(*key.NotAfter) {
+		delete(s.cachedKeys, userID)
+		key = nil
+		ok = false
+	}
 	s.mutex.RUnlock()
 
 	var err error
 	if !ok {
-		if key, err = s.getOrReadKey(userID); err != nil {
+		if key, err = s.readKey(userID); err != nil {
 			return nil, err
 		}
 	}
 
-	now := time.Now().UTC()
 	if key.NotBefore != nil && now.Before(*key.NotBefore) {
 		return nil, zerrors.ThrowNotFound(nil, "AUTHZ-NiJstf", "Errors.User.NotBefore")
 	}
@@ -157,7 +165,7 @@ func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID st
 	return &jose.JSONWebKey{KeyID: userID, Key: key.Data}, nil
 }
 
-func (s *systemJWTStorage) getOrReadKey(userID string) (*SystemAPIPublicKey, error) {
+func (s *systemJWTStorage) readKey(userID string) (*SystemAPIPublicKey, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	user, ok := s.keys[userID]
