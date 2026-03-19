@@ -1,7 +1,6 @@
 package domain_test
 
 import (
-	"context"
 	"encoding/base64"
 	"errors"
 	"testing"
@@ -65,7 +64,9 @@ func TestIDPIntentCheckCommand_Events(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			// Test
-			events, err := tc.command.Events(context.Background(), &domain.InvokeOpts{})
+			oneSecondAgo := time.Now().Add(-1 * time.Second)
+			events, err := tc.command.Events(t.Context(), &domain.InvokeOpts{})
+			inOneSecond := time.Now().Add(1 * time.Second)
 
 			// Verify
 			assert.NoError(t, err)
@@ -73,12 +74,12 @@ func TestIDPIntentCheckCommand_Events(t *testing.T) {
 			require.Len(t, events, len(tc.expectedEvents))
 
 			for i, expectedType := range tc.expectedEvents {
-				assert.IsType(t, expectedType, events[i])
-				switch expectedAssertedType := expectedType.(type) {
+				require.IsType(t, expectedType, events[i])
+				switch expectedType.(type) {
 				case *session.IntentCheckedEvent:
 					actualAssertedType, ok := events[i].(*session.IntentCheckedEvent)
 					require.True(t, ok)
-					assert.InDelta(t, expectedAssertedType.CheckedAt.UnixMilli(), actualAssertedType.CheckedAt.UnixMilli(), 10)
+					assert.WithinRange(t, actualAssertedType.CheckedAt, oneSecondAgo, inOneSecond)
 				case *idpintent.ConsumedEvent:
 					_, ok := events[i].(*idpintent.ConsumedEvent)
 					require.True(t, ok)

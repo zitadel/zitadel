@@ -1179,7 +1179,9 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 			ctx := authz.NewMockContext(tc.cmd.InstanceID, "", "")
 
 			// Test
+			oneSecondAgo := time.Now().Add(-1 * time.Second)
 			events, err := tc.cmd.Events(ctx, &domain.InvokeOpts{})
+			inOneSecond := time.Now().Add(1 * time.Second)
 
 			// Verify
 			assert.NoError(t, err)
@@ -1204,7 +1206,7 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 				case *session.PasswordCheckedEvent:
 					actualAssertedType, ok := events[i].(*session.PasswordCheckedEvent)
 					require.True(t, ok)
-					assert.InDelta(t, expectedAssertedType.CheckedAt.UnixMilli(), actualAssertedType.CheckedAt.UnixMilli(), 10)
+					assert.WithinRange(t, actualAssertedType.CheckedAt, oneSecondAgo, inOneSecond)
 				}
 			}
 		})
