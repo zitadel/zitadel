@@ -44,7 +44,7 @@ func TestInstanceDomainReducers(t *testing.T) {
 		domainAddedEvt := instance.NewDomainAddedEvent(ctx, &instance.NewAggregate("123").Aggregate, domainName, false)
 
 		// Test
-		res := callReduce(t, ctx, rawTx, handler, domainAddedEvt)
+		res := callReduce(t, rawTx, handler, domainAddedEvt)
 		require.True(t, res)
 
 		// Verify
@@ -85,7 +85,7 @@ func TestInstanceDomainReducers(t *testing.T) {
 		domainPrimarySetEvt := instance.NewDomainPrimarySetEvent(ctx, &instance.NewAggregate("123").Aggregate, domainName)
 
 		// Test
-		res := callReduce(t, ctx, rawTx, handler, domainPrimarySetEvt)
+		res := callReduce(t, rawTx, handler, domainPrimarySetEvt)
 		require.True(t, res)
 
 		// Verify
@@ -127,7 +127,7 @@ func TestInstanceDomainReducers(t *testing.T) {
 		domainRemovedEvt := instance.NewDomainRemovedEvent(ctx, &instance.NewAggregate("123").Aggregate, domainName)
 
 		// Test
-		res := callReduce(t, ctx, rawTx, handler, domainRemovedEvt)
+		res := callReduce(t, rawTx, handler, domainRemovedEvt)
 		require.True(t, res)
 
 		// Verify
@@ -150,7 +150,7 @@ func TestInstanceDomainReducers(t *testing.T) {
 		trustedDomainAddedEvt := instance.NewTrustedDomainAddedEvent(ctx, &instance.NewAggregate("123").Aggregate, domainName)
 
 		// Test
-		res := callReduce(t, ctx, rawTx, handler, trustedDomainAddedEvt)
+		res := callReduce(t, rawTx, handler, trustedDomainAddedEvt)
 		require.True(t, res)
 
 		// Verify
@@ -185,7 +185,7 @@ func TestInstanceDomainReducers(t *testing.T) {
 		trustedDomainRemovedEvt := instance.NewTrustedDomainRemovedEvent(ctx, &instance.NewAggregate("123").Aggregate, domainName)
 
 		// Test
-		res := callReduce(t, ctx, rawTx, handler, trustedDomainRemovedEvt)
+		res := callReduce(t, rawTx, handler, trustedDomainRemovedEvt)
 		require.True(t, res)
 
 		// Verify
