@@ -11,6 +11,7 @@ const (
 	OrganizationWritePermission = "organization.write"
 	SessionReadPermission       = "session.read"
 	SessionWritePermission      = "session.write"
+	SessionDeletePermission     = "session.delete"
 )
 
 // PermissionRepository is the interface that manages and checks Zitadel permissions.
