@@ -220,6 +220,17 @@ func Test_newTracerProvider_autoexport(t *testing.T) {
 			},
 		},
 		{
+			name: "unspecified type with OTEL_TRACES_EXPORTER=none creates provider (autoexport none)",
+			cfg: TraceConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeUnspecified,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_TRACES_EXPORTER": "none",
+			},
+		},
+		{
 			name: "none type ignores OTEL env vars (explicit disable)",
 			cfg: TraceConfig{
 				Exporter: ExporterConfig{

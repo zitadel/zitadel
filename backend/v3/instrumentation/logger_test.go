@@ -106,6 +106,15 @@ func Test_newLoggerProvider_autoexport(t *testing.T) {
 			},
 		},
 		{
+			name: "unspecified type with OTEL_LOGS_EXPORTER=none creates provider (autoexport none)",
+			cfg: ExporterConfig{
+				Type: ExporterTypeUnspecified,
+			},
+			envVars: map[string]string{
+				"OTEL_LOGS_EXPORTER": "none",
+			},
+		},
+		{
 			name: "none type ignores OTEL env vars (explicit disable)",
 			cfg: ExporterConfig{
 				Type: ExporterTypeNone,

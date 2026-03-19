@@ -215,6 +215,17 @@ func Test_newMeterProvider_autoexport(t *testing.T) {
 			},
 		},
 		{
+			name: "unspecified type with OTEL_METRICS_EXPORTER=none creates provider (autoexport none)",
+			cfg: MetricConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeUnspecified,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_METRICS_EXPORTER": "none",
+			},
+		},
+		{
 			name: "none type ignores OTEL env vars (explicit disable)",
 			cfg: MetricConfig{
 				Exporter: ExporterConfig{
