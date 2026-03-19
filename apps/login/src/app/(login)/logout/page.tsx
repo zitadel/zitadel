@@ -1,7 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsClearList } from "@/components/sessions-clear-list";
 import { Translated } from "@/components/translated";
-import { toClientSerializable } from "@/lib/client-serialization";
 import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getLogoutTokenVerificationOptions } from "@/lib/logout-token";
 import { getServiceConfig } from "@/lib/service-url";
