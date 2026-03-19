@@ -164,7 +164,8 @@ func Test_systemJWTStorage_GetKeyByIDAndClientID_Ok(t *testing.T) {
 			signed, err := signer.Sign([]byte("This is a test payload"))
 			require.NoError(tt, err)
 
-			signed.Verify(jwk)
+			_, err = signed.Verify(jwk)
+			assert.NoError(tt, err)
 		})
 	}
 }
