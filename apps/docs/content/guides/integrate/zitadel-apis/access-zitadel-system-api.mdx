@@ -54,6 +54,9 @@ SystemAPIUsers:
       KeyData: <base64 encoded value of system-user-1.pub>
 ```
 
+You can either specify the public key directly in this way or wrap it in an X.509 certificate for better key management
+in environments like kubernetes.
+
 You can define memberships for the user as well:
 
 ```yaml
