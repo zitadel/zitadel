@@ -125,7 +125,7 @@ jobs:
           context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          file: apps/api/Dockerfile
+          file: apps/api/Containerfile
           target: final
           platforms: linux/amd64,linux/arm64
           push: true
@@ -149,7 +149,7 @@ jobs:
           context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          file: apps/api/Dockerfile
+          file: apps/api/Containerfile
           target: builder
           platforms: linux/amd64,linux/arm64
           push: true

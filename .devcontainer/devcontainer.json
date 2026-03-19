@@ -1,7 +1,7 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
 	"name": "Zitadel Devcontainer",
-	"dockerComposeFile": "docker-compose.yaml",
+	"dockerComposeFile": "compose.yaml",
 	"service": "devcontainer",
 	"runServices": [
 		"devcontainer"

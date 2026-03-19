@@ -21,12 +21,7 @@ services:
     networks:
       - zitadel
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    depends_on:
-      zitadel-api:
-        condition: service_healthy
-      zitadel-login:
-        condition: service_healthy
+      - $CONTAINER_SOCK:/var/run/docker.sock:ro,z
 
   zitadel-api:
     image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION}
@@ -149,7 +144,7 @@ services:
         - CMD
         - /bin/sh
         - -c
-        - node /app/healthcheck.js http://localhost:3000/ui/v2/login/healthy
+        - node /app/healthcheck.mjs http://localhost:3000/ui/v2/login/healthy
       interval: 10s
       timeout: 30s
       retries: 12
@@ -208,7 +203,7 @@ services:
       retries: 10
       start_period: 20s
     volumes:
-      - postgres-data:/var/lib/postgresql/data:rw
+      - postgres-data:/var/lib/postgresql:rw
     networks:
       - zitadel
 

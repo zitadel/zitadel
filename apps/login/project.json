@@ -32,12 +32,12 @@
     "pack": {
       "description": "Builds a local Docker image for the ZITADEL Login UI (zitadel/zitadel-login:local). Requires Docker daemon.",
       "dependsOn": ["build"],
-      "command": "docker build -f apps/login/Dockerfile -t zitadel/zitadel-login:local apps/login",
+      "command": "docker build -f apps/login/Containerfile -t zitadel/zitadel-login:local apps/login",
       "cache": false,
       "inputs": [
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",
-        "{projectRoot}/Dockerfile",
+        "{projectRoot}/Containerfile",
         "!{projectRoot}/.env.*",
         "!{projectRoot}/acceptance/**/*"
       ]

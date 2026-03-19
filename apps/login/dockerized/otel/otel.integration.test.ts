@@ -135,7 +135,7 @@ describe("OpenTelemetry Integration", () => {
       .start();
 
     try {
-      await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+      await GenericContainer.fromContainerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
     } catch (err) {
       throw new Error(`Failed to build login Docker image: ${err instanceof Error ? err.message : err}`);
     }

@@ -45,7 +45,7 @@ describe("Login Container TLS Support", () => {
     fs.writeFileSync(path.join(CERTS_DIR, "server.crt"), certs.server.cert);
     fs.writeFileSync(path.join(CERTS_DIR, "server.key"), certs.server.key);
 
-    await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+    await GenericContainer.fromContainerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
     loginImage = new GenericContainer(LOGIN_IMAGE_TAG);
   });
 

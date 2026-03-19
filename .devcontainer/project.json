@@ -3,7 +3,7 @@
   "name": "@zitadel/devcontainer",
   "targets": {
     "compose": {
-      "description": "Runs arbitrary Docker Compose commands with dev container support. All running services are manageable and addressable from in- and outside the dev container. The services are defined in .devcontainer/docker-compose.yaml.",
+      "description": "Runs arbitrary Docker Compose commands with dev container support. All running services are manageable and addressable from in- and outside the dev container. The services are defined in .devcontainer/compose.yaml.",
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",

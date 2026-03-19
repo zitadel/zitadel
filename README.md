@@ -77,7 +77,7 @@ ZITADEL Cloud and self-hosted ZITADEL run the same codebase.
 
 ```bash
 # Docker Compose — up and running in under 3 minutes
-curl -LO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/docker-compose.yml \
+curl -LO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/compose.yaml \
   && curl -LO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/.env.example \
   && cp .env.example .env \
   && docker compose up -d --wait

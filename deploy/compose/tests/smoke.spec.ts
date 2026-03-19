@@ -13,11 +13,11 @@
  *
  * Credentials are read from SMOKE_TEST_ADMIN_USERNAME / SMOKE_TEST_ADMIN_PASSWORD
  * (set in .env.test). The fallback values below match the defaults in .env.test and
- * docker-compose.test.yml — they are intentional so the test works out-of-the-box
+ * compose.test.yaml — they are intentional so the test works out-of-the-box
  * without any extra configuration. If you change the seeded admin password, update
  * .env.test accordingly.
  * The initial admin password is seeded via ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD
- * in docker-compose.test.yml.
+ * in compose.test.yaml.
  */
 import { expect, test } from "@playwright/test";
 

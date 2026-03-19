@@ -28,12 +28,12 @@ Optional services via profiles: `redis` (`cache`), `otel-collector` (`observabil
 
 | File | Role | Notes |
 |------|------|-------|
-| `docker-compose.yml` | **Base stack** — all modes start from this | Must work standalone with `.env.example` |
-| `docker-compose.mode-letsencrypt.yml` | TLS overlay: ACME HTTP challenge | Declares its own `letsencrypt` volume |
-| `docker-compose.mode-external-tls.yml` | TLS overlay: upstream LB terminates TLS | Enables forwarded headers |
-| `docker-compose.mode-local-tls.yml` | TLS overlay: self-signed certs | Mounts `./certs/` and `traefik-local-tls.yml` |
-| `docker-compose.prodlike.yml` | Init/setup/start split | Uses YAML anchors for shared DB env |
-| `docker-compose.test.yml` | CI smoke test overlay | Overrides images to `:local` tags |
+| `compose.yaml` | **Base stack** — all modes start from this | Must work standalone with `.env.example` |
+| `compose.mode-letsencrypt.yaml` | TLS overlay: ACME HTTP challenge | Declares its own `letsencrypt` volume |
+| `compose.mode-external-tls.yaml` | TLS overlay: upstream LB terminates TLS | Enables forwarded headers |
+| `compose.mode-local-tls.yaml` | TLS overlay: self-signed certs | Mounts `./certs/` and `traefik-local-tls.yml` |
+| `compose.prodlike.yaml` | Init/setup/start split | Uses YAML anchors for shared DB env |
+| `compose.test.yaml` | CI smoke test overlay | Overrides images to `:local` tags |
 | `.env.example` | User-facing config template | Copy to `.env` before first run |
 | `.env.test` | CI-only config | Used by NX targets: `test-run`, `test-e2e`, `test-full`, `stop` |
 | `otel-collector-config.yaml` | OTEL Collector pipeline config | Logs traces to stdout; configure `OTEL_BACKEND_ENDPOINT` to forward to a backend |

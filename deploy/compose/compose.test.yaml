@@ -5,7 +5,7 @@
 # so the routing rules are validated end-to-end.
 #
 # Usage:
-#   docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml \
+#   docker compose --env-file .env.test -f compose.yaml -f compose.test.yaml \
 #     -p zitadel-compose-test up --force-recreate --renew-anon-volumes --wait
 
 services:

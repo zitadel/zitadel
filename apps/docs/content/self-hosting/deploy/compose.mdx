@@ -25,7 +25,7 @@ Download the two required files, copy the example config, and start:
 mkdir zitadel-compose && cd zitadel-compose
 
 # Download the compose file and example environment
-curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/docker-compose.yml &&
+curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/compose.yaml &&
 curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/.env.example
 
 # Create your environment file and start
@@ -40,6 +40,10 @@ That's it. Visit [http://localhost:8080](http://localhost:8080) to open the logi
 <Callout type="info">
 The base stack runs: **Traefik** ([reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)) → **ZITADEL API** (Go) + **ZITADEL Login** (Next.js) → **PostgreSQL**.
 All routing, including [gRPC over HTTP/2](/self-hosting/manage/http2), is handled automatically by Traefik — no extra configuration needed.
+</Callout>
+
+<Callout type="info">
+If you're using `podman` instead of `docker`, run `echo $XDG_RUNTIME_DIR/podman/podman.sock` & use the output as value for the variable `CONTAINER_SOCK` in your `.env` file.
 </Callout>
 
 ## Stage 2 — Homelab / Semi-Production
@@ -58,20 +62,20 @@ Pick a TLS mode and download the matching overlay file:
 
 | Mode | Overlay file | When to use |
 |------|-------------|-------------|
-| Let's Encrypt | `docker-compose.mode-letsencrypt.yml` | Public domain, automatic certs |
-| External TLS | `docker-compose.mode-external-tls.yml` | Behind a load balancer, CDN, or WAF that terminates TLS |
-| Local TLS | `docker-compose.mode-local-tls.yml` | Self-signed certs for LAN-only access |
+| Let's Encrypt | `compose.mode-letsencrypt.yaml` | Public domain, automatic certs |
+| External TLS | `compose.mode-external-tls.yaml` | Behind a load balancer, CDN, or WAF that terminates TLS |
+| Local TLS | `compose.mode-local-tls.yaml` | Self-signed certs for LAN-only access |
 
 Download the overlay you need, then start with both files:
 
 ```shell
 # Download the overlay (replace with your chosen mode)
-curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/docker-compose.mode-letsencrypt.yml
+curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/compose.mode-letsencrypt.yaml
 
 # Start with the overlay
 docker compose --env-file .env \
-  -f docker-compose.yml \
-  -f docker-compose.mode-letsencrypt.yml \
+  -f compose.yaml \
+  -f compose.mode-letsencrypt.yaml \
   up -d --wait
 ```
 
@@ -121,7 +125,7 @@ ZITADEL_CACHES_ORGANIZATION_CONNECTOR=redis
 Then start with the `cache` profile:
 
 ```shell
-docker compose --env-file .env -f docker-compose.yml --profile cache up -d --wait
+docker compose --env-file .env -f compose.yaml --profile cache up -d --wait
 ```
 
 ## Stage 3 — Beyond Compose
@@ -131,11 +135,11 @@ docker compose --env-file .env -f docker-compose.yml --profile cache up -d --wai
 For controlled upgrades, separate [database initialization from the running API](/self-hosting/manage/updating_scaling):
 
 ```shell
-curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/docker-compose.prodlike.yml &&
+curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/compose.prodlike.yaml &&
 
 docker compose --env-file .env \
-  -f docker-compose.yml \
-  -f docker-compose.prodlike.yml \
+  -f compose.yaml \
+  -f compose.prodlike.yaml \
   up -d --wait
 ```
 
@@ -157,7 +161,7 @@ Download the collector configuration and start with the `observability` profile:
 ```shell
 curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/compose/otel-collector-config.yaml &&
 
-docker compose --env-file .env -f docker-compose.yml --profile observability up -d --wait
+docker compose --env-file .env -f compose.yaml --profile observability up -d --wait
 ```
 
 Traces are logged to the collector's stdout by default (`docker compose logs otel-collector`).
@@ -172,8 +176,8 @@ Scaling requires the **prodlike overlay** so that migrations run once in `zitade
 
 ```shell
 docker compose --env-file .env \
-  -f docker-compose.yml \
-  -f docker-compose.prodlike.yml \
+  -f compose.yaml \
+  -f compose.prodlike.yaml \
   up -d --scale zitadel-api=3
 ```
 
@@ -182,8 +186,8 @@ docker compose --env-file .env \
 Edit `ZITADEL_VERSION` in `.env`, then:
 
 ```shell
-docker compose --env-file .env -f docker-compose.yml pull
-docker compose --env-file .env -f docker-compose.yml up -d --wait
+docker compose --env-file .env -f compose.yaml pull
+docker compose --env-file .env -f compose.yaml up -d --wait
 ```
 
 <Callout>

@@ -20,7 +20,7 @@ const SMOCKER_ADMIN_PORT = 8081;
 /**
  * Integration tests for custom CA certificate support in the login application.
  *
- * These tests verify that the Dockerfile correctly configures Node.js to trust
+ * These tests verify that the Containerfile correctly configures Node.js to trust
  * custom Certificate Authorities via the SSL_CERT_FILE environment variable and
  * the NODE_OPTIONS=--use-openssl-ca flag.
  *
@@ -73,7 +73,7 @@ describe("Custom CA Certificate Integration", () => {
       .start();
 
     try {
-      await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+      await GenericContainer.fromContainerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
     } catch (err) {
       throw new Error(`Failed to build login Docker image: ${err instanceof Error ? err.message : err}`);
     }

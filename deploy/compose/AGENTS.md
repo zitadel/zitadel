@@ -12,10 +12,10 @@ The stack contains four core services and two optional profile-based services:
 
 | File | Purpose | Safe to modify? |
 |------|---------|----------------|
-| `docker-compose.yml` | Base stack — all modes start from this | Yes, with care |
-| `docker-compose.mode-*.yml` | TLS mode overlays (one per mode) | Yes |
-| `docker-compose.prodlike.yml` | Init/setup/start split overlay | Yes |
-| `docker-compose.test.yml` | CI test overlay (local images, no direct ports) | Yes |
+| `compose.yaml` | Base stack — all modes start from this | Yes, with care |
+| `compose.mode-*.yml` | TLS mode overlays (one per mode) | Yes |
+| `compose.prodlike.yaml` | Init/setup/start split overlay | Yes |
+| `compose.test.yaml` | CI test overlay (local images, no direct ports) | Yes |
 | `.env.example` | User-facing config template | Yes — update on version bumps |
 | `.env.test` | CI-only test config | Internal only |
 | `otel-collector-config.yaml` | OTEL Collector pipeline config | Yes |
@@ -25,7 +25,7 @@ The stack contains four core services and two optional profile-based services:
 
 ### 3. Key Invariants
 
-- **Four TLS modes must remain independently composable.** Never merge mode-specific config into the base `docker-compose.yml`. Each `docker-compose.mode-*.yml` overlay must work when composed with the base file alone.
+- **Four TLS modes must remain independently composable.** Never merge mode-specific config into the base `compose.yaml`. Each `compose.mode-*.yml` overlay must work when composed with the base file alone.
 - **gRPC routing uses `Content-Type: application/grpc*` header matching**, not path prefixes. Do NOT introduce `/grpc` path routing.
 - **`ZITADEL_EXTERNALDOMAIN`, `ZITADEL_EXTERNALPORT`, `ZITADEL_EXTERNALSECURE` must be consistent** with the actual public endpoint. Mismatches cause "Instance not found" errors — the single most common deployment issue.
 - **Profiles (`cache`, `observability`) are opt-in** and must not affect the default stack behavior.
@@ -48,9 +48,9 @@ These designs were considered and explicitly rejected — do not re-propose them
 | Task | Command |
 |------|---------|
 | Start (local dev) | `cp .env.example .env && docker compose up -d --wait` |
-| Start (Let's Encrypt) | `docker compose --env-file .env -f docker-compose.yml -f docker-compose.mode-letsencrypt.yml up -d --wait` |
-| Start (production-like) | `docker compose --env-file .env -f docker-compose.yml -f docker-compose.prodlike.yml up -d --wait` |
-| Validate all configs | `docker compose --env-file .env.example -f docker-compose.yml -f <overlay> config > /dev/null` for each overlay |
+| Start (Let's Encrypt) | `docker compose --env-file .env -f compose.yaml -f compose.mode-letsencrypt.yaml up -d --wait` |
+| Start (production-like) | `docker compose --env-file .env -f compose.yaml -f compose.prodlike.yaml up -d --wait` |
+| Validate all configs | `docker compose --env-file .env.example -f compose.yaml -f <overlay> config > /dev/null` for each overlay |
 | Run CI smoke test | `pnpm nx run @zitadel/compose:test-full` |
 | Smoke check | `curl -sS http://localhost:8888/.well-known/openid-configuration` |
 

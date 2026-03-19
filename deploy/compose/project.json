@@ -9,17 +9,17 @@
                 "cwd": "{projectRoot}",
                 "parallel": false,
                 "commands": [
-                    "docker compose --env-file .env.example -f docker-compose.yml config --quiet",
-                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-letsencrypt.yml config --quiet",
-                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-external-tls.yml config --quiet",
-                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.mode-local-tls.yml config --quiet",
-                    "docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.prodlike.yml config --quiet"
+                    "docker compose --env-file .env.example -f compose.yaml config --quiet",
+                    "docker compose --env-file .env.example -f compose.yaml -f compose.mode-letsencrypt.yaml config --quiet",
+                    "docker compose --env-file .env.example -f compose.yaml -f compose.mode-external-tls.yaml config --quiet",
+                    "docker compose --env-file .env.example -f compose.yaml -f compose.mode-local-tls.yaml config --quiet",
+                    "docker compose --env-file .env.example -f compose.yaml -f compose.prodlike.yaml config --quiet"
                 ]
             },
             "inputs": [
-                "{projectRoot}/docker-compose.yml",
-                "{projectRoot}/docker-compose.mode-*.yml",
-                "{projectRoot}/docker-compose.prodlike.yml",
+                "{projectRoot}/compose.yaml",
+                "{projectRoot}/compose.mode-*.yml",
+                "{projectRoot}/compose.prodlike.yaml",
                 "{projectRoot}/.env.example"
             ]
         },
@@ -34,8 +34,8 @@
                 "cwd": "{projectRoot}",
                 "parallel": false,
                 "commands": [
-                    "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes --remove-orphans",
-                    "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test up --force-recreate --wait"
+                    "docker compose --env-file .env.test -f compose.yaml -f compose.test.yaml -p zitadel-compose-test down --volumes --remove-orphans",
+                    "docker compose --env-file .env.test -f compose.yaml -f compose.test.yaml -p zitadel-compose-test up --force-recreate --wait"
                 ]
             }
         },
@@ -75,8 +75,8 @@
                 ]
             },
             "inputs": [
-                "{projectRoot}/docker-compose.yml",
-                "{projectRoot}/docker-compose.test.yml",
+                "{projectRoot}/compose.yaml",
+                "{projectRoot}/compose.test.yaml",
                 "{projectRoot}/.env.test",
                 "{projectRoot}/playwright.config.ts",
                 "{projectRoot}/tests/**"
@@ -87,7 +87,7 @@
             "executor": "nx:run-commands",
             "options": {
                 "cwd": "{projectRoot}",
-                "command": "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes"
+                "command": "docker compose --env-file .env.test -f compose.yaml -f compose.test.yaml -p zitadel-compose-test down --volumes"
             }
         }
     }
