@@ -5,6 +5,44 @@ Errors:
   IDMissing: "ID missing"
   ResourceOwnerMissing: "Resource Owner Organisation missing"
   RemoveFailed: "Could not be removed"
+  AlreadyExists: "Already exists"
+  Already:
+    Exists: "Already exists"
+  NotFound: "Not found"
+  InvalidArgument: "Invalid argument"
+  PermissionDenied: "Permission denied"
+  Invalid:
+    Argument: "Invalid argument"
+    Event:
+      Type: "Invalid event type"
+  Missing:
+    InstanceID: "Instance ID is missing"
+    SessionID: "Session ID is missing"
+  Hash:
+    NotSupported: "Hash algorithm is not supported"
+  App:
+    NotExisting: "Application does not exist"
+    NotFound: "Application not found"
+  Arguments:
+    Level:
+      Invalid: "Level argument is invalid"
+    LevelType:
+      Invalid: "Level type argument is invalid"
+    Locale:
+      Invalid: "Locale argument is invalid"
+  Languages:
+    Duplicate: "Duplicate language found"
+    NotSupported: "Language is not supported"
+  List:
+    Query:
+      Invalid: "List query is invalid"
+  Database:
+    Connection:
+      Failed: "Database connection failed"
+  Mirror:
+    NoInstances: "No instances to mirror"
+  Protobuf:
+    ConvertToStruct: "Could not convert protobuf to struct"
   ProjectionName:
     Invalid: "Invalid projection name"
   Assets:
@@ -51,9 +89,13 @@ Errors:
     NotFound: "Secret generator not found"
   SMSConfig:
     NotFound: "SMS configuration not found"
+    NotExisting: "SMS configuration does not exist"
     AlreadyActive: "SMS configuration already active"
     AlreadyDeactivated: "SMS configuration already deactivated"
     NotExternalVerification: "SMS configuration does not support code verification"
+  SMS:
+    Twilio:
+      NotFound: "Twilio SMS configuration not found"
   SMTP:
     NotEmailMessage: "message is not EmailMessage"
     RequiredAttributes: "subject, recipients and content must be set but some or all of them are empty"
@@ -63,17 +105,26 @@ Errors:
     CouldNotCreateClient: "could not create smtp client"
     CouldNotStartTLS: "could not start tls"
     CouldNotAuth: "could not add smtp auth, check if both your user and password are correct, if they're correct maybe your provider requires an auth method not supported by Zitadel"
+    CouldNotXOAuth2: "Could not authenticate using XOAUTH2"
     CouldNotSetSender: "could not set sender"
     CouldNotSetRecipient: "could not set recipient"
   SMTPConfig:
     TestPassword: "Password for test not found"
+    TestClientSecret: "Client secret for test not found"
     NotFound: "SMTP configuration not found"
     AlreadyExists: "SMTP configuration already exists"
+    AlreadyActive: "SMTP configuration is already active"
     AlreadyDeactivated: "SMTP configuration already deactivated"
     SenderAdressNotCustomDomain: "The sender address must be configured as Custom Domain on the instance."
     TestEmailNotFound: "Email address for test not found"
   Notification:
     NoDomain: "No Domain found for message"
+    Channels:
+      NotPresent: "Notification channels are not present"
+  NotificationPolicy:
+    NotFound: "Notification Policy not found"
+  NotificationProvider:
+    NotFound: "Notification Provider not found"
   User:
     NotFound: "User could not be found"
     AlreadyExists: "User already exists"
@@ -85,6 +136,19 @@ Errors:
     EmailAsUsernameNotAllowed: "Email is not allowed as username"
     Invalid: "Userdata is invalid"
     DomainNotAllowedAsUsername: "Domain is already reserved and cannot be used"
+    AlreadyExisting: "User already exists"
+    NotExisting: "User does not exist"
+    NotChanged: "User has not been changed"
+    Inactive: "User is inactive"
+    NotActive: "User is not active"
+    NotMatchingUserID: "User ID does not match"
+    IDMissing: "User ID is missing"
+    State:
+      Invalid: "User state is invalid"
+    GrantRequired: "User grant is required"
+    ProjectRequired: "Project is required for the user"
+    UsernameOrPassword:
+      Invalid: "Username or password is invalid"
     AlreadyInactive: "User already inactive"
     NotInactive: "User is not inactive"
     CantDeactivateInitial: "User with state initial can only be deleted not deactivated"
@@ -117,6 +181,7 @@ Errors:
       AlreadyVerified: "Phone already verified"
       Empty: "Phone is empty"
       NotChanged: "Phone not changed"
+      IDMissing: "Phone ID is missing"
       VerifyingRemovalIsNotSupported: "Verifying phone removal is not supported"
     Address:
       NotFound: "Address not found"
@@ -125,6 +190,7 @@ Errors:
       Key:
         NotFound: "Machine key not found"
         AlreadyExisting: "Machine key already existing"
+        AlreadyExists: "Machine key already exists"
         Invalid: "Public key is not a valid RSA public key in PKIX format with PEM encoding"
       Secret:
         NotExisting: "Secret doesn't exist"
@@ -134,6 +200,10 @@ Errors:
       NotFound: "Personal Access Token not found"
     Metadata:
       Conflicting: "Metadata must not be set on both the user and human fields"
+      KeyEmpty: "Metadata key is empty"
+      ValueEmpty: "Metadata value is empty"
+    AccessToken:
+      NotFound: "Access token not found"
     NotHuman: "The User must be personal"
     NotMachine: "The User must be technical"
     WrongType: "Not allowed for this user type"
@@ -148,6 +218,8 @@ Errors:
       Expired: "Code is expired"
       GeneratorAlgNotSupported: "Unsupported generator algorithm"
       Invalid: "Code is invalid"
+      CryptoCodeNil: "Crypto code is nil"
+      NotConfigured: "Code generator is not configured"
     Password:
       NotFound: "Password not found"
       Empty: "Password is empty"
@@ -155,6 +227,7 @@ Errors:
       NotSet: "User has not set a password"
       NotChanged: "New password cannot be the same as your current password"
       NotSupported: "Password hash encoding not supported. Check out https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+      ConfirmationWrong: "Password confirmation does not match"
     PasswordComplexityPolicy:
       NotFound: "Password policy not found"
       MinLength: "Password is too short"
@@ -171,7 +244,14 @@ Errors:
       AlreadyExists: "External IDP already taken"
       NotFound: "External IDP not found"
       LoginFailed: "Login at External IDP failed"
+      NoOptionAllowed: "No external IDP option is allowed"
+      CreationNotAllowed: "External IDP creation is not allowed"
+      LinkingNotAllowed: "External IDP linking is not allowed"
+      IDPTypeNotImplemented: "IDP type is not implemented"
+      LogoutRequestNotFound: "Logout request not found"
+      NoExternalUserData: "No external user data received"
     MFA:
+      NoProviders: "No MFA providers configured"
       OTP:
         AlreadyReady: "Multifactor OTP (OneTimePassword) is already set up"
         NotExisting: "Multifactor OTP (OneTimePassword) doesn't exist"
@@ -187,6 +267,7 @@ Errors:
         MaxCountExceeded: "Maximum number of recovery codes exceeded"
         NotReady: "Recovery codes are not ready for use"
         ConfigInvalid: "Recovery codes configuration is invalid"
+        CountInvalid: "Recovery codes count is invalid"
     WebAuthN:
       NotFound: "WebAuthN Token could not be found"
       BeginRegisterFailed: "WebAuthN begin registration failed"
@@ -196,10 +277,14 @@ Errors:
       BeginLoginFailed: "WebAuthN begin login failed"
       ValidateLoginFailed: "Error on validate login credentials"
       CloneWarning: "Credentials may be cloned"
+      ServerConfig: "WebAuthN server configuration error"
+    RecoveryCodes:
+      CountInvalid: "Recovery codes count is invalid"
     RefreshToken:
       Invalid: "Refresh Token is invalid"
       NotFound: "Refresh Token not found"
   Org:
+    AlreadyExisting: "Organisation already exists"
     AlreadyExists: "Organisation's name or id already taken"
     Invalid: "Organisation is invalid"
     AlreadyDeactivated: "Organisation is already deactivated"
@@ -223,17 +308,46 @@ Errors:
     DomainVerificationHTTPNoMatch: "The file containing the challenge has been found in the expected URL but it doesn't contain the right token text. Check its content"
     DomainVerificationTimeout: "There was a timeout querying the DNS server"
     PrimaryDomainNotDeletable: "Organization Domain must not be deleted"
+    DomainAlreadyPrimary: "Domain is already the primary domain"
     DomainNotFound: "Domain not found"
     MemberIDMissing: "Member ID missing"
     MemberNotFound: "Organisation member not found"
+    MemberInvalid: "Organisation member is invalid"
     InvalidMember: "Organisation member is invalid"
     UserIDMissing: "User ID missing"
+    Settings:
+      Invalid: "Organisation settings are invalid"
     PolicyAlreadyExists: "Policy already exists"
     PolicyNotExisting: "Policy doesn't exist"
     IdpInvalid: "IDP configuration is invalid"
     IdpNotExisting: "IDP configuration does not exist"
     OIDCConfigInvalid: "OIDC IDP configuration is invalid"
     IdpIsNotOIDC: "IDP configuration is not of type oidc"
+    Member:
+      AlreadyExists: "Organisation member already exists"
+    DomainPolicy:
+      AlreadyExists: "Domain policy already exists"
+      NotExisting: "Domain policy does not exist"
+      NotFound: "Domain policy not found"
+    IDPConfig:
+      AlreadyExisting: "IDP configuration already exists"
+      AlreadyExists: "IDP configuration already exists"
+      NotActive: "IDP configuration is not active"
+      NotChanged: "IDP configuration has not been changed"
+      NotExisting: "IDP configuration does not exist"
+      NotInactive: "IDP configuration is not inactive"
+    LockoutPolicy:
+      AlreadyExists: "Lockout policy already exists"
+      NotChanged: "Lockout policy has not been changed"
+      NotFound: "Lockout policy not found"
+    PasswordComplexityPolicy:
+      NotChanged: "Password complexity policy has not been changed"
+    PrivacyPolicy:
+      AlreadyExists: "Privacy policy already exists"
+      NotChanged: "Privacy policy has not been changed"
+      NotFound: "Privacy policy not found"
+    LabelPolicy:
+      AlreadyExists: "Label policy already exists"
     Domain:
       AlreadyExists: "Domain already exists"
       InvalidCharacter: "Only alphanumeric characters, . and - are allowed for a domain"
@@ -241,6 +355,7 @@ Errors:
     LoginPolicy:
       NotFound: "Login Policy not found"
       Invalid: "Login Policy is invalid"
+      NotChanged: "Login Policy has not been changed"
       RedirectURIInvalid: "Default Redirect URI is invalid"
       NotExisting: "Login Policy not existing"
       AlreadyExists: "Login Policy already exists"
@@ -248,6 +363,10 @@ Errors:
       IdpProviderNotExisting: "Identity Provider not existing"
       RegistrationNotAllowed: "Registration is not allowed"
       UsernamePasswordNotAllowed: "Login with Username / Password is not allowed"
+      IDP:
+        AlreadyExists: "Identity Provider already exists on Login Policy"
+        Invalid: "Identity Provider is invalid"
+        NotExisting: "Identity Provider does not exist on Login Policy"
       MFA:
         AlreadyExists: "Multifactor already exists"
         NotExisting: "Multifactor not existing"
@@ -284,9 +403,29 @@ Errors:
     LabelPolicy:
       NotFound: "Private Label Policy not found"
       NotChanged: "Private Label Policy has not been changed"
+  ORG:
+    LockoutPolicy:
+      AlreadyExists: "Lockout policy already exists"
+  ORg:
+    LabelPolicy:
+      NotChanged: "Label policy has not been changed"
+  LoginPolicy:
+    NotFound: "Login policy not found"
+  MailTemplate:
+    NotFound: "Mail template not found"
+  MessageText:
+    NotFound: "Message text not found"
+  DomainPolicy:
+    NotFound: "Domain policy not found"
+  PrivacyPolicy:
+    NotFound: "Privacy policy not found"
+  PersonalAccessToken:
+    NotFound: "Personal access token not found"
   Project:
     ProjectIDMissing: "Project Id missing"
+    AlreadyExisting: "Project already exists"
     AlreadyExists: "Project already exists on organization"
+    NotExisting: "Project does not exist"
     OrgNotExisting: "Organisation doesn't exist"
     UserNotExisting: "User doesn't exist"
     CouldNotGenerateClientSecret: "Could not generate client secret"
@@ -305,9 +444,12 @@ Errors:
       AlreadyExists: "Role already exists"
       Invalid: "Role is invalid"
       NotExisting: "Role doesn't exist"
+      NotFound: "Role not found"
     IDMissing: "ID missing"
     App:
+      AlreadyExisting: "Application already exists"
       AlreadyExists: "Application already exists"
+      NotExisting: "Application does not exist"
       NotFound: "Application not found"
       Invalid: "Application invalid"
       NotExisting: "Application doesn't exist"
@@ -338,12 +480,36 @@ Errors:
       HasNotExistingRole: "One role doesn't exist on project"
       NotActive: "Project Grant is not active"
       NotInactive: "Project Grant is not inactive"
+      RoleKeyNotFound: "Role key not found on project grant"
+      Member:
+        Invalid: "Project Grant member is invalid"
   Instance:
     AlreadyExists: "Instance already exists"
     NotChanged: "Instance not changed"
     NotFound: "Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains"
+    Delete: "Instance could not be deleted"
+    Get: "Instance could not be retrieved"
+    List: "Instances could not be listed"
+    Update: "Instance could not be updated"
+    ID: "Instance ID is invalid"
+    Name: "Instance name is invalid"
+    Domain:
+      Add: "Instance domain could not be added"
+      AlreadyExists: "Instance domain already exists"
+      Get: "Instance domain could not be retrieved"
+      GeneratedNotRemovable: "Generated domain cannot be removed"
+      InvalidCharacter: "Only alphanumeric characters, . and - are allowed for a domain"
+      List: "Instance domains could not be listed"
+      NotFound: "Instance domain not found"
+      Remove: "Instance domain could not be removed"
+    TrustedDomain:
+      List: "Trusted domains could not be listed"
+    DebugNotificationProvider:
+      AlreadyExists: "Debug notification provider already exists"
+      NotFound: "Debug notification provider not found"
     Member:
       RolesNotChanged: "Roles have not been changed"
+      AlreadyExists: "Instance member already exists"
     MemberInvalid: "Member is invalid"
     MemberAlreadyExisting: "Member already exists"
     MemberNotExisting: "Member does not exist"
@@ -355,6 +521,27 @@ Errors:
     LoginPolicyInvalid: "Login Policy is invalid"
     LoginPolicyNotExisting: "Login Policy doesn't exist"
     IdpProviderInvalid: "Identity Provider is invalid"
+    IDPConfig:
+      AlreadyExists: "Instance IDP configuration already exists"
+      NotActive: "Instance IDP configuration is not active"
+      NotChanged: "Instance IDP configuration has not been changed"
+      NotExisting: "Instance IDP configuration does not exist"
+      NotInactive: "Instance IDP configuration is not inactive"
+    LabelPolicy:
+      AlreadyExists: "Instance Label Policy already exists"
+      NotExisting: "Instance Label Policy does not exist"
+    LockoutPolicy:
+      AlreadyExists: "Instance Lockout Policy already exists"
+      NotChanged: "Instance Lockout Policy has not been changed"
+      NotFound: "Instance Lockout Policy not found"
+    MFA:
+      AlreadyExists: "Instance MFA already exists"
+    PasswordComplexityPolicy:
+      MinLengthNotAllowed: "Given minimum password length is not allowed"
+    PrivacyPolicy:
+      AlreadyExists: "Instance Privacy Policy already exists"
+      NotChanged: "Instance Privacy Policy has not been changed"
+      NotFound: "Instance Privacy Policy not found"
     LoginPolicy:
       NotFound: "Default Login Policy not found"
       NotChanged: "Default Login Policy has not been changed"
@@ -439,6 +626,70 @@ Errors:
   IDPConfig:
     AlreadyExists: "IDP Configuration with this name already exists"
     NotExisting: "Identity Provider Configuration doesn't exist"
+    Invalid: "IDP configuration is invalid"
+  AuthNKey:
+    ExpireBeforeNow: "Authentication key expiration date is in the past"
+    NotFound: "Authentication key not found"
+  AuthRequest:
+    AlreadyExisting: "Auth request already exists"
+    InvalidCode: "Auth request code is invalid"
+    MissingParameters: "Auth request is missing required parameters"
+    NoCode: "Auth request has no code"
+    NotAuthenticated: "Auth request is not authenticated"
+    NotFound: "Auth request not found"
+    RequestTypeNotSupported: "Auth request type is not supported"
+    TokenNotFound: "Auth request token not found"
+    UserAgentNotCorresponding: "User agent does not correspond to the auth request"
+  CustomMessageText:
+    Invalid: "Custom message text is invalid"
+    NotFound: "Custom message text not found"
+  Endpoint:
+    Denied: "Endpoint is denied"
+    Invalid: "Endpoint is invalid"
+  ExternalIDP:
+    CreationNotAllowed: "External IDP creation is not allowed"
+    IDPTypeNotImplemented: "IDP type is not implemented"
+    LinkingNotAllowed: "External IDP linking is not allowed"
+    LogoutRequestNotFound: "Logout request not found"
+    NoExternalUserData: "No external user data received"
+    NotFound: "External IDP not found"
+  Group:
+    AlreadyExists: "Group already exists"
+    InvalidName: "Group name is invalid"
+    MissingOrganizationID: "Organization ID is missing for the group"
+    NotFound: "Group not found"
+  Instsance:
+    DeleteMismatch: "Instance delete mismatch"
+    Domain:
+      DeleteMismatch: "Instance domain delete mismatch"
+  ProjectGrant:
+    NotFound: "Project Grant not found"
+  Quota:
+    NotExisting: "Quota does not exist"
+  QuotaNotification:
+    NotExisting: "Quota notification does not exist"
+  Metrics:
+    Counter:
+      NotFound: "Metrics counter not found"
+    Histogram:
+      NotFound: "Metrics histogram not found"
+  SamlRequest:
+    NotExisting: "SAML request does not exist"
+  Users:
+    DomainPolicyNil: "Organisation Domain Policy is empty"
+    MFA:
+      OTP:
+        AlreadyReady: "Multifactor OTP is already set up"
+      Passwordless:
+        NotExisting: "Passkey does not exist"
+      U2F:
+        NotExisting: "U2F does not exist"
+    NotFound: "Users not found"
+  UserType:
+    Undefined: "User type is undefined"
+  idp:
+    config:
+      notset: "IDP configuration is not set"
   Changes:
     NotFound: "No history found"
     AuditRetention: "History is outside of the Audit Log Retention"
@@ -474,6 +725,7 @@ Errors:
     KeyNotExisting: "One or more keys do not exist"
   Action:
     Invalid: "Action is invalid"
+    AlreadyExisting: "Action already exists"
     NotFound: "Action not found"
     NotActive: "Action is not active"
     NotInactive: "Action is not inactive"
@@ -491,9 +743,13 @@ Errors:
     InvalidRequest: "Request is invalid"
     TooManyNestingLevels: "Too many query nesting levels (Max 20)"
     LimitExceeded: "Limit exceeded"
+    NotFound: "Query result not found"
+    HostedLoginTranslationNotFound: "Hosted login translation not found"
+    MergeTranslations: "Could not merge translations"
   Quota:
     AlreadyExists: "Quota already exists for this unit"
     NotFound: "Quota not found for this unit"
+    NotExisting: "Quota does not exist"
     Invalid:
       CallURL: "Quota call URL is invalid"
       Percent: "Quota percent is lower than 1"
@@ -524,6 +780,9 @@ Errors:
   Intent:
     IDPMissing: "IDP ID is missing in the request"
     IDPInvalid: "IDP invalid for the request"
+    Invalid: "Intent is invalid"
+    NotFound: "Intent not found"
+    MissingTransientMappingAttributeName: "Transient mapping attribute name is missing"
     ResponseInvalid: "IDP response is invalid"
     MissingSingleMappingAttribute: "IDP response does not contain the mapping attribute or has more than one value"
     SuccessURLMissing: "Success URL is missing in the request"
@@ -536,8 +795,17 @@ Errors:
     InvalidToken: "Intent Token is invalid"
     OtherUser: "Intent meant for another user"
   AuthRequest:
+    AlreadyExisting: "Auth Request already exists"
     AlreadyExists: "Auth Request already exists"
     NotExisting: "Auth Request does not exist"
+    NotFound: "Auth Request not found"
+    NotAuthenticated: "Auth Request is not authenticated"
+    InvalidCode: "Auth Request code is invalid"
+    NoCode: "Auth Request has no code"
+    MissingParameters: "Auth Request is missing required parameters"
+    RequestTypeNotSupported: "Auth Request type is not supported"
+    TokenNotFound: "Auth Request token not found"
+    UserAgentNotCorresponding: "User agent does not correspond to the auth request"
     WrongLoginClient: "Auth Request created by other login application"
     AlreadyHandled: "Auth Request has already been handled"
   OIDCSession:
@@ -547,7 +815,10 @@ Errors:
       Expired: "Token is expired"
     InvalidClient: "Token was not issued for this application"
   SAMLRequest:
+    AlreadyExisting: "SAML Request already exists"
     AlreadyExists: "SAMLRequest already exists"
+    InvalidCode: "SAML Request code is invalid"
+    NotAuthenticated: "SAML Request is not authenticated"
     NotExisting: "SAMLRequest does not exist"
     WrongLoginClient: "SAMLRequest created by other login application"
     AlreadyHandled: "SAMLRequest has already been handled"
@@ -562,6 +833,8 @@ Errors:
     InvalidValue: "Invalid value for this feature"
   Target:
     Invalid: "Target is invalid"
+    AlreadyExists: "Target already exists"
+    DeniedURL: "Target URL is denied"
     NoTimeout: "Target has no timeout"
     InvalidURL: "Target has an invalid URL"
     NotFound: "Target not found"
@@ -571,8 +844,12 @@ Errors:
     InvalidPublicKey: "The public key is invalid. Must be a PEM encoded RSA or ECDSA public key in PKCS#8 format"
   Execution:
     ConditionInvalid: "Execution condition is invalid"
+    CircularInclude: "Circular include detected in execution"
     Invalid: "Execution is invalid"
+    InvalidPublicKey: "Execution public key is invalid"
+    MaxLevelsInclude: "Maximum include levels exceeded in execution"
     NotFound: "Execution not found"
+    Unknown: "Unknown execution error"
     IncludeNotFound: "Include not found"
     NoTargets: "No targets defined"
     Failed: "Execution failed"
@@ -583,6 +860,8 @@ Errors:
     Type:
       Missing: "User Schema Type missing"
       AlreadyExists: "User Schema Type already exists"
+    Schema:
+      Invalid: "User Schema is invalid"
     Authenticator:
       Invalid: "Invalid authenticator type"
     NotActive: "User Schema not active"
