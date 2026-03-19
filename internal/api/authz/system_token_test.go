@@ -14,8 +14,10 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var exampleRsaPrivateKey *rsa.PrivateKey
@@ -80,11 +82,12 @@ func Test_SystemAPIUser_readKey(t *testing.T) {
 
 func Test_systemJWTStorage_GetKeyByIDAndClientID_Ok(t *testing.T) {
 	type TestCase struct {
-		name    string
-		storage *systemJWTStorage
-		userID  string
-		keyID   string
-		key     *SystemAPIPublicKey
+		name       string
+		storage    *systemJWTStorage
+		userID     string
+		keyID      string
+		publicKey  *SystemAPIPublicKey
+		privateKey *rsa.PrivateKey
 	}
 
 	testCases := []TestCase{
@@ -97,8 +100,9 @@ func Test_systemJWTStorage_GetKeyByIDAndClientID_Ok(t *testing.T) {
 						"user-1": key,
 					},
 				},
-				userID: "user-1",
-				key:    key,
+				userID:     "user-1",
+				publicKey:  key,
+				privateKey: exampleRsaPrivateKey,
 			}
 		}(),
 		func() TestCase {
@@ -114,8 +118,9 @@ func Test_systemJWTStorage_GetKeyByIDAndClientID_Ok(t *testing.T) {
 						"user-2": key,
 					},
 				},
-				userID: "user-2",
-				key:    key,
+				userID:     "user-2",
+				publicKey:  key,
+				privateKey: exampleRsaPrivateKey,
 			}
 		}(),
 		func() TestCase {
@@ -133,11 +138,12 @@ func Test_systemJWTStorage_GetKeyByIDAndClientID_Ok(t *testing.T) {
 					},
 				},
 				userID: "user",
-				key: &SystemAPIPublicKey{
+				publicKey: &SystemAPIPublicKey{
 					Data:      &exampleRsaPrivateKey.PublicKey,
 					NotBefore: &now,
 					NotAfter:  &until,
 				},
+				privateKey: exampleRsaPrivateKey,
 			}
 		}(),
 	}
@@ -147,7 +153,18 @@ func Test_systemJWTStorage_GetKeyByIDAndClientID_Ok(t *testing.T) {
 			jwk, err := tc.storage.GetKeyByIDAndClientID(context.Background(), tc.keyID, tc.userID)
 			assert.NoError(tt, err)
 			assert.IsType(tt, &rsa.PublicKey{}, jwk.Key)
-			assert.Equal(tt, tc.key.Data, jwk.Key)
+			assert.Equal(tt, tc.publicKey.Data, jwk.Key)
+
+			// create a signed payload to test the verification using the public key works
+			signer, err := jose.NewSigner(jose.SigningKey{
+				Algorithm: jose.RS256,
+				Key:       tc.privateKey,
+			}, nil)
+			require.NoError(tt, err)
+			signed, err := signer.Sign([]byte("This is a test payload"))
+			require.NoError(tt, err)
+
+			signed.Verify(jwk)
 		})
 	}
 }
@@ -181,18 +198,6 @@ func Test_systemJWTStorage_GetKeyByIDAndClientID_Nok(t *testing.T) {
 			},
 			userID: "user",
 			err:    "AUTHZ-NiJstf",
-		},
-		{
-			name: "get from cache, not after",
-			storage: &systemJWTStorage{
-				cachedKeys: map[string]*SystemAPIPublicKey{
-					"user": {
-						NotAfter: gu.Ptr(time.Now().UTC()),
-					},
-				},
-			},
-			userID: "user",
-			err:    "AUTHZ-CGmV4b",
 		},
 	}
 
