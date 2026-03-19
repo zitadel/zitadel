@@ -150,7 +150,9 @@
       "couldNotLoadSession": "Impossible de charger la session",
       "couldNotLoadAuthMethods": "Impossible de charger les méthodes d'authentification",
       "failedPrecondition": "Pré-condition non remplie",
-      "sessionNotValid": "La session n'est pas valide"
+      "sessionNotValid": "La session n'est pas valide",
+      "passwordVerificationMissing": "La vérification du mot de passe est manquante.",
+      "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier votre mot de passe à nouveau."
     }
   },
   "idp": {
@@ -369,16 +371,28 @@
     },
     "errors": {
       "couldNotResendEmail": "Impossible de renvoyer l'e-mail",
+      "couldNotResendPhone": "Impossible de renvoyer le code de vérification du téléphone",
       "couldNotVerifyUser": "Impossible de vérifier l'utilisateur",
       "couldNotVerifyInvite": "Impossible de vérifier l'invitation",
       "couldNotVerifyEmail": "Impossible de vérifier l'e-mail",
+      "couldNotVerifyPhone": "Impossible de vérifier le téléphone",
       "couldNotVerify": "Impossible de vérifier",
       "couldNotLoadUser": "Impossible de charger l'utilisateur",
       "couldNotLoadAuthenticators": "Impossible de charger les authentificateurs disponibles",
       "couldNotCreateSession": "Impossible de créer la session",
       "noHostFound": "Aucun hôte trouvé",
       "userAlreadyVerified": "L'utilisateur est déjà vérifié !",
-      "couldNotResendInvite": "Impossible de renvoyer l'invitation"
+      "phoneAlreadyVerified": "Le numéro de téléphone est déjà vérifié !",
+      "couldNotResendInvite": "Impossible de renvoyer l'invitation",
+      "inviteSendFailed": "Échec de l'envoi de l'email d'invitation",
+      "emailSendFailed": "Échec de l'envoi de l'email de vérification",
+      "contextMissing": "Une erreur est survenue. Veuillez réessayer.",
+      "phoneSendFailed": "Échec de l'envoi du code de vérification du téléphone"
+    },
+    "verifyPhone": {
+      "title": "Vérifier le téléphone",
+      "description": "Entrez le code fourni dans le SMS de vérification.",
+      "codeSent": "Un code vient d'être envoyé à votre numéro de téléphone."
     }
   },
   "authenticator": {
