@@ -8,6 +8,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"fmt"
 	"math/big"
 	"testing"
 	"time"
@@ -21,10 +22,21 @@ var exampleRsaPrivateKey *rsa.PrivateKey
 var exampleRsaPublicKeyBs []byte
 
 func init() {
-	exampleRsaPrivateKey, _ = rsa.GenerateKey(rand.Reader, 2048)
-	publicBs, _ := x509.MarshalPKIXPublicKey(&exampleRsaPrivateKey.PublicKey)
+	var err error
+
+	exampleRsaPrivateKey, err = rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		panic(fmt.Sprintf("failed to generate RSA private key: %v", err))
+	}
+	publicBs, err := x509.MarshalPKIXPublicKey(&exampleRsaPrivateKey.PublicKey)
+	if err != nil {
+		panic(fmt.Sprintf("failed to marshal RSA public key: %v", err))
+	}
 	writer := &bytes.Buffer{}
-	_ = pem.Encode(writer, &pem.Block{Type: "PUBLIC KEY", Bytes: publicBs})
+	err = pem.Encode(writer, &pem.Block{Type: "PUBLIC KEY", Bytes: publicBs})
+	if err != nil {
+		panic(fmt.Sprintf("failed to PEM-encode RSA public key: %v", err))
+	}
 	exampleRsaPublicKeyBs = writer.Bytes()
 }
 
@@ -134,6 +146,7 @@ func Test_systemJWTStorage_GetKeyByIDAndClientID_Ok(t *testing.T) {
 		t.Run(tc.name, func(tt *testing.T) {
 			jwk, err := tc.storage.GetKeyByIDAndClientID(context.Background(), tc.keyID, tc.userID)
 			assert.NoError(tt, err)
+			assert.IsType(tt, &rsa.PublicKey{}, jwk.Key)
 			assert.Equal(tt, tc.key.Data, jwk.Key)
 		})
 	}
