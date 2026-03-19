@@ -16,7 +16,7 @@ Please refer to the separate [vulnerability disclosure policy](https://zitadel.c
 
 ### Supported Versions
 
-We support the latest 2 major releases. You can read more about the release cycle [here](https://zitadel.com/docs/product/release-cycle).
+Supported are releases that are newer and not older than 6 months from our stable release. You can read more about the release cycle [here](https://zitadel.com/docs/product/release-cycle)
 
 ### Out of scope (what is NOT a security vulnerability)
 
