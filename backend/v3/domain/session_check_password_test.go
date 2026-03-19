@@ -1048,7 +1048,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			}
 			if tc.humanRepo != nil {
 				humanRepo := tc.humanRepo(ctrl)
-				userRepo := domainmock.NewMockUserRepository(ctrl)
+				userRepo := domainmock.NewUserRepo(ctrl)
 				userRepo.EXPECT().Human().Times(1).Return(humanRepo)
 				domain.WithUserRepo(userRepo)(opts)
 			}
