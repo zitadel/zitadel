@@ -261,7 +261,7 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			err := tc.cmd.Validate(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }
@@ -297,7 +297,10 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 		finishLoginFn func(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error)
 		cmd           *domain.PasskeyCheckCommand
 
-		expectedError error
+		expectedError            error
+		expectedPasskeySignCount uint32
+		expectedPasskeyID        string
+		expectedUserVerified     bool
 	}{
 		{
 			testName:      "when checkPasskey is nil should return no error",
@@ -394,7 +397,9 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 				repo := domainmock.NewUserRepo(ctrl)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-Uadvap", "failed updating session"),
+			expectedError:        zerrors.ThrowInternal(sessionUpdateErr, "DOM-Uadvap", "failed updating session"),
+			expectedPasskeyID:    "pkey-1",
+			expectedUserVerified: true,
 		},
 		{
 			testName: "when session not found should return not found error",
@@ -437,7 +442,9 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 				repo := domainmock.NewUserRepo(ctrl)
 				return repo
 			},
-			expectedError: zerrors.ThrowNotFound(nil, "DOM-Uadvap", "session not found"),
+			expectedError:        zerrors.ThrowNotFound(nil, "DOM-Uadvap", "session not found"),
+			expectedPasskeyID:    "pkey-1",
+			expectedUserVerified: true,
 		},
 		{
 			testName: "when user update fails should return error",
@@ -493,7 +500,9 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 					Return(int64(0), userUpdateErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-wdwZYk", "failed updating user"),
+			expectedError:        zerrors.ThrowInternal(userUpdateErr, "DOM-wdwZYk", "failed updating user"),
+			expectedPasskeyID:    "pkey-1",
+			expectedUserVerified: true,
 		},
 		{
 			testName: "when execute succeeds should return no error",
@@ -549,7 +558,10 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 					Return(int64(1), nil)
 				return repo
 			},
-			expectedError: nil,
+			expectedError:            nil,
+			expectedPasskeyID:        "pkey-1",
+			expectedPasskeySignCount: 5,
+			expectedUserVerified:     true,
 		},
 	}
 
@@ -573,9 +585,12 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			err := tc.cmd.Execute(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
+			assert.Equal(t, tc.expectedPasskeyID, tc.cmd.PKeyID)
+			assert.Equal(t, tc.expectedPasskeySignCount, tc.cmd.PKeySignCount)
+			assert.Equal(t, tc.expectedUserVerified, tc.cmd.UserVerified)
 			if tc.cmd.CheckPasskey != nil && tc.expectedError == nil {
-				assert.NotZero(t, tc.cmd.LastVeriedAt)
+				assert.NotZero(t, tc.cmd.LastVerifiedAt)
 			}
 		})
 	}
@@ -618,10 +633,10 @@ func TestPasskeyCheckCommand_Events(t *testing.T) {
 						&domain.SessionChallengePasskey{Challenge: "challenge", RPID: "example.com", UserVerification: old_domain.UserVerificationRequirementRequired},
 					},
 				},
-				LastVeriedAt:  time.Now(),
-				UserVerified:  true,
-				PKeyID:        "pkey-1",
-				PKeySignCount: 5,
+				LastVerifiedAt: time.Now(),
+				UserVerified:   true,
+				PKeyID:         "pkey-1",
+				PKeySignCount:  5,
 			},
 			expectedEvents: []eventstore.Command{
 				session.NewWebAuthNCheckedEvent(t.Context(), nil, time.Now(), true),
@@ -651,10 +666,10 @@ func TestPasskeyCheckCommand_Events(t *testing.T) {
 						&domain.SessionChallengePasskey{Challenge: "challenge", RPID: "example.com", UserVerification: old_domain.UserVerificationRequirementPreferred},
 					},
 				},
-				LastVeriedAt:  time.Now(),
-				UserVerified:  false,
-				PKeyID:        "pkey-2",
-				PKeySignCount: 10,
+				LastVerifiedAt: time.Now(),
+				UserVerified:   false,
+				PKeyID:         "pkey-2",
+				PKeySignCount:  10,
 			},
 			expectedEvents: []eventstore.Command{
 				session.NewWebAuthNCheckedEvent(t.Context(), nil, time.Now(), false),
@@ -682,7 +697,7 @@ func TestPasskeyCheckCommand_Events(t *testing.T) {
 				case *session.WebAuthNCheckedEvent:
 					actualAssertedType, ok := events[i].(*session.WebAuthNCheckedEvent)
 					require.True(t, ok)
-					assert.InDelta(t, expectedAssertedType.CheckedAt.UnixMilli(), actualAssertedType.CheckedAt.UnixMilli(), 1.5)
+					assert.Equal(t, tc.cmd.LastVerifiedAt, actualAssertedType.CheckedAt)
 					assert.Equal(t, expectedAssertedType.UserVerified, actualAssertedType.UserVerified)
 				case *user.HumanPasswordlessSignCountChangedEvent:
 					actualAssertedType, ok := events[i].(*user.HumanPasswordlessSignCountChangedEvent)

@@ -30,10 +30,10 @@ type PasskeyCheckCommand struct {
 	FetchedSession *Session
 
 	// For Events()
-	LastVeriedAt  time.Time
-	UserVerified  bool
-	PKeyID        string
-	PKeySignCount uint32
+	LastVerifiedAt time.Time
+	UserVerified   bool
+	PKeyID         string
+	PKeySignCount  uint32
 }
 
 // NewPasskeyCheckCommand initializes a new [PasskeyCheckCommand]
@@ -70,7 +70,7 @@ func (p *PasskeyCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]e
 	toReturn := make([]eventstore.Command, 2)
 
 	sessionAgg := &session.NewAggregate(p.SessionID, p.InstanceID).Aggregate
-	toReturn[0] = session.NewWebAuthNCheckedEvent(ctx, sessionAgg, p.LastVeriedAt, p.UserVerified)
+	toReturn[0] = session.NewWebAuthNCheckedEvent(ctx, sessionAgg, p.LastVerifiedAt, p.UserVerified)
 	if passkeyChallenge.UserVerification == old_domain.UserVerificationRequirementRequired {
 		toReturn[1] = user.NewHumanPasswordlessSignCountChangedEvent(ctx, sessionAgg, p.PKeyID, p.PKeySignCount)
 	} else {
@@ -115,6 +115,7 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 	if matchingPKey == nil {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-uuxodH", "Errors.User.WebAuthN.NotFound")
 	}
+	p.PKeyID = matchingPKey.ID
 
 	beginner, ok := opts.DB().(database.Beginner)
 	if !ok {
@@ -133,12 +134,13 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 	}()
 
 	p.UserVerified = webAuthCreds.Flags.UserVerified
-	p.LastVeriedAt = time.Now()
+	p.LastVerifiedAt = time.Now()
 	rowCount, err := sessionRepo.Update(ctx, tx,
 		sessionRepo.IDCondition(p.SessionID),
-		sessionRepo.SetFactor(&SessionFactorPasskey{LastVerifiedAt: p.LastVeriedAt, UserVerified: p.UserVerified}),
+		sessionRepo.SetFactor(&SessionFactorPasskey{LastVerifiedAt: p.LastVerifiedAt, UserVerified: p.UserVerified}),
 	)
 	if err := handleUpdateError(err, 1, rowCount, "DOM-Uadvap", "session"); err != nil {
+		txErr = err
 		return err
 	}
 
@@ -150,8 +152,10 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 		userRepo.Human().SetPasskeySignCount(webAuthCreds.Authenticator.SignCount),
 	)
 	if err := handleUpdateError(err, 1, rowCount, "DOM-wdwZYk", "user"); err != nil {
+		txErr = err
 		return err
 	}
+	p.PKeySignCount = webAuthCreds.Authenticator.SignCount
 
 	return nil
 }

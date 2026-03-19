@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"slices"
 	"time"
 
 	"golang.org/x/text/language"
@@ -52,7 +51,7 @@ type HumanUser struct {
 
 	Email         HumanEmail          `json:"email,omitzero" db:"-"`
 	Phone         *HumanPhone         `json:"phone,omitempty" db:"-"`
-	Passkeys      PasskeyList         `json:"passkeys,omitempty" db:"-"`
+	Passkeys      []*Passkey          `json:"passkeys,omitempty" db:"-"`
 	Password      HumanPassword       `json:"password,omitzero" db:"-"`
 	TOTP          *HumanTOTP          `json:"totp,omitempty" db:"-"`
 	RecoveryCodes *HumanRecoveryCodes `json:"recoveryCodes,omitempty" db:"-"`
@@ -205,19 +204,6 @@ type Passkey struct {
 
 	// Initialization is used during user registration
 	Initialization *Verification `json:"-" db:"-"`
-}
-
-type PasskeyList []*Passkey
-
-func (pl PasskeyList) GetPasskeysOfType(wantedTypes []PasskeyType) PasskeyList {
-	toReturn := PasskeyList{}
-	for _, pkey := range pl {
-		if slices.Contains(wantedTypes, pkey.Type) {
-			toReturn = append(toReturn, pkey)
-		}
-	}
-
-	return toReturn
 }
 
 //go:generate enumer -type PasskeyType -transform lower -trimprefix PasskeyType -json -sql

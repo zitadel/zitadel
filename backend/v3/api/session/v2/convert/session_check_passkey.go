@@ -6,10 +6,10 @@ import (
 	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
-func CheckPasskeyGRPCToDomain(checkPsw *session_grpc.CheckWebAuthN) ([]byte, error) {
-	if checkPsw == nil || checkPsw.GetCredentialAssertionData() == nil {
+func CheckPasskeyGRPCToDomain(checkPasskey *session_grpc.CheckWebAuthN) ([]byte, error) {
+	if checkPasskey == nil || checkPasskey.GetCredentialAssertionData() == nil {
 		return nil, nil
 	}
 
-	return json.Marshal(checkPsw.GetCredentialAssertionData())
+	return json.Marshal(checkPasskey.GetCredentialAssertionData())
 }

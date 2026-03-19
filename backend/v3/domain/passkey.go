@@ -15,6 +15,7 @@ func PasskeysToCredentials(ctx context.Context, passkeys []*Passkey, rpID string
 
 	for _, pkey := range passkeys {
 		// TODO(IAM-Marco): There is no state to check against, is this a problem?
+		// See https://github.com/zitadel/zitadel/blob/654322678c44036974667d7738e2b38e53516ba5/internal/webauthn/converter.go#L20
 		if pkey.RelyingPartyID == rpID ||
 			(pkey.RelyingPartyID == "" && rpID == http.DomainContext(ctx).InstanceDomain()) {
 			creds = append(creds, webauthn.Credential{
