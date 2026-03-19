@@ -23,6 +23,8 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+// TODO(IAM-Marco): collect input params inside *domain.PasswordCheckCommand
+
 func TestTOTPCheckCommand_Validate(t *testing.T) {
 	t.Parallel()
 	sessionGetErr := errors.New("session get error")
