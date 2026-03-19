@@ -103,7 +103,7 @@ Instrumentation:
       Endpoint: "" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_ENDPOINT
       # Disable TLS for grpc and http exporters
       Insecure: false # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_INSECURE
-      # Interval at which metrics are exported
+      # Interval at which logs are batched for export
       BatchDuration: 1s # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_BATCHDURATION
   Profile:
     Exporter:

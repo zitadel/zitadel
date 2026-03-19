@@ -157,7 +157,7 @@ func newTracerProvider(ctx context.Context, cfg TraceConfig, resource *resource.
 	case ExporterTypeGoogle:
 		exporter, err = traceGoogleExporter(ctx, cfg.Exporter)
 	case ExporterTypePrometheus:
-		fallthrough // prometheus is not supported for logs
+		fallthrough // prometheus is not supported for traces
 	default:
 		err = errExporterType(cfg.Exporter.Type, "tracer")
 	}
@@ -170,7 +170,7 @@ func newTracerProvider(ctx context.Context, cfg TraceConfig, resource *resource.
 		sdk_trace.WithSampler(sampler),
 	}
 	if exporter != nil {
-		opts = append(opts, sdk_trace.WithBatcher(exporter))
+		opts = append(opts, sdk_trace.WithBatcher(exporter, sdk_trace.WithBatchTimeout(cfg.Exporter.BatchDuration)))
 	}
 	tracerProvider := sdk_trace.NewTracerProvider(opts...)
 	return tracerProvider, nil
