@@ -20,7 +20,7 @@ type ServiceClass =
   | typeof SAMLService;
 
 export async function createServiceForHost<T extends ServiceClass>(service: T, serviceConfig: ServiceConfig) {
-  let token;
+  let token: string;
 
   // Determine authentication method based on available credentials
   // Priority: system user JWT > login client key > service account token
@@ -30,7 +30,11 @@ export async function createServiceForHost<T extends ServiceClass>(service: T, s
     token = await loginClientKeyToken();
   } else if (hasServiceUserToken()) {
     // Use service account token authentication (self-hosted)
-    token = process.env.ZITADEL_SERVICE_USER_TOKEN;
+    const serviceUserToken = process.env.ZITADEL_SERVICE_USER_TOKEN;
+    if (!serviceUserToken) {
+      throw new Error("ZITADEL_SERVICE_USER_TOKEN is not set");
+    }
+    token = serviceUserToken;
   } else {
     throw new Error(
       "No authentication credentials found. Set ZITADEL_LOGINCLIENT_KEYFILE, or system user credentials (AUDIENCE, SYSTEM_USER_ID, SYSTEM_USER_PRIVATE_KEY or SYSTEM_USER_PRIVATE_KEY_FILE), or ZITADEL_SERVICE_USER_TOKEN",

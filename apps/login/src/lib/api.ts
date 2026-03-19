@@ -25,13 +25,23 @@ async function getTokenFromFile(): Promise<string> {
  * @throws If the underlying token signing fails.
  */
 export async function systemAPIToken() {
+  const audience = process.env.AUDIENCE;
+  const subject = process.env.SYSTEM_USER_ID;
   const key = process.env.SYSTEM_USER_PRIVATE_KEY_FILE
     ? await getTokenFromFile()
-    : Buffer.from(process.env.SYSTEM_USER_PRIVATE_KEY, "base64").toString("utf-8");
+    : process.env.SYSTEM_USER_PRIVATE_KEY
+      ? Buffer.from(process.env.SYSTEM_USER_PRIVATE_KEY, "base64").toString("utf-8")
+      : undefined;
+
+  if (!audience || !subject || !key) {
+    throw new Error(
+      "Missing system API credentials: AUDIENCE, SYSTEM_USER_ID, and SYSTEM_USER_PRIVATE_KEY or SYSTEM_USER_PRIVATE_KEY_FILE",
+    );
+  }
 
   return newSystemToken({
-    audience: process.env.AUDIENCE,
-    subject: process.env.SYSTEM_USER_ID,
+    audience,
+    subject,
     key,
   });
 }
