@@ -4,6 +4,7 @@ import { Alert } from "@/components/alert";
 import { getDeviceAuthorizationRequest } from "@/lib/server/oidc";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
@@ -30,7 +31,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
 
   const [error, setError] = useState<string>("");
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
 
   async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
     setLoading(true);
@@ -49,6 +50,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
       return;
     }
 
+    startRedirectLoading();
     return router.push(
       `/device/consent?` +
         new URLSearchParams({

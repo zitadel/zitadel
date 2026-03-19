@@ -7,6 +7,7 @@ import { addU2F, verifyU2F } from "@/lib/server/u2f";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useState } from "react";
 import { Alert } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
@@ -28,7 +29,7 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
   const [error, setError] = useState<string>("");
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
 
   const router = useRouter();
 
@@ -146,6 +147,7 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
           paramsToContinue.append("requestId", requestId);
         }
 
+        startRedirectLoading();
         return router.push(`/u2f?` + paramsToContinue);
       } else {
         if (requestId && sessionId) {
@@ -158,7 +160,7 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
             loginSettings?.defaultRedirectUri,
           );
 
-          handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+          handleServerActionResponse(callbackResponse, router, setSamlData, setError, undefined, startRedirectLoading);
         } else if (loginName) {
           const callbackResponse = await completeFlowOrGetUrl(
             {
@@ -168,7 +170,7 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
             loginSettings?.defaultRedirectUri,
           );
 
-          handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+          handleServerActionResponse(callbackResponse, router, setSamlData, setError, undefined, startRedirectLoading);
         }
       }
     }

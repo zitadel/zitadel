@@ -70,12 +70,14 @@ export function handleServerActionResponse(
   setSamlData: (data: { url: string; fields: Record<string, string> }) => void,
   setError: (error: string) => void,
   hardNavigate: (url: string) => void = navigateHard,
+  onRedirectStart?: () => void,
 ): boolean {
   if (!response) {
     return false;
   }
 
   if ("redirect" in response && response.redirect) {
+    onRedirectStart?.();
     if (shouldUseHardNavigation(response.redirect)) {
       hardNavigate(response.redirect);
     } else {

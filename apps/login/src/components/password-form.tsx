@@ -7,6 +7,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
@@ -40,7 +41,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
   const [error, setError] = useState<string>("");
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
 
   const router = useRouter();
 
@@ -59,7 +60,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
         requestId,
       });
 
-      handleServerActionResponse(response, router, setSamlData, setError);
+      handleServerActionResponse(response, router, setSamlData, setError, undefined, startRedirectLoading);
     } catch {
       setError(t("verify.errors.couldNotVerifyPassword"));
     } finally {
@@ -105,6 +106,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
       params.append("requestId", requestId);
     }
 
+    startRedirectLoading();
     return router.push("/password/set?" + params);
   }
 

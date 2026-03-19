@@ -5,6 +5,7 @@ import { handleServerActionResponse } from "@/lib/client-utils";
 import { setPhoneAndContinue } from "@/lib/server/phone";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { AutoSubmitForm } from "./auto-submit-form";
@@ -38,7 +39,7 @@ export function PhoneSetForm({ userId, loginName, sessionId, requestId, organiza
   const router = useRouter();
   const t = useTranslations("otp");
   const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -60,7 +61,7 @@ export function PhoneSetForm({ userId, loginName, sessionId, requestId, organiza
         checkAfter,
       });
 
-      handleServerActionResponse(response, router, setSamlData, setError);
+      handleServerActionResponse(response, router, setSamlData, setError, undefined, startRedirectLoading);
     } catch {
       setError(t("set.errors.couldNotSavePhoneNumber"));
     } finally {

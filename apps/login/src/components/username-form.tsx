@@ -3,6 +3,7 @@
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { sendLoginname } from "@/lib/server/loginname";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -51,7 +52,7 @@ export function UsernameForm({
 
   const router = useRouter();
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
   const [error, setError] = useState<string>("");
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
@@ -69,7 +70,7 @@ export function UsernameForm({
           ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
         });
 
-        handleServerActionResponse(res, router, setSamlData, setError);
+        handleServerActionResponse(res, router, setSamlData, setError, undefined, startRedirectLoading);
         return res;
       } catch {
         setError(t("errors.internalError"));
@@ -77,7 +78,7 @@ export function UsernameForm({
         setLoading(false);
       }
     },
-    [defaultOrganization, requestId, suffix, loginSettings, router, t],
+    [defaultOrganization, requestId, suffix, loginSettings, router, startRedirectLoading, t],
   );
 
   useEffect(() => {
@@ -125,6 +126,7 @@ export function UsernameForm({
                   registerParams.append("requestId", requestId);
                 }
 
+                startRedirectLoading();
                 router.push("/register?" + registerParams);
               }}
               type="button"

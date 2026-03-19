@@ -9,6 +9,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
@@ -39,7 +40,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
   const t = useTranslations("otp");
 
   const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
@@ -201,7 +202,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
           );
           setLoading(false);
 
-          handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+          handleServerActionResponse(callbackResponse, router, setSamlData, setError, undefined, startRedirectLoading);
         } else {
           setLoading(false);
         }

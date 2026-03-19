@@ -5,6 +5,7 @@ import { handleServerActionResponse } from "@/lib/client-utils";
 import { resendPhoneVerification, verifyPhoneAndContinue } from "@/lib/server/phone";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AutoSubmitForm } from "./auto-submit-form";
@@ -42,7 +43,7 @@ export function VerifyPhoneForm({ userId, loginName, sessionId, requestId, organ
 
   const [error, setError] = useState<string>("");
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
 
   const resendCode = useCallback(async () => {
     setError("");
@@ -82,7 +83,7 @@ export function VerifyPhoneForm({ userId, loginName, sessionId, requestId, organ
         checkAfter,
       });
 
-      handleServerActionResponse(response, router, setSamlData, setError);
+      handleServerActionResponse(response, router, setSamlData, setError, undefined, startRedirectLoading);
     } catch {
       setError("Could not verify phone number");
     } finally {
