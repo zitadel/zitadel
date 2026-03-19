@@ -2,93 +2,42 @@ package projection
 
 import (
 	"context"
+	"database/sql"
 
-	repoDomain "github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/domain"
+	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const (
-	OrgRelationProjectionTable = "zitadel.organizations"
-)
-
-type orgRelationalProjection struct{}
-
-func (*orgRelationalProjection) Name() string {
-	return OrgRelationProjectionTable
-}
-
-func newOrgRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(orgRelationalProjection))
-}
-
-func (p *orgRelationalProjection) Reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: org.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  org.OrgAddedEventType,
-					Reduce: p.reduceOrgRelationalAdded,
-				},
-				{
-					Event:  org.OrgChangedEventType,
-					Reduce: p.reduceOrgRelationalChanged,
-				},
-				{
-					Event:  org.OrgDeactivatedEventType,
-					Reduce: p.reduceOrgRelationalDeactivated,
-				},
-				{
-					Event:  org.OrgReactivatedEventType,
-					Reduce: p.reduceOrgRelationalReactivated,
-				},
-				{
-					Event:  org.OrgRemovedEventType,
-					Reduce: p.reduceOrgRelationalRemoved,
-				},
-				// TODO
-				// {
-				// 	Event:  org.OrgDomainPrimarySetEventType,
-				// 	Reduce: p.reducePrimaryDomainSetRelational,
-				// },
-			},
-		},
-		{
-			Aggregate: instance.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  instance.InstanceRemovedEventType,
-					Reduce: reduceInstanceRemovedHelper(OrgColumnInstanceID),
-				},
-			},
-		},
-	}
-}
-
-func (p *orgRelationalProjection) reduceOrgRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-uYq5R", "reduce.wrong.event.type %s", org.OrgAddedEventType)
 	}
 
-	return handler.NewCreateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(OrgColumnID, e.Aggregate().ID),
-			handler.NewCol(OrgColumnName, e.Name),
-			handler.NewCol(OrgColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(State, repoDomain.OrgStateActive),
-			handler.NewCol(CreatedAt, e.CreationDate()),
-			handler.NewCol(UpdatedAt, e.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-K6rs9Y", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.OrganizationRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.Organization{
+			ID:         e.Aggregate().ID,
+			Name:       e.Name,
+			InstanceID: e.Aggregate().InstanceID,
+			State:      domain.OrgStateActive,
+			CreatedAt:  e.CreatedAt(),
+			UpdatedAt:  e.CreatedAt(),
+		})
+	}), nil
 }
 
-func (p *orgRelationalProjection) reduceOrgRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgChangedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Bg9om", "reduce.wrong.event.type %s", org.OrgChangedEventType)
@@ -96,86 +45,78 @@ func (p *orgRelationalProjection) reduceOrgRelationalChanged(event eventstore.Ev
 	if e.Name == "" {
 		return handler.NewNoOpStatement(e), nil
 	}
-	return handler.NewUpdateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(OrgColumnName, e.Name),
-			handler.NewCol(UpdatedAt, e.CreationDate()),
-		},
-		[]handler.Condition{
-			handler.NewCond(OrgColumnID, e.Aggregate().ID),
-			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
-		},
-	), nil
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZrVXLa", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.OrganizationRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetName(e.Name),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
 }
 
-func (p *orgRelationalProjection) reduceOrgRelationalDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgRelationalDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgDeactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-BApK5", "reduce.wrong.event.type %s", org.OrgDeactivatedEventType)
 	}
 
-	return handler.NewUpdateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(State, repoDomain.OrgStateInactive),
-			handler.NewCol(UpdatedAt, e.CreationDate()),
-		},
-		[]handler.Condition{
-			handler.NewCond(OrgColumnID, e.Aggregate().ID),
-			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
-		},
-	), nil
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ro7g4", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.OrganizationRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetState(domain.OrgStateInactive),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
 }
 
-func (p *orgRelationalProjection) reduceOrgRelationalReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgRelationalReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgReactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-o38DE", "reduce.wrong.event.type %s", org.OrgReactivatedEventType)
 	}
-	return handler.NewUpdateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(State, repoDomain.OrgStateActive),
-			handler.NewCol(UpdatedAt, e.CreationDate()),
-		},
-		[]handler.Condition{
-			handler.NewCond(OrgColumnID, e.Aggregate().ID),
-			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
-		},
-	), nil
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5snmW", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.OrganizationRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetState(domain.OrgStateActive),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
 }
 
-// TODO
-// func (p *orgRelationalProjection) reducePrimaryDomainSetRelational(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*org.DomainPrimarySetEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-3Tbkt", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
-// 	}
-// 	return handler.NewUpdateStatement(
-// 		e,
-// 		[]handler.Column{
-// 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
-// 			handler.NewCol(OrgColumnSequence, e.Sequence()),
-// 			handler.NewCol(OrgColumnDomain, e.Domain),
-// 		},
-// 		[]handler.Condition{
-// 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
-// 			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
-// 		},
-// 	), nil
-// }
-
-func (p *orgRelationalProjection) reduceOrgRelationalRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *relationalTablesProjection) reduceOrgRelationalRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-DGm9g", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-DGm9g", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
-	return handler.NewDeleteStatement(
-		e,
-		[]handler.Condition{
-			handler.NewCond(OrgColumnID, e.Aggregate().ID),
-			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
-		},
-	), nil
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-6y7hJ", "reduce.wrong.db.pool %T", ex)
+		}
+
+		repo := repository.OrganizationRepository()
+		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx), repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID))
+		return err
+	}), nil
 }

@@ -1,13 +1,11 @@
 package actions
 
 import (
-	"errors"
-	"fmt"
-	"net"
 	"reflect"
-	"strings"
 
 	"github.com/mitchellh/mapstructure"
+
+	"github.com/zitadel/zitadel/internal/denylist"
 )
 
 func SetHTTPConfig(config *HTTPConfig) {
@@ -17,11 +15,11 @@ func SetHTTPConfig(config *HTTPConfig) {
 var httpConfig *HTTPConfig
 
 type HTTPConfig struct {
-	DenyList []AddressChecker
+	DenyList []denylist.AddressChecker
 }
 
-func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
-	if to.Type() != reflect.TypeOf(HTTPConfig{}) {
+func HTTPConfigDecodeHook(from, to reflect.Value) (any, error) {
+	if to.Type() != reflect.TypeFor[HTTPConfig]() {
 		return from.Interface(), nil
 	}
 
@@ -30,7 +28,10 @@ func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
 	}{}
 
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		DecodeHook:       mapstructure.StringToTimeDurationHookFunc(),
+		DecodeHook: mapstructure.ComposeDecodeHookFunc(
+			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToSliceHookFunc(","),
+		),
 		WeaklyTypedInput: true,
 		Result:           &config,
 	})
@@ -43,77 +44,13 @@ func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
 	}
 
 	c := HTTPConfig{
-		DenyList: make([]AddressChecker, 0),
+		DenyList: make([]denylist.AddressChecker, 0),
 	}
 
-	for _, unsplit := range config.DenyList {
-		for _, split := range strings.Split(unsplit, ",") {
-			parsed, parseErr := NewHostChecker(split)
-			if parseErr != nil {
-				return nil, parseErr
-			}
-			if parsed != nil {
-				c.DenyList = append(c.DenyList, parsed)
-			}
-		}
+	c.DenyList, err = denylist.ParseDenyList(config.DenyList)
+	if err != nil {
+		return nil, err
 	}
 
 	return c, nil
-}
-
-func NewHostChecker(entry string) (AddressChecker, error) {
-	if entry == "" {
-		return nil, nil
-	}
-	_, network, err := net.ParseCIDR(entry)
-	if err == nil {
-		return &HostChecker{Net: network}, nil
-	}
-	if ip := net.ParseIP(entry); ip != nil {
-		return &HostChecker{IP: ip}, nil
-	}
-	return &HostChecker{Domain: entry}, nil
-}
-
-type HostChecker struct {
-	Net    *net.IPNet
-	IP     net.IP
-	Domain string
-}
-
-type AddressDeniedError struct {
-	deniedBy string
-}
-
-func NewAddressDeniedError(deniedBy string) *AddressDeniedError {
-	return &AddressDeniedError{deniedBy: deniedBy}
-}
-
-func (e *AddressDeniedError) Error() string {
-	return fmt.Sprintf("address is denied by '%s'", e.deniedBy)
-}
-
-func (e *AddressDeniedError) Is(target error) bool {
-	var addressDeniedErr *AddressDeniedError
-	if !errors.As(target, &addressDeniedErr) {
-		return false
-	}
-	return e.deniedBy == addressDeniedErr.deniedBy
-}
-
-func (c *HostChecker) IsDenied(ips []net.IP, address string) error {
-	// if the address matches the domain, no additional checks as needed
-	if c.Domain == address {
-		return NewAddressDeniedError(c.Domain)
-	}
-	// otherwise we need to check on ips (incl. the resolved ips of the host)
-	for _, ip := range ips {
-		if c.Net != nil && c.Net.Contains(ip) {
-			return NewAddressDeniedError(c.Net.String())
-		}
-		if c.IP != nil && c.IP.Equal(ip) {
-			return NewAddressDeniedError(c.IP.String())
-		}
-	}
-	return nil
 }

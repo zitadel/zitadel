@@ -49,7 +49,7 @@ func (s *Server) listUserMetadataRequestToModel(req *user.ListUserMetadataReques
 }
 
 func (s *Server) SetUserMetadata(ctx context.Context, req *connect.Request[user.SetUserMetadataRequest]) (*connect.Response[user.SetUserMetadataResponse], error) {
-	result, err := s.command.BulkSetUserMetadata(ctx, req.Msg.UserId, "", s.command.NewPermissionCheckUserWrite(ctx, false), setUserMetadataToDomain(req.Msg)...)
+	result, err := s.command.BulkSetUserMetadata(ctx, req.Msg.UserId, "", s.command.NewPermissionCheckUserWrite(ctx, false), setUserMetadataToDomain(req.Msg.GetMetadata())...)
 	if err != nil {
 		return nil, err
 	}
@@ -58,15 +58,18 @@ func (s *Server) SetUserMetadata(ctx context.Context, req *connect.Request[user.
 	}), nil
 }
 
-func setUserMetadataToDomain(req *user.SetUserMetadataRequest) []*domain.Metadata {
-	metadata := make([]*domain.Metadata, len(req.Metadata))
-	for i, data := range req.Metadata {
-		metadata[i] = &domain.Metadata{
-			Key:   data.Key,
-			Value: data.Value,
+func setUserMetadataToDomain(reqMetadata []*user.Metadata) []*domain.Metadata {
+	if len(reqMetadata) == 0 {
+		return nil
+	}
+	metadataEntries := make([]*domain.Metadata, len(reqMetadata))
+	for i, data := range reqMetadata {
+		metadataEntries[i] = &domain.Metadata{
+			Key:   data.GetKey(),
+			Value: data.GetValue(),
 		}
 	}
-	return metadata
+	return metadataEntries
 }
 
 func (s *Server) DeleteUserMetadata(ctx context.Context, req *connect.Request[user.DeleteUserMetadataRequest]) (*connect.Response[user.DeleteUserMetadataResponse], error) {

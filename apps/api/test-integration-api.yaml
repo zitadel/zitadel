@@ -76,6 +76,9 @@ LogStore:
     Stdout:
       Enabled: true
 
+Executions:
+  DenyList: # ZITADEL_EXECUTIONS_DENYLIST (comma separated list)
+
 Projections:
   HandleActiveInstances: 30m
   RequeueEvery: 20s

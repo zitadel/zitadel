@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Тайната не можа да бъде генерирана"
     PAT:
       NotFound: "Личен токен за достъп не е намерен"
+    Metadata:
+      Conflicting: "Метаданните не трябва да бъдат зададени едновременно в полетата [user] и [human]"
     NotHuman: "Потребителят трябва да е личен"
     NotMachine: "Потребителят трябва да е техничен"
     WrongType: "Не е разрешено за този тип потребител"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "Токенът за опресняване е невалиден"
       NotFound: "Токенът за обновяване не е намерен"
-  Instance:
-    NotFound: "Екземплярът не е намерен"
-    AlreadyExists: "Екземплярът вече съществува"
-    NotChanged: "Екземплярът не е променен"
   Org:
     AlreadyExists: "Името или идентификационният номер на организацията вече е зает."
     Invalid: "Организацията е невалидна"
@@ -238,12 +236,6 @@ Errors:
       AlreadyExists: "Домейнът вече съществува"
       InvalidCharacter: "Само буквено-цифрови знаци, . "
       EmptyString: "Невалидни нецифрови и азбучни знаци бяха заменени с празни интервали и полученият домейн е празен низ"
-    IDP:
-      InvalidSearchQuery: "Невалидна заявка за търсене"
-      ClientIDMissing: "Липсва ClientID"
-      TeamIDMissing: "TeamID липсва"
-      KeyIDMissing: "Липсва KeyID"
-      PrivateKeyMissing: "Липсва частен ключ"
     LoginPolicy:
       NotFound: "Правилата за влизане не са намерени"
       Invalid: "Правилата за влизане са невалидни"
@@ -345,7 +337,9 @@ Errors:
       NotActive: "Грантът по проекта не е активен"
       NotInactive: "Грантът по проекта не е неактивен"
   Instance:
-    NotFound: "IAM не е намерен. Уверете се, че сте получили правилния домейн. Вижте https://zitadel.com/docs/apis/introduction#domains"
+    AlreadyExists: "Екземплярът вече съществува"
+    NotChanged: "Екземплярът не е променен"
+    NotFound: "Екземплярът не е намерен. Уверете се, че сте получили правилния домейн. Вижте https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Ролите не са сменени"
     MemberInvalid: "Членът е невалиден"
@@ -613,6 +607,13 @@ Errors:
     Duplicate: "ID на уеб ключ не е уникален"
     NoActive: "Не е намерен активен уеб ключ"
     NotFound: "Уеб ключът не е намерен"
+  IDP:
+    InvalidSearchQuery: "Невалидна заявка за търсене"
+    ClientIDMissing: "Липсва ClientID"
+    TeamIDMissing: "TeamID липсва"
+    KeyIDMissing: "Липсва KeyID"
+    PrivateKeyMissing: "Липсва частен ключ"
+    InvalidPrivateKey: "Невалиден формат на частния ключ"
 
 AggregateTypes:
   action: "Действие"

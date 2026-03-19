@@ -1,7 +1,7 @@
+import { APPEARANCE_STYLES, getComponentRoundness, getThemeConfig } from "@/lib/theme";
+import { ThemeableProps } from "@/lib/themeUtils";
 import { clsx } from "clsx";
 import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from "react";
-import { ThemeableProps } from "@/lib/themeUtils";
-import { getThemeConfig, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
 
 export enum ButtonSizes {
   Small = "Small",
@@ -65,7 +65,6 @@ function getDefaultButtonAppearance(): string {
   return appearance?.button || "border border-button-light-border dark:border-button-dark-border"; // Fallback to flat design
 }
 
-// eslint-disable-next-line react/display-name
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {

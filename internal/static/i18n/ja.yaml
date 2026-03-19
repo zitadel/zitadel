@@ -132,6 +132,8 @@ Errors:
         CouldNotGenerate: "シークレットの生成に失敗しました"
     PAT:
       NotFound: "パーソナルアクセストークンが見つかりません"
+    Metadata:
+      Conflicting: "メタデータは [user] と [human] の両方のフィールドに同時に設定してはなりません"
     NotHuman: "ユーザーはパーソナルである必要があります"
     NotMachine: "ユーザーはテクニカルである必要があります"
     WrongType: "このユーザータイプは許可されていません"
@@ -196,10 +198,6 @@ Errors:
     RefreshToken:
       Invalid: "無効なリフレッシュトークンです"
       NotFound: "リフレッシュトークンが見つかりません"
-  Instance:
-    NotFound: "インスタンスが見つかりません"
-    AlreadyExists: "すでに存在するインスタンス"
-    NotChanged: "インスタンスは変更されていません"
   Org:
     AlreadyExists: "組織名またはIDはすでに使用されています"
     Invalid: "無効な組織です"
@@ -239,12 +237,6 @@ Errors:
       AlreadyExists: "ドメインはすでに存在します"
       InvalidCharacter: "ドメインは英数字、'.'、'-'のみ使用可能です。"
       EmptyString: "無効な数字およびアルファベット以外の文字は空のスペースに置き換えられ、結果のドメインは空の文字列になります"
-    IDP:
-      InvalidSearchQuery: "無効な検索クエリです"
-      ClientIDMissing: "クライアントIDがありません"
-      TeamIDMissing: "チームIDがありません"
-      KeyIDMissing: "キーIDがありません"
-      PrivateKeyMissing: "秘密キーがありません"
     LoginPolicy:
       NotFound: "ログインポリシーが見つかりません"
       Invalid: "無効なログインポリシーです"
@@ -346,6 +338,8 @@ Errors:
       NotActive: "プロジェクトグラントはアクティブではありません"
       NotInactive: "プロジェクトグラントは非アクティブではありません"
   Instance:
+    AlreadyExists: "すでに存在するインスタンス"
+    NotChanged: "インスタンスは変更されていません"
     NotFound: "インスタンスが見つかりません。正しいドメインを持っていることを確認してください。 https://zitadel.com/docs/apis/introduction#domains を参照してください"
     Member:
       RolesNotChanged: "ロールは変更されていません"
@@ -614,6 +608,13 @@ Errors:
     Duplicate: "Web キー ID が一意ではありません"
     NoActive: "アクティブな Web キーが見つかりません"
     NotFound: "Web キーが見つかりません"
+  IDP:
+    InvalidSearchQuery: "無効な検索クエリです"
+    ClientIDMissing: "クライアントIDがありません"
+    TeamIDMissing: "チームIDがありません"
+    KeyIDMissing: "キーIDがありません"
+    PrivateKeyMissing: "秘密キーがありません"
+    InvalidPrivateKey: "無効な秘密鍵形式"
 
 AggregateTypes:
   action: "アクション"

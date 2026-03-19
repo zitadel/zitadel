@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "El secreto no pudo generarse"
     PAT:
       NotFound: "Token de acceso personal no encontrado"
+    Metadata:
+      Conflicting: "Los metadatos no deben definirse simultáneamente en los campos [user] y [human]"
     NotHuman: "El usuario debe ser personal"
     NotMachine: "El usuario debe ser técnico"
     WrongType: "Tipo de usuario no permitido"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "El token de refresco no es válido"
       NotFound: "No se encontró el token de refresco"
-  Instance:
-    NotFound: "Instancia no encontrada"
-    AlreadyExists: "La instancia ya existe"
-    NotChanged: "La instancia no ha cambiado"
   Org:
     AlreadyExists: "El nombre o id de la organización ya está tomado"
     Invalid: "El nombre de la organización no es válido"
@@ -238,12 +236,6 @@ Errors:
       AlreadyExists: "El dominio ya existe"
       InvalidCharacter: "Solo caracteres alfanuméricos, . y - se permiten para un dominio"
       EmptyString: "Los caracteres alfabéticos y no numéricos no válidos se reemplazaron con espacios vacíos y el dominio resultante es una cadena vacía"
-    IDP:
-      InvalidSearchQuery: "Consulta de búsqueda no válida"
-      ClientIDMissing: "Falta ClientID"
-      TeamIDMissing: "Falta TeamID"
-      KeyIDMissing: "Falta KeyID"
-      PrivateKeyMissing: "Falta la clave privada"
     LoginPolicy:
       NotFound: "Política de inicio de sesión no encontrada"
       Invalid: "Política de inicio de sesión no es válida"
@@ -345,6 +337,8 @@ Errors:
       NotActive: "La concesión del proyecto no está activa"
       NotInactive: "La concesión del proyecto no está inactiva"
   Instance:
+    AlreadyExists: "La instancia ya existe"
+    NotChanged: "La instancia no ha cambiado"
     NotFound: "Instancia no encontrada. Asegúrate de que tienes el dominio correcto. Consulta https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Los roles no han cambiado"
@@ -613,6 +607,13 @@ Errors:
     Duplicate: "ID de clave web no único"
     NoActive: "No se encontró ninguna clave web activa"
     NotFound: "Clave web no encontrada"
+  IDP:
+    InvalidSearchQuery: "Consulta de búsqueda no válida"
+    ClientIDMissing: "Falta ClientID"
+    TeamIDMissing: "Falta TeamID"
+    KeyIDMissing: "Falta KeyID"
+    PrivateKeyMissing: "Falta la clave privada"
+    InvalidPrivateKey: "Formato de clave privada inválido"
 
 AggregateTypes:
   action: "Acción"

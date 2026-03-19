@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	internaldb "github.com/zitadel/zitadel/internal/database"
 )
 
 var _ domain.AuthorizationRepository = (*authorization)(nil)
@@ -36,17 +37,6 @@ func (a authorization) qualifiedAuthorizationRolesTableName() string {
 // repository
 // -------------------------------------------------------------
 
-const insertAuthorizationStmt = `INSERT INTO zitadel.authorizations (
-	instance_id, id, user_id, grant_id, project_id, state, created_at, updated_at
-)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-RETURNING created_at, updated_at`
-
-const insertAuthorizationWithRolesStmt = `WITH roles AS (
-  INSERT INTO zitadel.authorization_roles
-      (instance_id, authorization_id, grant_id, project_id, role_key)
-      VALUES ($1, $2, $4, $5, unnest($9::text[])))` + insertAuthorizationStmt
-
 // Create implements [domain.AuthorizationRepository].
 func (a authorization) Create(ctx context.Context, client database.QueryExecutor, authorization *domain.Authorization) error {
 	var (
@@ -59,17 +49,12 @@ func (a authorization) Create(ctx context.Context, client database.QueryExecutor
 		updatedAt = authorization.UpdatedAt
 	}
 
-	builder := database.NewStatementBuilder(insertAuthorizationWithRolesStmt,
-		authorization.InstanceID,
-		authorization.ID,
-		authorization.UserID,
-		authorization.GrantID,
-		authorization.ProjectID,
-		authorization.State,
-		createdAt,
-		updatedAt,
-		authorization.Roles,
+	builder := database.NewStatementBuilder("WITH roles AS (INSERT INTO zitadel.authorization_roles (instance_id, authorization_id, grant_id, project_id, role_key)"+
+		" VALUES ($1, $2, $3, $4, unnest($5::text[]))) INSERT INTO zitadel.authorizations (instance_id, id, grant_id, project_id, user_id, state, created_at, updated_at) VALUES ($1, $2, $3, $4, $6, $7, ",
+		authorization.InstanceID, authorization.ID, authorization.GrantID, authorization.ProjectID, authorization.Roles, authorization.UserID, authorization.State,
 	)
+	builder.WriteArgs(createdAt, updatedAt)
+	builder.WriteString(") RETURNING created_at, updated_at")
 
 	if err := client.QueryRow(
 		ctx,
@@ -109,7 +94,7 @@ func (a authorization) Get(ctx context.Context, client database.QueryExecutor, o
 	if err != nil {
 		return nil, err
 	}
-	return getOne[domain.Authorization](ctx, client, builder)
+	return scanAuthorization(ctx, client, builder)
 }
 
 // List implements [domain.AuthorizationRepository].
@@ -122,7 +107,7 @@ func (a authorization) List(ctx context.Context, client database.QueryExecutor, 
 	if err != nil {
 		return nil, err
 	}
-	return getMany[domain.Authorization](ctx, client, builder)
+	return scanAuthorizations(ctx, client, builder)
 }
 
 func (a authorization) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
@@ -191,10 +176,10 @@ func (a authorization) setRoles(ctx context.Context, client database.QueryExecut
 
 	// set the roles
 	builder.WriteString(updateAuthorizationRoleStmt)
-	err := database.Changes(changes).Write(builder)
-	if err != nil {
+	if err := database.Changes(changes).Write(builder); err != nil {
 		return 0, err
 	}
+
 	builder.WriteString(updateAuthorizationRoleStmtWhere)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
@@ -210,6 +195,50 @@ func (a authorization) Delete(ctx context.Context, client database.QueryExecutor
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+// rawAuthorization is used for query collection because ARRAY_AGG roles cannot be
+// scanned directly into the domain model's []string field when the client is backed
+// by [database/sql]. The intermediate TextArray field works with both [database/sql] and pgx.
+type rawAuthorization struct {
+	domain.Authorization
+	Roles internaldb.TextArray[string] `db:"roles"`
+}
+
+func (a *rawAuthorization) toDomain() *domain.Authorization {
+	a.Authorization.Roles = []string(a.Roles)
+	return &a.Authorization
+}
+
+func scanAuthorization(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) (*domain.Authorization, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	var authorization rawAuthorization
+	if err = rows.(database.CollectableRows).CollectExactlyOneRow(&authorization); err != nil {
+		return nil, err
+	}
+	return authorization.toDomain(), nil
+}
+
+func scanAuthorizations(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) ([]*domain.Authorization, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	var authorizations []rawAuthorization
+	if err = rows.(database.CollectableRows).Collect(&authorizations); err != nil {
+		return nil, err
+	}
+
+	result := make([]*domain.Authorization, len(authorizations))
+	for i := range authorizations {
+		result[i] = authorizations[i].toDomain()
+	}
+	return result, nil
 }
 
 // -------------------------------------------------------------

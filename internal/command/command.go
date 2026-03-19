@@ -8,6 +8,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"math/big"
+	"net"
 	"net/http"
 	"slices"
 	"strconv"
@@ -18,15 +19,18 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 
+	new_domain "github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	internal_net "github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -101,7 +105,9 @@ type Commands struct {
 	// so the query and cache overhead can be completely eliminated.
 	milestonesCompleted sync.Map
 
-	loginPaths LoginPaths
+	loginPaths        LoginPaths
+	ActionsV2DenyList []denylist.AddressChecker
+	IPLookupFunction  internal_net.IPLookupFunc
 }
 
 //go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
@@ -130,6 +136,7 @@ func StartCommands(
 	defaultAccessTokenLifetime, defaultRefreshTokenLifetime, defaultRefreshTokenIdleLifetime time.Duration,
 	defaultSecretGenerators *SecretGenerators,
 	loginPaths LoginPaths,
+	actionsDeniedHostList []denylist.AddressChecker,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -146,6 +153,9 @@ func StartCommands(
 	if err != nil {
 		return nil, fmt.Errorf("password hasher: %w", err)
 	}
+
+	new_domain.SetPasswordHasher(userPasswordHasher)
+
 	caches, err := startCaches(ctx, cacheConnectors)
 	if err != nil {
 		return nil, fmt.Errorf("caches: %w", err)
@@ -215,9 +225,11 @@ func StartCommands(
 				WithHyphen: defaults.Multifactors.RecoveryCodes.WithHyphen,
 			},
 		},
-		GenerateDomain: domain.NewGeneratedInstanceDomain,
-		caches:         caches,
-		loginPaths:     loginPaths,
+		GenerateDomain:    domain.NewGeneratedInstanceDomain,
+		caches:            caches,
+		loginPaths:        loginPaths,
+		ActionsV2DenyList: actionsDeniedHostList,
+		IPLookupFunction:  net.LookupIP,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
