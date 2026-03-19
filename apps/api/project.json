@@ -164,13 +164,25 @@
                 "generate"
             ],
             "cache": true,
-            "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...,./backend/...  ./...",
+            "command": "go test -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...,./backend/...  ./...",
             "inputs": [
                 "sources",
                 "{workspaceRoot}/go*"
             ],
             "outputs": [
                 "{workspaceRoot}/profile.api.test-unit.cov"
+            ]
+        },
+        "test-unit-race": {
+            "description": "Runs the unit tests with race detection (no coverage, for speed)",
+            "dependsOn": [
+                "generate"
+            ],
+            "cache": true,
+            "command": "go test -race ./...",
+            "inputs": [
+                "sources",
+                "{workspaceRoot}/go*"
             ]
         },
         "test-integration-build": {

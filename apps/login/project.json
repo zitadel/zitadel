@@ -67,6 +67,10 @@
     },
     "lint-check-next": {
       "description": "Runs Next.js specific lint checks",
+      "dependsOn": [
+        "^build",
+        "^generate"
+      ],
       "cache": true,
       "inputs": ["default"],
       "dependsOn": ["^build"]
