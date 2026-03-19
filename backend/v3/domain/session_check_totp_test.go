@@ -21,7 +21,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 func TestTOTPCheckCommand_Validate(t *testing.T) {
@@ -34,7 +33,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		testName      string
 		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
 		userRepo      func(ctrl *gomock.Controller) domain.UserRepository
-		checkTOTP     *session_grpc.CheckTOTP
+		checkTOTP     *domain.CheckTOTPType
 		sessionID     string
 		instanceID    string
 		expectedError error
@@ -47,18 +46,18 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:      "when session ID is not set should return error",
-			checkTOTP:     &session_grpc.CheckTOTP{},
+			checkTOTP:     &domain.CheckTOTPType{},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-ZNWO80", "Errors.Missing.SessionID"),
 		},
 		{
 			testName:      "when instance ID is not set should return error",
 			sessionID:     "session-1",
-			checkTOTP:     &session_grpc.CheckTOTP{},
+			checkTOTP:     &domain.CheckTOTPType{},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-47G8S3", "Errors.Missing.InstanceID"),
 		},
 		{
 			testName:   "when retrieving session fails should return error",
-			checkTOTP:  &session_grpc.CheckTOTP{Code: "123456"},
+			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -74,7 +73,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:   "when session not found should return not found error",
-			checkTOTP:  &session_grpc.CheckTOTP{Code: "123456"},
+			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -90,7 +89,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:   "when session userID is empty should return precondition failed error",
-			checkTOTP:  &session_grpc.CheckTOTP{Code: "123456"},
+			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -106,7 +105,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:   "when retrieving user fails should return error",
-			checkTOTP:  &session_grpc.CheckTOTP{Code: "123456"},
+			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -131,7 +130,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:   "when user not found should return not found error",
-			checkTOTP:  &session_grpc.CheckTOTP{Code: "123456"},
+			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -156,7 +155,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:   "when user is not human should return precondition failed error",
-			checkTOTP:  &session_grpc.CheckTOTP{Code: "123456"},
+			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -181,7 +180,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:   "when user is locked should return precondition failed error",
-			checkTOTP:  &session_grpc.CheckTOTP{Code: "123456"},
+			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -209,7 +208,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName:   "when all validations pass should return no error and set user",
-			checkTOTP:  &session_grpc.CheckTOTP{Code: "123456"},
+			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -290,7 +289,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 
 	tt := []struct {
 		testName           string
-		checkTOTP          *session_grpc.CheckTOTP
+		checkTOTP          *domain.CheckTOTPType
 		fetchedUser        domain.User
 		userRepo           func(ctrl *gomock.Controller) domain.HumanUserRepository
 		sessionRepo        func(ctrl *gomock.Controller) domain.SessionRepository
@@ -310,7 +309,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:  "when TOTP verification succeeds should update user and session",
-			checkTOTP: &session_grpc.CheckTOTP{Code: "123456"},
+			checkTOTP: &domain.CheckTOTPType{Code: "123456"},
 			fetchedUser: domain.User{
 				ID:             "user-1",
 				OrganizationID: "org-1",
@@ -349,7 +348,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:  "when user update fails should return error",
-			checkTOTP: &session_grpc.CheckTOTP{Code: "123456"},
+			checkTOTP: &domain.CheckTOTPType{Code: "123456"},
 			fetchedUser: domain.User{
 				ID:             "user-1",
 				OrganizationID: "org-1",
@@ -379,7 +378,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:     "when session update fails after successful TOTP should return error",
-			checkTOTP:    &session_grpc.CheckTOTP{Code: "123456"},
+			checkTOTP:    &domain.CheckTOTPType{Code: "123456"},
 			validateFunc: func(_, _ string) bool { return true },
 			fetchedUser: domain.User{
 				ID:             "user-1",
@@ -418,7 +417,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:  "when lockout policy fetch fails should return error",
-			checkTOTP: &session_grpc.CheckTOTP{Code: "wrong-code"},
+			checkTOTP: &domain.CheckTOTPType{Code: "wrong-code"},
 			fetchedUser: domain.User{
 				ID:             "user-1",
 				OrganizationID: "org-1",
@@ -459,7 +458,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:  "when TOTP verification fails should update user and fail",
-			checkTOTP: &session_grpc.CheckTOTP{Code: "wrong-code"},
+			checkTOTP: &domain.CheckTOTPType{Code: "wrong-code"},
 			fetchedUser: domain.User{
 				ID:             "user-1",
 				OrganizationID: "org-1",
@@ -512,7 +511,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:  "when TOTP verification fails should update user with failed check and fail on session update",
-			checkTOTP: &session_grpc.CheckTOTP{Code: "wrong-code"},
+			checkTOTP: &domain.CheckTOTPType{Code: "wrong-code"},
 			fetchedUser: domain.User{
 				ID:             "user-1",
 				OrganizationID: "org-1",
@@ -579,7 +578,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:  "when TOTP verification fails should update user with failed check",
-			checkTOTP: &session_grpc.CheckTOTP{Code: "wrong-code"},
+			checkTOTP: &domain.CheckTOTPType{Code: "wrong-code"},
 			fetchedUser: domain.User{
 				ID:             "user-1",
 				OrganizationID: "org-1",
@@ -647,7 +646,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 		},
 		{
 			testName:  "when TOTP verification fails and user exceeds max attempts should lock user",
-			checkTOTP: &session_grpc.CheckTOTP{Code: "wrong-code"},
+			checkTOTP: &domain.CheckTOTPType{Code: "wrong-code"},
 			fetchedUser: domain.User{
 				ID:             "user-1",
 				OrganizationID: "org-1",
@@ -766,7 +765,7 @@ func TestTOTPCheckCommand_Events(t *testing.T) {
 
 	tt := []struct {
 		testName          string
-		checkTOTP         *session_grpc.CheckTOTP
+		checkTOTP         *domain.CheckTOTPType
 		sessionID         string
 		instanceID        string
 		fetchedUser       domain.User
@@ -782,7 +781,7 @@ func TestTOTPCheckCommand_Events(t *testing.T) {
 		},
 		{
 			testName:          "when check is successful should emit user succeeded and session totp checked events",
-			checkTOTP:         &session_grpc.CheckTOTP{},
+			checkTOTP:         &domain.CheckTOTPType{},
 			checkedAt:         time.Now(),
 			isCheckSuccessful: true,
 
@@ -794,7 +793,7 @@ func TestTOTPCheckCommand_Events(t *testing.T) {
 		},
 		{
 			testName:  "when check is unsuccessful should emit user failed and session totp checked events",
-			checkTOTP: &session_grpc.CheckTOTP{},
+			checkTOTP: &domain.CheckTOTPType{},
 			checkedAt: time.Now(),
 
 			fetchedUser: domain.User{ID: "user-1", OrganizationID: "org-1"},
@@ -805,7 +804,7 @@ func TestTOTPCheckCommand_Events(t *testing.T) {
 		},
 		{
 			testName:     "when check is unsuccessful and user is locked should emit user failed, user locked and session totp checked events",
-			checkTOTP:    &session_grpc.CheckTOTP{},
+			checkTOTP:    &domain.CheckTOTPType{},
 			checkedAt:    time.Now(),
 			isUserLocked: true,
 

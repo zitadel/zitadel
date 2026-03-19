@@ -12,11 +12,14 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
+type CheckTOTPType struct {
+	Code string
+}
+
 type TOTPCheckCommand struct {
-	CheckTOTP           *session_grpc.CheckTOTP
+	CheckTOTP           *CheckTOTPType
 	tarpitFunc          tarpitFn
 	validateFunc        totpValidateFn
 	encryptionAlgorithm crypto.EncryptionAlgorithm
@@ -32,7 +35,7 @@ type TOTPCheckCommand struct {
 	CheckedAt         time.Time
 }
 
-func NewTOTPCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, totpValidator totpValidateFn, encryptionAlgo crypto.EncryptionAlgorithm, request *session_grpc.CheckTOTP) *TOTPCheckCommand {
+func NewTOTPCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, totpValidator totpValidateFn, encryptionAlgo crypto.EncryptionAlgorithm, request *CheckTOTPType) *TOTPCheckCommand {
 	tf := sysConfig.Tarpit.Tarpit()
 	if tarpitFunc != nil {
 		tf = tarpitFunc
@@ -207,7 +210,7 @@ func (t *TOTPCheckCommand) verifyTOTP(existingTOTPSecret *crypto.CryptoValue) er
 		return zerrors.ThrowInternal(err, "DOM-Yqhggx", "failed decrypting TOTP secret")
 	}
 
-	isValid := t.validateFunc(t.CheckTOTP.GetCode(), decryptedSecret)
+	isValid := t.validateFunc(t.CheckTOTP.Code, decryptedSecret)
 	if !isValid {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-o5cVir", "Errors.User.MFA.OTP.InvalidCode")
 	}
