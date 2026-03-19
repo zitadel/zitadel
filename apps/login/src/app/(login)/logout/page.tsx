@@ -1,7 +1,9 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsClearList } from "@/components/sessions-clear-list";
 import { Translated } from "@/components/translated";
+import { toClientSerializable } from "@/lib/client-serialization";
 import { getAllSessionCookieIds } from "@/lib/cookies";
+import { getLogoutTokenVerificationOptions } from "@/lib/logout-token";
 import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/zitadel";
 import { verifyJwt } from "@zitadel/client/node";
@@ -39,15 +41,11 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   let postLogoutRedirectUri, logoutHint;
   if (logoutToken) {
     try {
-      const payload = await verifyJwt<{ post_logout_redirect_uri?: string; logoutHint?: string }>(
+      const payload = await verifyJwt<{ post_logout_redirect_uri?: string; logout_hint?: string }>(
         logoutToken,
         `${serviceConfig.baseUrl}/oauth/v2/keys`,
-        {
-          instanceHost: serviceConfig.instanceHost,
-          publicHost: serviceConfig.publicHost,
-        },
+        getLogoutTokenVerificationOptions(serviceConfig),
       );
-      console.log("logout token payload", payload);
 
       if (payload.post_logout_redirect_uri && typeof payload.post_logout_redirect_uri === "string") {
         postLogoutRedirectUri = payload.post_logout_redirect_uri;
