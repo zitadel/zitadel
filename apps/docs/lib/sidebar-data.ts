@@ -959,7 +959,7 @@ export const apisSidebar: readonly SidebarItem[] = [
           { type: "category", label: "Instance", items: ["reference/api/instance"] },
           { type: "category", label: "Project", items: ["reference/api/project"] },
           { type: "category", label: "Application", items: ["reference/api/application"] },
-          { type: "category", label: "Role Assignments", items: ["reference/api/authorization"] },
+          { type: "category", label: "Role Assignment", items: ["reference/api/authorization"] },
           { type: "category", label: "ZITADEL Internal Permissions", items: ["reference/api/internal_permission"] },
         ],
       },
