@@ -47,10 +47,11 @@ func TestIDPIntentCheckCommand_Events(t *testing.T) {
 		{
 			name: "valid command returns events",
 			command: &domain.IDPIntentCheckCommand{
-				CheckIntent:     &domain.CheckIDPIntentType{ID: "intent-123"},
-				SessionID:       "session-456",
-				InstanceID:      "instance-789",
-				IsCheckComplete: true,
+				CheckIntent:        &domain.CheckIDPIntentType{ID: "intent-123"},
+				SessionID:          "session-456",
+				InstanceID:         "instance-789",
+				IsCheckComplete:    true,
+				IntentLastVerified: time.Now(),
 			},
 
 			expectedEvents: []eventstore.Command{
@@ -64,9 +65,7 @@ func TestIDPIntentCheckCommand_Events(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			// Test
-			oneSecondAgo := time.Now().Add(-1 * time.Second)
 			events, err := tc.command.Events(t.Context(), &domain.InvokeOpts{})
-			inOneSecond := time.Now().Add(1 * time.Second)
 
 			// Verify
 			assert.NoError(t, err)
@@ -79,7 +78,7 @@ func TestIDPIntentCheckCommand_Events(t *testing.T) {
 				case *session.IntentCheckedEvent:
 					actualAssertedType, ok := events[i].(*session.IntentCheckedEvent)
 					require.True(t, ok)
-					assert.WithinRange(t, actualAssertedType.CheckedAt, oneSecondAgo, inOneSecond)
+					assert.Equal(t, tc.command.IntentLastVerified, actualAssertedType.CheckedAt)
 				case *idpintent.ConsumedEvent:
 					_, ok := events[i].(*idpintent.ConsumedEvent)
 					require.True(t, ok)
@@ -740,10 +739,12 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 func TestIDPIntentCheckCommand_Execute(t *testing.T) {
 	t.Parallel()
 	deleteErr := errors.New("delete error")
+	updateErr := errors.New("update error")
 
 	tt := []struct {
 		testName       string
 		idpIntentRepo  func(ctrl *gomock.Controller) domain.IDPIntentRepository
+		sessionRepo    func(ctrl *gomock.Controller) domain.SessionRepository
 		cmd            *domain.IDPIntentCheckCommand
 		expectedError  error
 		expectComplete bool
@@ -781,7 +782,7 @@ func TestIDPIntentCheckCommand_Execute(t *testing.T) {
 			expectComplete: false,
 		},
 		{
-			testName: "when intent is successfully deleted should mark complete",
+			testName: "when session update fails should return internal error",
 			cmd:      domain.NewIDPIntentCheckCommand(&domain.CheckIDPIntentType{ID: "intent-123"}, "session-1", "instance-1", nil),
 			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
 				repo := domainmock.NewIDPIntentRepo(ctrl)
@@ -790,14 +791,81 @@ func TestIDPIntentCheckCommand_Execute(t *testing.T) {
 					Return(int64(1), nil)
 				return repo
 			},
-			expectedError:  nil,
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewSessionRepo(ctrl)
+				repo.EXPECT().
+					Update(gomock.Any(), gomock.Any(), repo.PrimaryKeyCondition("instance-1", "session-1"), repo.SetFactor(&domain.SessionFactorIdentityProviderIntent{LastVerifiedAt: time.Now()})).
+					Times(1).
+					Return(int64(0), updateErr)
+				return repo
+			},
+			expectedError: zerrors.ThrowInternal(updateErr, "DOM-pec0al", "failed updating session"),
+		},
+		{
+			testName: "when session update returns no rows should return not found error",
+			cmd:      domain.NewIDPIntentCheckCommand(&domain.CheckIDPIntentType{ID: "intent-123"}, "session-1", "instance-1", nil),
+			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
+				repo := domainmock.NewIDPIntentRepo(ctrl)
+				repo.EXPECT().
+					Delete(gomock.Any(), gomock.Any(), repo.PrimaryKeyCondition("instance-1", "intent-123")).
+					Return(int64(1), nil)
+				return repo
+			},
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewSessionRepo(ctrl)
+				repo.EXPECT().
+					Update(gomock.Any(), gomock.Any(), repo.PrimaryKeyCondition("instance-1", "session-1"), repo.SetFactor(&domain.SessionFactorIdentityProviderIntent{LastVerifiedAt: time.Now()})).
+					Times(1).
+					Return(int64(0), nil)
+				return repo
+			},
+			expectedError: zerrors.ThrowNotFound(nil, "DOM-CopO4e", "session not found"),
+		},
+		{
+			testName: "when session update returns no too many rows should return internal error",
+			cmd:      domain.NewIDPIntentCheckCommand(&domain.CheckIDPIntentType{ID: "intent-123"}, "session-1", "instance-1", nil),
+			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
+				repo := domainmock.NewIDPIntentRepo(ctrl)
+				repo.EXPECT().
+					Delete(gomock.Any(), gomock.Any(), repo.PrimaryKeyCondition("instance-1", "intent-123")).
+					Return(int64(1), nil)
+				return repo
+			},
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewSessionRepo(ctrl)
+				repo.EXPECT().
+					Update(gomock.Any(), gomock.Any(), repo.PrimaryKeyCondition("instance-1", "session-1"), repo.SetFactor(&domain.SessionFactorIdentityProviderIntent{LastVerifiedAt: time.Now()})).
+					Times(1).
+					Return(int64(2), nil)
+				return repo
+			},
+			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-mlbibw", "unexpected number of rows updated"),
+		},
+		{
+			testName: "when session update returns 1 row updated should return no error",
+			cmd:      domain.NewIDPIntentCheckCommand(&domain.CheckIDPIntentType{ID: "intent-123"}, "session-1", "instance-1", nil),
+			idpIntentRepo: func(ctrl *gomock.Controller) domain.IDPIntentRepository {
+				repo := domainmock.NewIDPIntentRepo(ctrl)
+				repo.EXPECT().
+					Delete(gomock.Any(), gomock.Any(), repo.PrimaryKeyCondition("instance-1", "intent-123")).
+					Return(int64(1), nil)
+				return repo
+			},
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewSessionRepo(ctrl)
+				repo.EXPECT().
+					Update(gomock.Any(), gomock.Any(), repo.PrimaryKeyCondition("instance-1", "session-1"), repo.SetFactor(&domain.SessionFactorIdentityProviderIntent{LastVerifiedAt: time.Now()})).
+					Times(1).
+					Return(int64(1), nil)
+				return repo
+			},
 			expectComplete: true,
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			// t.Parallel()
+			t.Parallel()
 			// Given
 			ctrl := gomock.NewController(t)
 			ctx := authz.NewMockContext(tc.cmd.InstanceID, "", "")
@@ -810,6 +878,9 @@ func TestIDPIntentCheckCommand_Execute(t *testing.T) {
 			if tc.idpIntentRepo != nil {
 				domain.WithIDPIntentRepo(tc.idpIntentRepo(ctrl))(opts)
 			}
+			if tc.sessionRepo != nil {
+				domain.WithSessionRepo(tc.sessionRepo(ctrl))(opts)
+			}
 
 			// Test
 			err := tc.cmd.Execute(ctx, opts)
@@ -817,6 +888,9 @@ func TestIDPIntentCheckCommand_Execute(t *testing.T) {
 			// Verify
 			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectComplete, tc.cmd.IsCheckComplete)
+			if tc.expectedError == nil && tc.expectComplete {
+				assert.NotZero(t, tc.cmd.IntentLastVerified)
+			}
 		})
 	}
 }
