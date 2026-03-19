@@ -51,9 +51,12 @@ zitadel start-from-init \
 
 ### Configure by Environment Variables
 
+The environment variable approach uses a single DSN string instead of the individual field-based configuration shown above.
+
 ```bash
 # Set the PostgreSQL connection via a single DSN
-export ZITADEL_DATABASE_POSTGRES_DSN=postgresql://my_zitadel_db_user:Secret_DB_User_Password@my.database:5432/zitadel?sslmode=disable
+# Use the "postgres" maintenance database so ZITADEL can create its own database during initialization
+export ZITADEL_DATABASE_POSTGRES_DSN=postgresql://my_zitadel_db_user:Secret_DB_User_Password@my.database:5432/postgres?sslmode=disable
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME="root"
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
 

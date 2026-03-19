@@ -76,7 +76,7 @@ The bundled PostgreSQL subchart is for quickstart use only. You can replace it i
 
 | Component | How to replace |
 |-----------|---------------|
-| **Database** | Set `postgresql.enabled: false` and configure `ZITADEL_DATABASE_POSTGRES_DSN` pointing to your own PostgreSQL |
+| **Database** | Set `postgresql.enabled: false` and configure `ZITADEL_DATABASE_POSTGRES_DSN` pointing to your own PostgreSQL. Use the `postgres` maintenance database so ZITADEL can create its own database during initialization |
 | **Ingress controller** | Update `ingress.className` (and `login.ingress.className`) to match your controller's IngressClass |
 | **Caching** | Add Redis by configuring `zitadel.configmapConfig.Caches` (see [Caching](/self-hosting/deploy/kubernetes/caching)) |
 
@@ -108,7 +108,7 @@ kubectl create secret generic zitadel-masterkey \
 
 # Database credentials — store the full DSN
 kubectl create secret generic zitadel-db-credentials \
-  --from-literal=dsn="postgresql://zitadel:your-secure-password@postgres.database.svc.cluster.local:5432/zitadel?sslmode=verify-full"
+  --from-literal=dsn="postgresql://zitadel:your-secure-password@postgres.database.svc.cluster.local:5432/postgres?sslmode=verify-full"
 ```
 
 ### Configure values

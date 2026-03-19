@@ -212,6 +212,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	new_domain.SetIDPEncryptionAlgorithm(keys.IDPConfig)
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+	sessionTokenDecryptor := internal_authz.SessionTokenDecryptor(keys.OIDC)
+	new_domain.SetSessionTokenDecryptor(sessionTokenDecryptor)
 	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)
 	if err != nil {
 		return fmt.Errorf("unable to start caches: %w", err)
