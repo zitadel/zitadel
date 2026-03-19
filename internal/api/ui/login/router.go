@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 )
 

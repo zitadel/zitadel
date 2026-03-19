@@ -1,5 +1,5 @@
+import { createConnectTransport } from "@connectrpc/connect-node";
 import { Client, create, Duration } from "@zitadel/client";
-import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { OrganizationSchema, TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
@@ -30,22 +30,65 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getTranslations } from "next-intl/server";
-import { unstable_cacheLife as cacheLife } from "next/cache";
+
 import { getUserAgent } from "./fingerprint";
-import { otelGrpcInterceptor } from "./grpc/interceptors/otel";
 import { createLogger } from "./logger";
 
+import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
+import { Interceptor } from "@connectrpc/connect";
 import { createServiceForHost } from "./service";
 
 const logger = createLogger("zitadel");
 
-const useCache = process.env.DEBUG !== "true";
+const useCache = process.env.API_CACHE_ENABLED !== "false";
 
-async function cacheWrapper<T>(callback: Promise<T>) {
-  "use cache";
-  cacheLife("hours");
+let cacheConfig: Record<string, number> = {};
+try {
+  if (process.env.API_CACHE_CONFIG) {
+    cacheConfig = JSON.parse(process.env.API_CACHE_CONFIG);
+  }
+} catch (e) {
+  console.error("Failed to parse API_CACHE_CONFIG", e);
+}
 
-  return callback;
+const defaultCacheTTL = (cacheConfig.defaultMinutes ?? 15) * 60 * 1000; // 15 mins default
+const longCacheTTL = (cacheConfig.longMinutes ?? 60) * 60 * 1000; // 1 hour default
+
+/**
+ * Helper to determine the TTL for a specific API method.
+ * Allows overriding per-resource via the API_CACHE_CONFIG environment variable.
+ */
+function getTTLForKey(keyPrefix: string, fallbackTtl: number) {
+  const configTTL = cacheConfig[keyPrefix];
+  if (typeof configTTL === "number" && !isNaN(configTTL)) {
+    return configTTL * 60 * 1000; // Config expects minutes
+  }
+  return fallbackTtl;
+}
+
+const promiseCache = new Map<string, { promise: Promise<any>; expiresAt: number }>();
+
+/**
+ * A stale-while-revalidate in-memory cache to keep data fresh and deduplicate concurrent requests.
+ * We cache the Promise, so concurrent requests share the exact same execution.
+ */
+function freshCache<T>(key: string, fetcher: () => Promise<T>, ttlMs: number): Promise<T> {
+  if (!useCache) {
+    return fetcher();
+  }
+
+  const now = Date.now();
+  const cached = promiseCache.get(key);
+  if (cached && now < cached.expiresAt) {
+    return cached.promise;
+  }
+
+  const promise = fetcher();
+  promiseCache.set(key, { promise, expiresAt: now + ttlMs });
+
+  promise.catch(() => promiseCache.delete(key));
+
+  return promise;
 }
 
 export async function getHostedLoginTranslation({
@@ -56,29 +99,35 @@ export async function getHostedLoginTranslation({
   organization?: string;
   locale?: string;
 }>) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-  const callback = settingsService
-    .getHostedLoginTranslation(
-      {
-        level: organization
-          ? {
-              case: "organizationId",
-              value: organization,
-            }
-          : {
-              case: "instance",
-              value: true,
-            },
-        locale: locale,
-      },
-      {},
-    )
-    .then((resp) => {
-      return resp.translations ? resp.translations : undefined;
-    });
+    return settingsService
+      .getHostedLoginTranslation(
+        {
+          level: organization
+            ? {
+                case: "organizationId",
+                value: organization,
+              }
+            : {
+                case: "instance",
+                value: true,
+              },
+          locale: locale,
+        },
+        {},
+      )
+      .then((resp) => {
+        return resp.translations ? resp.translations : undefined;
+      });
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return freshCache(
+    `getHostedLoginTranslation-${organization || "instance"}-${locale || "default"}`,
+    fetcher,
+    getTTLForKey("getHostedLoginTranslation", longCacheTTL),
+  );
 }
 
 export async function getBrandingSettings({
@@ -87,13 +136,19 @@ export async function getBrandingSettings({
 }: WithServiceConfig<{
   organization?: string;
 }>) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-  const callback = settingsService
-    .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+    return settingsService
+      .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
+      .then((resp) => (resp.settings ? resp.settings : undefined));
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return freshCache(
+    `getBrandingSettings-${organization || "instance"}`,
+    fetcher,
+    getTTLForKey("getBrandingSettings", longCacheTTL),
+  );
 }
 
 export async function getLoginSettings({
@@ -102,41 +157,61 @@ export async function getLoginSettings({
 }: WithServiceConfig<{
   organization?: string;
 }>) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-  const callback = settingsService
-    .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+    return settingsService
+      .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
+      .then((resp) => (resp.settings ? resp.settings : undefined));
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return freshCache(
+    `getLoginSettings-${organization || "instance"}`,
+    fetcher,
+    getTTLForKey("getLoginSettings", defaultCacheTTL),
+  );
 }
 
 export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-  const callback = settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
+    return settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return freshCache(`getSecuritySettings-instance`, fetcher, getTTLForKey("getSecuritySettings", defaultCacheTTL));
 }
 
 export async function getLockoutSettings({ serviceConfig, orgId }: WithServiceConfig<{ orgId?: string }>) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-  const callback = settingsService
-    .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+    return settingsService
+      .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
+      .then((resp) => (resp.settings ? resp.settings : undefined));
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return freshCache(
+    `getLockoutSettings-${orgId || "instance"}`,
+    fetcher,
+    getTTLForKey("getLockoutSettings", defaultCacheTTL),
+  );
 }
 
 export async function getPasswordExpirySettings({ serviceConfig, orgId }: WithServiceConfig<{ orgId?: string }>) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-  const callback = settingsService
-    .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+    return settingsService
+      .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
+      .then((resp) => (resp.settings ? resp.settings : undefined));
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return freshCache(
+    `getPasswordExpirySettings-${orgId || "instance"}`,
+    fetcher,
+    getTTLForKey("getPasswordExpirySettings", defaultCacheTTL),
+  );
 }
 
 export async function listIDPLinks({ serviceConfig, userId }: WithServiceConfig<{ userId: string }>) {
@@ -164,16 +239,18 @@ export async function registerTOTP({ serviceConfig, userId }: WithServiceConfig<
 }
 
 export async function getAllowedLanguages({ serviceConfig }: WithServiceConfig) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-  const callback = settingsService.getGeneralSettings({}, {}).then((resp) => {
-    return {
-      allowedLanguages: resp.allowedLanguages,
-      defaultLanguage: resp.defaultLanguage,
-    };
-  });
+    return settingsService.getGeneralSettings({}, {}).then((resp) => {
+      return {
+        allowedLanguages: resp.allowedLanguages,
+        defaultLanguage: resp.defaultLanguage,
+      };
+    });
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return freshCache(`getGeneralSettings-instance`, fetcher, getTTLForKey("getGeneralSettings", longCacheTTL));
 }
 
 export async function getLegalAndSupportSettings({
@@ -182,13 +259,19 @@ export async function getLegalAndSupportSettings({
 }: WithServiceConfig<{
   organization?: string;
 }>) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-  const callback = settingsService
-    .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+    return settingsService
+      .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
+      .then((resp) => (resp.settings ? resp.settings : undefined));
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return freshCache(
+    `getLegalAndSupportSettings-${organization || "instance"}`,
+    fetcher,
+    getTTLForKey("getLegalAndSupportSettings", longCacheTTL),
+  );
 }
 
 export async function getPasswordComplexitySettings({
@@ -197,13 +280,19 @@ export async function getPasswordComplexitySettings({
 }: WithServiceConfig<{
   organization?: string;
 }>) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-  const callback = settingsService
-    .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+    return settingsService
+      .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
+      .then((resp) => (resp.settings ? resp.settings : undefined));
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return freshCache(
+    `getPasswordComplexitySettings-${organization || "instance"}`,
+    fetcher,
+    getTTLForKey("getPasswordComplexitySettings", defaultCacheTTL),
+  );
 }
 
 export async function createSessionFromChecksAndChallenges({
@@ -739,23 +828,29 @@ export async function searchUsers({
 }
 
 export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promise<Organization | null> {
-  const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
+  const fetcher = async () => {
+    const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
 
-  return orgService
-    .listOrganizations(
-      {
-        queries: [
-          {
-            query: {
-              case: "defaultQuery",
-              value: {},
+    return orgService
+      .listOrganizations(
+        {
+          queries: [
+            {
+              query: {
+                case: "defaultQuery",
+                value: {},
+              },
             },
-          },
-        ],
-      },
-      {},
-    )
-    .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
+          ],
+        },
+        {},
+      )
+      .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
+  };
+
+  return useCache
+    ? freshCache(`getDefaultOrg-${"instance"}`, fetcher, getTTLForKey("getDefaultOrg", defaultCacheTTL))
+    : fetcher();
 }
 
 export async function getOrgsByDomain({ serviceConfig, domain }: WithServiceConfig<{ domain: string }>) {
@@ -1243,46 +1338,46 @@ export type WithServiceConfig<T = {}> = T & {
 };
 
 export function createServerTransport(token: string, serviceConfig: ServiceConfig) {
-  // Build interceptors list - OTEL interceptor is always included for trace propagation
-  const interceptors: any[] = [otelGrpcInterceptor];
+  const authorizationInterceptor: Interceptor = (next) => (req) => {
+    if (!req.header.get("Authorization")) {
+      req.header.set("Authorization", `Bearer ${token}`);
+    }
+    return next(req);
+  };
 
-  // Add custom headers interceptor if needed
-  if (process.env.CUSTOM_REQUEST_HEADERS || serviceConfig.instanceHost || serviceConfig.publicHost) {
-    interceptors.push((next: any) => {
-      return (req: any) => {
-        // Apply headers from serviceConfig
-        if (serviceConfig.instanceHost) {
-          req.header.set("x-zitadel-instance-host", serviceConfig.instanceHost);
+  const headerInterceptor: Interceptor = (next) => (req) => {
+    // Apply headers from serviceConfig
+    if (serviceConfig.instanceHost) {
+      req.header.set("x-zitadel-instance-host", serviceConfig.instanceHost);
+    }
+    if (serviceConfig.publicHost) {
+      req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
+    }
+
+    // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
+    if (process.env.CUSTOM_REQUEST_HEADERS) {
+      process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
+        const kv = header.indexOf(":");
+        if (kv > 0) {
+          const key = header.slice(0, kv).trim();
+          const value = header.slice(kv + 1).trim();
+          if (value) {
+            req.header.set(key, value);
+          } else {
+            req.header.delete(key);
+          }
+        } else {
+          logger.warn("Skipping malformed header", { header });
         }
-        if (serviceConfig.publicHost) {
-          req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
-        }
+      });
+    }
 
-        // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
-        if (process.env.CUSTOM_REQUEST_HEADERS) {
-          process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
-            const kv = header.indexOf(":");
-            if (kv > 0) {
-              const key = header.slice(0, kv).trim();
-              const value = header.slice(kv + 1).trim();
-              if (value) {
-                req.header.set(key, value);
-              } else {
-                req.header.delete(key);
-              }
-            } else {
-              logger.warn("Skipping malformed header", { header });
-            }
-          });
-        }
+    return next(req);
+  };
 
-        return next(req);
-      };
-    });
-  }
-
-  return libCreateServerTransport(token, {
+  return createConnectTransport({
+    httpVersion: "1.1",
     baseUrl: serviceConfig.baseUrl,
-    interceptors,
+    interceptors: [otelGrpcInterceptor, authorizationInterceptor, headerInterceptor],
   });
 }
