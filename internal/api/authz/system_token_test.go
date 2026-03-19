@@ -134,7 +134,7 @@ func Test_systemJWTStorage_GetKeyByIDAndClientID_Ok(t *testing.T) {
 		t.Run(tc.name, func(tt *testing.T) {
 			jwk, err := tc.storage.GetKeyByIDAndClientID(context.Background(), tc.keyID, tc.userID)
 			assert.NoError(tt, err)
-			assert.Equal(tt, tc.key, jwk.Key)
+			assert.Equal(tt, tc.key.Data, jwk.Key)
 		})
 	}
 }

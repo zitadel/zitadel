@@ -116,11 +116,17 @@ func (s *SystemAPIUser) readKey() (*SystemAPIPublicKey, error) {
 	if block == nil {
 		return nil, zerrors.ThrowInternal(err, "AUTHZ-FC8ohc", "Errors.SystemApiUser.CertDecodeFailed")
 	}
+
 	cert, err := x509.ParseCertificate(block.Bytes)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "AUTHZ-64nMHP", "Errors.SystemApiUser.CertParseFailed")
 	}
-	key = cert.PublicKey.(*rsa.PublicKey)
+
+	key, ok := cert.PublicKey.(*rsa.PublicKey)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgument(err, "AUTHZ-PNKOMf", "Errors.SystemApiUser.UsupportedPublicKey")
+	}
+
 	return &SystemAPIPublicKey{
 		Data:      key,
 		NotBefore: &cert.NotBefore,
@@ -135,17 +141,9 @@ func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID st
 
 	var err error
 	if !ok {
-		s.mutex.Lock()
-		user, ok := s.keys[userID]
-		if !ok {
-			return nil, zerrors.ThrowNotFound(nil, "AUTHZ-asfd3", "Errors.User.NotFound")
-		}
-		key, err = user.readKey()
-		if err != nil {
+		if key, err = s.getOrReadKey(userID); err != nil {
 			return nil, err
 		}
-		s.cachedKeys[userID] = key
-		s.mutex.Unlock()
 	}
 
 	now := time.Now().UTC()
@@ -153,8 +151,23 @@ func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID st
 		return nil, zerrors.ThrowNotFound(nil, "AUTHZ-NiJstf", "Errors.User.NotBefore")
 	}
 	if key.NotAfter != nil && now.After(*key.NotAfter) {
-		return nil, zerrors.ThrowNotFound(nil, "AUTHZ-CGmV4b", "Errors.User.NotBefore")
+		return nil, zerrors.ThrowNotFound(nil, "AUTHZ-CGmV4b", "Errors.User.NotAfter")
 	}
 
-	return &jose.JSONWebKey{KeyID: userID, Key: key}, nil
+	return &jose.JSONWebKey{KeyID: userID, Key: key.Data}, nil
+}
+
+func (s *systemJWTStorage) getOrReadKey(userID string) (*SystemAPIPublicKey, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	user, ok := s.keys[userID]
+	if !ok {
+		return nil, zerrors.ThrowNotFound(nil, "AUTHZ-asfd3", "Errors.User.NotFound")
+	}
+	key, err := user.readKey()
+	if err != nil {
+		return nil, err
+	}
+	s.cachedKeys[userID] = key
+	return key, err
 }
