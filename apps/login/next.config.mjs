@@ -19,7 +19,6 @@ const secureHeaders = [
     key: "X-XSS-Protection",
     value: "1; mode=block",
   },
-  { key: "X-Frame-Options", value: "deny" },
 ];
 
 /** @type {import('next').NextConfig} */

@@ -27,7 +27,7 @@ import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_s
 import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
 import escapeHtml from "escape-html";
 import { NextRequest, NextResponse } from "next/server";
-import { buildCSP } from "../csp";
+import { buildCSP, resolveImageSources } from "../csp";
 
 const logger = createLogger("flow-initiation");
 
@@ -40,12 +40,22 @@ function setCSPHeaders(
   serviceConfig: ServiceConfig,
   securitySettings: SecuritySettings | undefined,
 ): void {
+  const imageSources = resolveImageSources({
+    serviceUrl: serviceConfig.baseUrl,
+    publicHost: serviceConfig.publicHost,
+    instanceHost: serviceConfig.instanceHost,
+    customRequestHeaders: process.env.CUSTOM_REQUEST_HEADERS,
+  });
+
   const iframeOrigins =
     securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
       ? securitySettings.embeddedIframe.allowedOrigins
       : undefined;
 
-  response.headers.set("Content-Security-Policy", buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }));
+  response.headers.set(
+    "Content-Security-Policy",
+    buildCSP({ imageSources, iframeOrigins }),
+  );
 
   if (!iframeOrigins) {
     response.headers.set("X-Frame-Options", "deny");

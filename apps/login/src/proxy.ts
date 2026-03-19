@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { buildCSP } from "./lib/csp";
+import { buildCSP, resolveImageSources } from "./lib/csp";
 import { applyCustomHeaders } from "./lib/custom-headers";
 import { createLogger } from "./lib/logger";
 import { getIframeOrigins } from "./lib/server/security-settings";
@@ -8,7 +8,15 @@ import { getServiceConfig } from "./lib/service-url";
 const logger = createLogger("middleware");
 
 export const config = {
-  matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
+  matcher: [
+    "/.well-known/:path*",
+    "/oauth/:path*",
+    "/oidc/:path*",
+    "/idps/callback/:path*",
+    "/saml/:path*",
+    "/assets/:path*",
+    "/:path*",
+  ],
 };
 
 export async function proxy(request: NextRequest) {
@@ -36,13 +44,20 @@ export async function proxy(request: NextRequest) {
   // ZITADEL API (no self-loopback through the load balancer).
   const responseHeaders = new Headers();
 
+  const imageSources = resolveImageSources({
+    serviceUrl: baseUrl,
+    publicHost,
+    instanceHost,
+    customRequestHeaders: process.env.CUSTOM_REQUEST_HEADERS,
+  });
+
   const cspFetchEnabled = process.env.CSP_FETCH_ENABLED !== "false";
 
   if (cspFetchEnabled) {
     try {
       const iframeOrigins = await getIframeOrigins(baseUrl, instanceHost, publicHost);
 
-      responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, iframeOrigins }));
+      responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, imageSources, iframeOrigins }));
 
       if (!iframeOrigins) {
         responseHeaders.set("X-Frame-Options", "deny");
@@ -51,16 +66,16 @@ export async function proxy(request: NextRequest) {
       logger.error("Failed to load security settings for CSP, using default CSP", {
         error: err instanceof Error ? err.message : String(err),
       });
-      responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl }));
+      responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, imageSources }));
       responseHeaders.set("X-Frame-Options", "deny");
     }
   } else {
-    responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl }));
+    responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, imageSources }));
     responseHeaders.set("X-Frame-Options", "deny");
   }
 
   // Only proxy paths need to be rewritten to the ZITADEL backend
-  const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/"];
+  const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/", "/assets/"];
   const isMatched = proxyPaths.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
 
   if (!isMatched) {
