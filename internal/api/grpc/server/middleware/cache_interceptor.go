@@ -24,7 +24,7 @@ func NoCacheInterceptor() grpc.UnaryServerInterceptor {
 		for key, value := range headers {
 			header.Append(runtime.MetadataHeaderPrefix+key, value)
 		}
-		err := grpc.SendHeader(ctx, header)
+		err := grpc.SetHeader(ctx, header)
 		logging.Log("MIDDLE-efh41").OnError(err).WithField("req", info.FullMethod).Warn("cannot send cache-control on grpc response")
 		resp, err := handler(ctx, req)
 		return resp, err
