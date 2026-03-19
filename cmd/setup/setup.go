@@ -324,7 +324,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			defaults:       config.SystemDefaults,
 		},
 		&TransactionalTables{
-			dbClient: dbClient,
+			dbClient:             dbClient,
+			ShouldRecreateSchema: steps.RelationalTables.ShouldRecreateSchema,
 		},
 		&projectionTables{
 			es:      eventstoreClient,
@@ -575,6 +576,7 @@ func startCommandsQueries(
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
 		config.Login.DefaultPaths,
+		config.Executions.DenyList,
 	)
 	logging.OnError(ctx, err).Fatal("unable to start commands")
 

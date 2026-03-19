@@ -682,6 +682,10 @@ func NewAppClientIDSearchQuery(clientID string) (SearchQuery, error) {
 	return NewOrQuery(oidcClientIDQuery, apiClientIDQuery)
 }
 
+func NewAppResourceOwnerSearchQuery(resourceOwner string) (SearchQuery, error) {
+	return NewTextQuery(AppColumnResourceOwner, resourceOwner, TextEquals)
+}
+
 func NewAppSAMLEntityIDSearchQuery(entityID string) (SearchQuery, error) {
 	return NewTextQuery(AppSAMLConfigColumnEntityID, entityID, TextEquals)
 }

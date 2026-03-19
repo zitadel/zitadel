@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { render } from "@testing-library/react";
-import { Button, ButtonSizes, ButtonVariants, ButtonColors, getButtonClasses } from "./button";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { Button, ButtonColors, ButtonSizes, ButtonVariants, getButtonClasses } from "./button";
 
 describe("Button Component", () => {
   const originalEnv = process.env;

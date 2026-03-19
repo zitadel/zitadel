@@ -5,13 +5,13 @@ import { addHumanUser, addIDPLink, getLoginSettings, getUserByID, listAuthentica
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { cookies, headers } from "next/headers";
+import crypto from "crypto";
 import { getTranslations } from "next-intl/server";
+import { cookies, headers } from "next/headers";
+import { completeFlowOrGetUrl } from "../client";
+import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
-import { getOrSetFingerprintId } from "../fingerprint";
-import crypto from "crypto";
-import { completeFlowOrGetUrl } from "../client";
 
 type RegisterUserCommand = {
   email: string;
@@ -34,6 +34,20 @@ export async function registerUser(
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
+
+  if (!loginSettings) {
+    return { error: t("errors.couldNotGetLoginSettings") };
+  }
+
+  if (!loginSettings.allowRegister) {
+    return { error: t("errors.registerNotAllowed") };
+  }
+
+  if (command.password && !loginSettings.allowLocalAuthentication) {
+    return { error: t("errors.localAuthenticationNotAllowed") };
+  }
+
   const addResponse = await addHumanUser({
     serviceConfig,
     email: command.email,
@@ -46,8 +60,6 @@ export async function registerUser(
   if (!addResponse) {
     return { error: t("errors.couldNotCreateUser") };
   }
-
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
   let checkPayload: any = {
     user: { search: { case: "userId", value: addResponse.userId } },
@@ -163,6 +175,16 @@ export async function registerUserAndLinkToIDP(
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
+
+  if (!loginSettings) {
+    return { error: t("errors.couldNotGetLoginSettings") };
+  }
+
+  if (!loginSettings.allowRegister) {
+    return { error: t("errors.registerNotAllowed") };
+  }
+
   const addUserResponse = await addHumanUser({
     serviceConfig,
     email: command.email,
@@ -170,12 +192,6 @@ export async function registerUserAndLinkToIDP(
     lastName: command.lastName,
     organization: command.organization,
   });
-
-  if (!addUserResponse) {
-    return { error: t("errors.couldNotCreateUser") };
-  }
-
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
   const idpLink = await addIDPLink({
     serviceConfig,

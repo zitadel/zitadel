@@ -22,3 +22,4 @@ The **Login App** (`apps/login`) provides the user interface for authentication 
 - **Test (all)**: `pnpm nx run @zitadel/login:test`
 - **Test (unit)**: `pnpm nx run @zitadel/login:test-unit`
 - **Test (integration)**: `pnpm nx run @zitadel/login:test-integration`
+- **Pack (Docker)**: `pnpm nx run @zitadel/login:pack` — builds a local Docker image `zitadel/zitadel-login:local`. Requires Docker daemon.

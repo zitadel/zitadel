@@ -574,6 +574,14 @@ Executions:
   TransactionDuration: 10s # ZITADEL_EXECUTIONS_TRANSACTIONDURATION
   # Automatically cancel the notification if it cannot be handled within a specific time
   MaxTtl: 5m  # ZITADEL_EXECUTIONS_MAXTTL
+  # List of domains and IPs that are not valid execution target's endpoints
+  # Wildcard sub domains are currently unsupported
+  DenyList: # ZITADEL_EXECUTIONS_DENYLIST (comma separated list)
+    - localhost
+    - "127.0.0.0/8"
+    - "::1"
+    - "0.0.0.0"
+    - "::"
 
 Auth:
   # See Projections.BulkLimit

@@ -1,5 +1,6 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   deleteSession,
@@ -24,6 +25,8 @@ import {
 } from "../cookies";
 import { getServiceConfig } from "../service-url";
 import { getPublicHost } from "./host";
+
+const logger = createLogger("session");
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,
@@ -149,7 +152,7 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       challenges,
       requestId,
     }).catch((error) => {
-      console.error("Could not create session", error);
+      logger.error("Could not create session", { error });
       return undefined;
     });
 
@@ -175,7 +178,7 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
   }
 
   if (!lifetime || !lifetime.seconds) {
-    console.warn("No lifetime provided for session, defaulting to 24 hours");
+    logger.warn("No lifetime provided for session, defaulting to 24 hours");
     lifetime = {
       seconds: BigInt(60 * 60 * 24), // default to 24 hours
       nanos: 0,

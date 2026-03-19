@@ -21,7 +21,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const { serviceConfig } = getServiceConfig(_headers);
 
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
     if (org) {
       organization = org.id;
     }
@@ -29,16 +29,12 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const missingData = !firstname || !lastname || !email || !organization;
 
-  const legal = await getLegalAndSupportSettings({ serviceConfig, organization,
-  });
-  const passwordComplexitySettings = await getPasswordComplexitySettings({ serviceConfig, organization,
-  });
+  const legal = await getLegalAndSupportSettings({ serviceConfig, organization });
+  const passwordComplexitySettings = await getPasswordComplexitySettings({ serviceConfig, organization });
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization });
 
   return missingData ? (
     <DynamicTheme branding={branding}>

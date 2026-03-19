@@ -56,21 +56,14 @@ export const Boundary = ({
       })}
     >
       <div
-        className={clsx(
-          "absolute -top-2 flex space-x-1 text-[9px] uppercase leading-4 tracking-widest",
-          {
-            "left-3 lg:left-5": size === "small",
-            "left-4 lg:left-9": size === "default",
-          },
-        )}
+        className={clsx("absolute -top-2 flex space-x-1 text-[9px] uppercase leading-4 tracking-widest", {
+          "left-3 lg:left-5": size === "small",
+          "left-4 lg:left-9": size === "default",
+        })}
       >
         {labels.map((label) => {
           return (
-            <Label
-              key={label}
-              color={color}
-              animateRerendering={animateRerendering}
-            >
+            <Label key={label} color={color} animateRerendering={animateRerendering}>
               {label}
             </Label>
           );

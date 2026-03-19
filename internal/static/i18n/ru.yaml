@@ -132,6 +132,8 @@ Errors:
         CouldNotGenerate: "Ключ не может быть сгенерирован"
     PAT:
       NotFound: "Токен личного доступа не найден"
+    Metadata:
+      Conflicting: "Метаданные не должны быть заданы одновременно в полях [user] и [human]"
     NotHuman: "Пользователь должен быть персональным"
     NotMachine: "Пользователь должен быть техническим"
     WrongType: "Запрещено для данного типа пользователя"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "Токен обновления недействителен"
       NotFound: "Токен обновления не найден"
-  Instance:
-    NotFound: "Экземпляр не найден"
-    AlreadyExists: "Экземпляр уже существует"
-    NotChanged: "Экземпляр не изменён"
   Org:
     AlreadyExists: "Название организации или идентификатор уже занят"
     Invalid: "Организация недействительна"
@@ -232,12 +230,6 @@ Errors:
     Domain:
       AlreadyExists: "Домен уже существует"
       InvalidCharacter: "Только буквенно-цифровые символы, . и - разрешены для домена"
-    IDP:
-      InvalidSearchQuery: "Неверный поисковый запрос"
-      ClientIDMissing: "ClientID отсутствует"
-      TeamIDMissing: "TeamID отсутствует"
-      KeyIDMissing: "KeyID отсутствует"
-      PrivateKeyMissing: "Закрытый ключ отсутствует"
     LoginPolicy:
       NotFound: "Политика входа в систему не найдена"
       Invalid: "Политика входа в систему недействительна"
@@ -339,6 +331,8 @@ Errors:
       NotActive: "Допуск проекта неактивен"
       NotInactive: "Допуск проекта не является неактивным"
   Instance:
+    AlreadyExists: "Экземпляр уже существует"
+    NotChanged: "Экземпляр не изменён"
     NotFound: "Экземпляр не найден. Убедитесь, что у вас правильный домен. Проверьте https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Роли не изменены"
@@ -602,6 +596,13 @@ Errors:
     Duplicate: "Идентификатор веб-ключа не уникален"
     NoActive: "Активный веб-ключ не найден"
     NotFound: "Веб-ключ не найден"
+  IDP:
+    InvalidSearchQuery: "Неверный поисковый запрос"
+    ClientIDMissing: "ClientID отсутствует"
+    TeamIDMissing: "TeamID отсутствует"
+    KeyIDMissing: "KeyID отсутствует"
+    PrivateKeyMissing: "Закрытый ключ отсутствует"
+    InvalidPrivateKey: "Неверный формат приватного ключа"
 
 AggregateTypes:
   action: "Действие"

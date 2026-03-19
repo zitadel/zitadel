@@ -325,7 +325,7 @@ func TestServer_SessionReduces(t *testing.T) {
 				Metadata:  metadata,
 				UserAgent: userAgent,
 			}, dbSession)
-		}, retryDuration, tick, "session not found within %v: %v", retryDuration, err)
+		}, retryDuration, tick, "session %q not found within %v: %v", createdSession.GetSessionId(), retryDuration, err)
 	})
 
 	t.Run("checks with challenges set reduces", func(t *testing.T) {
@@ -473,6 +473,8 @@ func TestServer_SessionReduces(t *testing.T) {
 			assert.Nil(collect, dbSession)
 		}, retryDuration, tick, "session not found within %v: %v", retryDuration, err)
 	})
+
+	// TODO (@grvijayan): add tests for session reducers based on user deactivated, locked, deleted events
 }
 
 func assertSessionsEqual(t *assert.CollectT, expected, actual *domain.Session) {
