@@ -5,15 +5,16 @@ import (
 	"log/slog"
 	"slices"
 	"strings"
-	"time"
 
 	"connectrpc.com/connect"
 
-	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
-	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/call"
 )
 
+// LogHandler is a connect interceptor that logs the request details
+// including protocol, domain, service, HTTP method, path, response code, and duration.
+// It depends on [CallDurationHandler] and [RequestDetailsHandler] to set the request start time and ID in the context.
 func LogHandler(ignoredMethodSuffixes ...string) connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
@@ -22,9 +23,7 @@ func LogHandler(ignoredMethodSuffixes ...string) connect.UnaryInterceptorFunc {
 			}) {
 				return next(ctx, req)
 			}
-			start := time.Now()
 			ctx = logging.NewCtx(ctx, logging.StreamRequest)
-			ctx = instrumentation.SetRequestID(ctx, start)
 
 			resp, err := next(ctx, req)
 			var code connect.Code
@@ -34,12 +33,11 @@ func LogHandler(ignoredMethodSuffixes ...string) connect.UnaryInterceptorFunc {
 			spec := req.Spec()
 			logging.Info(ctx, "request served",
 				slog.String("protocol", "connect"),
-				slog.Any("domain", http_util.DomainContext(ctx)),
 				slog.String("service", serviceFromRPCMethod(spec.Procedure)),
 				slog.String("http_method", req.HTTPMethod()),
 				slog.String("path", spec.Procedure),
 				slog.Any("code", code),
-				slog.Duration("duration", time.Since(start)),
+				slog.Duration("duration", call.Took(ctx)),
 			)
 			return resp, err
 		}
