@@ -160,7 +160,7 @@ func (p *relationalTablesProjection) reduceUserLocked(event eventstore.Event) (*
 				sessionRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 				sessionRepo.UserIDCondition(event.Aggregate().ID),
 			)
-			_, err := sessionRepo.Delete(ctx, v3Tx, condition)
+			_, _, err := sessionRepo.Delete(ctx, v3Tx, condition, nil)
 			return err
 		}),
 	), nil
@@ -223,7 +223,7 @@ func (p *relationalTablesProjection) reduceUserDeactivated(event eventstore.Even
 				sessionRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 				sessionRepo.UserIDCondition(event.Aggregate().ID),
 			)
-			_, err := sessionRepo.Delete(ctx, v3Tx, condition)
+			_, _, err := sessionRepo.Delete(ctx, v3Tx, condition, nil)
 			return err
 		}),
 	), nil

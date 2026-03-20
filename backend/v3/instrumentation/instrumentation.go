@@ -68,6 +68,8 @@ func NewMeter(name string, options ...metric.MeterOption) *Meter {
 	}
 }
 
+// RequestFilter returns an [otelhttp.Filter] that excludes requests
+// with paths starting with any of the specified prefixes.
 func RequestFilter(ignoredPrefix ...string) otelhttp.Filter {
 	return func(r *http.Request) bool {
 		return !slices.ContainsFunc(

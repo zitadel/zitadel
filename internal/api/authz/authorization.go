@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -28,6 +29,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 	if err != nil {
 		return nil, err
 	}
+	instrumentation.SetUserID(ctx, ctxData.UserID)
 
 	if requiredAuthOption.Permission == authenticated {
 		return func(parent context.Context) context.Context {

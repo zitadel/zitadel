@@ -377,6 +377,24 @@ func (p *relationalTablesProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.IDPRemovedEventType,
 					Reduce: p.reduceIDPRemoved,
 				},
+
+				// Administrators
+				{
+					Event:  instance.MemberAddedEventType,
+					Reduce: p.reduceInstanceAdminAdded,
+				},
+				{
+					Event:  instance.MemberChangedEventType,
+					Reduce: p.reduceInstanceAdminChanged,
+				},
+				{
+					Event:  instance.MemberRemovedEventType,
+					Reduce: p.reduceInstanceAdminRemoved,
+				},
+				{
+					Event:  instance.MemberCascadeRemovedEventType,
+					Reduce: p.reduceInstanceAdminRemoved,
+				},
 			},
 		},
 		{
@@ -750,6 +768,24 @@ func (p *relationalTablesProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.IDPRemovedEventType,
 					Reduce: p.reduceIDPRemoved,
 				},
+
+				// Administrators
+				{
+					Event:  org.MemberAddedEventType,
+					Reduce: p.reduceOrganizationAdminAdded,
+				},
+				{
+					Event:  org.MemberChangedEventType,
+					Reduce: p.reduceOrganizationAdminChanged,
+				},
+				{
+					Event:  org.MemberRemovedEventType,
+					Reduce: p.reduceOrganizationAdminRemoved,
+				},
+				{
+					Event:  org.MemberCascadeRemovedEventType,
+					Reduce: p.reduceOrganizationAdminRemoved,
+				},
 			},
 		},
 		{
@@ -827,6 +863,40 @@ func (p *relationalTablesProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  project.RoleRemovedType,
 					Reduce: p.reduceProjectRoleRemoved,
+				},
+
+				// Administrators
+				{
+					Event:  project.MemberAddedEventType,
+					Reduce: p.reduceProjectAdminAdded,
+				},
+				{
+					Event:  project.MemberChangedEventType,
+					Reduce: p.reduceProjectAdminChanged,
+				},
+				{
+					Event:  project.MemberRemovedEventType,
+					Reduce: p.reduceProjectAdminRemoved,
+				},
+				{
+					Event:  project.MemberCascadeRemovedEventType,
+					Reduce: p.reduceProjectAdminRemoved,
+				},
+				{
+					Event:  project.GrantMemberAddedType,
+					Reduce: p.reduceProjectGrantAdminAdded,
+				},
+				{
+					Event:  project.GrantMemberChangedType,
+					Reduce: p.reduceProjectGrantAdminChanged,
+				},
+				{
+					Event:  project.GrantMemberRemovedType,
+					Reduce: p.reduceProjectGrantAdminRemoved,
+				},
+				{
+					Event:  project.GrantMemberCascadeRemovedType,
+					Reduce: p.reduceProjectGrantAdminRemoved,
 				},
 			},
 		},

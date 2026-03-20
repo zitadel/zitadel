@@ -24,8 +24,9 @@ type IDPIntentCheckCommand struct {
 	InstanceID string
 	EncAlgo    crypto.EncryptionAlgorithm
 
-	FetchedUser     User
-	IsCheckComplete bool
+	FetchedUser        User
+	IsCheckComplete    bool
+	IntentLastVerified time.Time
 }
 
 // NewIDPIntentCheckCommand returns an IDPIntentCheckCommand initialized with the input values.
@@ -53,7 +54,7 @@ func (i *IDPIntentCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([
 	}
 
 	return []eventstore.Command{
-		session.NewIntentCheckedEvent(ctx, &session.NewAggregate(i.SessionID, i.InstanceID).Aggregate, time.Now()),
+		session.NewIntentCheckedEvent(ctx, &session.NewAggregate(i.SessionID, i.InstanceID).Aggregate, i.IntentLastVerified),
 		idpintent.NewConsumedEvent(ctx, &idpintent.NewAggregate(i.CheckIntent.ID, "").Aggregate),
 	}, nil
 }
@@ -65,15 +66,54 @@ func (i *IDPIntentCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 	}
 
 	intentRepo := opts.idpIntentRepo
+	sessionRepo := opts.sessionRepo
+
+	beginner, ok := opts.DB().(database.Beginner)
+	if !ok {
+		return zerrors.ThrowInternal(nil, "DOM-jiuIbh", "database doesn't implement database.Beginner")
+	}
+
+	tx, txErr := beginner.Begin(ctx, nil)
+	if txErr != nil {
+		return zerrors.ThrowInternal(txErr, "DOM-Msuwn2", "failed starting transaction")
+	}
+
+	defer func() {
+		if endErr := tx.End(ctx, txErr); endErr != nil {
+			err = endErr
+		}
+	}()
 
 	removedRows, err := intentRepo.Delete(ctx, opts.DB(), intentRepo.PrimaryKeyCondition(i.InstanceID, i.CheckIntent.ID))
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-j1s5Eu", "failed deleting IDP intent")
+		txErr = zerrors.ThrowInternal(err, "DOM-j1s5Eu", "failed deleting IDP intent")
+		return txErr
 	}
 	if removedRows != 1 {
-		return zerrors.ThrowInternal(NewRowsReturnedMismatchError(1, removedRows), "DOM-3CBpdB", "unexpected number of rows deleted")
+		txErr = zerrors.ThrowInternal(NewRowsReturnedMismatchError(1, removedRows), "DOM-3CBpdB", "unexpected number of rows deleted")
+		return txErr
 	}
 
+	idpFactor := &SessionFactorIdentityProviderIntent{LastVerifiedAt: time.Now()}
+	updateCount, updateErr := sessionRepo.Update(ctx, opts.DB(),
+		sessionRepo.PrimaryKeyCondition(i.InstanceID, i.SessionID),
+		sessionRepo.SetFactor(idpFactor),
+	)
+	if updateErr != nil {
+		txErr = zerrors.ThrowInternal(updateErr, "DOM-pec0al", "failed updating session")
+		return txErr
+	}
+
+	if updateCount == 0 {
+		txErr = zerrors.ThrowNotFound(nil, "DOM-CopO4e", "session not found")
+		return txErr
+	}
+	if updateCount > 1 {
+		txErr = zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-mlbibw", "unexpected number of rows updated")
+		return txErr
+	}
+
+	i.IntentLastVerified = idpFactor.LastVerifiedAt
 	i.IsCheckComplete = true
 
 	return nil

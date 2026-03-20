@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -228,14 +229,40 @@ func sessionCTE(change database.Change, i, j int, builder *database.StatementBui
 }
 
 // Delete implements [domain.SessionRepository].
-func (s session) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (s session) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error) {
 	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(s.InstanceIDColumn())
+		return 0, time.Time{}, database.NewMissingConditionError(s.InstanceIDColumn())
 	}
 	var builder database.StatementBuilder
-	builder.WriteString("DELETE FROM zitadel.sessions")
+	builder.WriteString("WITH gatekeeper AS (SELECT count(*) as total_found, MAX(sessions.deleted_at) as deleted_at FROM (SELECT instance_id, user_id, token_id, now() as deleted_at FROM zitadel.sessions")
 	writeCondition(&builder, condition)
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	// In case the deletion is intended for a specific session,
+	// we'll also include already deleted session to check the permission against,
+	// and to return the deleted_at timestamp from the previous deletion in case the session was already deleted.
+	if condition.IsRestrictingColumn(s.IDColumn()) {
+		builder.WriteString(" UNION ALL SELECT instance_id, user_id, token_id, deleted_at FROM zitadel.archived_sessions as sessions")
+		writeCondition(&builder, condition)
+	}
+	// join the users table to get the user's organization, which will be needed for checking the permission
+	builder.WriteString(") as sessions")
+	if permissionCondition != nil {
+		builder.WriteString(" LEFT JOIN zitadel.users ON users.instance_id = sessions.instance_id AND users.id = sessions.user_id HAVING (bool_and(")
+		permissionCondition.Write(&builder)
+		builder.WriteString(") AND count(*) > 0) or zitadel.throw_not_permitted()") //TODO: change throw_not_permitted to actual permission check
+	}
+	builder.WriteString("), execution AS (DELETE FROM zitadel.sessions")
+	writeCondition(&builder, condition)
+	builder.WriteString(" and exists (SELECT 1 FROM gatekeeper) RETURNING 1 AS rows_affected) SELECT (CASE WHEN gatekeeper.total_found = 1 THEN gatekeeper.deleted_at END) as deleted_at, (SELECT count(*) FROM execution) as rows_affected FROM gatekeeper")
+	var deletedAt database.Null[time.Time]
+	var deletedSessions int64
+	if err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&deletedAt, &deletedSessions); err != nil {
+		// If the criteria did not match any session, ignore the error since the user would have had the permission to delete the session,
+		if errors.Is(err, new(database.NoRowFoundError)) {
+			return 0, time.Time{}, nil
+		}
+		return 0, time.Time{}, err
+	}
+	return deletedSessions, deletedAt.V, nil
 }
 
 // -------------------------------------------------------------
@@ -425,6 +452,11 @@ func (s session) UserAgentIDCondition(userAgentID string) database.Condition {
 // UserIDCondition implements [domain.sessionConditions].
 func (s session) UserIDCondition(userID string) database.Condition {
 	return database.NewTextCondition(s.UserIDColumn(), database.TextOperationEqual, userID)
+}
+
+// TokenIDCondition implements [domain.sessionConditions].
+func (s session) TokenIDCondition(tokenID string) database.Condition {
+	return database.NewTextCondition(s.TokenIDColumn(), database.TextOperationEqual, tokenID)
 }
 
 // CreatorIDCondition implements [domain.sessionConditions].
