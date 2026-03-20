@@ -11,7 +11,6 @@ Ensure you have followed the [root quick start](../../CONTRIBUTING.md#quick-star
 Ensure all dependencies are installed:
 
 ```bash
-cd apps/docs # if your shell is still in the project root
 pnpm install
 pnpm fetch:remote-content
 ```
@@ -19,7 +18,6 @@ pnpm fetch:remote-content
 Start the development server:
 
 ```bash
-# in the project root
 pnpm nx run @zitadel/docs:dev
 ```
 
@@ -48,6 +46,38 @@ Key scripts for documentation workflows:
   * Broken internal links
   * Missing required front-matter (e.g., `title`)
   * Image references
+
+### Troubleshooting
+
+#### Issue: Nx configuration not found or "nx" command not found
+
+If you see errors like:
+
+```bash
+ NX   Cannot find configuration for task @zitadel/zitadel:@zitadel/docs:generate
+
+Pass --verbose to see the stacktrace.
+```
+
+or
+
+```
+pnpm nx run @zitadel/docs:dev
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command "nx" not found
+
+Did you mean "pnpm nx"?
+```
+
+**Root cause**: Your dependency cache or `node_modules` is out of sync.
+
+**Solution**: Run these commands from the repository root in order:
+
+1. **Clear node_modules**: `rm -rf node_modules` — removes the installed dependency folder
+2. **Clear pnpm cache**: `pnpm cache delete` — clears pnpm's internal package cache
+3. **Reinstall dependencies**: `pnpm install` — reinstalls all dependencies fresh
+4. **Test the setup**: `pnpm nx run @zitadel/docs:generate` — verifies everything works
+
+This resolves 99% of setup-related issues.
 
 ## Contributing
 
