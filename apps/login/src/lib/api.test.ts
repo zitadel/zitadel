@@ -1,51 +1,57 @@
+// @vitest-environment node
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { loginClientKeyToken } from "./api";
-
-vi.mock("fs/promises", () => ({
-  readFile: vi.fn(),
-}));
-
-vi.mock("@zitadel/client/node", () => ({
-  newSystemToken: vi.fn(),
-}));
-
-import { readFile } from "fs/promises";
-import { newSystemToken } from "@zitadel/client/node";
-
-const mockedReadFile = vi.mocked(readFile);
-const mockedNewSystemToken = vi.mocked(newSystemToken);
 
 describe("loginClientKeyToken", () => {
   const originalEnv = process.env;
+  let mockReadFile: ReturnType<typeof vi.fn>;
+  let mockNewSystemToken: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     process.env = { ...originalEnv };
-    vi.clearAllMocks();
-    // Reset the module-level cache by re-importing would be ideal,
-    // but since we mock readFile we can verify call counts instead.
+    vi.resetModules();
+
+    mockReadFile = vi.fn();
+    mockNewSystemToken = vi.fn();
+
+    vi.doMock("fs/promises", () => ({ readFile: mockReadFile }));
+    vi.doMock("@zitadel/client/node", () => ({ newSystemToken: mockNewSystemToken }));
   });
 
   afterEach(() => {
     process.env = originalEnv;
-    vi.restoreAllMocks();
   });
 
   test("should read key file and create token with hardcoded subject", async () => {
     process.env.ZITADEL_LOGINCLIENT_KEYFILE = "/path/to/key.pem";
     process.env.AUDIENCE = "https://api.zitadel.cloud";
 
-    mockedReadFile.mockResolvedValue("-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----");
-    mockedNewSystemToken.mockResolvedValue("signed-jwt-token");
+    mockReadFile.mockResolvedValue("-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----");
+    mockNewSystemToken.mockResolvedValue("signed-jwt-token");
 
+    const { loginClientKeyToken } = await import("./api");
     const token = await loginClientKeyToken();
 
     expect(token).toBe("signed-jwt-token");
-    expect(mockedReadFile).toHaveBeenCalledWith("/path/to/key.pem", "utf-8");
-    expect(mockedNewSystemToken).toHaveBeenCalledWith({
+    expect(mockReadFile).toHaveBeenCalledWith("/path/to/key.pem", "utf-8");
+    expect(mockNewSystemToken).toHaveBeenCalledWith({
       audience: "https://api.zitadel.cloud",
       subject: "login-client",
       key: "-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----",
     });
+  });
+
+  test("should cache key and not re-read file on subsequent calls", async () => {
+    process.env.ZITADEL_LOGINCLIENT_KEYFILE = "/path/to/key.pem";
+    process.env.AUDIENCE = "https://api.zitadel.cloud";
+
+    mockReadFile.mockResolvedValue("cached-key");
+    mockNewSystemToken.mockResolvedValue("token");
+
+    const { loginClientKeyToken } = await import("./api");
+    await loginClientKeyToken();
+    await loginClientKeyToken();
+
+    expect(mockReadFile).toHaveBeenCalledTimes(1);
   });
 
   test("should fall back to ZITADEL_API_URL when AUDIENCE is not set", async () => {
@@ -53,12 +59,13 @@ describe("loginClientKeyToken", () => {
     process.env.AUDIENCE = undefined as any;
     process.env.ZITADEL_API_URL = "https://zitadel.example.com";
 
-    mockedReadFile.mockResolvedValue("key-content");
-    mockedNewSystemToken.mockResolvedValue("token");
+    mockReadFile.mockResolvedValue("key-content");
+    mockNewSystemToken.mockResolvedValue("token");
 
+    const { loginClientKeyToken } = await import("./api");
     await loginClientKeyToken();
 
-    expect(mockedNewSystemToken).toHaveBeenCalledWith(
+    expect(mockNewSystemToken).toHaveBeenCalledWith(
       expect.objectContaining({ audience: "https://zitadel.example.com" }),
     );
   });
@@ -66,8 +73,9 @@ describe("loginClientKeyToken", () => {
   test("should throw a clear error when key file cannot be read", async () => {
     process.env.ZITADEL_LOGINCLIENT_KEYFILE = "/nonexistent/key.pem";
 
-    mockedReadFile.mockRejectedValue(new Error("ENOENT: no such file or directory"));
+    mockReadFile.mockRejectedValue(new Error("ENOENT: no such file or directory"));
 
+    const { loginClientKeyToken } = await import("./api");
     await expect(loginClientKeyToken()).rejects.toThrow(
       'Failed to read login client key file "/nonexistent/key.pem"',
     );
