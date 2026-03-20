@@ -47,19 +47,19 @@ export async function systemAPIToken() {
 export async function loginClientKeyToken() {
   const keyFile = process.env.ZITADEL_LOGINCLIENT_KEYFILE!;
 
-  try {
-    if (!loginClientKeyCache) {
+  if (!loginClientKeyCache) {
+    try {
       loginClientKeyCache = await readFile(keyFile, "utf-8");
+    } catch (err) {
+      throw new Error(`Failed to read login client key file "${keyFile}": ${err instanceof Error ? err.message : err}`, {
+        cause: err,
+      });
     }
-
-    return newSystemToken({
-      audience: process.env.AUDIENCE || process.env.ZITADEL_API_URL,
-      subject: "login-client",
-      key: loginClientKeyCache,
-    });
-  } catch (err) {
-    throw new Error(`Failed to read login client key file "${keyFile}": ${err instanceof Error ? err.message : err}`, {
-      cause: err,
-    });
   }
+
+  return newSystemToken({
+    audience: process.env.AUDIENCE || process.env.ZITADEL_API_URL,
+    subject: "login-client",
+    key: loginClientKeyCache,
+  });
 }
