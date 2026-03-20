@@ -87,8 +87,3 @@ Pass quality checks before submitting:
 pnpm nx run @zitadel/docs:build
 pnpm nx run @zitadel/docs:check-links
 ```
-
-You can also run specific steps individually:
-
-* `pnpm fetch:remote-content`
-* `pnpm generate:api-reference`
