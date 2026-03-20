@@ -815,7 +815,7 @@ SystemAPIUsers:
 # NOTE: This top-level LoginClient is for system API user JWT verification only.
 # It is NOT the DefaultInstance.Org.LoginClient machine user configuration defined below.
 #
-# Login client (registers user "login-client" with IAM_LOGIN_CLIENT + SYSTEM_OWNER roles):
+# Login client (registers user "login-client" with IAM_LOGIN_CLIENT role):
 # In the API container, ZITADEL_LOGINCLIENT_KEYFILE must point to the public certificate/key
 # (e.g. /path/to/login-client.crt.pem) used for JWT verification.
 # In the login container, ZITADEL_LOGINCLIENT_KEYFILE must point to the corresponding private
@@ -825,7 +825,7 @@ SystemAPIUsers:
 LoginClient:
   KeyFile: # ZITADEL_LOGINCLIENT_KEYFILE (API: public certificate/key for JWT verification)
 #
-# Admin client (registers user "admin-client" with IAM_OWNER + SYSTEM_OWNER roles):
+# Admin client (registers user "admin-client" with IAM_OWNER role):
 # Points to the public certificate or public key used by the API to verify admin-client JWTs.
 # ZITADEL_ADMINCLIENT_KEYFILE=/path/to/admin-client-cert.pem
 AdminClient:

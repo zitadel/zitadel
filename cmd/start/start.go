@@ -443,20 +443,15 @@ func startAPIs(
 		// always set the origin in the context if available in the http headers, no matter for what protocol
 		middleware.WithOrigin(config.ExternalSecure, config.HTTP1HostHeader, config.HTTP2HostHeader, config.InstanceHostHeaders, config.PublicHostHeaders),
 	)
-	if config.LoginClient.KeyFile != "" || config.AdminClient.KeyFile != "" {
-		if config.SystemAPIUsers == nil {
-			config.SystemAPIUsers = make(map[string]*internal_authz.SystemAPIUser)
-		}
-	}
-	if err := addSystemAPIUser(config.SystemAPIUsers, config.LoginClient.KeyFile, "login-client",
+	if err := addSystemAPIUser(&config.SystemAPIUsers, config.LoginClient.KeyFile, "login-client",
 		"ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile",
-		[]string{"SYSTEM_OWNER", "IAM_LOGIN_CLIENT"},
+		[]string{"IAM_LOGIN_CLIENT"},
 	); err != nil {
 		return nil, err
 	}
-	if err := addSystemAPIUser(config.SystemAPIUsers, config.AdminClient.KeyFile, "admin-client",
+	if err := addSystemAPIUser(&config.SystemAPIUsers, config.AdminClient.KeyFile, "admin-client",
 		"ZITADEL_ADMINCLIENT_KEYFILE", "AdminClient.KeyFile",
-		[]string{"SYSTEM_OWNER", "IAM_OWNER"},
+		[]string{"IAM_OWNER"},
 	); err != nil {
 		return nil, err
 	}
@@ -832,16 +827,20 @@ func showBasicInformation(startConfig *Config) {
 }
 
 // addSystemAPIUser registers a system API user from a key file path into the
-// SystemAPIUsers map. It is a no-op if keyFile is empty. Returns an error if
-// the entry already exists (to prevent silent overrides).
-func addSystemAPIUser(users map[string]*internal_authz.SystemAPIUser, keyFile, name, envVar, configKey string, roles []string) error {
+// SystemAPIUsers map. It lazily initialises the map on first use. It is a
+// no-op if keyFile is empty. Returns an error if the entry already exists (to
+// prevent silent overrides).
+func addSystemAPIUser(users *map[string]*internal_authz.SystemAPIUser, keyFile, name, envVar, configKey string, roles []string) error {
 	if keyFile == "" {
 		return nil
 	}
-	if _, exists := users[name]; exists {
+	if *users == nil {
+		*users = make(map[string]*internal_authz.SystemAPIUser)
+	}
+	if _, exists := (*users)[name]; exists {
 		return fmt.Errorf("cannot use %s (%s): SystemAPIUsers already contains a %q entry", envVar, configKey, name)
 	}
-	users[name] = &internal_authz.SystemAPIUser{
+	(*users)[name] = &internal_authz.SystemAPIUser{
 		Path: keyFile,
 		Memberships: internal_authz.Memberships{{
 			MemberType: internal_authz.MemberTypeSystem,

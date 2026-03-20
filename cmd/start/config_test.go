@@ -318,25 +318,33 @@ Actions:
 func Test_addSystemAPIUser(t *testing.T) {
 	t.Run("no-op when keyFile is empty", func(t *testing.T) {
 		users := make(map[string]*authz.SystemAPIUser)
-		err := addSystemAPIUser(users, "", "login-client", "ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile", []string{"SYSTEM_OWNER"})
+		err := addSystemAPIUser(&users, "", "login-client", "ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile", []string{"IAM_LOGIN_CLIENT"})
 		require.NoError(t, err)
 		assert.Empty(t, users)
 	})
 
-	t.Run("adds entry with expected roles", func(t *testing.T) {
-		users := make(map[string]*authz.SystemAPIUser)
-		err := addSystemAPIUser(users, "/path/to/cert.pem", "login-client", "ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile", []string{"SYSTEM_OWNER", "IAM_LOGIN_CLIENT"})
+	t.Run("lazily initialises nil map", func(t *testing.T) {
+		var users map[string]*authz.SystemAPIUser
+		err := addSystemAPIUser(&users, "/path/to/cert.pem", "login-client", "ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile", []string{"IAM_LOGIN_CLIENT"})
 		require.NoError(t, err)
 		require.Contains(t, users, "login-client")
 		assert.Equal(t, "/path/to/cert.pem", users["login-client"].Path)
-		assert.Equal(t, []string{"SYSTEM_OWNER", "IAM_LOGIN_CLIENT"}, users["login-client"].Memberships[0].Roles)
+	})
+
+	t.Run("adds entry with expected roles", func(t *testing.T) {
+		users := make(map[string]*authz.SystemAPIUser)
+		err := addSystemAPIUser(&users, "/path/to/cert.pem", "login-client", "ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile", []string{"IAM_LOGIN_CLIENT"})
+		require.NoError(t, err)
+		require.Contains(t, users, "login-client")
+		assert.Equal(t, "/path/to/cert.pem", users["login-client"].Path)
+		assert.Equal(t, []string{"IAM_LOGIN_CLIENT"}, users["login-client"].Memberships[0].Roles)
 	})
 
 	t.Run("errors when entry already exists", func(t *testing.T) {
 		users := map[string]*authz.SystemAPIUser{
 			"login-client": {Path: "/existing.pem"},
 		}
-		err := addSystemAPIUser(users, "/new.pem", "login-client", "ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile", []string{"SYSTEM_OWNER"})
+		err := addSystemAPIUser(&users, "/new.pem", "login-client", "ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile", []string{"IAM_LOGIN_CLIENT"})
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "ZITADEL_LOGINCLIENT_KEYFILE")
 		assert.Contains(t, err.Error(), "login-client")

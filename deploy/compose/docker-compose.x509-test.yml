@@ -5,7 +5,10 @@
 # The API container receives the certificate (public key) via ZITADEL_LOGINCLIENT_KEYFILE
 # to verify JWTs. The login container uses legacy env vars (ZITADEL_LOGIN_SERVICE_KEY_FILE)
 # because it runs a published image. To test the login-side env var path, build a local
-# login image via the Nx @zitadel/login:pack target and switch to zitadel/zitadel-login:local.
+# login image via the Nx @zitadel/login:pack target and switch to the commented-out
+# "zitadel-login with local image" block below.
+#
+# NOTE: This overlay is for local/manual testing only and is not referenced by CI.
 #
 # Usage:
 #   docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.x509-test.yml up --force-recreate --renew-anon-volumes --wait
@@ -21,10 +24,10 @@ services:
       - zitadel-bootstrap:/zitadel/bootstrap:rw
       - ./certs/system-api.crt:/zitadel/certs/system-api.crt:ro
 
+  # --- Published login image (legacy env vars) ---
+  # Use this when running against the published login image that does not yet
+  # support ZITADEL_LOGINCLIENT_KEYFILE.
   zitadel-login:
-    # Use published image for testing. It supports ZITADEL_LOGIN_SERVICE_KEY_FILE
-    # (backward compat). Once a local build with ZITADEL_LOGINCLIENT_KEYFILE is
-    # available, switch to zitadel/zitadel-login:local.
     image: ghcr.io/zitadel/zitadel-login:v4.12.3
     environment:
       ZITADEL_LOGIN_SERVICE_KEY_FILE: /zitadel/certs/system-api.key
@@ -44,3 +47,28 @@ services:
     volumes:
       - zitadel-bootstrap:/zitadel/bootstrap:ro
       - ./certs/system-api.key:/zitadel/certs/system-api.key:ro
+
+  # --- Local login image (new env var) ---
+  # Uncomment this block (and comment out the block above) to test the
+  # login-side ZITADEL_LOGINCLIENT_KEYFILE path with a locally-built image.
+  # Build with: npx nx run @zitadel/login:pack
+  #
+  # zitadel-login:
+  #   image: zitadel/zitadel-login:local
+  #   environment:
+  #     ZITADEL_LOGINCLIENT_KEYFILE: /zitadel/certs/system-api.key
+  #     ZITADEL_SERVICE_USER_TOKEN_FILE: ""
+  #     AUDIENCE: http://localhost:8888
+  #   healthcheck:
+  #     test:
+  #       - CMD
+  #       - /bin/sh
+  #       - -c
+  #       - node /app/healthcheck.mjs http://localhost:3000/ui/v2/login/healthy
+  #     interval: 10s
+  #     timeout: 30s
+  #     retries: 12
+  #     start_period: 20s
+  #   volumes:
+  #     - zitadel-bootstrap:/zitadel/bootstrap:ro
+  #     - ./certs/system-api.key:/zitadel/certs/system-api.key:ro
