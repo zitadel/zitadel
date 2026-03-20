@@ -42,7 +42,14 @@ type SessionRepository interface {
 	// The condition must include at least the instanceID of the session to update.
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	// Delete removes sessions based on the given condition.
-	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	// An additional permission condition can be provided to check if the session can be deleted, for example by checking the token id or user id.
+	// The primary condition is used to select the session(s) to be deleted, while the permission condition can be used to verify that the session(s) meet certain criteria before deletion
+	// respectively to return an error if the criteria are not met. In case no session matches the primary condition and a permission condition is provided,
+	// the method will return a permission denied error, as the session(s) that should be deleted do not meet the criteria defined in the permission condition.
+	// The method returns the number of deleted rows / session(s) and the latest deletion timestamp of the deleted session in case of a single deleted session.
+	// In case the session was previously deleted, the method returns 0 and the previous deletion timestamp.
+	// If multiple sessions are deleted, the method returns the number of deleted sessions and no timestamp, as it cannot be determined which session's deletion timestamp to return.
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error)
 }
 
 // sessionColumns define all the columns of the session table.
@@ -77,6 +84,8 @@ type sessionConditions interface {
 	UserAgentIDCondition(userAgentID string) database.Condition
 	// UserIDCondition returns an equal filter on the user id field.
 	UserIDCondition(userID string) database.Condition
+	// TokenIDCondition returns an equal filter on the token id field.
+	TokenIDCondition(tokenID string) database.Condition
 	// CreatorIDCondition returns an equal filter on the creator id field.
 	CreatorIDCondition(creatorID string) database.Condition
 	// ExpirationCondition returns a filter on the expiration field.

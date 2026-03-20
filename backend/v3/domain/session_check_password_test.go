@@ -17,7 +17,6 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -1049,7 +1048,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			}
 			if tc.humanRepo != nil {
 				humanRepo := tc.humanRepo(ctrl)
-				userRepo := domainmock.NewMockUserRepository(ctrl)
+				userRepo := domainmock.NewUserRepo(ctrl)
 				userRepo.EXPECT().Human().Times(1).Return(humanRepo)
 				domain.WithUserRepo(userRepo)(opts)
 			}
@@ -1071,7 +1070,6 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 
 func TestPasswordCheckCommand_Events(t *testing.T) {
 	t.Parallel()
-	domain.SetPasswordHasher(&crypto.Hasher{})
 	userAgg := user.NewAggregate("user-1", "org-1").Aggregate
 	sessAgg := session.NewAggregate("session-1", "instance-1").Aggregate
 
@@ -1206,7 +1204,7 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 				case *session.PasswordCheckedEvent:
 					actualAssertedType, ok := events[i].(*session.PasswordCheckedEvent)
 					require.True(t, ok)
-					assert.InDelta(t, expectedAssertedType.CheckedAt.UnixMilli(), actualAssertedType.CheckedAt.UnixMilli(), 10)
+					assert.Equal(t, tc.cmd.CheckTime, actualAssertedType.CheckedAt)
 				}
 			}
 		})

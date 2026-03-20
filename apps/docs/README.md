@@ -85,5 +85,4 @@ Pass quality checks before submitting:
 
 ```bash
 pnpm nx run @zitadel/docs:build
-pnpm nx run @zitadel/docs:check-links
 ```

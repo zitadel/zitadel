@@ -92,6 +92,10 @@ For production you need:
 - Helm 3.x+
 
 <Callout type="warn">
+**PostgreSQL compatibility:** ZITADEL supports PostgreSQL **14–18**. When using **PostgreSQL 18**, ensure you run **ZITADEL v4.11.0 or newer**. For the most up-to-date compatibility matrix and configuration details, see [Database requirements](/self-hosting/manage/database).
+</Callout>
+
+<Callout type="warn">
 The ZITADEL management console [requires end-to-end HTTP/2 support](/self-hosting/manage/http2). Ensure your ingress controller is configured to forward HTTP/2 (h2c) traffic to ZITADEL pods.
 </Callout>
 
