@@ -448,29 +448,17 @@ func startAPIs(
 			config.SystemAPIUsers = make(map[string]*internal_authz.SystemAPIUser)
 		}
 	}
-	if config.LoginClient.KeyFile != "" {
-		if _, exists := config.SystemAPIUsers["login-client"]; exists {
-			return nil, fmt.Errorf("cannot use ZITADEL_LOGINCLIENT_KEYFILE (LoginClient.KeyFile): SystemAPIUsers already contains a \"login-client\" entry")
-		}
-		config.SystemAPIUsers["login-client"] = &internal_authz.SystemAPIUser{
-			Path: config.LoginClient.KeyFile,
-			Memberships: internal_authz.Memberships{{
-				MemberType: internal_authz.MemberTypeSystem,
-				Roles:      []string{"SYSTEM_OWNER", "IAM_LOGIN_CLIENT"},
-			}},
-		}
+	if err := addSystemAPIUser(config.SystemAPIUsers, config.LoginClient.KeyFile, "login-client",
+		"ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile",
+		[]string{"SYSTEM_OWNER", "IAM_LOGIN_CLIENT"},
+	); err != nil {
+		return nil, err
 	}
-	if config.AdminClient.KeyFile != "" {
-		if _, exists := config.SystemAPIUsers["admin-client"]; exists {
-			return nil, fmt.Errorf("cannot use ZITADEL_ADMINCLIENT_KEYFILE (AdminClient.KeyFile): SystemAPIUsers already contains an \"admin-client\" entry")
-		}
-		config.SystemAPIUsers["admin-client"] = &internal_authz.SystemAPIUser{
-			Path: config.AdminClient.KeyFile,
-			Memberships: internal_authz.Memberships{{
-				MemberType: internal_authz.MemberTypeSystem,
-				Roles:      []string{"SYSTEM_OWNER", "IAM_OWNER"},
-			}},
-		}
+	if err := addSystemAPIUser(config.SystemAPIUsers, config.AdminClient.KeyFile, "admin-client",
+		"ZITADEL_ADMINCLIENT_KEYFILE", "AdminClient.KeyFile",
+		[]string{"SYSTEM_OWNER", "IAM_OWNER"},
+	); err != nil {
+		return nil, err
 	}
 	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	if err != nil {
@@ -841,6 +829,26 @@ func showBasicInformation(startConfig *Config) {
 		fmt.Printf(" Visit: %s    \n", color.CyanString("https://zitadel.com/docs/self-hosting/manage/tls_modes"))
 	}
 	fmt.Printf("\n ===============================================================\n\n")
+}
+
+// addSystemAPIUser registers a system API user from a key file path into the
+// SystemAPIUsers map. It is a no-op if keyFile is empty. Returns an error if
+// the entry already exists (to prevent silent overrides).
+func addSystemAPIUser(users map[string]*internal_authz.SystemAPIUser, keyFile, name, envVar, configKey string, roles []string) error {
+	if keyFile == "" {
+		return nil
+	}
+	if _, exists := users[name]; exists {
+		return fmt.Errorf("cannot use %s (%s): SystemAPIUsers already contains a %q entry", envVar, configKey, name)
+	}
+	users[name] = &internal_authz.SystemAPIUser{
+		Path: keyFile,
+		Memberships: internal_authz.Memberships{{
+			MemberType: internal_authz.MemberTypeSystem,
+			Roles:      roles,
+		}},
+	}
+	return nil
 }
 
 func checkExisting(values []string) func(string) bool {
